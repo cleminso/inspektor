@@ -1,5 +1,6 @@
 import "./index.css";
 
+import { Agentation } from "agentation";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { ThemeProvider } from "next-themes";
@@ -30,6 +31,7 @@ if (rootElement !== null) {
       <TooltipProvider>
         <StrictMode>
           <RouterProvider router={router} />
+          {import.meta.env.DEV === true ? <Agentation endpoint="http://localhost:4747" /> : null}
         </StrictMode>
       </TooltipProvider>
     </ThemeProvider>

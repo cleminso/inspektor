@@ -29,11 +29,18 @@ A 2-weeks challenge to build an inspector with my UX and product vision.
    `pnpm build`
 
 4. Start the inspector:
-   `cd apps/web-inspector`
-   `pnpm dev`
+   `pnpm dev:web`
 
 5. Open in browser:
    `http://regarde.inspector.localhost:1355/conn`
+
+The default dev command runs Portless with an unprivileged HTTP proxy on port `1355`, so it does not require `sudo`. If you want to run Vite without the named local URL, use:
+
+`pnpm --filter regarde.inspector dev:vite`
+
+Then open `http://localhost:5173/conn`.
+
+Agentation is enabled in development and syncs annotations with the local MCP server at `http://localhost:4747`.
 
 ## Option 2: add your Jazz app inside this workspace
 
@@ -59,11 +66,12 @@ You can also clone your Jazz app into the `apps/` directory. Or see `apps/my-jaz
 3. Build the workspace once:
    `pnpm build`
 
-4. Start the inspector:
+4. Start the inspector in one terminal:
+   `pnpm dev:web`
+
+5. Start your Jazz app in another terminal:
    `cd apps/{your_app_name}`
    `pnpm dev`
-
-5. Start your Jazz app in another terminal.
 
 6. Open the inspector link printed in your app's dev server logs.
 

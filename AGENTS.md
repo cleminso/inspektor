@@ -2,9 +2,13 @@
 
 ## Commands
 
-- Root scripts are only `pnpm dev` and `pnpm build`; both run recursively across workspaces.
+- Root scripts include `pnpm dev`, `pnpm dev:web`, and `pnpm build`.
+- `pnpm dev` runs every workspace `dev` script.
+- `pnpm dev:web` starts only the inspector app.
 - Focused app commands:
-  - `pnpm --filter regarde.inspector dev` starts the inspector via `portless regarde.inspector vite` and also starts `agentation-mcp server`.
+  - `pnpm --filter regarde.inspector dev` starts the inspector via Portless on `http://regarde.inspector.localhost:1355` and also starts `agentation-mcp server`.
+  - `pnpm --filter regarde.inspector dev:vite` starts the inspector directly through Vite and also starts `agentation-mcp server`.
+  - `pnpm --filter regarde.inspector portless:proxy` starts the unprivileged HTTP Portless proxy on port `1355`.
   - `pnpm --filter regarde.inspector build` runs `vite build && tsc`.
   - `pnpm --filter regarde.inspector typecheck` runs `tsc --noEmit`.
   - `pnpm --filter my-jazz-app dev` runs the sample Jazz app with the local inspector plugin.

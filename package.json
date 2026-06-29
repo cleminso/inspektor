@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "dev": "pnpm -r dev",
+    "dev:web": "pnpm --filter regarde.inspector dev",
     "build": "pnpm -r build"
   },
   "author": "cleminso",
