@@ -1,3 +1,9 @@
+/**
+ * Synchronizes data-explorer UI state with the table route search params.
+ *
+ * Filters, sorting, selected row editor mode, and schema/data view are encoded in the URL
+ * so Inspector links can restore a specific view into a Jazz table.
+ */
 import { useMemo } from "react";
 
 import { useNavigate, useSearch } from "@tanstack/react-router";
@@ -29,6 +35,7 @@ interface UpdateSearchOptions {
   replace?: boolean;
 }
 
+/** Parsed table explorer URL state plus setters that write back to route search params. */
 export interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
   setFilters: (filters: TableFilterClause[]) => Promise<void>;
   setRowEditor: (mode: DetailPaneMode | null, rowId?: TableRowId | null, options?: UpdateSearchOptions) => Promise<void>;
@@ -61,6 +68,12 @@ function parseRowId(value: string | null | undefined): TableRowId | null {
   return trimmedValue.length > 0 ? trimmedValue : null;
 }
 
+/**
+ * Provides typed accessors for table explorer route search state.
+ *
+ * The Inspector keeps filters, sorting, row editor mode, and schema/data view in the URL so
+ * links reopen the same table context without storing this transient state in Jazz.
+ */
 export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResult {
   const navigate = useNavigate({ from: appRoutes.table });
   const search = useSearch({ strict: false }) as SearchValues;
@@ -68,10 +81,12 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
   const state = useMemo<TableExplorerSearchState>(() => {
     const editorMode = parseEditorMode(search.mode);
     const rowId = parseRowId(search.rowId);
+    // Edit mode requires a stable Jazz row ID; invalid URLs fall back to the data table.
     const resolvedEditorMode = editorMode === "edit" && rowId === null ? null : editorMode;
 
     return {
       editorMode: resolvedEditorMode,
+      // Opening the row editor always returns the user to data rows, even from schema view.
       view: resolvedEditorMode !== null ? "data" : parseView(search.view),
       filters: parseFiltersFromSearchParam(search.filters ?? null),
       rowId: resolvedEditorMode === "edit" ? rowId : null,
@@ -91,6 +106,7 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
       ...updates,
     };
 
+    // Remove default values so generated URLs stay readable and shareable.
     if (nextSearch.view === "data" || nextSearch.view === undefined) {
       delete nextSearch.view;
     }

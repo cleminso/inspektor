@@ -6,6 +6,12 @@ import type { JazzPluginOptions, ViteDevServer } from "jazz-tools/dev/vite";
 
 const LOG_PREFIX = "[jazz]";
 
+/**
+ * Mirrors Vite app `.env` values into `process.env` for Jazz's managed runtime.
+ *
+ * Jazz reads these keys from Node process env, while Vite usually keeps them in
+ * its own config-derived env object.
+ */
 function loadEnvFileIntoProcessEnv(envRoot: string): void {
   try {
     const dotenvPath = createRequire(import.meta.url).resolve("dotenv");
@@ -25,10 +31,16 @@ function loadEnvFileIntoProcessEnv(envRoot: string): void {
       quiet: true,
     });
   } catch {
-    // Best-effort env hydration for local dev parity.
+    // Missing dotenv should not prevent apps from using explicit process env values.
   }
 }
 
+/**
+ * Loads Jazz dev internals from the app's installed `jazz-tools` package.
+ *
+ * Lazy resolution keeps this wrapper aligned with the Jazz version used by the
+ * inspected app.
+ */
 async function importJazzViteInternals(): Promise<{
   ManagedDevRuntime: new (envKeys: {
     appId: string;
@@ -61,6 +73,12 @@ async function importJazzViteInternals(): Promise<{
   };
 }
 
+/**
+ * Creates a Vite plugin that runs Jazz dev infrastructure and exposes an Inspector link.
+ *
+ * From the app's perspective this behaves like Jazz dev tooling. From the Inspector's
+ * perspective it supplies the resolved admin connection needed to inspect that app.
+ */
 export function jazzInspectorPlugin(options: JazzPluginOptions = {}) {
   let runtimePromise: ReturnType<typeof importJazzViteInternals> | null = null;
 
@@ -72,6 +90,7 @@ export function jazzInspectorPlugin(options: JazzPluginOptions = {}) {
   return {
     name: "jazz-inspector",
 
+    // Keeps Vite from pre-bundling Jazz runtime pieces that must load as authored.
     async config(config: {
       ssr?: { external?: true | string[] };
       optimizeDeps?: { exclude?: string[] };
@@ -93,6 +112,7 @@ export function jazzInspectorPlugin(options: JazzPluginOptions = {}) {
       };
     },
 
+    // The Inspector only needs a link during local serving, when the managed runtime exists.
     async configureServer(viteServer: ViteDevServer) {
       if (viteServer.config.command !== "serve") {
         return;
@@ -142,6 +162,7 @@ export function jazzInspectorPlugin(options: JazzPluginOptions = {}) {
         return;
       }
 
+      // The managed runtime may supply defaults that are absent from the app's env file.
       viteServer.config.env ??= {};
       viteServer.config.env.VITE_JAZZ_APP_ID = managed.appId;
       viteServer.config.env.VITE_JAZZ_SERVER_URL = managed.serverUrl;
@@ -149,6 +170,7 @@ export function jazzInspectorPlugin(options: JazzPluginOptions = {}) {
         viteServer.config.env.VITE_JAZZ_TELEMETRY_COLLECTOR_URL = managed.telemetryCollectorUrl;
       }
 
+      // The link hands the Inspector the admin credentials for this managed Jazz app.
       console.log(
         `${LOG_PREFIX} Open the inspector: ${buildJazzInspectorLink(
           managed.serverUrl,

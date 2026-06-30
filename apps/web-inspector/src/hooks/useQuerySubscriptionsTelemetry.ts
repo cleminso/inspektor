@@ -1,45 +1,59 @@
+/**
+ * Polls Jazz server telemetry for active query subscriptions.
+ *
+ * This is server-side introspection, not local client state. The Inspector uses the active
+ * admin connection to fetch grouped query subscriptions and renders them as debugging
+ * context for which tables and queries the sync server is currently tracking.
+ */
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import { fetchServerSubscriptions } from "jazz-tools";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
-import type { LiveQueryRow } from "@/types/liveQuery";
+import type { QuerySubscriptionRow } from "@/types/QuerySubscriptions";
 
 const LIVE_QUERY_POLL_MS = 20_000;
 
-interface LiveQueryTelemetryCacheEntry {
+interface QuerySubscriptionsTelemetryCacheEntry {
   generatedAt: number | null;
-  rows: LiveQueryRow[];
+  rows: QuerySubscriptionRow[];
 }
 
-const liveQueryTelemetryCache = new Map<string, LiveQueryTelemetryCacheEntry>();
+// Module-level cache prevents empty flashes when navigating away from and back to telemetry.
+const QuerySubscriptionsTelemetryCache = new Map<string, QuerySubscriptionsTelemetryCacheEntry>();
 
-export interface UseLiveQueryTelemetryResult {
+export interface useQuerySubscriptionTelemetryResult {
   error: string | null;
   generatedAt: number | null;
   isInitialLoading: boolean;
   isRefreshing: boolean;
-  rows: LiveQueryRow[];
+  rows: QuerySubscriptionRow[];
 }
 
-interface LiveQueryConnectionConfig {
+interface QuerySubscriptionsConnectionConfig {
   adminSecret: string;
   appId: string;
   connectionKey: string;
   serverUrl: string;
 }
 
-interface LiveQueryTelemetryState {
+interface QuerySubscriptionsTelemetryState {
   error: string | null;
   generatedAt: number | null;
   isInitialLoading: boolean;
   isRefreshing: boolean;
-  rows: LiveQueryRow[];
+  rows: QuerySubscriptionRow[];
 }
 
-export function useLiveQueryTelemetry(): UseLiveQueryTelemetryResult {
+/**
+ * Loads query subscription telemetry for the active Inspector connection.
+ *
+ * This reads the sync server's subscription list through the admin connection. Inspector
+ * explorer queries are hidden elsewhere, so this hook shows the inspected app's activity
+ * instead of the Inspector's own background reads.
+ */
+export function useQuerySubscriptionTelemetry(): useQuerySubscriptionTelemetryResult {
   const { activeConnection } = useInspector();
-  const connectionConfig = useMemo<LiveQueryConnectionConfig | null>(() => {
+  const connectionConfig = useMemo<QuerySubscriptionsConnectionConfig | null>(() => {
     if (
       activeConnection === null ||
       activeConnection === undefined ||
@@ -61,11 +75,12 @@ export function useLiveQueryTelemetry(): UseLiveQueryTelemetryResult {
     };
   }, [activeConnection]);
   const cachedTelemetry = useMemo(
-    () => (connectionConfig !== null ? (liveQueryTelemetryCache.get(connectionConfig.connectionKey) ?? null) : null),
+    () => (connectionConfig !== null ? (QuerySubscriptionsTelemetryCache.get(connectionConfig.connectionKey) ?? null) : null),
     [connectionConfig],
   );
+  // Prevent overlapping telemetry requests when a refresh is still resolving.
   const isFetchingRef = useRef(false);
-  const [state, setState] = useState<LiveQueryTelemetryState>(() => ({
+  const [state, setState] = useState<QuerySubscriptionsTelemetryState>(() => ({
     rows: cachedTelemetry?.rows ?? [],
     generatedAt: cachedTelemetry?.generatedAt ?? null,
     error: connectionConfig === null ? "No connection selected." : null,
@@ -74,9 +89,11 @@ export function useLiveQueryTelemetry(): UseLiveQueryTelemetryResult {
   }));
 
   useEffect(() => {
-    let cancelled: boolean = false;
+    // Polling can outlive a connection switch; ignore late responses for old connections.
+    let cancelled = false;
+    const isCancelled = () => cancelled;
     const nextCachedTelemetry =
-      connectionConfig !== null ? (liveQueryTelemetryCache.get(connectionConfig.connectionKey) ?? null) : null;
+      connectionConfig !== null ? (QuerySubscriptionsTelemetryCache.get(connectionConfig.connectionKey) ?? null) : null;
 
     if (connectionConfig === null) {
       setState({
@@ -90,6 +107,7 @@ export function useLiveQueryTelemetry(): UseLiveQueryTelemetryResult {
     }
 
     if (nextCachedTelemetry !== null) {
+      // Reuse cached rows so the telemetry panel does not flash empty during navigation.
       setState({
         rows: nextCachedTelemetry.rows,
         generatedAt: nextCachedTelemetry.generatedAt,
@@ -108,7 +126,7 @@ export function useLiveQueryTelemetry(): UseLiveQueryTelemetryResult {
     }
 
     const load = async (mode: "initial" | "refresh") => {
-      if (cancelled === true || isFetchingRef.current === true) {
+      if (isCancelled() === true || isFetchingRef.current === true) {
         return;
       }
 
@@ -126,11 +144,11 @@ export function useLiveQueryTelemetry(): UseLiveQueryTelemetryResult {
           appId: connectionConfig.appId,
         });
 
-        if (cancelled === true) {
+        if (isCancelled() === true) {
           return;
         }
 
-        liveQueryTelemetryCache.set(connectionConfig.connectionKey, {
+        QuerySubscriptionsTelemetryCache.set(connectionConfig.connectionKey, {
           rows: response.queries,
           generatedAt: response.generatedAt,
         });
@@ -142,14 +160,14 @@ export function useLiveQueryTelemetry(): UseLiveQueryTelemetryResult {
           isInitialLoading: false,
           isRefreshing: false,
         });
-      } catch (liveQueryError) {
-        if (cancelled === true) {
+      } catch (QuerySubscriptionsError) {
+        if (isCancelled() === true) {
           return;
         }
 
         setState((currentState) => ({
           ...currentState,
-          error: liveQueryError instanceof Error ? liveQueryError.message : String(liveQueryError),
+          error: QuerySubscriptionsError instanceof Error ? QuerySubscriptionsError.message : String(QuerySubscriptionsError),
           isInitialLoading: false,
           isRefreshing: false,
         }));

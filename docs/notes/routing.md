@@ -31,7 +31,7 @@ where → when → which version
 **Sidebar (What)**: What you're viewing
 
 - **Data Explorer**: Browse tables and their data
-- **Live Query**: Monitor active subscriptions and queries
+- **Query Subscriptions**: Monitor active subscriptions and queries
 
 ## Decisions
 
@@ -141,7 +141,7 @@ TABLES
 ├── orders
 └── ...
 
-LIVE QUERY
+QUERY SUBSCRIPTIONS
 ```
 
 Clicking a table navigates to `/conn/:id/:branch/:schema/tables/:tableName`

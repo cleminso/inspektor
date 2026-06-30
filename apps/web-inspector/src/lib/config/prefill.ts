@@ -1,3 +1,10 @@
+/**
+ * Extracts Inspector connection drafts from dev-tool links.
+ *
+ * Jazz dev tooling can open the Inspector with connection details embedded in the
+ * URL. This module turns those values into the same draft shape used by the
+ * connection form, so the Inspector can attach to a Jazz app without manual entry.
+ */
 import {
   DEFAULT_BRANCH_NAME,
   DEFAULT_SERVER_URL,
@@ -6,10 +13,17 @@ import {
   type ConnectionDraft,
 } from "./connections";
 
+/** URL-provided connection draft plus the Jazz branch selected for the Inspector runtime. */
 export interface PrefillConfig extends ConnectionDraft {
   branch: string;
 }
 
+/**
+ * Parses known Inspector prefill params from query string and URL fragment.
+ *
+ * Fragment params keep `adminSecret` out of the HTTP request for the Inspector
+ * page. Query params remain supported for compatibility and manual links.
+ */
 export function readPrefillConfig(locationOverride?: Location): PrefillConfig | null {
   const location = locationOverride ?? globalThis.location;
   if (!location) {
@@ -38,6 +52,7 @@ export function readPrefillConfig(locationOverride?: Location): PrefillConfig | 
   };
 }
 
+/** Keeps explicit query values while filling missing fields from the fragment. */
 function mergeSearchParams(searchParams: URLSearchParams, hashParams: URLSearchParams): URLSearchParams {
   const mergedParams = new URLSearchParams(searchParams);
 

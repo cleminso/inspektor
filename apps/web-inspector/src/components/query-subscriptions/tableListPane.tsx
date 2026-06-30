@@ -3,25 +3,25 @@ import { Badge } from "@regarde/ui/badge";
 import { EmptyState } from "@regarde/ui/emptyState";
 import { cn } from "@regarde/ui/lib/utils";
 
-import type { LiveQueryTableItem } from "@/types/liveQuery";
+import type { QuerySubscriptionTableItem } from "@/types/QuerySubscriptions";
 
-interface LiveQueryListPaneProps {
+interface QuerySubscriptionsListPaneProps {
   isInitialLoading: boolean;
   searchValue: string;
   selectedTableName: string | null;
-  visibleTableItems: LiveQueryTableItem[];
+  visibleTableItems: QuerySubscriptionTableItem[];
   onSearchValueChange: (value: string) => void;
   onSelectedTableNameChange: (value: string | null) => void;
 }
 
-export function LiveQueryListPane({
+export function QuerySubscriptionsListPane({
   isInitialLoading,
   searchValue,
   selectedTableName,
   visibleTableItems,
   onSearchValueChange,
   onSelectedTableNameChange,
-}: LiveQueryListPaneProps): React.ReactElement {
+}: QuerySubscriptionsListPaneProps): React.ReactElement {
   const shouldShowEmptyState = isInitialLoading === false && visibleTableItems.length === 0;
   const emptyStateDescription =
     searchValue.trim().length === 0 ? "No active server subscriptions found." : "Try a different table search.";
@@ -30,7 +30,7 @@ export function LiveQueryListPane({
     <div className="flex h-full min-h-0 flex-col bg-background">
       <div className="flex h-10 shrink-0 items-center border-b border-border px-3">
         <Search
-          aria-label="Search live query tables"
+          aria-label="Search query subscriptions tables"
           value={searchValue}
           onChange={(event) => {
             onSearchValueChange(event.currentTarget.value);
@@ -42,7 +42,7 @@ export function LiveQueryListPane({
         <div
           className="flex flex-col gap-1"
           role="listbox"
-          aria-label="Live query table filter"
+          aria-label="Query subscriptions table filter"
           aria-busy={isInitialLoading === true}
         >
           <button

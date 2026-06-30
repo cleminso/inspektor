@@ -4,8 +4,8 @@ import { Button } from "@regarde/ui/button";
 import { CopyButton } from "@regarde/ui/copyButton";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
-import { buildExplorerLink } from "@/lib/live-query/buildExplorerUrl";
-import type { LiveQueryRow } from "@/types/liveQuery";
+import { buildExplorerLink } from "@/lib/query-subscriptions/buildExplorerUrl";
+import type { QuerySubscriptionRow } from "@/types/QuerySubscriptions";
 
 function formatQuery(value: string): string {
   try {
@@ -15,11 +15,11 @@ function formatQuery(value: string): string {
   }
 }
 
-interface LiveQueryExpandedRowProps {
-  row: LiveQueryRow;
+interface QuerySubscriptionsExpandedRowProps {
+  row: QuerySubscriptionRow;
 }
 
-export function LiveQueryExpandedRow({ row }: LiveQueryExpandedRowProps): React.ReactElement {
+export function QuerySubscriptionsExpandedRow({ row }: QuerySubscriptionsExpandedRowProps): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
 
   const formattedQuery = formatQuery(row.query);

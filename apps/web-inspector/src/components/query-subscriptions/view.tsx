@@ -3,12 +3,12 @@ import type { PanelImperativeHandle, PanelSize } from "react-resizable-panels";
 
 import { ResizableGroup, ResizablePanel, ResizableSeparator } from "@regarde/ui/resizablePanel";
 
-import { LiveQueryGrid } from "@/components/live-query/dataGrid";
-import { LiveQueryListPane } from "@/components/live-query/tableListPane";
-import { useLiveQueryState } from "@/components/live-query/useLiveQueryState";
+import { QuerySubscriptionsGrid } from "@/components/query-subscriptions/dataGrid";
+import { QuerySubscriptionsListPane } from "@/components/query-subscriptions/tableListPane";
+import { useQuerySubscriptionsState } from "@/components/query-subscriptions/useQuerySubscriptionsState";
 
-export function LiveQueryScreen(): React.ReactElement {
-  const state = useLiveQueryState();
+export function QuerySubscriptionsScreen(): React.ReactElement {
+  const state = useQuerySubscriptionsState();
   const listPaneRef = useRef<PanelImperativeHandle>(null);
   const [isListPaneOpen, setIsListPaneOpen] = useState(true);
 
@@ -45,7 +45,7 @@ export function LiveQueryScreen(): React.ReactElement {
         maxSize={360}
         onResize={handleListPaneResize}
       >
-        <LiveQueryListPane
+        <QuerySubscriptionsListPane
           isInitialLoading={state.isInitialLoading}
           searchValue={state.listSearchValue}
           selectedTableName={state.selectedTableName}
@@ -56,7 +56,7 @@ export function LiveQueryScreen(): React.ReactElement {
       </ResizablePanel>
       {isListPaneOpen === true ? <ResizableSeparator /> : null}
       <ResizablePanel className="min-w-0 overflow-hidden">
-        <LiveQueryGrid state={state} isListPaneOpen={isListPaneOpen} onToggleListPane={handleToggleListPane} />
+        <QuerySubscriptionsGrid state={state} isListPaneOpen={isListPaneOpen} onToggleListPane={handleToggleListPane} />
       </ResizablePanel>
     </ResizableGroup>
   );

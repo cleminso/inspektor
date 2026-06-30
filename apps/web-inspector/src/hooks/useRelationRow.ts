@@ -1,3 +1,10 @@
+/**
+ * Resolves a referenced Jazz row for relation-cell display.
+ *
+ * The data explorer receives relation IDs from schema reference columns. This hook runs a
+ * hidden generic query against the referenced table so the UI can show a friendlier label
+ * while still linking by stable row ID.
+ */
 import { useMemo } from "react";
 
 import type { DynamicTableRow } from "jazz-tools";
@@ -9,6 +16,7 @@ import { getRelationDisplayColumn } from "@/lib/table-explorer/tableSchema";
 
 const EMPTY_ROWS: DynamicTableRow[] = [];
 
+/** Converts arbitrary dynamic row values into compact relation labels. */
 function formatCellValue(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
@@ -31,6 +39,12 @@ export interface UseRelationRowResult {
   row: DynamicTableRow | null;
 }
 
+/**
+ * Fetches one referenced Jazz row and returns the best display value for a relation cell.
+ *
+ * The query is generic because the Inspector only knows the referenced table through
+ * stored runtime schema metadata.
+ */
 export function useRelationRow(relationTable: string, relationId: string): UseRelationRowResult {
   const { runtime } = useInspector();
 
@@ -44,6 +58,7 @@ export function useRelationRow(relationTable: string, relationId: string): UseRe
 
   const relationRows = useAll<DynamicTableRow>(
     queryBuilder ?? undefined,
+    // Relation label lookups should not appear in the query-subscriptions telemetry being inspected.
     { propagation: "full", visibility: "hidden_from_live_query_list" },
   ) ?? EMPTY_ROWS;
   const row = relationRows[0] ?? null;

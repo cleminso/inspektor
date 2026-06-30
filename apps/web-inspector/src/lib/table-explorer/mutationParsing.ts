@@ -1,14 +1,23 @@
+/**
+ * Parses generic row mutation forms into Jazz runtime values.
+ *
+ * The Inspector edits rows for schemas loaded at runtime, so mutation input must be shaped
+ * from `ColumnType` metadata instead of app-specific generated form models.
+ */
 import type { ColumnDescriptor, ColumnType } from "jazz-tools";
 
 import { parseBooleanValue } from "@/lib/table-explorer/valueParsing";
 
+/** Reason the generic mutation form cannot safely edit a column. */
 export type MutationFieldReadOnlyReason = "binary" | null;
 
+/** Schema column plus generic-form editability metadata. */
 export interface MutationFormField {
   column: ColumnDescriptor;
   readOnlyReason: MutationFieldReadOnlyReason;
 }
 
+/** Treats nested Bytea arrays as binary because the generic form cannot preserve byte intent. */
 function isBinaryColumnType(columnType: ColumnType): boolean {
   if (columnType.type === "Bytea") {
     return true;
@@ -19,6 +28,7 @@ function isBinaryColumnType(columnType: ColumnType): boolean {
   return false;
 }
 
+/** Explains when the schema-driven form should display a value without accepting edits. */
 export function getFieldReadOnlyReason(column: ColumnDescriptor): MutationFieldReadOnlyReason {
   if (isBinaryColumnType(column.column_type) === true) {
     return "binary";
@@ -27,6 +37,7 @@ export function getFieldReadOnlyReason(column: ColumnDescriptor): MutationFieldR
   return null;
 }
 
+/** Pairs schema columns with the editability decisions needed by the mutation UI. */
 export function buildMutationFields(columns: ColumnDescriptor[]): MutationFormField[] {
   return columns.map((column) => ({
     column,
@@ -34,6 +45,7 @@ export function buildMutationFields(columns: ColumnDescriptor[]): MutationFormFi
   }));
 }
 
+/** Converts one form field into the value shape Jazz expects for that column type. */
 export function parseMutationFieldValue(columnType: ColumnType, valueText: string): unknown {
   const trimmedValue = valueText.trim();
 
@@ -138,6 +150,7 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
   }
 }
 
+/** Formats runtime row values for generic text inputs without implying binary edit support. */
 export function formatMutationFieldValue(value: unknown): string {
   if (value === null || value === undefined) {
     return "";

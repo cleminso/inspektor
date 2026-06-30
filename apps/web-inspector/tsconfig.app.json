@@ -14,7 +14,7 @@
       "@/*": ["./src/*"],
       "#auth": ["./src/components/auth"],
       "#layout": ["./src/components/layout"],
-      "#live-query": ["./src/components/live-query"],
+      "#query-subscriptions": ["./src/components/query-subscriptions"],
       "#navigation": ["./src/components/navigation"],
       "#onboarding": ["./src/components/onboarding"],
       "#settings": ["./src/components/settings"],

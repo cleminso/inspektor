@@ -1,3 +1,10 @@
+/**
+ * Resolves partial Inspector navigation into concrete Jazz runtime targets.
+ *
+ * Entry routes may only know the connection. These helpers combine stored Inspector
+ * preferences with Jazz schema-hash metadata so table and query-subscriptions routes can bootstrap
+ * the same runtime context after direct navigation, refresh, or redirect.
+ */
 import { redirect } from "@tanstack/react-router";
 import { fetchSchemaHashes } from "jazz-tools";
 
@@ -12,6 +19,7 @@ import {
 
 import { appRoutes } from "./appRoutes";
 
+/** Route params that identify one inspectable Jazz runtime context. */
 export interface ResolvedTablesNavigationTarget {
   connectionId: string;
   branch: string;
@@ -39,6 +47,12 @@ interface ResolveStoredTablesNavigationTargetOptions {
   store?: StoredConnectionsStore;
 }
 
+/**
+ * Resolves a connection into branch and schema hash route params.
+ *
+ * `reusableSchemaHashes` keeps redirects from refetching Jazz admin metadata when the
+ * current runtime already loaded the hash list.
+ */
 export async function resolveTablesNavigationTarget({
   connectionId,
   branchOverride,
@@ -76,6 +90,7 @@ export async function resolveTablesNavigationTarget({
   };
 }
 
+/** Uses persisted Inspector connections when loaders need a complete runtime route. */
 export async function resolveStoredTablesNavigationTarget({
   connectionId,
   branchOverride,
@@ -95,10 +110,12 @@ export async function resolveStoredTablesNavigationTarget({
   });
 }
 
+/** Sends users back to connection setup when a Jazz runtime target is unavailable. */
 export function redirectToConnections(): never {
   throw redirect({ to: appRoutes.connections });
 }
 
+/** Enters the schema-driven table explorer for a resolved runtime context. */
 export function redirectToTablesTarget(target: ResolvedTablesNavigationTarget): never {
   throw redirect({
     to: appRoutes.tables,

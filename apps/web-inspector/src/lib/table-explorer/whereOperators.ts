@@ -1,7 +1,14 @@
+/**
+ * Maps Jazz schema column types to supported Inspector filter operators.
+ *
+ * The explorer only exposes operators it can parse, serialize into URLs, and translate
+ * into generic Jazz `where` input for the selected column type.
+ */
 import type { ColumnType } from "jazz-tools";
 
 import type { TableFilterOperator } from "@/types/tableFilters";
 
+/** Minimal schema metadata needed to decide the operator support matrix. */
 export interface WhereOperatorColumn {
   name: string;
   columnType: ColumnType;
@@ -10,6 +17,7 @@ export interface WhereOperatorColumn {
   implicitId?: boolean;
 }
 
+/** Keeps unsupported Jazz/operator combinations out of schema-driven filter controls. */
 export function getSupportedWhereOperatorsForColumn(
   column: WhereOperatorColumn,
 ): TableFilterOperator[] {

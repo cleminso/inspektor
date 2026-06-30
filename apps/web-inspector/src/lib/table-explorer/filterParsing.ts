@@ -1,9 +1,17 @@
+/**
+ * Parses Inspector filter inputs into values accepted by generic Jazz queries.
+ *
+ * The table explorer only has stored schema metadata, not generated app builders. Keeping
+ * parsing here makes URL filters, relation links, and manual filters resolve through the
+ * same schema-driven rules before they reach `GenericQueryBuilder`.
+ */
 import type { ColumnDescriptor, ColumnType } from "jazz-tools";
 
 import { getSupportedWhereOperatorsForColumn } from "@/lib/table-explorer/whereOperators";
 import { parseBooleanValue } from "@/lib/table-explorer/valueParsing";
 import type { TableFilterClause, TableFilterOperator } from "@/types/tableFilters";
 
+/** Supports Bytea filters with a simple comma-separated byte format in generic forms. */
 function parseBytea(value: string): Uint8Array {
   const parts = value
     .split(",")
@@ -33,6 +41,7 @@ function parseJsonValue(value: string): unknown {
   }
 }
 
+/** Converts form text into the runtime value expected for one Jazz column type. */
 function parseScalarValue(columnType: ColumnType, value: string): unknown {
   const trimmedValue = value.trim();
   if (trimmedValue.length === 0) {
@@ -81,10 +90,12 @@ function parseScalarValue(columnType: ColumnType, value: string): unknown {
   }
 }
 
+/** Creates a client-only key for editable filter rows before they are serialized to the URL. */
 export function createFilterClauseId(): string {
   return `filter-${Math.random().toString(16).slice(2, 10)}`;
 }
 
+/** Applies operator-specific parsing before a filter becomes generic query input. */
 export function parseFilterValue(
   column: Pick<ColumnDescriptor, "column_type" | "nullable">,
   operator: TableFilterOperator,
@@ -118,6 +129,7 @@ export function parseFilterValue(
   return parseScalarValue(column.column_type, value);
 }
 
+/** Reads shareable URL filter state without letting malformed links break the explorer. */
 export function parseFiltersFromSearchParam(value: string | null): TableFilterClause[] {
   if (value === null) {
     return [];
@@ -146,6 +158,7 @@ export function parseFiltersFromSearchParam(value: string | null): TableFilterCl
   }
 }
 
+/** Serializes table filters so telemetry and relation links can open the same explorer state. */
 export function serializeFiltersToSearchParam(filters: TableFilterClause[]): string | null {
   if (filters.length === 0) {
     return null;
@@ -154,6 +167,7 @@ export function serializeFiltersToSearchParam(filters: TableFilterClause[]): str
   return JSON.stringify(filters);
 }
 
+/** Delegates operator exposure to the Jazz-type support matrix used by the explorer UI. */
 export function getFilterOperatorsForColumn(column: ColumnDescriptor): TableFilterOperator[] {
   return getSupportedWhereOperatorsForColumn({
     name: column.name,

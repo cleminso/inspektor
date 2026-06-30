@@ -1,3 +1,9 @@
+/**
+ * Wraps generic Jazz table mutations for the schema-driven data explorer.
+ *
+ * The Inspector builds a dynamic table proxy from stored schema metadata, then uses Jazz's
+ * mutation runtime to insert, update, and delete rows without app-generated table code.
+ */
 import { useMemo, useState } from "react";
 
 import { useDb } from "jazz-tools/react";
@@ -13,10 +19,17 @@ export interface UseTableMutationsResult {
   updateRow: (rowId: string, values: Record<string, unknown>) => Promise<void>;
 }
 
+/** Drops untouched optional form fields before sending mutation payloads to Jazz. */
 function omitUndefinedValues(values: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(values).filter(([, value]) => value !== undefined));
 }
 
+/**
+ * Provides insert, update, and delete actions for one schema-driven Inspector table.
+ *
+ * The hook converts stored runtime schema metadata into a dynamic Jazz table proxy, then
+ * exposes mutation state that forms can use before closing panels or clearing input.
+ */
 export function useTableMutations(tableName: string): UseTableMutationsResult {
   const db = useDb();
   const { runtime } = useInspector();
@@ -31,6 +44,7 @@ export function useTableMutations(tableName: string): UseTableMutationsResult {
     return createTableProxy(tableName, runtime.wasmSchema);
   }, [runtime.wasmSchema, tableName]);
 
+  // Wait for the edge write so forms can surface Jazz errors before closing or resetting.
   const runMutation = async (callback: () => Promise<void>) => {
     try {
       setPendingCount((currentPendingCount) => currentPendingCount + 1);

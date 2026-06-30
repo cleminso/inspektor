@@ -1,9 +1,17 @@
+/**
+ * Schema-driven Jazz query builder for Inspector table exploration.
+ *
+ * Inspected apps can rely on generated typed builders; the Inspector cannot because it
+ * loads arbitrary schemas at runtime. This builder implements Jazz's `QueryBuilder` shape
+ * from table names, column names, and stored schema metadata.
+ */
 import type { DynamicTableRow, QueryBuilder, WasmSchema } from "jazz-tools";
 
 export type GenericWhereValue = unknown | { [op: string]: unknown };
 
 export type GenericWhereInput = Record<string, GenericWhereValue>;
 
+/** QueryBuilder implementation that lets `useAll(...)` query runtime-selected tables. */
 export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
   readonly _table: string;
   readonly _schema: WasmSchema;
@@ -19,6 +27,7 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
     this._schema = schema;
   }
 
+  /** Accepts Inspector filter state as either shorthand equality or explicit Jazz operators. */
   public where(conditions: GenericWhereInput): GenericQueryBuilder {
     const clone = this.clone();
 
@@ -70,6 +79,7 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
     return clone;
   }
 
+  /** Emits the minimal query payload Jazz needs for table rows selected at runtime. */
   public _build(): string {
     return JSON.stringify({
       table: this._table,
@@ -82,6 +92,7 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
     });
   }
 
+  /** Matches generated builder chaining semantics by keeping every query step immutable. */
   private clone(): GenericQueryBuilder {
     const clone = new GenericQueryBuilder(this._table, this._schema);
     clone.conditions = [...this.conditions];

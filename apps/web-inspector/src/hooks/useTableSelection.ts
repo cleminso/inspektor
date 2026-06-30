@@ -1,3 +1,10 @@
+/**
+ * Owns transient table row selection for the data explorer.
+ *
+ * Selection is local UI state, not Jazz state. The hook continuously intersects selected
+ * row IDs with currently visible valid IDs so stale selections disappear as queries,
+ * filters, or schema context change.
+ */
 import { useMemo, useState } from "react";
 
 import type { TableRowId } from "@/types/tableExplorer";
@@ -16,6 +23,7 @@ export interface UseTableSelectionResult {
   toggleRow: (rowId: TableRowId, checked: boolean) => void;
 }
 
+/** Provides single and bulk row selection helpers scoped to visible rows. */
 export function useTableSelection({
   validRowIds,
 }: UseTableSelectionOptions): UseTableSelectionResult {

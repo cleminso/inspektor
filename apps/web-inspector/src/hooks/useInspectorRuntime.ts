@@ -20,6 +20,13 @@ interface UseInspectorRuntimeOptions {
   schemaHash: string | null;
 }
 
+/**
+ * Owns the Inspector's Jazz runtime for the selected connection, branch, and schema hash.
+ *
+ * It creates an in-memory Jazz admin client, loads the stored WASM schema metadata used
+ * by the generic data explorer, fetches available schema hashes, and exposes stored
+ * permissions when the server can provide them.
+ */
 export function useInspectorRuntime({
   connection,
   branch,
@@ -32,6 +39,7 @@ export function useInspectorRuntime({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Shut down the active client before dropping schema-dependent runtime state.
   const clearRuntime = useCallback(() => {
     setClient((currentClient) => {
       if (currentClient !== null) {
@@ -52,7 +60,9 @@ export function useInspectorRuntime({
       return;
     }
 
+    // Guards against stale async work updating state after the selected runtime changes.
     let active = true;
+    const isActive = () => active;
     let runtimeClient: JazzClient | null = null;
 
     setError(null);
@@ -69,7 +79,8 @@ export function useInspectorRuntime({
           driver: { type: "memory" },
         });
 
-        if (active === false) {
+        if (isActive() === false) {
+          // The user selected a different runtime while client creation was in flight.
           void runtimeClient.shutdown();
           runtimeClient = null;
           return;
@@ -85,13 +96,15 @@ export function useInspectorRuntime({
             appId: connection.appId,
             adminSecret: connection.adminSecret,
           }),
+          // Permissions enrich the UI but should not block the runtime if unavailable.
           fetchStoredPermissions(connection.serverUrl, {
             appId: connection.appId,
             adminSecret: connection.adminSecret,
           }).catch(() => null),
         ]);
 
-        if (active === false) {
+        if (isActive() === false) {
+          // Schema/hash requests can finish after navigation; discard their client and data.
           if (runtimeClient !== null) {
             void runtimeClient.shutdown();
             runtimeClient = null;
@@ -117,7 +130,7 @@ export function useInspectorRuntime({
           runtimeClient = null;
         }
 
-        if (active === false) {
+        if (isActive() === false) {
           return;
         }
 
@@ -140,6 +153,7 @@ export function useInspectorRuntime({
     };
   }, [branch, clearRuntime, connection, schemaHash]);
 
+  // Keep the returned object stable for consumers that use it in dependency arrays.
   return useMemo(
     () => ({
       client,

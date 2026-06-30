@@ -3,7 +3,7 @@ import { JazzProvider, useAll, useLocalFirstAuth } from "jazz-tools/react";
 import { app } from "../schema.js";
 import { TodoList } from "./TodoList.js";
 
-function LiveQueryProbe(): null {
+function QuerySubscriptionsProbe(): null {
   useAll(app.todos.limit(1), {
     propagation: "full",
     tier: "edge",
@@ -27,7 +27,7 @@ function TodoApp(): React.ReactElement | null {
         secret,
       }}
     >
-      <LiveQueryProbe />
+      <QuerySubscriptionsProbe />
       <h1>Todos</h1>
       <TodoList />
     </JazzProvider>

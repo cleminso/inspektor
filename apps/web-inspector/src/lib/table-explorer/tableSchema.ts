@@ -1,3 +1,9 @@
+/**
+ * Reads Jazz stored schema metadata for the schema-driven explorer UI.
+ *
+ * Table lists, column lists, and relation labels must come from runtime metadata so the
+ * Inspector can browse any app without importing generated schema code.
+ */
 import type { ColumnDescriptor, WasmSchema } from "jazz-tools";
 
 const RELATION_LABEL_COLUMN_PRIORITY = [
@@ -12,6 +18,7 @@ const RELATION_LABEL_COLUMN_PRIORITY = [
   "email",
 ] as const;
 
+/** Avoids IDs, nested references, and complex values when labeling relation links. */
 function isDisplayFriendlyColumn(column: ColumnDescriptor): boolean {
   if (column.name === "id" || column.references !== undefined) {
     return false;
@@ -31,6 +38,7 @@ function isDisplayFriendlyColumn(column: ColumnDescriptor): boolean {
   }
 }
 
+/** Gives the table explorer deterministic navigation from unordered schema metadata. */
 export function getTableNames(schema: WasmSchema | null): string[] {
   if (schema === null) {
     return [];
@@ -39,6 +47,7 @@ export function getTableNames(schema: WasmSchema | null): string[] {
   return Object.keys(schema).sort((left, right) => left.localeCompare(right));
 }
 
+/** Keeps callers generic by treating unresolved schema/table state as no columns. */
 export function getTableColumns(schema: WasmSchema | null, tableName: string | null): ColumnDescriptor[] {
   if (schema === null || tableName === null) {
     return [];
@@ -47,6 +56,12 @@ export function getTableColumns(schema: WasmSchema | null, tableName: string | n
   return schema[tableName]?.columns ?? [];
 }
 
+/**
+ * Chooses a human-readable column for relation link previews.
+ *
+ * Generic relation cells need a label without app-specific display config, so common name
+ * fields win before falling back to the first simple scalar column.
+ */
 export function getRelationDisplayColumn(
   schema: WasmSchema | null,
   tableName: string | null,

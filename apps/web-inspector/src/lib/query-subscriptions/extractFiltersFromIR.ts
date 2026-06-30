@@ -1,4 +1,13 @@
-export interface LiveQueryFilterClause {
+/**
+ * Extracts Inspector filter clauses from Jazz relation IR.
+ *
+ * query-subscriptions telemetry exposes Jazz's internal query shape, while the table explorer uses
+ * URL-serializable filter clauses. This parser recognizes the comparison subset that maps
+ * cleanly to generic `where` filters and ignores unknown IR so telemetry links still work.
+ */
+
+/** Filter shape shared with table route search params without importing route code. */
+export interface QuerySubscriptionsFilterClause {
   column: string;
   id: string;
   operator: string;
@@ -14,7 +23,8 @@ const irOpToFilterOp: Record<string, string> = {
   Lte: "lte",
 };
 
-export function extractFiltersFromIR(node: unknown): LiveQueryFilterClause[] {
+/** Walks nested IR nodes because supported comparisons may be wrapped in `And` or planner nodes. */
+export function extractFiltersFromIR(node: unknown): QuerySubscriptionsFilterClause[] {
   if (node === null || node === undefined || typeof node !== "object") {
     return [];
   }
@@ -40,7 +50,7 @@ export function extractFiltersFromIR(node: unknown): LiveQueryFilterClause[] {
     return objectNode.And.flatMap((child) => extractFiltersFromIR(child));
   }
 
-  const filters: LiveQueryFilterClause[] = [];
+  const filters: QuerySubscriptionsFilterClause[] = [];
   for (const value of Object.values(objectNode)) {
     if (value !== null && typeof value === "object") {
       filters.push(...extractFiltersFromIR(value));

@@ -80,5 +80,5 @@ UI polish is not the priority.
 - server-backed branch discovery
 - schema metadata driven schema selection
 - edit connection route design
-- live query routes
+- query subscriptions routes
 - table schema route if not needed for MVP

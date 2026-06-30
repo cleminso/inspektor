@@ -1,3 +1,9 @@
+/**
+ * Runs schema-driven table queries for the Inspector data explorer.
+ *
+ * The hook turns route search state into a generic Jazz query, derives render columns from
+ * stored schema metadata, and loads rows incrementally without app-generated table types.
+ */
 import { useMemo, useState } from "react";
 
 import { useAll } from "jazz-tools/react";
@@ -12,6 +18,7 @@ import type { TableColumnMeta } from "@/types/tableExplorer";
 const DEFAULT_CHUNK_SIZE = 50;
 const EMPTY_ROWS: DynamicTableRow[] = [];
 
+/** Returns whether the generic query builder can sort this Jazz column type. */
 function isColumnSortable(columnType: ReturnType<typeof getTableColumns>[number]["column_type"]): boolean {
   switch (columnType.type) {
     case "Integer":
@@ -48,12 +55,19 @@ interface RequestedRowCountState {
   rowCount: number;
 }
 
+/**
+ * Provides columns, rows, and incremental loading controls for one Inspector table.
+ *
+ * The hook derives columns from stored Jazz runtime schema metadata and builds a generic
+ * query from URL-backed filters and sorting, avoiding inspected-app generated code.
+ */
 export function useTableQuery({
   chunkSize = DEFAULT_CHUNK_SIZE,
   tableName,
 }: UseTableQueryOptions): UseTableQueryResult {
   const { currentSchemaHash, runtime } = useInspector();
   const { filters, sortColumn, sortDirection } = useTableExplorerSearchParams();
+  // Reset incremental loading when the table, schema hash, or URL query state changes.
   const queryKey = useMemo(
     () => JSON.stringify({ chunkSize, currentSchemaHash, filters, sortColumn, sortDirection, tableName }),
     [chunkSize, currentSchemaHash, filters, sortColumn, sortDirection, tableName],
@@ -112,6 +126,7 @@ export function useTableQuery({
 
     return builder
       .orderBy(sortColumn, sortDirection)
+      // Fetch one extra row to know whether the UI should offer "load more".
       .limit(requestedRowCount + 1)
       .offset(0);
   }, [filters, requestedRowCount, runtime.wasmSchema, sortColumn, sortDirection, tableName]);
@@ -119,6 +134,7 @@ export function useTableQuery({
   const queryOptions = useMemo(() => {
     return {
       propagation: "full" as const,
+      // Explorer reads should not pollute the server telemetry view the user is inspecting.
       visibility: "hidden_from_live_query_list" as const,
     };
   }, []);

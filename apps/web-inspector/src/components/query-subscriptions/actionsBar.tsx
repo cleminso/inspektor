@@ -40,7 +40,7 @@ export function ActionsBar({
           onClick={onToggleListPane}
         >
           {isListPaneOpen === true ? <PanelLeftClose /> : <PanelLeftOpen />}
-          <span className="sr-only">Toggle live query table list</span>
+          <span className="sr-only">Toggle query subscriptions table list</span>
         </Button>
       </div>
       <div className="flex flex-col items-end gap-1 text-xs text-muted-foreground">

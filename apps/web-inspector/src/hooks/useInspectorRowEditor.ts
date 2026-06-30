@@ -1,3 +1,10 @@
+/**
+ * Coordinates the Inspector row detail panel.
+ *
+ * The panel can be closed, inserting a new Jazz row, or editing one row from the current
+ * selection. The reducer keeps those modes mutually exclusive while preserving simple
+ * next/previous navigation inside the editable selection.
+ */
 import { useMemo, useReducer } from "react";
 
 import type { InspectorRowEditorMode, InspectorRowEditorState, TableRowId } from "@/types/tableExplorer";
@@ -24,6 +31,7 @@ type RowEditorAction =
   | { type: "goToNextRow" }
   | { type: "goToPreviousRow" };
 
+/** Keeps row navigation inside the currently editable selection. */
 function clampActiveRowIndex(index: number, editedRowIds: TableRowId[]): number {
   if (editedRowIds.length === 0) {
     return 0;
@@ -84,6 +92,7 @@ function rowEditorReducer(state: InspectorRowEditorState, action: RowEditorActio
   }
 }
 
+/** Provides table explorer components with row editor state and navigation actions. */
 export function useInspectorRowEditor(): UseInspectorRowEditorResult {
   const [state, dispatch] = useReducer(rowEditorReducer, { kind: "closed" });
 

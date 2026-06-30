@@ -28,8 +28,8 @@ export function InspectorRail(): React.ReactElement {
   const isTablesActive =
     routeParams !== null && matchRoute({ to: appRoutes.tables, params: routeParams, fuzzy: true }) !== false;
 
-  const isLiveQueryActive =
-    routeParams !== null && matchRoute({ to: appRoutes.liveQuery, params: routeParams, fuzzy: true }) !== false;
+  const isQuerySubscriptionsActive =
+    routeParams !== null && matchRoute({ to: appRoutes.QuerySubscriptions, params: routeParams, fuzzy: true }) !== false;
 
   return (
     <aside
@@ -69,24 +69,24 @@ export function InspectorRail(): React.ReactElement {
             render={
               routeParams !== null ? (
               <Button
-                variant={isLiveQueryActive === true ? "default" : "ghost"}
+                variant={isQuerySubscriptionsActive === true ? "default" : "ghost"}
                 size="icon-lg"
                 nativeButton={false}
-                render={<Link to={appRoutes.liveQuery} params={routeParams} />}
-                aria-current={isLiveQueryActive === true ? "page" : undefined}
+                render={<Link to={appRoutes.QuerySubscriptions} params={routeParams} />}
+                aria-current={isQuerySubscriptionsActive === true ? "page" : undefined}
               >
                 <CodeXml />
-                <span className="sr-only">Live Query</span>
+                <span className="sr-only">Query Subscriptions</span>
               </Button>
               ) : (
               <Button type="button" variant="ghost" size="icon-lg" disabled>
                 <CodeXml />
-                <span className="sr-only">Live Query</span>
+                <span className="sr-only">Query Subscriptions</span>
               </Button>
               )
             }
           />
-          <TooltipContent side="right">Live Query</TooltipContent>
+          <TooltipContent side="right">Query Subscriptions</TooltipContent>
         </Tooltip>
       </nav>
       <div className="flex shrink-0 flex-col items-center px-1.5 py-2">

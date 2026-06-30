@@ -1,28 +1,28 @@
 import { useMemo, useState } from "react";
 
-import { useLiveQueryTelemetry } from "@/hooks/useLiveQueryTelemetry";
-import type { LiveQueryRow, LiveQueryTableItem } from "@/types/liveQuery";
+import { useQuerySubscriptionTelemetry } from "@/hooks/useQuerySubscriptionsTelemetry";
+import type { QuerySubscriptionRow, QuerySubscriptionTableItem } from "@/types/QuerySubscriptions";
 
-export interface UseLiveQueryStateResult {
+export interface UseQuerySubscriptionsStateResult {
   error: string | null;
-  filteredRows: LiveQueryRow[];
+  filteredRows: QuerySubscriptionRow[];
   generatedAt: number | null;
   isInitialLoading: boolean;
   isRefreshing: boolean;
   listSearchValue: string;
-  rows: LiveQueryRow[];
+  rows: QuerySubscriptionRow[];
   selectedTableName: string | null;
   setListSearchValue: (value: string) => void;
   setSelectedTableName: (value: string | null) => void;
-  visibleTableItems: LiveQueryTableItem[];
+  visibleTableItems: QuerySubscriptionTableItem[];
 }
 
-export function useLiveQueryState(): UseLiveQueryStateResult {
-  const telemetry = useLiveQueryTelemetry();
+export function useQuerySubscriptionsState(): UseQuerySubscriptionsStateResult {
+  const telemetry = useQuerySubscriptionTelemetry();
   const [listSearchValue, setListSearchValue] = useState("");
   const [selectedTableName, setSelectedTableName] = useState<string | null>(null);
 
-  const tableItems = useMemo<LiveQueryTableItem[]>(() => {
+  const tableItems = useMemo<QuerySubscriptionTableItem[]>(() => {
     const subscriptionCountByTable = new Map<string, number>();
 
     for (const row of telemetry.rows) {

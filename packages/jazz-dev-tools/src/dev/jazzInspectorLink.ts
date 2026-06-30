@@ -4,6 +4,12 @@ function encodeFragmentValue(value: string): string {
   return encodeURIComponent(value);
 }
 
+/**
+ * Builds a local Inspector link for the Jazz app managed by dev tooling.
+ *
+ * Connection values live in the URL fragment so `adminSecret` is available to the
+ * Inspector page without being sent in the HTTP request.
+ */
 export function buildJazzInspectorLink(serverUrl: string, appId: string, adminSecret: string): string {
   return (
     `${LOCAL_INSPECTOR_URL}#serverUrl=${encodeFragmentValue(serverUrl)}` +

@@ -21,6 +21,13 @@ import {
 } from "@/lib/config/connections";
 import { readPrefillConfig, type PrefillConfig } from "@/lib/config/prefill";
 
+/**
+ * React-facing API for the Inspector connection session.
+ *
+ * Components use this instead of reading localStorage directly so connection CRUD,
+ * URL-provided dev links, active connection selection, and Jazz runtime preferences stay
+ * synchronized through one state boundary.
+ */
 export interface UseInspectorSessionResult {
   store: StoredConnectionsStore;
   connections: StoredConnection[];
@@ -47,12 +54,22 @@ interface SessionState {
   prefill: PrefillConfig | null;
 }
 
+/**
+ * Owns the Inspector's saved connection session.
+ *
+ * From the Jazz perspective, it selects the connection details and runtime context that
+ * `useInspectorRuntime` needs to create an in-memory Jazz admin client.
+ *
+ * From the Inspector perspective, it provides a stable UI API for saved connections,
+ * remembered branches, selected schema hashes, and URL-provided prefill data.
+ */
 export function useInspectorSession(): UseInspectorSessionResult {
   const [state, setState] = useState<SessionState>(() => ({
     store: readStoredConnections(),
     prefill: readPrefillConfig(),
   }));
 
+  // Keep saved connection storage and React state in sync through one write path.
   const persistStore = useCallback((store: StoredConnectionsStore) => {
     writeStoredConnections(store);
     setState((currentState) => ({
@@ -96,6 +113,7 @@ export function useInspectorSession(): UseInspectorSessionResult {
       const nextSchemaHash = schemaHash ?? null;
       const hasRememberedBranch = currentPreferences.rememberedBranches.includes(nextBranch);
 
+      // Avoid rewriting storage when navigation did not change the remembered runtime context.
       if (
         currentPreferences.lastBranch === nextBranch &&
         currentPreferences.lastSchemaHash === nextSchemaHash &&
@@ -114,6 +132,7 @@ export function useInspectorSession(): UseInspectorSessionResult {
     [persistStore, state.store],
   );
 
+  // Keep the returned session object stable for consumers that depend on it as one value.
   return useMemo(
     () => ({
       store: state.store,

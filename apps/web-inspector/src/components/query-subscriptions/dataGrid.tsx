@@ -17,10 +17,10 @@ import {
 } from "@regarde/ui/dataGrid";
 import { Badge } from "@regarde/ui/badge";
 
-import { ActionsBar } from "@/components/live-query/actionsBar";
-import { LiveQueryExpandedRow } from "@/components/live-query/expandedRow";
-import type { UseLiveQueryStateResult } from "@/components/live-query/useLiveQueryState";
-import type { LiveQueryRow } from "@/types/liveQuery";
+import { ActionsBar } from "@/components/query-subscriptions/actionsBar";
+import { QuerySubscriptionsExpandedRow } from "@/components/query-subscriptions/expandedRow";
+import type { UseQuerySubscriptionsStateResult } from "@/components/query-subscriptions/useQuerySubscriptionsState";
+import type { QuerySubscriptionRow } from "@/types/QuerySubscriptions";
 
 function getEmptyStateCopy(selectedTableName: string | null): {
   description: string;
@@ -54,7 +54,7 @@ function GridMessage({ description, title }: { description: string; title: strin
   );
 }
 
-const columns: ColumnDef<LiveQueryRow>[] = [
+const columns: ColumnDef<QuerySubscriptionRow>[] = [
   {
     id: "expander",
     size: 40,
@@ -77,7 +77,7 @@ const columns: ColumnDef<LiveQueryRow>[] = [
       );
     },
     meta: {
-      expandedContent: (row) => <LiveQueryExpandedRow row={row} />,
+      expandedContent: (row) => <QuerySubscriptionsExpandedRow row={row} />,
       cellClassName: "w-10",
       headerClassName: "w-10",
     },
@@ -103,13 +103,13 @@ const columns: ColumnDef<LiveQueryRow>[] = [
   },
 ];
 
-interface LiveQueryGridProps {
+interface QuerySubscriptionsGridProps {
   isListPaneOpen: boolean;
   onToggleListPane: () => void;
-  state: UseLiveQueryStateResult;
+  state: UseQuerySubscriptionsStateResult;
 }
 
-export function LiveQueryGrid({ isListPaneOpen, onToggleListPane, state }: LiveQueryGridProps): React.ReactElement {
+export function QuerySubscriptionsGrid({ isListPaneOpen, onToggleListPane, state }: QuerySubscriptionsGridProps): React.ReactElement {
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const emptyStateCopy = getEmptyStateCopy(state.selectedTableName);
 

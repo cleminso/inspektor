@@ -1,7 +1,17 @@
+/**
+ * Local persistence model for Inspector connection profiles.
+ *
+ * From the Jazz side, each connection stores the credentials needed to create an admin
+ * runtime against a Jazz app: server URL, app ID, admin secret, and env.
+ *
+ * From the Inspector side, the same store keeps UI session preferences separate from
+ * credentials so branch/schema selection can change without rewriting connection data.
+ */
 export const CONNECTIONS_STORAGE_KEY = "regarde-inspector-connections";
 export const DEFAULT_SERVER_URL = "https://v2.sync.jazz.tools/";
 export const DEFAULT_BRANCH_NAME = "main";
 
+/** Connection values before the Inspector assigns its local profile ID. */
 export interface ConnectionDraft {
   name: string;
   serverUrl: string;
@@ -10,16 +20,19 @@ export interface ConnectionDraft {
   env: string;
 }
 
+/** Saved Jazz admin connection used to start the Inspector runtime. */
 export interface StoredConnection extends ConnectionDraft {
   id: string;
 }
 
+/** Inspector view state stored separately from Jazz connection credentials. */
 export interface ConnectionPreferences {
   lastBranch: string;
   lastSchemaHash: string | null;
   rememberedBranches: string[];
 }
 
+/** Version 3 localStorage schema for Jazz credentials and Inspector preferences. */
 export interface StoredConnectionsStore {
   version: 3;
   activeConnectionId: string | null;
@@ -41,6 +54,7 @@ interface LegacyStoredConnectionsStore {
 
 type LegacyStoredConfig = Omit<LegacyStoredConnection, "id" | "name">;
 
+/** Creates the empty Inspector connection store used when persisted data is unavailable. */
 export function createEmptyConnectionStore(): StoredConnectionsStore {
   return {
     version: 3,
@@ -50,6 +64,12 @@ export function createEmptyConnectionStore(): StoredConnectionsStore {
   };
 }
 
+/**
+ * Reads and validates the persisted Inspector connection store.
+ *
+ * Stored JSON is treated as untrusted input because localStorage can be edited
+ * manually and legacy Inspector stores used different shapes.
+ */
 export function readStoredConnections(): StoredConnectionsStore {
   if (typeof localStorage === "undefined") {
     return createEmptyConnectionStore();
@@ -68,6 +88,7 @@ export function readStoredConnections(): StoredConnectionsStore {
   }
 }
 
+/** Persists the complete Inspector connection store. */
 export function writeStoredConnections(store: StoredConnectionsStore): void {
   if (typeof localStorage === "undefined") {
     return;
@@ -76,6 +97,7 @@ export function writeStoredConnections(store: StoredConnectionsStore): void {
   localStorage.setItem(CONNECTIONS_STORAGE_KEY, JSON.stringify(store));
 }
 
+/** Resolves the active Inspector profile, falling back when the saved ID is stale. */
 export function getActiveConnection(store: StoredConnectionsStore): StoredConnection | null {
   if (store.activeConnectionId !== null) {
     const activeConnection = store.connections.find((connection) => connection.id === store.activeConnectionId);
@@ -98,6 +120,7 @@ export function getConnectionById(
   return store.connections.find((connection) => connection.id === connectionId) ?? null;
 }
 
+/** Returns Inspector preferences with defaults so callers never handle a missing record. */
 export function getConnectionPreferences(
   store: StoredConnectionsStore,
   connectionId: string,
@@ -121,6 +144,7 @@ export function setActiveConnectionId(
   };
 }
 
+/** Saves a Jazz connection profile, marks it active, and ensures it has preferences. */
 export function upsertConnection(
   store: StoredConnectionsStore,
   connection: StoredConnection,
@@ -157,6 +181,12 @@ export function removeConnection(
   };
 }
 
+/**
+ * Updates Inspector runtime preferences while keeping branch values normalized and deduped.
+ *
+ * Branch and schema hash are Jazz runtime context, but the Inspector stores them as
+ * preferences because they describe the selected view of a saved connection.
+ */
 export function updateConnectionPreferences(
   store: StoredConnectionsStore,
   connectionId: string,
@@ -200,6 +230,7 @@ export function rememberBranch(
   });
 }
 
+/** Converts editable values into the saved Jazz connection shape used by runtime hooks. */
 export function createConnectionFromDraft(
   draft: ConnectionDraft,
   connectionId = createConnectionId(),
@@ -262,6 +293,12 @@ export function resolveDefaultBranch(
   return normalizeBranchName(branch ?? getConnectionPreferences(store, connectionId).lastBranch);
 }
 
+/**
+ * Chooses the schema hash the Inspector should use for a connection.
+ *
+ * Jazz can expose multiple stored schema hashes for the same app. The Inspector only
+ * reuses a requested or remembered hash when Jazz reports it as available.
+ */
 export function resolveDefaultSchemaHash(
   store: StoredConnectionsStore,
   connectionId: string,
@@ -277,6 +314,7 @@ export function resolveDefaultSchemaHash(
   return availableSchemaHashes[0] ?? null;
 }
 
+/** Migrates recognized Inspector localStorage shapes into store version 3. */
 function migrateStoredConnections(parsed: unknown): StoredConnectionsStore | null {
   if (isStoredConnectionsStore(parsed) === true) {
     return {
@@ -436,6 +474,7 @@ function isConnectionPreferences(value: unknown): value is ConnectionPreferences
   );
 }
 
+/** Normalizes branch history while preserving input order for the branch picker. */
 function dedupeBranches(branches: string[]): string[] {
   const normalizedBranches: string[] = [];
   const seen = new Set<string>();
