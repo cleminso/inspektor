@@ -159,7 +159,7 @@ Verified upstream behavior:
 
 For this repo, the local equivalent should target:
 
-`http://regarde.inspector.localhost:1355/conn/new#serverUrl=<encoded>&appId=<encoded>&adminSecret=<encoded>`
+`https://regarde.inspector.localhost:1355/conn/new#serverUrl=<encoded>&appId=<encoded>&adminSecret=<encoded>`
 
 This preserves strict upstream emitted-link parity while routing into the local add-connection flow.
 

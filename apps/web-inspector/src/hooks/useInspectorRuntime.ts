@@ -26,6 +26,9 @@ interface UseInspectorRuntimeOptions {
  * It creates an in-memory Jazz admin client, loads the stored WASM schema metadata used
  * by the generic data explorer, fetches available schema hashes, and exposes stored
  * permissions when the server can provide them.
+ *
+ * It starts async work in an effect, then stores resolved data in React state.
+ * Consumers read `runtime.wasmSchema`, `runtime.client`, etc.
  */
 export function useInspectorRuntime({
   connection,

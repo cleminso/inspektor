@@ -4,9 +4,9 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev": "concurrently \"PORTLESS_PORT=1355 PORTLESS_HTTPS=0 portless regarde.inspector --force vite\" \"agentation-mcp server\" --names \"vite,agentation\" --prefix-colors \"cyan,magenta\"",
+    "dev": "concurrently \"PORTLESS_PORT=1355 PORTLESS_HTTPS=1 portless regarde.inspector --force vite\" \"agentation-mcp server\" --names \"vite,agentation\" --prefix-colors \"cyan,magenta\"",
     "dev:vite": "concurrently \"vite\" \"agentation-mcp server\" --names \"vite,agentation\" --prefix-colors \"cyan,magenta\"",
-    "portless:proxy": "portless proxy start --port 1355 --no-tls",
+    "portless:proxy": "portless proxy start --port 1355 --https",
     "build": "vite build && tsc",
     "typecheck": "tsc --noEmit"
   },

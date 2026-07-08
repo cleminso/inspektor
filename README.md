@@ -32,9 +32,9 @@ A 2-weeks challenge to build an inspector with my UX and product vision.
    `pnpm dev:web`
 
 5. Open in browser:
-   `http://regarde.inspector.localhost:1355/conn`
+   `https://regarde.inspector.localhost:1355/conn`
 
-The default dev command runs Portless with an unprivileged HTTP proxy on port `1355`, so it does not require `sudo`. If you want to run Vite without the named local URL, use:
+The default dev command runs Portless with an unprivileged HTTPS proxy on port `1355`, so it does not require `sudo`. If the local certificate is not trusted yet, run `pnpm --filter regarde.inspector exec portless trust`. If you want to run Vite without the named local URL, use:
 
 `pnpm --filter regarde.inspector dev:vite`
 

@@ -4,7 +4,7 @@ import { Agentation } from "agentation";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { ThemeProvider } from "next-themes";
-import { TooltipProvider } from "@regarde/ui/ui/tooltip";
+import { TooltipProvider } from "@regarde/ui/tooltip";
 
 import { routeTree } from "./routeTree.gen";
 import ReactDOM from "react-dom/client";
