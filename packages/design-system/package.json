@@ -24,10 +24,6 @@
     "./theme": {
       "types": "./dist/tokens/tokens.stylex.d.ts",
       "default": "./src/tokens/tokens.stylex.ts"
-    },
-    "./primitives/*": {
-      "types": "./dist/primitives/*.d.ts",
-      "default": "./src/primitives/*.tsx"
     }
   },
   "scripts": {
