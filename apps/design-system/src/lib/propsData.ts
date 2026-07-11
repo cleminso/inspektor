@@ -4,13 +4,34 @@ export interface GeneratedPropItem {
   name: string;
   type: string;
   required: boolean;
-  sourcePath: string;
+  defaultValue?: string;
+  description: string;
+  deprecated?: string;
+  source: {
+    path: string;
+    line: number;
+  };
 }
 
-export type GeneratedPropsBySlug = Record<string, GeneratedPropItem[]>;
+export type GeneratedPropsByComponentId = Record<string, GeneratedPropItem[]>;
 
-export const propsBySlug = generatedProps as GeneratedPropsBySlug;
+export const propsByComponentId = generatedProps as GeneratedPropsByComponentId;
 
-export function getGeneratedProps(slug: string): GeneratedPropItem[] {
-  return propsBySlug[slug] ?? [];
+export function getGeneratedProps(
+  componentId: string,
+  propNames: readonly string[],
+): GeneratedPropItem[] {
+  const componentProps = propsByComponentId[componentId];
+  if (componentProps === undefined) {
+    throw new Error(`Generated props are missing for component ${componentId}.`);
+  }
+
+  return propNames.map((propName) => {
+    const prop = componentProps.find(({ name }) => name === propName);
+    if (prop === undefined) {
+      throw new Error(`Generated prop ${componentId}.${propName} is missing.`);
+    }
+
+    return prop;
+  });
 }

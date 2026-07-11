@@ -1,71 +1,162 @@
+import { Box, Button } from "@inspector/ds";
 import * as stylex from "@stylexjs/stylex";
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { HeadContent, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { type ReactElement } from "react";
 
 import { navSections } from "@/lib/registry";
+
+function ThemeSwitch(): ReactElement {
+  const { resolvedTheme, setTheme } = useTheme();
+
+  const handleToggleTheme = (): void => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon-m"
+      onClick={handleToggleTheme}
+      aria-label={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+      title={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+    >
+      {resolvedTheme === "dark" ? (
+        <Sun aria-hidden="true" size={15} />
+      ) : (
+        <Moon aria-hidden="true" size={15} />
+      )}
+    </Button>
+  );
+}
 
 export function AppShell(): ReactElement {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   return (
-    <div {...stylex.props(styles.shell)}>
-      <aside {...stylex.props(styles.sidebar)}>
-        <Link to="/" {...stylex.props(styles.wordmark)}>
-          <span {...stylex.props(styles.wordmarkTitle)}>Inspector</span>
-          <span {...stylex.props(styles.wordmarkSubtitle)}>Design System</span>
-        </Link>
+    <>
+      <HeadContent />
+      <a href="#main-content" {...stylex.props(styles.skipLink)}>
+        Skip to content
+      </a>
+      <Box
+        minHeight="100vh"
+        display="grid"
+        backgroundColor="bg-surface-1"
+        color="text-primary"
+        {...stylex.props(styles.shell)}
+      >
+      <Box
+        as="aside"
+        flexDirection="column"
+        gap="3xl"
+        padding="none"
+        borderStyle="solid"
+        borderRightWidth={1}
+        borderColor="border"
+        backgroundColor="bg-surface-1"
+        {...stylex.props(styles.sidebar)}
+      >
+        <Box flexDirection="row" alignItems="center" justifyContent="between" gap="m" paddingRight="m">
+          <Link to="/" {...stylex.props(styles.wordmark)}>
+            <span {...stylex.props(styles.wordmarkTitle)}>Inspector</span>
+            <span {...stylex.props(styles.wordmarkSubtitle)}>Design System</span>
+          </Link>
+          <ThemeSwitch />
+        </Box>
 
-        <nav {...stylex.props(styles.navigation)} aria-label="Design system navigation">
+        <Box
+          as="nav"
+          flexDirection="column"
+          gap="2xl"
+          aria-label="Design system navigation"
+          {...stylex.props(styles.navigation)}
+        >
           {navSections.map((section) => (
-            <section key={section.title} {...stylex.props(styles.navSection)}>
-              <h2 {...stylex.props(styles.navSectionTitle)}>{section.title}</h2>
-              <div {...stylex.props(styles.navItems)}>
+            <Box as="section" key={section.title} flexDirection="column" gap="m">
+              <span {...stylex.props(styles.navSectionTitle)}>
+                {section.title}
+              </span>
+              <Box flexDirection="column" gap="none">
                 {section.items.map((item) => {
                   const isActive = pathname === item.href;
 
                   return (
-                    <Link
+                    <Button
                       key={item.href}
-                      to={item.href}
-                      {...stylex.props(styles.navItem, isActive === true && styles.navItemActive)}
+                      variant={isActive === true ? "secondary" : "ghost"}
+                      size="l"
+                      fullWidth
+                      justify="start"
+                      render={<Link to={item.href} />}
+                      aria-current={isActive === true ? "page" : undefined}
+                      radius="none"
                     >
                       {item.title}
-                    </Link>
+                    </Button>
                   );
                 })}
-              </div>
-            </section>
+              </Box>
+            </Box>
           ))}
-        </nav>
-      </aside>
+        </Box>
+      </Box>
 
-      <main {...stylex.props(styles.main)}>
+      <Box id="main-content" as="main" display="block" minWidth={0} padding="l">
         <Outlet />
-      </main>
-    </div>
+      </Box>
+      </Box>
+    </>
   );
 }
 
 const styles = stylex.create({
   shell: {
-    minHeight: "100vh",
-    display: "grid",
-    gridTemplateColumns: "260px minmax(0, 1fr)",
-    backgroundColor: "oklch(0.962 0.002 286)",
-    color: "oklch(0.145 0 0)",
+    gridTemplateColumns: {
+      default: "1fr",
+      "@media (min-width: 768px)": "260px minmax(0, 1fr)",
+    },
   },
   sidebar: {
-    position: "sticky",
+    position: {
+      default: "static",
+      "@media (min-width: 768px)": "sticky",
+    },
     top: 0,
-    height: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    gap: 32,
-    padding: 20,
-    borderRightWidth: 1,
-    borderRightStyle: "solid",
-    borderRightColor: "oklch(0.89 0.004 286)",
-    backgroundColor: "oklch(0.985 0 0)",
+    height: {
+      default: "auto",
+      "@media (min-width: 768px)": "100vh",
+    },
+    borderRightWidth: {
+      default: 0,
+      "@media (min-width: 768px)": 1,
+    },
+    borderBottomWidth: {
+      default: 1,
+      "@media (min-width: 768px)": 0,
+    },
+  },
+  navigation: {
+    display: {
+      default: "grid",
+      "@media (min-width: 768px)": "flex",
+    },
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  },
+  skipLink: {
+    position: "fixed",
+    top: 8,
+    left: 8,
+    zIndex: 10,
+    padding: "8px 12px",
+    borderRadius: 4,
+    backgroundColor: "light-dark(oklch(0.268 0.013 320.606), oklch(0.991 0.003 106.448))",
+    color: "light-dark(oklch(0.991 0.003 106.448), oklch(0.268 0.013 320.606))",
+    transform: {
+      default: "translateY(-150%)",
+      ":focus-visible": "translateY(0)",
+    },
   },
   wordmark: {
     display: "flex",
@@ -83,45 +174,12 @@ const styles = stylex.create({
     fontSize: 12,
     color: "oklch(0.46 0.006 286)",
   },
-  navigation: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 24,
-  },
-  navSection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-  },
   navSectionTitle: {
     margin: 0,
-    padding: "0 10px",
-    fontSize: 11,
+    paddingInline: 12,
+    fontSize: 12,
     fontWeight: 650,
-    color: "oklch(0.52 0.006 286)",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-  },
-  navItems: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 2,
-  },
-  navItem: {
-    display: "flex",
-    alignItems: "center",
-    minHeight: 34,
-    padding: "0 10px",
-    borderRadius: 9,
-    fontSize: 14,
-    color: "oklch(0.34 0.006 286)",
-  },
-  navItemActive: {
-    backgroundColor: "oklch(0.94 0.005 286)",
-    color: "oklch(0.145 0 0)",
-  },
-  main: {
-    minWidth: 0,
-    padding: 12,
+    letterSpacing: "0.02em",
+    color: "oklch(0.46 0.006 286)",
   },
 });

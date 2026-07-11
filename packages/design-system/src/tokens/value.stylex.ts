@@ -2,17 +2,17 @@
 import * as stylex from "@stylexjs/stylex";
 
 
-export const palette = stylex.defineVars({
+export const paletteValues = stylex.defineConsts({
   // Base
   white: 'oklch(1 0 0)',
   black: 'oklch(0 0 0)',
 
   // Light-mode gray (Zedokai-light)
   gray50: 'oklch(0.988 0.004 34.309)', // lightest surface background
-  gray100: 'oklch(0.971 0.007 39.461)', // main background
+  gray100: 'oklch(0.953 0.004 34.31)', // main background
   gray150: 'oklch(0.949 0.006 43.334)', // panel/subheader/status/tab background
-  gray200: 'oklch(0.91 0.006 43.331)', // title bar background
-  gray250: 'oklch(0.9 0.025 39.357)', // highlight/search match surface
+  gray200: 'oklch(0.925 0.004 34.309)', // title bar background
+  gray250: 'oklch(0.9 0.025 34.357)', // highlight/search match surface
   gray300: 'oklch(0.893 0.007 28.836)', // selected/disabled border, element background
   gray325: 'oklch(0.853 0.007 28.838)', // terminal black
   gray350: 'oklch(0.852 0.006 43.325)', // border
@@ -59,6 +59,8 @@ export const palette = stylex.defineVars({
   cyan600: 'oklch(0.594 0.102 219.889)',
 
 } as const)
+
+export const palette = stylex.defineVars(paletteValues)
 
 export const fontSizes = stylex.defineVars({
   1: '0.75rem', // 12

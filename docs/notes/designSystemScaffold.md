@@ -9,7 +9,7 @@
 - [Why Oxlint and Oxfmt](#why-oxlint-and-oxfmt)
 - [Why `tsup` for the Package](#why-tsup-for-the-package)
 - [Polar-Inspired Workflow](#polar-inspired-workflow)
-- [Why Generated Props Are Only Scaffolded](#why-generated-props-are-only-scaffolded)
+- [Generated Props](#generated-props)
 - [Validation Intent](#validation-intent)
 
 ## Goal
@@ -69,8 +69,7 @@ The docs registry carries the manual metadata needed to document a package item:
 - route path
 - package import path
 - source file path
-- readiness status
-- optional prop metadata slug
+- component API identifier for documented components
 
 Adding a component remains deliberate:
 
@@ -82,15 +81,19 @@ Adding a component remains deliberate:
 
 ## Generated Props
 
-Polar uses generated AST metadata to support curated prop tables.
+The props pipeline combines Polar's proportional generated JSON with Base UI's package-source authority.
 
-We scaffolded the same extension point with:
+The pipeline consists of:
 
 - `apps/design-system/scripts/extract-props.mjs`
 - `apps/design-system/src/generated/props.json`
 - `apps/design-system/src/lib/propsData.ts`
 
-The script currently writes an empty metadata object. This keeps the workflow visible without adding AST extraction complexity too early. When components stabilize, the script can start reading `packages/design-system/src` and filling generated type/source metadata.
+The extractor resolves configured public exports through `packages/design-system/src/index.ts`, uses the TypeScript type checker through `ts-morph`, and writes deterministic metadata keyed by the registry's `componentId`.
+
+Package declarations supply prop names, types, requiredness, public descriptions, and source locations. Runtime parameter destructuring supplies defaults. Documentation pages select and order prop names without overriding those API facts.
+
+Package-authored inherited props are included. External inherited props require an explicit component extraction allowlist so native DOM attributes do not overwhelm the API table.
 
 ## Validation Intent
 
@@ -101,7 +104,8 @@ The focused checks each cover a different risk:
 - package build: validates package output and declaration generation
 - app lint: validates app route and shell source
 - app typecheck: validates route bindings and workspace imports
-- app build: validates Vite, TanStack Router generation, and StyleX extraction together
-- app prop generation: validates the docs metadata pipeline once extraction becomes real
+- app prop tests: validate extraction, filtering, and runtime defaults
+- app prop check: fails when committed generated metadata is stale
+- app build: validates generated props, Vite, TanStack Router generation, and StyleX extraction together
 
 Generated files such as `src/routeTree.gen.ts` should not be edited by hand.

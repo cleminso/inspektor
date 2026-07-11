@@ -12,12 +12,13 @@ import {
 
 
 export const backgroundColors = stylex.defineVars({
-  'bg-primary': `light-dark(${palette.gray100}, ${palette.neutral850})`,
-  'bg-secondary': `light-dark(${palette.gray150}, ${palette.neutral800})`,
-  'bg-surface': `light-dark(${palette.gray50}, ${palette.neutral750})`,
-  'bg-surface-hover': `light-dark(${palette.gray150}, ${palette.neutral800})`,
-  'bg-surface-selected': `light-dark(${palette.gray300}, ${palette.neutral900})`,
+  'bg-surface-1': `light-dark(${palette.gray50}, ${palette.neutral900})`,
+  'bg-primary': `light-dark(${palette.gray150}, ${palette.neutral800})`,
+  'bg-secondary': `light-dark(${palette.gray200}, ${palette.neutral750})`,
+  'bg-surface-hover': `light-dark(${palette.gray100}, ${palette.neutral800})`,
+  'bg-surface-selected': `light-dark(${palette.gray200}, ${palette.neutral900})`,
   'bg-surface-highlight': `light-dark(${palette.gray250}, ${palette.neutral725})`,
+  'bg-danger': `light-dark(${palette.red400}, ${palette.red500})`,
   'bg-inverse': `light-dark(${palette.gray800}, ${palette.neutral50})`,
 } as const)
 
@@ -35,6 +36,7 @@ export const textColors = stylex.defineVars({
   'text-info': `light-dark(${palette.yellow400}, ${palette.yellow400})`,
   'text-constant': `light-dark(${palette.purple500}, ${palette.purple300})`,
   'text-type': `light-dark(${palette.cyan600}, ${palette.cyan300})`,
+  'text-inverse': `light-dark(${palette.gray50}, ${palette.neutral900})`
 } as const)
 
 

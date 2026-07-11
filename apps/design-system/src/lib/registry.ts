@@ -1,5 +1,3 @@
-export type NavItemStatus = "planned" | "ready";
-
 export interface SourceReference {
   label: string;
   path: string;
@@ -10,10 +8,9 @@ export interface NavItem {
   slug: string;
   href: string;
   description: string;
-  importPath: string;
+  importPath?: string;
   source: SourceReference;
-  status: NavItemStatus;
-  propsSlug?: string;
+  componentId?: string;
 }
 
 export interface NavSection {
@@ -21,61 +18,46 @@ export interface NavSection {
   items: NavItem[];
 }
 
-export const foundationItems: NavItem[] = [
-  {
-    title: "Colors",
-    slug: "colors",
-    href: "/foundations/colors",
-    description: "Core background and foreground tokens from @inspector/ds.",
-    importPath: "@inspector/ds/theme",
-    source: {
-      label: "tokens.stylex.ts",
-      path: "packages/design-system/src/tokens/tokens.stylex.ts",
-    },
-    status: "ready",
+export const colorsFoundationItem = {
+  title: "Colors",
+  slug: "colors",
+  href: "/foundations/colors",
+  description: "Primitive palette and semantic color tokens from @inspector/ds.",
+  importPath: "@inspector/ds/theme",
+  source: {
+    label: "value.stylex.ts",
+    path: "packages/design-system/src/tokens/value.stylex.ts",
   },
-  {
-    title: "Typography",
-    slug: "typography",
-    href: "/foundations/typography",
-    description: "Text scale, tone, and hierarchy for inspector surfaces.",
-    importPath: "@inspector/ds/theme",
-    source: {
-      label: "tokens.stylex.ts",
-      path: "packages/design-system/src/tokens/tokens.stylex.ts",
-    },
-    status: "planned",
-  },
-];
+} satisfies NavItem;
 
-export const componentItems: NavItem[] = [
-  {
-    title: "Box",
-    slug: "box",
-    href: "/components/box",
-    description: "Layout primitive for structured inspector UI.",
-    importPath: "@inspector/ds/primitives/box",
-    source: {
-      label: "box.tsx",
-      path: "packages/design-system/src/primitives/box.tsx",
-    },
-    status: "planned",
-    propsSlug: "box",
+export const typographyFoundationItem = {
+  title: "Typography",
+  slug: "typography",
+  href: "/foundations/typography",
+  description: "Text scale, tone, and hierarchy for inspector surfaces.",
+  importPath: "@inspector/ds/theme",
+  source: {
+    label: "semantics.stylex.ts",
+    path: "packages/design-system/src/tokens/semantics.stylex.ts",
   },
-  {
-    title: "Text",
-    slug: "text",
-    href: "/components/text",
-    description: "Typography primitive for readable data-heavy views.",
-    importPath: "@inspector/ds/primitives/text",
-    source: {
-      label: "text.tsx",
-      path: "packages/design-system/src/primitives/text.tsx",
-    },
-    status: "planned",
-    propsSlug: "text",
+} satisfies NavItem;
+
+export const foundationItems: NavItem[] = [colorsFoundationItem, typographyFoundationItem];
+
+export const buttonItem = {
+  title: "Button",
+  slug: "button",
+  href: "/components/button",
+  description: "Action primitive with variants, sizes, loading, and composition support.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "button.tsx",
+    path: "packages/design-system/src/components/button/button.tsx",
   },
-];
+  componentId: "button",
+} satisfies NavItem;
+
+export const componentItems: NavItem[] = [buttonItem];
 
 export const navSections: NavSection[] = [
   { title: "Foundations", items: foundationItems },

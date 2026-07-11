@@ -1,1 +1,91 @@
-{}
+{
+  "button": [
+    {
+      "name": "variant",
+      "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | \"outline\" | \"link\"",
+      "required": false,
+      "defaultValue": "\"primary\"",
+      "description": "Controls the visual treatment and emphasis of the action.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 56
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\" | \"icon-s\" | \"icon-m\" | \"icon-l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the button height and horizontal padding. Icon sizes are square.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 58
+      }
+    },
+    {
+      "name": "loading",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Shows a centered loading indicator, preserves the label width, and disables interaction.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 60
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the button to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 62
+      }
+    },
+    {
+      "name": "justify",
+      "type": "\"center\" | \"start\" | \"between\"",
+      "required": false,
+      "defaultValue": "\"center\"",
+      "description": "Controls how content is distributed inside the button.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 64
+      }
+    },
+    {
+      "name": "radius",
+      "type": "\"none\" | \"xs\" | \"s\" | \"m\" | \"l\" | \"xl\"",
+      "required": false,
+      "defaultValue": "\"xs\"",
+      "description": "Selects a design-system corner radius.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 66
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables interaction and exposes the disabled state to assistive technology.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 68
+      }
+    },
+    {
+      "name": "render",
+      "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes Button behavior and styles onto another element, such as a link.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 70
+      }
+    }
+  ]
+}

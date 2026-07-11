@@ -12,7 +12,7 @@ import {
   textAlignStyles,
   textUtilityStyles,
   textWrapStyles,
-} from '../utils/text-styles'
+} from '../components/text/text-styles'
 
 type TextTag =
   | 'p'

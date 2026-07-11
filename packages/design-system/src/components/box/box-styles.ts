@@ -4,8 +4,8 @@ import {
   backgroundColors,
   borderColors,
   textColors,
-} from '../tokens/semantics.stylex'
-import { borderRadii, shadows, spacing } from '../tokens/value.stylex'
+} from '../../tokens/semantics.stylex'
+import { borderRadii, shadows, spacing } from '../../tokens/value.stylex'
 
 export const paddingStyles = stylex.create({
   none: { padding: spacing.none },
@@ -256,7 +256,7 @@ export const columnGapStyles = stylex.create({
 export const backgroundColorStyles = stylex.create({
   'bg-primary': { backgroundColor: backgroundColors['bg-primary'] },
   'bg-secondary': { backgroundColor: backgroundColors['bg-secondary'] },
-  'bg-surface': { backgroundColor: backgroundColors['bg-surface'] },
+  'bg-surface-1': { backgroundColor: backgroundColors['bg-surface-1'] },
   'bg-surface-hover': {
     backgroundColor: backgroundColors['bg-surface-hover'],
   },

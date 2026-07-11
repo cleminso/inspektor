@@ -51,8 +51,8 @@ import {
   rowGapStyles,
   userSelectStyles,
   visibilityStyles,
-} from './box-styles'
-import { textAlignStyles } from './text-styles'
+} from '../components/box/box-styles'
+import { textAlignStyles } from '../components/text/text-styles'
 import type { BoxStyleProps, PseudoState, ResponsiveValue } from './types'
 
 const PSEUDO_SELECTOR_MAP: Record<PseudoState, string> = {
@@ -436,6 +436,16 @@ export function resolveBoxStyles(
   addTokenProp(borderTopRightRadiusStyles as StyleMap, 'border-top-right-radius', props.borderTopRightRadius, radiusCss)
   addTokenProp(borderBottomLeftRadiusStyles as StyleMap, 'border-bottom-left-radius', props.borderBottomLeftRadius, radiusCss)
   addTokenProp(borderBottomRightRadiusStyles as StyleMap, 'border-bottom-right-radius', props.borderBottomRightRadius, radiusCss)
+
+  if (
+    props.borderWidth === undefined &&
+    (props.borderTopWidth !== undefined ||
+      props.borderRightWidth !== undefined ||
+      props.borderBottomWidth !== undefined ||
+      props.borderLeftWidth !== undefined)
+  ) {
+    inlineStyle.borderWidth = 0
+  }
 
   addArbitraryProp('borderWidth', props.borderWidth, px)
   addArbitraryProp('borderTopWidth', props.borderTopWidth, px)

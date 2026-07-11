@@ -4,20 +4,25 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 1356",
-    "build": "vite build && tsc",
+    "dev": "pnpm gen:props && vite --host 0.0.0.0 --port 1356",
+    "build": "pnpm check:props && vite build && tsc",
+    "check:props": "node scripts/extract-props.mjs --check",
     "gen:props": "node scripts/extract-props.mjs",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
+    "test": "node --test scripts/*.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@inspector/ds": "workspace:*",
+    "@shikijs/langs-precompiled": "3.23.0",
     "@stylexjs/stylex": "^0.19.0",
     "@tanstack/react-router": "catalog:",
     "lucide-react": "catalog:",
+    "next-themes": "0.4.6",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "shiki": "3.23.0"
   },
   "devDependencies": {
     "@stylexjs/unplugin": "^0.19.0",
@@ -28,6 +33,7 @@
     "@vitejs/plugin-react": "catalog:",
     "oxfmt": "^0.58.0",
     "oxlint": "^1.73.0",
+    "ts-morph": "26.0.0",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

@@ -1,5 +1,7 @@
 :root {
-  color-scheme: light;
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+  color-scheme: light dark;
   background: oklch(0.985 0 0);
   color: oklch(0.145 0 0);
   font-family:
@@ -8,6 +10,18 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html.light {
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+  color-scheme: light;
+}
+
+html.dark {
+  --lightningcss-light: ;
+  --lightningcss-dark: initial;
+  color-scheme: dark;
 }
 
 * {
@@ -34,4 +48,26 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+.docs-code-content .shiki {
+  margin: 0;
+  padding: 16px 48px 16px 16px;
+  overflow-x: auto;
+  font-family: "GeistMono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.docs-code-content .shiki code {
+  font: inherit;
+}
+
+html.dark .docs-code-content .shiki,
+html.dark .docs-code-content .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
 }

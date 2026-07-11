@@ -3,7 +3,7 @@
 //
 import * as stylex from '@stylexjs/stylex'
 
-import { fontFamilies } from '../tokens/value.stylex'
+import { fontFamilies } from '../../tokens/value.stylex'
 
 export const textAlignStyles = stylex.create({
   left: { textAlign: 'left' },
