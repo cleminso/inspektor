@@ -13,10 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FoundationsTypographyRouteImport } from './routes/foundations/typography'
 import { Route as FoundationsColorsRouteImport } from './routes/foundations/colors'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
+import { Route as ComponentsSelectRouteImport } from './routes/components/select'
+import { Route as ComponentsSearchRouteImport } from './routes/components/search'
+import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
+import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 
@@ -40,6 +44,21 @@ const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
   path: '/components/text-field',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
+  id: '/components/select',
+  path: '/components/select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsSearchRoute = ComponentsSearchRouteImport.update({
+  id: '/components/search',
+  path: '/components/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsMenuRoute = ComponentsMenuRouteImport.update({
+  id: '/components/menu',
+  path: '/components/menu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsInputRoute = ComponentsInputRouteImport.update({
   id: '/components/input',
   path: '/components/input',
@@ -60,6 +79,11 @@ const ComponentsFieldRoute = ComponentsFieldRouteImport.update({
   path: '/components/field',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsComboboxRoute = ComponentsComboboxRouteImport.update({
+  id: '/components/combobox',
+  path: '/components/combobox',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
   id: '/components/checkbox',
   path: '/components/checkbox',
@@ -75,10 +99,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/combobox': typeof ComponentsComboboxRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/menu': typeof ComponentsMenuRoute
+  '/components/search': typeof ComponentsSearchRoute
+  '/components/select': typeof ComponentsSelectRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
@@ -87,10 +115,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/combobox': typeof ComponentsComboboxRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/menu': typeof ComponentsMenuRoute
+  '/components/search': typeof ComponentsSearchRoute
+  '/components/select': typeof ComponentsSelectRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
@@ -100,10 +132,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/combobox': typeof ComponentsComboboxRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/menu': typeof ComponentsMenuRoute
+  '/components/search': typeof ComponentsSearchRoute
+  '/components/select': typeof ComponentsSelectRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
@@ -114,10 +150,14 @@ export interface FileRouteTypes {
     | '/'
     | '/components/button'
     | '/components/checkbox'
+    | '/components/combobox'
     | '/components/field'
     | '/components/fieldset'
     | '/components/form'
     | '/components/input'
+    | '/components/menu'
+    | '/components/search'
+    | '/components/select'
     | '/components/text-field'
     | '/foundations/colors'
     | '/foundations/typography'
@@ -126,10 +166,14 @@ export interface FileRouteTypes {
     | '/'
     | '/components/button'
     | '/components/checkbox'
+    | '/components/combobox'
     | '/components/field'
     | '/components/fieldset'
     | '/components/form'
     | '/components/input'
+    | '/components/menu'
+    | '/components/search'
+    | '/components/select'
     | '/components/text-field'
     | '/foundations/colors'
     | '/foundations/typography'
@@ -138,10 +182,14 @@ export interface FileRouteTypes {
     | '/'
     | '/components/button'
     | '/components/checkbox'
+    | '/components/combobox'
     | '/components/field'
     | '/components/fieldset'
     | '/components/form'
     | '/components/input'
+    | '/components/menu'
+    | '/components/search'
+    | '/components/select'
     | '/components/text-field'
     | '/foundations/colors'
     | '/foundations/typography'
@@ -151,10 +199,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
+  ComponentsComboboxRoute: typeof ComponentsComboboxRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
+  ComponentsMenuRoute: typeof ComponentsMenuRoute
+  ComponentsSearchRoute: typeof ComponentsSearchRoute
+  ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   FoundationsColorsRoute: typeof FoundationsColorsRoute
   FoundationsTypographyRoute: typeof FoundationsTypographyRoute
@@ -190,6 +242,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsTextFieldRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/select': {
+      id: '/components/select'
+      path: '/components/select'
+      fullPath: '/components/select'
+      preLoaderRoute: typeof ComponentsSelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/search': {
+      id: '/components/search'
+      path: '/components/search'
+      fullPath: '/components/search'
+      preLoaderRoute: typeof ComponentsSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/menu': {
+      id: '/components/menu'
+      path: '/components/menu'
+      fullPath: '/components/menu'
+      preLoaderRoute: typeof ComponentsMenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/input': {
       id: '/components/input'
       path: '/components/input'
@@ -218,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsFieldRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/combobox': {
+      id: '/components/combobox'
+      path: '/components/combobox'
+      fullPath: '/components/combobox'
+      preLoaderRoute: typeof ComponentsComboboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/checkbox': {
       id: '/components/checkbox'
       path: '/components/checkbox'
@@ -239,10 +319,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
+  ComponentsComboboxRoute: ComponentsComboboxRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
+  ComponentsMenuRoute: ComponentsMenuRoute,
+  ComponentsSearchRoute: ComponentsSearchRoute,
+  ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   FoundationsColorsRoute: FoundationsColorsRoute,
   FoundationsTypographyRoute: FoundationsTypographyRoute,

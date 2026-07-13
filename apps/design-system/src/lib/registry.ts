@@ -83,6 +83,58 @@ export const inputItem = {
   componentId: "input",
 } satisfies NavItem;
 
+export const menuItem = {
+  title: "Menu",
+  slug: "menu",
+  href: "/components/menu",
+  description: "Action menu built on Base UI Menu with grouped standard and checkbox items.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "menu.tsx",
+    path: "packages/design-system/src/components/menu/menu.tsx",
+  },
+  componentId: "menu",
+} satisfies NavItem;
+
+export const searchItem = {
+  title: "Search",
+  slug: "search",
+  href: "/components/search",
+  description: "Free-form search input with a fixed leading search indicator.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "search.tsx",
+    path: "packages/design-system/src/components/search/search.tsx",
+  },
+  componentId: "search",
+} satisfies NavItem;
+
+export const comboboxItem = {
+  title: "Combobox",
+  slug: "combobox",
+  href: "/components/combobox",
+  description: "Filterable single selection from a predefined collection.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "combobox.tsx",
+    path: "packages/design-system/src/components/combobox/combobox.tsx",
+  },
+  componentId: "combobox",
+} satisfies NavItem;
+
+export const selectItem = {
+  title: "Select",
+  slug: "select",
+  href: "/components/select",
+  description: "Single selection from a compact predefined collection.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "select.tsx",
+    path: "packages/design-system/src/components/select/select.tsx",
+  },
+  componentId: "select",
+} satisfies NavItem;
+
 export const fieldItem = {
   title: "Field",
   slug: "field",
@@ -138,7 +190,11 @@ export const textFieldItem = {
 export const componentItems: NavItem[] = [
   buttonItem,
   checkboxItem,
+  comboboxItem,
   inputItem,
+  menuItem,
+  searchItem,
+  selectItem,
   fieldItem,
   fieldsetItem,
   formItem,

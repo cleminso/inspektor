@@ -732,5 +732,835 @@
         "line": 28
       }
     }
+  ],
+  "search": [
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the search input height.",
+      "source": {
+        "path": "packages/design-system/src/components/search/search.tsx",
+        "line": 8
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Stretches the search control to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/search/search.tsx",
+        "line": 10
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables editing and exposes the disabled state to assistive technology.",
+      "source": {
+        "path": "packages/design-system/src/components/search/search.tsx",
+        "line": 12
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the initial query when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/search/search.tsx",
+        "line": 14
+      }
+    },
+    {
+      "name": "value",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the current query when controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/search/search.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: string, eventDetails: Input.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the query changes.",
+      "source": {
+        "path": "packages/design-system/src/components/search/search.tsx",
+        "line": 18
+      }
+    }
+  ],
+  "menu.root": [
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the menu is initially open.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 15
+      }
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the menu is currently open.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean, eventDetails: BaseMenu.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the menu opens or closes.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables interaction with the menu.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 21
+      }
+    }
+  ],
+  "menu.trigger": [
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the menu trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, MenuTriggerState>",
+      "required": false,
+      "description": "Composes trigger behavior onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 28
+      }
+    }
+  ],
+  "menu.portal": [
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the portal mounted while the menu is closed.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 33
+      }
+    }
+  ],
+  "menu.positioner": [
+    {
+      "name": "sideOffset",
+      "type": "number | OffsetFunction",
+      "required": false,
+      "defaultValue": "4",
+      "description": "Sets the gap between the trigger and popup.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"start\" | \"center\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "Aligns the popup along the trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 40
+      }
+    }
+  ],
+  "menu.popup": [
+    {
+      "name": "width",
+      "type": "\"content\" | \"anchor\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Controls whether the popup follows its content or trigger width.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 47
+      }
+    }
+  ],
+  "menu.item": [
+    {
+      "name": "variant",
+      "type": "\"default\" | \"danger\"",
+      "required": false,
+      "defaultValue": "\"default\"",
+      "description": "Controls the action's semantic emphasis.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 52
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the action.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 54
+      }
+    },
+    {
+      "name": "closeOnClick",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Controls whether activating the item closes the menu.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 56
+      }
+    }
+  ],
+  "menu.group": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, MenuGroupState>",
+      "required": false,
+      "description": "Composes the group semantics onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 63
+      }
+    }
+  ],
+  "menu.groupLabel": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, MenuGroupLabelState>",
+      "required": false,
+      "description": "Composes the group label onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 68
+      }
+    }
+  ],
+  "menu.shortcut": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes the shortcut label onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 74
+      }
+    }
+  ],
+  "menu.separator": [],
+  "menu.checkboxItem": [
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls the checked state.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 79
+      }
+    },
+    {
+      "name": "defaultChecked",
+      "type": "boolean",
+      "required": false,
+      "description": "Sets the initial checked state.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 81
+      }
+    },
+    {
+      "name": "onCheckedChange",
+      "type": "(checked: boolean, eventDetails: BaseMenu.CheckboxItem.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the checked state changes.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 83
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the option.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 85
+      }
+    }
+  ],
+  "menu.checkboxItemIndicator": [
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the indicator mounted while unchecked.",
+      "source": {
+        "path": "packages/design-system/src/components/menu/menu.tsx",
+        "line": 91
+      }
+    }
+  ],
+  "combobox.root": [
+    {
+      "name": "items",
+      "type": "readonly any[] | readonly Group<any>[]",
+      "required": false,
+      "description": "The items to be displayed in the list.\nCan be either a flat array of items or an array of groups with items.\nItems available for filtering and selection.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "value",
+      "type": "NonNullable<Value>",
+      "required": false,
+      "description": "The selected value of the combobox. Use when controlled.\nThe selected item.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "NonNullable<Value>",
+      "required": false,
+      "description": "The uncontrolled selected value of the combobox when it's initially rendered.\n\nTo render a controlled combobox, use the `value` prop instead.\nThe initially selected item.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: Value | null, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Event handler called when the selected value of the combobox changes.\nRuns when the selected item changes.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "inputValue",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "The input value of the combobox. Use when controlled.\nThe current filter input value.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "onInputValueChange",
+      "type": "(inputValue: string, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Event handler called when the input value changes.\nRuns when the filter input value changes.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the popup is initially open.\n\nTo render a controlled popup, use the `open` prop instead.\nWhether the popup is initially open.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the popup is currently open. Use when controlled.\nWhether the popup is open.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Event handler called when the popup is opened or closed.\nRuns when the popup opens or closes.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 34
+      }
+    },
+    {
+      "name": "itemToStringLabel",
+      "type": "(itemValue: Value) => string",
+      "required": false,
+      "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for display in the input.\nIf the shape of the object is `{ value, label }`, the label will be used automatically without needing to specify this prop.\nConverts an item into its displayed label.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 36
+      }
+    },
+    {
+      "name": "isItemEqualToValue",
+      "type": "(itemValue: Value, value: Value) => boolean",
+      "required": false,
+      "description": "Custom comparison logic used to determine if a combobox item value matches the current selected value. Useful when item values are objects without matching referentially.\nDefaults to `Object.is` comparison.\nCompares an item with the selected value.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "filter",
+      "type": "(itemValue: Value, query: string, itemToString?: ((itemValue: Value) => string) | undefined) => boolean",
+      "required": false,
+      "description": "Filter function used to match items vs input query.\nFilters an item against the current query.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the component should ignore user interaction.\nDisables the combobox.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 42
+      }
+    }
+  ],
+  "combobox.label": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ComboboxLabelState>",
+      "required": false,
+      "description": "Composes the label onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 75
+      }
+    }
+  ],
+  "combobox.value": [
+    {
+      "name": "placeholder",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Content displayed when no item is selected.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 80
+      }
+    }
+  ],
+  "combobox.inputGroup": [],
+  "combobox.input": [],
+  "combobox.trigger": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Content displayed by the trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 62
+      }
+    },
+    {
+      "name": "variant",
+      "type": "\"ghost\" | \"outline\"",
+      "required": false,
+      "defaultValue": "\"ghost\"",
+      "description": "Controls the trigger treatment.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 64
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the trigger height and padding.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 66
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the trigger to its container width.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 68
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 70
+      }
+    }
+  ],
+  "combobox.inputTrigger": [
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the input action trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 53
+      }
+    }
+  ],
+  "combobox.portal": [
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the portal mounted while closed.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 85
+      }
+    }
+  ],
+  "combobox.positioner": [
+    {
+      "name": "sideOffset",
+      "type": "number | OffsetFunction",
+      "required": false,
+      "defaultValue": "4",
+      "description": "Sets the gap between the control and popup.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 90
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"start\" | \"center\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "Aligns the popup along the control.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 92
+      }
+    }
+  ],
+  "combobox.popup": [
+    {
+      "name": "width",
+      "type": "\"anchor\" | \"content\" | \"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"anchor\"",
+      "description": "Controls the popup width using a design-system size.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 100
+      }
+    }
+  ],
+  "combobox.popupHeader": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes the header layout onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 106
+      }
+    }
+  ],
+  "combobox.popupFooter": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes the footer layout onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 112
+      }
+    }
+  ],
+  "combobox.viewport": [
+    {
+      "name": "maxHeight",
+      "type": "\"s\" | \"m\" | \"l\" | \"available\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the maximum height of the scrolling results region.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 120
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes the viewport layout onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 122
+      }
+    }
+  ],
+  "combobox.separator": [],
+  "combobox.empty": [],
+  "combobox.list": [],
+  "combobox.item": [
+    {
+      "name": "value",
+      "type": "NonNullable<Value>",
+      "required": true,
+      "description": "The item represented by this option.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 131
+      }
+    }
+  ],
+  "combobox.itemText": [
+    {
+      "name": "label",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Primary item text, constrained to one line.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 136
+      }
+    },
+    {
+      "name": "description",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional secondary item text, constrained to one line.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 138
+      }
+    }
+  ],
+  "combobox.itemIndicator": [
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the indicator mounted while the item is not selected.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 144
+      }
+    }
+  ],
+  "select.root": [
+    {
+      "name": "items",
+      "type": "readonly Group<any>[] | Record<string, ReactNode> | readonly { label: React.ReactNode; value: any; }[]",
+      "required": false,
+      "description": "Data structure of the items rendered in the select popup.\nWhen specified, `<Select.Value>` renders the label of the selected item instead of the raw value.\nItems used to resolve selected value labels.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "value",
+      "type": "NonNullable<Value>",
+      "required": false,
+      "description": "The value of the select. Use when controlled.\nThe selected value.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "NonNullable<Value>",
+      "required": false,
+      "description": "The uncontrolled value of the select when it's initially rendered.\n\nTo render a controlled select, use the `value` prop instead.\nThe initially selected value.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: Value | null, eventDetails: SelectRootChangeEventDetails) => void",
+      "required": false,
+      "description": "Event handler called when the value of the select changes.\nRuns when the selected value changes.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the component should ignore user interaction.\nDisables the select.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 30
+      }
+    }
+  ],
+  "select.label": [],
+  "select.trigger": [
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the trigger height and padding.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 40
+      }
+    }
+  ],
+  "select.value": [],
+  "select.icon": [],
+  "select.portal": [],
+  "select.positioner": [
+    {
+      "name": "sideOffset",
+      "type": "number | OffsetFunction",
+      "required": false,
+      "defaultValue": "4",
+      "description": "Sets the gap between the trigger and popup.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 49
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"start\" | \"center\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "Aligns the popup along the trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 51
+      }
+    },
+    {
+      "name": "alignItemWithTrigger",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Aligns the selected item text with the trigger value.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 53
+      }
+    }
+  ],
+  "select.popup": [],
+  "select.list": [],
+  "select.item": [
+    {
+      "name": "value",
+      "type": "NonNullable<Value>",
+      "required": true,
+      "description": "The value represented by this option.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 61
+      }
+    }
+  ],
+  "select.itemText": [],
+  "select.itemIndicator": [
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the indicator mounted while the item is not selected.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 69
+      }
+    }
   ]
 }

@@ -173,3 +173,68 @@ test("extracts TextField composition props from the public package export", () =
   assert.equal(textFieldProps.find(({ name }) => name === "className"), undefined);
   assert.equal(textFieldProps.find(({ name }) => name === "style"), undefined);
 });
+
+test("extracts the constrained Search API", () => {
+  const metadata = extractPropsMetadata();
+  const searchProps = metadata.search;
+
+  assert.deepEqual(
+    searchProps?.map(({ name }) => name),
+    ["size", "fullWidth", "disabled", "defaultValue", "value", "onValueChange"],
+  );
+  assert.equal(searchProps?.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(searchProps?.find(({ name }) => name === "fullWidth")?.defaultValue, "true");
+  assert.equal(searchProps?.find(({ name }) => name === "className"), undefined);
+  assert.equal(searchProps?.find(({ name }) => name === "preSlot"), undefined);
+});
+
+test("extracts the constrained Menu compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.equal(metadata["menu.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue, "false");
+  assert.equal(metadata["menu.trigger"]?.find(({ name }) => name === "disabled")?.defaultValue, "false");
+  assert.equal(metadata["menu.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue, "4");
+  assert.equal(metadata["menu.popup"]?.find(({ name }) => name === "width")?.defaultValue, '"content"');
+  assert.match(metadata["menu.popup"]?.find(({ name }) => name === "width")?.type ?? "", /"content".*"anchor"/);
+  assert.equal(metadata["menu.item"]?.find(({ name }) => name === "closeOnClick")?.defaultValue, "true");
+  assert.equal(metadata["menu.item"]?.find(({ name }) => name === "variant")?.defaultValue, '"default"');
+  assert.match(metadata["menu.item"]?.find(({ name }) => name === "variant")?.type ?? "", /"default".*"danger"/);
+  assert.equal(metadata["menu.item"]?.find(({ name }) => name === "className"), undefined);
+  assert.ok(metadata["menu.group"]);
+  assert.ok(metadata["menu.groupLabel"]);
+  assert.equal(metadata["menu.groupLabel"]?.find(({ name }) => name === "className"), undefined);
+  assert.ok(metadata["menu.shortcut"]?.some(({ name }) => name === "render"));
+  assert.equal(metadata["menu.shortcut"]?.find(({ name }) => name === "className"), undefined);
+});
+
+test("extracts the constrained Combobox compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.equal(metadata["combobox.root"]?.find(({ name }) => name === "disabled")?.defaultValue, "false");
+  assert.equal(metadata["combobox.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue, "false");
+  assert.equal(metadata["combobox.trigger"]?.find(({ name }) => name === "variant")?.defaultValue, '"ghost"');
+  assert.equal(metadata["combobox.inputTrigger"]?.find(({ name }) => name === "disabled")?.defaultValue, "false");
+  assert.equal(metadata["combobox.input"]?.find(({ name }) => name === "size"), undefined);
+  assert.equal(metadata["combobox.popup"]?.find(({ name }) => name === "width")?.defaultValue, '"anchor"');
+  assert.match(metadata["combobox.popup"]?.find(({ name }) => name === "width")?.type ?? "", /"anchor".*"content"/);
+  assert.equal(metadata["combobox.viewport"]?.find(({ name }) => name === "maxHeight")?.defaultValue, '"m"');
+  assert.equal(metadata["combobox.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue, "4");
+  assert.equal(metadata["combobox.clear"], undefined);
+  assert.deepEqual(metadata["combobox.itemText"]?.map(({ name }) => name), ["label", "description"]);
+  assert.ok(metadata["combobox.label"]);
+  assert.ok(metadata["combobox.value"]);
+  assert.ok(metadata["combobox.popupHeader"]);
+  assert.ok(metadata["combobox.popupFooter"]);
+  assert.ok(metadata["combobox.separator"]);
+  assert.equal(metadata["combobox.input"]?.find(({ name }) => name === "style"), undefined);
+});
+
+test("extracts the constrained Select compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.equal(metadata["select.root"]?.find(({ name }) => name === "disabled")?.defaultValue, "false");
+  assert.equal(metadata["select.trigger"]?.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(metadata["select.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue, "4");
+  assert.equal(metadata["select.itemIndicator"]?.find(({ name }) => name === "keepMounted")?.defaultValue, "false");
+  assert.equal(metadata["select.trigger"]?.find(({ name }) => name === "className"), undefined);
+});
