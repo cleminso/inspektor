@@ -57,8 +57,9 @@ export const buttonStyles = stylex.create({
   danger: {
     backgroundColor: {
       default: backgroundColors['bg-danger'],
+      ':hover': backgroundColors['bg-danger-hover'],
     },
-    color: textColors['text-inverse'],
+    color: textColors['text-light'],
   },
   ghost: {
     backgroundColor: {

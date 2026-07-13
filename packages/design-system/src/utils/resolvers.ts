@@ -437,6 +437,7 @@ export function resolveBoxStyles(
   addTokenProp(borderBottomLeftRadiusStyles as StyleMap, 'border-bottom-left-radius', props.borderBottomLeftRadius, radiusCss)
   addTokenProp(borderBottomRightRadiusStyles as StyleMap, 'border-bottom-right-radius', props.borderBottomRightRadius, radiusCss)
 
+  // Side-specific borders should not imply a full border on every side.
   if (
     props.borderWidth === undefined &&
     (props.borderTopWidth !== undefined ||

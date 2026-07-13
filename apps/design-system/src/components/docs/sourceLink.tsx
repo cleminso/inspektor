@@ -1,5 +1,4 @@
 import { Button } from "@inspector/ds";
-import { Code2 } from "lucide-react";
 import { type ReactElement } from "react";
 
 import { type SourceReference } from "@/lib/registry";
@@ -20,7 +19,6 @@ export function SourceLink({ source }: { source: SourceReference }): ReactElemen
         />
       }
     >
-      <Code2 aria-hidden="true" size={14} strokeWidth={1.75} />
       Source
     </Button>
   );

@@ -20,6 +20,7 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 - Keep behavior in `{componentName}.tsx` and StyleX definitions in `{componentName}.styles.ts`.
 - Import Base UI primitives directly and alias them with a `Base` prefix.
 - Derive wrapper props from the Base UI primitive, but omit public `className` and `style`; use `useRender.ComponentProps` for custom polymorphic leaves.
+- Check every Inspector-specific prop name against inherited Base UI and native DOM props. Omit collisions such as the native numeric `size` prop when replacing them with a constrained design-system union.
 - Preserve Base UI accessibility, refs, events, state attributes, and render composition.
 - Add only Inspector-specific API: semantic variants, sizes, layout, loading, or composition.
 - Prefer enum props and composition over mutually exclusive booleans and broad slot override props.
@@ -39,6 +40,8 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 - Use semantic tokens before primitive tokens and avoid raw values when a token exists.
 - Keep variants in typed lookup objects with `satisfies Record<Variant, unknown>`.
 - Apply Base UI state and interaction styling without replacing its behavior.
+- Use `createStateStyleProps` from `packages/design-system/src/primitives/createStateStyleProps.ts` when Base UI provides state-based `className` and `style` callbacks. Define the state-to-style selection once and pass both returned callbacks to the primitive.
+- Express StyleX pseudo-class conditions inside property values, such as `borderColor: { default: token, ':focus': focusedToken }`. Top-level conditional blocks are invalid under the package lint rules; top-level pseudo-elements such as `::placeholder` remain valid.
 - Apply StyleX output through the primitive's internal `className`, `style`, or render interface without forwarding consumer styling values.
 - Do not add app-specific layout or documentation styling to the package.
 
@@ -54,7 +57,9 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 
 - `pnpm --filter @inspector/ds typecheck`
 - `pnpm --filter @inspector/ds build`
-- Run focused package lint on changed files.
+- Run focused package lint from `packages/design-system`, for example `pnpm exec oxlint src/components/{componentName}/{componentName}.tsx src/components/{componentName}/{componentName}.styles.ts src/index.ts`. Include `src/primitives/createStateStyleProps.ts` when changing the shared adapter.
+- Classify full-package lint findings as changed-file failures or existing repository failures. Fix all changed-file failures without expanding the task into unrelated cleanup.
+- Run package-scoped formatting only when a shared formatter configuration preserves adjacent conventions. Do not normalize unrelated files to formatter defaults.
 - Complete the documentation workflow and its validation commands.
 
 See [REFERENCE.md](REFERENCE.md) for API decisions, wrapper patterns, and compound-component guidance.

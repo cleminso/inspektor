@@ -13,8 +13,64 @@ const outputPath = resolve(scriptDirectory, "../src/generated/props.json");
 
 const componentEntries = [
   {
+    componentId: "checkbox",
+    exportName: "Checkbox",
+    inheritedProps: [],
+  },
+  {
     componentId: "button",
     exportName: "Button",
+    inheritedProps: [],
+  },
+  {
+    componentId: "input",
+    exportName: "Input",
+    inheritedProps: [],
+  },
+  {
+    componentId: "field.root",
+    exportName: "Field",
+    part: "Root",
+    inheritedProps: [],
+  },
+  {
+    componentId: "field.label",
+    exportName: "Field",
+    part: "Label",
+    inheritedProps: [],
+  },
+  {
+    componentId: "field.description",
+    exportName: "Field",
+    part: "Description",
+    inheritedProps: [],
+  },
+  {
+    componentId: "field.error",
+    exportName: "Field",
+    part: "Error",
+    inheritedProps: [],
+  },
+  {
+    componentId: "fieldset.root",
+    exportName: "Fieldset",
+    part: "Root",
+    inheritedProps: [],
+  },
+  {
+    componentId: "fieldset.legend",
+    exportName: "Fieldset",
+    part: "Legend",
+    inheritedProps: [],
+  },
+  {
+    componentId: "form",
+    exportName: "Form",
+    inheritedProps: [],
+  },
+  {
+    componentId: "textField",
+    exportName: "TextField",
     inheritedProps: [],
   },
 ];
@@ -106,10 +162,51 @@ function getRuntimeDefaults(componentDeclaration) {
   );
 }
 
+function resolveAssignedFunction(variableDeclaration, part) {
+  const initializer = variableDeclaration.getInitializer();
+  if (initializer === undefined || Node.isCallExpression(initializer) === false) {
+    return undefined;
+  }
+
+  const expression = initializer.getExpression();
+  if (Node.isPropertyAccessExpression(expression) === false || expression.getText() !== "Object.assign") {
+    return undefined;
+  }
+
+  const [rootArgument, partsArgument] = initializer.getArguments();
+  let functionName;
+
+  if (part === undefined) {
+    functionName = Node.isIdentifier(rootArgument) ? rootArgument.getText() : undefined;
+  } else if (partsArgument !== undefined && Node.isObjectLiteralExpression(partsArgument)) {
+    const property = partsArgument.getProperty(part);
+    if (property !== undefined && Node.isPropertyAssignment(property)) {
+      const propertyInitializer = property.getInitializer();
+      functionName = Node.isIdentifier(propertyInitializer) ? propertyInitializer.getText() : undefined;
+    }
+  }
+
+  return functionName === undefined
+    ? undefined
+    : variableDeclaration.getSourceFile().getFunction(functionName);
+}
+
+function resolveComponentDeclaration(declarations, entry) {
+  const functionDeclaration = declarations?.find(Node.isFunctionDeclaration);
+  if (functionDeclaration !== undefined && entry.part === undefined) {
+    return functionDeclaration;
+  }
+
+  const variableDeclaration = declarations?.find(Node.isVariableDeclaration);
+  return variableDeclaration === undefined
+    ? undefined
+    : resolveAssignedFunction(variableDeclaration, entry.part);
+}
+
 function extractComponentProps(project, entry) {
   const packageEntry = project.getSourceFileOrThrow(packageEntryPath);
   const declarations = packageEntry.getExportedDeclarations().get(entry.exportName);
-  const componentDeclaration = declarations?.find(Node.isFunctionDeclaration);
+  const componentDeclaration = resolveComponentDeclaration(declarations, entry);
 
   if (componentDeclaration === undefined) {
     throw new Error(`Public component export ${entry.exportName} was not found.`);

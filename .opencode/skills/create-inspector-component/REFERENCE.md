@@ -3,9 +3,13 @@
 ## Table of contents
 
 - [Source hierarchy](#source-hierarchy)
+- [Base UI source lookup](#base-ui-source-lookup)
 - [Choosing a wrapper pattern](#choosing-a-wrapper-pattern)
 - [Closed styling boundary](#closed-styling-boundary)
 - [Public API rules](#public-api-rules)
+- [StyleX state patterns](#stylex-state-patterns)
+- [Testing decision table](#testing-decision-table)
+- [Validation commands](#validation-commands)
 - [Package documentation contract](#package-documentation-contract)
 - [Compound components](#compound-components)
 - [Completion checklist](#completion-checklist)
@@ -23,6 +27,12 @@ Use evidence in this order:
 7. Existing `@inspector/ds` components and semantic tokens.
 
 Do not rely on recalled Base UI APIs. Verify import paths, part names, ref behavior, render composition, and state attributes against the installed version.
+
+## Base UI source lookup
+
+Use the source link on the matching Base UI API page to locate the component directory under the exact installed tag. Inspect the directory or repository tree rather than guessing secondary filenames. Raw source normally follows `https://raw.githubusercontent.com/mui/base-ui/v{version}/packages/react/src/{component}/{file}` once the tree confirms the file name.
+
+Treat a missing guessed source path as a lookup error, not evidence that the API is absent. The API page, confirmed component source, and any delegated primitive source are sufficient when they establish the wrapper contract.
 
 ## Choosing a wrapper pattern
 
@@ -54,9 +64,65 @@ If the system cannot express a legitimate design, treat it as a missing token or
 - Prefer children and compound parts over broad `data` objects.
 - Preserve render composition rather than adding `asChild` aliases.
 - Omit inherited `className` and `style` from public wrapper props.
+- Compare every new prop with the inherited Base UI and native DOM surface. Add colliding names to `Omit`, especially when replacing a native prop such as numeric `size` with a design-system union.
 - Do not expose StyleX internals as component props.
 - Use package JSDoc for reusable API facts; keep usage guidance in the docs app.
 - Express documented defaults as literal destructuring initializers so prop extraction reads runtime truth.
+
+## StyleX state patterns
+
+Represent pseudo-class conditions inside each affected property:
+
+```/dev/null/input.styles.ts#L1-8
+const styles = stylex.create({
+  root: {
+    borderColor: {
+      default: borderColors.border,
+      ':focus': borderColors['border-focused'],
+    },
+  },
+})
+```
+
+Top-level pseudo-elements such as `::placeholder` are supported. Translate Base UI state such as `disabled` or `valid === false` into separate StyleX rules selected by the component's internal state callback. Run focused StyleX lint against each changed style file.
+
+When Base UI exposes separate state-based `className` and `style` callbacks, use `createStateStyleProps` to keep the state mapping in one place:
+
+```/dev/null/input.tsx#L1-10
+const stateStyleProps = createStateStyleProps<BaseInput.State>((state) => [
+  inputStyles.base,
+  state.disabled === true && inputStyles.disabled,
+  state.valid === false && inputStyles.invalid,
+])
+
+<BaseInput
+  className={stateStyleProps.className}
+  style={stateStyleProps.style}
+/>
+```
+
+The adapter preserves complete StyleX output: static rules use `className`, while dynamic values may require `style`. It removes duplicated selection logic but intentionally does not cache `stylex.props(...)` across callbacks. Prefer typed Base UI state callbacks over data-attribute selectors; reserve attributes for inspection, tests, interoperability, or primitives without state callbacks.
+
+## Testing decision table
+
+| Change | Required proof |
+| --- | --- |
+| Wrapper adds behavior or state transitions | Failing behavioral component test |
+| Wrapper only constrains props and applies styles | Type test or extractor/API contract test |
+| Public export uses `Object.assign` or a namespaced shape | Failing extractor-resolution test |
+| Base UI state maps to Inspector styles | Focused render test when package test infrastructure supports it; otherwise typecheck plus focused lint |
+
+Do not retest behavior wholly owned by Base UI. Test the wrapper's behavior, public contract, and state translation.
+
+## Validation commands
+
+Run focused package lint from `packages/design-system`:
+
+```/dev/null/commands.sh#L1
+pnpm exec oxlint src/components/{componentName}/{componentName}.tsx src/components/{componentName}/{componentName}.styles.ts src/index.ts
+```
+
+Full-package lint can expose unrelated existing findings. Report changed-file failures separately and do not hide them among repository-wide diagnostics. Use package-scoped formatting only when its configuration matches adjacent source conventions.
 
 ## Package documentation contract
 

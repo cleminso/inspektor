@@ -1,4 +1,4 @@
-import { Box, Button } from "@inspector/ds";
+import { Box, Button, Text } from "@inspector/ds";
 import * as stylex from "@stylexjs/stylex";
 import { HeadContent, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Moon, Sun } from "lucide-react";
@@ -55,13 +55,15 @@ export function AppShell(): ReactElement {
         borderStyle="solid"
         borderRightWidth={1}
         borderColor="border"
-        backgroundColor="bg-surface-1"
+        backgroundColor="bg-primary"
         {...stylex.props(styles.sidebar)}
       >
         <Box flexDirection="row" alignItems="center" justifyContent="between" gap="m" paddingRight="m">
-          <Link to="/" {...stylex.props(styles.wordmark)}>
+            <Link to="/" {...stylex.props(styles.wordmark)}>
             <span {...stylex.props(styles.wordmarkTitle)}>Inspector</span>
-            <span {...stylex.props(styles.wordmarkSubtitle)}>Design System</span>
+              <Text as="span" variant="caption" color="muted">
+                Design System
+              </Text>
           </Link>
           <ThemeSwitch />
         </Box>
@@ -75,9 +77,11 @@ export function AppShell(): ReactElement {
         >
           {navSections.map((section) => (
             <Box as="section" key={section.title} flexDirection="column" gap="m">
-              <span {...stylex.props(styles.navSectionTitle)}>
-                {section.title}
-              </span>
+              <Box as="span" paddingHorizontal="l">
+                <Text as="span" variant="label" color="muted">
+                  {section.title}
+                </Text>
+              </Box>
               <Box flexDirection="column" gap="none">
                 {section.items.map((item) => {
                   const isActive = pathname === item.href;
@@ -169,17 +173,5 @@ const styles = stylex.create({
     fontSize: 15,
     fontWeight: 650,
     letterSpacing: "-0.01em",
-  },
-  wordmarkSubtitle: {
-    fontSize: 12,
-    color: "oklch(0.46 0.006 286)",
-  },
-  navSectionTitle: {
-    margin: 0,
-    paddingInline: 12,
-    fontSize: 12,
-    fontWeight: 650,
-    letterSpacing: "0.02em",
-    color: "oklch(0.46 0.006 286)",
   },
 });

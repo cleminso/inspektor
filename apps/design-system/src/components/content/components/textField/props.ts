@@ -1,0 +1,16 @@
+export const textFieldPropNames = [
+  "label",
+  "description",
+  "error",
+  "name",
+  "disabled",
+  "invalid",
+  "validate",
+  "validationMode",
+  "validationDebounceTime",
+  "fullWidth",
+  "size",
+  "defaultValue",
+  "value",
+  "onValueChange",
+] as const;

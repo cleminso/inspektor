@@ -16,6 +16,7 @@ description: Generates and updates `apps/design-system` documentation for `@insp
 
 ## Documentation workflow
 
+- Start with an idempotency check across the page, examples, prop selection, registry, extractor, generated metadata, and route. Update only missing or stale parts; when everything matches the public API, run validation without creating duplicate files or entries.
 - Add the component to `apps/design-system/src/lib/registry.ts` only when its page exists.
 - Give component items a stable `componentId`; do not use readiness or placeholder status markers.
 - Include title, route, description, package import path, and package source reference.
@@ -25,7 +26,7 @@ description: Generates and updates `apps/design-system` documentation for `@insp
 - Keep each executable example in its own camelCase TSX file.
 - Import each example normally for preview and with `?raw` for displayed source.
 - Use `PageHeader`, `Section`, `Example`, `CodeBlock`, and `PropsTable` rather than recreating page chrome.
-- Add a static route under `src/routes/components/`; never edit `routeTree.gen.ts`.
+- Add a static route under `src/routes/components/`; never hand-edit `routeTree.gen.ts`. Router generation may update the generated tree as a consequence of validation; review that generated change rather than recreating it manually.
 
 ## Props workflow
 

@@ -1,0 +1,45 @@
+import { Box } from "@inspector/ds";
+import { type ReactElement } from "react";
+
+import { Example } from "@/components/docs/example";
+import { PageHeader } from "@/components/docs/pageHeader";
+import { PropsTable } from "@/components/docs/propsTable";
+import { Section } from "@/components/docs/section";
+import { getGeneratedProps } from "@/lib/propsData";
+import { checkboxItem } from "@/lib/registry";
+
+import BasicExample from "./basicExample";
+import basicSource from "./basicExample.tsx?raw";
+import { checkboxPropNames } from "./props";
+import StatesExample from "./statesExample";
+import statesSource from "./statesExample.tsx?raw";
+
+const checkboxProps = getGeneratedProps(checkboxItem.componentId, checkboxPropNames);
+
+export function CheckboxPage(): ReactElement {
+  return (
+    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+      <PageHeader
+        title={checkboxItem.title}
+        description={checkboxItem.description}
+        source={checkboxItem.source}
+      />
+
+      <Section title="Field" description="Use Field.Label to provide an accessible name.">
+        <Example source={basicSource}>
+          <BasicExample />
+        </Example>
+      </Section>
+
+      <Section title="States" description="Checkbox supports checked, mixed, disabled, and size states.">
+        <Example source={statesSource}>
+          <StatesExample />
+        </Example>
+      </Section>
+
+      <Section title="Props" description="Checkbox participates in Field and Form automatically.">
+        <PropsTable rows={checkboxProps} />
+      </Section>
+    </Box>
+  );
+}

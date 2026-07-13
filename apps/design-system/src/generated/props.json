@@ -1,4 +1,152 @@
 {
+  "checkbox": [
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the checkbox dimensions.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls whether the checkbox is checked.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "defaultChecked",
+      "type": "boolean",
+      "required": false,
+      "description": "Sets the initial checked state when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 21
+      }
+    },
+    {
+      "name": "onCheckedChange",
+      "type": "(checked: boolean, eventDetails: CheckboxRootChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the checked state changes.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 23
+      }
+    },
+    {
+      "name": "indeterminate",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Displays a mixed state.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 25
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the checkbox during form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 27
+      }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Sets the submitted value when checked.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 29
+      }
+    },
+    {
+      "name": "uncheckedValue",
+      "type": "string",
+      "required": false,
+      "description": "Sets the submitted value when unchecked.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 31
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables interaction.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 33
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents changes while preserving interaction semantics.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 35
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Requires the checkbox to be checked for valid form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 37
+      }
+    },
+    {
+      "name": "nativeButton",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Indicates that a composed root renders a native button.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 39
+      }
+    },
+    {
+      "name": "inputRef",
+      "type": "((instance: HTMLInputElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<HTMLInputElement | null>",
+      "required": false,
+      "description": "Provides access to the hidden native input.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 41
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, CheckboxRootState>",
+      "required": false,
+      "description": "Composes Checkbox behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 43
+      }
+    }
+  ],
   "button": [
     {
       "name": "variant",
@@ -85,6 +233,503 @@
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
         "line": 70
+      }
+    }
+  ],
+  "input": [
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the input height.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the input to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables editing and exposes the disabled state to assistive technology.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the initial value when the input is uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "value",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the current value when the input is controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: string, eventDetails: BaseInput.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the input value changes.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, InputState>",
+      "required": false,
+      "description": "Composes Input behavior and styles onto another input element.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 28
+      }
+    }
+  ],
+  "field.root": [
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the field and its control.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 9
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the field when a form is submitted.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 11
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls invalid state from an external form library.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 13
+      }
+    },
+    {
+      "name": "dirty",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls dirty state from an external form library.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 15
+      }
+    },
+    {
+      "name": "touched",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls touched state from an external form library.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "validate",
+      "type": "(value: unknown, formValues: Form.Values) => string | string[] | null | Promise<string | string[] | null>",
+      "required": false,
+      "description": "Validates the field value and returns validation messages.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "validationMode",
+      "type": "\"onSubmit\" | \"onBlur\" | \"onChange\"",
+      "required": false,
+      "description": "Selects when field validation runs.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 21
+      }
+    },
+    {
+      "name": "validationDebounceTime",
+      "type": "number",
+      "required": false,
+      "description": "Delays validation while using change validation.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 23
+      }
+    },
+    {
+      "name": "actionsRef",
+      "type": "RefObject<FieldRootActions | null>",
+      "required": false,
+      "description": "Provides access to imperative field actions.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 25
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FieldRootState>",
+      "required": false,
+      "description": "Composes Field.Root behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 27
+      }
+    }
+  ],
+  "field.label": [
+    {
+      "name": "nativeLabel",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Indicates whether the rendered element uses native label behavior.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FieldLabelState>",
+      "required": false,
+      "description": "Composes Field.Label behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 34
+      }
+    }
+  ],
+  "field.description": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FieldDescriptionState>",
+      "required": false,
+      "description": "Composes Field.Description behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 40
+      }
+    }
+  ],
+  "field.error": [
+    {
+      "name": "match",
+      "type": "boolean | keyof ValidityState",
+      "required": false,
+      "description": "Selects the validity condition that displays the error. Use true for externally controlled errors.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 45
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FieldErrorState>",
+      "required": false,
+      "description": "Composes Field.Error behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/field/field.tsx",
+        "line": 47
+      }
+    }
+  ],
+  "fieldset.root": [
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables every form control in the fieldset.",
+      "source": {
+        "path": "packages/design-system/src/components/fieldset/fieldset.tsx",
+        "line": 10
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FieldsetRootState>",
+      "required": false,
+      "description": "Composes Fieldset.Root behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/fieldset/fieldset.tsx",
+        "line": 12
+      }
+    }
+  ],
+  "fieldset.legend": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FieldsetLegendState>",
+      "required": false,
+      "description": "Composes Fieldset.Legend behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/fieldset/fieldset.tsx",
+        "line": 18
+      }
+    }
+  ],
+  "form": [
+    {
+      "name": "validationMode",
+      "type": "\"onSubmit\" | \"onBlur\" | \"onChange\"",
+      "required": false,
+      "defaultValue": "\"onSubmit\"",
+      "description": "Selects when fields in the form are validated.",
+      "source": {
+        "path": "packages/design-system/src/components/form/form.tsx",
+        "line": 9
+      }
+    },
+    {
+      "name": "errors",
+      "type": "Errors",
+      "required": false,
+      "description": "Supplies external validation errors keyed by Field.Root name.",
+      "source": {
+        "path": "packages/design-system/src/components/form/form.tsx",
+        "line": 11
+      }
+    },
+    {
+      "name": "onFormSubmit",
+      "type": "(formValues: FormValues, eventDetails: BaseForm.SubmitEventDetails) => void",
+      "required": false,
+      "description": "Receives consolidated field values after successful validation.",
+      "source": {
+        "path": "packages/design-system/src/components/form/form.tsx",
+        "line": 13
+      }
+    },
+    {
+      "name": "actionsRef",
+      "type": "RefObject<FormActions | null>",
+      "required": false,
+      "description": "Provides access to imperative form validation.",
+      "source": {
+        "path": "packages/design-system/src/components/form/form.tsx",
+        "line": 15
+      }
+    },
+    {
+      "name": "onSubmit",
+      "type": "(event: BaseUIEvent<SubmitEvent<HTMLFormElement>>) => void",
+      "required": false,
+      "description": "Handles the native submit event after successful validation.",
+      "source": {
+        "path": "packages/design-system/src/components/form/form.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "action",
+      "type": "string | ((formData: FormData) => void | Promise<void>)",
+      "required": false,
+      "description": "Selects a URL or function that handles form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/form/form.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FormState>",
+      "required": false,
+      "description": "Composes Form behavior and styles onto another form element.",
+      "source": {
+        "path": "packages/design-system/src/components/form/form.tsx",
+        "line": 21
+      }
+    }
+  ],
+  "textField": [
+    {
+      "name": "label",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Provides the input's accessible label.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 10
+      }
+    },
+    {
+      "name": "description",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Provides supporting information associated with the input.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 12
+      }
+    },
+    {
+      "name": "error",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Displays an externally controlled error message.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 14
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the field during form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "description": "Controls the input height.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the field and input.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls invalid state from an external form library.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "validate",
+      "type": "(value: unknown, formValues: Form.Values) => string | string[] | null | Promise<string | string[] | null>",
+      "required": false,
+      "description": "Validates the input value and returns validation messages.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the initial value when the input is uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "validationMode",
+      "type": "\"onSubmit\" | \"onBlur\" | \"onChange\"",
+      "required": false,
+      "description": "Selects when field validation runs.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "value",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the current value when the input is controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "validationDebounceTime",
+      "type": "number",
+      "required": false,
+      "description": "Delays validation while using change validation.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: string, eventDetails: Input.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the input value changes.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Stretches the input to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/textField/textField.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, InputState>",
+      "required": false,
+      "description": "Composes Input behavior and styles onto another input element.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 28
       }
     }
   ]

@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Ownership boundary](#ownership-boundary)
+- [Idempotent updates](#idempotent-updates)
 - [Required files](#required-files)
 - [Generated props](#generated-props)
 - [Examples](#examples)
@@ -18,6 +19,12 @@ Do not fix generated metadata in `props.json` or duplicate API facts in a page. 
 
 Examples must demonstrate the closed styling contract. Do not teach consumers to pass `className`, inline `style`, raw CSS values, or arbitrary styling callbacks to design-system components.
 
+## Idempotent updates
+
+Inspect all documentation surfaces for the component: public package export, extraction entry, extractor tests, generated metadata, registry item, content page, examples, prop selection, and static route. Compare them with the current package API.
+
+Create only absent surfaces and update only stale facts or examples. If every surface already matches, make no source edits and run the validation commands. This keeps repeated documentation requests safe and avoids duplicate navigation, extraction entries, or routes.
+
 ## Required files
 
 A component page normally includes:
@@ -30,6 +37,8 @@ A component page normally includes:
 - one extraction entry and generated JSON record
 
 Navigation contains documented components only. Do not add planned components or readiness badges to reserve future routes.
+
+Static route files are authored source. `routeTree.gen.ts` is generated output and must not be hand-edited. Router tooling may regenerate it when a static route is added; review and retain the generated result produced by the repository commands.
 
 ## Generated props
 

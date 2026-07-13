@@ -8,18 +8,19 @@ export const paletteValues = stylex.defineConsts({
   black: 'oklch(0 0 0)',
 
   // Light-mode gray (Zedokai-light)
-  gray50: 'oklch(0.988 0.004 34.309)', // lightest surface background
-  gray100: 'oklch(0.953 0.004 34.31)', // main background
-  gray150: 'oklch(0.949 0.006 43.334)', // panel/subheader/status/tab background
-  gray200: 'oklch(0.925 0.004 34.309)', // title bar background
-  gray250: 'oklch(0.9 0.025 34.357)', // highlight/search match surface
-  gray300: 'oklch(0.893 0.007 28.836)', // selected/disabled border, element background
-  gray325: 'oklch(0.853 0.007 28.838)', // terminal black
-  gray350: 'oklch(0.852 0.006 43.325)', // border
-  gray400: 'oklch(0.791 0.007 5.675)', // line number
-  gray500: 'oklch(0.708 0.007 5.708)', // comment/focused foreground
-  gray600: 'oklch(0.645 0.007 350.912)', // muted/secondary foreground, punctuation
-  gray800: 'oklch(0.268 0.013 320.606)', // primary foreground
+  gray50: 'oklch(0.988 0 180)', // lightest surface background
+  gray100: 'oklch(0.977 0 171.87)', // main background
+  gray150: 'oklch(0.95 0 171.254)', // panel/subheader/status/tab background
+  gray200: 'oklch(0.94 0 171.254)', // title bar background
+  gray250: 'oklch(0.9 0 171.254)', // highlight/search match surface
+  gray300: 'oklch(0.887 0 180)', // selected/disabled border, element background
+  gray325: 'oklch(0.875 0 180)', // terminal black
+  gray350: 'oklch(0.850 0 180)', // border
+  gray400: 'oklch(0.722 0 180)', // line number
+  gray500: 'oklch(0.567 0 194.036)', // comment/focused foreground
+  gray600: 'oklch(0.448 0 164.055)', // muted/secondary foreground, punctuation
+  gray700: 'oklch(0.378 0 180)',
+  gray800: 'oklch(0.209 0 201.801)', // primary foreground
 
 
   // Dark-mode neutral (Zedokai)
@@ -35,8 +36,10 @@ export const paletteValues = stylex.defineConsts({
   neutral900: 'oklch(0.211 0.0042 308.24)', // disabled/selected border, drop target
 
   // Red - Danger
-  red400: 'oklch(0.706 0.194 8.454)', // danger/error/deleted, keyword/operator/tag
-  red500: 'oklch(0.627 0.192 6.574)',
+  red400: 'oklch(0.664 0.185 18.101)', // danger/error/deleted, keyword/operator/tag
+  red500: 'oklch(0.645 0.207 18.268)',
+  red550: 'oklch(0.614 0.185 18.101)',
+  red600: 'oklch(0.597 0.191 18.101)',
 
   // Green - Success
   green300: 'oklch(0.836 0.142 130.714)', // success/created, function/label/link uri
