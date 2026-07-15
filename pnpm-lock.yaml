@@ -57,6 +57,9 @@ catalogs:
     react-dom:
       specifier: 19.2.6
       version: 19.2.6
+    react-resizable-panels:
+      specifier: ^4.11.2
+      version: 4.11.2
     shadcn:
       specifier: ^4.12.0
       version: 4.12.0
@@ -84,11 +87,7 @@ catalogs:
 
 importers:
 
-  .:
-    dependencies:
-      react-resizable-panels:
-        specifier: ^4.11.2
-        version: 4.11.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+  .: {}
 
   apps/design-system:
     dependencies:
@@ -420,6 +419,12 @@ importers:
       react-dom:
         specifier: ^18 || ^19
         version: 19.2.6(react@19.2.6)
+      react-resizable-panels:
+        specifier: 'catalog:'
+        version: 4.11.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      sonner:
+        specifier: 'catalog:'
+        version: 2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
     devDependencies:
       '@stylexjs/eslint-plugin':
         specifier: ^0.19.0

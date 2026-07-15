@@ -19,6 +19,7 @@ export const comboboxStyles = stylex.create({
   },
   inputGroupInvalid: { borderColor: borderColors["border-danger"] },
   inputGroupDisabled: { backgroundColor: backgroundColors["bg-primary"] },
+  inputGroupFullWidth: { width: "100%" },
   input: {
     borderWidth: 0,
     flex: "1",
@@ -75,8 +76,7 @@ export const comboboxStyles = stylex.create({
   },
   popupFooter: {
     flexShrink: 0,
-      padding: spacing.xs,
-
+    padding: spacing.xs,
   },
   viewport: {
     padding: spacing.xs,
@@ -155,6 +155,13 @@ export const comboboxStyles = stylex.create({
     height: 1,
   },
   empty: {
+    padding: spacing.l,
+    color: textColors["text-secondary"],
+    display: "block",
+    fontFamily: fontFamilies.sans,
+    fontSize: fontSizes[2],
+  },
+  status: {
     padding: spacing.l,
     color: textColors["text-secondary"],
     display: "block",

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@inspector/ds";
 import { Button } from "@regarde/ui/button";
-import { ResizableGroup, ResizablePanel, ResizableSeparator } from "@regarde/ui/resizablePanel";
 
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
 import { DataGrid } from "@/components/table-explorer/data/dataGrid";
@@ -34,8 +34,8 @@ export function DataView({
   });
 
   return (
-    <ResizableGroup orientation="horizontal" className="min-w-0 bg-background">
-      <ResizablePanel className="min-w-0 overflow-hidden">
+    <ResizablePanelGroup orientation="horizontal">
+      <ResizablePanel>
         <div className="flex h-full flex-col overflow-hidden">
           <ActionsBar
             view={view}
@@ -93,8 +93,8 @@ export function DataView({
       </ResizablePanel>
       {state.rowEditor.isOpen === true ? (
         <>
-          <ResizableSeparator />
-          <ResizablePanel className="min-w-0 overflow-hidden" defaultSize={420} minSize={320} maxSize={720}>
+          <ResizableHandle />
+          <ResizablePanel defaultSize={420} minSize={320} maxSize={720}>
             <RowEditorSidePanel
               mode={state.rowEditor.mode === "insert" ? "insert" : "edit"}
               editedRowIds={state.rowEditor.editedRowIds}
@@ -129,6 +129,6 @@ export function DataView({
           </ResizablePanel>
         </>
       ) : null}
-    </ResizableGroup>
+    </ResizablePanelGroup>
   );
 }

@@ -14,8 +14,8 @@ import {
 export const backgroundColors = stylex.defineVars({
   'bg-surface-1': `light-dark(${palette.gray50}, ${palette.neutral900})`,
   'bg-primary': `light-dark(${palette.gray100}, ${palette.neutral850})`,
-  'bg-secondary': `light-dark(${palette.gray150}, ${palette.neutral800})`,
-  'bg-surface-hover': `light-dark(${palette.gray150}, ${palette.neutral750})`,
+  'bg-secondary': `light-dark(${palette.gray200}, ${palette.neutral750})`,
+  'bg-surface-hover': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'bg-surface-selected': `light-dark(${palette.gray200}, ${palette.neutral850})`,
   'bg-surface-highlight': `light-dark(${palette.gray250}, ${palette.neutral725})`,
   'bg-danger': `light-dark(${palette.red500}, ${palette.red600})`,
@@ -45,7 +45,7 @@ export const textColors = stylex.defineVars({
 export const borderColors = stylex.defineVars({
   'border': `light-dark(${palette.gray350}, ${palette.neutral700})`,
   'border-secondary': `light-dark(${palette.gray250}, ${palette.neutral700})`,
-  'border-focused': `light-dark(${palette.gray500}, ${palette.neutral500})`,
+  'border-focused': `light-dark(${palette.gray500}, ${palette.neutral800})`,
 
   'border-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
   'border-danger': `light-dark(${palette.red500}, ${palette.red400})`,

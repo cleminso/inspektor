@@ -51,6 +51,7 @@ export const buttonStyles = stylex.create({
   secondary: {
     backgroundColor: {
       default: backgroundColors['bg-secondary'],
+      ':hover': backgroundColors['bg-secondary'],
       ':active': backgroundColors['bg-secondary'],
     },
     color: textColors['text-primary'],

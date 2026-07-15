@@ -1,35 +1,17 @@
-import { Button, useClipboard } from "@inspector/ds";
+import { CopyButton } from "@inspector/ds";
 import * as stylex from "@stylexjs/stylex";
-import { Check, Copy } from "lucide-react";
 import { type ReactElement } from "react";
 
 import { useHighlightedCode } from "@/lib/shiki";
 
 export function CodeBlock({ source }: { source: string }): ReactElement {
-  const { copied, error, copy } = useClipboard();
   const code = source.trim();
   const highlightedHtml = useHighlightedCode(code);
-
-  const handleCopy = (): void => {
-    void copy(source).catch(() => undefined);
-  };
 
   return (
     <div {...stylex.props(styles.root)}>
       <div {...stylex.props(styles.copyAction)}>
-        <Button
-          variant="ghost"
-          size="icon-s"
-          onClick={handleCopy}
-          aria-label={copied === true ? "Copied source" : "Copy source"}
-          render={<button title={copied === true ? "Copied" : "Copy source"} />}
-        >
-          {copied === true ? (
-            <Check aria-hidden="true" size={14} />
-          ) : (
-            <Copy aria-hidden="true" size={14} />
-          )}
-        </Button>
+        <CopyButton textToCopy={source} label="Copy source" />
       </div>
       {highlightedHtml !== null ? (
         <div
@@ -41,14 +23,6 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
           <code>{code}</code>
         </pre>
       )}
-      {error !== null ? (
-        <span role="status" {...stylex.props(styles.error)}>
-          Source could not be copied.
-        </span>
-      ) : null}
-      <span aria-live="polite" {...stylex.props(styles.visuallyHidden)}>
-        {copied === true ? "Source copied to clipboard." : ""}
-      </span>
     </div>
   );
 }
@@ -76,21 +50,5 @@ const styles = stylex.create({
     lineHeight: "20px",
     color: "light-dark(#24292e, #e1e4e8)",
     whiteSpace: "pre",
-  },
-  error: {
-    display: "block",
-    padding: "0 16px 12px",
-    fontSize: 12,
-    color: "light-dark(oklch(0.627 0.192 6.574), oklch(0.706 0.194 8.454))",
-  },
-  visuallyHidden: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    padding: 0,
-    overflow: "hidden",
-    clip: "rect(0, 0, 0, 0)",
-    whiteSpace: "nowrap",
-    borderWidth: 0,
   },
 });

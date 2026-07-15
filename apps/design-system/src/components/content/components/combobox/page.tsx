@@ -12,11 +12,9 @@ import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
 import ControlledExample from "./controlledExample";
 import controlledSource from "./controlledExample.tsx?raw";
-import ConnectionSwitcherExample from "./connectionSwitcherExample";
-import connectionSwitcherSource from "./connectionSwitcherExample.tsx?raw";
-import ContentWidthExample from "./contentWidthExample";
-import contentWidthSource from "./contentWidthExample.tsx?raw";
 import {
+  comboboxClearPropNames,
+  comboboxContentPropNames,
   comboboxIndicatorPropNames,
   comboboxInputTriggerPropNames,
   comboboxItemPropNames,
@@ -31,6 +29,8 @@ import {
 } from "./props";
 
 const rootProps = getGeneratedProps("combobox.root", comboboxRootPropNames);
+const contentProps = getGeneratedProps("combobox.content", comboboxContentPropNames);
+const clearProps = getGeneratedProps("combobox.clear", comboboxClearPropNames);
 const triggerProps = getGeneratedProps("combobox.trigger", comboboxTriggerPropNames);
 const inputTriggerProps = getGeneratedProps("combobox.inputTrigger", comboboxInputTriggerPropNames);
 const positionerProps = getGeneratedProps("combobox.positioner", comboboxPositionerPropNames);
@@ -52,19 +52,9 @@ export function ComboboxPage(): ReactElement {
       <Section title="Controlled value" description="Control the selected item while Base UI manages filtering and keyboard behavior.">
         <Example source={controlledSource} align="stretch"><ControlledExample /></Example>
       </Section>
-      <Section
-        title="Resource switcher"
-        description="Place the input inside the popup for filterable resource switchers with rich items and a footer action."
-      >
-        <Example source={connectionSwitcherSource}><ConnectionSwitcherExample /></Example>
-      </Section>
-      <Section
-        title="Content-sized popup"
-        description="Use content width when long values should determine the popup width while remaining constrained to the available viewport."
-      >
-        <Example source={contentWidthSource}><ContentWidthExample /></Example>
-      </Section>
       <Section title="Root props"><PropsTable rows={rootProps} /></Section>
+      <Section title="Content props"><PropsTable rows={contentProps} /></Section>
+      <Section title="Clear props"><PropsTable rows={clearProps} /></Section>
       <Section title="Trigger props"><PropsTable rows={triggerProps} /></Section>
       <Section title="Input trigger props"><PropsTable rows={inputTriggerProps} /></Section>
       <Section title="Positioner props"><PropsTable rows={positionerProps} /></Section>

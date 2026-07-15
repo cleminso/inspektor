@@ -35,6 +35,226 @@ test("extracts runtime defaults instead of JSDoc default tags", () => {
   assert.equal(buttonProps.find(({ name }) => name === "disabled")?.defaultValue, "false");
 });
 
+test("extracts the constrained CopyButton API", () => {
+  const metadata = extractPropsMetadata();
+  const copyButtonProps = metadata.copyButton;
+
+  assert.deepEqual(
+    copyButtonProps?.map(({ name }) => name),
+    [
+      "textToCopy",
+      "label",
+      "copiedLabel",
+      "errorLabel",
+      "size",
+      "variant",
+      "disabled",
+      "tooltipSide",
+      "onCopy",
+      "onCopyError",
+    ],
+  );
+  assert.equal(copyButtonProps?.find(({ name }) => name === "copiedLabel")?.defaultValue, '"Copied"');
+  assert.equal(copyButtonProps?.find(({ name }) => name === "size")?.defaultValue, '"icon-s"');
+  assert.equal(copyButtonProps?.find(({ name }) => name === "variant")?.defaultValue, '"ghost"');
+  assert.equal(copyButtonProps?.find(({ name }) => name === "className"), undefined);
+  assert.equal(copyButtonProps?.find(({ name }) => name === "children"), undefined);
+});
+
+test("extracts the constrained resizable panel APIs", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata.resizablePanelGroup?.map(({ name }) => name),
+    [
+      "orientation",
+      "defaultLayout",
+      "disabled",
+      "disableCursor",
+      "id",
+      "onLayoutChange",
+      "onLayoutChanged",
+      "groupRef",
+      "elementRef",
+    ],
+  );
+  assert.equal(
+    metadata.resizablePanelGroup?.find(({ name }) => name === "orientation")?.defaultValue,
+    '"horizontal"',
+  );
+  assert.deepEqual(
+    metadata.resizablePanel?.map(({ name }) => name),
+    [
+      "id",
+      "defaultSize",
+      "minSize",
+      "maxSize",
+      "collapsedSize",
+      "collapsible",
+      "disabled",
+      "groupResizeBehavior",
+      "onResize",
+      "panelRef",
+      "elementRef",
+    ],
+  );
+  assert.equal(
+    metadata.resizablePanel?.find(({ name }) => name === "groupResizeBehavior")?.defaultValue,
+    '"preserve-relative-size"',
+  );
+  assert.deepEqual(
+    metadata.resizableHandle?.map(({ name }) => name),
+    ["appearance", "id", "disabled", "disableDoubleClick", "elementRef"],
+  );
+  assert.equal(
+    metadata.resizableHandle?.find(({ name }) => name === "appearance")?.defaultValue,
+    '"line"',
+  );
+  assert.equal(metadata.resizablePanelGroup?.find(({ name }) => name === "className"), undefined);
+  assert.equal(metadata.resizablePanel?.find(({ name }) => name === "style"), undefined);
+  assert.equal(metadata.resizableHandle?.find(({ name }) => name === "className"), undefined);
+});
+
+test("extracts the constrained Switch API", () => {
+  const metadata = extractPropsMetadata();
+  const switchProps = metadata.switch;
+
+  assert.deepEqual(
+    switchProps?.map(({ name }) => name),
+    [
+      "size",
+      "checked",
+      "defaultChecked",
+      "onCheckedChange",
+      "name",
+      "value",
+      "form",
+      "uncheckedValue",
+      "disabled",
+      "readOnly",
+      "required",
+      "nativeButton",
+      "inputRef",
+      "render",
+    ],
+  );
+  assert.equal(switchProps?.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(switchProps?.find(({ name }) => name === "disabled")?.defaultValue, "false");
+  assert.equal(switchProps?.find(({ name }) => name === "className"), undefined);
+});
+
+test("extracts the constrained Tooltip compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata["tooltip.provider"]?.map(({ name }) => name),
+    ["delay", "closeDelay", "timeout"],
+  );
+  assert.equal(
+    metadata["tooltip.provider"]?.find(({ name }) => name === "timeout")?.defaultValue,
+    "400",
+  );
+  assert.deepEqual(
+    metadata["tooltip.root"]?.map(({ name }) => name),
+    [
+      "defaultOpen",
+      "open",
+      "onOpenChange",
+      "onOpenChangeComplete",
+      "disableHoverablePopup",
+      "trackCursorAxis",
+      "actionsRef",
+      "disabled",
+    ],
+  );
+  assert.equal(
+    metadata["tooltip.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
+    "false",
+  );
+  assert.deepEqual(
+    metadata["tooltip.trigger"]?.map(({ name }) => name),
+    ["delay", "closeOnClick", "closeDelay", "disabled", "render"],
+  );
+  assert.deepEqual(
+    metadata["tooltip.content"]?.map(({ name }) => name),
+    ["side", "align", "sideOffset"],
+  );
+  assert.equal(
+    metadata["tooltip.content"]?.find(({ name }) => name === "side")?.defaultValue,
+    '"top"',
+  );
+  assert.equal(metadata["tooltip.trigger"]?.find(({ name }) => name === "className"), undefined);
+});
+
+test("extracts the constrained Toaster API", () => {
+  const metadata = extractPropsMetadata();
+  const toasterProps = metadata.toaster;
+
+  assert.deepEqual(
+    toasterProps?.map(({ name }) => name),
+    ["position", "closeButton"],
+  );
+  assert.equal(
+    toasterProps?.find(({ name }) => name === "position")?.defaultValue,
+    '"bottom-right"',
+  );
+  assert.equal(
+    toasterProps?.find(({ name }) => name === "closeButton")?.defaultValue,
+    "true",
+  );
+  assert.equal(toasterProps?.find(({ name }) => name === "className"), undefined);
+});
+
+test("extracts the constrained ButtonGroup compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata["buttonGroup.root"]?.map(({ name }) => name),
+    ["orientation", "render"],
+  );
+  assert.equal(
+    metadata["buttonGroup.root"]?.find(({ name }) => name === "orientation")?.defaultValue,
+    '"horizontal"',
+  );
+  assert.equal(
+    metadata["buttonGroup.separator"]?.find(({ name }) => name === "orientation")?.defaultValue,
+    '"vertical"',
+  );
+  assert.equal(metadata["buttonGroup.text"], undefined);
+  assert.equal(metadata["buttonGroup.root"]?.find(({ name }) => name === "className"), undefined);
+  assert.equal(metadata["buttonGroup.separator"]?.find(({ name }) => name === "style"), undefined);
+});
+
+test("extracts the constrained ToggleGroup compound API", () => {
+  const metadata = extractPropsMetadata();
+  const rootProps = metadata["toggleGroup.root"];
+  const itemProps = metadata["toggleGroup.item"];
+
+  assert.deepEqual(
+    rootProps?.map(({ name }) => name),
+    [
+      "value",
+      "defaultValue",
+      "onValueChange",
+      "loopFocus",
+      "multiple",
+      "disabled",
+      "orientation",
+      "render",
+    ],
+  );
+  assert.equal(rootProps?.find(({ name }) => name === "loopFocus")?.defaultValue, "true");
+  assert.equal(rootProps?.find(({ name }) => name === "multiple")?.defaultValue, "false");
+  assert.equal(rootProps?.find(({ name }) => name === "orientation")?.defaultValue, '"horizontal"');
+  assert.deepEqual(
+    itemProps?.map(({ name }) => name),
+    ["value", "onPressedChange", "nativeButton", "disabled", "render"],
+  );
+  assert.equal(itemProps?.find(({ name }) => name === "nativeButton")?.defaultValue, "true");
+  assert.equal(itemProps?.find(({ name }) => name === "className"), undefined);
+  assert.equal(itemProps?.find(({ name }) => name === "pressed"), undefined);
+});
+
 test("extracts Input API facts from the public package export", () => {
   const metadata = extractPropsMetadata();
   const inputProps = metadata.input;
@@ -215,11 +435,16 @@ test("extracts the constrained Combobox compound API", () => {
   assert.equal(metadata["combobox.trigger"]?.find(({ name }) => name === "variant")?.defaultValue, '"ghost"');
   assert.equal(metadata["combobox.inputTrigger"]?.find(({ name }) => name === "disabled")?.defaultValue, "false");
   assert.equal(metadata["combobox.input"]?.find(({ name }) => name === "size"), undefined);
+  assert.equal(metadata["combobox.inputGroup"]?.find(({ name }) => name === "fullWidth")?.defaultValue, "false");
+  assert.equal(metadata["combobox.content"]?.find(({ name }) => name === "width")?.defaultValue, '"anchor"');
+  assert.equal(metadata["combobox.clear"]?.find(({ name }) => name === "label")?.defaultValue, '"Clear selection"');
+  assert.ok(metadata["combobox.status"]);
   assert.equal(metadata["combobox.popup"]?.find(({ name }) => name === "width")?.defaultValue, '"anchor"');
   assert.match(metadata["combobox.popup"]?.find(({ name }) => name === "width")?.type ?? "", /"anchor".*"content"/);
   assert.equal(metadata["combobox.viewport"]?.find(({ name }) => name === "maxHeight")?.defaultValue, '"m"');
   assert.equal(metadata["combobox.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue, "4");
-  assert.equal(metadata["combobox.clear"], undefined);
+  assert.deepEqual(metadata["combobox.item"]?.map(({ name }) => name), ["value", "indicator"]);
+  assert.equal(metadata["combobox.item"]?.find(({ name }) => name === "indicator")?.defaultValue, '"check"');
   assert.deepEqual(metadata["combobox.itemText"]?.map(({ name }) => name), ["label", "description"]);
   assert.ok(metadata["combobox.label"]);
   assert.ok(metadata["combobox.value"]);
@@ -227,6 +452,62 @@ test("extracts the constrained Combobox compound API", () => {
   assert.ok(metadata["combobox.popupFooter"]);
   assert.ok(metadata["combobox.separator"]);
   assert.equal(metadata["combobox.input"]?.find(({ name }) => name === "style"), undefined);
+});
+
+test("extracts the constrained ContextSwitcher compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata["contextSwitcher.root"]?.map(({ name }) => name),
+    [
+      "items",
+      "value",
+      "defaultValue",
+      "onValueChange",
+      "defaultOpen",
+      "open",
+      "onOpenChange",
+      "itemToStringLabel",
+      "itemToStringValue",
+      "isItemEqualToValue",
+      "filter",
+      "disabled",
+    ],
+  );
+  assert.equal(
+    metadata["contextSwitcher.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
+    "false",
+  );
+  assert.deepEqual(
+    metadata["contextSwitcher.trigger"]?.map(({ name }) => name),
+    ["label", "size", "width", "disabled", "title"],
+  );
+  assert.equal(
+    metadata["contextSwitcher.trigger"]?.find(({ name }) => name === "size")?.defaultValue,
+    '"m"',
+  );
+  assert.equal(
+    metadata["contextSwitcher.trigger"]?.find(({ name }) => name === "width")?.defaultValue,
+    '"content"',
+  );
+  assert.equal(
+    metadata["contextSwitcher.popup"]?.find(({ name }) => name === "width")?.defaultValue,
+    '"m"',
+  );
+  assert.deepEqual(
+    metadata["contextSwitcher.search"]?.map(({ name }) => name),
+    ["label", "placeholder"],
+  );
+  assert.equal(
+    metadata["contextSwitcher.content"]?.find(({ name }) => name === "maxHeight")?.defaultValue,
+    '"m"',
+  );
+  assert.equal(
+    metadata["contextSwitcher.item"]?.find(({ name }) => name === "indicator")?.defaultValue,
+    '"check"',
+  );
+  assert.equal(metadata["contextSwitcher.trigger"]?.find(({ name }) => name === "className"), undefined);
+  assert.equal(metadata["contextSwitcher.popup"]?.find(({ name }) => name === "style"), undefined);
 });
 
 test("extracts the constrained Select compound API", () => {

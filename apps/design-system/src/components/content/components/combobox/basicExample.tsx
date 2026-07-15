@@ -12,21 +12,16 @@ export default function BasicExample(): ReactElement {
           <Combobox.Input placeholder="Filter branches" />
           <Combobox.InputTrigger />
         </Combobox.InputGroup>
-        <Combobox.Portal>
-          <Combobox.Positioner>
-            <Combobox.Popup>
-              <Combobox.Empty>No branches found.</Combobox.Empty>
-              <Combobox.List>
-                {(branch: string) => (
-                  <Combobox.Item key={branch} value={branch}>
-                    <Combobox.ItemIndicator />
-                    {branch}
-                  </Combobox.Item>
-                )}
-              </Combobox.List>
-            </Combobox.Popup>
-          </Combobox.Positioner>
-        </Combobox.Portal>
+        <Combobox.Content>
+          <Combobox.Empty>No branches found.</Combobox.Empty>
+          <Combobox.List>
+            {(branch: string) => (
+              <Combobox.Item key={branch} value={branch}>
+                {branch}
+              </Combobox.Item>
+            )}
+          </Combobox.List>
+        </Combobox.Content>
       </Combobox.Root>
       <Field.Description>Choose one of the available application branches.</Field.Description>
     </Field.Root>

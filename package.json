@@ -18,8 +18,5 @@
     "build": "pnpm -r build"
   },
   "author": "cleminso",
-  "packageManager": "pnpm@11.9.0",
-  "dependencies": {
-    "react-resizable-panels": "^4.11.2"
-  }
+  "packageManager": "pnpm@11.9.0"
 }

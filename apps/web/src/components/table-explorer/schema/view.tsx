@@ -1,4 +1,4 @@
-import { CopyButton } from "@regarde/ui/copyButton";
+import { CopyButton } from "@inspector/ds";
 
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
 import { useInspector } from "@/components/providers/inspectorProvider";
@@ -26,7 +26,7 @@ export function SchemaView({ isListPaneOpen, onToggleListPane, onViewChange, tab
         <section className="flex min-h-0 flex-col overflow-hidden border-b border-border xl:border-r xl:border-b-0">
           <div className="flex h-10 shrink-0 items-center justify-between border-b border-border px-3">
             <h2 className="text-sm font-medium text-foreground">Schema</h2>
-            <CopyButton text={schemaJson} variant="ghost" size="icon-sm" />
+            <CopyButton textToCopy={schemaJson} label="Copy schema" />
           </div>
           <div className="app-scrollbar min-h-0 flex-1 overflow-auto p-3">
             <pre className="text-xs text-muted-foreground">{schemaJson}</pre>
@@ -35,7 +35,7 @@ export function SchemaView({ isListPaneOpen, onToggleListPane, onViewChange, tab
         <section className="flex min-h-0 flex-col overflow-hidden">
           <div className="flex h-10 shrink-0 items-center justify-between border-b border-border px-3">
             <h2 className="text-sm font-medium text-foreground">Permissions</h2>
-            <CopyButton text={permissionsJson} variant="ghost" size="icon-sm" />
+            <CopyButton textToCopy={permissionsJson} label="Copy permissions" />
           </div>
           <div className="app-scrollbar min-h-0 flex-1 overflow-auto p-3">
             <pre className="text-xs text-muted-foreground">{permissionsJson}</pre>

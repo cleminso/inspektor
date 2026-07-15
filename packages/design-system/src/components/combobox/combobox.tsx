@@ -24,6 +24,8 @@ export type ComboboxRootProps<Value> = Omit<
   onValueChange?: BaseCombobox.Root.Props<Value, false>["onValueChange"];
   /** The current filter input value. */
   inputValue?: BaseCombobox.Root.Props<Value, false>["inputValue"];
+  /** The initial filter input value when uncontrolled. */
+  defaultInputValue?: BaseCombobox.Root.Props<Value, false>["defaultInputValue"];
   /** Runs when the filter input value changes. */
   onInputValueChange?: BaseCombobox.Root.Props<Value, false>["onInputValueChange"];
   /** Whether the popup is initially open. */
@@ -32,17 +34,32 @@ export type ComboboxRootProps<Value> = Omit<
   open?: boolean;
   /** Runs when the popup opens or closes. */
   onOpenChange?: BaseCombobox.Root.Props<Value, false>["onOpenChange"];
+  /** Runs after an opening or closing transition completes. */
+  onOpenChangeComplete?: BaseCombobox.Root.Props<Value, false>["onOpenChangeComplete"];
   /** Converts an item into its displayed label. */
   itemToStringLabel?: BaseCombobox.Root.Props<Value, false>["itemToStringLabel"];
+  /** Converts an item into the value submitted with a form. */
+  itemToStringValue?: BaseCombobox.Root.Props<Value, false>["itemToStringValue"];
   /** Compares an item with the selected value. */
   isItemEqualToValue?: BaseCombobox.Root.Props<Value, false>["isItemEqualToValue"];
   /** Filters an item against the current query. */
   filter?: BaseCombobox.Root.Props<Value, false>["filter"];
+  /** Identifies the value when the combobox participates in form submission. */
+  name?: BaseCombobox.Root.Props<Value, false>["name"];
+  /** Associates the combobox with a form element. */
+  form?: BaseCombobox.Root.Props<Value, false>["form"];
+  /** Requires a selection before form submission. */
+  required?: BaseCombobox.Root.Props<Value, false>["required"];
+  /** Prevents selection changes while preserving focus and form participation. */
+  readOnly?: BaseCombobox.Root.Props<Value, false>["readOnly"];
   /** Disables the combobox. */
   disabled?: boolean;
 };
 
-export type ComboboxInputGroupProps = WithoutStyles<BaseCombobox.InputGroup.Props>;
+export interface ComboboxInputGroupProps extends WithoutStyles<BaseCombobox.InputGroup.Props> {
+  /** Stretches the input group to the width of its container. */
+  fullWidth?: boolean;
+}
 export type ComboboxInputProps = Omit<
   WithoutStyles<BaseCombobox.Input.Props>,
   "size" | "value"
@@ -100,6 +117,13 @@ export interface ComboboxPopupProps
   width?: ComboboxPopupWidth;
 }
 
+export interface ComboboxContentProps {
+  /** Content rendered inside the positioned popup. */
+  children?: ReactNode;
+  /** Controls the popup width using a design-system size. */
+  width?: ComboboxPopupWidth;
+}
+
 export interface ComboboxPopupHeaderProps
   extends Omit<useRender.ComponentProps<"div">, "className" | "style"> {
   /** Composes the header layout onto another element. */
@@ -124,11 +148,24 @@ export interface ComboboxViewportProps
 
 export type ComboboxSeparatorProps = WithoutStyles<BaseCombobox.Separator.Props>;
 export type ComboboxEmptyProps = WithoutStyles<BaseCombobox.Empty.Props>;
+export type ComboboxStatusProps = WithoutStyles<BaseCombobox.Status.Props>;
 export type ComboboxListProps = WithoutStyles<BaseCombobox.List.Props>;
+
+export interface ComboboxClearProps
+  extends Omit<WithoutStyles<BaseCombobox.Clear.Props>, "children" | "aria-label"> {
+  /** Accessible label for the clear action. */
+  label?: string;
+  /** Keeps the clear action mounted when no value is selected. */
+  keepMounted?: BaseCombobox.Clear.Props["keepMounted"];
+  /** Disables the clear action. */
+  disabled?: BaseCombobox.Clear.Props["disabled"];
+}
 
 export type ComboboxItemProps<Value> = Omit<WithoutStyles<BaseCombobox.Item.Props>, "value"> & {
   /** The item represented by this option. */
   value: Value;
+  /** Controls whether the standard selected indicator is displayed. */
+  indicator?: "check" | "none";
 };
 
 export interface ComboboxItemTextProps {
@@ -144,13 +181,28 @@ export interface ComboboxItemIndicatorProps
   keepMounted?: boolean;
 }
 
-function ComboboxRoot<Value>({ defaultOpen = false, disabled = false, ...props }: ComboboxRootProps<Value>) {
-  return <BaseCombobox.Root {...props} defaultOpen={defaultOpen} disabled={disabled} />;
+function ComboboxRoot<Value>({
+  defaultOpen = false,
+  required = false,
+  readOnly = false,
+  disabled = false,
+  ...props
+}: ComboboxRootProps<Value>) {
+  return (
+    <BaseCombobox.Root
+      {...props}
+      defaultOpen={defaultOpen}
+      required={required}
+      readOnly={readOnly}
+      disabled={disabled}
+    />
+  );
 }
 
-function ComboboxInputGroup(props: ComboboxInputGroupProps) {
+function ComboboxInputGroup({ fullWidth = false, ...props }: ComboboxInputGroupProps) {
   const stateStyles = createStateStyleProps<BaseCombobox.InputGroup.State>((state) => [
     comboboxStyles.inputGroup,
+    fullWidth === true && comboboxStyles.inputGroupFullWidth,
     state.valid === false && comboboxStyles.inputGroupInvalid,
     state.disabled === true && comboboxStyles.inputGroupDisabled,
   ]);
@@ -242,6 +294,16 @@ function ComboboxPopup({ width = "anchor", ...props }: ComboboxPopupProps) {
   return <BaseCombobox.Popup {...props} {...stateStyles} />;
 }
 
+function ComboboxContent({ children, width = "anchor" }: ComboboxContentProps) {
+  return (
+    <ComboboxPortal>
+      <ComboboxPositioner>
+        <ComboboxPopup width={width}>{children}</ComboboxPopup>
+      </ComboboxPositioner>
+    </ComboboxPortal>
+  );
+}
+
 function ComboboxPopupHeader({ render, ...props }: ComboboxPopupHeaderProps) {
   const styles = stylex.props(comboboxStyles.popupHeader);
   const defaultProps = {
@@ -293,12 +355,43 @@ function ComboboxSeparator(props: ComboboxSeparatorProps) {
   return <BaseCombobox.Separator {...props} {...styles} />;
 }
 
+function ComboboxClear({ label = "Clear selection", keepMounted = false, disabled = false, ...props }: ComboboxClearProps) {
+  const stateStyles = createStateStyleProps<BaseCombobox.Clear.State>((state) => [
+    comboboxStyles.action,
+    state.disabled === true && comboboxStyles.actionDisabled,
+  ]);
+  const iconStyles = stylex.props(comboboxStyles.icon);
+
+  return (
+    <BaseCombobox.Clear
+      aria-label={label}
+      {...props}
+      keepMounted={keepMounted}
+      disabled={disabled}
+      {...stateStyles}
+    >
+      <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" {...iconStyles}>
+        <path d="m4 4 8 8M12 4l-8 8" />
+      </svg>
+    </BaseCombobox.Clear>
+  );
+}
+
 function ComboboxEmpty({ children, ...props }: ComboboxEmptyProps) {
   const styles = stylex.props(comboboxStyles.empty);
   return (
     <BaseCombobox.Empty {...props}>
       <span {...styles}>{children}</span>
     </BaseCombobox.Empty>
+  );
+}
+
+function ComboboxStatus({ children, ...props }: ComboboxStatusProps) {
+  const styles = stylex.props(comboboxStyles.status);
+  return (
+    <BaseCombobox.Status {...props}>
+      <span {...styles}>{children}</span>
+    </BaseCombobox.Status>
   );
 }
 
@@ -310,13 +403,18 @@ function ComboboxList(props: ComboboxListProps) {
   return <BaseCombobox.List {...props} {...stateStyles} />;
 }
 
-function ComboboxItem<Value>({ value, ...props }: ComboboxItemProps<Value>) {
+function ComboboxItem<Value>({ value, indicator = "check", children, ...props }: ComboboxItemProps<Value>) {
   const stateStyles = createStateStyleProps<BaseCombobox.Item.State>((state) => [
     comboboxStyles.item,
     state.highlighted === true && comboboxStyles.itemHighlighted,
     state.disabled === true && comboboxStyles.itemDisabled,
   ]);
-  return <BaseCombobox.Item {...props} value={value} {...stateStyles} />;
+  return (
+    <BaseCombobox.Item {...props} value={value} {...stateStyles}>
+      {children}
+      {indicator === "check" ? <ComboboxItemIndicator /> : null}
+    </BaseCombobox.Item>
+  );
 }
 
 function ComboboxItemText({ label, description }: ComboboxItemTextProps) {
@@ -354,11 +452,14 @@ export const Combobox = Object.assign(ComboboxRoot, {
   Portal: ComboboxPortal,
   Positioner: ComboboxPositioner,
   Popup: ComboboxPopup,
+  Content: ComboboxContent,
   PopupHeader: ComboboxPopupHeader,
   PopupFooter: ComboboxPopupFooter,
   Viewport: ComboboxViewport,
+  Clear: ComboboxClear,
   Separator: ComboboxSeparator,
   Empty: ComboboxEmpty,
+  Status: ComboboxStatus,
   List: ComboboxList,
   Item: ComboboxItem,
   ItemText: ComboboxItemText,

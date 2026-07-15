@@ -147,6 +147,153 @@
       }
     }
   ],
+  "switch": [
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the switch dimensions.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 11
+      }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls whether the switch is checked.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 13
+      }
+    },
+    {
+      "name": "defaultChecked",
+      "type": "boolean",
+      "required": false,
+      "description": "Sets the initial checked state when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 15
+      }
+    },
+    {
+      "name": "onCheckedChange",
+      "type": "(checked: boolean, eventDetails: BaseSwitch.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the checked state changes.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the switch during form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Sets the submitted value when checked.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 21
+      }
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the form that owns the hidden input.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 23
+      }
+    },
+    {
+      "name": "uncheckedValue",
+      "type": "string",
+      "required": false,
+      "description": "Sets the submitted value when unchecked.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 25
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables interaction.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 27
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents changes while preserving interaction semantics.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 29
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Requires the switch to be checked for valid form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 31
+      }
+    },
+    {
+      "name": "nativeButton",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Indicates that a composed root renders a native button.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 33
+      }
+    },
+    {
+      "name": "inputRef",
+      "type": "((instance: HTMLInputElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<HTMLInputElement | null>",
+      "required": false,
+      "description": "Provides access to the hidden native input.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 35
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, SwitchRootState>",
+      "required": false,
+      "description": "Composes Switch behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/switch/switch.tsx",
+        "line": 37
+      }
+    }
+  ],
   "button": [
     {
       "name": "variant",
@@ -233,6 +380,798 @@
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
         "line": 70
+      }
+    }
+  ],
+  "copyButton": [
+    {
+      "name": "textToCopy",
+      "type": "string",
+      "required": true,
+      "description": "Text written to the clipboard when the button is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 13
+      }
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible action label that identifies what will be copied.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 15
+      }
+    },
+    {
+      "name": "copiedLabel",
+      "type": "string",
+      "required": false,
+      "defaultValue": "\"Copied\"",
+      "description": "Feedback shown after the text is copied.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "errorLabel",
+      "type": "string",
+      "required": false,
+      "defaultValue": "\"Could not copy\"",
+      "description": "Feedback shown when the clipboard operation fails.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"icon-s\" | \"icon-m\" | \"icon-l\"",
+      "required": false,
+      "defaultValue": "\"icon-s\"",
+      "description": "Controls the square button and icon size.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 21
+      }
+    },
+    {
+      "name": "variant",
+      "type": "\"ghost\" | \"secondary\" | \"outline\"",
+      "required": false,
+      "defaultValue": "\"ghost\"",
+      "description": "Controls the visual treatment and emphasis of the copy action.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 23
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents the copy action and its tooltip from being activated.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 25
+      }
+    },
+    {
+      "name": "tooltipSide",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
+      "required": false,
+      "defaultValue": "\"top\"",
+      "description": "Places the feedback tooltip on this side of the button.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 27
+      }
+    },
+    {
+      "name": "onCopy",
+      "type": "() => void",
+      "required": false,
+      "description": "Runs after text is successfully written to the clipboard.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 29
+      }
+    },
+    {
+      "name": "onCopyError",
+      "type": "(error: Error) => void",
+      "required": false,
+      "description": "Runs when writing text to the clipboard fails.",
+      "source": {
+        "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
+        "line": 31
+      }
+    }
+  ],
+  "resizablePanelGroup": [
+    {
+      "name": "orientation",
+      "type": "\"horizontal\" | \"vertical\"",
+      "required": false,
+      "defaultValue": "\"horizontal\"",
+      "description": "Controls whether panels are arranged and resized horizontally or vertically.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "defaultLayout",
+      "type": "Layout",
+      "required": false,
+      "description": "Restores a previously saved layout keyed by panel id.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables resizing for every panel and handle in the group.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 42
+      }
+    },
+    {
+      "name": "disableCursor",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents the library from changing the pointer cursor during resizing.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 44
+      }
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "Uniquely identifies the group and its persisted layout.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 46
+      }
+    },
+    {
+      "name": "onLayoutChange",
+      "type": "(layout: Layout) => void | undefined",
+      "required": false,
+      "description": "Runs continuously while the group layout changes.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 48
+      }
+    },
+    {
+      "name": "onLayoutChanged",
+      "type": "(layout: Layout) => void | undefined",
+      "required": false,
+      "description": "Runs after a group layout change is committed.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 50
+      }
+    },
+    {
+      "name": "groupRef",
+      "type": "((instance: GroupImperativeHandle | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<GroupImperativeHandle | null>",
+      "required": false,
+      "description": "Provides access to the group's imperative layout controls.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 52
+      }
+    },
+    {
+      "name": "elementRef",
+      "type": "((instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<HTMLDivElement | null>",
+      "required": false,
+      "description": "Provides access to the group's root element.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 54
+      }
+    }
+  ],
+  "resizablePanel": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "Uniquely identifies the panel within its group.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 59
+      }
+    },
+    {
+      "name": "defaultSize",
+      "type": "string | number",
+      "required": false,
+      "description": "Sets the panel size used when no persisted layout is available.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 61
+      }
+    },
+    {
+      "name": "minSize",
+      "type": "string | number",
+      "required": false,
+      "description": "Sets the smallest expanded panel size.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 63
+      }
+    },
+    {
+      "name": "maxSize",
+      "type": "string | number",
+      "required": false,
+      "description": "Sets the largest panel size.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 65
+      }
+    },
+    {
+      "name": "collapsedSize",
+      "type": "string | number",
+      "required": false,
+      "defaultValue": "0",
+      "description": "Sets the panel size when collapsed.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 67
+      }
+    },
+    {
+      "name": "collapsible",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Allows the panel to collapse when resized below its minimum size.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 69
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents this panel from being resized directly or indirectly.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 71
+      }
+    },
+    {
+      "name": "groupResizeBehavior",
+      "type": "\"preserve-relative-size\" | \"preserve-pixel-size\"",
+      "required": false,
+      "defaultValue": "\"preserve-relative-size\"",
+      "description": "Controls how the panel responds when its group changes size.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 73
+      }
+    },
+    {
+      "name": "onResize",
+      "type": "(panelSize: PanelSize, id: string | number | undefined, prevPanelSize: PanelSize | undefined) => void",
+      "required": false,
+      "description": "Runs when the panel size changes.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 75
+      }
+    },
+    {
+      "name": "panelRef",
+      "type": "((instance: PanelImperativeHandle | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<PanelImperativeHandle | null>",
+      "required": false,
+      "description": "Provides access to collapse, expand, size, and resize controls.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 77
+      }
+    },
+    {
+      "name": "elementRef",
+      "type": "((instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<HTMLDivElement | null>",
+      "required": false,
+      "description": "Provides access to the panel's root element.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 79
+      }
+    }
+  ],
+  "resizableHandle": [
+    {
+      "name": "appearance",
+      "type": "\"line\" | \"grip\"",
+      "required": false,
+      "defaultValue": "\"line\"",
+      "description": "Controls whether the separator is a line or includes a visible grip.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 85
+      }
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "Uniquely identifies the handle within its group.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 87
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents the handle from resizing its neighboring panels.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 89
+      }
+    },
+    {
+      "name": "disableDoubleClick",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents a double click from restoring the adjacent panel's default size.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 91
+      }
+    },
+    {
+      "name": "elementRef",
+      "type": "RefObject<HTMLDivElement | null> | ((instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES])",
+      "required": false,
+      "description": "Provides access to the handle element.",
+      "source": {
+        "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+        "line": 93
+      }
+    }
+  ],
+  "buttonGroup.root": [
+    {
+      "name": "orientation",
+      "type": "\"horizontal\" | \"vertical\"",
+      "required": false,
+      "defaultValue": "\"horizontal\"",
+      "description": "Controls the direction in which grouped controls are arranged.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
+        "line": 12
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes ButtonGroup behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
+        "line": 14
+      }
+    }
+  ],
+  "buttonGroup.separator": [
+    {
+      "name": "orientation",
+      "type": "\"horizontal\" | \"vertical\"",
+      "required": false,
+      "defaultValue": "\"vertical\"",
+      "description": "Controls the separator axis. Use the opposite axis of the group orientation.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes the separator behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
+        "line": 22
+      }
+    }
+  ],
+  "toggleGroup.root": [
+    {
+      "name": "value",
+      "type": "readonly Value[]",
+      "required": false,
+      "description": "The values of the pressed items when controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 14
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "readonly Value[]",
+      "required": false,
+      "description": "The initial values of the pressed items when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(groupValue: Value[], eventDetails: BaseToggleGroup.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Called when the pressed item values change.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "loopFocus",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Loops keyboard focus from the last item to the first and vice versa.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Allows more than one item to be pressed.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables every item in the group.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "orientation",
+      "type": "\"horizontal\" | \"vertical\"",
+      "required": false,
+      "defaultValue": "\"horizontal\"",
+      "description": "Controls the group layout and arrow-key navigation axis.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ToggleGroupState>",
+      "required": false,
+      "description": "Composes ToggleGroup behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 28
+      }
+    }
+  ],
+  "toggleGroup.item": [
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Uniquely identifies the item within its group.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 34
+      }
+    },
+    {
+      "name": "onPressedChange",
+      "type": "(pressed: boolean, eventDetails: BaseToggle.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Called before the group commits the next pressed state.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 36
+      }
+    },
+    {
+      "name": "nativeButton",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Whether the rendered element is a native button.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables this item.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ToggleState>",
+      "required": false,
+      "description": "Composes item behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 42
+      }
+    }
+  ],
+  "tooltip.provider": [
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "description": "Sets the shared delay before tooltips open.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 10
+      }
+    },
+    {
+      "name": "closeDelay",
+      "type": "number",
+      "required": false,
+      "description": "Sets the shared delay before tooltips close.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 12
+      }
+    },
+    {
+      "name": "timeout",
+      "type": "number",
+      "required": false,
+      "defaultValue": "400",
+      "description": "Keeps adjacent tooltips in the instant-open phase after one closes.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 14
+      }
+    }
+  ],
+  "tooltip.root": [
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Sets the initial open state when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls whether the tooltip is open.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 21
+      }
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean, eventDetails: BaseTooltip.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the open state changes.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 23
+      }
+    },
+    {
+      "name": "onOpenChangeComplete",
+      "type": "(open: boolean) => void",
+      "required": false,
+      "description": "Runs after an opening or closing transition completes.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 25
+      }
+    },
+    {
+      "name": "disableHoverablePopup",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents pointer movement over the popup from keeping it open.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 27
+      }
+    },
+    {
+      "name": "trackCursorAxis",
+      "type": "\"none\" | \"x\" | \"y\" | \"both\"",
+      "required": false,
+      "defaultValue": "\"none\"",
+      "description": "Selects the cursor axis followed by the tooltip.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 29
+      }
+    },
+    {
+      "name": "actionsRef",
+      "type": "RefObject<TooltipRootActions | null>",
+      "required": false,
+      "description": "Provides access to imperative close and unmount actions.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 31
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents the tooltip from opening.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 33
+      }
+    }
+  ],
+  "tooltip.trigger": [
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "description": "Overrides the delay before this tooltip opens.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 39
+      }
+    },
+    {
+      "name": "closeOnClick",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Closes the tooltip when its trigger is clicked.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 41
+      }
+    },
+    {
+      "name": "closeDelay",
+      "type": "number",
+      "required": false,
+      "description": "Overrides the delay before this tooltip closes.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 43
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents this trigger from opening the tooltip.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 45
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, TooltipTriggerState>",
+      "required": false,
+      "description": "Composes tooltip trigger behavior onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 47
+      }
+    }
+  ],
+  "tooltip.content": [
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
+      "required": false,
+      "defaultValue": "\"top\"",
+      "description": "Places the tooltip on this side of its trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 52
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"start\" | \"center\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"center\"",
+      "description": "Aligns the tooltip along its trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 54
+      }
+    },
+    {
+      "name": "sideOffset",
+      "type": "number | OffsetFunction",
+      "required": false,
+      "defaultValue": "8",
+      "description": "Sets the distance between the tooltip and its trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
+        "line": 56
+      }
+    }
+  ],
+  "toaster": [
+    {
+      "name": "position",
+      "type": "\"top-left\" | \"top-center\" | \"top-right\" | \"bottom-left\" | \"bottom-center\" | \"bottom-right\"",
+      "required": false,
+      "defaultValue": "\"bottom-right\"",
+      "description": "Places the application toast stack at a viewport edge.",
+      "source": {
+        "path": "packages/design-system/src/components/toaster/toaster.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "closeButton",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Shows a dismiss button on each toast.",
+      "source": {
+        "path": "packages/design-system/src/components/toaster/toaster.tsx",
+        "line": 21
       }
     }
   ],
@@ -1095,13 +2034,23 @@
       }
     },
     {
+      "name": "defaultInputValue",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "The uncontrolled input value when initially rendered.\n\nTo render a controlled input, use the `inputValue` prop instead.\nThe initial filter input value when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 28
+      }
+    },
+    {
       "name": "onInputValueChange",
       "type": "(inputValue: string, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void",
       "required": false,
       "description": "Event handler called when the input value changes.\nRuns when the filter input value changes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 28
+        "line": 30
       }
     },
     {
@@ -1112,7 +2061,7 @@
       "description": "Whether the popup is initially open.\n\nTo render a controlled popup, use the `open` prop instead.\nWhether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 30
+        "line": 32
       }
     },
     {
@@ -1122,7 +2071,7 @@
       "description": "Whether the popup is currently open. Use when controlled.\nWhether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 32
+        "line": 34
       }
     },
     {
@@ -1132,7 +2081,17 @@
       "description": "Event handler called when the popup is opened or closed.\nRuns when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 34
+        "line": 36
+      }
+    },
+    {
+      "name": "onOpenChangeComplete",
+      "type": "(open: boolean) => void",
+      "required": false,
+      "description": "Event handler called after any animations complete when the popup is opened or closed.\nRuns after an opening or closing transition completes.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 38
       }
     },
     {
@@ -1142,7 +2101,17 @@
       "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for display in the input.\nIf the shape of the object is `{ value, label }`, the label will be used automatically without needing to specify this prop.\nConverts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 36
+        "line": 40
+      }
+    },
+    {
+      "name": "itemToStringValue",
+      "type": "(itemValue: Value) => string",
+      "required": false,
+      "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for form submission.\nIf the shape of the object is `{ value, label }`, the value will be used automatically without needing to specify this prop.\nConverts an item into the value submitted with a form.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 42
       }
     },
     {
@@ -1152,7 +2121,7 @@
       "description": "Custom comparison logic used to determine if a combobox item value matches the current selected value. Useful when item values are objects without matching referentially.\nDefaults to `Object.is` comparison.\nCompares an item with the selected value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 38
+        "line": 44
       }
     },
     {
@@ -1162,7 +2131,49 @@
       "description": "Filter function used to match items vs input query.\nFilters an item against the current query.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 40
+        "line": 46
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the field when a form is submitted.\nIdentifies the value when the combobox participates in form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 48
+      }
+    },
+    {
+      "name": "form",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the form that owns the internal input.\nUseful when the combobox is rendered outside the form.\nAssociates the combobox with a form element.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 50
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the user must choose a value before submitting a form.\nRequires a selection before form submission.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 52
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the user should be unable to choose a different option from the popup.\nPrevents selection changes while preserving focus and form participation.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 54
       }
     },
     {
@@ -1173,7 +2184,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the combobox.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 42
+        "line": 56
       }
     }
   ],
@@ -1185,7 +2196,7 @@
       "description": "Composes the label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 75
+        "line": 92
       }
     }
   ],
@@ -1197,11 +2208,23 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 80
+        "line": 97
       }
     }
   ],
-  "combobox.inputGroup": [],
+  "combobox.inputGroup": [
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the input group to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 61
+      }
+    }
+  ],
   "combobox.input": [],
   "combobox.trigger": [
     {
@@ -1211,7 +2234,7 @@
       "description": "Content displayed by the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 62
+        "line": 79
       }
     },
     {
@@ -1222,7 +2245,7 @@
       "description": "Controls the trigger treatment.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 64
+        "line": 81
       }
     },
     {
@@ -1233,7 +2256,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 66
+        "line": 83
       }
     },
     {
@@ -1244,7 +2267,7 @@
       "description": "Stretches the trigger to its container width.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 68
+        "line": 85
       }
     },
     {
@@ -1255,7 +2278,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 70
+        "line": 87
       }
     }
   ],
@@ -1268,7 +2291,7 @@
       "description": "Disables the input action trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 53
+        "line": 70
       }
     }
   ],
@@ -1281,7 +2304,7 @@
       "description": "Keeps the portal mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 85
+        "line": 102
       }
     }
   ],
@@ -1294,7 +2317,7 @@
       "description": "Sets the gap between the control and popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 90
+        "line": 107
       }
     },
     {
@@ -1305,7 +2328,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 92
+        "line": 109
       }
     }
   ],
@@ -1318,7 +2341,30 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 100
+        "line": 117
+      }
+    }
+  ],
+  "combobox.content": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Content rendered inside the positioned popup.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 122
+      }
+    },
+    {
+      "name": "width",
+      "type": "\"anchor\" | \"content\" | \"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"anchor\"",
+      "description": "Controls the popup width using a design-system size.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 124
       }
     }
   ],
@@ -1330,7 +2376,7 @@
       "description": "Composes the header layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 106
+        "line": 130
       }
     }
   ],
@@ -1342,7 +2388,7 @@
       "description": "Composes the footer layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 112
+        "line": 136
       }
     }
   ],
@@ -1355,7 +2401,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 120
+        "line": 144
       }
     },
     {
@@ -1365,12 +2411,48 @@
       "description": "Composes the viewport layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 122
+        "line": 146
+      }
+    }
+  ],
+  "combobox.clear": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "defaultValue": "\"Clear selection\"",
+      "description": "Accessible label for the clear action.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 157
+      }
+    },
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the clear action mounted when no value is selected.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 159
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the clear action.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 161
       }
     }
   ],
   "combobox.separator": [],
   "combobox.empty": [],
+  "combobox.status": [],
   "combobox.list": [],
   "combobox.item": [
     {
@@ -1380,7 +2462,18 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 131
+        "line": 166
+      }
+    },
+    {
+      "name": "indicator",
+      "type": "\"none\" | \"check\"",
+      "required": false,
+      "defaultValue": "\"check\"",
+      "description": "Controls whether the standard selected indicator is displayed.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 168
       }
     }
   ],
@@ -1392,7 +2485,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 136
+        "line": 173
       }
     },
     {
@@ -1402,7 +2495,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 138
+        "line": 175
       }
     }
   ],
@@ -1415,10 +2508,298 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 144
+        "line": 181
       }
     }
   ],
+  "contextSwitcher.root": [
+    {
+      "name": "items",
+      "type": "readonly any[] | readonly Group<any>[]",
+      "required": true,
+      "description": "Items available for filtering and context selection.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 25
+      }
+    },
+    {
+      "name": "value",
+      "type": "NonNullable<Value>",
+      "required": false,
+      "description": "The active context item.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 27
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "NonNullable<Value>",
+      "required": false,
+      "description": "The initially active context item.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 29
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: Value | null, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the active context item changes.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 31
+      }
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the popup is initially open.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 33
+      }
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the popup is open.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 35
+      }
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the popup opens or closes.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 37
+      }
+    },
+    {
+      "name": "itemToStringLabel",
+      "type": "(itemValue: Value) => string",
+      "required": false,
+      "description": "Converts an item into its displayed label.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 39
+      }
+    },
+    {
+      "name": "itemToStringValue",
+      "type": "(itemValue: Value) => string",
+      "required": false,
+      "description": "Converts an item into a stable string value.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 41
+      }
+    },
+    {
+      "name": "isItemEqualToValue",
+      "type": "(itemValue: Value, value: Value) => boolean",
+      "required": false,
+      "description": "Compares an item with the active context value.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 43
+      }
+    },
+    {
+      "name": "filter",
+      "type": "(itemValue: Value, query: string, itemToString?: ((itemValue: Value) => string) | undefined) => boolean",
+      "required": false,
+      "description": "Filters an item against the switcher query.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 45
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the switcher.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 47
+      }
+    }
+  ],
+  "contextSwitcher.trigger": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible label that identifies the context being switched.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 54
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the trigger height and padding.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 56
+      }
+    },
+    {
+      "name": "width",
+      "type": "\"content\" | \"s\" | \"m\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Constrains the trigger width.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 58
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 60
+      }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Provides supplemental text for truncated trigger content.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 62
+      }
+    }
+  ],
+  "contextSwitcher.value": [
+    {
+      "name": "placeholder",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Content displayed when no item is selected.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 97
+      }
+    }
+  ],
+  "contextSwitcher.popup": [
+    {
+      "name": "width",
+      "type": "\"anchor\" | \"content\" | \"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the popup width using a design-system size.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 67
+      }
+    }
+  ],
+  "contextSwitcher.search": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible label for the search input.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 72
+      }
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Placeholder displayed while the search input is empty.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 74
+      }
+    }
+  ],
+  "contextSwitcher.content": [
+    {
+      "name": "maxHeight",
+      "type": "\"s\" | \"m\" | \"l\" | \"available\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the maximum height of the scrolling results region.",
+      "source": {
+        "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+        "line": 79
+      }
+    }
+  ],
+  "contextSwitcher.empty": [],
+  "contextSwitcher.status": [],
+  "contextSwitcher.list": [],
+  "contextSwitcher.item": [
+    {
+      "name": "value",
+      "type": "NonNullable<Value>",
+      "required": true,
+      "description": "The item represented by this option.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 166
+      }
+    },
+    {
+      "name": "indicator",
+      "type": "\"none\" | \"check\"",
+      "required": false,
+      "defaultValue": "\"check\"",
+      "description": "Controls whether the standard selected indicator is displayed.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 168
+      }
+    }
+  ],
+  "contextSwitcher.itemText": [
+    {
+      "name": "label",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Primary item text, constrained to one line.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 173
+      }
+    },
+    {
+      "name": "description",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional secondary item text, constrained to one line.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 175
+      }
+    }
+  ],
+  "contextSwitcher.footer": [],
   "select.root": [
     {
       "name": "items",

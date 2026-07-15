@@ -1,7 +1,11 @@
-import { useRef, useState } from "react";
-import type { PanelImperativeHandle, PanelSize } from "react-resizable-panels";
-
-import { ResizableGroup, ResizablePanel, ResizableSeparator } from "@regarde/ui/resizablePanel";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  useResizablePanelRef,
+  type ResizablePanelSize,
+} from "@inspector/ds";
+import { useState } from "react";
 
 import { QuerySubscriptionsGrid } from "@/components/query-subscriptions/dataGrid";
 import { QuerySubscriptionsListPane } from "@/components/query-subscriptions/tableListPane";
@@ -9,10 +13,10 @@ import { useQuerySubscriptionsState } from "@/components/query-subscriptions/use
 
 export function QuerySubscriptionsScreen(): React.ReactElement {
   const state = useQuerySubscriptionsState();
-  const listPaneRef = useRef<PanelImperativeHandle>(null);
+  const listPaneRef = useResizablePanelRef();
   const [isListPaneOpen, setIsListPaneOpen] = useState(true);
 
-  const handleListPaneResize = (panelSize: PanelSize) => {
+  const handleListPaneResize = (panelSize: ResizablePanelSize) => {
     const nextIsListPaneOpen = panelSize.inPixels > 0;
     setIsListPaneOpen((currentIsListPaneOpen) =>
       currentIsListPaneOpen === nextIsListPaneOpen ? currentIsListPaneOpen : nextIsListPaneOpen,
@@ -34,9 +38,8 @@ export function QuerySubscriptionsScreen(): React.ReactElement {
   };
 
   return (
-    <ResizableGroup orientation="horizontal" className="min-w-0 bg-background">
+    <ResizablePanelGroup orientation="horizontal">
       <ResizablePanel
-        className="min-w-0 overflow-hidden"
         panelRef={listPaneRef}
         collapsible
         collapsedSize={0}
@@ -54,10 +57,10 @@ export function QuerySubscriptionsScreen(): React.ReactElement {
           onSelectedTableNameChange={state.setSelectedTableName}
         />
       </ResizablePanel>
-      {isListPaneOpen === true ? <ResizableSeparator /> : null}
-      <ResizablePanel className="min-w-0 overflow-hidden">
+      {isListPaneOpen === true ? <ResizableHandle /> : null}
+      <ResizablePanel>
         <QuerySubscriptionsGrid state={state} isListPaneOpen={isListPaneOpen} onToggleListPane={handleToggleListPane} />
       </ResizablePanel>
-    </ResizableGroup>
+    </ResizablePanelGroup>
   );
 }

@@ -523,7 +523,30 @@ UI representation:
 - Primary content: rows, columns, relation cells, selected row state, live update highlights, row bookmarks.
 - States: loading, no open table tab, empty table, filtered-empty table, unsupported field display, changed cells, inserted row, deleted row animation, stale live data.
 
+#### Column type rendering
+
+Column headers render compact type markers from Jazz schema metadata. The marker should describe the Jazz DSL type first; semantic formatting such as email, URL, image, or currency can be layered on later only when the schema exposes enough metadata to identify it safely.
+
+| Symbol | Jazz DSL type              | TypeScript value      | SQL storage         | Notes                                                                 |
+| ------ | -------------------------- | --------------------- | ------------------- | --------------------------------------------------------------------- |
+| `T`    | `s.string()`               | `string`              | `TEXT`              | Plain text. Do not infer semantic text types from the SQL type alone. |
+| `?`    | `.optional()`              | base type or `null`   | nullable column     | Modifier badge, not a standalone type.                                |
+| `#`    | `s.int()`                  | `number`              | `INTEGER`           | Whole numbers.                                                        |
+| `F`    | `s.float()`                | `number`              | `REAL`              | Floating-point numbers.                                               |
+| `B`    | `s.boolean()`              | `boolean`             | `BOOLEAN`           | True/false values.                                                    |
+| `TS`   | `s.timestamp()`            | `Date`                | `TIMESTAMP`         | Render relative and absolute time where useful.                       |
+| `BIN`  | `s.bytes()`                | `Uint8Array`          | `BYTEA`             | Binary data. Prefer Files & Blobs patterns for uploads and images.    |
+| `ID`   | `s.ref("table")`           | row ID `string`       | `UUID` foreign key  | Relation to another table. Ref columns must end in `Id` or `_id`.     |
+| `[]`   | `s.array(type)`            | array of base type    | base SQL array      | Render as an array container with the nested type marker when known.  |
+| `IDS`  | `s.array(s.ref())`         | row ID `string[]`     | `UUID[]`            | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
+| `E`    | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details or hover, not the compact header.      |
+| `{}`   | `s.json()`                 | `JsonValue`           | `JSON`              | Untyped JSON; replace whole value on write.                           |
+| `{T}`  | `s.json(schema)`           | schema-inferred value | `JSON`              | Typed JSON; still atomic on write.                                    |
+| `FX`   | `.transform({ from, to })` | transformed value     | underlying SQL type | Modifier badge. Filters use the stored column value.                  |
+
 #### Row reading and cell rendering
+
+<!--TODO: explicitly describe how each Jazz DSL type will render into table cell and edit form.-->
 
 Rows are readable before they are editable.
 

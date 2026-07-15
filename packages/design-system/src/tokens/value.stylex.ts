@@ -9,7 +9,7 @@ export const paletteValues = stylex.defineConsts({
 
   // Light-mode gray (Zedokai-light)
   gray50: 'oklch(0.988 0 180)', // lightest surface background
-  gray100: 'oklch(0.977 0 171.87)', // main background
+  gray100: 'oklch(0.9851 0 0)', // main background
   gray150: 'oklch(0.95 0 171.254)', // panel/subheader/status/tab background
   gray200: 'oklch(0.94 0 171.254)', // title bar background
   gray250: 'oklch(0.9 0 171.254)', // highlight/search match surface

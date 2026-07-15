@@ -1,4 +1,4 @@
-import { Box, Button, Text, useClipboard } from "@inspector/ds";
+import { Box, CopyButton, Text } from "@inspector/ds";
 import {
   backgroundColors,
   borderColors,
@@ -7,7 +7,6 @@ import {
   type PaletteToken,
 } from "@inspector/ds/theme";
 import * as stylex from "@stylexjs/stylex";
-import { Check, Copy } from "lucide-react";
 import { type ReactElement } from "react";
 
 import { PageHeader } from "@/components/docs/pageHeader";
@@ -50,12 +49,6 @@ const borderTokens = [
 const paletteEntries = Object.entries(paletteValues) as Array<[PaletteToken, string]>;
 
 function PaletteColorCard({ name, value }: { name: PaletteToken; value: string }): ReactElement {
-  const { copied, copy } = useClipboard();
-
-  const handleCopy = (): void => {
-    void copy(value).catch(() => undefined);
-  };
-
   return (
     <article {...stylex.props(styles.paletteCard)}>
       <span aria-hidden="true" {...stylex.props(styles.swatch)} style={{ background: value }} />
@@ -64,22 +57,7 @@ function PaletteColorCard({ name, value }: { name: PaletteToken; value: string }
           <span {...stylex.props(styles.paletteName)}>{name}</span>
           <span {...stylex.props(styles.paletteValue)}>{value}</span>
         </span>
-        <Button
-          variant="ghost"
-          size="icon-s"
-          onClick={handleCopy}
-          aria-label={copied === true ? `${name} value copied` : `Copy ${name} value`}
-          title={copied === true ? "Copied" : `Copy ${value}`}
-        >
-          {copied === true ? (
-            <Check aria-hidden="true" size={14} />
-          ) : (
-            <Copy aria-hidden="true" size={14} />
-          )}
-        </Button>
-        <span aria-live="polite" {...stylex.props(styles.visuallyHidden)}>
-          {copied === true ? `${name} value copied to clipboard.` : ""}
-        </span>
+        <CopyButton textToCopy={value} label={`Copy ${name} value`} />
       </span>
     </article>
   );
@@ -211,15 +189,5 @@ const styles = stylex.create({
     color: "light-dark(oklch(0.645 0.007 350.912), oklch(0.661 0.002 325.597))",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-  },
-  visuallyHidden: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    padding: 0,
-    overflow: "hidden",
-    clip: "rect(0, 0, 0, 0)",
-    whiteSpace: "nowrap",
-    borderWidth: 0,
   },
 });

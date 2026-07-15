@@ -1,18 +1,6 @@
-import { useMemo, useState } from "react";
 import { HashIcon } from "lucide-react";
 
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-  ComboboxSeparator,
-} from "@regarde/ui/combobox";
-import { Button } from "@regarde/ui/button";
-import { cn } from "@regarde/ui/lib/utils";
+import { ContextSwitcher, Text } from "@inspector/ds";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 
@@ -41,18 +29,6 @@ export function SchemaSwitcher({
   width = "auto",
 }: SchemaSwitcherProps = {}): React.ReactElement {
   const { currentSchemaHash, runtime, switchSchema } = useInspector();
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const schemaHashes = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    if (normalizedQuery.length === 0) {
-      return runtime.availableSchemaHashes;
-    }
-
-    return runtime.availableSchemaHashes.filter((schemaHash) => schemaHash.toLowerCase().includes(normalizedQuery));
-  }, [query, runtime.availableSchemaHashes]);
-
   const triggerText = triggerLabel ?? currentSchemaHash ?? "Select schema";
   const triggerTitle = triggerLabel ?? currentSchemaHash ?? undefined;
   const shouldTruncateCurrentSchema =
@@ -61,70 +37,48 @@ export function SchemaSwitcher({
     shouldTruncateCurrentSchema === true
       ? truncateMiddle(currentSchemaHash, 24)
       : triggerText;
-  const triggerClassName = cn(
-    "justify-start gap-2 rounded-xs",
-    placement === "header" ? "h-7 px-1 text-secondary-foreground" : null,
-    width === "md" ? "max-w-[280px]" : null,
-  );
   return (
-    <Combobox<string>
-      items={schemaHashes}
-      value={currentSchemaHash ?? undefined}
-      open={open}
-      onOpenChange={(nextOpen) => {
-        setOpen(nextOpen);
-        if (nextOpen === false) {
-          setQuery("");
+    <ContextSwitcher.Root<string>
+      items={runtime.availableSchemaHashes}
+      value={currentSchemaHash}
+      onValueChange={(schemaHash) => {
+        if (schemaHash !== null) {
+          void switchSchema(schemaHash);
         }
       }}
     >
-      <Button
-        variant="ghost"
-        size="sm"
-        nativeButton={true}
-        className={triggerClassName}
-        render={<ComboboxTrigger />}
+      <ContextSwitcher.Trigger
+        label="Switch schema"
+        size={placement === "header" ? "m" : "l"}
+        width={width === "md" ? "m" : "content"}
         title={triggerTitle}
       >
-        <HashIcon className="size-3.5 text-current" />
-        <span className="block whitespace-nowrap font-mono">{displayTriggerText}</span>
-      </Button>
-      <ComboboxContent className="w-max min-w-(--anchor-width) max-w-[calc(100vw-2rem)] p-0">
-        <div className="sticky top-0 z-10 bg-popover p-1">
-          <ComboboxInput
-            value={query}
-            onChange={(event) => {
-              setQuery(event.currentTarget.value);
-            }}
-            onFocus={() => {
-              setOpen(true);
-            }}
-            placeholder="Search schemas..."
-            aria-label="Search schemas"
-            showClear={false}
-            showTrigger={false}
-          />
-        </div>
-        <ComboboxSeparator />
-        <ComboboxEmpty>
-          {runtime.isLoading === true ? "Loading schemas..." : "No schemas available."}
-        </ComboboxEmpty>
-        <ComboboxList className="max-h-80">
-          {(schemaHash) => (
-            <ComboboxItem
-              key={schemaHash}
-              value={schemaHash}
-              className="pr-8"
-              onClick={() => {
-                setOpen(false);
-                void switchSchema(schemaHash);
-              }}
-            >
-              <span className="block whitespace-nowrap font-mono">{schemaHash}</span>
-            </ComboboxItem>
+        <HashIcon aria-hidden="true" size={14} />
+        <Text as="span" color="inherit" monospace truncate>
+          {displayTriggerText}
+        </Text>
+      </ContextSwitcher.Trigger>
+      <ContextSwitcher.Popup width="content">
+        <ContextSwitcher.Search label="Search schemas" placeholder="Search schemas" />
+        <ContextSwitcher.Content maxHeight="l">
+          {runtime.isLoading === true ? (
+            <ContextSwitcher.Status>Loading schemas...</ContextSwitcher.Status>
+          ) : (
+            <>
+              <ContextSwitcher.Empty>No schemas available.</ContextSwitcher.Empty>
+              <ContextSwitcher.List>
+                {(schemaHash: string) => (
+                  <ContextSwitcher.Item key={schemaHash} value={schemaHash}>
+                    <Text as="span" color="inherit" monospace>
+                      {schemaHash}
+                    </Text>
+                  </ContextSwitcher.Item>
+                )}
+              </ContextSwitcher.List>
+            </>
           )}
-        </ComboboxList>
-      </ComboboxContent>
-    </Combobox>
+        </ContextSwitcher.Content>
+      </ContextSwitcher.Popup>
+    </ContextSwitcher.Root>
   );
 }

@@ -57,6 +57,45 @@ export const buttonItem = {
   componentId: "button",
 } satisfies NavItem;
 
+export const buttonGroupItem = {
+  title: "Button Group",
+  slug: "button-group",
+  href: "/components/button-group",
+  description: "A container for related actions, controls, and separators.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "buttonGroup.tsx",
+    path: "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
+  },
+  componentId: "buttonGroup",
+} satisfies NavItem;
+
+export const copyButtonItem = {
+  title: "Copy Button",
+  slug: "copy-button",
+  href: "/components/copy-button",
+  description: "An icon action that copies text and reports success or failure.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "copyButton.tsx",
+    path: "packages/design-system/src/components/copyButton/copyButton.tsx",
+  },
+  componentId: "copyButton",
+} satisfies NavItem;
+
+export const toggleGroupItem = {
+  title: "Toggle Group",
+  slug: "toggle-group",
+  href: "/components/toggle-group",
+  description: "A single- or multiple-selection group of related toggle buttons.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "toggleGroup.tsx",
+    path: "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+  },
+  componentId: "toggleGroup",
+} satisfies NavItem;
+
 export const checkboxItem = {
   title: "Checkbox",
   slug: "checkbox",
@@ -68,6 +107,45 @@ export const checkboxItem = {
     path: "packages/design-system/src/components/checkbox/checkbox.tsx",
   },
   componentId: "checkbox",
+} satisfies NavItem;
+
+export const switchItem = {
+  title: "Switch",
+  slug: "switch",
+  href: "/components/switch",
+  description: "A binary control for settings that take effect when switched on or off.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "switch.tsx",
+    path: "packages/design-system/src/components/switch/switch.tsx",
+  },
+  componentId: "switch",
+} satisfies NavItem;
+
+export const tooltipItem = {
+  title: "Tooltip",
+  slug: "tooltip",
+  href: "/components/tooltip",
+  description: "Supplementary non-interactive context shown when a trigger is hovered or focused.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "tooltip.tsx",
+    path: "packages/design-system/src/components/tooltip/tooltip.tsx",
+  },
+  componentId: "tooltip",
+} satisfies NavItem;
+
+export const toastItem = {
+  title: "Toast",
+  slug: "toast",
+  href: "/components/toast",
+  description: "Concise, temporary feedback for user-initiated actions.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "toaster.tsx",
+    path: "packages/design-system/src/components/toaster/toaster.tsx",
+  },
+  componentId: "toaster",
 } satisfies NavItem;
 
 export const inputItem = {
@@ -109,6 +187,19 @@ export const searchItem = {
   componentId: "search",
 } satisfies NavItem;
 
+export const resizablePanelItem = {
+  title: "Resizable Panel",
+  slug: "resizable-panel",
+  href: "/components/resizable-panel",
+  description: "Accessible split panels with constrained handles, collapse controls, and layout persistence support.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "resizablePanel.tsx",
+    path: "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
+  },
+  componentId: "resizablePanelGroup",
+} satisfies NavItem;
+
 export const comboboxItem = {
   title: "Combobox",
   slug: "combobox",
@@ -120,6 +211,19 @@ export const comboboxItem = {
     path: "packages/design-system/src/components/combobox/combobox.tsx",
   },
   componentId: "combobox",
+} satisfies NavItem;
+
+export const contextSwitcherItem = {
+  title: "Context Switcher",
+  slug: "context-switcher",
+  href: "/components/context-switcher",
+  description: "A searchable popup for changing the active application resource or scope.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "contextSwitcher.tsx",
+    path: "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
+  },
+  componentId: "contextSwitcher",
 } satisfies NavItem;
 
 export const selectItem = {
@@ -189,16 +293,24 @@ export const textFieldItem = {
 
 export const componentItems: NavItem[] = [
   buttonItem,
+  buttonGroupItem,
   checkboxItem,
   comboboxItem,
+  contextSwitcherItem,
+  copyButtonItem,
   inputItem,
   menuItem,
+  resizablePanelItem,
   searchItem,
   selectItem,
+  switchItem,
+  toastItem,
+  tooltipItem,
   fieldItem,
   fieldsetItem,
   formItem,
   textFieldItem,
+  toggleGroupItem,
 ];
 
 export const navSections: NavSection[] = [

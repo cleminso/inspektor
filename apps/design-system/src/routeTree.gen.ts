@@ -12,16 +12,24 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FoundationsTypographyRouteImport } from './routes/foundations/typography'
 import { Route as FoundationsColorsRouteImport } from './routes/foundations/colors'
+import { Route as ComponentsTooltipRouteImport } from './routes/components/tooltip'
+import { Route as ComponentsToggleGroupRouteImport } from './routes/components/toggle-group'
+import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
+import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
+import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
+import { Route as ComponentsCopyButtonRouteImport } from './routes/components/copy-button'
+import { Route as ComponentsContextSwitcherRouteImport } from './routes/components/context-switcher'
 import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
+import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 
 const IndexRoute = IndexRouteImport.update({
@@ -39,9 +47,29 @@ const FoundationsColorsRoute = FoundationsColorsRouteImport.update({
   path: '/foundations/colors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTooltipRoute = ComponentsTooltipRouteImport.update({
+  id: '/components/tooltip',
+  path: '/components/tooltip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsToggleGroupRoute = ComponentsToggleGroupRouteImport.update({
+  id: '/components/toggle-group',
+  path: '/components/toggle-group',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsToastRoute = ComponentsToastRouteImport.update({
+  id: '/components/toast',
+  path: '/components/toast',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
   id: '/components/text-field',
   path: '/components/text-field',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
+  id: '/components/switch',
+  path: '/components/switch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
@@ -54,6 +82,12 @@ const ComponentsSearchRoute = ComponentsSearchRouteImport.update({
   path: '/components/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsResizablePanelRoute =
+  ComponentsResizablePanelRouteImport.update({
+    id: '/components/resizable-panel',
+    path: '/components/resizable-panel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsMenuRoute = ComponentsMenuRouteImport.update({
   id: '/components/menu',
   path: '/components/menu',
@@ -79,6 +113,17 @@ const ComponentsFieldRoute = ComponentsFieldRouteImport.update({
   path: '/components/field',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsCopyButtonRoute = ComponentsCopyButtonRouteImport.update({
+  id: '/components/copy-button',
+  path: '/components/copy-button',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsContextSwitcherRoute =
+  ComponentsContextSwitcherRouteImport.update({
+    id: '/components/context-switcher',
+    path: '/components/context-switcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsComboboxRoute = ComponentsComboboxRouteImport.update({
   id: '/components/combobox',
   path: '/components/combobox',
@@ -87,6 +132,11 @@ const ComponentsComboboxRoute = ComponentsComboboxRouteImport.update({
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
   id: '/components/checkbox',
   path: '/components/checkbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsButtonGroupRoute = ComponentsButtonGroupRouteImport.update({
+  id: '/components/button-group',
+  path: '/components/button-group',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
@@ -98,32 +148,48 @@ const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/context-switcher': typeof ComponentsContextSwitcherRoute
+  '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/toast': typeof ComponentsToastRoute
+  '/components/toggle-group': typeof ComponentsToggleGroupRoute
+  '/components/tooltip': typeof ComponentsTooltipRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/context-switcher': typeof ComponentsContextSwitcherRoute
+  '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/toast': typeof ComponentsToastRoute
+  '/components/toggle-group': typeof ComponentsToggleGroupRoute
+  '/components/tooltip': typeof ComponentsTooltipRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
 }
@@ -131,16 +197,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/context-switcher': typeof ComponentsContextSwitcherRoute
+  '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/toast': typeof ComponentsToastRoute
+  '/components/toggle-group': typeof ComponentsToggleGroupRoute
+  '/components/tooltip': typeof ComponentsTooltipRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
 }
@@ -149,48 +223,72 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/components/button'
+    | '/components/button-group'
     | '/components/checkbox'
     | '/components/combobox'
+    | '/components/context-switcher'
+    | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
     | '/components/form'
     | '/components/input'
     | '/components/menu'
+    | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/switch'
     | '/components/text-field'
+    | '/components/toast'
+    | '/components/toggle-group'
+    | '/components/tooltip'
     | '/foundations/colors'
     | '/foundations/typography'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/components/button'
+    | '/components/button-group'
     | '/components/checkbox'
     | '/components/combobox'
+    | '/components/context-switcher'
+    | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
     | '/components/form'
     | '/components/input'
     | '/components/menu'
+    | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/switch'
     | '/components/text-field'
+    | '/components/toast'
+    | '/components/toggle-group'
+    | '/components/tooltip'
     | '/foundations/colors'
     | '/foundations/typography'
   id:
     | '__root__'
     | '/'
     | '/components/button'
+    | '/components/button-group'
     | '/components/checkbox'
     | '/components/combobox'
+    | '/components/context-switcher'
+    | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
     | '/components/form'
     | '/components/input'
     | '/components/menu'
+    | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/switch'
     | '/components/text-field'
+    | '/components/toast'
+    | '/components/toggle-group'
+    | '/components/tooltip'
     | '/foundations/colors'
     | '/foundations/typography'
   fileRoutesById: FileRoutesById
@@ -198,16 +296,24 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
+  ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsComboboxRoute: typeof ComponentsComboboxRoute
+  ComponentsContextSwitcherRoute: typeof ComponentsContextSwitcherRoute
+  ComponentsCopyButtonRoute: typeof ComponentsCopyButtonRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsMenuRoute: typeof ComponentsMenuRoute
+  ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
+  ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
+  ComponentsToastRoute: typeof ComponentsToastRoute
+  ComponentsToggleGroupRoute: typeof ComponentsToggleGroupRoute
+  ComponentsTooltipRoute: typeof ComponentsTooltipRoute
   FoundationsColorsRoute: typeof FoundationsColorsRoute
   FoundationsTypographyRoute: typeof FoundationsTypographyRoute
 }
@@ -235,11 +341,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FoundationsColorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/tooltip': {
+      id: '/components/tooltip'
+      path: '/components/tooltip'
+      fullPath: '/components/tooltip'
+      preLoaderRoute: typeof ComponentsTooltipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/toggle-group': {
+      id: '/components/toggle-group'
+      path: '/components/toggle-group'
+      fullPath: '/components/toggle-group'
+      preLoaderRoute: typeof ComponentsToggleGroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/toast': {
+      id: '/components/toast'
+      path: '/components/toast'
+      fullPath: '/components/toast'
+      preLoaderRoute: typeof ComponentsToastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/text-field': {
       id: '/components/text-field'
       path: '/components/text-field'
       fullPath: '/components/text-field'
       preLoaderRoute: typeof ComponentsTextFieldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/switch': {
+      id: '/components/switch'
+      path: '/components/switch'
+      fullPath: '/components/switch'
+      preLoaderRoute: typeof ComponentsSwitchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/select': {
@@ -254,6 +388,13 @@ declare module '@tanstack/react-router' {
       path: '/components/search'
       fullPath: '/components/search'
       preLoaderRoute: typeof ComponentsSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/resizable-panel': {
+      id: '/components/resizable-panel'
+      path: '/components/resizable-panel'
+      fullPath: '/components/resizable-panel'
+      preLoaderRoute: typeof ComponentsResizablePanelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/menu': {
@@ -291,6 +432,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsFieldRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/copy-button': {
+      id: '/components/copy-button'
+      path: '/components/copy-button'
+      fullPath: '/components/copy-button'
+      preLoaderRoute: typeof ComponentsCopyButtonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/context-switcher': {
+      id: '/components/context-switcher'
+      path: '/components/context-switcher'
+      fullPath: '/components/context-switcher'
+      preLoaderRoute: typeof ComponentsContextSwitcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/combobox': {
       id: '/components/combobox'
       path: '/components/combobox'
@@ -303,6 +458,13 @@ declare module '@tanstack/react-router' {
       path: '/components/checkbox'
       fullPath: '/components/checkbox'
       preLoaderRoute: typeof ComponentsCheckboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/button-group': {
+      id: '/components/button-group'
+      path: '/components/button-group'
+      fullPath: '/components/button-group'
+      preLoaderRoute: typeof ComponentsButtonGroupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/button': {
@@ -318,16 +480,24 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
+  ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsComboboxRoute: ComponentsComboboxRoute,
+  ComponentsContextSwitcherRoute: ComponentsContextSwitcherRoute,
+  ComponentsCopyButtonRoute: ComponentsCopyButtonRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsMenuRoute: ComponentsMenuRoute,
+  ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
+  ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
+  ComponentsToastRoute: ComponentsToastRoute,
+  ComponentsToggleGroupRoute: ComponentsToggleGroupRoute,
+  ComponentsTooltipRoute: ComponentsTooltipRoute,
   FoundationsColorsRoute: FoundationsColorsRoute,
   FoundationsTypographyRoute: FoundationsTypographyRoute,
 }

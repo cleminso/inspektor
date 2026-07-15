@@ -1,5 +1,5 @@
+import { CopyButton } from "@inspector/ds";
 import { Button } from "@regarde/ui/button";
-import { CopyButton } from "@regarde/ui/copyButton";
 import { EmptyState } from "@regarde/ui/emptyState";
 import { FieldError } from "@regarde/ui/field";
 
@@ -48,7 +48,11 @@ export function SchemaSwitcher({
               >
                 <span className="truncate text-sm">{schemaHash}</span>
               </Button>
-              <CopyButton text={schemaHash} className="shrink-0" />
+              <CopyButton
+                textToCopy={schemaHash}
+                label={`Copy schema ${schemaHash}`}
+                disabled={isSubmitting === true}
+              />
             </div>
           ))
         ) : (

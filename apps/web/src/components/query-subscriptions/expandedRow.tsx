@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+import { CopyButton } from "@inspector/ds";
 import { Button } from "@regarde/ui/button";
-import { CopyButton } from "@regarde/ui/copyButton";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { buildExplorerLink } from "@/lib/query-subscriptions/buildExplorerUrl";
@@ -48,7 +48,7 @@ export function QuerySubscriptionsExpandedRow({ row }: QuerySubscriptionsExpande
               Open in table explorer
             </Button>
           ) : null}
-          <CopyButton text={row.query} size="icon-lg" variant="secondary" />
+          <CopyButton textToCopy={row.query} label="Copy query" size="icon-l" variant="secondary" />
         </div>
       </div>
       <pre className="app-scrollbar max-w-full overflow-x-auto rounded-md border border-border bg-background p-3 text-xs text-muted-foreground">{formattedQuery}</pre>
