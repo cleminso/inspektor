@@ -18,7 +18,7 @@ export const searchStyles = stylex.create({
   },
   icon: {
     alignSelf: "center",
-    color: textColors["text-tertiary"],
+    color: textColors["text-subtle"],
     gridColumnStart: "1",
     gridRowStart: "1",
     marginInlineStart: spacing.m,

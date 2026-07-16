@@ -303,18 +303,28 @@
       "description": "Controls the visual treatment and emphasis of the action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 56
+        "line": 61
       }
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\" | \"icon-s\" | \"icon-m\" | \"icon-l\"",
+      "type": "\"s\" | \"m\" | \"l\"",
       "required": false,
       "defaultValue": "\"m\"",
-      "description": "Controls the button height and horizontal padding. Icon sizes are square.",
+      "description": "Controls the button height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 58
+        "line": 63
+      }
+    },
+    {
+      "name": "shape",
+      "type": "\"square\"",
+      "required": false,
+      "description": "Makes an icon-only button square. Pair with an accessible label.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 65
       }
     },
     {
@@ -322,10 +332,10 @@
       "type": "boolean",
       "required": false,
       "defaultValue": "false",
-      "description": "Shows a centered loading indicator, preserves the label width, and disables interaction.",
+      "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 60
+        "line": 67
       }
     },
     {
@@ -336,7 +346,7 @@
       "description": "Stretches the button to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 62
+        "line": 69
       }
     },
     {
@@ -347,7 +357,7 @@
       "description": "Controls how content is distributed inside the button.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 64
+        "line": 71
       }
     },
     {
@@ -358,7 +368,27 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 66
+        "line": 73
+      }
+    },
+    {
+      "name": "prefix",
+      "type": "string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Renders decorative content before the visible label.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 75
+      }
+    },
+    {
+      "name": "suffix",
+      "type": "string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Renders decorative content after the visible label.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 77
       }
     },
     {
@@ -369,7 +399,7 @@
       "description": "Disables interaction and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 68
+        "line": 79
       }
     },
     {
@@ -379,7 +409,7 @@
       "description": "Composes Button behavior and styles onto another element, such as a link.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 70
+        "line": 81
       }
     }
   ],
@@ -391,7 +421,7 @@
       "description": "Text written to the clipboard when the button is activated.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 13
+        "line": 20
       }
     },
     {
@@ -401,7 +431,7 @@
       "description": "Accessible action label that identifies what will be copied.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 15
+        "line": 22
       }
     },
     {
@@ -412,7 +442,7 @@
       "description": "Feedback shown after the text is copied.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 17
+        "line": 24
       }
     },
     {
@@ -423,29 +453,29 @@
       "description": "Feedback shown when the clipboard operation fails.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 19
+        "line": 26
       }
     },
     {
       "name": "size",
-      "type": "\"icon-s\" | \"icon-m\" | \"icon-l\"",
+      "type": "\"s\" | \"m\" | \"l\"",
       "required": false,
-      "defaultValue": "\"icon-s\"",
+      "defaultValue": "\"s\"",
       "description": "Controls the square button and icon size.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 21
+        "line": 28
       }
     },
     {
       "name": "variant",
-      "type": "\"ghost\" | \"secondary\" | \"outline\"",
+      "type": "\"secondary\" | \"ghost\" | \"outline\"",
       "required": false,
       "defaultValue": "\"ghost\"",
       "description": "Controls the visual treatment and emphasis of the copy action.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 23
+        "line": 30
       }
     },
     {
@@ -456,7 +486,7 @@
       "description": "Prevents the copy action and its tooltip from being activated.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 25
+        "line": 32
       }
     },
     {
@@ -467,7 +497,7 @@
       "description": "Places the feedback tooltip on this side of the button.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 27
+        "line": 34
       }
     },
     {
@@ -477,7 +507,7 @@
       "description": "Runs after text is successfully written to the clipboard.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 29
+        "line": 36
       }
     },
     {
@@ -487,7 +517,7 @@
       "description": "Runs when writing text to the clipboard fails.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 31
+        "line": 38
       }
     }
   ],
@@ -766,7 +796,7 @@
       "description": "Controls the direction in which grouped controls are arranged.",
       "source": {
         "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
-        "line": 12
+        "line": 17
       }
     },
     {
@@ -776,7 +806,7 @@
       "description": "Composes ButtonGroup behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
-        "line": 14
+        "line": 19
       }
     }
   ],
@@ -789,17 +819,29 @@
       "description": "Controls the separator axis. Use the opposite axis of the group orientation.",
       "source": {
         "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
-        "line": 20
+        "line": 31
       }
     },
     {
       "name": "render",
       "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
       "required": false,
-      "description": "Composes the separator behavior and styles onto another element.",
+      "description": "Composes ButtonGroupSeparator behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
-        "line": 22
+        "line": 33
+      }
+    }
+  ],
+  "buttonGroup.text": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes ButtonGroupText behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonGroup/buttonGroup.tsx",
+        "line": 25
       }
     }
   ],

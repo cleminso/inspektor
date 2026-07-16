@@ -21,7 +21,7 @@ export const fieldStyles = stylex.create({
   label: {
     gap: spacing.s,
     alignItems: "center",
-    color: textColors["text-primary"],
+    color: textColors["text-default"],
     display: "inline-flex",
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
@@ -35,10 +35,10 @@ export const fieldStyles = stylex.create({
     lineHeight: lineHeights.tight,
   },
   description: {
-    color: textColors["text-secondary"],
+    color: textColors["text-muted"],
   },
   error: {
-    color: textColors["text-danger"],
+    color: textColors["fg-danger"],
   },
   disabled: {
     color: textColors["text-disabled"],

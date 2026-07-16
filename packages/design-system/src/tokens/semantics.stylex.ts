@@ -21,7 +21,7 @@ export const backgroundColors = stylex.defineVars({
   'bg-inverse': `light-dark(${palette.gray900}, ${palette.neutral100})`,
 
   // Interaction
-  'bg-hover': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
+  'bg-hover': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
   'bg-pressed': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
   'bg-selected': `light-dark(${palette.gray300}, ${palette.neutral700})`,
   'bg-disabled': `light-dark(${palette.gray100}, ${palette.neutral900})`,
@@ -55,8 +55,8 @@ export const textColors = stylex.defineVars({
 
 
 export const borderColors = stylex.defineVars({
-  'border': `light-dark(${palette.gray300}, ${palette.neutral300})`,
-  'border-secondary': `light-dark(${palette.gray200}, ${palette.neutral200})`,
+  'border': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+  'border-secondary': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'border-focused': `light-dark(${palette.blue600}, ${palette.blue400})`,
 
   'border-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,

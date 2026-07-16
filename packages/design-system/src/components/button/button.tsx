@@ -1,8 +1,12 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
 import * as stylex from '@stylexjs/stylex'
+import { useContext } from 'react'
 import type React from 'react'
 
+import { buttonGroupStyles } from '../buttonGroup/buttonGroup.styles'
+import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
+import { Spinner } from '../spinner/spinner'
 import { buttonStyles } from './button.styles'
 
 export type ButtonVariant =
@@ -13,7 +17,8 @@ export type ButtonVariant =
   | 'outline'
   | 'link'
 
-export type ButtonSize = 's' | 'm' | 'l' | 'icon-s' | 'icon-m' | 'icon-l'
+export type ButtonSize = 's' | 'm' | 'l'
+export type ButtonShape = 'square'
 export type ButtonJustify = 'center' | 'start' | 'between'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm' | 'l' | 'xl'
 
@@ -30,9 +35,6 @@ const sizeStyles = {
   s: buttonStyles.sizeS,
   m: buttonStyles.sizeM,
   l: buttonStyles.sizeL,
-  'icon-s': buttonStyles.iconS,
-  'icon-m': buttonStyles.iconM,
-  'icon-l': buttonStyles.iconL,
 } satisfies Record<ButtonSize, unknown>
 
 const justifyStyles = {
@@ -51,12 +53,17 @@ const radiusStyles = {
 } satisfies Record<ButtonRadius, unknown>
 
 export interface ButtonProps
-  extends Omit<useRender.ComponentProps<'button'>, 'className' | 'style'> {
+  extends Omit<
+    useRender.ComponentProps<'button'>,
+    'className' | 'prefix' | 'style'
+  > {
   /** Controls the visual treatment and emphasis of the action. */
   variant?: ButtonVariant
-  /** Controls the button height and horizontal padding. Icon sizes are square. */
+  /** Controls the button height and horizontal padding. */
   size?: ButtonSize
-  /** Shows a centered loading indicator, preserves the label width, and disables interaction. */
+  /** Makes an icon-only button square. Pair with an accessible label. */
+  shape?: ButtonShape
+  /** Shows a leading spinner, preserves the label, and blocks interaction. */
   loading?: boolean
   /** Stretches the button to the width of its container. */
   fullWidth?: boolean
@@ -64,6 +71,10 @@ export interface ButtonProps
   justify?: ButtonJustify
   /** Selects a design-system corner radius. */
   radius?: ButtonRadius
+  /** Renders decorative content before the visible label. */
+  prefix?: React.ReactNode
+  /** Renders decorative content after the visible label. */
+  suffix?: React.ReactNode
   /** Disables interaction and exposes the disabled state to assistive technology. */
   disabled?: useRender.ComponentProps<'button'>['disabled']
   /** Composes Button behavior and styles onto another element, such as a link. */
@@ -73,10 +84,13 @@ export interface ButtonProps
 export function Button({
   variant = 'primary',
   size = 'm',
+  shape,
   loading = false,
   fullWidth = false,
   justify = 'center',
   radius = 'xs',
+  prefix,
+  suffix,
   disabled = false,
   render,
   children,
@@ -84,25 +98,27 @@ export function Button({
   onClick,
   ...props
 }: ButtonProps) {
-  const isDisabled = disabled === true || loading === true
+  const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
+  const isDisabled = disabled === true
+  const isInteractionBlocked = isDisabled === true || loading === true
   const rootStylexProps = stylex.props(
     buttonStyles.base,
     variantStyles[variant],
     sizeStyles[size],
+    shape === 'square' && buttonStyles.square,
     radiusStyles[radius],
+    buttonGroupOrientation !== null && buttonGroupStyles.member,
+    buttonGroupOrientation === 'horizontal' && buttonGroupStyles.memberHorizontal,
+    buttonGroupOrientation === 'vertical' && buttonGroupStyles.memberVertical,
     fullWidth === true && buttonStyles.fullWidth,
     justifyStyles[justify],
-    isDisabled === true && buttonStyles.disabled,
+    isInteractionBlocked === true && buttonStyles.disabled,
   )
-  const contentStylexProps = stylex.props(
-    buttonStyles.content,
-    loading === true && buttonStyles.loadingContent,
-  )
-  const loadingIndicatorStylexProps = stylex.props(buttonStyles.loadingIndicator)
-  const loadingDotStylexProps = stylex.props(buttonStyles.loadingDot)
+  const contentStylexProps = stylex.props(buttonStyles.content)
+  const iconSlotStylexProps = stylex.props(buttonStyles.iconSlot)
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
-    if (isDisabled === true) {
+    if (isInteractionBlocked === true) {
       event.preventDefault()
       event.stopPropagation()
       return
@@ -116,35 +132,46 @@ export function Button({
     style: rootStylexProps.style,
     disabled: isDisabled,
     'aria-busy': loading === true ? true : undefined,
-    'aria-disabled': isDisabled === true ? true : undefined,
+    'aria-disabled': isInteractionBlocked === true ? true : undefined,
     'data-slot': 'button',
     'data-size': size,
     'data-radius': radius,
+    'data-shape': shape,
     'data-variant': variant,
     'data-loading': loading === true ? '' : undefined,
     'data-full-width': fullWidth === true ? '' : undefined,
     onClick: handleClick,
     children: (
-      <>
-        {loading === true ? (
-          <span
-            aria-hidden="true"
-            className={loadingIndicatorStylexProps.className}
-            style={loadingIndicatorStylexProps.style}
-          >
-            <span
-              className={loadingDotStylexProps.className}
-              style={loadingDotStylexProps.style}
-            />
-          </span>
-        ) : null}
-        <span
-          className={contentStylexProps.className}
-          style={contentStylexProps.style}
-        >
-          {children}
-        </span>
-      </>
+      <span
+        className={contentStylexProps.className}
+        style={contentStylexProps.style}
+      >
+        {shape === 'square' ? (
+          loading === true ? <Spinner size={size} /> : children
+        ) : (
+          <>
+            {loading === true || prefix !== undefined ? (
+              <span
+                aria-hidden="true"
+                className={iconSlotStylexProps.className}
+                style={iconSlotStylexProps.style}
+              >
+                {loading === true ? <Spinner size={size} /> : prefix}
+              </span>
+            ) : null}
+            {children}
+            {suffix !== undefined ? (
+              <span
+                aria-hidden="true"
+                className={iconSlotStylexProps.className}
+                style={iconSlotStylexProps.style}
+              >
+                {suffix}
+              </span>
+            ) : null}
+          </>
+        )}
+      </span>
     ),
   } as useRender.ComponentProps<'button'>
 

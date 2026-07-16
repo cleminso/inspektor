@@ -1,20 +1,69 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { borderColors } from '../../tokens/semantics.stylex'
-import { spacing } from '../../tokens/value.stylex'
+import {
+  backgroundColors,
+  borderColors,
+  textColors,
+} from '../../tokens/semantics.stylex'
+import {
+  borderRadii,
+  fontFamilies,
+  fontSizes,
+  fontWeights,
+  lineHeights,
+  spacing,
+} from '../../tokens/value.stylex'
 
 export const buttonGroupStyles = stylex.create({
   root: {
-    gap: spacing.xxs,
+    gap: spacing.none,
     alignItems: 'stretch',
     display: 'inline-flex',
+    isolation: 'isolate',
     width: 'fit-content',
+  },
+  member: {
+    position: 'relative',
+    zIndex: { default: 0, ':focus-visible': 1 },
+  },
+  memberHorizontal: {
+    borderEndEndRadius: { default: borderRadii.none, ':last-child': null },
+    borderEndStartRadius: { default: borderRadii.none, ':first-child': null },
+    borderInlineStartWidth: { default: 0, ':first-child': null },
+    borderStartEndRadius: { default: borderRadii.none, ':last-child': null },
+    borderStartStartRadius: { default: borderRadii.none, ':first-child': null },
+  },
+  memberVertical: {
+    borderBlockStartWidth: { default: 0, ':first-child': null },
+    borderEndEndRadius: { default: borderRadii.none, ':last-child': null },
+    borderEndStartRadius: { default: borderRadii.none, ':last-child': null },
+    borderStartEndRadius: { default: borderRadii.none, ':first-child': null },
+    borderStartStartRadius: { default: borderRadii.none, ':first-child': null },
   },
   horizontal: {
     flexDirection: 'row',
   },
   vertical: {
     flexDirection: 'column',
+  },
+  text: {
+    borderColor: borderColors['border'],
+    borderRadius: borderRadii.xs,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    gap: spacing.s,
+    paddingInline: spacing.m,
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: backgroundColors['bg-secondary'],
+    color: textColors['text-default'],
+    display: 'inline-flex',
+    flexShrink: 0,
+    fontFamily: fontFamilies.sans,
+    fontSize: fontSizes[2],
+    fontWeight: fontWeights.medium,
+    lineHeight: lineHeights.relaxed,
+    whiteSpace: 'nowrap',
   },
   separator: {
     alignSelf: 'stretch',

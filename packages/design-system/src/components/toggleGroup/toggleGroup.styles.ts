@@ -45,11 +45,11 @@ export const toggleGroupStyles = stylex.create({
     appearance: 'none',
     backgroundColor: {
       default: 'transparent',
-      ':hover': backgroundColors['bg-surface-selected'],
+      ':hover': backgroundColors['bg-hover'],
     },
     color: {
-      default: textColors['text-secondary'],
-      ':hover': textColors['text-primary'],
+      default: textColors['text-muted'],
+      ':hover': textColors['text-default'],
     },
     cursor: 'pointer',
     display: 'inline-flex',
@@ -72,11 +72,11 @@ export const toggleGroupStyles = stylex.create({
   },
   itemPressed: {
     backgroundColor: {
-      default: backgroundColors['bg-primary'],
-      ':hover': backgroundColors['bg-primary'],
+      default: backgroundColors['bg-selected'],
+      ':hover': backgroundColors['bg-selected'],
     },
     borderColor: borderColors['border'],
-    color: textColors['text-primary'],
+    color: textColors['text-default'],
   },
   itemDisabled: {
     color: textColors['text-disabled'],

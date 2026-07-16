@@ -16,7 +16,7 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
       alignItems="center"
       flexDirection="column"
       position="relative"
-      backgroundColor="bg-surface"
+      backgroundColor="bg-page"
       borderColor="border"
       borderBottomLeftRadius="xl"
       borderBottomRightRadius="xl"

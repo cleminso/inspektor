@@ -31,7 +31,7 @@ description: Generates and updates `apps/design-system` documentation for `@insp
 ## Props workflow
 
 - Package TypeScript, runtime defaults, and JSDoc are authoritative.
-- Page prop files contain only selected prop names in display order.
+- Page prop files contain only selected prop names in display order; select only props that are part of the design vocabulary.
 - Use `getGeneratedProps(componentId, propNames)` to resolve rows.
 - Do not override generated type, requiredness, default, description, or source.
 - Group compound-component parts into separate API sections when their props differ.

@@ -23,15 +23,15 @@ export const inputStyles = stylex.create({
     paddingBlock: 0,
     paddingInline: spacing.m,
     appearance: "none",
-    backgroundColor: backgroundColors["bg-surface-1"],
+    backgroundColor: backgroundColors["bg-card"],
     boxSizing: "border-box",
-    color: textColors["text-primary"],
+    color: textColors["text-default"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.normal,
     minWidth: 0,
     "::placeholder": {
-      color: textColors["text-tertiary"],
+      color: textColors["text-subtle"],
     },
   },
   sizeS: {
@@ -47,7 +47,7 @@ export const inputStyles = stylex.create({
     width: "100%",
   },
   disabled: {
-    backgroundColor: backgroundColors["bg-primary"],
+    backgroundColor: backgroundColors["bg-disabled"],
     color: textColors["text-disabled"],
     cursor: "not-allowed",
   },

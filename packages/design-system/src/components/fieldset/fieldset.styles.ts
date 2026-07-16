@@ -21,7 +21,7 @@ export const fieldsetStyles = stylex.create({
     width: "100%",
   },
   legend: {
-    color: textColors["text-primary"],
+    color: textColors["text-default"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[3],
     fontWeight: fontWeights.medium,

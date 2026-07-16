@@ -46,7 +46,7 @@ function getSonnerOptions(options: ToastOptions | undefined) {
   return {
     description:
       options?.description === undefined ? undefined : (
-        <span style={{ color: textColors['text-secondary'] }}>
+        <span style={{ color: textColors['text-muted'] }}>
           {options.description}
         </span>
       ),
@@ -69,8 +69,8 @@ export function Toaster({ position = 'bottom-right', closeButton = true }: Toast
   const toasterStyleProps = stylex.props(toasterStyles.toaster)
   const toastStyleProps = stylex.props(toasterStyles.toast)
   const tokenStyles = {
-    '--normal-bg': backgroundColors['bg-primary'],
-    '--normal-text': textColors['text-primary'],
+    '--normal-bg': backgroundColors['bg-card'],
+    '--normal-text': textColors['text-default'],
     '--normal-border': borderColors.border,
     '--border-radius': borderRadii.s,
   } as CSSProperties

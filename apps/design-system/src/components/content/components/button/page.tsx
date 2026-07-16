@@ -8,13 +8,21 @@ import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
 import { buttonItem } from "@/lib/registry";
 
+import DisabledExample from "./disabledExample";
+import disabledSource from "./disabledExample.tsx?raw";
+import LoadingExample from "./loadingExample";
+import loadingSource from "./loadingExample.tsx?raw";
+import PrefixAndSuffixExample from "./prefixAndSuffix";
+import prefixAndSuffixSource from "./prefixAndSuffix.tsx?raw";
+import { buttonPropNames } from "./props";
+import RoundedExample from "./roundedExample";
+import roundedSource from "./roundedExample.tsx?raw";
+import ShapeExample from "./shape";
+import shapeSource from "./shape.tsx?raw";
 import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
-import StateExample from "./stateExample";
-import statesSource from "./stateExample.tsx?raw";
 import VariantsExample from "./variantsExample";
 import variantsSource from "./variantsExample.tsx?raw";
-import { buttonPropNames } from "./props";
 
 const buttonProps = getGeneratedProps(buttonItem.componentId, buttonPropNames);
 
@@ -27,7 +35,9 @@ export function ButtonPage(): ReactElement {
         source={buttonItem.source}
       />
 
-      <Section title="Variants" description="Treatments communicate action hierarchy and intent.">
+      <Section
+        title="All variants and states"
+      >
         <Example source={variantsSource}>
           <VariantsExample />
         </Example>
@@ -35,7 +45,6 @@ export function ButtonPage(): ReactElement {
 
       <Section
         title="Sizes"
-        description="Text and square icon sizes share a consistent height scale."
       >
         <Example source={sizesSource}>
           <SizesExample />
@@ -43,17 +52,50 @@ export function ButtonPage(): ReactElement {
       </Section>
 
       <Section
-        title="States"
-        description="Loading preserves layout, disabled blocks interaction, and full width fills its container."
+        title="Shape"
+        description="Square buttons contain one icon and require an `aria-label`."
       >
-        <Example source={statesSource} align="stretch">
-          <StateExample />
+        <Example source={shapeSource}>
+          <ShapeExample />
+        </Example>
+      </Section>
+
+      <Section title="Rounded" description="A larger radius provides a softer button treatment.">
+        <Example source={roundedSource}>
+          <RoundedExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Loading"
+        description="Loading keeps the label visible and blocks repeated activation."
+      >
+        <Example source={loadingSource}>
+          <LoadingExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Prefix and suffix"
+        description="Place decorative icons before, after, or around the label."
+      >
+        <Example source={prefixAndSuffixSource}>
+          <PrefixAndSuffixExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Disabled"
+        description="Disabled buttons share one neutral treatment across variants."
+      >
+        <Example source={disabledSource}>
+          <DisabledExample />
         </Example>
       </Section>
 
       <Section
         title="Props"
-        description="Button also accepts native button attributes and Base UI render composition props."
+        description="Button combines constrained visual props with native button behavior and render composition."
       >
         <PropsTable rows={buttonProps} />
       </Section>

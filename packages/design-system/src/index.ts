@@ -54,20 +54,28 @@ export type {
   ButtonJustify,
   ButtonProps,
   ButtonRadius,
+  ButtonShape,
   ButtonSize,
   ButtonVariant,
 } from './components/button/button'
+export { Spinner } from './components/spinner/spinner'
+export type { SpinnerProps, SpinnerSize } from './components/spinner/spinner'
 export { CopyButton } from './components/copyButton/copyButton'
 export type {
   CopyButtonProps,
   CopyButtonSize,
   CopyButtonVariant,
 } from './components/copyButton/copyButton'
-export { ButtonGroup } from './components/buttonGroup/buttonGroup'
+export {
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupText,
+} from './components/buttonGroup/buttonGroup'
 export type {
   ButtonGroupOrientation,
-  ButtonGroupRootProps,
+  ButtonGroupProps,
   ButtonGroupSeparatorProps,
+  ButtonGroupTextProps,
 } from './components/buttonGroup/buttonGroup'
 export { Field } from './components/field/field'
 export type {

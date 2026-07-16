@@ -48,27 +48,27 @@ export function AppShell(): ReactElement {
       </a>
       <Box
         display="block"
-        backgroundColor="bg-surface"
-        color="text-primary"
+        backgroundColor="bg-page"
+        color="text-default"
         paddingHorizontal={{ base: "xl", md: "5xl" }}
         {...stylex.props(styles.page)}
       >
         <Box as="header" display="block" maxWidth={shellMaxWidth} {...stylex.props(styles.header)}>
           <Box
             display="grid"
-            backgroundColor="bg-page"
-            borderColor="border"
-            borderStyle="solid"
+            backgroundColor="bg-card"
+            // borderColor="border"
+            // borderStyle="solid"
             {...stylex.props(styles.headerInner)}
           >
             <Box
               alignItems="center"
-              borderColor="border"
-              borderStyle="solid"
-              borderTopWidth={0}
-              borderRightWidth={1}
-              borderBottomWidth={0}
-              borderLeftWidth={0}
+              // borderColor="border"
+              // borderStyle="solid"
+              // borderTopWidth={0}
+              // borderRightWidth={1}
+              // borderBottomWidth={0}
+              // borderLeftWidth={0}
               {...stylex.props(styles.brandRegion)}
             >
               <Link to="/" {...stylex.props(styles.brandLink)}>
@@ -85,9 +85,9 @@ export function AppShell(): ReactElement {
         <Box display="block">
           <Box
             display="grid"
-            backgroundColor="bg-surface"
-            borderColor="border"
-            borderStyle="solid"
+            backgroundColor="bg-card"
+            // borderColor="border"
+            // borderStyle="solid"
             maxWidth={shellMaxWidth}
             {...stylex.props(styles.shell)}
           >
@@ -95,13 +95,13 @@ export function AppShell(): ReactElement {
               as="aside"
               flexDirection="column"
               gap="3xl"
-              borderStyle="solid"
-              borderTopWidth={0}
-              borderRightWidth={1}
-              borderBottomWidth={0}
-              borderLeftWidth={0}
-              borderColor="border"
-              backgroundColor="bg-surface"
+              // borderStyle="solid"
+              // borderTopWidth={0}
+              // borderRightWidth={1}
+              // borderBottomWidth={0}
+              // borderLeftWidth={0}
+              // borderColor="border"
+              backgroundColor="bg-card"
               {...stylex.props(styles.sidebar)}
             >
               <Box
@@ -186,7 +186,7 @@ const styles = stylex.create({
     gap: 16,
     minWidth: 0,
     paddingBlock: 16,
-    paddingLeft: 22,
+    paddingLeft: 8,
   },
   brandLink: {
     alignItems: "center",

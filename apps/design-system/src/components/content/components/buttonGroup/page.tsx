@@ -17,10 +17,12 @@ import orientationSource from "./orientationExample.tsx?raw";
 import {
   buttonGroupRootPropNames,
   buttonGroupSeparatorPropNames,
+  buttonGroupTextPropNames,
 } from "./props";
 
 const rootProps = getGeneratedProps("buttonGroup.root", buttonGroupRootPropNames);
 const separatorProps = getGeneratedProps("buttonGroup.separator", buttonGroupSeparatorPropNames);
+const textProps = getGeneratedProps("buttonGroup.text", buttonGroupTextPropNames);
 
 export function ButtonGroupPage(): ReactElement {
   return (
@@ -33,14 +35,17 @@ export function ButtonGroupPage(): ReactElement {
 
       <Section
         title="Related actions"
-        description="Group controls that operate on the same object or workflow. Label the group for assistive technology."
+        description="Group direct child controls that operate on the same object or workflow. Label the group for assistive technology."
       >
         <Example source={basicSource}>
           <BasicExample />
         </Example>
       </Section>
 
-      <Section title="Orientation" description="Arrange grouped controls horizontally or vertically.">
+      <Section
+        title="Orientation"
+        description="Orientation connects the appropriate edges while preserving each outer corner and focus ring."
+      >
         <Example source={orientationSource}>
           <OrientationExample />
         </Example>
@@ -60,6 +65,9 @@ export function ButtonGroupPage(): ReactElement {
       </Section>
       <Section title="Separator props">
         <PropsTable rows={separatorProps} />
+      </Section>
+      <Section title="Text props">
+        <PropsTable rows={textProps} />
       </Section>
     </DocsPage>
   );

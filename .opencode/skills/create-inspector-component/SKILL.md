@@ -5,6 +5,16 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 
 # Create Inspector Component
 
+## Table of contents
+
+- [Quick start](#quick-start)
+- [Component workflow](#component-workflow)
+- [Closed styling contract](#closed-styling-contract)
+- [Public prop vocabulary](#public-prop-vocabulary)
+- [StyleX workflow](#stylex-workflow)
+- [Compound components](#compound-components)
+- [Validation](#validation)
+
 ## Quick start
 
 1. Read `AGENTS.md` and inspect adjacent components and tokens.
@@ -35,8 +45,18 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 - When a design decision is missing, add a semantic token, typed prop, variant, or composed component instead of an escape hatch.
 - Keep exceptions explicit, narrow, and enforced by lint rather than normalizing bypasses in component APIs.
 
+## Public prop vocabulary
+
+Expose only props that are part of the Inspector design vocabulary. Do not wholesale-forward Base UI props to consumers.
+
+- Define an explicit prop type that lists only what Inspector components need: semantic variants, sizes, disabled/loading/invalid states, value/onChange pairs, and children/composition hooks.
+- Forward other Base UI behavior internally without typing it publicly. If a product feature later needs a missing prop, add it deliberately rather than exposing everything upfront.
+- Do not expose Base UI state callbacks, `render` props, `className`/`style` overrides, or arbitrary DOM attributes as public component props.
+- Every public prop should answer a design question such as "Which variant/size/state?" or "What content/action?". If it answers "How do I tweak internals?", it does not belong in the public API.
+
 ## StyleX workflow
 
+- Before designing cross-component or parent/descendant styling, you must evaluate relevant official StyleX recipes, including [Context-driven styles](https://stylexjs.com/docs/learn/recipes/context-driven-styles) and [Descendant styles](https://stylexjs.com/docs/learn/recipes/descendant-styles), and choose and apply them only when useful.
 - Use semantic tokens before primitive tokens and avoid raw values when a token exists.
 - Keep variants in typed lookup objects with `satisfies Record<Variant, unknown>`.
 - Apply Base UI state and interaction styling without replacing its behavior.

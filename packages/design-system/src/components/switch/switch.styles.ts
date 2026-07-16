@@ -49,7 +49,7 @@ export const switchStyles = stylex.create({
   },
   thumb: {
     borderRadius: borderRadii.xs,
-    backgroundColor: backgroundColors['bg-primary'],
+    backgroundColor: backgroundColors['bg-card'],
     display: 'block',
     transform: 'translateX(0)',
     transitionDuration: { default: '120ms', [reducedMotion]: '0ms' },
@@ -57,7 +57,7 @@ export const switchStyles = stylex.create({
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
   },
   thumbChecked: {
-    backgroundColor: backgroundColors['bg-surface-1'],
+    backgroundColor: backgroundColors['bg-page'],
   },
   thumbSizeS: {
     height: 12,

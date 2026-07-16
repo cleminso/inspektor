@@ -44,7 +44,7 @@ Static route files are authored source. `routeTree.gen.ts` is generated output a
 
 The extractor resolves the public export from `packages/design-system/src/index.ts`, filters external DOM props, reads package JSDoc, and reads literal defaults from parameter destructuring.
 
-Use `inheritedProps` only for meaningful external props that cannot be redeclared in the package. Prefer package redeclarations with JSDoc when the inherited behavior is part of the design-system contract.
+Use `inheritedProps` only for meaningful external props that are part of the design vocabulary but cannot be redeclared in the package. Prefer package redeclarations with JSDoc when the inherited behavior is part of the design-system contract. Do not document Base UI props that are not intentionally exposed.
 
 Generated output is committed and deterministic. Run generation after package source formatting because source line numbers are included. `check:props` must fail when the artifact is stale.
 
@@ -54,13 +54,15 @@ Each example module must compile as ordinary consumer code. The page imports the
 
 Do not put page wrappers, fixed widths, or documentation-only labels inside the example unless consumers need them. Do not maintain a second handwritten source string.
 
-Cover the component's meaningful dimensions without creating a matrix for every prop combination:
+Cover the component's meaningful design dimensions without creating a matrix for every prop combination:
 
 - semantic variants
 - supported sizes
 - interaction and disabled/loading states
 - render composition
 - one representative compound composition
+
+Do not demonstrate props that are not part of the design vocabulary.
 
 ## Compound APIs
 

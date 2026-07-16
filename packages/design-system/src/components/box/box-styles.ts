@@ -255,42 +255,34 @@ export const columnGapStyles = stylex.create({
 
 export const backgroundColorStyles = stylex.create({
   'bg-page': { backgroundColor: backgroundColors['bg-page'] },
-  'bg-surface': { backgroundColor: backgroundColors['bg-surface'] },
-  'bg-surface-raised': {
-    backgroundColor: backgroundColors['bg-surface-raised'],
-  },
-  'bg-surface-active': {
-    backgroundColor: backgroundColors['bg-surface-active'],
-  },
+  'bg-card': { backgroundColor: backgroundColors['bg-card'] },
+  'bg-popover': { backgroundColor: backgroundColors['bg-popover'] },
   'bg-overlay': { backgroundColor: backgroundColors['bg-overlay'] },
   'bg-backdrop': { backgroundColor: backgroundColors['bg-backdrop'] },
+  'bg-hover': { backgroundColor: backgroundColors['bg-hover'] },
+  'bg-pressed': { backgroundColor: backgroundColors['bg-pressed'] },
+  'bg-selected': { backgroundColor: backgroundColors['bg-selected'] },
+  'bg-disabled': { backgroundColor: backgroundColors['bg-disabled'] },
+  'bg-inverse': { backgroundColor: backgroundColors['bg-inverse'] },
   'bg-primary': { backgroundColor: backgroundColors['bg-primary'] },
   'bg-secondary': { backgroundColor: backgroundColors['bg-secondary'] },
-  'bg-surface-1': { backgroundColor: backgroundColors['bg-surface-1'] },
-  'bg-surface-hover': {
-    backgroundColor: backgroundColors['bg-surface-hover'],
-  },
-  'bg-surface-selected': {
-    backgroundColor: backgroundColors['bg-surface-selected'],
-  },
-  'bg-surface-highlight': {
-    backgroundColor: backgroundColors['bg-surface-highlight'],
-  },
-  'bg-inverse': { backgroundColor: backgroundColors['bg-inverse'] },
+  'bg-danger': { backgroundColor: backgroundColors['bg-danger'] },
+  'bg-success': { backgroundColor: backgroundColors['bg-success'] },
+  'bg-accent': { backgroundColor: backgroundColors['bg-accent'] },
 })
 
 export const colorStyles = stylex.create({
-  'text-primary': { color: textColors['text-primary'] },
-  'text-secondary': { color: textColors['text-secondary'] },
-  'text-tertiary': { color: textColors['text-tertiary'] },
+  'text-default': { color: textColors['text-default'] },
+  'text-muted': { color: textColors['text-muted'] },
+  'text-subtle': { color: textColors['text-subtle'] },
   'text-disabled': { color: textColors['text-disabled'] },
-  'text-accent': { color: textColors['text-accent'] },
-  'text-danger': { color: textColors['text-danger'] },
-  'text-success': { color: textColors['text-success'] },
-  'text-warning': { color: textColors['text-warning'] },
-  'text-info': { color: textColors['text-info'] },
-  'text-constant': { color: textColors['text-constant'] },
-  'text-type': { color: textColors['text-type'] },
+  'text-link': { color: textColors['text-link'] },
+  'fg-primary': { color: textColors['fg-primary'] },
+  'fg-secondary': { color: textColors['fg-secondary'] },
+  'fg-danger': { color: textColors['fg-danger'] },
+  'fg-success': { color: textColors['fg-success'] },
+  'fg-accent': { color: textColors['fg-accent'] },
+  'fg-inverse': { color: textColors['fg-inverse'] },
 })
 
 export const borderColorStyles = stylex.create({

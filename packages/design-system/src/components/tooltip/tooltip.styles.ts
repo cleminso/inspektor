@@ -23,7 +23,7 @@ export const tooltipStyles = stylex.create({
     paddingBlock: spacing.xs,
     paddingInline: spacing.m,
     backgroundColor: backgroundColors['bg-inverse'],
-    color: textColors['text-inverse'],
+    color: textColors['fg-inverse'],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.tight,

@@ -58,14 +58,17 @@ If the system cannot express a legitimate design, treat it as a missing token or
 
 ## Public API rules
 
+- Expose only props that are part of the Inspector design vocabulary. Do not derive wrapper props wholesale from Base UI; pick or redeclare the small set the product needs.
 - Name props relative to the component: `isOpen`, not `isDialogOpen`.
 - Derive behavior from existing props when possible.
 - Use a union prop for exclusive modes.
 - Prefer children and compound parts over broad `data` objects.
 - Preserve render composition rather than adding `asChild` aliases.
 - Omit inherited `className` and `style` from public wrapper props.
+- Do not expose Base UI state callbacks, internal `render` props, or arbitrary DOM attributes as public props. Forward them internally when behavior requires it.
 - Compare every new prop with the inherited Base UI and native DOM surface. Add colliding names to `Omit`, especially when replacing a native prop such as numeric `size` with a design-system union.
 - Do not expose StyleX internals as component props.
+- Add a prop only when a real product usage needs it. Avoid speculative flexibility.
 - Use package JSDoc for reusable API facts; keep usage guidance in the docs app.
 - Express documented defaults as literal destructuring initializers so prop extraction reads runtime truth.
 

@@ -20,7 +20,7 @@ export const checkboxStyles = stylex.create({
     borderWidth: 1,
     alignItems: "center",
     appearance: "none",
-    backgroundColor: backgroundColors["bg-surface-1"],
+    backgroundColor: backgroundColors["bg-card"],
     color: "transparent",
     cursor: "pointer",
     display: "inline-flex",
@@ -45,13 +45,13 @@ export const checkboxStyles = stylex.create({
   selected: {
     borderColor: backgroundColors["bg-inverse"],
     backgroundColor: backgroundColors["bg-inverse"],
-    color: textColors["text-inverse"],
+    color: textColors["fg-inverse"],
   },
   invalid: {
     borderColor: borderColors["border-danger"],
   },
   disabled: {
-    backgroundColor: backgroundColors["bg-primary"],
+    backgroundColor: backgroundColors["bg-disabled"],
     color: textColors["text-disabled"],
     cursor: "not-allowed",
   },

@@ -1,12 +1,19 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { useClipboard } from '../../hooks/useClipboard'
-import { Button } from '../button/button'
+import {
+  Button,
+  type ButtonSize,
+  type ButtonVariant,
+} from '../button/button'
 import { Tooltip, type TooltipContentProps } from '../tooltip/tooltip'
 import { copyButtonStyles } from './copyButton.styles'
 
-export type CopyButtonSize = 'icon-s' | 'icon-m' | 'icon-l'
-export type CopyButtonVariant = 'ghost' | 'secondary' | 'outline'
+export type CopyButtonSize = ButtonSize
+export type CopyButtonVariant = Extract<
+  ButtonVariant,
+  'ghost' | 'secondary' | 'outline'
+>
 
 export interface CopyButtonProps {
   /** Text written to the clipboard when the button is activated. */
@@ -32,9 +39,9 @@ export interface CopyButtonProps {
 }
 
 const iconSizeStyles = {
-  'icon-s': copyButtonStyles.iconS,
-  'icon-m': copyButtonStyles.iconM,
-  'icon-l': copyButtonStyles.iconL,
+  s: copyButtonStyles.iconS,
+  m: copyButtonStyles.iconM,
+  l: copyButtonStyles.iconL,
 } satisfies Record<CopyButtonSize, unknown>
 
 function CopyIcon({ size }: { size: CopyButtonSize }) {
@@ -63,7 +70,7 @@ export function CopyButton({
   label,
   copiedLabel = 'Copied',
   errorLabel = 'Could not copy',
-  size = 'icon-s',
+  size = 's',
   variant = 'ghost',
   disabled = false,
   tooltipSide = 'top',
@@ -93,6 +100,7 @@ export function CopyButton({
             aria-label={label}
             disabled={disabled}
             onClick={() => void handleCopy()}
+            shape="square"
             size={size}
             variant={variant}
           >

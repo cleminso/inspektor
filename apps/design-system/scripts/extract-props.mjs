@@ -47,12 +47,21 @@ const componentEntries = [
     exportName: "ResizableHandle",
     inheritedProps: [],
   },
-  ...["Root", "Separator"].map((part) => ({
-    componentId: `buttonGroup.${part[0].toLowerCase()}${part.slice(1)}`,
+  {
+    componentId: "buttonGroup.root",
     exportName: "ButtonGroup",
-    part,
     inheritedProps: [],
-  })),
+  },
+  {
+    componentId: "buttonGroup.separator",
+    exportName: "ButtonGroupSeparator",
+    inheritedProps: [],
+  },
+  {
+    componentId: "buttonGroup.text",
+    exportName: "ButtonGroupText",
+    inheritedProps: [],
+  },
   ...["Root", "Item"].map((part) => ({
     componentId: `toggleGroup.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "ToggleGroup",
@@ -308,7 +317,10 @@ function resolveAssignedFunction(variableDeclaration, part) {
   }
 
   const expression = initializer.getExpression();
-  if (Node.isPropertyAccessExpression(expression) === false || expression.getText() !== "Object.assign") {
+  if (
+    Node.isPropertyAccessExpression(expression) === false ||
+    expression.getText() !== "Object.assign"
+  ) {
     return undefined;
   }
 
@@ -321,7 +333,9 @@ function resolveAssignedFunction(variableDeclaration, part) {
     const property = partsArgument.getProperty(part);
     if (property !== undefined && Node.isPropertyAssignment(property)) {
       const propertyInitializer = property.getInitializer();
-      functionName = Node.isIdentifier(propertyInitializer) ? propertyInitializer.getText() : undefined;
+      functionName = Node.isIdentifier(propertyInitializer)
+        ? propertyInitializer.getText()
+        : undefined;
     }
   }
 
