@@ -12,15 +12,16 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  optimizeDeps: {
+    exclude: ["@inspector/ds"],
+  },
   plugins: [
     devtools(),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
     }),
-    stylex.vite({
-      useCSSLayers: true,
-    }),
+    stylex.vite(),
     viteReact(),
     tailwindcss(),
   ],

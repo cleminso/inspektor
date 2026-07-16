@@ -9,6 +9,10 @@ import { TooltipProvider } from "@regarde/ui/tooltip";
 import { routeTree } from "./routeTree.gen";
 import ReactDOM from "react-dom/client";
 
+if (import.meta.env.DEV === true) {
+  void import("virtual:stylex:runtime");
+}
+
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
