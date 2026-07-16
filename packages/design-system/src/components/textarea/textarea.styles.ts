@@ -9,7 +9,7 @@ import {
   spacing,
 } from "../../tokens/value.stylex";
 
-export const inputStyles = stylex.create({
+export const textareaStyles = stylex.create({
   base: {
     margin: 0,
     borderColor: {
@@ -18,47 +18,52 @@ export const inputStyles = stylex.create({
     },
     outlineColor: borderColors["border-focused"],
     outlineWidth: 0,
-        outlineColor: borderColors["border-focused"],
-        outlineStyle: "solid",
+    outlineColor: borderColors["border-focused"],
+    outlineStyle: "solid",
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
-    paddingBlock: 0,
+    paddingBlock: spacing.s,
     paddingInline: spacing.m,
     appearance: "none",
     backgroundColor: backgroundColors["bg-card"],
     boxSizing: "border-box",
     color: textColors["text-default"],
-    fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.normal,
+    resize: "vertical",
     minWidth: 0,
     "::placeholder": {
       color: textColors["text-subtle"],
     },
   },
-  sizeS: {
-    height: 24,
+  heightS: {
+    minHeight: 72,
   },
-  sizeM: {
-    height: 28,
+  heightM: {
+    minHeight: 112,
   },
-  sizeL: {
-    height: 32,
+  heightL: {
+    minHeight: 160,
+  },
+  fontSans: {
+    fontFamily: fontFamilies.sans,
+  },
+  fontMono: {
+    fontFamily: fontFamilies.mono,
   },
   fullWidth: {
     width: "100%",
   },
-  grouped: {
-    borderColor: "transparent",
-    borderRadius: 0,
-    borderWidth: 0,
-    flexBasis: "0%",
-    flexGrow: "1",
-    flexShrink: "1",
-    outlineWidth: 0,
-    height: "100%",
-    minWidth: 0,
+  invalid: {
+    borderColor: {
+      default: borderColors["border-danger"],
+      ":focus-visible": borderColors["border-danger"],
+    },
+    outlineColor: borderColors["border-danger-subtle"],
+    outlineOffset: 0,
+    outlineStyle: "solid",
+    outlineWidth: 2,
   },
   disabled: {
     backgroundColor: backgroundColors["bg-disabled"],
@@ -71,15 +76,5 @@ export const inputStyles = stylex.create({
   readOnly: {
     backgroundColor: backgroundColors["bg-secondary"],
     cursor: "default",
-  },
-  invalid: {
-    borderColor: {
-      default: borderColors["border-danger"],
-      ":focus-visible": borderColors["border-danger"],
-    },
-    outlineColor: borderColors["border-danger-subtle"],
-    outlineOffset: 0,
-    outlineStyle: "solid",
-    outlineWidth: 2,
   },
 });

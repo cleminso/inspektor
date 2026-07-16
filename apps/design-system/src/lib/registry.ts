@@ -100,7 +100,7 @@ export const checkboxItem = {
   title: "Checkbox",
   slug: "checkbox",
   href: "/components/checkbox",
-  description: "Binary and mixed-state selection with Field and Form integration.",
+  description: "Binary and mixed-state selection with Field and native form integration.",
   importPath: "@inspector/ds",
   source: {
     label: "checkbox.tsx",
@@ -161,6 +161,32 @@ export const inputItem = {
   componentId: "input",
 } satisfies NavItem;
 
+export const inputGroupItem = {
+  title: "Input Group",
+  slug: "input-group",
+  href: "/components/input-group",
+  description: "Compound text input with constrained static and interactive affixes.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "inputGroup.tsx",
+    path: "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+  },
+  componentId: "inputGroup",
+} satisfies NavItem;
+
+export const textareaItem = {
+  title: "Textarea",
+  slug: "textarea",
+  href: "/components/textarea",
+  description: "Multiline text entry with field validation and constrained editor treatments.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "textarea.tsx",
+    path: "packages/design-system/src/components/textarea/textarea.tsx",
+  },
+  componentId: "textarea",
+} satisfies NavItem;
+
 export const menuItem = {
   title: "Menu",
   slug: "menu",
@@ -191,7 +217,8 @@ export const resizablePanelItem = {
   title: "Resizable Panel",
   slug: "resizable-panel",
   href: "/components/resizable-panel",
-  description: "Accessible split panels with constrained handles, collapse controls, and layout persistence support.",
+  description:
+    "Accessible split panels with constrained handles, collapse controls, and layout persistence support.",
   importPath: "@inspector/ds",
   source: {
     label: "resizablePanel.tsx",
@@ -265,19 +292,6 @@ export const fieldsetItem = {
   componentId: "fieldset",
 } satisfies NavItem;
 
-export const formItem = {
-  title: "Form",
-  slug: "form",
-  href: "/components/form",
-  description: "Native form submission with consolidated field validation and external errors.",
-  importPath: "@inspector/ds",
-  source: {
-    label: "form.tsx",
-    path: "packages/design-system/src/components/form/form.tsx",
-  },
-  componentId: "form",
-} satisfies NavItem;
-
 export const textFieldItem = {
   title: "Text Field",
   slug: "text-field",
@@ -299,6 +313,8 @@ export const componentItems: NavItem[] = [
   contextSwitcherItem,
   copyButtonItem,
   inputItem,
+  inputGroupItem,
+  textareaItem,
   menuItem,
   resizablePanelItem,
   searchItem,
@@ -308,7 +324,6 @@ export const componentItems: NavItem[] = [
   tooltipItem,
   fieldItem,
   fieldsetItem,
-  formItem,
   textFieldItem,
   toggleGroupItem,
 ];

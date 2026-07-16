@@ -30,7 +30,7 @@ export function SwitchPage(): ReactElement {
       <Section title="Sizes and states">
         <Example source={statesSource}><StatesExample /></Example>
       </Section>
-      <Section title="Props" description="Switch participates in Field and Form automatically.">
+      <Section title="Props" description="Switch participates in Field and native forms automatically.">
         <PropsTable rows={switchProps} />
       </Section>
     </DocsPage>

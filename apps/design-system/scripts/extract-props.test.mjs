@@ -285,6 +285,8 @@ test("extracts the constrained ToggleGroup compound API", () => {
       "multiple",
       "disabled",
       "orientation",
+      "width",
+      "itemWidth",
       "render",
     ],
   );
@@ -313,7 +315,17 @@ test("extracts Input API facts from the public package export", () => {
   assert.ok(inputProps);
   assert.deepEqual(
     inputProps.map(({ name }) => name),
-    ["size", "fullWidth", "disabled", "defaultValue", "value", "onValueChange", "render"],
+    [
+      "size",
+      "fullWidth",
+      "invalid",
+      "disabled",
+      "readOnly",
+      "defaultValue",
+      "value",
+      "onValueChange",
+      "render",
+    ],
   );
   assert.equal(inputProps.find(({ name }) => name === "size")?.defaultValue, '"m"');
   assert.equal(inputProps.find(({ name }) => name === "fullWidth")?.defaultValue, "false");
@@ -324,6 +336,50 @@ test("extracts Input API facts from the public package export", () => {
   assert.equal(
     inputProps.find(({ name }) => name === "style"),
     undefined,
+  );
+});
+
+test("extracts the constrained Textarea API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata.textarea?.map(({ name }) => name),
+    [
+      "height",
+      "font",
+      "fullWidth",
+      "invalid",
+      "disabled",
+      "readOnly",
+      "defaultValue",
+      "value",
+      "onValueChange",
+    ],
+  );
+});
+
+test("extracts the constrained InputGroup compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata["inputGroup.root"]?.map(({ name }) => name),
+    ["size", "fullWidth", "invalid", "disabled"],
+  );
+  assert.deepEqual(
+    metadata["inputGroup.prefix"]?.map(({ name }) => name),
+    ["children"],
+  );
+  assert.deepEqual(
+    metadata["inputGroup.suffix"]?.map(({ name }) => name),
+    ["children"],
+  );
+  assert.deepEqual(
+    metadata["inputGroup.action"]?.map(({ name }) => name),
+    ["label", "controls", "pressed", "disabled", "onClick", "children"],
+  );
+  assert.deepEqual(
+    metadata["inputGroup.checkbox"]?.map(({ name }) => name),
+    ["label", "checked", "defaultChecked", "onCheckedChange", "disabled", "readOnly", "children"],
   );
 });
 
@@ -362,6 +418,10 @@ test("extracts compound Field part API facts from the public package export", ()
     "false",
   );
   assert.equal(
+    metadata["field.root"]?.find(({ name }) => name === "validationMode")?.defaultValue,
+    '"onBlur"',
+  );
+  assert.equal(
     metadata["field.label"]?.find(({ name }) => name === "nativeLabel")?.defaultValue,
     "true",
   );
@@ -384,26 +444,10 @@ test("extracts compound Fieldset part API facts from the public package export",
   );
 });
 
-test("extracts Form API facts from the public package export", () => {
+test("does not expose an unused Form abstraction", () => {
   const metadata = extractPropsMetadata();
-  const formProps = metadata.form;
 
-  assert.deepEqual(
-    formProps?.map(({ name }) => name),
-    ["validationMode", "errors", "onFormSubmit", "actionsRef", "onSubmit", "action", "render"],
-  );
-  assert.equal(
-    formProps?.find(({ name }) => name === "validationMode")?.defaultValue,
-    '"onSubmit"',
-  );
-  assert.equal(
-    formProps?.find(({ name }) => name === "className"),
-    undefined,
-  );
-  assert.equal(
-    formProps?.find(({ name }) => name === "style"),
-    undefined,
-  );
+  assert.equal(metadata.form, undefined);
 });
 
 test("extracts Checkbox API facts from the public package export", () => {
@@ -682,6 +726,10 @@ test("extracts the constrained Select compound API", () => {
   assert.equal(
     metadata["select.trigger"]?.find(({ name }) => name === "size")?.defaultValue,
     '"m"',
+  );
+  assert.equal(
+    metadata["select.trigger"]?.find(({ name }) => name === "fullWidth")?.defaultValue,
+    "false",
   );
   assert.equal(
     metadata["select.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue,

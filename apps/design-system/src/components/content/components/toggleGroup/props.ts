@@ -6,6 +6,8 @@ export const toggleGroupRootPropNames = [
   "multiple",
   "disabled",
   "orientation",
+  "width",
+  "itemWidth",
   "render",
 ] as const;
 

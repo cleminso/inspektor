@@ -85,6 +85,17 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "textarea",
+    exportName: "Textarea",
+    inheritedProps: [],
+  },
+  ...["Root", "Prefix", "Suffix", "Action", "Checkbox"].map((part) => ({
+    componentId: `inputGroup.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "InputGroup",
+    part,
+    inheritedProps: [],
+  })),
+  {
     componentId: "field.root",
     exportName: "Field",
     part: "Root",
@@ -118,11 +129,6 @@ const componentEntries = [
     componentId: "fieldset.legend",
     exportName: "Fieldset",
     part: "Legend",
-    inheritedProps: [],
-  },
-  {
-    componentId: "form",
-    exportName: "Form",
     inheritedProps: [],
   },
   {

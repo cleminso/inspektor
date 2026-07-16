@@ -36,6 +36,8 @@ export interface SelectTriggerProps
   extends Omit<WithoutStyles<BaseSelect.Trigger.Props>, "size"> {
   /** Controls the trigger height and padding. */
   size?: SelectSize;
+  /** Stretches the trigger to the width of its container. */
+  fullWidth?: boolean;
   /** Disables the trigger. */
   disabled?: boolean;
 }
@@ -81,10 +83,11 @@ function SelectLabel(props: SelectLabelProps) {
   return <BaseSelect.Label {...props} {...stateStyles} />;
 }
 
-function SelectTrigger({ size = "m", disabled = false, ...props }: SelectTriggerProps) {
+function SelectTrigger({ size = "m", fullWidth = false, disabled = false, ...props }: SelectTriggerProps) {
   const stateStyles = createStateStyleProps<BaseSelect.Trigger.State>((state) => [
     selectStyles.trigger,
     sizeStyles[size],
+    fullWidth === true && selectStyles.triggerFullWidth,
     state.open === true && selectStyles.triggerOpen,
     state.valid === false && selectStyles.triggerInvalid,
     state.disabled === true && selectStyles.disabled,

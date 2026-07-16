@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Field } from "../field/field";
 import type { FieldRootProps } from "../field/field";
@@ -45,17 +45,37 @@ export function TextField({
   fullWidth = true,
   ...inputProps
 }: TextFieldProps) {
+  const [requiredTouched, setRequiredTouched] = useState(false);
+  const [requiredInvalid, setRequiredInvalid] = useState(false);
+  const { onBlur, onValueChange, required, ...controlProps } = inputProps;
+  const effectiveInvalid = invalid === true || error !== undefined || requiredInvalid === true;
+
   return (
     <Field.Root
       name={name}
       disabled={disabled}
-      invalid={invalid}
+      invalid={effectiveInvalid}
       validate={validate}
       validationMode={validationMode}
       validationDebounceTime={validationDebounceTime}
     >
       <Field.Label>{label}</Field.Label>
-      <Input {...inputProps} fullWidth={fullWidth} />
+      <Input
+        {...controlProps}
+        required={required}
+        fullWidth={fullWidth}
+        onBlur={(event) => {
+          setRequiredTouched(true);
+          setRequiredInvalid(required === true && event.currentTarget.value.trim().length === 0);
+          onBlur?.(event);
+        }}
+        onValueChange={(value, eventDetails) => {
+          if (required === true && requiredTouched === true) {
+            setRequiredInvalid(value.trim().length === 0);
+          }
+          onValueChange?.(value, eventDetails);
+        }}
+      />
       {description === undefined ? null : <Field.Description>{description}</Field.Description>}
       {error === undefined ? <Field.Error /> : <Field.Error match>{error}</Field.Error>}
     </Field.Root>

@@ -15,14 +15,15 @@ import { Route as FoundationsColorsRouteImport } from './routes/foundations/colo
 import { Route as ComponentsTooltipRouteImport } from './routes/components/tooltip'
 import { Route as ComponentsToggleGroupRouteImport } from './routes/components/toggle-group'
 import { Route as ComponentsToastRouteImport } from './routes/components/toast'
+import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
+import { Route as ComponentsInputGroupRouteImport } from './routes/components/input-group'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
-import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsCopyButtonRouteImport } from './routes/components/copy-button'
@@ -62,6 +63,11 @@ const ComponentsToastRoute = ComponentsToastRouteImport.update({
   path: '/components/toast',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
+  id: '/components/textarea',
+  path: '/components/textarea',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
   id: '/components/text-field',
   path: '/components/text-field',
@@ -93,14 +99,14 @@ const ComponentsMenuRoute = ComponentsMenuRouteImport.update({
   path: '/components/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsInputGroupRoute = ComponentsInputGroupRouteImport.update({
+  id: '/components/input-group',
+  path: '/components/input-group',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsInputRoute = ComponentsInputRouteImport.update({
   id: '/components/input',
   path: '/components/input',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComponentsFormRoute = ComponentsFormRouteImport.update({
-  id: '/components/form',
-  path: '/components/form',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsFieldsetRoute = ComponentsFieldsetRouteImport.update({
@@ -155,14 +161,15 @@ export interface FileRoutesByFullPath {
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
-  '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/input-group': typeof ComponentsInputGroupRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
@@ -179,14 +186,15 @@ export interface FileRoutesByTo {
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
-  '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/input-group': typeof ComponentsInputGroupRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
@@ -204,14 +212,15 @@ export interface FileRoutesById {
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
-  '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/input-group': typeof ComponentsInputGroupRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
@@ -230,14 +239,15 @@ export interface FileRouteTypes {
     | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
-    | '/components/form'
     | '/components/input'
+    | '/components/input-group'
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
     | '/components/switch'
     | '/components/text-field'
+    | '/components/textarea'
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
@@ -254,14 +264,15 @@ export interface FileRouteTypes {
     | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
-    | '/components/form'
     | '/components/input'
+    | '/components/input-group'
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
     | '/components/switch'
     | '/components/text-field'
+    | '/components/textarea'
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
@@ -278,14 +289,15 @@ export interface FileRouteTypes {
     | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
-    | '/components/form'
     | '/components/input'
+    | '/components/input-group'
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
     | '/components/switch'
     | '/components/text-field'
+    | '/components/textarea'
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
@@ -303,14 +315,15 @@ export interface RootRouteChildren {
   ComponentsCopyButtonRoute: typeof ComponentsCopyButtonRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
-  ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
+  ComponentsInputGroupRoute: typeof ComponentsInputGroupRoute
   ComponentsMenuRoute: typeof ComponentsMenuRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
+  ComponentsTextareaRoute: typeof ComponentsTextareaRoute
   ComponentsToastRoute: typeof ComponentsToastRoute
   ComponentsToggleGroupRoute: typeof ComponentsToggleGroupRoute
   ComponentsTooltipRoute: typeof ComponentsTooltipRoute
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsToastRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/textarea': {
+      id: '/components/textarea'
+      path: '/components/textarea'
+      fullPath: '/components/textarea'
+      preLoaderRoute: typeof ComponentsTextareaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/text-field': {
       id: '/components/text-field'
       path: '/components/text-field'
@@ -404,18 +424,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/input-group': {
+      id: '/components/input-group'
+      path: '/components/input-group'
+      fullPath: '/components/input-group'
+      preLoaderRoute: typeof ComponentsInputGroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/input': {
       id: '/components/input'
       path: '/components/input'
       fullPath: '/components/input'
       preLoaderRoute: typeof ComponentsInputRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/components/form': {
-      id: '/components/form'
-      path: '/components/form'
-      fullPath: '/components/form'
-      preLoaderRoute: typeof ComponentsFormRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/fieldset': {
@@ -487,14 +507,15 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsCopyButtonRoute: ComponentsCopyButtonRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
-  ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
+  ComponentsInputGroupRoute: ComponentsInputGroupRoute,
   ComponentsMenuRoute: ComponentsMenuRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
+  ComponentsTextareaRoute: ComponentsTextareaRoute,
   ComponentsToastRoute: ComponentsToastRoute,
   ComponentsToggleGroupRoute: ComponentsToggleGroupRoute,
   ComponentsTooltipRoute: ComponentsTooltipRoute,

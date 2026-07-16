@@ -8,7 +8,6 @@ export default function ErrorExample(): ReactElement {
       name="username"
       label="Username"
       defaultValue="admin"
-      invalid
       error="This username is unavailable."
     />
   );

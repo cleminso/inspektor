@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { textColors } from "../../tokens/semantics.stylex";
+import { backgroundColors, borderColors, textColors } from "../../tokens/semantics.stylex";
 import {
   fontFamilies,
   fontSizes,
@@ -8,6 +8,7 @@ import {
   lineHeights,
   spacing,
 } from "../../tokens/value.stylex";
+import { inputGroupVars } from "../inputGroup/inputGroupVars.stylex";
 
 export const fieldStyles = stylex.create({
   root: {
@@ -38,10 +39,20 @@ export const fieldStyles = stylex.create({
     color: textColors["text-muted"],
   },
   error: {
-    color: textColors["fg-danger"],
+    color: textColors["text-danger"],
   },
   disabled: {
     color: textColors["text-disabled"],
     cursor: "not-allowed",
+  },
+  inputGroupInvalid: {
+    [inputGroupVars.borderColor]: borderColors["border-danger"],
+    [inputGroupVars.focusedBorderColor]: borderColors["border-danger"],
+    [inputGroupVars.outlineColor]: borderColors["border-danger-subtle"],
+    [inputGroupVars.outlineWidth]: "2px",
+  },
+  inputGroupDisabled: {
+    [inputGroupVars.backgroundColor]: backgroundColors["bg-disabled"],
+    [inputGroupVars.textColor]: textColors["text-disabled"],
   },
 });

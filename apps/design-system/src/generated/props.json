@@ -853,7 +853,7 @@
       "description": "The values of the pressed items when controlled.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 14
+        "line": 18
       }
     },
     {
@@ -863,7 +863,7 @@
       "description": "The initial values of the pressed items when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 16
+        "line": 20
       }
     },
     {
@@ -873,7 +873,7 @@
       "description": "Called when the pressed item values change.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 18
+        "line": 22
       }
     },
     {
@@ -884,7 +884,7 @@
       "description": "Loops keyboard focus from the last item to the first and vice versa.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 20
+        "line": 24
       }
     },
     {
@@ -895,7 +895,7 @@
       "description": "Allows more than one item to be pressed.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 22
+        "line": 26
       }
     },
     {
@@ -906,7 +906,7 @@
       "description": "Disables every item in the group.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 24
+        "line": 28
       }
     },
     {
@@ -917,7 +917,29 @@
       "description": "Controls the group layout and arrow-key navigation axis.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 26
+        "line": 30
+      }
+    },
+    {
+      "name": "width",
+      "type": "\"content\" | \"full\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Controls whether the group follows its content or fills its container.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "itemWidth",
+      "type": "\"content\" | \"equal\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Controls whether items follow their content or share available width.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 34
       }
     },
     {
@@ -927,7 +949,7 @@
       "description": "Composes ToggleGroup behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 28
+        "line": 36
       }
     }
   ],
@@ -939,7 +961,7 @@
       "description": "Uniquely identifies the item within its group.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 34
+        "line": 42
       }
     },
     {
@@ -949,7 +971,7 @@
       "description": "Called before the group commits the next pressed state.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 36
+        "line": 44
       }
     },
     {
@@ -960,7 +982,7 @@
       "description": "Whether the rendered element is a native button.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 38
+        "line": 46
       }
     },
     {
@@ -971,7 +993,7 @@
       "description": "Disables this item.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 40
+        "line": 48
       }
     },
     {
@@ -981,7 +1003,7 @@
       "description": "Composes item behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 42
+        "line": 50
       }
     }
   ],
@@ -1226,7 +1248,7 @@
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 16
+        "line": 19
       }
     },
     {
@@ -1237,7 +1259,18 @@
       "description": "Stretches the input to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 18
+        "line": 21
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Marks the input as invalid and exposes that state to assistive technology.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 23
       }
     },
     {
@@ -1248,7 +1281,18 @@
       "description": "Disables editing and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 20
+        "line": 25
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents editing while preserving focus and text selection.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 27
       }
     },
     {
@@ -1258,7 +1302,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 22
+        "line": 29
       }
     },
     {
@@ -1268,7 +1312,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 24
+        "line": 31
       }
     },
     {
@@ -1278,7 +1322,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 26
+        "line": 33
       }
     },
     {
@@ -1288,7 +1332,312 @@
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 35
+      }
+    }
+  ],
+  "textarea": [
+    {
+      "name": "height",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the minimum editor height.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "font",
+      "type": "\"sans\" | \"mono\"",
+      "required": false,
+      "defaultValue": "\"sans\"",
+      "description": "Selects proportional or code-oriented typography.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Stretches the textarea to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Marks the textarea as invalid and exposes that state to assistive technology.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables editing and focus.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents editing while preserving focus and text selection.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "required": false,
+      "description": "Sets the initial value when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
         "line": 28
+      }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Sets the current value when controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: string) => void",
+      "required": false,
+      "description": "Runs when the textarea value changes.",
+      "source": {
+        "path": "packages/design-system/src/components/textarea/textarea.tsx",
+        "line": 32
+      }
+    }
+  ],
+  "inputGroup.root": [
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the height of the compound input.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the group to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Marks the compound input as invalid. Field.Root supplies this automatically.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the input and every interactive group member.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 22
+      }
+    }
+  ],
+  "inputGroup.prefix": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Static content displayed before the editable value.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 28
+      }
+    }
+  ],
+  "inputGroup.suffix": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Static content displayed after the editable value.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 34
+      }
+    }
+  ],
+  "inputGroup.action": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the action.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 39
+      }
+    },
+    {
+      "name": "controls",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the input controlled by the action.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 41
+      }
+    },
+    {
+      "name": "pressed",
+      "type": "boolean",
+      "required": false,
+      "description": "Exposes toggle state for actions such as password visibility.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 43
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the action.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 45
+      }
+    },
+    {
+      "name": "onClick",
+      "type": "MouseEventHandler<HTMLButtonElement>",
+      "required": false,
+      "description": "Runs when the action is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 47
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Decorative action content.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 49
+      }
+    }
+  ],
+  "inputGroup.checkbox": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name that identifies the value controlled by the checkbox.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 54
+      }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls whether the option is checked.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 56
+      }
+    },
+    {
+      "name": "defaultChecked",
+      "type": "boolean",
+      "required": false,
+      "description": "Sets the initial checked state when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 58
+      }
+    },
+    {
+      "name": "onCheckedChange",
+      "type": "(checked: boolean, eventDetails: CheckboxRootChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when checked state changes.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 60
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the checkbox.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 62
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents changes while preserving focus.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 64
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Visible checkbox label.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 66
       }
     }
   ],
@@ -1358,6 +1707,7 @@
       "name": "validationMode",
       "type": "\"onSubmit\" | \"onBlur\" | \"onChange\"",
       "required": false,
+      "defaultValue": "\"onBlur\"",
       "description": "Selects when field validation runs.",
       "source": {
         "path": "packages/design-system/src/components/field/field.tsx",
@@ -1487,79 +1837,6 @@
       }
     }
   ],
-  "form": [
-    {
-      "name": "validationMode",
-      "type": "\"onSubmit\" | \"onBlur\" | \"onChange\"",
-      "required": false,
-      "defaultValue": "\"onSubmit\"",
-      "description": "Selects when fields in the form are validated.",
-      "source": {
-        "path": "packages/design-system/src/components/form/form.tsx",
-        "line": 9
-      }
-    },
-    {
-      "name": "errors",
-      "type": "Errors",
-      "required": false,
-      "description": "Supplies external validation errors keyed by Field.Root name.",
-      "source": {
-        "path": "packages/design-system/src/components/form/form.tsx",
-        "line": 11
-      }
-    },
-    {
-      "name": "onFormSubmit",
-      "type": "(formValues: FormValues, eventDetails: BaseForm.SubmitEventDetails) => void",
-      "required": false,
-      "description": "Receives consolidated field values after successful validation.",
-      "source": {
-        "path": "packages/design-system/src/components/form/form.tsx",
-        "line": 13
-      }
-    },
-    {
-      "name": "actionsRef",
-      "type": "RefObject<FormActions | null>",
-      "required": false,
-      "description": "Provides access to imperative form validation.",
-      "source": {
-        "path": "packages/design-system/src/components/form/form.tsx",
-        "line": 15
-      }
-    },
-    {
-      "name": "onSubmit",
-      "type": "(event: BaseUIEvent<SubmitEvent<HTMLFormElement>>) => void",
-      "required": false,
-      "description": "Handles the native submit event after successful validation.",
-      "source": {
-        "path": "packages/design-system/src/components/form/form.tsx",
-        "line": 17
-      }
-    },
-    {
-      "name": "action",
-      "type": "string | ((formData: FormData) => void | Promise<void>)",
-      "required": false,
-      "description": "Selects a URL or function that handles form submission.",
-      "source": {
-        "path": "packages/design-system/src/components/form/form.tsx",
-        "line": 19
-      }
-    },
-    {
-      "name": "render",
-      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, FormState>",
-      "required": false,
-      "description": "Composes Form behavior and styles onto another form element.",
-      "source": {
-        "path": "packages/design-system/src/components/form/form.tsx",
-        "line": 21
-      }
-    }
-  ],
   "textField": [
     {
       "name": "label",
@@ -1602,16 +1879,6 @@
       }
     },
     {
-      "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
-      "required": false,
-      "description": "Controls the input height.",
-      "source": {
-        "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 16
-      }
-    },
-    {
       "name": "disabled",
       "type": "boolean",
       "required": false,
@@ -1620,6 +1887,16 @@
       "source": {
         "path": "packages/design-system/src/components/textField/textField.tsx",
         "line": 18
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "description": "Controls the input height.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 19
       }
     },
     {
@@ -1643,32 +1920,12 @@
       }
     },
     {
-      "name": "defaultValue",
-      "type": "string | number | readonly string[]",
-      "required": false,
-      "description": "Sets the initial value when the input is uncontrolled.",
-      "source": {
-        "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 22
-      }
-    },
-    {
       "name": "validationMode",
       "type": "\"onSubmit\" | \"onBlur\" | \"onChange\"",
       "required": false,
       "description": "Selects when field validation runs.",
       "source": {
         "path": "packages/design-system/src/components/textField/textField.tsx",
-        "line": 24
-      }
-    },
-    {
-      "name": "value",
-      "type": "string | number | readonly string[]",
-      "required": false,
-      "description": "Sets the current value when the input is controlled.",
-      "source": {
-        "path": "packages/design-system/src/components/input/input.tsx",
         "line": 24
       }
     },
@@ -1683,13 +1940,13 @@
       }
     },
     {
-      "name": "onValueChange",
-      "type": "(value: string, eventDetails: Input.ChangeEventDetails) => void",
+      "name": "readOnly",
+      "type": "boolean",
       "required": false,
-      "description": "Runs when the input value changes.",
+      "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -1704,13 +1961,43 @@
       }
     },
     {
+      "name": "defaultValue",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the initial value when the input is uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 29
+      }
+    },
+    {
+      "name": "value",
+      "type": "string | number | readonly string[]",
+      "required": false,
+      "description": "Sets the current value when the input is controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 31
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: string, eventDetails: Input.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the input value changes.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 33
+      }
+    },
+    {
       "name": "render",
       "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, InputState>",
       "required": false,
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 28
+        "line": 35
       }
     }
   ],
@@ -2909,6 +3196,17 @@
       }
     },
     {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the trigger to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 40
+      }
+    },
+    {
       "name": "disabled",
       "type": "boolean",
       "required": false,
@@ -2916,7 +3214,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 40
+        "line": 42
       }
     }
   ],
@@ -2932,7 +3230,7 @@
       "description": "Sets the gap between the trigger and popup.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 49
+        "line": 51
       }
     },
     {
@@ -2943,7 +3241,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 51
+        "line": 53
       }
     },
     {
@@ -2954,7 +3252,7 @@
       "description": "Aligns the selected item text with the trigger value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 53
+        "line": 55
       }
     }
   ],
@@ -2968,7 +3266,7 @@
       "description": "The value represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 61
+        "line": 63
       }
     }
   ],
@@ -2982,7 +3280,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 69
+        "line": 71
       }
     }
   ]

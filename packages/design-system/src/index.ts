@@ -89,10 +89,22 @@ export type {
   FieldsetLegendProps,
   FieldsetRootProps,
 } from './components/fieldset/fieldset'
-export { Form } from './components/form/form'
-export type { FormProps } from './components/form/form'
 export { Input } from './components/input/input'
 export type { InputProps, InputSize } from './components/input/input'
+export { InputGroup } from './components/inputGroup/inputGroup'
+export type {
+  InputGroupActionProps,
+  InputGroupCheckboxProps,
+  InputGroupPrefixProps,
+  InputGroupRootProps,
+  InputGroupSuffixProps,
+} from './components/inputGroup/inputGroup'
+export { Textarea } from './components/textarea/textarea'
+export type {
+  TextareaFont,
+  TextareaHeight,
+  TextareaProps,
+} from './components/textarea/textarea'
 export { Menu } from './components/menu/menu'
 export type {
   MenuCheckboxItemIndicatorProps,
@@ -174,6 +186,8 @@ export { ToggleGroup } from './components/toggleGroup/toggleGroup'
 export type {
   ToggleGroupItemProps,
   ToggleGroupOrientation,
+  ToggleGroupItemWidth,
+  ToggleGroupWidth,
   ToggleGroupRootProps,
 } from './components/toggleGroup/toggleGroup'
 

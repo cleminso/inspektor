@@ -47,7 +47,7 @@ export function FieldPage(): ReactElement {
 
       <Section
         title="Validation"
-        description="Control invalid state externally or use Base UI validation through Field.Root."
+        description="Control invalid state externally or use blur validation through Field.Root."
       >
         <Example source={validationSource} align="stretch">
           <ValidationExample />

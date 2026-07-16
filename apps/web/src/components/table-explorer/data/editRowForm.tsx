@@ -2,11 +2,12 @@ import { useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Button } from "@regarde/ui/button";
-import { EmptyState } from "@regarde/ui/emptyState";
-import { cn } from "@regarde/ui/lib/utils";
+import { Button, Text } from "@inspector/ds";
 
-import { RowEditorFields, useRowEditorFields } from "@/components/table-explorer/data/rowEditorFields";
+import {
+  RowEditorFields,
+  useRowEditorFields,
+} from "@/components/table-explorer/data/rowEditorFields";
 
 interface EditRowFormProps {
   onCancel?: () => void;
@@ -26,7 +27,7 @@ export function EditRowForm({
   targetRowId,
 }: EditRowFormProps): React.ReactElement {
   if (rowValues === null) {
-    return <EmptyState title="Select a row" description="Select a row from the data grid to edit it." />;
+    return <Text color="muted">Select a row from the data grid to edit it.</Text>;
   }
 
   return (
@@ -78,15 +79,15 @@ function LoadedEditRowForm({
           onFieldTextChange={rowEditor.setFieldText}
         />
 
-        {rowEditor.saveError !== null ? <p className="text-sm text-destructive">{rowEditor.saveError}</p> : null}
+        {rowEditor.saveError !== null ? <Text color="error">{rowEditor.saveError}</Text> : null}
       </div>
 
       <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
         {onDelete !== undefined ? (
           <Button
             type="button"
-            variant="destructive"
-            size="sm"
+            variant="danger"
+            size="s"
             disabled={isDeleting === true || rowEditor.isSaving === true}
             onClick={async () => {
               if (isDeleteConfirming === false) {
@@ -103,15 +104,23 @@ function LoadedEditRowForm({
               }
             }}
           >
-            {isDeleting === true ? "Deleting..." : isDeleteConfirming === true ? "Confirm delete" : "Delete"}
+            {isDeleting === true
+              ? "Deleting..."
+              : isDeleteConfirming === true
+                ? "Confirm delete"
+                : "Delete"}
           </Button>
         ) : null}
-        <div className={cn("flex items-center gap-2", onDelete === undefined && "ml-auto")}>
+        <div
+          className={
+            onDelete === undefined ? "ml-auto flex items-center gap-2" : "flex items-center gap-2"
+          }
+        >
           {onCancel !== undefined ? (
             <Button
               type="button"
               variant="ghost"
-              size="sm"
+              size="s"
               onClick={() => {
                 if (isDeleteConfirming === true) {
                   setIsDeleteConfirming(false);
@@ -125,7 +134,7 @@ function LoadedEditRowForm({
               Cancel
             </Button>
           ) : null}
-          <Button type="submit" variant="default" size="sm" loading={rowEditor.isSaving === true}>
+          <Button type="submit" variant="primary" size="s" loading={rowEditor.isSaving === true}>
             Save
           </Button>
         </div>

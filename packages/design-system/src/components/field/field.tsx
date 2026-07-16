@@ -47,13 +47,20 @@ export interface FieldErrorProps extends Omit<BaseField.Error.Props, "className"
   render?: BaseField.Error.Props["render"];
 }
 
-function FieldRoot({ disabled = false, ...props }: FieldRootProps) {
+function FieldRoot({ disabled = false, validationMode = "onBlur", ...props }: FieldRootProps) {
+  const stateStyleProps = createStateStyleProps<BaseField.Root.State>((state) => [
+    fieldStyles.root,
+    state.valid === false && fieldStyles.inputGroupInvalid,
+    state.disabled === true && fieldStyles.inputGroupDisabled,
+  ]);
+
   return (
     <BaseField.Root
       {...props}
       disabled={disabled}
-      className={stylex.props(fieldStyles.root).className}
-      style={stylex.props(fieldStyles.root).style}
+      validationMode={validationMode}
+      className={stateStyleProps.className}
+      style={stateStyleProps.style}
       data-slot="field"
     />
   );

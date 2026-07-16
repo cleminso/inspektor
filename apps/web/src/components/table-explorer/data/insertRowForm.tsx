@@ -2,14 +2,19 @@ import { useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Button } from "@regarde/ui/button";
-import { Switch } from "@regarde/ui/switch";
+import { Button, Switch, Text } from "@inspector/ds";
 
-import { RowEditorFields, useRowEditorFields } from "@/components/table-explorer/data/rowEditorFields";
+import {
+  RowEditorFields,
+  useRowEditorFields,
+} from "@/components/table-explorer/data/rowEditorFields";
 
 interface InsertRowFormProps {
   onCancel?: () => void;
-  onSave: (values: Record<string, unknown>, options?: { keepOpen: boolean }) => Promise<void> | void;
+  onSave: (
+    values: Record<string, unknown>,
+    options?: { keepOpen: boolean },
+  ) => Promise<void> | void;
   rowValues: Record<string, unknown>;
   schemaColumns: ColumnDescriptor[];
 }
@@ -56,11 +61,14 @@ function InsertRowFormFields({
           onFieldNullChange={rowEditor.setFieldNull}
           onFieldTextChange={rowEditor.setFieldText}
         />
-        {rowEditor.saveError !== null ? <p className="text-sm text-destructive">{rowEditor.saveError}</p> : null}
+        {rowEditor.saveError !== null ? <Text color="error">{rowEditor.saveError}</Text> : null}
       </div>
 
       <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
-        <label htmlFor={insertMoreFieldId} className="flex items-center gap-2 text-sm text-muted-foreground">
+        <label
+          htmlFor={insertMoreFieldId}
+          className="flex items-center gap-2 text-sm text-muted-foreground"
+        >
           <Switch
             id={insertMoreFieldId}
             aria-labelledby={`${insertMoreFieldId}-label`}
@@ -76,11 +84,17 @@ function InsertRowFormFields({
         </label>
         <div className="flex items-center gap-2">
           {onCancel !== undefined ? (
-            <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={rowEditor.isSaving === true}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="s"
+              onClick={onCancel}
+              disabled={rowEditor.isSaving === true}
+            >
               Cancel
             </Button>
           ) : null}
-          <Button type="submit" variant="default" size="sm" loading={rowEditor.isSaving === true}>
+          <Button type="submit" variant="primary" size="s" loading={rowEditor.isSaving === true}>
             Insert
           </Button>
         </div>

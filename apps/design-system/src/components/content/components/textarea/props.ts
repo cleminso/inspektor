@@ -1,5 +1,6 @@
-export const inputPropNames = [
-  "size",
+export const textareaPropNames = [
+  "height",
+  "font",
   "fullWidth",
   "invalid",
   "disabled",
@@ -7,5 +8,4 @@ export const inputPropNames = [
   "defaultValue",
   "value",
   "onValueChange",
-  "render",
 ] as const;

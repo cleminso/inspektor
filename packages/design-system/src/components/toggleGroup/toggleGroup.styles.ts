@@ -34,13 +34,16 @@ export const toggleGroupStyles = stylex.create({
   rootDisabled: {
     opacity: 0.6,
   },
+  rootFullWidth: {
+    width: '100%',
+  },
   item: {
-    paddingInline: spacing.xl,
     borderColor: 'transparent',
     borderRadius: borderRadii.xs,
     borderStyle: 'solid',
     borderWidth: 1,
     gap: spacing.s,
+    paddingInline: spacing.xl,
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: {
@@ -57,7 +60,6 @@ export const toggleGroupStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
-    height: 28,
     justifyContent: 'center',
     lineHeight: lineHeights.none,
     outlineColor: borderColors['border-focused'],
@@ -69,14 +71,20 @@ export const toggleGroupStyles = stylex.create({
     outlineWidth: 2,
     userSelect: 'none',
     whiteSpace: 'nowrap',
+    height: 28,
   },
   itemPressed: {
+    borderColor: borderColors['border'],
     backgroundColor: {
       default: backgroundColors['bg-selected'],
       ':hover': backgroundColors['bg-selected'],
     },
-    borderColor: borderColors['border'],
     color: textColors['text-default'],
+  },
+  itemEqualWidth: {
+    flexBasis: '0%',
+    flexGrow: '1',
+    flexShrink: '1',
   },
   itemDisabled: {
     color: textColors['text-disabled'],

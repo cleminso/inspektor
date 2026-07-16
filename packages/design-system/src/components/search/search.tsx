@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { Input, type InputProps, type InputSize } from "../input/input";
 import { searchStyles } from "./search.styles";
 
-export interface SearchProps extends Omit<InputProps, "type" | "render"> {
+export interface SearchProps extends Omit<InputProps, "invalid" | "readOnly" | "render" | "type"> {
   /** Controls the search input height. */
   size?: InputSize;
   /** Stretches the search control to the width of its container. */

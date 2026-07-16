@@ -43,6 +43,7 @@ export const textColors = stylex.defineVars({
   'text-subtle': `light-dark(${palette.gray500}, ${palette.neutral500})`,
   'text-disabled': `light-dark(${palette.gray400}, ${palette.neutral600})`,
   'text-link': `light-dark(${palette.blue600}, ${palette.blue400})`,
+  'text-danger': `light-dark(${palette.red600}, ${palette.red400})`,
 
   // Text on color-role surfaces
   'fg-primary': `light-dark(${palette.gray50}, ${palette.neutral950})`,
@@ -57,10 +58,11 @@ export const textColors = stylex.defineVars({
 export const borderColors = stylex.defineVars({
   'border': `light-dark(${palette.gray300}, ${palette.neutral700})`,
   'border-secondary': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'border-focused': `light-dark(${palette.blue600}, ${palette.blue400})`,
+  'border-focused': `light-dark(${palette.gray400}, ${palette.neutral500})`,
 
   'border-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
   'border-danger': `light-dark(${palette.red500}, ${palette.red400})`,
+  'border-danger-subtle': `light-dark(${palette.red200}, ${palette.red900})`,
   'border-success': `light-dark(${palette.green600}, ${palette.green300})`,
 } as const)
 
@@ -131,8 +133,8 @@ export const textColorStyles = stylex.create({
 
   primary: { color: textColors['fg-primary'] },
   secondary: { color: textColors['fg-secondary'] },
-  danger: { color: textColors['fg-danger'] },
-  error: { color: textColors['fg-danger'] },
+  danger: { color: textColors['text-danger'] },
+  error: { color: textColors['text-danger'] },
   success: { color: textColors['fg-success'] },
   accent: { color: textColors['fg-accent'] },
   inverse: { color: textColors['fg-inverse'] },

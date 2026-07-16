@@ -37,7 +37,7 @@ export function CheckboxPage(): ReactElement {
         </Example>
       </Section>
 
-      <Section title="Props" description="Checkbox participates in Field and Form automatically.">
+      <Section title="Props" description="Checkbox participates in Field and native forms automatically.">
         <PropsTable rows={checkboxProps} />
       </Section>
     </DocsPage>

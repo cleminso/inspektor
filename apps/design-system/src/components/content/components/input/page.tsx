@@ -33,7 +33,7 @@ export function InputPage(): ReactElement {
 
       <Section
         title="States"
-        description="Input supports controlled values, disabled state, and container-width layouts."
+        description="Input uses a neutral focused border and a danger border with a subtle halo when invalid."
       >
         <Example source={statesSource} align="stretch">
           <StatesExample />

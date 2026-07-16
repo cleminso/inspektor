@@ -29,7 +29,7 @@ export function TextFieldPage(): ReactElement {
 
       <Section
         title="Text field"
-        description="Import only TextField for the standard composition. Its rendered control is an internal Input configured through TextField props."
+        description="Import only TextField for the standard composition. Required fields become invalid after an empty blur and clear while editing."
       >
         <Example source={basicSource} align="stretch">
           <BasicExample />
@@ -47,14 +47,17 @@ export function TextFieldPage(): ReactElement {
 
       <Section
         title="TextField with external error"
-        description="TextField still renders its internal Input while invalid and error control the surrounding Field state."
+        description="Supplying an error makes the surrounding Field and its internal Input invalid."
       >
         <Example source={errorSource} align="stretch">
           <ErrorExample />
         </Example>
       </Section>
 
-      <Section title="Props" description="TextField accepts supported Input attributes and field validation props.">
+      <Section
+        title="Props"
+        description="TextField accepts supported Input attributes and field validation props."
+      >
         <PropsTable rows={textFieldProps} />
       </Section>
     </DocsPage>

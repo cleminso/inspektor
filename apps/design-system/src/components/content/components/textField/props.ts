@@ -4,6 +4,7 @@ export const textFieldPropNames = [
   "error",
   "name",
   "disabled",
+  "readOnly",
   "invalid",
   "validate",
   "validationMode",

@@ -3,18 +3,16 @@ import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { ButtonGroup, ButtonGroupItem } from "@regarde/ui/buttonGroup";
-import { Checkbox } from "@regarde/ui/checkbox";
-import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from "@regarde/ui/field";
-import { Input } from "@regarde/ui/input";
 import {
+  Button,
+  Checkbox,
+  Field,
+  Input,
+  InputGroup,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@regarde/ui/select";
-import { Textarea } from "@regarde/ui/textarea";
+  Textarea,
+  ToggleGroup,
+} from "@inspector/ds";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import {
@@ -27,6 +25,7 @@ import {
 import { buildRelationTableLink } from "@/lib/table-explorer/relationNavigation";
 import type { DetailPaneMode } from "@/types/tableExplorer";
 
+// TODO: investigate and when `checkbox NULL` is focus when press `enter` it target the Field.Root
 export interface FieldState {
   isNull: boolean;
   text: string;
@@ -63,7 +62,11 @@ interface RowEditorFieldsProps {
   onFieldTextChange: (columnName: string, text: string) => void;
 }
 
-function getInitialFieldState(value: unknown, mode: DetailPaneMode, column: ColumnDescriptor): FieldState {
+function getInitialFieldState(
+  value: unknown,
+  mode: DetailPaneMode,
+  column: ColumnDescriptor,
+): FieldState {
   if (mode === "insert") {
     return {
       text: formatMutationFieldValue(value),
@@ -92,7 +95,10 @@ function createInitialFields(
   schemaColumns: ColumnDescriptor[],
 ): Record<string, FieldState> {
   return Object.fromEntries(
-    schemaColumns.map((column) => [column.name, getInitialFieldState(rowValues[column.name], mode, column)]),
+    schemaColumns.map((column) => [
+      column.name,
+      getInitialFieldState(rowValues[column.name], mode, column),
+    ]),
   );
 }
 
@@ -109,7 +115,11 @@ function formatColumnNameLabel(columnName: string): string {
 }
 
 function isStructuredColumn(column: ColumnDescriptor): boolean {
-  return column.column_type.type === "Json" || column.column_type.type === "Array" || column.column_type.type === "Row";
+  return (
+    column.column_type.type === "Json" ||
+    column.column_type.type === "Array" ||
+    column.column_type.type === "Row"
+  );
 }
 
 function isBooleanFieldNull(fieldState: FieldState): BooleanFieldValue {
@@ -126,7 +136,9 @@ export function useRowEditorFields({
   onSubmit,
   schemaColumns,
 }: UseRowEditorFieldsOptions): UseRowEditorFieldsResult {
-  const [fieldStates, setFieldStates] = useState<Record<string, FieldState>>(() => createInitialFields(initialRowValues, mode, schemaColumns));
+  const [fieldStates, setFieldStates] = useState<Record<string, FieldState>>(() =>
+    createInitialFields(initialRowValues, mode, schemaColumns),
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -173,9 +185,13 @@ export function useRowEditorFields({
       }
 
       try {
-        updates[field.column.name] = parseMutationFieldValue(field.column.column_type, fieldState.text);
+        updates[field.column.name] = parseMutationFieldValue(
+          field.column.column_type,
+          fieldState.text,
+        );
       } catch (nextError) {
-        nextErrors[field.column.name] = nextError instanceof Error ? nextError.message : String(nextError);
+        nextErrors[field.column.name] =
+          nextError instanceof Error ? nextError.message : String(nextError);
       }
     }
 
@@ -222,23 +238,22 @@ export function RowEditorFields({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6 pr-1">
       {shouldShowIdField === true ? (
-        <Field>
+        <Field.Root>
           <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
-              <FieldLabel htmlFor="row-editor-id" className="min-w-0">
+              <Field.Label htmlFor="row-editor-id">
                 <span>Id</span>
-              </FieldLabel>
+              </Field.Label>
               <span className="text-xs text-muted-foreground">text</span>
             </div>
           </div>
-          <FieldContent>
-            <Input
-              id="row-editor-id"
-              value={mode === "insert" ? "auto-generated" : String(initialRowValues.id ?? "")}
-              readOnly
-            />
-          </FieldContent>
-        </Field>
+          <Input
+            id="row-editor-id"
+            value={mode === "insert" ? "auto-generated" : String(initialRowValues.id ?? "")}
+            fullWidth
+            readOnly
+          />
+        </Field.Root>
       ) : null}
 
       {formFields.map(({ column, readOnlyReason }) => {
@@ -250,27 +265,41 @@ export function RowEditorFields({
         const isBinaryColumn = column.column_type.type === "Bytea";
         const isStructuredColumnType = isStructuredColumn(column);
         const relationTarget =
-          column.references !== undefined && fieldState.isNull === false && fieldState.text.trim().length > 0
+          column.references !== undefined &&
+          fieldState.isNull === false &&
+          fieldState.text.trim().length > 0
             ? fieldState.text.trim()
             : null;
+        const hasFieldError = fieldError !== undefined && fieldError.length > 0;
+        const usesTextInput =
+          isBooleanColumn === false &&
+          column.column_type.type !== "Enum" &&
+          isStructuredColumnType === false &&
+          isBinaryColumn === false;
 
         return (
-          <Field key={column.name}>
+          <Field.Root key={column.name} invalid={hasFieldError}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
-                <FieldLabel
+                <Field.Label
                   id={fieldLabelId}
                   htmlFor={isBooleanColumn === true ? undefined : fieldId}
-                  className="min-w-0"
+                  nativeLabel={isBooleanColumn === false}
                 >
                   <span>{formatColumnNameLabel(column.name)}</span>
-                </FieldLabel>
-                <span className="text-xs text-muted-foreground">{formatColumnTypeLabel(column)}</span>
+                </Field.Label>
+                <span className="text-xs text-muted-foreground">
+                  {formatColumnTypeLabel(column)}
+                </span>
               </div>
               <div className="flex items-center gap-3">
-                {column.nullable === true && readOnlyReason === null && isBooleanColumn === false ? (
+                {column.nullable === true &&
+                readOnlyReason === null &&
+                isBooleanColumn === false &&
+                usesTextInput === false ? (
                   <label className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Checkbox
+                      aria-label={`Set ${formatColumnNameLabel(column.name)} to NULL`}
                       checked={fieldState.isNull}
                       onCheckedChange={(nextChecked) => {
                         onFieldNullChange(column.name, nextChecked === true);
@@ -281,115 +310,138 @@ export function RowEditorFields({
                 ) : null}
               </div>
             </div>
-            <FieldContent>
-              {isBooleanColumn === true && readOnlyReason === null ? (
-                <ButtonGroup fullWidth={true} aria-labelledby={fieldLabelId}>
-                  <ButtonGroupItem
-                    fill={true}
-                    selected={isBooleanFieldNull(fieldState) === "true"}
-                    onClick={() => {
-                      onFieldNullChange(column.name, false);
-                      onFieldTextChange(column.name, "true");
-                    }}
-                  >
-                    True
-                  </ButtonGroupItem>
-                  <ButtonGroupItem
-                    fill={true}
-                    selected={isBooleanFieldNull(fieldState) === "false"}
-                    onClick={() => {
-                      onFieldNullChange(column.name, false);
-                      onFieldTextChange(column.name, "false");
-                    }}
-                  >
-                    False
-                  </ButtonGroupItem>
-                  {column.nullable === true ? (
-                    <ButtonGroupItem
-                      fill={true}
-                      selected={isBooleanFieldNull(fieldState) === "null"}
-                      onClick={() => {
-                        onFieldNullChange(column.name, true);
-                      }}
-                    >
-                      Null
-                    </ButtonGroupItem>
-                  ) : null}
-                </ButtonGroup>
-              ) : column.column_type.type === "Enum" && readOnlyReason === null ? (
-                <Select
-                  value={fieldState.isNull === true ? "" : fieldState.text}
-                  onValueChange={(nextValue) => {
-                    if (typeof nextValue === "string") {
-                      onFieldTextChange(column.name, nextValue);
-                    }
-                  }}
-                  disabled={fieldState.isNull === true}
-                >
-                  <SelectTrigger id={fieldId} className="w-full">
-                    <SelectValue placeholder={fieldState.isNull === true ? "NULL" : "Select value"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {column.column_type.variants.map((variant) => (
-                      <SelectItem key={variant} value={variant}>
-                        {variant}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : isStructuredColumnType === true || isBinaryColumn === true ? (
-                <div className="flex flex-col gap-2">
-                  <Textarea
-                    id={fieldId}
-                    className="min-h-28 font-mono"
-                    value={fieldState.text}
-                    readOnly={readOnlyReason !== null || isBinaryColumn === true}
-                    disabled={fieldState.isNull === true}
-                    onChange={(event) => {
-                      onFieldTextChange(column.name, event.currentTarget.value);
-                    }}
+            {isBooleanColumn === true && readOnlyReason === null ? (
+              <ToggleGroup
+                value={[isBooleanFieldNull(fieldState)]}
+                onValueChange={(values) => {
+                  const nextValue = values[0];
+                  if (nextValue === "true") {
+                    onFieldNullChange(column.name, false);
+                    onFieldTextChange(column.name, "true");
+                  } else if (nextValue === "false") {
+                    onFieldNullChange(column.name, false);
+                    onFieldTextChange(column.name, "false");
+                  } else if (nextValue === "null") {
+                    onFieldNullChange(column.name, true);
+                  }
+                }}
+                width="full"
+                itemWidth="equal"
+                aria-labelledby={fieldLabelId}
+              >
+                <ToggleGroup.Item value="true">True</ToggleGroup.Item>
+                <ToggleGroup.Item value="false">False</ToggleGroup.Item>
+                {column.nullable === true ? (
+                  <ToggleGroup.Item value="null">Null</ToggleGroup.Item>
+                ) : null}
+              </ToggleGroup>
+            ) : column.column_type.type === "Enum" && readOnlyReason === null ? (
+              <Select.Root
+                items={column.column_type.variants}
+                value={
+                  fieldState.isNull === true || fieldState.text.length === 0
+                    ? null
+                    : fieldState.text
+                }
+                onValueChange={(nextValue) => {
+                  if (typeof nextValue === "string") {
+                    onFieldTextChange(column.name, nextValue);
+                  }
+                }}
+                disabled={fieldState.isNull === true}
+              >
+                <Select.Trigger id={fieldId} fullWidth>
+                  <Select.Value
+                    placeholder={fieldState.isNull === true ? "NULL" : "Select value"}
                   />
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {relationTarget !== null &&
-                  column.references !== undefined &&
-                  currentConnectionId !== null &&
-                  currentBranch !== null &&
-                  currentSchemaHash !== null ? (
-                    <div className="flex justify-end">
-                      <Link
-                        {...buildRelationTableLink({
-                          connectionId: currentConnectionId,
-                          branch: currentBranch,
-                          schemaHash: currentSchemaHash,
-                          tableName: column.references,
-                          relationId: relationTarget,
-                        })}
-                        className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-                      >
-                        Show
-                      </Link>
-                    </div>
-                  ) : null}
+                  <Select.Icon />
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Positioner>
+                    <Select.Popup>
+                      <Select.List>
+                        {column.column_type.variants.map((variant) => (
+                          <Select.Item key={variant} value={variant}>
+                            <Select.ItemIndicator />
+                            <Select.ItemText>{variant}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.List>
+                    </Select.Popup>
+                  </Select.Positioner>
+                </Select.Portal>
+              </Select.Root>
+            ) : isStructuredColumnType === true || isBinaryColumn === true ? (
+              <div className="flex flex-col gap-2">
+                <Textarea
+                  id={fieldId}
+                  height="m"
+                  font="mono"
+                  value={fieldState.text}
+                  readOnly={readOnlyReason !== null || isBinaryColumn === true}
+                  disabled={fieldState.isNull === true}
+                  onValueChange={(value) => {
+                    onFieldTextChange(column.name, value);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {relationTarget !== null &&
+                column.references !== undefined &&
+                currentConnectionId !== null &&
+                currentBranch !== null &&
+                currentSchemaHash !== null ? (
+                  <div className="flex justify-end">
+                    <Button
+                      variant="link"
+                      size="s"
+                      render={
+                        <Link
+                          {...buildRelationTableLink({
+                            connectionId: currentConnectionId,
+                            branch: currentBranch,
+                            schemaHash: currentSchemaHash,
+                            tableName: column.references,
+                            relationId: relationTarget,
+                          })}
+                        />
+                      }
+                    >
+                      Show
+                    </Button>
+                  </div>
+                ) : null}
+                <InputGroup fullWidth>
                   <Input
                     id={fieldId}
-                    value={fieldState.text}
+                    value={fieldState.isNull === true ? "" : fieldState.text}
                     readOnly={readOnlyReason !== null}
                     disabled={fieldState.isNull === true}
-                    onChange={(event) => {
-                      onFieldTextChange(column.name, event.currentTarget.value);
+                    onValueChange={(value) => {
+                      onFieldTextChange(column.name, value);
                     }}
                   />
-                </div>
-              )}
-            </FieldContent>
+                  {column.nullable === true && readOnlyReason === null ? (
+                    <InputGroup.Checkbox
+                      label={`Set ${formatColumnNameLabel(column.name)} to NULL`}
+                      checked={fieldState.isNull}
+                      onCheckedChange={(nextChecked) => {
+                        onFieldNullChange(column.name, nextChecked === true);
+                      }}
+                    >
+                      NULL
+                    </InputGroup.Checkbox>
+                  ) : null}
+                </InputGroup>
+              </div>
+            )}
 
             {getFieldReadOnlyReason(column) === "binary" ? (
-              <FieldDescription>Read-only: binary field</FieldDescription>
+              <Field.Description>Read-only: binary field</Field.Description>
             ) : null}
-            <FieldError>{fieldError !== undefined && fieldError.length > 0 ? fieldError : null}</FieldError>
-          </Field>
+            {hasFieldError === true ? <Field.Error match>{fieldError}</Field.Error> : null}
+          </Field.Root>
         );
       })}
     </div>
