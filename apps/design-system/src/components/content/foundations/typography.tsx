@@ -2,6 +2,7 @@ import { Box, Text, type TextVariant } from "@inspector/ds";
 import * as stylex from "@stylexjs/stylex";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { Section } from "@/components/docs/section";
 import { typographyFoundationItem } from "@/lib/registry";
@@ -37,7 +38,7 @@ const textColors = [
 
 export function TypographyFoundationPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={typographyFoundationItem.title}
         description={typographyFoundationItem.description}
@@ -100,7 +101,7 @@ export function TypographyFoundationPage(): ReactElement {
           </Text>
         </Box>
       </Section>
-    </Box>
+    </DocsPage>
   );
 }
 

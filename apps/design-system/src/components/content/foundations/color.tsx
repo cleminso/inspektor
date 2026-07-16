@@ -1,193 +1,278 @@
-import { Box, CopyButton, Text } from "@inspector/ds";
-import {
-  backgroundColors,
-  borderColors,
-  paletteValues,
-  textColors,
-  type PaletteToken,
-} from "@inspector/ds/theme";
+import { Text, Toaster, toasts } from "@inspector/ds";
+import { paletteValues, type PaletteToken } from "@inspector/ds/theme";
 import * as stylex from "@stylexjs/stylex";
 import { type ReactElement } from "react";
+import { useTheme } from "next-themes";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { Section } from "@/components/docs/section";
 import { colorsFoundationItem } from "@/lib/registry";
 
-const backgroundTokens = [
-  "bg-surface-1",
-  "bg-primary",
-  "bg-secondary",
-  "bg-surface-hover",
-  "bg-surface-selected",
-  "bg-surface-highlight",
-  "bg-inverse",
-] as const;
+const scaleSteps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
 
-const textTokens = [
-  "text-primary",
-  "text-secondary",
-  "text-tertiary",
-  "text-disabled",
-  "text-accent",
-  "text-danger",
-  "text-success",
-  "text-warning",
-  "text-info",
-  "text-constant",
-  "text-type",
-] as const;
+type ScaleStep = (typeof scaleSteps)[number];
+type ThemeMode = "light" | "dark";
+type ScaleName = "gray" | "grayAlpha" | "neutral" | "neutralAlpha" | "blue" | "red" | "orange" | "yellow" | "green";
 
-const borderTokens = [
-  "border",
-  "border-secondary",
-  "border-focused",
-  "border-warning",
-  "border-danger",
-  "border-success",
-] as const;
+interface ColorSwatch {
+  label: string;
+  token: PaletteToken;
+  value: string;
+}
 
-const paletteEntries = Object.entries(paletteValues) as Array<[PaletteToken, string]>;
+interface ColorScale {
+  label: string;
+  swatches: ColorSwatch[];
+}
 
-function PaletteColorCard({ name, value }: { name: PaletteToken; value: string }): ReactElement {
+function getScaleToken(scaleName: ScaleName, step: ScaleStep): PaletteToken {
+  return `${scaleName}${step}` as PaletteToken;
+}
+
+function getSwatch(scaleName: ScaleName, step: ScaleStep): ColorSwatch {
+  const token = getScaleToken(scaleName, step);
+
+  return {
+    label: String(step),
+    token,
+    value: paletteValues[token],
+  };
+}
+
+function getScale(label: string, scaleName: ScaleName): ColorScale {
+  return {
+    label,
+    swatches: scaleSteps.map((step) => getSwatch(scaleName, step)),
+  };
+}
+
+function getBackgroundScale(mode: ThemeMode): ColorScale {
+  const backgroundSwatches =
+    mode === "dark"
+      ? [getSwatch("neutral", 50), getSwatch("neutral", 100)]
+      : [getSwatch("gray", 50), getSwatch("gray", 100)];
+
+  return {
+    label: "Backgrounds",
+    swatches: backgroundSwatches.map((swatch, index) => ({
+      ...swatch,
+      label: `Background ${index + 1}`,
+    })),
+  };
+}
+
+function getModeScales(mode: ThemeMode): ColorScale[] {
+  const neutralScales =
+    mode === "dark"
+      ? [getScale("Neutral", "neutral"), getScale("Neutral alpha", "neutralAlpha")]
+      : [getScale("Gray", "gray"), getScale("Gray alpha", "grayAlpha")];
+
+  return [
+    getBackgroundScale(mode),
+    ...neutralScales,
+    getScale("Blue", "blue"),
+    getScale("Red", "red"),
+    getScale("Orange", "orange"),
+    getScale("Yellow", "yellow"),
+    getScale("Green", "green"),
+  ];
+}
+
+async function copyColorValue(swatch: ColorSwatch): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(swatch.value);
+    toasts.success("Color copied", {
+      description: `${swatch.token}: ${swatch.value}`,
+    });
+  } catch {
+    toasts.error("Could not copy color", {
+      description: swatch.value,
+    });
+  }
+}
+
+function ColorSwatchButton({ swatch }: { swatch: ColorSwatch }): ReactElement {
   return (
-    <article {...stylex.props(styles.paletteCard)}>
-      <span aria-hidden="true" {...stylex.props(styles.swatch)} style={{ background: value }} />
-      <span {...stylex.props(styles.paletteDetails)}>
-        <span {...stylex.props(styles.paletteText)}>
-          <span {...stylex.props(styles.paletteName)}>{name}</span>
-          <span {...stylex.props(styles.paletteValue)}>{value}</span>
-        </span>
-        <CopyButton textToCopy={value} label={`Copy ${name} value`} />
-      </span>
-    </article>
+    <li {...stylex.props(styles.swatchItem)}>
+      <button
+        type="button"
+        aria-label={`Copy ${swatch.token} value`}
+        onClick={() => {
+          void copyColorValue(swatch);
+        }}
+        {...stylex.props(styles.swatchButton)}
+        style={{ backgroundColor: swatch.value }}
+      />
+    </li>
   );
 }
 
-function ColorToken({ name, value }: { name: string; value: string }): ReactElement {
+function ScaleStepHeader(): ReactElement {
   return (
-    <Box
-      flexDirection="column"
-      overflow="hidden"
-      borderWidth={1}
-      borderStyle="solid"
-      borderColor="border"
-      borderRadius="l"
-      backgroundColor="bg-surface-1"
-    >
-      <div aria-hidden="true" style={{ background: value }} {...stylex.props(styles.swatch)} />
-      <Text as="code" variant="caption" style={{ margin: 0, padding: 12 }}>
-        {name}
-      </Text>
-    </Box>
+    <div aria-hidden="true" {...stylex.props(styles.stepHeader)}>
+      <span {...stylex.props(styles.labelColumn)} />
+      <div {...stylex.props(styles.swatchList)}>
+        {scaleSteps.map((step) => (
+          <span key={step} {...stylex.props(styles.stepHeaderItem)}>
+            {step}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ColorScaleRow({ scale }: { scale: ColorScale }): ReactElement {
+  const labelId = `color-scale-${scale.label.toLowerCase().replaceAll(" ", "-")}`;
+
+  return (
+    <div {...stylex.props(styles.scaleRow)}>
+      <div {...stylex.props(styles.labelColumn)}>
+        <Text id={labelId} as="h3" variant="title" {...stylex.props(styles.scaleLabel)}>
+          {scale.label}
+        </Text>
+      </div>
+      <ul aria-describedby={labelId} {...stylex.props(styles.swatchList)}>
+        {scale.swatches.map((swatch) => (
+          <ColorSwatchButton key={swatch.token} swatch={swatch} />
+        ))}
+      </ul>
+    </div>
   );
 }
 
 export function ColorFoundationPage(): ReactElement {
+  const { resolvedTheme } = useTheme();
+  const mode: ThemeMode = resolvedTheme === "dark" ? "dark" : "light";
+  const scales = getModeScales(mode);
+
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
-      <PageHeader
-        title={colorsFoundationItem.title}
-        description={colorsFoundationItem.description}
-        source={colorsFoundationItem.source}
-      />
+    <>
+      <DocsPage>
+        <PageHeader
+          title={colorsFoundationItem.title}
+          description={colorsFoundationItem.description}
+          source={colorsFoundationItem.source}
+        />
 
-      <Section
-        title="Palette"
-        description="Primitive colors from value.stylex.ts. Select a card to copy its OKLCH value."
-      >
-        <div {...stylex.props(styles.grid)}>
-          {paletteEntries.map(([name, value]) => (
-            <PaletteColorCard key={name} name={name} value={value} />
-          ))}
-        </div>
-      </Section>
+        <Section
+          title="Scales"
+          description="Primitive color scales from value.stylex.ts. Select a swatch to copy its OKLCH value. Light mode shows gray scales; dark mode shows neutral scales."
+        >
+          <div {...stylex.props(styles.scaleRows)}>
+            <ScaleStepHeader />
+            {scales.map((scale) => (
+              <ColorScaleRow key={scale.label} scale={scale} />
+            ))}
+          </div>
+        </Section>
 
-      <Section
-        title="Background"
-        description="Surface tokens establish elevation and interaction states."
-      >
-        <div {...stylex.props(styles.grid)}>
-          {backgroundTokens.map((token) => (
-            <ColorToken key={token} name={token} value={String(backgroundColors[token])} />
-          ))}
-        </div>
-      </Section>
+        {/*<Section
+          title="Backgrounds"
+          description="There are two background colors for pages and UI components. In most cases, use "
+        >
 
-      <Section
-        title="Text"
-        description="Foreground tokens communicate hierarchy, status, and code semantics."
-      >
-        <div {...stylex.props(styles.grid)}>
-          {textTokens.map((token) => (
-            <ColorToken key={token} name={token} value={String(textColors[token])} />
-          ))}
-        </div>
-      </Section>
+        </Section>*/}
 
-      <Section title="Border" description="Border tokens separate surfaces and expose status.">
-        <div {...stylex.props(styles.grid)}>
-          {borderTokens.map((token) => (
-            <ColorToken key={token} name={token} value={String(borderColors[token])} />
-          ))}
-        </div>
-      </Section>
-    </Box>
+      </DocsPage>
+      <Toaster />
+    </>
   );
 }
 
 const styles = stylex.create({
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: 12,
-  },
-  swatch: {
-    display: "block",
-    height: 88,
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: "light-dark(oklch(0.852 0.006 43.325), oklch(0.391 0.0077 317.73))",
-  },
-  paletteCard: {
+  scaleRows: {
     display: "flex",
     flexDirection: "column",
-    minWidth: 0,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: {
-      default: "light-dark(oklch(0.852 0.006 43.325), oklch(0.391 0.0077 317.73))",
-      ":hover": "light-dark(oklch(0.708 0.007 5.708), oklch(0.548 0.004 325.63))",
-      ":focus-within": "light-dark(oklch(0.708 0.007 5.708), oklch(0.548 0.004 325.63))",
+    gap: 24,
+    paddingBottom: 4,
+  },
+  scaleRow: {
+    alignItems: {
+      default: "flex-start",
+      "@media (min-width: 768px)": "center",
     },
-    borderRadius: 2,
-    backgroundColor: "light-dark(oklch(0.988 0.004 34.309), oklch(0.211 0.0042 308.24))",
-    color: "inherit",
-  },
-  paletteDetails: {
     display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    padding: 12,
+    flexDirection: {
+      default: "column",
+      "@media (min-width: 768px)": "row",
+    },
+    gap: 8,
+    width: "100%",
   },
-  paletteText: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-    minWidth: 0,
+  labelColumn: {
+    flexShrink: 0,
+    width: {
+      default: "100%",
+      "@media (min-width: 768px)": 100,
+    },
   },
-  paletteName: {
-    fontFamily: "'GeistMono', ui-monospace, SFMono-Regular, Consolas, monospace",
-    fontSize: 12,
+  scaleLabel: {
+    fontSize: 14,
     fontWeight: 500,
+    lineHeight: "20px",
+    margin: 0,
   },
-  paletteValue: {
-    overflow: "hidden",
-    fontFamily: "'GeistMono', ui-monospace, SFMono-Regular, Consolas, monospace",
-    fontSize: 11,
-    color: "light-dark(oklch(0.645 0.007 350.912), oklch(0.661 0.002 325.597))",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
+  swatchList: {
+    display: "flex",
+    gap: {
+      default: 4,
+      "@media (min-width: 768px)": 8,
+    },
+    listStyle: "none",
+    margin: 0,
+    minWidth: 0,
+    padding: 0,
+    width: "100%",
+  },
+  stepHeader: {
+    alignItems: "center",
+    display: {
+      default: "none",
+      "@media (min-width: 768px)": "flex",
+    },
+    gap: 8,
+    width: "100%",
+  },
+  swatchItem: {
+    flexShrink: 1,
+    maxWidth: 68,
+    width: "100%",
+  },
+  stepHeaderItem: {
+    color: "light-dark(oklch(0.205 0 none), oklch(0.97 0 none))",
+    fontFamily: "'Geist', 'Inter', sans-serif",
+    fontSize: 14,
+    fontWeight: 500,
+    lineHeight: "20px",
+    maxWidth: 68,
+    textAlign: "center",
+    width: "100%",
+  },
+  swatchButton: {
+    appearance: "none",
+    aspectRatio: {
+      default: "1 / 1",
+      "@media (min-width: 768px)": "auto",
+    },
+    backgroundColor: "transparent",
+    borderColor: "light-dark(oklch(0.922 0 none), oklch(0.269 0 none))",
+    borderRadius: 6,
+    borderStyle: "solid",
+    borderWidth: 1,
+    boxSizing: "border-box",
+    color: "inherit",
+    cursor: "copy",
+    display: "flex",
+    flexGrow: 1,
+    font: "inherit",
+    height: {
+      default: "auto",
+      "@media (min-width: 768px)": 40,
+    },
+    minWidth: 0,
+    padding: 0,
+    width: "100%",
   },
 });

@@ -254,6 +254,16 @@ export const columnGapStyles = stylex.create({
 })
 
 export const backgroundColorStyles = stylex.create({
+  'bg-page': { backgroundColor: backgroundColors['bg-page'] },
+  'bg-surface': { backgroundColor: backgroundColors['bg-surface'] },
+  'bg-surface-raised': {
+    backgroundColor: backgroundColors['bg-surface-raised'],
+  },
+  'bg-surface-active': {
+    backgroundColor: backgroundColors['bg-surface-active'],
+  },
+  'bg-overlay': { backgroundColor: backgroundColors['bg-overlay'] },
+  'bg-backdrop': { backgroundColor: backgroundColors['bg-backdrop'] },
   'bg-primary': { backgroundColor: backgroundColors['bg-primary'] },
   'bg-secondary': { backgroundColor: backgroundColors['bg-secondary'] },
   'bg-surface-1': { backgroundColor: backgroundColors['bg-surface-1'] },

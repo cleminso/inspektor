@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -18,7 +18,7 @@ const searchProps = getGeneratedProps(searchItem.componentId, searchPropNames);
 
 export function SearchPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={searchItem.title}
         description={searchItem.description}
@@ -43,6 +43,6 @@ export function SearchPage(): ReactElement {
       <Section title="Props" description="Provide a visible label or an accessible aria-label.">
         <PropsTable rows={searchProps} />
       </Section>
-    </Box>
+    </DocsPage>
   );
 }

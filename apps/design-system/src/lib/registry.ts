@@ -22,7 +22,7 @@ export const colorsFoundationItem = {
   title: "Colors",
   slug: "colors",
   href: "/foundations/colors",
-  description: "Primitive palette and semantic color tokens from @inspector/ds.",
+  description: "Learn how to work with our color system. Click to copy raw values.",
   importPath: "@inspector/ds/theme",
   source: {
     label: "value.stylex.ts",

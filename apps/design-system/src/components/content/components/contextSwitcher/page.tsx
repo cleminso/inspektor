@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -32,7 +32,7 @@ const itemTextProps = getGeneratedProps("contextSwitcher.itemText", contextSwitc
 
 export function ContextSwitcherPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={contextSwitcherItem.title}
         description={contextSwitcherItem.description}
@@ -64,6 +64,6 @@ export function ContextSwitcherPage(): ReactElement {
       <Section title="Content props"><PropsTable rows={contentProps} /></Section>
       <Section title="Item props"><PropsTable rows={itemProps} /></Section>
       <Section title="Item text props"><PropsTable rows={itemTextProps} /></Section>
-    </Box>
+    </DocsPage>
   );
 }

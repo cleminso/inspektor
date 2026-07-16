@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -18,7 +18,7 @@ const checkboxProps = getGeneratedProps(checkboxItem.componentId, checkboxPropNa
 
 export function CheckboxPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={checkboxItem.title}
         description={checkboxItem.description}
@@ -40,6 +40,6 @@ export function CheckboxPage(): ReactElement {
       <Section title="Props" description="Checkbox participates in Field and Form automatically.">
         <PropsTable rows={checkboxProps} />
       </Section>
-    </Box>
+    </DocsPage>
   );
 }

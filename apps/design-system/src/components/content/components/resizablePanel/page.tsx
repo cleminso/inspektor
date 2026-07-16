@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -24,7 +24,7 @@ const handleProps = getGeneratedProps("resizableHandle", resizableHandlePropName
 
 export function ResizablePanelPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={resizablePanelItem.title}
         description={resizablePanelItem.description}
@@ -58,6 +58,6 @@ export function ResizablePanelPage(): ReactElement {
       <Section title="Handle props">
         <PropsTable rows={handleProps} />
       </Section>
-    </Box>
+    </DocsPage>
   );
 }

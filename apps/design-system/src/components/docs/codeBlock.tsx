@@ -1,54 +1,135 @@
-import { CopyButton } from "@inspector/ds";
+import { Box, CopyButton } from "@inspector/ds";
 import * as stylex from "@stylexjs/stylex";
-import { type ReactElement } from "react";
+import { ChevronDown } from "lucide-react";
+import { type ReactElement, useId, useState } from "react";
 
 import { useHighlightedCode } from "@/lib/shiki";
 
 export function CodeBlock({ source }: { source: string }): ReactElement {
   const code = source.trim();
   const highlightedHtml = useHighlightedCode(code);
+  const contentId = useId();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div {...stylex.props(styles.root)}>
-      <div {...stylex.props(styles.copyAction)}>
-        <CopyButton textToCopy={source} label="Copy source" />
-      </div>
-      {highlightedHtml !== null ? (
-        <div
-          className="docs-code-content"
-          dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-        />
-      ) : (
-        <pre {...stylex.props(styles.pre)}>
-          <code>{code}</code>
-        </pre>
-      )}
-    </div>
+    <Box
+      alignItems="center"
+      flexDirection="column"
+      position="relative"
+      backgroundColor="bg-surface"
+      borderColor="border"
+      borderBottomLeftRadius="xl"
+      borderBottomRightRadius="xl"
+      borderStyle="solid"
+      borderWidth={0}
+      borderTopWidth={1}
+    >
+      <Box
+        flexDirection="column"
+        width="100%"
+        borderBottomLeftRadius="xl"
+        borderBottomRightRadius="xl"
+        data-state={isExpanded === true ? "open" : "closed"}
+      >
+        <button
+          type="button"
+          aria-controls={contentId}
+          aria-expanded={isExpanded}
+          data-state={isExpanded === true ? "open" : "closed"}
+          onClick={() => {
+            setIsExpanded((expanded) => expanded === false);
+          }}
+          {...stylex.props(styles.trigger, isExpanded === true && styles.triggerExpanded)}
+        >
+          <span
+            aria-hidden="true"
+            {...stylex.props(styles.triggerIcon, isExpanded === false && styles.triggerIconCollapsed)}
+          >
+            <ChevronDown size={16} />
+          </span>
+          {isExpanded === true ? "Hide code" : "Show code"}
+        </button>
+        <Box
+          id={contentId}
+          data-state={isExpanded === true ? "open" : "closed"}
+          hidden={isExpanded === false}
+          display={isExpanded === true ? "block" : "none"}
+          position="relative"
+          backgroundColor="bg-page"
+          borderColor="border"
+          borderStyle="solid"
+          borderWidth={0}
+          borderTopWidth={1}
+        >
+          <Box position="absolute" top={12} right={12} zIndex={1}>
+            <CopyButton textToCopy={source} label="Copy source" />
+          </Box>
+          {highlightedHtml !== null ? (
+            <Box
+              display="block"
+              className="docs-code-content"
+              dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+            />
+          ) : (
+            <pre {...stylex.props(styles.pre)}>
+              <code>{code}</code>
+            </pre>
+          )}
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
 const styles = stylex.create({
-  root: {
-    position: "relative",
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: "light-dark(#d0d7de, #30363d)",
-    backgroundColor: "light-dark(#ffffff, #24292e)",
+  trigger: {
+    alignItems: "center",
+    appearance: "none",
+    backgroundColor: "transparent",
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    borderWidth: 0,
+    color: "inherit",
+    cursor: "pointer",
+    display: "flex",
+    fontFamily: "'Geist', 'Inter', sans-serif",
+    fontSize: 14,
+    gap: 12,
+    height: 48,
+    outlineColor: {
+      default: "transparent",
+      ":focus-visible": "currentColor",
+    },
+    outlineOffset: -2,
+    outlineStyle: "solid",
+    outlineWidth: {
+      default: 0,
+      ":focus-visible": 2,
+    },
+    paddingInline: 16,
+    textAlign: "left",
+    width: "100%",
   },
-  copyAction: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    zIndex: 1,
+  triggerExpanded: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  triggerIcon: {
+    display: "flex",
+    flexShrink: 0,
+    transform: "rotate(0deg)",
+  },
+  triggerIconCollapsed: {
+    transform: "rotate(-90deg)",
   },
   pre: {
-    margin: 0,
-    padding: "16px 48px 16px 16px",
-    overflowX: "auto",
+    color: "inherit",
     fontFamily: "'GeistMono', ui-monospace, SFMono-Regular, Consolas, monospace",
     fontSize: 13,
     lineHeight: "20px",
-    color: "light-dark(#24292e, #e1e4e8)",
+    margin: 0,
+    overflowX: "auto",
+    padding: "16px 48px 16px 16px",
     whiteSpace: "pre",
   },
 });

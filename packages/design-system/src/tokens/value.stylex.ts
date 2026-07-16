@@ -3,64 +3,123 @@ import * as stylex from "@stylexjs/stylex";
 
 
 export const paletteValues = stylex.defineConsts({
-  // Base
   white: 'oklch(1 0 0)',
   black: 'oklch(0 0 0)',
 
-  // Light-mode gray (Zedokai-light)
-  gray50: 'oklch(0.988 0 180)', // lightest surface background
-  gray100: 'oklch(0.9851 0 0)', // main background
-  gray150: 'oklch(0.95 0 171.254)', // panel/subheader/status/tab background
-  gray200: 'oklch(0.94 0 171.254)', // title bar background
-  gray250: 'oklch(0.9 0 171.254)', // highlight/search match surface
-  gray300: 'oklch(0.887 0 180)', // selected/disabled border, element background
-  gray325: 'oklch(0.875 0 180)', // terminal black
-  gray350: 'oklch(0.850 0 180)', // border
-  gray400: 'oklch(0.722 0 180)', // line number
-  gray500: 'oklch(0.567 0 194.036)', // comment/focused foreground
-  gray600: 'oklch(0.448 0 164.055)', // muted/secondary foreground, punctuation
-  gray700: 'oklch(0.378 0 180)',
-  gray800: 'oklch(0.209 0 201.801)', // primary foreground
+  gray50:  'oklch(0.985 0 none)',
+  gray100: 'oklch(0.97 0 none)',
+  gray200: 'oklch(0.922 0 none)',
+  gray300: 'oklch(0.87 0 none)',
+  gray400: 'oklch(0.708 0 none)',
+  gray500: 'oklch(0.556 0 none)',
+  gray600: 'oklch(0.439 0 none)',
+  gray700: 'oklch(0.371 0 none)',
+  gray800: 'oklch(0.269 0 none)',
+  gray900: 'oklch(0.205 0 none)',
+  gray950: 'oklch(0.145 0 none)',
 
+  // Dark tint on light surfaces
+  grayAlpha50:  'oklch(0.145 0 none / 0.03)',
+  grayAlpha100: 'oklch(0.145 0 none / 0.06)',
+  grayAlpha200: 'oklch(0.145 0 none / 0.10)',
+  grayAlpha300: 'oklch(0.145 0 none / 0.16)',
+  grayAlpha400: 'oklch(0.145 0 none / 0.24)',
+  grayAlpha500: 'oklch(0.145 0 none / 0.36)',
+  grayAlpha600: 'oklch(0.145 0 none / 0.48)',
+  grayAlpha700: 'oklch(0.145 0 none / 0.60)',
+  grayAlpha800: 'oklch(0.145 0 none / 0.72)',
+  grayAlpha900: 'oklch(0.145 0 none / 0.84)',
+  grayAlpha950: 'oklch(0.145 0 none / 0.92)',
 
-  // Dark-mode neutral (Zedokai)
-  neutral50: 'oklch(0.991 0.003 106.448)', // primary foreground
-  neutral400: 'oklch(0.661 0.002 325.597)', // muted/secondary foreground
-  neutral500: 'oklch(0.548 0.004 325.63)', // comment/focused foreground
-  neutral600: 'oklch(0.467 0.005 314.771)', // low-emphasis foreground
-  neutral700: 'oklch(0.391 0.0077 317.73)', // border
-  neutral725: 'oklch(0.3759 0.0078 317.73)', // highlight surface
-  neutral750: 'oklch(0.3669 0.0057 314.75)', // raised dark surface
-  neutral800: 'oklch(0.314 0.008 317.721)', // panel/subheader background
-  neutral850: 'oklch(0.2898 0.0083 317.72)', // main background
-  neutral900: 'oklch(0.211 0.0042 308.24)', // disabled/selected border, drop target
+  neutral50:  'oklch(0.985 0 none)',
+  neutral100: 'oklch(0.97 0 none)',
+  neutral200: 'oklch(0.922 0 none)',
+  neutral300: 'oklch(0.87 0 none)',
+  neutral400: 'oklch(0.708 0 none)',
+  neutral500: 'oklch(0.556 0 none)',
+  neutral600: 'oklch(0.439 0 none)',
+  neutral700: 'oklch(0.371 0 none)',
+  neutral800: 'oklch(0.269 0 none)',
+  neutral900: 'oklch(0.205 0 none)',
+  neutral950: 'oklch(0.145 0 none)',
 
-  // Red - Danger
-  red400: 'oklch(0.664 0.185 18.101)', // danger/error/deleted, keyword/operator/tag
-  red500: 'oklch(0.645 0.207 18.268)',
-  red550: 'oklch(0.614 0.185 18.101)',
-  red600: 'oklch(0.597 0.191 18.101)',
+  // Light tint on dark surfaces
+  neutralAlpha50:  'oklch(0.985 0 none / 0.03)',
+  neutralAlpha100: 'oklch(0.985 0 none / 0.06)',
+  neutralAlpha200: 'oklch(0.985 0 none / 0.10)',
+  neutralAlpha300: 'oklch(0.985 0 none / 0.16)',
+  neutralAlpha400: 'oklch(0.985 0 none / 0.24)',
+  neutralAlpha500: 'oklch(0.985 0 none / 0.36)',
+  neutralAlpha600: 'oklch(0.985 0 none / 0.48)',
+  neutralAlpha700: 'oklch(0.985 0 none / 0.60)',
+  neutralAlpha800: 'oklch(0.985 0 none / 0.72)',
+  neutralAlpha900: 'oklch(0.985 0 none / 0.84)',
+  neutralAlpha950: 'oklch(0.985 0 none / 0.92)',
 
-  // Green - Success
-  green300: 'oklch(0.836 0.142 130.714)', // success/created, function/label/link uri
-  green600: 'oklch(0.619 0.13 159.216)',
+  /* from blue (100%) @ shade 600 */
+  blue50: 'oklch(0.971 0.014 266.435)',
+  blue100: 'oklch(0.933 0.032 266.52)',
+  blue200: 'oklch(0.884 0.056 265.85)',
+  blue300: 'oklch(0.81 0.095 265.027)',
+  blue400: 'oklch(0.707 0.152 265.695)',
+  blue500: 'oklch(0.624 0.202 266.274)',
+  blue600: 'oklch(0.555 0.245 266.681)',
+  blue700: 'oklch(0.496 0.243 266.681)',
+  blue800: 'oklch(0.431 0.199 266.681)',
+  blue900: 'oklch(0.385 0.146 266.681)',
+  blue950: 'oklch(0.287 0.091 266.681)',
 
-  // Orange - Warning
-  orange400: 'oklch(0.774 0.136 46.202)', // warning/conflict/modified, string special
-  orange600: 'oklch(0.645 0.172 39.135)',
+  /* from red (100%) shade at 400 */
+  red50: 'oklch(0.971 0.013 22.22)',
+  red100: 'oklch(0.936 0.032 22.22)',
+  red200: 'oklch(0.884 0.061 22.263)',
+  red300: 'oklch(0.805 0.111 22.219)',
+  red400: 'oklch(0.702 0.189 22.166)',
+  red500: 'oklch(0.637 0.237 22.22)',
+  red600: 'oklch(0.585 0.236 23.699)',
+  red700: 'oklch(0.511 0.207 23.511)',
+  red800: 'oklch(0.444 0.177 22.22)',
+  red900: 'oklch(0.396 0.141 22.22)',
+  red950: 'oklch(0.258 0.092 22.22)',
 
-  // Yellow - Info
-  yellow400: 'oklch(0.894 0.139 90.467)', // info/accent, string/title
-  yellow600: 'oklch(0.654 0.145 64.328)',
+  /* blend from green (74%) + lime (26%) at shade 400 */
+  green50: 'oklch(0.983 0.021 145.1)',
+  green100: 'oklch(0.963 0.048 145.1)',
+  green200: 'oklch(0.928 0.093 145.1)',
+  green300: 'oklch(0.877 0.159 145.1)',
+  green400: 'oklch(0.803 0.215 145.1)',
+  green500: 'oklch(0.733 0.222 145.1)',
+  green600: 'oklch(0.631 0.196 145.1)',
+  green700: 'oklch(0.527 0.155 145.1)',
+  green800: 'oklch(0.448 0.12 145.1)',
+  green900: 'oklch(0.395 0.096 145.1)',
+  green950: 'oklch(0.267 0.067 145.1)',
 
-  // Purple - Accent
-  purple300: 'oklch(0.741 0.121 290.676)', // boolean/constant/number/preproc/variable special
-  purple500: 'oklch(0.535 0.154 291.137)',
+  /* from orange (100%) at shade 400 */
+  orange50: 'oklch(0.978 0.014 62.743)',
+  orange100: 'oklch(0.949 0.033 62.889)',
+  orange200: 'oklch(0.894 0.069 60.341)',
+  orange300: 'oklch(0.826 0.119 59.519)',
+  orange400: 'oklch(0.746 0.18 56.712)',
+  orange500: 'oklch(0.707 0.185 50.806)',
+  orange600: 'oklch(0.648 0.17 50.36)',
+  orange700: 'oklch(0.555 0.148 49.5)',
+  orange800: 'oklch(0.472 0.128 48.476)',
+  orange900: 'oklch(0.41 0.112 47.49)',
+  orange950: 'oklch(0.267 0.073 47.925)',
 
-  // Cyan - Accent
-  cyan300: 'oklch(0.838 0.095 205.656)', // type/attribute
-  cyan600: 'oklch(0.594 0.102 219.889)',
-
+  /* from yellow (100%) at shade 400 */
+  yellow50: 'oklch(0.985 0.025 96.531)',
+  yellow100: 'oklch(0.966 0.069 99.177)',
+  yellow200: 'oklch(0.934 0.127 98.365)',
+  yellow300: 'oklch(0.893 0.181 96.386)',
+  yellow400: 'oklch(0.854 0.174 89.626)',
+  yellow500: 'oklch(0.797 0.163 89.461)',
+  yellow600: 'oklch(0.683 0.14 89.057)',
+  yellow700: 'oklch(0.556 0.114 88.375)',
+  yellow800: 'oklch(0.478 0.098 88.263)',
+  yellow900: 'oklch(0.422 0.086 89.751)',
+  yellow950: 'oklch(0.287 0.059 89.208)',
 } as const)
 
 export const palette = stylex.defineVars(paletteValues)

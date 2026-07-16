@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -28,7 +28,7 @@ const indicatorProps = getGeneratedProps("select.itemIndicator", selectIndicator
 
 export function SelectPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader title={selectItem.title} description={selectItem.description} source={selectItem.source} />
       <Section title="Selection" description="Use Select for compact collections that do not require filtering.">
         <Example source={basicSource}><BasicExample /></Example>
@@ -41,6 +41,6 @@ export function SelectPage(): ReactElement {
       <Section title="Positioner props"><PropsTable rows={positionerProps} /></Section>
       <Section title="Item props"><PropsTable rows={itemProps} /></Section>
       <Section title="Item indicator props"><PropsTable rows={indicatorProps} /></Section>
-    </Box>
+    </DocsPage>
   );
 }

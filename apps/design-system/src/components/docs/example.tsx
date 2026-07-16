@@ -24,9 +24,9 @@ export function Example({ children, source, align = "center" }: ExampleProps): R
       borderWidth={1}
       borderStyle="solid"
       borderColor="border"
-      borderRadius="l"
+      borderRadius="m"
       overflow="hidden"
-      backgroundColor="bg-surface-1"
+      backgroundColor="bg-page"
     >
       <Box
         minHeight={120}
@@ -36,7 +36,6 @@ export function Example({ children, source, align = "center" }: ExampleProps): R
         alignItems={alignmentByValue[align]}
         justifyContent={align === "center" ? "center" : "start"}
         gap="l"
-        backgroundColor="bg-primary"
       >
         {children}
       </Box>

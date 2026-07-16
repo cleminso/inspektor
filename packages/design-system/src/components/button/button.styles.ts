@@ -82,7 +82,7 @@ export const buttonStyles = stylex.create({
   },
   link: {
     backgroundColor: 'transparent',
-    color: textColors['text-accent'],
+    color: textColors['text-info'],
     paddingInline: 0,
     textDecorationLine: {
       default: 'none',

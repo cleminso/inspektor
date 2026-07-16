@@ -7,6 +7,11 @@ import { type ReactElement } from "react";
 
 import { navSections } from "@/lib/registry";
 
+const shellMaxWidth = {
+  base: 1220,
+  xl: 1440,
+} as const;
+
 function ThemeSwitch(): ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
 
@@ -17,15 +22,16 @@ function ThemeSwitch(): ReactElement {
   return (
     <Button
       variant="ghost"
-      size="icon-m"
+      size="icon-s"
+      radius="m"
       onClick={handleToggleTheme}
       aria-label={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
       title={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
     >
       {resolvedTheme === "dark" ? (
-        <Sun aria-hidden="true" size={15} />
+        <Sun aria-hidden="true" size={16} />
       ) : (
-        <Moon aria-hidden="true" size={15} />
+        <Moon aria-hidden="true" size={16} />
       )}
     </Button>
   );
@@ -41,137 +47,212 @@ export function AppShell(): ReactElement {
         Skip to content
       </a>
       <Box
-        minHeight="100vh"
-        display="grid"
-        backgroundColor="bg-surface-1"
+        display="block"
+        backgroundColor="bg-surface"
         color="text-primary"
-        {...stylex.props(styles.shell)}
+        paddingHorizontal={{ base: "xl", md: "5xl" }}
+        {...stylex.props(styles.page)}
       >
-      <Box
-        as="aside"
-        flexDirection="column"
-        gap="3xl"
-        padding="none"
-        borderStyle="solid"
-        borderRightWidth={1}
-        borderColor="border"
-        backgroundColor="bg-primary"
-        {...stylex.props(styles.sidebar)}
-      >
-        <Box flexDirection="row" alignItems="center" justifyContent="between" gap="m" paddingRight="m">
-            <Link to="/" {...stylex.props(styles.wordmark)}>
-            <span {...stylex.props(styles.wordmarkTitle)}>Inspector</span>
-              <Text as="span" variant="caption" color="muted">
-                Design System
-              </Text>
-          </Link>
-          <ThemeSwitch />
+        <Box as="header" display="block" maxWidth={shellMaxWidth} {...stylex.props(styles.header)}>
+          <Box
+            display="grid"
+            backgroundColor="bg-page"
+            borderColor="border"
+            borderStyle="solid"
+            {...stylex.props(styles.headerInner)}
+          >
+            <Box
+              alignItems="center"
+              borderColor="border"
+              borderStyle="solid"
+              borderTopWidth={0}
+              borderRightWidth={1}
+              borderBottomWidth={0}
+              borderLeftWidth={0}
+              {...stylex.props(styles.brandRegion)}
+            >
+              <Link to="/" {...stylex.props(styles.brandLink)}>
+                <span {...stylex.props(styles.brandTitle)}>Inspector Design System</span>
+              </Link>
+            </Box>
+
+            <Box alignItems="center" justifyContent="end" {...stylex.props(styles.headerActions)}>
+              <ThemeSwitch />
+            </Box>
+          </Box>
         </Box>
 
-        <Box
-          as="nav"
-          flexDirection="column"
-          gap="2xl"
-          aria-label="Design system navigation"
-          {...stylex.props(styles.navigation)}
-        >
-          {navSections.map((section) => (
-            <Box as="section" key={section.title} flexDirection="column" gap="m">
-              <Box as="span" paddingHorizontal="l">
-                <Text as="span" variant="label" color="muted">
-                  {section.title}
-                </Text>
-              </Box>
-              <Box flexDirection="column" gap="none">
-                {section.items.map((item) => {
-                  const isActive = pathname === item.href;
+        <Box display="block">
+          <Box
+            display="grid"
+            backgroundColor="bg-surface"
+            borderColor="border"
+            borderStyle="solid"
+            maxWidth={shellMaxWidth}
+            {...stylex.props(styles.shell)}
+          >
+            <Box
+              as="aside"
+              flexDirection="column"
+              gap="3xl"
+              borderStyle="solid"
+              borderTopWidth={0}
+              borderRightWidth={1}
+              borderBottomWidth={0}
+              borderLeftWidth={0}
+              borderColor="border"
+              backgroundColor="bg-surface"
+              {...stylex.props(styles.sidebar)}
+            >
+              <Box
+                as="nav"
+                flexDirection="column"
+                gap="2xl"
+                aria-label="Design system navigation"
+              >
+                {navSections.map((section) => (
+                  <Box as="section" key={section.title} flexDirection="column" gap="m">
+                    <Box as="span" {...stylex.props(styles.sectionTitle)}>
+                      <Text as="span" variant="label" color="muted">
+                        {section.title}
+                      </Text>
+                    </Box>
+                    <Box flexDirection="column" gap="none">
+                      {section.items.map((item) => {
+                        const isActive = pathname === item.href;
 
-                  return (
-                    <Button
-                      key={item.href}
-                      variant={isActive === true ? "secondary" : "ghost"}
-                      size="l"
-                      fullWidth
-                      justify="start"
-                      render={<Link to={item.href} />}
-                      aria-current={isActive === true ? "page" : undefined}
-                      radius="none"
-                    >
-                      {item.title}
-                    </Button>
-                  );
-                })}
+                        return (
+                          <Button
+                            key={item.href}
+                            variant={isActive === true ? "secondary" : "ghost"}
+                            size="l"
+                            fullWidth
+                            justify="start"
+                            render={<Link to={item.href} />}
+                            aria-current={isActive === true ? "page" : undefined}
+                            radius="none"
+                          >
+                            {item.title}
+                          </Button>
+                        );
+                      })}
+                    </Box>
+                  </Box>
+                ))}
               </Box>
             </Box>
-          ))}
-        </Box>
-      </Box>
 
-      <Box id="main-content" as="main" display="block" minWidth={0} padding="l">
-        <Outlet />
-      </Box>
+            <Box
+              id="main-content"
+              as="main"
+              display="block"
+              minWidth={0}
+              padding="l"
+            >
+              <Outlet />
+            </Box>
+          </Box>
+        </Box>
       </Box>
     </>
   );
 }
 
 const styles = stylex.create({
-  shell: {
-    gridTemplateColumns: {
-      default: "1fr",
-      "@media (min-width: 768px)": "260px minmax(0, 1fr)",
-    },
+  page: {
+    minHeight: "100vh",
   },
-  sidebar: {
-    position: {
-      default: "static",
-      "@media (min-width: 768px)": "sticky",
-    },
+  header: {
+    flexShrink: 0,
+    marginInline: "auto",
+    position: "sticky",
     top: 0,
-    height: {
-      default: "auto",
-      "@media (min-width: 768px)": "100vh",
+    width: "100%",
+    zIndex: 100,
+  },
+  headerInner: {
+    borderBottomWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderTopWidth: 0,
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr) auto",
+      "@media (min-width: 1280px)": "260px minmax(0, 1fr)",
+    },
+    minHeight: 65,
+    width: "100%",
+  },
+  brandRegion: {
+    gap: 16,
+    minWidth: 0,
+    paddingBlock: 16,
+    paddingLeft: 22,
+  },
+  brandLink: {
+    alignItems: "center",
+    display: "flex",
+    gap: 16,
+    minWidth: 0,
+  },
+  brandTitle: {
+    fontSize: 16,
+    fontWeight: 500,
+    letterSpacing: "-0.32px",
+    lineHeight: "24px",
+    whiteSpace: "nowrap",
+  },
+  headerActions: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  shell: {
+    borderBottomWidth: 0,
+    borderLeftWidth: {
+      default: 0,
+      "@media (min-width: 1280px)": 1,
     },
     borderRightWidth: {
       default: 0,
-      "@media (min-width: 768px)": 1,
+      "@media (min-width: 1280px)": 1,
     },
-    borderBottomWidth: {
-      default: 1,
-      "@media (min-width: 768px)": 0,
+    borderTopWidth: 0,
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr)",
+      "@media (min-width: 1280px)": "260px minmax(0, 1fr)",
     },
+    marginInline: "auto",
+    minHeight: "calc(100vh - 65px)",
+    width: "100%",
   },
-  navigation: {
+  sidebar: {
+    alignSelf: "start",
     display: {
-      default: "grid",
-      "@media (min-width: 768px)": "flex",
+      default: "none",
+      "@media (min-width: 1280px)": "flex",
     },
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    height: "calc(100vh - 65px)",
+    overflowY: "auto",
+    overscrollBehavior: "contain",
+    paddingBlock: 24,
+    position: "sticky",
+    top: 65,
+    width: 260,
+  },
+  sectionTitle: {
+    paddingLeft: 8,
   },
   skipLink: {
+    backgroundColor: "light-dark(oklch(0.268 0.013 320.606), oklch(0.991 0.003 106.448))",
+    borderRadius: 4,
+    color: "light-dark(oklch(0.991 0.003 106.448), oklch(0.268 0.013 320.606))",
+    left: 8,
+    padding: "8px 12px",
     position: "fixed",
     top: 8,
-    left: 8,
-    zIndex: 10,
-    padding: "8px 12px",
-    borderRadius: 4,
-    backgroundColor: "light-dark(oklch(0.268 0.013 320.606), oklch(0.991 0.003 106.448))",
-    color: "light-dark(oklch(0.991 0.003 106.448), oklch(0.268 0.013 320.606))",
     transform: {
       default: "translateY(-150%)",
       ":focus-visible": "translateY(0)",
     },
-  },
-  wordmark: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-    padding: "8px 10px",
-    borderRadius: 10,
-  },
-  wordmarkTitle: {
-    fontSize: 15,
-    fontWeight: 650,
-    letterSpacing: "-0.01em",
+    zIndex: 101,
   },
 });

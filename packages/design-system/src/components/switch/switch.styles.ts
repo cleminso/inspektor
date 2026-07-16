@@ -9,7 +9,7 @@ export const switchStyles = stylex.create({
   root: {
     padding: 2,
     borderColor: 'transparent',
-    borderRadius: borderRadii.s,
+    borderRadius: borderRadii.xs,
     borderStyle: 'solid',
     borderWidth: 1,
     alignItems: 'center',

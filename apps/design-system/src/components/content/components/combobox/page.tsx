@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -44,7 +44,7 @@ const indicatorProps = getGeneratedProps("combobox.itemIndicator", comboboxIndic
 
 export function ComboboxPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader title={comboboxItem.title} description={comboboxItem.description} source={comboboxItem.source} />
       <Section title="Filterable selection" description="Use Combobox when a predefined collection is large enough to require filtering.">
         <Example source={basicSource} align="stretch"><BasicExample /></Example>
@@ -65,6 +65,6 @@ export function ComboboxPage(): ReactElement {
       <Section title="Item props"><PropsTable rows={itemProps} /></Section>
       <Section title="Item text props"><PropsTable rows={itemTextProps} /></Section>
       <Section title="Item indicator props"><PropsTable rows={indicatorProps} /></Section>
-    </Box>
+    </DocsPage>
   );
 }

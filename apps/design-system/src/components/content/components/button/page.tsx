@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -20,7 +20,7 @@ const buttonProps = getGeneratedProps(buttonItem.componentId, buttonPropNames);
 
 export function ButtonPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={buttonItem.title}
         description={buttonItem.description}
@@ -57,6 +57,6 @@ export function ButtonPage(): ReactElement {
       >
         <PropsTable rows={buttonProps} />
       </Section>
-    </Box>
+    </DocsPage>
   );
 }

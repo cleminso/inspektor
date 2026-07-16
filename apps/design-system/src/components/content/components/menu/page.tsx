@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -36,7 +36,7 @@ const checkboxItemProps = getGeneratedProps("menu.checkboxItem", menuCheckboxIte
 
 export function MenuPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader title={menuItem.title} description={menuItem.description} source={menuItem.source} />
       <Section
         title="Actions"
@@ -61,6 +61,6 @@ export function MenuPage(): ReactElement {
         <PropsTable rows={itemProps} />
       </Section>
       <Section title="Checkbox item props"><PropsTable rows={checkboxItemProps} /></Section>
-    </Box>
+    </DocsPage>
   );
 }

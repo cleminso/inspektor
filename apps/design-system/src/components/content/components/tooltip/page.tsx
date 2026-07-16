@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -26,7 +26,7 @@ const contentProps = getGeneratedProps("tooltip.content", tooltipContentPropName
 
 export function TooltipPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={tooltipItem.title}
         description={tooltipItem.description}
@@ -45,6 +45,6 @@ export function TooltipPage(): ReactElement {
       <Section title="Root props"><PropsTable rows={rootProps} /></Section>
       <Section title="Trigger props"><PropsTable rows={triggerProps} /></Section>
       <Section title="Content props"><PropsTable rows={contentProps} /></Section>
-    </Box>
+    </DocsPage>
   );
 }

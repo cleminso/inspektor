@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -18,7 +18,7 @@ const formProps = getGeneratedProps(formItem.componentId, formPropNames);
 
 export function FormPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={formItem.title}
         description={formItem.description}
@@ -46,6 +46,6 @@ export function FormPage(): ReactElement {
       <Section title="Props" description="Form also accepts native form attributes.">
         <PropsTable rows={formProps} />
       </Section>
-    </Box>
+    </DocsPage>
   );
 }

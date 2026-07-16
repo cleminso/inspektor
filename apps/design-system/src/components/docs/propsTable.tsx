@@ -42,10 +42,6 @@ export function PropsTable({ rows }: { rows: readonly GeneratedPropItem[] }): Re
 const styles = stylex.create({
   scroller: {
     overflowX: "auto",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "light-dark(oklch(0.852 0.006 43.325), oklch(0.391 0.0077 317.73))",
-    borderRadius: 6,
   },
   table: {
     width: "100%",
@@ -59,7 +55,6 @@ const styles = stylex.create({
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
     borderBottomColor: "light-dark(oklch(0.852 0.006 43.325), oklch(0.391 0.0077 317.73))",
-    backgroundColor: "light-dark(oklch(0.953 0.004 34.31), oklch(0.314 0.008 317.721))",
     textAlign: "left",
     fontWeight: 500,
   },

@@ -12,40 +12,52 @@ import {
 
 
 export const backgroundColors = stylex.defineVars({
-  'bg-surface-1': `light-dark(${palette.gray50}, ${palette.neutral900})`,
-  'bg-primary': `light-dark(${palette.gray100}, ${palette.neutral850})`,
-  'bg-secondary': `light-dark(${palette.gray200}, ${palette.neutral750})`,
-  'bg-surface-hover': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'bg-surface-selected': `light-dark(${palette.gray200}, ${palette.neutral850})`,
-  'bg-surface-highlight': `light-dark(${palette.gray250}, ${palette.neutral725})`,
-  'bg-danger': `light-dark(${palette.red500}, ${palette.red600})`,
-  'bg-danger-hover': `light-dark(${palette.red400}, ${palette.red500})`,
-  'bg-inverse': `light-dark(${palette.gray800}, ${palette.neutral50})`,
+  // Surfaces
+  'bg-page': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'bg-card': `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  'bg-popover': `light-dark(${palette.gray200}, ${palette.neutral800})`,
+  'bg-overlay': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
+  'bg-backdrop': `light-dark(${palette.grayAlpha500}, ${palette.neutralAlpha500})`,
+  'bg-inverse': `light-dark(${palette.gray900}, ${palette.neutral100})`,
+
+  // Interaction
+  'bg-hover': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
+  'bg-pressed': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
+  'bg-selected': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+  'bg-disabled': `light-dark(${palette.gray100}, ${palette.neutral900})`,
+
+  // Color roles
+  'bg-primary': `light-dark(${palette.blue600}, ${palette.blue400})`,
+  'bg-primary-hover': `light-dark(${palette.blue700}, ${palette.blue300})`,
+  'bg-secondary': `light-dark(${palette.gray200}, ${palette.neutral800})`,
+  'bg-danger': `light-dark(${palette.red500}, ${palette.red400})`,
+  'bg-danger-hover': `light-dark(${palette.red600}, ${palette.red300})`,
+  'bg-success': `light-dark(${palette.green600}, ${palette.green400})`,
+  'bg-accent': `light-dark(${palette.yellow500}, ${palette.yellow400})`,
 } as const)
 
-
 export const textColors = stylex.defineVars({
-  'text-primary': `light-dark(${palette.gray800}, ${palette.neutral50})`,
-  'text-secondary': `light-dark(${palette.gray600}, ${palette.neutral400})`,
-  'text-tertiary': `light-dark(${palette.gray500}, ${palette.neutral500})`,
+  // Text on neutral surfaces
+  'text-default': `light-dark(${palette.gray900}, ${palette.neutral50})`,
+  'text-muted': `light-dark(${palette.gray600}, ${palette.neutral400})`,
+  'text-subtle': `light-dark(${palette.gray500}, ${palette.neutral500})`,
   'text-disabled': `light-dark(${palette.gray400}, ${palette.neutral600})`,
+  'text-link': `light-dark(${palette.blue600}, ${palette.blue400})`,
 
-  'text-accent': `light-dark(${palette.yellow600}, ${palette.yellow400})`,
-  'text-danger': `light-dark(${palette.red500}, ${palette.red400})`,
-  'text-success': `light-dark(${palette.green600}, ${palette.green300})`,
-  'text-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
-  'text-info': `light-dark(${palette.yellow400}, ${palette.yellow400})`,
-  'text-constant': `light-dark(${palette.purple500}, ${palette.purple300})`,
-  'text-type': `light-dark(${palette.cyan600}, ${palette.cyan300})`,
-  'text-inverse': `light-dark(${palette.gray50}, ${palette.neutral900})`,
-  'text-light': `light-dark(${palette.gray50}, ${palette.gray50})`
+  // Text on color-role surfaces
+  'fg-primary': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'fg-secondary': `light-dark(${palette.gray900}, ${palette.neutral50})`,
+  'fg-danger': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'fg-success': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'fg-accent': `light-dark(${palette.gray900}, ${palette.neutral50})`,
+  'fg-inverse': `light-dark(${palette.gray50}, ${palette.neutral950})`,
 } as const)
 
 
 export const borderColors = stylex.defineVars({
-  'border': `light-dark(${palette.gray350}, ${palette.neutral700})`,
-  'border-secondary': `light-dark(${palette.gray250}, ${palette.neutral700})`,
-  'border-focused': `light-dark(${palette.gray500}, ${palette.neutral800})`,
+  'border': `light-dark(${palette.gray300}, ${palette.neutral300})`,
+  'border-secondary': `light-dark(${palette.gray200}, ${palette.neutral200})`,
+  'border-focused': `light-dark(${palette.blue600}, ${palette.blue400})`,
 
   'border-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
   'border-danger': `light-dark(${palette.red500}, ${palette.red400})`,
@@ -112,23 +124,20 @@ export const textRoleStyles = stylex.create({
 })
 
 export const textColorStyles = stylex.create({
-  default: { color: textColors['text-primary'] },
-  muted: { color: textColors['text-secondary'] },
-  subtle: { color: textColors['text-tertiary'] },
+  default: { color: textColors['text-default'] },
+  muted: { color: textColors['text-muted'] },
+  subtle: { color: textColors['text-subtle'] },
   disabled: { color: textColors['text-disabled'] },
 
-  accent: { color: textColors['text-accent'] },
-  danger: { color: textColors['text-danger'] },
-  error: { color: textColors['text-danger'] },
-  warning: { color: textColors['text-warning'] },
-  success: { color: textColors['text-success'] },
-  info: { color: textColors['text-info'] },
-
-  type: { color: textColors['text-type'] },
-  constant: { color: textColors['text-constant'] },
-
-  inverse: { color: `light-dark(${palette.neutral50}, ${palette.gray800})` },
-  inherit: {}, // inherit color from its parent. Usefull inside components where parents has controls color.
+  primary: { color: textColors['fg-primary'] },
+  secondary: { color: textColors['fg-secondary'] },
+  danger: { color: textColors['fg-danger'] },
+  error: { color: textColors['fg-danger'] },
+  success: { color: textColors['fg-success'] },
+  accent: { color: textColors['fg-accent'] },
+  inverse: { color: textColors['fg-inverse'] },
+  inherit: {},
+ // inherit color from its parent. Usefull inside components where parents has controls color.
 })
 
 type StyleXTokenKeys<T> = Exclude<

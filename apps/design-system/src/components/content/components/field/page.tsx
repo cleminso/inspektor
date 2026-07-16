@@ -1,6 +1,6 @@
-import { Box } from "@inspector/ds";
 import { type ReactElement } from "react";
 
+import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
 import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
@@ -29,7 +29,7 @@ const errorProps = getGeneratedProps(`${fieldItem.componentId}.error`, fieldErro
 
 export function FieldPage(): ReactElement {
   return (
-    <Box flexDirection="column" gap="4xl" maxWidth={840} marginHorizontal="auto" padding="xl">
+    <DocsPage>
       <PageHeader
         title={fieldItem.title}
         description={fieldItem.description}
@@ -72,6 +72,6 @@ export function FieldPage(): ReactElement {
       <Section title="Error props" description="Error displays matching validation messages.">
         <PropsTable rows={errorProps} />
       </Section>
-    </Box>
+    </DocsPage>
   );
 }
