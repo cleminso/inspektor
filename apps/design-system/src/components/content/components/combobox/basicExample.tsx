@@ -7,9 +7,9 @@ export default function BasicExample(): ReactElement {
   return (
     <Field.Root name="branch">
       <Field.Label>Branch</Field.Label>
-      <Combobox.Root items={branches}>
+      <Combobox.Root items={branches} defaultValue="develop">
         <Combobox.InputGroup>
-          <Combobox.Input placeholder="Filter branches" />
+          <Combobox.Input placeholder="Find a branch" />
           <Combobox.InputTrigger />
         </Combobox.InputGroup>
         <Combobox.Content>

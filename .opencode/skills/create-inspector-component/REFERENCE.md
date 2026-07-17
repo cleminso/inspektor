@@ -106,6 +106,16 @@ const stateStyleProps = createStateStyleProps<BaseInput.State>((state) => [
 
 The adapter preserves complete StyleX output: static rules use `className`, while dynamic values may require `style`. It removes duplicated selection logic but intentionally does not cache `stylex.props(...)` across callbacks. Prefer typed Base UI state callbacks over data-attribute selectors; reserve attributes for inspection, tests, interoperability, or primitives without state callbacks.
 
+### Contextual descendant styles
+
+When an ancestor must influence a descendant's rendered appearance without prop drilling or exposing styling escape hatches, use a component-scoped `stylex.defineVars()` contract:
+
+- Define variables in a dedicated `{component}Vars.stylex.ts` module that exports **only** the variables.
+- The component consumes them in its `{component}.styles.ts`.
+- Ancestors override specific variables inside their own state styles.
+
+This pattern is required because StyleX files that export `defineVars()` cannot also export `stylex.create()` or type exports. Splitting keeps the contract explicit and reusable. See `InputGroup` for the established precedent.
+
 ## Testing decision table
 
 | Change | Required proof |

@@ -22,12 +22,14 @@ import { Route as ComponentsSelectRouteImport } from './routes/components/select
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
+import { Route as ComponentsKeyboardInputRouteImport } from './routes/components/keyboard-input'
 import { Route as ComponentsInputGroupRouteImport } from './routes/components/input-group'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsCopyButtonRouteImport } from './routes/components/copy-button'
 import { Route as ComponentsContextSwitcherRouteImport } from './routes/components/context-switcher'
+import { Route as ComponentsContextMenuRouteImport } from './routes/components/context-menu'
 import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
@@ -99,6 +101,11 @@ const ComponentsMenuRoute = ComponentsMenuRouteImport.update({
   path: '/components/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsKeyboardInputRoute = ComponentsKeyboardInputRouteImport.update({
+  id: '/components/keyboard-input',
+  path: '/components/keyboard-input',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsInputGroupRoute = ComponentsInputGroupRouteImport.update({
   id: '/components/input-group',
   path: '/components/input-group',
@@ -130,6 +137,11 @@ const ComponentsContextSwitcherRoute =
     path: '/components/context-switcher',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ComponentsContextMenuRoute = ComponentsContextMenuRouteImport.update({
+  id: '/components/context-menu',
+  path: '/components/context-menu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsComboboxRoute = ComponentsComboboxRouteImport.update({
   id: '/components/combobox',
   path: '/components/combobox',
@@ -157,12 +169,14 @@ export interface FileRoutesByFullPath {
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
+  '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
@@ -182,12 +196,14 @@ export interface FileRoutesByTo {
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
+  '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
@@ -208,12 +224,14 @@ export interface FileRoutesById {
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
+  '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
@@ -235,12 +253,14 @@ export interface FileRouteTypes {
     | '/components/button-group'
     | '/components/checkbox'
     | '/components/combobox'
+    | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
     | '/components/input'
     | '/components/input-group'
+    | '/components/keyboard-input'
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
@@ -260,12 +280,14 @@ export interface FileRouteTypes {
     | '/components/button-group'
     | '/components/checkbox'
     | '/components/combobox'
+    | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
     | '/components/input'
     | '/components/input-group'
+    | '/components/keyboard-input'
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
@@ -285,12 +307,14 @@ export interface FileRouteTypes {
     | '/components/button-group'
     | '/components/checkbox'
     | '/components/combobox'
+    | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
     | '/components/field'
     | '/components/fieldset'
     | '/components/input'
     | '/components/input-group'
+    | '/components/keyboard-input'
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
@@ -311,12 +335,14 @@ export interface RootRouteChildren {
   ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsComboboxRoute: typeof ComponentsComboboxRoute
+  ComponentsContextMenuRoute: typeof ComponentsContextMenuRoute
   ComponentsContextSwitcherRoute: typeof ComponentsContextSwitcherRoute
   ComponentsCopyButtonRoute: typeof ComponentsCopyButtonRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsInputGroupRoute: typeof ComponentsInputGroupRoute
+  ComponentsKeyboardInputRoute: typeof ComponentsKeyboardInputRoute
   ComponentsMenuRoute: typeof ComponentsMenuRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
@@ -424,6 +450,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/keyboard-input': {
+      id: '/components/keyboard-input'
+      path: '/components/keyboard-input'
+      fullPath: '/components/keyboard-input'
+      preLoaderRoute: typeof ComponentsKeyboardInputRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/input-group': {
       id: '/components/input-group'
       path: '/components/input-group'
@@ -466,6 +499,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsContextSwitcherRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/context-menu': {
+      id: '/components/context-menu'
+      path: '/components/context-menu'
+      fullPath: '/components/context-menu'
+      preLoaderRoute: typeof ComponentsContextMenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/combobox': {
       id: '/components/combobox'
       path: '/components/combobox'
@@ -503,12 +543,14 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsComboboxRoute: ComponentsComboboxRoute,
+  ComponentsContextMenuRoute: ComponentsContextMenuRoute,
   ComponentsContextSwitcherRoute: ComponentsContextSwitcherRoute,
   ComponentsCopyButtonRoute: ComponentsCopyButtonRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsInputGroupRoute: ComponentsInputGroupRoute,
+  ComponentsKeyboardInputRoute: ComponentsKeyboardInputRoute,
   ComponentsMenuRoute: ComponentsMenuRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,

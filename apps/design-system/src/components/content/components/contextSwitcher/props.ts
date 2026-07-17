@@ -21,8 +21,13 @@ export const contextSwitcherTriggerPropNames = [
   "title",
 ] as const;
 
-export const contextSwitcherPopupPropNames = ["width"] as const;
 export const contextSwitcherSearchPropNames = ["label", "placeholder"] as const;
-export const contextSwitcherContentPropNames = ["maxHeight"] as const;
+export const contextSwitcherContentPropNames = [
+  "width",
+  "keepMounted",
+  "sideOffset",
+  "align",
+] as const;
+export const contextSwitcherViewportPropNames = ["maxHeight"] as const;
 export const contextSwitcherItemPropNames = ["value", "indicator"] as const;
 export const contextSwitcherItemTextPropNames = ["label", "description"] as const;

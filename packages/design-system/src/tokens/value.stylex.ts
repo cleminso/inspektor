@@ -181,6 +181,9 @@ export const borderRadii = stylex.defineVars({
 
 export const shadows = stylex.defineVars({
   none: 'none',
+  border: `0 0 0 1px light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
+  small: `0 0 0 1px light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200}), 0 2px 2px ${palette.grayAlpha100}`,
+  medium: `0 0 0 1px light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200}), 0 2px 2px ${palette.grayAlpha100}, 0 8px 8px -8px ${palette.grayAlpha200}`,
 } as const)
 
 export const breakpoints = stylex.defineConsts({

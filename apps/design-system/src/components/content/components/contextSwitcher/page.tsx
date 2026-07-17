@@ -14,21 +14,29 @@ import {
   contextSwitcherContentPropNames,
   contextSwitcherItemPropNames,
   contextSwitcherItemTextPropNames,
-  contextSwitcherPopupPropNames,
   contextSwitcherRootPropNames,
   contextSwitcherSearchPropNames,
   contextSwitcherTriggerPropNames,
+  contextSwitcherViewportPropNames,
 } from "./props";
+import SimpleExample from "./simpleExample";
+import simpleSource from "./simpleExample.tsx?raw";
 import StatusExample from "./statusExample";
 import statusSource from "./statusExample.tsx?raw";
 
 const rootProps = getGeneratedProps("contextSwitcher.root", contextSwitcherRootPropNames);
 const triggerProps = getGeneratedProps("contextSwitcher.trigger", contextSwitcherTriggerPropNames);
-const popupProps = getGeneratedProps("contextSwitcher.popup", contextSwitcherPopupPropNames);
 const searchProps = getGeneratedProps("contextSwitcher.search", contextSwitcherSearchPropNames);
 const contentProps = getGeneratedProps("contextSwitcher.content", contextSwitcherContentPropNames);
+const viewportProps = getGeneratedProps(
+  "contextSwitcher.viewport",
+  contextSwitcherViewportPropNames,
+);
 const itemProps = getGeneratedProps("contextSwitcher.item", contextSwitcherItemPropNames);
-const itemTextProps = getGeneratedProps("contextSwitcher.itemText", contextSwitcherItemTextPropNames);
+const itemTextProps = getGeneratedProps(
+  "contextSwitcher.itemText",
+  contextSwitcherItemTextPropNames,
+);
 
 export function ContextSwitcherPage(): ReactElement {
   return (
@@ -40,8 +48,8 @@ export function ContextSwitcherPage(): ReactElement {
       />
 
       <Section
-        title="Application context"
-        description="Use Context Switcher when selection changes the active resource or scope rather than a form value."
+        title="Connection switcher"
+        description="Use rich item descriptions and a footer action for saved application connections."
       >
         <Example source={connectionSource}>
           <ConnectionExample />
@@ -49,21 +57,44 @@ export function ContextSwitcherPage(): ReactElement {
       </Section>
 
       <Section
-        title="Long values"
-        description="Use content-sized popups for values that need more space than the constrained trigger."
+        title="Simple context"
+        description="Use a compact switcher for a branch-like context without supporting item details."
+      >
+        <Example source={simpleSource}>
+          <SimpleExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Loading, empty, and error status"
+        description="Compose status regions around long monospaced values while preserving the same switcher structure."
       >
         <Example source={statusSource}>
           <StatusExample />
         </Example>
       </Section>
 
-      <Section title="Root props"><PropsTable rows={rootProps} /></Section>
-      <Section title="Trigger props"><PropsTable rows={triggerProps} /></Section>
-      <Section title="Popup props"><PropsTable rows={popupProps} /></Section>
-      <Section title="Search props"><PropsTable rows={searchProps} /></Section>
-      <Section title="Content props"><PropsTable rows={contentProps} /></Section>
-      <Section title="Item props"><PropsTable rows={itemProps} /></Section>
-      <Section title="Item text props"><PropsTable rows={itemTextProps} /></Section>
+      <Section title="Root props">
+        <PropsTable rows={rootProps} />
+      </Section>
+      <Section title="Trigger props">
+        <PropsTable rows={triggerProps} />
+      </Section>
+      <Section title="Content props">
+        <PropsTable rows={contentProps} />
+      </Section>
+      <Section title="Search props">
+        <PropsTable rows={searchProps} />
+      </Section>
+      <Section title="Viewport props">
+        <PropsTable rows={viewportProps} />
+      </Section>
+      <Section title="Item props">
+        <PropsTable rows={itemProps} />
+      </Section>
+      <Section title="Item text props">
+        <PropsTable rows={itemTextProps} />
+      </Section>
     </DocsPage>
   );
 }

@@ -15,15 +15,16 @@ export const backgroundColors = stylex.defineVars({
   // Surfaces
   'bg-page': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'bg-card': `light-dark(${palette.gray100}, ${palette.neutral900})`,
-  'bg-popover': `light-dark(${palette.gray200}, ${palette.neutral800})`,
+  'bg-popover': `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  'bg-subtle': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
   'bg-overlay': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
   'bg-backdrop': `light-dark(${palette.grayAlpha500}, ${palette.neutralAlpha500})`,
   'bg-inverse': `light-dark(${palette.gray900}, ${palette.neutral100})`,
 
   // Interaction
-  'bg-hover': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
+  'bg-hover': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
   'bg-pressed': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
-  'bg-selected': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+  'bg-selected': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
   'bg-disabled': `light-dark(${palette.gray100}, ${palette.neutral900})`,
 
   // Color roles
@@ -48,7 +49,7 @@ export const textColors = stylex.defineVars({
   // Text on color-role surfaces
   'fg-primary': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'fg-secondary': `light-dark(${palette.gray900}, ${palette.neutral50})`,
-  'fg-danger': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'fg-danger': `light-dark(${palette.gray50}, ${palette.gray50})`,
   'fg-success': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'fg-accent': `light-dark(${palette.gray900}, ${palette.neutral50})`,
   'fg-inverse': `light-dark(${palette.gray50}, ${palette.neutral950})`,

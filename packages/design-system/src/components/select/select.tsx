@@ -1,12 +1,14 @@
+import * as React from "react";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import * as stylex from "@stylexjs/stylex";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { selectStyles } from "./select.styles";
 
-type WithoutStyles<Props> = Omit<Props, "className" | "style">;
+type WithoutStyles<Props> = Omit<Props, "className" | "style" | "render">;
 
 export type SelectSize = "s" | "m" | "l";
+export type SelectWidth = "content" | "full";
 
 const sizeStyles = {
   s: selectStyles.sizeS,
@@ -33,10 +35,16 @@ export type SelectRootProps<Value> = Omit<
 export type SelectLabelProps = WithoutStyles<BaseSelect.Label.Props>;
 
 export interface SelectTriggerProps
-  extends Omit<WithoutStyles<BaseSelect.Trigger.Props>, "size"> {
+  extends Omit<WithoutStyles<BaseSelect.Trigger.Props>, "prefix" | "size"> {
   /** Controls the trigger height and padding. */
   size?: SelectSize;
-  /** Stretches the trigger to the width of its container. */
+  /** Controls whether the trigger follows its content or fills its container. */
+  width?: SelectWidth;
+  /** Content displayed before the selected value. */
+  prefix?: React.ReactNode;
+  /** Content displayed after the selected value and before the chevron. */
+  suffix?: React.ReactNode;
+  /** Stretches the trigger to the width of its container. @deprecated Use `width="full"`. */
   fullWidth?: boolean;
   /** Disables the trigger. */
   disabled?: boolean;
@@ -58,12 +66,32 @@ export interface SelectPositionerProps extends WithoutStyles<BaseSelect.Position
 export type SelectPopupProps = WithoutStyles<BaseSelect.Popup.Props>;
 export type SelectListProps = WithoutStyles<BaseSelect.List.Props>;
 
+export interface SelectContentProps {
+  /** Select options, groups, and separators rendered in the popup. */
+  children?: React.ReactNode;
+  /** Places the popup on this side of the trigger. */
+  side?: BaseSelect.Positioner.Props["side"];
+  /** Sets the gap between the trigger and popup. */
+  sideOffset?: BaseSelect.Positioner.Props["sideOffset"];
+  /** Aligns the popup along the trigger. */
+  align?: BaseSelect.Positioner.Props["align"];
+  /** Offsets the popup along its alignment axis. */
+  alignOffset?: BaseSelect.Positioner.Props["alignOffset"];
+  /** Aligns the selected item text with the trigger value. */
+  alignItemWithTrigger?: BaseSelect.Positioner.Props["alignItemWithTrigger"];
+}
+
 export type SelectItemProps<Value> = Omit<WithoutStyles<BaseSelect.Item.Props>, "value"> & {
   /** The value represented by this option. */
   value: Value;
+  /** Disables the option. */
+  disabled?: BaseSelect.Item.Props["disabled"];
 };
 
 export type SelectItemTextProps = WithoutStyles<BaseSelect.ItemText.Props>;
+export type SelectGroupProps = WithoutStyles<BaseSelect.Group.Props>;
+export type SelectGroupLabelProps = WithoutStyles<BaseSelect.GroupLabel.Props>;
+export type SelectSeparatorProps = WithoutStyles<BaseSelect.Separator.Props>;
 
 export interface SelectItemIndicatorProps
   extends Omit<WithoutStyles<BaseSelect.ItemIndicator.Props>, "children"> {
@@ -83,16 +111,66 @@ function SelectLabel(props: SelectLabelProps) {
   return <BaseSelect.Label {...props} {...stateStyles} />;
 }
 
-function SelectTrigger({ size = "m", fullWidth = false, disabled = false, ...props }: SelectTriggerProps) {
+const widthStyles = {
+  content: selectStyles.triggerWidthContent,
+  full: selectStyles.triggerWidthFull,
+} satisfies Record<SelectWidth, unknown>;
+
+function hasChild(children: React.ReactNode, component: React.ElementType): boolean {
+  return React.Children.toArray(children).some(
+    (child) =>
+      React.isValidElement(child) &&
+      (child.type === component ||
+        (child.type === React.Fragment &&
+          hasChild((child.props as { children?: React.ReactNode }).children, component))),
+  );
+}
+
+function SelectTrigger({
+  size = "m",
+  width = "content",
+  prefix,
+  suffix,
+  fullWidth = false,
+  disabled = false,
+  children,
+  ...props
+}: SelectTriggerProps) {
+  const resolvedWidth = fullWidth === true ? "full" : width;
   const stateStyles = createStateStyleProps<BaseSelect.Trigger.State>((state) => [
     selectStyles.trigger,
     sizeStyles[size],
-    fullWidth === true && selectStyles.triggerFullWidth,
+    widthStyles[resolvedWidth],
     state.open === true && selectStyles.triggerOpen,
     state.valid === false && selectStyles.triggerInvalid,
     state.disabled === true && selectStyles.disabled,
   ]);
-  return <BaseSelect.Trigger {...props} disabled={disabled} {...stateStyles} data-slot="select-trigger" />;
+  const adornmentStyles = stylex.props(selectStyles.adornment);
+  const hasIcon = hasChild(children, SelectIcon);
+
+  return (
+    <BaseSelect.Trigger
+      {...props}
+      disabled={disabled}
+      {...stateStyles}
+      data-size={size}
+      data-slot="select-trigger"
+      data-width={resolvedWidth}
+    >
+      {prefix != null && (
+        <span {...adornmentStyles} data-slot="select-prefix">
+          {prefix}
+        </span>
+      )}
+      {children}
+      {suffix != null && (
+        <span {...adornmentStyles} data-slot="select-suffix">
+          {suffix}
+        </span>
+      )}
+      {hasIcon === false && <SelectIcon />}
+    </BaseSelect.Trigger>
+  );
 }
 
 function SelectValue(props: SelectValueProps) {
@@ -106,7 +184,7 @@ function SelectIcon(props: SelectIconProps) {
   const stateStyles = createStateStyleProps<BaseSelect.Icon.State>(() => [selectStyles.iconContainer]);
   const iconStyles = stylex.props(selectStyles.icon);
   return (
-    <BaseSelect.Icon {...props} {...stateStyles}>
+    <BaseSelect.Icon {...props} {...stateStyles} data-slot="select-icon">
       <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" {...iconStyles}>
         <path d="M4.5 6h7L8 10z" />
       </svg>
@@ -150,13 +228,47 @@ function SelectList(props: SelectListProps) {
   return <BaseSelect.List {...props} {...styles} />;
 }
 
-function SelectItem<Value>({ value, disabled = false, ...props }: SelectItemProps<Value>) {
+function SelectContent({
+  children,
+  side = "bottom",
+  sideOffset = 4,
+  align = "start",
+  alignOffset = 0,
+  alignItemWithTrigger = false,
+}: SelectContentProps) {
+  return (
+    <SelectPortal>
+      <SelectPositioner
+        side={side}
+        sideOffset={sideOffset}
+        align={align}
+        alignOffset={alignOffset}
+        alignItemWithTrigger={alignItemWithTrigger}
+      >
+        <SelectPopup>
+          <SelectList>{children}</SelectList>
+        </SelectPopup>
+      </SelectPositioner>
+    </SelectPortal>
+  );
+}
+
+function SelectItem<Value>({ value, disabled = false, children, ...props }: SelectItemProps<Value>) {
   const stateStyles = createStateStyleProps<BaseSelect.Item.State>((state) => [
     selectStyles.item,
+    state.selected === true && selectStyles.itemSelected,
     state.highlighted === true && selectStyles.itemHighlighted,
     state.disabled === true && selectStyles.itemDisabled,
   ]);
-  return <BaseSelect.Item {...props} value={value} disabled={disabled} {...stateStyles} />;
+  const hasText = hasChild(children, SelectItemText);
+  const hasIndicator = hasChild(children, SelectItemIndicator);
+
+  return (
+    <BaseSelect.Item {...props} value={value} disabled={disabled} {...stateStyles}>
+      {hasText === true ? children : <SelectItemText>{children}</SelectItemText>}
+      {hasIndicator === false && <SelectItemIndicator />}
+    </BaseSelect.Item>
+  );
 }
 
 function SelectItemText(props: SelectItemTextProps) {
@@ -168,7 +280,12 @@ function SelectItemIndicator({ keepMounted = false, ...props }: SelectItemIndica
   const stateStyles = createStateStyleProps<BaseSelect.ItemIndicator.State>(() => [selectStyles.indicator]);
   const iconStyles = stylex.props(selectStyles.icon);
   return (
-    <BaseSelect.ItemIndicator {...props} keepMounted={keepMounted} {...stateStyles}>
+    <BaseSelect.ItemIndicator
+      {...props}
+      keepMounted={keepMounted}
+      {...stateStyles}
+      data-slot="select-item-indicator"
+    >
       <svg
         aria-hidden="true"
         viewBox="0 0 16 16"
@@ -183,6 +300,21 @@ function SelectItemIndicator({ keepMounted = false, ...props }: SelectItemIndica
   );
 }
 
+function SelectGroup(props: SelectGroupProps) {
+  const styles = stylex.props(selectStyles.group);
+  return <BaseSelect.Group {...props} {...styles} data-slot="select-group" />;
+}
+
+function SelectGroupLabel(props: SelectGroupLabelProps) {
+  const styles = stylex.props(selectStyles.groupLabel);
+  return <BaseSelect.GroupLabel {...props} {...styles} data-slot="select-group-label" />;
+}
+
+function SelectSeparator(props: SelectSeparatorProps) {
+  const styles = stylex.props(selectStyles.separator);
+  return <BaseSelect.Separator {...props} {...styles} />;
+}
+
 export const Select = Object.assign(SelectRoot, {
   Root: SelectRoot,
   Label: SelectLabel,
@@ -193,7 +325,11 @@ export const Select = Object.assign(SelectRoot, {
   Positioner: SelectPositioner,
   Popup: SelectPopup,
   List: SelectList,
+  Content: SelectContent,
   Item: SelectItem,
   ItemText: SelectItemText,
   ItemIndicator: SelectItemIndicator,
+  Group: SelectGroup,
+  GroupLabel: SelectGroupLabel,
+  Separator: SelectSeparator,
 });

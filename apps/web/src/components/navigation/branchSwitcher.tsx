@@ -36,9 +36,9 @@ export function BranchSwitcher({
           {triggerLabel ?? currentBranch ?? "Select branch"}
         </Text>
       </ContextSwitcher.Trigger>
-      <ContextSwitcher.Popup>
+      <ContextSwitcher.Content>
         <ContextSwitcher.Search label="Search branches" placeholder="Search branches" />
-        <ContextSwitcher.Content maxHeight="l">
+        <ContextSwitcher.Viewport maxHeight="l">
           <ContextSwitcher.Empty>No remembered branches.</ContextSwitcher.Empty>
           <ContextSwitcher.List>
             {(branch: string) => (
@@ -47,8 +47,8 @@ export function BranchSwitcher({
               </ContextSwitcher.Item>
             )}
           </ContextSwitcher.List>
-        </ContextSwitcher.Content>
-      </ContextSwitcher.Popup>
+        </ContextSwitcher.Viewport>
+      </ContextSwitcher.Content>
     </ContextSwitcher.Root>
   );
 }

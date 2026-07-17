@@ -78,12 +78,12 @@ export function ConnectionSwitcher({
           {resolvedTriggerLabel}
         </Text>
       </ContextSwitcher.Trigger>
-      <ContextSwitcher.Popup>
+      <ContextSwitcher.Content>
         <ContextSwitcher.Search
           label="Search connections"
           placeholder="Search connections"
         />
-        <ContextSwitcher.Content maxHeight="l">
+        <ContextSwitcher.Viewport maxHeight="l">
           <ContextSwitcher.Empty>No saved connections.</ContextSwitcher.Empty>
           <ContextSwitcher.List>
             {(connection: StoredConnection) => (
@@ -95,7 +95,7 @@ export function ConnectionSwitcher({
               </ContextSwitcher.Item>
             )}
           </ContextSwitcher.List>
-        </ContextSwitcher.Content>
+        </ContextSwitcher.Viewport>
         <ContextSwitcher.Footer>
           <Button
             variant="ghost"
@@ -110,7 +110,7 @@ export function ConnectionSwitcher({
             Add new connection
           </Button>
         </ContextSwitcher.Footer>
-      </ContextSwitcher.Popup>
+      </ContextSwitcher.Content>
     </ContextSwitcher.Root>
   );
 }

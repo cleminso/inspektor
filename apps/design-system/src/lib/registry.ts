@@ -174,6 +174,19 @@ export const inputGroupItem = {
   componentId: "inputGroup",
 } satisfies NavItem;
 
+export const keyboardInputItem = {
+  title: "Keyboard Input",
+  slug: "keyboard-input",
+  href: "/components/keyboard-input",
+  description: "A semantic shortcut hint with ordered modifier combinations.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "keyboardInput.tsx",
+    path: "packages/design-system/src/components/keyboardInput/keyboardInput.tsx",
+  },
+  componentId: "keyboardInput",
+} satisfies NavItem;
+
 export const textareaItem = {
   title: "Textarea",
   slug: "textarea",
@@ -198,6 +211,19 @@ export const menuItem = {
     path: "packages/design-system/src/components/menu/menu.tsx",
   },
   componentId: "menu",
+} satisfies NavItem;
+
+export const contextMenuItem = {
+  title: "Context Menu",
+  slug: "context-menu",
+  href: "/components/context-menu",
+  description: "Contextual actions opened from a pointer target without a visible trigger.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "contextMenu.tsx",
+    path: "packages/design-system/src/components/contextMenu/contextMenu.tsx",
+  },
+  componentId: "contextMenu",
 } satisfies NavItem;
 
 export const searchItem = {
@@ -310,10 +336,12 @@ export const componentItems: NavItem[] = [
   buttonGroupItem,
   checkboxItem,
   comboboxItem,
+  contextMenuItem,
   contextSwitcherItem,
   copyButtonItem,
   inputItem,
   inputGroupItem,
+  keyboardInputItem,
   textareaItem,
   menuItem,
   resizablePanelItem,

@@ -5,6 +5,8 @@ export { Checkbox } from './components/checkbox/checkbox'
 export type { CheckboxProps, CheckboxSize } from './components/checkbox/checkbox'
 export { Combobox } from './components/combobox/combobox'
 export type {
+  ComboboxGroupLabelProps,
+  ComboboxGroupProps,
   ComboboxEmptyProps,
   ComboboxClearProps,
   ComboboxContentProps,
@@ -28,6 +30,7 @@ export type {
   ComboboxTriggerSize,
   ComboboxTriggerProps,
   ComboboxTriggerVariant,
+  ComboboxTriggerWidth,
   ComboboxValueProps,
   ComboboxViewportHeight,
   ComboboxViewportProps,
@@ -40,7 +43,6 @@ export type {
   ContextSwitcherItemProps,
   ContextSwitcherItemTextProps,
   ContextSwitcherListProps,
-  ContextSwitcherPopupProps,
   ContextSwitcherRootProps,
   ContextSwitcherSearchProps,
   ContextSwitcherStatusProps,
@@ -48,7 +50,32 @@ export type {
   ContextSwitcherTriggerSize,
   ContextSwitcherTriggerWidth,
   ContextSwitcherValueProps,
+  ContextSwitcherViewportProps,
 } from './components/contextSwitcher/contextSwitcher'
+export { ContextMenu } from './components/contextMenu/contextMenu'
+export type {
+  ContextMenuCheckboxItemIndicatorProps,
+  ContextMenuCheckboxItemProps,
+  ContextMenuContentProps,
+  ContextMenuGroupLabelProps,
+  ContextMenuGroupProps,
+  ContextMenuItemProps,
+  ContextMenuItemVariant,
+  ContextMenuLinkItemProps,
+  ContextMenuPopupProps,
+  ContextMenuPortalProps,
+  ContextMenuPositionerProps,
+  ContextMenuPresentationProps,
+  ContextMenuRadioGroupProps,
+  ContextMenuRadioItemIndicatorProps,
+  ContextMenuRadioItemProps,
+  ContextMenuRootProps,
+  ContextMenuSeparatorProps,
+  ContextMenuShortcutProps,
+  ContextMenuSubmenuRootProps,
+  ContextMenuSubmenuTriggerProps,
+  ContextMenuTriggerProps,
+} from './components/contextMenu/contextMenu'
 export { Button } from './components/button/button'
 export type {
   ButtonJustify,
@@ -99,6 +126,13 @@ export type {
   InputGroupRootProps,
   InputGroupSuffixProps,
 } from './components/inputGroup/inputGroup'
+export { KeyboardInput } from './components/keyboardInput/keyboardInput'
+export type {
+  KeyboardInputModifier,
+  KeyboardInputPlatform,
+  KeyboardInputProps,
+  KeyboardInputSize,
+} from './components/keyboardInput/keyboardInput'
 export { Textarea } from './components/textarea/textarea'
 export type {
   TextareaFont,
@@ -109,17 +143,25 @@ export { Menu } from './components/menu/menu'
 export type {
   MenuCheckboxItemIndicatorProps,
   MenuCheckboxItemProps,
+  MenuContentProps,
   MenuGroupLabelProps,
   MenuGroupProps,
   MenuItemProps,
   MenuItemVariant,
+  MenuLinkItemProps,
+  MenuPresentationProps,
   MenuPopupProps,
   MenuPopupWidth,
   MenuPortalProps,
   MenuPositionerProps,
+  MenuRadioGroupProps,
+  MenuRadioItemIndicatorProps,
+  MenuRadioItemProps,
   MenuRootProps,
   MenuSeparatorProps,
   MenuShortcutProps,
+  MenuSubmenuRootProps,
+  MenuSubmenuTriggerProps,
   MenuTriggerProps,
 } from './components/menu/menu'
 export { Search } from './components/search/search'
@@ -147,6 +189,9 @@ export type {
 } from './components/resizablePanel/resizablePanel'
 export { Select } from './components/select/select'
 export type {
+  SelectContentProps,
+  SelectGroupLabelProps,
+  SelectGroupProps,
   SelectIconProps,
   SelectItemIndicatorProps,
   SelectItemProps,
@@ -157,9 +202,11 @@ export type {
   SelectPortalProps,
   SelectPositionerProps,
   SelectRootProps,
+  SelectSeparatorProps,
   SelectSize,
   SelectTriggerProps,
   SelectValueProps,
+  SelectWidth,
 } from './components/select/select'
 export { Text } from './components/text/text'
 export type { TextColor, TextStyleProps, TextVariant } from './components/text/text'

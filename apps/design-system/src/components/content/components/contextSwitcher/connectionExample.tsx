@@ -34,9 +34,9 @@ export default function ConnectionExample(): ReactElement {
       <ContextSwitcher.Trigger label="Switch connection" width="m">
         <ContextSwitcher.Value placeholder="Open connections" />
       </ContextSwitcher.Trigger>
-      <ContextSwitcher.Popup>
+      <ContextSwitcher.Content width="m">
         <ContextSwitcher.Search label="Search connections" placeholder="Search connections" />
-        <ContextSwitcher.Content>
+        <ContextSwitcher.Viewport>
           <ContextSwitcher.Empty>No saved connections.</ContextSwitcher.Empty>
           <ContextSwitcher.List>
             {(item: Connection) => (
@@ -45,13 +45,13 @@ export default function ConnectionExample(): ReactElement {
               </ContextSwitcher.Item>
             )}
           </ContextSwitcher.List>
-        </ContextSwitcher.Content>
+        </ContextSwitcher.Viewport>
         <ContextSwitcher.Footer>
           <Button variant="ghost" size="s" fullWidth justify="start" onClick={() => setOpen(false)}>
             Add new connection
           </Button>
         </ContextSwitcher.Footer>
-      </ContextSwitcher.Popup>
+      </ContextSwitcher.Content>
     </ContextSwitcher.Root>
   );
 }

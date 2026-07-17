@@ -10,6 +10,7 @@ import {
   lineHeights,
   spacing,
 } from "../../tokens/value.stylex";
+import { keyboardInputVars } from "../keyboardInput/keyboardInputVars.stylex";
 
 export const menuStyles = stylex.create({
   trigger: {
@@ -23,7 +24,7 @@ export const menuStyles = stylex.create({
     appearance: "none",
     backgroundColor: {
       default: backgroundColors["bg-card"],
-      ":hover": backgroundColors["bg-secondary"],
+      ":hover": backgroundColors["bg-hover"],
       ":active": backgroundColors["bg-pressed"],
     },
     color: textColors["text-default"],
@@ -42,11 +43,19 @@ export const menuStyles = stylex.create({
     height: 28,
   },
   triggerOpen: { backgroundColor: backgroundColors["bg-selected"] },
-  disabled: { color: textColors["text-disabled"], cursor: "not-allowed" },
+  disabled: {
+    backgroundColor: {
+      default: backgroundColors["bg-card"],
+      ":hover": backgroundColors["bg-card"],
+      ":active": backgroundColors["bg-card"],
+    },
+    color: textColors["text-disabled"],
+    cursor: "not-allowed",
+  },
   positioner: { outline: "none", zIndex: layerIndexes.popup },
   popup: {
     borderColor: borderColors.border,
-    borderRadius: borderRadii.s,
+    borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
     outline: "none",
@@ -66,7 +75,9 @@ export const menuStyles = stylex.create({
     outline: "none",
     paddingInline: spacing.xs,
     alignItems: "center",
+    backgroundColor: { default: "transparent", ":active": backgroundColors["bg-hover"] },
     boxSizing: "border-box",
+    color: textColors["text-default"],
     cursor: "default",
     display: "flex",
     fontFamily: fontFamilies.sans,
@@ -77,24 +88,46 @@ export const menuStyles = stylex.create({
     width: "auto",
   },
   itemHighlighted: {
-    backgroundColor: backgroundColors["bg-secondary"],
+    backgroundColor: backgroundColors["bg-hover"],
   },
-  itemDisabled: { color: textColors["text-disabled"] },
-  itemDanger: { color: textColors["fg-danger"] },
+  itemSelected: { backgroundColor: backgroundColors["bg-selected"] },
+  itemOpen: { backgroundColor: backgroundColors["bg-selected"] },
+  itemDisabled: {
+    backgroundColor: { default: "transparent", ":active": "transparent" },
+    color: textColors["text-disabled"],
+    cursor: "not-allowed",
+  },
+  itemDanger: { color: textColors["text-danger"] },
   itemDangerHighlighted: {
+    [keyboardInputVars.textColor]: textColors["fg-danger"],
     backgroundColor: backgroundColors["bg-danger"],
-    color: textColors["fg-inverse"],
+    color: textColors["fg-danger"],
   },
-  checkItem: { display: "grid", gridTemplateColumns: "minmax(0, 1fr) 16px" },
+  choiceItem: { display: "grid", gridTemplateColumns: "16px minmax(0, 1fr) auto" },
   indicator: {
     alignItems: "center",
     display: "inline-flex",
-    gridColumnStart: "2",
+    gridColumnStart: "1",
     gridRowStart: "1",
     justifyContent: "center",
-    justifySelf: "end",
+    justifySelf: "start",
   },
   icon: { display: "block", height: 14, width: 14 },
+  prefix: {
+    alignItems: "center",
+    display: "inline-flex",
+    flexShrink: 0,
+    justifyContent: "center",
+    width: 16,
+  },
+  suffix: {
+    alignItems: "center",
+    display: "inline-flex",
+    flexShrink: 0,
+    justifyContent: "center",
+    marginInlineStart: "auto",
+  },
+  submenuIcon: { display: "block", height: 12, width: 12 },
   shortcut: {
     color: textColors["text-subtle"],
     flexShrink: 0,

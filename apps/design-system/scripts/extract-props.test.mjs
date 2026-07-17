@@ -577,6 +577,59 @@ test("extracts the constrained Menu compound API", () => {
     metadata["menu.shortcut"]?.find(({ name }) => name === "className"),
     undefined,
   );
+  assert.equal(
+    metadata["menu.content"]?.find(({ name }) => name === "sideOffset")?.defaultValue,
+    "4",
+  );
+  assert.equal(
+    metadata["menu.linkItem"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "true",
+  );
+  assert.equal(
+    metadata["menu.checkboxItem"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "false",
+  );
+  assert.equal(
+    metadata["menu.radioItem"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "false",
+  );
+});
+
+test("extracts the constrained ContextMenu compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.equal(
+    metadata["contextMenu.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
+    "false",
+  );
+  assert.equal(
+    metadata["contextMenu.content"]?.find(({ name }) => name === "sideOffset")?.defaultValue,
+    "4",
+  );
+  assert.equal(
+    metadata["contextMenu.item"]?.find(({ name }) => name === "variant")?.defaultValue,
+    '"default"',
+  );
+  assert.equal(
+    metadata["contextMenu.item"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "true",
+  );
+  assert.equal(
+    metadata["contextMenu.linkItem"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "true",
+  );
+  assert.equal(
+    metadata["contextMenu.checkboxItem"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "false",
+  );
+  assert.equal(
+    metadata["contextMenu.radioItem"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "false",
+  );
+  assert.equal(
+    metadata["contextMenu.item"]?.find(({ name }) => name === "className"),
+    undefined,
+  );
 });
 
 test("extracts the constrained Combobox compound API", () => {
@@ -691,7 +744,7 @@ test("extracts the constrained ContextSwitcher compound API", () => {
     '"content"',
   );
   assert.equal(
-    metadata["contextSwitcher.popup"]?.find(({ name }) => name === "width")?.defaultValue,
+    metadata["contextSwitcher.content"]?.find(({ name }) => name === "width")?.defaultValue,
     '"m"',
   );
   assert.deepEqual(
@@ -699,7 +752,7 @@ test("extracts the constrained ContextSwitcher compound API", () => {
     ["label", "placeholder"],
   );
   assert.equal(
-    metadata["contextSwitcher.content"]?.find(({ name }) => name === "maxHeight")?.defaultValue,
+    metadata["contextSwitcher.viewport"]?.find(({ name }) => name === "maxHeight")?.defaultValue,
     '"m"',
   );
   assert.equal(
@@ -711,7 +764,7 @@ test("extracts the constrained ContextSwitcher compound API", () => {
     undefined,
   );
   assert.equal(
-    metadata["contextSwitcher.popup"]?.find(({ name }) => name === "style"),
+    metadata["contextSwitcher.content"]?.find(({ name }) => name === "style"),
     undefined,
   );
 });

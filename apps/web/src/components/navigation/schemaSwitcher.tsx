@@ -58,9 +58,9 @@ export function SchemaSwitcher({
           {displayTriggerText}
         </Text>
       </ContextSwitcher.Trigger>
-      <ContextSwitcher.Popup width="content">
+      <ContextSwitcher.Content width="content">
         <ContextSwitcher.Search label="Search schemas" placeholder="Search schemas" />
-        <ContextSwitcher.Content maxHeight="l">
+        <ContextSwitcher.Viewport maxHeight="l">
           {runtime.isLoading === true ? (
             <ContextSwitcher.Status>Loading schemas...</ContextSwitcher.Status>
           ) : (
@@ -77,8 +77,8 @@ export function SchemaSwitcher({
               </ContextSwitcher.List>
             </>
           )}
-        </ContextSwitcher.Content>
-      </ContextSwitcher.Popup>
+        </ContextSwitcher.Viewport>
+      </ContextSwitcher.Content>
     </ContextSwitcher.Root>
   );
 }
