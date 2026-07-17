@@ -11,6 +11,7 @@ export default defineConfig({
     },
   },
   bundle: true,
+  clean: true,
   outExtension: ({ format }) => ({
     js: format === 'cjs' ? '.js' : '.mjs',
   }),
