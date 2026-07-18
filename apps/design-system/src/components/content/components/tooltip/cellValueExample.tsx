@@ -6,7 +6,7 @@ const value = "usr_01J7HZ9Q4K6MW3T8V2P5N1BXCE";
 export default function CellValueExample(): ReactElement {
   return (
     <Tooltip.Provider>
-      <Box maxWidth={180}>
+      <Box display="block" maxWidth="tooltip-width">
         <Tooltip.Root>
           <Tooltip.Trigger render={<Text as="span" monospace truncate />}>
             {value}

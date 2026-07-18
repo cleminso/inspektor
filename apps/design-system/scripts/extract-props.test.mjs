@@ -18,6 +18,7 @@ test("extracts Button API facts from the public package export", () => {
       "fullWidth",
       "justify",
       "radius",
+      "inset",
       "prefix",
       "suffix",
       "disabled",
@@ -30,6 +31,12 @@ test("extracts Button API facts from the public package export", () => {
   assert.match(radius?.type ?? "", /"none".*"xs".*"s".*"m".*"l".*"xl"/);
   assert.equal(radius?.required, false);
   assert.equal(radius?.description, "Selects a design-system corner radius.");
+
+  const inset = buttonProps.find(({ name }) => name === "inset");
+  assert.equal(inset?.defaultValue, '"default"');
+  assert.match(inset?.type ?? "", /"default".*"flush"/);
+  assert.equal(inset?.required, false);
+  assert.equal(inset?.description, "Controls the inline inset for actions aligned with compact popup content.");
 
   const ariaLabel = buttonProps.find(({ name }) => name === "aria-label");
   assert.equal(ariaLabel, undefined);
@@ -226,19 +233,22 @@ test("extracts the constrained Toaster API", () => {
   const metadata = extractPropsMetadata();
   const toasterProps = metadata.toaster;
 
-  assert.deepEqual(
-    toasterProps?.map(({ name }) => name),
-    ["position", "closeButton"],
-  );
-  assert.equal(
-    toasterProps?.find(({ name }) => name === "position")?.defaultValue,
-    '"bottom-right"',
-  );
-  assert.equal(toasterProps?.find(({ name }) => name === "closeButton")?.defaultValue, "true");
+  assert.deepEqual(toasterProps?.map(({ name }) => name), []);
   assert.equal(
     toasterProps?.find(({ name }) => name === "className"),
     undefined,
   );
+});
+
+test("extracts the Spinner API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata.spinner?.map(({ name }) => name),
+    ["label", "size"],
+  );
+  assert.equal(metadata.spinner?.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(metadata.spinner?.find(({ name }) => name === "className"), undefined);
 });
 
 test("extracts the constrained ButtonGroup named API", () => {
@@ -656,8 +666,12 @@ test("extracts the constrained Combobox compound API", () => {
     undefined,
   );
   assert.equal(
-    metadata["combobox.inputGroup"]?.find(({ name }) => name === "fullWidth")?.defaultValue,
-    "false",
+    metadata["combobox.inputGroup"]?.find(({ name }) => name === "appearance")?.defaultValue,
+    '"default"',
+  );
+  assert.equal(
+    metadata["combobox.inputGroup"]?.find(({ name }) => name === "width")?.defaultValue,
+    '"content"',
   );
   assert.equal(
     metadata["combobox.content"]?.find(({ name }) => name === "width")?.defaultValue,

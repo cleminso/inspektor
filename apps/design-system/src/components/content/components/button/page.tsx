@@ -68,7 +68,7 @@ export function ButtonPage(): ReactElement {
 
       <Section
         title="Loading"
-        description="Loading keeps the label visible and blocks repeated activation."
+        description="Loading keeps the label visible, remains focusable, and blocks repeated activation."
       >
         <Example source={loadingSource}>
           <LoadingExample />
@@ -86,7 +86,7 @@ export function ButtonPage(): ReactElement {
 
       <Section
         title="Disabled"
-        description="Disabled buttons share one neutral treatment across variants."
+        description="Disabled and loading buttons share one neutral treatment across variants."
       >
         <Example source={disabledSource}>
           <DisabledExample />

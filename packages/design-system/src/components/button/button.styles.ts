@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex'
 import {
   backgroundColors,
   borderColors,
+  spatial,
   textColors,
 } from '../../tokens/semantics.stylex'
 import {
@@ -36,7 +37,7 @@ export const buttonStyles = stylex.create({
     outlineColor: borderColors['border-focused'],
     outlineOffset: 2,
     outlineStyle: 'solid',
-    outlineWidth: { default: 0, ':focus-visible': 2 },
+    outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
     position: 'relative',
     userSelect: 'none',
     whiteSpace: 'nowrap',
@@ -45,13 +46,15 @@ export const buttonStyles = stylex.create({
     backgroundColor: {
       default: backgroundColors['bg-primary'],
       ':hover': backgroundColors['bg-primary-hover'],
+      ':active': backgroundColors['bg-primary-hover'],
     },
     color: textColors['fg-primary'],
   },
   secondary: {
     backgroundColor: {
       default: backgroundColors['bg-secondary'],
-      ':hover': backgroundColors['bg-hover'],
+      ':hover': backgroundColors['bg-secondary-hover'],
+      ':active': backgroundColors['bg-pressed'],
     },
     color: textColors['text-default'],
   },
@@ -59,6 +62,7 @@ export const buttonStyles = stylex.create({
     backgroundColor: {
       default: backgroundColors['bg-danger'],
       ':hover': backgroundColors['bg-danger-hover'],
+      ':active': backgroundColors['bg-danger-hover'],
     },
     color: textColors['fg-danger'],
   },
@@ -66,6 +70,7 @@ export const buttonStyles = stylex.create({
     backgroundColor: {
       default: 'transparent',
       ':hover': backgroundColors['bg-hover'],
+      ':active': backgroundColors['bg-pressed'],
     },
     color: textColors['text-default'],
   },
@@ -74,6 +79,7 @@ export const buttonStyles = stylex.create({
     backgroundColor: {
       default: 'transparent',
       ':hover': backgroundColors['bg-hover'],
+      ':active': backgroundColors['bg-pressed'],
     },
     color: textColors['text-default'],
   },
@@ -101,6 +107,9 @@ export const buttonStyles = stylex.create({
     paddingInline: spacing.xl,
     fontSize: fontSizes[2],
     height: 32,
+  },
+  insetFlush: {
+    paddingInline: spacing.xxs,
   },
   square: {
     aspectRatio: '1 / 1',
@@ -137,8 +146,16 @@ export const buttonStyles = stylex.create({
     justifyContent: 'space-between',
   },
   disabled: {
-    borderColor: borderColors['border-secondary'],
-    backgroundColor: backgroundColors['bg-disabled'],
+    borderColor: {
+      default: borderColors['border-secondary'],
+      ':hover': borderColors['border-secondary'],
+      ':active': borderColors['border-secondary'],
+    },
+    backgroundColor: {
+      default: backgroundColors['bg-disabled'],
+      ':hover': backgroundColors['bg-disabled'],
+      ':active': backgroundColors['bg-disabled'],
+    },
     color: textColors['text-disabled'],
     cursor: 'not-allowed',
   },

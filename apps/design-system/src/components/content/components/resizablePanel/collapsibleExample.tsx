@@ -22,13 +22,14 @@ export default function CollapsibleExample(): ReactElement {
   };
 
   return (
-    <Box width="100%" height={280} flexDirection="column" borderWidth={1} borderStyle="solid" borderColor="border">
-      <Box padding="m" borderBottomWidth={1} borderBottomStyle="solid" borderBottomColor="border">
+    <Box width="full" height="panel-height">
+      <Box flexDirection="column" borderWidth={1} borderStyle="solid" borderColor="border">
+        <Box padding="m" borderBottomWidth={1} borderStyle="solid" borderColor="border">
         <Button variant="secondary" size="s" onClick={toggleListPanel}>
           {isCollapsed === true ? "Show tables" : "Hide tables"}
         </Button>
       </Box>
-      <Box flexGrow={1} minHeight={0}>
+        <Box flexGrow={1} minHeight={0}>
         <ResizablePanelGroup>
           <ResizablePanel
             panelRef={listPanelRef}
@@ -39,17 +40,18 @@ export default function CollapsibleExample(): ReactElement {
             collapsible
             onResize={(size) => setIsCollapsed(size.inPixels === 0)}
           >
-            <Box height="100%" alignItems="center" justifyContent="center" backgroundColor="bg-secondary">
+            <Box height="full" alignItems="center" justifyContent="center" backgroundColor="bg-secondary">
               <Text>Table list</Text>
             </Box>
           </ResizablePanel>
           {isCollapsed === false ? <ResizableHandle /> : null}
           <ResizablePanel>
-            <Box height="100%" alignItems="center" justifyContent="center">
+            <Box height="full" alignItems="center" justifyContent="center">
               <Text>Table explorer</Text>
             </Box>
           </ResizablePanel>
         </ResizablePanelGroup>
+        </Box>
       </Box>
     </Box>
   );

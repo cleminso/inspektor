@@ -80,6 +80,11 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "spinner",
+    exportName: "Spinner",
+    inheritedProps: [],
+  },
+  {
     componentId: "input",
     exportName: "Input",
     inheritedProps: [],

@@ -27,7 +27,7 @@ export function SwitchPage(): ReactElement {
       <Section title="Field" description="Use Field.Label to provide an accessible name and click target.">
         <Example source={basicSource}><BasicExample /></Example>
       </Section>
-      <Section title="Sizes and states">
+      <Section title="Sizes and states" description="Switch covers checked, disabled, read-only, hover, and pressed interaction states.">
         <Example source={statesSource}><StatesExample /></Example>
       </Section>
       <Section title="Props" description="Switch participates in Field and native forms automatically.">

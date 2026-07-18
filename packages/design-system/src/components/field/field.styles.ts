@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, textColors } from "../../tokens/semantics.stylex";
+import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
 import {
   fontFamilies,
   fontSizes,
@@ -49,7 +49,7 @@ export const fieldStyles = stylex.create({
     [inputGroupVars.borderColor]: borderColors["border-danger"],
     [inputGroupVars.focusedBorderColor]: borderColors["border-danger"],
     [inputGroupVars.outlineColor]: borderColors["border-danger-subtle"],
-    [inputGroupVars.outlineWidth]: "2px",
+    [inputGroupVars.outlineWidth]: spatial["focus-ring-width"],
   },
   inputGroupDisabled: {
     [inputGroupVars.backgroundColor]: backgroundColors["bg-disabled"],

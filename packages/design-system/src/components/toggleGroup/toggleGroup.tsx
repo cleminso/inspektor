@@ -94,6 +94,7 @@ function ToggleGroupItem({
     equalWidth === true && toggleGroupStyles.itemEqualWidth,
     state.pressed === true && toggleGroupStyles.itemPressed,
     state.disabled === true && toggleGroupStyles.itemDisabled,
+    state.pressed === true && state.disabled === true && toggleGroupStyles.itemPressedDisabled,
   ])
 
   return (

@@ -148,6 +148,19 @@ export const toastItem = {
   componentId: "toaster",
 } satisfies NavItem;
 
+export const spinnerItem = {
+  title: "Spinner",
+  slug: "spinner",
+  href: "/components/spinner",
+  description: "A compact loading indicator with optional accessible status text.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "spinner.tsx",
+    path: "packages/design-system/src/components/spinner/spinner.tsx",
+  },
+  componentId: "spinner",
+} satisfies NavItem;
+
 export const inputItem = {
   title: "Input",
   slug: "input",
@@ -347,6 +360,7 @@ export const componentItems: NavItem[] = [
   resizablePanelItem,
   searchItem,
   selectItem,
+  spinnerItem,
   switchItem,
   toastItem,
   tooltipItem,

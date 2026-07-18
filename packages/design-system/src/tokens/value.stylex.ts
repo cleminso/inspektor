@@ -170,6 +170,29 @@ export const spacing = stylex.defineVars({
   '5xl': '64px',
 } as const)
 
+export const dimensions = stylex.defineVars({
+  1: '1px',
+  2: '2px',
+  12: '12px',
+  14: '14px',
+  16: '16px',
+  20: '20px',
+  24: '24px',
+  28: '28px',
+  32: '32px',
+  100: '100px',
+  120: '120px',
+  160: '160px',
+  180: '180px',
+  240: '240px',
+  280: '280px',
+  320: '320px',
+  400: '400px',
+  680: '680px',
+  1220: '1220px',
+  1440: '1440px',
+} as const)
+
 export const borderRadii = stylex.defineVars({
   none: '0',
   xs: '2px',

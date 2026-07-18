@@ -13,14 +13,16 @@ export default function BasicExample(): ReactElement {
           <Combobox.InputTrigger />
         </Combobox.InputGroup>
         <Combobox.Content>
-          <Combobox.Empty>No branches found.</Combobox.Empty>
-          <Combobox.List>
-            {(branch: string) => (
-              <Combobox.Item key={branch} value={branch}>
-                {branch}
-              </Combobox.Item>
-            )}
-          </Combobox.List>
+          <Combobox.Viewport>
+            <Combobox.Empty>No branches found.</Combobox.Empty>
+            <Combobox.List>
+              {(branch: string) => (
+                <Combobox.Item key={branch} value={branch}>
+                  {branch}
+                </Combobox.Item>
+              )}
+            </Combobox.List>
+          </Combobox.Viewport>
         </Combobox.Content>
       </Combobox.Root>
       <Field.Description>Choose one of the available application branches.</Field.Description>

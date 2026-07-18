@@ -11,7 +11,9 @@ export type {
   ComboboxClearProps,
   ComboboxContentProps,
   ComboboxInputTriggerProps,
+  ComboboxInputGroupAppearance,
   ComboboxInputGroupProps,
+  ComboboxInputGroupWidth,
   ComboboxInputProps,
   ComboboxItemIndicatorProps,
   ComboboxItemProps,
@@ -209,17 +211,18 @@ export type {
   SelectWidth,
 } from './components/select/select'
 export { Text } from './components/text/text'
-export type { TextColor, TextStyleProps, TextVariant } from './components/text/text'
+export type { TextColor, TextProps, TextStyleProps, TextVariant } from './components/text/text'
 export { TextField } from './components/textField/textField'
 export type { TextFieldProps } from './components/textField/textField'
 export { Switch } from './components/switch/switch'
 export type { SwitchProps, SwitchSize } from './components/switch/switch'
 export { Toaster, toasts } from './components/toaster/toaster'
 export type {
-  ToasterPosition,
   ToasterProps,
   ToastId,
   ToastOptions,
+  ToastPromiseOptions,
+  ToastStatus,
   Toasts,
 } from './components/toaster/toaster'
 export { Tooltip } from './components/tooltip/tooltip'

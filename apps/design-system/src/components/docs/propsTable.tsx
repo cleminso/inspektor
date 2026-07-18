@@ -1,3 +1,4 @@
+import { Box } from "@inspector/ds";
 import * as stylex from "@stylexjs/stylex";
 import { type ReactElement } from "react";
 
@@ -5,7 +6,7 @@ import { type GeneratedPropItem } from "@/lib/propsData";
 
 export function PropsTable({ rows }: { rows: readonly GeneratedPropItem[] }): ReactElement {
   return (
-    <div {...stylex.props(styles.scroller)}>
+    <Box display="block" overflowX="auto">
       <table {...stylex.props(styles.table)}>
         <thead>
           <tr>
@@ -35,14 +36,11 @@ export function PropsTable({ rows }: { rows: readonly GeneratedPropItem[] }): Re
           ))}
         </tbody>
       </table>
-    </div>
+    </Box>
   );
 }
 
 const styles = stylex.create({
-  scroller: {
-    overflowX: "auto",
-  },
   table: {
     width: "100%",
     minWidth: 720,

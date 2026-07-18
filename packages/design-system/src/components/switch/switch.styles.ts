@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { backgroundColors, borderColors } from '../../tokens/semantics.stylex'
+import { backgroundColors, borderColors, spatial } from '../../tokens/semantics.stylex'
 import { borderRadii } from '../../tokens/value.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
@@ -21,22 +21,47 @@ export const switchStyles = stylex.create({
     outlineColor: borderColors['border-focused'],
     outlineOffset: 1,
     outlineStyle: 'solid',
-    outlineWidth: { default: 0, ':focus-visible': 1 },
+    outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
     transitionDuration: { default: '120ms', [reducedMotion]: '0ms' },
     transitionProperty: 'background-color',
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
   },
   rootChecked: {
-    backgroundColor: backgroundColors['bg-inverse'],
+    backgroundColor: {
+      default: backgroundColors['bg-primary'],
+      ':hover': backgroundColors['bg-primary-hover'],
+      ':active': backgroundColors['bg-primary-hover'],
+    },
+  },
+  rootCheckedReadOnly: {
+    backgroundColor: {
+      default: backgroundColors['bg-primary'],
+      ':hover': backgroundColors['bg-primary'],
+      ':active': backgroundColors['bg-primary'],
+    },
   },
   rootInvalid: {
     borderColor: borderColors['border-danger'],
   },
   rootDisabled: {
+    borderColor: {
+      default: borderColors['border-secondary'],
+      ':hover': borderColors['border-secondary'],
+      ':active': borderColors['border-secondary'],
+    },
+    backgroundColor: {
+      default: backgroundColors['bg-disabled'],
+      ':hover': backgroundColors['bg-disabled'],
+      ':active': backgroundColors['bg-disabled'],
+    },
     cursor: 'not-allowed',
-    opacity: 0.6,
   },
   rootReadOnly: {
+    backgroundColor: {
+      default: backgroundColors['bg-secondary'],
+      ':hover': backgroundColors['bg-secondary'],
+      ':active': backgroundColors['bg-secondary'],
+    },
     cursor: 'default',
   },
   rootSizeS: {

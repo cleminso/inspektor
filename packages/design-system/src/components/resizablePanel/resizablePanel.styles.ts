@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { borderColors } from '../../tokens/semantics.stylex'
+import { layerIndexes } from '../../tokens/layers.stylex'
+import { borderColors, spatial, textColors } from '../../tokens/semantics.stylex'
 import { borderRadii, spacing } from '../../tokens/value.stylex'
 
 export const resizablePanelStyles = stylex.create({
@@ -18,14 +19,16 @@ export const resizablePanelStyles = stylex.create({
     backgroundColor: {
       default: borderColors['border-secondary'],
       ':focus-visible': borderColors['border-focused'],
-      ':is([data-separator="active"])': borderColors['border-focused'],
-      ':hover': borderColors.border,
+      ':is([data-disabled])': borderColors['border-secondary'],
+      ':not([data-disabled]):hover': borderColors.border,
+      ':not([data-disabled]):is([data-separator="active"])': borderColors['border-focused'],
     },
     color: {
       default: borderColors.border,
       ':focus-visible': borderColors['border-focused'],
-      ':is([data-separator="active"])': borderColors['border-focused'],
-      ':hover': borderColors['border-focused'],
+      ':is([data-disabled])': textColors['text-disabled'],
+      ':not([data-disabled]):hover': borderColors['border-focused'],
+      ':not([data-disabled]):is([data-separator="active"])': borderColors['border-focused'],
     },
     display: 'flex',
     justifyContent: 'center',
@@ -37,15 +40,16 @@ export const resizablePanelStyles = stylex.create({
     },
     outlineWidth: {
       default: 0,
-      ':focus-visible': 1,
+      ':focus-visible': spatial['focus-ring-width'],
     },
     position: 'relative',
+    zIndex: layerIndexes.drag,
     height: {
       default: '100%',
-      ':is([aria-orientation="horizontal"])': 1,
+      ':is([aria-orientation="horizontal"])': spatial['panel-handle-size'],
     },
     width: {
-      default: 1,
+      default: spatial['panel-handle-size'],
       ':is([aria-orientation="horizontal"])': '100%',
     },
   },

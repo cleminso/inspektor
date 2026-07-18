@@ -44,7 +44,7 @@ export function ButtonGroupPage(): ReactElement {
 
       <Section
         title="Orientation"
-        description="Orientation connects the appropriate edges while preserving each outer corner and focus ring."
+        description="Orientation connects the appropriate edges while preserving each outer corner, focus ring, and pressed stacking order."
       >
         <Example source={orientationSource}>
           <OrientationExample />

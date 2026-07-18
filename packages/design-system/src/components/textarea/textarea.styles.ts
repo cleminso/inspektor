@@ -12,7 +12,6 @@ import {
 export const textareaStyles = stylex.create({
   base: {
     margin: 0,
-    // Editable controls match :focus-visible after pointer focus, so use :focus without a halo.
     borderColor: {
       default: borderColors.border,
       ":focus": borderColors["border-focused"],
@@ -59,14 +58,18 @@ export const textareaStyles = stylex.create({
     borderColor: {
       default: borderColors["border-danger"],
       ":focus-visible": borderColors["border-danger"],
+      ":focus": borderColors["border-danger"],
     },
     outlineColor: borderColors["border-danger-subtle"],
     outlineOffset: 0,
     outlineStyle: "solid",
-    outlineWidth: 2,
+    outlineWidth: 0,
   },
   disabled: {
-    backgroundColor: backgroundColors["bg-disabled"],
+    backgroundColor: {
+      default: backgroundColors["bg-disabled"],
+      ":hover": backgroundColors["bg-disabled"],
+    },
     color: textColors["text-disabled"],
     cursor: "not-allowed",
     "::placeholder": {
@@ -74,7 +77,10 @@ export const textareaStyles = stylex.create({
     },
   },
   readOnly: {
-    backgroundColor: backgroundColors["bg-secondary"],
+    backgroundColor: {
+      default: backgroundColors["bg-secondary"],
+      ":hover": backgroundColors["bg-secondary"],
+    },
     cursor: "default",
   },
 });

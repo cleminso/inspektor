@@ -3,7 +3,30 @@
 //
 import * as stylex from '@stylexjs/stylex'
 
-import { fontFamilies } from '../../tokens/value.stylex'
+import { backgroundColors, textColors } from '../../tokens/semantics.stylex'
+import { borderRadii, fontFamilies, spacing } from '../../tokens/value.stylex'
+
+const reducedMotion = '@media (prefers-reduced-motion: reduce)'
+
+const pulse = stylex.keyframes({
+  '0%, 100%': { opacity: 1 },
+  '50%': { opacity: 0.5 },
+})
+
+export const textBaseStyles = stylex.create({
+  base: { margin: 0 },
+})
+
+export const textColorStyles = stylex.create({
+  default: { color: textColors['text-default'] },
+  muted: { color: textColors['text-muted'] },
+  subtle: { color: textColors['text-subtle'] },
+  disabled: { color: textColors['text-disabled'] },
+  link: { color: textColors['text-link'] },
+  danger: { color: textColors['text-danger'] },
+  error: { color: textColors['text-danger'] },
+  inherit: {},
+})
 
 export const textAlignStyles = stylex.create({
   left: { textAlign: 'left' },
@@ -20,6 +43,10 @@ export const textWrapStyles = stylex.create({
 })
 
 export const textUtilityStyles = stylex.create({
+  heading: {
+    fontFeatureSettings: "'ss07' 1, 'ss08' 1, 'zero' 1, 'liga' 0",
+  },
+  lineThrough: { textDecorationLine: 'line-through' },
   monospace: { fontFamily: fontFamilies.mono },
   tabularNums: { fontVariantNumeric: 'tabular-nums' },
   truncate: {
@@ -27,4 +54,40 @@ export const textUtilityStyles = stylex.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
+})
+
+export const textLoadingStyles = stylex.create({
+  inline: {
+    display: 'inline-block',
+    position: 'relative',
+  },
+  placeholder: { visibility: 'hidden' },
+  skeleton: {
+    inset: 0,
+    borderRadius: borderRadii.xs,
+    animationDuration: '1.5s',
+    animationIterationCount: 'infinite',
+    animationName: { default: pulse, [reducedMotion]: 'none' },
+    animationTimingFunction: 'ease-in-out',
+    backgroundColor: backgroundColors['bg-secondary'],
+    position: 'absolute',
+  },
+  lines: {
+    gap: spacing.s,
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
+  line: {
+    borderRadius: borderRadii.xs,
+    animationDuration: '1.5s',
+    animationIterationCount: 'infinite',
+    animationName: { default: pulse, [reducedMotion]: 'none' },
+    animationTimingFunction: 'ease-in-out',
+    backgroundColor: backgroundColors['bg-secondary'],
+    display: 'block',
+    height: '1em',
+    width: '100%',
+  },
+  lastLine: { width: '70%' },
 })

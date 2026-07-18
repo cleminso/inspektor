@@ -1,15 +1,19 @@
-import {
+import React, {
+  type ComponentRef,
   type ComponentPropsWithoutRef,
-  type CSSProperties,
   type ElementType,
+  type ForwardedRef,
   type JSX,
   type ReactNode,
 } from 'react'
 import * as stylex from '@stylexjs/stylex'
 
-import { textColorStyles, textRoleStyles } from '../tokens/semantics.stylex'
+import { textRoleStyles } from '../tokens/semantics.stylex'
 import {
   textAlignStyles,
+  textBaseStyles,
+  textColorStyles,
+  textLoadingStyles,
   textUtilityStyles,
   textWrapStyles,
 } from '../components/text/text-styles'
@@ -46,13 +50,9 @@ export type TextColor =
   | 'muted'
   | 'subtle'
   | 'disabled'
-  | 'primary'
-  | 'secondary'
+  | 'link'
   | 'danger'
   | 'error'
-  | 'success'
-  | 'accent'
-  | 'inverse'
   | 'inherit'
 
 export type TextAlign = 'left' | 'center' | 'right' | 'justify'
@@ -114,34 +114,55 @@ function applyFormatter(
     : numberFormatter.format(numberValue)
 }
 
-type TextProps<E extends TextTag = 'p'> = TextStyleProps & {
+export type TextProps<E extends TextTag = 'p'> = TextStyleProps & {
   as?: E
   children?: ReactNode
+  /** Replaces content with a text-shaped loading placeholder. */
+  loading?: boolean
+  /** Sizes a single-line loading placeholder without exposing loaded content. */
+  placeholderText?: string
+  /** Controls how many placeholder lines are rendered while loading. */
+  placeholderNumberOfLines?: number
+  /** Provides the accessible name announced while content is loading. */
+  loadingLabel?: string
+  /** Applies a semantic line-through treatment. */
+  lineThrough?: boolean
   monospace?: boolean
   tabularNums?: boolean
   truncate?: boolean | number
   formatter?: TextFormatter
 } & Omit<
-    ComponentPropsWithoutRef<E>,
-    keyof TextStyleProps | 'as' | 'className' | 'children'
+  ComponentPropsWithoutRef<E>,
+    keyof TextStyleProps | 'as' | 'className' | 'style' | 'children'
   >
 
-function Text<E extends TextTag = 'p'>({
-  as,
-  variant,
-  color,
-  align,
-  wrap,
-  children,
-  style,
-  monospace,
-  tabularNums,
-  truncate,
-  formatter,
-  ...props
-}: TextProps<E> & { style?: CSSProperties }): JSX.Element {
+function TextInner<E extends TextTag = 'p'>(
+  {
+    as,
+    variant,
+    color,
+    align,
+    wrap,
+    children,
+    loading = false,
+    placeholderText,
+    placeholderNumberOfLines = 1,
+    loadingLabel,
+    lineThrough = false,
+    monospace,
+    tabularNums,
+    truncate,
+    formatter,
+    ...props
+  }: TextProps<E>,
+  ref: ForwardedRef<HTMLElement>,
+): JSX.Element {
   const resolvedVariant = variant ?? 'default'
   const Tag = (as ?? VARIANT_DEFAULT_TAG[resolvedVariant]) as ElementType
+  const isHeading = resolvedVariant.startsWith('heading-')
+  const loadingLineCount = Number.isFinite(placeholderNumberOfLines)
+    ? Math.max(1, Math.floor(placeholderNumberOfLines))
+    : 1
   const resolvedWrap =
     wrap ?? (truncate === true || typeof truncate === 'number'
       ? undefined
@@ -153,17 +174,47 @@ function Text<E extends TextTag = 'p'>({
       ? applyFormatter(formatter, children)
       : children
 
+  const loadingPlaceholder = placeholderText ?? formattedContent ?? 'Loading...'
+  const loadingAccessibleLabel =
+    loadingLabel ??
+    placeholderText ??
+    (typeof formattedContent === 'string' || typeof formattedContent === 'number'
+      ? String(formattedContent)
+      : 'Loading')
+  const content =
+    loading === false ? formattedContent : loadingLineCount > 1 ? (
+      <span data-slot="text-skeleton" aria-hidden="true" {...stylex.props(textLoadingStyles.lines)}>
+        {Array.from({ length: loadingLineCount }, (_, index) => (
+          <span
+            key={index}
+            {...stylex.props(
+              textLoadingStyles.line,
+              index === loadingLineCount - 1 && textLoadingStyles.lastLine,
+            )}
+          />
+        ))}
+      </span>
+    ) : (
+      <span {...stylex.props(textLoadingStyles.inline)}>
+        <span {...stylex.props(textLoadingStyles.placeholder)}>{loadingPlaceholder}</span>
+        <span data-slot="text-skeleton" aria-hidden="true" {...stylex.props(textLoadingStyles.skeleton)} />
+      </span>
+    )
+
   const stylexProps = stylex.props(
+    textBaseStyles.base,
     textRoleStyles[resolvedVariant],
     textColorStyles[color ?? 'default'],
+    isHeading === true && textUtilityStyles.heading,
     align !== undefined && textAlignStyles[align],
     resolvedWrap !== undefined && textWrapStyles[resolvedWrap],
+    lineThrough === true && textUtilityStyles.lineThrough,
     monospace === true && textUtilityStyles.monospace,
     tabularNums === true && textUtilityStyles.tabularNums,
     truncate === true && textUtilityStyles.truncate,
   )
 
-  const mergedStyle: CSSProperties = {
+  const inlineStyle = {
     ...stylexProps.style,
     ...(typeof truncate === 'number'
       ? {
@@ -173,21 +224,33 @@ function Text<E extends TextTag = 'p'>({
           overflow: 'hidden',
         }
       : {}),
-    ...style,
   }
+
+  const domProps = Object.fromEntries(
+    Object.entries(props).filter(([key]) => key !== 'className' && key !== 'style'),
+  )
+  const consumerAriaBusy = props['aria-busy']
 
   return (
     <Tag
+      ref={ref}
       className={stylexProps.className}
-      style={mergedStyle}
-      {...(props as object)}
+      style={inlineStyle}
+      {...domProps}
+      aria-busy={loading === true ? true : consumerAriaBusy}
+      aria-label={loading === true ? loadingAccessibleLabel : props['aria-label']}
     >
-      {formattedContent}
+      {content}
     </Tag>
   )
 }
 
-Text.displayName = 'Text'
+const TextBase = React.forwardRef(TextInner)
+TextBase.displayName = 'Text'
+
+const Text = TextBase as <E extends TextTag = 'p'>(
+  props: TextProps<E> & { ref?: ForwardedRef<ComponentRef<E>> },
+) => JSX.Element
 
 export function createText() {
   return Text

@@ -36,12 +36,17 @@ export const comboboxStyles = stylex.create({
     backgroundColor: backgroundColors["bg-disabled"],
     outlineWidth: 0,
   },
-  inputGroupFullWidth: { width: "100%" },
+  inputGroupWidthFull: { width: "100%" },
+  inputGroupBare: {
+    borderColor: { default: "transparent", ":focus-within": "transparent" },
+    borderWidth: 0,
+    backgroundColor: "transparent",
+  },
   input: {
     borderWidth: 0,
     flex: "1",
     outline: "none",
-    paddingInline: spacing.m,
+    paddingInline: spacing.xs,
     appearance: "none",
     backgroundColor: "transparent",
     color: textColors["text-default"],
@@ -116,14 +121,15 @@ export const comboboxStyles = stylex.create({
   popupTransition: { opacity: 0, transform: "scale(0.98)" },
   popupHeader: {
     flexShrink: 0,
-    padding: spacing.xs,
+    paddingBlock: spacing.xxs,
   },
   popupFooter: {
     flexShrink: 0,
-    padding: spacing.xs,
+    padding: spacing.xxs,
   },
   viewport: {
-    padding: spacing.xs,
+    padding: spacing.xxs,
+    // paddingBlock: spacing.xs,
     minHeight: 0,
     overflowY: "auto",
   },
@@ -132,11 +138,14 @@ export const comboboxStyles = stylex.create({
   viewportHeightL: { maxHeight: 320 },
   viewportHeightAvailable: { maxHeight: "var(--available-height)" },
   list: {
+    gap: spacing.xxs,
     outline: "none",
     overscrollBehavior: "contain",
+    display: "flex",
+    flexDirection: "column",
     maxHeight: "var(--available-height)",
     overflowY: "auto",
-    paddingBlock: spacing.xxs
+    // paddingBlock: spacing.xxs
   },
   listEmpty: {},
   group: {
@@ -152,12 +161,10 @@ export const comboboxStyles = stylex.create({
     lineHeight: lineHeights.tight,
   },
   item: {
+    padding: spacing.xxs,
     borderRadius: borderRadii.xs,
     gap: spacing.m,
-    marginInline: spacing.xxs,
     outline: "none",
-    paddingBlock: spacing.xs,
-    paddingInline: spacing.m,
     alignItems: "center",
     boxSizing: "border-box",
     cursor: "default",

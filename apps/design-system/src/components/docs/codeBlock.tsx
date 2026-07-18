@@ -26,7 +26,7 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
     >
       <Box
         flexDirection="column"
-        width="100%"
+        width="full"
         borderBottomLeftRadius="xl"
         borderBottomRightRadius="xl"
         data-state={isExpanded === true ? "open" : "closed"}
@@ -61,13 +61,12 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
           borderWidth={0}
           borderTopWidth={1}
         >
-          <Box position="absolute" top={12} right={12} zIndex={1}>
+          <Box position="absolute" right="l" top="l" zIndex="content">
             <CopyButton textToCopy={source} label="Copy source" />
           </Box>
           {highlightedHtml !== null ? (
-            <Box
-              display="block"
-              className="docs-code-content"
+            <div
+              {...stylex.props(styles.codeContent)}
               dangerouslySetInnerHTML={{ __html: highlightedHtml }}
             />
           ) : (
@@ -82,6 +81,7 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
 }
 
 const styles = stylex.create({
+  codeContent: { display: "block" },
   trigger: {
     alignItems: "center",
     appearance: "none",

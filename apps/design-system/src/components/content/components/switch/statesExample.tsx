@@ -22,6 +22,12 @@ export default function StatesExample(): ReactElement {
           Disabled
         </Field.Label>
       </Field.Root>
+      <Field.Root>
+        <Field.Label>
+          <Switch defaultChecked readOnly />
+          Read-only
+        </Field.Label>
+      </Field.Root>
     </Box>
   );
 }

@@ -1,5 +1,4 @@
-import { Box, Text, type TextVariant } from "@inspector/ds";
-import * as stylex from "@stylexjs/stylex";
+import { Box, Text, type TextColor, type TextVariant } from "@inspector/ds";
 import { type ReactElement } from "react";
 
 import { DocsPage } from "@/components/docs/docsPage";
@@ -24,17 +23,11 @@ const textColors = [
   "muted",
   "subtle",
   "disabled",
-  "accent",
   "danger",
   "error",
-  "success",
-  "warning",
-  "info",
-  "type",
-  "constant",
-  "inverse",
+  "link",
   "inherit",
-] as const;
+] as const satisfies readonly TextColor[];
 
 export function TypographyFoundationPage(): ReactElement {
   return (
@@ -67,10 +60,10 @@ export function TypographyFoundationPage(): ReactElement {
               borderStyle="solid"
               borderColor="border"
             >
-              <Text as="code" variant="caption" color="muted" style={{ margin: 0 }}>
+              <Text as="code" variant="caption" color="muted">
                 {variant}
               </Text>
-              <Text as="div" variant={variant} style={{ margin: 0 }}>
+              <Text as="div" variant={variant}>
                 {sample}
               </Text>
             </Box>
@@ -79,41 +72,44 @@ export function TypographyFoundationPage(): ReactElement {
       </Section>
 
       <Section title="Colors" description="Text colors express hierarchy and semantic status.">
-        <div {...stylex.props(styles.colorList)}>
+        <Box
+          display="grid"
+          gridTemplateColumns="auto-fit-s"
+          gap="l"
+          padding="xl"
+          borderWidth={1}
+          borderStyle="solid"
+          borderColor="border"
+          borderRadius="l"
+        >
           {textColors.map((color) => (
-            <Text key={color} color={color} style={{ margin: 0 }}>
+            <Text key={color} color={color}>
               {color}
             </Text>
           ))}
-        </div>
+        </Box>
       </Section>
 
       <Section title="Utilities" description="Formatting helpers cover data-heavy interfaces.">
         <Box flexDirection="column" gap="m">
-          <Text monospace style={{ margin: 0 }}>
+          <Text monospace>
             monospace: connection_42
           </Text>
-          <Text tabularNums style={{ margin: 0 }}>
+          <Text tabularNums>
             tabularNums: 1,234,567
           </Text>
-          <Text formatter="compact" style={{ margin: 0 }}>
+          <Text formatter="compact">
             {1284000}
+          </Text>
+          <Text lineThrough>Previous value</Text>
+          <Text loading placeholderText="Loading account name">
+            Account name
+          </Text>
+          <Text loading placeholderNumberOfLines={3}>
+            Loading description
           </Text>
         </Box>
       </Section>
     </DocsPage>
   );
 }
-
-const styles = stylex.create({
-  colorList: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-    gap: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "light-dark(oklch(0.852 0.006 43.325), oklch(0.391 0.0077 317.73))",
-    borderRadius: 6,
-  },
-});

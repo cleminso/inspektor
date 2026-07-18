@@ -6,6 +6,8 @@ import {
   borderColors,
   textColors,
 } from '../tokens/semantics.stylex'
+import { layerIndexes } from '../tokens/layers.stylex'
+import { spatial } from '../tokens/semantics.stylex'
 import { borderRadii, breakpoints, shadows, spacing } from '../tokens/value.stylex'
 import {
   alignContentStyles,
@@ -180,10 +182,8 @@ const BOX_STYLE_PROP_MAP: Record<keyof BoxStyleProps, true> = {
   alignContent: true,
   gridTemplateColumns: true,
   gridTemplateRows: true,
-  gridTemplateAreas: true,
   gridColumn: true,
   gridRow: true,
-  gridArea: true,
   gridAutoFlow: true,
   position: true,
   top: true,
@@ -256,10 +256,6 @@ function px(value: number): string {
   return value === 0 ? '0' : `${value}px`
 }
 
-function sizeValue(value: string | number): string {
-  return typeof value === 'number' ? px(value) : value
-}
-
 function spacingCss(token: keyof typeof spacing): string {
   return spacing[token] as string
 }
@@ -288,6 +284,14 @@ function shadowCss(token: keyof typeof shadows): string {
   return shadows[token] as string
 }
 
+function layoutSizeCss(token: keyof typeof spatial | 'full'): string {
+  return token === 'full' ? '100%' : (spatial[token] as string)
+}
+
+function layerIndexCss(token: keyof typeof layerIndexes): number {
+  return layerIndexes[token]
+}
+
 const FLEX_KEYWORD_MAP: Record<string, string> = {
   start: 'flex-start',
   end: 'flex-end',
@@ -295,6 +299,39 @@ const FLEX_KEYWORD_MAP: Record<string, string> = {
   around: 'space-around',
   evenly: 'space-evenly',
 }
+
+const ASPECT_RATIO_MAP = {
+  square: '1 / 1',
+  landscape: '4 / 3',
+  portrait: '3 / 4',
+  video: '16 / 9',
+} as const
+
+const GRID_TEMPLATE_COLUMNS_MAP = {
+  one: 'minmax(0, 1fr)',
+  two: 'repeat(2, minmax(0, 1fr))',
+  three: 'repeat(3, minmax(0, 1fr))',
+  four: 'repeat(4, minmax(0, 1fr))',
+  'auto-fit-s': `repeat(auto-fit, minmax(${spatial['grid-track-s']}, 1fr))`,
+  'auto-fit-m': `repeat(auto-fit, minmax(${spatial['grid-track-m']}, 1fr))`,
+  'label-content': `${spatial['label-width']} minmax(0, 1fr)`,
+} as const
+
+const GRID_TEMPLATE_ROWS_MAP = {
+  one: 'minmax(0, 1fr)',
+  two: 'repeat(2, minmax(0, 1fr))',
+  three: 'repeat(3, minmax(0, 1fr))',
+  four: 'repeat(4, minmax(0, 1fr))',
+} as const
+
+const GRID_PLACEMENT_MAP = {
+  auto: 'auto',
+  'span-1': 'span 1 / span 1',
+  'span-2': 'span 2 / span 2',
+  'span-3': 'span 3 / span 3',
+  'span-4': 'span 4 / span 4',
+  full: '1 / -1',
+} as const
 
 function flexKeyword(value: string): string {
   return FLEX_KEYWORD_MAP[value] ?? value
@@ -462,13 +499,19 @@ export function resolveBoxStyles(
   addTokenProp(overflowXStyles as StyleMap, 'overflow-x', props.overflowX, (value) => value)
   addTokenProp(overflowYStyles as StyleMap, 'overflow-y', props.overflowY, (value) => value)
 
-  addArbitraryProp('width', props.width, sizeValue)
-  addArbitraryProp('height', props.height, sizeValue)
-  addArbitraryProp('minWidth', props.minWidth, sizeValue)
-  addArbitraryProp('maxWidth', props.maxWidth, sizeValue)
-  addArbitraryProp('minHeight', props.minHeight, sizeValue)
-  addArbitraryProp('maxHeight', props.maxHeight, sizeValue)
-  addArbitraryProp('aspectRatio', props.aspectRatio, (value) => value)
+  addArbitraryProp('width', props.width, layoutSizeCss)
+  addArbitraryProp('height', props.height, layoutSizeCss)
+  addArbitraryProp('minWidth', props.minWidth, (value) =>
+    value === 0 ? '0' : layoutSizeCss(value),
+  )
+  addArbitraryProp('maxWidth', props.maxWidth, layoutSizeCss)
+  addArbitraryProp('minHeight', props.minHeight, (value) =>
+    value === 0 ? '0' : layoutSizeCss(value),
+  )
+  addArbitraryProp('maxHeight', props.maxHeight, layoutSizeCss)
+  addArbitraryProp('aspectRatio', props.aspectRatio, (value) =>
+    ASPECT_RATIO_MAP[value],
+  )
 
   addArbitraryProp('flex', props.flex, (value) =>
     typeof value === 'number' ? `${value} ${value} 0%` : value,
@@ -477,27 +520,40 @@ export function resolveBoxStyles(
   addTokenProp(flexWrapStyles as StyleMap, 'flex-wrap', props.flexWrap, (value) => value)
   addArbitraryProp('flexGrow', props.flexGrow, (value) => value)
   addArbitraryProp('flexShrink', props.flexShrink, (value) => value)
-  addArbitraryProp('flexBasis', props.flexBasis, sizeValue)
+  addArbitraryProp('flexBasis', props.flexBasis, (value) =>
+    value === 0 ? '0' : value,
+  )
   addTokenProp(alignItemsStyles as StyleMap, 'align-items', props.alignItems, flexKeyword)
   addTokenProp(alignSelfStyles as StyleMap, 'align-self', props.alignSelf, flexKeyword)
   addTokenProp(justifyContentStyles as StyleMap, 'justify-content', props.justifyContent, flexKeyword)
   addTokenProp(alignContentStyles as StyleMap, 'align-content', props.alignContent, flexKeyword)
 
-  addArbitraryProp('gridTemplateColumns', props.gridTemplateColumns, (value) => value)
-  addArbitraryProp('gridTemplateRows', props.gridTemplateRows, (value) => value)
-  addArbitraryProp('gridTemplateAreas', props.gridTemplateAreas, (value) => value)
-  addArbitraryProp('gridColumn', props.gridColumn, (value) => value)
-  addArbitraryProp('gridRow', props.gridRow, (value) => value)
-  addArbitraryProp('gridArea', props.gridArea, (value) => value)
-  addTokenProp(gridAutoFlowStyles as StyleMap, 'grid-auto-flow', props.gridAutoFlow, (value) => value)
+  addArbitraryProp('gridTemplateColumns', props.gridTemplateColumns, (value) =>
+    GRID_TEMPLATE_COLUMNS_MAP[value],
+  )
+  addArbitraryProp('gridTemplateRows', props.gridTemplateRows, (value) =>
+    GRID_TEMPLATE_ROWS_MAP[value],
+  )
+  addArbitraryProp('gridColumn', props.gridColumn, (value) =>
+    GRID_PLACEMENT_MAP[value],
+  )
+  addArbitraryProp('gridRow', props.gridRow, (value) =>
+    GRID_PLACEMENT_MAP[value],
+  )
+  addTokenProp(
+    gridAutoFlowStyles as StyleMap,
+    'grid-auto-flow',
+    props.gridAutoFlow,
+    (value) => value,
+  )
 
   addTokenProp(positionStyles as StyleMap, 'position', props.position, (value) => value)
-  addArbitraryProp('top', props.top, sizeValue)
-  addArbitraryProp('right', props.right, sizeValue)
-  addArbitraryProp('bottom', props.bottom, sizeValue)
-  addArbitraryProp('left', props.left, sizeValue)
-  addArbitraryProp('inset', props.inset, sizeValue)
-  addArbitraryProp('zIndex', props.zIndex, (value) => value)
+  addArbitraryProp('top', props.top, spacingCss)
+  addArbitraryProp('right', props.right, spacingCss)
+  addArbitraryProp('bottom', props.bottom, spacingCss)
+  addArbitraryProp('left', props.left, spacingCss)
+  addArbitraryProp('inset', props.inset, spacingCss)
+  addArbitraryProp('zIndex', props.zIndex, layerIndexCss)
 
   addArbitraryProp('opacity', props.opacity, (value) => value)
   addTokenProp(cursorStyles as StyleMap, 'cursor', props.cursor, (value) => value)

@@ -257,6 +257,7 @@ export const backgroundColorStyles = stylex.create({
   'bg-page': { backgroundColor: backgroundColors['bg-page'] },
   'bg-card': { backgroundColor: backgroundColors['bg-card'] },
   'bg-popover': { backgroundColor: backgroundColors['bg-popover'] },
+  'bg-subtle': { backgroundColor: backgroundColors['bg-subtle'] },
   'bg-overlay': { backgroundColor: backgroundColors['bg-overlay'] },
   'bg-backdrop': { backgroundColor: backgroundColors['bg-backdrop'] },
   'bg-hover': { backgroundColor: backgroundColors['bg-hover'] },
@@ -265,10 +266,16 @@ export const backgroundColorStyles = stylex.create({
   'bg-disabled': { backgroundColor: backgroundColors['bg-disabled'] },
   'bg-inverse': { backgroundColor: backgroundColors['bg-inverse'] },
   'bg-primary': { backgroundColor: backgroundColors['bg-primary'] },
+  'bg-primary-hover': { backgroundColor: backgroundColors['bg-primary-hover'] },
   'bg-secondary': { backgroundColor: backgroundColors['bg-secondary'] },
   'bg-danger': { backgroundColor: backgroundColors['bg-danger'] },
+  'bg-danger-hover': { backgroundColor: backgroundColors['bg-danger-hover'] },
   'bg-success': { backgroundColor: backgroundColors['bg-success'] },
   'bg-accent': { backgroundColor: backgroundColors['bg-accent'] },
+  'bg-notification-warning': { backgroundColor: backgroundColors['bg-notification-warning'] },
+  'bg-notification-error': { backgroundColor: backgroundColors['bg-notification-error'] },
+  'bg-notification-info': { backgroundColor: backgroundColors['bg-notification-info'] },
+  'bg-notification-loading': { backgroundColor: backgroundColors['bg-notification-loading'] },
 })
 
 export const colorStyles = stylex.create({
@@ -277,12 +284,17 @@ export const colorStyles = stylex.create({
   'text-subtle': { color: textColors['text-subtle'] },
   'text-disabled': { color: textColors['text-disabled'] },
   'text-link': { color: textColors['text-link'] },
+  'text-danger': { color: textColors['text-danger'] },
   'fg-primary': { color: textColors['fg-primary'] },
   'fg-secondary': { color: textColors['fg-secondary'] },
   'fg-danger': { color: textColors['fg-danger'] },
   'fg-success': { color: textColors['fg-success'] },
   'fg-accent': { color: textColors['fg-accent'] },
   'fg-inverse': { color: textColors['fg-inverse'] },
+  'fg-notification-warning': { color: textColors['fg-notification-warning'] },
+  'fg-notification-error': { color: textColors['fg-notification-error'] },
+  'fg-notification-info': { color: textColors['fg-notification-info'] },
+  'fg-notification-loading': { color: textColors['fg-notification-loading'] },
 })
 
 export const borderColorStyles = stylex.create({
@@ -292,6 +304,11 @@ export const borderColorStyles = stylex.create({
   'border-warning': { borderColor: borderColors['border-warning'] },
   'border-danger': { borderColor: borderColors['border-danger'] },
   'border-success': { borderColor: borderColors['border-success'] },
+  'border-danger-subtle': { borderColor: borderColors['border-danger-subtle'] },
+  'border-notification-warning': { borderColor: borderColors['border-notification-warning'] },
+  'border-notification-error': { borderColor: borderColors['border-notification-error'] },
+  'border-notification-info': { borderColor: borderColors['border-notification-info'] },
+  'border-notification-loading': { borderColor: borderColors['border-notification-loading'] },
 })
 
 export const borderRadiusStyles = stylex.create({
@@ -341,6 +358,9 @@ export const borderBottomRightRadiusStyles = stylex.create({
 
 export const boxShadowStyles = stylex.create({
   none: { boxShadow: shadows.none },
+  border: { boxShadow: shadows.border },
+  small: { boxShadow: shadows.small },
+  medium: { boxShadow: shadows.medium },
 })
 
 export const displayStyles = stylex.create({

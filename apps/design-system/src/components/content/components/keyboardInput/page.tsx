@@ -47,7 +47,7 @@ export function KeyboardInputPage(): ReactElement {
 
       <Section
         title="Platform and density"
-        description="Set the platform for the application keymap. Use the small size in dense menus, command bars, and tables."
+        description="Set the platform for the application keymap. The keycap uses the subdued semantic surface; use the small size in dense menus, command bars, and tables."
       >
         <Example source={platformSource}>
           <PlatformExample />

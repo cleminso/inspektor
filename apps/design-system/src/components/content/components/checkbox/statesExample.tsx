@@ -8,6 +8,7 @@ export default function StatesExample(): ReactElement {
       <Checkbox aria-label="Checked" defaultChecked />
       <Checkbox aria-label="Indeterminate" indeterminate />
       <Checkbox aria-label="Disabled" disabled />
+      <Checkbox aria-label="Checked disabled" defaultChecked disabled />
       <Checkbox aria-label="Small" size="s" defaultChecked />
     </>
   );

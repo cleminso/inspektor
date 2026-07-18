@@ -303,7 +303,7 @@
       "description": "Controls the visual treatment and emphasis of the action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 61
+        "line": 67
       }
     },
     {
@@ -314,7 +314,7 @@
       "description": "Controls the button height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 63
+        "line": 69
       }
     },
     {
@@ -324,7 +324,7 @@
       "description": "Makes an icon-only button square. Pair with an accessible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 65
+        "line": 71
       }
     },
     {
@@ -335,7 +335,7 @@
       "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 67
+        "line": 73
       }
     },
     {
@@ -346,7 +346,7 @@
       "description": "Stretches the button to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 69
+        "line": 75
       }
     },
     {
@@ -357,7 +357,7 @@
       "description": "Controls how content is distributed inside the button.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 71
+        "line": 77
       }
     },
     {
@@ -368,7 +368,18 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 73
+        "line": 79
+      }
+    },
+    {
+      "name": "inset",
+      "type": "\"default\" | \"flush\"",
+      "required": false,
+      "defaultValue": "\"default\"",
+      "description": "Controls the inline inset for actions aligned with compact popup content.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 81
       }
     },
     {
@@ -378,7 +389,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 75
+        "line": 83
       }
     },
     {
@@ -388,7 +399,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 77
+        "line": 85
       }
     },
     {
@@ -399,17 +410,17 @@
       "description": "Disables interaction and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 79
+        "line": 87
       }
     },
     {
       "name": "render",
-      "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ButtonState>",
       "required": false,
       "description": "Composes Button behavior and styles onto another element, such as a link.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 81
+        "line": 89
       }
     }
   ],
@@ -1215,27 +1226,27 @@
       }
     }
   ],
-  "toaster": [
+  "toaster": [],
+  "spinner": [
     {
-      "name": "position",
-      "type": "\"top-left\" | \"top-center\" | \"top-right\" | \"bottom-left\" | \"bottom-center\" | \"bottom-right\"",
+      "name": "label",
+      "type": "string",
       "required": false,
-      "defaultValue": "\"bottom-right\"",
-      "description": "Places the application toast stack at a viewport edge.",
+      "description": "Provides an accessible status label. Omit when another control communicates the busy state.",
       "source": {
-        "path": "packages/design-system/src/components/toaster/toaster.tsx",
-        "line": 19
+        "path": "packages/design-system/src/components/spinner/spinner.tsx",
+        "line": 9
       }
     },
     {
-      "name": "closeButton",
-      "type": "boolean",
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
       "required": false,
-      "defaultValue": "true",
-      "description": "Shows a dismiss button on each toast.",
+      "defaultValue": "\"m\"",
+      "description": "Controls the spinner dimensions.",
       "source": {
-        "path": "packages/design-system/src/components/toaster/toaster.tsx",
-        "line": 21
+        "path": "packages/design-system/src/components/spinner/spinner.tsx",
+        "line": 11
       }
     }
   ],
@@ -1443,7 +1454,7 @@
       "description": "Controls the height of the compound input.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 16
+        "line": 17
       }
     },
     {
@@ -1454,7 +1465,7 @@
       "description": "Stretches the group to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 18
+        "line": 19
       }
     },
     {
@@ -1465,7 +1476,7 @@
       "description": "Marks the compound input as invalid. Field.Root supplies this automatically.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 20
+        "line": 21
       }
     },
     {
@@ -1476,7 +1487,7 @@
       "description": "Disables the input and every interactive group member.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 22
+        "line": 23
       }
     }
   ],
@@ -1488,7 +1499,7 @@
       "description": "Static content displayed before the editable value.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 28
+        "line": 29
       }
     }
   ],
@@ -1500,7 +1511,7 @@
       "description": "Static content displayed after the editable value.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 34
+        "line": 35
       }
     }
   ],
@@ -1512,7 +1523,7 @@
       "description": "Accessible name for the action.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 39
+        "line": 40
       }
     },
     {
@@ -1522,7 +1533,7 @@
       "description": "Identifies the input controlled by the action.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -1532,7 +1543,7 @@
       "description": "Exposes toggle state for actions such as password visibility.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -1543,7 +1554,7 @@
       "description": "Disables the action.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -1553,7 +1564,7 @@
       "description": "Runs when the action is activated.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -1563,7 +1574,7 @@
       "description": "Decorative action content.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 49
+        "line": 50
       }
     }
   ],
@@ -1575,7 +1586,7 @@
       "description": "Accessible name that identifies the value controlled by the checkbox.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 54
+        "line": 55
       }
     },
     {
@@ -1585,7 +1596,7 @@
       "description": "Controls whether the option is checked.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 56
+        "line": 57
       }
     },
     {
@@ -1595,7 +1606,7 @@
       "description": "Sets the initial checked state when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 58
+        "line": 59
       }
     },
     {
@@ -1605,7 +1616,7 @@
       "description": "Runs when checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 60
+        "line": 61
       }
     },
     {
@@ -1616,7 +1627,7 @@
       "description": "Disables the checkbox.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 62
+        "line": 63
       }
     },
     {
@@ -1627,7 +1638,7 @@
       "description": "Prevents changes while preserving focus.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 64
+        "line": 65
       }
     },
     {
@@ -1637,7 +1648,7 @@
       "description": "Visible checkbox label.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 66
+        "line": 67
       }
     }
   ],
@@ -3029,7 +3040,7 @@
       "description": "Composes the label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 97
+        "line": 99
       }
     }
   ],
@@ -3041,20 +3052,31 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 102
+        "line": 104
       }
     }
   ],
   "combobox.inputGroup": [
     {
-      "name": "fullWidth",
-      "type": "boolean",
+      "name": "appearance",
+      "type": "\"default\" | \"bare\"",
       "required": false,
-      "defaultValue": "false",
-      "description": "Stretches the input group to the width of its container.",
+      "defaultValue": "\"default\"",
+      "description": "Controls the input-group surface treatment.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 61
+        "line": 64
+      }
+    },
+    {
+      "name": "width",
+      "type": "\"content\" | \"full\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Controls whether the input group follows its content or fills its container.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 66
       }
     }
   ],
@@ -3067,7 +3089,7 @@
       "description": "Content displayed by the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 81
+        "line": 86
       }
     },
     {
@@ -3078,7 +3100,7 @@
       "description": "Controls the trigger treatment.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 83
+        "line": 88
       }
     },
     {
@@ -3089,7 +3111,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 85
+        "line": 90
       }
     },
     {
@@ -3100,19 +3122,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 87
-      }
-    },
-    {
-      "name": "fullWidth",
-      "type": "boolean",
-      "required": false,
-      "defaultValue": "false",
-      "description": "",
-      "deprecated": "Use width=\"full\".",
-      "source": {
-        "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 90
+        "line": 92
       }
     },
     {
@@ -3123,7 +3133,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 92
+        "line": 94
       }
     }
   ],
@@ -3136,7 +3146,7 @@
       "description": "Disables the input action trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 69
+        "line": 74
       }
     }
   ],
@@ -3149,7 +3159,7 @@
       "description": "Keeps the portal mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 107
+        "line": 109
       }
     }
   ],
@@ -3162,7 +3172,7 @@
       "description": "Sets the gap between the control and popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 112
+        "line": 114
       }
     },
     {
@@ -3173,7 +3183,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 114
+        "line": 116
       }
     }
   ],
@@ -3186,7 +3196,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 121
+        "line": 123
       }
     }
   ],
@@ -3198,7 +3208,7 @@
       "description": "Content rendered inside the positioned popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 126
+        "line": 128
       }
     },
     {
@@ -3209,7 +3219,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 128
+        "line": 130
       }
     },
     {
@@ -3220,7 +3230,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 130
+        "line": 132
       }
     },
     {
@@ -3231,7 +3241,7 @@
       "description": "Sets the gap between the control and popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 132
+        "line": 134
       }
     },
     {
@@ -3242,7 +3252,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 134
+        "line": 136
       }
     }
   ],
@@ -3254,7 +3264,7 @@
       "description": "Composes the header layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 142
+        "line": 144
       }
     }
   ],
@@ -3266,7 +3276,7 @@
       "description": "Composes the footer layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 150
+        "line": 152
       }
     }
   ],
@@ -3279,7 +3289,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 160
+        "line": 162
       }
     },
     {
@@ -3289,7 +3299,7 @@
       "description": "Composes the viewport layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 162
+        "line": 164
       }
     }
   ],
@@ -3302,7 +3312,7 @@
       "description": "Accessible label for the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 177
+        "line": 179
       }
     },
     {
@@ -3313,7 +3323,7 @@
       "description": "Keeps the clear action mounted when no value is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 179
+        "line": 181
       }
     },
     {
@@ -3324,7 +3334,7 @@
       "description": "Disables the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 181
+        "line": 183
       }
     }
   ],
@@ -3342,7 +3352,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 186
+        "line": 188
       }
     },
     {
@@ -3353,7 +3363,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 188
+        "line": 190
       }
     }
   ],
@@ -3365,7 +3375,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 193
+        "line": 195
       }
     },
     {
@@ -3375,7 +3385,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 197
       }
     }
   ],
@@ -3388,7 +3398,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 203
+        "line": 205
       }
     }
   ],
@@ -3579,7 +3589,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 102
+        "line": 104
       }
     }
   ],
@@ -3673,7 +3683,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 186
+        "line": 188
       }
     },
     {
@@ -3684,7 +3694,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 188
+        "line": 190
       }
     }
   ],
@@ -3696,7 +3706,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 193
+        "line": 195
       }
     },
     {
@@ -3706,7 +3716,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 197
       }
     }
   ],

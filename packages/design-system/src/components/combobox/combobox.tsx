@@ -56,9 +56,14 @@ export type ComboboxRootProps<Value> = Omit<
   disabled?: boolean;
 };
 
+export type ComboboxInputGroupAppearance = "default" | "bare";
+export type ComboboxInputGroupWidth = "content" | "full";
+
 export interface ComboboxInputGroupProps extends WithoutStyles<BaseCombobox.InputGroup.Props> {
-  /** Stretches the input group to the width of its container. */
-  fullWidth?: boolean;
+  /** Controls the input-group surface treatment. */
+  appearance?: ComboboxInputGroupAppearance;
+  /** Controls whether the input group follows its content or fills its container. */
+  width?: ComboboxInputGroupWidth;
 }
 export type ComboboxInputProps = Omit<WithoutStyles<BaseCombobox.Input.Props>, "size" | "value">;
 export interface ComboboxInputTriggerProps extends Omit<
@@ -85,9 +90,6 @@ export interface ComboboxTriggerProps extends Omit<
   size?: ComboboxTriggerSize;
   /** Constrains the trigger width. */
   width?: ComboboxTriggerWidth;
-  /** Stretches the trigger to its container width. */
-  /** @deprecated Use width="full". */
-  fullWidth?: boolean;
   /** Disables the trigger. */
   disabled?: boolean;
 }
@@ -221,11 +223,12 @@ function ComboboxRoot<Value>({
   );
 }
 
-function ComboboxInputGroup({ fullWidth = false, ...props }: ComboboxInputGroupProps) {
+function ComboboxInputGroup({ appearance = "default", width = "content", ...props }: ComboboxInputGroupProps) {
   const [focusVisible, setFocusVisible] = useState(false);
   const stateStyles = createStateStyleProps<BaseCombobox.InputGroup.State>((state) => [
     comboboxStyles.inputGroup,
-    fullWidth === true && comboboxStyles.inputGroupFullWidth,
+    width === "full" && comboboxStyles.inputGroupWidthFull,
+    appearance === "bare" && comboboxStyles.inputGroupBare,
     focusVisible === true && comboboxStyles.inputGroupFocusVisible,
     state.valid === false && comboboxStyles.inputGroupInvalid,
     state.disabled === true && comboboxStyles.inputGroupDisabled,
@@ -294,11 +297,9 @@ function ComboboxTrigger({
   variant = "ghost",
   size = "m",
   width = "content",
-  fullWidth = false,
   disabled = false,
   ...props
 }: ComboboxTriggerProps) {
-  const resolvedWidth = fullWidth === true ? "full" : width;
   const triggerWidthStyles = {
     content: comboboxStyles.triggerWidthContent,
     s: comboboxStyles.triggerWidthS,
@@ -307,13 +308,13 @@ function ComboboxTrigger({
   } satisfies Record<ComboboxTriggerWidth, unknown>;
   const triggerStyles = createStateStyleProps<BaseCombobox.Trigger.State>(() => [
     comboboxStyles.trigger,
-    triggerWidthStyles[resolvedWidth],
+    triggerWidthStyles[width],
   ]);
   return (
     <Button
       variant={variant}
       size={size}
-      fullWidth={resolvedWidth === "full"}
+      fullWidth={width === "full"}
       justify="start"
       disabled={disabled}
       render={

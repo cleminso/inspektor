@@ -91,7 +91,6 @@ export default function StatusExample(): ReactElement {
                         {item.hash}
                       </Text>
                     }
-                    description={item.status}
                   />
                 </ContextSwitcher.Item>
               )}

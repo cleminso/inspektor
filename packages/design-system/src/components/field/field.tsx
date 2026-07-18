@@ -1,7 +1,7 @@
 import { Field as BaseField } from "@base-ui/react/field";
-import * as stylex from "@stylexjs/stylex";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { FieldContext } from "./fieldContext";
 import { fieldStyles } from "./field.styles";
 
 export interface FieldRootProps extends Omit<BaseField.Root.Props, "className" | "style"> {
@@ -55,14 +55,16 @@ function FieldRoot({ disabled = false, validationMode = "onBlur", ...props }: Fi
   ]);
 
   return (
-    <BaseField.Root
-      {...props}
-      disabled={disabled}
-      validationMode={validationMode}
-      className={stateStyleProps.className}
-      style={stateStyleProps.style}
-      data-slot="field"
-    />
+    <FieldContext.Provider value={{ disabled }}>
+      <BaseField.Root
+        {...props}
+        disabled={disabled}
+        validationMode={validationMode}
+        className={stateStyleProps.className}
+        style={stateStyleProps.style}
+        data-slot="field"
+      />
+    </FieldContext.Provider>
   );
 }
 
@@ -101,11 +103,17 @@ function FieldDescription(props: FieldDescriptionProps) {
 }
 
 function FieldError(props: FieldErrorProps) {
+  const stateStyleProps = createStateStyleProps<BaseField.Error.State>((state) => [
+    fieldStyles.message,
+    fieldStyles.error,
+    state.disabled === true && fieldStyles.disabled,
+  ]);
+
   return (
     <BaseField.Error
       {...props}
-      className={stylex.props(fieldStyles.message, fieldStyles.error).className}
-      style={stylex.props(fieldStyles.message, fieldStyles.error).style}
+      className={stateStyleProps.className}
+      style={stateStyleProps.style}
       data-slot="field-error"
     />
   );

@@ -34,14 +34,16 @@ export default function ControlledExample(): ReactElement {
           <Combobox.InputTrigger />
         </Combobox.InputGroup>
         <Combobox.Content>
-          <Combobox.Empty>No tables found.</Combobox.Empty>
-          <Combobox.List>
-            {(item: Table) => (
-              <Combobox.Item key={item.id} value={item}>
-                <Combobox.ItemText label={item.name} description={item.namespace} />
-              </Combobox.Item>
-            )}
-          </Combobox.List>
+          <Combobox.Viewport>
+            <Combobox.Empty>No tables found.</Combobox.Empty>
+            <Combobox.List>
+              {(item: Table) => (
+                <Combobox.Item key={item.id} value={item}>
+                  <Combobox.ItemText label={item.name} description={item.namespace} />
+                </Combobox.Item>
+              )}
+            </Combobox.List>
+          </Combobox.Viewport>
         </Combobox.Content>
       </Combobox.Root>
     </Field.Root>

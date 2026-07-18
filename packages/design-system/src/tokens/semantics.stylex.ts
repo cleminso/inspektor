@@ -8,6 +8,7 @@ import {
   fontWeights,
   lineHeights,
   palette,
+  dimensions,
 } from './value.stylex'
 
 
@@ -28,13 +29,20 @@ export const backgroundColors = stylex.defineVars({
   'bg-disabled': `light-dark(${palette.gray100}, ${palette.neutral900})`,
 
   // Color roles
-  'bg-primary': `light-dark(${palette.blue600}, ${palette.blue400})`,
-  'bg-primary-hover': `light-dark(${palette.blue700}, ${palette.blue300})`,
+  'bg-primary': `light-dark(${palette.blue600}, ${palette.blue500})`,
+  'bg-primary-hover': `light-dark(${palette.blue700}, ${palette.blue400})`,
   'bg-secondary': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'bg-danger': `light-dark(${palette.red500}, ${palette.red400})`,
-  'bg-danger-hover': `light-dark(${palette.red600}, ${palette.red300})`,
+  'bg-secondary-hover': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+  'bg-danger': `light-dark(${palette.red100}, ${palette.red950})`,
+  'bg-danger-hover': `light-dark(${palette.red200}, ${palette.red900})`,
   'bg-success': `light-dark(${palette.green600}, ${palette.green400})`,
   'bg-accent': `light-dark(${palette.yellow500}, ${palette.yellow400})`,
+
+  // Notifications
+  'bg-notification-warning': `light-dark(${palette.orange100}, ${palette.orange900})`,
+  'bg-notification-error': `light-dark(${palette.red100}, ${palette.red900})`,
+  'bg-notification-info': `light-dark(${palette.blue100}, ${palette.blue900})`,
+  'bg-notification-loading': `light-dark(${palette.gray100}, ${palette.neutral900})`,
 } as const)
 
 export const textColors = stylex.defineVars({
@@ -44,15 +52,21 @@ export const textColors = stylex.defineVars({
   'text-subtle': `light-dark(${palette.gray500}, ${palette.neutral500})`,
   'text-disabled': `light-dark(${palette.gray400}, ${palette.neutral600})`,
   'text-link': `light-dark(${palette.blue600}, ${palette.blue400})`,
-  'text-danger': `light-dark(${palette.red600}, ${palette.red400})`,
+  'text-danger': `light-dark(${palette.red600}, ${palette.red500})`,
 
   // Text on color-role surfaces
   'fg-primary': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'fg-secondary': `light-dark(${palette.gray900}, ${palette.neutral50})`,
-  'fg-danger': `light-dark(${palette.gray50}, ${palette.gray50})`,
+  'fg-danger': `light-dark(${palette.red600}, ${palette.red500})`,
   'fg-success': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'fg-accent': `light-dark(${palette.gray900}, ${palette.neutral50})`,
   'fg-inverse': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+
+  // Notifications
+  'fg-notification-warning': `light-dark(${palette.orange700}, ${palette.orange300})`,
+  'fg-notification-error': `light-dark(${palette.red700}, ${palette.red300})`,
+  'fg-notification-info': `light-dark(${palette.blue700}, ${palette.blue300})`,
+  'fg-notification-loading': `light-dark(${palette.gray700}, ${palette.neutral300})`,
 } as const)
 
 
@@ -65,6 +79,39 @@ export const borderColors = stylex.defineVars({
   'border-danger': `light-dark(${palette.red500}, ${palette.red400})`,
   'border-danger-subtle': `light-dark(${palette.red200}, ${palette.red900})`,
   'border-success': `light-dark(${palette.green600}, ${palette.green300})`,
+
+  // Notifications
+  'border-notification-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
+  'border-notification-error': `light-dark(${palette.red500}, ${palette.red400})`,
+  'border-notification-info': `light-dark(${palette.blue600}, ${palette.blue400})`,
+  'border-notification-loading': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+} as const)
+
+export const spatial = stylex.defineVars({
+  'control-height-s': dimensions[24],
+  'control-height-m': dimensions[28],
+  'control-height-l': dimensions[32],
+  'icon-size-xs': dimensions[12],
+  'icon-size-s': dimensions[14],
+  'icon-size-m': dimensions[16],
+  'icon-size-l': dimensions[20],
+  'focus-ring-width': dimensions[2],
+  'popup-width-s': dimensions[240],
+  'popup-width-m': dimensions[320],
+  'popup-width-l': dimensions[400],
+  'label-width': dimensions[100],
+  'tooltip-width': dimensions[180],
+  'content-measure': dimensions[680],
+  'content-width': dimensions[1220],
+  'content-width-wide': dimensions[1440],
+  'grid-track-s': dimensions[160],
+  'grid-track-m': dimensions[240],
+  'example-height': dimensions[120],
+  'panel-height': dimensions[280],
+  'viewport-height-s': dimensions[160],
+  'viewport-height-m': dimensions[240],
+  'viewport-height-l': dimensions[320],
+  'panel-handle-size': dimensions[1],
 } as const)
 
 const md = '@media (min-width: 768px)'

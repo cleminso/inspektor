@@ -172,7 +172,7 @@ function ContextSwitcherSearch({ label, placeholder }: ContextSwitcherSearchProp
   return (
     <>
       <Combobox.PopupHeader>
-        <Combobox.InputGroup fullWidth>
+        <Combobox.InputGroup appearance="bare" width="full">
           <Combobox.Input aria-label={label} placeholder={placeholder} />
         </Combobox.InputGroup>
       </Combobox.PopupHeader>

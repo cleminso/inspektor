@@ -8,11 +8,12 @@ import {
   lineHeights,
   spacing,
 } from "../../tokens/value.stylex";
+import { spatial } from "../../tokens/semantics.stylex";
 import { keyboardInputVars } from "./keyboardInputVars.stylex";
 
 export const keyboardInputStyles = stylex.create({
   root: {
-    borderRadius: borderRadii.s,
+    borderRadius: borderRadii.xs,
     paddingInline: spacing.xs,
     alignItems: "center",
     backgroundColor: keyboardInputVars.backgroundColor,
@@ -27,8 +28,8 @@ export const keyboardInputStyles = stylex.create({
     lineHeight: lineHeights.none,
     userSelect: "none",
     whiteSpace: "nowrap",
-    minHeight: 24,
-    minWidth: 24,
+    minHeight: spatial["control-height-s"],
+    minWidth: spatial["control-height-s"],
   },
   glyph: {
     display: "inline-block",
@@ -38,7 +39,7 @@ export const keyboardInputStyles = stylex.create({
   small: {
     paddingInline: spacing.xs,
     fontSize: fontSizes[1],
-    minHeight: 20,
-    minWidth: 20,
+    minHeight: spatial["icon-size-l"],
+    minWidth: spatial["icon-size-l"],
   },
 });

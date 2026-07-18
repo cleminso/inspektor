@@ -26,7 +26,7 @@ export function ToggleGroupPage(): ReactElement {
 
       <Section
         title="View switcher"
-        description="Use a controlled single-selection group when one view must remain selected."
+        description="Use a controlled single-selection group when one view must remain selected. Selected surfaces match hover because the pressed indicator communicates persistence."
       >
         <Example source={viewSwitcherSource}>
           <ViewSwitcherExample />

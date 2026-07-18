@@ -13,6 +13,9 @@ export default function BasicExample(): ReactElement {
       >
         Error
       </Button>
+      <Button variant="outline" onClick={() => toasts.message("Row deleted", { undo: () => undefined })}>
+        Undo
+      </Button>
       <Toaster />
     </Box>
   );

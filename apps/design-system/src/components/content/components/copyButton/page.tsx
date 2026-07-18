@@ -36,7 +36,7 @@ export function CopyButtonPage(): ReactElement {
 
       <Section
         title="Variants and sizes"
-        description="Use compact ghost actions beside values and stronger treatments when the copy action stands alone."
+        description="Use compact ghost actions beside values and stronger treatments when the copy action stands alone. Copy actions inherit Button's disabled and pressed treatment."
       >
         <Example source={variantsSource}>
           <VariantsExample />

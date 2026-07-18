@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex'
 import {
   backgroundColors,
   borderColors,
+  spatial,
   textColors,
 } from '../../tokens/semantics.stylex'
 import {
@@ -21,7 +22,7 @@ export const toggleGroupStyles = stylex.create({
     gap: spacing.xxs,
     overflow: 'clip',
     alignItems: 'stretch',
-    backgroundColor: backgroundColors['bg-secondary'],
+    backgroundColor: backgroundColors['bg-subtle'],
     display: 'inline-flex',
     width: 'fit-content',
   },
@@ -49,6 +50,7 @@ export const toggleGroupStyles = stylex.create({
     backgroundColor: {
       default: 'transparent',
       ':hover': backgroundColors['bg-hover'],
+      ':active': backgroundColors['bg-pressed'],
     },
     color: {
       default: textColors['text-muted'],
@@ -68,7 +70,7 @@ export const toggleGroupStyles = stylex.create({
       default: 'none',
       ':focus-visible': 'solid',
     },
-    outlineWidth: 2,
+    outlineWidth: spatial['focus-ring-width'],
     userSelect: 'none',
     whiteSpace: 'nowrap',
     height: 28,
@@ -76,8 +78,9 @@ export const toggleGroupStyles = stylex.create({
   itemPressed: {
     borderColor: borderColors['border'],
     backgroundColor: {
-      default: backgroundColors['bg-selected'],
-      ':hover': backgroundColors['bg-selected'],
+      default: backgroundColors['bg-popover'],
+      ':hover': backgroundColors['bg-popover'],
+      ':active': backgroundColors['bg-popover'],
     },
     color: textColors['text-default'],
   },
@@ -87,7 +90,24 @@ export const toggleGroupStyles = stylex.create({
     flexShrink: '1',
   },
   itemDisabled: {
+    borderColor: {
+      default: 'transparent',
+      ':hover': 'transparent',
+      ':active': 'transparent',
+    },
+    backgroundColor: {
+      default: backgroundColors['bg-disabled'],
+      ':hover': backgroundColors['bg-disabled'],
+      ':active': backgroundColors['bg-disabled'],
+    },
     color: textColors['text-disabled'],
     cursor: 'not-allowed',
+  },
+  itemPressedDisabled: {
+    borderColor: {
+      default: borderColors['border-secondary'],
+      ':hover': borderColors['border-secondary'],
+      ':active': borderColors['border-secondary'],
+    },
   },
 })

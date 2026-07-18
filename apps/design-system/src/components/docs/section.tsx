@@ -11,11 +11,11 @@ export function Section({ title, description, children }: SectionProps): ReactEl
   return (
     <Box as="section" flexDirection="column" gap="xl">
       <Box flexDirection="column" gap="xs">
-        <Text as="h2" variant="heading-xs" style={{ margin: 0 }}>
+        <Text as="h2" variant="heading-xs">
           {title}
         </Text>
         {description !== undefined ? (
-          <Text variant="body" color="muted" style={{ margin: 0 }}>
+          <Text variant="body" color="muted">
             {description}
           </Text>
         ) : null}

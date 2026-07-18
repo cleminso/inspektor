@@ -6,6 +6,7 @@ import { useContext, useState, type MouseEventHandler, type ReactNode } from "re
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { Checkbox } from "../checkbox/checkbox";
 import type { CheckboxProps } from "../checkbox/checkbox";
+import { FieldContext } from "../field/fieldContext";
 import type { InputSize } from "../input/input";
 import { InputGroupContext } from "./inputGroupContext";
 import { inputGroupStyles } from "./inputGroup.styles";
@@ -85,6 +86,8 @@ function InputGroupRoot({
   disabled = false,
   children,
 }: InputGroupRootProps) {
+  const field = useContext(FieldContext);
+  const effectiveDisabled = disabled === true || field?.disabled === true;
   const [focusVisible, setFocusVisible] = useState(false);
   const rootStyleProps = stylex.props(
     inputGroupStyles.root,
@@ -92,15 +95,16 @@ function InputGroupRoot({
     sizeStyles[size],
     fullWidth === true && inputGroupStyles.fullWidth,
     invalid === true && inputGroupStyles.invalid,
-    disabled === true && inputGroupStyles.disabled,
+    effectiveDisabled === true && inputGroupStyles.disabled,
   );
 
   return (
-    <InputGroupContext.Provider value={{ disabled, size }}>
+    <InputGroupContext.Provider value={{ disabled: effectiveDisabled, size }}>
       <div
         {...rootStyleProps}
         data-slot="input-group"
         data-invalid={invalid === true ? "" : undefined}
+        data-disabled={effectiveDisabled === true ? "" : undefined}
         data-focus-visible={focusVisible === true ? "" : undefined}
         onFocusCapture={(event) => {
           setFocusVisible(event.target instanceof HTMLElement && event.target.matches(":focus-visible"));
@@ -149,6 +153,7 @@ function InputGroupAction({
   const stateStyleProps = createStateStyleProps<BaseButton.State>(() => [
     inputGroupStyles.action,
     actionSizeStyles[size],
+    pressed === true && inputGroupStyles.actionPressed,
     effectiveDisabled === true && inputGroupStyles.memberDisabled,
   ]);
 
@@ -162,6 +167,7 @@ function InputGroupAction({
       onClick={onClick}
       {...stateStyleProps}
       data-slot="input-group-action"
+      data-pressed={pressed === true ? "" : undefined}
     >
       {children}
     </BaseButton>

@@ -18,6 +18,7 @@ import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
+import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
@@ -78,6 +79,11 @@ const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
 const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
   id: '/components/switch',
   path: '/components/switch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsSpinnerRoute = ComponentsSpinnerRouteImport.update({
+  id: '/components/spinner',
+  path: '/components/spinner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/spinner'
     | '/components/switch'
     | '/components/text-field'
     | '/components/textarea'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/spinner'
     | '/components/switch'
     | '/components/text-field'
     | '/components/textarea'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/spinner'
     | '/components/switch'
     | '/components/text-field'
     | '/components/textarea'
@@ -347,6 +359,7 @@ export interface RootRouteChildren {
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
+  ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
@@ -420,6 +433,13 @@ declare module '@tanstack/react-router' {
       path: '/components/switch'
       fullPath: '/components/switch'
       preLoaderRoute: typeof ComponentsSwitchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/spinner': {
+      id: '/components/spinner'
+      path: '/components/spinner'
+      fullPath: '/components/spinner'
+      preLoaderRoute: typeof ComponentsSpinnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/select': {
@@ -555,6 +575,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
+  ComponentsSpinnerRoute: ComponentsSpinnerRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,

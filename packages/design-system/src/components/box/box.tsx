@@ -1,3 +1,5 @@
+'use client'
+
 // react rendering and DOM prop handling
 import * as stylex from '@stylexjs/stylex'
 import React, { useId } from 'react'
@@ -32,21 +34,21 @@ const NON_FLEX_DEFAULT_ELEMENTS = new Set<BoxElement>([
 
 type BoxOwnProps<E extends BoxElement = 'div'> = BoxStyleProps & {
   as?: E
-  className?: string
   children?: React.ReactNode
+  /** Applies an auditable integration class when the constrained Box API cannot represent a requirement. */
+  unsafeClassName?: string
 }
 
 export type BoxProps<E extends BoxElement = 'div'> = BoxOwnProps<E> &
-  Omit<React.ComponentPropsWithoutRef<E>, keyof BoxOwnProps<E>>
+  Omit<React.ComponentPropsWithoutRef<E>, keyof BoxOwnProps<E> | 'className' | 'style'>
 
 function BoxInner<E extends BoxElement = 'div'>(
   {
     as,
-    className,
     children,
-    style: styleProp,
+    unsafeClassName,
     ...rest
-  }: BoxProps<E> & { style?: React.CSSProperties },
+  }: BoxProps<E>,
   ref: React.ForwardedRef<HTMLElement>,
 ) {
   const id = useId()
@@ -59,7 +61,7 @@ function BoxInner<E extends BoxElement = 'div'>(
   for (const [key, value] of Object.entries(rest)) {
     if (BOX_STYLE_PROP_KEYS.has(key)) {
       styleProps[key] = value
-    } else {
+    } else if (key !== 'className' && key !== 'style') {
       domProps[key] = value
     }
   }
@@ -80,9 +82,8 @@ function BoxInner<E extends BoxElement = 'div'>(
     stylexStyles.length > 0 ? stylex.props(...stylexStyles) : null
 
   const mergedStyle = {
-    ...(stylexProps?.style ?? {}),
+    ...stylexProps?.style,
     ...inlineStyle,
-    ...styleProp,
   }
 
   const hasStyle = Object.keys(mergedStyle).length > 0
@@ -91,7 +92,7 @@ function BoxInner<E extends BoxElement = 'div'>(
     [
       stylexProps?.className ?? null,
       responsiveCSS !== null ? scopeClass : null,
-      className,
+      unsafeClassName ?? null,
     ]
       .filter(Boolean)
       .join(' ') || undefined
@@ -114,5 +115,5 @@ function BoxInner<E extends BoxElement = 'div'>(
 }
 
 export const Box = React.forwardRef(BoxInner) as <E extends BoxElement = 'div'>(
-  props: BoxProps<E> & { ref?: React.ForwardedRef<HTMLElement> },
+  props: BoxProps<E> & { ref?: React.ForwardedRef<React.ComponentRef<E>> },
 ) => React.ReactElement | null

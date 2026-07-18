@@ -1,4 +1,4 @@
-import { Text, Toaster, toasts } from "@inspector/ds";
+import { Box, Text, Toaster, toasts } from "@inspector/ds";
 import { paletteValues, type PaletteToken } from "@inspector/ds/theme";
 import * as stylex from "@stylexjs/stylex";
 import { type ReactElement } from "react";
@@ -110,16 +110,23 @@ function ColorSwatchButton({ swatch }: { swatch: ColorSwatch }): ReactElement {
 
 function ScaleStepHeader(): ReactElement {
   return (
-    <div aria-hidden="true" {...stylex.props(styles.stepHeader)}>
-      <span {...stylex.props(styles.labelColumn)} />
-      <div {...stylex.props(styles.swatchList)}>
+    <Box
+      aria-hidden="true"
+      display={{ base: "none", md: "grid" }}
+      gridTemplateColumns="label-content"
+      alignItems="center"
+      gap="m"
+      width="full"
+    >
+      <Box as="span" />
+      <Box minWidth={0} gap={{ base: "xs", md: "m" }} width="full">
         {scaleSteps.map((step) => (
           <span key={step} {...stylex.props(styles.stepHeaderItem)}>
             {step}
           </span>
         ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
 
@@ -127,18 +134,20 @@ function ColorScaleRow({ scale }: { scale: ColorScale }): ReactElement {
   const labelId = `color-scale-${scale.label.toLowerCase().replaceAll(" ", "-")}`;
 
   return (
-    <div {...stylex.props(styles.scaleRow)}>
-      <div {...stylex.props(styles.labelColumn)}>
-        <Text id={labelId} as="h3" variant="title" {...stylex.props(styles.scaleLabel)}>
-          {scale.label}
-        </Text>
-      </div>
+    <Box
+      display="grid"
+      gridTemplateColumns={{ base: "one", md: "label-content" }}
+      alignItems={{ base: "start", md: "center" }}
+      gap="m"
+      width="full"
+    >
+      <Text id={labelId} as="h3" variant="title">{scale.label}</Text>
       <ul aria-describedby={labelId} {...stylex.props(styles.swatchList)}>
         {scale.swatches.map((swatch) => (
           <ColorSwatchButton key={swatch.token} swatch={swatch} />
         ))}
       </ul>
-    </div>
+    </Box>
   );
 }
 
@@ -160,12 +169,12 @@ export function ColorFoundationPage(): ReactElement {
           title="Scales"
           description="Primitive color scales from value.stylex.ts. Select a swatch to copy its OKLCH value. Light mode shows gray scales; dark mode shows neutral scales."
         >
-          <div {...stylex.props(styles.scaleRows)}>
+          <Box flexDirection="column" gap="2xl" paddingBottom="xs">
             <ScaleStepHeader />
             {scales.map((scale) => (
               <ColorScaleRow key={scale.label} scale={scale} />
             ))}
-          </div>
+          </Box>
         </Section>
 
         {/*<Section
@@ -182,38 +191,6 @@ export function ColorFoundationPage(): ReactElement {
 }
 
 const styles = stylex.create({
-  scaleRows: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 24,
-    paddingBottom: 4,
-  },
-  scaleRow: {
-    alignItems: {
-      default: "flex-start",
-      "@media (min-width: 768px)": "center",
-    },
-    display: "flex",
-    flexDirection: {
-      default: "column",
-      "@media (min-width: 768px)": "row",
-    },
-    gap: 8,
-    width: "100%",
-  },
-  labelColumn: {
-    flexShrink: 0,
-    width: {
-      default: "100%",
-      "@media (min-width: 768px)": 100,
-    },
-  },
-  scaleLabel: {
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "20px",
-    margin: 0,
-  },
   swatchList: {
     display: "flex",
     gap: {
@@ -224,15 +201,6 @@ const styles = stylex.create({
     margin: 0,
     minWidth: 0,
     padding: 0,
-    width: "100%",
-  },
-  stepHeader: {
-    alignItems: "center",
-    display: {
-      default: "none",
-      "@media (min-width: 768px)": "flex",
-    },
-    gap: 8,
     width: "100%",
   },
   swatchItem: {

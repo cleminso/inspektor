@@ -6,6 +6,7 @@ export const buttonPropNames = [
   "fullWidth",
   "justify",
   "radius",
+  "inset",
   "prefix",
   "suffix",
   "disabled",

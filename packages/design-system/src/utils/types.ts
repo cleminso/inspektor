@@ -9,6 +9,16 @@ import type {
   ShadowToken,
   SpacingToken,
 } from '../tokens/value.stylex'
+import { layerIndexes } from '../tokens/layers.stylex'
+import { spatial } from '../tokens/semantics.stylex'
+
+type StyleXTokenKeys<T> = Exclude<
+  keyof T,
+  '__opaqueId' | '__tokens' | symbol | 'toString' | 'valueOf' | 'description'
+>
+
+type SpatialToken = StyleXTokenKeys<typeof spatial>
+type LayerIndex = keyof typeof layerIndexes
 
 export type PseudoState =
   | 'hover'
@@ -70,11 +80,11 @@ export interface BorderProps {
   borderTopRightRadius?: ResponsiveValue<BorderRadiusToken>
   borderBottomLeftRadius?: ResponsiveValue<BorderRadiusToken>
   borderBottomRightRadius?: ResponsiveValue<BorderRadiusToken>
-  borderWidth?: ResponsiveValue<number>
-  borderTopWidth?: ResponsiveValue<number>
-  borderRightWidth?: ResponsiveValue<number>
-  borderBottomWidth?: ResponsiveValue<number>
-  borderLeftWidth?: ResponsiveValue<number>
+  borderWidth?: ResponsiveValue<0 | 1>
+  borderTopWidth?: ResponsiveValue<0 | 1>
+  borderRightWidth?: ResponsiveValue<0 | 1>
+  borderBottomWidth?: ResponsiveValue<0 | 1>
+  borderLeftWidth?: ResponsiveValue<0 | 1>
   borderStyle?: ResponsiveValue<'solid' | 'dashed' | 'dotted' | 'none'>
 }
 
@@ -97,24 +107,24 @@ export interface LayoutProps {
   overflow?: ResponsiveValue<'hidden' | 'auto' | 'scroll' | 'visible'>
   overflowX?: ResponsiveValue<'hidden' | 'auto' | 'scroll' | 'visible'>
   overflowY?: ResponsiveValue<'hidden' | 'auto' | 'scroll' | 'visible'>
-  width?: ResponsiveValue<string | number>
-  height?: ResponsiveValue<string | number>
-  minWidth?: ResponsiveValue<string | number>
-  maxWidth?: ResponsiveValue<string | number>
-  minHeight?: ResponsiveValue<string | number>
-  maxHeight?: ResponsiveValue<string | number>
-  aspectRatio?: ResponsiveValue<string>
+  width?: ResponsiveValue<SpatialToken | 'full'>
+  height?: ResponsiveValue<SpatialToken | 'full'>
+  minWidth?: ResponsiveValue<0 | SpatialToken | 'full'>
+  maxWidth?: ResponsiveValue<SpatialToken | 'full'>
+  minHeight?: ResponsiveValue<0 | SpatialToken | 'full'>
+  maxHeight?: ResponsiveValue<SpatialToken | 'full'>
+  aspectRatio?: ResponsiveValue<'square' | 'landscape' | 'portrait' | 'video'>
 }
 
 export interface FlexProps {
-  flex?: ResponsiveValue<number | string>
+  flex?: ResponsiveValue<0 | 1 | 'none'>
   flexDirection?: ResponsiveValue<
     'row' | 'column' | 'row-reverse' | 'column-reverse'
   >
   flexWrap?: ResponsiveValue<'wrap' | 'nowrap' | 'wrap-reverse'>
-  flexGrow?: ResponsiveValue<number>
-  flexShrink?: ResponsiveValue<number>
-  flexBasis?: ResponsiveValue<string | number>
+  flexGrow?: ResponsiveValue<0 | 1>
+  flexShrink?: ResponsiveValue<0 | 1>
+  flexBasis?: ResponsiveValue<0 | 'auto'>
   alignItems?: ResponsiveValue<
     'start' | 'end' | 'center' | 'baseline' | 'stretch'
   >
@@ -130,12 +140,16 @@ export interface FlexProps {
 }
 
 export interface GridProps {
-  gridTemplateColumns?: ResponsiveValue<string>
-  gridTemplateRows?: ResponsiveValue<string>
-  gridTemplateAreas?: ResponsiveValue<string>
-  gridColumn?: ResponsiveValue<string | number>
-  gridRow?: ResponsiveValue<string | number>
-  gridArea?: ResponsiveValue<string>
+  gridTemplateColumns?: ResponsiveValue<
+    'one' | 'two' | 'three' | 'four' | 'auto-fit-s' | 'auto-fit-m' | 'label-content'
+  >
+  gridTemplateRows?: ResponsiveValue<'one' | 'two' | 'three' | 'four'>
+  gridColumn?: ResponsiveValue<
+    'auto' | 'span-1' | 'span-2' | 'span-3' | 'span-4' | 'full'
+  >
+  gridRow?: ResponsiveValue<
+    'auto' | 'span-1' | 'span-2' | 'span-3' | 'span-4' | 'full'
+  >
   gridAutoFlow?: ResponsiveValue<
     'row' | 'column' | 'dense' | 'row-dense' | 'column-dense'
   >
@@ -145,17 +159,17 @@ export interface PositionProps {
   position?: ResponsiveValue<
     'relative' | 'absolute' | 'fixed' | 'sticky' | 'static'
   >
-  top?: ResponsiveValue<string | number>
-  right?: ResponsiveValue<string | number>
-  bottom?: ResponsiveValue<string | number>
-  left?: ResponsiveValue<string | number>
-  inset?: ResponsiveValue<string | number>
-  zIndex?: ResponsiveValue<number | string>
+  top?: ResponsiveValue<SpacingToken>
+  right?: ResponsiveValue<SpacingToken>
+  bottom?: ResponsiveValue<SpacingToken>
+  left?: ResponsiveValue<SpacingToken>
+  inset?: ResponsiveValue<SpacingToken>
+  zIndex?: ResponsiveValue<LayerIndex>
 }
 
 
 export interface VisualProps {
-  opacity?: ResponsiveValue<number>
+  opacity?: ResponsiveValue<0 | 1>
   cursor?: ResponsiveValue<
     | 'pointer'
     | 'default'

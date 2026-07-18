@@ -48,10 +48,11 @@ export function Switch({
   const rootStyleProps = createStateStyleProps<BaseSwitch.Root.State>((state) => [
     switchStyles.root,
     size === 's' ? switchStyles.rootSizeS : switchStyles.rootSizeM,
-    state.checked === true && switchStyles.rootChecked,
+    state.checked === true && state.readOnly === false && switchStyles.rootChecked,
+    state.checked === true && state.readOnly === true && switchStyles.rootCheckedReadOnly,
     state.valid === false && switchStyles.rootInvalid,
     state.disabled === true && switchStyles.rootDisabled,
-    state.readOnly === true && switchStyles.rootReadOnly,
+    state.readOnly === true && state.checked === false && switchStyles.rootReadOnly,
   ])
   const thumbStyleProps = createStateStyleProps<BaseSwitch.Thumb.State>((state) => [
     switchStyles.thumb,

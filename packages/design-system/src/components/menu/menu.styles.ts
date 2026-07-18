@@ -54,12 +54,13 @@ export const menuStyles = stylex.create({
   },
   positioner: { outline: "none", zIndex: layerIndexes.popup },
   popup: {
+    padding: spacing.xxs,
     borderColor: borderColors.border,
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
+    gap: spacing.xxs,
     outline: "none",
-    paddingBlock: spacing.xxs,
     backgroundColor: backgroundColors["bg-popover"],
     color: textColors["text-default"],
     transformOrigin: "var(--transform-origin)",
@@ -71,7 +72,6 @@ export const menuStyles = stylex.create({
   item: {
     borderRadius: borderRadii.xs,
     gap: spacing.m,
-    marginInline: spacing.xxs,
     outline: "none",
     paddingInline: spacing.xs,
     alignItems: "center",

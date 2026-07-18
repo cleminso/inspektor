@@ -22,14 +22,14 @@ export function PageHeader({ title, description, source }: PageHeaderProps): Rea
       borderColor="border"
     >
       <Box flexDirection="row" alignItems="center" justifyContent="between" gap="xl">
-        <Text as="h1" variant="heading-s" style={{ margin: 0 }}>
+        <Text as="h1" variant="heading-s">
           {title}
         </Text>
         {source !== undefined ? <SourceLink source={source} /> : null}
       </Box>
-      <Text variant="body" color="muted" style={{ margin: 0, maxWidth: 680 }}>
-        {description}
-      </Text>
+      <Box display="block" maxWidth="content-measure">
+        <Text variant="body" color="muted">{description}</Text>
+      </Box>
     </Box>
   );
 }

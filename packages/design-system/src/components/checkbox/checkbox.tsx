@@ -58,6 +58,9 @@ export function Checkbox({
     (state.checked === true || state.indeterminate === true) && checkboxStyles.selected,
     state.valid === false && checkboxStyles.invalid,
     state.disabled === true && checkboxStyles.disabled,
+    state.disabled === true &&
+      (state.checked === true || state.indeterminate === true) &&
+      checkboxStyles.selectedDisabled,
     state.readOnly === true && checkboxStyles.readOnly,
   ]);
   const indicatorStylexProps = stylex.props(checkboxStyles.indicator);

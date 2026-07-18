@@ -4,6 +4,7 @@ import {
   backgroundColors,
   borderColors,
   textColors,
+  spatial,
 } from "../../tokens/semantics.stylex";
 import { borderRadii } from "../../tokens/value.stylex";
 
@@ -31,7 +32,7 @@ export const checkboxStyles = stylex.create({
     outlineStyle: "solid",
     outlineWidth: {
       default: 0,
-      ":focus-visible": 2,
+      ":focus-visible": spatial["focus-ring-width"],
     },
   },
   sizeS: {
@@ -51,9 +52,13 @@ export const checkboxStyles = stylex.create({
     borderColor: borderColors["border-danger"],
   },
   disabled: {
+    borderColor: borderColors["border-secondary"],
     backgroundColor: backgroundColors["bg-disabled"],
     color: textColors["text-disabled"],
     cursor: "not-allowed",
+  },
+  selectedDisabled: {
+    borderColor: borderColors["border-secondary"],
   },
   readOnly: {
     cursor: "default",

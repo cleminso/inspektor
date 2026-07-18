@@ -1,5 +1,4 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
+import { Button as BaseButton } from '@base-ui/react/button'
 import * as stylex from '@stylexjs/stylex'
 import { useContext } from 'react'
 import type React from 'react'
@@ -7,6 +6,7 @@ import type React from 'react'
 import { buttonGroupStyles } from '../buttonGroup/buttonGroup.styles'
 import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
 import { Spinner } from '../spinner/spinner'
+import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { buttonStyles } from './button.styles'
 
 export type ButtonVariant =
@@ -21,6 +21,7 @@ export type ButtonSize = 's' | 'm' | 'l'
 export type ButtonShape = 'square'
 export type ButtonJustify = 'center' | 'start' | 'between'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm' | 'l' | 'xl'
+export type ButtonInset = 'default' | 'flush'
 
 const variantStyles = {
   primary: buttonStyles.primary,
@@ -52,10 +53,15 @@ const radiusStyles = {
   xl: buttonStyles.radiusXL,
 } satisfies Record<ButtonRadius, unknown>
 
+const insetStyles = {
+  default: undefined,
+  flush: buttonStyles.insetFlush,
+} satisfies Record<ButtonInset, unknown>
+
 export interface ButtonProps
   extends Omit<
-    useRender.ComponentProps<'button'>,
-    'className' | 'prefix' | 'style'
+    BaseButton.Props,
+    'className' | 'focusableWhenDisabled' | 'nativeButton' | 'prefix' | 'style'
   > {
   /** Controls the visual treatment and emphasis of the action. */
   variant?: ButtonVariant
@@ -71,14 +77,16 @@ export interface ButtonProps
   justify?: ButtonJustify
   /** Selects a design-system corner radius. */
   radius?: ButtonRadius
+  /** Controls the inline inset for actions aligned with compact popup content. */
+  inset?: ButtonInset
   /** Renders decorative content before the visible label. */
   prefix?: React.ReactNode
   /** Renders decorative content after the visible label. */
   suffix?: React.ReactNode
   /** Disables interaction and exposes the disabled state to assistive technology. */
-  disabled?: useRender.ComponentProps<'button'>['disabled']
+  disabled?: BaseButton.Props['disabled']
   /** Composes Button behavior and styles onto another element, such as a link. */
-  render?: useRender.ComponentProps<'button'>['render']
+  render?: BaseButton.Props['render']
 }
 
 export function Button({
@@ -89,62 +97,52 @@ export function Button({
   fullWidth = false,
   justify = 'center',
   radius = 'xs',
+  inset = 'default',
   prefix,
   suffix,
   disabled = false,
   render,
   children,
   type = 'button',
-  onClick,
   ...props
 }: ButtonProps) {
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const isDisabled = disabled === true
   const isInteractionBlocked = isDisabled === true || loading === true
-  const rootStylexProps = stylex.props(
+  const stateStyleProps = createStateStyleProps<BaseButton.State>((state) => [
     buttonStyles.base,
     variantStyles[variant],
     sizeStyles[size],
     shape === 'square' && buttonStyles.square,
     radiusStyles[radius],
+    insetStyles[inset],
     buttonGroupOrientation !== null && buttonGroupStyles.member,
     buttonGroupOrientation === 'horizontal' && buttonGroupStyles.memberHorizontal,
     buttonGroupOrientation === 'vertical' && buttonGroupStyles.memberVertical,
     fullWidth === true && buttonStyles.fullWidth,
     justifyStyles[justify],
-    isInteractionBlocked === true && buttonStyles.disabled,
-  )
-  const contentStylexProps = stylex.props(buttonStyles.content)
-  const iconSlotStylexProps = stylex.props(buttonStyles.iconSlot)
+    state.disabled === true && buttonStyles.disabled,
+  ])
 
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
-    if (isInteractionBlocked === true) {
-      event.preventDefault()
-      event.stopPropagation()
-      return
-    }
-
-    onClick?.(event)
-  }
-
-  const defaultProps = {
-    className: rootStylexProps.className,
-    style: rootStylexProps.style,
-    disabled: isDisabled,
-    'aria-busy': loading === true ? true : undefined,
-    'aria-disabled': isInteractionBlocked === true ? true : undefined,
-    'data-slot': 'button',
-    'data-size': size,
-    'data-radius': radius,
-    'data-shape': shape,
-    'data-variant': variant,
-    'data-loading': loading === true ? '' : undefined,
-    'data-full-width': fullWidth === true ? '' : undefined,
-    onClick: handleClick,
-    children: (
+  return (
+    <BaseButton
+      {...props}
+      disabled={isInteractionBlocked}
+      focusableWhenDisabled={loading === true}
+      render={render ?? <button type={type} />}
+      {...stateStyleProps}
+      aria-busy={loading === true ? true : undefined}
+      data-full-width={fullWidth === true ? '' : undefined}
+      data-inset={inset}
+      data-loading={loading === true ? '' : undefined}
+      data-radius={radius}
+      data-shape={shape}
+      data-size={size}
+      data-slot="button"
+      data-variant={variant}
+    >
       <span
-        className={contentStylexProps.className}
-        style={contentStylexProps.style}
+        {...stylex.props(buttonStyles.content)}
       >
         {shape === 'square' ? (
           loading === true ? <Spinner size={size} /> : children
@@ -153,8 +151,7 @@ export function Button({
             {loading === true || prefix !== undefined ? (
               <span
                 aria-hidden="true"
-                className={iconSlotStylexProps.className}
-                style={iconSlotStylexProps.style}
+                {...stylex.props(buttonStyles.iconSlot)}
               >
                 {loading === true ? <Spinner size={size} /> : prefix}
               </span>
@@ -163,8 +160,7 @@ export function Button({
             {suffix !== undefined ? (
               <span
                 aria-hidden="true"
-                className={iconSlotStylexProps.className}
-                style={iconSlotStylexProps.style}
+                {...stylex.props(buttonStyles.iconSlot)}
               >
                 {suffix}
               </span>
@@ -172,11 +168,6 @@ export function Button({
           </>
         )}
       </span>
-    ),
-  } as useRender.ComponentProps<'button'>
-
-  return useRender({
-    render: render ?? <button type={type} />,
-    props: mergeProps<'button'>(defaultProps, props),
-  })
+    </BaseButton>
+  )
 }

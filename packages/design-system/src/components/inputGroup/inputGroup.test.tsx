@@ -67,4 +67,17 @@ describe("InputGroup", () => {
     expect(screen.getByRole("checkbox", { name: "Set value to NULL" }).getAttribute("aria-disabled")).not.toBe("true");
     expect(onCheckedChange).toHaveBeenCalledOnce();
   });
+
+  it("exposes persistent action state for toggle actions", () => {
+    render(
+      <InputGroup>
+        <Input aria-label="Password" />
+        <InputGroup.Action label="Hide password" pressed>
+          hide
+        </InputGroup.Action>
+      </InputGroup>,
+    );
+
+    expect(screen.getByRole("button", { name: "Hide password" }).getAttribute("data-pressed")).toBe("");
+  });
 });

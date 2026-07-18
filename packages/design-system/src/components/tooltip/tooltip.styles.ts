@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { backgroundColors, textColors } from '../../tokens/semantics.stylex'
+import { backgroundColors, spatial, textColors } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -15,7 +15,7 @@ const reducedMotion = '@media (prefers-reduced-motion: reduce)'
 export const tooltipStyles = stylex.create({
   positioner: {
     outline: 'none',
-    zIndex: layerIndexes.popup,
+    zIndex: layerIndexes.tooltip,
     maxWidth: 'var(--available-width)',
   },
   popup: {
@@ -32,7 +32,7 @@ export const tooltipStyles = stylex.create({
     transitionDuration: { default: '100ms', [reducedMotion]: '0ms' },
     transitionProperty: 'opacity, transform',
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-    maxWidth: 320,
+    maxWidth: spatial['popup-width-m'],
   },
   popupTransition: {
     opacity: 0,

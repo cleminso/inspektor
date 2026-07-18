@@ -24,7 +24,7 @@ export const buttonGroupStyles = stylex.create({
   },
   member: {
     position: 'relative',
-    zIndex: { default: 0, ':focus-visible': 1 },
+    zIndex: { default: 0, ':focus-visible': 1, ':active': 1 },
   },
   memberHorizontal: {
     borderEndEndRadius: { default: borderRadii.none, ':last-child': null },

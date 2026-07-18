@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, textColors } from "../../tokens/semantics.stylex";
+import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
 import {
   borderRadii,
   fontFamilies,
@@ -32,13 +32,13 @@ export const inputGroupStyles = stylex.create({
     borderColor: inputGroupVars.focusedBorderColor,
   },
   sizeS: {
-    height: 24,
+    height: spatial["control-height-s"],
   },
   sizeM: {
-    height: 28,
+    height: spatial["control-height-m"],
   },
   sizeL: {
-    height: 32,
+    height: spatial["control-height-l"],
   },
   fullWidth: {
     width: "100%",
@@ -47,7 +47,7 @@ export const inputGroupStyles = stylex.create({
     [inputGroupVars.borderColor]: borderColors["border-danger"],
     [inputGroupVars.focusedBorderColor]: borderColors["border-danger"],
     [inputGroupVars.outlineColor]: borderColors["border-danger-subtle"],
-    [inputGroupVars.outlineWidth]: "2px",
+    [inputGroupVars.outlineWidth]: spatial["focus-ring-width"],
   },
   disabled: {
     [inputGroupVars.backgroundColor]: backgroundColors["bg-disabled"],
@@ -78,12 +78,12 @@ export const inputGroupStyles = stylex.create({
   action: {
     margin: 0,
     padding: 0,
-    outline: "none",
     alignItems: "center",
     appearance: "none",
     backgroundColor: {
       default: "transparent",
       ":hover": backgroundColors["bg-hover"],
+      ":active": backgroundColors["bg-pressed"],
     },
     borderBlockEndWidth: 0,
     borderBlockStartWidth: 0,
@@ -96,6 +96,20 @@ export const inputGroupStyles = stylex.create({
     display: "inline-flex",
     flexShrink: 0,
     justifyContent: "center",
+    outlineColor: borderColors["border-focused"],
+    outlineOffset: 0,
+    outlineStyle: "solid",
+    outlineWidth: {
+      default: 0,
+      ":focus-visible": spatial["focus-ring-width"],
+    },
+  },
+  actionPressed: {
+    backgroundColor: {
+      default: backgroundColors["bg-selected"],
+      ":hover": backgroundColors["bg-hover"],
+      ":active": backgroundColors["bg-pressed"],
+    },
   },
   actionS: {
     width: 22,
@@ -123,7 +137,13 @@ export const inputGroupStyles = stylex.create({
     whiteSpace: "nowrap",
   },
   memberDisabled: {
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "transparent",
+      ":active": "transparent",
+    },
     color: textColors["text-disabled"],
     cursor: "not-allowed",
+    outlineWidth: 0,
   },
 });

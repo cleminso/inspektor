@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, textColors } from "../../tokens/semantics.stylex";
+import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
 import {
   borderRadii,
   fontFamilies,
@@ -38,13 +38,13 @@ export const inputStyles = stylex.create({
     },
   },
   sizeS: {
-    height: 24,
+    height: spatial["control-height-s"],
   },
   sizeM: {
-    height: 28,
+    height: spatial["control-height-m"],
   },
   sizeL: {
-    height: 32,
+    height: spatial["control-height-l"],
   },
   fullWidth: {
     width: "100%",
@@ -61,7 +61,10 @@ export const inputStyles = stylex.create({
     minWidth: 0,
   },
   disabled: {
-    backgroundColor: backgroundColors["bg-disabled"],
+    backgroundColor: {
+      default: backgroundColors["bg-disabled"],
+      ":hover": backgroundColors["bg-disabled"],
+    },
     color: textColors["text-disabled"],
     cursor: "not-allowed",
     "::placeholder": {
@@ -69,17 +72,24 @@ export const inputStyles = stylex.create({
     },
   },
   readOnly: {
-    backgroundColor: backgroundColors["bg-secondary"],
+    backgroundColor: {
+      default: backgroundColors["bg-secondary"],
+      ":hover": backgroundColors["bg-secondary"],
+    },
     cursor: "default",
   },
   invalid: {
     borderColor: {
       default: borderColors["border-danger"],
       ":focus-visible": borderColors["border-danger"],
+      ":focus": borderColors["border-danger"],
     },
     outlineColor: borderColors["border-danger-subtle"],
     outlineOffset: 0,
     outlineStyle: "solid",
-    outlineWidth: 2,
+    outlineWidth: {
+      default: 0,
+      ":focus-visible": spatial["focus-ring-width"],
+    },
   },
 });

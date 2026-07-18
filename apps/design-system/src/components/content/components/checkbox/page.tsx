@@ -31,7 +31,7 @@ export function CheckboxPage(): ReactElement {
         </Example>
       </Section>
 
-      <Section title="States" description="Checkbox supports checked, mixed, disabled, and size states.">
+      <Section title="States" description="Checkbox supports checked, mixed, checked-disabled, focus-visible, and size states.">
         <Example source={statesSource}>
           <StatesExample />
         </Example>

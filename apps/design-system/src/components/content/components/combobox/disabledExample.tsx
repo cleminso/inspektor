@@ -14,13 +14,15 @@ export default function DisabledExample(): ReactElement {
           <Combobox.InputTrigger />
         </Combobox.InputGroup>
         <Combobox.Content>
-          <Combobox.List>
-            {(branch: string) => (
-              <Combobox.Item key={branch} value={branch}>
-                {branch}
-              </Combobox.Item>
-            )}
-          </Combobox.List>
+          <Combobox.Viewport>
+            <Combobox.List>
+              {(branch: string) => (
+                <Combobox.Item key={branch} value={branch}>
+                  {branch}
+                </Combobox.Item>
+              )}
+            </Combobox.List>
+          </Combobox.Viewport>
         </Combobox.Content>
       </Combobox.Root>
       <Field.Description>Selection is unavailable for this connection.</Field.Description>

@@ -29,7 +29,7 @@ export function Example({ children, source, align = "center" }: ExampleProps): R
       backgroundColor="bg-page"
     >
       <Box
-        minHeight={120}
+        minHeight="example-height"
         padding="2xl"
         flexDirection="row"
         flexWrap="wrap"
