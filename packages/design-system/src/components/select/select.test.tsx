@@ -152,6 +152,21 @@ describe("Select", () => {
     expect(trigger.getAttribute("data-width")).toBe("full");
   });
 
+  it("applies a constrained size to popup items", () => {
+    render(
+      <Select.Root defaultOpen>
+        <Select.Trigger aria-label="Branch">
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="main" size="l">Main</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    );
+
+    expect(screen.getByRole("option", { name: "Main" }).getAttribute("data-size")).toBe("l");
+  });
+
   it("composes trigger adornments and owned icons without duplicating legacy parts", () => {
     const { rerender } = render(
       <Select.Root>

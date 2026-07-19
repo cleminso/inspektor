@@ -1,12 +1,9 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { contextSwitcherItem } from "@/lib/registry";
 
 import ConnectionExample from "./connectionExample";
 import connectionSource from "./connectionExample.tsx?raw";
@@ -19,6 +16,7 @@ import {
   contextSwitcherTriggerPropNames,
   contextSwitcherViewportPropNames,
 } from "./props";
+import { ContextSwitcherPlayground } from "./playground";
 import SimpleExample from "./simpleExample";
 import simpleSource from "./simpleExample.tsx?raw";
 import StatusExample from "./statusExample";
@@ -40,13 +38,7 @@ const itemTextProps = getGeneratedProps(
 
 export function ContextSwitcherPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={contextSwitcherItem.title}
-        description={contextSwitcherItem.description}
-        source={contextSwitcherItem.source}
-      />
-
+    <ContextSwitcherPlayground>
       <Section
         title="Connection switcher"
         description="Use rich item descriptions and a footer action for saved application connections."
@@ -95,6 +87,6 @@ export function ContextSwitcherPage(): ReactElement {
       <Section title="Item text props">
         <PropsTable rows={itemTextProps} />
       </Section>
-    </DocsPage>
+    </ContextSwitcherPlayground>
   );
 }

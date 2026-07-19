@@ -17,7 +17,7 @@ export default function SizesExample(): ReactElement {
           </Select.Trigger>
           <Select.Content>
             {items.map((item) => (
-              <Select.Item key={item.value} value={item.value}>
+              <Select.Item key={item.value} value={item.value} size={size}>
                 {item.label}
               </Select.Item>
             ))}

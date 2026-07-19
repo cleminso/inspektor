@@ -1,8 +1,6 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
@@ -14,6 +12,7 @@ import LoadingExample from "./loadingExample";
 import loadingSource from "./loadingExample.tsx?raw";
 import PrefixAndSuffixExample from "./prefixAndSuffix";
 import prefixAndSuffixSource from "./prefixAndSuffix.tsx?raw";
+import { ButtonPlayground } from "./playground";
 import { buttonPropNames } from "./props";
 import RoundedExample from "./roundedExample";
 import roundedSource from "./roundedExample.tsx?raw";
@@ -28,24 +27,14 @@ const buttonProps = getGeneratedProps(buttonItem.componentId, buttonPropNames);
 
 export function ButtonPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={buttonItem.title}
-        description={buttonItem.description}
-        source={buttonItem.source}
-      />
-
-      <Section
-        title="All variants and states"
-      >
+    <ButtonPlayground>
+      <Section title="All variants and states">
         <Example source={variantsSource}>
           <VariantsExample />
         </Example>
       </Section>
 
-      <Section
-        title="Sizes"
-      >
+      <Section title="Sizes">
         <Example source={sizesSource}>
           <SizesExample />
         </Example>
@@ -99,6 +88,6 @@ export function ButtonPage(): ReactElement {
       >
         <PropsTable rows={buttonProps} />
       </Section>
-    </DocsPage>
+    </ButtonPlayground>
   );
 }

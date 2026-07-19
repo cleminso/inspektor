@@ -1,8 +1,6 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
@@ -14,19 +12,14 @@ import CompositionExample from "./compositionExample";
 import compositionSource from "./compositionExample.tsx?raw";
 import ErrorExample from "./errorExample";
 import errorSource from "./errorExample.tsx?raw";
+import { TextFieldPlayground } from "./playground";
 import { textFieldPropNames } from "./props";
 
 const textFieldProps = getGeneratedProps(textFieldItem.componentId, textFieldPropNames);
 
 export function TextFieldPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={textFieldItem.title}
-        description={textFieldItem.description}
-        source={textFieldItem.source}
-      />
-
+    <TextFieldPlayground>
       <Section
         title="Text field"
         description="Import only TextField for the standard composition. Required fields become invalid after an empty blur and clear while editing."
@@ -60,6 +53,6 @@ export function TextFieldPage(): ReactElement {
       >
         <PropsTable rows={textFieldProps} />
       </Section>
-    </DocsPage>
+    </TextFieldPlayground>
   );
 }

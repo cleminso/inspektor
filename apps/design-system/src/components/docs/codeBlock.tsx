@@ -66,6 +66,7 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
           </Box>
           {highlightedHtml !== null ? (
             <div
+              data-docs-code-content
               {...stylex.props(styles.codeContent)}
               dangerouslySetInnerHTML={{ __html: highlightedHtml }}
             />

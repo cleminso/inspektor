@@ -1,12 +1,9 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { comboboxItem } from "@/lib/registry";
 
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
@@ -29,6 +26,7 @@ import {
   comboboxTriggerPropNames,
   comboboxViewportPropNames,
 } from "./props";
+import { ComboboxPlayground } from "./playground";
 import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
 import StatusExample from "./statusExample";
@@ -50,12 +48,7 @@ const indicatorProps = getGeneratedProps("combobox.itemIndicator", comboboxIndic
 
 export function ComboboxPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={comboboxItem.title}
-        description={comboboxItem.description}
-        source={comboboxItem.source}
-      />
+    <ComboboxPlayground>
       <Section
         title="Uncontrolled default"
         description="Use Combobox as a text input with a filterable collection and an initial selection."
@@ -135,6 +128,6 @@ export function ComboboxPage(): ReactElement {
       <Section title="Item indicator props">
         <PropsTable rows={indicatorProps} />
       </Section>
-    </DocsPage>
+    </ComboboxPlayground>
   );
 }

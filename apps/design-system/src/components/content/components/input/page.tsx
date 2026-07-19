@@ -1,14 +1,13 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
 import { inputItem } from "@/lib/registry";
 
 import { inputPropNames } from "./props";
+import { InputPlayground } from "./playground";
 import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
 import StatesExample from "./statesExample";
@@ -18,13 +17,7 @@ const inputProps = getGeneratedProps(inputItem.componentId, inputPropNames);
 
 export function InputPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={inputItem.title}
-        description={inputItem.description}
-        source={inputItem.source}
-      />
-
+    <InputPlayground>
       <Section title="Sizes" description="Choose a height that matches nearby controls.">
         <Example source={sizesSource}>
           <SizesExample />
@@ -46,6 +39,6 @@ export function InputPage(): ReactElement {
       >
         <PropsTable rows={inputProps} />
       </Section>
-    </DocsPage>
+    </InputPlayground>
   );
 }

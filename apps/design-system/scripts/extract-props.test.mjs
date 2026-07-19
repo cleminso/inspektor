@@ -807,6 +807,10 @@ test("extracts the constrained Select compound API", () => {
     "false",
   );
   assert.equal(
+    metadata["select.item"]?.find(({ name }) => name === "size")?.defaultValue,
+    '"m"',
+  );
+  assert.equal(
     metadata["select.trigger"]?.find(({ name }) => name === "className"),
     undefined,
   );

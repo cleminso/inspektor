@@ -1,0 +1,59 @@
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { SelectPlayground, serializeSelectPlayground } from "./playground";
+
+vi.mock("@/lib/shiki", () => ({ useHighlightedCode: () => null }));
+
+afterEach(cleanup);
+
+describe("Select playground", () => {
+  it("serializes a constrained Select composition without default props", () => {
+    const source = serializeSelectPlayground({
+      size: "m",
+      itemSize: "m",
+      width: "content",
+      disabled: false,
+      prefix: false,
+      suffix: false,
+    });
+
+    expect(source).toContain('<Select.Root items={options} defaultValue="main">');
+    expect(source).toContain('<Select.Trigger aria-label="Branch">');
+    expect(source).not.toContain('size="m"');
+    expect(source).not.toContain('<Select.Item key={option.value} value={option.value} size="m">');
+    expect(source).not.toContain('width="content"');
+  });
+
+  it("updates preview and source together, then resets both", () => {
+    const { container } = render(<SelectPlayground />);
+
+    fireEvent.click(screen.getByRole("switch", { name: "Disabled" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show code" }));
+
+    expect(
+      (container.querySelector('[data-slot="select-trigger"]') as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(container.querySelector("pre")?.textContent).toContain("disabled");
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset controls" }));
+
+    expect(
+      (container.querySelector('[data-slot="select-trigger"]') as HTMLButtonElement).disabled,
+    ).toBe(false);
+    expect(container.querySelector("pre")?.textContent).not.toContain("disabled");
+  });
+
+  it("serializes a non-default option size", () => {
+    const source = serializeSelectPlayground({
+      size: "m",
+      itemSize: "l",
+      width: "content",
+      disabled: false,
+      prefix: false,
+      suffix: false,
+    });
+
+    expect(source).toContain('value={option.value} size="l"');
+  });
+});

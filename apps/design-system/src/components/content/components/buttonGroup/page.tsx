@@ -1,12 +1,9 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { buttonGroupItem } from "@/lib/registry";
 
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
@@ -14,6 +11,7 @@ import CompositionExample from "./compositionExample";
 import compositionSource from "./compositionExample.tsx?raw";
 import OrientationExample from "./orientationExample";
 import orientationSource from "./orientationExample.tsx?raw";
+import { ButtonGroupPlayground } from "./playground";
 import {
   buttonGroupRootPropNames,
   buttonGroupSeparatorPropNames,
@@ -26,13 +24,7 @@ const textProps = getGeneratedProps("buttonGroup.text", buttonGroupTextPropNames
 
 export function ButtonGroupPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={buttonGroupItem.title}
-        description={buttonGroupItem.description}
-        source={buttonGroupItem.source}
-      />
-
+    <ButtonGroupPlayground>
       <Section
         title="Related actions"
         description="Group direct child controls that operate on the same object or workflow. Label the group for assistive technology."
@@ -69,6 +61,6 @@ export function ButtonGroupPage(): ReactElement {
       <Section title="Text props">
         <PropsTable rows={textProps} />
       </Section>
-    </DocsPage>
+    </ButtonGroupPlayground>
   );
 }

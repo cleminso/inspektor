@@ -375,6 +375,8 @@ export const navSections: NavSection[] = [
   { title: "Components", items: componentItems },
 ];
 
+export const navigationItems = navSections.flatMap((section) => section.items);
+
 export function findNavItem(slug: string, items: NavItem[]): NavItem | undefined {
   return items.find((item) => item.slug === slug);
 }

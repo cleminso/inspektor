@@ -8,7 +8,7 @@ const repositoryUrl = "https://github.com/regardedev/inspector/blob/main";
 export function SourceLink({ source }: { source: SourceReference }): ReactElement {
   return (
     <Button
-      variant="outline"
+      variant="link"
       size="s"
       render={
         <a

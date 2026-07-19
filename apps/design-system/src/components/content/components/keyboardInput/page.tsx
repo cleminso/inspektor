@@ -1,12 +1,9 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { keyboardInputItem } from "@/lib/registry";
 
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
@@ -14,19 +11,14 @@ import CombinationExample from "./combinationExample";
 import combinationSource from "./combinationExample.tsx?raw";
 import PlatformExample from "./platformExample";
 import platformSource from "./platformExample.tsx?raw";
+import { KeyboardInputPlayground } from "./playground";
 import { keyboardInputPropNames } from "./props";
 
 const props = getGeneratedProps("keyboardInput", keyboardInputPropNames);
 
 export function KeyboardInputPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={keyboardInputItem.title}
-        description={keyboardInputItem.description}
-        source={keyboardInputItem.source}
-      />
-
+    <KeyboardInputPlayground>
       <Section
         title="Key"
         description="Use a keyboard input to show a single key required by an action."
@@ -57,6 +49,6 @@ export function KeyboardInputPage(): ReactElement {
       <Section title="Props">
         <PropsTable rows={props} />
       </Section>
-    </DocsPage>
+    </KeyboardInputPlayground>
   );
 }

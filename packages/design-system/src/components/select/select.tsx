@@ -84,6 +84,8 @@ export interface SelectContentProps {
 export type SelectItemProps<Value> = Omit<WithoutStyles<BaseSelect.Item.Props>, "value"> & {
   /** The value represented by this option. */
   value: Value;
+  /** Controls the option height and horizontal padding. */
+  size?: SelectSize;
   /** Disables the option. */
   disabled?: BaseSelect.Item.Props["disabled"];
 };
@@ -253,9 +255,22 @@ function SelectContent({
   );
 }
 
-function SelectItem<Value>({ value, disabled = false, children, ...props }: SelectItemProps<Value>) {
+const itemSizeStyles = {
+  s: selectStyles.itemSizeS,
+  m: selectStyles.itemSizeM,
+  l: selectStyles.itemSizeL,
+} satisfies Record<SelectSize, unknown>;
+
+function SelectItem<Value>({
+  value,
+  size = "m",
+  disabled = false,
+  children,
+  ...props
+}: SelectItemProps<Value>) {
   const stateStyles = createStateStyleProps<BaseSelect.Item.State>((state) => [
     selectStyles.item,
+    itemSizeStyles[size],
     state.selected === true && selectStyles.itemSelected,
     state.highlighted === true && selectStyles.itemHighlighted,
     state.disabled === true && selectStyles.itemDisabled,
@@ -264,7 +279,13 @@ function SelectItem<Value>({ value, disabled = false, children, ...props }: Sele
   const hasIndicator = hasChild(children, SelectItemIndicator);
 
   return (
-    <BaseSelect.Item {...props} value={value} disabled={disabled} {...stateStyles}>
+    <BaseSelect.Item
+      {...props}
+      value={value}
+      disabled={disabled}
+      {...stateStyles}
+      data-size={size}
+    >
       {hasText === true ? children : <SelectItemText>{children}</SelectItemText>}
       {hasIndicator === false && <SelectItemIndicator />}
     </BaseSelect.Item>

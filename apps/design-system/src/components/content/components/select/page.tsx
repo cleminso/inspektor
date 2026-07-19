@@ -1,12 +1,9 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { selectItem } from "@/lib/registry";
 
 import DefaultOptionsExample from "./defaultOptionsExample";
 import defaultOptionsSource from "./defaultOptionsExample.tsx?raw";
@@ -16,6 +13,7 @@ import LabelExample from "./labelExample";
 import labelSource from "./labelExample.tsx?raw";
 import PrefixAndSuffixExample from "./prefixAndSuffixExample";
 import prefixAndSuffixSource from "./prefixAndSuffixExample.tsx?raw";
+import { SelectPlayground } from "./playground";
 import { selectItemPropNames, selectRootPropNames, selectTriggerPropNames } from "./props";
 import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
@@ -26,12 +24,7 @@ const itemProps = getGeneratedProps("select.item", selectItemPropNames);
 
 export function SelectPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={selectItem.title}
-        description={selectItem.description}
-        source={selectItem.source}
-      />
+    <SelectPlayground>
       <Section
         title="Default options"
         description="Use Select for compact collections that do not require filtering."
@@ -40,7 +33,7 @@ export function SelectPage(): ReactElement {
           <DefaultOptionsExample />
         </Example>
       </Section>
-      <Section title="Sizes" description="Match the trigger size to adjacent controls.">
+      <Section title="Sizes" description="Match the trigger and option size to adjacent controls.">
         <Example source={sizesSource}>
           <SizesExample />
         </Example>
@@ -62,7 +55,7 @@ export function SelectPage(): ReactElement {
         </Example>
       </Section>
       <Section title="Label" description="Use Select.Label to provide an accessible visible name.">
-        <Example source={labelSource} align="stretch">
+        <Example source={labelSource}>
           <LabelExample />
         </Example>
       </Section>
@@ -78,6 +71,6 @@ export function SelectPage(): ReactElement {
       <Section title="Item props">
         <PropsTable rows={itemProps} />
       </Section>
-    </DocsPage>
+    </SelectPlayground>
   );
 }

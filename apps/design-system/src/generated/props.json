@@ -3964,6 +3964,17 @@
       }
     },
     {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the option height and horizontal padding.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 88
+      }
+    },
+    {
       "name": "disabled",
       "type": "boolean",
       "required": false,
@@ -3971,7 +3982,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 88
+        "line": 90
       }
     }
   ],
@@ -3985,7 +3996,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 99
+        "line": 101
       }
     }
   ]

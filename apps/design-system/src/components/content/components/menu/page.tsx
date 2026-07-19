@@ -1,12 +1,9 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { menuItem } from "@/lib/registry";
 
 import ChevronExample from "./chevronExample";
 import chevronSource from "./chevronExample.tsx?raw";
@@ -18,6 +15,7 @@ import LinkItemsExample from "./linkItemsExample";
 import linkItemsSource from "./linkItemsExample.tsx?raw";
 import PrefixSuffixExample from "./prefixSuffixExample";
 import prefixSuffixSource from "./prefixSuffixExample.tsx?raw";
+import { MenuPlayground } from "./playground";
 import {
   menuCheckboxItemPropNames,
   menuContentPropNames,
@@ -40,12 +38,7 @@ const radioItemProps = getGeneratedProps("menu.radioItem", menuRadioItemPropName
 
 export function MenuPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={menuItem.title}
-        description={menuItem.description}
-        source={menuItem.source}
-      />
+    <MenuPlayground>
       <Section
         title="Default"
         description="Menu composes Button as its trigger while preserving Button's visual treatment."
@@ -118,6 +111,6 @@ export function MenuPage(): ReactElement {
       <Section title="Radio item props">
         <PropsTable rows={radioItemProps} />
       </Section>
-    </DocsPage>
+    </MenuPlayground>
   );
 }

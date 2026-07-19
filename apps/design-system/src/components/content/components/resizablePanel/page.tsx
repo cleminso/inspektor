@@ -1,17 +1,15 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { resizablePanelItem } from "@/lib/registry";
 
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
 import CollapsibleExample from "./collapsibleExample";
 import collapsibleSource from "./collapsibleExample.tsx?raw";
+import { ResizablePanelPlayground } from "./playground";
 import {
   resizableHandlePropNames,
   resizablePanelGroupPropNames,
@@ -24,13 +22,7 @@ const handleProps = getGeneratedProps("resizableHandle", resizableHandlePropName
 
 export function ResizablePanelPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={resizablePanelItem.title}
-        description={resizablePanelItem.description}
-        source={resizablePanelItem.source}
-      />
-
+    <ResizablePanelPlayground>
       <Section
         title="Split layout"
         description="Combine pixel-sized side panels with a flexible center panel. Handles support keyboard and pointer resizing."
@@ -58,6 +50,6 @@ export function ResizablePanelPage(): ReactElement {
       <Section title="Handle props">
         <PropsTable rows={handleProps} />
       </Section>
-    </DocsPage>
+    </ResizablePanelPlayground>
   );
 }

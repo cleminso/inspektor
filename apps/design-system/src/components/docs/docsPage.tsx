@@ -9,6 +9,7 @@ export function DocsPage({ children }: DocsPageProps): ReactElement {
   return (
     <Box
       display="block"
+      width="full"
       marginHorizontal="auto"
       maxWidth={{ base: "content-width", xl: "content-width-wide" }}
     >

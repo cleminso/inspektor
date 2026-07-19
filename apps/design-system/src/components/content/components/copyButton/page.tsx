@@ -1,15 +1,13 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { copyButtonItem } from "@/lib/registry";
 
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
+import { CopyButtonPlayground } from "./playground";
 import { copyButtonPropNames } from "./props";
 import VariantsExample from "./variantsExample";
 import variantsSource from "./variantsExample.tsx?raw";
@@ -18,13 +16,7 @@ const props = getGeneratedProps("copyButton", copyButtonPropNames);
 
 export function CopyButtonPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={copyButtonItem.title}
-        description={copyButtonItem.description}
-        source={copyButtonItem.source}
-      />
-
+    <CopyButtonPlayground>
       <Section
         title="Copy action"
         description="Provide a contextual accessible label. The component owns clipboard feedback, icons, and failure handling."
@@ -46,6 +38,6 @@ export function CopyButtonPage(): ReactElement {
       <Section title="Props">
         <PropsTable rows={props} />
       </Section>
-    </DocsPage>
+    </CopyButtonPlayground>
   );
 }

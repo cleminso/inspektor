@@ -1,12 +1,9 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
-import { contextMenuItem } from "@/lib/registry";
 
 import DefaultExample from "./defaultExample";
 import defaultSource from "./defaultExample.tsx?raw";
@@ -14,6 +11,7 @@ import DisabledItemsExample from "./disabledItemsExample";
 import disabledItemsSource from "./disabledItemsExample.tsx?raw";
 import PrefixSuffixExample from "./prefixSuffixExample";
 import prefixSuffixSource from "./prefixSuffixExample.tsx?raw";
+import { ContextMenuPlayground } from "./playground";
 import {
   contextMenuCheckboxItemPropNames,
   contextMenuContentPropNames,
@@ -35,12 +33,7 @@ const radioItemProps = getGeneratedProps("contextMenu.radioItem", contextMenuRad
 
 export function ContextMenuPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={contextMenuItem.title}
-        description={contextMenuItem.description}
-        source={contextMenuItem.source}
-      />
+    <ContextMenuPlayground>
       <Section
         title="Default"
         description="Right-click the trigger to open contextual actions. Item callbacks remain responsible for updating application state."
@@ -86,6 +79,6 @@ export function ContextMenuPage(): ReactElement {
       <Section title="Radio item props">
         <PropsTable rows={radioItemProps} />
       </Section>
-    </DocsPage>
+    </ContextMenuPlayground>
   );
 }

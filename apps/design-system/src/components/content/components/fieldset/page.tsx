@@ -1,8 +1,6 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
@@ -12,6 +10,7 @@ import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
 import DisabledExample from "./disabledExample";
 import disabledSource from "./disabledExample.tsx?raw";
+import { FieldsetPlayground } from "./playground";
 import { fieldsetLegendPropNames, fieldsetRootPropNames } from "./props";
 
 const rootProps = getGeneratedProps(`${fieldsetItem.componentId}.root`, fieldsetRootPropNames);
@@ -22,17 +21,8 @@ const legendProps = getGeneratedProps(
 
 export function FieldsetPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={fieldsetItem.title}
-        description={fieldsetItem.description}
-        source={fieldsetItem.source}
-      />
-
-      <Section
-        title="Composition"
-        description="Group related fields under one accessible legend."
-      >
+    <FieldsetPlayground>
+      <Section title="Composition" description="Group related fields under one accessible legend.">
         <Example source={basicSource} align="stretch">
           <BasicExample />
         </Example>
@@ -54,6 +44,6 @@ export function FieldsetPage(): ReactElement {
       <Section title="Legend props" description="Legend provides the group's accessible name.">
         <PropsTable rows={legendProps} />
       </Section>
-    </DocsPage>
+    </FieldsetPlayground>
   );
 }

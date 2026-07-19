@@ -1,8 +1,6 @@
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
 import { Example } from "@/components/docs/example";
-import { PageHeader } from "@/components/docs/pageHeader";
 import { PropsTable } from "@/components/docs/propsTable";
 import { Section } from "@/components/docs/section";
 import { getGeneratedProps } from "@/lib/propsData";
@@ -16,6 +14,7 @@ import {
   fieldLabelPropNames,
   fieldRootPropNames,
 } from "./props";
+import { FieldPlayground } from "./playground";
 import ValidationExample from "./validationExample";
 import validationSource from "./validationExample.tsx?raw";
 
@@ -29,13 +28,7 @@ const errorProps = getGeneratedProps(`${fieldItem.componentId}.error`, fieldErro
 
 export function FieldPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={fieldItem.title}
-        description={fieldItem.description}
-        source={fieldItem.source}
-      />
-
+    <FieldPlayground>
       <Section
         title="Composition"
         description="Field associates its label and description with a nested Base UI control."
@@ -72,6 +65,6 @@ export function FieldPage(): ReactElement {
       <Section title="Error props" description="Error displays matching validation messages.">
         <PropsTable rows={errorProps} />
       </Section>
-    </DocsPage>
+    </FieldPlayground>
   );
 }
