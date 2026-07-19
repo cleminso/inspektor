@@ -598,7 +598,7 @@
     },
     {
       "name": "onLayoutChanged",
-      "type": "(layout: Layout) => void | undefined",
+      "type": "(layout: Layout, meta: LayoutChangedMeta) => void",
       "required": false,
       "description": "Runs after a group layout change is committed.",
       "source": {

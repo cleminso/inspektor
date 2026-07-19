@@ -14,10 +14,10 @@ import { Route as ConnNewRouteImport } from './routes/conn/new'
 import { Route as ConnConnectionIdIndexRouteImport } from './routes/conn/$connectionId/index'
 import { Route as ConnConnectionIdBranchIndexRouteImport } from './routes/conn/$connectionId/$branch/index'
 import { Route as ConnConnectionIdBranchSchemaHashIndexRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/index'
-import { Route as ConnConnectionIdBranchSchemaHashTablesRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/tables'
 import { Route as ConnConnectionIdBranchSchemaHashQuerySubscriptionsRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/query-subscriptions'
-import { Route as ConnConnectionIdBranchSchemaHashTablesIndexRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/tables/index'
+import { Route as ConnConnectionIdBranchSchemaHashTablesRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/tables'
 import { Route as ConnConnectionIdBranchSchemaHashQuerySubscriptionsIndexRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/query-subscriptions/index'
+import { Route as ConnConnectionIdBranchSchemaHashTablesIndexRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/tables/index'
 import { Route as ConnConnectionIdBranchSchemaHashTablesTableNameIndexRouteImport } from './routes/conn/$connectionId/$branch/$schemaHash/tables/$tableName/index'
 
 const ConnRoute = ConnRouteImport.update({
@@ -47,23 +47,17 @@ const ConnConnectionIdBranchSchemaHashIndexRoute =
     path: '/$connectionId/$branch/$schemaHash/',
     getParentRoute: () => ConnRoute,
   } as any)
-const ConnConnectionIdBranchSchemaHashTablesRoute =
-  ConnConnectionIdBranchSchemaHashTablesRouteImport.update({
-    id: '/$connectionId/$branch/$schemaHash/tables',
-    path: '/$connectionId/$branch/$schemaHash/tables',
-    getParentRoute: () => ConnRoute,
-  } as any)
 const ConnConnectionIdBranchSchemaHashQuerySubscriptionsRoute =
   ConnConnectionIdBranchSchemaHashQuerySubscriptionsRouteImport.update({
     id: '/$connectionId/$branch/$schemaHash/query-subscriptions',
     path: '/$connectionId/$branch/$schemaHash/query-subscriptions',
     getParentRoute: () => ConnRoute,
   } as any)
-const ConnConnectionIdBranchSchemaHashTablesIndexRoute =
-  ConnConnectionIdBranchSchemaHashTablesIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => ConnConnectionIdBranchSchemaHashTablesRoute,
+const ConnConnectionIdBranchSchemaHashTablesRoute =
+  ConnConnectionIdBranchSchemaHashTablesRouteImport.update({
+    id: '/$connectionId/$branch/$schemaHash/tables',
+    path: '/$connectionId/$branch/$schemaHash/tables',
+    getParentRoute: () => ConnRoute,
   } as any)
 const ConnConnectionIdBranchSchemaHashQuerySubscriptionsIndexRoute =
   ConnConnectionIdBranchSchemaHashQuerySubscriptionsIndexRouteImport.update({
@@ -71,6 +65,12 @@ const ConnConnectionIdBranchSchemaHashQuerySubscriptionsIndexRoute =
     path: '/',
     getParentRoute: () =>
       ConnConnectionIdBranchSchemaHashQuerySubscriptionsRoute,
+  } as any)
+const ConnConnectionIdBranchSchemaHashTablesIndexRoute =
+  ConnConnectionIdBranchSchemaHashTablesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ConnConnectionIdBranchSchemaHashTablesRoute,
   } as any)
 const ConnConnectionIdBranchSchemaHashTablesTableNameIndexRoute =
   ConnConnectionIdBranchSchemaHashTablesTableNameIndexRouteImport.update({
@@ -192,13 +192,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnConnectionIdBranchSchemaHashIndexRouteImport
       parentRoute: typeof ConnRoute
     }
-    '/conn/$connectionId/$branch/$schemaHash/tables': {
-      id: '/conn/$connectionId/$branch/$schemaHash/tables'
-      path: '/$connectionId/$branch/$schemaHash/tables'
-      fullPath: '/conn/$connectionId/$branch/$schemaHash/tables'
-      preLoaderRoute: typeof ConnConnectionIdBranchSchemaHashTablesRouteImport
-      parentRoute: typeof ConnRoute
-    }
     '/conn/$connectionId/$branch/$schemaHash/query-subscriptions': {
       id: '/conn/$connectionId/$branch/$schemaHash/query-subscriptions'
       path: '/$connectionId/$branch/$schemaHash/query-subscriptions'
@@ -206,12 +199,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnConnectionIdBranchSchemaHashQuerySubscriptionsRouteImport
       parentRoute: typeof ConnRoute
     }
-    '/conn/$connectionId/$branch/$schemaHash/tables/': {
-      id: '/conn/$connectionId/$branch/$schemaHash/tables/'
-      path: '/'
-      fullPath: '/conn/$connectionId/$branch/$schemaHash/tables/'
-      preLoaderRoute: typeof ConnConnectionIdBranchSchemaHashTablesIndexRouteImport
-      parentRoute: typeof ConnConnectionIdBranchSchemaHashTablesRoute
+    '/conn/$connectionId/$branch/$schemaHash/tables': {
+      id: '/conn/$connectionId/$branch/$schemaHash/tables'
+      path: '/$connectionId/$branch/$schemaHash/tables'
+      fullPath: '/conn/$connectionId/$branch/$schemaHash/tables'
+      preLoaderRoute: typeof ConnConnectionIdBranchSchemaHashTablesRouteImport
+      parentRoute: typeof ConnRoute
     }
     '/conn/$connectionId/$branch/$schemaHash/query-subscriptions/': {
       id: '/conn/$connectionId/$branch/$schemaHash/query-subscriptions/'
@@ -219,6 +212,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/conn/$connectionId/$branch/$schemaHash/query-subscriptions/'
       preLoaderRoute: typeof ConnConnectionIdBranchSchemaHashQuerySubscriptionsIndexRouteImport
       parentRoute: typeof ConnConnectionIdBranchSchemaHashQuerySubscriptionsRoute
+    }
+    '/conn/$connectionId/$branch/$schemaHash/tables/': {
+      id: '/conn/$connectionId/$branch/$schemaHash/tables/'
+      path: '/'
+      fullPath: '/conn/$connectionId/$branch/$schemaHash/tables/'
+      preLoaderRoute: typeof ConnConnectionIdBranchSchemaHashTablesIndexRouteImport
+      parentRoute: typeof ConnConnectionIdBranchSchemaHashTablesRoute
     }
     '/conn/$connectionId/$branch/$schemaHash/tables/$tableName/': {
       id: '/conn/$connectionId/$branch/$schemaHash/tables/$tableName/'
