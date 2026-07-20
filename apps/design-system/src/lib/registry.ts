@@ -122,6 +122,19 @@ export const toggleGroupItem = {
   componentId: "toggleGroup",
 } satisfies NavItem;
 
+export const tabViewItem = {
+  title: "Tab View",
+  slug: "tab-view",
+  href: "/components/tab-view",
+  description: "Closable tabs for switching between captured representations of the same resource.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "tabView.tsx",
+    path: "packages/design-system/src/components/tabView/tabView.tsx",
+  },
+  componentId: "tabView",
+} satisfies NavItem;
+
 export const checkboxItem = {
   title: "Checkbox",
   slug: "checkbox",
@@ -395,6 +408,7 @@ export const componentItems: NavItem[] = [
   fieldItem,
   fieldsetItem,
   textFieldItem,
+  tabViewItem,
   toggleGroupItem,
 ];
 

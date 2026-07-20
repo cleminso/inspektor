@@ -469,7 +469,9 @@ Table tabs follow this model:
 - filters and sort are URL-backed for the active tab view and also saved in storage
 - grid column state is saved per table
 - page index is memory-only and resets when table, filters, or sort changes
-- v1 supports multiple tab views for the same table when the views have different filters or sort state
+
+<!--- TODO: Review this decision, I'm not sure finally: v1 supports multiple tab views for the same table when the views have different filters or sort state-->
+
 - if a saved or URL-backed tab references a table missing from the selected schema, Inspector renders an unavailable-table empty state, does not run table queries, and lets the user close the tab or switch schema hash
 
 State split:

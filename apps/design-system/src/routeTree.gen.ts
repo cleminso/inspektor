@@ -29,6 +29,7 @@ import { Route as ComponentsSearchRouteImport } from './routes/components/search
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
+import { Route as ComponentsTabViewRouteImport } from './routes/components/tab-view'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
@@ -140,6 +141,11 @@ const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
   path: '/components/switch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTabViewRoute = ComponentsTabViewRouteImport.update({
+  id: '/components/tab-view',
+  path: '/components/tab-view',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
   id: '/components/text-field',
   path: '/components/text-field',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/components/select': typeof ComponentsSelectRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
+  '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/components/select': typeof ComponentsSelectRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
+  '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/components/select': typeof ComponentsSelectRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
+  '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/components/select'
     | '/components/spinner'
     | '/components/switch'
+    | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/components/select'
     | '/components/spinner'
     | '/components/switch'
+    | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/components/select'
     | '/components/spinner'
     | '/components/switch'
+    | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
@@ -386,6 +398,7 @@ export interface RootRouteChildren {
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
+  ComponentsTabViewRoute: typeof ComponentsTabViewRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
@@ -538,6 +551,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsSwitchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/tab-view': {
+      id: '/components/tab-view'
+      path: '/components/tab-view'
+      fullPath: '/components/tab-view'
+      preLoaderRoute: typeof ComponentsTabViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/text-field': {
       id: '/components/text-field'
       path: '/components/text-field'
@@ -618,6 +638,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
+  ComponentsTabViewRoute: ComponentsTabViewRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextLinkRoute: ComponentsTextLinkRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,

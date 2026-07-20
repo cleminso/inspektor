@@ -1179,6 +1179,199 @@
       }
     }
   ],
+  "tabView.root": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "The tab views and their associated panels.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "value",
+      "type": "string | number",
+      "required": false,
+      "description": "The active view value when controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "string | number",
+      "required": false,
+      "description": "The initially active view value when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: TabViewValue | null, eventDetails: BaseTabs.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Called when the active view changes.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 34
+      }
+    }
+  ],
+  "tabView.list": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "The tab view items.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 42
+      }
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "An accessible name for the tab list.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 44
+      }
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the element that labels the tab list.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 46
+      }
+    },
+    {
+      "name": "activateOnFocus",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Activates a view as arrow-key navigation moves focus.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 48
+      }
+    },
+    {
+      "name": "loopFocus",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Loops keyboard focus between the first and last views.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 50
+      }
+    }
+  ],
+  "tabView.item": [
+    {
+      "name": "value",
+      "type": "string | number",
+      "required": true,
+      "description": "Uniquely identifies the view and links it to a matching panel.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 55
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "The visible view name.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 57
+      }
+    },
+    {
+      "name": "prefix",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Renders a decorative 16px icon before the view name.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 59
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables selection and closing for this view.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 61
+      }
+    },
+    {
+      "name": "onClose",
+      "type": "(value: TabViewValue) => void",
+      "required": false,
+      "description": "Adds a close action to the view.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 63
+      }
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "defaultValue": "\"Close tab\"",
+      "description": "Provides the accessible name for the close action.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 65
+      }
+    }
+  ],
+  "tabView.panel": [
+    {
+      "name": "value",
+      "type": "string | number",
+      "required": true,
+      "description": "Identifies the view that controls this panel.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 70
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "The view content.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 72
+      }
+    },
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the panel mounted while another view is active.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 74
+      }
+    }
+  ],
   "tooltip.provider": [
     {
       "name": "delay",

@@ -244,6 +244,14 @@ export type {
   ToggleGroupWidth,
   ToggleGroupRootProps,
 } from './components/toggleGroup/toggleGroup'
+export { TabView } from './components/tabView/tabView'
+export type {
+  TabViewItemProps,
+  TabViewListProps,
+  TabViewPanelProps,
+  TabViewRootProps,
+  TabViewValue,
+} from './components/tabView/tabView'
 
 // Tokens
 export * from './tokens/tokens.stylex'

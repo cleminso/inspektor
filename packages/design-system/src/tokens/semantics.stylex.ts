@@ -16,6 +16,9 @@ export const backgroundColors = stylex.defineVars({
   // Surfaces
   'bg-page': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'bg-card': `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  'bg-tab': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'bg-tab-hover': `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  'bg-tab-selected': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'bg-popover': `light-dark(${palette.gray100}, ${palette.neutral900})`,
   'bg-subtle': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
   'bg-overlay': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
@@ -103,6 +106,7 @@ export const spatial = stylex.defineVars({
   'popup-width-l': dimensions[400],
   'label-width': dimensions[100],
   'tooltip-width': dimensions[180],
+  'tab-view-width': dimensions[224],
   'content-measure': dimensions[680],
   'content-width': dimensions[1220],
   'content-width-wide': dimensions[1440],

@@ -78,6 +78,12 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...["Root", "List", "Item", "Panel"].map((part) => ({
+    componentId: `tabView.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "TabView",
+    part,
+    inheritedProps: [],
+  })),
   ...["Provider", "Root", "Trigger", "Content"].map((part) => ({
     componentId: `tooltip.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "Tooltip",

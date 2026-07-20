@@ -184,6 +184,7 @@ export const dimensions = stylex.defineVars({
   120: '120px',
   160: '160px',
   180: '180px',
+  224: '224px',
   240: '240px',
   280: '280px',
   320: '320px',

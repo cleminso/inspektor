@@ -361,6 +361,35 @@ test("extracts the constrained ToggleGroup compound API", () => {
   );
 });
 
+test("extracts the constrained TabView compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata["tabView.root"]?.map(({ name }) => name),
+    ["children", "value", "defaultValue", "onValueChange"],
+  );
+  assert.deepEqual(
+    metadata["tabView.list"]?.map(({ name }) => name),
+    ["children", "aria-label", "aria-labelledby", "activateOnFocus", "loopFocus"],
+  );
+  assert.deepEqual(
+    metadata["tabView.item"]?.map(({ name }) => name),
+    ["value", "children", "prefix", "disabled", "onClose", "closeLabel"],
+  );
+  assert.deepEqual(
+    metadata["tabView.panel"]?.map(({ name }) => name),
+    ["value", "children", "keepMounted"],
+  );
+  assert.equal(
+    metadata["tabView.item"]?.find(({ name }) => name === "closeLabel")?.defaultValue,
+    '"Close tab"',
+  );
+  assert.equal(
+    metadata["tabView.item"]?.find(({ name }) => name === "className"),
+    undefined,
+  );
+});
+
 test("extracts Input API facts from the public package export", () => {
   const metadata = extractPropsMetadata();
   const inputProps = metadata.input;
