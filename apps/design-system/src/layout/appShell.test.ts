@@ -7,8 +7,12 @@ describe("getMainContentOverflowY", () => {
     expect(getMainContentOverflowY("/components/button")).toBe("hidden");
   });
 
-  it("keeps standalone documentation pages scrollable", () => {
-    expect(getMainContentOverflowY("/foundations/colors")).toBe("auto");
+  it("delegates foundation scrolling to the foundation workspace", () => {
+    expect(getMainContentOverflowY("/foundations/colors")).toBe("hidden");
+  });
+
+  it("keeps standalone pages scrollable", () => {
+    expect(getMainContentOverflowY("/")).toBe("auto");
   });
 });
 

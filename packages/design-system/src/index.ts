@@ -87,6 +87,10 @@ export type {
   ButtonSize,
   ButtonVariant,
 } from './components/button/button'
+export { ButtonLink } from './components/buttonLink/buttonLink'
+export type { ButtonLinkProps } from './components/buttonLink/buttonLink'
+export { TextLink } from './components/textLink/textLink'
+export type { TextLinkProps } from './components/textLink/textLink'
 export { Spinner } from './components/spinner/spinner'
 export type { SpinnerProps, SpinnerSize } from './components/spinner/spinner'
 export { CopyButton } from './components/copyButton/copyButton'
@@ -119,7 +123,7 @@ export type {
   FieldsetRootProps,
 } from './components/fieldset/fieldset'
 export { Input } from './components/input/input'
-export type { InputProps, InputSize } from './components/input/input'
+export type { InputProps, InputSize, InputVariant } from './components/input/input'
 export { InputGroup } from './components/inputGroup/inputGroup'
 export type {
   InputGroupActionProps,

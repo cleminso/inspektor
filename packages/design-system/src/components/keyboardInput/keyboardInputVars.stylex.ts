@@ -10,7 +10,7 @@ import { backgroundColors, textColors } from "../../tokens/semantics.stylex";
 import { shadows } from "../../tokens/value.stylex";
 
 export const keyboardInputVars = stylex.defineVars({
-  backgroundColor: backgroundColors["bg-subtle"],
+  backgroundColor: backgroundColors["bg-card"],
   boxShadow: shadows.border,
   textColor: textColors["text-muted"],
 });

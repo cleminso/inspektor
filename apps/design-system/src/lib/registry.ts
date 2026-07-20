@@ -57,6 +57,32 @@ export const buttonItem = {
   componentId: "button",
 } satisfies NavItem;
 
+export const buttonLinkItem = {
+  title: "Button Link",
+  slug: "button-link",
+  href: "/components/button-link",
+  description: "Navigation with Button presentation and native link semantics.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "buttonLink.tsx",
+    path: "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+  },
+  componentId: "buttonLink",
+} satisfies NavItem;
+
+export const textLinkItem = {
+  title: "Text Link",
+  slug: "text-link",
+  href: "/components/text-link",
+  description: "Inline navigation with native anchor semantics and router composition.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "textLink.tsx",
+    path: "packages/design-system/src/components/textLink/textLink.tsx",
+  },
+  componentId: "textLink",
+} satisfies NavItem;
+
 export const buttonGroupItem = {
   title: "Button Group",
   slug: "button-group",
@@ -346,6 +372,7 @@ export const textFieldItem = {
 
 export const componentItems: NavItem[] = [
   buttonItem,
+  buttonLinkItem,
   buttonGroupItem,
   checkboxItem,
   comboboxItem,
@@ -355,6 +382,7 @@ export const componentItems: NavItem[] = [
   inputItem,
   inputGroupItem,
   keyboardInputItem,
+  textLinkItem,
   textareaItem,
   menuItem,
   resizablePanelItem,

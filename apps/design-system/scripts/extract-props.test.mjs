@@ -42,6 +42,49 @@ test("extracts Button API facts from the public package export", () => {
   assert.equal(ariaLabel, undefined);
 });
 
+test("extracts the semantic TextLink API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata.textLink?.map(({ name }) => name),
+    ["variant", "trailingIcon", "href", "render"],
+  );
+  assert.equal(
+    metadata.textLink?.find(({ name }) => name === "variant")?.defaultValue,
+    '"default"',
+  );
+  assert.equal(metadata.textLink?.find(({ name }) => name === "className"), undefined);
+  assert.equal(metadata.textLink?.find(({ name }) => name === "style"), undefined);
+});
+
+test("extracts ButtonLink navigation and presentation props", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata.buttonLink?.map(({ name }) => name),
+    [
+      "variant",
+      "size",
+      "shape",
+      "fullWidth",
+      "justify",
+      "radius",
+      "inset",
+      "prefix",
+      "suffix",
+      "href",
+      "render",
+    ],
+  );
+  assert.equal(
+    metadata.buttonLink?.find(({ name }) => name === "variant")?.defaultValue,
+    '"primary"',
+  );
+  assert.equal(metadata.buttonLink?.find(({ name }) => name === "className"), undefined);
+  assert.equal(metadata.buttonLink?.find(({ name }) => name === "disabled"), undefined);
+  assert.equal(metadata.buttonLink?.find(({ name }) => name === "loading"), undefined);
+});
+
 test("extracts runtime defaults instead of JSDoc default tags", () => {
   const metadata = extractPropsMetadata();
   const buttonProps = metadata.button ?? [];
@@ -327,6 +370,7 @@ test("extracts Input API facts from the public package export", () => {
     inputProps.map(({ name }) => name),
     [
       "size",
+      "variant",
       "fullWidth",
       "invalid",
       "disabled",
@@ -338,6 +382,7 @@ test("extracts Input API facts from the public package export", () => {
     ],
   );
   assert.equal(inputProps.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(inputProps.find(({ name }) => name === "variant")?.defaultValue, '"default"');
   assert.equal(inputProps.find(({ name }) => name === "fullWidth")?.defaultValue, "false");
   assert.equal(
     inputProps.find(({ name }) => name === "className"),
@@ -523,10 +568,11 @@ test("extracts the constrained Search API", () => {
 
   assert.deepEqual(
     searchProps?.map(({ name }) => name),
-    ["size", "fullWidth", "disabled", "defaultValue", "value", "onValueChange"],
+    ["size", "fullWidth", "disabled", "shortcut", "defaultValue", "value", "onValueChange"],
   );
   assert.equal(searchProps?.find(({ name }) => name === "size")?.defaultValue, '"m"');
   assert.equal(searchProps?.find(({ name }) => name === "fullWidth")?.defaultValue, "true");
+  assert.equal(searchProps?.find(({ name }) => name === "shortcut")?.type, '"command-k"');
   assert.equal(
     searchProps?.find(({ name }) => name === "className"),
     undefined,

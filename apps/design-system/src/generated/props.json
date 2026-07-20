@@ -303,7 +303,7 @@
       "description": "Controls the visual treatment and emphasis of the action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 67
+        "line": 33
       }
     },
     {
@@ -314,7 +314,7 @@
       "description": "Controls the button height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 69
+        "line": 35
       }
     },
     {
@@ -324,7 +324,7 @@
       "description": "Makes an icon-only button square. Pair with an accessible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 71
+        "line": 37
       }
     },
     {
@@ -335,7 +335,7 @@
       "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 73
+        "line": 39
       }
     },
     {
@@ -346,7 +346,7 @@
       "description": "Stretches the button to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 75
+        "line": 41
       }
     },
     {
@@ -357,7 +357,7 @@
       "description": "Controls how content is distributed inside the button.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 77
+        "line": 43
       }
     },
     {
@@ -368,7 +368,7 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 79
+        "line": 45
       }
     },
     {
@@ -379,7 +379,7 @@
       "description": "Controls the inline inset for actions aligned with compact popup content.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 81
+        "line": 47
       }
     },
     {
@@ -389,7 +389,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 83
+        "line": 49
       }
     },
     {
@@ -399,7 +399,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 85
+        "line": 51
       }
     },
     {
@@ -410,17 +410,178 @@
       "description": "Disables interaction and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 87
+        "line": 53
       }
     },
     {
       "name": "render",
       "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ButtonState>",
       "required": false,
-      "description": "Composes Button behavior and styles onto another element, such as a link.",
+      "description": "Composes Button behavior and styles onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 89
+        "line": 55
+      }
+    }
+  ],
+  "buttonLink": [
+    {
+      "name": "variant",
+      "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | \"outline\" | \"link\"",
+      "required": false,
+      "defaultValue": "\"primary\"",
+      "description": "Controls the visual treatment and emphasis of the navigation link.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the link height and horizontal padding.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "shape",
+      "type": "\"square\"",
+      "required": false,
+      "description": "Makes an icon-only link square. Pair with an accessible label.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the link to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "justify",
+      "type": "\"center\" | \"start\" | \"between\"",
+      "required": false,
+      "defaultValue": "\"center\"",
+      "description": "Controls how content is distributed inside the link.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "radius",
+      "type": "\"none\" | \"xs\" | \"s\" | \"m\" | \"l\" | \"xl\"",
+      "required": false,
+      "defaultValue": "\"xs\"",
+      "description": "Selects a design-system corner radius.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 34
+      }
+    },
+    {
+      "name": "inset",
+      "type": "\"default\" | \"flush\"",
+      "required": false,
+      "defaultValue": "\"default\"",
+      "description": "Controls the inline inset for navigation aligned with compact popup content.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 36
+      }
+    },
+    {
+      "name": "prefix",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Renders decorative content before the visible label.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "suffix",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Renders decorative content after the visible label.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the native anchor destination when render composition is not used.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 42
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes ButtonLink presentation onto a router link component.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 44
+      }
+    }
+  ],
+  "textLink": [
+    {
+      "name": "variant",
+      "type": "\"default\" | \"title\" | \"body\" | \"label\" | \"caption\" | \"heading-l\" | \"heading-m\" | \"heading-s\" | \"heading-xs\"",
+      "required": false,
+      "defaultValue": "\"default\"",
+      "description": "Controls the typography role used by the link label.",
+      "source": {
+        "path": "packages/design-system/src/components/textLink/textLink.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "trailingIcon",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Keeps a decorative icon attached to the final line of link text.",
+      "source": {
+        "path": "packages/design-system/src/components/textLink/textLink.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the native anchor destination when render composition is not used.",
+      "source": {
+        "path": "packages/design-system/src/components/textLink/textLink.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes link semantics and styles onto a router link component.",
+      "source": {
+        "path": "packages/design-system/src/components/textLink/textLink.tsx",
+        "line": 26
       }
     }
   ],
@@ -1259,7 +1420,18 @@
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 19
+        "line": 25
+      }
+    },
+    {
+      "name": "variant",
+      "type": "\"default\" | \"subtle\"",
+      "required": false,
+      "defaultValue": "\"default\"",
+      "description": "Controls the input's visual prominence.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 27
       }
     },
     {
@@ -1270,7 +1442,7 @@
       "description": "Stretches the input to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 21
+        "line": 29
       }
     },
     {
@@ -1281,7 +1453,7 @@
       "description": "Marks the input as invalid and exposes that state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 23
+        "line": 31
       }
     },
     {
@@ -1292,7 +1464,7 @@
       "description": "Disables editing and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 25
+        "line": 33
       }
     },
     {
@@ -1303,7 +1475,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 27
+        "line": 35
       }
     },
     {
@@ -1313,7 +1485,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 29
+        "line": 37
       }
     },
     {
@@ -1323,7 +1495,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 31
+        "line": 39
       }
     },
     {
@@ -1333,7 +1505,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 33
+        "line": 41
       }
     },
     {
@@ -1343,7 +1515,7 @@
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 43
       }
     }
   ],
@@ -1946,16 +2118,6 @@
       }
     },
     {
-      "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
-      "required": false,
-      "description": "Controls the input height.",
-      "source": {
-        "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 19
-      }
-    },
-    {
       "name": "invalid",
       "type": "boolean",
       "required": false,
@@ -1986,6 +2148,16 @@
       }
     },
     {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "description": "Controls the input height.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 25
+      }
+    },
+    {
       "name": "validationDebounceTime",
       "type": "number",
       "required": false,
@@ -1996,10 +2168,10 @@
       }
     },
     {
-      "name": "readOnly",
-      "type": "boolean",
+      "name": "variant",
+      "type": "\"default\" | \"subtle\"",
       "required": false,
-      "description": "Prevents editing while preserving focus and text selection.",
+      "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
         "line": 27
@@ -2017,13 +2189,23 @@
       }
     },
     {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "Prevents editing while preserving focus and text selection.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 35
+      }
+    },
+    {
       "name": "defaultValue",
       "type": "string | number | readonly string[]",
       "required": false,
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 29
+        "line": 37
       }
     },
     {
@@ -2033,7 +2215,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 31
+        "line": 39
       }
     },
     {
@@ -2043,7 +2225,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 33
+        "line": 41
       }
     },
     {
@@ -2053,7 +2235,7 @@
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 43
       }
     }
   ],
@@ -2066,7 +2248,7 @@
       "description": "Controls the search input height.",
       "source": {
         "path": "packages/design-system/src/components/search/search.tsx",
-        "line": 8
+        "line": 10
       }
     },
     {
@@ -2077,7 +2259,7 @@
       "description": "Stretches the search control to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/search/search.tsx",
-        "line": 10
+        "line": 12
       }
     },
     {
@@ -2088,7 +2270,17 @@
       "description": "Disables editing and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/search/search.tsx",
-        "line": 12
+        "line": 14
+      }
+    },
+    {
+      "name": "shortcut",
+      "type": "\"command-k\"",
+      "required": false,
+      "description": "Shows the Command K keyboard shortcut hint.",
+      "source": {
+        "path": "packages/design-system/src/components/search/search.tsx",
+        "line": 16
       }
     },
     {
@@ -2098,7 +2290,7 @@
       "description": "Sets the initial query when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/search/search.tsx",
-        "line": 14
+        "line": 18
       }
     },
     {
@@ -2108,7 +2300,7 @@
       "description": "Sets the current query when controlled.",
       "source": {
         "path": "packages/design-system/src/components/search/search.tsx",
-        "line": 16
+        "line": 20
       }
     },
     {
@@ -2118,7 +2310,7 @@
       "description": "Runs when the query changes.",
       "source": {
         "path": "packages/design-system/src/components/search/search.tsx",
-        "line": 18
+        "line": 22
       }
     }
   ],

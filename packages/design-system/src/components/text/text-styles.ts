@@ -1,6 +1,3 @@
-// Maps CSS props to style maps.
-// Does not encore design decisions
-//
 import * as stylex from '@stylexjs/stylex'
 
 import { backgroundColors, textColors } from '../../tokens/semantics.stylex'
@@ -53,6 +50,21 @@ export const textUtilityStyles = stylex.create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  withTrailingIcon: {
+    display: 'inline-block',
+    position: 'relative',
+    paddingRight: spacing.xl,
+  },
+  trailingIcon: {
+    alignItems: 'center',
+    display: 'inline-flex',
+    lineHeight: '1lh',
+    position: 'absolute',
+    verticalAlign: 'top',
+    height: '1lh',
+    marginLeft: spacing.xs,
+    width: '1em',
   },
 })
 

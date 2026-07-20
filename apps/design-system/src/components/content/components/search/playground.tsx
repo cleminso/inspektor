@@ -11,10 +11,16 @@ export interface SearchPlaygroundState {
   size: InputSize;
   fullWidth: boolean;
   disabled: boolean;
+  shortcut: boolean;
   [key: string]: boolean | string;
 }
 
-const initialState: SearchPlaygroundState = { size: "m", fullWidth: true, disabled: false };
+const initialState: SearchPlaygroundState = {
+  size: "m",
+  fullWidth: true,
+  disabled: false,
+  shortcut: false,
+};
 
 const controls = [
   {
@@ -25,6 +31,7 @@ const controls = [
   },
   { kind: "boolean", key: "fullWidth", label: "Full width" },
   { kind: "boolean", key: "disabled", label: "Disabled" },
+  { kind: "boolean", key: "shortcut", label: "Command K shortcut" },
 ] as const satisfies readonly PlaygroundControl<SearchPlaygroundState>[];
 
 export function serializeSearchPlayground(state: SearchPlaygroundState): string {
@@ -32,6 +39,7 @@ export function serializeSearchPlayground(state: SearchPlaygroundState): string 
   if (state.size !== "m") props.push(`size="${state.size}"`);
   if (state.fullWidth === false) props.push("fullWidth={false}");
   if (state.disabled === true) props.push("disabled");
+  if (state.shortcut === true) props.push('shortcut="command-k"');
   return createPlaygroundSource({
     imports: { Search: true },
     example: `<Search ${props.join(" ")} />`,
@@ -56,7 +64,14 @@ export function SearchPlayground({ children }: { children?: ReactNode }): ReactE
       source={searchItem.source}
       preview={
         <Box width="popup-width-m">
-          <Search aria-label="Search tables" placeholder="Search tables" {...state} />
+          <Search
+            aria-label="Search tables"
+            placeholder="Search tables"
+            size={state.size}
+            fullWidth={state.fullWidth}
+            disabled={state.disabled}
+            shortcut={state.shortcut === true ? "command-k" : undefined}
+          />
         </Box>
       }
       sourceCode={serializeSearchPlayground(state)}

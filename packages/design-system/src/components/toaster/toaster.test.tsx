@@ -1,9 +1,58 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { backgroundColors, textColors } from '../../tokens/semantics.stylex'
 import { Toaster, toasts } from './toaster'
 import { toasterStyles } from './toaster.styles'
+import { toasterVars } from './toasterVars.stylex'
+
+const stackContractStyles = stylex.create({
+  frontmostOrder: {
+    zIndex: 3,
+  },
+  middleOrder: {
+    zIndex: 2,
+  },
+  backOrder: {
+    zIndex: 1,
+  },
+  expandedGap: {
+    transform:
+      'translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * 8px + var(--toast-swipe-movement-y)))',
+  },
+})
+
+const semanticStatusStyles = stylex.create({
+  error: {
+    [toasterVars.actionBackground]: backgroundColors['bg-danger'],
+    backgroundColor: backgroundColors['bg-danger'],
+    boxShadow: 'none',
+    color: textColors['fg-danger'],
+  },
+  success: {
+    [toasterVars.actionBackground]: backgroundColors['bg-success'],
+    backgroundColor: backgroundColors['bg-success'],
+    boxShadow: 'none',
+    color: textColors['fg-success'],
+  },
+  warning: {
+    [toasterVars.actionBackground]: backgroundColors['bg-warning'],
+    backgroundColor: backgroundColors['bg-warning'],
+    boxShadow: 'none',
+    color: textColors['fg-warning'],
+  },
+  action: {
+    backgroundColor: toasterVars.actionBackground,
+    borderWidth: 0,
+  },
+})
+
+function expectStyleClasses(element: Element | null, className: string | undefined) {
+  for (const atomicClassName of className?.split(' ') ?? []) {
+    expect(element?.className).toContain(atomicClassName)
+  }
+}
 
 afterEach(async () => {
   toasts.dismiss()
@@ -55,6 +104,58 @@ describe('Toaster', () => {
 
     expect(description.className).toContain(stylex.props(toasterStyles.description).className)
     expect(closeButton?.className).toContain(stylex.props(toasterStyles.close).className)
+  })
+
+  it('uses semantic status surfaces without leading icons', async () => {
+    render(<Toaster />)
+
+    toasts.error('Danger notification', { preserve: true, undo: () => undefined })
+    toasts.warning('Warning notification', { preserve: true })
+    toasts.success('Success notification', { preserve: true })
+
+    const errorToast = (await screen.findByText('Danger notification')).closest(
+      '[data-slot="toast"]',
+    )
+    const warningToast = screen.getByText('Warning notification').closest('[data-slot="toast"]')
+    const successToast = screen.getByText('Success notification').closest('[data-slot="toast"]')
+    const action = screen.getByRole('button', { name: 'Undo' })
+
+    expectStyleClasses(errorToast, stylex.props(semanticStatusStyles.error).className)
+    expectStyleClasses(warningToast, stylex.props(semanticStatusStyles.warning).className)
+    expectStyleClasses(successToast, stylex.props(semanticStatusStyles.success).className)
+    expectStyleClasses(action, stylex.props(semanticStatusStyles.action).className)
+    expect(document.querySelector('[data-slot="toast-icon"]')).toBeNull()
+  })
+
+  it('keeps the front toast above hidden content and spaces the expanded stack', async () => {
+    render(<Toaster />)
+
+    toasts.message('First notification', { preserve: true })
+    toasts.message('Second notification', { preserve: true })
+    toasts.message('Third notification', { preserve: true })
+
+    await screen.findByText('Third notification')
+
+    const viewport = screen.getByLabelText('Notifications')
+    const toastElements = Array.from(viewport.querySelectorAll('[data-slot="toast"]'))
+    const orderClassNames = [
+      stylex.props(stackContractStyles.frontmostOrder).className,
+      stylex.props(stackContractStyles.middleOrder).className,
+      stylex.props(stackContractStyles.backOrder).className,
+    ]
+    const expandedGapClassName = stylex.props(stackContractStyles.expandedGap).className
+
+    for (const [index, toast] of toastElements.entries()) {
+      expect(toast.className).toContain(orderClassNames[index])
+    }
+
+    fireEvent.mouseEnter(viewport)
+
+    await waitFor(() => {
+      for (const toast of toastElements) {
+        expect(toast.className).toContain(expandedGapClassName)
+      }
+    })
   })
 
   it('runs the constrained Undo action', async () => {

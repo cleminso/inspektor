@@ -12,6 +12,8 @@ import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
 import StatesExample from "./statesExample";
 import statesSource from "./statesExample.tsx?raw";
+import VariantsExample from "./variantsExample";
+import variantsSource from "./variantsExample.tsx?raw";
 
 const inputProps = getGeneratedProps(inputItem.componentId, inputPropNames);
 
@@ -21,6 +23,15 @@ export function InputPage(): ReactElement {
       <Section title="Sizes" description="Choose a height that matches nearby controls.">
         <Example source={sizesSource}>
           <SizesExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Variants"
+        description="Use subtle for low-emphasis filtering controls that reveal their border on hover or focus."
+      >
+        <Example source={variantsSource}>
+          <VariantsExample />
         </Example>
       </Section>
 

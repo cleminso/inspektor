@@ -28,6 +28,16 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "buttonLink",
+    exportName: "ButtonLink",
+    inheritedProps: [],
+  },
+  {
+    componentId: "textLink",
+    exportName: "TextLink",
+    inheritedProps: [],
+  },
+  {
     componentId: "copyButton",
     exportName: "CopyButton",
     inheritedProps: [],

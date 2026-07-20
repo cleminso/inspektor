@@ -1,8 +1,7 @@
 import { Box, Text, type TextColor, type TextVariant } from "@inspector/ds";
 import { type ReactElement } from "react";
 
-import { DocsPage } from "@/components/docs/docsPage";
-import { PageHeader } from "@/components/docs/pageHeader";
+import { FoundationDocsPage } from "@/components/docs/foundationDocsPage";
 import { Section } from "@/components/docs/section";
 import { typographyFoundationItem } from "@/lib/registry";
 
@@ -31,13 +30,7 @@ const textColors = [
 
 export function TypographyFoundationPage(): ReactElement {
   return (
-    <DocsPage>
-      <PageHeader
-        title={typographyFoundationItem.title}
-        description={typographyFoundationItem.description}
-        source={typographyFoundationItem.source}
-      />
-
+    <FoundationDocsPage item={typographyFoundationItem}>
       <Section
         title="Roles"
         description="Text variants pair visual hierarchy with appropriate semantic defaults."
@@ -92,15 +85,9 @@ export function TypographyFoundationPage(): ReactElement {
 
       <Section title="Utilities" description="Formatting helpers cover data-heavy interfaces.">
         <Box flexDirection="column" gap="m">
-          <Text monospace>
-            monospace: connection_42
-          </Text>
-          <Text tabularNums>
-            tabularNums: 1,234,567
-          </Text>
-          <Text formatter="compact">
-            {1284000}
-          </Text>
+          <Text monospace>monospace: connection_42</Text>
+          <Text tabularNums>tabularNums: 1,234,567</Text>
+          <Text formatter="compact">{1284000}</Text>
           <Text lineThrough>Previous value</Text>
           <Text loading placeholderText="Loading account name">
             Account name
@@ -110,6 +97,6 @@ export function TypographyFoundationPage(): ReactElement {
           </Text>
         </Box>
       </Section>
-    </DocsPage>
+    </FoundationDocsPage>
   );
 }

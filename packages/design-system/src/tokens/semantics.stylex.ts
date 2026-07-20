@@ -35,8 +35,9 @@ export const backgroundColors = stylex.defineVars({
   'bg-secondary-hover': `light-dark(${palette.gray300}, ${palette.neutral700})`,
   'bg-danger': `light-dark(${palette.red100}, ${palette.red950})`,
   'bg-danger-hover': `light-dark(${palette.red200}, ${palette.red900})`,
-  'bg-success': `light-dark(${palette.green600}, ${palette.green400})`,
-  'bg-accent': `light-dark(${palette.yellow500}, ${palette.yellow400})`,
+  'bg-success': `light-dark(${palette.green200}, ${palette.green900})`,
+  'bg-warning': `light-dark(${palette.orange100}, ${palette.orange900})`,
+  'bg-accent': `light-dark(${palette.yellow400}, ${palette.yellow500})`,
 
   // Notifications
   'bg-notification-warning': `light-dark(${palette.orange100}, ${palette.orange900})`,
@@ -58,7 +59,8 @@ export const textColors = stylex.defineVars({
   'fg-primary': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'fg-secondary': `light-dark(${palette.gray900}, ${palette.neutral50})`,
   'fg-danger': `light-dark(${palette.red600}, ${palette.red500})`,
-  'fg-success': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'fg-success': `light-dark(${palette.green700}, ${palette.green400})`,
+  'fg-warning': `light-dark(${palette.orange700}, ${palette.orange400})`,
   'fg-accent': `light-dark(${palette.gray900}, ${palette.neutral50})`,
   'fg-inverse': `light-dark(${palette.gray50}, ${palette.neutral950})`,
 
@@ -124,7 +126,7 @@ export const textRoleStyles = stylex.create({
   },
   title: {
     fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[2],
+    fontSize: fontSizes[3],
     lineHeight: lineHeights.normal,
     fontWeight: fontWeights.medium,
   },

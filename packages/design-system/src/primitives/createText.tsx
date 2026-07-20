@@ -33,6 +33,7 @@ type TextTag =
   | 'h4'
   | 'h5'
   | 'h6'
+  | 'a'
 
 export type TextVariant =
   | 'default'
@@ -125,6 +126,8 @@ export type TextProps<E extends TextTag = 'p'> = TextStyleProps & {
   placeholderNumberOfLines?: number
   /** Provides the accessible name announced while content is loading. */
   loadingLabel?: string
+  /** Keeps a trailing icon attached to the final line of text. */
+  trailingIcon?: ReactNode
   /** Applies a semantic line-through treatment. */
   lineThrough?: boolean
   monospace?: boolean
@@ -148,6 +151,7 @@ function TextInner<E extends TextTag = 'p'>(
     placeholderText,
     placeholderNumberOfLines = 1,
     loadingLabel,
+    trailingIcon,
     lineThrough = false,
     monospace,
     tabularNums,
@@ -200,6 +204,19 @@ function TextInner<E extends TextTag = 'p'>(
         <span data-slot="text-skeleton" aria-hidden="true" {...stylex.props(textLoadingStyles.skeleton)} />
       </span>
     )
+  const contentWithTrailingIcon =
+    trailingIcon !== undefined && loading === false ? (
+      <>
+        {content}
+        <span
+          data-slot="text-trailing-icon"
+          aria-hidden="true"
+          {...stylex.props(textUtilityStyles.trailingIcon)}
+        >
+          {trailingIcon}
+        </span>
+      </>
+    ) : content
 
   const stylexProps = stylex.props(
     textBaseStyles.base,
@@ -212,6 +229,7 @@ function TextInner<E extends TextTag = 'p'>(
     monospace === true && textUtilityStyles.monospace,
     tabularNums === true && textUtilityStyles.tabularNums,
     truncate === true && textUtilityStyles.truncate,
+    trailingIcon !== undefined && textUtilityStyles.withTrailingIcon,
   )
 
   const inlineStyle = {
@@ -240,7 +258,7 @@ function TextInner<E extends TextTag = 'p'>(
       aria-busy={loading === true ? true : consumerAriaBusy}
       aria-label={loading === true ? loadingAccessibleLabel : props['aria-label']}
     >
-      {content}
+      {contentWithTrailingIcon}
     </Tag>
   )
 }

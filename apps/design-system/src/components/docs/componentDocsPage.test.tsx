@@ -41,7 +41,9 @@ describe("ComponentDocsPage", () => {
     );
     const documentation = screen.getByRole("region", { name: "Button documentation" });
     expect(documentation.textContent).toContain("Sizes");
-    expect(documentation.querySelector("div")?.getAttribute("style")).toContain("width: 100%;");
+    const documentationPage = documentation.querySelector("div");
+    expect(documentationPage?.getAttribute("style")).toContain("width: 100%;");
+    expect(documentationPage?.getAttribute("data-docs-width")).toBe("full");
   });
 
   it("keeps the toolbar and controls fixed while only the center content scrolls", () => {
@@ -65,6 +67,7 @@ describe("ComponentDocsPage", () => {
     expect(scrollArea).not.toBeNull();
     expect(scrollArea?.contains(toolbar)).toBe(false);
     expect(toolbar.nextElementSibling).toBe(scrollArea);
+    expect(scrollArea?.getAttribute("data-scroll-fade")).toBe("top");
     expect(scrollArea?.getAttribute("style")).toContain("width: 100%;");
     expect(screen.getByRole("region", { name: "Copy Button playground" }).getAttribute("style")).toContain(
       "min-width: 0px;",

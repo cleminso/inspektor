@@ -14,7 +14,7 @@ import { keyboardInputVars } from "./keyboardInputVars.stylex";
 export const keyboardInputStyles = stylex.create({
   root: {
     borderRadius: borderRadii.xs,
-    paddingInline: spacing.xs,
+    paddingInline: spacing.s,
     alignItems: "center",
     backgroundColor: keyboardInputVars.backgroundColor,
     boxShadow: keyboardInputVars.boxShadow,
@@ -23,9 +23,9 @@ export const keyboardInputStyles = stylex.create({
     display: "inline-flex",
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    fontWeight: fontWeights.medium,
+    fontWeight: fontWeights.regular,
     justifyContent: "center",
-    lineHeight: lineHeights.none,
+    lineHeight: lineHeights.relaxed,
     userSelect: "none",
     whiteSpace: "nowrap",
     minHeight: spatial["control-height-s"],
@@ -39,6 +39,7 @@ export const keyboardInputStyles = stylex.create({
   small: {
     paddingInline: spacing.xs,
     fontSize: fontSizes[1],
+    height: spatial["icon-size-l"],
     minHeight: spatial["icon-size-l"],
     minWidth: spatial["icon-size-l"],
   },

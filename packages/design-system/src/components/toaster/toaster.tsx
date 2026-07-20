@@ -4,7 +4,6 @@ import { Toast as BaseToast } from '@base-ui/react/toast'
 import * as stylex from '@stylexjs/stylex'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
-import { Spinner } from '../spinner/spinner'
 import { toasterStyles } from './toaster.styles'
 
 export type ToastId = string | number
@@ -88,12 +87,18 @@ export const toasts: Toasts = {
 }
 
 const statusStyles = {
-  message: toasterStyles.iconMessage,
-  success: toasterStyles.iconSuccess,
-  warning: toasterStyles.iconWarning,
-  error: toasterStyles.iconError,
-  loading: toasterStyles.iconLoading,
+  message: undefined,
+  success: toasterStyles.toastSuccess,
+  warning: toasterStyles.toastWarning,
+  error: toasterStyles.toastError,
+  loading: undefined,
 } satisfies Record<ToastStatus, unknown>
+
+const stackOrderStyles = [
+  toasterStyles.toastFrontmost,
+  toasterStyles.toastMiddle,
+  toasterStyles.toastBack,
+] as const
 
 function getToastStatus(type: string | undefined): ToastStatus {
   if (type === 'success' || type === 'warning' || type === 'error' || type === 'loading') {
@@ -102,46 +107,15 @@ function getToastStatus(type: string | undefined): ToastStatus {
   return 'message'
 }
 
-function ToastIcon({ status }: { status: ToastStatus }) {
-  const iconStyleProps = stylex.props(toasterStyles.icon, statusStyles[status])
-
-  if (status === 'loading') {
-    return (
-      <span {...iconStyleProps} data-slot="toast-icon">
-        <Spinner size="s" />
-      </span>
-    )
-  }
-
-  const path = {
-    message: 'M8 4.5v4M8 11.5h.01',
-    success: 'm4 8 2.5 2.5L12 5',
-    warning: 'M8 4.5v4M8 11.5h.01',
-    error: 'M5 5l6 6m0-6-6 6',
-  }[status]
-
-  return (
-    <span {...iconStyleProps} data-slot="toast-icon">
-      <svg aria-hidden="true" fill="none" viewBox="0 0 16 16">
-        <path
-          d={path}
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.5"
-        />
-      </svg>
-    </span>
-  )
-}
-
 function ToastList() {
   const { toasts: activeToasts } = BaseToast.useToastManager()
 
-  return activeToasts.map((toast) => {
+  return activeToasts.map((toast, index) => {
     const status = getToastStatus(toast.type)
     const rootStyleProps = createStateStyleProps<BaseToast.Root.State>((state) => [
       toasterStyles.toast,
+      statusStyles[status],
+      stackOrderStyles[Math.min(index, stackOrderStyles.length - 1)],
       state.expanded === true && toasterStyles.toastExpanded,
       state.limited === true && toasterStyles.toastLimited,
       state.transitionStatus === 'starting' && toasterStyles.toastStarting,
@@ -175,7 +149,6 @@ function ToastList() {
         data-status={status}
       >
         <BaseToast.Content {...contentStyleProps}>
-          <ToastIcon status={status} />
           <span {...stylex.props(toasterStyles.text)}>
             <BaseToast.Title {...stylex.props(toasterStyles.title)} />
             <BaseToast.Description

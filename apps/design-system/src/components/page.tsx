@@ -1,5 +1,5 @@
-import { Button } from "@inspector/ds";
-import { Link } from "@tanstack/react-router";
+import { ButtonLink } from "@inspector/ds";
+import { Link as RouterLink } from "@tanstack/react-router";
 
 import { type ReactElement } from "react";
 
@@ -25,9 +25,9 @@ export function NotFoundPage(): ReactElement {
         title="Page not found"
         description="This design-system page does not exist or is not documented."
       />
-      <Button variant="outline" render={<Link to="/" />}>
+      <ButtonLink variant="outline" render={<RouterLink to="/" />}>
         Return to the catalog
-      </Button>
+      </ButtonLink>
     </DocsPage>
   );
 }

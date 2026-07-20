@@ -1,5 +1,6 @@
 export const inputPropNames = [
   "size",
+  "variant",
   "fullWidth",
   "invalid",
   "disabled",

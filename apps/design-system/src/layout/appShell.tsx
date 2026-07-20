@@ -1,4 +1,4 @@
-import { Box, Button, Text } from "@inspector/ds";
+import { Box, Button, ButtonLink, Text } from "@inspector/ds";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { HeadContent, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Moon, Sun } from "lucide-react";
@@ -9,7 +9,9 @@ import { navigationItems, navSections, type NavItem } from "@/lib/registry";
 import { AppShellLayoutProvider, useAppShellLayout } from "@/layout/appShellLayout";
 
 export function getMainContentOverflowY(pathname: string): "auto" | "hidden" {
-  return pathname.startsWith("/components/") ? "hidden" : "auto";
+  return pathname.startsWith("/components/") || pathname.startsWith("/foundations/")
+    ? "hidden"
+    : "auto";
 }
 
 export function getAdjacentNavigationItems(pathname: string): {
@@ -118,9 +120,6 @@ function AppShellContent(): ReactElement {
               overflowY="auto"
               data-scroll-area="navigation"
               padding="m"
-              borderRightWidth={1}
-              borderStyle="solid"
-              borderColor="border"
             >
               <Box as="nav" flexDirection="column" gap="2xl" aria-label="Design system navigation">
                 {navSections.map((section) => (
@@ -132,7 +131,7 @@ function AppShellContent(): ReactElement {
                       {section.items.map((item) => {
                         const isActive = pathname === item.href;
                         return (
-                          <Button
+                          <ButtonLink
                             key={item.href}
                             variant={isActive === true ? "secondary" : "ghost"}
                             size="l"
@@ -143,7 +142,7 @@ function AppShellContent(): ReactElement {
                             radius="none"
                           >
                             {item.title}
-                          </Button>
+                          </ButtonLink>
                         );
                       })}
                     </Box>
@@ -162,7 +161,9 @@ function AppShellContent(): ReactElement {
             minHeight={0}
             overflowX="hidden"
             overflowY={getMainContentOverflowY(pathname)}
-            data-scroll-area={pathname.startsWith("/components/") ? undefined : "main-content"}
+            data-scroll-area={
+              getMainContentOverflowY(pathname) === "auto" ? "main-content" : undefined
+            }
           >
             <Outlet />
           </Box>

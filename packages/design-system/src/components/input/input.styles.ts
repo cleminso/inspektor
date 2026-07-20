@@ -46,6 +46,14 @@ export const inputStyles = stylex.create({
   sizeL: {
     height: spatial["control-height-l"],
   },
+  subtle: {
+    borderColor: {
+      default: "transparent",
+      ":hover": borderColors.border,
+      ":focus": borderColors["border-focused"],
+    },
+    backgroundColor: backgroundColors["bg-subtle"],
+  },
   fullWidth: {
     width: "100%",
   },

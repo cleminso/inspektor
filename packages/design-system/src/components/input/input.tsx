@@ -7,6 +7,7 @@ import { InputGroupContext } from "../inputGroup/inputGroupContext";
 import { inputStyles } from "./input.styles";
 
 export type InputSize = "s" | "m" | "l";
+export type InputVariant = "default" | "subtle";
 
 const sizeStyles = {
   s: inputStyles.sizeS,
@@ -14,9 +15,16 @@ const sizeStyles = {
   l: inputStyles.sizeL,
 } satisfies Record<InputSize, unknown>;
 
+const variantStyles = {
+  default: undefined,
+  subtle: inputStyles.subtle,
+} satisfies Record<InputVariant, unknown>;
+
 export interface InputProps extends Omit<BaseInput.Props, "className" | "style" | "size"> {
   /** Controls the input height. */
   size?: InputSize;
+  /** Controls the input's visual prominence. */
+  variant?: InputVariant;
   /** Stretches the input to the width of its container. */
   fullWidth?: boolean;
   /** Marks the input as invalid and exposes that state to assistive technology. */
@@ -37,6 +45,7 @@ export interface InputProps extends Omit<BaseInput.Props, "className" | "style" 
 
 export function Input({
   size = "m",
+  variant = "default",
   fullWidth = false,
   invalid = false,
   disabled = false,
@@ -48,6 +57,7 @@ export function Input({
   const effectiveSize = inputGroup?.size ?? size;
   const stateStyleProps = createStateStyleProps<BaseInput.State>((state) => [
     inputStyles.base,
+    variantStyles[variant],
     sizeStyles[effectiveSize],
     fullWidth === true && inputStyles.fullWidth,
     inputGroup !== null && inputStyles.grouped,
@@ -66,6 +76,7 @@ export function Input({
       style={stateStyleProps.style}
       data-slot="input"
       data-size={size}
+      data-variant={variant}
       data-full-width={fullWidth === true ? "" : undefined}
       data-grouped={inputGroup !== null ? "" : undefined}
     />

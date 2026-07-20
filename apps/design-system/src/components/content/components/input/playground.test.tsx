@@ -12,6 +12,7 @@ describe("Input playground", () => {
     expect(
       serializeInputPlayground({
         size: "m",
+        variant: "default",
         fullWidth: false,
         invalid: false,
         disabled: false,

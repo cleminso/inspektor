@@ -40,6 +40,45 @@ body {
   overflow: hidden;
 }
 
+@property --docs-scroll-fade-top {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes docs-scroll-fade-top {
+  from {
+    --docs-scroll-fade-top: 0px;
+  }
+
+  to {
+    --docs-scroll-fade-top: 24px;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  [data-scroll-fade="top"] {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      black var(--docs-scroll-fade-top),
+      black 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      black var(--docs-scroll-fade-top),
+      black 100%
+    );
+    animation-name: docs-scroll-fade-top;
+    animation-duration: auto;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(self y);
+    animation-range: 0 64px;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   [data-scroll-area] {
     scrollbar-color: transparent transparent;
@@ -116,7 +155,7 @@ select {
 html.dark [data-docs-code-content] .shiki,
 html.dark [data-docs-code-content] .shiki span {
   color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
+  background-color: var(--shiki-nord) !important;
   font-style: var(--shiki-dark-font-style) !important;
   font-weight: var(--shiki-dark-font-weight) !important;
   text-decoration: var(--shiki-dark-text-decoration) !important;

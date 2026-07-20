@@ -38,6 +38,13 @@ describe('Text', () => {
     expect(screen.getByText('Danger').className).not.toBe('')
   })
 
+  it('reserves interactive link styling for the TextLink component', () => {
+    // @ts-expect-error Text does not expose interactive link styling.
+    const interactive = <Text color="interactive">Button</Text>
+
+    expect(interactive).toBeDefined()
+  })
+
   it('strips styling escape hatches passed by untyped consumers', () => {
     render(
       <Text

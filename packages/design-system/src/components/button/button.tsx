@@ -1,62 +1,28 @@
 import { Button as BaseButton } from '@base-ui/react/button'
-import * as stylex from '@stylexjs/stylex'
 import { useContext } from 'react'
 import type React from 'react'
 
-import { buttonGroupStyles } from '../buttonGroup/buttonGroup.styles'
 import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
-import { Spinner } from '../spinner/spinner'
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
-import { buttonStyles } from './button.styles'
+import {
+  ButtonContent,
+  getButtonVisualStyles,
+  type ButtonInset,
+  type ButtonJustify,
+  type ButtonRadius,
+  type ButtonShape,
+  type ButtonSize,
+  type ButtonVariant,
+} from './buttonVisuals'
 
-export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'danger'
-  | 'ghost'
-  | 'outline'
-  | 'link'
-
-export type ButtonSize = 's' | 'm' | 'l'
-export type ButtonShape = 'square'
-export type ButtonJustify = 'center' | 'start' | 'between'
-export type ButtonRadius = 'none' | 'xs' | 's' | 'm' | 'l' | 'xl'
-export type ButtonInset = 'default' | 'flush'
-
-const variantStyles = {
-  primary: buttonStyles.primary,
-  secondary: buttonStyles.secondary,
-  danger: buttonStyles.danger,
-  ghost: buttonStyles.ghost,
-  outline: buttonStyles.outline,
-  link: buttonStyles.link,
-} satisfies Record<ButtonVariant, unknown>
-
-const sizeStyles = {
-  s: buttonStyles.sizeS,
-  m: buttonStyles.sizeM,
-  l: buttonStyles.sizeL,
-} satisfies Record<ButtonSize, unknown>
-
-const justifyStyles = {
-  center: buttonStyles.justifyCenter,
-  start: buttonStyles.justifyStart,
-  between: buttonStyles.justifyBetween,
-} satisfies Record<ButtonJustify, unknown>
-
-const radiusStyles = {
-  none: buttonStyles.radiusNone,
-  xs: buttonStyles.radiusXS,
-  s: buttonStyles.radiusS,
-  m: buttonStyles.radiusM,
-  l: buttonStyles.radiusL,
-  xl: buttonStyles.radiusXL,
-} satisfies Record<ButtonRadius, unknown>
-
-const insetStyles = {
-  default: undefined,
-  flush: buttonStyles.insetFlush,
-} satisfies Record<ButtonInset, unknown>
+export type {
+  ButtonInset,
+  ButtonJustify,
+  ButtonRadius,
+  ButtonShape,
+  ButtonSize,
+  ButtonVariant,
+} from './buttonVisuals'
 
 export interface ButtonProps
   extends Omit<
@@ -85,7 +51,7 @@ export interface ButtonProps
   suffix?: React.ReactNode
   /** Disables interaction and exposes the disabled state to assistive technology. */
   disabled?: BaseButton.Props['disabled']
-  /** Composes Button behavior and styles onto another element, such as a link. */
+  /** Composes Button behavior and styles onto another native button component. */
   render?: BaseButton.Props['render']
 }
 
@@ -109,20 +75,19 @@ export function Button({
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const isDisabled = disabled === true
   const isInteractionBlocked = isDisabled === true || loading === true
-  const stateStyleProps = createStateStyleProps<BaseButton.State>((state) => [
-    buttonStyles.base,
-    variantStyles[variant],
-    sizeStyles[size],
-    shape === 'square' && buttonStyles.square,
-    radiusStyles[radius],
-    insetStyles[inset],
-    buttonGroupOrientation !== null && buttonGroupStyles.member,
-    buttonGroupOrientation === 'horizontal' && buttonGroupStyles.memberHorizontal,
-    buttonGroupOrientation === 'vertical' && buttonGroupStyles.memberVertical,
-    fullWidth === true && buttonStyles.fullWidth,
-    justifyStyles[justify],
-    state.disabled === true && buttonStyles.disabled,
-  ])
+  const stateStyleProps = createStateStyleProps<BaseButton.State>((state) =>
+    getButtonVisualStyles({
+      variant,
+      size,
+      shape,
+      fullWidth,
+      justify,
+      radius,
+      inset,
+      orientation: buttonGroupOrientation,
+      disabled: state.disabled,
+    }),
+  )
 
   return (
     <BaseButton
@@ -141,33 +106,15 @@ export function Button({
       data-slot="button"
       data-variant={variant}
     >
-      <span
-        {...stylex.props(buttonStyles.content)}
+      <ButtonContent
+        prefix={prefix}
+        suffix={suffix}
+        shape={shape}
+        loading={loading}
+        size={size}
       >
-        {shape === 'square' ? (
-          loading === true ? <Spinner size={size} /> : children
-        ) : (
-          <>
-            {loading === true || prefix !== undefined ? (
-              <span
-                aria-hidden="true"
-                {...stylex.props(buttonStyles.iconSlot)}
-              >
-                {loading === true ? <Spinner size={size} /> : prefix}
-              </span>
-            ) : null}
-            {children}
-            {suffix !== undefined ? (
-              <span
-                aria-hidden="true"
-                {...stylex.props(buttonStyles.iconSlot)}
-              >
-                {suffix}
-              </span>
-            ) : null}
-          </>
-        )}
-      </span>
+        {children}
+      </ButtonContent>
     </BaseButton>
   )
 }

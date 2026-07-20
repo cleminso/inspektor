@@ -4,8 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { type ReactElement } from "react";
 import { useTheme } from "next-themes";
 
-import { DocsPage } from "@/components/docs/docsPage";
-import { PageHeader } from "@/components/docs/pageHeader";
+import { FoundationDocsPage } from "@/components/docs/foundationDocsPage";
 import { Section } from "@/components/docs/section";
 import { colorsFoundationItem } from "@/lib/registry";
 
@@ -13,7 +12,16 @@ const scaleSteps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as con
 
 type ScaleStep = (typeof scaleSteps)[number];
 type ThemeMode = "light" | "dark";
-type ScaleName = "gray" | "grayAlpha" | "neutral" | "neutralAlpha" | "blue" | "red" | "orange" | "yellow" | "green";
+type ScaleName =
+  | "gray"
+  | "grayAlpha"
+  | "neutral"
+  | "neutralAlpha"
+  | "blue"
+  | "red"
+  | "orange"
+  | "yellow"
+  | "green";
 
 interface ColorSwatch {
   label: string;
@@ -141,7 +149,9 @@ function ColorScaleRow({ scale }: { scale: ColorScale }): ReactElement {
       gap="m"
       width="full"
     >
-      <Text id={labelId} as="h3" variant="title">{scale.label}</Text>
+      <Text id={labelId} as="h3" variant="title">
+        {scale.label}
+      </Text>
       <ul aria-describedby={labelId} {...stylex.props(styles.swatchList)}>
         {scale.swatches.map((swatch) => (
           <ColorSwatchButton key={swatch.token} swatch={swatch} />
@@ -158,13 +168,7 @@ export function ColorFoundationPage(): ReactElement {
 
   return (
     <>
-      <DocsPage>
-        <PageHeader
-          title={colorsFoundationItem.title}
-          description={colorsFoundationItem.description}
-          source={colorsFoundationItem.source}
-        />
-
+      <FoundationDocsPage item={colorsFoundationItem}>
         <Section
           title="Scales"
           description="Primitive color scales from value.stylex.ts. Select a swatch to copy its OKLCH value. Light mode shows gray scales; dark mode shows neutral scales."
@@ -183,8 +187,7 @@ export function ColorFoundationPage(): ReactElement {
         >
 
         </Section>*/}
-
-      </DocsPage>
+      </FoundationDocsPage>
       <Toaster />
     </>
   );

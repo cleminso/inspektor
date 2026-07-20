@@ -25,4 +25,12 @@ describe("workspace scrollbar styles", () => {
     expect(styles.slice(mediaQueryIndex)).toContain("width: 6px");
     expect(styles.slice(mediaQueryIndex)).toContain("::-webkit-scrollbar-thumb:hover");
   });
+
+  it("fades scrolled documentation beneath the fixed header", () => {
+    expect(styles).toContain("@property --docs-scroll-fade-top");
+    expect(styles).toContain('[data-scroll-fade="top"]');
+    expect(styles).toContain("animation-timeline: scroll(self y)");
+    expect(styles).toContain("animation-range: 0 64px");
+    expect(styles).toContain("mask-image: linear-gradient");
+  });
 });

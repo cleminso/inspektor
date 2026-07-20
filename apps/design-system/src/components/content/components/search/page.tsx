@@ -12,6 +12,8 @@ import { SearchPlayground } from "./playground";
 import { searchPropNames } from "./props";
 import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
+import StatesExample from "./statesExample";
+import statesSource from "./statesExample.tsx?raw";
 
 const searchProps = getGeneratedProps(searchItem.componentId, searchPropNames);
 
@@ -30,6 +32,15 @@ export function SearchPage(): ReactElement {
       <Section title="Sizes" description="Search follows the Input control scale.">
         <Example source={sizesSource}>
           <SizesExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Shortcut and disabled states"
+        description="Use the Command K hint when the search opens through that shortcut. Disabled search remains visible but cannot be edited."
+      >
+        <Example source={statesSource}>
+          <StatesExample />
         </Example>
       </Section>
 

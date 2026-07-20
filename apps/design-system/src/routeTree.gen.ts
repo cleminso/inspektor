@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
+import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
 import { Route as ComponentsContextMenuRouteImport } from './routes/components/context-menu'
@@ -29,6 +30,7 @@ import { Route as ComponentsSelectRouteImport } from './routes/components/select
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
+import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
 import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsToggleGroupRouteImport } from './routes/components/toggle-group'
@@ -49,6 +51,11 @@ const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
 const ComponentsButtonGroupRoute = ComponentsButtonGroupRouteImport.update({
   id: '/components/button-group',
   path: '/components/button-group',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsButtonLinkRoute = ComponentsButtonLinkRouteImport.update({
+  id: '/components/button-link',
+  path: '/components/button-link',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
@@ -138,6 +145,11 @@ const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
   path: '/components/text-field',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTextLinkRoute = ComponentsTextLinkRouteImport.update({
+  id: '/components/text-link',
+  path: '/components/text-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
   id: '/components/textarea',
   path: '/components/textarea',
@@ -173,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
+  '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
@@ -190,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
@@ -201,6 +215,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
+  '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
@@ -218,6 +233,7 @@ export interface FileRoutesByTo {
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
@@ -230,6 +246,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
+  '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
@@ -247,6 +264,7 @@ export interface FileRoutesById {
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
+  '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
@@ -260,6 +278,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/button'
     | '/components/button-group'
+    | '/components/button-link'
     | '/components/checkbox'
     | '/components/combobox'
     | '/components/context-menu'
@@ -277,6 +296,7 @@ export interface FileRouteTypes {
     | '/components/spinner'
     | '/components/switch'
     | '/components/text-field'
+    | '/components/text-link'
     | '/components/textarea'
     | '/components/toast'
     | '/components/toggle-group'
@@ -288,6 +308,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/button'
     | '/components/button-group'
+    | '/components/button-link'
     | '/components/checkbox'
     | '/components/combobox'
     | '/components/context-menu'
@@ -305,6 +326,7 @@ export interface FileRouteTypes {
     | '/components/spinner'
     | '/components/switch'
     | '/components/text-field'
+    | '/components/text-link'
     | '/components/textarea'
     | '/components/toast'
     | '/components/toggle-group'
@@ -316,6 +338,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/button'
     | '/components/button-group'
+    | '/components/button-link'
     | '/components/checkbox'
     | '/components/combobox'
     | '/components/context-menu'
@@ -333,6 +356,7 @@ export interface FileRouteTypes {
     | '/components/spinner'
     | '/components/switch'
     | '/components/text-field'
+    | '/components/text-link'
     | '/components/textarea'
     | '/components/toast'
     | '/components/toggle-group'
@@ -345,6 +369,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
+  ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsComboboxRoute: typeof ComponentsComboboxRoute
   ComponentsContextMenuRoute: typeof ComponentsContextMenuRoute
@@ -362,6 +387,7 @@ export interface RootRouteChildren {
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
+  ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
   ComponentsToastRoute: typeof ComponentsToastRoute
   ComponentsToggleGroupRoute: typeof ComponentsToggleGroupRoute
@@ -391,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/components/button-group'
       fullPath: '/components/button-group'
       preLoaderRoute: typeof ComponentsButtonGroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/button-link': {
+      id: '/components/button-link'
+      path: '/components/button-link'
+      fullPath: '/components/button-link'
+      preLoaderRoute: typeof ComponentsButtonLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/checkbox': {
@@ -512,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsTextFieldRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/text-link': {
+      id: '/components/text-link'
+      path: '/components/text-link'
+      fullPath: '/components/text-link'
+      preLoaderRoute: typeof ComponentsTextLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/textarea': {
       id: '/components/textarea'
       path: '/components/textarea'
@@ -561,6 +601,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
+  ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsComboboxRoute: ComponentsComboboxRoute,
   ComponentsContextMenuRoute: ComponentsContextMenuRoute,
@@ -578,6 +619,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
+  ComponentsTextLinkRoute: ComponentsTextLinkRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,
   ComponentsToastRoute: ComponentsToastRoute,
   ComponentsToggleGroupRoute: ComponentsToggleGroupRoute,
