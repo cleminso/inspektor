@@ -96,7 +96,7 @@ export const inputStyles = stylex.create({
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: {
-      default: 0,
+      default: spatial["focus-ring-width"],
       ":focus-visible": spatial["focus-ring-width"],
     },
   },

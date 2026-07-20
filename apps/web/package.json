@@ -10,6 +10,7 @@
     "build": "vite build && tsc",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -35,19 +36,22 @@
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
+    "@stylexjs/unplugin": "^0.19.0",
     "@tanstack/devtools-vite": "^0.7.0",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@stylexjs/unplugin": "^0.19.0",
     "@vitejs/plugin-react": "catalog:",
     "agentation": "^3.0.2",
     "concurrently": "^9.2.1",
+    "jsdom": "^29.1.1",
     "oxfmt": "^0.58.0",
     "oxlint": "^1.73.0",
     "portless": "^0.15.0",
     "tw-animate-css": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "^4.1.10"
   }
 }

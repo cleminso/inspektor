@@ -94,19 +94,19 @@ export const buttonStyles = stylex.create({
     textUnderlineOffset: 3,
   },
   sizeS: {
-    paddingInline: spacing.m,
+    paddingInline: spacing.s,
     fontSize: fontSizes[2],
-    height: 24,
+    minHeight: spatial['control-height-s'],
   },
   sizeM: {
-    paddingInline: spacing.l,
+    paddingInline: spacing.m,
     fontSize: fontSizes[2],
-    height: 28,
+    minHeight: spatial['control-height-m'],
   },
   sizeL: {
-    paddingInline: spacing.xl,
+    paddingInline: spacing.l,
     fontSize: fontSizes[2],
-    height: 32,
+    minHeight: spatial['control-height-l'],
   },
   insetFlush: {
     paddingInline: spacing.xxs,
@@ -146,11 +146,7 @@ export const buttonStyles = stylex.create({
     justifyContent: 'space-between',
   },
   disabled: {
-    borderColor: {
-      default: borderColors['border-secondary'],
-      ':hover': borderColors['border-secondary'],
-      ':active': borderColors['border-secondary'],
-    },
+    borderColor: 'transparent',
     backgroundColor: {
       default: backgroundColors['bg-disabled'],
       ':hover': backgroundColors['bg-disabled'],

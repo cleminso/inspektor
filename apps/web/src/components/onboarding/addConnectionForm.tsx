@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Button, Text, TextField } from "@inspector/ds";
+import { Box, Button, Text, TextField } from "@inspector/ds";
 
 import type { AddConnectionFormValues } from "./connectionFormTypes";
 
@@ -51,8 +51,15 @@ export function AddConnectionForm({
   };
 
   return (
-    <form className="flex min-h-0 flex-1 flex-col gap-4" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-4">
+    <Box
+      as="form"
+      minHeight={0}
+      width="full"
+      flexDirection="column"
+      gap="3xl"
+      onSubmit={handleSubmit}
+    >
+      <Box flexDirection="column" gap="xl">
         <TextField
           id="connection-name"
           label="Connection name"
@@ -113,7 +120,7 @@ export function AddConnectionForm({
           required={true}
           invalid={isFieldInvalid("adminSecret") === true}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <Box display="grid" gridTemplateColumns={{ base: "one", sm: "two" }} gap="m">
           <TextField
             id="connection-env"
             label="Env"
@@ -130,21 +137,21 @@ export function AddConnectionForm({
               onUpdateField("branch", value);
             }}
           />
-        </div>
-      </div>
+        </Box>
+      </Box>
       {hasError === true ? (
         <Text color="error" role="status" aria-live="polite">
           {errorMessage}
         </Text>
       ) : null}
-      <div className="mt-auto flex items-center justify-end gap-2 pt-4">
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting === true}>
+      <Box alignItems="center" justifyContent="end" gap="m">
+        <Button type="button" variant="ghost" size="s" onClick={onCancel} disabled={isSubmitting === true}>
           Cancel
         </Button>
-        <Button type="submit" disabled={canSubmit === false} loading={isSubmitting === true}>
+        <Button type="submit" size="s" disabled={canSubmit === false} loading={isSubmitting === true}>
           Add connection
         </Button>
-      </div>
-    </form>
+      </Box>
+    </Box>
   );
 }

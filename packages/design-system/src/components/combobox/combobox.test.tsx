@@ -42,6 +42,16 @@ describe("Combobox", () => {
     );
   });
 
+  it("does not render a chevron icon in the generic trigger", () => {
+    const { container } = render(
+      <Combobox.Root items={[]}>
+        <Combobox.Trigger>Open connection</Combobox.Trigger>
+      </Combobox.Root>,
+    );
+
+    expect(container.querySelector('[data-slot="combobox-chevron"]')).toBeNull();
+  });
+
   it("keeps Empty and Status as mounted live-region roots", () => {
     render(
       <Combobox.Root items={[]} defaultOpen>

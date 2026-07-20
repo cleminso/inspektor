@@ -90,6 +90,7 @@ export const comboboxStyles = stylex.create({
   },
   iconOpen: { transform: "rotate(180deg)" },
   trigger: {
+    paddingInline: spacing.xs,
     backgroundColor: {
       default: "transparent",
       ":disabled": backgroundColors["bg-disabled"],

@@ -1,23 +1,50 @@
+import { Box } from "@inspector/ds";
+
 import { ConnectionSwitcher } from "@/components/navigation";
-import { ConnectionsView } from "@/components/onboarding/view";
-import { inspectorShellStyle } from "#/layout/inspectorShell";
 
 interface ConnectionsLayoutProps {
-  pane: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export function ConnectionsLayout({ pane }: ConnectionsLayoutProps): React.ReactElement {
-  const hasPane = pane !== null && pane !== undefined;
-
+export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.ReactElement {
   return (
-    <div className="flex h-svh min-h-0 w-full flex-col overflow-hidden" style={inspectorShellStyle}>
-      <header className="flex h-10 w-full shrink-0 items-center border-b border-border bg-secondary px-3 py-1">
+    <Box
+      height="full"
+      minHeight={0}
+      width="full"
+      flexDirection="column"
+      overflow="hidden"
+      backgroundColor="bg-page"
+      unsafeClassName="h-svh"
+    >
+      <Box
+        as="header"
+        width="full"
+        flexShrink={0}
+        alignItems="center"
+        paddingHorizontal="l"
+        paddingVertical="s"
+        backgroundColor="bg-secondary"
+        borderBottomWidth={1}
+        borderColor="border-secondary"
+        borderStyle="solid"
+      >
         <ConnectionSwitcher placement="header" triggerLabel="Open connection" />
-      </header>
-      <div className="flex min-h-0 flex-1 flex-col justify-between lg:flex-row">
-        <ConnectionsView />
-        {hasPane === true ? pane : null}
-      </div>
-    </div>
+      </Box>
+      <Box
+        as="main"
+        minHeight={0}
+        flex={1}
+        alignItems="start"
+        justifyContent="center"
+        overflowY="auto"
+        paddingTop="5xl"
+        paddingRight="2xl"
+        paddingBottom="5xl"
+        paddingLeft="2xl"
+      >
+        {children}
+      </Box>
+    </Box>
   );
 }

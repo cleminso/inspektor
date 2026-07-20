@@ -1,13 +1,9 @@
-import { CopyButton } from "@inspector/ds";
-import { Button } from "@regarde/ui/button";
-import { EmptyState } from "@regarde/ui/emptyState";
-import { FieldError } from "@regarde/ui/field";
+import { Box, Button, CopyButton, Text } from "@inspector/ds";
 
 interface SchemaSwitcherProps {
   appId: string;
   errorMessage: string | null;
   isSubmitting: boolean;
-  onBack: () => void;
   onCancel: () => void;
   onSelectSchema: (schemaHash: string) => Promise<void>;
   schemaHashes: string[];
@@ -17,7 +13,6 @@ export function SchemaSwitcher({
   appId,
   errorMessage,
   isSubmitting,
-  onBack,
   onCancel,
   onSelectSchema,
   schemaHashes,
@@ -27,49 +22,68 @@ export function SchemaSwitcher({
   const appLabel = appId.trim().length > 0 ? appId.trim() : "this connection";
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="space-y-1">
-        <h3 className="text-sm font-medium text-foreground">Select schema</h3>
-        <p className="text-sm text-muted-foreground">Choose the stored schema to open for {appLabel}.</p>
-      </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
+    <Box minHeight={0} width="full" flexDirection="column" gap="xl">
+      <Box flexDirection="column" gap="xs">
+        <Text as="h2" variant="label">
+          Select schema
+        </Text>
+        <Text color="muted">Choose the stored schema to open for {appLabel}.</Text>
+      </Box>
+      <Box minHeight={0} flexDirection="column" gap="m" overflowY="auto" paddingRight="xs">
         {hasSchemas === true ? (
           schemaHashes.map((schemaHash) => (
-            <div key={schemaHash} className="flex items-center gap-1 rounded-xs border border-border px-2 py-1">
+            <Box
+              key={schemaHash}
+              alignItems="center"
+              gap="xs"
+              paddingHorizontal="m"
+              paddingVertical="xs"
+              borderWidth={1}
+              borderColor="border"
+              borderStyle="solid"
+              borderRadius="xs"
+            >
               <Button
                 type="button"
                 variant="ghost"
-                className="h-auto min-w-0 flex-1 justify-start px-1 py-1 text-left"
+                size="s"
+                inset="flush"
+                fullWidth
+                justify="start"
                 onClick={() => {
                   void onSelectSchema(schemaHash);
                 }}
                 disabled={isSubmitting === true}
                 aria-label={`Open schema ${schemaHash}`}
               >
-                <span className="truncate text-sm">{schemaHash}</span>
+                <Text as="span" color="inherit" monospace truncate>
+                  {schemaHash}
+                </Text>
               </Button>
               <CopyButton
                 textToCopy={schemaHash}
                 label={`Copy schema ${schemaHash}`}
                 disabled={isSubmitting === true}
               />
-            </div>
+            </Box>
           ))
         ) : (
-          <EmptyState title="No schemas found" description="Try a different server, app ID, or admin secret." />
+          <Box flexDirection="column" gap="xs" paddingVertical="2xl">
+            <Text variant="label">No schemas found</Text>
+            <Text color="muted">Try a different server, app ID, or admin secret.</Text>
+          </Box>
         )}
-      </div>
-      <FieldError className="rounded-xs border border-destructive/20 bg-destructive/5 px-3 py-2" aria-live="polite">
-        {hasError === true ? errorMessage : null}
-      </FieldError>
-      <div className="flex items-center justify-between border-t border-border pt-4">
-        <Button type="button" variant="ghost" onClick={onBack} disabled={isSubmitting === true}>
-          Back
-        </Button>
+      </Box>
+      {hasError === true ? (
+        <Text color="error" role="status" aria-live="polite">
+          {errorMessage}
+        </Text>
+      ) : null}
+      <Box alignItems="center" justifyContent="end" paddingTop="xl">
         <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting === true}>
           Cancel
         </Button>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

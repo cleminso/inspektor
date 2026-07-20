@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 
 import { ConnectionsLayout } from "@/components/layout/connectionsLayout";
+import { ConnectionsView } from "@/components/onboarding/view";
 import { appRoutes } from "@/lib/navigation/appRoutes";
 
 export const Route = createFileRoute("/conn")({
@@ -17,5 +18,9 @@ function ConnRoute(): React.ReactElement {
     return <Outlet />;
   }
 
-  return <ConnectionsLayout pane={isNewConnectionRoute === true ? <Outlet /> : null} />;
+  return (
+    <ConnectionsLayout>
+      {isNewConnectionRoute === true ? <Outlet /> : <ConnectionsView />}
+    </ConnectionsLayout>
+  );
 }

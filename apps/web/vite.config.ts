@@ -8,7 +8,7 @@ import { defineConfig } from "vite";
 // Explicitly use PORT from portless
 const PORT = parseInt(process.env.PORT || "5173");
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   resolve: {
     tsconfigPaths: true,
   },
@@ -16,7 +16,7 @@ export default defineConfig({
     exclude: ["@inspector/ds"],
   },
   plugins: [
-    devtools(),
+    mode === "test" ? null : devtools(),
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
@@ -31,4 +31,8 @@ export default defineConfig({
     sourcemap: true,
     target: "es2022",
   },
-});
+  test: {
+    environment: "jsdom",
+    exclude: ["node_modules/**"],
+  },
+}));

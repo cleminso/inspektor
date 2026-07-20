@@ -1,6 +1,5 @@
-import { useNavigate } from "@tanstack/react-router";
-
-import { SidePanel } from "@regarde/ui/sheet";
+import { Box, Button, TextLink } from "@inspector/ds";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { appRoutes } from "@/lib/navigation/appRoutes";
@@ -10,32 +9,48 @@ import { getPrefillKey } from "./connectionFormTypes";
 import { SchemaSwitcher } from "./schemaSwitcher";
 import { useAddConnectionFlow } from "./useAddConnectionFlow";
 
-export function AddConnectionPane(): React.ReactElement {
+export function AddConnectionView(): React.ReactElement {
   const { prefill } = useInspector();
   const navigate = useNavigate();
   const prefillKey = getPrefillKey(prefill);
 
-  const closePane = () => {
+  const closeView = () => {
     void navigate({ to: appRoutes.connections });
   };
 
-  return <AddConnectionPaneContent key={prefillKey} onClose={closePane} />;
+  return <AddConnectionViewContent key={prefillKey} onClose={closeView} />;
 }
 
-interface AddConnectionPaneContentProps {
+interface AddConnectionViewContentProps {
   onClose: () => void;
 }
 
-function AddConnectionPaneContent({ onClose }: AddConnectionPaneContentProps): React.ReactElement {
+function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): React.ReactElement {
   const flow = useAddConnectionFlow();
+  const isFormStep = flow.step === "form";
 
   return (
-    <SidePanel
-      title="Add connection"
-      description="Connect to a Jazz app and select a stored schema."
-      onClose={onClose}
-    >
-      {flow.step === "form" ? (
+    <Box width="full" maxWidth="popup-width-l" flexDirection="column" gap="xl">
+      <Box justifyContent="end">
+        {isFormStep === true ? (
+          <TextLink variant="caption" render={<Link to={appRoutes.connections} />}>
+            Back
+          </TextLink>
+        ) : (
+          <Button
+            type="button"
+            variant="link"
+            size="s"
+            inset="flush"
+            onClick={flow.goBackToForm}
+            disabled={flow.isSubmitting === true}
+          >
+            Back
+          </Button>
+        )}
+      </Box>
+      {isFormStep === true ? (
+        // TODO: update error message UI and copywriting
         <AddConnectionForm
           errorMessage={flow.errorMessage}
           formValues={flow.formValues}
@@ -49,12 +64,11 @@ function AddConnectionPaneContent({ onClose }: AddConnectionPaneContentProps): R
           appId={flow.formValues.appId}
           errorMessage={flow.errorMessage}
           isSubmitting={flow.isSubmitting}
-          onBack={flow.goBackToForm}
           onCancel={onClose}
           onSelectSchema={flow.selectSchema}
           schemaHashes={flow.schemaHashes}
         />
       )}
-    </SidePanel>
+    </Box>
   );
 }

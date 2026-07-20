@@ -322,12 +322,7 @@ function ComboboxTrigger({
           {...props}
           disabled={disabled}
           {...triggerStyles}
-          render={(triggerProps, state) => (
-            <button {...triggerProps}>
-              {triggerProps.children}
-              <ComboboxChevron open={state.open} />
-            </button>
-          )}
+          render={(triggerProps) => <button {...triggerProps}>{triggerProps.children}</button>}
         />
       }
     >
