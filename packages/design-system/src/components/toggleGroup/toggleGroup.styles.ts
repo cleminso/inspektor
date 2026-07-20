@@ -8,6 +8,7 @@ import {
 } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
+  dimensions,
   fontFamilies,
   fontSizes,
   fontWeights,
@@ -23,6 +24,7 @@ export const toggleGroupStyles = stylex.create({
     overflow: 'clip',
     alignItems: 'stretch',
     backgroundColor: backgroundColors['bg-subtle'],
+    boxSizing: 'border-box',
     display: 'inline-flex',
     width: 'fit-content',
   },
@@ -38,20 +40,22 @@ export const toggleGroupStyles = stylex.create({
   rootFullWidth: {
     width: '100%',
   },
+  rootSizeS: {
+    height: spatial['control-height-s'],
+  },
+  rootSizeM: {
+    height: spatial['control-height-m'],
+  },
   item: {
     borderColor: 'transparent',
     borderRadius: borderRadii.xs,
     borderStyle: 'solid',
     borderWidth: 1,
     gap: spacing.s,
-    paddingInline: spacing.xl,
+    paddingInline: spacing.m,
     alignItems: 'center',
     appearance: 'none',
-    backgroundColor: {
-      default: 'transparent',
-      // ':hover': backgroundColors['bg-hover'],
-      // ':active': backgroundColors['bg-pressed'],
-    },
+    backgroundColor: 'transparent',
     color: {
       default: textColors['text-muted'],
       ':hover': textColors['text-default'],
@@ -73,7 +77,12 @@ export const toggleGroupStyles = stylex.create({
     outlineWidth: spatial['focus-ring-width'],
     userSelect: 'none',
     whiteSpace: 'nowrap',
-    height: 28,
+  },
+  itemSizeS: {
+    height: dimensions[20],
+  },
+  itemSizeM: {
+    height: dimensions[24],
   },
   itemPressed: {
     borderColor: borderColors['border'],

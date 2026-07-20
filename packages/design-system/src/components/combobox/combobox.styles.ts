@@ -98,8 +98,8 @@ export const comboboxStyles = stylex.create({
     color: { default: textColors["text-default"], ":disabled": textColors["text-disabled"] },
   },
   triggerWidthContent: { width: "fit-content" },
-  triggerWidthS: { maxWidth: 200, width: "100%" },
-  triggerWidthM: { maxWidth: 280, width: "100%" },
+  triggerWidthS: { maxWidth: 200, width: "fit-content" },
+  triggerWidthM: { maxWidth: 280, width: "fit-content" },
   triggerWidthFull: { width: "100%" },
   positioner: { outline: "none", zIndex: layerIndexes.popup },
   popup: {

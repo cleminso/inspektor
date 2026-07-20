@@ -3,6 +3,7 @@ import {
   ToggleGroup,
   type ToggleGroupItemWidth,
   type ToggleGroupOrientation,
+  type ToggleGroupSize,
   type ToggleGroupWidth,
 } from "@inspector/ds";
 import { type ReactElement, type ReactNode, useState } from "react";
@@ -15,6 +16,7 @@ import { toggleGroupItem } from "@/lib/registry";
 
 export interface ToggleGroupPlaygroundState {
   orientation: ToggleGroupOrientation;
+  size: ToggleGroupSize;
   width: ToggleGroupWidth;
   itemWidth: ToggleGroupItemWidth;
   multiple: boolean;
@@ -25,6 +27,7 @@ export interface ToggleGroupPlaygroundState {
 
 const initialState: ToggleGroupPlaygroundState = {
   orientation: "horizontal",
+  size: "m",
   width: "content",
   itemWidth: "content",
   multiple: false,
@@ -33,6 +36,12 @@ const initialState: ToggleGroupPlaygroundState = {
 };
 
 const controls = [
+  {
+    kind: "select",
+    key: "size",
+    label: "Size",
+    options: ["s", "m"].map((value) => ({ label: value, value })),
+  },
   {
     kind: "select",
     key: "orientation",
@@ -60,6 +69,7 @@ export function serializeToggleGroupPlayground(state: ToggleGroupPlaygroundState
   const props = [
     `defaultValue={[${state.multiple === true ? '"tables", "subscriptions"' : '"tables"'}]}`,
     state.orientation !== "horizontal" ? `orientation="${state.orientation}"` : null,
+    state.size !== "m" ? `size="${state.size}"` : null,
     state.width !== "content" ? `width="${state.width}"` : null,
     state.itemWidth !== "content" ? `itemWidth="${state.itemWidth}"` : null,
     state.multiple === true ? "multiple" : null,
@@ -83,6 +93,7 @@ export function ToggleGroupPlayground({ children }: { children?: ReactNode }): R
         value={value}
         onValueChange={(nextValue) => setValue([...nextValue])}
         orientation={state.orientation}
+        size={state.size}
         width={state.width}
         itemWidth={state.itemWidth}
         multiple={state.multiple}

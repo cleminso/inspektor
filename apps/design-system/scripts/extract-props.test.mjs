@@ -340,12 +340,14 @@ test("extracts the constrained ToggleGroup compound API", () => {
       "orientation",
       "width",
       "itemWidth",
+      "size",
       "render",
     ],
   );
   assert.equal(rootProps?.find(({ name }) => name === "loopFocus")?.defaultValue, "true");
   assert.equal(rootProps?.find(({ name }) => name === "multiple")?.defaultValue, "false");
   assert.equal(rootProps?.find(({ name }) => name === "orientation")?.defaultValue, '"horizontal"');
+  assert.equal(rootProps?.find(({ name }) => name === "size")?.defaultValue, '"m"');
   assert.deepEqual(
     itemProps?.map(({ name }) => name),
     ["value", "onPressedChange", "nativeButton", "disabled", "render"],

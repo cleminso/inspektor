@@ -162,6 +162,24 @@ describe("ContextSwitcher", () => {
     expect(screen.queryByRole("combobox", { name: "Find context" })).toBe(null);
   });
 
+  it("keeps trigger icons and labels in one constrained content row", () => {
+    render(
+      <ContextSwitcher.Root items={["main"]} defaultValue="main">
+        <ContextSwitcher.Trigger label="Switch context" width="s">
+          <svg aria-hidden="true" data-testid="context-icon" />
+          <span>Main</span>
+        </ContextSwitcher.Trigger>
+      </ContextSwitcher.Root>,
+    );
+
+    const trigger = screen.getByRole("combobox", { name: "Switch context" });
+    const content = trigger.querySelector('[data-slot="context-switcher-trigger-content"]');
+
+    expect(trigger.getAttribute("data-width")).toBe("s");
+    expect(content?.contains(screen.getByTestId("context-icon"))).toBe(true);
+    expect(content?.textContent).toBe("Main");
+  });
+
   it("composes Content as the popup and Viewport as the scrolling results", () => {
     render(<Switcher />);
     openSwitcher();

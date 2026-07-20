@@ -1025,7 +1025,7 @@
       "description": "The values of the pressed items when controlled.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 18
+        "line": 19
       }
     },
     {
@@ -1035,7 +1035,7 @@
       "description": "The initial values of the pressed items when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 20
+        "line": 21
       }
     },
     {
@@ -1045,7 +1045,7 @@
       "description": "Called when the pressed item values change.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 22
+        "line": 23
       }
     },
     {
@@ -1056,7 +1056,7 @@
       "description": "Loops keyboard focus from the last item to the first and vice versa.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 24
+        "line": 25
       }
     },
     {
@@ -1067,7 +1067,7 @@
       "description": "Allows more than one item to be pressed.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -1078,7 +1078,7 @@
       "description": "Disables every item in the group.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -1089,7 +1089,7 @@
       "description": "Controls the group layout and arrow-key navigation axis.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
@@ -1100,7 +1100,7 @@
       "description": "Controls whether the group follows its content or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -1111,7 +1111,18 @@
       "description": "Controls whether items follow their content or share available width.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 34
+        "line": 35
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"s\" | \"m\"",
+      "required": false,
+      "defaultValue": "\"m\"",
+      "description": "Controls the group height; items inherit the selected size.",
+      "source": {
+        "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
+        "line": 37
       }
     },
     {
@@ -1121,7 +1132,7 @@
       "description": "Composes ToggleGroup behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 36
+        "line": 39
       }
     }
   ],
@@ -1133,7 +1144,7 @@
       "description": "Uniquely identifies the item within its group.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 42
+        "line": 45
       }
     },
     {
@@ -1143,7 +1154,7 @@
       "description": "Called before the group commits the next pressed state.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 44
+        "line": 47
       }
     },
     {
@@ -1154,7 +1165,7 @@
       "description": "Whether the rendered element is a native button.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 46
+        "line": 49
       }
     },
     {
@@ -1165,7 +1176,7 @@
       "description": "Disables this item.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 48
+        "line": 51
       }
     },
     {
@@ -1175,7 +1186,7 @@
       "description": "Composes item behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
-        "line": 50
+        "line": 53
       }
     }
   ],

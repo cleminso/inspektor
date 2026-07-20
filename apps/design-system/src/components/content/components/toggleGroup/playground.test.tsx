@@ -12,6 +12,7 @@ describe("Toggle Group playground", () => {
     expect(
       serializeToggleGroupPlayground({
         orientation: "horizontal",
+        size: "m",
         width: "content",
         itemWidth: "content",
         multiple: false,
@@ -19,6 +20,20 @@ describe("Toggle Group playground", () => {
         loopFocus: true,
       }),
     ).toContain('defaultValue={["tables"]}');
+  });
+
+  it("serializes the compact size", () => {
+    expect(
+      serializeToggleGroupPlayground({
+        orientation: "horizontal",
+        size: "s",
+        width: "content",
+        itemWidth: "content",
+        multiple: false,
+        disabled: false,
+        loopFocus: true,
+      }),
+    ).toContain('size="s"');
   });
 
   it("updates the preview and source from the disabled control", () => {

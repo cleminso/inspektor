@@ -1,3 +1,13 @@
 import { createContext } from "react";
 
-export const ToggleGroupEqualItemsContext = createContext(false);
+import type { ToggleGroupSize } from "./toggleGroup";
+
+interface ToggleGroupContextValue {
+  equalWidth: boolean;
+  size: ToggleGroupSize;
+}
+
+export const ToggleGroupContext = createContext<ToggleGroupContextValue>({
+  equalWidth: false,
+  size: "m",
+});

@@ -39,4 +39,26 @@ describe("ToggleGroup", () => {
     expect(item.getAttribute("data-pressed")).toBeNull();
     expect(changeCount).toBe(0);
   });
+
+  it("uses the medium size by default", () => {
+    render(
+      <ToggleGroup aria-label="Data view">
+        <ToggleGroup.Item value="tables">Tables</ToggleGroup.Item>
+      </ToggleGroup>,
+    );
+
+    expect(screen.getByRole("group", { name: "Data view" }).getAttribute("data-size")).toBe("m");
+    expect(screen.getByRole("button", { name: "Tables" }).getAttribute("data-size")).toBe("m");
+  });
+
+  it("provides a compact small size", () => {
+    render(
+      <ToggleGroup aria-label="Data view" size="s">
+        <ToggleGroup.Item value="tables">Tables</ToggleGroup.Item>
+      </ToggleGroup>,
+    );
+
+    expect(screen.getByRole("group", { name: "Data view" }).getAttribute("data-size")).toBe("s");
+    expect(screen.getByRole("button", { name: "Tables" }).getAttribute("data-size")).toBe("s");
+  });
 });

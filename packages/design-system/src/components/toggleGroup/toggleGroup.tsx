@@ -4,13 +4,14 @@ import { useContext } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { toggleGroupStyles } from './toggleGroup.styles'
-import { ToggleGroupEqualItemsContext } from './toggleGroupContext'
+import { ToggleGroupContext } from './toggleGroupContext'
 
 type WithoutStyles<Props> = Omit<Props, 'className' | 'style'>
 
 export type ToggleGroupOrientation = 'horizontal' | 'vertical'
 export type ToggleGroupWidth = 'content' | 'full'
 export type ToggleGroupItemWidth = 'content' | 'equal'
+export type ToggleGroupSize = 's' | 'm'
 
 export interface ToggleGroupRootProps<Value extends string = string>
   extends WithoutStyles<BaseToggleGroup.Props<Value>> {
@@ -32,6 +33,8 @@ export interface ToggleGroupRootProps<Value extends string = string>
   width?: ToggleGroupWidth
   /** Controls whether items follow their content or share available width. */
   itemWidth?: ToggleGroupItemWidth
+  /** Controls the group height; items inherit the selected size. */
+  size?: ToggleGroupSize
   /** Composes ToggleGroup behavior and styles onto another element. */
   render?: BaseToggleGroup.Props<Value>['render']
 }
@@ -57,8 +60,13 @@ function ToggleGroupRoot<Value extends string>({
   orientation = 'horizontal',
   width = 'content',
   itemWidth = 'content',
+  size = 'm',
   ...props
 }: ToggleGroupRootProps<Value>) {
+  const sizeStyles = {
+    s: toggleGroupStyles.rootSizeS,
+    m: toggleGroupStyles.rootSizeM,
+  } satisfies Record<ToggleGroupSize, unknown>
   const stateStyles = createStateStyleProps<BaseToggleGroup.State>((state) => [
     toggleGroupStyles.root,
     state.orientation === 'horizontal'
@@ -66,10 +74,11 @@ function ToggleGroupRoot<Value extends string>({
       : toggleGroupStyles.vertical,
     state.disabled === true && toggleGroupStyles.rootDisabled,
     width === 'full' && toggleGroupStyles.rootFullWidth,
+    state.orientation === 'horizontal' && sizeStyles[size],
   ])
 
   return (
-    <ToggleGroupEqualItemsContext.Provider value={itemWidth === 'equal'}>
+    <ToggleGroupContext.Provider value={{ equalWidth: itemWidth === 'equal', size }}>
       <BaseToggleGroup
         {...props}
         loopFocus={loopFocus}
@@ -77,9 +86,10 @@ function ToggleGroupRoot<Value extends string>({
         disabled={disabled}
         orientation={orientation}
         {...stateStyles}
+        data-size={size}
         data-slot="toggle-group"
       />
-    </ToggleGroupEqualItemsContext.Provider>
+    </ToggleGroupContext.Provider>
   )
 }
 
@@ -88,9 +98,14 @@ function ToggleGroupItem({
   disabled = false,
   ...props
 }: ToggleGroupItemProps) {
-  const equalWidth = useContext(ToggleGroupEqualItemsContext)
+  const { equalWidth, size } = useContext(ToggleGroupContext)
+  const sizeStyles = {
+    s: toggleGroupStyles.itemSizeS,
+    m: toggleGroupStyles.itemSizeM,
+  } satisfies Record<ToggleGroupSize, unknown>
   const stateStyles = createStateStyleProps<BaseToggle.State>((state) => [
     toggleGroupStyles.item,
+    sizeStyles[size],
     equalWidth === true && toggleGroupStyles.itemEqualWidth,
     state.pressed === true && toggleGroupStyles.itemPressed,
     state.disabled === true && toggleGroupStyles.itemDisabled,
@@ -103,6 +118,7 @@ function ToggleGroupItem({
       nativeButton={nativeButton}
       disabled={disabled}
       {...stateStyles}
+      data-size={size}
       data-slot="toggle-group-item"
     />
   )

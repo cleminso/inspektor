@@ -140,12 +140,15 @@ function ContextSwitcherTrigger({
     <Combobox.Trigger
       aria-label={label}
       title={title}
+      data-width={width}
       variant="ghost"
       size={size}
       width={width}
       disabled={disabled}
     >
-      <span {...contentStyleProps}>{children}</span>
+      <span data-slot="context-switcher-trigger-content" {...contentStyleProps}>
+        {children}
+      </span>
     </Combobox.Trigger>
   );
 }

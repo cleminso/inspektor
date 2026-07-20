@@ -241,6 +241,7 @@ export type {
   ToggleGroupItemProps,
   ToggleGroupOrientation,
   ToggleGroupItemWidth,
+  ToggleGroupSize,
   ToggleGroupWidth,
   ToggleGroupRootProps,
 } from './components/toggleGroup/toggleGroup'
