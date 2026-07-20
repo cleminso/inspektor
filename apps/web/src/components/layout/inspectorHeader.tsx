@@ -43,13 +43,13 @@ export function InspectorHeader(): React.ReactElement {
       borderStyle="solid"
     >
       <Box minWidth={0} flex={1} alignItems="center" gap="none">
-        <ConnectionSwitcher placement="header" width="md" />
+        <ConnectionSwitcher width="m" />
         <Box minWidth={0} alignItems="center" gap="s">
-          <BranchSwitcher placement="header" width="sm" />
+          <BranchSwitcher width="s" />
           <Text as="span" color="muted" aria-hidden="true">
             /
           </Text>
-          <SchemaSwitcher placement="header" width="md" />
+          <SchemaSwitcher width="m" />
         </Box>
       </Box>
 

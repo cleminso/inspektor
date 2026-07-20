@@ -25,10 +25,10 @@ export interface ContextSwitcherPlaygroundState {
 }
 
 const initialState: ContextSwitcherPlaygroundState = {
-  size: "s",
-  triggerWidth: "s",
-  contentWidth: "s",
-  maxHeight: "s",
+  size: "m",
+  triggerWidth: "content",
+  contentWidth: "m",
+  maxHeight: "m",
   disabled: false,
 };
 const controls = [

@@ -50,7 +50,7 @@ export function ContextSwitcherPage(): ReactElement {
 
       <Section
         title="Simple context"
-        description="Use a compact switcher for a branch-like context without supporting item details."
+        description="Use the medium 28px trigger for a branch-like context without supporting item details."
       >
         <Example source={simpleSource}>
           <SimpleExample />

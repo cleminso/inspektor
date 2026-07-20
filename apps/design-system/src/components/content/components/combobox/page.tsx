@@ -31,6 +31,8 @@ import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
 import StatusExample from "./statusExample";
 import statusSource from "./statusExample.tsx?raw";
+import TriggerExample from "./triggerExample";
+import triggerSource from "./triggerExample.tsx?raw";
 
 const rootProps = getGeneratedProps("combobox.root", comboboxRootPropNames);
 const contentProps = getGeneratedProps("combobox.content", comboboxContentPropNames);
@@ -71,6 +73,14 @@ export function ComboboxPage(): ReactElement {
       >
         <Example source={sizesSource} align="start">
           <SizesExample />
+        </Example>
+      </Section>
+      <Section
+        title="Trigger sizing"
+        description="Combobox.Trigger defaults to the medium 28px control. Use its size prop when a different constrained control height is required."
+      >
+        <Example source={triggerSource} align="start">
+          <TriggerExample />
         </Example>
       </Section>
       <Section

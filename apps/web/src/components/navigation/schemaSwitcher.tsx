@@ -1,13 +1,18 @@
 import { HashIcon } from "lucide-react";
 
-import { ContextSwitcher, Text } from "@inspector/ds";
+import {
+  ContextSwitcher,
+  Text,
+  type ContextSwitcherTriggerSize,
+  type ContextSwitcherTriggerWidth,
+} from "@inspector/ds";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 
 interface SchemaSwitcherProps {
-  placement?: "default" | "header";
+  size?: ContextSwitcherTriggerSize;
   triggerLabel?: string;
-  width?: "auto" | "md";
+  width?: ContextSwitcherTriggerWidth;
 }
 
 function truncateMiddle(value: string, maxLength: number): string {
@@ -24,9 +29,9 @@ function truncateMiddle(value: string, maxLength: number): string {
 }
 
 export function SchemaSwitcher({
-  placement = "default",
+  size = "m",
   triggerLabel,
-  width = "auto",
+  width = "content",
 }: SchemaSwitcherProps = {}): React.ReactElement {
   const { currentSchemaHash, runtime, switchSchema } = useInspector();
   const triggerText = triggerLabel ?? currentSchemaHash ?? "Select schema";
@@ -49,8 +54,8 @@ export function SchemaSwitcher({
     >
       <ContextSwitcher.Trigger
         label="Switch schema"
-        size={placement === "header" ? "m" : "l"}
-        width={width === "md" ? "m" : "content"}
+        size={size}
+        width={width}
         title={triggerTitle}
       >
         <HashIcon aria-hidden="true" size={14} />

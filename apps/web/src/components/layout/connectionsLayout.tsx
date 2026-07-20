@@ -29,7 +29,7 @@ export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.R
         borderColor="border-secondary"
         borderStyle="solid"
       >
-        <ConnectionSwitcher placement="header" triggerLabel="Open connection" />
+        <ConnectionSwitcher triggerLabel="Open connection" />
       </Box>
       <Box
         as="main"

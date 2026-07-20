@@ -2,7 +2,13 @@ import { useMemo, useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { Button, ContextSwitcher, Text } from "@inspector/ds";
+import {
+  Button,
+  ContextSwitcher,
+  Text,
+  type ContextSwitcherTriggerSize,
+  type ContextSwitcherTriggerWidth,
+} from "@inspector/ds";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import {
@@ -13,9 +19,9 @@ import {
 import { appRoutes } from "@/lib/navigation/appRoutes";
 
 interface ConnectionSwitcherProps {
-  placement?: "default" | "header";
+  size?: ContextSwitcherTriggerSize;
   triggerLabel?: string;
-  width?: "auto" | "md";
+  width?: ContextSwitcherTriggerWidth;
 }
 
 function sortConnections(
@@ -29,9 +35,9 @@ function sortConnections(
 }
 
 export function ConnectionSwitcher({
-  placement = "default",
+  size = "m",
   triggerLabel,
-  width = "auto",
+  width = "content",
 }: ConnectionSwitcherProps = {}): React.ReactElement {
   const { connections, currentConnectionId, openConnection } = useInspector();
   const navigate = useNavigate();
@@ -71,8 +77,8 @@ export function ConnectionSwitcher({
     >
       <ContextSwitcher.Trigger
         label="Switch connection"
-        size={placement === "header" ? "m" : "l"}
-        width={width === "md" ? "m" : "content"}
+        size={size}
+        width={width}
       >
         <Text as="span" color="inherit" truncate>
           {resolvedTriggerLabel}

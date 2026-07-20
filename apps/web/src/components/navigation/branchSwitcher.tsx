@@ -1,19 +1,24 @@
 import { SplitIcon } from "lucide-react";
 
-import { ContextSwitcher, Text } from "@inspector/ds";
+import {
+  ContextSwitcher,
+  Text,
+  type ContextSwitcherTriggerSize,
+  type ContextSwitcherTriggerWidth,
+} from "@inspector/ds";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 
 interface BranchSwitcherProps {
-  placement?: "default" | "header";
+  size?: ContextSwitcherTriggerSize;
   triggerLabel?: string;
-  width?: "auto" | "sm";
+  width?: ContextSwitcherTriggerWidth;
 }
 
 export function BranchSwitcher({
-  placement = "default",
+  size = "m",
   triggerLabel,
-  width = "auto",
+  width = "content",
 }: BranchSwitcherProps = {}): React.ReactElement {
   const { currentBranch, rememberedBranches, switchBranch } = useInspector();
   return (
@@ -28,8 +33,8 @@ export function BranchSwitcher({
     >
       <ContextSwitcher.Trigger
         label="Switch branch"
-        size={placement === "header" ? "m" : "l"}
-        width={width === "sm" ? "s" : "content"}
+        size={size}
+        width={width}
       >
         <SplitIcon aria-hidden="true" size={14} />
         <Text as="span" color="inherit" truncate>
