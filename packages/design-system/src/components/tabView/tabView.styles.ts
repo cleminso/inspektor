@@ -16,10 +16,13 @@ import {
 } from '../../tokens/value.stylex'
 import { tabViewVars } from './tabViewVars.stylex'
 
-const narrowTab = '@container (max-width: 64px)'
-
 export const tabViewStyles = stylex.create({
   root: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    height: '100%',
+    minHeight: 0,
     minWidth: 0,
     width: '100%',
   },
@@ -28,8 +31,9 @@ export const tabViewStyles = stylex.create({
     overflow: 'clip',
     alignItems: 'center',
     display: 'flex',
+    flexShrink: 1,
     minWidth: 0,
-    width: '100%',
+    width: 'max-content',
   },
   item: {
     [tabViewVars.background]: {
@@ -70,6 +74,7 @@ export const tabViewStyles = stylex.create({
     height: spatial['control-height-m'],
     maxWidth: spatial['tab-view-width'],
     minWidth: spatial['control-height-m'],
+    width: spatial['tab-view-width'],
   },
   itemActive: {
     [tabViewVars.background]: {
@@ -99,7 +104,10 @@ export const tabViewStyles = stylex.create({
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: 'transparent',
-    color: textColors['text-muted'],
+    color: {
+      default: textColors['text-muted'],
+      ':hover': textColors['text-secondary'],
+    },
     cursor: 'pointer',
     display: 'flex',
     fontFamily: fontFamilies.sans,
@@ -136,10 +144,7 @@ export const tabViewStyles = stylex.create({
   },
   title: {
     overflow: 'hidden',
-    display: {
-      default: 'block',
-      [narrowTab]: 'none',
-    },
+    display: 'block',
     flexGrow: 1,
     flexShrink: 1,
     textOverflow: 'clip',
@@ -206,6 +211,8 @@ export const tabViewStyles = stylex.create({
     width: spatial['icon-size-m'],
   },
   panel: {
+    overflow: 'hidden',
+    flexGrow: 1,
     outlineColor: borderColors['border-focused'],
     outlineOffset: -2,
     outlineStyle: {
@@ -213,6 +220,7 @@ export const tabViewStyles = stylex.create({
       ':focus-visible': 'solid',
     },
     outlineWidth: spatial['focus-ring-width'],
+    minHeight: 0,
     minWidth: 0,
     width: '100%',
   },

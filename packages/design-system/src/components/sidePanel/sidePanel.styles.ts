@@ -17,7 +17,7 @@ export const sidePanelStyles = stylex.create({
     width: '100%',
   },
   header: {
-    padding: spacing.s,
+    padding: spacing.xs,
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,

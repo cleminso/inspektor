@@ -51,7 +51,8 @@ export const backgroundColors = stylex.defineVars({
 
 export const textColors = stylex.defineVars({
   // Text on neutral surfaces
-  'text-default': `light-dark(${palette.gray900}, ${palette.neutral50})`,
+  'text-default': `light-dark(${palette.gray900}, ${palette.neutral100})`,
+  'text-secondary': `light-dark(${palette.grayAlpha900}, ${palette.neutralAlpha900})`,
   'text-muted': `light-dark(${palette.gray600}, ${palette.neutral400})`,
   'text-subtle': `light-dark(${palette.gray500}, ${palette.neutral500})`,
   'text-disabled': `light-dark(${palette.gray400}, ${palette.neutral600})`,
@@ -107,7 +108,7 @@ export const spatial = stylex.defineVars({
   'popup-width-l': dimensions[400],
   'label-width': dimensions[100],
   'tooltip-width': dimensions[180],
-  'tab-view-width': dimensions[224],
+  'tab-view-width': dimensions[180],
   'content-measure': dimensions[680],
   'content-width': dimensions[1220],
   'content-width-wide': dimensions[1440],

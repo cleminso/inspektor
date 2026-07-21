@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { Tooltip } from '../tooltip/tooltip'
 import { TabView } from './tabView'
 
 afterEach(cleanup)
@@ -168,6 +169,65 @@ describe('TabView', () => {
       } else {
         Object.defineProperty(HTMLElement.prototype, 'clientWidth', clientWidthDescriptor)
       }
+    }
+  })
+
+  it('shows supplied details even when the title does not overflow', async () => {
+    render(
+      <Tooltip.Provider delay={0}>
+        <TabView.Root defaultValue="accounts">
+          <TabView.List aria-label="Table views">
+            <TabView.Item value="accounts" details="Table view details">
+              Accounts
+            </TabView.Item>
+          </TabView.List>
+        </TabView.Root>
+      </Tooltip.Provider>,
+    )
+
+    fireEvent.mouseEnter(screen.getByRole('tab', { name: 'Accounts' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Table view details')).toBeTruthy()
+    })
+  })
+
+  it('keeps its resize observer when the prefix element identity changes', () => {
+    let observedItemCount = 0
+    class ResizeObserverMock {
+      observe(target: Element) {
+        if (target.getAttribute('data-slot') === 'tab-view-item') {
+          observedItemCount += 1
+        }
+      }
+      disconnect() {}
+    }
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+
+    try {
+      const { rerender } = render(
+        <TabView.Root defaultValue="accounts">
+          <TabView.List aria-label="Table views">
+            <TabView.Item value="accounts" prefix={<span>Table</span>}>
+              Accounts
+            </TabView.Item>
+          </TabView.List>
+        </TabView.Root>,
+      )
+
+      rerender(
+        <TabView.Root defaultValue="accounts">
+          <TabView.List aria-label="Table views">
+            <TabView.Item value="accounts" prefix={<span>Table</span>}>
+              Accounts
+            </TabView.Item>
+          </TabView.List>
+        </TabView.Root>,
+      )
+
+      expect(observedItemCount).toBe(1)
+    } finally {
+      vi.unstubAllGlobals()
     }
   })
 })

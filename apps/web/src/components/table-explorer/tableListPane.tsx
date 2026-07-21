@@ -4,6 +4,7 @@ import { EllipsisVertical, Table2 } from "lucide-react";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { TableViewToggle } from "@/components/table-explorer/tableViewToggle";
+import { useTableTabs } from "@/components/table-explorer/tableTabsProvider";
 import { appRoutes } from "@/lib/navigation/appRoutes";
 
 export interface TableCheckedChangeOptions {
@@ -39,6 +40,7 @@ export function TableListPane({
   onTableCheckedChange,
 }: TableListPaneProps): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
+  const { getBaseTabSearch } = useTableTabs();
   const canBuildHref =
     currentConnectionId !== null && currentBranch !== null && currentSchemaHash !== null;
   const normalizedSearchValue = searchValue.trim().toLowerCase();
@@ -117,11 +119,7 @@ export function TableListPane({
 
                       if (tableParams === null) {
                         return (
-                          <ActionList.Item
-                            key={tableName}
-                            active={isActive}
-                            checked={isChecked}
-                          >
+                          <ActionList.Item key={tableName} active={isActive} checked={isChecked}>
                             <ActionList.SelectionControl
                               aria-label={`Select ${tableName}`}
                               checked={isChecked}
@@ -133,19 +131,13 @@ export function TableListPane({
                                 });
                               }}
                             />
-                            <ActionList.Trigger disabled>
-                              {tableName}
-                            </ActionList.Trigger>
+                            <ActionList.Trigger disabled>{tableName}</ActionList.Trigger>
                           </ActionList.Item>
                         );
                       }
 
                       return (
-                        <ActionList.Item
-                          key={tableName}
-                          active={isActive}
-                          checked={isChecked}
-                        >
+                        <ActionList.Item key={tableName} active={isActive} checked={isChecked}>
                           <ActionList.SelectionControl
                             aria-label={`Select ${tableName}`}
                             checked={isChecked}
@@ -162,11 +154,7 @@ export function TableListPane({
                               <Link
                                 to={appRoutes.table}
                                 params={tableParams}
-                                search={(currentSearch) => ({
-                                  ...currentSearch,
-                                  mode: undefined,
-                                  rowId: undefined,
-                                })}
+                                search={getBaseTabSearch(tableName)}
                                 aria-current={isActive === true ? "page" : undefined}
                               />
                             }

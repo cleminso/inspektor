@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 
 import { TableExplorerScreen } from "@/components/table-explorer/tableExplorerScreen";
 import { useInspectorTables } from "@/hooks/useInspectorTables";
@@ -12,10 +12,16 @@ export const Route = createFileRoute("/conn/$connectionId/$branch/$schemaHash/ta
 function TablesRoute(): React.ReactElement {
   const navigate = useNavigate();
   const params = Route.useParams();
+  const search = useSearch({ strict: false }) as { empty?: string; tab?: string };
   const { isSchemaReady, tables } = useInspectorTables();
 
   useEffect(() => {
-    if (isSchemaReady === false || tables.length === 0) {
+    if (
+      search.empty === "true" ||
+      search.tab === "new-view" ||
+      isSchemaReady === false ||
+      tables.length === 0
+    ) {
       return;
     }
 
@@ -27,7 +33,7 @@ function TablesRoute(): React.ReactElement {
       },
       replace: true,
     });
-  }, [isSchemaReady, navigate, params, tables]);
+  }, [isSchemaReady, navigate, params, search.empty, search.tab, tables]);
 
   return <TableExplorerScreen />;
 }

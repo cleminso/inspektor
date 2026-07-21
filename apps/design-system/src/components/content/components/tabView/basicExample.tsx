@@ -57,6 +57,7 @@ export default function BasicExample(): ReactElement {
               <TabView.Item
                 key={view.value}
                 value={view.value}
+                details={view.value === 'active' ? 'Filtered account table view' : undefined}
                 prefix={<TableIcon />}
                 closeLabel={`Close ${view.label}`}
                 onClose={closeView}

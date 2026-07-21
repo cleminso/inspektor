@@ -397,7 +397,7 @@ test("extracts the constrained TabView compound API", () => {
   );
   assert.deepEqual(
     metadata["tabView.item"]?.map(({ name }) => name),
-    ["value", "children", "prefix", "disabled", "onClose", "closeLabel"],
+    ["value", "children", "details", "prefix", "disabled", "onClose", "closeLabel"],
   );
   assert.deepEqual(
     metadata["tabView.panel"]?.map(({ name }) => name),

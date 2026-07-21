@@ -9,6 +9,7 @@ export const tabViewListPropNames = [
 
 export const tabViewItemPropNames = [
   'value',
+  'details',
   'prefix',
   'disabled',
   'onClose',

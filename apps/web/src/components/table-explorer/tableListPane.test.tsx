@@ -15,6 +15,12 @@ vi.mock("@/components/table-explorer/tableViewToggle", () => ({
   TableViewToggle: () => null,
 }));
 
+vi.mock("@/components/table-explorer/tableTabsProvider", () => ({
+  useTableTabs: () => ({
+    getBaseTabSearch: () => ({}),
+  }),
+}));
+
 afterEach(cleanup);
 
 describe("TableListPane", () => {

@@ -3,8 +3,6 @@ import { Children, isValidElement } from "react";
 import { Box, Button } from "@inspector/ds";
 import { ListFilter } from "lucide-react";
 
-import { SidePanelLayout } from "@/components/layout/sidePanelLayout";
-
 interface ActionsBarProps {
   children?: React.ReactNode;
   filterCount?: number;
@@ -68,7 +66,6 @@ function ActionsBarRoot({
       borderStyle="solid"
     >
       <Box alignItems="center" gap="s">
-        <SidePanelLayout.Toggle label="Toggle table list" />
         {canShowFilters === true ? (
           <Button
             type="button"

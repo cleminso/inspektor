@@ -22,7 +22,7 @@ export function TabViewPage(): ReactElement {
     <TabViewPlayground>
       <Section
         title="Behavior"
-        description="Views select on pointer interaction or arrow-key focus. The close action appears for the active, hovered, or focused view. Press Delete while a tab is focused to close it."
+        description="Views select on pointer interaction or arrow-key focus. Truncated names reveal their full content in a tooltip, while details provide supplementary context. The close action appears for the active, hovered, or focused view. Press Delete while a tab is focused to close it."
       />
       <Section title="Root props">
         <PropsTable rows={rootProps} />

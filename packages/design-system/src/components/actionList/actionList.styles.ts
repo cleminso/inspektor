@@ -37,10 +37,7 @@ export const actionListStyles = stylex.create({
       default: 'transparent',
       ':hover': backgroundColors['bg-hover'],
     },
-    color: {
-      default: textColors['text-subtle'],
-      ':hover': textColors['text-muted'],
-    },
+    color: { default: textColors['text-muted'], ':hover': textColors['text-secondary'], },
     display: 'flex',
     minWidth: 0,
     paddingRight: spacing.s,

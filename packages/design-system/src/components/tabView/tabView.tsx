@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { Tooltip } from '../tooltip/tooltip'
 import { tabViewStyles } from './tabView.styles'
 
 export type TabViewValue = string | number
@@ -55,6 +56,8 @@ export interface TabViewItemProps {
   value: TabViewValue
   /** The visible view name. */
   children: ReactNode
+  /** Supplementary context shown in a tooltip even when the view name fits. */
+  details?: ReactNode
   /** Renders a decorative 16px icon before the view name. */
   prefix?: ReactNode
   /** Disables selection and closing for this view. */
@@ -134,6 +137,7 @@ function TabViewList({
 function TabViewItem({
   value,
   children,
+  details,
   prefix,
   disabled = false,
   onClose,
@@ -141,6 +145,7 @@ function TabViewItem({
 }: TabViewItemProps) {
   const context = useContext(TabViewContext)
   const active = context.value === value
+  const hasPrefix = prefix !== undefined
   const itemRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLSpanElement>(null)
   const [titleOverflowing, setTitleOverflowing] = useState(false)
@@ -204,7 +209,7 @@ function TabViewItem({
         cancelAnimationFrame(animationFrame)
       }
     }
-  }, [children, prefix])
+  }, [children, hasPrefix])
 
   return (
     <div
@@ -219,22 +224,33 @@ function TabViewItem({
       data-slot="tab-view-item"
       data-title-overflow={titleOverflowing}
     >
-      <BaseTabs.Tab
-        value={value}
-        disabled={disabled}
-        onKeyDown={handleTabKeyDown}
-        {...tabStyles}
-        data-slot="tab-view-tab"
-      >
-        {prefix !== undefined ? (
-          <span aria-hidden="true" {...stylex.props(tabViewStyles.prefix)}>
-            {prefix}
-          </span>
-        ) : null}
-        <span ref={titleRef} {...stylex.props(tabViewStyles.title)} data-slot="tab-view-title">
-          {children}
-        </span>
-      </BaseTabs.Tab>
+      <Tooltip.Root disabled={details === undefined && titleOverflowing === false}>
+        <Tooltip.Trigger
+          render={
+            <BaseTabs.Tab
+              value={value}
+              disabled={disabled}
+              onKeyDown={handleTabKeyDown}
+              {...tabStyles}
+              data-slot="tab-view-tab"
+            >
+              {prefix !== undefined ? (
+                <span aria-hidden="true" {...stylex.props(tabViewStyles.prefix)}>
+                  {prefix}
+                </span>
+              ) : null}
+              <span
+                ref={titleRef}
+                {...stylex.props(tabViewStyles.title)}
+                data-slot="tab-view-title"
+              >
+                {children}
+              </span>
+            </BaseTabs.Tab>
+          }
+        />
+        <Tooltip.Content>{details ?? children}</Tooltip.Content>
+      </Tooltip.Root>
       {onClose !== undefined ? (
         <div
           {...stylex.props(

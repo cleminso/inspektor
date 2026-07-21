@@ -1198,7 +1198,7 @@
       "description": "The tab views and their associated panels.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -1208,7 +1208,7 @@
       "description": "The active view value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
@@ -1218,7 +1218,7 @@
       "description": "The initially active view value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -1228,7 +1228,7 @@
       "description": "Called when the active view changes.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 34
+        "line": 35
       }
     }
   ],
@@ -1240,7 +1240,7 @@
       "description": "The tab view items.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 42
+        "line": 43
       }
     },
     {
@@ -1250,7 +1250,7 @@
       "description": "An accessible name for the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -1260,7 +1260,7 @@
       "description": "Identifies the element that labels the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 46
+        "line": 47
       }
     },
     {
@@ -1271,7 +1271,7 @@
       "description": "Activates a view as arrow-key navigation moves focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 48
+        "line": 49
       }
     },
     {
@@ -1282,7 +1282,7 @@
       "description": "Loops keyboard focus between the first and last views.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 50
+        "line": 51
       }
     }
   ],
@@ -1294,7 +1294,7 @@
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 55
+        "line": 56
       }
     },
     {
@@ -1304,7 +1304,17 @@
       "description": "The visible view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 57
+        "line": 58
+      }
+    },
+    {
+      "name": "details",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Supplementary context shown in a tooltip even when the view name fits.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 60
       }
     },
     {
@@ -1314,7 +1324,7 @@
       "description": "Renders a decorative 16px icon before the view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 59
+        "line": 62
       }
     },
     {
@@ -1325,7 +1335,7 @@
       "description": "Disables selection and closing for this view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 61
+        "line": 64
       }
     },
     {
@@ -1335,7 +1345,7 @@
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 63
+        "line": 66
       }
     },
     {
@@ -1346,7 +1356,7 @@
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 65
+        "line": 68
       }
     }
   ],
@@ -1358,7 +1368,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 70
+        "line": 73
       }
     },
     {
@@ -1368,7 +1378,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 72
+        "line": 75
       }
     },
     {
@@ -1379,7 +1389,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 74
+        "line": 77
       }
     }
   ],

@@ -58,7 +58,7 @@ export const toggleGroupStyles = stylex.create({
     backgroundColor: 'transparent',
     color: {
       default: textColors['text-muted'],
-      ':hover': textColors['text-default'],
+      ':hover': textColors['text-secondary'],
     },
     cursor: 'pointer',
     display: 'inline-flex',
