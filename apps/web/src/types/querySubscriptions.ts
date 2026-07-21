@@ -17,8 +17,4 @@ export interface QuerySubscriptionRow {
   table: string;
 }
 
-/** Per-table subscription totals used to drive the telemetry table list. */
-export interface QuerySubscriptionTableItem {
-  subscriptionCount: number;
-  tableName: string;
-}
+export type QuerySubscriptionPropagation = "full" | "local-only";

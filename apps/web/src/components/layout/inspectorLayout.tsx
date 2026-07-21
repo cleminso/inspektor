@@ -7,14 +7,13 @@ import { InspectorHeader } from "./inspectorHeader";
 export function InspectorLayout({ children }: PropsWithChildren): React.ReactElement {
   return (
     <Box
-      height="full"
-      minHeight={0}
+      minHeight={1}
       width="full"
       flexDirection="column"
       overflow="hidden"
       backgroundColor="bg-page"
       color="text-default"
-      unsafeClassName="h-svh"
+      unsafeClassName="h-dvh"
     >
       <InspectorHeader />
       <Box as="main" minHeight={0} minWidth={0} flex={1} overflow="hidden">

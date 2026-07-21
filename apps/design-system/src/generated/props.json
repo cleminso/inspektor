@@ -308,7 +308,7 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"xs\" | \"s\" | \"m\" | \"l\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the button height and horizontal padding.",
@@ -438,7 +438,7 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"xs\" | \"s\" | \"m\" | \"l\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the link height and horizontal padding.",
@@ -1380,6 +1380,401 @@
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
         "line": 74
+      }
+    }
+  ],
+  "accordion.root": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Accordion items and their panels.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 15
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "AccordionValue[]",
+      "required": false,
+      "description": "Values expanded when the accordion is uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "value",
+      "type": "AccordionValue[]",
+      "required": false,
+      "description": "Values expanded when the accordion is controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 19
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: AccordionValue<AccordionValue>, eventDetails: AccordionRootChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when expanded values change.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 21
+      }
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Allows more than one panel to remain expanded.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 23
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables every accordion item.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 25
+      }
+    }
+  ],
+  "accordion.item": [
+    {
+      "name": "value",
+      "type": "string | number",
+      "required": true,
+      "description": "Identifies the item for controlled and initial state.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables this accordion item.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 32
+      }
+    }
+  ],
+  "accordion.header": [],
+  "accordion.trigger": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Visible heading text.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "suffix",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional content aligned opposite the heading.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 42
+      }
+    }
+  ],
+  "accordion.panel": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Panel content.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 47
+      }
+    },
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "description": "Keeps the panel mounted while collapsed.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 49
+      }
+    },
+    {
+      "name": "hiddenUntilFound",
+      "type": "boolean",
+      "required": false,
+      "description": "Allows browser find-in-page to reveal collapsed panel content.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 51
+      }
+    }
+  ],
+  "actionList.root": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Action-list items.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 13
+      }
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the list.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 15
+      }
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the element that labels the list.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 17
+      }
+    },
+    {
+      "name": "onEscapeKeyDown",
+      "type": "KeyboardEventHandler<HTMLUListElement>",
+      "required": false,
+      "description": "Runs when an unhandled Escape key event bubbles from within the list. Preventing default returns focus to the item's primary trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 19
+      }
+    }
+  ],
+  "actionList.item": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional selection control, primary trigger, and optional trailing action.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Applies the active navigation treatment.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Applies the bulk-selection treatment.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 28
+      }
+    }
+  ],
+  "actionList.selectionControl": [
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name describing which item the checkbox selects.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 33
+      }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": true,
+      "description": "Controls whether this item participates in the bulk selection.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 35
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables selection for this item.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 37
+      }
+    },
+    {
+      "name": "icon",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Leading icon shown while the selection control is inactive.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 39
+      }
+    },
+    {
+      "name": "onCheckedChange",
+      "type": "(checked: boolean, eventDetails: CheckboxRootChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the checked state changes.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 41
+      }
+    }
+  ],
+  "actionList.trigger": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Visible action label.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 47
+      }
+    },
+    {
+      "name": "prefix",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Decorative content before the label.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 49
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the primary trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 51
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ButtonState>",
+      "required": false,
+      "description": "Composes trigger behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 53
+      }
+    }
+  ],
+  "actionList.action": [
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for an icon-only action.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 58
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the trailing action.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 60
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ButtonState>",
+      "required": false,
+      "description": "Composes action behavior and styles onto another element.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 62
+      }
+    }
+  ],
+  "sidePanel.root": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Content rendered in this panel region.",
+      "source": {
+        "path": "packages/design-system/src/components/sidePanel/sidePanel.tsx",
+        "line": 8
+      }
+    }
+  ],
+  "sidePanel.header": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Content rendered in this panel region.",
+      "source": {
+        "path": "packages/design-system/src/components/sidePanel/sidePanel.tsx",
+        "line": 8
+      }
+    }
+  ],
+  "sidePanel.body": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Content rendered in this panel region.",
+      "source": {
+        "path": "packages/design-system/src/components/sidePanel/sidePanel.tsx",
+        "line": 8
+      }
+    }
+  ],
+  "sidePanel.footer": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Content rendered in this panel region.",
+      "source": {
+        "path": "packages/design-system/src/components/sidePanel/sidePanel.tsx",
+        "line": 8
       }
     }
   ],

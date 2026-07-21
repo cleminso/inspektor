@@ -1,5 +1,3 @@
-import { SplitIcon } from "lucide-react";
-
 import {
   ContextSwitcher,
   Text,
@@ -36,7 +34,6 @@ export function BranchSwitcher({
         size={size}
         width={width}
       >
-        <SplitIcon aria-hidden="true" size={14} />
         <Text as="span" color="inherit" truncate>
           {triggerLabel ?? currentBranch ?? "Select branch"}
         </Text>

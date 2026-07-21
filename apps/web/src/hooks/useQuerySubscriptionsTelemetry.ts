@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchServerSubscriptions } from "jazz-tools";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
-import type { QuerySubscriptionRow } from "@/types/QuerySubscriptions";
+import type { QuerySubscriptionRow } from "@/types/querySubscriptions";
 
 const LIVE_QUERY_POLL_MS = 20_000;
 
@@ -75,7 +75,10 @@ export function useQuerySubscriptionTelemetry(): useQuerySubscriptionTelemetryRe
     };
   }, [activeConnection]);
   const cachedTelemetry = useMemo(
-    () => (connectionConfig !== null ? (QuerySubscriptionsTelemetryCache.get(connectionConfig.connectionKey) ?? null) : null),
+    () =>
+      connectionConfig !== null
+        ? (QuerySubscriptionsTelemetryCache.get(connectionConfig.connectionKey) ?? null)
+        : null,
     [connectionConfig],
   );
   // Prevent overlapping telemetry requests when a refresh is still resolving.
@@ -93,7 +96,9 @@ export function useQuerySubscriptionTelemetry(): useQuerySubscriptionTelemetryRe
     let cancelled = false;
     const isCancelled = () => cancelled;
     const nextCachedTelemetry =
-      connectionConfig !== null ? (QuerySubscriptionsTelemetryCache.get(connectionConfig.connectionKey) ?? null) : null;
+      connectionConfig !== null
+        ? (QuerySubscriptionsTelemetryCache.get(connectionConfig.connectionKey) ?? null)
+        : null;
 
     if (connectionConfig === null) {
       setState({
@@ -167,7 +172,10 @@ export function useQuerySubscriptionTelemetry(): useQuerySubscriptionTelemetryRe
 
         setState((currentState) => ({
           ...currentState,
-          error: QuerySubscriptionsError instanceof Error ? QuerySubscriptionsError.message : String(QuerySubscriptionsError),
+          error:
+            QuerySubscriptionsError instanceof Error
+              ? QuerySubscriptionsError.message
+              : String(QuerySubscriptionsError),
           isInitialLoading: false,
           isRefreshing: false,
         }));

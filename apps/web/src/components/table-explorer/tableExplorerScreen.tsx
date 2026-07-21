@@ -1,71 +1,72 @@
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  useResizablePanelRef,
-  type ResizablePanelSize,
-} from "@inspector/ds";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
+import { SidePanelLayout } from "@/components/layout/sidePanelLayout";
 import { SelectedTableView } from "@/components/table-explorer/selectedTableView";
-import { TableListPane } from "@/components/table-explorer/tableListPane";
+import {
+  TableListPane,
+  type TableCheckedChangeOptions,
+} from "@/components/table-explorer/tableListPane";
+import { updateTableNameSelection } from "@/components/table-explorer/tableNameSelection";
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { useInspectorTables } from "@/hooks/useInspectorTables";
 
 export function TableExplorerScreen(): React.ReactElement {
   const { currentTableName } = useInspector();
   const [tableSearch, setTableSearch] = useState("");
+  const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const tableSelectionAnchorRef = useRef<string | null>(null);
   const { tables } = useInspectorTables();
-  const listPaneRef = useResizablePanelRef();
-  const [isListPaneOpen, setIsListPaneOpen] = useState(true);
 
-  const handleListPaneResize = (panelSize: ResizablePanelSize) => {
-    const nextIsListPaneOpen = panelSize.inPixels > 0;
-    setIsListPaneOpen((currentIsListPaneOpen) =>
-      currentIsListPaneOpen === nextIsListPaneOpen ? currentIsListPaneOpen : nextIsListPaneOpen,
+  const handleTableCheckedChange = (
+    tableName: string,
+    checked: boolean,
+    { extendRange, orderedTableNames }: TableCheckedChangeOptions,
+  ) => {
+    const currentAnchor = tableSelectionAnchorRef.current;
+    const canExtendRange =
+      extendRange === true &&
+      currentAnchor !== null &&
+      orderedTableNames.includes(currentAnchor);
+    const anchorTableName = canExtendRange === true ? currentAnchor : null;
+
+    if (canExtendRange === false) {
+      tableSelectionAnchorRef.current = tableName;
+    }
+
+    setCheckedTableNames((currentCheckedTableNames) =>
+      updateTableNameSelection({
+        anchorTableName,
+        checked,
+        checkedTableNames: currentCheckedTableNames,
+        orderedTableNames,
+        targetTableName: tableName,
+      }),
     );
   };
 
-  const handleToggleListPane = () => {
-    const panel = listPaneRef.current;
-    if (panel === null) {
-      return;
-    }
-    if (panel.isCollapsed() === true) {
-      panel.expand();
-      setIsListPaneOpen(true);
-    } else {
-      panel.collapse();
-      setIsListPaneOpen(false);
-    }
+  const clearTableSelection = () => {
+    tableSelectionAnchorRef.current = null;
+    setCheckedTableNames(new Set());
   };
 
   return (
-    <ResizablePanelGroup orientation="horizontal">
-      <ResizablePanel
-        panelRef={listPaneRef}
-        collapsible
-        collapsedSize={0}
-        defaultSize={200}
-        minSize={160}
-        maxSize={360}
-        onResize={handleListPaneResize}
-      >
+    <SidePanelLayout>
+      <SidePanelLayout.Panel>
         <TableListPane
+          checkedTableNames={checkedTableNames}
           searchValue={tableSearch}
           selectedTableName={currentTableName}
           tables={tables}
+          onClearSelection={clearTableSelection}
           onSearchValueChange={setTableSearch}
+          onTableCheckedChange={handleTableCheckedChange}
         />
-      </ResizablePanel>
-      {isListPaneOpen === true ? <ResizableHandle /> : null}
-      <ResizablePanel>
-        <SelectedTableView
-          isListPaneOpen={isListPaneOpen}
-          tableName={currentTableName}
-          onToggleListPane={handleToggleListPane}
-        />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+      </SidePanelLayout.Panel>
+      <SidePanelLayout.Content>
+        <SelectedTableView tableName={currentTableName} />
+      </SidePanelLayout.Content>
+    </SidePanelLayout>
   );
 }

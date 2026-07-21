@@ -14,7 +14,7 @@ export type ButtonVariant =
   | 'outline'
   | 'link'
 
-export type ButtonSize = 's' | 'm' | 'l'
+export type ButtonSize = 'xs' | 's' | 'm' | 'l'
 export type ButtonShape = 'square'
 export type ButtonJustify = 'center' | 'start' | 'between'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm' | 'l' | 'xl'
@@ -30,6 +30,7 @@ const variantStyles = {
 } satisfies Record<ButtonVariant, unknown>
 
 const sizeStyles = {
+  xs: buttonStyles.sizeXS,
   s: buttonStyles.sizeS,
   m: buttonStyles.sizeM,
   l: buttonStyles.sizeL,
@@ -100,6 +101,7 @@ interface ButtonContentProps {
   suffix?: ReactNode
   shape?: ButtonShape
   loading?: boolean
+  justify: ButtonJustify
   size: ButtonSize
 }
 
@@ -109,19 +111,41 @@ export function ButtonContent({
   suffix,
   shape,
   loading = false,
+  justify,
   size,
 }: ButtonContentProps) {
+  const spinnerSize = size === 'xs' ? 's' : size
+  const prefixContent = loading === true || prefix !== undefined ? (
+    <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
+      {loading === true ? <Spinner size={spinnerSize} /> : prefix}
+    </span>
+  ) : null
+
   return (
-    <span {...stylex.props(buttonStyles.content)}>
+    <span
+      data-slot="button-content"
+      {...stylex.props(
+        buttonStyles.content,
+        justify === 'between' && buttonStyles.contentBetween,
+      )}
+    >
       {shape === 'square' ? (
-        loading === true ? <Spinner size={size} /> : children
-      ) : (
+        loading === true ? <Spinner size={spinnerSize} /> : children
+      ) : justify === 'between' ? (
         <>
-          {loading === true || prefix !== undefined ? (
+          <span data-slot="button-leading" {...stylex.props(buttonStyles.leadingContent)}>
+            {prefixContent}
+            {children}
+          </span>
+          {suffix !== undefined ? (
             <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
-              {loading === true ? <Spinner size={size} /> : prefix}
+              {suffix}
             </span>
           ) : null}
+        </>
+      ) : (
+        <>
+          {prefixContent}
           {children}
           {suffix !== undefined ? (
             <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>

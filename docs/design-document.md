@@ -453,6 +453,36 @@ When the inspector opens for the first time, the Data Explorer auto-selects the 
 
 If no table tab is open, the main table surface renders an empty state instead of the grid toolbar. That empty state shows recently opened tables so the developer can reopen prior work quickly.
 
+**Table action item**
+
+A table action item can be checked when hovere via a checkbox component that replace the leading table icon. Click right open a menu of actions (open x tabs; close x close; pin x tables; deselect all)
+
+Selection rules
+
+- Normal click:
+  - Toggle only the clicked item
+  - Replace the anchor with that item
+- Shift-click with a valid visible anchor:
+  - Find anchor and target indices in filteredTables
+  - Take the inclusive range
+  - Apply the target checkbox’s new state to the complete range
+  - Preserve the original anchor so another Shift-click can extend the range
+- Shift-click without a visible anchor:
+  - Treat it as a normal click and establish a new anchor
+- Shift-unchecking:
+  - Uncheck the inclusive range
+- Search filtering:
+  - Operate only on visible items. Hidden tables should not change unexpectedly
+
+A ref is suitable for the anchor because changing it does not affect rendering. Checked names remain React state because they affect the UI and bulk commands.
+
+Accessibility
+
+- Shift+Space on a focused checkbox should use the same range logic
+- Per-item :focus-within should reveal the checkbox just like hover
+- Checkbox and navigation trigger remain siblings
+- The checkbox receives the click without activating the table link
+
 #### Table tabs and saved table state
 
 Table tabs follow this model:

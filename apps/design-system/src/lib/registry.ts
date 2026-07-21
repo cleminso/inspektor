@@ -291,6 +291,45 @@ export const searchItem = {
   componentId: "search",
 } satisfies NavItem;
 
+export const accordionItem = {
+  title: "Accordion",
+  slug: "accordion",
+  href: "/components/accordion",
+  description: "Collapsible sections with Base UI behavior and compact Inspector presentation.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "accordion.tsx",
+    path: "packages/design-system/src/components/accordion/accordion.tsx",
+  },
+  componentId: "accordion",
+} satisfies NavItem;
+
+export const actionListItem = {
+  title: "Action List",
+  slug: "action-list",
+  href: "/components/action-list",
+  description: "Selectable action rows with navigation triggers and composable trailing actions.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "actionList.tsx",
+    path: "packages/design-system/src/components/actionList/actionList.tsx",
+  },
+  componentId: "actionList",
+} satisfies NavItem;
+
+export const sidePanelItem = {
+  title: "Side Panel",
+  slug: "side-panel",
+  href: "/components/side-panel",
+  description: "Full-height panel structure with fixed header and footer regions.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "sidePanel.tsx",
+    path: "packages/design-system/src/components/sidePanel/sidePanel.tsx",
+  },
+  componentId: "sidePanel",
+} satisfies NavItem;
+
 export const resizablePanelItem = {
   title: "Resizable Panel",
   slug: "resizable-panel",
@@ -384,6 +423,8 @@ export const textFieldItem = {
 } satisfies NavItem;
 
 export const componentItems: NavItem[] = [
+  accordionItem,
+  actionListItem,
   buttonItem,
   buttonLinkItem,
   buttonGroupItem,
@@ -400,6 +441,7 @@ export const componentItems: NavItem[] = [
   menuItem,
   resizablePanelItem,
   searchItem,
+  sidePanelItem,
   selectItem,
   spinnerItem,
   switchItem,

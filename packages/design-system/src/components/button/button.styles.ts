@@ -93,18 +93,23 @@ export const buttonStyles = stylex.create({
     },
     textUnderlineOffset: 3,
   },
+  sizeXS: {
+    paddingInline: spacing.s,
+    fontSize: fontSizes[2],
+    minHeight: spatial['control-height-xs'],
+  },
   sizeS: {
     paddingInline: spacing.s,
     fontSize: fontSizes[2],
     minHeight: spatial['control-height-s'],
   },
   sizeM: {
-    paddingInline: spacing.m,
+    paddingInline: spacing.s,
     fontSize: fontSizes[2],
     minHeight: spatial['control-height-m'],
   },
   sizeL: {
-    paddingInline: spacing.l,
+    paddingInline: spacing.m,
     fontSize: fontSizes[2],
     minHeight: spatial['control-height-l'],
   },
@@ -161,6 +166,16 @@ export const buttonStyles = stylex.create({
     display: 'inline-flex',
     justifyContent: 'center',
     lineHeight: lineHeights.none,
+    minWidth: 0,
+  },
+  contentBetween: {
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  leadingContent: {
+    gap: spacing.s,
+    alignItems: 'center',
+    display: 'inline-flex',
     minWidth: 0,
   },
   iconSlot: {

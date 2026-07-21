@@ -84,6 +84,24 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...["Root", "Item", "Header", "Trigger", "Panel"].map((part) => ({
+    componentId: `accordion.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "Accordion",
+    part,
+    inheritedProps: [],
+  })),
+  ...["Root", "Item", "SelectionControl", "Trigger", "Action"].map((part) => ({
+    componentId: `actionList.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "ActionList",
+    part,
+    inheritedProps: [],
+  })),
+  ...["Root", "Header", "Body", "Footer"].map((part) => ({
+    componentId: `sidePanel.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "SidePanel",
+    part,
+    inheritedProps: [],
+  })),
   ...["Provider", "Root", "Trigger", "Content"].map((part) => ({
     componentId: `tooltip.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "Tooltip",

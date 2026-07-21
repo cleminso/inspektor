@@ -9,7 +9,7 @@ import {
 import { Tooltip, type TooltipContentProps } from '../tooltip/tooltip'
 import { copyButtonStyles } from './copyButton.styles'
 
-export type CopyButtonSize = ButtonSize
+export type CopyButtonSize = Exclude<ButtonSize, 'xs'>
 export type CopyButtonVariant = Extract<
   ButtonVariant,
   'ghost' | 'secondary' | 'outline'

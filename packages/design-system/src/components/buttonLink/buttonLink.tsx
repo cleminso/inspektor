@@ -79,6 +79,7 @@ export function ButtonLink({
         prefix={prefix}
         suffix={suffix}
         shape={shape}
+        justify={justify}
         size={size}
       >
         {children}

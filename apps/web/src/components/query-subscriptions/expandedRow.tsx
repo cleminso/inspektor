@@ -5,7 +5,7 @@ import { Button } from "@regarde/ui/button";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { buildExplorerLink } from "@/lib/query-subscriptions/buildExplorerUrl";
-import type { QuerySubscriptionRow } from "@/types/QuerySubscriptions";
+import type { QuerySubscriptionRow } from "@/types/querySubscriptions";
 
 function formatQuery(value: string): string {
   try {
@@ -19,7 +19,9 @@ interface QuerySubscriptionsExpandedRowProps {
   row: QuerySubscriptionRow;
 }
 
-export function QuerySubscriptionsExpandedRow({ row }: QuerySubscriptionsExpandedRowProps): React.ReactElement {
+export function QuerySubscriptionsExpandedRow({
+  row,
+}: QuerySubscriptionsExpandedRowProps): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
 
   const formattedQuery = formatQuery(row.query);
@@ -40,7 +42,9 @@ export function QuerySubscriptionsExpandedRow({ row }: QuerySubscriptionsExpande
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium text-foreground">Query</p>
-          <p className="text-xs text-muted-foreground">Grouped server subscription for `{row.table}`.</p>
+          <p className="text-xs text-muted-foreground">
+            Grouped server subscription for `{row.table}`.
+          </p>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-1">
           {explorerLink !== null ? (
@@ -51,7 +55,9 @@ export function QuerySubscriptionsExpandedRow({ row }: QuerySubscriptionsExpande
           <CopyButton textToCopy={row.query} label="Copy query" size="icon-l" variant="secondary" />
         </div>
       </div>
-      <pre className="app-scrollbar max-w-full overflow-x-auto rounded-md border border-border bg-background p-3 text-xs text-muted-foreground">{formattedQuery}</pre>
+      <pre className="app-scrollbar max-w-full overflow-x-auto rounded-md border border-border bg-background p-3 text-xs text-muted-foreground">
+        {formattedQuery}
+      </pre>
     </div>
   );
 }

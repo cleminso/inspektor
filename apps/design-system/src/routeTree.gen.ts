@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComponentsAccordionRouteImport } from './routes/components/accordion'
+import { Route as ComponentsActionListRouteImport } from './routes/components/action-list'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
@@ -27,6 +29,7 @@ import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
+import { Route as ComponentsSidePanelRouteImport } from './routes/components/side-panel'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
 import { Route as ComponentsTabViewRouteImport } from './routes/components/tab-view'
@@ -42,6 +45,16 @@ import { Route as FoundationsTypographyRouteImport } from './routes/foundations/
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsAccordionRoute = ComponentsAccordionRouteImport.update({
+  id: '/components/accordion',
+  path: '/components/accordion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsActionListRoute = ComponentsActionListRouteImport.update({
+  id: '/components/action-list',
+  path: '/components/action-list',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
@@ -131,6 +144,11 @@ const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
   path: '/components/select',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsSidePanelRoute = ComponentsSidePanelRouteImport.update({
+  id: '/components/side-panel',
+  path: '/components/side-panel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsSpinnerRoute = ComponentsSpinnerRouteImport.update({
   id: '/components/spinner',
   path: '/components/spinner',
@@ -189,6 +207,8 @@ const FoundationsTypographyRoute = FoundationsTypographyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/components/accordion': typeof ComponentsAccordionRoute
+  '/components/action-list': typeof ComponentsActionListRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -206,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/tab-view': typeof ComponentsTabViewRoute
@@ -220,6 +241,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/components/accordion': typeof ComponentsAccordionRoute
+  '/components/action-list': typeof ComponentsActionListRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -237,6 +260,7 @@ export interface FileRoutesByTo {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/tab-view': typeof ComponentsTabViewRoute
@@ -252,6 +276,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/components/accordion': typeof ComponentsAccordionRoute
+  '/components/action-list': typeof ComponentsActionListRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -269,6 +295,7 @@ export interface FileRoutesById {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/tab-view': typeof ComponentsTabViewRoute
@@ -285,6 +312,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/components/accordion'
+    | '/components/action-list'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -302,6 +331,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/side-panel'
     | '/components/spinner'
     | '/components/switch'
     | '/components/tab-view'
@@ -316,6 +346,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/components/accordion'
+    | '/components/action-list'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -333,6 +365,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/side-panel'
     | '/components/spinner'
     | '/components/switch'
     | '/components/tab-view'
@@ -347,6 +380,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/components/accordion'
+    | '/components/action-list'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -364,6 +399,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/select'
+    | '/components/side-panel'
     | '/components/spinner'
     | '/components/switch'
     | '/components/tab-view'
@@ -379,6 +415,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComponentsAccordionRoute: typeof ComponentsAccordionRoute
+  ComponentsActionListRoute: typeof ComponentsActionListRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
@@ -396,6 +434,7 @@ export interface RootRouteChildren {
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
+  ComponentsSidePanelRoute: typeof ComponentsSidePanelRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTabViewRoute: typeof ComponentsTabViewRoute
@@ -416,6 +455,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/accordion': {
+      id: '/components/accordion'
+      path: '/components/accordion'
+      fullPath: '/components/accordion'
+      preLoaderRoute: typeof ComponentsAccordionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/action-list': {
+      id: '/components/action-list'
+      path: '/components/action-list'
+      fullPath: '/components/action-list'
+      preLoaderRoute: typeof ComponentsActionListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/button': {
@@ -537,6 +590,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsSelectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/side-panel': {
+      id: '/components/side-panel'
+      path: '/components/side-panel'
+      fullPath: '/components/side-panel'
+      preLoaderRoute: typeof ComponentsSidePanelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/spinner': {
       id: '/components/spinner'
       path: '/components/spinner'
@@ -619,6 +679,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComponentsAccordionRoute: ComponentsAccordionRoute,
+  ComponentsActionListRoute: ComponentsActionListRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
@@ -636,6 +698,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
+  ComponentsSidePanelRoute: ComponentsSidePanelRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTabViewRoute: ComponentsTabViewRoute,

@@ -1,66 +1,30 @@
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  useResizablePanelRef,
-  type ResizablePanelSize,
-} from "@inspector/ds";
-import { useState } from "react";
-
+import { SidePanelLayout } from "@/components/layout/sidePanelLayout";
 import { QuerySubscriptionsGrid } from "@/components/query-subscriptions/dataGrid";
 import { QuerySubscriptionsListPane } from "@/components/query-subscriptions/tableListPane";
 import { useQuerySubscriptionsState } from "@/components/query-subscriptions/useQuerySubscriptionsState";
+import { useInspectorTables } from "@/hooks/useInspectorTables";
 
 export function QuerySubscriptionsScreen(): React.ReactElement {
-  const state = useQuerySubscriptionsState();
-  const listPaneRef = useResizablePanelRef();
-  const [isListPaneOpen, setIsListPaneOpen] = useState(true);
-
-  const handleListPaneResize = (panelSize: ResizablePanelSize) => {
-    const nextIsListPaneOpen = panelSize.inPixels > 0;
-    setIsListPaneOpen((currentIsListPaneOpen) =>
-      currentIsListPaneOpen === nextIsListPaneOpen ? currentIsListPaneOpen : nextIsListPaneOpen,
-    );
-  };
-
-  const handleToggleListPane = () => {
-    const panel = listPaneRef.current;
-    if (panel === null) {
-      return;
-    }
-    if (panel.isCollapsed() === true) {
-      panel.expand();
-      setIsListPaneOpen(true);
-    } else {
-      panel.collapse();
-      setIsListPaneOpen(false);
-    }
-  };
+  const { tables } = useInspectorTables();
+  const state = useQuerySubscriptionsState(tables);
 
   return (
-    <ResizablePanelGroup orientation="horizontal">
-      <ResizablePanel
-        panelRef={listPaneRef}
-        collapsible
-        collapsedSize={0}
-        defaultSize={200}
-        minSize={160}
-        maxSize={360}
-        onResize={handleListPaneResize}
-      >
+    <SidePanelLayout>
+      <SidePanelLayout.Panel>
         <QuerySubscriptionsListPane
-          isInitialLoading={state.isInitialLoading}
           searchValue={state.listSearchValue}
+          selectedPropagations={state.selectedPropagations}
           selectedTableName={state.selectedTableName}
-          visibleTableItems={state.visibleTableItems}
+          tableCount={state.tableCount}
+          visibleTableNames={state.visibleTableNames}
+          onPropagationSelectedChange={state.setPropagationSelected}
           onSearchValueChange={state.setListSearchValue}
           onSelectedTableNameChange={state.setSelectedTableName}
         />
-      </ResizablePanel>
-      {isListPaneOpen === true ? <ResizableHandle /> : null}
-      <ResizablePanel>
-        <QuerySubscriptionsGrid state={state} isListPaneOpen={isListPaneOpen} onToggleListPane={handleToggleListPane} />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+      </SidePanelLayout.Panel>
+      <SidePanelLayout.Content>
+        <QuerySubscriptionsGrid state={state} />
+      </SidePanelLayout.Content>
+    </SidePanelLayout>
   );
 }

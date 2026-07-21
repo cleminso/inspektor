@@ -1,7 +1,14 @@
 import { useMemo, useState } from "react";
 
+import {
+  filterQuerySubscriptionRows,
+  filterQuerySubscriptionTableNames,
+} from "@/components/query-subscriptions/querySubscriptionFilters";
 import { useQuerySubscriptionTelemetry } from "@/hooks/useQuerySubscriptionsTelemetry";
-import type { QuerySubscriptionRow, QuerySubscriptionTableItem } from "@/types/QuerySubscriptions";
+import type {
+  QuerySubscriptionPropagation,
+  QuerySubscriptionRow,
+} from "@/types/querySubscriptions";
 
 export interface UseQuerySubscriptionsStateResult {
   error: string | null;
@@ -11,67 +18,70 @@ export interface UseQuerySubscriptionsStateResult {
   isRefreshing: boolean;
   listSearchValue: string;
   rows: QuerySubscriptionRow[];
+  selectedPropagations: QuerySubscriptionPropagation[];
   selectedTableName: string | null;
+  setPropagationSelected: (propagation: QuerySubscriptionPropagation, selected: boolean) => void;
   setListSearchValue: (value: string) => void;
   setSelectedTableName: (value: string | null) => void;
-  visibleTableItems: QuerySubscriptionTableItem[];
+  tableCount: number;
+  visibleTableNames: string[];
 }
 
-export function useQuerySubscriptionsState(): UseQuerySubscriptionsStateResult {
+export function useQuerySubscriptionsState(tables: string[]): UseQuerySubscriptionsStateResult {
   const telemetry = useQuerySubscriptionTelemetry();
   const [listSearchValue, setListSearchValue] = useState("");
   const [selectedTableName, setSelectedTableName] = useState<string | null>(null);
-
-  const tableItems = useMemo<QuerySubscriptionTableItem[]>(() => {
-    const subscriptionCountByTable = new Map<string, number>();
-
-    for (const row of telemetry.rows) {
-      subscriptionCountByTable.set(row.table, (subscriptionCountByTable.get(row.table) ?? 0) + row.count);
-    }
-
-    return [...subscriptionCountByTable.entries()]
-      .sort(([leftTableName], [rightTableName]) => leftTableName.localeCompare(rightTableName))
-      .map(([tableName, subscriptionCount]) => ({ tableName, subscriptionCount }));
-  }, [telemetry.rows]);
-
-  const normalizedSearchValue = listSearchValue.trim().toLowerCase();
-  const visibleTableItems = useMemo(() => {
-    if (normalizedSearchValue.length === 0) {
-      return tableItems;
-    }
-
-    return tableItems.filter((tableItem) => tableItem.tableName.toLowerCase().includes(normalizedSearchValue));
-  }, [normalizedSearchValue, tableItems]);
+  const [selectedPropagations, setSelectedPropagations] = useState<QuerySubscriptionPropagation[]>(
+    [],
+  );
+  const visibleTableNames = useMemo(
+    () => filterQuerySubscriptionTableNames(tables, listSearchValue),
+    [listSearchValue, tables],
+  );
 
   const effectiveSelectedTableName = useMemo(() => {
     if (selectedTableName === null) {
       return null;
     }
 
-    const selectedTableExists = tableItems.some((tableItem) => tableItem.tableName === selectedTableName);
+    const selectedTableExists = tables.includes(selectedTableName);
     return selectedTableExists === true ? selectedTableName : null;
-  }, [selectedTableName, tableItems]);
+  }, [selectedTableName, tables]);
 
-  const filteredRows = useMemo(() => {
-    return telemetry.rows.filter((row) => {
-      if (effectiveSelectedTableName !== null && row.table !== effectiveSelectedTableName) {
-        return false;
+  const filteredRows = useMemo(
+    () =>
+      filterQuerySubscriptionRows(telemetry.rows, {
+        selectedPropagations,
+        selectedTableName: effectiveSelectedTableName,
+      }),
+    [effectiveSelectedTableName, selectedPropagations, telemetry.rows],
+  );
+
+  const setPropagationSelected = (propagation: QuerySubscriptionPropagation, selected: boolean) => {
+    setSelectedPropagations((currentPropagations) => {
+      if (selected === true) {
+        return currentPropagations.includes(propagation)
+          ? currentPropagations
+          : [...currentPropagations, propagation];
       }
 
-      return true;
+      return currentPropagations.filter((currentPropagation) => currentPropagation !== propagation);
     });
-  }, [effectiveSelectedTableName, telemetry.rows]);
+  };
 
   return {
     rows: telemetry.rows,
     filteredRows,
-    visibleTableItems,
+    visibleTableNames,
+    tableCount: tables.length,
     generatedAt: telemetry.generatedAt,
     error: telemetry.error,
     isInitialLoading: telemetry.isInitialLoading,
     isRefreshing: telemetry.isRefreshing,
     listSearchValue,
+    selectedPropagations,
     selectedTableName: effectiveSelectedTableName,
+    setPropagationSelected,
     setListSearchValue,
     setSelectedTableName,
   };

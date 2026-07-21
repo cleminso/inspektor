@@ -106,12 +106,13 @@ export function Button({
       data-slot="button"
       data-variant={variant}
     >
-      <ButtonContent
+        <ButtonContent
         prefix={prefix}
         suffix={suffix}
         shape={shape}
-        loading={loading}
-        size={size}
+          loading={loading}
+          justify={justify}
+          size={size}
       >
         {children}
       </ButtonContent>

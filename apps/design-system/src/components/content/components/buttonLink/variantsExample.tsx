@@ -1,7 +1,14 @@
 import { Box, ButtonLink, type ButtonVariant } from "@inspector/ds";
 import { type ReactElement } from "react";
 
-const variants: ButtonVariant[] = ["primary", "secondary", "danger", "ghost", "outline", "link"];
+const variants: ButtonVariant[] = [
+  "primary",
+  "secondary",
+  "danger",
+  "ghost",
+  "outline",
+  "link",
+];
 
 export default function VariantsExample(): ReactElement {
   return (

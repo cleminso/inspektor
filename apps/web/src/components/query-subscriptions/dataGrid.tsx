@@ -20,7 +20,7 @@ import { Badge } from "@regarde/ui/badge";
 import { ActionsBar } from "@/components/query-subscriptions/actionsBar";
 import { QuerySubscriptionsExpandedRow } from "@/components/query-subscriptions/expandedRow";
 import type { UseQuerySubscriptionsStateResult } from "@/components/query-subscriptions/useQuerySubscriptionsState";
-import type { QuerySubscriptionRow } from "@/types/QuerySubscriptions";
+import type { QuerySubscriptionRow } from "@/types/querySubscriptions";
 
 function getEmptyStateCopy(selectedTableName: string | null): {
   description: string;
@@ -43,7 +43,13 @@ function HeaderLabel({ title }: { title: string }): React.ReactElement {
   return <span className="text-secondary-foreground/80 text-xs font-normal">{title}</span>;
 }
 
-function GridMessage({ description, title }: { description: string; title: string }): React.ReactElement {
+function GridMessage({
+  description,
+  title,
+}: {
+  description: string;
+  title: string;
+}): React.ReactElement {
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center px-6">
       <div className="max-w-md text-center">
@@ -104,12 +110,10 @@ const columns: ColumnDef<QuerySubscriptionRow>[] = [
 ];
 
 interface QuerySubscriptionsGridProps {
-  isListPaneOpen: boolean;
-  onToggleListPane: () => void;
   state: UseQuerySubscriptionsStateResult;
 }
 
-export function QuerySubscriptionsGrid({ isListPaneOpen, onToggleListPane, state }: QuerySubscriptionsGridProps): React.ReactElement {
+export function QuerySubscriptionsGrid({ state }: QuerySubscriptionsGridProps): React.ReactElement {
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const emptyStateCopy = getEmptyStateCopy(state.selectedTableName);
 
@@ -129,15 +133,16 @@ export function QuerySubscriptionsGrid({ isListPaneOpen, onToggleListPane, state
       <ActionsBar
         error={state.error}
         generatedAt={state.generatedAt}
-        isListPaneOpen={isListPaneOpen}
         isRefreshing={state.isRefreshing}
-        onToggleListPane={onToggleListPane}
         rowCount={state.rows.length}
       />
       {state.error !== null && state.rows.length === 0 && state.isInitialLoading === false ? (
         <GridMessage title="Unable to load subscription telemetry" description={state.error} />
       ) : state.isInitialLoading === true && state.rows.length === 0 ? (
-        <GridMessage title="Loading subscriptions" description="Fetching active server subscriptions." />
+        <GridMessage
+          title="Loading subscriptions"
+          description="Fetching active server subscriptions."
+        />
       ) : state.filteredRows.length === 0 ? (
         <GridMessage title={emptyStateCopy.title} description={emptyStateCopy.description} />
       ) : (
@@ -155,7 +160,10 @@ export function QuerySubscriptionsGrid({ isListPaneOpen, onToggleListPane, state
           >
             <DataGridContainer className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-none border-0">
               <div className="relative flex min-h-0 min-w-0 flex-1 overflow-hidden">
-                <DataGridScrollArea className="app-scrollbar h-full min-h-0 min-w-0 flex-1" orientation="both">
+                <DataGridScrollArea
+                  className="app-scrollbar h-full min-h-0 min-w-0 flex-1"
+                  orientation="both"
+                >
                   <DataGridTable />
                 </DataGridScrollArea>
               </div>

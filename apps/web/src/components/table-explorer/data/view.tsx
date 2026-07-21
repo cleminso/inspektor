@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@inspector/ds";
-import { Button } from "@regarde/ui/button";
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@inspector/ds";
 
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
 import { DataGrid } from "@/components/table-explorer/data/dataGrid";
@@ -11,23 +10,12 @@ import { InsertRowForm } from "@/components/table-explorer/data/insertRowForm";
 import { RowEditorSidePanel } from "@/components/table-explorer/data/rowEditorSidePanel";
 import { TableFilter } from "@/components/table-explorer/data/tableFilter";
 import { useDataViewState } from "@/components/table-explorer/data/useDataViewState";
-import type { TableExplorerView } from "@/types/tableExplorer";
 
 interface DataViewProps {
-  isListPaneOpen: boolean;
-  onToggleListPane: () => void;
-  onViewChange: (view: TableExplorerView) => Promise<void>;
   tableName: string;
-  view: TableExplorerView;
 }
 
-export function DataView({
-  isListPaneOpen,
-  onToggleListPane,
-  onViewChange,
-  tableName,
-  view,
-}: DataViewProps): React.ReactElement {
+export function DataView({ tableName }: DataViewProps): React.ReactElement {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const state = useDataViewState({
     tableName,
@@ -38,19 +26,15 @@ export function DataView({
       <ResizablePanel>
         <div className="flex h-full flex-col overflow-hidden">
           <ActionsBar
-            view={view}
-            isListPaneOpen={isListPaneOpen}
             isFilterOpen={isFilterOpen}
             filterCount={state.filters.length}
-            onToggleListPane={onToggleListPane}
             onFilterOpenChange={setIsFilterOpen}
-            onViewChange={onViewChange}
           >
             <ActionsBar.Leading>
               <Button
                 type="button"
-                variant="default"
-                size="default"
+                variant="primary"
+                size="m"
                 onClick={() => {
                   if (state.rowEditor.isOpen === true && state.rowEditor.mode === "insert") {
                     state.handleRowEditorOpenChange(false);

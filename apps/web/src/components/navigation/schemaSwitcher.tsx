@@ -1,5 +1,3 @@
-import { HashIcon } from "lucide-react";
-
 import {
   ContextSwitcher,
   Text,
@@ -58,7 +56,6 @@ export function SchemaSwitcher({
         width={width}
         title={triggerTitle}
       >
-        <HashIcon aria-hidden="true" size={14} />
         <Text as="span" color="inherit" monospace truncate>
           {displayTriggerText}
         </Text>

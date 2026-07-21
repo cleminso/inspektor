@@ -1,4 +1,21 @@
 // Components
+export { Accordion } from './components/accordion/accordion'
+export type {
+  AccordionHeaderProps,
+  AccordionItemProps,
+  AccordionPanelProps,
+  AccordionRootProps,
+  AccordionTriggerProps,
+  AccordionValue,
+} from './components/accordion/accordion'
+export { ActionList } from './components/actionList/actionList'
+export type {
+  ActionListActionProps,
+  ActionListItemProps,
+  ActionListRootProps,
+  ActionListSelectionControlProps,
+  ActionListTriggerProps,
+} from './components/actionList/actionList'
 export { Box } from './components//box/box'
 export type { BoxProps } from './components/box/box'
 export { Checkbox } from './components/checkbox/checkbox'
@@ -172,6 +189,13 @@ export type {
 } from './components/menu/menu'
 export { Search } from './components/search/search'
 export type { SearchProps } from './components/search/search'
+export { SidePanel } from './components/sidePanel/sidePanel'
+export type {
+  SidePanelBodyProps,
+  SidePanelFooterProps,
+  SidePanelHeaderProps,
+  SidePanelRootProps,
+} from './components/sidePanel/sidePanel'
 export {
   ResizableHandle,
   ResizablePanel,

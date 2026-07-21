@@ -20,7 +20,7 @@ describe("getAdjacentNavigationItems", () => {
   it("crosses from foundations into components", () => {
     expect(getAdjacentNavigationItems("/foundations/typography")).toMatchObject({
       previous: { href: "/foundations/colors" },
-      next: { href: "/components/button" },
+      next: { href: "/components/accordion" },
     });
   });
 

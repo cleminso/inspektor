@@ -1,96 +1,129 @@
-import { Search } from "@regarde/ui/search";
-import { Badge } from "@regarde/ui/badge";
-import { EmptyState } from "@regarde/ui/emptyState";
-import { cn } from "@regarde/ui/lib/utils";
+import { Accordion, ActionList, Box, Checkbox, Search, SidePanel, Text } from "@inspector/ds";
+import { Table2 } from "lucide-react";
 
-import type { QuerySubscriptionTableItem } from "@/types/QuerySubscriptions";
+import type { QuerySubscriptionPropagation } from "@/types/querySubscriptions";
 
 interface QuerySubscriptionsListPaneProps {
-  isInitialLoading: boolean;
   searchValue: string;
+  selectedPropagations: QuerySubscriptionPropagation[];
   selectedTableName: string | null;
-  visibleTableItems: QuerySubscriptionTableItem[];
+  tableCount: number;
+  visibleTableNames: string[];
+  onPropagationSelectedChange: (
+    propagation: QuerySubscriptionPropagation,
+    selected: boolean,
+  ) => void;
   onSearchValueChange: (value: string) => void;
   onSelectedTableNameChange: (value: string | null) => void;
 }
 
 export function QuerySubscriptionsListPane({
-  isInitialLoading,
   searchValue,
+  selectedPropagations,
   selectedTableName,
-  visibleTableItems,
+  tableCount,
+  visibleTableNames,
+  onPropagationSelectedChange,
   onSearchValueChange,
   onSelectedTableNameChange,
 }: QuerySubscriptionsListPaneProps): React.ReactElement {
-  const shouldShowEmptyState = isInitialLoading === false && visibleTableItems.length === 0;
-  const emptyStateDescription =
-    searchValue.trim().length === 0 ? "No active server subscriptions found." : "Try a different table search.";
-
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
-      <div className="flex h-10 shrink-0 items-center border-b border-border px-3">
+    <SidePanel>
+      <SidePanel.Header>
         <Search
           aria-label="Search query subscriptions tables"
           value={searchValue}
-          onChange={(event) => {
-            onSearchValueChange(event.currentTarget.value);
-          }}
-          placeholder="Search tables..."
+          onValueChange={onSearchValueChange}
+          placeholder="Search"
+          size="m"
+          fullWidth
         />
-      </div>
-      <div className="min-h-0 flex-1 overflow-auto p-2">
-        <div
-          className="flex flex-col gap-1"
-          role="listbox"
-          aria-label="Query subscriptions table filter"
-          aria-busy={isInitialLoading === true}
-        >
-          <button
-            type="button"
-            role="option"
-            aria-selected={selectedTableName === null}
-            onClick={() => {
-              onSelectedTableNameChange(null);
-            }}
-            className={cn(
-              "flex min-h-7 w-full items-center justify-between rounded-xs px-3 text-sm text-foreground",
-              selectedTableName === null ? "bg-muted" : "hover:bg-muted/60",
-            )}
-          >
-            <span className="truncate">All tables</span>
-          </button>
-          {isInitialLoading === true ? (
-            <EmptyState title="Loading tables" description="Fetching active server subscriptions." />
-          ) : shouldShowEmptyState === true ? (
-            <EmptyState title="No tables found" description={emptyStateDescription} />
-          ) : (
-            visibleTableItems.map((tableItem) => {
-              const isActive = selectedTableName === tableItem.tableName;
+      </SidePanel.Header>
+      <SidePanel.Body>
+        <Accordion multiple defaultValue={["tables", "propagation"]}>
+          <Accordion.Item value="tables">
+            <Accordion.Header>
+              <Accordion.Trigger
+                suffix={
+                  <Text as="span" variant="caption" color="muted" tabularNums>
+                    {tableCount}
+                  </Text>
+                }
+              >
+                TABLES
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel>
+              <ActionList aria-label="Subscription tables">
+                <ActionList.Item active={selectedTableName === null}>
+                  <ActionList.Trigger
+                    prefix={<Table2 size={14} />}
+                    aria-pressed={selectedTableName === null}
+                    onClick={() => {
+                      onSelectedTableNameChange(null);
+                    }}
+                  >
+                    All
+                  </ActionList.Trigger>
+                </ActionList.Item>
+                {visibleTableNames.map((tableName) => {
+                  const isActive = selectedTableName === tableName;
 
-              return (
-                <button
-                  key={tableItem.tableName}
-                  type="button"
-                  role="option"
-                  aria-selected={isActive === true}
-                  onClick={() => {
-                    onSelectedTableNameChange(tableItem.tableName);
-                  }}
-                  className={cn(
-                    "flex min-h-7 w-full items-center justify-between rounded-xs px-3 text-sm text-foreground",
-                    isActive === true ? "bg-muted" : "hover:bg-muted/60",
-                  )}
-                >
-                  <span className="truncate">{tableItem.tableName}</span>
-                  <Badge variant="secondary" size="sm" aria-label={`${tableItem.subscriptionCount} subscriptions`}>
-                    {tableItem.subscriptionCount}
-                  </Badge>
-                </button>
-              );
-            })
-          )}
-        </div>
-      </div>
-    </div>
+                  return (
+                    <ActionList.Item key={tableName} active={isActive}>
+                      <ActionList.Trigger
+                        prefix={<Table2 size={14} />}
+                        aria-pressed={isActive}
+                        onClick={() => {
+                          onSelectedTableNameChange(tableName);
+                        }}
+                      >
+                        {tableName}
+                      </ActionList.Trigger>
+                    </ActionList.Item>
+                  );
+                })}
+              </ActionList>
+              {visibleTableNames.length === 0 && tableCount > 0 ? (
+                <Box padding="m">
+                  <Text variant="caption" color="muted">
+                    No matching tables.
+                  </Text>
+                </Box>
+              ) : null}
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          <Accordion.Item value="propagation">
+            <Accordion.Header>
+              <Accordion.Trigger>PROPAGATION</Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel>
+              <Box width="full" flexDirection="column" gap="s" paddingHorizontal="s">
+                {(["full", "local-only"] as const).map((propagation) => (
+                  <Box
+                    as="label"
+                    key={propagation}
+                    display="flex"
+                    alignItems="center"
+                    paddingHorizontal="m"
+                    gap="s"
+                  >
+                    <Checkbox
+                      size="s"
+                      checked={selectedPropagations.includes(propagation)}
+                      onCheckedChange={(checked) => {
+                        onPropagationSelectedChange(propagation, checked === true);
+                      }}
+                    />
+                    <Text as="span">{propagation === "full" ? "Full" : "Local-only"}</Text>
+                  </Box>
+                ))}
+              </Box>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      </SidePanel.Body>
+    </SidePanel>
   );
 }

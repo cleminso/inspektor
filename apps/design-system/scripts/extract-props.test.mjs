@@ -3,6 +3,27 @@ import test from "node:test";
 
 import { extractPropsMetadata } from "./extract-props.mjs";
 
+test("extracts documented Accordion and ActionList props", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata["accordion.panel"]?.map(({ name }) => name),
+    ["children", "keepMounted", "hiddenUntilFound"],
+  );
+  assert.deepEqual(
+    metadata["actionList.root"]?.map(({ name }) => name),
+    ["children", "aria-label", "aria-labelledby", "onEscapeKeyDown"],
+  );
+  assert.deepEqual(
+    metadata["actionList.trigger"]?.map(({ name }) => name),
+    ["children", "prefix", "disabled", "render"],
+  );
+  assert.deepEqual(
+    metadata["actionList.action"]?.map(({ name }) => name),
+    ["aria-label", "disabled", "render"],
+  );
+});
+
 test("extracts Button API facts from the public package export", () => {
   const metadata = extractPropsMetadata();
   const buttonProps = metadata.button;

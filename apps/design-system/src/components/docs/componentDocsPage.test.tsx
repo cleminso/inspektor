@@ -116,8 +116,8 @@ describe("ComponentDocsPage", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Previous page: Typography" }));
-    expect(navigate).toHaveBeenCalledWith({ to: "/foundations/typography" });
+    fireEvent.click(screen.getByRole("button", { name: "Previous page: Action List" }));
+    expect(navigate).toHaveBeenCalledWith({ to: "/components/action-list" });
 
     rerender(
       <ComponentDocsPage

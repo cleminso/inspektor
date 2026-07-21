@@ -37,4 +37,30 @@ describe("Button", () => {
     expect(button.getAttribute("aria-disabled")).toBe("true");
     expect(activationCount).toBe(0);
   });
+
+  it("keeps leading content together while pushing a suffix to the far edge", () => {
+    render(
+      <Button fullWidth justify="between" prefix={<span>Prefix</span>} suffix={<span>Suffix</span>}>
+        Label
+      </Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "Label" });
+    const content = button.querySelector<HTMLElement>('[data-slot="button-content"]');
+    const leading = button.querySelector<HTMLElement>('[data-slot="button-leading"]');
+
+    expect(content?.children).toHaveLength(2);
+    expect(leading?.textContent).toBe("PrefixLabel");
+    expect(leading?.nextElementSibling?.textContent).toBe("Suffix");
+  });
+
+  it("supports extra-small icon actions", () => {
+    render(
+      <Button size="xs" shape="square" aria-label="More actions">
+        More
+      </Button>,
+    );
+
+    expect(screen.getByRole("button", { name: "More actions" }).getAttribute("data-size")).toBe("xs");
+  });
 });

@@ -32,10 +32,10 @@ export const backgroundColors = stylex.defineVars({
   'bg-disabled': `light-dark(${palette.gray100}, ${palette.neutral900})`,
 
   // Color roles
-  'bg-primary': `light-dark(${palette.blue600}, ${palette.blue500})`,
-  'bg-primary-hover': `light-dark(${palette.blue700}, ${palette.blue400})`,
-  'bg-secondary': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'bg-secondary-hover': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+  'bg-primary': `light-dark(${palette.blue600}, ${palette.blue700})`,
+  'bg-primary-hover': `light-dark(${palette.blue700}, ${palette.blue600})`,
+  'bg-secondary': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha200})`,
+  'bg-secondary-hover': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'bg-danger': `light-dark(${palette.red100}, ${palette.red950})`,
   'bg-danger-hover': `light-dark(${palette.red200}, ${palette.red900})`,
   'bg-success': `light-dark(${palette.green200}, ${palette.green900})`,
@@ -59,7 +59,7 @@ export const textColors = stylex.defineVars({
   'text-danger': `light-dark(${palette.red600}, ${palette.red500})`,
 
   // Text on color-role surfaces
-  'fg-primary': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'fg-primary': `light-dark(${palette.gray50}, ${palette.gray50})`,
   'fg-secondary': `light-dark(${palette.gray900}, ${palette.neutral50})`,
   'fg-danger': `light-dark(${palette.red600}, ${palette.red500})`,
   'fg-success': `light-dark(${palette.green700}, ${palette.green400})`,
@@ -93,6 +93,7 @@ export const borderColors = stylex.defineVars({
 } as const)
 
 export const spatial = stylex.defineVars({
+  'control-height-xs': dimensions[20],
   'control-height-s': dimensions[24],
   'control-height-m': dimensions[28],
   'control-height-l': dimensions[32],
