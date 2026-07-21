@@ -22,4 +22,13 @@ describe("TableViewToggle", () => {
 
     expect(setView).toHaveBeenCalledWith("schema");
   });
+
+  it("keeps the toggle interactive on the new-view surface", () => {
+    render(<TableViewToggle />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Schema" }));
+
+    expect(screen.getByRole("group", { name: "Table view" })).toBeTruthy();
+    expect(setView).toHaveBeenCalledWith("schema");
+  });
 });

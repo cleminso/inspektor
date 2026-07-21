@@ -43,7 +43,10 @@ export const resizablePanelStyles = stylex.create({
       ':focus-visible': spatial['focus-ring-width'],
     },
     position: 'relative',
-    zIndex: layerIndexes.drag,
+    zIndex: {
+      default: layerIndexes.navigation,
+      ':not([data-disabled]):is([data-separator="active"])': layerIndexes.drag,
+    },
     height: {
       default: '100%',
       ':is([aria-orientation="horizontal"])': spatial['panel-handle-size'],

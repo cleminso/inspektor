@@ -5,6 +5,7 @@ import {
   closeTableTab,
   createBaseTableTabId,
   loadTableTabsState,
+  openBaseTableTabs,
   openNewViewTab,
   recordRecentTableView,
   reconcileTableTab,
@@ -33,6 +34,24 @@ describe("table tabs", () => {
 
   it("uses one deterministic base tab per table", () => {
     expect(createBaseTableTabId("better_auth_account")).toBe("table:better_auth_account");
+  });
+
+  it("opens missing base tabs without duplicating existing tabs", () => {
+    const existingTab: TableTab = {
+      kind: "table",
+      id: "table:accounts",
+      tableName: "accounts",
+      search: { sort: "name" },
+    };
+
+    expect(openBaseTableTabs([existingTab], ["accounts", "sessions", "users"])).toEqual({
+      activeTabId: "table:users",
+      tabs: [
+        existingTab,
+        { kind: "table", id: "table:sessions", tableName: "sessions", search: {} },
+        { kind: "table", id: "table:users", tableName: "users", search: {} },
+      ],
+    });
   });
 
   it("updates an existing tab with the current URL-backed view state", () => {

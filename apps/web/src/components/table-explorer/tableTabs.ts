@@ -47,6 +47,11 @@ interface OpenNewViewTabResult {
   tabs: TableTab[];
 }
 
+interface OpenBaseTableTabsResult {
+  activeTabId: string | null;
+  tabs: TableTab[];
+}
+
 const TABLE_TABS_STORAGE_KEY = "regarde-inspector-tabs";
 const MAX_RECENT_VIEWS = 5;
 export const NEW_VIEW_TAB_ID = "new-view" as const;
@@ -60,6 +65,28 @@ const emptyTableTabsState = (): TableTabsState => ({
 
 export function createBaseTableTabId(tableName: string): string {
   return `table:${encodeURIComponent(tableName)}`;
+}
+
+export function openBaseTableTabs(
+  tabs: readonly TableTab[],
+  orderedTableNames: readonly string[],
+): OpenBaseTableTabsResult {
+  const nextTabs = tabs.filter((tab) => tab.kind !== "newView");
+  const tabIds = new Set(nextTabs.map((tab) => tab.id));
+  let activeTabId: string | null = null;
+
+  for (const tableName of orderedTableNames) {
+    const tabId = createBaseTableTabId(tableName);
+    activeTabId = tabId;
+    if (tabIds.has(tabId) === true) {
+      continue;
+    }
+
+    nextTabs.push({ kind: "table", id: tabId, tableName, search: {} });
+    tabIds.add(tabId);
+  }
+
+  return { activeTabId, tabs: nextTabs };
 }
 
 function isBaseSearch(search: TableTabSearch): boolean {

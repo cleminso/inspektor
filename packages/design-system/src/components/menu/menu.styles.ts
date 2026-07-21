@@ -8,6 +8,7 @@ import {
   fontSizes,
   fontWeights,
   lineHeights,
+  shadows,
   spacing,
 } from "../../tokens/value.stylex";
 import { keyboardInputVars } from "../keyboardInput/keyboardInputVars.stylex";
@@ -59,14 +60,15 @@ export const menuStyles = stylex.create({
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
-    gap: spacing.xxs,
+    // gap: spacing.xxs,
     outline: "none",
     backgroundColor: backgroundColors["bg-popover"],
+    boxShadow: shadows.medium,
     color: textColors["text-default"],
     transformOrigin: "var(--transform-origin)",
     maxWidth: "var(--available-width)",
   },
-  popupWidthContent: { minWidth: 160, width: "max-content" },
+  popupWidthContent: { minWidth: 140, width: "max-content" },
   popupWidthAnchor: { width: "var(--anchor-width)" },
   popupTransition: { opacity: 0, transform: "scale(0.98)" },
   item: {
@@ -84,7 +86,7 @@ export const menuStyles = stylex.create({
     fontSize: fontSizes[2],
     lineHeight: lineHeights.none,
     userSelect: "none",
-    minHeight: 26,
+    minHeight: 20,
     width: "auto",
   },
   itemHighlighted: {
@@ -145,7 +147,7 @@ export const menuStyles = stylex.create({
     lineHeight: lineHeights.tight,
   },
   separator: {
-    marginBlock: spacing.xs,
+    marginBlock: spacing.xxs,
     marginInline: spacing.none,
     backgroundColor: borderColors["border-secondary"],
     height: 1,

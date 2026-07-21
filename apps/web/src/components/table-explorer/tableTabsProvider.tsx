@@ -16,6 +16,7 @@ import {
   closeTableTab,
   createBaseTableTabId,
   loadTableTabsState,
+  openBaseTableTabs,
   openNewViewTab,
   recordRecentTableView,
   reconcileTableTab,
@@ -40,6 +41,7 @@ interface TableTabsContextValue {
   activateTab: (tabId: string) => void;
   closeTab: (tabId: string) => void;
   getBaseTabSearch: (tableName: string) => RouteSearch;
+  openBaseTabs: (orderedTableNames: readonly string[]) => void;
   openNewView: () => void;
   openRecentView: (view: TableDataTab) => void;
 }
@@ -282,6 +284,26 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     navigateToTab({ kind: "newView", id: NEW_VIEW_TAB_ID });
   }, [navigateToTab, state.tabs]);
 
+  const openBaseTabs = useCallback(
+    (orderedTableNames: readonly string[]) => {
+      const result = openBaseTableTabs(state.tabs, orderedTableNames);
+      if (result.activeTabId === null) {
+        return;
+      }
+
+      const activeTab = result.tabs.find((tab) => tab.id === result.activeTabId);
+      if (activeTab === undefined) {
+        return;
+      }
+
+      setState((currentState) => ({ ...currentState, tabs: result.tabs }));
+      setActiveTabId(result.activeTabId);
+      pendingNavigationTabIdRef.current = result.activeTabId;
+      navigateToTab(activeTab);
+    },
+    [navigateToTab, state.tabs],
+  );
+
   const openRecentView = useCallback(
     (view: TableDataTab) => {
       const tabs =
@@ -320,6 +342,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       activateTab,
       closeTab,
       getBaseTabSearch,
+      openBaseTabs,
       openNewView,
       openRecentView,
     }),
@@ -328,6 +351,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       activateTab,
       closeTab,
       getBaseTabSearch,
+      openBaseTabs,
       openNewView,
       openRecentView,
       state,

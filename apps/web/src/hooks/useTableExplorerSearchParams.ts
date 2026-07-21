@@ -12,7 +12,6 @@ import {
   parseFiltersFromSearchParam,
   serializeFiltersToSearchParam,
 } from "@/lib/table-explorer/filterParsing";
-import { appRoutes } from "@/lib/navigation/appRoutes";
 import type { TableFilterClause } from "@/types/tableFilters";
 import type {
   DetailPaneMode,
@@ -75,7 +74,7 @@ function parseRowId(value: string | null | undefined): TableRowId | null {
  * links reopen the same table context without storing this transient state in Jazz.
  */
 export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResult {
-  const navigate = useNavigate({ from: appRoutes.table });
+  const navigate = useNavigate();
   const search = useSearch({ strict: false }) as SearchValues;
 
   const state = useMemo<TableExplorerSearchState>(() => {
@@ -97,12 +96,7 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
 
   const createNextSearch = (baseSearch: SearchValues, updates: Partial<SearchValues>): SearchValues => {
     const nextSearch: SearchValues = {
-      dir: baseSearch.dir,
-      filters: baseSearch.filters,
-      mode: baseSearch.mode,
-      rowId: baseSearch.rowId,
-      sort: baseSearch.sort,
-      view: baseSearch.view,
+      ...baseSearch,
       ...updates,
     };
 
