@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   activateTab: vi.fn(),
   closeTab: vi.fn(),
   openNewView: vi.fn(),
+  reorderTabs: vi.fn(),
   state: {
     activeTabId: null as string | null,
     tabs: [] as Array<
@@ -38,6 +39,7 @@ vi.mock("@/components/table-explorer/tableTabsProvider", () => ({
     activateTab: mocks.activateTab,
     closeTab: mocks.closeTab,
     openNewView: mocks.openNewView,
+    reorderTabs: mocks.reorderTabs,
     tabs: mocks.state.tabs,
   }),
 }));
@@ -48,6 +50,7 @@ beforeEach(() => {
   mocks.activateTab.mockReset();
   mocks.closeTab.mockReset();
   mocks.openNewView.mockReset();
+  mocks.reorderTabs.mockReset();
   mocks.state.activeTabId = null;
   mocks.state.tabs = [];
 });

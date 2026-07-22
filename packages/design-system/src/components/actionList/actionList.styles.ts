@@ -21,7 +21,6 @@ const selectionVisibility = `clamp(0, calc(${actionListVars.selectionChecked} + 
 
 export const actionListStyles = stylex.create({
   root: {
-    gap: spacing.xxs,
     display: 'flex',
     flexDirection: 'column',
     width: '100%',

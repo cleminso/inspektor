@@ -5,6 +5,8 @@ export const tabViewListPropNames = [
   'aria-labelledby',
   'activateOnFocus',
   'loopFocus',
+  'values',
+  'onReorder',
 ] as const
 
 export const tabViewItemPropNames = [

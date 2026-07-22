@@ -89,6 +89,21 @@ export function openBaseTableTabs(
   return { activeTabId, tabs: nextTabs };
 }
 
+export function reorderTableTabs(
+  tabs: readonly TableTab[],
+  orderedTabIds: readonly string[],
+): TableTab[] {
+  if (orderedTabIds.length !== tabs.length || new Set(orderedTabIds).size !== tabs.length) {
+    return [...tabs];
+  }
+  const tabsById = new Map(tabs.map((tab) => [tab.id, tab]));
+  const reorderedTabs = orderedTabIds.flatMap((tabId) => {
+    const tab = tabsById.get(tabId);
+    return tab === undefined ? [] : [tab];
+  });
+  return reorderedTabs.length === tabs.length ? reorderedTabs : [...tabs];
+}
+
 function isBaseSearch(search: TableTabSearch): boolean {
   return (
     search.filters === undefined &&

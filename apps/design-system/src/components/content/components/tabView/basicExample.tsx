@@ -48,11 +48,25 @@ export default function BasicExample(): ReactElement {
     setNextViewNumber((currentNumber) => currentNumber + 1)
   }
 
+  const reorderViews = (orderedValues: Array<string | number>) => {
+    setViews((currentViews) => {
+      const viewsByValue = new Map(currentViews.map((view) => [view.value, view]))
+      return orderedValues.flatMap((orderedValue) => {
+        const view = viewsByValue.get(String(orderedValue))
+        return view === undefined ? [] : [view]
+      })
+    })
+  }
+
   return (
     <Box width="full" flexDirection="column" gap="l">
       <TabView.Root value={value} onValueChange={(nextValue) => setValue(String(nextValue))}>
         <Box width="full" minWidth={0} alignItems="center" gap="xs">
-          <TabView.List aria-label="Account table views">
+          <TabView.List
+            aria-label="Account table views"
+            values={views.map((view) => view.value)}
+            onReorder={reorderViews}
+          >
             {views.map((view) => (
               <TabView.Item
                 key={view.value}

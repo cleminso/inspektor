@@ -46,7 +46,7 @@ export const comboboxStyles = stylex.create({
     borderWidth: 0,
     flex: "1",
     outline: "none",
-    paddingInline: spacing.xs,
+    paddingInline: spacing.s,
     appearance: "none",
     backgroundColor: "transparent",
     color: textColors["text-default"],
@@ -162,7 +162,7 @@ export const comboboxStyles = stylex.create({
     lineHeight: lineHeights.tight,
   },
   item: {
-    padding: spacing.xxs,
+    padding: spacing.xs,
     borderRadius: borderRadii.xs,
     gap: spacing.m,
     outline: "none",

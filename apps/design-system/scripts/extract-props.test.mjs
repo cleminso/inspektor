@@ -393,7 +393,15 @@ test("extracts the constrained TabView compound API", () => {
   );
   assert.deepEqual(
     metadata["tabView.list"]?.map(({ name }) => name),
-    ["children", "aria-label", "aria-labelledby", "activateOnFocus", "loopFocus"],
+    [
+      "children",
+      "aria-label",
+      "aria-labelledby",
+      "activateOnFocus",
+      "loopFocus",
+      "values",
+      "onReorder",
+    ],
   );
   assert.deepEqual(
     metadata["tabView.item"]?.map(({ name }) => name),

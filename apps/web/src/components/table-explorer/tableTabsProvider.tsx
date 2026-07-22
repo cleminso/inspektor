@@ -20,6 +20,7 @@ import {
   openNewViewTab,
   recordRecentTableView,
   reconcileTableTab,
+  reorderTableTabs,
   replaceNewViewTab,
   saveTableTabsState,
   type TableDataTab,
@@ -44,6 +45,7 @@ interface TableTabsContextValue {
   openBaseTabs: (orderedTableNames: readonly string[]) => void;
   openNewView: () => void;
   openRecentView: (view: TableDataTab) => void;
+  reorderTabs: (orderedTabIds: readonly string[]) => void;
 }
 
 const TableTabsContext = createContext<TableTabsContextValue | null>(null);
@@ -324,6 +326,13 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     [activeTabId, navigateToTab, state.recentViews, state.tabs],
   );
 
+  const reorderTabs = useCallback((orderedTabIds: readonly string[]) => {
+    setState((currentState) => ({
+      ...currentState,
+      tabs: reorderTableTabs(currentState.tabs, orderedTabIds),
+    }));
+  }, []);
+
   const getBaseTabSearch = useCallback(
     (tableName: string): RouteSearch => {
       const id = createBaseTableTabId(tableName);
@@ -345,6 +354,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       openBaseTabs,
       openNewView,
       openRecentView,
+      reorderTabs,
     }),
     [
       activeTabId,
@@ -354,6 +364,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       openBaseTabs,
       openNewView,
       openRecentView,
+      reorderTabs,
       state,
     ],
   );

@@ -20,7 +20,7 @@ export const menuStyles = stylex.create({
     borderStyle: "solid",
     borderWidth: 1,
     gap: spacing.s,
-    paddingInline: spacing.l,
+    paddingInline: spacing.m,
     alignItems: "center",
     appearance: "none",
     backgroundColor: {
@@ -75,7 +75,7 @@ export const menuStyles = stylex.create({
     borderRadius: borderRadii.xs,
     gap: spacing.m,
     outline: "none",
-    paddingInline: spacing.xs,
+    paddingInline: spacing.s,
     alignItems: "center",
     backgroundColor: { default: "transparent", ":active": backgroundColors["bg-hover"] },
     boxSizing: "border-box",
@@ -86,7 +86,7 @@ export const menuStyles = stylex.create({
     fontSize: fontSizes[2],
     lineHeight: lineHeights.none,
     userSelect: "none",
-    minHeight: 20,
+    minHeight: 24,
     width: "auto",
   },
   itemHighlighted: {
@@ -139,7 +139,7 @@ export const menuStyles = stylex.create({
   groupLabel: {
     marginInline: spacing.xxs,
     paddingBlock: spacing.xxs,
-    paddingInline: spacing.xs,
+    paddingInline: spacing.xxs,
     color: textColors["text-subtle"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],

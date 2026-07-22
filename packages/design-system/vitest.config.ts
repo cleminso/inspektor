@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [stylex.vite()],
   test: {
     environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
   },
 });

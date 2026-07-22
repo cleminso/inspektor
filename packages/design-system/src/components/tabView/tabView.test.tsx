@@ -1,12 +1,119 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Tooltip } from '../tooltip/tooltip'
 import { TabView } from './tabView'
 
+let onDragEnd: ((event: unknown) => void) | undefined
+let onDragStart: ((event: unknown) => void) | undefined
+
+vi.mock('@dnd-kit/react', () => ({
+  DragDropProvider: ({
+    children,
+    onDragEnd: handleDragEnd,
+    onDragStart: handleDragStart,
+  }: {
+    children: ReactNode
+    onDragEnd?: (event: unknown) => void
+    onDragStart?: (event: unknown) => void
+  }) => {
+    onDragEnd = handleDragEnd
+    onDragStart = handleDragStart
+    return children
+  },
+}))
+
+vi.mock('@dnd-kit/react/sortable', () => ({
+  isSortable: (source: { sortable?: boolean } | null | undefined) => source?.sortable === true,
+  useSortable: () => ({
+    isDragSource: false,
+    ref: () => undefined,
+  }),
+}))
+
+vi.mock('@dnd-kit/abstract/modifiers', () => ({
+  RestrictToHorizontalAxis: class RestrictToHorizontalAxis {},
+}))
+
+vi.mock('@dnd-kit/dom', () => ({
+  AutoScroller: { configure: () => ({}) },
+  Feedback: { configure: () => ({}) },
+  PointerActivationConstraints: {
+    Distance: class Distance {
+      constructor(_options: { value: number }) {}
+    },
+  },
+  PointerSensor: { configure: () => ({}) },
+}))
+
+vi.mock('@dnd-kit/dom/modifiers', () => ({
+  RestrictToElement: { configure: () => ({}) },
+}))
+
 afterEach(cleanup)
 
 describe('TabView', () => {
+  it('activates the dragged view when sorting starts', () => {
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'active']}
+          onReorder={() => undefined}
+        >
+          <TabView.Item value="all">All accounts</TabView.Item>
+          <TabView.Item value="active">Active accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
+    act(() => {
+      onDragStart?.({
+        operation: {
+          source: {
+            element: activeTab.closest('[data-slot="tab-view-item"]'),
+          },
+        },
+      })
+    })
+
+    expect(activeTab.getAttribute('data-active')).toBe('')
+  })
+
+  it('reports the reordered values after a sortable drag ends', () => {
+    const handleReorder = vi.fn()
+
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'active', 'archived']}
+          onReorder={handleReorder}
+        >
+          <TabView.Item value="all">All accounts</TabView.Item>
+          <TabView.Item value="active">Active accounts</TabView.Item>
+          <TabView.Item value="archived">Archived accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    onDragEnd?.({
+      canceled: false,
+      operation: {
+        source: {
+          id: 'active',
+          index: 0,
+          initialIndex: 1,
+          sortable: true,
+        },
+      },
+    })
+
+    expect(handleReorder).toHaveBeenCalledWith(['active', 'all', 'archived'])
+  })
+
   it('switches the active view and its associated panel', () => {
     render(
       <TabView.Root defaultValue="all">

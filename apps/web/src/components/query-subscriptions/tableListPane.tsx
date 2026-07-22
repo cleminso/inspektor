@@ -54,43 +54,45 @@ export function QuerySubscriptionsListPane({
               </Accordion.Trigger>
             </Accordion.Header>
             <Accordion.Panel>
-              <ActionList aria-label="Subscription tables">
-                <ActionList.Item active={selectedTableName === null}>
-                  <ActionList.Trigger
-                    prefix={<Table2 size={14} />}
-                    aria-pressed={selectedTableName === null}
-                    onClick={() => {
-                      onSelectedTableNameChange(null);
-                    }}
-                  >
-                    All
-                  </ActionList.Trigger>
-                </ActionList.Item>
-                {visibleTableNames.map((tableName) => {
-                  const isActive = selectedTableName === tableName;
+              <Box paddingTop="xxs" flexDirection="column">
+                <ActionList aria-label="Subscription tables">
+                  <ActionList.Item active={selectedTableName === null}>
+                    <ActionList.Trigger
+                      prefix={<Table2 size={14} />}
+                      aria-pressed={selectedTableName === null}
+                      onClick={() => {
+                        onSelectedTableNameChange(null);
+                      }}
+                    >
+                      All
+                    </ActionList.Trigger>
+                  </ActionList.Item>
+                  {visibleTableNames.map((tableName) => {
+                    const isActive = selectedTableName === tableName;
 
-                  return (
-                    <ActionList.Item key={tableName} active={isActive}>
-                      <ActionList.Trigger
-                        prefix={<Table2 size={14} />}
-                        aria-pressed={isActive}
-                        onClick={() => {
-                          onSelectedTableNameChange(tableName);
-                        }}
-                      >
-                        {tableName}
-                      </ActionList.Trigger>
-                    </ActionList.Item>
-                  );
-                })}
-              </ActionList>
-              {visibleTableNames.length === 0 && tableCount > 0 ? (
-                <Box padding="m">
-                  <Text variant="caption" color="muted">
-                    No matching tables.
-                  </Text>
-                </Box>
-              ) : null}
+                    return (
+                      <ActionList.Item key={tableName} active={isActive}>
+                        <ActionList.Trigger
+                          prefix={<Table2 size={14} />}
+                          aria-pressed={isActive}
+                          onClick={() => {
+                            onSelectedTableNameChange(tableName);
+                          }}
+                        >
+                          {tableName}
+                        </ActionList.Trigger>
+                      </ActionList.Item>
+                    );
+                  })}
+                </ActionList>
+                {visibleTableNames.length === 0 && tableCount > 0 ? (
+                  <Box padding="m">
+                    <Text variant="caption" color="muted">
+                      No matching tables.
+                    </Text>
+                  </Box>
+                ) : null}
+              </Box>
             </Accordion.Panel>
           </Accordion.Item>
 

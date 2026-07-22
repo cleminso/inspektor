@@ -15,7 +15,7 @@ interface TableTabsViewProps {
 }
 
 export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactElement {
-  const { activeTabId, activateTab, closeTab, openNewView, tabs } = useTableTabs();
+  const { activeTabId, activateTab, closeTab, openNewView, reorderTabs, tabs } = useTableTabs();
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
 
   return (
@@ -50,7 +50,11 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
           borderStyle="solid"
         />
         <Box minWidth={0} flex={1} alignItems="center" gap="xs" overflow="hidden">
-          <TabView.List aria-label="Open table views">
+          <TabView.List
+            aria-label="Open table views"
+            values={tabs.map((tab) => tab.id)}
+            onReorder={reorderTabs}
+          >
             {tabs.map((tab) => {
               if (tab.kind === "newView") {
                 const canCloseNewView = tabs.length > 1;

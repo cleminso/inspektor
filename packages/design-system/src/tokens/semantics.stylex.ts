@@ -17,7 +17,7 @@ export const backgroundColors = stylex.defineVars({
   'bg-page': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'bg-card': `light-dark(${palette.gray100}, ${palette.neutral900})`,
   'bg-tab': `light-dark(${palette.gray50}, ${palette.neutral950})`,
-  'bg-tab-hover': `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  'bg-tab-hover': `light-dark(color-mix(in oklch, ${palette.gray100} 35%, ${palette.gray200}), ${palette.neutral900})`,
   'bg-tab-selected': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'bg-popover': `light-dark(${palette.gray100}, ${palette.neutral900})`,
   'bg-subtle': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,

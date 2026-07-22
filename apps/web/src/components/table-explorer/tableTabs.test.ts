@@ -9,6 +9,7 @@ import {
   openNewViewTab,
   recordRecentTableView,
   reconcileTableTab,
+  reorderTableTabs,
   replaceNewViewTab,
   saveTableTabsState,
   type TableTab,
@@ -111,6 +112,21 @@ describe("table tabs", () => {
       tabs: [tabs[0], tabs[2]],
       nextActiveTab: tabs[2],
     });
+  });
+
+  it("reorders existing tabs from a complete id permutation", () => {
+    const tabs: TableTab[] = [
+      { kind: "table", id: "one", tableName: "accounts", search: {} },
+      { kind: "table", id: "two", tableName: "users", search: {} },
+      { kind: "table", id: "three", tableName: "sessions", search: {} },
+    ];
+
+    expect(reorderTableTabs(tabs, ["three", "one", "two"])).toEqual([
+      tabs[2],
+      tabs[0],
+      tabs[1],
+    ]);
+    expect(reorderTableTabs(tabs, ["three", "one"])).toEqual(tabs);
   });
 
   it("replaces the final closed tab with the default new view", () => {
