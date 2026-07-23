@@ -10,7 +10,7 @@ interface SelectedTableViewProps {
 }
 
 export function SelectedTableView({ tableName }: SelectedTableViewProps): React.ReactElement {
-  const { runtime } = useInspector();
+  const { currentBranch, currentConnectionId, currentSchemaHash, runtime } = useInspector();
   const searchState = useTableExplorerSearchParams();
 
   if (tableName === null) {
@@ -30,5 +30,7 @@ export function SelectedTableView({ tableName }: SelectedTableViewProps): React.
     return <SchemaView tableName={tableName} />;
   }
 
-  return <DataView tableName={tableName} />;
+  // Key the table-scoped state boundary by its complete identity so React resets interactions without synchronization effects.
+  const dataViewKey = `${currentConnectionId ?? "unknown"}:${currentBranch ?? "unknown"}:${currentSchemaHash ?? "unknown"}:${tableName}`;
+  return <DataView key={dataViewKey} tableName={tableName} />;
 }

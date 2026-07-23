@@ -330,6 +330,19 @@ export const sidePanelItem = {
   componentId: "sidePanel",
 } satisfies NavItem;
 
+export const dataTableItem = {
+  title: "Data Table",
+  slug: "data-table",
+  href: "/components/data-table",
+  description: "Controlled TanStack table rendering with semantic structure and inspection states.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "dataTable.tsx",
+    path: "packages/design-system/src/components/dataTable/dataTable.tsx",
+  },
+  componentId: "dataTable",
+} satisfies NavItem;
+
 export const resizablePanelItem = {
   title: "Resizable Panel",
   slug: "resizable-panel",
@@ -433,6 +446,7 @@ export const componentItems: NavItem[] = [
   contextMenuItem,
   contextSwitcherItem,
   copyButtonItem,
+  dataTableItem,
   inputItem,
   inputGroupItem,
   keyboardInputItem,

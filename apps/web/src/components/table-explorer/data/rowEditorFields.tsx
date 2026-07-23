@@ -233,28 +233,25 @@ export function RowEditorFields({
   onFieldTextChange,
 }: RowEditorFieldsProps): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
-  const shouldShowIdField = mode === "insert";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6 pr-1">
-      {shouldShowIdField === true ? (
-        <Field.Root>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-2">
-              <Field.Label htmlFor="row-editor-id">
-                <span>Id</span>
-              </Field.Label>
-              <span className="text-xs text-muted-foreground">text</span>
-            </div>
+      <Field.Root id="row-editor-field-id">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <Field.Label htmlFor="row-editor-id">
+              <span>Id</span>
+            </Field.Label>
+            <span className="text-xs text-muted-foreground">text</span>
           </div>
-          <Input
-            id="row-editor-id"
-            value={mode === "insert" ? "auto-generated" : String(initialRowValues.id ?? "")}
-            fullWidth
-            readOnly
-          />
-        </Field.Root>
-      ) : null}
+        </div>
+        <Input
+          id="row-editor-id"
+          value={mode === "insert" ? "auto-generated" : String(initialRowValues.id ?? "")}
+          fullWidth
+          readOnly
+        />
+      </Field.Root>
 
       {formFields.map(({ column, readOnlyReason }) => {
         const fieldId = `row-editor-${column.name}`;
@@ -278,7 +275,11 @@ export function RowEditorFields({
           isBinaryColumn === false;
 
         return (
-          <Field.Root key={column.name} invalid={hasFieldError}>
+          <Field.Root
+            id={`row-editor-field-${column.name}`}
+            key={column.name}
+            invalid={hasFieldError}
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Field.Label

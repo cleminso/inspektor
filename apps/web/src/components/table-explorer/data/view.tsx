@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 
-import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@inspector/ds";
+import {
+  Box,
+  Button,
+  DataTable,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  Text,
+} from "@inspector/ds";
 
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
-import { DataGrid } from "@/components/table-explorer/data/dataGrid";
-import { DataGridToolbar } from "@/components/table-explorer/data/dataGridToolbar";
+import { DataTableColumnVisibility } from "@/components/table-explorer/data/dataTableColumnVisibility";
 import { EditRowForm } from "@/components/table-explorer/data/editRowForm";
 import { InsertRowForm } from "@/components/table-explorer/data/insertRowForm";
 import { RowEditorSidePanel } from "@/components/table-explorer/data/rowEditorSidePanel";
@@ -20,6 +27,24 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
   const state = useDataViewState({
     tableName,
   });
+  const handleEscape = useEffectEvent(state.handleEscape);
+
+  useEffect(() => {
+    if (state.rowEditor.isOpen === false) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && event.defaultPrevented === false) {
+        handleEscape();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [state.rowEditor.isOpen]);
 
   return (
     <ResizablePanelGroup orientation="horizontal">
@@ -47,7 +72,7 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
               </Button>
             </ActionsBar.Leading>
             <ActionsBar.Trailing>
-              <DataGridToolbar table={state.table} />
+              <DataTableColumnVisibility table={state.table} />
             </ActionsBar.Trailing>
           </ActionsBar>
           {isFilterOpen === true ? (
@@ -64,15 +89,50 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
               }}
             />
           ) : null}
-          <div className="min-h-0 flex-1 overflow-hidden">
-            <DataGrid
+          <Box minHeight={0} flex={1} overflow="hidden">
+            <DataTable.Root
               table={state.table}
-              loadedRowCount={state.loadedRowCount}
-              hasMore={state.hasMore}
-              isFetchingMore={state.isFetchingMore}
-              onFetchMore={state.fetchMore}
-            />
-          </div>
+              columnOrder={state.columnOrder}
+              density="compact"
+              activeCell={state.activeCell}
+              activeColumnId={state.activeColumnId}
+              activeRowId={state.rowEditor.activeRowId}
+              onCellActivate={state.handleCellActivate}
+              onColumnActivate={state.handleColumnActivate}
+              onColumnOrderChange={state.setColumnOrder}
+              onRowActivate={state.handleRowActivate}
+            >
+              <DataTable.Viewport>
+                <DataTable.Table aria-label={`${tableName} rows`}>
+                  <DataTable.Content
+                    loading={state.isFetchingMore === true && state.loadedRowCount === 0}
+                    loadingContent="Loading rows"
+                    emptyContent={
+                      state.filters.length > 0
+                        ? "No rows match these filters"
+                        : "This table has no rows"
+                    }
+                  />
+                </DataTable.Table>
+              </DataTable.Viewport>
+              <DataTable.Footer>
+                <Text color="muted" variant="caption">
+                  {state.loadedRowCount} rows loaded
+                </Text>
+                {state.hasMore === true ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    loading={state.isFetchingMore}
+                    onClick={state.fetchMore}
+                  >
+                    Load more
+                  </Button>
+                ) : null}
+              </DataTable.Footer>
+            </DataTable.Root>
+          </Box>
         </div>
       </ResizablePanel>
       {state.rowEditor.isOpen === true ? (
@@ -102,6 +162,7 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
                   rowValues={state.rowValues}
                   schemaColumns={state.schemaColumns}
                   targetRowId={state.rowEditor.activeRowId}
+                  focusedFieldName={state.activeCell?.columnId ?? null}
                   onCancel={() => {
                     state.handleRowEditorOpenChange(false);
                   }}

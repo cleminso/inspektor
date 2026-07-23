@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ExternalLinkIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
+
+import { TextLink } from "@inspector/ds";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { useRelationRow } from "@/hooks/useRelationRow";
@@ -15,7 +17,7 @@ export function RelationCellLink({ relationId, relationTable }: RelationCellLink
   const { displayValue } = useRelationRow(relationTable, relationId);
 
   if (currentConnectionId === null || currentBranch === null || currentSchemaHash === null) {
-    return <span className="truncate">{displayValue}</span>;
+    return <>{displayValue}</>;
   }
 
   const relationLink = buildRelationTableLink({
@@ -27,15 +29,18 @@ export function RelationCellLink({ relationId, relationTable }: RelationCellLink
   });
 
   return (
-    <Link
-      to={relationLink.to}
-      params={relationLink.params}
-      search={relationLink.search}
-      className="inline-flex items-center gap-1 truncate text-foreground underline-offset-4 hover:underline"
+    <TextLink
+      render={
+        <Link
+          to={relationLink.to}
+          params={relationLink.params}
+          search={relationLink.search}
+        />
+      }
+      trailingIcon={<ArrowRightIcon size={12} />}
       title={`${relationTable}.${relationId}`}
     >
-      <span className="truncate">{displayValue}</span>
-      <ExternalLinkIcon className="size-3 shrink-0" />
-    </Link>
+      {displayValue}
+    </TextLink>
   );
 }

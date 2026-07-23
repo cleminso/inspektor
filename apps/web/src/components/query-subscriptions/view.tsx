@@ -1,5 +1,5 @@
 import { SidePanelLayout } from "@/components/layout/sidePanelLayout";
-import { QuerySubscriptionsGrid } from "@/components/query-subscriptions/dataGrid";
+import { QuerySubscriptionsTable } from "@/components/query-subscriptions/dataTable";
 import { QuerySubscriptionsListPane } from "@/components/query-subscriptions/tableListPane";
 import { useQuerySubscriptionsState } from "@/components/query-subscriptions/useQuerySubscriptionsState";
 import { useInspectorTables } from "@/hooks/useInspectorTables";
@@ -23,7 +23,7 @@ export function QuerySubscriptionsScreen(): React.ReactElement {
         />
       </SidePanelLayout.Panel>
       <SidePanelLayout.Content>
-        <QuerySubscriptionsGrid state={state} />
+        <QuerySubscriptionsTable state={state} />
       </SidePanelLayout.Content>
     </SidePanelLayout>
   );

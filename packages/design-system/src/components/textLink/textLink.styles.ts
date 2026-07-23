@@ -9,11 +9,6 @@ export const textLinkStyles = stylex.create({
       ':focus-visible': textColors['text-link'],
       ':hover': textColors['text-link'],
     },
-    textDecorationLine: {
-      default: 'none',
-      ':focus-visible': 'underline',
-      ':hover': 'underline',
-    },
-    textUnderlineOffset: 3,
+    textDecorationLine: 'none',
   },
 })

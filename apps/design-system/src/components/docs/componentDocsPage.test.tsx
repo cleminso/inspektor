@@ -97,8 +97,8 @@ describe("ComponentDocsPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Previous page: Context Switcher" }));
     expect(navigate).toHaveBeenCalledWith({ to: "/components/context-switcher" });
 
-    fireEvent.click(screen.getByRole("button", { name: "Next page: Input" }));
-    expect(navigate).toHaveBeenCalledWith({ to: "/components/input" });
+    fireEvent.click(screen.getByRole("button", { name: "Next page: Data Table" }));
+    expect(navigate).toHaveBeenCalledWith({ to: "/components/data-table" });
   });
 
   it("continues toolbar navigation across registry sections and wraps at both ends", () => {

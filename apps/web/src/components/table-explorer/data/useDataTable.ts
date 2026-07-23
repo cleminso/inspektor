@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 
-import { buildDataGridColumns } from "@/components/table-explorer/data/buildDataGridColumns";
+import { buildDataTableColumns } from "@/components/table-explorer/data/buildDataTableColumns";
 import type {
   TableColumnMeta,
   TableColumnVisibilityState,
@@ -19,7 +19,8 @@ import type {
   TableSortDirection,
 } from "@/types/tableExplorer";
 
-interface UseDataGridOptions {
+interface UseDataTableOptions {
+  columnOrder: string[];
   columnVisibility: TableColumnVisibilityState;
   columns: TableColumnMeta[];
   onColumnVisibilityChange: (next: TableColumnVisibilityState) => void;
@@ -31,7 +32,8 @@ interface UseDataGridOptions {
   sortDirection: TableSortDirection;
 }
 
-export function useDataGrid({
+export function useDataTable({
+  columnOrder,
   columnVisibility,
   columns,
   onColumnVisibilityChange,
@@ -41,27 +43,30 @@ export function useDataGrid({
   selectedRowIds,
   sortColumn,
   sortDirection,
-}: UseDataGridOptions): Table<DynamicTableRow> {
-  const columnDefs = useMemo(
-    () => buildDataGridColumns({ columns, sortColumn, sortDirection }),
-    [columns, sortColumn, sortDirection],
-  );
+}: UseDataTableOptions): Table<DynamicTableRow> {
+  const columnDefs = useMemo(() => buildDataTableColumns({ columns }), [columns]);
 
   const rowSelection = useMemo<RowSelectionState>(() => {
     return Object.fromEntries(selectedRowIds.map((rowId) => [rowId, true]));
   }, [selectedRowIds]);
 
-  const sorting = useMemo<SortingState>(() => [{ id: sortColumn, desc: sortDirection === "desc" }], [sortColumn, sortDirection]);
+  const sorting = useMemo<SortingState>(
+    () => [{ id: sortColumn, desc: sortDirection === "desc" }],
+    [sortColumn, sortDirection],
+  );
+  const tableColumnOrder = useMemo(() => ["_select", ...columnOrder], [columnOrder]);
 
   return useReactTable({
     data: rows,
     columns: columnDefs,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => String(row.id),
+    columnResizeMode: "onChange",
     enableRowSelection: true,
     manualSorting: true,
     state: {
       columnVisibility: columnVisibility as VisibilityState,
+      columnOrder: tableColumnOrder,
       rowSelection,
       sorting,
     },
@@ -74,7 +79,8 @@ export function useDataGrid({
       onSelectedRowIdsChange(nextSelectedRowIds);
     },
     onColumnVisibilityChange: (updater) => {
-      const nextColumnVisibility = typeof updater === "function" ? updater(columnVisibility as VisibilityState) : updater;
+      const nextColumnVisibility =
+        typeof updater === "function" ? updater(columnVisibility as VisibilityState) : updater;
       onColumnVisibilityChange(nextColumnVisibility as TableColumnVisibilityState);
     },
     onSortingChange: (updater) => {

@@ -1808,6 +1808,391 @@
       }
     }
   ],
+  "dataTable.root": [
+    {
+      "name": "activeCell",
+      "type": "DataTableCellTarget",
+      "required": false,
+      "defaultValue": "null",
+      "description": "Active row and column intersection.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 73
+      }
+    },
+    {
+      "name": "activeColumnId",
+      "type": "string",
+      "required": false,
+      "defaultValue": "null",
+      "description": "Column highlighted across the header and visible rows.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 75
+      }
+    },
+    {
+      "name": "activeRowId",
+      "type": "string",
+      "required": false,
+      "defaultValue": "null",
+      "description": "Row currently targeted for inspection.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 77
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Data-table regions and companion controls.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 79
+      }
+    },
+    {
+      "name": "density",
+      "type": "\"compact\" | \"default\"",
+      "required": false,
+      "defaultValue": "\"default\"",
+      "description": "Controls table row and cell spacing.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 81
+      }
+    },
+    {
+      "name": "onCellActivate",
+      "type": "(target: DataTableCellTarget) => void",
+      "required": false,
+      "description": "Runs when a non-interactive cell is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 83
+      }
+    },
+    {
+      "name": "onCellContextMenu",
+      "type": "DataTableCellContextMenuHandler",
+      "required": false,
+      "description": "Runs when a cell context menu is requested.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 85
+      }
+    },
+    {
+      "name": "onColumnActivate",
+      "type": "(columnId: string | null) => void",
+      "required": false,
+      "description": "Runs when a column header is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 87
+      }
+    },
+    {
+      "name": "onHeaderContextMenu",
+      "type": "DataTableHeaderContextMenuHandler",
+      "required": false,
+      "description": "Runs when a column-header context menu is requested.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 89
+      }
+    },
+    {
+      "name": "onRowActivate",
+      "type": "(rowId: string) => void",
+      "required": false,
+      "description": "Runs when a non-interactive row is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 91
+      }
+    },
+    {
+      "name": "onRowContextMenu",
+      "type": "DataTableRowContextMenuHandler",
+      "required": false,
+      "description": "Runs when a row context menu is requested.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 93
+      }
+    },
+    {
+      "name": "table",
+      "type": "Table<TData>",
+      "required": true,
+      "description": "Controlled TanStack table instance rendered by the compound parts.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 95
+      }
+    },
+    {
+      "name": "columnOrder",
+      "type": "readonly string[]",
+      "required": false,
+      "description": "Column ids in their controlled draggable order. Omit fixed columns from this list.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 100
+      }
+    },
+    {
+      "name": "onColumnOrderChange",
+      "type": "(columnIds: string[]) => void",
+      "required": false,
+      "description": "Runs with the complete draggable column order after a header is moved.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 102
+      }
+    }
+  ],
+  "dataTable.viewport": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Table or custom viewport content.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 115
+      }
+    }
+  ],
+  "dataTable.table": [
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the table.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 120
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Header and body composition.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 122
+      }
+    }
+  ],
+  "dataTable.content": [
+    {
+      "name": "emptyContent",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "defaultValue": "\"No data available\"",
+      "description": "Content shown when the table has no rows.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 127
+      }
+    },
+    {
+      "name": "loading",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether loading content replaces the current row model.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 129
+      }
+    },
+    {
+      "name": "loadingContent",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "defaultValue": "\"Loading data\"",
+      "description": "Content shown while rows are loading.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 131
+      }
+    }
+  ],
+  "dataTable.header": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Custom header rows. TanStack header groups render when omitted.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 136
+      }
+    }
+  ],
+  "dataTable.headerRow": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Custom header cells. TanStack headers render when omitted.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 141
+      }
+    },
+    {
+      "name": "headerGroup",
+      "type": "HeaderGroup<TData>",
+      "required": true,
+      "description": "TanStack header group represented by this row.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 143
+      }
+    }
+  ],
+  "dataTable.headerCell": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Custom header content. The column header definition renders when omitted.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 148
+      }
+    },
+    {
+      "name": "header",
+      "type": "Header<TData, unknown>",
+      "required": true,
+      "description": "TanStack header represented by this cell.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 150
+      }
+    }
+  ],
+  "dataTable.body": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Custom rows. TanStack rows render when omitted.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 155
+      }
+    }
+  ],
+  "dataTable.row": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Custom cells. Visible TanStack cells render when omitted.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 160
+      }
+    },
+    {
+      "name": "row",
+      "type": "Row<TData>",
+      "required": true,
+      "description": "TanStack row represented by this table row.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 162
+      }
+    }
+  ],
+  "dataTable.cell": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Custom cell content. The column cell definition renders when omitted.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 167
+      }
+    },
+    {
+      "name": "cell",
+      "type": "Cell<TData, unknown>",
+      "required": true,
+      "description": "TanStack cell represented by this table cell.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 169
+      }
+    }
+  ],
+  "dataTable.expandedRow": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Expanded content associated with the row.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 174
+      }
+    },
+    {
+      "name": "row",
+      "type": "Row<TData>",
+      "required": true,
+      "description": "TanStack row represented by this expanded region.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 176
+      }
+    }
+  ],
+  "dataTable.empty": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Loading or empty-state content.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 181
+      }
+    }
+  ],
+  "dataTable.loading": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Loading or empty-state content.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 181
+      }
+    }
+  ],
+  "dataTable.footer": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Status and table companion controls.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 186
+      }
+    }
+  ],
   "tooltip.provider": [
     {
       "name": "delay",

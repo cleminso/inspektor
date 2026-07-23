@@ -197,28 +197,4 @@
     border-radius: 9999px;
   }
 
-  .data-grid-scroll-region > div {
-    position: absolute;
-    inset: 0;
-  }
-
-  .data-grid-scroll-region [data-slot="data-grid-scroll-area"],
-  .data-grid-scroll-region [data-slot="scroll-area-viewport"],
-  .data-grid-scroll-region [data-slot="scroll-area-content"] {
-    height: 100%;
-    min-height: 0;
-  }
-
-  .data-grid-scroll-region [data-slot="data-grid-scroll-area"] {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .data-grid-scroll-region [data-slot="scroll-area-viewport"] {
-    flex: 1 1 auto;
-  }
-
-  .inspector-data-grid [data-slot="data-grid-scrollbar"] {
-    scrollbar-width: none;
-  }
 }

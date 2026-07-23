@@ -7,6 +7,24 @@ Doc-URL: https://github.com/regardedev/inspector/tree/main/docs/design-document.
 Audience: Project author and AI agents working on the implementation. Secondary, future contributors who want to understand
 the product direction.
 
+## Table of contents
+
+- [Objective](#objective)
+- [Background](#background)
+- [Users](#users)
+- [Goals](#goals)
+- [Non-goals](#non-goals)
+- [Architecture Diagram](#architecture-diagram)
+- [Glossary](#glossary)
+- [Known pain points](#known-pain-points)
+- [Inspector](#inspector)
+- [User interface](#user-interface)
+- [Scenarios](#scenarios)
+- [Product states](#product-states)
+- [Out of scope features](#out-of-scope-features)
+- [Performances](#performances)
+- [Attack surface](#attack-surface)
+
 ## Objective
 
 Inspector is a local, schema-driven developer tool for Jazz applications. It helps developers inspect their app data,
@@ -14,7 +32,7 @@ schema, permissions, and active sync-server query subscriptions from one interfa
 
 v1 continues the MVP direction with stronger UI/UX foundations, clearer interaction design, better performance, and more maintainable architecture.
 
-By better implementation/performance I mean faster browsing, clearer data-grid interactions, stronger query subscription UX,
+By better implementation/performance I mean faster browsing, clearer data-table interactions, stronger query subscription UX,
 reusable UI foundations, and better state handling, so future inspector features can be added without becoming one-off
 patches.
 
@@ -43,9 +61,9 @@ Primary users are Jazz app developers debugging local or development data. They 
 
 Capability tables in this document define the v1 required feature set. Items not required for v1 belong in Non-goals or Missing Features.
 
-Make the data grid the core product surface
+Make the data table the core product surface
 
-- The grid helps developers read, filter, navigate, inspect, and edit Jazz app data.
+- The data table helps developers read, filter, navigate, inspect, and edit Jazz app data.
 - Redesign query subscriptions into a useful debugging surface
 - Help developers understand what the sync server is tracking, which tables are involved, and how subscriptions relate back to app data.
 - Establish durable UI and component foundations
@@ -59,6 +77,7 @@ Make the data grid the core product surface
 Inspector v1:
 
 - is not a generic database client. It is specific to Jazz concepts such as schemas, permissions, branches, sync-server query subscriptions, and admin client access.
+- does not replace Jazz's in-app Inspector overlay. The standalone Inspector focuses on remote admin exploration, while the overlay focuses on an application's local identity, local store, and active development context. Their user experiences may share foundations without becoming the same product surface.
 - does not generate or import app-specific query builders, table views, or custom admin screens
 - remains schema-driven and generic.
 - does not implement traces, logs, metrics collection, or a dedicated telemetry query endpoint. Those belong to a later telemetry-focused version.
@@ -109,7 +128,7 @@ flowchart TD
       TableExplorer --> SelectedTable["SelectedTableView"]
       SelectedTable --> SearchParams["useTableExplorerSearchParams"]
       SearchParams --> UrlSearch["URL search: filters sort view row editor"]
-      SearchParams --> GridStorage["localStorage: table grid state"]
+      SearchParams --> TableStorage["localStorage: data-table preferences"]
 
       SelectedTable --> DataView["DataView"]
       SelectedTable --> SchemaView["SchemaView"]
@@ -122,14 +141,15 @@ flowchart TD
       QueryBuilder --> UseAll["Jazz useAll"]
       UseAll --> ReactiveRuntime["Jazz reactive query runtime"]
 
-      DataState --> DataGrid["DataGrid"]
+      DataState --> DataTable["DataTable"]
       DataState --> RowEditor["RowEditorSidePanel"]
+      DataState --> CellInspector["CellInspectorSidePanel"]
       DataState --> Mutations["useTableMutations"]
       Mutations --> TableProxy["createTableProxy"]
       TableProxy --> UseDb["Jazz useDb"]
       UseDb --> MutationRuntime["Jazz mutation runtime"]
 
-      DataGrid --> RelationCell["RelationCellLink"]
+      DataTable --> RelationCell["RelationCellLink"]
       RelationCell --> RelationRow["useRelationRow"]
       RelationCell --> TableTabs
     end
@@ -222,6 +242,13 @@ server query activity.
 Because of this, the inspector can work with arbitrary app schemas without importing generated types from the target app.
 
 The inspector is close to an **admin client talking to the sync system** rather than a purely local debug tool. It's for that the default durability/mutation tier is `edge`
+
+To me, Jazz's in-app overlay and standalone Inspector answer different problems.
+
+- The overlay joins the host application's local store and identity, which makes it useful for local and unsynced application state.
+- THe standalone Inspector keeps an independant remote-admin workflow, switching connections, branches, and schema hashes then inspecting query subscriptions.
+
+Standalone Inspector behavior is my product priority here.
 
 ### Composition
 
@@ -451,7 +478,7 @@ near the selected table or in the Schema Inspector.
 
 When the inspector opens for the first time, the Data Explorer auto-selects the first available table and opens it as the first table tab.
 
-If no table tab is open, the main table surface renders an empty state instead of the grid toolbar. That empty state shows recently opened tables so the developer can reopen prior work quickly.
+If no table tab is open, the main table surface renders an empty state instead of the data-table toolbar. That empty state shows recently opened tables so the developer can reopen prior work quickly.
 
 **Table action item**
 
@@ -497,7 +524,7 @@ Table tabs follow this model:
 - recently opened tabs show the last five opened tables when no tab is open
 - filters and sort are per tab view
 - filters and sort are URL-backed for the active tab view and also saved in storage
-- grid column state is saved per table
+- data-table column state is saved per table
 - page index is memory-only and resets when table, filters, or sort changes
 
 <!--- TODO: Review this decision, I'm not sure finally: v1 supports multiple tab views for the same table when the views have different filters or sort state-->
@@ -507,7 +534,7 @@ Table tabs follow this model:
 State split:
 
 - URL: active tab view, active table, shareable filters, shareable sort
-- localStorage: open tab list, recent table list, saved tab view state, saved table grid state
+- localStorage: open tab list, recent table list, saved tab view state, saved data-table preferences
 - memory: pagination, transient selection, live update highlights, row editor focus
 
 Do not add sessionStorage unless a specific table state needs to survive route navigation without surviving a browser restart.
@@ -526,18 +553,90 @@ UI representation:
 - Primary content: schema table names, open table tabs, active table state, recently opened tables when no tab is open.
 - States: loading schema, no tables, search-empty, active table unavailable, no open table tab.
 
-#### Data grid
+#### Data table
 
-The data grid is the core product surface of the Data Explorer, it is read-first.
+The data table is the core product surface of the Data Explorer. It is read-first and record-oriented. `DataTable` is the
+consistent name for the reusable design-system renderer and table surface. The project reserves `DataGrid` for a possible
+spreadsheet-like component with range selection, matrix copy and paste, and complete keyboard cell navigation.
 
-Most Data Explorer actions converge in the grid. It brings row reading, filtering, selection, relation navigation,
+Most Data Explorer actions converge in the data table. It brings row reading, filtering, selection, relation navigation,
 schema context, and safe edits into one coherent surface.
 
-The grid does not become table-specific UI. Special behavior comes from schema metadata or generic inspector rules.
+The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspector rules.
+
+`@inspector/ds` owns the reusable `DataTable` presentation system. `apps/web` owns the Inspector composition, TanStack table
+construction, Jazz queries, schema-derived columns, filters, relations, routes, and mutations. The design-system root receives
+a controlled TanStack `Table<TData>` instance rather than receiving duplicate data, columns, sorting, pagination, or selection
+state.
+
+The design-system API uses compound parts so consumers can compose the required structure without styling escape hatches:
+
+- `DataTable.Root`
+- `DataTable.Viewport`
+- `DataTable.Header`
+- `DataTable.HeaderRow`
+- `DataTable.HeaderCell`
+- `DataTable.Body`
+- `DataTable.Row`
+- `DataTable.Cell`
+- `DataTable.Empty`
+- `DataTable.Loading`
+- `DataTable.Footer`
+
+These parts own semantic table markup, StyleX styles, focus presentation, state attributes, and constrained variants. Consumers
+provide application content and state but do not receive `className`, inline `style`, raw CSS values, or broad styling slot
+overrides. A standard renderer can iterate TanStack header groups, rows, and visible cells, while manual compound composition
+supports advanced consumers such as expanded Query Subscription rows.
+
+The replacement starts from a fresh design-system table surface rather than wrapping or restyling the deprecated renderer. The
+rewrite preserves application logic that already has the correct ownership: stored-schema interpretation, generic Jazz query
+construction, URL state, table preferences, relation navigation, and mutation parsing. Deprecated rendering components and
+layout CSS are removed only when the new table can render a complete read-only slice.
 
 v1 uses page-windowed table browsing. Virtualization can still render the current page efficiently, but the product model is pagination.
 
-Clicking a cell opens the row side panel and focuses the matching field. Editing happens in the side panel, not inline in the grid.
+Interaction state keeps these concepts separate:
+
+- the active column is the transient column inspection target
+- the active cell is the row and column intersection shown in the cell inspector
+- selected rows are the checkbox-controlled, page-local bulk operation set
+- bookmarked rows are persistent developer reference points
+
+The side pane uses an explicit state model:
+
+- `closed`: no side pane
+- `insert`: the schema-driven insert form
+- `cell`: one row id and column id rendered by a schema-aware cell inspector
+- `selection`: checked row ids and an active selection index rendered by the complete-row editor
+
+Clicking a cell opens the cell inspector without changing checkbox selection. The inspector dispatches from schema metadata:
+structured values can use formatted code or tree views, relations can show their target, dates can show formatted and raw
+values, binary values can show metadata and download actions, and scalar values can expose their exact value and type. Clicking
+a checkbox opens the existing complete-row editor for the checked row set. Previous and next controls navigate checked rows,
+while edit actions remain scoped to the active row unless explicitly labelled as bulk actions. Insert remains a separate pane
+mode. Pressing Escape clears active cell focus and closes the side pane unless an open nested control consumes Escape first.
+
+An active cell gives its row the blue inspection background, but only the cell receives the blue focus border. A checked row
+uses the selected-row background without an additional row border. The complete checkbox cell is the checkbox hit area: pressing
+empty space inside it toggles selection and opens the complete-row editor rather than activating the cell inspector.
+
+Clicking a column header activates and highlights that column and its visible cells. Clicking the active header again,
+pressing Escape, clicking a cell, or pressing elsewhere in the interface clears the active column. Focus remains visible
+independently of color. Active column, active cell, checkbox selection, dirty state, validation state, and live-update
+highlights use distinct semantic states so one highlight does not imply several meanings.
+
+Editing happens in the side pane, not inline in the v1 data table.
+
+Columns use schema-aware initial widths rather than one width for every value. Boolean and numeric columns start narrow; ids,
+relations, timestamps, text, and structured values receive progressively wider defaults. Header resize handles update TanStack
+column-sizing state within constrained minimum and maximum widths. A double-click on the handle resets the schema-derived
+width. Column sizing preferences are scoped to the active connection, branch, schema hash, and table.
+
+Data columns can be reordered by dragging their header horizontally. A short movement threshold preserves normal header clicks,
+and interactive header controls such as checkboxes, resize handles, and menu actions do not start dragging. Column order is
+controlled by the Inspector, persisted with the other table preferences, and normalized when schema columns are added or
+removed. During dragging, the header and every visible body cell use the same preview order so the complete column moves as one
+unit. The checkbox column remains fixed at the leading edge and is not part of the draggable order.
 
 Cell context menu:
 
@@ -548,11 +647,14 @@ Cell context menu:
 
 `Filter by value` completes the FilterBar with the clicked cell value. The default operator is `eq`, and the user can still change the operator before or after applying the filter.
 
+Column-header, row, and cell context menus use the design-system `ContextMenu` component. `DataTable` identifies the interaction
+target; `apps/web` derives available actions from the Jazz schema, row state, and navigation context.
+
 UI representation:
 
 - Surface: main center table surface.
 - Primary controls: filters, pagination, row-size selector, refresh, insert row.
-- Primary content: rows, columns, relation cells, selected row state, live update highlights, row bookmarks.
+- Primary content: rows, columns, active row/column/cell state, relation cells, checkbox selection, live update highlights, row bookmarks.
 - States: loading, no open table tab, empty table, filtered-empty table, unsupported field display, changed cells, inserted row, deleted row animation, stale live data.
 
 #### Column type rendering
@@ -587,11 +689,13 @@ Cells render values based on type and context:
 - short primitive values can render inline
 - long strings are truncated with a way to inspect/copy the full value
 - JSON-like values are readable and copyable
-  - grid shows truncated preview
+  - data table shows truncated preview
   - hover/focus popover shows formatted value and copy action
   - side panel shows editable textarea when safely serializable
 - binary values do not pretend to be editable text
 - relation values use relation cell rendering when schema metadata provides a reference
+- relation values use `TextLink` with a trailing arrow; text uses the normal foreground color and changes to link color on
+  hover or keyboard focus without adding an underline
 - timestamps are formatted for reading while preserving the raw value when copied
 
 The goal is not to make every cell interactive. The goal is to make every cell understandable.
@@ -628,7 +732,7 @@ Defaults:
 - page size options: 100, 500, 1000
 - default sort: deterministic latest-first row order when Jazz can express it, otherwise stable `id` order
 - page index: memory-only
-- page size: saved as table grid preference
+- page size: saved as a data-table preference
 
 The page number input can jump to a known page by mapping `pageIndex` to `offset`. If the requested page has no rows, Inspector falls back to the nearest page with rows.
 
@@ -638,7 +742,9 @@ Side-panel row focus is row-id based and can survive page changes. Checkbox sele
 
 #### Selection and row inspection
 
-Selecting a row opens a side panel that gives the developer a focused place for reading and editing rows. It shows full field values, schema hints, relation targets, copy actions, staged changes, validation errors, and save/delete actions.
+Activating a row or cell opens a side panel that gives the developer a focused place for reading and editing rows. Checkbox
+selection remains an independent bulk-operation set. The side panel shows full field values, schema hints, relation targets,
+copy actions, staged changes, validation errors, and save/delete actions.
 
 The side panel answers:
 
@@ -649,7 +755,7 @@ The side panel answers:
 - What happened after save/delete?
 - Which values are read-only?
 
-Selection remains stable when possible. Filtering, sorting, or refreshing data does not make the user lose context
+The active row remains stable when possible. Filtering, sorting, or refreshing data does not make the user lose context
 without a clear reason.
 
 Opening the panel from a cell should focus the matching field.
@@ -658,8 +764,8 @@ UI representation:
 
 - Surface: right side panel attached to the active table view.
 - Primary controls: close panel, save changes, reset changes, delete row, copy row, open relation target.
-- Primary content: selected row id, field list, full values, relation targets, schema hints, staged changes, validation and mutation errors.
-- States: no row selected, selected row loading, clean row, dirty row, saving, saved, mutation rejected, row missing after refresh, unsupported read-only field.
+- Primary content: active row id, field list, full values, relation targets, schema hints, staged changes, validation and mutation errors.
+- States: no active row, active row loading, clean row, dirty row, saving, saved, mutation rejected, row missing after refresh, unsupported read-only field.
 
 #### Schema context inside the explorer
 
@@ -674,7 +780,7 @@ Useful context includes:
 - permission hints when useful
 - primary identifier fields
 
-This context supports the current task. It does not overload the grid with schema details that belong in the Schema
+This context supports the current task. It does not overload the data table with schema details that belong in the Schema
 Inspector.
 
 #### Filter builder
@@ -685,7 +791,13 @@ It validates and parses input before clauses are applied.
 
 Since the target audience is developers, I opt for a component that handles both click selection and manual typing.
 
-v1 keeps the existing generic filter query semantics and replaces the interface with a command-style FilterBar.
+v1 keeps the existing generic filter query semantics and exposes two synchronized interfaces over one controlled filter model:
+
+- `DataTableFilterBuilder` sits below the table tabs and provides a command-style, keyboard-friendly experience
+- `DataTableFilterControl` sits in the left pane and provides direct field and operator controls
+
+Both interfaces read and update the same URL-backed applied clauses. Adding, editing, or removing a clause in either interface
+updates the other. Closing the left pane does not limit filtering because the builder remains available.
 
 The filter interface is a FilterBar: one search-like input that supports both typing and selection. The user can type a column name, pick suggestions, choose an operator, enter a value, and see the applied filter rendered as a compact editable token.
 
@@ -699,9 +811,17 @@ Operators are schema-gated by column type. Filter clauses combine as a flat `AND
 
 Filters are serialized as URL-backed tokens: `{ id, column, operator, value }`. Advanced query shapes remain out of scope. Query Subscription links into the Data Explorer only map filters Inspector can translate safely.
 
+Applied clauses and in-progress input are separate states. Applied clauses are URL-backed. The current column, operator, raw
+value, completion stage, and validation issue are transient memory state. Cell context actions and Query Subscription links use
+the same schema-validation and filter actions as both visible filter interfaces.
+
+Jazz does not expose generic count, distinct, group-by, aggregate min/max, or facet-count queries. Filter controls may use safe
+schema metadata such as enum variants, booleans, nullability, references, and stored types, but they do not present current-page
+counts as table-wide facets.
+
 UI representation:
 
-- Surface: toolbar above the grid.
+- Surface: builder below the table tabs and direct controls in the left pane.
 - Primary controls: type filter, choose column suggestion, choose operator, enter value, remove token, add more filters.
 - Primary content: compact filter tokens and a trailing `Add more filters...` input.
 - States: invalid value, unsupported operator for type, no filters, unsupported query mapping.
@@ -724,14 +844,14 @@ v1 relation behavior:
 - show the raw relation id immediately
 - resolve a friendly label progressively when affordable
 - cache relation labels by connection, branch, schema hash, table, and id
-- label loading never blocks the grid; raw ids are always valid fallback UI
+- label loading never blocks the data table; raw ids are always valid fallback UI
 - clicking a relation opens a new table tab for the referenced table
 - the new tab applies an `id = relationId` filter
 - missing, deleted, or inaccessible related rows degrade to raw id and a clear empty state
 
 UI representation:
 
-- Surface: relation cells inside the grid and row side panel.
+- Surface: relation cells inside the data table and row side panel.
 - Primary controls: open related table tab, copy relation id.
 - Primary content: raw id, friendly label when resolved, target table name.
 - States: loading label, missing or inaccessible target, unsupported reference metadata.
@@ -748,6 +868,15 @@ v1 uses side-panel editing only.
 - insert uses the same side-panel form pattern
 - unsupported field types are visible but read-only
 - inline cell editing is out of scope for v1
+
+Side-pane editing is the default and only v1 editing presentation. An optional inline presentation remains outside v1 for users
+who prefer direct cell editing. Both presentations must use the same row draft, schema parsing, dirty-field,
+validation, conflict, and mutation controller rather than implementing separate write paths. Adding inline presentation does
+not change the read-first default or cause cell activation to write immediately.
+
+The shared row draft tracks the baseline row, baseline update metadata, raw input, parsed values, dirty fields, validation
+issues, unsupported fields, mutation status, and remote-change status. Saves send a partial patch for dirty fields rather than
+resubmitting every editable field.
 
 Permissions are shown as debugging hints, not guarantees. The server/runtime response is authoritative.
 
@@ -804,6 +933,12 @@ Highlights are ephemeral and brief.
 
 Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspector can unsubscribe by skipping a query, but freezing visible rows would require an inspector-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
 
+An out-of-scope `Live`/`Paused` presentation can freeze an Inspector-owned visible snapshot while Jazz remains connected and the table
+subscription continues receiving changes. The paused state can report pending inserted, updated, and deleted rows, then
+reconcile and highlight changes when returning to `Live`. Jazz `Db.disconnect()` and `Db.reconnect()` are not used for this
+feature because they control remote synchronization for the whole database connection rather than one visible table, do not
+freeze local subscription updates, and can leave edge-durability mutations pending.
+
 #### Row bookmarks
 
 Large table pages need a way to keep visual focus while comparing distant rows.
@@ -817,7 +952,7 @@ Rules:
 - bookmarks are UI-only and do not write to Jazz
 - bookmarks are scoped to connection, branch, schema hash, and table
 - bookmarks attach to row ids, not visible indexes
-- if filters hide a bookmarked row, it remains in the table bookmark list but is not drawn in the visible grid
+- if filters hide a bookmarked row, it remains in the table bookmark list but is not drawn in the visible data table
 - the active table exposes a bookmark list for that table
 - the bookmark list can jump to, rename, and delete bookmarks
 - clicking the bookmark dot on a bookmarked row removes the bookmark
@@ -891,7 +1026,7 @@ Current code path:
 2. It calls `fetchServerSubscriptions(serverUrl, { adminSecret, appId })`.
 3. The server returns a snapshot with `generatedAt` and `queries`.
 4. Inspector stores the last successful snapshot in module memory to avoid empty flashes during navigation.
-5. `useQuerySubscriptionsState(...)` derives table counts, selected table filtering, and grid rows.
+5. `useQuerySubscriptionsState(...)` derives table counts, selected table filtering, and data-table rows.
 6. `expandedRow.tsx` and query-subscription helpers parse the serialized query JSON when building the Data Explorer link.
 
 Relevant files:
@@ -947,7 +1082,7 @@ The Query Subscriptions view does not show returned row data. To inspect data, I
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Show current grouped subscriptions | Show active server-visible query shapes returned by the latest snapshot.                                                                       |
 | Filter by table and propagation    | Keep table and returned propagation values as side-panel filters.                                                                              |
-| Show a simple grid                 | Start with table and count.                                                                                                                    |
+| Show a simple data table           | Start with table and count.                                                                                                                    |
 | Inspect one subscription in a dock | Selection opens a bottom dock with overview and raw JSON.                                                                                      |
 | Explain empty states               | Explain no active queries, local-only queries, short-lived reads, mismatched connection context, hidden inspector reads, and failed telemetry. |
 | Manual refresh                     | Keep auto-refresh and let the user refresh immediately.                                                                                        |
@@ -978,7 +1113,7 @@ Polls the server for grouped active subscriptions and links them back into the D
 
 #### Grid
 
-The grid should stay simple. It should not try to render the full query shape inline because query JSON can be large and difficult to summarize in a row.
+The data table should stay simple. It should not try to render the full query shape inline because query JSON can be large and difficult to summarize in a row.
 
 Default columns:
 
@@ -997,7 +1132,7 @@ Branch should not be a default filter while the inspector route already scopes t
 
 UI representation:
 
-- Surface: Query Subscriptions main grid.
+- Surface: Query Subscriptions main data table.
 - Primary controls: refresh, pause, table filter, propagation filter, select subscription.
 - Primary content: table, count, optional query summary.
 - States: loading, empty, stale snapshot, failed telemetry, unsupported query mapping.
@@ -1130,7 +1265,7 @@ This interface **must answer**:
 - Not a schema editor.
 - Not a visual schema designer.
 - Not a replacement for Table Explorer schema hints.
-- No schema-field-to-grid navigation unless a clear workflow appears.
+- No schema-field-to-data-table navigation unless a clear workflow appears.
 
 UI representation:
 

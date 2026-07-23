@@ -53,5 +53,4 @@ export interface TableColumnMeta {
   accessorKey: string;
   column: ColumnDescriptor | null;
   isSortable: boolean;
-  width?: string;
 }

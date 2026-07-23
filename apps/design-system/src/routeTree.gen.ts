@@ -20,6 +20,7 @@ import { Route as ComponentsComboboxRouteImport } from './routes/components/comb
 import { Route as ComponentsContextMenuRouteImport } from './routes/components/context-menu'
 import { Route as ComponentsContextSwitcherRouteImport } from './routes/components/context-switcher'
 import { Route as ComponentsCopyButtonRouteImport } from './routes/components/copy-button'
+import { Route as ComponentsDataTableRouteImport } from './routes/components/data-table'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
@@ -96,6 +97,11 @@ const ComponentsContextSwitcherRoute =
 const ComponentsCopyButtonRoute = ComponentsCopyButtonRouteImport.update({
   id: '/components/copy-button',
   path: '/components/copy-button',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsDataTableRoute = ComponentsDataTableRouteImport.update({
+  id: '/components/data-table',
+  path: '/components/data-table',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsFieldRoute = ComponentsFieldRouteImport.update({
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
+  '/components/data-table': typeof ComponentsDataTableRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
+  '/components/data-table': typeof ComponentsDataTableRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
@@ -286,6 +294,7 @@ export interface FileRoutesById {
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
+  '/components/data-table': typeof ComponentsDataTableRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
@@ -322,6 +331,7 @@ export interface FileRouteTypes {
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
+    | '/components/data-table'
     | '/components/field'
     | '/components/fieldset'
     | '/components/input'
@@ -356,6 +366,7 @@ export interface FileRouteTypes {
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
+    | '/components/data-table'
     | '/components/field'
     | '/components/fieldset'
     | '/components/input'
@@ -390,6 +401,7 @@ export interface FileRouteTypes {
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
+    | '/components/data-table'
     | '/components/field'
     | '/components/fieldset'
     | '/components/input'
@@ -425,6 +437,7 @@ export interface RootRouteChildren {
   ComponentsContextMenuRoute: typeof ComponentsContextMenuRoute
   ComponentsContextSwitcherRoute: typeof ComponentsContextSwitcherRoute
   ComponentsCopyButtonRoute: typeof ComponentsCopyButtonRoute
+  ComponentsDataTableRoute: typeof ComponentsDataTableRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
@@ -525,6 +538,13 @@ declare module '@tanstack/react-router' {
       path: '/components/copy-button'
       fullPath: '/components/copy-button'
       preLoaderRoute: typeof ComponentsCopyButtonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/data-table': {
+      id: '/components/data-table'
+      path: '/components/data-table'
+      fullPath: '/components/data-table'
+      preLoaderRoute: typeof ComponentsDataTableRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/field': {
@@ -689,6 +709,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsContextMenuRoute: ComponentsContextMenuRoute,
   ComponentsContextSwitcherRoute: ComponentsContextSwitcherRoute,
   ComponentsCopyButtonRoute: ComponentsCopyButtonRoute,
+  ComponentsDataTableRoute: ComponentsDataTableRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsInputRoute: ComponentsInputRoute,

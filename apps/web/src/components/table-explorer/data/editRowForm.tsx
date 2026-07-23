@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
@@ -10,6 +10,7 @@ import {
 } from "@/components/table-explorer/data/rowEditorFields";
 
 interface EditRowFormProps {
+  focusedFieldName?: string | null;
   onCancel?: () => void;
   onDelete?: () => Promise<void> | void;
   onSave: (values: Record<string, unknown>) => Promise<void> | void;
@@ -18,7 +19,27 @@ interface EditRowFormProps {
   targetRowId: string | null;
 }
 
+const ROW_EDITOR_FOCUSABLE_SELECTOR = [
+  "input:not([disabled])",
+  "textarea:not([disabled])",
+  "button:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
+
+export function focusRowEditorField(fieldName: string): boolean {
+  const field = document.getElementById(`row-editor-field-${fieldName}`);
+  const control = field?.querySelector<HTMLElement>(ROW_EDITOR_FOCUSABLE_SELECTOR) ?? null;
+
+  if (control === null) {
+    return false;
+  }
+
+  control.focus();
+  return true;
+}
+
 export function EditRowForm({
+  focusedFieldName = null,
   onCancel,
   onDelete,
   onSave,
@@ -27,12 +48,13 @@ export function EditRowForm({
   targetRowId,
 }: EditRowFormProps): React.ReactElement {
   if (rowValues === null) {
-    return <Text color="muted">Select a row from the data grid to edit it.</Text>;
+    return <Text color="muted">Select a row from the data table to edit it.</Text>;
   }
 
   return (
     <LoadedEditRowForm
       key={targetRowId ?? "unknown-row"}
+      focusedFieldName={focusedFieldName}
       onCancel={onCancel}
       onDelete={onDelete}
       onSave={onSave}
@@ -48,12 +70,12 @@ interface LoadedEditRowFormProps extends Omit<EditRowFormProps, "rowValues"> {
 }
 
 function LoadedEditRowForm({
+  focusedFieldName,
   onCancel,
   onDelete,
   onSave,
   rowValues,
   schemaColumns,
-  targetRowId,
 }: LoadedEditRowFormProps): React.ReactElement {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
@@ -64,11 +86,23 @@ function LoadedEditRowForm({
     schemaColumns,
   });
 
+  useEffect(() => {
+    if (focusedFieldName === null || focusedFieldName === undefined) {
+      return;
+    }
+
+    const animationFrame = requestAnimationFrame(() => {
+      focusRowEditorField(focusedFieldName);
+    });
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+    };
+  }, [focusedFieldName]);
+
   return (
     <form className="flex h-full min-h-0 flex-col mt-2 overflow-hidden" onSubmit={rowEditor.submit}>
       <div className="app-scrollbar flex min-h-0 flex-1 flex-col gap-4 px-2 mb-2 overflow-auto">
-        <p className="text-sm text-muted-foreground">ID: {targetRowId}</p>
-
         <RowEditorFields
           errors={rowEditor.errors}
           fieldStates={rowEditor.fieldStates}

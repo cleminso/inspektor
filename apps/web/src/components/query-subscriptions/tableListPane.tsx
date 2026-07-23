@@ -17,6 +17,8 @@ interface QuerySubscriptionsListPaneProps {
   onSelectedTableNameChange: (value: string | null) => void;
 }
 
+// TODO: table list pane should only render tables item that has a subscription query
+// not all app tables.
 export function QuerySubscriptionsListPane({
   searchValue,
   selectedPropagations,

@@ -16,6 +16,27 @@ export type {
   ActionListSelectionControlProps,
   ActionListTriggerProps,
 } from './components/actionList/actionList'
+export { DataTable } from './components/dataTable/dataTable'
+export type {
+  DataTableBodyProps,
+  DataTableCellContextMenuHandler,
+  DataTableCellProps,
+  DataTableCellTarget,
+  DataTableContentProps,
+  DataTableDensity,
+  DataTableExpandedRowProps,
+  DataTableFooterProps,
+  DataTableHeaderCellProps,
+  DataTableHeaderContextMenuHandler,
+  DataTableHeaderProps,
+  DataTableHeaderRowProps,
+  DataTableMessageProps,
+  DataTableRootProps,
+  DataTableRowContextMenuHandler,
+  DataTableRowProps,
+  DataTableTableProps,
+  DataTableViewportProps,
+} from './components/dataTable/dataTable'
 export { Box } from './components//box/box'
 export type { BoxProps } from './components/box/box'
 export { Checkbox } from './components/checkbox/checkbox'

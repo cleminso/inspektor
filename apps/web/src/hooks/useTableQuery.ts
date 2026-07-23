@@ -90,7 +90,6 @@ export function useTableQuery({
       accessorKey: "id",
       column: null,
       isSortable: true,
-      width: "minmax(14rem, 1.4fr)",
     };
 
     return [
@@ -101,7 +100,6 @@ export function useTableQuery({
         accessorKey: column.name,
         column,
         isSortable: isColumnSortable(column.column_type),
-        width: "minmax(10rem, 1fr)",
       })),
     ];
   }, [schemaColumns]);
