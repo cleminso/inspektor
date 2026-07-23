@@ -3,15 +3,7 @@ import { useMemo, useState } from "react";
 import type { ColumnDescriptor, ColumnType } from "jazz-tools";
 import { X } from "lucide-react";
 
-import { Button } from "@regarde/ui/button";
-import { Input } from "@regarde/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@regarde/ui/select";
+import { Button, Input, Select } from "@inspector/ds";
 
 import {
   createFilterClauseId,
@@ -270,8 +262,8 @@ function TableFilterDraft({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon-sm"
-                  className="mt-0.5"
+                  size="s"
+                  shape="square"
                   aria-label={`Remove ${rowLabel.toLowerCase()}`}
                   onClick={() => {
                     removeRow(row.id);
@@ -300,16 +292,16 @@ function TableFilterDraft({
                     });
                   }}
                 >
-                  <SelectTrigger density="lg" className="w-36" aria-label={`${rowLabel} column`}>
-                    <SelectValue placeholder="column" />
-                  </SelectTrigger>
-                  <SelectContent>
+                  <Select.Trigger size="l" aria-label={`${rowLabel} column`}>
+                    <Select.Value placeholder="column" />
+                  </Select.Trigger>
+                  <Select.Content>
                     {filterableColumns.map((column) => (
-                      <SelectItem key={column.name} value={column.name}>
+                      <Select.Item key={column.name} value={column.name}>
                         {column.name}
-                      </SelectItem>
+                      </Select.Item>
                     ))}
-                  </SelectContent>
+                  </Select.Content>
                 </Select>
                 <Select
                   value={row.operator}
@@ -329,16 +321,16 @@ function TableFilterDraft({
                     });
                   }}
                 >
-                  <SelectTrigger density="lg" className="w-36" aria-label={`${rowLabel} operator`}>
-                    <SelectValue placeholder="operator" />
-                  </SelectTrigger>
-                  <SelectContent>
+                  <Select.Trigger size="l" aria-label={`${rowLabel} operator`}>
+                    <Select.Value placeholder="operator" />
+                  </Select.Trigger>
+                  <Select.Content>
                     {operators.map((operator) => (
-                      <SelectItem key={operator} value={operator}>
+                      <Select.Item key={operator} value={operator}>
                         {OPERATOR_LABELS[operator]}
-                      </SelectItem>
+                      </Select.Item>
                     ))}
-                  </SelectContent>
+                  </Select.Content>
                 </Select>
                 <div className="flex w-64 flex-col gap-1">
                   {usesBooleanSelect === true ? (
@@ -352,18 +344,18 @@ function TableFilterDraft({
                         updateRow(row.id, { ...row, valueText: nextValue });
                       }}
                     >
-                      <SelectTrigger
-                        density="lg"
-                        className="w-full"
+                      <Select.Trigger
+                        size="l"
+                        width="full"
                         aria-invalid={error !== null}
                         aria-label={`${rowLabel} value`}
                       >
-                        <SelectValue placeholder="value" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">true</SelectItem>
-                        <SelectItem value="false">false</SelectItem>
-                      </SelectContent>
+                        <Select.Value placeholder="value" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value="true">true</Select.Item>
+                        <Select.Item value="false">false</Select.Item>
+                      </Select.Content>
                     </Select>
                   ) : enumVariants !== null ? (
                     <Select
@@ -376,21 +368,21 @@ function TableFilterDraft({
                         updateRow(row.id, { ...row, valueText: nextValue });
                       }}
                     >
-                      <SelectTrigger
-                        density="lg"
-                        className="w-full"
+                      <Select.Trigger
+                        size="l"
+                        width="full"
                         aria-invalid={error !== null}
                         aria-label={`${rowLabel} value`}
                       >
-                        <SelectValue placeholder="value" />
-                      </SelectTrigger>
-                      <SelectContent>
+                        <Select.Value placeholder="value" />
+                      </Select.Trigger>
+                      <Select.Content>
                         {enumVariants.map((variant) => (
-                          <SelectItem key={variant} value={variant}>
+                          <Select.Item key={variant} value={variant}>
                             {variant}
-                          </SelectItem>
+                          </Select.Item>
                         ))}
-                      </SelectContent>
+                      </Select.Content>
                     </Select>
                   ) : (
                     <Input
@@ -398,7 +390,6 @@ function TableFilterDraft({
                       placeholder="value"
                       aria-invalid={error !== null}
                       aria-label={`${rowLabel} value`}
-                      density="default"
                       onChange={(event) => {
                         updateRow(row.id, { ...row, valueText: event.currentTarget.value });
                       }}
@@ -411,13 +402,12 @@ function TableFilterDraft({
           })}
         </div>
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <Button type="button" variant="outline" size="default" onClick={onClear}>
+          <Button type="button" variant="outline" onClick={onClear}>
             Clear
           </Button>
           <Button
             type="button"
             variant="secondary"
-            size="default"
             disabled={filterableColumns.length === 0}
             onClick={() => {
               const firstColumn = filterableColumns[0] ?? null;

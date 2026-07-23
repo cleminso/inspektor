@@ -16,7 +16,6 @@
   "dependencies": {
     "@base-ui/react": "catalog:",
     "@inspector/ds": "workspace:*",
-    "@regarde/ui": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-devtools": "catalog:",

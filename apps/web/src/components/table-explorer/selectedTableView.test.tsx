@@ -7,10 +7,6 @@ import { SelectedTableView } from "@/components/table-explorer/selectedTableView
 
 let mountCount = 0;
 
-vi.mock("@regarde/ui/emptyState", () => ({
-  EmptyState: ({ title }: { title: string }) => <div>{title}</div>,
-}));
-
 vi.mock("@/components/providers/inspectorProvider", () => ({
   useInspector: () => ({
     currentBranch: "main",

@@ -1,6 +1,6 @@
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
-import { Button } from "@regarde/ui/button";
+import { Button } from "@inspector/ds";
 
 import { DetailPane } from "@/components/table-explorer/detailPane";
 import type { TableRowId } from "@/types/tableExplorer";
@@ -37,7 +37,8 @@ export function RowEditorSidePanel({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon-sm"
+                  size="s"
+                  shape="square"
                   disabled={activeRowIndex === 0}
                   onClick={onNavigatePrevious}
                   aria-label="Previous selected row"
@@ -47,7 +48,8 @@ export function RowEditorSidePanel({
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon-sm"
+                  size="s"
+                  shape="square"
                   disabled={activeRowIndex >= editedRowIds.length - 1}
                   onClick={onNavigateNext}
                   aria-label="Next selected row"

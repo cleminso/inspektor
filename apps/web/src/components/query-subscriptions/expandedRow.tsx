@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { CopyButton } from "@inspector/ds";
-import { Button } from "@regarde/ui/button";
+import { Button, CopyButton } from "@inspector/ds";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { buildExplorerLink } from "@/lib/query-subscriptions/buildExplorerUrl";
@@ -48,7 +47,7 @@ export function QuerySubscriptionsExpandedRow({
         </div>
         <div className="flex flex-wrap items-center justify-end gap-1">
           {explorerLink !== null ? (
-            <Button size="lg" variant="secondary" render={<Link {...explorerLink} />}>
+            <Button size="l" variant="secondary" render={<Link {...explorerLink} />}>
               Open in table explorer
             </Button>
           ) : null}

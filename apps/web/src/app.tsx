@@ -4,7 +4,7 @@ import { Agentation } from "agentation";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { ThemeProvider } from "next-themes";
-import { TooltipProvider } from "@regarde/ui/tooltip";
+import { Tooltip } from "@inspector/ds";
 
 import { routeTree } from "./routeTree.gen";
 import ReactDOM from "react-dom/client";
@@ -32,12 +32,12 @@ const rootElement = document.getElementById("root");
 if (rootElement !== null) {
   ReactDOM.createRoot(rootElement).render(
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <TooltipProvider>
+      <Tooltip.Provider>
         <StrictMode>
           <RouterProvider router={router} />
           {import.meta.env.DEV === true ? <Agentation endpoint="http://localhost:4747" /> : null}
         </StrictMode>
-      </TooltipProvider>
+      </Tooltip.Provider>
     </ThemeProvider>
   );
 }

@@ -4,9 +4,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Tell Tailwind to scan @regarde/ui package source files for classes */
-@source "../../../packages/ui/src";
-
 @theme inline {
   --text-xxs: 0.65rem;
   --text-sm: 0.8125rem;

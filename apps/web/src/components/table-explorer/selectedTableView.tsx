@@ -1,5 +1,3 @@
-import { EmptyState } from "@regarde/ui/emptyState";
-
 import { DataView } from "@/components/table-explorer/data/view";
 import { SchemaView } from "@/components/table-explorer/schema/view";
 import { useInspector } from "@/components/providers/inspectorProvider";
@@ -14,16 +12,11 @@ export function SelectedTableView({ tableName }: SelectedTableViewProps): React.
   const searchState = useTableExplorerSearchParams();
 
   if (tableName === null) {
-    return (
-      <EmptyState
-        title="Select a table"
-        description="Choose a table from the list to view its content."
-      />
-    );
+    return null;
   }
 
   if (runtime.wasmSchema === null) {
-    return <EmptyState title="Loading schema" description="Waiting for schema metadata to load." />;
+    return null;
   }
 
   if (searchState.view === "schema") {
