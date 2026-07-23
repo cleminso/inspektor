@@ -1,227 +1,239 @@
-import * as stylex from '@stylexjs/stylex'
-import { RestrictToHorizontalAxis } from '@dnd-kit/abstract/modifiers'
-import { move } from '@dnd-kit/helpers'
-import { DragDropProvider, DragOverlay } from '@dnd-kit/react'
-import { useSortable } from '@dnd-kit/react/sortable'
-import {
-  AutoScroller,
-  PointerActivationConstraints,
-  PointerSensor,
-} from '@dnd-kit/dom'
-import { RestrictToElement } from '@dnd-kit/dom/modifiers'
-import type {
-  Cell,
-  Header,
-  HeaderGroup,
-  Row,
-  RowData,
-  Table,
-} from '@tanstack/react-table'
-import { flexRender } from '@tanstack/react-table'
-import { useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from 'react'
+import * as stylex from "@stylexjs/stylex";
+import { RestrictToHorizontalAxis } from "@dnd-kit/abstract/modifiers";
+import { move } from "@dnd-kit/helpers";
+import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
+import { useSortable } from "@dnd-kit/react/sortable";
+import { AutoScroller, PointerActivationConstraints, PointerSensor } from "@dnd-kit/dom";
+import { RestrictToElement } from "@dnd-kit/dom/modifiers";
+import type { Cell, Header, HeaderGroup, Row, RowData, Table } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
+import { useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from "react";
 
-import { dataTableStyles } from './dataTable.styles'
+import { dataTableStyles } from "./dataTable.styles";
 import {
   DataTableContext,
   type DataTableContextValue,
   useDataTableContext,
-} from './dataTableContext'
+} from "./dataTableContext";
 
-export type DataTableDensity = 'compact' | 'default'
+export type DataTableDensity = "compact" | "default";
 
 const dataTablePointerSensor = PointerSensor.configure({
   activationConstraints: [new PointerActivationConstraints.Distance({ value: 4 })],
   preventActivation: (event) => {
-    if (event.pointerType === 'touch') {
-      return true
+    if (event.pointerType === "touch") {
+      return true;
     }
     if (!(event.target instanceof Element)) {
-      return false
+      return false;
     }
-    return event.target.closest(
-      'a, button, input, select, textarea, [role="checkbox"], [data-slot="data-table-resize-handle"]',
-    ) !== null
+    return (
+      event.target.closest(
+        'a, button, input, select, textarea, [role="checkbox"], [data-slot="data-table-resize-handle"]',
+      ) !== null
+    );
   },
-})
+});
 
-const dataTableSensors = [dataTablePointerSensor]
+const dataTableSensors = [dataTablePointerSensor];
 
 export interface DataTableCellTarget {
-  columnId: string
-  rowId: string
+  columnId: string;
+  rowId: string;
 }
+
+const emptySelectedCells: readonly DataTableCellTarget[] = [];
+
+export type DataTableCellSelectionMode = "additive" | "range" | "replace";
 
 export type DataTableHeaderContextMenuHandler = (
   columnId: string,
   event: MouseEvent<HTMLTableCellElement>,
-) => void
+) => void;
 export type DataTableRowContextMenuHandler = (
   rowId: string,
   event: MouseEvent<HTMLTableRowElement>,
-) => void
+) => void;
 export type DataTableCellContextMenuHandler = (
   target: DataTableCellTarget,
   event: MouseEvent<HTMLTableCellElement>,
-) => void
+) => void;
 
 interface DataTableRootBaseProps<TData extends RowData> {
   /** Active row and column intersection. */
-  activeCell?: DataTableCellTarget | null
+  activeCell?: DataTableCellTarget | null;
   /** Column highlighted across the header and visible rows. */
-  activeColumnId?: string | null
+  activeColumnId?: string | null;
   /** Row currently targeted for inspection. */
-  activeRowId?: string | null
+  activeRowId?: string | null;
   /** Data-table regions and companion controls. */
-  children: ReactNode
+  children: ReactNode;
   /** Controls table row and cell spacing. */
-  density?: DataTableDensity
+  density?: DataTableDensity;
   /** Runs when a non-interactive cell is activated. */
-  onCellActivate?: (target: DataTableCellTarget) => void
+  onCellActivate?: (target: DataTableCellTarget, selectionMode: DataTableCellSelectionMode) => void;
   /** Runs when a cell context menu is requested. */
-  onCellContextMenu?: DataTableCellContextMenuHandler
+  onCellContextMenu?: DataTableCellContextMenuHandler;
+  /** Runs when a non-interactive cell is explicitly opened. */
+  onCellOpen?: (target: DataTableCellTarget) => void;
   /** Runs when a column header is activated. */
-  onColumnActivate?: (columnId: string | null) => void
+  onColumnActivate?: (columnId: string | null) => void;
   /** Runs when a column-header context menu is requested. */
-  onHeaderContextMenu?: DataTableHeaderContextMenuHandler
+  onHeaderContextMenu?: DataTableHeaderContextMenuHandler;
   /** Runs when a non-interactive row is activated. */
-  onRowActivate?: (rowId: string) => void
+  onRowActivate?: (rowId: string) => void;
   /** Runs when a row context menu is requested. */
-  onRowContextMenu?: DataTableRowContextMenuHandler
+  onRowContextMenu?: DataTableRowContextMenuHandler;
   /** Controlled TanStack table instance rendered by the compound parts. */
-  table: Table<TData>
+  table: Table<TData>;
+  /** Cells included in the current cell-selection set. */
+  selectedCells?: readonly DataTableCellTarget[];
 }
 
 interface ReorderableDataTableRootProps {
   /** Column ids in their controlled draggable order. Omit fixed columns from this list. */
-  columnOrder: readonly string[]
+  columnOrder: readonly string[];
   /** Runs with the complete draggable column order after a header is moved. */
-  onColumnOrderChange: (columnIds: string[]) => void
+  onColumnOrderChange: (columnIds: string[]) => void;
 }
 
 interface StaticDataTableRootProps {
-  columnOrder?: never
-  onColumnOrderChange?: never
+  columnOrder?: never;
+  onColumnOrderChange?: never;
 }
 
 export type DataTableRootProps<TData extends RowData> = DataTableRootBaseProps<TData> &
-  (ReorderableDataTableRootProps | StaticDataTableRootProps)
+  (ReorderableDataTableRootProps | StaticDataTableRootProps);
 
 export interface DataTableViewportProps {
   /** Table or custom viewport content. */
-  children: ReactNode
+  children: ReactNode;
 }
 
 export interface DataTableTableProps {
   /** Accessible name for the table. */
-  'aria-label': string
+  "aria-label": string;
   /** Header and body composition. */
-  children: ReactNode
+  children: ReactNode;
 }
 
 export interface DataTableContentProps {
   /** Content shown when the table has no rows. */
-  emptyContent?: ReactNode
+  emptyContent?: ReactNode;
   /** Whether loading content replaces the current row model. */
-  loading?: boolean
+  loading?: boolean;
   /** Content shown while rows are loading. */
-  loadingContent?: ReactNode
+  loadingContent?: ReactNode;
 }
 
 export interface DataTableHeaderProps {
   /** Custom header rows. TanStack header groups render when omitted. */
-  children?: ReactNode
+  children?: ReactNode;
 }
 
 export interface DataTableHeaderRowProps<TData extends RowData> {
   /** Custom header cells. TanStack headers render when omitted. */
-  children?: ReactNode
+  children?: ReactNode;
   /** TanStack header group represented by this row. */
-  headerGroup: HeaderGroup<TData>
+  headerGroup: HeaderGroup<TData>;
 }
 
 export interface DataTableHeaderCellProps<TData extends RowData> {
   /** Custom header content. The column header definition renders when omitted. */
-  children?: ReactNode
+  children?: ReactNode;
   /** TanStack header represented by this cell. */
-  header: Header<TData, unknown>
+  header: Header<TData, unknown>;
 }
 
 export interface DataTableBodyProps {
   /** Custom rows. TanStack rows render when omitted. */
-  children?: ReactNode
+  children?: ReactNode;
 }
 
 export interface DataTableRowProps<TData extends RowData> {
   /** Custom cells. Visible TanStack cells render when omitted. */
-  children?: ReactNode
+  children?: ReactNode;
   /** TanStack row represented by this table row. */
-  row: Row<TData>
+  row: Row<TData>;
 }
 
 export interface DataTableCellProps<TData extends RowData> {
   /** Custom cell content. The column cell definition renders when omitted. */
-  children?: ReactNode
+  children?: ReactNode;
   /** TanStack cell represented by this table cell. */
-  cell: Cell<TData, unknown>
+  cell: Cell<TData, unknown>;
 }
 
 export interface DataTableExpandedRowProps<TData extends RowData> {
   /** Expanded content associated with the row. */
-  children: ReactNode
+  children: ReactNode;
   /** TanStack row represented by this expanded region. */
-  row: Row<TData>
+  row: Row<TData>;
 }
 
 export interface DataTableMessageProps {
   /** Loading or empty-state content. */
-  children: ReactNode
+  children: ReactNode;
 }
 
 export interface DataTableFooterProps {
   /** Status and table companion controls. */
-  children: ReactNode
+  children: ReactNode;
 }
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
   if (target instanceof Element === false) {
-    return false
+    return false;
   }
 
-  return target.closest('a, button, input, select, textarea, [role="button"], [role="checkbox"]') !== null
+  return (
+    target.closest('a, button, input, select, textarea, [role="button"], [role="checkbox"]') !==
+    null
+  );
 }
 
 function isSelectionControlTarget(target: EventTarget | null): boolean {
   if (target instanceof Element === false) {
-    return false
+    return false;
   }
 
-  return target.closest('input, [role="checkbox"], [role="radio"]') !== null
+  return target.closest('input, [role="checkbox"], [role="radio"]') !== null;
 }
 
-function activateSelectionControlFromCell(
-  event: MouseEvent<HTMLTableCellElement>,
-): boolean {
+function hasSelectionControl(cell: HTMLTableCellElement): boolean {
+  return cell.querySelector('input[type="checkbox"], [role="checkbox"]') !== null;
+}
+
+function activateSelectionControlFromCell(event: MouseEvent<HTMLTableCellElement>): boolean {
   const selectionControl = event.currentTarget.querySelector<HTMLElement>(
     'input[type="checkbox"], [role="checkbox"]',
-  )
+  );
   if (selectionControl === null) {
-    return false
+    return false;
   }
 
-  event.stopPropagation()
+  event.stopPropagation();
   if (isSelectionControlTarget(event.target) === false) {
-    selectionControl.focus()
-    selectionControl.click()
+    selectionControl.focus();
+    selectionControl.dispatchEvent(
+      new globalThis.MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+      }),
+    );
   }
-  return true
+  return true;
 }
 
 function getVisibleColumnCount<TData extends RowData>(table: Table<TData>): number {
-  return Math.max(table.getVisibleLeafColumns().length, 1)
+  return Math.max(table.getVisibleLeafColumns().length, 1);
 }
 
 function areColumnOrdersEqual(left: readonly string[], right: readonly string[]): boolean {
-  return left.length === right.length && left.every((columnId, index) => columnId === right[index])
+  return left.length === right.length && left.every((columnId, index) => columnId === right[index]);
 }
 
 function DataTableRoot<TData extends RowData>({
@@ -230,34 +242,47 @@ function DataTableRoot<TData extends RowData>({
   activeRowId = null,
   children,
   columnOrder,
-  density = 'default',
+  density = "default",
   onCellActivate,
   onCellContextMenu,
+  onCellOpen,
   onColumnActivate,
   onColumnOrderChange,
   onHeaderContextMenu,
   onRowActivate,
   onRowContextMenu,
+  selectedCells = emptySelectedCells,
   table,
 }: DataTableRootProps<TData>) {
-  const rootRef = useRef<HTMLDivElement>(null)
-  const initialColumnOrderRef = useRef<readonly string[]>([])
-  const onColumnActivateRef = useRef(onColumnActivate)
+  const rootRef = useRef<HTMLDivElement>(null);
+  const initialColumnOrderRef = useRef<readonly string[]>([]);
+  const onColumnActivateRef = useRef(onColumnActivate);
   const columnReorderIndices = useMemo(
     () => new Map(columnOrder?.map((columnId, index) => [columnId, index]) ?? []),
     [columnOrder],
-  )
+  );
   const columnReorderEnabled =
     columnOrder !== undefined &&
     onColumnOrderChange !== undefined &&
-    columnReorderIndices.size === columnOrder.length
+    columnReorderIndices.size === columnOrder.length;
   const modifiers = useMemo(
     () => [
       RestrictToHorizontalAxis,
       RestrictToElement.configure({ element: () => rootRef.current }),
     ],
     [],
-  )
+  );
+  const selectedColumnsByRow = useMemo(() => {
+    const columnsByRow = new Map<string, Set<string>>();
+
+    for (const cell of selectedCells) {
+      const columns = columnsByRow.get(cell.rowId) ?? new Set<string>();
+      columns.add(cell.columnId);
+      columnsByRow.set(cell.rowId, columns);
+    }
+
+    return columnsByRow;
+  }, [selectedCells]);
   const value: DataTableContextValue<TData> = {
     activeCell,
     activeColumnId,
@@ -265,45 +290,47 @@ function DataTableRoot<TData extends RowData>({
     density,
     onCellActivate,
     onCellContextMenu,
+    onCellOpen,
     onColumnActivate,
     onHeaderContextMenu,
     onRowActivate,
     onRowContextMenu,
+    selectedColumnsByRow,
     columnReorderEnabled,
     getColumnReorderIndex: (columnId) => columnReorderIndices.get(columnId) ?? -1,
     table,
-  }
+  };
 
   useEffect(() => {
-    onColumnActivateRef.current = onColumnActivate
-  }, [onColumnActivate])
+    onColumnActivateRef.current = onColumnActivate;
+  }, [onColumnActivate]);
 
   useEffect(() => {
     if (activeColumnId === null || onColumnActivateRef.current === undefined) {
-      return
+      return;
     }
 
     const handlePointerDown = (event: PointerEvent) => {
       if (event.target instanceof Node && rootRef.current?.contains(event.target) === true) {
-        return
+        return;
       }
 
-      onColumnActivateRef.current?.(null)
-    }
+      onColumnActivateRef.current?.(null);
+    };
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onColumnActivateRef.current?.(null)
+      if (event.key === "Escape") {
+        onColumnActivateRef.current?.(null);
       }
-    }
+    };
 
-    document.addEventListener('pointerdown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('pointerdown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [activeColumnId])
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeColumnId]);
 
   const root = (
     <DataTableContext.Provider value={value as DataTableContextValue<RowData>}>
@@ -316,10 +343,10 @@ function DataTableRoot<TData extends RowData>({
         {children}
       </div>
     </DataTableContext.Provider>
-  )
+  );
 
   if (columnReorderEnabled === false) {
-    return root
+    return root;
   }
 
   return (
@@ -331,38 +358,35 @@ function DataTableRoot<TData extends RowData>({
         AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
       ]}
       onDragStart={() => {
-        initialColumnOrderRef.current = columnOrder
+        initialColumnOrderRef.current = columnOrder;
       }}
       onDragOver={(event) => {
-        if (event.operation.source?.type !== 'column') {
-          return
+        if (event.operation.source?.type !== "column") {
+          return;
         }
-        const nextColumnOrder = move([...columnOrder], event)
+        const nextColumnOrder = move([...columnOrder], event);
         if (areColumnOrdersEqual(columnOrder, nextColumnOrder) === false) {
-          onColumnOrderChange(nextColumnOrder)
+          onColumnOrderChange(nextColumnOrder);
         }
       }}
       onDragEnd={(event) => {
         if (event.canceled === false) {
-          return
+          return;
         }
-        const initialColumnOrder = initialColumnOrderRef.current
+        const initialColumnOrder = initialColumnOrderRef.current;
         if (areColumnOrdersEqual(columnOrder, initialColumnOrder) === false) {
-          onColumnOrderChange([...initialColumnOrder])
+          onColumnOrderChange([...initialColumnOrder]);
         }
       }}
     >
       {root}
-      <DragOverlay
-        {...stylex.props(dataTableStyles.columnDragOverlay)}
-        dropAnimation={null}
-      >
+      <DragOverlay {...stylex.props(dataTableStyles.columnDragOverlay)} dropAnimation={null}>
         {(source) => (
           <div
             {...stylex.props(
               dataTableStyles.headerDragContent,
               dataTableStyles.columnDragOverlayContent,
-              density === 'compact' && dataTableStyles.compactHeaderDragContent,
+              density === "compact" && dataTableStyles.compactHeaderDragContent,
             )}
           >
             {source.element?.textContent ?? String(source.id)}
@@ -370,7 +394,7 @@ function DataTableRoot<TData extends RowData>({
         )}
       </DragOverlay>
     </DragDropProvider>
-  )
+  );
 }
 
 function DataTableViewport({ children }: DataTableViewportProps) {
@@ -378,23 +402,27 @@ function DataTableViewport({ children }: DataTableViewportProps) {
     <div {...stylex.props(dataTableStyles.viewport)} data-slot="data-table-viewport">
       {children}
     </div>
-  )
+  );
 }
 
-function DataTableTable({ 'aria-label': ariaLabel, children }: DataTableTableProps) {
+function DataTableTable({ "aria-label": ariaLabel, children }: DataTableTableProps) {
   return (
-    <table {...stylex.props(dataTableStyles.table)} aria-label={ariaLabel} data-slot="data-table-table">
+    <table
+      {...stylex.props(dataTableStyles.table)}
+      aria-label={ariaLabel}
+      data-slot="data-table-table"
+    >
       {children}
     </table>
-  )
+  );
 }
 
 function DataTableContent({
-  emptyContent = 'No data available',
+  emptyContent = "No data available",
   loading = false,
-  loadingContent = 'Loading data',
+  loadingContent = "Loading data",
 }: DataTableContentProps) {
-  const { table } = useDataTableContext()
+  const { table } = useDataTableContext();
 
   return (
     <>
@@ -407,20 +435,22 @@ function DataTableContent({
         <DataTableBody />
       )}
     </>
-  )
+  );
 }
 
 function DataTableHeader({ children }: DataTableHeaderProps) {
-  const { table } = useDataTableContext()
+  const { table } = useDataTableContext();
 
   return (
     <thead {...stylex.props(dataTableStyles.header)} data-slot="data-table-header">
       {children ??
-        table.getHeaderGroups().map((headerGroup) => (
-          <DataTableHeaderRow key={headerGroup.id} headerGroup={headerGroup} />
-        ))}
+        table
+          .getHeaderGroups()
+          .map((headerGroup) => (
+            <DataTableHeaderRow key={headerGroup.id} headerGroup={headerGroup} />
+          ))}
     </thead>
-  )
+  );
 }
 
 function DataTableHeaderRow<TData extends RowData>({
@@ -434,7 +464,7 @@ function DataTableHeaderRow<TData extends RowData>({
           <DataTableHeaderCell key={header.id} header={header} />
         ))}
     </tr>
-  )
+  );
 }
 
 function DataTableHeaderCell<TData extends RowData>({
@@ -449,59 +479,59 @@ function DataTableHeaderCell<TData extends RowData>({
     getColumnReorderIndex,
     onColumnActivate,
     onHeaderContextMenu,
-  } = useDataTableContext<TData>()
-  const isActive = activeCell === null && activeColumnId === header.column.id
-  const columnReorderIndex = getColumnReorderIndex(header.column.id)
-  const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0
+  } = useDataTableContext<TData>();
+  const isActive = activeCell === null && activeColumnId === header.column.id;
+  const columnReorderIndex = getColumnReorderIndex(header.column.id);
+  const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0;
   const sortable = useSortable({
-    accept: 'column',
+    accept: "column",
     id: header.column.id,
     index: Math.max(0, columnReorderIndex),
     disabled: {
       draggable: columnReorderable === false,
       droppable: columnReorderable === false,
     },
-    type: 'column',
-  })
-  const isDragVisual = sortable.isDragSource === true || sortable.isDropping === true
+    type: "column",
+  });
+  const isDragVisual = sortable.isDragSource === true || sortable.isDropping === true;
 
   const handleClick = (event: MouseEvent<HTMLTableCellElement>) => {
     if (activateSelectionControlFromCell(event) === true) {
-      return
+      return;
     }
 
     if (isInteractiveTarget(event.target) === false) {
-      event.currentTarget.focus()
+      event.currentTarget.focus();
     }
 
-    onColumnActivate?.(isActive === true ? null : header.column.id)
-  }
+    onColumnActivate?.(isActive === true ? null : header.column.id);
+  };
 
   const handleContextMenu = (event: MouseEvent<HTMLTableCellElement>) => {
     if (onHeaderContextMenu === undefined) {
-      return
+      return;
     }
 
-    event.preventDefault()
-    onHeaderContextMenu(header.column.id, event)
-  }
+    event.preventDefault();
+    onHeaderContextMenu(header.column.id, event);
+  };
 
   return (
     <th
       ref={sortable.ref}
       {...stylex.props(
         dataTableStyles.headerCell,
-        density === 'compact' && dataTableStyles.compactCell,
+        density === "compact" && dataTableStyles.compactCell,
         dataTableStyles.headerCellLayout,
         isActive === true && dataTableStyles.headerCellActive,
         columnReorderable === true && dataTableStyles.headerCellReorderable,
         isDragVisual === true && dataTableStyles.headerCellDragging,
       )}
       colSpan={header.colSpan}
-      data-active={isActive === true ? '' : undefined}
+      data-active={isActive === true ? "" : undefined}
       data-column-id={header.column.id}
-      data-dragging={isDragVisual === true ? '' : undefined}
-      data-reorderable={columnReorderable === true ? '' : undefined}
+      data-dragging={isDragVisual === true ? "" : undefined}
+      data-reorderable={columnReorderable === true ? "" : undefined}
       data-slot="data-table-header-cell"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
@@ -513,14 +543,14 @@ function DataTableHeaderCell<TData extends RowData>({
         {...stylex.props(
           dataTableStyles.headerDragContent,
           dataTableStyles.headerDragSource,
-          density === 'compact' && dataTableStyles.compactHeaderDragContent,
+          density === "compact" && dataTableStyles.compactHeaderDragContent,
           isDragVisual === true && dataTableStyles.headerDragSourceDragging,
         )}
         data-slot="data-table-header-drag-source"
       >
         {header.isPlaceholder === true
           ? null
-          : children ?? flexRender(header.column.columnDef.header, header.getContext())}
+          : (children ?? flexRender(header.column.columnDef.header, header.getContext()))}
       </div>
       {header.column.getCanResize() === true ? (
         <button
@@ -530,80 +560,81 @@ function DataTableHeaderCell<TData extends RowData>({
             isDragVisual === true && dataTableStyles.resizeHandleDragging,
           )}
           aria-label={`Resize ${header.column.id} column`}
-          data-resizing={header.column.getIsResizing() === true ? '' : undefined}
+          data-resizing={header.column.getIsResizing() === true ? "" : undefined}
           data-slot="data-table-resize-handle"
           onClick={(event) => {
-            event.stopPropagation()
+            event.stopPropagation();
           }}
           onDoubleClick={(event) => {
-            event.stopPropagation()
-            header.column.resetSize()
+            event.stopPropagation();
+            header.column.resetSize();
           }}
           onMouseDown={(event) => {
-            event.stopPropagation()
-            header.getResizeHandler()(event)
+            event.stopPropagation();
+            header.getResizeHandler()(event);
           }}
           onTouchStart={(event) => {
-            event.stopPropagation()
-            header.getResizeHandler()(event)
+            event.stopPropagation();
+            header.getResizeHandler()(event);
           }}
           type="button"
         />
       ) : null}
     </th>
-  )
+  );
 }
 
 function DataTableBody({ children }: DataTableBodyProps) {
-  const { table } = useDataTableContext()
+  const { table } = useDataTableContext();
 
   return (
     <tbody data-slot="data-table-body">
       {children ?? table.getRowModel().rows.map((row) => <DataTableRow key={row.id} row={row} />)}
     </tbody>
-  )
+  );
 }
 
 function DataTableRow<TData extends RowData>({ children, row }: DataTableRowProps<TData>) {
   const { activeRowId, onColumnActivate, onRowActivate, onRowContextMenu } =
-    useDataTableContext<TData>()
-  const isActive = activeRowId === row.id
-  const isSelected = row.getIsSelected()
+    useDataTableContext<TData>();
+  const isActive = activeRowId === row.id;
+  const isSelected = row.getIsSelected();
 
   const handleClick = (event: MouseEvent<HTMLTableRowElement>) => {
     if (isInteractiveTarget(event.target) === true) {
-      return
+      return;
     }
 
-    onColumnActivate?.(null)
-    onRowActivate?.(row.id)
-  }
+    onColumnActivate?.(null);
+    onRowActivate?.(row.id);
+  };
 
   const handleContextMenu = (event: MouseEvent<HTMLTableRowElement>) => {
     if (onRowContextMenu === undefined || event.defaultPrevented === true) {
-      return
+      return;
     }
 
-    event.preventDefault()
-    onRowContextMenu(row.id, event)
-  }
+    event.preventDefault();
+    onRowContextMenu(row.id, event);
+  };
 
   return (
     <tr
       {...stylex.props(
         dataTableStyles.row,
         isSelected === true && dataTableStyles.rowSelected,
+        isActive === true && dataTableStyles.rowActive,
       )}
       aria-selected={isSelected}
-      data-active={isActive === true ? '' : undefined}
-      data-selected={isSelected === true ? '' : undefined}
+      data-active={isActive === true ? "" : undefined}
+      data-selected={isSelected === true ? "" : undefined}
       data-slot="data-table-row"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
     >
       {children ?? row.getVisibleCells().map((cell) => <DataTableCell key={cell.id} cell={cell} />)}
     </tr>
-  )
+  );
 }
 
 function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellProps<TData>) {
@@ -616,18 +647,20 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
     getColumnReorderIndex,
     onCellActivate,
     onCellContextMenu,
+    onCellOpen,
     onColumnActivate,
-  } = useDataTableContext<TData>()
-  const target = { rowId: cell.row.id, columnId: cell.column.id }
-  const isColumnActive = activeCell === null && activeColumnId === target.columnId
-  const isRowActive = activeRowId === target.rowId
-  const isSelected = cell.row.getIsSelected()
-  const isActive =
-    activeCell?.rowId === target.rowId && activeCell.columnId === target.columnId
-  const columnReorderIndex = getColumnReorderIndex(target.columnId)
-  const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0
+    selectedColumnsByRow,
+  } = useDataTableContext<TData>();
+  const target = { rowId: cell.row.id, columnId: cell.column.id };
+  const isColumnActive = activeCell === null && activeColumnId === target.columnId;
+  const isRowActive = activeRowId === target.rowId;
+  const isSelected = cell.row.getIsSelected();
+  const isCellSelected = selectedColumnsByRow.get(target.rowId)?.has(target.columnId) === true;
+  const isActive = activeCell?.rowId === target.rowId && activeCell.columnId === target.columnId;
+  const columnReorderIndex = getColumnReorderIndex(target.columnId);
+  const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0;
   const sortable = useSortable({
-    accept: 'column-cell',
+    accept: "column-cell",
     id: `${target.rowId}:${target.columnId}`,
     index: Math.max(0, columnReorderIndex),
     group: `data-table-row:${target.rowId}`,
@@ -635,59 +668,87 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
       draggable: true,
       droppable: columnReorderable === false,
     },
-    type: 'column-cell',
-  })
+    type: "column-cell",
+  });
 
   const handleClick = (event: MouseEvent<HTMLTableCellElement>) => {
+    if (event.detail > 1) {
+      event.stopPropagation();
+      return;
+    }
+
     if (activateSelectionControlFromCell(event) === true) {
-      return
+      return;
     }
 
     if (isInteractiveTarget(event.target) === true) {
-      return
+      return;
     }
 
-    event.stopPropagation()
-    event.currentTarget.focus()
-    onColumnActivate?.(null)
-    onCellActivate?.(target)
-  }
+    event.stopPropagation();
+    event.currentTarget.focus();
+    onColumnActivate?.(null);
+    const selectionMode: DataTableCellSelectionMode =
+      event.metaKey === true || event.ctrlKey === true
+        ? "additive"
+        : event.shiftKey === true
+          ? "range"
+          : "replace";
+    onCellActivate?.(target, selectionMode);
+  };
 
   const handleContextMenu = (event: MouseEvent<HTMLTableCellElement>) => {
     if (onCellContextMenu === undefined) {
-      return
+      return;
     }
 
-    event.preventDefault()
-    event.stopPropagation()
-    onCellContextMenu(target, event)
-  }
+    event.preventDefault();
+    event.stopPropagation();
+    onCellContextMenu(target, event);
+  };
+
+  const handleDoubleClick = (event: MouseEvent<HTMLTableCellElement>) => {
+    if (
+      hasSelectionControl(event.currentTarget) === true ||
+      isInteractiveTarget(event.target) === true
+    ) {
+      event.stopPropagation();
+      return;
+    }
+
+    event.stopPropagation();
+    event.currentTarget.focus();
+    onColumnActivate?.(null);
+    onCellOpen?.(target);
+  };
 
   return (
     <td
-      ref={sortable.ref}
+      ref={sortable.targetRef}
       {...stylex.props(
         dataTableStyles.cell,
-        density === 'compact' && dataTableStyles.compactCell,
+        density === "compact" && dataTableStyles.compactCell,
         isColumnActive === true && dataTableStyles.cellColumnActive,
         isSelected === true && dataTableStyles.cellSelected,
-        isRowActive === true && dataTableStyles.cellRowActive,
+        isCellSelected === true && dataTableStyles.cellSelection,
         isActive === true && dataTableStyles.cellActive,
       )}
-      data-active={isActive === true ? '' : undefined}
+      data-active={isActive === true ? "" : undefined}
+      data-cell-selected={isCellSelected === true ? "" : undefined}
       data-column-id={target.columnId}
-      data-column-active={isColumnActive === true ? '' : undefined}
-      data-row-active={isRowActive === true ? '' : undefined}
-      data-selected={isSelected === true ? '' : undefined}
+      data-column-active={isColumnActive === true ? "" : undefined}
+      data-row-active={isRowActive === true ? "" : undefined}
+      data-selected={isSelected === true ? "" : undefined}
       data-slot="data-table-cell"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
+      onDoubleClick={handleDoubleClick}
       style={{ width: cell.column.getSize() }}
       tabIndex={-1}
     >
       {children ?? flexRender(cell.column.columnDef.cell, cell.getContext())}
     </td>
-  )
+  );
 }
 
 function DataTableExpandedRow<TData extends RowData>({
@@ -704,11 +765,11 @@ function DataTableExpandedRow<TData extends RowData>({
         {children}
       </td>
     </tr>
-  )
+  );
 }
 
 function DataTableEmpty({ children }: DataTableMessageProps) {
-  const { table } = useDataTableContext()
+  const { table } = useDataTableContext();
 
   return (
     <tbody data-slot="data-table-empty">
@@ -718,11 +779,11 @@ function DataTableEmpty({ children }: DataTableMessageProps) {
         </td>
       </tr>
     </tbody>
-  )
+  );
 }
 
 function DataTableLoading({ children }: DataTableMessageProps) {
-  const { table } = useDataTableContext()
+  const { table } = useDataTableContext();
 
   return (
     <tbody aria-busy="true" data-slot="data-table-loading">
@@ -732,7 +793,7 @@ function DataTableLoading({ children }: DataTableMessageProps) {
         </td>
       </tr>
     </tbody>
-  )
+  );
 }
 
 function DataTableFooter({ children }: DataTableFooterProps) {
@@ -740,7 +801,7 @@ function DataTableFooter({ children }: DataTableFooterProps) {
     <div {...stylex.props(dataTableStyles.footer)} data-slot="data-table-footer">
       {children}
     </div>
-  )
+  );
 }
 
 export const DataTable = Object.assign(DataTableRoot, {
@@ -758,4 +819,4 @@ export const DataTable = Object.assign(DataTableRoot, {
   Row: DataTableRow,
   Table: DataTableTable,
   Viewport: DataTableViewport,
-})
+});

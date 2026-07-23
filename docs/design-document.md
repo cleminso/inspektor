@@ -555,9 +555,14 @@ UI representation:
 
 #### Data table
 
+Detailed row selection, cell selection, side-pane, column-selection, and bulk-edit behavior lives in the focused
+[Table Explorer selection and pane behavior specification](./tableExplorerBehaviors.md). This document retains the product and
+architecture summary; the focused specification owns interaction scenarios and unresolved behavior decisions.
+
 The data table is the core product surface of the Data Explorer. It is read-first and record-oriented. `DataTable` is the
-consistent name for the reusable design-system renderer and table surface. The project reserves `DataGrid` for a possible
-spreadsheet-like component with range selection, matrix copy and paste, and complete keyboard cell navigation.
+consistent name for the reusable design-system renderer and table surface. `DataGrid` names the spreadsheet behavior layer for
+opening complete multi-cell selections, column operations, matrix copy and paste, bulk cell editing, and complete keyboard cell
+navigation.
 
 Most Data Explorer actions converge in the data table. It brings row reading, filtering, selection, relation navigation,
 schema context, and safe edits into one coherent surface.
@@ -598,32 +603,57 @@ v1 uses page-windowed table browsing. Virtualization can still render the curren
 Interaction state keeps these concepts separate:
 
 - the active column is the transient column inspection target
-- the active cell is the row and column intersection shown in the cell inspector
+- the focused cell is the row and column intersection receiving the strongest cell focus treatment
+- selected cells are an explicit cell operation set that can span rows and columns
 - selected rows are the checkbox-controlled, page-local bulk operation set
+- the focused row is the selected row represented by the row side pane
 - bookmarked rows are persistent developer reference points
 
-The side pane uses an explicit state model:
+Selection and side-pane presentation are independent. A cell can be focused without opening the pane, and a multi-cell selection
+can be assembled before the user chooses `Open selection`. The side pane uses an explicit presentation model:
 
 - `closed`: no side pane
 - `insert`: the schema-driven insert form
-- `cell`: one row id and column id rendered by a schema-aware cell inspector
-- `selection`: checked row ids and an active selection index rendered by the complete-row editor
+- `rows`: checked row ids and one focused row rendered by the complete-row editor
+- `cells`: one or more row-id and column-id targets rendered by schema-aware cell components grouped by column
 
-Clicking a cell opens the cell inspector without changing checkbox selection. The inspector dispatches from schema metadata:
-structured values can use formatted code or tree views, relations can show their target, dates can show formatted and raw
-values, binary values can show metadata and download actions, and scalar values can expose their exact value and type. Clicking
-a checkbox opens the existing complete-row editor for the checked row set. Previous and next controls navigate checked rows,
-while edit actions remain scoped to the active row unless explicitly labelled as bulk actions. Insert remains a separate pane
-mode. Pressing Escape clears active cell focus and closes the side pane unless an open nested control consumes Escape first.
+Single-clicking a cell focuses it without opening or changing the pane. Double-clicking opens that cell in the cell pane;
+double-clicking the same cell again closes the pane and clears that cell's selection and focus.
+Command/Control-click builds an additive multi-cell selection across rows and columns, while Shift-click selects the rectangular
+range between the anchor and target. A context-menu `Open selection` action
+opens that selection in column-grouped pane sections. Cell components dispatch from schema metadata: structured values can use formatted code or tree views,
+relations can show their target, dates can show formatted and raw values, binary values can show metadata and download actions,
+and scalar values can expose their exact value and type.
 
-An active cell gives its row the blue inspection background, but only the cell receives the blue focus border. A checked row
-uses the selected-row background without an additional row border. The complete checkbox cell is the checkbox hit area: pressing
-empty space inside it toggles selection and opens the complete-row editor rather than activating the cell inspector.
+The foundation reuses the existing schema-derived field rendering and type components in an inspection-only cell pane. Redesigning
+individual cell-type presentations and adding cell mutation, review, confirmation, or save behavior are outside that foundation.
 
-Clicking a column header activates and highlights that column and its visible cells. Clicking the active header again,
-pressing Escape, clicking a cell, or pressing elsewhere in the interface clears the active column. Focus remains visible
-independently of color. Active column, active cell, checkbox selection, dirty state, validation state, and live-update
-highlights use distinct semantic states so one highlight does not imply several meanings.
+Clicking checkboxes individually builds the checked-row set. Shift-clicking another checkbox selects the visible range from the
+checkbox anchor. The checkbox opens the complete-row editor for the checked-row set. Previous and next controls navigate checked
+rows in active query order, while edit actions remain scoped to the focused row unless explicitly labelled as bulk actions.
+Insert remains a separate pane mode. Unless an open nested control consumes Escape first, Escape closes an open pane while
+preserving its table selection. With no pane open, Escape clears cell selection, cell focus, and column focus without unchecking
+rows.
+
+Closing a pane preserves its table selection. Filter, sort, page, table, or schema changes clear row and cell selections. Column
+reorder preserves selected cells, hiding a selected column removes its cells, and loading more rows does not extend an existing
+selection.
+
+Focusing a cell in the focused checked row keeps the row pane open and focuses that field's first available control. Cells in
+other rows do not silently retarget the row editor. Double-clicking a cell or explicitly opening a cell selection changes the pane
+presentation. Numeric row and column coordinates can support developer orientation, but row IDs and column IDs remain the
+selection identity.
+
+A focused cell receives the selected-cell background and blue focus border without changing its whole row background. A checked
+row uses the selected-row background without an additional row border. The focused checked row adds a distinct blue focus edge.
+The complete checkbox cell is the checkbox hit area: pressing empty space inside it toggles selection and opens the complete-row
+editor rather than focusing a data cell.
+
+Clicking a column header clears cell focus and selection, closes an open cell pane, then activates and highlights that column and
+its visible cells. Clicking the active header again, pressing Escape, clicking a cell, or pressing elsewhere in the interface
+clears the active column. Focus remains visible independently of color. Active column, active cell, checkbox selection, dirty
+state, validation state, and live-update highlights use distinct semantic states so one highlight does not imply several
+meanings.
 
 Editing happens in the side pane, not inline in the v1 data table.
 
@@ -644,8 +674,13 @@ Cell context menu:
 - copy row
 - filter by value
 - edit row
+- open selected cells
 
 `Filter by value` completes the FilterBar with the clicked cell value. The default operator is `eq`, and the user can still change the operator before or after applying the filter.
+
+Column selection is an explicit header context-menu action rather than a normal header click. `Open column selection` must state
+whether it targets visible cells or every row matching the active query. Visible cells form a table selection; every matching row
+is a separate query-backed bulk operation.
 
 Column-header, row, and cell context menus use the design-system `ContextMenu` component. `DataTable` identifies the interaction
 target; `apps/web` derives available actions from the Jazz schema, row state, and navigation context.
@@ -742,9 +777,11 @@ Side-panel row focus is row-id based and can survive page changes. Checkbox sele
 
 #### Selection and row inspection
 
-Activating a row or cell opens a side panel that gives the developer a focused place for reading and editing rows. Checkbox
-selection remains an independent bulk-operation set. The side panel shows full field values, schema hints, relation targets,
-copy actions, staged changes, validation errors, and save/delete actions.
+Clicking a row checkbox opens a side pane that gives the developer a focused place for reading and editing checked rows. Clicking
+additional checkboxes extends that row set, while one checked row remains focused and is represented as a position such as
+`2 / 4`. Single-clicking a data cell focuses it without opening the pane. Double-clicking a cell opens its schema-derived cell
+presentation. Explicit context actions open multi-cell selections. The focused behavior specification defines the detailed
+transitions and visual precedence.
 
 The side panel answers:
 
@@ -758,7 +795,8 @@ The side panel answers:
 The active row remains stable when possible. Filtering, sorting, or refreshing data does not make the user lose context
 without a clear reason.
 
-Opening the panel from a cell should focus the matching field.
+Opening the cell pane preserves the focused cell. Opening the row pane renders all schema fields, including fields hidden from the
+table, and focuses the active row rather than treating every checked row as one implicit bulk mutation.
 
 UI representation:
 
@@ -862,8 +900,9 @@ As a developer I want to write inside tables for debugging and test setup.
 
 v1 uses side-panel editing only.
 
-- row click opens the side panel
-- cell click opens the side panel and focuses the matching field
+- row checkbox selection opens the complete-row side panel
+- cell double-click opens the schema-derived cell side panel
+- selected-cell context actions can open an explicit multi-column cell selection grouped by column
 - edits are staged before save
 - insert uses the same side-panel form pattern
 - unsupported field types are visible but read-only
@@ -1279,7 +1318,7 @@ UI representation:
 1. Developer connects a Jazz app, validates credentials, and opens the intended branch and schema hash.
 2. Developer reopens a saved local connection and understands whether the server/runtime is reachable.
 3. Developer opens a table, filters rows, distinguishes empty from filtered-empty, and inspects one record.
-4. Developer clicks a cell, opens the side panel, and focuses the matching field.
+4. Developer single-clicks a cell to focus it, then double-clicks or uses an explicit context action to open its side-pane presentation.
 5. Developer edits or inserts a row, sees staged changes, and gets a clear rejection if the runtime/server denies the mutation.
 6. Developer follows a relation cell to inspect linked data in another table tab without losing the original table context.
 7. Developer bookmarks rows in a large table, then jumps back to them after changing page or filter context.

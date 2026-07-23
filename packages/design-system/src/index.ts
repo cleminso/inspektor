@@ -21,6 +21,7 @@ export type {
   DataTableBodyProps,
   DataTableCellContextMenuHandler,
   DataTableCellProps,
+  DataTableCellSelectionMode,
   DataTableCellTarget,
   DataTableContentProps,
   DataTableDensity,

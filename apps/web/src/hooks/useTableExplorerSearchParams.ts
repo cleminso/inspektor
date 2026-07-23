@@ -37,7 +37,11 @@ interface UpdateSearchOptions {
 /** Parsed table explorer URL state plus setters that write back to route search params. */
 export interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
   setFilters: (filters: TableFilterClause[]) => Promise<void>;
-  setRowEditor: (mode: DetailPaneMode | null, rowId?: TableRowId | null, options?: UpdateSearchOptions) => Promise<void>;
+  setRowEditor: (
+    mode: DetailPaneMode | null,
+    rowId?: TableRowId | null,
+    options?: UpdateSearchOptions,
+  ) => Promise<void>;
   setSorting: (sortColumn: string, sortDirection: TableSortDirection) => Promise<void>;
   setView: (view: TableExplorerView) => Promise<void>;
 }
@@ -94,7 +98,10 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     };
   }, [search.dir, search.filters, search.mode, search.rowId, search.sort, search.view]);
 
-  const createNextSearch = (baseSearch: SearchValues, updates: Partial<SearchValues>): SearchValues => {
+  const createNextSearch = (
+    baseSearch: SearchValues,
+    updates: Partial<SearchValues>,
+  ): SearchValues => {
     const nextSearch: SearchValues = {
       ...baseSearch,
       ...updates,
@@ -133,7 +140,10 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     return nextSearch;
   };
 
-  const updateSearch = async (updates: Partial<SearchValues>, options?: UpdateSearchOptions): Promise<void> => {
+  const updateSearch = async (
+    updates: Partial<SearchValues>,
+    options?: UpdateSearchOptions,
+  ): Promise<void> => {
     await navigate({
       replace: options?.replace ?? true,
       search: (currentSearch) => createNextSearch(currentSearch as SearchValues, updates),
@@ -146,7 +156,11 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
       await updateSearch(view === "schema" ? { mode: null, rowId: null, view } : { view });
     },
     setFilters: async (filters) => {
-      await updateSearch({ filters: serializeFiltersToSearchParam(filters) ?? undefined });
+      await updateSearch({
+        filters: serializeFiltersToSearchParam(filters) ?? undefined,
+        mode: null,
+        rowId: null,
+      });
     },
     setRowEditor: async (mode, rowId = null, options) => {
       if (mode === "edit") {
@@ -162,7 +176,7 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
       await updateSearch({ mode: null, rowId: null }, options);
     },
     setSorting: async (sortColumn, sortDirection) => {
-      await updateSearch({ sort: sortColumn, dir: sortDirection });
+      await updateSearch({ sort: sortColumn, dir: sortDirection, mode: null, rowId: null });
     },
   };
 }

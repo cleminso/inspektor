@@ -82,8 +82,15 @@ describe("useTableExplorerSearchParams", () => {
       await result.current.setFilters([{ column: "id", operator: "eq", value: "1" }]);
     });
 
-    const nextSearch = captureSearchUpdater()({ tab: "new-view", custom: "kept" });
+    const nextSearch = captureSearchUpdater()({
+      tab: "new-view",
+      custom: "kept",
+      mode: "edit",
+      rowId: "row-1",
+    });
 
     expect(nextSearch).toMatchObject({ tab: "new-view", custom: "kept" });
+    expect(nextSearch.mode).toBeUndefined();
+    expect(nextSearch.rowId).toBeUndefined();
   });
 });

@@ -7,7 +7,13 @@ import { DataTable } from "@inspector/ds";
 
 import { buildDataTableColumns } from "@/components/table-explorer/data/buildDataTableColumns";
 
-function TestTable({ onSortingChange }: { onSortingChange: () => void }): React.ReactElement {
+function TestTable({
+  onRowSelectionRequest,
+  onSortingChange,
+}: {
+  onRowSelectionRequest?: (request: { checked: boolean; rowId: string; shiftKey: boolean }) => void;
+  onSortingChange: () => void;
+}): React.ReactElement {
   const table = useReactTable({
     columns: buildDataTableColumns({
       columns: [
@@ -19,6 +25,7 @@ function TestTable({ onSortingChange }: { onSortingChange: () => void }): React.
           label: "Name",
         },
       ],
+      onRowSelectionRequest,
     }),
     data: [{ id: "row-1", name: "Ada" } as DynamicTableRow],
     getCoreRowModel: getCoreRowModel(),
@@ -78,5 +85,24 @@ describe("buildDataTableColumns", () => {
 
     expect(columns.find((column) => column.id === "enabled")?.size).toBe(96);
     expect(columns.find((column) => column.id === "metadata")?.size).toBe(320);
+  });
+
+  it("reports the Shift modifier when a row checkbox requests selection", () => {
+    const onRowSelectionRequest = vi.fn();
+    render(
+      <TestTable
+        onRowSelectionRequest={onRowSelectionRequest}
+        onSortingChange={() => undefined}
+      />,
+    );
+
+    const checkboxCell = screen.getByRole("checkbox", { name: "Select row row-1" }).closest("td");
+    fireEvent.click(checkboxCell as HTMLTableCellElement, { shiftKey: true });
+
+    expect(onRowSelectionRequest).toHaveBeenCalledWith({
+      checked: true,
+      rowId: "row-1",
+      shiftKey: true,
+    });
   });
 });

@@ -1198,7 +1198,7 @@
       "description": "The tab views and their associated panels.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 88
+        "line": 93
       }
     },
     {
@@ -1208,7 +1208,7 @@
       "description": "The active view value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 90
+        "line": 95
       }
     },
     {
@@ -1218,7 +1218,7 @@
       "description": "The initially active view value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 92
+        "line": 97
       }
     },
     {
@@ -1228,7 +1228,7 @@
       "description": "Called when the active view changes.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 94
+        "line": 99
       }
     }
   ],
@@ -1240,7 +1240,7 @@
       "description": "The tab view items.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 102
+        "line": 107
       }
     },
     {
@@ -1250,7 +1250,7 @@
       "description": "An accessible name for the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 104
+        "line": 109
       }
     },
     {
@@ -1260,7 +1260,7 @@
       "description": "Identifies the element that labels the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 106
+        "line": 111
       }
     },
     {
@@ -1271,7 +1271,7 @@
       "description": "Activates a view as arrow-key navigation moves focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 108
+        "line": 113
       }
     },
     {
@@ -1282,7 +1282,7 @@
       "description": "Loops keyboard focus between the first and last views.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 110
+        "line": 115
       }
     },
     {
@@ -1292,7 +1292,7 @@
       "description": "The tab values in their controlled visual order.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 115
+        "line": 120
       }
     },
     {
@@ -1302,7 +1302,7 @@
       "description": "Called with the complete ordered value list after a tab is dragged.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 117
+        "line": 122
       }
     }
   ],
@@ -1314,7 +1314,7 @@
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 130
+        "line": 135
       }
     },
     {
@@ -1324,7 +1324,7 @@
       "description": "The visible view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 132
+        "line": 137
       }
     },
     {
@@ -1334,7 +1334,7 @@
       "description": "Supplementary context shown in a tooltip even when the view name fits.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 134
+        "line": 139
       }
     },
     {
@@ -1344,7 +1344,7 @@
       "description": "Renders a decorative 16px icon before the view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 136
+        "line": 141
       }
     },
     {
@@ -1355,7 +1355,7 @@
       "description": "Disables selection and closing for this view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 138
+        "line": 143
       }
     },
     {
@@ -1365,7 +1365,7 @@
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 140
+        "line": 145
       }
     },
     {
@@ -1376,7 +1376,7 @@
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 142
+        "line": 147
       }
     }
   ],
@@ -1388,7 +1388,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 147
+        "line": 152
       }
     },
     {
@@ -1398,7 +1398,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 149
+        "line": 154
       }
     },
     {
@@ -1409,7 +1409,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 151
+        "line": 156
       }
     }
   ],
@@ -1817,7 +1817,7 @@
       "description": "Active row and column intersection.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 73
+        "line": 64
       }
     },
     {
@@ -1828,7 +1828,7 @@
       "description": "Column highlighted across the header and visible rows.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 75
+        "line": 66
       }
     },
     {
@@ -1839,7 +1839,7 @@
       "description": "Row currently targeted for inspection.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 77
+        "line": 68
       }
     },
     {
@@ -1849,7 +1849,7 @@
       "description": "Data-table regions and companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 79
+        "line": 70
       }
     },
     {
@@ -1860,17 +1860,17 @@
       "description": "Controls table row and cell spacing.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 81
+        "line": 72
       }
     },
     {
       "name": "onCellActivate",
-      "type": "(target: DataTableCellTarget) => void",
+      "type": "(target: DataTableCellTarget, selectionMode: DataTableCellSelectionMode) => void",
       "required": false,
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 83
+        "line": 74
       }
     },
     {
@@ -1880,7 +1880,17 @@
       "description": "Runs when a cell context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 85
+        "line": 76
+      }
+    },
+    {
+      "name": "onCellOpen",
+      "type": "(target: DataTableCellTarget) => void",
+      "required": false,
+      "description": "Runs when a non-interactive cell is explicitly opened.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 78
       }
     },
     {
@@ -1890,7 +1900,7 @@
       "description": "Runs when a column header is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 87
+        "line": 80
       }
     },
     {
@@ -1900,7 +1910,7 @@
       "description": "Runs when a column-header context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 89
+        "line": 82
       }
     },
     {
@@ -1910,7 +1920,7 @@
       "description": "Runs when a non-interactive row is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 91
+        "line": 84
       }
     },
     {
@@ -1920,7 +1930,7 @@
       "description": "Runs when a row context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 93
+        "line": 86
       }
     },
     {
@@ -1930,7 +1940,18 @@
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 95
+        "line": 88
+      }
+    },
+    {
+      "name": "selectedCells",
+      "type": "readonly DataTableCellTarget[]",
+      "required": false,
+      "defaultValue": "emptySelectedCells",
+      "description": "Cells included in the current cell-selection set.",
+      "source": {
+        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "line": 90
       }
     },
     {
@@ -1940,7 +1961,7 @@
       "description": "Column ids in their controlled draggable order. Omit fixed columns from this list.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 100
+        "line": 95
       }
     },
     {
@@ -1950,7 +1971,7 @@
       "description": "Runs with the complete draggable column order after a header is moved.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 102
+        "line": 97
       }
     }
   ],
@@ -1962,7 +1983,7 @@
       "description": "Table or custom viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 115
+        "line": 110
       }
     }
   ],
@@ -1974,7 +1995,7 @@
       "description": "Accessible name for the table.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 120
+        "line": 115
       }
     },
     {
@@ -1984,7 +2005,7 @@
       "description": "Header and body composition.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 122
+        "line": 117
       }
     }
   ],
@@ -1997,7 +2018,7 @@
       "description": "Content shown when the table has no rows.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 127
+        "line": 122
       }
     },
     {
@@ -2008,7 +2029,7 @@
       "description": "Whether loading content replaces the current row model.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 129
+        "line": 124
       }
     },
     {
@@ -2019,7 +2040,7 @@
       "description": "Content shown while rows are loading.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 131
+        "line": 126
       }
     }
   ],
@@ -2031,7 +2052,7 @@
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 136
+        "line": 131
       }
     }
   ],
@@ -2043,7 +2064,7 @@
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 141
+        "line": 136
       }
     },
     {
@@ -2053,7 +2074,7 @@
       "description": "TanStack header group represented by this row.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 143
+        "line": 138
       }
     }
   ],
@@ -2065,7 +2086,7 @@
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 148
+        "line": 143
       }
     },
     {
@@ -2075,7 +2096,7 @@
       "description": "TanStack header represented by this cell.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 150
+        "line": 145
       }
     }
   ],
@@ -2087,7 +2108,7 @@
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 155
+        "line": 150
       }
     }
   ],
@@ -2099,7 +2120,7 @@
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 160
+        "line": 155
       }
     },
     {
@@ -2109,7 +2130,7 @@
       "description": "TanStack row represented by this table row.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 162
+        "line": 157
       }
     }
   ],
@@ -2121,7 +2142,7 @@
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 167
+        "line": 162
       }
     },
     {
@@ -2131,7 +2152,7 @@
       "description": "TanStack cell represented by this table cell.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 169
+        "line": 164
       }
     }
   ],
@@ -2143,7 +2164,7 @@
       "description": "Expanded content associated with the row.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 174
+        "line": 169
       }
     },
     {
@@ -2153,7 +2174,7 @@
       "description": "TanStack row represented by this expanded region.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 176
+        "line": 171
       }
     }
   ],
@@ -2165,7 +2186,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 181
+        "line": 176
       }
     }
   ],
@@ -2177,7 +2198,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 181
+        "line": 176
       }
     }
   ],
@@ -2189,7 +2210,7 @@
       "description": "Status and table companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 186
+        "line": 181
       }
     }
   ],

@@ -6,11 +6,13 @@ import { borderRadii, spacing } from '../../tokens/value.stylex'
 
 export const resizablePanelStyles = stylex.create({
   group: {
+    outlineStyle: 'none',
     minHeight: 0,
     minWidth: 0,
   },
   panel: {
     overflow: 'hidden',
+    outlineStyle: 'none',
     minHeight: 0,
     minWidth: 0,
   },

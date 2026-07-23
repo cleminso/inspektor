@@ -11,6 +11,7 @@ import {
 } from "@inspector/ds";
 
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
+import { CellInspectorSidePanel } from "@/components/table-explorer/data/cellInspectorSidePanel";
 import { DataTableColumnVisibility } from "@/components/table-explorer/data/dataTableColumnVisibility";
 import { EditRowForm } from "@/components/table-explorer/data/editRowForm";
 import { InsertRowForm } from "@/components/table-explorer/data/insertRowForm";
@@ -30,7 +31,11 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
   const handleEscape = useEffectEvent(state.handleEscape);
 
   useEffect(() => {
-    if (state.rowEditor.isOpen === false) {
+    if (
+      state.detailPaneMode === "closed" &&
+      state.activeCell === null &&
+      state.activeColumnId === null
+    ) {
       return;
     }
 
@@ -44,7 +49,7 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [state.rowEditor.isOpen]);
+  }, [state.activeCell, state.activeColumnId, state.detailPaneMode]);
 
   return (
     <ResizablePanelGroup orientation="horizontal">
@@ -61,7 +66,7 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
                 variant="primary"
                 size="m"
                 onClick={() => {
-                  if (state.rowEditor.isOpen === true && state.rowEditor.mode === "insert") {
+                  if (state.detailPaneMode === "insert") {
                     state.handleRowEditorOpenChange(false);
                   } else {
                     state.rowEditor.openInsert();
@@ -97,10 +102,11 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
               activeCell={state.activeCell}
               activeColumnId={state.activeColumnId}
               activeRowId={state.rowEditor.activeRowId}
+              selectedCells={state.selectedCells}
               onCellActivate={state.handleCellActivate}
+              onCellOpen={state.handleCellOpen}
               onColumnActivate={state.handleColumnActivate}
               onColumnOrderChange={state.setColumnOrder}
-              onRowActivate={state.handleRowActivate}
             >
               <DataTable.Viewport>
                 <DataTable.Table aria-label={`${tableName} rows`}>
@@ -135,42 +141,54 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
           </Box>
         </div>
       </ResizablePanel>
-      {state.rowEditor.isOpen === true ? (
+      {state.detailPaneMode !== "closed" ? (
         <>
           <ResizableHandle />
           <ResizablePanel defaultSize={420} minSize={320} maxSize={720}>
-            <RowEditorSidePanel
-              mode={state.rowEditor.mode === "insert" ? "insert" : "edit"}
-              editedRowIds={state.rowEditor.editedRowIds}
-              activeRowIndex={state.rowEditor.activeRowIndex}
-              onNavigatePrevious={state.rowEditor.goToPreviousRow}
-              onNavigateNext={state.rowEditor.goToNextRow}
-            >
-              {state.rowEditor.mode === "insert" ? (
-                <InsertRowForm
-                  key={`${tableName}:insert`}
-                  rowValues={state.rowValues ?? {}}
-                  schemaColumns={state.schemaColumns}
-                  onCancel={() => {
-                    state.handleRowEditorOpenChange(false);
-                  }}
-                  onSave={state.handleInsertSave}
-                />
-              ) : (
-                <EditRowForm
-                  key={`${tableName}:${state.rowEditor.activeRowId ?? "none"}`}
-                  rowValues={state.rowValues}
-                  schemaColumns={state.schemaColumns}
-                  targetRowId={state.rowEditor.activeRowId}
-                  focusedFieldName={state.activeCell?.columnId ?? null}
-                  onCancel={() => {
-                    state.handleRowEditorOpenChange(false);
-                  }}
-                  onDelete={state.handleDelete}
-                  onSave={state.handleEditSave}
-                />
-              )}
-            </RowEditorSidePanel>
+            {state.detailPaneMode === "cells" ? (
+              <CellInspectorSidePanel
+                columnPosition={state.cellInspector.columnPosition}
+                rowPosition={state.cellInspector.rowPosition}
+                rowValues={state.cellInspector.rowValues}
+                schemaColumns={state.schemaColumns}
+                target={state.cellInspector.target}
+                onClose={() => {
+                  state.handleRowEditorOpenChange(false);
+                }}
+              />
+            ) : (
+              <RowEditorSidePanel
+                mode={state.detailPaneMode === "insert" ? "insert" : "edit"}
+                editedRowIds={state.rowEditor.editedRowIds}
+                activeRowIndex={state.rowEditor.activeRowIndex}
+                onNavigatePrevious={state.rowEditor.goToPreviousRow}
+                onNavigateNext={state.rowEditor.goToNextRow}
+              >
+                {state.detailPaneMode === "insert" ? (
+                  <InsertRowForm
+                    key={`${tableName}:insert`}
+                    rowValues={state.rowValues ?? {}}
+                    schemaColumns={state.schemaColumns}
+                    onCancel={() => {
+                      state.handleRowEditorOpenChange(false);
+                    }}
+                    onSave={state.handleInsertSave}
+                  />
+                ) : (
+                  <EditRowForm
+                    key={`${tableName}:${state.rowEditor.activeRowId ?? "none"}`}
+                    rowValues={state.rowValues}
+                    schemaColumns={state.schemaColumns}
+                    targetRowId={state.rowEditor.activeRowId}
+                    onCancel={() => {
+                      state.handleRowEditorOpenChange(false);
+                    }}
+                    onDelete={state.handleDelete}
+                    onSave={state.handleEditSave}
+                  />
+                )}
+              </RowEditorSidePanel>
+            )}
           </ResizablePanel>
         </>
       ) : null}

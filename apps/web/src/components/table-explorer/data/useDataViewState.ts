@@ -1,15 +1,23 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { DataTableCellTarget } from "@inspector/ds";
+import type { DataTableCellSelectionMode, DataTableCellTarget } from "@inspector/ds";
 import type { Table } from "@tanstack/react-table";
 import type { ColumnDescriptor, DynamicTableRow } from "jazz-tools";
 import { useAll } from "jazz-tools/react";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
+import {
+  type CellSelectionState,
+  updateCellSelection,
+} from "@/components/table-explorer/data/cellSelection";
+import { focusRowEditorField } from "@/components/table-explorer/data/editRowForm";
 import { useDataTable } from "@/components/table-explorer/data/useDataTable";
+import {
+  getNearestSelectedRowId,
+  updateRowSelection,
+} from "@/components/table-explorer/data/rowSelection";
 import { useInspectorColumnVisibility } from "@/hooks/useInspectorColumnVisibility";
 import { useInspectorColumnOrder } from "@/hooks/useInspectorColumnOrder";
-import { useInspectorRowEditor } from "@/hooks/useInspectorRowEditor";
 import { useTableExplorerSearchParams } from "@/hooks/useTableExplorerSearchParams";
 import { useTableMutations } from "@/hooks/useTableMutations";
 import { useTableQuery } from "@/hooks/useTableQuery";
@@ -17,7 +25,7 @@ import { GenericQueryBuilder } from "@/lib/table-explorer/genericQueryBuilder";
 import { getFieldReadOnlyReason } from "@/lib/table-explorer/mutationParsing";
 import { getTableColumns } from "@/lib/table-explorer/tableSchema";
 import type { TableFilterClause } from "@/types/tableFilters";
-import type { InspectorRowEditorMode, TableRowId } from "@/types/tableExplorer";
+import type { TableRowId } from "@/types/tableExplorer";
 
 interface UseDataViewStateOptions {
   tableName: string;
@@ -29,9 +37,16 @@ interface DataViewRowEditorState {
   editedRowIds: TableRowId[];
   goToNextRow: () => void;
   goToPreviousRow: () => void;
-  isOpen: boolean;
-  mode: InspectorRowEditorMode;
   openInsert: () => void;
+}
+
+export type DataViewDetailPaneMode = "cells" | "closed" | "insert" | "rows";
+
+interface DataViewCellInspectorState {
+  columnPosition: number | null;
+  rowPosition: number | null;
+  rowValues: Record<string, unknown> | null;
+  target: DataTableCellTarget | null;
 }
 
 interface InsertRowSaveOptions {
@@ -42,6 +57,8 @@ interface UseDataViewStateResult {
   activeCell: DataTableCellTarget | null;
   activeColumnId: string | null;
   columnOrder: string[];
+  cellInspector: DataViewCellInspectorState;
+  detailPaneMode: DataViewDetailPaneMode;
   fetchMore: () => void;
   filters: TableFilterClause[];
   handleDelete: (() => Promise<void>) | undefined;
@@ -51,9 +68,12 @@ interface UseDataViewStateResult {
     values: Record<string, unknown>,
     options?: InsertRowSaveOptions,
   ) => Promise<void>;
-  handleCellActivate: (target: DataTableCellTarget) => void;
+  handleCellActivate: (
+    target: DataTableCellTarget,
+    selectionMode: DataTableCellSelectionMode,
+  ) => void;
+  handleCellOpen: (target: DataTableCellTarget) => void;
   handleColumnActivate: (columnId: string | null) => void;
-  handleRowActivate: (rowId: TableRowId) => void;
   handleRowEditorOpenChange: (open: boolean) => void;
   hasMore: boolean;
   isFetchingMore: boolean;
@@ -61,6 +81,7 @@ interface UseDataViewStateResult {
   rowEditor: DataViewRowEditorState;
   rowValues: Record<string, unknown> | null;
   schemaColumns: ColumnDescriptor[];
+  selectedCells: DataTableCellTarget[];
   setFilters: (filters: TableFilterClause[]) => Promise<void>;
   setColumnOrder: (columnIds: string[]) => void;
   table: Table<DynamicTableRow>;
@@ -80,6 +101,10 @@ function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record<string
   );
 }
 
+function createEmptyCellSelection(): CellSelectionState {
+  return { activeCell: null, anchorCell: null, selectedCells: [] };
+}
+
 export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDataViewStateResult {
   const { currentBranch, currentConnectionId, currentSchemaHash, runtime } = useInspector();
   const searchState = useTableExplorerSearchParams();
@@ -88,11 +113,16 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     () => getTableColumns(runtime.wasmSchema, tableName),
     [runtime.wasmSchema, tableName],
   );
-  const rowEditor = useInspectorRowEditor();
-  // Store only the focused column; the URL-owned active row derives the complete cell target so navigation cannot desynchronize them.
-  const [activeCellColumnId, setActiveCellColumnId] = useState<string | null>(null);
+  const editorMode = searchState.editorMode ?? "closed";
+  const activeRowId = searchState.editorMode === "edit" ? searchState.rowId : null;
+  const [cellSelection, setCellSelection] = useState<CellSelectionState>(createEmptyCellSelection);
+  const activeCell = cellSelection.activeCell;
+  const [cellPaneOpen, setCellPaneOpen] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-  const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>([]);
+  const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
+    activeRowId === null ? [] : [activeRowId],
+  );
+  const [rowSelectionAnchorId, setRowSelectionAnchorId] = useState<TableRowId | null>(null);
   const mutations = useTableMutations(tableName);
   const tableKey = `${currentConnectionId ?? "unknown"}:${currentBranch ?? "unknown"}:${currentSchemaHash ?? "unknown"}:${tableName}`;
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns]);
@@ -105,29 +135,37 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     columnIds,
   });
 
-  const editorMode = searchState.editorMode ?? "closed";
-  const activeRowId = searchState.editorMode === "edit" ? searchState.rowId : null;
-  const activeCell =
-    activeCellColumnId !== null && activeRowId !== null
-      ? { columnId: activeCellColumnId, rowId: activeRowId }
-      : null;
-  const editedRowIds = useMemo(() => {
+  const detailPaneMode: DataViewDetailPaneMode =
+    cellPaneOpen === true ? "cells" : editorMode === "edit" ? "rows" : editorMode;
+  const selectionScopeKey = useMemo(
+    () =>
+      JSON.stringify({
+        filters: searchState.filters,
+        sortColumn: searchState.sortColumn,
+        sortDirection: searchState.sortDirection,
+        tableKey,
+      }),
+    [searchState.filters, searchState.sortColumn, searchState.sortDirection, tableKey],
+  );
+  const selectionScopeKeyRef = useRef(selectionScopeKey);
+  const effectiveSelectedRowIds = useMemo(() => {
     if (activeRowId === null) {
-      return [];
+      return selectedRowIds;
     }
 
-    if (rowEditor.editedRowIds.includes(activeRowId) === true) {
-      return rowEditor.editedRowIds;
+    if (selectedRowIds.includes(activeRowId) === true) {
+      return selectedRowIds;
     }
 
     return [activeRowId];
-  }, [activeRowId, rowEditor.editedRowIds]);
+  }, [activeRowId, selectedRowIds]);
+  const editedRowIds = activeRowId === null ? [] : effectiveSelectedRowIds;
   const activeRowIndex = activeRowId === null ? 0 : Math.max(editedRowIds.indexOf(activeRowId), 0);
   const validRowIds = useMemo(() => query.rows.map((row) => String(row.id)), [query.rows]);
-  const visibleSelectedRowIds = useMemo(
-    () => selectedRowIds.filter((rowId) => validRowIds.includes(rowId) === true),
-    [selectedRowIds, validRowIds],
-  );
+  const visibleSelectedRowIds = useMemo(() => {
+    const validRowIdSet = new Set(validRowIds);
+    return effectiveSelectedRowIds.filter((rowId) => validRowIdSet.has(rowId) === true);
+  }, [effectiveSelectedRowIds, validRowIds]);
 
   const activeRowQueryBuilder = useMemo(() => {
     if (runtime.wasmSchema === null || activeRowId === null || searchState.editorMode !== "edit") {
@@ -150,17 +188,28 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     activeRowQueryOptions,
   );
 
-  const handleSelectedRowIdsChange = (nextSelectedRowIds: TableRowId[]) => {
+  const openRows = (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
     setSelectedRowIds(nextSelectedRowIds);
-    setActiveCellColumnId(null);
     setActiveColumnId(null);
+    setCellPaneOpen(false);
 
     if (nextSelectedRowIds.length === 0) {
-      rowEditor.close();
       void searchState.setRowEditor(null, null, { replace: false });
       return;
     }
 
+    const resolvedActiveRowId =
+      nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
+        ? nextActiveRowId
+        : nextSelectedRowIds[0];
+    if (resolvedActiveRowId === undefined) {
+      return;
+    }
+
+    void searchState.setRowEditor("edit", resolvedActiveRowId, { replace: false });
+  };
+
+  const handleSelectedRowIdsChange = (nextSelectedRowIds: TableRowId[]) => {
     const newlySelectedRowId = nextSelectedRowIds.find(
       (rowId) => selectedRowIds.includes(rowId) === false,
     );
@@ -168,22 +217,96 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
       newlySelectedRowId ??
       (activeRowId !== null && nextSelectedRowIds.includes(activeRowId) === true
         ? activeRowId
-        : nextSelectedRowIds[0]);
-    if (nextActiveRowId === undefined) {
+        : (nextSelectedRowIds[0] ?? null));
+
+    openRows(nextSelectedRowIds, nextActiveRowId);
+  };
+
+  const handleRowSelectionRequest = ({
+    checked,
+    rowId,
+    shiftKey,
+  }: {
+    checked: boolean;
+    rowId: string;
+    shiftKey: boolean;
+  }) => {
+    const nextSelection = updateRowSelection({
+      anchorRowId: rowSelectionAnchorId,
+      checked,
+      rowIds: validRowIds,
+      selectedRowIds: effectiveSelectedRowIds,
+      shiftKey,
+      targetRowId: rowId,
+    });
+    const nextActiveRowId =
+      checked === true
+        ? rowId
+        : activeRowId !== null &&
+            activeRowId !== rowId &&
+            nextSelection.selectedRowIds.includes(activeRowId) === true
+          ? activeRowId
+          : getNearestSelectedRowId(validRowIds, nextSelection.selectedRowIds, rowId);
+
+    setRowSelectionAnchorId(nextSelection.anchorRowId);
+    openRows(nextSelection.selectedRowIds, nextActiveRowId);
+  };
+
+  const resetSelection = useCallback(() => {
+    setSelectedRowIds([]);
+    setRowSelectionAnchorId(null);
+    setCellSelection(createEmptyCellSelection());
+    setActiveColumnId(null);
+    setCellPaneOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (selectionScopeKeyRef.current === selectionScopeKey) {
       return;
     }
 
-    const nextActiveRowIndex = nextSelectedRowIds.indexOf(nextActiveRowId);
-    rowEditor.openEdit(nextSelectedRowIds, nextActiveRowIndex);
-    void searchState.setRowEditor("edit", nextActiveRowId, { replace: false });
+    selectionScopeKeyRef.current = selectionScopeKey;
+    resetSelection();
+  }, [resetSelection, selectionScopeKey]);
+
+  const handleSortChange = (columnId: string, direction: "asc" | "desc") => {
+    selectionScopeKeyRef.current = JSON.stringify({
+      filters: searchState.filters,
+      sortColumn: columnId,
+      sortDirection: direction,
+      tableKey,
+    });
+    resetSelection();
+    void searchState.setSorting(columnId, direction);
   };
 
-  const activateRow = (rowId: TableRowId) => {
-    const navigationRowIds = selectedRowIds.includes(rowId) === true ? selectedRowIds : [rowId];
-    const activeIndex = Math.max(navigationRowIds.indexOf(rowId), 0);
+  const handleColumnVisibilityChange = (nextVisibility: Record<string, boolean>) => {
+    visibility.setColumnVisibility(nextVisibility);
+    if (cellSelection.selectedCells.some((cell) => nextVisibility[cell.columnId] === false)) {
+      setCellSelection((currentSelection) => {
+        const selectedCells = currentSelection.selectedCells.filter(
+          (cell) => nextVisibility[cell.columnId] !== false,
+        );
+        const activeCell =
+          currentSelection.activeCell !== null &&
+          nextVisibility[currentSelection.activeCell.columnId] !== false
+            ? currentSelection.activeCell
+            : (selectedCells.at(-1) ?? null);
+        const anchorCell =
+          currentSelection.anchorCell !== null &&
+          nextVisibility[currentSelection.anchorCell.columnId] !== false
+            ? currentSelection.anchorCell
+            : activeCell;
 
-    rowEditor.openEdit(navigationRowIds, activeIndex);
-    void searchState.setRowEditor("edit", rowId, { replace: false });
+        return { activeCell, anchorCell, selectedCells };
+      });
+    }
+    if (activeCell !== null && nextVisibility[activeCell.columnId] === false) {
+      setCellPaneOpen(false);
+    }
+    if (activeColumnId !== null && nextVisibility[activeColumnId] === false) {
+      setActiveColumnId(null);
+    }
   };
 
   const table = useDataTable({
@@ -194,9 +317,10 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     sortDirection: searchState.sortDirection,
     selectedRowIds: visibleSelectedRowIds,
     columnVisibility: visibility.columnVisibility,
-    onSortChange: searchState.setSorting,
+    onSortChange: handleSortChange,
     onSelectedRowIdsChange: handleSelectedRowIdsChange,
-    onColumnVisibilityChange: visibility.setColumnVisibility,
+    onRowSelectionRequest: handleRowSelectionRequest,
+    onColumnVisibilityChange: handleColumnVisibilityChange,
   });
   const selectedRow = useMemo(() => {
     const visibleSelectedRow = query.rows.find((row) => String(row.id) === activeRowId) ?? null;
@@ -214,14 +338,40 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     return selectedRow;
   }, [schemaColumns, searchState.editorMode, selectedRow]);
 
+  const cellInspector = useMemo<DataViewCellInspectorState>(() => {
+    if (activeCell === null) {
+      return { columnPosition: null, rowPosition: null, rowValues: null, target: null };
+    }
+
+    const rowIndex = query.rows.findIndex((row) => String(row.id) === activeCell.rowId);
+    const visibleDataColumns = table
+      .getVisibleLeafColumns()
+      .filter((column) => column.id !== "_select");
+    const columnIndex = visibleDataColumns.findIndex((column) => column.id === activeCell.columnId);
+
+    return {
+      columnPosition: columnIndex >= 0 ? columnIndex : null,
+      rowPosition: rowIndex >= 0 ? rowIndex : null,
+      rowValues: rowIndex >= 0 ? (query.rows[rowIndex] ?? null) : null,
+      target: activeCell,
+    };
+  }, [activeCell, order.columnOrder, query.rows, table, visibility.columnVisibility]);
+
   const closeDetailPane = () => {
-    rowEditor.close();
-    setActiveCellColumnId(null);
-    setActiveColumnId(null);
+    if (detailPaneMode === "cells") {
+      setCellPaneOpen(false);
+      return;
+    }
+
     void searchState.setRowEditor(null, null, { replace: false });
   };
 
   const handleEscape = () => {
+    if (detailPaneMode !== "closed") {
+      closeDetailPane();
+      return;
+    }
+
     const activeElement = document.activeElement;
     if (
       activeElement instanceof HTMLElement &&
@@ -229,13 +379,12 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     ) {
       activeElement.blur();
     }
-    closeDetailPane();
+    setCellSelection(createEmptyCellSelection());
+    setActiveColumnId(null);
   };
 
   const openInsert = () => {
-    rowEditor.openInsert();
-    setActiveCellColumnId(null);
-    setActiveColumnId(null);
+    setCellPaneOpen(false);
     void searchState.setRowEditor("insert", null, { replace: false });
   };
 
@@ -245,7 +394,6 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
       return;
     }
 
-    rowEditor.setActiveRowIndex(nextActiveRowIndex);
     void searchState.setRowEditor("edit", nextActiveRowId, { replace: false });
   };
 
@@ -276,7 +424,7 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
 
           const nextActiveRowIndex = Math.min(activeRowIndex, nextEditedRowIds.length - 1);
           const nextActiveRowId = nextEditedRowIds[nextActiveRowIndex] ?? null;
-          rowEditor.openEdit(nextEditedRowIds, nextActiveRowIndex);
+          setSelectedRowIds(nextEditedRowIds);
           void searchState.setRowEditor("edit", nextActiveRowId, { replace: false });
         }
       : undefined;
@@ -284,41 +432,92 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
   return {
     activeCell,
     activeColumnId,
+    cellInspector,
     columnOrder: order.columnOrder,
+    detailPaneMode,
     table,
     loadedRowCount: query.loadedRowCount,
     hasMore: query.hasMore,
     isFetchingMore: query.isFetchingMore,
     fetchMore: query.fetchMore,
     filters: searchState.filters,
-    setFilters: searchState.setFilters,
+    setFilters: async (filters) => {
+      selectionScopeKeyRef.current = JSON.stringify({
+        filters,
+        sortColumn: searchState.sortColumn,
+        sortDirection: searchState.sortDirection,
+        tableKey,
+      });
+      resetSelection();
+      await searchState.setFilters(filters);
+    },
     setColumnOrder: order.setColumnOrder,
     schemaColumns,
+    selectedCells: cellSelection.selectedCells,
     rowValues,
     rowEditor: {
-      activeRowId,
+      activeRowId: detailPaneMode === "rows" ? activeRowId : null,
       activeRowIndex,
       editedRowIds,
       goToNextRow,
       goToPreviousRow,
-      isOpen: searchState.editorMode !== null,
-      mode: editorMode,
       openInsert,
     },
-    handleCellActivate: (target) => {
-      setActiveCellColumnId(target.columnId);
+    handleCellActivate: (target, selectionMode) => {
+      const visibleColumnIds = table
+        .getVisibleLeafColumns()
+        .map((column) => column.id)
+        .filter((columnId) => columnId !== "_select");
+      setCellSelection((currentSelection) =>
+        updateCellSelection({
+          anchorCell: currentSelection.anchorCell,
+          columnIds: visibleColumnIds,
+          mode: selectionMode,
+          rowIds: validRowIds,
+          selectedCells: currentSelection.selectedCells,
+          target,
+        }),
+      );
       setActiveColumnId(null);
-      activateRow(target.rowId);
+      if (detailPaneMode === "rows" && target.rowId === activeRowId) {
+        requestAnimationFrame(() => {
+          focusRowEditorField(target.columnId);
+        });
+      }
+    },
+    handleCellOpen: (target) => {
+      const isOpenTarget =
+        detailPaneMode === "cells" &&
+        activeCell?.rowId === target.rowId &&
+        activeCell.columnId === target.columnId &&
+        cellSelection.selectedCells.length === 1;
+      if (isOpenTarget === true) {
+        const activeElement = document.activeElement;
+        if (
+          activeElement instanceof HTMLElement &&
+          activeElement.closest('[data-slot="data-table-cell"]') !== null
+        ) {
+          activeElement.blur();
+        }
+        setCellSelection(createEmptyCellSelection());
+        setCellPaneOpen(false);
+        return;
+      }
+
+      setCellSelection({ activeCell: target, anchorCell: target, selectedCells: [target] });
+      setActiveColumnId(null);
+      setCellPaneOpen(true);
+      if (searchState.editorMode !== null) {
+        void searchState.setRowEditor(null, null, { replace: false });
+      }
     },
     handleEscape,
     handleColumnActivate: (columnId) => {
-      setActiveCellColumnId(null);
+      if (columnId !== null) {
+        setCellSelection(createEmptyCellSelection());
+        setCellPaneOpen(false);
+      }
       setActiveColumnId(columnId);
-    },
-    handleRowActivate: (rowId) => {
-      setActiveCellColumnId(null);
-      setActiveColumnId(null);
-      activateRow(rowId);
     },
     handleRowEditorOpenChange: (open) => {
       if (open === false) {

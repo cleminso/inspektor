@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
@@ -10,7 +10,6 @@ import {
 } from "@/components/table-explorer/data/rowEditorFields";
 
 interface EditRowFormProps {
-  focusedFieldName?: string | null;
   onCancel?: () => void;
   onDelete?: () => Promise<void> | void;
   onSave: (values: Record<string, unknown>) => Promise<void> | void;
@@ -39,7 +38,6 @@ export function focusRowEditorField(fieldName: string): boolean {
 }
 
 export function EditRowForm({
-  focusedFieldName = null,
   onCancel,
   onDelete,
   onSave,
@@ -54,7 +52,6 @@ export function EditRowForm({
   return (
     <LoadedEditRowForm
       key={targetRowId ?? "unknown-row"}
-      focusedFieldName={focusedFieldName}
       onCancel={onCancel}
       onDelete={onDelete}
       onSave={onSave}
@@ -70,7 +67,6 @@ interface LoadedEditRowFormProps extends Omit<EditRowFormProps, "rowValues"> {
 }
 
 function LoadedEditRowForm({
-  focusedFieldName,
   onCancel,
   onDelete,
   onSave,
@@ -85,20 +81,6 @@ function LoadedEditRowForm({
     onSubmit: onSave,
     schemaColumns,
   });
-
-  useEffect(() => {
-    if (focusedFieldName === null || focusedFieldName === undefined) {
-      return;
-    }
-
-    const animationFrame = requestAnimationFrame(() => {
-      focusRowEditorField(focusedFieldName);
-    });
-
-    return () => {
-      cancelAnimationFrame(animationFrame);
-    };
-  }, [focusedFieldName]);
 
   return (
     <form className="flex h-full min-h-0 flex-col mt-2 overflow-hidden" onSubmit={rowEditor.submit}>

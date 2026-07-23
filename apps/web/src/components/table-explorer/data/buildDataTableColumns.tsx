@@ -1,4 +1,6 @@
 // Defines `ColumnDef`
+import { useRef } from "react";
+
 import type { ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 
@@ -9,6 +11,13 @@ import type { TableColumnMeta } from "@/types/tableExplorer";
 
 interface BuildDataTableColumnsOptions {
   columns: TableColumnMeta[];
+  onRowSelectionRequest?: (request: RowSelectionRequest) => void;
+}
+
+export interface RowSelectionRequest {
+  checked: boolean;
+  rowId: string;
+  shiftKey: boolean;
 }
 
 interface ColumnSizing {
@@ -83,7 +92,7 @@ interface SelectionCheckboxProps {
   ariaLabel: string;
   checked: boolean;
   indeterminate?: boolean;
-  onCheckedChange: (checked: boolean) => void;
+  onCheckedChange: (checked: boolean, shiftKey: boolean) => void;
 }
 
 function SelectionCheckbox({
@@ -92,13 +101,21 @@ function SelectionCheckbox({
   indeterminate = false,
   onCheckedChange,
 }: SelectionCheckboxProps): React.ReactElement {
+  const shiftKeyRef = useRef(false);
+
   return (
     <Checkbox
       aria-label={ariaLabel}
       checked={checked}
       indeterminate={indeterminate}
       size="m"
-      onCheckedChange={onCheckedChange}
+      onClickCapture={(event) => {
+        shiftKeyRef.current = event.shiftKey;
+      }}
+      onCheckedChange={(nextChecked) => {
+        onCheckedChange(nextChecked === true, shiftKeyRef.current);
+        shiftKeyRef.current = false;
+      }}
     />
   );
 }
@@ -120,6 +137,7 @@ function ColumnHeader({
 
 export function buildDataTableColumns({
   columns,
+  onRowSelectionRequest,
 }: BuildDataTableColumnsOptions): ColumnDef<DynamicTableRow>[] {
   const selectionColumn: ColumnDef<DynamicTableRow> = {
     id: "_select",
@@ -141,7 +159,7 @@ export function buildDataTableColumns({
             indeterminate={isSomeSelected === true && isAllSelected === false}
             ariaLabel="Select all loaded rows"
             onCheckedChange={(value) => {
-              table.toggleAllPageRowsSelected(value === true);
+              table.toggleAllPageRowsSelected(value);
             }}
           />
         </Box>
@@ -153,8 +171,17 @@ export function buildDataTableColumns({
           <SelectionCheckbox
             checked={row.getIsSelected()}
             ariaLabel={`Select row ${String(row.original.id)}`}
-            onCheckedChange={(value) => {
-              row.toggleSelected(value === true);
+            onCheckedChange={(value, shiftKey) => {
+              if (onRowSelectionRequest !== undefined) {
+                onRowSelectionRequest({
+                  checked: value,
+                  rowId: String(row.original.id),
+                  shiftKey,
+                });
+                return;
+              }
+
+              row.toggleSelected(value);
             }}
           />
         </Box>

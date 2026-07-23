@@ -1,26 +1,27 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import {
   createColumnHelper,
   getCoreRowModel,
   type RowSelectionState,
   useReactTable,
-} from '@tanstack/react-table'
-import { useState, type ReactNode } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+} from "@tanstack/react-table";
+import { useState, type ReactNode } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { DataTable } from './dataTable'
+import { DataTable } from "./dataTable";
 
-let onDataTableDragEnd: ((event: unknown) => void) | undefined
-let onDataTableDragOver: ((event: unknown) => void) | undefined
-let onDataTableDragStart: ((event: unknown) => void) | undefined
-let dragOverlayDropAnimation: unknown
-const sortableInputs: unknown[] = []
-let droppingSortableId: string | null = null
+let onDataTableDragEnd: ((event: unknown) => void) | undefined;
+let onDataTableDragOver: ((event: unknown) => void) | undefined;
+let onDataTableDragStart: ((event: unknown) => void) | undefined;
+let dragOverlayDropAnimation: unknown;
+const sortableInputs: unknown[] = [];
+const sortableTargetRefs = new Map<string, ReturnType<typeof vi.fn>>();
+let droppingSortableId: string | null = null;
 
-vi.mock('@dnd-kit/react', () => ({
+vi.mock("@dnd-kit/react", () => ({
   DragOverlay: ({ dropAnimation }: { dropAnimation?: unknown }) => {
-    dragOverlayDropAnimation = dropAnimation
-    return null
+    dragOverlayDropAnimation = dropAnimation;
+    return null;
   },
   DragDropProvider: ({
     children,
@@ -28,35 +29,38 @@ vi.mock('@dnd-kit/react', () => ({
     onDragOver,
     onDragStart,
   }: {
-    children: ReactNode
-    onDragEnd?: (event: unknown) => void
-    onDragOver?: (event: unknown) => void
-    onDragStart?: (event: unknown) => void
+    children: ReactNode;
+    onDragEnd?: (event: unknown) => void;
+    onDragOver?: (event: unknown) => void;
+    onDragStart?: (event: unknown) => void;
   }) => {
-    onDataTableDragEnd = onDragEnd
-    onDataTableDragOver = onDragOver
-    onDataTableDragStart = onDragStart
-    return children
+    onDataTableDragEnd = onDragEnd;
+    onDataTableDragOver = onDragOver;
+    onDataTableDragStart = onDragStart;
+    return children;
   },
-}))
+}));
 
-vi.mock('@dnd-kit/react/sortable', () => ({
+vi.mock("@dnd-kit/react/sortable", () => ({
   isSortable: (source: { sortable?: boolean } | null | undefined) => source?.sortable === true,
   useSortable: (input: { id: string }) => {
-    sortableInputs.push(input)
+    const targetRef = vi.fn();
+    sortableInputs.push(input);
+    sortableTargetRefs.set(input.id, targetRef);
     return {
       isDropping: input.id === droppingSortableId,
       isDragSource: false,
       ref: () => undefined,
-    }
+      targetRef,
+    };
   },
-}))
+}));
 
-vi.mock('@dnd-kit/abstract/modifiers', () => ({
+vi.mock("@dnd-kit/abstract/modifiers", () => ({
   RestrictToHorizontalAxis: class RestrictToHorizontalAxis {},
-}))
+}));
 
-vi.mock('@dnd-kit/dom', () => ({
+vi.mock("@dnd-kit/dom", () => ({
   AutoScroller: { configure: () => ({}) },
   Feedback: { configure: () => ({}) },
   PointerActivationConstraints: {
@@ -65,39 +69,41 @@ vi.mock('@dnd-kit/dom', () => ({
     },
   },
   PointerSensor: { configure: () => ({}) },
-}))
+}));
 
-vi.mock('@dnd-kit/dom/modifiers', () => ({
+vi.mock("@dnd-kit/dom/modifiers", () => ({
   RestrictToElement: { configure: () => ({}) },
-}))
+}));
 
 interface Person {
-  id: string
-  name: string
-  role: string
+  id: string;
+  name: string;
+  role: string;
 }
 
-const columnHelper = createColumnHelper<Person>()
+const columnHelper = createColumnHelper<Person>();
 const columns = [
-  columnHelper.accessor('name', { header: 'Name' }),
-  columnHelper.accessor('role', { header: 'Role' }),
-]
+  columnHelper.accessor("name", { header: "Name" }),
+  columnHelper.accessor("role", { header: "Role" }),
+];
 const rows: Person[] = [
-  { id: 'person-1', name: 'Ada', role: 'Engineer' },
-  { id: 'person-2', name: 'Grace', role: 'Admiral' },
-]
+  { id: "person-1", name: "Ada", role: "Engineer" },
+  { id: "person-2", name: "Grace", role: "Admiral" },
+];
 
 interface TestDataTableProps {
-  activeCell?: { columnId: string; rowId: string } | null
-  activeColumnId?: string | null
-  activeRowId?: string | null
-  data?: Person[]
-  loading?: boolean
-  onCellActivate?: (target: { columnId: string; rowId: string }) => void
-  onCellContextMenu?: (target: { columnId: string; rowId: string }) => void
-  onColumnActivate?: (columnId: string | null) => void
-  onRowActivate?: (rowId: string) => void
-  selectedRowIds?: string[]
+  activeCell?: { columnId: string; rowId: string } | null;
+  activeColumnId?: string | null;
+  activeRowId?: string | null;
+  data?: Person[];
+  loading?: boolean;
+  onCellActivate?: (target: { columnId: string; rowId: string }) => void;
+  onCellContextMenu?: (target: { columnId: string; rowId: string }) => void;
+  onCellOpen?: (target: { columnId: string; rowId: string }) => void;
+  onColumnActivate?: (columnId: string | null) => void;
+  onRowActivate?: (rowId: string) => void;
+  selectedCells?: { columnId: string; rowId: string }[];
+  selectedRowIds?: string[];
 }
 
 function TestDataTable({
@@ -108,18 +114,20 @@ function TestDataTable({
   loading = false,
   onCellActivate,
   onCellContextMenu,
+  onCellOpen,
   onColumnActivate,
   onRowActivate,
+  selectedCells = [],
   selectedRowIds = [],
 }: TestDataTableProps) {
-  const rowSelection = Object.fromEntries(selectedRowIds.map((rowId) => [rowId, true]))
+  const rowSelection = Object.fromEntries(selectedRowIds.map((rowId) => [rowId, true]));
   const table = useReactTable({
     columns,
     data,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     state: { rowSelection },
-  })
+  });
 
   return (
     <DataTable.Root
@@ -129,8 +137,10 @@ function TestDataTable({
       activeRowId={activeRowId}
       onCellActivate={onCellActivate}
       onCellContextMenu={(target) => onCellContextMenu?.(target)}
+      onCellOpen={onCellOpen}
       onColumnActivate={onColumnActivate}
       onRowActivate={onRowActivate}
+      selectedCells={selectedCells}
     >
       <DataTable.Viewport>
         <DataTable.Table aria-label="People">
@@ -142,7 +152,7 @@ function TestDataTable({
         </DataTable.Table>
       </DataTable.Viewport>
     </DataTable.Root>
-  )
+  );
 }
 
 function ExpandedTestDataTable() {
@@ -151,8 +161,8 @@ function ExpandedTestDataTable() {
     data: rows,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
-  })
-  const firstRow = table.getRowModel().rows[0]
+  });
+  const firstRow = table.getRowModel().rows[0];
 
   return (
     <DataTable.Root table={table}>
@@ -170,25 +180,25 @@ function ExpandedTestDataTable() {
         </DataTable.Table>
       </DataTable.Viewport>
     </DataTable.Root>
-  )
+  );
 }
 
 function InteractiveHeaderDataTable({
   onColumnActivate,
 }: {
-  onColumnActivate: (columnId: string | null) => void
+  onColumnActivate: (columnId: string | null) => void;
 }) {
   const interactiveColumns = [
-    columnHelper.accessor('name', {
+    columnHelper.accessor("name", {
       header: () => <button type="button">Sort name</button>,
     }),
-  ]
+  ];
   const table = useReactTable({
     columns: interactiveColumns,
     data: rows,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
-  })
+  });
 
   return (
     <DataTable.Root table={table} onColumnActivate={onColumnActivate}>
@@ -198,17 +208,17 @@ function InteractiveHeaderDataTable({
         </DataTable.Table>
       </DataTable.Viewport>
     </DataTable.Root>
-  )
+  );
 }
 
 function DismissibleColumnDataTable() {
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const table = useReactTable({
     columns,
     data: rows,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
-  })
+  });
 
   return (
     <DataTable.Root
@@ -222,24 +232,26 @@ function DismissibleColumnDataTable() {
         </DataTable.Table>
       </DataTable.Viewport>
     </DataTable.Root>
-  )
+  );
 }
 
 function SelectionHitAreaDataTable({
   onCellActivate,
+  onCellOpen,
 }: {
-  onCellActivate: (target: { columnId: string; rowId: string }) => void
+  onCellActivate: (target: { columnId: string; rowId: string }) => void;
+  onCellOpen?: (target: { columnId: string; rowId: string }) => void;
 }) {
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const selectionColumns = [
     columnHelper.display({
-      id: 'select',
+      id: "select",
       header: ({ table }) => (
         <input
           aria-label="Select all rows"
           checked={table.getIsAllRowsSelected()}
           onChange={(event) => {
-            table.toggleAllRowsSelected(event.currentTarget.checked)
+            table.toggleAllRowsSelected(event.currentTarget.checked);
           }}
           type="checkbox"
         />
@@ -249,14 +261,14 @@ function SelectionHitAreaDataTable({
           aria-label={`Select ${row.original.name}`}
           checked={row.getIsSelected()}
           onChange={(event) => {
-            row.toggleSelected(event.currentTarget.checked)
+            row.toggleSelected(event.currentTarget.checked);
           }}
           type="checkbox"
         />
       ),
     }),
     ...columns,
-  ]
+  ];
   const table = useReactTable({
     columns: selectionColumns,
     data: rows,
@@ -265,40 +277,40 @@ function SelectionHitAreaDataTable({
     getRowId: (row) => row.id,
     onRowSelectionChange: setRowSelection,
     state: { rowSelection },
-  })
+  });
 
   return (
-    <DataTable.Root table={table} onCellActivate={onCellActivate}>
+    <DataTable.Root table={table} onCellActivate={onCellActivate} onCellOpen={onCellOpen}>
       <DataTable.Viewport>
         <DataTable.Table aria-label="Selectable people">
           <DataTable.Content />
         </DataTable.Table>
       </DataTable.Viewport>
     </DataTable.Root>
-  )
+  );
 }
 
 function ReorderableDataTable({
   onColumnOrderChange,
 }: {
-  onColumnOrderChange: (columnIds: string[]) => void
+  onColumnOrderChange: (columnIds: string[]) => void;
 }) {
-  const [columnOrder, setColumnOrder] = useState(['name', 'role'])
+  const [columnOrder, setColumnOrder] = useState(["name", "role"]);
   const table = useReactTable({
     columns,
     data: rows,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     state: { columnOrder },
-  })
+  });
 
   return (
     <DataTable.Root
       table={table}
       columnOrder={columnOrder}
       onColumnOrderChange={(nextColumnOrder) => {
-        setColumnOrder(nextColumnOrder)
-        onColumnOrderChange(nextColumnOrder)
+        setColumnOrder(nextColumnOrder);
+        onColumnOrderChange(nextColumnOrder);
       }}
     >
       <DataTable.Viewport>
@@ -307,75 +319,76 @@ function ReorderableDataTable({
         </DataTable.Table>
       </DataTable.Viewport>
     </DataTable.Root>
-  )
+  );
 }
 
 afterEach(() => {
-  cleanup()
-  dragOverlayDropAnimation = undefined
-  droppingSortableId = null
-  sortableInputs.length = 0
-})
+  cleanup();
+  dragOverlayDropAnimation = undefined;
+  droppingSortableId = null;
+  sortableInputs.length = 0;
+  sortableTargetRefs.clear();
+});
 
-describe('DataTable', () => {
-  it('renders semantic headers, rows, and visible cells from TanStack state', () => {
-    render(<TestDataTable />)
+describe("DataTable", () => {
+  it("renders semantic headers, rows, and visible cells from TanStack state", () => {
+    render(<TestDataTable />);
 
-    expect(screen.getByRole('table', { name: 'People' })).toBeTruthy()
-    expect(screen.getAllByRole('columnheader')).toHaveLength(2)
-    expect(screen.getAllByRole('row')).toHaveLength(3)
-    expect(screen.getByRole('cell', { name: 'Ada' })).toBeTruthy()
-  })
+    expect(screen.getByRole("table", { name: "People" })).toBeTruthy();
+    expect(screen.getAllByRole("columnheader")).toHaveLength(2);
+    expect(screen.getAllByRole("row")).toHaveLength(3);
+    expect(screen.getByRole("cell", { name: "Ada" })).toBeTruthy();
+  });
 
-  it('renders explicit loading and empty content', () => {
-    const { rerender } = render(<TestDataTable loading />)
+  it("renders explicit loading and empty content", () => {
+    const { rerender } = render(<TestDataTable loading />);
 
-    expect(screen.getByText('Loading people')).toBeTruthy()
+    expect(screen.getByText("Loading people")).toBeTruthy();
 
-    rerender(<TestDataTable data={[]} />)
+    rerender(<TestDataTable data={[]} />);
 
-    expect(screen.getByText('No people')).toBeTruthy()
-  })
+    expect(screen.getByText("No people")).toBeTruthy();
+  });
 
-  it('gives active-cell state precedence over column highlighting', () => {
+  it("gives active-cell state precedence over column highlighting", () => {
     render(
       <TestDataTable
         activeRowId="person-1"
         activeColumnId="role"
-        activeCell={{ rowId: 'person-1', columnId: 'role' }}
-        selectedRowIds={['person-2']}
+        activeCell={{ rowId: "person-1", columnId: "role" }}
+        selectedRowIds={["person-2"]}
       />,
-    )
+    );
 
-    const adaRow = screen.getByRole('row', { name: /Ada Engineer/ })
-    const graceRow = screen.getByRole('row', { name: /Grace Admiral/ })
-    const activeCell = screen.getByRole('cell', { name: 'Engineer' })
-    const activeHeader = screen.getByRole('columnheader', { name: 'Role' })
+    const adaRow = screen.getByRole("row", { name: /Ada Engineer/ });
+    const graceRow = screen.getByRole("row", { name: /Grace Admiral/ });
+    const activeCell = screen.getByRole("cell", { name: "Engineer" });
+    const activeHeader = screen.getByRole("columnheader", { name: "Role" });
 
-    expect(adaRow.hasAttribute('data-active')).toBe(true)
-    expect(graceRow.hasAttribute('data-selected')).toBe(true)
-    expect(activeHeader.hasAttribute('data-active')).toBe(false)
-    expect(activeCell.hasAttribute('data-active')).toBe(true)
-    expect(activeCell.hasAttribute('data-column-active')).toBe(false)
-    expect(activeCell.hasAttribute('data-row-active')).toBe(true)
-    expect(graceRow.querySelectorAll('[data-selected]')).toHaveLength(2)
-  })
+    expect(adaRow.hasAttribute("data-active")).toBe(true);
+    expect(graceRow.hasAttribute("data-selected")).toBe(true);
+    expect(activeHeader.hasAttribute("data-active")).toBe(false);
+    expect(activeCell.hasAttribute("data-active")).toBe(true);
+    expect(activeCell.hasAttribute("data-column-active")).toBe(false);
+    expect(activeCell.hasAttribute("data-row-active")).toBe(true);
+    expect(graceRow.querySelectorAll("[data-selected]")).toHaveLength(2);
+  });
 
-  it('highlights a column when no cell is active', () => {
-    render(<TestDataTable activeColumnId="role" />)
+  it("highlights a column when no cell is active", () => {
+    render(<TestDataTable activeColumnId="role" />);
 
-    const activeHeader = screen.getByRole('columnheader', { name: 'Role' })
-    const activeColumnCell = screen.getByRole('cell', { name: 'Engineer' })
+    const activeHeader = screen.getByRole("columnheader", { name: "Role" });
+    const activeColumnCell = screen.getByRole("cell", { name: "Engineer" });
 
-    expect(activeHeader.hasAttribute('data-active')).toBe(true)
-    expect(activeColumnCell.hasAttribute('data-column-active')).toBe(true)
-  })
+    expect(activeHeader.hasAttribute("data-active")).toBe(true);
+    expect(activeColumnCell.hasAttribute("data-column-active")).toBe(true);
+  });
 
-  it('reports header, row, cell, and cell context-menu activation targets', () => {
-    const onColumnActivate = vi.fn()
-    const onRowActivate = vi.fn()
-    const onCellActivate = vi.fn()
-    const onCellContextMenu = vi.fn()
+  it("reports header, row, cell, and cell context-menu activation targets", () => {
+    const onColumnActivate = vi.fn();
+    const onRowActivate = vi.fn();
+    const onCellActivate = vi.fn();
+    const onCellContextMenu = vi.fn();
 
     render(
       <TestDataTable
@@ -384,176 +397,267 @@ describe('DataTable', () => {
         onCellActivate={onCellActivate}
         onCellContextMenu={onCellContextMenu}
       />,
-    )
+    );
 
-    fireEvent.click(screen.getByRole('columnheader', { name: 'Role' }))
-    fireEvent.click(screen.getByRole('row', { name: /Ada Engineer/ }))
-    fireEvent.click(screen.getByRole('cell', { name: 'Admiral' }))
-    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Engineer' }))
+    fireEvent.click(screen.getByRole("columnheader", { name: "Role" }));
+    fireEvent.click(screen.getByRole("row", { name: /Ada Engineer/ }));
+    fireEvent.click(screen.getByRole("cell", { name: "Admiral" }));
+    fireEvent.contextMenu(screen.getByRole("cell", { name: "Engineer" }));
 
-    expect(onColumnActivate).toHaveBeenCalledWith('role')
-    expect(onRowActivate).toHaveBeenCalledWith('person-1')
-    expect(onCellActivate).toHaveBeenCalledWith({ rowId: 'person-2', columnId: 'role' })
-    expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: 'person-1', columnId: 'role' })
-  })
+    expect(onColumnActivate).toHaveBeenCalledWith("role");
+    expect(onRowActivate).toHaveBeenCalledWith("person-1");
+    expect(onCellActivate).toHaveBeenCalledWith({ rowId: "person-2", columnId: "role" }, "replace");
+    expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: "person-1", columnId: "role" });
+  });
 
-  it('supports expanded content through manual compound composition', () => {
-    render(<ExpandedTestDataTable />)
+  it("focuses a cell on click and opens it only on double click", () => {
+    const onCellActivate = vi.fn();
+    const onCellOpen = vi.fn();
+    render(<TestDataTable onCellActivate={onCellActivate} onCellOpen={onCellOpen} />);
+    const cell = screen.getByRole("cell", { name: "Engineer" });
 
-    const details = screen.getByRole('cell', { name: 'Ada details' })
-    expect(details.getAttribute('colspan')).toBe('2')
-  })
+    fireEvent.click(cell);
 
-  it('activates a column when its interactive header content is used', () => {
-    const onColumnActivate = vi.fn()
-    render(<InteractiveHeaderDataTable onColumnActivate={onColumnActivate} />)
+    expect(onCellActivate).toHaveBeenCalledOnce();
+    expect(onCellOpen).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sort name' }))
+    fireEvent.doubleClick(cell);
 
-    expect(onColumnActivate).toHaveBeenCalledWith('name')
-  })
+    expect(onCellOpen).toHaveBeenCalledWith({ rowId: "person-1", columnId: "role" });
+  });
 
-  it('deactivates a column when its active header is clicked again', () => {
-    render(<DismissibleColumnDataTable />)
-    const header = screen.getByRole('columnheader', { name: 'Role' })
+  it("activates a cell once before opening it on double click", () => {
+    const onCellActivate = vi.fn();
+    const onCellOpen = vi.fn();
+    render(<TestDataTable onCellActivate={onCellActivate} onCellOpen={onCellOpen} />);
+    const cell = screen.getByRole("cell", { name: "Engineer" });
 
-    fireEvent.click(header)
-    expect(header.hasAttribute('data-active')).toBe(true)
+    fireEvent.click(cell, { detail: 1 });
+    fireEvent.click(cell, { detail: 2 });
+    fireEvent.doubleClick(cell);
 
-    fireEvent.click(header)
-    expect(header.hasAttribute('data-active')).toBe(false)
-  })
+    expect(onCellActivate).toHaveBeenCalledOnce();
+    expect(onCellOpen).toHaveBeenCalledOnce();
+  });
 
-  it('deactivates a column when a pointer press occurs outside the table', () => {
-    render(<DismissibleColumnDataTable />)
-    const header = screen.getByRole('columnheader', { name: 'Role' })
+  it("reports additive and range cell-selection intent from click modifiers", () => {
+    const onCellActivate = vi.fn();
+    render(<TestDataTable onCellActivate={onCellActivate} />);
+    const cell = screen.getByRole("cell", { name: "Engineer" });
 
-    fireEvent.click(header)
-    fireEvent.pointerDown(document.body)
+    fireEvent.click(cell, { metaKey: true });
+    fireEvent.click(cell, { shiftKey: true });
 
-    expect(header.hasAttribute('data-active')).toBe(false)
-  })
+    expect(onCellActivate).toHaveBeenNthCalledWith(
+      1,
+      { rowId: "person-1", columnId: "role" },
+      "additive",
+    );
+    expect(onCellActivate).toHaveBeenNthCalledWith(
+      2,
+      { rowId: "person-1", columnId: "role" },
+      "range",
+    );
+  });
 
-  it('uses the complete checkbox cell as the selection hit area', () => {
-    const onCellActivate = vi.fn()
-    render(<SelectionHitAreaDataTable onCellActivate={onCellActivate} />)
-    const checkbox = screen.getByRole('checkbox', { name: 'Select Ada' })
-    const checkboxCell = checkbox.closest('td')
+  it("marks every selected cell independently from checked rows", () => {
+    render(
+      <TestDataTable
+        selectedCells={[
+          { rowId: "person-1", columnId: "name" },
+          { rowId: "person-2", columnId: "role" },
+        ]}
+      />,
+    );
 
-    expect(checkboxCell).not.toBeNull()
-    fireEvent.click(checkboxCell as HTMLTableCellElement)
+    expect(screen.getByRole("cell", { name: "Ada" }).hasAttribute("data-cell-selected")).toBe(true);
+    expect(screen.getByRole("cell", { name: "Admiral" }).hasAttribute("data-cell-selected")).toBe(
+      true,
+    );
+    expect(screen.getByRole("cell", { name: "Engineer" }).hasAttribute("data-cell-selected")).toBe(
+      false,
+    );
+  });
 
-    expect((checkbox as HTMLInputElement).checked).toBe(true)
-    expect(document.activeElement).not.toBe(checkboxCell)
-    expect(onCellActivate).not.toHaveBeenCalled()
-  })
+  it("registers body cells only as column drop targets", () => {
+    render(<ReorderableDataTable onColumnOrderChange={vi.fn()} />);
+    const cell = screen.getByRole("cell", { name: "Engineer" });
 
-  it('moves headers and body cells together while a column is dragged', () => {
-    const onColumnOrderChange = vi.fn()
-    render(<ReorderableDataTable onColumnOrderChange={onColumnOrderChange} />)
+    expect(sortableTargetRefs.get("person-1:role")).toHaveBeenCalledWith(cell);
+  });
+
+  it("supports expanded content through manual compound composition", () => {
+    render(<ExpandedTestDataTable />);
+
+    const details = screen.getByRole("cell", { name: "Ada details" });
+    expect(details.getAttribute("colspan")).toBe("2");
+  });
+
+  it("activates a column when its interactive header content is used", () => {
+    const onColumnActivate = vi.fn();
+    render(<InteractiveHeaderDataTable onColumnActivate={onColumnActivate} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Sort name" }));
+
+    expect(onColumnActivate).toHaveBeenCalledWith("name");
+  });
+
+  it("deactivates a column when its active header is clicked again", () => {
+    render(<DismissibleColumnDataTable />);
+    const header = screen.getByRole("columnheader", { name: "Role" });
+
+    fireEvent.click(header);
+    expect(header.hasAttribute("data-active")).toBe(true);
+
+    fireEvent.click(header);
+    expect(header.hasAttribute("data-active")).toBe(false);
+  });
+
+  it("deactivates a column when a pointer press occurs outside the table", () => {
+    render(<DismissibleColumnDataTable />);
+    const header = screen.getByRole("columnheader", { name: "Role" });
+
+    fireEvent.click(header);
+    fireEvent.pointerDown(document.body);
+
+    expect(header.hasAttribute("data-active")).toBe(false);
+  });
+
+  it("uses the complete checkbox cell as the selection hit area", () => {
+    const onCellActivate = vi.fn();
+    render(<SelectionHitAreaDataTable onCellActivate={onCellActivate} />);
+    const checkbox = screen.getByRole("checkbox", { name: "Select Ada" });
+    const checkboxCell = checkbox.closest("td");
+
+    expect(checkboxCell).not.toBeNull();
+    fireEvent.click(checkboxCell as HTMLTableCellElement);
+
+    expect((checkbox as HTMLInputElement).checked).toBe(true);
+    expect(document.activeElement).not.toBe(checkboxCell);
+    expect(onCellActivate).not.toHaveBeenCalled();
+  });
+
+  it("does not open a checkbox cell on double click", () => {
+    const onCellActivate = vi.fn();
+    const onCellOpen = vi.fn();
+    render(<SelectionHitAreaDataTable onCellActivate={onCellActivate} onCellOpen={onCellOpen} />);
+    const checkboxCell = screen.getByRole("checkbox", { name: "Select Ada" }).closest("td");
+
+    fireEvent.doubleClick(checkboxCell as HTMLTableCellElement);
+
+    expect(onCellActivate).not.toHaveBeenCalled();
+    expect(onCellOpen).not.toHaveBeenCalled();
+  });
+
+  it("moves headers and body cells together while a column is dragged", () => {
+    const onColumnOrderChange = vi.fn();
+    render(<ReorderableDataTable onColumnOrderChange={onColumnOrderChange} />);
 
     act(() => {
-      onDataTableDragStart?.({ operation: {} })
+      onDataTableDragStart?.({ operation: {} });
       onDataTableDragOver?.({
         operation: {
           source: {
-            id: 'role',
+            id: "role",
             initialIndex: 1,
             index: 1,
             sortable: true,
-            type: 'column',
+            type: "column",
           },
           target: {
-            id: 'name',
+            id: "name",
             index: 0,
             sortable: true,
-            type: 'column',
+            type: "column",
           },
         },
         preventDefault: () => undefined,
-      })
-    })
+      });
+    });
 
-    expect(onColumnOrderChange).toHaveBeenCalledWith(['role', 'name'])
-    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
-      'Role',
-      'Name',
-    ])
-    expect(screen.getAllByRole('cell').slice(0, 2).map((cell) => cell.textContent)).toEqual([
-      'Engineer',
-      'Ada',
-    ])
-  })
+    expect(onColumnOrderChange).toHaveBeenCalledWith(["role", "name"]);
+    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
+      "Role",
+      "Name",
+    ]);
+    expect(
+      screen
+        .getAllByRole("cell")
+        .slice(0, 2)
+        .map((cell) => cell.textContent),
+    ).toEqual(["Engineer", "Ada"]);
+  });
 
-  it('gives reorderable body cells row-scoped sortable transitions without making them draggable', () => {
-    render(<ReorderableDataTable onColumnOrderChange={() => undefined} />)
+  it("gives reorderable body cells row-scoped sortable transitions without making them draggable", () => {
+    render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
     expect(sortableInputs).toContainEqual({
-      accept: 'column-cell',
-      id: 'person-1:role',
+      accept: "column-cell",
+      id: "person-1:role",
       index: 1,
-      group: 'data-table-row:person-1',
+      group: "data-table-row:person-1",
       disabled: {
         draggable: true,
         droppable: false,
       },
-      type: 'column-cell',
-    })
-  })
+      type: "column-cell",
+    });
+  });
 
-  it('keeps the source header visually reserved while its overlay is dropping', () => {
-    droppingSortableId = 'name'
-    render(<ReorderableDataTable onColumnOrderChange={() => undefined} />)
+  it("keeps the source header visually reserved while its overlay is dropping", () => {
+    droppingSortableId = "name";
+    render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
-    expect(screen.getByRole('columnheader', { name: 'Name' }).hasAttribute('data-dragging')).toBe(
+    expect(screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-dragging")).toBe(
       true,
-    )
-  })
+    );
+  });
 
-  it('does not animate the drag overlay after the pointer is released', () => {
-    render(<ReorderableDataTable onColumnOrderChange={() => undefined} />)
+  it("does not animate the drag overlay after the pointer is released", () => {
+    render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
-    expect(dragOverlayDropAnimation).toBeNull()
-  })
+    expect(dragOverlayDropAnimation).toBeNull();
+  });
 
-  it('restores the complete column order when a drag is canceled', () => {
-    const onColumnOrderChange = vi.fn()
-    render(<ReorderableDataTable onColumnOrderChange={onColumnOrderChange} />)
+  it("restores the complete column order when a drag is canceled", () => {
+    const onColumnOrderChange = vi.fn();
+    render(<ReorderableDataTable onColumnOrderChange={onColumnOrderChange} />);
 
     act(() => {
-      onDataTableDragStart?.({ operation: {} })
+      onDataTableDragStart?.({ operation: {} });
       onDataTableDragOver?.({
         operation: {
           source: {
-            id: 'role',
+            id: "role",
             initialIndex: 1,
             index: 1,
             sortable: true,
-            type: 'column',
+            type: "column",
           },
           target: {
-            id: 'name',
+            id: "name",
             index: 0,
             sortable: true,
-            type: 'column',
+            type: "column",
           },
         },
         preventDefault: () => undefined,
-      })
-    })
+      });
+    });
     act(() => {
-      onDataTableDragEnd?.({ canceled: true, operation: {} })
-    })
+      onDataTableDragEnd?.({ canceled: true, operation: {} });
+    });
 
-    expect(onColumnOrderChange).toHaveBeenLastCalledWith(['name', 'role'])
-    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
-      'Name',
-      'Role',
-    ])
-    expect(screen.getAllByRole('cell').slice(0, 2).map((cell) => cell.textContent)).toEqual([
-      'Ada',
-      'Engineer',
-    ])
-  })
-
-})
+    expect(onColumnOrderChange).toHaveBeenLastCalledWith(["name", "role"]);
+    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
+      "Name",
+      "Role",
+    ]);
+    expect(
+      screen
+        .getAllByRole("cell")
+        .slice(0, 2)
+        .map((cell) => cell.textContent),
+    ).toEqual(["Ada", "Engineer"]);
+  });
+});

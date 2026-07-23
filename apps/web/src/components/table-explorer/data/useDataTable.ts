@@ -1,5 +1,5 @@
 // creates TanStack `Table` instance
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 import {
   getCoreRowModel,
@@ -12,6 +12,7 @@ import {
 import type { DynamicTableRow } from "jazz-tools";
 
 import { buildDataTableColumns } from "@/components/table-explorer/data/buildDataTableColumns";
+import type { RowSelectionRequest } from "@/components/table-explorer/data/buildDataTableColumns";
 import type {
   TableColumnMeta,
   TableColumnVisibilityState,
@@ -25,6 +26,7 @@ interface UseDataTableOptions {
   columns: TableColumnMeta[];
   onColumnVisibilityChange: (next: TableColumnVisibilityState) => void;
   onSelectedRowIdsChange: (rowIds: TableRowId[]) => void;
+  onRowSelectionRequest: (request: RowSelectionRequest) => void;
   onSortChange: (columnId: string, direction: TableSortDirection) => void;
   rows: DynamicTableRow[];
   selectedRowIds: TableRowId[];
@@ -38,13 +40,25 @@ export function useDataTable({
   columns,
   onColumnVisibilityChange,
   onSelectedRowIdsChange,
+  onRowSelectionRequest,
   onSortChange,
   rows,
   selectedRowIds,
   sortColumn,
   sortDirection,
 }: UseDataTableOptions): Table<DynamicTableRow> {
-  const columnDefs = useMemo(() => buildDataTableColumns({ columns }), [columns]);
+  const onRowSelectionRequestRef = useRef(onRowSelectionRequest);
+  onRowSelectionRequestRef.current = onRowSelectionRequest;
+  const columnDefs = useMemo(
+    () =>
+      buildDataTableColumns({
+        columns,
+        onRowSelectionRequest: (request) => {
+          onRowSelectionRequestRef.current(request);
+        },
+      }),
+    [columns],
+  );
 
   const rowSelection = useMemo<RowSelectionState>(() => {
     return Object.fromEntries(selectedRowIds.map((rowId) => [rowId, true]));

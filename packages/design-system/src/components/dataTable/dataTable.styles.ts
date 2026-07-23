@@ -41,6 +41,7 @@ export const dataTableStyles = stylex.create({
     fontSize: fontSizes[1],
     lineHeight: lineHeights.normal,
     tableLayout: 'fixed',
+    userSelect: 'none',
     minWidth: '100%',
     width: 'max-content',
   },
@@ -148,6 +149,9 @@ export const dataTableStyles = stylex.create({
   rowSelected: {
     backgroundColor: 'transparent',
   },
+  rowActive: {
+    boxShadow: `inset 0 ${spatial['focus-ring-width']} 0 ${borderColors['border-table-cell-active']}`,
+  },
   cell: {
     backgroundColor: 'transparent',
     borderBottomColor: borderColors['border-table-cell'],
@@ -157,7 +161,7 @@ export const dataTableStyles = stylex.create({
     borderRightColor: borderColors['border-table-cell'],
     outlineColor: {
       default: 'transparent',
-      ':focus-visible': borderColors['border-focused'],
+      ':focus-visible': borderColors['border-table-cell-active'],
     },
     outlineOffset: -2,
     borderRightStyle: 'solid',
@@ -181,8 +185,8 @@ export const dataTableStyles = stylex.create({
   cellSelected: {
     backgroundColor: backgroundColors['bg-table-row-cell-selected'],
   },
-  cellRowActive: {
-    backgroundColor: backgroundColors['bg-table-row-cell-active'],
+  cellSelection: {
+    backgroundColor: backgroundColors['bg-table-cell-active'],
   },
   cellActive: {
     backgroundColor: backgroundColors['bg-table-cell-active'],

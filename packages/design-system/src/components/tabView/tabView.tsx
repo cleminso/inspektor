@@ -1,3 +1,8 @@
+// TODO:
+// - add `click-right` -> context menu to perform actions with tabView
+// - handle behavior: select tab + press shit + click another tab = select all tabs range
+//  - right click = open context menu
+//  - direct press `delete` = close all tabView from the selected range
 import { Button as BaseButton } from '@base-ui/react/button'
 import { Tabs as BaseTabs } from '@base-ui/react/tabs'
 import { RestrictToHorizontalAxis } from '@dnd-kit/abstract/modifiers'
