@@ -66,7 +66,7 @@ selected: {
 
 - Always: use semantic tokens, preserve Base UI behavior, omit public `className` and `style`, and keep approved escape hatches explicit and auditable.
 - Ask first: add semantic tokens, change public APIs, remove public styling escape hatches, or migrate application consumers.
-- Never: modify deprecated `packages/ui` or `apps/web-inspector`, expose arbitrary CSS values from `@inspector/ds`, or hand-edit generated route trees or props metadata.
+- Never: expose arbitrary CSS values from `@inspector/ds`, or hand-edit generated route trees or props metadata.
 
 ## Implementation batches
 

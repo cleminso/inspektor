@@ -1031,12 +1031,12 @@ Current code path:
 
 Relevant files:
 
-- `apps/web-inspector/src/hooks/useQuerySubscriptionsTelemetry.ts`
-- `apps/web-inspector/src/components/query-subscriptions/useQuerySubscriptionsState.ts`
-- `apps/web-inspector/src/components/query-subscriptions/dataGrid.tsx`
-- `apps/web-inspector/src/components/query-subscriptions/expandedRow.tsx`
-- `apps/web-inspector/src/lib/query-subscriptions/buildExplorerUrl.ts`
-- `apps/web-inspector/src/lib/query-subscriptions/extractFiltersFromIR.ts`
+- `apps/web/src/hooks/useQuerySubscriptionsTelemetry.ts`
+- `apps/web/src/components/query-subscriptions/useQuerySubscriptionsState.ts`
+- `apps/web/src/components/query-subscriptions/dataTable.tsx`
+- `apps/web/src/components/query-subscriptions/expandedRow.tsx`
+- `apps/web/src/lib/query-subscriptions/buildExplorerUrl.ts`
+- `apps/web/src/lib/query-subscriptions/extractFiltersFromIR.ts`
 
 The server response is a current snapshot, not logs. Inspector should not persist it across reloads. It can keep short-lived in-memory cache for navigation and mark stale data when refresh fails.
 

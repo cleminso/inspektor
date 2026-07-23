@@ -20,8 +20,6 @@ Implementation work is limited to these directories:
 - `apps/design-system`: documentation, examples, generated API metadata, and design-system validation.
 - `apps/web`: Inspector product application consuming `@inspector/ds`.
 
-`packages/ui` and `apps/web-inspector` are deprecated. Do not modify them, add imports from them, or implement replacement behavior there. They may be read only when migration context is required.
-
 Other workspace packages are outside the replacement UI architecture. Do not modify them unless the user explicitly requests work in them.
 
 ## Commands
@@ -93,7 +91,7 @@ Other workspace packages are outside the replacement UI architecture. Do not mod
 
 ## Application rules
 
-- `apps/web` imports reusable UI from `@inspector/ds`, not `@regarde/ui`.
+- `apps/web` imports reusable UI from `@inspector/ds`.
 - Keep feature and data logic in `apps/web`; move reusable presentation and interaction behavior into `packages/design-system`.
 - Build layouts with constrained design-system primitives and token props instead of raw layout elements with CSS strings.
 - Do not recreate Base UI behavior in application components.

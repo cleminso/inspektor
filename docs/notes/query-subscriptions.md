@@ -182,7 +182,7 @@ UI implication:
 
 Current fetch behavior:
 
-- `apps/web-inspector/src/hooks/useQuerySubscriptionsTelemetry.ts` fetches through `fetchServerSubscriptions(...)`.
+- `apps/web/src/hooks/useQuerySubscriptionsTelemetry.ts` fetches through `fetchServerSubscriptions(...)`.
 - It starts with cached rows when available.
 - It polls using a fixed interval.
 - It avoids overlapping fetches with `isFetchingRef`.
@@ -213,14 +213,14 @@ Current hidden reads:
 
 Evidence:
 
-- `apps/web-inspector/src/hooks/useQuerySubscriptionsTelemetry.ts`
-- `apps/web-inspector/src/components/query-subscriptions/dataGrid.tsx`
-- `apps/web-inspector/src/components/query-subscriptions/actionsBar.tsx`
-- `apps/web-inspector/src/components/query-subscriptions/expandedRow.tsx`
-- `apps/web-inspector/src/lib/query-subscriptions/buildExplorerUrl.ts`
-- `apps/web-inspector/src/lib/query-subscriptions/extractFiltersFromIR.ts`
-- `apps/web-inspector/src/hooks/useTableQuery.ts`
-- `apps/web-inspector/src/hooks/useRelationRow.ts`
+- `apps/web/src/hooks/useQuerySubscriptionsTelemetry.ts`
+- `apps/web/src/components/query-subscriptions/dataTable.tsx`
+- `apps/web/src/components/query-subscriptions/actionsBar.tsx`
+- `apps/web/src/components/query-subscriptions/expandedRow.tsx`
+- `apps/web/src/lib/query-subscriptions/buildExplorerUrl.ts`
+- `apps/web/src/lib/query-subscriptions/extractFiltersFromIR.ts`
+- `apps/web/src/hooks/useTableQuery.ts`
+- `apps/web/src/hooks/useRelationRow.ts`
 
 ## Official Jazz inspector comparison
 

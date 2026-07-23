@@ -47,13 +47,13 @@ Current data flow:
 
 Relevant Regarde files:
 
-- `apps/web-inspector/src/hooks/useInspectorRuntime.ts`
-- `apps/web-inspector/src/components/providers/inspectorProvider.tsx`
-- `apps/web-inspector/src/routes/conn/$connectionId/$branch/$schemaHash/tables/$tableName/index.tsx`
-- `apps/web-inspector/src/components/table-explorer/tableExplorerScreen.tsx`
-- `apps/web-inspector/src/components/table-explorer/selectedTableView.tsx`
-- `apps/web-inspector/src/hooks/useTableQuery.ts`
-- `apps/web-inspector/src/components/table-explorer/data/view.tsx`
+- `apps/web/src/hooks/useInspectorRuntime.ts`
+- `apps/web/src/components/providers/inspectorProvider.tsx`
+- `apps/web/src/routes/conn/$connectionId/$branch/$schemaHash/tables/$tableName/index.tsx`
+- `apps/web/src/components/table-explorer/tableExplorerScreen.tsx`
+- `apps/web/src/components/table-explorer/selectedTableView.tsx`
+- `apps/web/src/hooks/useTableQuery.ts`
+- `apps/web/src/components/table-explorer/data/view.tsx`
 
 ## Schema metadata
 
@@ -98,12 +98,12 @@ Regarde uses schema metadata to derive:
 
 Relevant Regarde files:
 
-- `apps/web-inspector/src/lib/table-explorer/tableSchema.ts`
-- `apps/web-inspector/src/components/table-explorer/data/buildDataGridColumns.tsx`
-- `apps/web-inspector/src/lib/table-explorer/whereOperators.ts`
-- `apps/web-inspector/src/lib/table-explorer/filterParsing.ts`
-- `apps/web-inspector/src/lib/table-explorer/mutationParsing.ts`
-- `apps/web-inspector/src/components/table-explorer/schema/view.tsx`
+- `apps/web/src/lib/table-explorer/tableSchema.ts`
+- `apps/web/src/components/table-explorer/data/buildDataTableColumns.tsx`
+- `apps/web/src/lib/table-explorer/whereOperators.ts`
+- `apps/web/src/lib/table-explorer/filterParsing.ts`
+- `apps/web/src/lib/table-explorer/mutationParsing.ts`
+- `apps/web/src/components/table-explorer/schema/view.tsx`
 
 ## Stored schema and permissions APIs
 
@@ -190,7 +190,7 @@ Regarde uses it because the inspector must support arbitrary app schemas without
 
 Current Regarde implementation:
 
-- `apps/web-inspector/src/lib/table-explorer/genericQueryBuilder.ts`
+- `apps/web/src/lib/table-explorer/genericQueryBuilder.ts`
 
 The builder stores:
 
@@ -228,7 +228,7 @@ Jazz translates this shape to relation IR before execution.
 
 Confirmed source:
 
-- Regarde: `apps/web-inspector/src/lib/table-explorer/genericQueryBuilder.ts`
+- Regarde: `apps/web/src/lib/table-explorer/genericQueryBuilder.ts`
 - Jazz: `packages/jazz-tools/src/runtime/query-adapter.ts`
 - Official inspector: `packages/inspector/src/utility/generic-query-builder.ts`
 
@@ -245,12 +245,12 @@ v1 keeps filters and sorting URL-backed for the active tab view and also saves t
 
 Relevant files:
 
-- `apps/web-inspector/src/hooks/useTableExplorerSearchParams.ts`
-- `apps/web-inspector/src/types/tableFilters.ts`
-- `apps/web-inspector/src/components/table-explorer/data/tableFilter.tsx`
-- `apps/web-inspector/src/lib/table-explorer/filterParsing.ts`
-- `apps/web-inspector/src/lib/table-explorer/whereOperators.ts`
-- `apps/web-inspector/src/hooks/useTableQuery.ts`
+- `apps/web/src/hooks/useTableExplorerSearchParams.ts`
+- `apps/web/src/types/tableFilters.ts`
+- `apps/web/src/components/table-explorer/data/tableFilter.tsx`
+- `apps/web/src/lib/table-explorer/filterParsing.ts`
+- `apps/web/src/lib/table-explorer/whereOperators.ts`
+- `apps/web/src/hooks/useTableQuery.ts`
 
 Current supported filter operators:
 
@@ -286,7 +286,7 @@ Example meaning:
 
 Current Regarde flow:
 
-1. `buildDataGridColumns(...)` checks `column.column?.references`.
+1. `buildDataTableColumns(...)` checks `column.column?.references`.
 2. If the current cell value is a non-empty string, it renders `RelationCellLink`.
 3. `RelationCellLink` calls `useRelationRow(relationTable, relationId)`.
 4. `useRelationRow(...)` queries the referenced table with `id = relationId` and `limit(1)`.
@@ -297,11 +297,11 @@ v1 relation navigation opens or focuses a table tab view for the referenced tabl
 
 Relevant Regarde files:
 
-- `apps/web-inspector/src/components/table-explorer/data/buildDataGridColumns.tsx`
-- `apps/web-inspector/src/components/table-explorer/data/relationCellLink.tsx`
-- `apps/web-inspector/src/hooks/useRelationRow.ts`
-- `apps/web-inspector/src/lib/table-explorer/relationNavigation.ts`
-- `apps/web-inspector/src/lib/table-explorer/tableSchema.ts`
+- `apps/web/src/components/table-explorer/data/buildDataTableColumns.tsx`
+- `apps/web/src/components/table-explorer/data/relationCellLink.tsx`
+- `apps/web/src/hooks/useRelationRow.ts`
+- `apps/web/src/lib/table-explorer/relationNavigation.ts`
+- `apps/web/src/lib/table-explorer/tableSchema.ts`
 
 Relation display column priority:
 
@@ -344,12 +344,12 @@ Current Regarde flow:
 
 Relevant Regarde files:
 
-- `apps/web-inspector/src/hooks/useTableMutations.ts`
-- `apps/web-inspector/src/lib/table-explorer/tableProxy.ts`
-- `apps/web-inspector/src/lib/table-explorer/mutationParsing.ts`
-- `apps/web-inspector/src/components/table-explorer/data/rowEditorFields.tsx`
-- `apps/web-inspector/src/components/table-explorer/data/editRowForm.tsx`
-- `apps/web-inspector/src/components/table-explorer/data/insertRowForm.tsx`
+- `apps/web/src/hooks/useTableMutations.ts`
+- `apps/web/src/lib/table-explorer/tableProxy.ts`
+- `apps/web/src/lib/table-explorer/mutationParsing.ts`
+- `apps/web/src/components/table-explorer/data/rowEditorFields.tsx`
+- `apps/web/src/components/table-explorer/data/editRowForm.tsx`
+- `apps/web/src/components/table-explorer/data/insertRowForm.tsx`
 
 Mutation value parsing uses schema metadata:
 
