@@ -25,6 +25,7 @@ import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsInputGroupRouteImport } from './routes/components/input-group'
+import { Route as ComponentsJsonViewRouteImport } from './routes/components/json-view'
 import { Route as ComponentsKeyboardInputRouteImport } from './routes/components/keyboard-input'
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
@@ -122,6 +123,11 @@ const ComponentsInputRoute = ComponentsInputRouteImport.update({
 const ComponentsInputGroupRoute = ComponentsInputGroupRouteImport.update({
   id: '/components/input-group',
   path: '/components/input-group',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsJsonViewRoute = ComponentsJsonViewRouteImport.update({
+  id: '/components/json-view',
+  path: '/components/json-view',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsKeyboardInputRoute = ComponentsKeyboardInputRouteImport.update({
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
+  '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
+  '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
+  '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/components/fieldset'
     | '/components/input'
     | '/components/input-group'
+    | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
     | '/components/resizable-panel'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/components/fieldset'
     | '/components/input'
     | '/components/input-group'
+    | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
     | '/components/resizable-panel'
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/components/fieldset'
     | '/components/input'
     | '/components/input-group'
+    | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
     | '/components/resizable-panel'
@@ -442,6 +454,7 @@ export interface RootRouteChildren {
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsInputGroupRoute: typeof ComponentsInputGroupRoute
+  ComponentsJsonViewRoute: typeof ComponentsJsonViewRoute
   ComponentsKeyboardInputRoute: typeof ComponentsKeyboardInputRoute
   ComponentsMenuRoute: typeof ComponentsMenuRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
@@ -573,6 +586,13 @@ declare module '@tanstack/react-router' {
       path: '/components/input-group'
       fullPath: '/components/input-group'
       preLoaderRoute: typeof ComponentsInputGroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/json-view': {
+      id: '/components/json-view'
+      path: '/components/json-view'
+      fullPath: '/components/json-view'
+      preLoaderRoute: typeof ComponentsJsonViewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/keyboard-input': {
@@ -714,6 +734,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsInputGroupRoute: ComponentsInputGroupRoute,
+  ComponentsJsonViewRoute: ComponentsJsonViewRoute,
   ComponentsKeyboardInputRoute: ComponentsKeyboardInputRoute,
   ComponentsMenuRoute: ComponentsMenuRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,

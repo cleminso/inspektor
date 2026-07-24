@@ -124,6 +124,31 @@ export const paletteValues = stylex.defineConsts({
 
 export const palette = stylex.defineVars(paletteValues)
 
+export const syntaxPaletteValues = stylex.defineConsts({
+  syntaxCyanDark: 'oklch(0.838 0.095 205.66)',
+  syntaxCyanLight: 'oklch(0.594 0.102 219.89)',
+  syntaxPurpleDark: 'oklch(0.741 0.122 290.68)',
+  syntaxPurpleLight: 'oklch(0.535 0.154 291.14)',
+  syntaxPinkDark: 'oklch(0.706 0.194 8.45)',
+  syntaxPinkLight: 'oklch(0.627 0.192 6.57)',
+  syntaxGreenDark: 'oklch(0.836 0.142 130.71)',
+  syntaxGreenLight: 'oklch(0.619 0.130 159.22)',
+  syntaxYellowDark: 'oklch(0.894 0.139 90.47)',
+  syntaxYellowLight: 'oklch(0.654 0.145 64.33)',
+  syntaxOrangeDark: 'oklch(0.774 0.136 46.2)',
+  syntaxOrangeLight: 'oklch(0.645 0.172 39.13)',
+  syntaxForegroundDark: 'oklch(0.991 0.003 106.45)',
+  syntaxForegroundLight: 'oklch(0.268 0.013 320.61)',
+  syntaxMutedDark: 'oklch(0.661 0.002 325.6)',
+  syntaxMutedLight: 'oklch(0.645 0.007 350.91)',
+  syntaxCommentDark: 'oklch(0.548 0.004 325.63)',
+  syntaxCommentLight: 'oklch(0.708 0.007 5.71)',
+  syntaxMarkBackgroundDark: 'oklch(0.376 0.008 317.73)',
+  syntaxMarkBackgroundLight: 'oklch(0.901 0.025 39.36)',
+} as const)
+
+export const syntaxPalette = stylex.defineVars(syntaxPaletteValues)
+
 export const fontSizes = stylex.defineVars({
   1: '0.75rem', // 12
   2: '0.875rem', // 14
@@ -224,6 +249,7 @@ type StyleXTokenKeys<T> = Exclude<
 >
 
 export type PaletteToken = StyleXTokenKeys<typeof palette>
+export type SyntaxPaletteToken = StyleXTokenKeys<typeof syntaxPalette>
 export type FontSizeToken = StyleXTokenKeys<typeof fontSizes>
 export type LineHeightToken = StyleXTokenKeys<typeof lineHeights>
 export type FontWeightToken = StyleXTokenKeys<typeof fontWeights>

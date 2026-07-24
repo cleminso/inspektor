@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Active workspace](#active-workspace)
+- [Implementation checklists](#implementation-checklists)
 - [Commands](#commands)
 - [Architecture](#architecture)
 - [Design-system constraints](#design-system-constraints)
@@ -21,6 +22,32 @@ Implementation work is limited to these directories:
 - `apps/web`: Inspector product application consuming `@inspector/ds`.
 
 Other workspace packages are outside the replacement UI architecture. Do not modify them unless the user explicitly requests work in them.
+
+## Implementation checklists
+
+Use `docs/todo/*.md` checklists to track implementation work for each UI element. One file corresponds to one UI element, such as `table-explorer`, `subscription-query`, or `routing`. The checklist is a working dump place for completed foundation work and for ideas that come up during development but are not to implement now.
+
+A checklist file follows this structure:
+
+- Table of contents linking to each section.
+- Implemented foundation: completed parts of the UI element, grouped by topic.
+- Open product work: known next steps that are out of scope for the current implementation.
+- Work outside the foundation scope: explicit exclusions when the current foundation intentionally does not cover them.
+- Settled interaction decisions: rules that are already decided and should not be reopened.
+- Open design decisions: questions that still need a product decision before implementation.
+- Validation checklist: commands and verification steps to run before considering the work done.
+
+Record a date at the start of each section so it is easy to see when items were added or last updated. Use the format `[DD/MM/YY]`.
+
+When working on an implementation:
+
+- Create or update the relevant `docs/todo/{elementName}.md` file for the UI element in scope.
+- Mark completed items with `[x]` and keep the date current for the section.
+- Add new open items, design decisions, or exclusions as they appear, with the current date, instead of holding them in memory.
+- Do not implement items marked as open or out of scope unless the user explicitly asks for them.
+- Keep the checklist focused on one UI element. If an idea belongs to a different element, add it to that element's checklist instead.
+
+Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and pane foundation, open product work, and decisions for the table explorer.
 
 ## Commands
 

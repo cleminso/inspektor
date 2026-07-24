@@ -2446,6 +2446,50 @@
       }
     }
   ],
+  "jsonView": [
+    {
+      "name": "accessibilityLabel",
+      "type": "string",
+      "required": true,
+      "description": "Contextual label for the JSON tree.",
+      "source": {
+        "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "data",
+      "type": "JsonViewObject | readonly JsonViewValue[]",
+      "required": true,
+      "description": "JSON-compatible object or array to inspect.",
+      "source": {
+        "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "defaultExpandDepth",
+      "type": "0 | 1 | 2",
+      "required": false,
+      "defaultValue": "1",
+      "description": "Number of container levels expanded initially.",
+      "source": {
+        "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "searchTerms",
+      "type": "readonly string[]",
+      "required": false,
+      "defaultValue": "[]",
+      "description": "Literal terms highlighted in keys and primitive values.",
+      "source": {
+        "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
+        "line": 30
+      }
+    }
+  ],
   "input": [
     {
       "name": "size",

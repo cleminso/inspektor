@@ -315,6 +315,26 @@ test("extracts the Spinner API", () => {
   assert.equal(metadata.spinner?.find(({ name }) => name === "className"), undefined);
 });
 
+test("extracts the constrained JsonView API", () => {
+  const metadata = extractPropsMetadata();
+  const jsonViewProps = metadata.jsonView;
+
+  assert.deepEqual(
+    jsonViewProps?.map(({ name }) => name),
+    ["accessibilityLabel", "data", "defaultExpandDepth", "searchTerms"],
+  );
+  assert.equal(jsonViewProps?.find(({ name }) => name === "defaultExpandDepth")?.defaultValue, "1");
+  assert.equal(jsonViewProps?.find(({ name }) => name === "searchTerms")?.defaultValue, "[]");
+  assert.equal(
+    jsonViewProps?.find(({ name }) => name === "className"),
+    undefined,
+  );
+  assert.equal(
+    jsonViewProps?.find(({ name }) => name === "style"),
+    undefined,
+  );
+});
+
 test("extracts the constrained ButtonGroup named API", () => {
   const metadata = extractPropsMetadata();
 

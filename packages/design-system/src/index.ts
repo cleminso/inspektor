@@ -171,6 +171,13 @@ export type {
   InputGroupRootProps,
   InputGroupSuffixProps,
 } from './components/inputGroup/inputGroup'
+export { JsonView } from './components/jsonView/jsonView'
+export type {
+  JsonViewObject,
+  JsonViewPrimitive,
+  JsonViewProps,
+  JsonViewValue,
+} from './components/jsonView/jsonView'
 export { KeyboardInput } from './components/keyboardInput/keyboardInput'
 export type {
   KeyboardInputModifier,

@@ -9,6 +9,7 @@ import {
   Field,
   Input,
   InputGroup,
+  JsonView,
   Select,
   Textarea,
   ToggleGroup,
@@ -24,6 +25,10 @@ import {
 } from "@/lib/table-explorer/mutationParsing";
 import { buildRelationTableLink } from "@/lib/table-explorer/relationNavigation";
 import type { DetailPaneMode } from "@/types/tableExplorer";
+import {
+  createColumnJsonViewValue,
+  isJsonViewContainer,
+} from "@/components/table-explorer/data/jsonViewValue";
 
 // TODO: investigate and when `checkbox NULL` is focus when press `enter` it target the Field.Root
 export interface FieldState {
@@ -233,6 +238,25 @@ export function RowEditorFields({
   onFieldTextChange,
 }: RowEditorFieldsProps): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
+  const readOnlyStructuredValues = useMemo(() => {
+    const values = new Map<string, ReturnType<typeof createColumnJsonViewValue>>();
+
+    for (const { column, readOnlyReason } of formFields) {
+      if (
+        isStructuredColumn(column) === true &&
+        readOnlyReason !== null &&
+        initialRowValues[column.name] !== null &&
+        initialRowValues[column.name] !== undefined
+      ) {
+        values.set(
+          column.name,
+          createColumnJsonViewValue(initialRowValues[column.name], column.column_type),
+        );
+      }
+    }
+
+    return values;
+  }, [formFields, initialRowValues]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-6 pr-1">
@@ -273,6 +297,15 @@ export function RowEditorFields({
           column.column_type.type !== "Enum" &&
           isStructuredColumnType === false &&
           isBinaryColumn === false;
+        const readOnlyStructuredValue =
+          isStructuredColumnType === true &&
+          readOnlyReason !== null &&
+          fieldState.isNull === false
+            ? (readOnlyStructuredValues.get(column.name) ?? null)
+            : null;
+        const usesJsonView =
+          readOnlyStructuredValue !== null &&
+          isJsonViewContainer(readOnlyStructuredValue) === true;
 
         return (
           <Field.Root
@@ -284,8 +317,8 @@ export function RowEditorFields({
               <div className="flex min-w-0 items-center gap-2">
                 <Field.Label
                   id={fieldLabelId}
-                  htmlFor={isBooleanColumn === true ? undefined : fieldId}
-                  nativeLabel={isBooleanColumn === false}
+                  htmlFor={isBooleanColumn === true || usesJsonView === true ? undefined : fieldId}
+                  nativeLabel={isBooleanColumn === false && usesJsonView === false}
                 >
                   <span>{formatColumnNameLabel(column.name)}</span>
                 </Field.Label>
@@ -372,6 +405,11 @@ export function RowEditorFields({
                   </Select.Positioner>
                 </Select.Portal>
               </Select.Root>
+            ) : usesJsonView === true ? (
+              <JsonView
+                accessibilityLabel={`${formatColumnNameLabel(column.name)} value`}
+                data={readOnlyStructuredValue}
+              />
             ) : isStructuredColumnType === true || isBinaryColumn === true ? (
               <div className="flex flex-col gap-2">
                 <Textarea

@@ -696,6 +696,14 @@ UI representation:
 
 Column headers render compact type markers from Jazz schema metadata. The marker should describe the Jazz DSL type first; semantic formatting such as email, URL, image, or currency can be layered on later only when the schema exposes enough metadata to identify it safely.
 
+The type marker composes a base type, container, and modifiers rather than treating every combination as an independent visual
+type. Optionality changes null handling around the base renderer. A transform does not receive its own value renderer; the
+effective value uses the appropriate base renderer, while schema details disclose the transform when it affects filtering,
+editing, copying, or round-trip safety.
+
+Header markers compose these dimensions directly, including forms such as `T?`, `REF?`, `REF[]`, `{T}`, and `T FX`. The compact
+symbol remains secondary to the column name and exposes an accessible Jazz type label.
+
 | Symbol | Jazz DSL type              | TypeScript value      | SQL storage         | Notes                                                                 |
 | ------ | -------------------------- | --------------------- | ------------------- | --------------------------------------------------------------------- |
 | `T`    | `s.string()`               | `string`              | `TEXT`              | Plain text. Do not infer semantic text types from the SQL type alone. |
@@ -708,14 +716,12 @@ Column headers render compact type markers from Jazz schema metadata. The marker
 | `ID`   | `s.ref("table")`           | row ID `string`       | `UUID` foreign key  | Relation to another table. Ref columns must end in `Id` or `_id`.     |
 | `[]`   | `s.array(type)`            | array of base type    | base SQL array      | Render as an array container with the nested type marker when known.  |
 | `IDS`  | `s.array(s.ref())`         | row ID `string[]`     | `UUID[]`            | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
-| `E`    | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details or hover, not the compact header.      |
+| `E`    | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details, not the compact header.               |
 | `{}`   | `s.json()`                 | `JsonValue`           | `JSON`              | Untyped JSON; replace whole value on write.                           |
 | `{T}`  | `s.json(schema)`           | schema-inferred value | `JSON`              | Typed JSON; still atomic on write.                                    |
 | `FX`   | `.transform({ from, to })` | transformed value     | underlying SQL type | Modifier badge. Filters use the stored column value.                  |
 
 #### Row reading and cell rendering
-
-<!--TODO: explicitly describe how each Jazz DSL type will render into table cell and edit form.-->
 
 Rows are readable before they are editable.
 
@@ -725,15 +731,86 @@ Cells render values based on type and context:
 - long strings are truncated with a way to inspect/copy the full value
 - JSON-like values are readable and copyable
   - data table shows truncated preview
-  - hover/focus popover shows formatted value and copy action
   - side panel shows editable textarea when safely serializable
-- binary values do not pretend to be editable text
+- binary values are not editable text
 - relation values use relation cell rendering when schema metadata provides a reference
 - relation values use `TextLink` with a trailing arrow; text uses the normal foreground color and changes to link color on
   hover or keyboard focus without adding an underline
 - timestamps are formatted for reading while preserving the raw value when copied
 
 The goal is not to make every cell interactive. The goal is to make every cell understandable.
+
+Grid cells use bounded, schema-derived previews. The grid does not serialize complete structured or binary values into a cell,
+and it does not replace stored identifiers with inferred semantic labels. The side pane is the authoritative surface for the
+complete value, alternate representations, copying, validation, and editing. Cells do not open hover cards; click, double-click,
+context-menu, and relation navigation already provide the grid's interaction layers.
+
+| Condition | Grid representation | Side-pane representation |
+| --------- | ------------------- | ------------------------ |
+| Row ID | Full ID at the schema-derived initial width. Middle-truncate only when the user narrows the column. | Read-only input group with the complete ID and Copy action. |
+| Non-empty string | Text with end truncation when it exceeds the available width. | Auto-growing text control with native text selection and clipboard behavior. |
+| Empty string | Explicit `""` so it cannot be mistaken for `NULL`. | Empty editable text control. |
+| Integer | Right-aligned whole number. | Numeric text input with integer parsing and validation. |
+| Float | Right-aligned readable number; preserve full precision outside the compact preview. | Numeric text input that preserves intermediate editing states and validates finite values. |
+| Boolean | Non-interactive boolean indicator with `true` or `false` text. | `ToggleGroup` with `True` and `False`; add `Null` when optional. |
+| Valid timestamp | Absolute date and time in the browser timezone without fractional seconds. | Date-time field plus browser-local, UTC, relative, and raw epoch representations. |
+| Malformed timestamp | Explicit invalid-value treatment with the raw value preserved. | Raw value, validation message, and no misleading date formatting. |
+| Non-empty bytes | Byte count only, such as `317 B` or `2 KB`. | Read-only input group with byte count and a `Copy as` menu for Hex, Base64, and Download raw. |
+| Empty bytes | `0 B`. | Read-only input group with `0 B`; binary actions remain available when meaningful. |
+| Resolved reference | Stored relation ID as a `TextLink` with a trailing arrow. | Editable raw relation ID when writable, target table, resolved display value, Copy ID, and Open target. |
+| Missing reference target | Stored relation ID with a missing-target state; never replace it with an empty label. | Editable raw relation ID when writable, target table, missing-target message, and Copy ID. |
+| Scalar enum | Plain enum value. | `Select` constrained to schema values. |
+| Malformed enum | Raw value with an invalid-value treatment. | Current raw value, schema options, and validation message without silent replacement. |
+| Empty array | `[]`. | Empty structured array editor in `Details`; read-only expandable array in row `JSON`. |
+| Primitive array | Item count and bounded one-line preview, such as `[3] reader, writer, reader`. | Schema-derived repeatable fields when practical, with JSON text editing as the generic `Details` fallback. |
+| Enum array | Item count and bounded enum preview. | Repeatable `Select` rows that preserve order and duplicate values. |
+| Reference array | Item count and bounded raw-ID preview. | Repeatable relation fields with raw IDs and explicit navigation actions. |
+| Empty JSON object | `{}`. | JSON text field in `Details`; read-only expandable object in row `JSON`. |
+| Untyped JSON | Key or value count plus bounded one-line preview. | JSON text field with parsing feedback in `Details`; read-only expandable object or array in row `JSON`. |
+| Typed JSON | JSON summary with the `{T}` marker and bounded one-line preview. | JSON text field with schema-derived validation in `Details`; read-only expandable object or array in row `JSON`. |
+| `NULL` | Explicit subdued `NULL` marker. | `NULL` control layered around the base editor. |
+| Unavailable value | Explicit unavailable marker rather than an empty cell. | Unavailable explanation and disabled field actions. |
+| Unsupported or malformed value | Raw bounded preview with an invalid or unsupported state. | Raw value, schema expectation, and reason the value cannot be represented or edited safely. |
+
+Timestamp display uses the user's browser timezone, available through the browser's internationalization APIs. The sync server's
+deployment location does not determine display timezone and cannot be inferred reliably from a timestamp or server URL. UTC and
+the raw epoch remain available in the side pane. Relative time is supporting information rather than the primary grid value.
+
+Reference details in the side pane show the target table, the complete stored relation ID, a resolved display value when one is
+available, and whether the target row was found. Clicking the relation keeps the existing navigation behavior. Showing the stored
+ID as the primary grid value preserves database truth, exposes broken references, and avoids making asynchronous target-row
+resolution look like the stored value. Writable reference fields accept direct row-ID input and may add generic target lookup;
+synthetic row IDs remain read-only.
+
+Jazz byte values are `Uint8Array` values stored as SQL `BYTEA`. Because a byte sequence has no canonical clipboard text form,
+binary copy commands name the encoding explicitly. Hex supports byte-level debugging and Base64 supports transport through APIs
+and text formats. PostgreSQL literals and JavaScript indexed-object serialization are not primary Inspector representations.
+
+Reusable, type-specific presentation and editor components belong in `packages/design-system`. The components remain independent
+from Jazz schema objects: they receive constrained display values, metadata, states, and callbacks. `apps/web` owns the mapping
+from Jazz schema metadata to those components, relation resolution and navigation, parsing, validation, and mutation behavior.
+Dedicated design-system components are required for binary preview and inspection, timestamp presentation and date-time editing,
+structured-value preview and JSON viewing, and relation presentation and field actions. Primitive text, numeric, boolean, enum,
+copy, and null controls should compose existing design-system components unless a repeated semantic contract justifies a dedicated
+component.
+
+The row side pane has two representations:
+
+- `Details` is the schema-derived insert and edit form. Field labels show Jazz semantics such as `string`, `timestamp`, `bytes`,
+  `ref → rooms`, and `json<typed>` rather than SQL storage labels.
+- `JSON` is a read-only, syntax-colored structured tree inspired by Geist JSON View. It expands top-level fields initially,
+  supports branch disclosure, keyboard tree navigation, search highlighting, selectable text, and whole-row Copy JSON. The row
+  JSON representation is not an editing surface; all row mutations remain in `Details`.
+
+The structured tree is an independent design-system component. It owns bounded tree presentation, expansion, keyboard behavior,
+focus, accessible tree semantics, and highlighting. `apps/web` normalizes Jazz values, owns the copy representation, and supplies
+explicit representations for timestamps, bytes, references, unsupported values, and exhausted rendering budgets. Binary values
+must not become indexed-object `Uint8Array` serialization in the JSON representation.
+
+Editable controls keep normal form semantics: one click focuses and positions the caret, and double-click remains normal text
+selection rather than entering edit mode. Read-only identifiers can expose a Copy suffix, and binary fields expose `Copy as`.
+When an editable field is nullable and suffix space is constrained, the `NULL` control takes precedence over Copy; users can copy
+editable text through normal selection and platform clipboard commands.
 
 #### Browsing large tables
 

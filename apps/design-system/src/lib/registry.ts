@@ -343,6 +343,20 @@ export const dataTableItem = {
   componentId: "dataTable",
 } satisfies NavItem;
 
+export const jsonViewItem = {
+  title: "JSON View",
+  slug: "json-view",
+  href: "/components/json-view",
+  description:
+    "Read-only JSON inspection with tree navigation, search highlighting, and bounded rendering.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "jsonView.tsx",
+    path: "packages/design-system/src/components/jsonView/jsonView.tsx",
+  },
+  componentId: "jsonView",
+} satisfies NavItem;
+
 export const resizablePanelItem = {
   title: "Resizable Panel",
   slug: "resizable-panel",
@@ -449,6 +463,7 @@ export const componentItems: NavItem[] = [
   dataTableItem,
   inputItem,
   inputGroupItem,
+  jsonViewItem,
   keyboardInputItem,
   textLinkItem,
   textareaItem,

@@ -9,6 +9,7 @@ import {
   lineHeights,
   palette,
   dimensions,
+  syntaxPalette,
 } from './value.stylex'
 
 
@@ -102,6 +103,26 @@ export const borderColors = stylex.defineVars({
   'border-notification-error': `light-dark(${palette.red500}, ${palette.red400})`,
   'border-notification-info': `light-dark(${palette.blue600}, ${palette.blue400})`,
   'border-notification-loading': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+} as const)
+
+export const syntaxColors = stylex.defineVars({
+  'syntax-attribute': `light-dark(${syntaxPalette.syntaxCyanLight}, ${syntaxPalette.syntaxCyanDark})`,
+  'syntax-boolean': `light-dark(${syntaxPalette.syntaxPurpleLight}, ${syntaxPalette.syntaxPurpleDark})`,
+  'syntax-comment': `light-dark(${syntaxPalette.syntaxCommentLight}, ${syntaxPalette.syntaxCommentDark})`,
+  'syntax-constant': `light-dark(${syntaxPalette.syntaxPurpleLight}, ${syntaxPalette.syntaxPurpleDark})`,
+  'syntax-function': `light-dark(${syntaxPalette.syntaxGreenLight}, ${syntaxPalette.syntaxGreenDark})`,
+  'syntax-keyword': `light-dark(${syntaxPalette.syntaxPinkLight}, ${syntaxPalette.syntaxPinkDark})`,
+  'syntax-number': `light-dark(${syntaxPalette.syntaxPurpleLight}, ${syntaxPalette.syntaxPurpleDark})`,
+  'syntax-operator': `light-dark(${syntaxPalette.syntaxPinkLight}, ${syntaxPalette.syntaxPinkDark})`,
+  'syntax-property': `light-dark(${syntaxPalette.syntaxForegroundLight}, ${syntaxPalette.syntaxForegroundDark})`,
+  'syntax-punctuation': `light-dark(${syntaxPalette.syntaxMutedLight}, ${syntaxPalette.syntaxMutedDark})`,
+  'syntax-string': `light-dark(${syntaxPalette.syntaxYellowLight}, ${syntaxPalette.syntaxYellowDark})`,
+  'syntax-string-special': `light-dark(${syntaxPalette.syntaxOrangeLight}, ${syntaxPalette.syntaxOrangeDark})`,
+  'syntax-tag': `light-dark(${syntaxPalette.syntaxPinkLight}, ${syntaxPalette.syntaxPinkDark})`,
+  'syntax-type': `light-dark(${syntaxPalette.syntaxCyanLight}, ${syntaxPalette.syntaxCyanDark})`,
+  'syntax-variable': `light-dark(${syntaxPalette.syntaxForegroundLight}, ${syntaxPalette.syntaxForegroundDark})`,
+  'syntax-mark-background': `light-dark(${syntaxPalette.syntaxMarkBackgroundLight}, ${syntaxPalette.syntaxMarkBackgroundDark})`,
+  'syntax-mark-foreground': `light-dark(${syntaxPalette.syntaxForegroundLight}, ${syntaxPalette.syntaxForegroundDark})`,
 } as const)
 
 export const spatial = stylex.defineVars({
@@ -217,7 +238,9 @@ type StyleXTokenKeys<T> = Exclude<
 export type BackgroundColorToken = StyleXTokenKeys<typeof backgroundColors>
 export type TextColorToken = StyleXTokenKeys<typeof textColors>
 export type BorderColorToken = StyleXTokenKeys<typeof borderColors>
+export type SyntaxColorToken = StyleXTokenKeys<typeof syntaxColors>
 export type ColorToken =
   | BackgroundColorToken
   | TextColorToken
   | BorderColorToken
+  | SyntaxColorToken
