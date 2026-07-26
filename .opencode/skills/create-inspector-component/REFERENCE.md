@@ -8,6 +8,7 @@
 - [Closed styling boundary](#closed-styling-boundary)
 - [Public API rules](#public-api-rules)
 - [StyleX state patterns](#stylex-state-patterns)
+- [Referential stability contracts](#referential-stability-contracts)
 - [Testing decision table](#testing-decision-table)
 - [Validation commands](#validation-commands)
 - [Package documentation contract](#package-documentation-contract)
@@ -116,6 +117,68 @@ When an ancestor must influence a descendant's rendered appearance without prop 
 
 This pattern is required because StyleX files that export `defineVars()` cannot also export `stylex.create()` or type exports. Splitting keeps the contract explicit and reusable. See `InputGroup` for the established precedent.
 
+## Referential stability contracts
+
+Use a referential stability contract when a reusable boundary intentionally promises that its object, array, or function identity survives unrelated renders. Typical boundaries are context provider values, hook return objects consumed as one dependency, and props passed to memoized component subtrees.
+
+Do not introduce `Stable<T>` for local implementation values or as a default performance technique. First identify the consumer that observes reference identity. Memoization adds dependency comparisons and can conceal mutable state when used without a clear boundary.
+
+### Type contract
+
+Define the brand with a private `unique symbol`. The brand is compile-only evidence that ordinary structural values cannot satisfy accidentally. It guarantees identity preservation, not immutability:
+
+```/dev/null/stable.ts#L1-11
+declare const stableBrand: unique symbol
+
+export type Stable<T> = T extends object
+  ? T & { readonly [stableBrand]: true }
+  : T
+
+export function asStable<T>(value: T): Stable<T> {
+  return value as unknown as Stable<T>
+}
+```
+
+The `unknown` assertion deliberately erases the source type before applying the phantom brand. It performs no runtime validation or mutation. Keep `asStable()` package-private and adjacent to the runtime mechanism that proves the guarantee. Never scatter it through consumers to make incompatible values compile.
+
+### Provider implementation
+
+React compares context provider values with `Object.is`. An inline provider object broadcasts a context update on every parent render. Build the complete value inside `useMemo`, list every meaningful field as a dependency, and apply the brand inside the memo factory:
+
+```/dev/null/provider.tsx#L1-14
+const value = useMemo(
+  () =>
+    asStable({
+      state,
+      action,
+    } satisfies ContextValue),
+  [action, state],
+)
+
+return <Context.Provider value={value}>{children}</Context.Provider>
+```
+
+The context and its accessor should preserve `Stable<ContextValue>` so the proof survives the provider boundary. Standard React hooks accept any dependency type, so this brand documents and transports the guarantee but does not make `useEffect` or `useMemo` reject unstable dependencies. Claim dependency-array enforcement only when strict hook types are installed.
+
+### Mutable stable containers
+
+Stable identity does not mean stable contents. React refs and TanStack Table instances retain container identity while their internal values change. Do not use a branded container reference as a state version, and do not tell consumers that an effect depending on the container will run when its internals change.
+
+For third-party containers:
+
+- Keep the public prop typed as the third-party return type when its API cannot produce the project brand.
+- Establish any wrapper or context stability inside the design-system component.
+- Preserve the library's own subscription or controlled-state mechanism for semantic updates.
+- Include wrapper inputs that should notify context consumers in the memo dependency set.
+
+### Consumer impact
+
+The runtime benefit is narrower context broadcasts and stable props for memoized descendants. The type benefit is preserving evidence across shared boundaries. There is no benefit when every relevant callback, object, or array dependency changes on each render, so do not claim an optimization until the complete identity chain is stable.
+
+### Required proof
+
+Add a regression test with a memoized consumer. Render the provider, trigger an unrelated owner render with identical meaningful inputs, and assert that the consumer did not render again. Add a separate update assertion when a meaningful input changes and the consumer must be notified.
+
 ## Testing decision table
 
 | Change | Required proof |
@@ -124,6 +187,7 @@ This pattern is required because StyleX files that export `defineVars()` cannot 
 | Wrapper only constrains props and applies styles | Type test or extractor/API contract test |
 | Public export uses `Object.assign` or a namespaced shape | Failing extractor-resolution test |
 | Base UI state maps to Inspector styles | Focused render test when package test infrastructure supports it; otherwise typecheck plus focused lint |
+| Component establishes `Stable<T>` at a provider or shared hook boundary | Failing identity regression test covering unrelated and meaningful input changes |
 
 Do not retest behavior wholly owned by Base UI. Test the wrapper's behavior, public contract, and state translation.
 

@@ -115,6 +115,15 @@ behavior discussion. Detailed acceptance rules remain in
 - [ ] Add header cell column type prefix/suffix
 - [ ] Add a chevron button icon to open context menu that display column actions
 
+### Query referential stability
+
+[26/07/26]
+
+- [x] Pass a module-scope constant options object to relation label queries so `useAll` subscription memoization holds across
+      per-cell renders.
+- [x] Parse URL filters in a dedicated memo keyed on the raw search string so unrelated search changes no longer rebuild the
+      filters array identity consumed by the query builder and selection-scope key.
+
 ### Documentation and regression coverage
 
 [23/07/26]

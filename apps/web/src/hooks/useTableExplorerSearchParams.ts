@@ -81,6 +81,28 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as SearchValues;
 
+  /**
+   * Why: the parsed filters array flows into useTableQuery's query-builder memo and
+   * useDataViewState's selection-scope key. When parsing lived inside the combined state
+   * memo below, any unrelated search change — opening the row editor flips `mode`/`rowId`,
+   * switching views flips `view` — re-ran the parse and produced a fresh array identity for
+   * identical filter content, which rebuilt the generic query and added identity noise that
+   * downstream stringified comparison keys then had to absorb.
+   *
+   * How: a dedicated memo keyed on the raw serialized string re-parses only when the filter
+   * content actually changes. React compares the string by value, so the array identity now
+   * follows filter content instead of following every URL update.
+   *
+   * What: downstream memos and effects re-run only on semantic filter changes. Opening or
+   * closing the row editor and switching views no longer rebuild the query builder, which
+   * removes the wasted query churn and shrinks what downstream comparison keys must defend
+   * against at this boundary.
+   */
+  const filters = useMemo(
+    () => parseFiltersFromSearchParam(search.filters ?? null),
+    [search.filters],
+  );
+
   const state = useMemo<TableExplorerSearchState>(() => {
     const editorMode = parseEditorMode(search.mode);
     const rowId = parseRowId(search.rowId);
@@ -91,12 +113,12 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
       editorMode: resolvedEditorMode,
       // Opening the row editor always returns the user to data rows, even from schema view.
       view: resolvedEditorMode !== null ? "data" : parseView(search.view),
-      filters: parseFiltersFromSearchParam(search.filters ?? null),
+      filters,
       rowId: resolvedEditorMode === "edit" ? rowId : null,
       sortColumn: search.sort ?? "id",
       sortDirection: parseSortDirection(search.dir),
     };
-  }, [search.dir, search.filters, search.mode, search.rowId, search.sort, search.view]);
+  }, [filters, search.dir, search.mode, search.rowId, search.sort, search.view]);
 
   const createNextSearch = (
     baseSearch: SearchValues,

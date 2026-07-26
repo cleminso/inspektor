@@ -12,5 +12,5 @@ export const appRoutes = {
   schema: "/conn/$connectionId/$branch/$schemaHash",
   tables: "/conn/$connectionId/$branch/$schemaHash/tables",
   QuerySubscriptions: "/conn/$connectionId/$branch/$schemaHash/query-subscriptions",
-  table: "/conn/$connectionId/$branch/$schemaHash/tables/$tableName/",
+  table: "/conn/$connectionId/$branch/$schemaHash/tables/$tableName",
 } as const;

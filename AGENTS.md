@@ -11,6 +11,7 @@
 - [Component documentation](#component-documentation)
 - [Application rules](#application-rules)
 - [React patterns](#react-patterns)
+- [Referential stability contracts](#referential-stability-contracts)
 - [TypeScript conventions](#typescript-conventions)
 
 ## Active workspace
@@ -133,6 +134,17 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 - Put user-action side effects in event handlers.
 - Use keys when remounting is the intended state reset.
 - Return cleanup from subscriptions, listeners, observers, and imperative integrations.
+
+## Referential stability contracts
+
+- Use `Stable<T>` only at shared boundaries where consumers intentionally rely on reference identity, such as memoized context values or reusable hooks. Do not brand ordinary local values.
+- Establish `Stable<T>` beside the mechanism that proves identity preservation: `useMemo`, `useCallback`, React state or ref containers, or a module-scope constant.
+- Treat `asStable()` as an explicit trust boundary. Never use it only to silence a type error, and cover each new proof boundary with an identity regression test.
+- A stable reference is not immutable and is not a reactive state version. Consumers of stable mutable containers must subscribe to their state instead of depending on container identity.
+- Include every meaningful input in the memoization dependency set. The stable value must change when a consumer should be notified.
+- Do not require branded versions of third-party return types in public props when the third-party API cannot produce the brand. Prove stability inside the design-system boundary instead.
+- Do not add memoization without a consumer or boundary that benefits from stable identity.
+- Standard React hook types do not enforce stable dependencies. Do not claim dependency-array enforcement unless the project adopts strict hook types that require `Stable<T>`.
 
 ## TypeScript conventions
 

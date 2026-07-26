@@ -5,10 +5,11 @@ import {
   type RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState, type ReactNode } from "react";
+import { memo, useState, type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DataTable } from "./dataTable";
+import { useDataTableContext } from "./dataTableContext";
 
 let onDataTableDragEnd: ((event: unknown) => void) | undefined;
 let onDataTableDragOver: ((event: unknown) => void) | undefined;
@@ -90,6 +91,39 @@ const rows: Person[] = [
   { id: "person-1", name: "Ada", role: "Engineer" },
   { id: "person-2", name: "Grace", role: "Admiral" },
 ];
+
+const contextRenderCount = { current: 0 };
+
+const ContextRenderProbe = memo(function ContextRenderProbe() {
+  useDataTableContext<Person>();
+  contextRenderCount.current += 1;
+  return null;
+});
+
+function StableContextDataTable() {
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  const [, setRenderCount] = useState(0);
+  const table = useReactTable({
+    columns,
+    data: rows,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
+  });
+
+  return (
+    <>
+      <button type="button" onClick={() => setRenderCount((count) => count + 1)}>
+        Rerender
+      </button>
+      <button type="button" onClick={() => setActiveColumnId("name")}>
+        Activate column
+      </button>
+      <DataTable.Root table={table} activeColumnId={activeColumnId}>
+        <ContextRenderProbe />
+      </DataTable.Root>
+    </>
+  );
+}
 
 interface TestDataTableProps {
   activeCell?: { columnId: string; rowId: string } | null;
@@ -324,6 +358,7 @@ function ReorderableDataTable({
 
 afterEach(() => {
   cleanup();
+  contextRenderCount.current = 0;
   dragOverlayDropAnimation = undefined;
   droppingSortableId = null;
   sortableInputs.length = 0;
@@ -331,6 +366,20 @@ afterEach(() => {
 });
 
 describe("DataTable", () => {
+  it("preserves context identity until a meaningful input changes", () => {
+    render(<StableContextDataTable />);
+
+    expect(contextRenderCount.current).toBe(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Rerender" }));
+
+    expect(contextRenderCount.current).toBe(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Activate column" }));
+
+    expect(contextRenderCount.current).toBe(2);
+  });
+
   it("renders semantic headers, rows, and visible cells from TanStack state", () => {
     render(<TestDataTable />);
 

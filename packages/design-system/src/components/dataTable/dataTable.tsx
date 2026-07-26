@@ -11,8 +11,10 @@ import { useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from "rea
 
 import { dataTableStyles } from "./dataTable.styles";
 import {
+  asStable,
   DataTableContext,
   type DataTableContextValue,
+  type Stable,
   useDataTableContext,
 } from "./dataTableContext";
 
@@ -283,23 +285,55 @@ function DataTableRoot<TData extends RowData>({
 
     return columnsByRow;
   }, [selectedCells]);
-  const value: DataTableContextValue<TData> = {
-    activeCell,
-    activeColumnId,
-    activeRowId,
-    density,
-    onCellActivate,
-    onCellContextMenu,
-    onCellOpen,
-    onColumnActivate,
-    onHeaderContextMenu,
-    onRowActivate,
-    onRowContextMenu,
-    selectedColumnsByRow,
-    columnReorderEnabled,
-    getColumnReorderIndex: (columnId) => columnReorderIndices.get(columnId) ?? -1,
-    table,
-  };
+  /**
+   * Why: React compares context values by reference. Recreating this object on every Root render
+   * would notify every compound DataTable part even when no table input changed.
+   *
+   * How: useMemo retains the object while every field used to build it is unchanged. Derived
+   * functions are created inside the memo so their identities follow the same dependency set.
+   *
+   * What: asStable records that runtime guarantee in the context type. It does not make the
+   * mutable TanStack Table instance immutable; it only preserves this wrapper's identity across
+   * unrelated renders. Consumers therefore avoid context-driven renders and can safely depend on
+   * the complete context reference instead of reconstructing their own stability assumptions.
+   */
+  const value = useMemo(
+    () =>
+      asStable({
+        activeCell,
+        activeColumnId,
+        activeRowId,
+        density,
+        onCellActivate,
+        onCellContextMenu,
+        onCellOpen,
+        onColumnActivate,
+        onHeaderContextMenu,
+        onRowActivate,
+        onRowContextMenu,
+        selectedColumnsByRow,
+        columnReorderEnabled,
+        getColumnReorderIndex: (columnId: string) => columnReorderIndices.get(columnId) ?? -1,
+        table,
+      } satisfies DataTableContextValue<TData>),
+    [
+      activeCell,
+      activeColumnId,
+      activeRowId,
+      columnReorderEnabled,
+      columnReorderIndices,
+      density,
+      onCellActivate,
+      onCellContextMenu,
+      onCellOpen,
+      onColumnActivate,
+      onHeaderContextMenu,
+      onRowActivate,
+      onRowContextMenu,
+      selectedColumnsByRow,
+      table,
+    ],
+  );
 
   useEffect(() => {
     onColumnActivateRef.current = onColumnActivate;
@@ -333,7 +367,7 @@ function DataTableRoot<TData extends RowData>({
   }, [activeColumnId]);
 
   const root = (
-    <DataTableContext.Provider value={value as DataTableContextValue<RowData>}>
+    <DataTableContext.Provider value={value as Stable<DataTableContextValue<RowData>>}>
       <div
         {...stylex.props(dataTableStyles.root)}
         data-density={density}

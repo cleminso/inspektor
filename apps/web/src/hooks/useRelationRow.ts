@@ -16,6 +16,26 @@ import { getRelationDisplayColumn } from "@/lib/table-explorer/tableSchema";
 
 const EMPTY_ROWS: DynamicTableRow[] = [];
 
+/**
+ * Why: `useAll` memoizes its subscription lookup on `[manager, query, queryOptions]`, so an
+ * inline options literal defeats that memo on every render. This hook runs once per visible
+ * relation cell, which made the unstable options identity the highest-frequency stability
+ * leak in the explorer: each cell re-ran Jazz's subscription key computation on every render.
+ *
+ * How: the options have no inputs, so a module-scope constant provides one identity for the
+ * whole app instead of one per mounted cell. This is the referential-stability contract's
+ * module-constant case: identity is guaranteed by construction, without a memoization hook.
+ *
+ * What: every relation cell now passes the same options reference, so `useAll`'s internal
+ * memo holds across unrelated renders and relation label lookups stop churning the
+ * subscription cache key.
+ */
+const RELATION_QUERY_OPTIONS = {
+  propagation: "full" as const,
+  // Relation label lookups should not appear in the query-subscriptions telemetry being inspected.
+  visibility: "hidden_from_live_query_list" as const,
+};
+
 /** Converts arbitrary dynamic row values into compact relation labels. */
 function formatCellValue(value: unknown): string {
   if (value === null || value === undefined) {
@@ -56,11 +76,8 @@ export function useRelationRow(relationTable: string, relationId: string): UseRe
     return new GenericQueryBuilder(relationTable, runtime.wasmSchema).where({ id: relationId }).limit(1);
   }, [relationId, relationTable, runtime.wasmSchema]);
 
-  const relationRows = useAll<DynamicTableRow>(
-    queryBuilder ?? undefined,
-    // Relation label lookups should not appear in the query-subscriptions telemetry being inspected.
-    { propagation: "full", visibility: "hidden_from_live_query_list" },
-  ) ?? EMPTY_ROWS;
+  const relationRows =
+    useAll<DynamicTableRow>(queryBuilder ?? undefined, RELATION_QUERY_OPTIONS) ?? EMPTY_ROWS;
   const row = relationRows[0] ?? null;
   const displayColumn = useMemo(() => {
     return getRelationDisplayColumn(runtime.wasmSchema, relationTable);
