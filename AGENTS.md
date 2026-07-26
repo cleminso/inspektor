@@ -6,6 +6,7 @@
 - [Implementation checklists](#implementation-checklists)
 - [Commands](#commands)
 - [Architecture](#architecture)
+- [Import boundaries](#import-boundaries)
 - [Design-system constraints](#design-system-constraints)
 - [Component authoring](#component-authoring)
 - [Component documentation](#component-documentation)
@@ -81,6 +82,16 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 - The Inspector is schema-driven and generic. Do not add generated query builders or table-specific UI for inspected applications; use stored schema metadata and generic query construction.
 - Connection data includes `serverUrl`, `appId`, `adminSecret`, branch, and schema hash. Treat `adminSecret` as sensitive even when local links pass it in URL hash parameters.
 - TanStack Router route trees are generated. Do not hand-edit `apps/web/src/routeTree.gen.ts` or `apps/design-system/src/routeTree.gen.ts`.
+
+## Import boundaries
+
+Follow `docs/importBoundaryPlaybook.md` when adding a heavy dependency, deferring optional behavior, or changing a dynamic import boundary.
+
+- Keep optional heavy runtime imports inside a dedicated deferred module.
+- Keep static bridge contexts free of the deferred dependency.
+- Attach behavioral refs through the React components that own the rendered elements; do not reconnect behavior through DOM discovery, positional matching, or mutation observers.
+- Treat a deferred provider insertion as a possible subtree remount and preserve required user state by semantic identity.
+- Add boundary and behavior regression tests, then inspect production output when the import graph changes.
 
 ## Design-system constraints
 

@@ -7,6 +7,7 @@ import { TabView } from './tabView'
 
 let onDragEnd: ((event: unknown) => void) | undefined
 let onDragStart: ((event: unknown) => void) | undefined
+const sortableRefs = new Map<string | number, ReturnType<typeof vi.fn>>()
 
 vi.mock('@dnd-kit/react', () => ({
   DragDropProvider: ({
@@ -26,10 +27,14 @@ vi.mock('@dnd-kit/react', () => ({
 
 vi.mock('@dnd-kit/react/sortable', () => ({
   isSortable: (source: { sortable?: boolean } | null | undefined) => source?.sortable === true,
-  useSortable: () => ({
-    isDragSource: false,
-    ref: () => undefined,
-  }),
+  useSortable: (input: { id: string | number }) => {
+    const ref = vi.fn()
+    sortableRefs.set(input.id, ref)
+    return {
+      isDragSource: false,
+      ref,
+    }
+  },
 }))
 
 vi.mock('@dnd-kit/abstract/modifiers', () => ({
@@ -51,10 +56,27 @@ vi.mock('@dnd-kit/dom/modifiers', () => ({
   RestrictToElement: { configure: () => ({}) },
 }))
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  onDragEnd = undefined
+  onDragStart = undefined
+  sortableRefs.clear()
+})
 
 describe('TabView', () => {
-  it('activates the dragged view when sorting starts', () => {
+  it('rejects duplicate reorder values', () => {
+    expect(() =>
+      render(
+        <TabView.Root defaultValue="all">
+          <TabView.List values={['all', 'all']} onReorder={() => undefined}>
+            <TabView.Item value="all">All accounts</TabView.Item>
+          </TabView.List>
+        </TabView.Root>,
+      ),
+    ).toThrow('TabView.List values must be unique')
+  })
+
+  it('preserves the focused tab when reorder behavior loads', async () => {
     render(
       <TabView.Root defaultValue="all">
         <TabView.List
@@ -67,6 +89,57 @@ describe('TabView', () => {
         </TabView.List>
       </TabView.Root>,
     )
+
+    const tab = screen.getByRole('tab', { name: 'Active accounts' })
+    tab.focus()
+
+    await waitFor(() => {
+      expect(onDragStart).toBeTypeOf('function')
+    })
+
+    const reorderedTab = screen.getByRole('tab', { name: 'Active accounts' })
+    expect(document.activeElement).toBe(reorderedTab)
+  })
+
+  it('registers each sortable through its owning tab item ref', async () => {
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'active']}
+          onReorder={() => undefined}
+        >
+          <TabView.Item value="all">All accounts</TabView.Item>
+          <TabView.Item value="active">Active accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    await waitFor(() => {
+      const activeItem = screen
+        .getByRole('tab', { name: 'Active accounts' })
+        .closest('[data-slot="tab-view-item"]')
+      expect(sortableRefs.get('active')).toHaveBeenCalledWith(activeItem)
+    })
+  })
+
+  it('activates the dragged view when sorting starts', async () => {
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'active']}
+          onReorder={() => undefined}
+        >
+          <TabView.Item value="all">All accounts</TabView.Item>
+          <TabView.Item value="active">Active accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    await waitFor(() => {
+      expect(onDragStart).toBeTypeOf('function')
+    })
 
     const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
     act(() => {
@@ -82,7 +155,7 @@ describe('TabView', () => {
     expect(activeTab.getAttribute('data-active')).toBe('')
   })
 
-  it('reports the reordered values after a sortable drag ends', () => {
+  it('reports the reordered values after a sortable drag ends', async () => {
     const handleReorder = vi.fn()
 
     render(
@@ -98,6 +171,10 @@ describe('TabView', () => {
         </TabView.List>
       </TabView.Root>,
     )
+
+    await waitFor(() => {
+      expect(onDragEnd).toBeTypeOf('function')
+    })
 
     onDragEnd?.({
       canceled: false,
@@ -128,7 +205,9 @@ describe('TabView', () => {
 
     fireEvent.click(screen.getByRole('tab', { name: 'Active accounts' }))
 
-    expect(screen.getByRole('tab', { name: 'Active accounts' }).getAttribute('data-active')).toBe('')
+    expect(screen.getByRole('tab', { name: 'Active accounts' }).getAttribute('data-active')).toBe(
+      '',
+    )
     expect(screen.getByText('Active account rows')).toBeTruthy()
     expect(screen.queryByText('All account rows')).toBeNull()
   })
@@ -157,7 +236,9 @@ describe('TabView', () => {
 
     expect(closedValue).toBe('active')
     expect(screen.getByRole('tab', { name: 'All accounts' }).getAttribute('data-active')).toBe('')
-    expect(screen.getByRole('tab', { name: 'Active accounts' }).getAttribute('data-active')).toBeNull()
+    expect(
+      screen.getByRole('tab', { name: 'Active accounts' }).getAttribute('data-active'),
+    ).toBeNull()
   })
 
   it('closes the focused view with the Delete key', () => {

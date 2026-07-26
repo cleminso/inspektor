@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -325,11 +325,13 @@ function SelectionHitAreaDataTable({
 }
 
 function ReorderableDataTable({
+  initialColumnOrder = ["name", "role"],
   onColumnOrderChange,
 }: {
+  initialColumnOrder?: string[];
   onColumnOrderChange: (columnIds: string[]) => void;
 }) {
-  const [columnOrder, setColumnOrder] = useState(["name", "role"]);
+  const [columnOrder, setColumnOrder] = useState(initialColumnOrder);
   const table = useReactTable({
     columns,
     data: rows,
@@ -361,11 +363,40 @@ afterEach(() => {
   contextRenderCount.current = 0;
   dragOverlayDropAnimation = undefined;
   droppingSortableId = null;
+  onDataTableDragEnd = undefined;
+  onDataTableDragOver = undefined;
+  onDataTableDragStart = undefined;
   sortableInputs.length = 0;
   sortableTargetRefs.clear();
 });
 
 describe("DataTable", () => {
+  it("rejects duplicate reorder column ids", () => {
+    expect(() =>
+      render(
+        <ReorderableDataTable
+          initialColumnOrder={["name", "name"]}
+          onColumnOrderChange={() => undefined}
+        />,
+      ),
+    ).toThrow("DataTable columnOrder values must be unique");
+  });
+
+  it("preserves the focused header when reorder behavior loads", async () => {
+    render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
+    const header = screen.getByRole("columnheader", { name: "Name" });
+    header.focus();
+    expect(header.hasAttribute("data-reorderable")).toBe(false);
+
+    await waitFor(() => {
+      expect(onDataTableDragStart).toBeTypeOf("function");
+    });
+
+    const reorderedHeader = screen.getByRole("columnheader", { name: "Name" });
+    expect(document.activeElement).toBe(reorderedHeader);
+    expect(reorderedHeader.hasAttribute("data-reorderable")).toBe(true);
+  });
+
   it("preserves context identity until a meaningful input changes", () => {
     render(<StableContextDataTable />);
 
@@ -528,11 +559,13 @@ describe("DataTable", () => {
     );
   });
 
-  it("registers body cells only as column drop targets", () => {
+  it("registers body cells only as column drop targets", async () => {
     render(<ReorderableDataTable onColumnOrderChange={vi.fn()} />);
     const cell = screen.getByRole("cell", { name: "Engineer" });
 
-    expect(sortableTargetRefs.get("person-1:role")).toHaveBeenCalledWith(cell);
+    await waitFor(() => {
+      expect(sortableTargetRefs.get("person-1:role")).toHaveBeenCalledWith(cell);
+    });
   });
 
   it("supports expanded content through manual compound composition", () => {
@@ -598,9 +631,13 @@ describe("DataTable", () => {
     expect(onCellOpen).not.toHaveBeenCalled();
   });
 
-  it("moves headers and body cells together while a column is dragged", () => {
+  it("moves headers and body cells together while a column is dragged", async () => {
     const onColumnOrderChange = vi.fn();
     render(<ReorderableDataTable onColumnOrderChange={onColumnOrderChange} />);
+
+    await waitFor(() => {
+      expect(onDataTableDragOver).toBeTypeOf("function");
+    });
 
     act(() => {
       onDataTableDragStart?.({ operation: {} });
@@ -637,40 +674,50 @@ describe("DataTable", () => {
     ).toEqual(["Engineer", "Ada"]);
   });
 
-  it("gives reorderable body cells row-scoped sortable transitions without making them draggable", () => {
+  it("gives reorderable body cells row-scoped sortable transitions without making them draggable", async () => {
     render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
-    expect(sortableInputs).toContainEqual({
-      accept: "column-cell",
-      id: "person-1:role",
-      index: 1,
-      group: "data-table-row:person-1",
-      disabled: {
-        draggable: true,
-        droppable: false,
-      },
-      type: "column-cell",
+    await waitFor(() => {
+      expect(sortableInputs).toContainEqual({
+        accept: "column-cell",
+        id: "person-1:role",
+        index: 1,
+        group: "data-table-row:person-1",
+        disabled: {
+          draggable: true,
+          droppable: false,
+        },
+        type: "column-cell",
+      });
     });
   });
 
-  it("keeps the source header visually reserved while its overlay is dropping", () => {
+  it("keeps the source header visually reserved while its overlay is dropping", async () => {
     droppingSortableId = "name";
     render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
-    expect(screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-dragging")).toBe(
-      true,
-    );
+    await waitFor(() => {
+      expect(screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-dragging")).toBe(
+        true,
+      );
+    });
   });
 
-  it("does not animate the drag overlay after the pointer is released", () => {
+  it("does not animate the drag overlay after the pointer is released", async () => {
     render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
-    expect(dragOverlayDropAnimation).toBeNull();
+    await waitFor(() => {
+      expect(dragOverlayDropAnimation).toBeNull();
+    });
   });
 
-  it("restores the complete column order when a drag is canceled", () => {
+  it("restores the complete column order when a drag is canceled", async () => {
     const onColumnOrderChange = vi.fn();
     render(<ReorderableDataTable onColumnOrderChange={onColumnOrderChange} />);
+
+    await waitFor(() => {
+      expect(onDataTableDragOver).toBeTypeOf("function");
+    });
 
     act(() => {
       onDataTableDragStart?.({ operation: {} });

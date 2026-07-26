@@ -1,13 +1,15 @@
 import * as stylex from "@stylexjs/stylex";
-import { RestrictToHorizontalAxis } from "@dnd-kit/abstract/modifiers";
-import { move } from "@dnd-kit/helpers";
-import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
-import { useSortable } from "@dnd-kit/react/sortable";
-import { AutoScroller, PointerActivationConstraints, PointerSensor } from "@dnd-kit/dom";
-import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import type { Cell, Header, HeaderGroup, Row, RowData, Table } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
-import { useEffect, useMemo, useRef, type MouseEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 
 import { dataTableStyles } from "./dataTable.styles";
 import {
@@ -17,27 +19,32 @@ import {
   type Stable,
   useDataTableContext,
 } from "./dataTableContext";
+import { useDataTableReorderContext } from "./dataTableReorderContext";
 
 export type DataTableDensity = "compact" | "default";
 
-const dataTablePointerSensor = PointerSensor.configure({
-  activationConstraints: [new PointerActivationConstraints.Distance({ value: 4 })],
-  preventActivation: (event) => {
-    if (event.pointerType === "touch") {
-      return true;
-    }
-    if (!(event.target instanceof Element)) {
-      return false;
-    }
-    return (
-      event.target.closest(
-        'a, button, input, select, textarea, [role="checkbox"], [data-slot="data-table-resize-handle"]',
-      ) !== null
-    );
-  },
-});
+/**
+ * Why: importing DND from this static module pulled the shared sortable chunk into the initial
+ * application load. A sibling-runtime alternative kept the chunk deferred but depended on DOM
+ * queries, mutation observers, and external element registration.
+ *
+ * How: the DND implementation loads after mount and wraps the table. Its context supplies small
+ * components that attach `useSortable` directly to each owning header and cell ref.
+ *
+ * What: the first render stays static, then the table remounts once with reorder behavior. The
+ * focused column is recorded and restored after that remount.
+ */
+type DataTableReorderModule = typeof import("./dataTableReorder");
 
-const dataTableSensors = [dataTablePointerSensor];
+let dataTableReorderModule: Promise<DataTableReorderModule> | undefined;
+
+function loadDataTableReorder(): Promise<DataTableReorderModule> {
+  dataTableReorderModule ??= import("./dataTableReorder").catch((error: unknown) => {
+    dataTableReorderModule = undefined;
+    throw error;
+  });
+  return dataTableReorderModule;
+}
 
 export interface DataTableCellTarget {
   columnId: string;
@@ -234,10 +241,6 @@ function getVisibleColumnCount<TData extends RowData>(table: Table<TData>): numb
   return Math.max(table.getVisibleLeafColumns().length, 1);
 }
 
-function areColumnOrdersEqual(left: readonly string[], right: readonly string[]): boolean {
-  return left.length === right.length && left.every((columnId, index) => columnId === right[index]);
-}
-
 function DataTableRoot<TData extends RowData>({
   activeCell = null,
   activeColumnId = null,
@@ -257,23 +260,22 @@ function DataTableRoot<TData extends RowData>({
   table,
 }: DataTableRootProps<TData>) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const initialColumnOrderRef = useRef<readonly string[]>([]);
+  const focusedColumnIdRef = useRef<string | null>(null);
   const onColumnActivateRef = useRef(onColumnActivate);
+  const [ReorderComponent, setReorderComponent] = useState<
+    DataTableReorderModule["DataTableReorder"] | null
+  >(null);
   const columnReorderIndices = useMemo(
     () => new Map(columnOrder?.map((columnId, index) => [columnId, index]) ?? []),
     [columnOrder],
   );
-  const columnReorderEnabled =
-    columnOrder !== undefined &&
-    onColumnOrderChange !== undefined &&
-    columnReorderIndices.size === columnOrder.length;
-  const modifiers = useMemo(
-    () => [
-      RestrictToHorizontalAxis,
-      RestrictToElement.configure({ element: () => rootRef.current }),
-    ],
-    [],
-  );
+  if (columnOrder !== undefined && columnReorderIndices.size !== columnOrder.length) {
+    throw new Error("DataTable columnOrder values must be unique");
+  }
+
+  const columnReorderConfigured = columnOrder !== undefined && onColumnOrderChange !== undefined;
+  const columnReorderReady = ReorderComponent !== null;
+  const columnReorderEnabled = columnReorderConfigured === true && columnReorderReady === true;
   const selectedColumnsByRow = useMemo(() => {
     const columnsByRow = new Map<string, Set<string>>();
 
@@ -340,6 +342,47 @@ function DataTableRoot<TData extends RowData>({
   }, [onColumnActivate]);
 
   useEffect(() => {
+    if (columnReorderConfigured === false || ReorderComponent !== null) {
+      return;
+    }
+
+    let active = true;
+    void loadDataTableReorder()
+      .then((module) => {
+        if (active === true) {
+          const activeElement = document.activeElement;
+          if (
+            activeElement instanceof Element &&
+            rootRef.current?.contains(activeElement) === true
+          ) {
+            focusedColumnIdRef.current =
+              activeElement.closest<HTMLElement>("[data-column-id]")?.dataset.columnId ?? null;
+          }
+          setReorderComponent(() => module.DataTableReorder);
+        }
+      })
+      .catch((error: unknown) => {
+        console.error("Unable to load DataTable reorder behavior", error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [ReorderComponent, columnReorderConfigured]);
+
+  useLayoutEffect(() => {
+    const focusedColumnId = focusedColumnIdRef.current;
+    if (ReorderComponent === null || focusedColumnId === null) {
+      return;
+    }
+    const focusedCell = Array.from(
+      rootRef.current?.querySelectorAll<HTMLElement>("[data-column-id]") ?? [],
+    ).find((cell) => cell.dataset.columnId === focusedColumnId);
+    focusedCell?.focus();
+    focusedColumnIdRef.current = null;
+  }, [ReorderComponent]);
+
+  useEffect(() => {
     if (activeColumnId === null || onColumnActivateRef.current === undefined) {
       return;
     }
@@ -379,55 +422,34 @@ function DataTableRoot<TData extends RowData>({
     </DataTableContext.Provider>
   );
 
-  if (columnReorderEnabled === false) {
+  if (
+    columnReorderEnabled === false ||
+    columnOrder === undefined ||
+    onColumnOrderChange === undefined
+  ) {
     return root;
   }
 
   return (
-    <DragDropProvider
-      sensors={dataTableSensors}
-      modifiers={modifiers}
-      plugins={(defaults) => [
-        ...defaults,
-        AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
-      ]}
-      onDragStart={() => {
-        initialColumnOrderRef.current = columnOrder;
-      }}
-      onDragOver={(event) => {
-        if (event.operation.source?.type !== "column") {
-          return;
-        }
-        const nextColumnOrder = move([...columnOrder], event);
-        if (areColumnOrdersEqual(columnOrder, nextColumnOrder) === false) {
-          onColumnOrderChange(nextColumnOrder);
-        }
-      }}
-      onDragEnd={(event) => {
-        if (event.canceled === false) {
-          return;
-        }
-        const initialColumnOrder = initialColumnOrderRef.current;
-        if (areColumnOrdersEqual(columnOrder, initialColumnOrder) === false) {
-          onColumnOrderChange([...initialColumnOrder]);
-        }
-      }}
+    <ReorderComponent
+      columnOrder={columnOrder}
+      onColumnOrderChange={onColumnOrderChange}
+      overlayProps={stylex.props(dataTableStyles.columnDragOverlay)}
+      rootRef={rootRef}
+      renderOverlay={(source) => (
+        <div
+          {...stylex.props(
+            dataTableStyles.headerDragContent,
+            dataTableStyles.columnDragOverlayContent,
+            density === "compact" && dataTableStyles.compactHeaderDragContent,
+          )}
+        >
+          {source.element?.textContent ?? String(source.id)}
+        </div>
+      )}
     >
       {root}
-      <DragOverlay {...stylex.props(dataTableStyles.columnDragOverlay)} dropAnimation={null}>
-        {(source) => (
-          <div
-            {...stylex.props(
-              dataTableStyles.headerDragContent,
-              dataTableStyles.columnDragOverlayContent,
-              density === "compact" && dataTableStyles.compactHeaderDragContent,
-            )}
-          >
-            {source.element?.textContent ?? String(source.id)}
-          </div>
-        )}
-      </DragOverlay>
-    </DragDropProvider>
+    </ReorderComponent>
   );
 }
 
@@ -505,6 +527,7 @@ function DataTableHeaderCell<TData extends RowData>({
   children,
   header,
 }: DataTableHeaderCellProps<TData>) {
+  const reorderContext = useDataTableReorderContext();
   const {
     activeCell,
     activeColumnId,
@@ -517,17 +540,6 @@ function DataTableHeaderCell<TData extends RowData>({
   const isActive = activeCell === null && activeColumnId === header.column.id;
   const columnReorderIndex = getColumnReorderIndex(header.column.id);
   const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0;
-  const sortable = useSortable({
-    accept: "column",
-    id: header.column.id,
-    index: Math.max(0, columnReorderIndex),
-    disabled: {
-      draggable: columnReorderable === false,
-      droppable: columnReorderable === false,
-    },
-    type: "column",
-  });
-  const isDragVisual = sortable.isDragSource === true || sortable.isDropping === true;
 
   const handleClick = (event: MouseEvent<HTMLTableCellElement>) => {
     if (activateSelectionControlFromCell(event) === true) {
@@ -550,72 +562,95 @@ function DataTableHeaderCell<TData extends RowData>({
     onHeaderContextMenu(header.column.id, event);
   };
 
-  return (
-    <th
-      ref={sortable.ref}
-      {...stylex.props(
-        dataTableStyles.headerCell,
-        density === "compact" && dataTableStyles.compactCell,
-        dataTableStyles.headerCellLayout,
-        isActive === true && dataTableStyles.headerCellActive,
-        columnReorderable === true && dataTableStyles.headerCellReorderable,
-        isDragVisual === true && dataTableStyles.headerCellDragging,
-      )}
-      colSpan={header.colSpan}
-      data-active={isActive === true ? "" : undefined}
-      data-column-id={header.column.id}
-      data-dragging={isDragVisual === true ? "" : undefined}
-      data-reorderable={columnReorderable === true ? "" : undefined}
-      data-slot="data-table-header-cell"
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-      scope="col"
-      style={{ width: header.getSize() }}
-      tabIndex={-1}
-    >
-      <div
+  const renderHeaderCell = ({
+    isDragSource = false,
+    isDropping = false,
+    setReorderRef,
+  }: {
+    isDragSource?: boolean;
+    isDropping?: boolean;
+    setReorderRef?: (element: HTMLTableCellElement | null) => void;
+  } = {}) => {
+    const isDragVisual = isDragSource === true || isDropping === true;
+
+    return (
+      <th
+        ref={setReorderRef}
         {...stylex.props(
-          dataTableStyles.headerDragContent,
-          dataTableStyles.headerDragSource,
-          density === "compact" && dataTableStyles.compactHeaderDragContent,
-          isDragVisual === true && dataTableStyles.headerDragSourceDragging,
+          dataTableStyles.headerCell,
+          density === "compact" && dataTableStyles.compactCell,
+          dataTableStyles.headerCellLayout,
+          isActive === true && dataTableStyles.headerCellActive,
+          columnReorderable === true && dataTableStyles.headerCellReorderable,
+          isDragVisual === true && dataTableStyles.headerCellDragging,
         )}
-        data-slot="data-table-header-drag-source"
+        colSpan={header.colSpan}
+        data-active={isActive === true ? "" : undefined}
+        data-column-id={header.column.id}
+        data-dragging={isDragVisual === true ? "" : undefined}
+        data-reorderable={columnReorderable === true ? "" : undefined}
+        data-slot="data-table-header-cell"
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+        scope="col"
+        style={{ width: header.getSize() }}
+        tabIndex={-1}
       >
-        {header.isPlaceholder === true
-          ? null
-          : (children ?? flexRender(header.column.columnDef.header, header.getContext()))}
-      </div>
-      {header.column.getCanResize() === true ? (
-        <button
+        <div
           {...stylex.props(
-            dataTableStyles.resizeHandle,
-            header.column.getIsResizing() === true && dataTableStyles.resizeHandleActive,
-            isDragVisual === true && dataTableStyles.resizeHandleDragging,
+            dataTableStyles.headerDragContent,
+            dataTableStyles.headerDragSource,
+            density === "compact" && dataTableStyles.compactHeaderDragContent,
+            isDragVisual === true && dataTableStyles.headerDragSourceDragging,
           )}
-          aria-label={`Resize ${header.column.id} column`}
-          data-resizing={header.column.getIsResizing() === true ? "" : undefined}
-          data-slot="data-table-resize-handle"
-          onClick={(event) => {
-            event.stopPropagation();
-          }}
-          onDoubleClick={(event) => {
-            event.stopPropagation();
-            header.column.resetSize();
-          }}
-          onMouseDown={(event) => {
-            event.stopPropagation();
-            header.getResizeHandler()(event);
-          }}
-          onTouchStart={(event) => {
-            event.stopPropagation();
-            header.getResizeHandler()(event);
-          }}
-          type="button"
-        />
-      ) : null}
-    </th>
-  );
+          data-slot="data-table-header-drag-source"
+        >
+          {header.isPlaceholder === true
+            ? null
+            : (children ?? flexRender(header.column.columnDef.header, header.getContext()))}
+        </div>
+        {header.column.getCanResize() === true ? (
+          <button
+            {...stylex.props(
+              dataTableStyles.resizeHandle,
+              header.column.getIsResizing() === true && dataTableStyles.resizeHandleActive,
+              isDragVisual === true && dataTableStyles.resizeHandleDragging,
+            )}
+            aria-label={`Resize ${header.column.id} column`}
+            data-resizing={header.column.getIsResizing() === true ? "" : undefined}
+            data-slot="data-table-resize-handle"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+            onDoubleClick={(event) => {
+              event.stopPropagation();
+              header.column.resetSize();
+            }}
+            onMouseDown={(event) => {
+              event.stopPropagation();
+              header.getResizeHandler()(event);
+            }}
+            onTouchStart={(event) => {
+              event.stopPropagation();
+              header.getResizeHandler()(event);
+            }}
+            type="button"
+          />
+        ) : null}
+      </th>
+    );
+  };
+
+  const SortableHeader = reorderContext.Header;
+  if (SortableHeader !== null && columnReorderable === true) {
+    return (
+      <SortableHeader columnId={header.column.id} index={columnReorderIndex}>
+        {renderHeaderCell}
+      </SortableHeader>
+    );
+  }
+
+  return renderHeaderCell();
 }
 
 function DataTableBody({ children }: DataTableBodyProps) {
@@ -672,6 +707,7 @@ function DataTableRow<TData extends RowData>({ children, row }: DataTableRowProp
 }
 
 function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellProps<TData>) {
+  const reorderContext = useDataTableReorderContext();
   const {
     activeCell,
     activeColumnId,
@@ -693,17 +729,6 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
   const isActive = activeCell?.rowId === target.rowId && activeCell.columnId === target.columnId;
   const columnReorderIndex = getColumnReorderIndex(target.columnId);
   const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0;
-  const sortable = useSortable({
-    accept: "column-cell",
-    id: `${target.rowId}:${target.columnId}`,
-    index: Math.max(0, columnReorderIndex),
-    group: `data-table-row:${target.rowId}`,
-    disabled: {
-      draggable: true,
-      droppable: columnReorderable === false,
-    },
-    type: "column-cell",
-  });
 
   const handleClick = (event: MouseEvent<HTMLTableCellElement>) => {
     if (event.detail > 1) {
@@ -756,9 +781,9 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
     onCellOpen?.(target);
   };
 
-  return (
+  const renderCell = (setReorderRef?: (element: HTMLTableCellElement | null) => void) => (
     <td
-      ref={sortable.targetRef}
+      ref={setReorderRef}
       {...stylex.props(
         dataTableStyles.cell,
         density === "compact" && dataTableStyles.compactCell,
@@ -783,6 +808,17 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
       {children ?? flexRender(cell.column.columnDef.cell, cell.getContext())}
     </td>
   );
+
+  const DroppableCell = reorderContext.Cell;
+  if (DroppableCell !== null && columnReorderable === true) {
+    return (
+      <DroppableCell columnId={target.columnId} index={columnReorderIndex} rowId={target.rowId}>
+        {renderCell}
+      </DroppableCell>
+    );
+  }
+
+  return renderCell();
 }
 
 function DataTableExpandedRow<TData extends RowData>({

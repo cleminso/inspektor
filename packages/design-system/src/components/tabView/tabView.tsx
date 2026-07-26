@@ -5,24 +5,13 @@
 //  - direct press `delete` = close all tabView from the selected range
 import { Button as BaseButton } from '@base-ui/react/button'
 import { Tabs as BaseTabs } from '@base-ui/react/tabs'
-import { RestrictToHorizontalAxis } from '@dnd-kit/abstract/modifiers'
-import { arrayMove } from '@dnd-kit/helpers'
-import { DragDropProvider } from '@dnd-kit/react'
-import { isSortable, useSortable } from '@dnd-kit/react/sortable'
-import {
-  AutoScroller,
-  Feedback,
-  PointerActivationConstraints,
-  PointerSensor,
-} from '@dnd-kit/dom'
-import { RestrictToElement } from '@dnd-kit/dom/modifiers'
 import * as stylex from '@stylexjs/stylex'
 import {
   useCallback,
   createContext,
   useEffect,
   useContext,
-  useMemo,
+  useLayoutEffect,
   useRef,
   useState,
   type KeyboardEvent,
@@ -33,8 +22,9 @@ import {
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { Tooltip } from '../tooltip/tooltip'
 import { tabViewStyles } from './tabView.styles'
+import { TabViewReorderContext, type TabViewValue } from './tabViewReorderContext'
 
-export type TabViewValue = string | number
+export type { TabViewValue } from './tabViewReorderContext'
 
 interface TabViewContextValue {
   value: TabViewValue | null
@@ -42,50 +32,31 @@ interface TabViewContextValue {
 
 const TabViewContext = createContext<TabViewContextValue>({ value: null })
 
-interface TabViewReorderContextValue {
-  enabled: boolean
-  getIndex: (value: TabViewValue) => number
+/**
+ * Why: importing DND from this static module pulled the shared sortable chunk into the initial
+ * application load. A later sibling-runtime approach avoided that download but matched tab values
+ * to discovered DOM elements by position, which made tabs jump and reorder unpredictably.
+ *
+ * How: the DND implementation loads after mount and wraps the list. Its context supplies a
+ * sortable component that attaches `useSortable` directly to each owning TabView.Item ref.
+ *
+ * What: the first render stays static, then the list remounts once with reorder behavior. The
+ * focused tab is recorded by its typed value key and restored after that remount.
+ */
+type TabViewReorderModule = typeof import('./tabViewReorder')
+
+let tabViewReorderModule: Promise<TabViewReorderModule> | undefined
+
+function loadTabViewReorder(): Promise<TabViewReorderModule> {
+  tabViewReorderModule ??= import('./tabViewReorder').catch((error: unknown) => {
+    tabViewReorderModule = undefined
+    throw error
+  })
+  return tabViewReorderModule
 }
 
-const TabViewReorderContext = createContext<TabViewReorderContextValue>({
-  enabled: false,
-  getIndex: () => -1,
-})
-
-const tabViewPointerSensor = PointerSensor.configure({
-  activationConstraints: [new PointerActivationConstraints.Distance({ value: 4 })],
-  preventActivation: (event) => {
-    if (event.pointerType === 'touch') {
-      return true
-    }
-    if (!(event.target instanceof Element)) {
-      return false
-    }
-    return (
-      event.target.closest('[data-slot="tab-view-close"]') !== null ||
-      event.target.closest('[contenteditable="true"]') !== null
-    )
-  },
-})
-
-const tabViewSensors = [tabViewPointerSensor]
-
-function getReorderedValues(
-  values: readonly TabViewValue[],
-  sourceValue: TabViewValue,
-  destinationIndex: number,
-): TabViewValue[] | null {
-  if (new Set(values).size !== values.length) {
-    return null
-  }
-  const sourceIndex = values.indexOf(sourceValue)
-  if (sourceIndex < 0 || destinationIndex < 0 || destinationIndex >= values.length) {
-    return null
-  }
-  if (sourceIndex === destinationIndex) {
-    return null
-  }
-  return arrayMove([...values], sourceIndex, destinationIndex)
+function getTabViewValueKey(value: TabViewValue): string {
+  return `${typeof value}:${String(value)}`
 }
 
 export interface TabViewRootProps {
@@ -156,12 +127,7 @@ export interface TabViewPanelProps {
   keepMounted?: boolean
 }
 
-function TabViewRoot({
-  children,
-  value,
-  defaultValue,
-  onValueChange,
-}: TabViewRootProps) {
+function TabViewRoot({ children, value, defaultValue, onValueChange }: TabViewRootProps) {
   const [uncontrolledValue, setUncontrolledValue] = useState<TabViewValue | null>(
     defaultValue ?? null,
   )
@@ -203,39 +169,68 @@ function TabViewList({
   ...props
 }: TabViewListProps) {
   const listRef = useRef<HTMLDivElement>(null)
+  const focusedValueKeyRef = useRef<string | null>(null)
   const listStyles = createStateStyleProps<BaseTabs.List.State>(() => [tabViewStyles.list])
-  const valueIndices = useMemo(
-    () => new Map(values?.map((value, index) => [value, index]) ?? []),
-    [values],
-  )
-  const reorderEnabled =
-    values !== undefined && onReorder !== undefined && valueIndices.size === values.length
-  const reorderContext = useMemo<TabViewReorderContextValue>(
-    () => ({
-      enabled: reorderEnabled,
-      getIndex: (value) => valueIndices.get(value) ?? -1,
-    }),
-    [reorderEnabled, valueIndices],
-  )
-  const modifiers = useMemo(
-    () => [
-      RestrictToHorizontalAxis,
-      RestrictToElement.configure({ element: () => listRef.current }),
-    ],
-    [],
-  )
+  const [ReorderComponent, setReorderComponent] = useState<
+    TabViewReorderModule['TabViewReorder'] | null
+  >(null)
+  if (values !== undefined && new Set(values).size !== values.length) {
+    throw new Error('TabView.List values must be unique')
+  }
+
+  const reorderConfigured = values !== undefined && onReorder !== undefined
+  const reorderReady = ReorderComponent !== null
+  const reorderEnabled = reorderConfigured === true && reorderReady === true
+  useEffect(() => {
+    if (reorderConfigured === false || ReorderComponent !== null) {
+      return
+    }
+
+    let active = true
+    void loadTabViewReorder()
+      .then((module) => {
+        if (active === true) {
+          const activeElement = document.activeElement
+          if (
+            activeElement instanceof Element &&
+            listRef.current?.contains(activeElement) === true
+          ) {
+            focusedValueKeyRef.current =
+              activeElement.closest<HTMLElement>('[data-reorder-key]')?.dataset.reorderKey ?? null
+          }
+          setReorderComponent(() => module.TabViewReorder)
+        }
+      })
+      .catch((error: unknown) => {
+        console.error('Unable to load TabView reorder behavior', error)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [ReorderComponent, reorderConfigured])
+
+  useLayoutEffect(() => {
+    const focusedValueKey = focusedValueKeyRef.current
+    if (ReorderComponent === null || focusedValueKey === null) {
+      return
+    }
+    const focusedItem = Array.from(
+      listRef.current?.querySelectorAll<HTMLElement>('[data-reorder-key]') ?? [],
+    ).find((item) => item.dataset.reorderKey === focusedValueKey)
+    focusedItem?.querySelector<HTMLElement>('[data-slot="tab-view-tab"]')?.focus()
+    focusedValueKeyRef.current = null
+  }, [ReorderComponent])
 
   const list = (
-    <TabViewReorderContext.Provider value={reorderContext}>
-      <BaseTabs.List
-        {...props}
-        ref={listRef}
-        activateOnFocus={activateOnFocus}
-        loopFocus={loopFocus}
-        {...listStyles}
-        data-slot="tab-view-list"
-      />
-    </TabViewReorderContext.Provider>
+    <BaseTabs.List
+      {...props}
+      ref={listRef}
+      activateOnFocus={activateOnFocus}
+      loopFocus={loopFocus}
+      {...listStyles}
+      data-slot="tab-view-list"
+    />
   )
 
   if (reorderEnabled === false) {
@@ -243,40 +238,40 @@ function TabViewList({
   }
 
   return (
-    <DragDropProvider
-      sensors={tabViewSensors}
-      modifiers={modifiers}
-      plugins={(defaults) => [
-        ...defaults,
-        AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
-        Feedback.configure({ dropAnimation: null }),
-      ]}
-      onDragStart={(event) => {
-        const tab = event.operation.source?.element?.querySelector('[data-slot="tab-view-tab"]')
-        if (tab instanceof HTMLButtonElement && tab.disabled === false) {
-          tab.click()
-        }
-      }}
-      onDragEnd={(event) => {
-        if (event.canceled) {
-          return
-        }
-        const source = event.operation.source
-        if (!isSortable(source)) {
-          return
-        }
-        const reorderedValues = getReorderedValues(values, source.id, source.index)
-        if (reorderedValues !== null) {
-          onReorder(reorderedValues)
-        }
-      }}
-    >
+    <ReorderComponent listRef={listRef} values={values} onReorder={onReorder}>
       {list}
-    </DragDropProvider>
+    </ReorderComponent>
   )
 }
 
-function TabViewItem({
+function TabViewItem(props: TabViewItemProps) {
+  const reorderContext = useContext(TabViewReorderContext)
+  const index = reorderContext.getIndex(props.value)
+  const SortableItem = reorderContext.Item
+
+  if (SortableItem !== null && index >= 0) {
+    return (
+      <SortableItem value={props.value} disabled={props.disabled} index={index}>
+        {(sortable) => (
+          <TabViewItemContent
+            {...props}
+            isDragSource={sortable.isDragSource}
+            setReorderRef={sortable.setReorderRef}
+          />
+        )}
+      </SortableItem>
+    )
+  }
+
+  return <TabViewItemContent {...props} />
+}
+
+interface TabViewItemContentProps extends TabViewItemProps {
+  isDragSource?: boolean
+  setReorderRef?: (element: HTMLDivElement | null) => void
+}
+
+function TabViewItemContent({
   value,
   children,
   details,
@@ -284,24 +279,15 @@ function TabViewItem({
   disabled = false,
   onClose,
   closeLabel = 'Close tab',
-}: TabViewItemProps) {
+  isDragSource = false,
+  setReorderRef,
+}: TabViewItemContentProps) {
   const context = useContext(TabViewContext)
-  const reorderContext = useContext(TabViewReorderContext)
   const active = context.value === value
   const hasPrefix = prefix !== undefined
   const itemRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLSpanElement>(null)
   const [titleOverflowing, setTitleOverflowing] = useState(false)
-  const sortableIndex = reorderContext.getIndex(value)
-  const sortableEnabled = reorderContext.enabled && sortableIndex >= 0
-  const sortable = useSortable({
-    id: value,
-    index: Math.max(0, sortableIndex),
-    disabled: {
-      draggable: sortableEnabled === false || disabled === true,
-      droppable: sortableEnabled === false,
-    },
-  })
   const tabStyles = createStateStyleProps<BaseTabs.Tab.State>((state) => [
     tabViewStyles.tab,
     state.active === true && tabViewStyles.tabActive,
@@ -331,9 +317,9 @@ function TabViewItem({
   const setItemRef = useCallback(
     (element: HTMLDivElement | null) => {
       itemRef.current = element
-      sortable.ref(element)
+      setReorderRef?.(element)
     },
-    [sortable.ref],
+    [setReorderRef],
   )
 
   useEffect(() => {
@@ -378,12 +364,13 @@ function TabViewItem({
       {...stylex.props(
         tabViewStyles.item,
         active === true && tabViewStyles.itemActive,
-        sortable.isDragSource === true && tabViewStyles.itemDragging,
+        isDragSource === true && tabViewStyles.itemDragging,
         disabled === true && tabViewStyles.itemDisabled,
       )}
       data-active={active === true ? '' : undefined}
       data-disabled={disabled === true ? '' : undefined}
-      data-dragging={sortable.isDragSource === true ? '' : undefined}
+      data-dragging={isDragSource === true ? '' : undefined}
+      data-reorder-key={getTabViewValueKey(value)}
       data-slot="tab-view-item"
       data-title-overflow={titleOverflowing}
     >
@@ -418,7 +405,9 @@ function TabViewItem({
         <div
           {...stylex.props(
             tabViewStyles.closeContainer,
-            titleOverflowing === true && disabled === false && tabViewStyles.closeContainerOverflowing,
+            titleOverflowing === true &&
+              disabled === false &&
+              tabViewStyles.closeContainerOverflowing,
           )}
           data-slot="tab-view-close"
         >
@@ -435,7 +424,11 @@ function TabViewItem({
               fill="none"
               {...stylex.props(tabViewStyles.closeIcon)}
             >
-              <path d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5" stroke="currentColor" strokeWidth="1.5" />
+              <path
+                d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
             </svg>
           </BaseButton>
         </div>
