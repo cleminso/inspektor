@@ -122,6 +122,20 @@ export const toggleGroupItem = {
   componentId: "toggleGroup",
 } satisfies NavItem;
 
+export const segmentedControlItem = {
+  title: "Segmented Control",
+  slug: "segmented-control",
+  href: "/components/segmented-control",
+  description:
+    "A single-selection view control whose moving indicator communicates alternate views of one persistent object.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "segmentedControl.tsx",
+    path: "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+  },
+  componentId: "segmentedControl",
+} satisfies NavItem;
+
 export const tabViewItem = {
   title: "Tab View",
   slug: "tab-view",
@@ -484,6 +498,7 @@ export const componentItems: NavItem[] = [
   menuItem,
   resizablePanelItem,
   searchItem,
+  segmentedControlItem,
   sidePanelItem,
   selectItem,
   spinnerItem,

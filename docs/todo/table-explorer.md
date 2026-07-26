@@ -200,7 +200,7 @@ behavior discussion. Detailed acceptance rules remain in
 [24/07/26]
 
 - [x] Add `Details` and `JSON` representations to the row side pane.
-- [x] Switch row representations through a full-width, single-select `ToggleGroup`.
+- [x] Switch row representations through a full-width `SegmentedControl` whose indicator communicates alternate views of the same row.
 - [x] Keep `Details` as the schema-derived editing surface.
 - [x] Keep `JSON` permanently read-only; all row mutation remains in `Details`.
 - [x] Normalize Jazz row values into a bounded structured presentation model without pre-stringifying ordinary objects or arrays.

@@ -86,6 +86,12 @@ const componentEntries = [
     inheritedProps: [],
   })),
   ...["Root", "List", "Item", "Panel"].map((part) => ({
+    componentId: `segmentedControl.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "SegmentedControl",
+    part,
+    inheritedProps: [],
+  })),
+  ...["Root", "List", "Item", "Panel"].map((part) => ({
     componentId: `tabView.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "TabView",
     part,

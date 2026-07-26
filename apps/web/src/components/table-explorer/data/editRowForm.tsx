@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Box, Button, CopyButton, JsonView, Search, Text, ToggleGroup } from "@inspector/ds";
+import { Box, Button, CopyButton, JsonView, Search, SegmentedControl, Text } from "@inspector/ds";
 
 import {
   focusRowEditorField,
@@ -114,26 +114,24 @@ function LoadedEditRowForm({
   });
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <SegmentedControl
+      value={representation}
+      onValueChange={(nextRepresentation) => {
+        if (nextRepresentation === "details" || nextRepresentation === "json") {
+          setRepresentation(nextRepresentation);
+        }
+      }}
+    >
       <div className="px-2 pt-2">
-        <ToggleGroup
+        <SegmentedControl.List
           aria-label="Row representation"
-          itemWidth="equal"
-          size="m"
-          value={[representation]}
           width="full"
-          onValueChange={(values) => {
-            const nextRepresentation = values[0];
-            if (nextRepresentation === "details" || nextRepresentation === "json") {
-              setRepresentation(nextRepresentation);
-            }
-          }}
         >
-          <ToggleGroup.Item value="details">Details</ToggleGroup.Item>
-          <ToggleGroup.Item value="json">JSON</ToggleGroup.Item>
-        </ToggleGroup>
+          <SegmentedControl.Item value="details">Details</SegmentedControl.Item>
+          <SegmentedControl.Item value="json">JSON</SegmentedControl.Item>
+        </SegmentedControl.List>
       </div>
-      {representation === "details" ? (
+      <SegmentedControl.Panel value="details">
         <form className="flex h-full min-h-0 flex-col mt-2 overflow-hidden" onSubmit={rowEditor.submit}>
           <Box
             data-row-editor-scroll-owner={
@@ -227,9 +225,10 @@ function LoadedEditRowForm({
             </div>
           </div>
         </form>
-      ) : (
+      </SegmentedControl.Panel>
+      <SegmentedControl.Panel value="json">
         <RowJsonRepresentation rowValues={rowValues} schemaColumns={schemaColumns} />
-      )}
-    </div>
+      </SegmentedControl.Panel>
+    </SegmentedControl>
   );
 }

@@ -1203,6 +1203,168 @@
       }
     }
   ],
+  "segmentedControl.root": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "The segments and their associated views.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 12
+      }
+    },
+    {
+      "name": "value",
+      "type": "string | number",
+      "required": false,
+      "description": "The selected segment value when controlled.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 14
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "string | number",
+      "required": false,
+      "description": "The initially selected segment value when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 16
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: SegmentedControlValue | null, eventDetails: BaseTabs.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Called when the selected segment changes.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 18
+      }
+    }
+  ],
+  "segmentedControl.list": [
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "The selectable segments.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "An accessible name for the segment list.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the element that labels the segment list.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "width",
+      "type": "\"content\" | \"full\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Controls whether the segment list follows its content or fills its container.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "loopFocus",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Loops keyboard focus between the first and last segments.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 34
+      }
+    }
+  ],
+  "segmentedControl.item": [
+    {
+      "name": "value",
+      "type": "string | number",
+      "required": true,
+      "description": "Uniquely identifies the represented view and links it to a matching panel.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 39
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "The visible segment label.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 41
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables selection for this segment.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 43
+      }
+    }
+  ],
+  "segmentedControl.panel": [
+    {
+      "name": "value",
+      "type": "string | number",
+      "required": true,
+      "description": "Identifies the segment that controls this view.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 48
+      }
+    },
+    {
+      "name": "children",
+      "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "The represented view content.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 50
+      }
+    },
+    {
+      "name": "keepMounted",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the view mounted while another segment is selected.",
+      "source": {
+        "path": "packages/design-system/src/components/segmentedControl/segmentedControl.tsx",
+        "line": 52
+      }
+    }
+  ],
   "tabView.root": [
     {
       "name": "children",
@@ -1211,7 +1373,7 @@
       "description": "The tab views and their associated panels.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 93
+        "line": 49
       }
     },
     {
@@ -1221,7 +1383,7 @@
       "description": "The active view value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 95
+        "line": 51
       }
     },
     {
@@ -1231,7 +1393,7 @@
       "description": "The initially active view value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 97
+        "line": 53
       }
     },
     {
@@ -1241,7 +1403,7 @@
       "description": "Called when the active view changes.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 99
+        "line": 55
       }
     }
   ],
@@ -1253,7 +1415,7 @@
       "description": "The tab view items.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 107
+        "line": 63
       }
     },
     {
@@ -1263,7 +1425,7 @@
       "description": "An accessible name for the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 109
+        "line": 65
       }
     },
     {
@@ -1273,7 +1435,7 @@
       "description": "Identifies the element that labels the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 111
+        "line": 67
       }
     },
     {
@@ -1284,7 +1446,7 @@
       "description": "Activates a view as arrow-key navigation moves focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 113
+        "line": 69
       }
     },
     {
@@ -1295,7 +1457,7 @@
       "description": "Loops keyboard focus between the first and last views.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 115
+        "line": 71
       }
     },
     {
@@ -1305,7 +1467,7 @@
       "description": "The tab values in their controlled visual order.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 120
+        "line": 76
       }
     },
     {
@@ -1315,7 +1477,7 @@
       "description": "Called with the complete ordered value list after a tab is dragged.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 122
+        "line": 78
       }
     }
   ],
@@ -1327,7 +1489,7 @@
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 135
+        "line": 91
       }
     },
     {
@@ -1337,7 +1499,7 @@
       "description": "The visible view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 137
+        "line": 93
       }
     },
     {
@@ -1347,7 +1509,7 @@
       "description": "Supplementary context shown in a tooltip even when the view name fits.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 139
+        "line": 95
       }
     },
     {
@@ -1357,18 +1519,17 @@
       "description": "Renders a decorative 16px icon before the view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 141
+        "line": 97
       }
     },
     {
       "name": "disabled",
       "type": "boolean",
       "required": false,
-      "defaultValue": "false",
       "description": "Disables selection and closing for this view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 143
+        "line": 99
       }
     },
     {
@@ -1378,18 +1539,17 @@
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 145
+        "line": 101
       }
     },
     {
       "name": "closeLabel",
       "type": "string",
       "required": false,
-      "defaultValue": "\"Close tab\"",
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 147
+        "line": 103
       }
     }
   ],
@@ -1401,7 +1561,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 152
+        "line": 108
       }
     },
     {
@@ -1411,7 +1571,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 154
+        "line": 110
       }
     },
     {
@@ -1422,7 +1582,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 156
+        "line": 112
       }
     }
   ],

@@ -181,16 +181,16 @@ describe("EditRowForm Details and JSON views", () => {
   it("selects Details by default", () => {
     renderEditRowForm();
 
-    expect(screen.getByRole("group", { name: "Row representation" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Details" }).getAttribute("data-pressed")).toBe("");
-    expect(screen.getByRole("button", { name: "JSON" }).getAttribute("data-pressed")).toBeNull();
+    expect(screen.getByRole("tablist", { name: "Row representation" })).toBeTruthy();
+    expect(screen.getByRole("tab", { name: "Details" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("tab", { name: "JSON" }).getAttribute("aria-selected")).toBe("false");
     expect(screen.getByLabelText("DisplayName")).toBeTruthy();
   });
 
   it("renders the complete row in schema order and marks missing fields unavailable", () => {
     renderEditRowForm();
 
-    fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+    fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
 
     const json = screen.getByRole("tree");
     const rowFields = within(json)
@@ -210,7 +210,7 @@ describe("EditRowForm Details and JSON views", () => {
   it("shows JSON tools without visible mutation controls", () => {
     renderEditRowForm();
 
-    fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+    fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
 
     expect(screen.getByRole("searchbox", { name: /search/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Copy row JSON" })).toBeTruthy();
@@ -224,15 +224,15 @@ describe("EditRowForm Details and JSON views", () => {
     const displayName = screen.getByLabelText("DisplayName");
 
     fireEvent.change(displayName, { target: { value: "Grace Hopper" } });
-    fireEvent.click(screen.getByRole("button", { name: "JSON" }));
-    fireEvent.click(screen.getByRole("button", { name: "Details" }));
+    fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Details" }));
 
     expect((screen.getByLabelText("DisplayName") as HTMLInputElement).value).toBe("Grace Hopper");
   });
 
   it("highlights a literal JSON search term", () => {
     const { container } = renderEditRowForm();
-    fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+    fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
 
     fireEvent.change(screen.getByRole("searchbox", { name: /search/i }), {
       target: { value: "." },
@@ -250,7 +250,7 @@ describe("EditRowForm Details and JSON views", () => {
       value: { writeText },
     });
     renderEditRowForm();
-    fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+    fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Copy row JSON" }));
 

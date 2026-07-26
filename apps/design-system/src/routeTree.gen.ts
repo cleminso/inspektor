@@ -31,6 +31,7 @@ import { Route as ComponentsKeyboardInputRouteImport } from './routes/components
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
+import { Route as ComponentsSegmentedControlRouteImport } from './routes/components/segmented-control'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSidePanelRouteImport } from './routes/components/side-panel'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
@@ -157,6 +158,12 @@ const ComponentsSearchRoute = ComponentsSearchRouteImport.update({
   path: '/components/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsSegmentedControlRoute =
+  ComponentsSegmentedControlRouteImport.update({
+    id: '/components/segmented-control',
+    path: '/components/segmented-control',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
   id: '/components/select',
   path: '/components/select',
@@ -246,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
+  '/components/segmented-control': typeof ComponentsSegmentedControlRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -283,6 +291,7 @@ export interface FileRoutesByTo {
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
+  '/components/segmented-control': typeof ComponentsSegmentedControlRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -321,6 +330,7 @@ export interface FileRoutesById {
   '/components/menu': typeof ComponentsMenuRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
+  '/components/segmented-control': typeof ComponentsSegmentedControlRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
+    | '/components/segmented-control'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -397,6 +408,7 @@ export interface FileRouteTypes {
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
+    | '/components/segmented-control'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -434,6 +446,7 @@ export interface FileRouteTypes {
     | '/components/menu'
     | '/components/resizable-panel'
     | '/components/search'
+    | '/components/segmented-control'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -472,6 +485,7 @@ export interface RootRouteChildren {
   ComponentsMenuRoute: typeof ComponentsMenuRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
+  ComponentsSegmentedControlRoute: typeof ComponentsSegmentedControlRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidePanelRoute: typeof ComponentsSidePanelRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
@@ -643,6 +657,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/segmented-control': {
+      id: '/components/segmented-control'
+      path: '/components/segmented-control'
+      fullPath: '/components/segmented-control'
+      preLoaderRoute: typeof ComponentsSegmentedControlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/select': {
       id: '/components/select'
       path: '/components/select'
@@ -760,6 +781,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsMenuRoute: ComponentsMenuRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,
+  ComponentsSegmentedControlRoute: ComponentsSegmentedControlRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidePanelRoute: ComponentsSidePanelRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
