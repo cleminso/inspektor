@@ -72,7 +72,7 @@ export const accordionStyles = stylex.create({
     cursor: 'not-allowed',
   },
   leading: {
-    gap: spacing.s,
+    gap: spacing.xs,
     alignItems: 'center',
     display: 'flex',
     minWidth: 0,

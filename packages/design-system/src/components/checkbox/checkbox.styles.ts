@@ -1,14 +1,44 @@
 import * as stylex from "@stylexjs/stylex";
 
+import { interactiveControlVars } from "../../primitives/interactiveControlVars.stylex";
 import {
   backgroundColors,
   borderColors,
   textColors,
   spatial,
 } from "../../tokens/semantics.stylex";
-import { borderRadii } from "../../tokens/value.stylex";
+import {
+  borderRadii,
+  fontFamilies,
+  fontSizes,
+  fontWeights,
+  lineHeights,
+  spacing,
+} from "../../tokens/value.stylex";
 
 export const checkboxStyles = stylex.create({
+  label: {
+    [interactiveControlVars.hoverBorderColor]: {
+      default: borderColors.border,
+      ":hover": borderColors["border-focused"],
+    },
+    gap: spacing.s,
+    alignItems: "center",
+    color: textColors["text-default"],
+    cursor: "pointer",
+    display: "inline-flex",
+    fontFamily: fontFamilies.sans,
+    fontSize: fontSizes[1],
+    fontWeight: fontWeights.medium,
+    lineHeight: lineHeights.tight,
+    userSelect: "none",
+  },
+  labelRow: {
+    boxSizing: "border-box",
+    paddingLeft: spacing.m,
+    paddingRight: spacing.m,
+    width: "100%",
+  },
   root: {
     margin: 0,
     padding: 0,
@@ -33,6 +63,22 @@ export const checkboxStyles = stylex.create({
     outlineWidth: {
       default: 0,
       ":focus-visible": spatial["focus-ring-width"],
+    },
+    position: "relative",
+    "::before": {
+      content: "",
+      position: "absolute",
+      transform: "translate(-50%, -50%)",
+      height: spatial["control-height-m"],
+      left: "50%",
+      top: "50%",
+      width: spatial["control-height-m"],
+    },
+  },
+  hoverable: {
+    borderColor: {
+      default: interactiveControlVars.hoverBorderColor,
+      ":hover": borderColors["border-focused"],
     },
   },
   sizeS: {

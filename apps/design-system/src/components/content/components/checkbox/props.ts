@@ -14,3 +14,5 @@ export const checkboxPropNames = [
   "inputRef",
   "render",
 ] as const;
+
+export const checkboxLabelPropNames = ["layout"] as const;

@@ -9,16 +9,17 @@ import { checkboxItem } from "@/lib/registry";
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
 import { CheckboxPlayground } from "./playground";
-import { checkboxPropNames } from "./props";
+import { checkboxLabelPropNames, checkboxPropNames } from "./props";
 import StatesExample from "./statesExample";
 import statesSource from "./statesExample.tsx?raw";
 
 const checkboxProps = getGeneratedProps(checkboxItem.componentId, checkboxPropNames);
+const checkboxLabelProps = getGeneratedProps("checkbox.label", checkboxLabelPropNames);
 
 export function CheckboxPage(): ReactElement {
   return (
     <CheckboxPlayground>
-      <Section title="Field" description="Use Field.Label to provide an accessible name.">
+      <Section title="Label" description="Use Checkbox.Label to provide an accessible name and complete hit area.">
         <Example source={basicSource}>
           <BasicExample />
         </Example>
@@ -38,6 +39,10 @@ export function CheckboxPage(): ReactElement {
         description="Checkbox participates in Field and native forms automatically."
       >
         <PropsTable rows={checkboxProps} />
+      </Section>
+
+      <Section title="Label props" description="Checkbox.Label makes the visible text and gap interactive.">
+        <PropsTable rows={checkboxLabelProps} />
       </Section>
     </CheckboxPlayground>
   );

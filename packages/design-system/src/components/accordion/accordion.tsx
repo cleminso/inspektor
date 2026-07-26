@@ -78,10 +78,10 @@ function AccordionTrigger({ children, suffix, ...props }: AccordionTriggerProps)
   return (
     <BaseAccordion.Trigger {...props} {...stateStyles}>
       <span {...stylex.props(accordionStyles.leading)}>
+        <span {...stylex.props(accordionStyles.label)}>{children}</span>
         <svg aria-hidden="true" viewBox="0 0 14 14" {...stylex.props(accordionStyles.indicator)}>
           <path d="m5 3 4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" />
         </svg>
-        <span {...stylex.props(accordionStyles.label)}>{children}</span>
       </span>
       {suffix === undefined ? null : (
         <span {...stylex.props(accordionStyles.suffix)}>{suffix}</span>

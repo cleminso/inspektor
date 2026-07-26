@@ -1,10 +1,12 @@
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import * as stylex from "@stylexjs/stylex";
+import type { ComponentPropsWithoutRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { checkboxStyles } from "./checkbox.styles";
 
 export type CheckboxSize = "s" | "m";
+export type CheckboxLabelLayout = "content" | "row";
 
 const sizeStyles = {
   s: checkboxStyles.sizeS,
@@ -43,7 +45,13 @@ export interface CheckboxProps
   render?: BaseCheckbox.Root.Props["render"];
 }
 
-export function Checkbox({
+export interface CheckboxLabelProps
+  extends Omit<ComponentPropsWithoutRef<"label">, "className" | "style"> {
+  /** Controls whether the label sizes to its content or fills a selectable row. */
+  layout?: CheckboxLabelLayout;
+}
+
+function CheckboxRoot({
   size = "m",
   disabled = false,
   readOnly = false,
@@ -55,6 +63,12 @@ export function Checkbox({
   const stateStyleProps = createStateStyleProps<BaseCheckbox.Root.State>((state) => [
     checkboxStyles.root,
     sizeStyles[size],
+    state.checked === false &&
+      state.indeterminate === false &&
+      state.disabled === false &&
+      state.readOnly === false &&
+      state.valid !== false &&
+      checkboxStyles.hoverable,
     (state.checked === true || state.indeterminate === true) && checkboxStyles.selected,
     state.valid === false && checkboxStyles.invalid,
     state.disabled === true && checkboxStyles.disabled,
@@ -100,3 +114,25 @@ export function Checkbox({
     </BaseCheckbox.Root>
   );
 }
+
+function CheckboxLabel({ layout = "content", ...props }: CheckboxLabelProps) {
+  const labelStylexProps = stylex.props(
+    checkboxStyles.label,
+    layout === "row" && checkboxStyles.labelRow,
+  );
+
+  return (
+    <label
+      {...props}
+      className={labelStylexProps.className}
+      style={labelStylexProps.style}
+      data-slot="checkbox-label"
+      data-layout={layout}
+    />
+  );
+}
+
+export const Checkbox = Object.assign(CheckboxRoot, {
+  Root: CheckboxRoot,
+  Label: CheckboxLabel,
+});

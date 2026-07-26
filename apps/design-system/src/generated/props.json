@@ -8,7 +8,7 @@
       "description": "Controls the checkbox dimensions.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 17
+        "line": 19
       }
     },
     {
@@ -18,7 +18,7 @@
       "description": "Controls whether the checkbox is checked.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 19
+        "line": 21
       }
     },
     {
@@ -28,7 +28,7 @@
       "description": "Sets the initial checked state when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 21
+        "line": 23
       }
     },
     {
@@ -38,7 +38,7 @@
       "description": "Runs when the checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 23
+        "line": 25
       }
     },
     {
@@ -49,7 +49,7 @@
       "description": "Displays a mixed state.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 25
+        "line": 27
       }
     },
     {
@@ -59,7 +59,7 @@
       "description": "Identifies the checkbox during form submission.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 27
+        "line": 29
       }
     },
     {
@@ -69,7 +69,7 @@
       "description": "Sets the submitted value when checked.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 29
+        "line": 31
       }
     },
     {
@@ -79,7 +79,7 @@
       "description": "Sets the submitted value when unchecked.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 31
+        "line": 33
       }
     },
     {
@@ -90,7 +90,7 @@
       "description": "Disables interaction.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 33
+        "line": 35
       }
     },
     {
@@ -101,7 +101,7 @@
       "description": "Prevents changes while preserving interaction semantics.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 35
+        "line": 37
       }
     },
     {
@@ -112,7 +112,7 @@
       "description": "Requires the checkbox to be checked for valid form submission.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 37
+        "line": 39
       }
     },
     {
@@ -123,7 +123,7 @@
       "description": "Indicates that a composed root renders a native button.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 39
+        "line": 41
       }
     },
     {
@@ -133,7 +133,7 @@
       "description": "Provides access to the hidden native input.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 41
+        "line": 43
       }
     },
     {
@@ -143,7 +143,20 @@
       "description": "Composes Checkbox behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 43
+        "line": 45
+      }
+    }
+  ],
+  "checkbox.label": [
+    {
+      "name": "layout",
+      "type": "\"content\" | \"row\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Controls whether the label sizes to its content or fills a selectable row.",
+      "source": {
+        "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
+        "line": 51
       }
     }
   ],

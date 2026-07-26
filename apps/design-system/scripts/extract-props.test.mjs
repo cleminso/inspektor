@@ -651,6 +651,14 @@ test("extracts Checkbox API facts from the public package export", () => {
     checkboxProps.find(({ name }) => name === "style"),
     undefined,
   );
+
+  const checkboxLabelProps = metadata["checkbox.label"];
+  assert.ok(checkboxLabelProps);
+  assert.deepEqual(
+    checkboxLabelProps.map(({ name }) => name),
+    ["layout"],
+  );
+  assert.equal(checkboxLabelProps[0]?.defaultValue, '"content"');
 });
 
 test("extracts TextField composition props from the public package export", () => {

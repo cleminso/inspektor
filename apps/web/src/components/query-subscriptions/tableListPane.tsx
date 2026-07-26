@@ -105,14 +105,7 @@ export function QuerySubscriptionsListPane({
             <Accordion.Panel>
               <Box width="full" flexDirection="column" gap="s" paddingHorizontal="s">
                 {(["full", "local-only"] as const).map((propagation) => (
-                  <Box
-                    as="label"
-                    key={propagation}
-                    display="flex"
-                    alignItems="center"
-                    paddingHorizontal="m"
-                    gap="s"
-                  >
+                  <Checkbox.Label layout="row" key={propagation}>
                     <Checkbox
                       size="s"
                       checked={selectedPropagations.includes(propagation)}
@@ -121,7 +114,7 @@ export function QuerySubscriptionsListPane({
                       }}
                     />
                     <Text as="span">{propagation === "full" ? "Full" : "Local-only"}</Text>
-                  </Box>
+                  </Checkbox.Label>
                 ))}
               </Box>
             </Accordion.Panel>

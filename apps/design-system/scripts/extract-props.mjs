@@ -15,6 +15,13 @@ const componentEntries = [
   {
     componentId: "checkbox",
     exportName: "Checkbox",
+    part: "Root",
+    inheritedProps: [],
+  },
+  {
+    componentId: "checkbox.label",
+    exportName: "Checkbox",
+    part: "Label",
     inheritedProps: [],
   },
   {

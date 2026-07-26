@@ -6,6 +6,20 @@ import { Checkbox } from "./checkbox";
 afterEach(cleanup);
 
 describe("Checkbox", () => {
+  it("toggles when its visible label is clicked", () => {
+    render(
+      <Checkbox.Label>
+        <Checkbox />
+        Enable notifications
+      </Checkbox.Label>,
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: "Enable notifications" });
+    fireEvent.click(screen.getByText("Enable notifications"));
+
+    expect(checkbox.getAttribute("aria-checked")).toBe("true");
+  });
+
   it("preserves checked disabled state without allowing a change", () => {
     let changeCount = 0;
 

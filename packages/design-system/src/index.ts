@@ -41,7 +41,12 @@ export type {
 export { Box } from './components//box/box'
 export type { BoxProps } from './components/box/box'
 export { Checkbox } from './components/checkbox/checkbox'
-export type { CheckboxProps, CheckboxSize } from './components/checkbox/checkbox'
+export type {
+  CheckboxLabelLayout,
+  CheckboxLabelProps,
+  CheckboxProps,
+  CheckboxSize,
+} from './components/checkbox/checkbox'
 export { Combobox } from './components/combobox/combobox'
 export type {
   ComboboxGroupLabelProps,

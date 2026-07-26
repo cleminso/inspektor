@@ -485,7 +485,7 @@ export function RowEditorFields({
                 readOnlyReason === null &&
                 isBooleanColumn === false &&
                 usesTextInput === false ? (
-                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Checkbox.Label>
                     <Checkbox
                       data-value-mode-control={isStructuredColumnType === true ? "" : undefined}
                       aria-label={`Set ${formatColumnNameLabel(column.name)} to NULL`}
@@ -495,7 +495,7 @@ export function RowEditorFields({
                       }}
                     />
                     <span>NULL</span>
-                  </label>
+                  </Checkbox.Label>
                 ) : null}
               </div>
             </div>
