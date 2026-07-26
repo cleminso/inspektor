@@ -252,6 +252,19 @@ export const textareaItem = {
   componentId: "textarea",
 } satisfies NavItem;
 
+export const codeEditorItem = {
+  title: "Code Editor",
+  slug: "code-editor",
+  href: "/components/code-editor",
+  description: "JSON source editing with formatting, diagnostics, and capped presentation.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "codeEditor.tsx",
+    path: "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+  },
+  componentId: "codeEditor",
+} satisfies NavItem;
+
 export const menuItem = {
   title: "Menu",
   slug: "menu",
@@ -456,6 +469,7 @@ export const componentItems: NavItem[] = [
   buttonLinkItem,
   buttonGroupItem,
   checkboxItem,
+  codeEditorItem,
   comboboxItem,
   contextMenuItem,
   contextSwitcherItem,

@@ -226,6 +226,7 @@ export const borderRadii = stylex.defineVars({
   m: '4px',
   l: '6px',
   xl: '8px',
+  full: '9999px',
 } as const)
 
 export const shadows = stylex.defineVars({

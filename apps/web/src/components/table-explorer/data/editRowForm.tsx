@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Button, CopyButton, JsonView, Search, Text, ToggleGroup } from "@inspector/ds";
+import { Box, Button, CopyButton, JsonView, Search, Text, ToggleGroup } from "@inspector/ds";
 
 import {
+  focusRowEditorField,
   RowEditorFields,
   useRowEditorFields,
 } from "@/components/table-explorer/data/rowEditorFields";
@@ -22,24 +23,7 @@ interface EditRowFormProps {
   targetRowId: string | null;
 }
 
-const ROW_EDITOR_FOCUSABLE_SELECTOR = [
-  "input:not([disabled])",
-  "textarea:not([disabled])",
-  "button:not([disabled])",
-  "[tabindex]:not([tabindex='-1'])",
-].join(",");
-
-export function focusRowEditorField(fieldName: string): boolean {
-  const field = document.getElementById(`row-editor-field-${fieldName}`);
-  const control = field?.querySelector<HTMLElement>(ROW_EDITOR_FOCUSABLE_SELECTOR) ?? null;
-
-  if (control === null) {
-    return false;
-  }
-
-  control.focus();
-  return true;
-}
+export { focusRowEditorField };
 
 export function EditRowForm({
   onCancel,
@@ -151,19 +135,37 @@ function LoadedEditRowForm({
       </div>
       {representation === "details" ? (
         <form className="flex h-full min-h-0 flex-col mt-2 overflow-hidden" onSubmit={rowEditor.submit}>
-          <div className="app-scrollbar flex min-h-0 flex-1 flex-col gap-4 px-2 mb-2 overflow-auto">
+          <Box
+            data-row-editor-scroll-owner={
+              rowEditor.expandedColumnName === null ? "form" : "editor"
+            }
+            unsafeClassName={rowEditor.expandedColumnName === null ? "app-scrollbar" : undefined}
+            flexDirection="column"
+            flexGrow={1}
+            gap="xl"
+            mb="m"
+            minHeight={0}
+            overflowY={rowEditor.expandedColumnName === null ? "auto" : "hidden"}
+            px="m"
+          >
             <RowEditorFields
               errors={rowEditor.errors}
+              expandedColumnName={rowEditor.expandedColumnName}
               fieldStates={rowEditor.fieldStates}
               formFields={rowEditor.formFields}
               initialRowValues={rowValues}
               mode="edit"
+              onFieldExpandedChange={rowEditor.setFieldExpanded}
               onFieldNullChange={rowEditor.setFieldNull}
               onFieldTextChange={rowEditor.setFieldText}
             />
 
-            {rowEditor.saveError !== null ? <Text color="error">{rowEditor.saveError}</Text> : null}
-          </div>
+            {rowEditor.saveError !== null ? (
+              <Text color="error" role="alert">
+                {rowEditor.saveError}
+              </Text>
+            ) : null}
+          </Box>
 
           <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
             {onDelete !== undefined ? (

@@ -145,6 +145,11 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "codeEditor",
+    exportName: "CodeEditor",
+    inheritedProps: [],
+  },
+  {
     componentId: "input",
     exportName: "Input",
     inheritedProps: [],

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Button, Switch, Text } from "@inspector/ds";
+import { Box, Button, Switch, Text } from "@inspector/ds";
 
 import {
   RowEditorFields,
@@ -51,18 +51,35 @@ function InsertRowFormFields({
 
   return (
     <form className="flex h-full min-h-0 flex-col overflow-hidden" onSubmit={rowEditor.submit}>
-      <div className="app-scrollbar flex min-h-0 flex-1 flex-col gap-4 px-2 py-2 mb-2 overflow-auto">
+      <Box
+        data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
+        unsafeClassName={rowEditor.expandedColumnName === null ? "app-scrollbar" : undefined}
+        flexDirection="column"
+        flexGrow={1}
+        gap="xl"
+        mb="m"
+        minHeight={0}
+        overflowY={rowEditor.expandedColumnName === null ? "auto" : "hidden"}
+        px="m"
+        py="m"
+      >
         <RowEditorFields
           errors={rowEditor.errors}
+          expandedColumnName={rowEditor.expandedColumnName}
           fieldStates={rowEditor.fieldStates}
           formFields={rowEditor.formFields}
           initialRowValues={rowValues}
           mode="insert"
+          onFieldExpandedChange={rowEditor.setFieldExpanded}
           onFieldNullChange={rowEditor.setFieldNull}
           onFieldTextChange={rowEditor.setFieldText}
         />
-        {rowEditor.saveError !== null ? <Text color="error">{rowEditor.saveError}</Text> : null}
-      </div>
+        {rowEditor.saveError !== null ? (
+          <Text color="error" role="alert">
+            {rowEditor.saveError}
+          </Text>
+        ) : null}
+      </Box>
 
       <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
         <label

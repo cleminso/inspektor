@@ -138,6 +138,8 @@ export type {
   CopyButtonSize,
   CopyButtonVariant,
 } from './components/copyButton/copyButton'
+export { CodeEditor } from './components/codeEditor/codeEditor'
+export type { CodeEditorLayout, CodeEditorProps } from './components/codeEditor/codeEditor'
 export {
   ButtonGroup,
   ButtonGroupSeparator,

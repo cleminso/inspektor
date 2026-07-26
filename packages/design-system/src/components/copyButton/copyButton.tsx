@@ -9,7 +9,7 @@ import {
 import { Tooltip, type TooltipContentProps } from '../tooltip/tooltip'
 import { copyButtonStyles } from './copyButton.styles'
 
-export type CopyButtonSize = Exclude<ButtonSize, 'xs'>
+export type CopyButtonSize = ButtonSize
 export type CopyButtonVariant = Extract<
   ButtonVariant,
   'ghost' | 'secondary' | 'outline'
@@ -39,6 +39,7 @@ export interface CopyButtonProps {
 }
 
 const iconSizeStyles = {
+  xs: copyButtonStyles.iconXS,
   s: copyButtonStyles.iconS,
   m: copyButtonStyles.iconM,
   l: copyButtonStyles.iconL,
@@ -48,7 +49,7 @@ function CopyIcon({ size }: { size: CopyButtonSize }) {
   const iconStyleProps = stylex.props(copyButtonStyles.icon, iconSizeStyles[size])
 
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" {...iconStyleProps}>
+    <svg aria-hidden="true" strokeWidth={1.5} viewBox="0 0 24 24" {...iconStyleProps}>
       <rect height="12" rx="1" width="12" x="8" y="8" />
       <path d="M16 6V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h1" />
     </svg>
@@ -59,7 +60,7 @@ function CheckIcon({ size }: { size: CopyButtonSize }) {
   const iconStyleProps = stylex.props(copyButtonStyles.icon, iconSizeStyles[size])
 
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" {...iconStyleProps}>
+    <svg aria-hidden="true" strokeWidth={1.5} viewBox="0 0 24 24" {...iconStyleProps}>
       <path d="m5 12 4 4L19 6" />
     </svg>
   )

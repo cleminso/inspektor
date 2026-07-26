@@ -6,9 +6,12 @@ export const copyButtonStyles = stylex.create({
     stroke: 'currentColor',
     strokeLinecap: 'round',
     strokeLinejoin: 'round',
-    strokeWidth: 2,
     display: 'block',
     flexShrink: 0,
+  },
+  iconXS: {
+    height: 14,
+    width: 14,
   },
   iconS: {
     height: 14,

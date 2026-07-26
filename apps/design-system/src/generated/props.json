@@ -630,7 +630,7 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"xs\" | \"s\" | \"m\" | \"l\"",
       "required": false,
       "defaultValue": "\"s\"",
       "description": "Controls the square button and icon size.",
@@ -1817,7 +1817,7 @@
       "description": "Active row and column intersection.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 64
+        "line": 66
       }
     },
     {
@@ -1828,7 +1828,7 @@
       "description": "Column highlighted across the header and visible rows.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 66
+        "line": 68
       }
     },
     {
@@ -1839,7 +1839,7 @@
       "description": "Row currently targeted for inspection.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 68
+        "line": 70
       }
     },
     {
@@ -1849,7 +1849,7 @@
       "description": "Data-table regions and companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 70
+        "line": 72
       }
     },
     {
@@ -1860,7 +1860,7 @@
       "description": "Controls table row and cell spacing.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 72
+        "line": 74
       }
     },
     {
@@ -1870,7 +1870,7 @@
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 74
+        "line": 76
       }
     },
     {
@@ -1880,7 +1880,7 @@
       "description": "Runs when a cell context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 76
+        "line": 78
       }
     },
     {
@@ -1890,7 +1890,7 @@
       "description": "Runs when a non-interactive cell is explicitly opened.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 78
+        "line": 80
       }
     },
     {
@@ -1900,7 +1900,7 @@
       "description": "Runs when a column header is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 80
+        "line": 82
       }
     },
     {
@@ -1910,7 +1910,7 @@
       "description": "Runs when a column-header context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 82
+        "line": 84
       }
     },
     {
@@ -1920,7 +1920,7 @@
       "description": "Runs when a non-interactive row is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 84
+        "line": 86
       }
     },
     {
@@ -1930,7 +1930,7 @@
       "description": "Runs when a row context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 86
+        "line": 88
       }
     },
     {
@@ -1940,7 +1940,7 @@
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 88
+        "line": 90
       }
     },
     {
@@ -1951,7 +1951,7 @@
       "description": "Cells included in the current cell-selection set.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 90
+        "line": 92
       }
     },
     {
@@ -1961,7 +1961,7 @@
       "description": "Column ids in their controlled draggable order. Omit fixed columns from this list.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 95
+        "line": 97
       }
     },
     {
@@ -1971,7 +1971,7 @@
       "description": "Runs with the complete draggable column order after a header is moved.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 97
+        "line": 99
       }
     }
   ],
@@ -1983,7 +1983,7 @@
       "description": "Table or custom viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 110
+        "line": 112
       }
     }
   ],
@@ -1995,7 +1995,7 @@
       "description": "Accessible name for the table.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 115
+        "line": 117
       }
     },
     {
@@ -2005,7 +2005,7 @@
       "description": "Header and body composition.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 117
+        "line": 119
       }
     }
   ],
@@ -2018,7 +2018,7 @@
       "description": "Content shown when the table has no rows.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 122
+        "line": 124
       }
     },
     {
@@ -2029,7 +2029,7 @@
       "description": "Whether loading content replaces the current row model.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 124
+        "line": 126
       }
     },
     {
@@ -2040,7 +2040,7 @@
       "description": "Content shown while rows are loading.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 126
+        "line": 128
       }
     }
   ],
@@ -2052,7 +2052,7 @@
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 131
+        "line": 133
       }
     }
   ],
@@ -2064,7 +2064,7 @@
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 136
+        "line": 138
       }
     },
     {
@@ -2074,7 +2074,7 @@
       "description": "TanStack header group represented by this row.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 138
+        "line": 140
       }
     }
   ],
@@ -2086,7 +2086,7 @@
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 143
+        "line": 145
       }
     },
     {
@@ -2096,7 +2096,7 @@
       "description": "TanStack header represented by this cell.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 145
+        "line": 147
       }
     }
   ],
@@ -2108,7 +2108,7 @@
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 150
+        "line": 152
       }
     }
   ],
@@ -2120,7 +2120,7 @@
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 155
+        "line": 157
       }
     },
     {
@@ -2130,7 +2130,7 @@
       "description": "TanStack row represented by this table row.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 157
+        "line": 159
       }
     }
   ],
@@ -2142,7 +2142,7 @@
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 162
+        "line": 164
       }
     },
     {
@@ -2152,7 +2152,7 @@
       "description": "TanStack cell represented by this table cell.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 164
+        "line": 166
       }
     }
   ],
@@ -2164,7 +2164,7 @@
       "description": "Expanded content associated with the row.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 169
+        "line": 171
       }
     },
     {
@@ -2174,7 +2174,7 @@
       "description": "TanStack row represented by this expanded region.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 171
+        "line": 173
       }
     }
   ],
@@ -2186,7 +2186,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 176
+        "line": 178
       }
     }
   ],
@@ -2198,7 +2198,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 176
+        "line": 178
       }
     }
   ],
@@ -2210,7 +2210,7 @@
       "description": "Status and table companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
-        "line": 181
+        "line": 183
       }
     }
   ],
@@ -2487,6 +2487,153 @@
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
         "line": 30
+      }
+    }
+  ],
+  "codeEditor": [
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Sets the source text displayed and edited by CodeMirror.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: string) => void",
+      "required": false,
+      "description": "Runs when editing or formatting changes the source text.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "accessibilityLabel",
+      "type": "string",
+      "required": false,
+      "description": "Provides an accessible name when no external label identifies the editor.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "Sets the editor control id used by an external label.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 24
+      }
+    },
+    {
+      "name": "labelledBy",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the external element that labels the editor.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 26
+      }
+    },
+    {
+      "name": "describedBy",
+      "type": "string",
+      "required": false,
+      "description": "Identifies external description and error elements for the editor.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 28
+      }
+    },
+    {
+      "name": "toolbarLabel",
+      "type": "string",
+      "required": false,
+      "description": "Displays a short source-type label at the start of the editor toolbar.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents source changes while preserving focus, selection, and copying.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Prevents editing and removes the editor from sequential keyboard focus.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 34
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Marks the editor value as invalid.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 36
+      }
+    },
+    {
+      "name": "expanded",
+      "type": "boolean",
+      "required": false,
+      "description": "Controls whether the editor uses its expanded viewport.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "defaultExpanded",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Sets the initial viewport presentation when expansion is uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "onExpandedChange",
+      "type": "(expanded: boolean) => void",
+      "required": false,
+      "description": "Runs when Expand or Collapse requests a presentation change.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 42
+      }
+    },
+    {
+      "name": "layout",
+      "type": "\"fill\" | \"intrinsic\"",
+      "required": false,
+      "defaultValue": "\"intrinsic\"",
+      "description": "Uses intrinsic sizing by default or fills a constrained parent when expanded.",
+      "source": {
+        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
+        "line": 44
       }
     }
   ],

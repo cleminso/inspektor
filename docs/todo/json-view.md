@@ -34,13 +34,14 @@
 - [x] Normalize Jazz rows without indexed `Uint8Array` serialization or loss of unsupported values.
 - [x] Add read-only row `JSON` beside editable `Details` in the Table Explorer pane.
 - [x] Keep search and whole-row Copy JSON application-owned.
+- [x] Bound the complete expanded tree across simultaneously expanded branches.
+- [x] Reuse `JsonView` for read-only structured fields where the normalized root is an object or array.
 
 ## Open product work
 
 [24/07/26]
 
-- [x] Add a fixed total visible-node budget across simultaneously expanded branches.
-- [x] Reuse `JsonView` for read-only structured fields where the normalized root is an object or array.
+- None.
 
 ## Work outside the foundation scope
 

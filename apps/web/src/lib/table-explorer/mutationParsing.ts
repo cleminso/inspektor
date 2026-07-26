@@ -151,7 +151,7 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
 }
 
 /** Formats runtime row values for generic text inputs without implying binary edit support. */
-export function formatMutationFieldValue(value: unknown): string {
+export function formatMutationFieldValue(value: unknown, columnType: ColumnType): string {
   if (value === null || value === undefined) {
     return "";
   }
@@ -161,8 +161,8 @@ export function formatMutationFieldValue(value: unknown): string {
   if (value instanceof Uint8Array) {
     return `(${value.length} bytes)`;
   }
-  if (typeof value === "object") {
-    return JSON.stringify(value);
+  if (columnType.type === "Json" || columnType.type === "Array" || columnType.type === "Row") {
+    return JSON.stringify(value, null, 2);
   }
   return String(value);
 }

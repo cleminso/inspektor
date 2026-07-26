@@ -81,7 +81,11 @@ function CellValue({
   const column = schemaColumns.find((candidate) => candidate.name === target.columnId);
   const value = rowValues[target.columnId];
   const formattedValue =
-    value === null || value === undefined ? "NULL" : formatMutationFieldValue(value);
+    value === null || value === undefined
+      ? "NULL"
+      : column === undefined
+        ? String(value)
+        : formatMutationFieldValue(value, column.column_type);
 
   return (
     <>

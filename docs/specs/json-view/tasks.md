@@ -94,16 +94,16 @@
   - Add integration tests for tab switching, hidden fields, row changes, search, copying, and read-only behavior.
   - Reference: [Inspector integration](./design.md#inspector-integration).
 
-- [ ] 11. Reuse `JsonView` for read-only JSON and array field inspection.
+- [x] 11. Reuse `JsonView` for read-only JSON and array field inspection.
   - Use `JsonView` when a represented structured field is read-only.
   - Keep editable JSON, typed JSON, and generic array fields as schema-validated text controls in `Details`.
-  - Keep enum arrays as repeatable `Select` fields that preserve order and duplicate values.
-  - Keep reference arrays as repeatable relation fields with stored IDs and navigation actions.
   - Add field-level integration tests proving that read-only viewing and editable Details controls do not share mutation behavior.
   - Reference: [Inspector integration](./design.md#inspector-integration).
 
-- [ ] 12. Complete cross-package verification.
+- [x] 12. Complete cross-package automated verification.
   - Run design-system and Inspector tests, typechecks, focused lint, prop extraction checks, and production builds.
+
+- [ ] 13. Verify the running Inspector integration.
   - Verify pointer selection, keyboard navigation, search highlighting, narrow panes, long values, large branches, and row switching in
     the running Inspector.
   - Confirm the complete-row `JSON` representation exposes no mutation path.

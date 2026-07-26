@@ -24,6 +24,7 @@ behavior discussion. Detailed acceptance rules remain in
 [23/07/26]
 
 - [x] Keep `DataTable` controlled through a TanStack `Table<TData>` instance.
+- [x] Keep the internal `DataTable` context referentially stable across unrelated root renders without branding the public TanStack table prop.
 - [x] Represent cell identity with stable row IDs and column IDs.
 - [x] Expose controlled active-cell, selected-cell, active-column, and active-row state.
 - [x] Report replace, additive, and range cell-selection intent without exposing raw pointer events as application state.
@@ -95,6 +96,11 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Keep synthetic IDs and unsupported binary mutations read-only.
 - [x] Display query-relative row and column coordinates as orientation metadata rather than identity.
 - [x] Format cell-inspector values for basic read-only inspection.
+- [x] Pretty-serialize runtime JSON, array, and row values when creating editable drafts without rewriting user source while typing.
+- [x] Preserve supplied nullable insert values instead of forcing every nullable field to NULL.
+- [x] Seed empty structured Value mode with `{}` or `[]` while preserving an existing draft.
+- [x] Keep structured editors mounted across NULL mode changes and connect visible errors to the editor control.
+- [x] Expand one structured editor into the form's available pane height while preserving the fixed action footer and mounted sibling fields.
 
 ### Column and table behavior
 
@@ -136,10 +142,16 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Create a read-only structured tree component inspired by Geist JSON View with bounded expansion, keyboard tree navigation,
       selectable text, search highlighting, and accessible tree semantics.
 - [x] Document and validate `JsonView` in `apps/design-system`.
+- [x] Use the CodeMirror-backed `CodeEditor` for editable JSON, array, and row fields while keeping database NULL as an explicit application-owned value mode.
+- [x] Provide enum labels and values in the item shape required by `Select` and keep relation links on the canonical typed table route.
+- [x] Move editable structured type labels into the editor toolbar.
+- [x] Render NULL structured values as compact read-only inputs without repeating NULL inside the field body.
 - [ ] Keep primitive text, numeric, boolean, enum, copy, and null controls composed from existing design-system components unless a
       repeated semantic contract requires a dedicated component.
 - [ ] Render text, numeric, enum, boolean, timestamp, structured, binary, nullable, and relation values through the shared
       renderers.
+- [ ] Render enum arrays as repeatable `Select` rows that preserve order and duplicate values.
+- [ ] Render reference arrays as repeatable relation fields with stored IDs and navigation actions.
 - [ ] Preserve raw values for copying while displaying readable formatted values.
 - [ ] Add readable previews and expanded inspection for long strings and structured values.
 - [ ] Represent null distinctly from empty strings and unavailable values.
@@ -193,7 +205,8 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Avoid native label associations when the read-only structured field is represented by an independently labelled tree.
 - [x] Do not expose arbitrary renderers, styling slots, Jazz schema objects, or an `editable` boolean from the design-system viewer.
 - [x] Track the reusable component design and implementation in [JsonView design](../specs/json-view/design.md).
-- [ ] Execute the approved [JsonView implementation plan](../specs/json-view/tasks.md).
+- [x] Complete the approved [JsonView implementation plan](../specs/json-view/tasks.md) through cross-package automated
+      verification.
 
 ### Complete multi-cell pane
 
@@ -346,17 +359,19 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Validation checklist
 
-- [ ] Every behavior change begins with a failing regression test.
-- [ ] `pnpm --filter @inspector/ds test`
-- [ ] `pnpm --filter @inspector/ds typecheck`
-- [ ] `pnpm --filter @inspector/ds build`
-- [ ] `pnpm --filter regarde.inspector test`
-- [ ] `pnpm --filter regarde.inspector typecheck`
-- [ ] `pnpm --filter regarde.inspector build`
-- [ ] `pnpm --filter inspector.design-system test`
-- [ ] `pnpm --filter inspector.design-system check:props`
-- [ ] `pnpm --filter inspector.design-system typecheck`
-- [ ] `pnpm --filter inspector.design-system build`
-- [ ] Changed files pass focused lint.
-- [ ] `git diff HEAD --check` passes.
+[24/07/26]
+
+- [x] Every JsonView behavior change begins with a failing regression test.
+- [x] `pnpm --filter @inspector/ds test`
+- [x] `pnpm --filter @inspector/ds typecheck`
+- [x] `pnpm --filter @inspector/ds build`
+- [x] `pnpm --filter regarde.inspector test`
+- [x] `pnpm --filter regarde.inspector typecheck`
+- [x] `pnpm --filter regarde.inspector build`
+- [x] `pnpm --filter inspector.design-system test`
+- [x] `pnpm --filter inspector.design-system check:props`
+- [x] `pnpm --filter inspector.design-system typecheck`
+- [x] `pnpm --filter inspector.design-system build`
+- [x] Changed JsonView files pass focused lint.
+- [x] `git diff HEAD --check` passes.
 - [ ] Browser verification covers pointer, keyboard, pane, selection, scrolling, and navigation behavior.

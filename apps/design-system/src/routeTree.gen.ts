@@ -16,6 +16,7 @@ import { Route as ComponentsButtonRouteImport } from './routes/components/button
 import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
+import { Route as ComponentsCodeEditorRouteImport } from './routes/components/code-editor'
 import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
 import { Route as ComponentsContextMenuRouteImport } from './routes/components/context-menu'
 import { Route as ComponentsContextSwitcherRouteImport } from './routes/components/context-switcher'
@@ -77,6 +78,11 @@ const ComponentsButtonLinkRoute = ComponentsButtonLinkRouteImport.update({
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
   id: '/components/checkbox',
   path: '/components/checkbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsCodeEditorRoute = ComponentsCodeEditorRouteImport.update({
+  id: '/components/code-editor',
+  path: '/components/code-editor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsComboboxRoute = ComponentsComboboxRouteImport.update({
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
@@ -261,6 +268,7 @@ export interface FileRoutesByTo {
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
@@ -298,6 +306,7 @@ export interface FileRoutesById {
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/components/button-group'
     | '/components/button-link'
     | '/components/checkbox'
+    | '/components/code-editor'
     | '/components/combobox'
     | '/components/context-menu'
     | '/components/context-switcher'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/components/button-group'
     | '/components/button-link'
     | '/components/checkbox'
+    | '/components/code-editor'
     | '/components/combobox'
     | '/components/context-menu'
     | '/components/context-switcher'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/components/button-group'
     | '/components/button-link'
     | '/components/checkbox'
+    | '/components/code-editor'
     | '/components/combobox'
     | '/components/context-menu'
     | '/components/context-switcher'
@@ -445,6 +457,7 @@ export interface RootRouteChildren {
   ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
+  ComponentsCodeEditorRoute: typeof ComponentsCodeEditorRoute
   ComponentsComboboxRoute: typeof ComponentsComboboxRoute
   ComponentsContextMenuRoute: typeof ComponentsContextMenuRoute
   ComponentsContextSwitcherRoute: typeof ComponentsContextSwitcherRoute
@@ -523,6 +536,13 @@ declare module '@tanstack/react-router' {
       path: '/components/checkbox'
       fullPath: '/components/checkbox'
       preLoaderRoute: typeof ComponentsCheckboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/code-editor': {
+      id: '/components/code-editor'
+      path: '/components/code-editor'
+      fullPath: '/components/code-editor'
+      preLoaderRoute: typeof ComponentsCodeEditorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/combobox': {
@@ -725,6 +745,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
+  ComponentsCodeEditorRoute: ComponentsCodeEditorRoute,
   ComponentsComboboxRoute: ComponentsComboboxRoute,
   ComponentsContextMenuRoute: ComponentsContextMenuRoute,
   ComponentsContextSwitcherRoute: ComponentsContextSwitcherRoute,

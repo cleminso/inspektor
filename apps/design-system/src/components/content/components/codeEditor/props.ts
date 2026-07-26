@@ -1,0 +1,16 @@
+export const codeEditorPropNames = [
+  "value",
+  "onValueChange",
+  "accessibilityLabel",
+  "id",
+  "labelledBy",
+  "describedBy",
+  "toolbarLabel",
+  "readOnly",
+  "disabled",
+  "invalid",
+  "expanded",
+  "defaultExpanded",
+  "onExpandedChange",
+  "layout",
+] as const;

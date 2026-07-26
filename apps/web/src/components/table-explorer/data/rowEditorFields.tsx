@@ -4,8 +4,10 @@ import { Link } from "@tanstack/react-router";
 import type { ColumnDescriptor } from "jazz-tools";
 
 import {
+  Box,
   Button,
   Checkbox,
+  CodeEditor,
   Field,
   Input,
   InputGroup,
@@ -48,10 +50,12 @@ interface UseRowEditorFieldsOptions {
 
 interface UseRowEditorFieldsResult {
   errors: Record<string, string>;
+  expandedColumnName: string | null;
   fieldStates: Record<string, FieldState>;
   formFields: MutationFormField[];
   isSaving: boolean;
   saveError: string | null;
+  setFieldExpanded: (columnName: string, expanded: boolean) => void;
   setFieldNull: (columnName: string, isNull: boolean) => void;
   setFieldText: (columnName: string, text: string) => void;
   submit: FormSubmitHandler;
@@ -59,12 +63,72 @@ interface UseRowEditorFieldsResult {
 
 interface RowEditorFieldsProps {
   errors: Record<string, string>;
+  expandedColumnName: string | null;
   fieldStates: Record<string, FieldState>;
   formFields: MutationFormField[];
   initialRowValues: Record<string, unknown>;
   mode: DetailPaneMode;
+  onFieldExpandedChange: (columnName: string, expanded: boolean) => void;
   onFieldNullChange: (columnName: string, isNull: boolean) => void;
   onFieldTextChange: (columnName: string, text: string) => void;
+}
+
+const ROW_EDITOR_FOCUSABLE_SELECTOR = [
+  "input:not([disabled])",
+  "textarea:not([disabled])",
+  "button:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
+const ROW_EDITOR_FOCUS_WAIT_LIMIT = 5_000;
+
+function getRowEditorFieldControl(field: HTMLElement): HTMLElement | null {
+  if (field.dataset.valueMode === "null") {
+    return field.querySelector<HTMLElement>("[data-value-mode-control]");
+  }
+
+  return (
+    field.querySelector<HTMLElement>("[role='textbox']:not([aria-disabled='true'])") ??
+    field.querySelector<HTMLElement>(ROW_EDITOR_FOCUSABLE_SELECTOR)
+  );
+}
+
+function focusAndScrollRowEditorField(field: HTMLElement): boolean {
+  const control = getRowEditorFieldControl(field);
+  if (control === null) {
+    return false;
+  }
+
+  field.scrollIntoView?.({ block: "nearest" });
+  control.focus();
+  return true;
+}
+
+export function focusRowEditorField(fieldName: string): boolean {
+  const field = document.getElementById(`row-editor-field-${fieldName}`);
+  if (field === null) {
+    return false;
+  }
+
+  if (focusAndScrollRowEditorField(field) === true) {
+    return true;
+  }
+
+  if (field.dataset.valueMode !== "value") {
+    return false;
+  }
+
+  let stopWaiting: number;
+  const observer = new MutationObserver(() => {
+    if (focusAndScrollRowEditorField(field) === true) {
+      observer.disconnect();
+      window.clearTimeout(stopWaiting);
+    }
+  });
+  observer.observe(field, { childList: true, subtree: true });
+  stopWaiting = window.setTimeout(() => {
+    observer.disconnect();
+  }, ROW_EDITOR_FOCUS_WAIT_LIMIT);
+  return true;
 }
 
 function getInitialFieldState(
@@ -74,13 +138,13 @@ function getInitialFieldState(
 ): FieldState {
   if (mode === "insert") {
     return {
-      text: formatMutationFieldValue(value),
-      isNull: column.nullable,
+      text: formatMutationFieldValue(value, column.column_type),
+      isNull: column.nullable === true && (value === null || value === undefined),
     };
   }
 
   return {
-    text: formatMutationFieldValue(value),
+    text: formatMutationFieldValue(value, column.column_type),
     isNull: value === null || value === undefined,
   };
 }
@@ -145,6 +209,7 @@ export function useRowEditorFields({
     createInitialFields(initialRowValues, mode, schemaColumns),
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [expandedColumnName, setExpandedColumnName] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const formFields = useMemo(() => buildMutationFields(schemaColumns), [schemaColumns]);
@@ -158,11 +223,41 @@ export function useRowEditorFields({
   };
 
   const setFieldNull = (columnName: string, isNull: boolean) => {
-    setFieldStates((currentFields) => ({
-      ...currentFields,
-      [columnName]: { ...currentFields[columnName], isNull },
-    }));
+    setFieldStates((currentFields) => {
+      const currentField = currentFields[columnName];
+      const column = schemaColumns.find((candidate) => candidate.name === columnName);
+      const shouldSeedStructuredValue =
+        isNull === false &&
+        currentField?.text.length === 0 &&
+        column !== undefined &&
+        isStructuredColumn(column) === true;
+
+      return {
+        ...currentFields,
+        [columnName]: {
+          ...currentField,
+          isNull,
+          text:
+            shouldSeedStructuredValue === true
+              ? column.column_type.type === "Array"
+                ? "[]"
+                : "{}"
+              : (currentField?.text ?? ""),
+        },
+      };
+    });
+    if (isNull === true) {
+      setExpandedColumnName((currentColumnName) =>
+        currentColumnName === columnName ? null : currentColumnName,
+      );
+    }
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: "" }));
+  };
+
+  const setFieldExpanded = (columnName: string, expanded: boolean) => {
+    setExpandedColumnName((currentColumnName) =>
+      expanded === true ? columnName : currentColumnName === columnName ? null : currentColumnName,
+    );
   };
 
   const submit: FormSubmitHandler = async (event) => {
@@ -202,6 +297,15 @@ export function useRowEditorFields({
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
+      setExpandedColumnName(null);
+      const firstInvalidField = formFields.find(
+        (field) => nextErrors[field.column.name] !== undefined,
+      );
+      if (firstInvalidField !== undefined) {
+        requestAnimationFrame(() => {
+          focusRowEditorField(firstInvalidField.column.name);
+        });
+      }
       return;
     }
 
@@ -218,10 +322,12 @@ export function useRowEditorFields({
 
   return {
     errors,
+    expandedColumnName,
     fieldStates,
     formFields,
     isSaving,
     saveError,
+    setFieldExpanded,
     setFieldNull,
     setFieldText,
     submit,
@@ -230,10 +336,12 @@ export function useRowEditorFields({
 
 export function RowEditorFields({
   errors,
+  expandedColumnName,
   fieldStates,
   formFields,
   initialRowValues,
   mode,
+  onFieldExpandedChange,
   onFieldNullChange,
   onFieldTextChange,
 }: RowEditorFieldsProps): React.ReactElement {
@@ -259,8 +367,8 @@ export function RowEditorFields({
   }, [formFields, initialRowValues]);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 pr-1">
-      <Field.Root id="row-editor-field-id">
+    <Box flexDirection="column" flexGrow={1} gap="2xl" minHeight={0} pr="xs">
+      <Field.Root hidden={expandedColumnName !== null} id="row-editor-field-id">
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <Field.Label htmlFor="row-editor-id">
@@ -285,6 +393,11 @@ export function RowEditorFields({
         const isBooleanColumn = column.column_type.type === "Boolean";
         const isBinaryColumn = column.column_type.type === "Bytea";
         const isStructuredColumnType = isStructuredColumn(column);
+        const isEditableStructuredColumn =
+          isStructuredColumnType === true && readOnlyReason === null;
+        const isExpanded = expandedColumnName === column.name;
+        const isHiddenByExpandedField =
+          expandedColumnName !== null && isExpanded === false;
         const relationTarget =
           column.references !== undefined &&
           fieldState.isNull === false &&
@@ -309,22 +422,63 @@ export function RowEditorFields({
 
         return (
           <Field.Root
+            data-value-mode={
+              isStructuredColumnType === true && readOnlyReason === null
+                ? fieldState.isNull === true
+                  ? "null"
+                  : "value"
+                : undefined
+            }
+            hidden={isHiddenByExpandedField}
             id={`row-editor-field-${column.name}`}
             key={column.name}
             invalid={hasFieldError}
+            render={
+              isEditableStructuredColumn === true ? (
+                <Box
+                  flexDirection="column"
+                  flexGrow={isExpanded === true ? 1 : 0}
+                  gap="xs"
+                  minHeight={isExpanded === true ? 0 : undefined}
+                  minWidth={0}
+                  width="full"
+                />
+              ) : undefined
+            }
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Field.Label
                   id={fieldLabelId}
-                  htmlFor={isBooleanColumn === true || usesJsonView === true ? undefined : fieldId}
-                  nativeLabel={isBooleanColumn === false && usesJsonView === false}
+                  htmlFor={
+                    isBooleanColumn === true ||
+                    usesJsonView === true ||
+                    isEditableStructuredColumn === true
+                      ? undefined
+                      : fieldId
+                  }
+                  nativeLabel={
+                    isBooleanColumn === false &&
+                    usesJsonView === false &&
+                    isEditableStructuredColumn === false
+                  }
+                  onClickCapture={
+                    isEditableStructuredColumn === true
+                      ? (event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          focusRowEditorField(column.name);
+                        }
+                      : undefined
+                  }
                 >
                   <span>{formatColumnNameLabel(column.name)}</span>
                 </Field.Label>
-                <span className="text-xs text-muted-foreground">
-                  {formatColumnTypeLabel(column)}
-                </span>
+                {isEditableStructuredColumn === false ? (
+                  <span className="text-xs text-muted-foreground">
+                    {formatColumnTypeLabel(column)}
+                  </span>
+                ) : null}
               </div>
               <div className="flex items-center gap-3">
                 {column.nullable === true &&
@@ -333,6 +487,7 @@ export function RowEditorFields({
                 usesTextInput === false ? (
                   <label className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Checkbox
+                      data-value-mode-control={isStructuredColumnType === true ? "" : undefined}
                       aria-label={`Set ${formatColumnNameLabel(column.name)} to NULL`}
                       checked={fieldState.isNull}
                       onCheckedChange={(nextChecked) => {
@@ -371,7 +526,10 @@ export function RowEditorFields({
               </ToggleGroup>
             ) : column.column_type.type === "Enum" && readOnlyReason === null ? (
               <Select.Root
-                items={column.column_type.variants}
+                items={column.column_type.variants.map((variant) => ({
+                  label: variant,
+                  value: variant,
+                }))}
                 value={
                   fieldState.isNull === true || fieldState.text.length === 0
                     ? null
@@ -410,7 +568,44 @@ export function RowEditorFields({
                 accessibilityLabel={`${formatColumnNameLabel(column.name)} value`}
                 data={readOnlyStructuredValue}
               />
-            ) : isStructuredColumnType === true || isBinaryColumn === true ? (
+            ) : isStructuredColumnType === true && readOnlyReason === null ? (
+              <>
+                <Box
+                  flexDirection="column"
+                  flexGrow={isExpanded === true ? 1 : 0}
+                  hidden={fieldState.isNull === true}
+                  minHeight={isExpanded === true ? 0 : undefined}
+                  overflow={isExpanded === true ? "hidden" : undefined}
+                >
+                  <CodeEditor
+                    id={fieldId}
+                    labelledBy={fieldLabelId}
+                    describedBy={hasFieldError === true ? `${fieldId}-error` : undefined}
+                    disabled={fieldState.isNull === true}
+                    expanded={isExpanded}
+                    invalid={hasFieldError}
+                    layout={isExpanded === true ? "fill" : "intrinsic"}
+                    toolbarLabel={formatColumnTypeLabel(column).toUpperCase()}
+                    onExpandedChange={(expanded) => {
+                      onFieldExpandedChange(column.name, expanded);
+                    }}
+                    value={fieldState.text}
+                    onValueChange={(value) => {
+                      onFieldTextChange(column.name, value);
+                    }}
+                  />
+                </Box>
+                {fieldState.isNull === true ? (
+                  <Input
+                    data-null-value
+                    aria-label={`${formatColumnNameLabel(column.name)} value`}
+                    readOnly
+                    fullWidth
+                    value=""
+                  />
+                ) : null}
+              </>
+            ) : isBinaryColumn === true || isStructuredColumnType === true ? (
               <div className="flex flex-col gap-2">
                 <Textarea
                   id={fieldId}
@@ -479,10 +674,14 @@ export function RowEditorFields({
             {getFieldReadOnlyReason(column) === "binary" ? (
               <Field.Description>Read-only: binary field</Field.Description>
             ) : null}
-            {hasFieldError === true ? <Field.Error match>{fieldError}</Field.Error> : null}
+            {hasFieldError === true ? (
+              <Field.Error id={`${fieldId}-error`} match>
+                {fieldError}
+              </Field.Error>
+            ) : null}
           </Field.Root>
         );
       })}
-    </div>
+    </Box>
   );
 }

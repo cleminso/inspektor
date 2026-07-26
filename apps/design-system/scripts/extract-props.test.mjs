@@ -335,6 +335,38 @@ test("extracts the constrained JsonView API", () => {
   );
 });
 
+test("extracts the constrained CodeEditor API", () => {
+  const metadata = extractPropsMetadata();
+  const codeEditorProps = metadata.codeEditor;
+
+  assert.deepEqual(
+    codeEditorProps?.map(({ name }) => name),
+    [
+      "value",
+      "onValueChange",
+      "accessibilityLabel",
+      "id",
+      "labelledBy",
+      "describedBy",
+      "toolbarLabel",
+      "readOnly",
+      "disabled",
+      "invalid",
+      "expanded",
+      "defaultExpanded",
+      "onExpandedChange",
+      "layout",
+    ],
+  );
+  assert.equal(
+    codeEditorProps?.find(({ name }) => name === "defaultExpanded")?.defaultValue,
+    "false",
+  );
+  assert.equal(codeEditorProps?.find(({ name }) => name === "layout")?.defaultValue, '"intrinsic"');
+  assert.equal(codeEditorProps?.find(({ name }) => name === "className"), undefined);
+  assert.equal(codeEditorProps?.find(({ name }) => name === "style"), undefined);
+});
+
 test("extracts the constrained ButtonGroup named API", () => {
   const metadata = extractPropsMetadata();
 
