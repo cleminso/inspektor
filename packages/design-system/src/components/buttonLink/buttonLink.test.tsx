@@ -1,8 +1,10 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { createRef, type ComponentProps } from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { ButtonLink } from './buttonLink'
+
+afterEach(cleanup)
 
 function RouterLink({ to, ...props }: { to: string } & ComponentProps<'a'>) {
   return <a href={to} {...props} />
@@ -74,5 +76,17 @@ describe('ButtonLink', () => {
 
     expect(link.className).not.toContain('consumer-style')
     expect(link.style.color).not.toBe('red')
+  })
+
+  it('optically balances centered content with a visual on only one side', () => {
+    render(
+      <ButtonLink href="/catalog" suffix={<span>Suffix</span>}>
+        Open catalog
+      </ButtonLink>,
+    )
+
+    expect(
+      screen.getByRole('link', { name: 'Open catalog' }).getAttribute('data-optical-alignment'),
+    ).toBe('suffix')
   })
 })

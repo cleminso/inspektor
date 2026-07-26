@@ -6,6 +6,7 @@ import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import {
   ButtonContent,
+  getButtonOpticalAlignment,
   getButtonVisualStyles,
   type ButtonInset,
   type ButtonJustify,
@@ -75,6 +76,14 @@ export function Button({
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const isDisabled = disabled === true
   const isInteractionBlocked = isDisabled === true || loading === true
+  const opticalAlignment = getButtonOpticalAlignment({
+    prefix,
+    suffix,
+    loading,
+    shape,
+    justify,
+    inset,
+  })
   const stateStyleProps = createStateStyleProps<BaseButton.State>((state) =>
     getButtonVisualStyles({
       variant,
@@ -86,6 +95,7 @@ export function Button({
       inset,
       orientation: buttonGroupOrientation,
       disabled: state.disabled,
+      opticalAlignment,
     }),
   )
 
@@ -100,6 +110,7 @@ export function Button({
       data-full-width={fullWidth === true ? '' : undefined}
       data-inset={inset}
       data-loading={loading === true ? '' : undefined}
+      data-optical-alignment={opticalAlignment}
       data-radius={radius}
       data-shape={shape}
       data-size={size}

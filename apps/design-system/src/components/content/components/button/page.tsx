@@ -66,7 +66,7 @@ export function ButtonPage(): ReactElement {
 
       <Section
         title="Prefix and suffix"
-        description="Place decorative icons before, after, or around the label."
+        description="Place decorative icons before, after, or around the label. Centered buttons optically balance one-sided icons automatically."
       >
         <Example source={prefixAndSuffixSource}>
           <PrefixAndSuffixExample />

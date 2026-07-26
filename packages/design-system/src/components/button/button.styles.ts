@@ -116,6 +116,22 @@ export const buttonStyles = stylex.create({
   insetFlush: {
     paddingInline: spacing.xxs,
   },
+  opticalPrefixCompact: {
+    paddingInlineStart: `calc(${spacing.s} - ${spacing.xxs})`,
+    paddingInlineEnd: `calc(${spacing.s} + ${spacing.xxs})`,
+  },
+  opticalSuffixCompact: {
+    paddingInlineStart: `calc(${spacing.s} + ${spacing.xxs})`,
+    paddingInlineEnd: `calc(${spacing.s} - ${spacing.xxs})`,
+  },
+  opticalPrefixLarge: {
+    paddingInlineStart: `calc(${spacing.m} - ${spacing.xxs})`,
+    paddingInlineEnd: `calc(${spacing.m} + ${spacing.xxs})`,
+  },
+  opticalSuffixLarge: {
+    paddingInlineStart: `calc(${spacing.m} + ${spacing.xxs})`,
+    paddingInlineEnd: `calc(${spacing.m} - ${spacing.xxs})`,
+  },
   square: {
     aspectRatio: '1 / 1',
     paddingInline: 0,

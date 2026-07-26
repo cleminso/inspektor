@@ -54,6 +54,46 @@ describe("Button", () => {
     expect(leading?.nextElementSibling?.textContent).toBe("Suffix");
   });
 
+  it("optically balances centered content with a visual on only one side", () => {
+    const { rerender } = render(
+      <Button suffix={<span>Suffix</span>}>Label</Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "Label" });
+
+    expect(button.getAttribute("data-optical-alignment")).toBe("suffix");
+
+    rerender(<Button prefix={<span>Prefix</span>}>Label</Button>);
+
+    expect(button.getAttribute("data-optical-alignment")).toBe("prefix");
+
+    rerender(
+      <Button prefix={<span>Prefix</span>} suffix={<span>Suffix</span>}>
+        Label
+      </Button>,
+    );
+
+    expect(button.getAttribute("data-optical-alignment")).toBeNull();
+  });
+
+  it("does not optically rebalance distributed or square content", () => {
+    const { rerender } = render(
+      <Button justify="between" suffix={<span>Suffix</span>}>Label</Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "Label" });
+
+    expect(button.getAttribute("data-optical-alignment")).toBeNull();
+
+    rerender(
+      <Button shape="square" suffix={<span>Suffix</span>} aria-label="Action">
+        Label
+      </Button>,
+    );
+
+    expect(button.getAttribute("data-optical-alignment")).toBeNull();
+  });
+
   it("supports extra-small icon actions", () => {
     render(
       <Button size="xs" shape="square" aria-label="More actions">
