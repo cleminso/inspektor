@@ -101,6 +101,7 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Seed empty structured Value mode with `{}` or `[]` while preserving an existing draft.
 - [x] Keep structured editors mounted across NULL mode changes and connect visible errors to the editor control.
 - [x] Expand one structured editor into the form's available pane height while preserving the fixed action footer and mounted sibling fields.
+- [x] Keep row representation panels at the available pane height so editor collapse restores the form and its action footer remains at the bottom.
 
 ### Column and table behavior
 

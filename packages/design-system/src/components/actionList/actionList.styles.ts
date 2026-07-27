@@ -24,6 +24,7 @@ export const actionListStyles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
+    gap: spacing.xxs,
   },
   item: {
     [actionListVars.selectionHoverVisible]: {

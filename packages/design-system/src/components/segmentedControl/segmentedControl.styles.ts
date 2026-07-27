@@ -109,6 +109,9 @@ export const segmentedControlStyles = stylex.create({
     transitionDuration: '0ms',
   },
   panel: {
+    flexBasis: 0,
+    flexGrow: 1,
+    flexShrink: 1,
     outlineColor: borderColors['border-focused'],
     outlineOffset: -2,
     outlineStyle: {

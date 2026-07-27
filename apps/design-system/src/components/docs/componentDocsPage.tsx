@@ -13,7 +13,7 @@ interface ComponentDocsPageProps {
   source: SourceReference;
   preview: ReactNode;
   sourceCode: string;
-  controls: ReactNode;
+  controls?: ReactNode;
   children?: ReactNode;
 }
 
