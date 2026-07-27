@@ -16,6 +16,16 @@ import { toasterVars } from './toasterVars.stylex'
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
 const compactViewport = '@media (max-width: 639px)'
 
+const pulseEven = stylex.keyframes({
+  '0%, 100%': { scale: 1 },
+  '50%': { scale: 1.04 },
+})
+
+const pulseOdd = stylex.keyframes({
+  '0%, 100%': { scale: 1 },
+  '49.999%, 50%': { scale: 1.04 },
+})
+
 export const toasterStyles = stylex.create({
   viewport: {
     margin: 0,
@@ -68,6 +78,16 @@ export const toasterStyles = stylex.create({
   toastFrontmost: { zIndex: 3 },
   toastMiddle: { zIndex: 2 },
   toastBack: { zIndex: 1 },
+  pulseEven: {
+    animationDuration: '280ms',
+    animationName: { default: pulseEven, [reducedMotion]: 'none' },
+    animationTimingFunction: 'ease',
+  },
+  pulseOdd: {
+    animationDuration: '280ms',
+    animationName: { default: pulseOdd, [reducedMotion]: 'none' },
+    animationTimingFunction: 'ease',
+  },
   toastSuccess: {
     [toasterVars.actionBackground]: backgroundColors['bg-success'],
     [toasterVars.actionColor]: textColors['fg-success'],

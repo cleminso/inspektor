@@ -170,6 +170,43 @@ describe('Toaster', () => {
     expect(onUndo).toHaveBeenCalledOnce()
   })
 
+  it('deduplicates matching notifications and replays the pulse', async () => {
+    expect(stylex.props(toasterStyles.pulseOdd).className).not.toBe(
+      stylex.props(toasterStyles.pulseEven).className,
+    )
+
+    render(<Toaster />)
+
+    toasts.success('Draft saved', { preserve: true })
+
+    const toast = (await screen.findByText('Draft saved')).closest('[data-slot="toast"]')
+    expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(1)
+    expect(toast?.className).not.toContain(stylex.props(toasterStyles.pulseOdd).className)
+
+    toasts.success('Draft saved', { preserve: true })
+
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(1)
+      expect(toast?.className).toContain(stylex.props(toasterStyles.pulseOdd).className)
+    })
+
+    toasts.success('Draft saved', { preserve: true })
+
+    await waitFor(() => {
+      expect(toast?.className).toContain(stylex.props(toasterStyles.pulseEven).className)
+    })
+  })
+
+  it('keeps matching notifications separate when they have distinct ids', async () => {
+    render(<Toaster />)
+
+    toasts.message('Export complete', { id: 'first', preserve: true })
+    toasts.message('Export complete', { id: 'second', preserve: true })
+
+    await screen.findAllByText('Export complete')
+    expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(2)
+  })
+
   it('updates a promise toast when its lifecycle completes', async () => {
     render(<Toaster />)
 

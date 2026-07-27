@@ -55,7 +55,7 @@ function getToastOptions(
     actionProps:
       options?.undo === undefined ? undefined : { children: 'Undo', onClick: options.undo },
     description: options?.description,
-    id: options?.id === undefined ? undefined : normalizeToastId(options.id),
+    id: normalizeToastId(options?.id ?? content),
     timeout: options?.preserve === true ? 0 : undefined,
     title: content,
     type: status,
@@ -116,6 +116,9 @@ function ToastList() {
       toasterStyles.toast,
       statusStyles[status],
       stackOrderStyles[Math.min(index, stackOrderStyles.length - 1)],
+      toast.updateKey !== undefined &&
+        toast.updateKey > 0 &&
+        (toast.updateKey % 2 === 0 ? toasterStyles.pulseEven : toasterStyles.pulseOdd),
       state.expanded === true && toasterStyles.toastExpanded,
       state.limited === true && toasterStyles.toastLimited,
       state.transitionStatus === 'starting' && toasterStyles.toastStarting,
