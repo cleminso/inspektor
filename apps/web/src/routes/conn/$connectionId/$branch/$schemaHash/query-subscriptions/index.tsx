@@ -1,11 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { QuerySubscriptionsScreen } from "@/components/query-subscriptions/view";
+import { Box, Text } from "@inspector/ds";
 
 export const Route = createFileRoute("/conn/$connectionId/$branch/$schemaHash/query-subscriptions/")({
   component: QuerySubscriptionsRoute,
 });
 
 function QuerySubscriptionsRoute(): React.ReactElement {
-  return <QuerySubscriptionsScreen />;
+  return (
+    <Box flex={1} alignItems="center" justifyContent="center" backgroundColor="bg-page">
+      <Text as="span" variant="label" color="muted">
+        Query subscriptions
+      </Text>
+    </Box>
+  );
 }
