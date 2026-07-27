@@ -1,15 +1,22 @@
 import * as stylex from "@stylexjs/stylex";
-import { lazy, Suspense } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { codeEditorStyles } from "./codeEditor.styles";
 
-const loadCodeMirrorEditor = () => import("./codeMirrorEditor");
+type CodeMirrorEditorModule = typeof import("./codeMirrorEditor");
 
-const LazyCodeMirrorEditor = lazy(async () => {
-  const module = await loadCodeMirrorEditor();
+let codeMirrorEditorPromise: Promise<CodeMirrorEditorModule> | null = null;
 
-  return { default: module.CodeMirrorEditor };
-});
+// Keep CodeMirror outside the static package graph. The controlled textarea remains usable while
+// loading, and the promise resets after failure so another mount can retry the optional engine.
+function loadCodeMirrorEditor(): Promise<CodeMirrorEditorModule> {
+  codeMirrorEditorPromise ??= import("./codeMirrorEditor").catch((error: unknown) => {
+    codeMirrorEditorPromise = null;
+    throw new Error("CodeEditor failed to load CodeMirror", { cause: error });
+  });
+
+  return codeMirrorEditorPromise;
+}
 
 export type CodeEditorLayout = "fill" | "intrinsic";
 
@@ -53,31 +60,82 @@ export function CodeEditor({
   ...props
 }: CodeEditorProps) {
   const fallbackExpanded = props.expanded ?? defaultExpanded;
+  const fallbackRef = useRef<HTMLTextAreaElement>(null);
+  const restoreFocusRef = useRef(false);
+  const [implementation, setImplementation] = useState<CodeMirrorEditorModule | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  return (
-    <Suspense
-      fallback={
-        <div
-          {...stylex.props(
-            codeEditorStyles.root,
-            layout === "fill" && fallbackExpanded === true && codeEditorStyles.rootFill,
-          )}
-          aria-label="Loading code editor"
-          data-slot="code-editor-loading"
-          role="status"
-        >
-          <div {...stylex.props(codeEditorStyles.viewport)} />
-        </div>
-      }
-    >
-      <LazyCodeMirrorEditor
+  useEffect(() => {
+    let active = true;
+
+    void loadCodeMirrorEditor()
+      .then((module) => {
+        if (active === false) {
+          return;
+        }
+
+        restoreFocusRef.current = document.activeElement === fallbackRef.current;
+        setImplementation(module);
+      })
+      .catch((error: unknown) => {
+        if (active === true) {
+          setLoadError(error instanceof Error ? error.message : "CodeEditor failed to load CodeMirror");
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (implementation !== null) {
+    const CodeMirrorEditor = implementation.CodeMirrorEditor;
+
+    return (
+      <CodeMirrorEditor
         {...props}
         readOnly={readOnly}
         disabled={disabled}
         invalid={invalid}
         defaultExpanded={defaultExpanded}
         layout={layout}
+        restoreFocus={restoreFocusRef.current}
       />
-    </Suspense>
+    );
+  }
+
+  return (
+    <div
+      {...stylex.props(
+        codeEditorStyles.root,
+        layout === "fill" && fallbackExpanded === true && codeEditorStyles.rootFill,
+        invalid === true && codeEditorStyles.invalid,
+        disabled === true && codeEditorStyles.disabled,
+        readOnly === true && codeEditorStyles.readOnly,
+      )}
+      aria-busy={loadError === null}
+      data-slot="code-editor-loading"
+    >
+      <textarea
+        {...stylex.props(codeEditorStyles.fallbackInput)}
+        ref={fallbackRef}
+        id={props.id}
+        value={props.value}
+        aria-label={props.accessibilityLabel}
+        aria-labelledby={props.labelledBy}
+        aria-describedby={props.describedBy}
+        aria-invalid={invalid === true ? true : undefined}
+        disabled={disabled}
+        readOnly={readOnly}
+        onChange={(event) => {
+          props.onValueChange?.(event.currentTarget.value);
+        }}
+      />
+      {loadError !== null ? (
+        <span {...stylex.props(codeEditorStyles.loadError)} role="alert">
+          {loadError}
+        </span>
+      ) : null}
+    </div>
   );
 }

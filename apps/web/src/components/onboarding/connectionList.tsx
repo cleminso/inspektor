@@ -1,10 +1,10 @@
 import { Box, Button, Text } from "@inspector/ds";
 
-import { useInspector } from "@/components/providers/inspectorProvider";
+import { useInspectorSessionContext } from "@/components/providers/inspectorSessionProvider";
 import { getConnectionDisplayName, getConnectionSecondaryLabel } from "@/lib/config/connections";
 
 export function ConnectionList(): React.ReactElement {
-  const { connections, openConnection } = useInspector();
+  const { connections, openConnection } = useInspectorSessionContext();
 
   return (
     <Box width="full" flexDirection="column" gap="xs">

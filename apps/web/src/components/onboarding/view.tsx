@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { Box, Button, Text } from "@inspector/ds";
 
-import { useInspector } from "@/components/providers/inspectorProvider";
+import { useInspectorSessionContext } from "@/components/providers/inspectorSessionProvider";
 import { appRoutes } from "@/lib/navigation/appRoutes";
 
 import { ConnectionList } from "./connectionList";
@@ -30,7 +30,7 @@ function ConnectionsSection({ children, title }: ConnectionsSectionProps): React
 }
 
 export function ConnectionsView(): React.ReactElement {
-  const { connections } = useInspector();
+  const { connections } = useInspectorSessionContext();
   const hasConnections = connections.length > 0;
 
   return (

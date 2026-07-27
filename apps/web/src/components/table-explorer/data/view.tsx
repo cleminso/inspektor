@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { lazy, Suspense, useEffect, useEffectEvent, useState } from "react";
 
 import {
   Box,
@@ -13,8 +13,6 @@ import {
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
 import { CellInspectorSidePanel } from "@/components/table-explorer/data/cellInspectorSidePanel";
 import { DataTableColumnVisibility } from "@/components/table-explorer/data/dataTableColumnVisibility";
-import { EditRowForm } from "@/components/table-explorer/data/editRowForm";
-import { InsertRowForm } from "@/components/table-explorer/data/insertRowForm";
 import { RowEditorSidePanel } from "@/components/table-explorer/data/rowEditorSidePanel";
 import { TableFilter } from "@/components/table-explorer/data/tableFilter";
 import { useDataViewState } from "@/components/table-explorer/data/useDataViewState";
@@ -22,6 +20,22 @@ import { useDataViewState } from "@/components/table-explorer/data/useDataViewSt
 interface DataViewProps {
   tableName: string;
 }
+
+/**
+ * Row forms and their editor integrations are optional until the detail pane opens. Keeping them
+ * behind this boundary preserves a usable base table without making editor code static work.
+ */
+const EditRowForm = lazy(async () => {
+  const module = await import("@/components/table-explorer/data/editRowForm");
+
+  return { default: module.EditRowForm };
+});
+
+const InsertRowForm = lazy(async () => {
+  const module = await import("@/components/table-explorer/data/insertRowForm");
+
+  return { default: module.InsertRowForm };
+});
 
 export function DataView({ tableName }: DataViewProps): React.ReactElement {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -164,29 +178,39 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
                 onNavigatePrevious={state.rowEditor.goToPreviousRow}
                 onNavigateNext={state.rowEditor.goToNextRow}
               >
-                {state.detailPaneMode === "insert" ? (
-                  <InsertRowForm
-                    key={`${tableName}:insert`}
-                    rowValues={state.rowValues ?? {}}
-                    schemaColumns={state.schemaColumns}
-                    onCancel={() => {
-                      state.handleRowEditorOpenChange(false);
-                    }}
-                    onSave={state.handleInsertSave}
-                  />
-                ) : (
-                  <EditRowForm
-                    key={`${tableName}:${state.rowEditor.activeRowId ?? "none"}`}
-                    rowValues={state.rowValues}
-                    schemaColumns={state.schemaColumns}
-                    targetRowId={state.rowEditor.activeRowId}
-                    onCancel={() => {
-                      state.handleRowEditorOpenChange(false);
-                    }}
-                    onDelete={state.handleDelete}
-                    onSave={state.handleEditSave}
-                  />
-                )}
+                <Suspense
+                  fallback={
+                    <Box width="full" padding="l">
+                      <Text color="muted" variant="caption">
+                        Loading row editor
+                      </Text>
+                    </Box>
+                  }
+                >
+                  {state.detailPaneMode === "insert" ? (
+                    <InsertRowForm
+                      key={`${tableName}:insert`}
+                      rowValues={state.rowValues ?? {}}
+                      schemaColumns={state.schemaColumns}
+                      onCancel={() => {
+                        state.handleRowEditorOpenChange(false);
+                      }}
+                      onSave={state.handleInsertSave}
+                    />
+                  ) : (
+                    <EditRowForm
+                      key={`${tableName}:${state.rowEditor.activeRowId ?? "none"}`}
+                      rowValues={state.rowValues}
+                      schemaColumns={state.schemaColumns}
+                      targetRowId={state.rowEditor.activeRowId}
+                      onCancel={() => {
+                        state.handleRowEditorOpenChange(false);
+                      }}
+                      onDelete={state.handleDelete}
+                      onSave={state.handleEditSave}
+                    />
+                  )}
+                </Suspense>
               </RowEditorSidePanel>
             )}
           </ResizablePanel>

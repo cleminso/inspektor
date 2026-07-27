@@ -57,6 +57,15 @@
 - [x] Replace font-dependent fold glyphs with token-sized SVG disclosure markers matching `JsonView`.
 - [x] Keep wrapped content at the horizontal origin behind a state-matched opaque gutter.
 
+[27/07/26]
+
+- [x] Keep a controlled native textarea usable while the deferred CodeMirror implementation loads.
+- [x] Share the in-flight CodeMirror module request and reset it after failure so another mount can retry.
+- [x] Report CodeMirror loading failures with a component-specific message while retaining the static editor.
+- [x] Restore editor focus when CodeMirror replaces the focused static textarea.
+- [x] Remove product-level DOM observation used to wait for the deferred editor control.
+- [x] Cover the static import boundary, loading fallback, retry behavior, and focus transition.
+
 ## Work outside the foundation scope
 
 [24/07/26]
@@ -109,3 +118,6 @@
 - [ ] Narrow side-pane behavior is verified without obscuring labels, errors, or form actions.
 - [x] Design-system tests, generated props, typecheck, documentation build, and application integration pass.
 - [x] Focused StyleX lint has no property-order warnings.
+- [x] Static import does not initialize CodeMirror.
+- [x] The controlled editor remains usable before CodeMirror resolves.
+- [x] A failed module request is visible and retryable from another mount.

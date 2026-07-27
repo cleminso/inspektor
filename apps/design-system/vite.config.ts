@@ -7,6 +7,7 @@ const PORT = Number.parseInt(process.env.PORT ?? "1356", 10);
 
 export default defineConfig({
   resolve: {
+    conditions: ["inspector-source", "module", "browser", "development|production"],
     tsconfigPaths: true,
   },
   optimizeDeps: {

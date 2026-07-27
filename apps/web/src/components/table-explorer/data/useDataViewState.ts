@@ -10,7 +10,7 @@ import {
   type CellSelectionState,
   updateCellSelection,
 } from "@/components/table-explorer/data/cellSelection";
-import { focusRowEditorField } from "@/components/table-explorer/data/editRowForm";
+import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorFocus";
 import { useDataTable } from "@/components/table-explorer/data/useDataTable";
 import {
   getNearestSelectedRowId,

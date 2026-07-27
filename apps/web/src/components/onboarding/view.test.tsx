@@ -11,8 +11,8 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
-vi.mock("@/components/providers/inspectorProvider", () => ({
-  useInspector: () => ({ connections }),
+vi.mock("@/components/providers/inspectorSessionProvider", () => ({
+  useInspectorSessionContext: () => ({ connections }),
 }));
 
 vi.mock("./connectionList", () => ({

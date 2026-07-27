@@ -31,6 +31,7 @@ import {
   createColumnJsonViewValue,
   isJsonViewContainer,
 } from "@/components/table-explorer/data/jsonViewValue";
+import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorFocus";
 
 // TODO: investigate and when `checkbox NULL` is focus when press `enter` it target the Field.Root
 export interface FieldState {
@@ -71,64 +72,6 @@ interface RowEditorFieldsProps {
   onFieldExpandedChange: (columnName: string, expanded: boolean) => void;
   onFieldNullChange: (columnName: string, isNull: boolean) => void;
   onFieldTextChange: (columnName: string, text: string) => void;
-}
-
-const ROW_EDITOR_FOCUSABLE_SELECTOR = [
-  "input:not([disabled])",
-  "textarea:not([disabled])",
-  "button:not([disabled])",
-  "[tabindex]:not([tabindex='-1'])",
-].join(",");
-const ROW_EDITOR_FOCUS_WAIT_LIMIT = 5_000;
-
-function getRowEditorFieldControl(field: HTMLElement): HTMLElement | null {
-  if (field.dataset.valueMode === "null") {
-    return field.querySelector<HTMLElement>("[data-value-mode-control]");
-  }
-
-  return (
-    field.querySelector<HTMLElement>("[role='textbox']:not([aria-disabled='true'])") ??
-    field.querySelector<HTMLElement>(ROW_EDITOR_FOCUSABLE_SELECTOR)
-  );
-}
-
-function focusAndScrollRowEditorField(field: HTMLElement): boolean {
-  const control = getRowEditorFieldControl(field);
-  if (control === null) {
-    return false;
-  }
-
-  field.scrollIntoView?.({ block: "nearest" });
-  control.focus();
-  return true;
-}
-
-export function focusRowEditorField(fieldName: string): boolean {
-  const field = document.getElementById(`row-editor-field-${fieldName}`);
-  if (field === null) {
-    return false;
-  }
-
-  if (focusAndScrollRowEditorField(field) === true) {
-    return true;
-  }
-
-  if (field.dataset.valueMode !== "value") {
-    return false;
-  }
-
-  let stopWaiting: number;
-  const observer = new MutationObserver(() => {
-    if (focusAndScrollRowEditorField(field) === true) {
-      observer.disconnect();
-      window.clearTimeout(stopWaiting);
-    }
-  });
-  observer.observe(field, { childList: true, subtree: true });
-  stopWaiting = window.setTimeout(() => {
-    observer.disconnect();
-  }, ROW_EDITOR_FOCUS_WAIT_LIMIT);
-  return true;
 }
 
 function getInitialFieldState(

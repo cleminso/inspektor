@@ -10,20 +10,30 @@
     "url": "https://github.com/regardedev/inspector.git",
     "directory": "packages/design-system"
   },
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./src/index.ts"
+      "inspector-source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./theme": {
       "types": "./dist/tokens/tokens.stylex.d.ts",
-      "default": "./src/tokens/tokens.stylex.ts"
+      "inspector-source": "./src/tokens/tokens.stylex.ts",
+      "import": "./dist/tokens/tokens.stylex.js",
+      "default": "./dist/tokens/tokens.stylex.js"
+    },
+    "./tooltip": {
+      "types": "./dist/components/tooltip/tooltip.d.ts",
+      "inspector-source": "./src/components/tooltip/tooltip.tsx",
+      "import": "./dist/components/tooltip/tooltip.js",
+      "default": "./dist/components/tooltip/tooltip.js"
     }
   },
   "scripts": {

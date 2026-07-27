@@ -1,7 +1,7 @@
 import { Box, Button, TextLink } from "@inspector/ds";
 import { Link, useNavigate } from "@tanstack/react-router";
 
-import { useInspector } from "@/components/providers/inspectorProvider";
+import { useInspectorSessionContext } from "@/components/providers/inspectorSessionProvider";
 import { appRoutes } from "@/lib/navigation/appRoutes";
 
 import { AddConnectionForm } from "./addConnectionForm";
@@ -10,7 +10,7 @@ import { SchemaSwitcher } from "./schemaSwitcher";
 import { useAddConnectionFlow } from "./useAddConnectionFlow";
 
 export function AddConnectionView(): React.ReactElement {
-  const { prefill } = useInspector();
+  const { prefill } = useInspectorSessionContext();
   const navigate = useNavigate();
   const prefillKey = getPrefillKey(prefill);
 

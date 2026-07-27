@@ -1,8 +1,12 @@
 import { defineConfig, type Options } from "tsup";
 
 export const options: Options = {
-  entry: ["./src/index.ts", "./src/tokens/tokens.stylex.ts"],
-  format: ["esm", "cjs"],
+  entry: {
+    index: "./src/index.ts",
+    "tokens/tokens.stylex": "./src/tokens/tokens.stylex.ts",
+    "components/tooltip/tooltip": "./src/components/tooltip/tooltip.tsx",
+  },
+  format: ["esm"],
   dts: true,
   sourcemap: true,
   clean: true,

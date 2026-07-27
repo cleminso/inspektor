@@ -4,11 +4,8 @@ import type { ColumnDescriptor } from "jazz-tools";
 
 import { Box, Button, CopyButton, JsonView, Search, SegmentedControl, Text } from "@inspector/ds";
 
-import {
-  focusRowEditorField,
-  RowEditorFields,
-  useRowEditorFields,
-} from "@/components/table-explorer/data/rowEditorFields";
+import { RowEditorFields, useRowEditorFields } from "@/components/table-explorer/data/rowEditorFields";
+import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorFocus";
 import {
   createRowJsonViewValue,
   stringifyRowJsonViewValue,

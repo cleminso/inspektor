@@ -4,12 +4,15 @@ import { Agentation } from "agentation";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { ThemeProvider } from "next-themes";
-import { Tooltip } from "@inspector/ds";
+// The app shell only needs Tooltip. Its focused public export avoids importing through the broad
+// design-system barrel at this application-wide boundary.
+import { Tooltip } from "@inspector/ds/tooltip";
 
 import { routeTree } from "./routeTree.gen";
 import ReactDOM from "react-dom/client";
 
 if (import.meta.env.DEV === true) {
+  // StyleX source is compiled by Vite; its development runtime is only needed while developing.
   void import("virtual:stylex:runtime");
 }
 

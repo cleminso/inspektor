@@ -5,6 +5,7 @@
 - [Purpose](#purpose)
 - [Current model](#current-model)
 - [Core rules](#core-rules)
+- [Package and consumer resolution](#package-and-consumer-resolution)
 - [Decision process](#decision-process)
 - [Deferred interaction pattern](#deferred-interaction-pattern)
 - [State and lifecycle rules](#state-and-lifecycle-rules)
@@ -64,6 +65,16 @@ The original performance issue was caused by static `@dnd-kit` imports in public
 - Keep a loader local to its feature until several features need exactly the same lifecycle and error semantics.
 - Do not create a generic deferred-module hook only to remove two small, readable effects.
 - Do not add custom bundle inspection to the normal build unless the project adopts a strict performance budget that must fail automation.
+
+## Package and consumer resolution
+
+- Verify the package export selected by each consumer before interpreting a library build. A source export means the consumer does not execute the package bundler output.
+- Keep source and distribution contracts explicit. Use a package-specific source condition for workspace consumers and `import` for the built ESM artifact.
+- Add component subpath exports at broad application boundaries when the public barrel retains unrelated modules or creates excessive development traversal.
+- Declare `sideEffects` only after verifying that modules do not rely on import-time CSS registration, globals, polyfills, or singleton setup.
+- Prefer ESM-only package output when no CommonJS consumer exists. Removing CommonJS simplifies package output but does not reduce application cost when the application consumes source.
+- Treat chunk names as assignment hints rather than ownership reports. Measure the HTML entry's complete static module-preload closure and each deferred closure.
+- Do not use manual static chunk grouping to claim an initial-load improvement. Moving the same modules between preloaded chunks does not remove network, parse, or evaluation work.
 
 ## Decision process
 

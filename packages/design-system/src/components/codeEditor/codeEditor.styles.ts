@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
-import { borderRadii, fontSizes, lineHeights, spacing } from "../../tokens/value.stylex";
+import { borderRadii, fontFamilies, fontSizes, lineHeights, spacing } from "../../tokens/value.stylex";
 import { codeEditorVars } from "./codeEditorVars.stylex";
 
 export const codeEditorStyles = stylex.create({
@@ -57,6 +57,28 @@ export const codeEditorStyles = stylex.create({
     flexBasis: 0,
     flexGrow: 1,
     flexShrink: 1,
+  },
+  fallbackInput: {
+    padding: spacing.m,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    color: "inherit",
+    fontFamily: fontFamilies.mono,
+    fontSize: fontSizes[1],
+    lineHeight: lineHeights.normal,
+    outlineWidth: 0,
+    resize: "none",
+    minHeight: spatial["viewport-height-s"],
+    width: "100%",
+  },
+  loadError: {
+    padding: spacing.xs,
+    borderColor: borderColors.border,
+    borderStyle: "solid",
+    color: textColors["text-danger"],
+    fontSize: fontSizes[1],
+    lineHeight: lineHeights.normal,
+    borderTopWidth: 1,
   },
   toolbar: {
     padding: spacing.xxs,

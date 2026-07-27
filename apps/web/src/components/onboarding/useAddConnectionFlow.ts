@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { fetchSchemaHashes } from "jazz-tools";
 
-import { useInspector } from "@/components/providers/inspectorProvider";
+import { useInspectorSessionContext } from "@/components/providers/inspectorSessionProvider";
 import { findConnectionByCredentials } from "@/lib/config/connectionIdentity";
 import { normalizeBranchName, normalizeEnvName } from "@/lib/config/connections";
 import { appRoutes } from "@/lib/navigation/appRoutes";
@@ -29,7 +29,7 @@ export interface UseAddConnectionFlowResult {
 }
 
 export function useAddConnectionFlow(): UseAddConnectionFlowResult {
-  const { connections, prefill, saveConnection, setActiveConnection } = useInspector();
+  const { connections, prefill, saveConnection, setActiveConnection } = useInspectorSessionContext();
   const navigate = useNavigate();
   const [step, setStep] = useState<AddConnectionStep>("form");
   const [formValues, setFormValues] = useState<AddConnectionFormValues>(() => createInitialFormValues(prefill));

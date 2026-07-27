@@ -120,38 +120,15 @@ describe("focusRowEditorField", () => {
     field.remove();
   });
 
-  it("focuses a structured textbox when it becomes ready", async () => {
+  it("reports when a requested row field has no focusable control", () => {
     const field = document.createElement("div");
     field.id = "row-editor-field-settings";
     field.dataset.valueMode = "value";
     document.body.append(field);
 
-    expect(focusRowEditorField("settings")).toBe(true);
-
-    const textbox = document.createElement("div");
-    textbox.setAttribute("role", "textbox");
-    textbox.tabIndex = 0;
-    field.append(textbox);
-
-    await waitFor(() => {
-      expect(document.activeElement).toBe(textbox);
-    });
-    field.remove();
-  });
-
-  it("stops waiting when a structured textbox does not become ready", () => {
-    vi.useFakeTimers();
-    const disconnect = vi.spyOn(MutationObserver.prototype, "disconnect");
-    const field = document.createElement("div");
-    field.id = "row-editor-field-settings";
-    field.dataset.valueMode = "value";
-    document.body.append(field);
-
-    expect(focusRowEditorField("settings")).toBe(true);
-    vi.runAllTimers();
+    expect(focusRowEditorField("settings")).toBe(false);
 
     field.remove();
-    expect(disconnect).toHaveBeenCalledOnce();
   });
 
   it("focuses the value-mode control while a structured field is NULL", () => {

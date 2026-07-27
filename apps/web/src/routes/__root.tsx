@@ -1,6 +1,6 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 
-import { InspectorProvider } from "@/components/providers/inspectorProvider";
+import { InspectorSessionProvider } from "@/components/providers/inspectorSessionProvider";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -8,8 +8,8 @@ export const Route = createRootRoute({
 
 function RootComponent(): React.ReactElement {
   return (
-    <InspectorProvider>
+    <InspectorSessionProvider>
       <Outlet />
-    </InspectorProvider>
+    </InspectorSessionProvider>
   );
 }

@@ -10,8 +10,8 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => vi.fn(),
 }));
 
-vi.mock("@/components/providers/inspectorProvider", () => ({
-  useInspector: () => ({ prefill: null }),
+vi.mock("@/components/providers/inspectorSessionProvider", () => ({
+  useInspectorSessionContext: () => ({ prefill: null }),
 }));
 
 vi.mock("./useAddConnectionFlow", () => ({

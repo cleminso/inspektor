@@ -10,7 +10,7 @@ import {
   type ContextSwitcherTriggerWidth,
 } from "@inspector/ds";
 
-import { useInspector } from "@/components/providers/inspectorProvider";
+import { useInspectorSessionContext } from "@/components/providers/inspectorSessionProvider";
 import {
   getConnectionDisplayName,
   getConnectionSecondaryLabel,
@@ -39,7 +39,7 @@ export function ConnectionSwitcher({
   triggerLabel,
   width = "content",
 }: ConnectionSwitcherProps = {}): React.ReactElement {
-  const { connections, currentConnectionId, openConnection } = useInspector();
+  const { connections, currentConnectionId, openConnection } = useInspectorSessionContext();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 

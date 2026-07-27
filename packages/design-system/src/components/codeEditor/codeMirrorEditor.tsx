@@ -41,6 +41,10 @@ import type { CodeEditorProps } from "./codeEditor";
 import { codeEditorStyles } from "./codeEditor.styles";
 import { codeEditorVars } from "./codeEditorVars.stylex";
 
+interface CodeMirrorEditorProps extends CodeEditorProps {
+  restoreFocus?: boolean;
+}
+
 const externalValueUpdate = Annotation.define<boolean>();
 const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -391,7 +395,8 @@ export function CodeMirrorEditor({
   defaultExpanded = false,
   onExpandedChange,
   layout = "intrinsic",
-}: CodeEditorProps) {
+  restoreFocus = false,
+}: CodeMirrorEditorProps) {
   const generatedId = useId();
   const editorId = id ?? `code-editor-${generatedId}`;
   const viewportId = `${editorId}-viewport`;
@@ -496,6 +501,9 @@ export function CodeMirrorEditor({
     });
 
     editorViewRef.current = editorView;
+    if (restoreFocus === true) {
+      editorView.focus();
+    }
     const resizeObserver = new ResizeObserver(() => {
       measureOverflow(editorView);
     });

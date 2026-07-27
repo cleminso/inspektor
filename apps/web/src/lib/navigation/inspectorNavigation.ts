@@ -6,7 +6,6 @@
  * the same runtime context after direct navigation, refresh, or redirect.
  */
 import { redirect } from "@tanstack/react-router";
-import { fetchSchemaHashes } from "jazz-tools";
 
 import {
   getConnectionById,
@@ -48,10 +47,12 @@ interface ResolveStoredTablesNavigationTargetOptions {
 }
 
 /**
- * Resolves a connection into branch and schema hash route params.
+ * Resolves a connection into branch and schema-hash route params without requiring a mounted Jazz
+ * provider.
  *
- * `reusableSchemaHashes` keeps redirects from refetching Jazz admin metadata when the
- * current runtime already loaded the hash list.
+ * The Jazz metadata import stays inside this user-triggered navigation path so onboarding does not
+ * make it part of the application-root graph. `reusableSchemaHashes` prevents refetching when the
+ * mounted runtime already has the hash list.
  */
 export async function resolveTablesNavigationTarget({
   connectionId,
@@ -68,13 +69,18 @@ export async function resolveTablesNavigationTarget({
   }
 
   const branch = resolveBranch(connectionId, branchOverride);
+  const fetchSchemaHashes = async () => {
+    const jazzTools = await import("jazz-tools");
+
+    return jazzTools.fetchSchemaHashes(connection.serverUrl, {
+      appId: connection.appId,
+      adminSecret: connection.adminSecret,
+    });
+  };
   const availableSchemaHashes =
     reusableSchemaHashes !== undefined && reusableSchemaHashes.length > 0
       ? reusableSchemaHashes
-      : await fetchSchemaHashes(connection.serverUrl, {
-          appId: connection.appId,
-          adminSecret: connection.adminSecret,
-        })
+      : await fetchSchemaHashes()
           .then((response) => response.hashes)
           .catch(() => []);
 

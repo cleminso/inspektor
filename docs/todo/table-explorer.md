@@ -136,6 +136,16 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Cover cell-pane focus, row-editor field focus, navigation restoration, header activation, and same-cell dismissal.
 - [x] Validate package and application types, tests, generated props, and production builds.
 
+### Deferred row editor boundary
+
+[27/07/26]
+
+- [x] Keep insert and edit form modules outside the static table-view import graph.
+- [x] Load the selected row form only after the detail pane opens.
+- [x] Keep row-field focus lookup in a dependency-light module shared by the table state and deferred forms.
+- [x] Render a stable detail-pane loading state while the selected form resolves.
+- [x] Cover the table-view import boundary with a regression test.
+
 ## Open product work
 
 ### Cell rendering refactor
