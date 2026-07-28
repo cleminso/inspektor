@@ -40,7 +40,6 @@ export interface DataTableContextValue<TData extends RowData> {
   density: DataTableDensity;
   onCellActivate?: (target: DataTableCellTarget, selectionMode: DataTableCellSelectionMode) => void;
   onCellContextMenu?: DataTableCellContextMenuHandler;
-  onCellOpen?: (target: DataTableCellTarget) => void;
   onColumnActivate?: (columnId: string | null) => void;
   onHeaderContextMenu?: DataTableHeaderContextMenuHandler;
   onRowActivate?: (rowId: string) => void;

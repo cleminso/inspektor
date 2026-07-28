@@ -12,6 +12,7 @@ export default function NullableExample(): ReactElement {
         <InputGroup.Checkbox
           label="Set access token to NULL"
           checked={isNull}
+          tooltip="Save this field as NULL. Turn off NULL to enter a value."
           onCheckedChange={setIsNull}
         >
           NULL

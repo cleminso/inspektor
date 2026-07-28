@@ -82,7 +82,7 @@ function decodeColumnDefault(value: Value, columnType: ColumnType): unknown {
 }
 
 /** Formats a default for display only; the returned text is never sent back as that default. */
-function formatColumnDefault(column: ColumnDescriptor): string {
+export function formatColumnDefault(column: ColumnDescriptor): string {
   if (column.default === undefined) {
     return "";
   }

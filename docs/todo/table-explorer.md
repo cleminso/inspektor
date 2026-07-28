@@ -12,8 +12,8 @@
 
 ## Purpose
 
-This checklist records the implemented Table Explorer selection and pane foundation and the open work identified through the
-behavior discussion. Detailed acceptance rules remain in
+This checklist records the implemented Table Explorer selection and complete-row pane foundation and the open work identified
+through the behavior discussion. Detailed acceptance rules remain in
 [Table Explorer selection and pane behavior](./tableExplorerBehaviors.md). Product ownership and architecture remain in the
 [design document](./design-document.md).
 
@@ -28,7 +28,7 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Represent cell identity with stable row IDs and column IDs.
 - [x] Expose controlled active-cell, selected-cell, active-column, and active-row state.
 - [x] Report replace, additive, and range cell-selection intent without exposing raw pointer events as application state.
-- [x] Separate single-click cell activation from explicit double-click cell opening.
+- [x] Keep single-click cell activation separate from the generic double-click action reported by `DataTable`.
 - [x] Register body cells only as column drop targets so dnd-kit does not consume normal cell clicks.
 - [x] Preserve header dragging, resizing, sorting, checkbox controls, relation links, and context-menu hooks.
 - [x] Disable native text selection on the table surface so pointer gestures select cells instead of glyphs.
@@ -63,24 +63,21 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Remove selected cells when their column is hidden.
 - [x] Clear row and cell selections when filter, sort, table, schema, or query scope changes.
 - [x] Render selected-cell background independently from the focused-cell border.
-- [x] Open one cell through double-click and replace a multi-cell selection with that target.
-- [x] Double-click the open cell to close its pane, clear cell selection, and remove cell focus.
-- [x] Double-click a different cell to retarget the cell pane.
-- [x] Clear cell selection and close the cell pane when a column header receives focus.
+- [x] Keep double-click from opening an inspection-only cell pane while inline editor routing is unavailable.
+- [x] Clear cell selection when a column header receives focus.
 - [ ] Click cell then right-click open context menu with action (copy, etc)
 
 ### Side-pane state and focus
 
 [23/07/26]
 
-- [x] Represent pane presentation explicitly as `closed`, `insert`, `rows`, or `cells`.
+- [x] Represent pane presentation explicitly as `closed`, `insert`, or `rows`.
 - [x] Keep selection state separate from pane presentation.
-- [x] Give row-checkbox interaction, cell opening, and insertion explicit pane precedence.
+- [x] Give row-checkbox interaction and insertion explicit pane precedence.
 - [x] Keep the row pane open when a cell in its focused row is clicked.
 - [x] Focus the corresponding row-editor field when a cell in the focused row is clicked.
-- [x] Focus the first available schema-derived control when a cell pane opens.
 - [x] Keep cells in other rows from silently retargeting the focused row editor.
-- [x] Close an open cell pane and activate the target column when its header is clicked.
+- [x] Activate a target column after clearing cell state.
 - [x] Use progressive Escape dismissal for pane, cell selection, cell focus, and column focus.
 - [x] Preserve checked rows when Escape dismisses a pane.
 - [x] Remove the non-interactive resizable panel and panel-group focus outline.
@@ -95,7 +92,6 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Render relation links when schema metadata provides a reference.
 - [x] Keep synthetic IDs and unsupported binary mutations read-only.
 - [x] Display query-relative row and column coordinates as orientation metadata rather than identity.
-- [x] Format cell-inspector values for basic read-only inspection.
 - [x] Pretty-serialize runtime JSON, array, and row values when creating editable drafts without rewriting user source while typing.
 - [x] Preserve supplied nullable insert values instead of forcing every nullable field to NULL.
 - [x] Seed empty structured Value mode with `{}` or `[]` while preserving an existing draft.
@@ -149,7 +145,7 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Cover DataTable click, double-click, modifier, checkbox, drag registration, and state attributes.
 - [x] Cover individual row selection, row ranges, focus recovery, and pane precedence.
 - [x] Cover additive cell selection, rectangular ranges, visibility changes, and column reorder.
-- [x] Cover cell-pane focus, row-editor field focus, navigation restoration, header activation, and same-cell dismissal.
+- [x] Cover row-editor field focus, navigation restoration, and header activation.
 - [ ] Validate every package and application test, generated-props check, typecheck, and production build without unrelated repository failures.
 
 ### Deferred row editor boundary
@@ -166,7 +162,7 @@ behavior discussion. Detailed acceptance rules remain in
 
 ### Shared mutation draft and editing surfaces
 
-[27/07/26]
+[28/07/26]
 
 - [x] Replace reconstructed-row updates with dirty-field patches over the latest live source row.
 - [x] Keep raw input and parsed values in the shared per-row draft while pane orchestration retains field, row, and mutation errors.
@@ -174,10 +170,16 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Remove a dirty overlay when its parsed value is semantically equal to the latest source value, including nested typed values.
 - [x] Represent insert fields as omitted, explicit NULL, valid, or invalid.
 - [x] Decode tagged Jazz defaults from stored schema metadata and omit untouched default-backed fields.
+- [x] Present omitted fields with their formatted schema default and an in-group DEFAULT control.
+- [x] Explain grouped DEFAULT and NULL modes with accessible tooltips and show schema defaults while editing existing rows.
 - [x] Normalize descriptor-compatible Row tuples into named records before Jazz mutation conversion.
 - [x] Make the existing pane editor consume the shared mutation layer before adding inline controls.
-- [ ] Persist one `pane` or `inline` editing preference at workspace level in user localStorage settings.
-- [ ] Use pane fallback in inline mode for structured, binary, generated, unsupported, and otherwise unsuitable fields.
+- [ ] Make pane and inline editing simultaneously available without a workspace mode preference.
+- [ ] Start constrained inline editing for primitive scalar and enum cells through double-click or Enter.
+- [ ] Use an expanded code editor in an anchored inline dialog for JSON, Array, and Row cells, with an expand action that opens the complete-row pane focused on the field.
+- [ ] Open the complete-row pane focused on relation and binary fields.
+- [ ] Use an inline calendar for timestamp fields when that control is implemented.
+- [ ] Keep generated, unsupported, and otherwise read-only fields read-only in the grid.
 - [x] Make pane Cancel explicitly discard the draft, closing insert mode directly and unchecking the focused edit row.
 - [x] When Cancel leaves checked rows, focus the nearest checked row; close the pane when no checked rows remain.
 - [x] Guard dirty row, query scope, route, and relation-navigation transitions with Save, Discard and continue, or remain on the
@@ -189,8 +191,10 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Resolve the draft lifecycle before continuing a guarded navigation so Discard and continue completes in one action.
 - [x] Preserve drafts after update, insert, and delete failures and expose accessible mutation errors.
 - [x] Reject required read-only binary inserts instead of synthesizing empty byte values.
-- [ ] Apply the dirty-transition guard when the workspace editing preference is implemented.
 - [ ] Add inline cell editing as a second consumer without adding cell hover cards.
+- [x] Remove the inspection-only cell pane, its state orchestration, and its dedicated field presentation.
+- [ ] Close a clean row pane before starting inline editing on a double-clicked cell.
+- [ ] Invoke the mutation draft guard with `The current row has staged changes.` when a dirty row pane blocks cell activation.
 - [x] Add direct contract tests around the generic Jazz mutation adapter.
 - [ ] Add direct contract tests around the generic Jazz query adapter.
 
@@ -200,7 +204,7 @@ behavior discussion. Detailed acceptance rules remain in
 
 - [x] Define the compact table-cell representation for every supported schema type.
 - [x] Define the expanded side-pane representation for every supported schema type.
-- [x] Extract a shared schema-derived presentation model used by compact cells and read-only cell inspection.
+- [x] Extract a shared schema-derived presentation model used by compact cells and complete-row field presentation.
 - [x] Map Jazz schema metadata to constrained, Jazz-independent design-system value components in `apps/web`.
 - [x] Create dedicated design-system components for binary preview and inspection, timestamp presentation, structured-value
       preview, and relation presentation and field actions.
@@ -211,15 +215,15 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Use the CodeMirror-backed `CodeEditor` for editable JSON, array, and row fields while keeping database NULL as an explicit application-owned value mode.
 - [x] Provide enum labels and values in the item shape required by `Select` and keep relation links on the canonical typed table route.
 - [x] Move editable structured type labels into the editor toolbar.
-- [x] Render NULL structured values as compact read-only inputs without repeating NULL inside the field body.
+- [x] Represent structured Value, Default, and NULL as exclusive field-header modes, with compact typed presentations for inactive values.
 - [x] Keep primitive text, numeric, boolean, enum, copy, and null controls composed from existing design-system components unless a
       repeated semantic contract requires a dedicated component.
-- [x] Render table and inspection values from shared schema classification, using dedicated compact and detail components for
+- [x] Render table and complete-row values from shared schema classification, using dedicated compact and detail components for
       timestamp, structured, binary, and relation values.
 - [ ] Render enum arrays as repeatable `Select` rows that preserve order and duplicate values.
 - [ ] Render reference arrays as repeatable relation fields with stored IDs and navigation actions.
 - [x] Preserve raw values in the presentation model for copy actions while displaying readable formatted values.
-- [x] Add readable previews and expanded inspection for long strings and structured values.
+- [x] Add readable previews and expanded complete-row presentation for long strings and structured values.
 - [x] Represent null distinctly from empty strings and unavailable values.
 - [x] Keep binary and unsupported values explicitly read-only.
 - [x] Normalize binary runtime values nested in read-only structured fields instead of exposing indexed-object JSON.
@@ -230,34 +234,36 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Copy binary download views into an `ArrayBuffer` so Blob construction preserves only the selected bytes and satisfies the DOM boundary.
 - [x] Render complete row-ID text and use width-aware middle truncation only when it overflows the column.
 - [x] Render the stored relation ID as the relation cell's primary value instead of replacing it with a resolved display label.
-- [x] Resolve relation targets only in relation inspection rather than mounting a Jazz query for every visible relation cell.
+- [x] Resolve relation targets only in complete-row fields rather than mounting a Jazz query for every visible relation cell.
 - [x] Show target table, complete relation ID, resolved display value, and missing-target state in relation side-pane details.
 - [x] Keep relation navigation available in compact and expanded representations.
-- [x] Remove cell hover cards and expose complete values and alternate representations through the side pane.
+- [x] Remove cell hover cards and expose complete values and alternate representations through the complete-row pane.
 - [x] Format timestamp previews without fractional seconds in the browser timezone and show browser-local, UTC, relative, and raw
       epoch representations in the side pane.
 - [x] Show Jazz semantic type labels rather than SQL storage labels in side-pane fields.
 - [ ] Keep editable field click and double-click behavior consistent with native text controls.
 - [ ] Give the `NULL` suffix precedence over Copy when an editable input group cannot contain both.
-- [x] Render malformed schema/runtime mismatches as explicit invalid presentations with a bounded raw fallback and read-only cell inspection.
+- [x] Render malformed schema/runtime mismatches as explicit invalid presentations with a bounded raw fallback in complete-row details.
 - [ ] Cover every supported representation with focused tests.
-- [x] Separate read-only inspection from mutation field rendering while sharing only schema-field presentation utilities.
-- [x] Focus the first enabled inspection control and use an accessible field fallback when a representation has no enabled control.
+- [x] Remove the dedicated read-only cell field while preserving schema-field presentation utilities used by row mutation fields.
 - [x] Pass only object or array fallbacks to `JsonView`; keep scalar structured values in the code representation.
 
-### Editable one-cell pane
+### Inline cell editing and row-pane routing
 
 [23/07/26]
 
-- [ ] Replace the inspection-only affordance with an explicit editable state for writable fields.
-- [ ] Keep IDs, binary values, generated values, and unsupported serializers read-only.
-- [ ] Provide Save and Cancel actions for a writable cell.
+- [x] Remove the inspection-only cell pane before adding inline editors and complete-row pane routing.
+- [ ] Keep IDs, generated values, and unsupported serializers read-only in the grid.
+- [ ] Provide Save and Cancel actions for an inline writable cell.
 - [ ] Submit a partial row patch containing only the represented field.
 - [ ] Reuse schema-derived parsing and validation from the row editor.
 - [ ] Keep validation errors attached to the represented field.
+- [ ] Give JSON, Array, and Row cells an expanded code editor in an anchored inline dialog with an expand action to the corresponding row field.
+- [ ] Route relation and binary cells to the corresponding field in the complete-row pane.
+- [ ] Add the inline timestamp calendar without changing timestamp conversion semantics.
 - [ ] Define dirty-state behavior when the user selects or opens another cell.
 - [ ] Define dirty-state behavior when filter, sort, table, schema, or query scope changes.
-- [ ] Define live-update reconciliation when the inspected value changes remotely during editing.
+- [ ] Define live-update reconciliation when the edited value changes remotely.
 - [ ] Confirm that relation navigation does not discard an unsaved mutation silently.
 
 ### Row JSON representation
@@ -282,23 +288,22 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Complete the approved [JsonView implementation plan](../specs/json-view/tasks.md) through cross-package automated
       verification.
 
-### Complete multi-cell pane
+### Complete multi-cell operations
 
 [23/07/26]
 
-- [ ] Add a selected-cell context menu with an explicit `Open selection` command.
+- [ ] Add a selected-cell context menu with explicit copy and supported mutation commands.
 - [ ] Keep right-click inside the current selection from replacing it.
 - [ ] Replace selection when right-click targets an unselected cell.
-- [ ] Group opened cells by schema column in visible column order.
-- [ ] Order cells inside each group by active query row order.
-- [ ] Identify each cell by stable row ID with query position as supporting information.
-- [ ] Render large selections incrementally instead of mounting every field control.
-- [ ] Define pane behavior when cells are added to or removed from an already open clean selection.
-- [ ] Define review and confirmation behavior for dirty multi-cell selections.
+- [ ] Group bulk-operation targets by schema column in visible column order.
+- [ ] Order targets inside each group by active query row order.
+- [ ] Identify each target by stable row ID with query position as supporting information.
+- [ ] Render large operation reviews incrementally instead of mounting every field control.
+- [ ] Define review and confirmation behavior for dirty multi-cell operations.
 
 ### Context menus and commands
 
-[23/07/26]
+[28/07/26]
 
 - [ ] Implement cell commands for copying a cell value, copying a row, filtering by value, editing a row, and opening selected
       cells.
@@ -388,20 +393,24 @@ These items were identified in the behavior design but intentionally excluded fr
 [23/07/26]
 
 - [x] A single click selects and focuses a cell without opening a pane.
-- [x] Double-click opens a cell and focuses its schema-derived representation.
-- [x] Double-clicking the same open cell closes the pane and clears that cell's selection and focus.
-- [x] Double-clicking a different cell retargets the pane.
+- [x] Double-click or Enter starts schema-appropriate inline editing for supported cells.
+- [x] JSON, Array, and Row cells use an expanded code editor in an anchored inline dialog whose expand action opens the complete-row pane focused on the field.
+- [x] Relation and binary cells open the complete-row pane focused on their field.
+- [x] Timestamp cells use an inline calendar when that control is implemented.
+- [x] Generated, unsupported, and otherwise read-only cells remain read-only in the grid.
 - [x] Command/Control-click toggles arbitrary cells.
 - [x] Shift-click selects a rectangular visible cell range.
 - [x] Table pointer gestures select cells rather than native text.
 - [x] Text remains selectable inside side-pane field controls.
-- [x] Clicking a header clears cell state, closes the cell pane, and activates the column.
+- [x] Clicking a header clears cell state and activates the column.
 - [x] Escape does not uncheck rows.
 - [x] Individual row checkboxes remain the single-row clear control after pane dismissal.
 - [x] The header checkbox remains the bulk row clear control.
 - [x] Cell identity uses row IDs and column IDs rather than displayed coordinates.
-- [x] Support pane and inline editing through one workspace-level user preference, with pane fallback for unsuitable inline fields.
-- [x] Keep full inspection in stable pane and command surfaces without adding cell hover cards.
+- [x] Keep pane and inline editing simultaneously available without a workspace mode preference.
+- [x] Keep full inspection in the complete-row pane without adding a separate cell-inspection pane or hover cards.
+- [x] Close a clean row pane before starting inline editing on a double-clicked cell.
+- [x] Guard a dirty row-pane transition with Save and continue, Discard and continue, or Keep editing.
 - [x] Keep mutation parsing, validation, dirty tracking, live reconciliation, save, and discard independent from the editing surface.
 - [x] Distinguish pane dismissal, which preserves clean selection, from Cancel, which discards the focused draft and unchecks its row.
 - [x] Row IDs render as continuous text and use standard end truncation when the rendered value overflows.
@@ -413,7 +422,7 @@ These items were identified in the behavior design but intentionally excluded fr
 - [x] Transforms use the effective value renderer and remain schema modifiers rather than standalone value presentations.
 - [x] Reusable type-specific presentation and editor components belong in the design system without depending on Jazz schema
       objects.
-- [x] Cell values do not open hover cards; complete and alternate representations belong in the side pane.
+- [x] Cell values do not open hover cards; complete and alternate representations belong in the complete-row pane.
 - [x] Timestamp previews use the browser timezone without trying to infer the sync server's deployment timezone.
 - [x] Side-pane field type labels should use Jazz semantics rather than SQL storage labels.
 - [x] The row pane provides editable `Details` and a read-only `JSON` tree.
@@ -424,11 +433,9 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [23/07/26]
 
-- [ ] Decide whether opening a writable cell enters edit state directly or begins in an inspect state with an explicit Edit action.
 - [ ] Decide how unsaved cell changes are reviewed, saved, or discarded when selection changes.
-- [ ] Decide whether a clean open cell pane follows additive selection or remains pinned to its original target.
-- [ ] Decide the visible-page versus loaded-result scope of `Open visible column cells`.
-- [ ] Decide the representation of non-rectangular multi-cell selections in copy and pane operations.
+- [ ] Decide the visible-page versus loaded-result scope of column-selection operations.
+- [ ] Decide the representation of non-rectangular multi-cell selections in copy and bulk operations.
 - [ ] Decide how a checked row outside the represented page remains visible and recoverable.
 - [ ] Decide how query-backed operations expose exact totals when count queries are unavailable.
 - [ ] Decide failure semantics for bulk writes when Jazz cannot provide an atomic transaction.
@@ -441,7 +448,7 @@ These items were identified in the behavior design but intentionally excluded fr
 - [x] Every JsonView behavior change begins with a failing regression test.
 - [x] `pnpm --filter @inspector/ds test`
 - [x] `pnpm --filter @inspector/ds typecheck`
-- [ ] `pnpm --filter @inspector/ds build`
+- [x] `pnpm --filter @inspector/ds build`
 - [x] `pnpm --filter regarde.inspector test`
 - [x] `pnpm --filter regarde.inspector typecheck`
 - [x] `pnpm --filter regarde.inspector build`

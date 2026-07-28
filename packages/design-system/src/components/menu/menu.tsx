@@ -2,8 +2,10 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import * as stylex from "@stylexjs/stylex";
+import { useContext } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { InputGroupContext } from "../inputGroup/inputGroupContext";
 import { menuStyles } from "./menu.styles";
 
 type WithoutStyles<Props> = Omit<Props, "className" | "style" | "render">;
@@ -158,13 +160,22 @@ function MenuRoot({ defaultOpen = false, disabled = false, ...props }: MenuRootP
 }
 
 function MenuTrigger({ disabled = false, ...props }: MenuTriggerProps) {
+  const inputGroup = useContext(InputGroupContext);
+  const effectiveDisabled = disabled === true || inputGroup?.disabled === true;
   const stateStyles = createStateStyleProps<BaseMenu.Trigger.State>((state) => [
     menuStyles.trigger,
+    inputGroup !== null && menuStyles.triggerGrouped,
     state.open === true && menuStyles.triggerOpen,
     state.disabled === true && menuStyles.disabled,
   ]);
   return (
-    <BaseMenu.Trigger {...props} disabled={disabled} {...stateStyles} data-slot="menu-trigger" />
+    <BaseMenu.Trigger
+      {...props}
+      disabled={effectiveDisabled}
+      {...stateStyles}
+      data-slot="menu-trigger"
+      data-grouped={inputGroup === null ? undefined : ""}
+    />
   );
 }
 

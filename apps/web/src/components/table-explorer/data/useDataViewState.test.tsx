@@ -166,7 +166,6 @@ function DataViewInteractionHarness(): React.ReactElement {
         activeRowId={state.rowEditor.activeRowId}
         selectedCells={state.selectedCells}
         onCellActivate={state.handleCellActivate}
-        onCellOpen={state.handleCellOpen}
         onColumnActivate={state.handleColumnActivate}
         onColumnOrderChange={state.setColumnOrder}
       >
@@ -216,7 +215,7 @@ describe("useDataViewState", () => {
     expect(result.current.rowValues).toBeNull();
   });
 
-  it("focuses and opens a cell through the composed DataTable", () => {
+  it("keeps the side pane closed when a focused cell is double-clicked", () => {
     render(<DataViewInteractionHarness />);
     const cell = screen.getByRole("cell", { name: "Ada" });
 
@@ -227,35 +226,20 @@ describe("useDataViewState", () => {
 
     fireEvent.doubleClick(cell);
 
-    expect(screen.getByRole("status", { name: "Pane mode" }).textContent).toBe("cells");
+    expect(screen.getByRole("status", { name: "Pane mode" }).textContent).toBe("closed");
   });
 
-  it("moves focus from an open cell pane to a clicked column header", () => {
+  it("moves focus from a selected cell to a clicked column header", () => {
     render(<DataViewInteractionHarness />);
     const cell = screen.getByRole("cell", { name: "Ada" });
     const header = screen.getByRole("columnheader", { name: "Name" });
 
-    fireEvent.doubleClick(cell);
+    fireEvent.click(cell);
     fireEvent.click(header);
 
     expect(cell.hasAttribute("data-active")).toBe(false);
     expect(header.hasAttribute("data-active")).toBe(true);
     expect(screen.getByRole("status", { name: "Pane mode" }).textContent).toBe("closed");
-  });
-
-  it("closes and clears an open cell when that cell is double-clicked again", () => {
-    render(<DataViewInteractionHarness />);
-    const cell = screen.getByRole("cell", { name: "Ada" });
-
-    fireEvent.doubleClick(cell);
-    expect(screen.getByRole("status", { name: "Pane mode" }).textContent).toBe("cells");
-
-    fireEvent.doubleClick(cell);
-
-    expect(screen.getByRole("status", { name: "Pane mode" }).textContent).toBe("closed");
-    expect(cell.hasAttribute("data-active")).toBe(false);
-    expect(cell.hasAttribute("data-cell-selected")).toBe(false);
-    expect(document.activeElement).not.toBe(cell);
   });
 
   it("opens the complete-row pane when a row is checked", () => {
@@ -513,43 +497,11 @@ describe("useDataViewState", () => {
     field.remove();
   });
 
-  it("opens a focused cell only when the cell is explicitly opened", () => {
-    const { result } = renderHook(() => useDataViewState({ tableName: "accounts" }));
-
-    act(() => {
-      result.current.handleCellOpen({ columnId: "id", rowId: "row-1" });
-    });
-
-    expect(result.current.activeCell).toEqual({ columnId: "id", rowId: "row-1" });
-    expect(result.current.detailPaneMode).toBe("cells");
-    expect(result.current.cellInspector.target).toEqual({ columnId: "id", rowId: "row-1" });
-  });
-
-  it("closes the pane on Escape while preserving cell selection, then clears focus", () => {
-    const { result } = renderHook(() => useDataViewState({ tableName: "accounts" }));
-
-    act(() => {
-      result.current.handleCellOpen({ columnId: "id", rowId: "row-1" });
-    });
-    act(() => {
-      result.current.handleEscape();
-    });
-
-    expect(result.current.detailPaneMode).toBe("closed");
-    expect(result.current.activeCell).toEqual({ columnId: "id", rowId: "row-1" });
-
-    act(() => {
-      result.current.handleEscape();
-    });
-
-    expect(result.current.activeCell).toBeNull();
-  });
-
-  it("gives row checkbox selection pane precedence without clearing cell focus", () => {
+  it("opens the row pane without clearing cell focus", () => {
     const { result, rerender } = renderHook(() => useDataViewState({ tableName: "accounts" }));
 
     act(() => {
-      result.current.handleCellOpen({ columnId: "name", rowId: "row-2" });
+      result.current.handleCellActivate({ columnId: "name", rowId: "row-2" }, "replace");
     });
     act(() => {
       result.current.table.getRow("row-1").toggleSelected(true);
@@ -565,7 +517,7 @@ describe("useDataViewState", () => {
     const { result } = renderHook(() => useDataViewState({ tableName: "accounts" }));
 
     act(() => {
-      result.current.handleCellOpen({ columnId: "name", rowId: "row-1" });
+      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
     });
     await act(async () => {
       await result.current.setFilters([]);
@@ -592,7 +544,7 @@ describe("useDataViewState", () => {
     const { result, rerender } = renderHook(() => useDataViewState({ tableName: "accounts" }));
 
     act(() => {
-      result.current.handleCellOpen({ columnId: "name", rowId: "row-1" });
+      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
     });
     searchState.sortColumn = "name";
     rerender();
@@ -607,7 +559,7 @@ describe("useDataViewState", () => {
     });
 
     act(() => {
-      result.current.handleCellOpen({ columnId: "name", rowId: "row-1" });
+      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
     });
     rerender({ tableName: "profiles" });
 
@@ -615,19 +567,4 @@ describe("useDataViewState", () => {
     expect(result.current.detailPaneMode).toBe("closed");
   });
 
-  it("updates the visible cell coordinate after columns are reordered", () => {
-    const { result, rerender } = renderHook(() => useDataViewState({ tableName: "accounts" }));
-
-    act(() => {
-      result.current.handleCellOpen({ columnId: "name", rowId: "row-1" });
-    });
-    expect(result.current.cellInspector.columnPosition).toBe(1);
-
-    act(() => {
-      result.current.setColumnOrder(["name", "id"]);
-    });
-    rerender();
-
-    expect(result.current.cellInspector.columnPosition).toBe(0);
-  });
 });

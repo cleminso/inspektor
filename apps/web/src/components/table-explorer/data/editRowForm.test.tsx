@@ -139,10 +139,26 @@ describe("focusRowEditorField", () => {
     textbox.setAttribute("role", "textbox");
     textbox.tabIndex = 0;
     hiddenEditor.append(textbox);
-    const valueModeControl = document.createElement("input");
+    const valueModeControl = document.createElement("button");
     valueModeControl.dataset.valueModeControl = "";
-    valueModeControl.type = "checkbox";
+    valueModeControl.type = "button";
     field.append(hiddenEditor, valueModeControl);
+    document.body.append(field);
+
+    expect(focusRowEditorField("settings")).toBe(true);
+    expect(document.activeElement).toBe(valueModeControl);
+
+    field.remove();
+  });
+
+  it("focuses the value-mode control while a structured field uses its default", () => {
+    const field = document.createElement("div");
+    field.id = "row-editor-field-settings";
+    field.dataset.valueMode = "omitted";
+    const valueModeControl = document.createElement("button");
+    valueModeControl.dataset.valueModeControl = "";
+    valueModeControl.type = "button";
+    field.append(valueModeControl);
     document.body.append(field);
 
     expect(focusRowEditorField("settings")).toBe(true);
@@ -258,8 +274,8 @@ describe("EditRowForm Details and JSON views", () => {
     );
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
 
-    const nullToggle = screen.getByRole("checkbox", { name: "Settings" });
-    fireEvent.click(nullToggle);
+    const nullToggle = screen.getByRole("button", { name: "NULL" });
+    fireEvent.click(screen.getByRole("button", { name: "Value" }));
     const editor = await screen.findByRole("textbox", { name: "Settings" });
     fireEvent.input(editor, { target: { textContent: '{"enabled":true}' } });
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
@@ -505,7 +521,7 @@ describe("EditRowForm Details and JSON views", () => {
         targetRowId="profile-1"
       />,
     );
-    const valueModeControl = screen.getByRole("checkbox", { name: "Settings" });
+    const valueModeControl = screen.getByRole("button", { name: "NULL" });
 
     fireEvent.click(screen.getByText("Settings"));
 
@@ -544,7 +560,7 @@ describe("EditRowForm Details and JSON views", () => {
       />,
     );
 
-    const nullToggle = screen.getByRole("checkbox", { name: "Settings" });
+    const nullToggle = screen.getByRole("button", { name: "NULL" });
     const editor = await screen.findByRole("textbox", { name: "Settings" });
     expect(editor.textContent).toContain('"enabled"');
 
@@ -553,14 +569,13 @@ describe("EditRowForm Details and JSON views", () => {
     expect(container.querySelector("#row-editor-settings")).toBe(editor);
     expect(editor.closest("[hidden]")).not.toBeNull();
     expect(screen.queryByRole("button", { name: "Format JSON" })).toBeNull();
-    const nullValue = container.querySelector<HTMLInputElement>("input[data-null-value]");
-    expect(nullValue?.readOnly).toBe(true);
-    expect(nullValue?.hasAttribute("data-disabled")).toBe(false);
-    expect(nullValue?.value).toBe("NULL");
+    const nullPresentation = screen.getByLabelText("Settings value: NULL");
+    expect(within(nullPresentation).getByText("JSON")).toBeTruthy();
+    expect(container.querySelector("input[data-null-value]")).toBeNull();
     expect(focusRowEditorField("settings")).toBe(true);
     expect(document.activeElement).toBe(nullToggle);
 
-    fireEvent.click(nullToggle);
+    fireEvent.click(screen.getByRole("button", { name: "Value" }));
 
     expect(await screen.findByRole("textbox", { name: "Settings" })).toBe(editor);
     expect(editor.textContent).toContain('"enabled"');

@@ -244,7 +244,7 @@ function TabViewList({
   )
 }
 
-function TabViewItem(props: TabViewItemProps) {
+function TabViewItem({ closeLabel = 'Close tab', ...props }: TabViewItemProps) {
   const reorderContext = useContext(TabViewReorderContext)
   const index = reorderContext.getIndex(props.value)
   const SortableItem = reorderContext.Item
@@ -255,6 +255,7 @@ function TabViewItem(props: TabViewItemProps) {
         {(sortable) => (
           <TabViewItemContent
             {...props}
+            closeLabel={closeLabel}
             isDragSource={sortable.isDragSource}
             setReorderRef={sortable.setReorderRef}
           />
@@ -263,7 +264,7 @@ function TabViewItem(props: TabViewItemProps) {
     )
   }
 
-  return <TabViewItemContent {...props} />
+  return <TabViewItemContent {...props} closeLabel={closeLabel} />
 }
 
 interface TabViewItemContentProps extends TabViewItemProps {
@@ -278,7 +279,7 @@ function TabViewItemContent({
   prefix,
   disabled = false,
   onClose,
-  closeLabel = 'Close tab',
+  closeLabel,
   isDragSource = false,
   setReorderRef,
 }: TabViewItemContentProps) {

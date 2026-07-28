@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsAccordionRouteImport } from './routes/components/accordion'
 import { Route as ComponentsActionListRouteImport } from './routes/components/action-list'
+import { Route as ComponentsBinaryValueRouteImport } from './routes/components/binary-value'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
@@ -29,17 +30,20 @@ import { Route as ComponentsInputGroupRouteImport } from './routes/components/in
 import { Route as ComponentsJsonViewRouteImport } from './routes/components/json-view'
 import { Route as ComponentsKeyboardInputRouteImport } from './routes/components/keyboard-input'
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
+import { Route as ComponentsRelationValueRouteImport } from './routes/components/relation-value'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
 import { Route as ComponentsSegmentedControlRouteImport } from './routes/components/segmented-control'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSidePanelRouteImport } from './routes/components/side-panel'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
+import { Route as ComponentsStructuredValuePreviewRouteImport } from './routes/components/structured-value-preview'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
 import { Route as ComponentsTabViewRouteImport } from './routes/components/tab-view'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
+import { Route as ComponentsTimestampValueRouteImport } from './routes/components/timestamp-value'
 import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsToggleGroupRouteImport } from './routes/components/toggle-group'
 import { Route as ComponentsTooltipRouteImport } from './routes/components/tooltip'
@@ -59,6 +63,11 @@ const ComponentsAccordionRoute = ComponentsAccordionRouteImport.update({
 const ComponentsActionListRoute = ComponentsActionListRouteImport.update({
   id: '/components/action-list',
   path: '/components/action-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsBinaryValueRoute = ComponentsBinaryValueRouteImport.update({
+  id: '/components/binary-value',
+  path: '/components/binary-value',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
@@ -147,6 +156,11 @@ const ComponentsMenuRoute = ComponentsMenuRouteImport.update({
   path: '/components/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsRelationValueRoute = ComponentsRelationValueRouteImport.update({
+  id: '/components/relation-value',
+  path: '/components/relation-value',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsResizablePanelRoute =
   ComponentsResizablePanelRouteImport.update({
     id: '/components/resizable-panel',
@@ -179,6 +193,12 @@ const ComponentsSpinnerRoute = ComponentsSpinnerRouteImport.update({
   path: '/components/spinner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsStructuredValuePreviewRoute =
+  ComponentsStructuredValuePreviewRouteImport.update({
+    id: '/components/structured-value-preview',
+    path: '/components/structured-value-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
   id: '/components/switch',
   path: '/components/switch',
@@ -204,6 +224,12 @@ const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
   path: '/components/textarea',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTimestampValueRoute =
+  ComponentsTimestampValueRouteImport.update({
+    id: '/components/timestamp-value',
+    path: '/components/timestamp-value',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsToastRoute = ComponentsToastRouteImport.update({
   id: '/components/toast',
   path: '/components/toast',
@@ -234,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
+  '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -251,17 +278,20 @@ export interface FileRoutesByFullPath {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/segmented-control': typeof ComponentsSegmentedControlRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
+  '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
@@ -272,6 +302,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
+  '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -289,17 +320,20 @@ export interface FileRoutesByTo {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/segmented-control': typeof ComponentsSegmentedControlRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
+  '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
@@ -311,6 +345,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
+  '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -328,17 +363,20 @@ export interface FileRoutesById {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
   '/components/segmented-control': typeof ComponentsSegmentedControlRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
+  '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
@@ -351,6 +389,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/accordion'
     | '/components/action-list'
+    | '/components/binary-value'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -368,17 +407,20 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/relation-value'
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/segmented-control'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
+    | '/components/structured-value-preview'
     | '/components/switch'
     | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
+    | '/components/timestamp-value'
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
@@ -389,6 +431,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/accordion'
     | '/components/action-list'
+    | '/components/binary-value'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -406,17 +449,20 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/relation-value'
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/segmented-control'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
+    | '/components/structured-value-preview'
     | '/components/switch'
     | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
+    | '/components/timestamp-value'
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
@@ -427,6 +473,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/accordion'
     | '/components/action-list'
+    | '/components/binary-value'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -444,17 +491,20 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/relation-value'
     | '/components/resizable-panel'
     | '/components/search'
     | '/components/segmented-control'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
+    | '/components/structured-value-preview'
     | '/components/switch'
     | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
+    | '/components/timestamp-value'
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
@@ -466,6 +516,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsAccordionRoute: typeof ComponentsAccordionRoute
   ComponentsActionListRoute: typeof ComponentsActionListRoute
+  ComponentsBinaryValueRoute: typeof ComponentsBinaryValueRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
@@ -483,17 +534,20 @@ export interface RootRouteChildren {
   ComponentsJsonViewRoute: typeof ComponentsJsonViewRoute
   ComponentsKeyboardInputRoute: typeof ComponentsKeyboardInputRoute
   ComponentsMenuRoute: typeof ComponentsMenuRoute
+  ComponentsRelationValueRoute: typeof ComponentsRelationValueRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
   ComponentsSegmentedControlRoute: typeof ComponentsSegmentedControlRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidePanelRoute: typeof ComponentsSidePanelRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
+  ComponentsStructuredValuePreviewRoute: typeof ComponentsStructuredValuePreviewRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTabViewRoute: typeof ComponentsTabViewRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
+  ComponentsTimestampValueRoute: typeof ComponentsTimestampValueRoute
   ComponentsToastRoute: typeof ComponentsToastRoute
   ComponentsToggleGroupRoute: typeof ComponentsToggleGroupRoute
   ComponentsTooltipRoute: typeof ComponentsTooltipRoute
@@ -522,6 +576,13 @@ declare module '@tanstack/react-router' {
       path: '/components/action-list'
       fullPath: '/components/action-list'
       preLoaderRoute: typeof ComponentsActionListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/binary-value': {
+      id: '/components/binary-value'
+      path: '/components/binary-value'
+      fullPath: '/components/binary-value'
+      preLoaderRoute: typeof ComponentsBinaryValueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/button': {
@@ -643,6 +704,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/relation-value': {
+      id: '/components/relation-value'
+      path: '/components/relation-value'
+      fullPath: '/components/relation-value'
+      preLoaderRoute: typeof ComponentsRelationValueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/resizable-panel': {
       id: '/components/resizable-panel'
       path: '/components/resizable-panel'
@@ -685,6 +753,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsSpinnerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/structured-value-preview': {
+      id: '/components/structured-value-preview'
+      path: '/components/structured-value-preview'
+      fullPath: '/components/structured-value-preview'
+      preLoaderRoute: typeof ComponentsStructuredValuePreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/switch': {
       id: '/components/switch'
       path: '/components/switch'
@@ -718,6 +793,13 @@ declare module '@tanstack/react-router' {
       path: '/components/textarea'
       fullPath: '/components/textarea'
       preLoaderRoute: typeof ComponentsTextareaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/timestamp-value': {
+      id: '/components/timestamp-value'
+      path: '/components/timestamp-value'
+      fullPath: '/components/timestamp-value'
+      preLoaderRoute: typeof ComponentsTimestampValueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/toast': {
@@ -762,6 +844,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsAccordionRoute: ComponentsAccordionRoute,
   ComponentsActionListRoute: ComponentsActionListRoute,
+  ComponentsBinaryValueRoute: ComponentsBinaryValueRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
@@ -779,17 +862,20 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsJsonViewRoute: ComponentsJsonViewRoute,
   ComponentsKeyboardInputRoute: ComponentsKeyboardInputRoute,
   ComponentsMenuRoute: ComponentsMenuRoute,
+  ComponentsRelationValueRoute: ComponentsRelationValueRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,
   ComponentsSegmentedControlRoute: ComponentsSegmentedControlRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidePanelRoute: ComponentsSidePanelRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
+  ComponentsStructuredValuePreviewRoute: ComponentsStructuredValuePreviewRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTabViewRoute: ComponentsTabViewRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextLinkRoute: ComponentsTextLinkRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,
+  ComponentsTimestampValueRoute: ComponentsTimestampValueRoute,
   ComponentsToastRoute: ComponentsToastRoute,
   ComponentsToggleGroupRoute: ComponentsToggleGroupRoute,
   ComponentsTooltipRoute: ComponentsTooltipRoute,

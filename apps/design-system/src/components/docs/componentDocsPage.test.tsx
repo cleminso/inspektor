@@ -116,8 +116,8 @@ describe("ComponentDocsPage", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Previous page: Action List" }));
-    expect(navigate).toHaveBeenCalledWith({ to: "/components/action-list" });
+    fireEvent.click(screen.getByRole("button", { name: "Previous page: Binary Value" }));
+    expect(navigate).toHaveBeenCalledWith({ to: "/components/binary-value" });
 
     rerender(
       <ComponentDocsPage

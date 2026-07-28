@@ -16,5 +16,6 @@ export const inputGroupCheckboxPropNames = [
   "onCheckedChange",
   "disabled",
   "readOnly",
+  "tooltip",
   "children",
 ] as const;

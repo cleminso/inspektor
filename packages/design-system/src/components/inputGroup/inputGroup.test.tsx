@@ -68,6 +68,24 @@ describe("InputGroup", () => {
     expect(onCheckedChange).toHaveBeenCalledOnce();
   });
 
+  it("composes supplementary guidance onto the complete checkbox control", () => {
+    render(
+      <InputGroup>
+        <Input aria-label="Value" />
+        <InputGroup.Checkbox label="Set value to NULL" tooltip="Insert NULL explicitly.">
+          NULL
+        </InputGroup.Checkbox>
+      </InputGroup>,
+    );
+
+    expect(
+      screen
+        .getByRole("checkbox", { name: "Set value to NULL" })
+        .parentElement
+        ?.getAttribute("aria-description"),
+    ).toBe("Insert NULL explicitly.");
+  });
+
   it("exposes persistent action state for toggle actions", () => {
     render(
       <InputGroup>

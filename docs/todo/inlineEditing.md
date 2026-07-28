@@ -59,12 +59,16 @@
 - [ ] Expose field state and actions to cells without making each cell its own draft owner.
 - [ ] Submit the complete sparse patch for the active row, including changes made in several inline cells.
 
-### Editing preference and fallback
+### Editing surfaces and field routing
 
-- [ ] Persist one workspace-level `pane` or `inline` editing preference in localStorage-backed user settings.
-- [ ] Apply the draft transition guard before changing the editing preference.
+- [ ] Make pane and inline editing simultaneously available without a workspace mode preference.
 - [ ] Define the inline suitability matrix from Jazz column descriptors and product constraints.
-- [ ] Open pane editing for structured, binary, generated, unsupported, or otherwise unsuitable inline fields.
+- [ ] Use constrained inline controls for primitive scalar and enum fields.
+- [ ] Use an expanded code editor in an anchored inline dialog for JSON, Array, and Row fields.
+- [ ] Add an expand action to the structured inline editor that opens the complete-row pane focused on that field.
+- [ ] Open the complete-row pane focused on relation and binary fields.
+- [ ] Use an inline calendar for timestamp fields when that control is implemented.
+- [ ] Keep generated, unsupported, and otherwise read-only fields read-only in the grid.
 - [ ] Do not transfer an existing dirty draft between pane and inline surfaces without an explicit Save, Discard, or Keep editing decision.
 
 ### Activation, focus, and keyboard behavior
@@ -79,15 +83,18 @@
 ### Inline controls
 
 - [ ] Add constrained inline controls for supported scalar fields without duplicating parsing or validation.
+- [ ] Add a bounded anchored inline dialog with explicit Save, Cancel, and expand actions for structured values.
 - [ ] Reuse the shared NULL semantics where the inline layout can express them clearly.
 - [ ] Reuse enum and boolean choices without recreating Base UI interaction behavior.
 - [ ] Use the existing timestamp conversion rules for inline timestamp input.
-- [ ] Show a clear fallback action when the selected field requires pane editing.
+- [ ] Focus the requested field when relation, binary, or structured expansion opens the complete-row pane.
 
 ### Guard and mutation integration
 
 - [ ] Report semantic inline dirty state to `useDraftTransitionGuard`.
 - [ ] Guard row changes, sorting, filtering, table changes, relation navigation, pane replacement, and route navigation.
+- [ ] Close a clean row pane before starting inline editing on a double-clicked cell.
+- [ ] Block that transition with `The current row has staged changes.` when the row pane draft is dirty.
 - [ ] Keep the inline draft after validation or Jazz mutation failure.
 - [ ] Let successful live-row reconciliation clear saved overlays without reconstructing the row.
 - [ ] Skip normal inline post-save focus behavior when Save and continue proceeds to another destination.
@@ -98,7 +105,8 @@
 - [ ] Cover restoring all changed cells to source values and returning the draft to clean.
 - [ ] Cover a live source update to untouched and dirty fields while inline editing.
 - [ ] Cover row change with Save, Discard, and Keep editing decisions.
-- [ ] Cover unsuitable-field fallback to the pane.
+- [ ] Cover structured inline expansion and relation or binary routing to the complete-row pane.
+- [ ] Cover clean row-pane dismissal before inline editing and dirty row-pane transition protection.
 - [ ] Cover validation and Jazz mutation failure without losing the draft.
 - [ ] Cover keyboard activation, traversal, save, and cancel as complete user flows.
 
@@ -110,7 +118,6 @@
 - [ ] Several simultaneously dirty row drafts are not supported; the first inline implementation owns one active row draft.
 - [ ] Batch save, partial retry, and cross-row transaction behavior are not part of the first inline implementation.
 - [ ] Binary text editing is not added until the product defines an explicit byte encoding and round-trip contract.
-- [ ] Structured JSON, Array, and Row editing remains in the pane unless a separate inline interaction is designed.
 - [ ] Cell hover cards are not introduced as part of inline editing.
 
 ## Settled interaction decisions
@@ -124,9 +131,13 @@
 - [x] Moving to another row is a guarded target change when the current draft is dirty.
 - [x] Saving from any inline cell submits every dirty field in that row's sparse patch.
 - [x] Pane and inline editing consume the same parsing, NULL, validation, reconciliation, patch, and mutation rules.
-- [x] Unsupported inline fields use pane fallback instead of a weaker inline parser.
+- [x] Pane and inline editing are simultaneously available rather than selected through a workspace preference.
+- [x] JSON, Array, and Row fields use an expanded code editor in an anchored inline dialog with an explicit path to the complete-row pane.
+- [x] Relation and binary fields open the complete-row pane focused on their field.
+- [x] Generated, unsupported, and otherwise read-only fields remain read-only in the grid.
 - [x] Selection, inspection, and editing remain separate interactions.
 - [x] A draft does not move between editing surfaces implicitly.
+- [x] A clean row pane closes before a cell begins inline editing; a dirty row pane invokes the mutation draft guard.
 - [x] Inline editing applies to existing rows; row insertion remains in the pane.
 
 ## Open design decisions
@@ -138,7 +149,7 @@
 - [ ] Decide how dirty cells and the active dirty row are indicated without competing with selection styles.
 - [ ] Decide where row-level Save and Cancel actions appear while several cells in one row are staged.
 - [ ] Decide whether validation keeps focus in the active cell or moves to the first invalid field in the row.
-- [ ] Decide which reference fields are suitable for inline editing and how relation navigation remains available.
+- [ ] Decide the exact inline calendar interaction for timestamp fields.
 - [ ] Decide how column hiding behaves when the hidden column has a dirty staged value.
 - [ ] Decide how pagination requests behave when the active dirty row would leave the loaded window.
 

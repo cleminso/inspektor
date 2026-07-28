@@ -163,6 +163,36 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "binaryValue",
+    exportName: "BinaryValue",
+    inheritedProps: [],
+  },
+  {
+    componentId: "binaryDetails",
+    exportName: "BinaryDetails",
+    inheritedProps: [],
+  },
+  {
+    componentId: "timestampValue",
+    exportName: "TimestampValue",
+    inheritedProps: [],
+  },
+  {
+    componentId: "structuredValuePreview",
+    exportName: "StructuredValuePreview",
+    inheritedProps: [],
+  },
+  {
+    componentId: "relationValue",
+    exportName: "RelationValue",
+    inheritedProps: [],
+  },
+  {
+    componentId: "relationDetails",
+    exportName: "RelationDetails",
+    inheritedProps: [],
+  },
+  {
     componentId: "input",
     exportName: "Input",
     inheritedProps: [],

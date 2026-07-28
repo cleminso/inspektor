@@ -83,8 +83,6 @@ interface DataTableRootBaseProps<TData extends RowData> {
   onCellActivate?: (target: DataTableCellTarget, selectionMode: DataTableCellSelectionMode) => void;
   /** Runs when a cell context menu is requested. */
   onCellContextMenu?: DataTableCellContextMenuHandler;
-  /** Runs when a non-interactive cell is explicitly opened. */
-  onCellOpen?: (target: DataTableCellTarget) => void;
   /** Runs when a column header is activated. */
   onColumnActivate?: (columnId: string | null) => void;
   /** Runs when a column-header context menu is requested. */
@@ -209,10 +207,6 @@ function isSelectionControlTarget(target: EventTarget | null): boolean {
   return target.closest('input, [role="checkbox"], [role="radio"]') !== null;
 }
 
-function hasSelectionControl(cell: HTMLTableCellElement): boolean {
-  return cell.querySelector('input[type="checkbox"], [role="checkbox"]') !== null;
-}
-
 function activateSelectionControlFromCell(event: MouseEvent<HTMLTableCellElement>): boolean {
   const selectionControl = event.currentTarget.querySelector<HTMLElement>(
     'input[type="checkbox"], [role="checkbox"]',
@@ -250,7 +244,6 @@ function DataTableRoot<TData extends RowData>({
   density = "default",
   onCellActivate,
   onCellContextMenu,
-  onCellOpen,
   onColumnActivate,
   onColumnOrderChange,
   onHeaderContextMenu,
@@ -308,7 +301,6 @@ function DataTableRoot<TData extends RowData>({
         density,
         onCellActivate,
         onCellContextMenu,
-        onCellOpen,
         onColumnActivate,
         onHeaderContextMenu,
         onRowActivate,
@@ -327,7 +319,6 @@ function DataTableRoot<TData extends RowData>({
       density,
       onCellActivate,
       onCellContextMenu,
-      onCellOpen,
       onColumnActivate,
       onHeaderContextMenu,
       onRowActivate,
@@ -717,7 +708,6 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
     getColumnReorderIndex,
     onCellActivate,
     onCellContextMenu,
-    onCellOpen,
     onColumnActivate,
     selectedColumnsByRow,
   } = useDataTableContext<TData>();
@@ -766,21 +756,6 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
     onCellContextMenu(target, event);
   };
 
-  const handleDoubleClick = (event: MouseEvent<HTMLTableCellElement>) => {
-    if (
-      hasSelectionControl(event.currentTarget) === true ||
-      isInteractiveTarget(event.target) === true
-    ) {
-      event.stopPropagation();
-      return;
-    }
-
-    event.stopPropagation();
-    event.currentTarget.focus();
-    onColumnActivate?.(null);
-    onCellOpen?.(target);
-  };
-
   const renderCell = (setReorderRef?: (element: HTMLTableCellElement | null) => void) => (
     <td
       ref={setReorderRef}
@@ -801,7 +776,6 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
       data-slot="data-table-cell"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      onDoubleClick={handleDoubleClick}
       style={{ width: cell.column.getSize() }}
       tabIndex={-1}
     >

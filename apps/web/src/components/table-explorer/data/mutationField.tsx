@@ -4,8 +4,8 @@ import { Link } from "@tanstack/react-router";
 import type { ColumnDescriptor } from "jazz-tools";
 
 import {
+  BinaryDetails,
   Box,
-  Button,
   Checkbox,
   CodeEditor,
   Field,
@@ -14,6 +14,7 @@ import {
   JsonView,
   Select,
   Text,
+  TextLink,
   ToggleGroup,
 } from "@inspector/ds";
 
@@ -24,12 +25,13 @@ import {
   formatTimestampInputValue,
   getBooleanFieldValue,
   isStructuredColumn,
-  parseTimestampInputValue,
   safelySerializeStructuredValue,
 } from "@/components/table-explorer/data/fieldPresentation";
 import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorFocus";
+import { copyBinaryValue, downloadBinaryValue } from "@/lib/table-explorer/binaryValue";
 import type { MutationFieldReadOnlyReason } from "@/lib/table-explorer/mutationParsing";
 import { buildRelationTableLink } from "@/lib/table-explorer/relationNavigation";
+import { formatColumnDefault } from "@/lib/table-explorer/rowMutationDraft";
 
 interface MutationFieldProps {
   canOmit: boolean;
@@ -44,6 +46,122 @@ interface MutationFieldProps {
   onOmittedChange: (isOmitted: boolean) => void;
   onTextChange: (text: string) => void;
   readOnlyReason: MutationFieldReadOnlyReason;
+}
+
+interface NullInputGroupCheckboxProps {
+  checked: boolean;
+  label: string;
+  onCheckedChange: (checked: boolean) => void;
+}
+
+type StructuredValueMode = "default" | "null" | "value";
+
+interface StructuredValueModeControlProps {
+  label: string;
+  mode: StructuredValueMode;
+  modes: readonly StructuredValueMode[];
+  onModeChange: (mode: StructuredValueMode) => void;
+}
+
+function StructuredValueModeControl({
+  label,
+  mode,
+  modes,
+  onModeChange,
+}: StructuredValueModeControlProps): React.ReactElement {
+  return (
+    <ToggleGroup<StructuredValueMode>
+      aria-label={`${label} value mode`}
+      size="s"
+      value={[mode]}
+      onValueChange={(nextModes) => {
+        const nextMode = nextModes[0];
+        if (nextMode !== undefined && nextMode !== mode) {
+          onModeChange(nextMode);
+        }
+      }}
+    >
+      <ToggleGroup.Item data-value-mode-control={mode === "value" ? "" : undefined} value="value">
+        Value
+      </ToggleGroup.Item>
+      {modes.includes("default") ? (
+        <ToggleGroup.Item
+          data-value-mode-control={mode === "default" ? "" : undefined}
+          value="default"
+        >
+          Default
+        </ToggleGroup.Item>
+      ) : null}
+      {modes.includes("null") ? (
+        <ToggleGroup.Item data-value-mode-control={mode === "null" ? "" : undefined} value="null">
+          NULL
+        </ToggleGroup.Item>
+      ) : null}
+    </ToggleGroup>
+  );
+}
+
+interface StructuredValuePresentationProps {
+  accessibilityLabel: string;
+  toolbarLabel: string;
+  value: string;
+}
+
+function StructuredValuePresentation({
+  accessibilityLabel,
+  toolbarLabel,
+  value,
+}: StructuredValuePresentationProps): React.ReactElement {
+  return (
+    <Box
+      aria-label={accessibilityLabel}
+      backgroundColor="bg-card"
+      borderColor="border"
+      borderRadius="xs"
+      borderStyle="solid"
+      borderWidth={1}
+      data-slot="structured-value-presentation"
+      flexDirection="column"
+      overflow="hidden"
+      role="group"
+      width="full"
+    >
+      <Box padding="m">
+        <Text as="span" monospace>
+          {value}
+        </Text>
+      </Box>
+      <Box
+        alignItems="center"
+        backgroundColor="bg-secondary"
+        borderColor="border"
+        borderStyle="solid"
+        borderTopWidth={1}
+        padding="xxs"
+      >
+        <Text as="span" color="muted" variant="caption">
+          {toolbarLabel}
+        </Text>
+      </Box>
+    </Box>
+  );
+}
+
+function NullInputGroupCheckbox({
+  checked,
+  label,
+  onCheckedChange,
+}: NullInputGroupCheckboxProps): React.ReactElement {
+  return (
+    <InputGroup.Checkbox
+      label={`Set ${label} to NULL`}
+      checked={checked}
+      tooltip="Save this field as NULL, even when the schema defines a default. Turn off NULL to enter a value."
+      onCheckedChange={(nextChecked) => onCheckedChange(nextChecked === true)}
+    >
+      NULL
+    </InputGroup.Checkbox>
+  );
 }
 
 export function MutationField({
@@ -83,6 +201,7 @@ export function MutationField({
   const usesNonNativeControl =
     fieldState.isOmitted === false &&
     (isBooleanColumn === true ||
+      isBinaryColumn === true ||
       isEnumColumn === true ||
       isStructuredColumnType === true ||
       usesJsonView);
@@ -94,6 +213,47 @@ export function MutationField({
       : null;
   const timestampInputValue =
     isTimestampColumn === true ? formatTimestampInputValue(fieldState.text) : null;
+  const formattedDefault = column.default === undefined ? "" : formatColumnDefault(column);
+  const defaultValue =
+    column.default?.type === "Null"
+      ? "NULL"
+      : formattedDefault.length === 0
+        ? '""'
+        : formattedDefault;
+  const defaultDescriptionValue =
+    column.default?.type === "Null" || formattedDefault.length === 0
+      ? defaultValue
+      : column.column_type.type === "Text" ||
+          column.column_type.type === "Uuid" ||
+          column.column_type.type === "Enum"
+      ? JSON.stringify(defaultValue)
+       : defaultValue;
+  const structuredValueMode: StructuredValueMode =
+    fieldState.isOmitted === true ? "default" : fieldState.isNull === true ? "null" : "value";
+  const structuredValueModes: readonly StructuredValueMode[] = [
+    "value",
+    ...(canOmit === true ? (["default"] as const) : []),
+    ...(column.nullable === true ? (["null"] as const) : []),
+  ];
+  const structuredToolbarLabel = formatColumnTypeLabel(column)?.toUpperCase() ?? "JSON";
+  const defaultCheckbox =
+    canOmit === true && isStructuredColumnType === false ? (
+      <InputGroup.Checkbox
+        label={`Use default for ${label}`}
+        checked={fieldState.isOmitted}
+        tooltip={`Create this row with the default value: ${defaultDescriptionValue}. Turn off DEFAULT to enter a different value.`}
+        onCheckedChange={(nextChecked) => onOmittedChange(nextChecked === true)}
+      >
+        DEFAULT
+      </InputGroup.Checkbox>
+    ) : null;
+  const defaultRestoreControl =
+    canOmit === true && fieldState.isOmitted === false && isStructuredColumnType === false ? (
+      <InputGroup fullWidth>
+        <Input aria-label={`${label} schema default`} readOnly value={defaultValue} />
+        {defaultCheckbox}
+      </InputGroup>
+    ) : null;
 
   return (
     <Field.Root
@@ -146,37 +306,55 @@ export function MutationField({
             </Text>
           ) : null}
         </Box>
-        <Box alignItems="center" gap="m">
-          {canOmit === true ? (
-            <Checkbox.Label>
-              <Checkbox
-                aria-label={`Use default for ${label}`}
-                checked={fieldState.isOmitted}
-                onCheckedChange={(nextChecked) => onOmittedChange(nextChecked === true)}
-              />
-              <Text as="span">DEFAULT</Text>
-            </Checkbox.Label>
-          ) : null}
-          {fieldState.isOmitted === false &&
+        {isEditableStructuredColumn === true &&
+        (canOmit === true || column.nullable === true) ? (
+          <StructuredValueModeControl
+            label={label}
+            mode={structuredValueMode}
+            modes={structuredValueModes}
+            onModeChange={(nextMode) => {
+              if (nextMode === "default") {
+                onOmittedChange(true);
+              } else if (nextMode === "null") {
+                onNullChange(true);
+              } else if (fieldState.isOmitted === true) {
+                onOmittedChange(false);
+              } else {
+                onNullChange(false);
+              }
+            }}
+          />
+        ) : null}
+        {fieldState.isOmitted === false &&
           column.nullable === true &&
           readOnlyReason === null &&
           isBooleanColumn === false &&
-          (isStructuredColumnType === true || isEnumColumn === true || isBinaryColumn === true) ? (
-            <Checkbox.Label>
-              <Checkbox
-                data-value-mode-control={isStructuredColumnType === true ? "" : undefined}
-                aria-label={`Set ${label} to NULL`}
-                checked={fieldState.isNull}
-                onCheckedChange={(nextChecked) => onNullChange(nextChecked === true)}
-              />
-              <Text as="span">NULL</Text>
-            </Checkbox.Label>
-          ) : null}
-        </Box>
+          (isEnumColumn === true || isBinaryColumn === true) ? (
+          <Checkbox.Label>
+            <Checkbox
+              data-value-mode-control={isStructuredColumnType === true ? "" : undefined}
+              aria-label={`Set ${label} to NULL`}
+              checked={fieldState.isNull}
+              onCheckedChange={(nextChecked) => onNullChange(nextChecked === true)}
+            />
+            <Text as="span">NULL</Text>
+          </Checkbox.Label>
+        ) : null}
       </Box>
 
       {fieldState.isOmitted === true ? (
-        <Input id={fieldId} aria-label={label} readOnly fullWidth value="DEFAULT" />
+        isStructuredColumnType === true ? (
+          <StructuredValuePresentation
+            accessibilityLabel={`${label} value: default`}
+            toolbarLabel={structuredToolbarLabel}
+            value={defaultValue}
+          />
+        ) : (
+          <InputGroup fullWidth>
+            <Input id={fieldId} aria-label={label} disabled value={defaultValue} />
+            {defaultCheckbox}
+          </InputGroup>
+        )
       ) : isBooleanColumn === true ? (
         <ToggleGroup
           value={[getBooleanFieldValue(fieldState)]}
@@ -187,6 +365,8 @@ export function MutationField({
               onTextChange(nextValue);
             } else if (nextValue === "null") {
               onNullChange(true);
+            } else if (nextValue === "default") {
+              onOmittedChange(true);
             }
           }}
           width="full"
@@ -195,38 +375,46 @@ export function MutationField({
         >
           <ToggleGroup.Item value="true">True</ToggleGroup.Item>
           <ToggleGroup.Item value="false">False</ToggleGroup.Item>
-          {column.nullable === true ? <ToggleGroup.Item value="null">Null</ToggleGroup.Item> : null}
+          {column.nullable === true ? (
+            <ToggleGroup.Item value="null">Null</ToggleGroup.Item>
+          ) : null}
+          {canOmit === true ? (
+            <ToggleGroup.Item value="default">Default</ToggleGroup.Item>
+          ) : null}
         </ToggleGroup>
       ) : isEnumColumn === true && column.column_type.type === "Enum" ? (
-        <Select.Root
-          disabled={fieldState.isNull === true}
-          items={column.column_type.variants.map((variant) => ({ label: variant, value: variant }))}
-          value={fieldState.text.length === 0 ? null : fieldState.text}
-          onValueChange={(nextValue) => {
-            if (typeof nextValue === "string") {
-              onTextChange(nextValue);
-            }
-          }}
-        >
-          <Select.Trigger id={fieldId} fullWidth>
-            <Select.Value placeholder="Select value" />
-            <Select.Icon />
-          </Select.Trigger>
-          <Select.Portal>
-            <Select.Positioner>
-              <Select.Popup>
-                <Select.List>
-                  {column.column_type.variants.map((variant) => (
-                    <Select.Item key={variant} value={variant}>
-                      <Select.ItemIndicator />
-                      <Select.ItemText>{variant}</Select.ItemText>
-                    </Select.Item>
-                  ))}
-                </Select.List>
-              </Select.Popup>
-            </Select.Positioner>
-          </Select.Portal>
-        </Select.Root>
+        <Box flexDirection="column" gap="s">
+          <Select.Root
+            disabled={fieldState.isNull === true}
+            items={column.column_type.variants.map((variant) => ({ label: variant, value: variant }))}
+            value={fieldState.text.length === 0 ? null : fieldState.text}
+            onValueChange={(nextValue) => {
+              if (typeof nextValue === "string") {
+                onTextChange(nextValue);
+              }
+            }}
+          >
+            <Select.Trigger id={fieldId} fullWidth>
+              <Select.Value placeholder="Select value" />
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Portal>
+              <Select.Positioner>
+                <Select.Popup>
+                  <Select.List>
+                    {column.column_type.variants.map((variant) => (
+                      <Select.Item key={variant} value={variant}>
+                        <Select.ItemIndicator />
+                        <Select.ItemText>{variant}</Select.ItemText>
+                      </Select.Item>
+                    ))}
+                  </Select.List>
+                </Select.Popup>
+              </Select.Positioner>
+            </Select.Portal>
+          </Select.Root>
+          {defaultRestoreControl}
+        </Box>
       ) : usesJsonView === true && structuredPresentation?.fallback != null ? (
         <JsonView accessibilityLabel={`${label} value`} data={structuredPresentation.fallback} />
       ) : isStructuredColumnType === true ? (
@@ -247,36 +435,46 @@ export function MutationField({
               invalid={hasFieldError}
               layout={expanded === true ? "fill" : "intrinsic"}
               readOnly={isReadOnly}
-              toolbarLabel={formatColumnTypeLabel(column)?.toUpperCase()}
+              toolbarLabel={structuredToolbarLabel}
               onExpandedChange={onExpandedChange}
               value={structuredPresentation?.source ?? fieldState.text}
               onValueChange={onTextChange}
             />
           </Box>
           {fieldState.isNull === true ? (
-            <Input data-null-value aria-label={`${label} value`} readOnly fullWidth value="NULL" />
+            <StructuredValuePresentation
+              accessibilityLabel={`${label} value: NULL`}
+              toolbarLabel={structuredToolbarLabel}
+              value="NULL"
+            />
           ) : null}
+          {defaultRestoreControl}
         </>
+      ) : isBinaryColumn === true && initialValue instanceof Uint8Array ? (
+        <BinaryDetails
+          byteLength={initialValue.byteLength}
+          onCopy={(format) => copyBinaryValue(initialValue, format)}
+          onDownload={() => downloadBinaryValue(initialValue, `${column.name}.bin`)}
+        />
       ) : isTimestampColumn === true && timestampInputValue !== null ? (
         <InputGroup fullWidth>
           <Input
             id={fieldId}
-            type="datetime-local"
-            step="1"
+            type="text"
+            placeholder="YYYY-MM-DDTHH:mm:ss"
             value={timestampInputValue}
             disabled={fieldState.isNull === true}
             readOnly={isReadOnly}
-            onValueChange={(nextValue) => onTextChange(parseTimestampInputValue(nextValue))}
+            onValueChange={(nextValue) => onTextChange(nextValue)}
           />
           {column.nullable === true && readOnlyReason === null ? (
-            <InputGroup.Checkbox
-              label={`Set ${label} to NULL`}
+            <NullInputGroupCheckbox
+              label={label}
               checked={fieldState.isNull}
-              onCheckedChange={(nextChecked) => onNullChange(nextChecked === true)}
-            >
-              NULL
-            </InputGroup.Checkbox>
+              onCheckedChange={onNullChange}
+            />
           ) : null}
+          {defaultCheckbox}
         </InputGroup>
       ) : (
         <Box flexDirection="column" gap="s">
@@ -289,45 +487,51 @@ export function MutationField({
               onValueChange={onTextChange}
             />
             {column.nullable === true && readOnlyReason === null ? (
-              <InputGroup.Checkbox
-                label={`Set ${label} to NULL`}
+              <NullInputGroupCheckbox
+                label={label}
                 checked={fieldState.isNull}
-                onCheckedChange={(nextChecked) => onNullChange(nextChecked === true)}
-              >
-                NULL
-              </InputGroup.Checkbox>
+                onCheckedChange={onNullChange}
+              />
+            ) : null}
+            {defaultCheckbox}
+            {relationTarget !== null &&
+            column.references !== undefined &&
+            currentConnectionId !== null &&
+            currentBranch !== null &&
+            currentSchemaHash !== null ? (
+              <InputGroup.Suffix>
+                <TextLink
+                  render={
+                    <Link
+                      {...buildRelationTableLink({
+                        connectionId: currentConnectionId,
+                        branch: currentBranch,
+                        schemaHash: currentSchemaHash,
+                        tableName: column.references,
+                        relationId: relationTarget,
+                      })}
+                    />
+                  }
+                >
+                  Open target
+                </TextLink>
+              </InputGroup.Suffix>
             ) : null}
           </InputGroup>
-          {relationTarget !== null &&
-          column.references !== undefined &&
-          currentConnectionId !== null &&
-          currentBranch !== null &&
-          currentSchemaHash !== null ? (
-            <Box justifyContent="end">
-              <Button
-                variant="link"
-                size="s"
-                render={
-                  <Link
-                    {...buildRelationTableLink({
-                      connectionId: currentConnectionId,
-                      branch: currentBranch,
-                      schemaHash: currentSchemaHash,
-                      tableName: column.references,
-                      relationId: relationTarget,
-                    })}
-                  />
-                }
-              >
-                Show
-              </Button>
-            </Box>
-          ) : null}
         </Box>
       )}
 
       {readOnlyReason === "binary" ? (
         <Field.Description>Read-only: binary field</Field.Description>
+      ) : null}
+      {column.default !== undefined && fieldState.isOmitted === false ? (
+        <Field.Description>
+          {canOmit === true
+            ? fieldState.isNull === true
+              ? `NULL overrides the schema default: ${defaultDescriptionValue}.`
+              : `Entered values override the schema default: ${defaultDescriptionValue}.`
+            : `Schema default for new rows: ${defaultDescriptionValue}. Editing this field changes this row only.`}
+        </Field.Description>
       ) : null}
       {hasFieldError === true ? (
         <Field.Error id={`${fieldId}-error`} match>

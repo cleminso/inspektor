@@ -6,7 +6,7 @@ const rowEditorFocusableSelector = [
 ].join(",");
 
 function getRowEditorFieldControl(field: HTMLElement): HTMLElement | null {
-  if (field.dataset.valueMode === "null") {
+  if (field.dataset.valueMode === "null" || field.dataset.valueMode === "omitted") {
     return field.querySelector<HTMLElement>("[data-value-mode-control]");
   }
 

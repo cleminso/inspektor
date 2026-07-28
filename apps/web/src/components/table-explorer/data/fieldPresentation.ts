@@ -6,7 +6,6 @@ import {
   type InspectorJsonObject,
   type InspectorJsonValue,
 } from "@/components/table-explorer/data/jsonViewValue";
-import { formatMutationFieldValue } from "@/lib/table-explorer/mutationParsing";
 
 export type BooleanFieldValue = "true" | "false" | "null";
 
@@ -35,9 +34,10 @@ export function formatTimestampInputValue(valueText: string): string | null {
     return "";
   }
 
-  const numericValue = Number(trimmedValue);
-  const epochMilliseconds =
-    Number.isFinite(numericValue) === true ? numericValue : Date.parse(trimmedValue);
+  const epochMilliseconds = Number(trimmedValue);
+  if (Number.isFinite(epochMilliseconds) === false) {
+    return valueText;
+  }
   const date = new Date(epochMilliseconds);
   if (Number.isNaN(date.getTime()) === true) {
     return null;
@@ -47,15 +47,6 @@ export function formatTimestampInputValue(valueText: string): string | null {
   const datePart = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   const timePart = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   return `${datePart}T${timePart}`;
-}
-
-export function parseTimestampInputValue(valueText: string): string {
-  if (valueText.length === 0) {
-    return "";
-  }
-
-  const epochMilliseconds = new Date(valueText).getTime();
-  return Number.isFinite(epochMilliseconds) === true ? String(epochMilliseconds) : valueText;
 }
 
 export function formatColumnNameLabel(columnName: string): string {
@@ -83,14 +74,6 @@ export function getBooleanFieldValue(fieldState: {
   }
 
   return fieldState.text === "true" ? "true" : "false";
-}
-
-export function safelyFormatValue(value: unknown, column: ColumnDescriptor | null): string {
-  try {
-    return column === null ? String(value) : formatMutationFieldValue(value, column.column_type);
-  } catch {
-    return "Unrepresentable value";
-  }
 }
 
 export function safelySerializeStructuredValue(

@@ -47,14 +47,7 @@ interface DataViewRowEditorState {
   openInsert: () => void;
 }
 
-export type DataViewDetailPaneMode = "cells" | "closed" | "insert" | "rows";
-
-interface DataViewCellInspectorState {
-  columnPosition: number | null;
-  rowPosition: number | null;
-  rowValues: Record<string, unknown> | null;
-  target: DataTableCellTarget | null;
-}
+export type DataViewDetailPaneMode = "closed" | "insert" | "rows";
 
 interface InsertRowSaveOptions {
   keepOpen: boolean;
@@ -71,7 +64,6 @@ interface UseDataViewStateResult {
   activeCell: DataTableCellTarget | null;
   activeColumnId: string | null;
   columnOrder: string[];
-  cellInspector: DataViewCellInspectorState;
   detailPaneMode: DataViewDetailPaneMode;
   draftTransition: DataViewDraftTransitionState;
   fetchMore: () => void;
@@ -87,7 +79,6 @@ interface UseDataViewStateResult {
     target: DataTableCellTarget,
     selectionMode: DataTableCellSelectionMode,
   ) => void;
-  handleCellOpen: (target: DataTableCellTarget) => void;
   handleColumnActivate: (columnId: string | null) => void;
   handleRowEditorOpenChange: (open: boolean) => void;
   handleRowEditorCancel: () => void;
@@ -138,7 +129,6 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
   const activeRowId = searchState.editorMode === "edit" ? searchState.rowId : null;
   const [cellSelection, setCellSelection] = useState<CellSelectionState>(createEmptyCellSelection);
   const activeCell = cellSelection.activeCell;
-  const [cellPaneOpen, setCellPaneOpen] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
     activeRowId === null ? [] : [activeRowId],
@@ -158,8 +148,7 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     columnIds,
   });
 
-  const detailPaneMode: DataViewDetailPaneMode =
-    cellPaneOpen === true ? "cells" : editorMode === "edit" ? "rows" : editorMode;
+  const detailPaneMode: DataViewDetailPaneMode = editorMode === "edit" ? "rows" : editorMode;
   // Filters, sorting, connection, branch, schema, and table define one selection scope.
   const selectionScopeKey = useMemo(
     () =>
@@ -242,7 +231,6 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
           : availableRowIds[0];
       setSelectedRowIds(availableRowIds);
       setActiveColumnId(null);
-      setCellPaneOpen(false);
 
       if (availableRowIds.length === 0) {
         void searchState.setRowEditor(null, null, { replace: false });
@@ -311,7 +299,6 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     setRowSelectionAnchorId(null);
     setCellSelection(createEmptyCellSelection());
     setActiveColumnId(null);
-    setCellPaneOpen(false);
   }, []);
 
   useEffect(() => {
@@ -359,9 +346,6 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
         return { activeCell, anchorCell, selectedCells };
       });
     }
-    if (activeCell !== null && nextVisibility[activeCell.columnId] === false) {
-      setCellPaneOpen(false);
-    }
     if (activeColumnId !== null && nextVisibility[activeColumnId] === false) {
       setActiveColumnId(null);
     }
@@ -397,32 +381,8 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     return selectedRow;
   }, [schemaColumns, searchState.editorMode, selectedRow]);
 
-  const cellInspector = useMemo<DataViewCellInspectorState>(() => {
-    if (activeCell === null) {
-      return { columnPosition: null, rowPosition: null, rowValues: null, target: null };
-    }
-
-    const rowIndex = query.rows.findIndex((row) => String(row.id) === activeCell.rowId);
-    const visibleDataColumns = table
-      .getVisibleLeafColumns()
-      .filter((column) => column.id !== "_select");
-    const columnIndex = visibleDataColumns.findIndex((column) => column.id === activeCell.columnId);
-
-    return {
-      columnPosition: columnIndex >= 0 ? columnIndex : null,
-      rowPosition: rowIndex >= 0 ? rowIndex : null,
-      rowValues: rowIndex >= 0 ? (query.rows[rowIndex] ?? null) : null,
-      target: activeCell,
-    };
-  }, [activeCell, order.columnOrder, query.rows, table, visibility.columnVisibility]);
-
   /** Closes presentation state without applying the stronger explicit-Cancel selection behavior. */
   const closeDetailPane = () => {
-    if (detailPaneMode === "cells") {
-      setCellPaneOpen(false);
-      return;
-    }
-
     void searchState.setRowEditor(null, null, { replace: false });
   };
 
@@ -445,7 +405,6 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
 
   const openInsert = () => {
     draftTransition.request(() => {
-      setCellPaneOpen(false);
       void searchState.setRowEditor("insert", null, { replace: false });
     });
   };
@@ -529,7 +488,6 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
   return {
     activeCell,
     activeColumnId,
-    cellInspector,
     columnOrder: order.columnOrder,
     detailPaneMode,
     draftTransition,
@@ -586,45 +544,10 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
         });
       }
     },
-    handleCellOpen: (target) => {
-      const isOpenTarget =
-        detailPaneMode === "cells" &&
-        activeCell?.rowId === target.rowId &&
-        activeCell.columnId === target.columnId &&
-        cellSelection.selectedCells.length === 1;
-      if (isOpenTarget === true) {
-        const activeElement = document.activeElement;
-        if (
-          activeElement instanceof HTMLElement &&
-          activeElement.closest('[data-slot="data-table-cell"]') !== null
-        ) {
-          activeElement.blur();
-        }
-        setCellSelection(createEmptyCellSelection());
-        setCellPaneOpen(false);
-        return;
-      }
-
-      const openCell = () => {
-        setCellSelection({ activeCell: target, anchorCell: target, selectedCells: [target] });
-        setActiveColumnId(null);
-        setCellPaneOpen(true);
-        if (searchState.editorMode !== null) {
-          void searchState.setRowEditor(null, null, { replace: false });
-        }
-      };
-      if (searchState.editorMode !== null) {
-        // Opening read-only cell details replaces the row editor and therefore its draft owner.
-        draftTransition.request(openCell);
-      } else {
-        openCell();
-      }
-    },
     handleEscape,
     handleColumnActivate: (columnId) => {
       if (columnId !== null) {
         setCellSelection(createEmptyCellSelection());
-        setCellPaneOpen(false);
       }
       setActiveColumnId(columnId);
     },

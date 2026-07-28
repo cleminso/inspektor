@@ -81,7 +81,7 @@ export const codeEditorStyles = stylex.create({
     borderTopWidth: 1,
   },
   toolbar: {
-    padding: spacing.xxs,
+    padding: spacing.xs,
     borderColor: borderColors.border,
     borderStyle: "solid",
     borderWidth: 0,

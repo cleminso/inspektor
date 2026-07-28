@@ -57,7 +57,10 @@ test("extracts Button API facts from the public package export", () => {
   assert.equal(inset?.defaultValue, '"default"');
   assert.match(inset?.type ?? "", /"default".*"flush"/);
   assert.equal(inset?.required, false);
-  assert.equal(inset?.description, "Controls the inline inset for actions aligned with compact popup content.");
+  assert.equal(
+    inset?.description,
+    "Controls the inline inset for actions aligned with compact popup content.",
+  );
 
   const ariaLabel = buttonProps.find(({ name }) => name === "aria-label");
   assert.equal(ariaLabel, undefined);
@@ -74,8 +77,14 @@ test("extracts the semantic TextLink API", () => {
     metadata.textLink?.find(({ name }) => name === "variant")?.defaultValue,
     '"default"',
   );
-  assert.equal(metadata.textLink?.find(({ name }) => name === "className"), undefined);
-  assert.equal(metadata.textLink?.find(({ name }) => name === "style"), undefined);
+  assert.equal(
+    metadata.textLink?.find(({ name }) => name === "className"),
+    undefined,
+  );
+  assert.equal(
+    metadata.textLink?.find(({ name }) => name === "style"),
+    undefined,
+  );
 });
 
 test("extracts ButtonLink navigation and presentation props", () => {
@@ -101,9 +110,18 @@ test("extracts ButtonLink navigation and presentation props", () => {
     metadata.buttonLink?.find(({ name }) => name === "variant")?.defaultValue,
     '"primary"',
   );
-  assert.equal(metadata.buttonLink?.find(({ name }) => name === "className"), undefined);
-  assert.equal(metadata.buttonLink?.find(({ name }) => name === "disabled"), undefined);
-  assert.equal(metadata.buttonLink?.find(({ name }) => name === "loading"), undefined);
+  assert.equal(
+    metadata.buttonLink?.find(({ name }) => name === "className"),
+    undefined,
+  );
+  assert.equal(
+    metadata.buttonLink?.find(({ name }) => name === "disabled"),
+    undefined,
+  );
+  assert.equal(
+    metadata.buttonLink?.find(({ name }) => name === "loading"),
+    undefined,
+  );
 });
 
 test("extracts runtime defaults instead of JSDoc default tags", () => {
@@ -297,7 +315,10 @@ test("extracts the constrained Toaster API", () => {
   const metadata = extractPropsMetadata();
   const toasterProps = metadata.toaster;
 
-  assert.deepEqual(toasterProps?.map(({ name }) => name), []);
+  assert.deepEqual(
+    toasterProps?.map(({ name }) => name),
+    [],
+  );
   assert.equal(
     toasterProps?.find(({ name }) => name === "className"),
     undefined,
@@ -312,7 +333,10 @@ test("extracts the Spinner API", () => {
     ["label", "size"],
   );
   assert.equal(metadata.spinner?.find(({ name }) => name === "size")?.defaultValue, '"m"');
-  assert.equal(metadata.spinner?.find(({ name }) => name === "className"), undefined);
+  assert.equal(
+    metadata.spinner?.find(({ name }) => name === "className"),
+    undefined,
+  );
 });
 
 test("extracts the constrained JsonView API", () => {
@@ -363,8 +387,14 @@ test("extracts the constrained CodeEditor API", () => {
     "false",
   );
   assert.equal(codeEditorProps?.find(({ name }) => name === "layout")?.defaultValue, '"intrinsic"');
-  assert.equal(codeEditorProps?.find(({ name }) => name === "className"), undefined);
-  assert.equal(codeEditorProps?.find(({ name }) => name === "style"), undefined);
+  assert.equal(
+    codeEditorProps?.find(({ name }) => name === "className"),
+    undefined,
+  );
+  assert.equal(
+    codeEditorProps?.find(({ name }) => name === "style"),
+    undefined,
+  );
 });
 
 test("extracts the constrained ButtonGroup named API", () => {
@@ -546,7 +576,16 @@ test("extracts the constrained InputGroup compound API", () => {
   );
   assert.deepEqual(
     metadata["inputGroup.checkbox"]?.map(({ name }) => name),
-    ["label", "checked", "defaultChecked", "onCheckedChange", "disabled", "readOnly", "children"],
+    [
+      "label",
+      "checked",
+      "defaultChecked",
+      "onCheckedChange",
+      "disabled",
+      "readOnly",
+      "tooltip",
+      "children",
+    ],
   );
 });
 
@@ -972,12 +1011,50 @@ test("extracts the constrained Select compound API", () => {
     metadata["select.itemIndicator"]?.find(({ name }) => name === "keepMounted")?.defaultValue,
     "false",
   );
-  assert.equal(
-    metadata["select.item"]?.find(({ name }) => name === "size")?.defaultValue,
-    '"m"',
-  );
+  assert.equal(metadata["select.item"]?.find(({ name }) => name === "size")?.defaultValue, '"m"');
   assert.equal(
     metadata["select.trigger"]?.find(({ name }) => name === "className"),
     undefined,
+  );
+});
+
+test("extracts the value presentation component APIs", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata.binaryValue?.map(({ name }) => name),
+    ["byteLength"],
+  );
+  assert.deepEqual(
+    metadata.binaryDetails?.map(({ name }) => name),
+    ["byteLength", "onCopy", "onDownload"],
+  );
+
+  assert.deepEqual(
+    metadata.timestampValue?.map(({ name }) => name),
+    ["value"],
+  );
+  assert.equal(metadata.timestampDetails, undefined);
+
+  assert.deepEqual(
+    metadata.structuredValuePreview?.map(({ name }) => name),
+    ["model", "variant"],
+  );
+  assert.equal(
+    metadata.structuredValuePreview?.find(({ name }) => name === "variant")?.defaultValue,
+    '"json"',
+  );
+
+  assert.deepEqual(
+    metadata.relationValue?.map(({ name }) => name),
+    ["id", "navigation"],
+  );
+  assert.deepEqual(
+    metadata.relationDetails?.map(({ name }) => name),
+    ["id", "navigation", "state"],
+  );
+  assert.match(
+    metadata.relationDetails?.find(({ name }) => name === "navigation")?.type ?? "",
+    /href.*render.*ReactElement/,
   );
 });

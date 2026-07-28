@@ -143,7 +143,6 @@ flowchart TD
 
       DataState --> DataTable["DataTable"]
       DataState --> RowEditor["RowEditorSidePanel"]
-      DataState --> CellInspector["CellInspectorSidePanel"]
       DataState --> Mutations["useTableMutations"]
       Mutations --> TableProxy["createTableProxy"]
       TableProxy --> UseDb["Jazz useDb"]
@@ -609,24 +608,23 @@ Interaction state keeps these concepts separate:
 - the focused row is the selected row represented by the row side pane
 - bookmarked rows are persistent developer reference points
 
-Selection and side-pane presentation are independent. A cell can be focused without opening the pane, and a multi-cell selection
-can be assembled before the user chooses `Open selection`. The side pane uses an explicit presentation model:
+Selection, inline editing, and side-pane presentation are independent. A cell can be focused without opening an editor, and a
+multi-cell selection can be assembled before the user chooses an explicit operation. The side pane uses an explicit presentation
+model:
 
 - `closed`: no side pane
 - `insert`: the schema-driven insert form
 - `rows`: checked row ids and one focused row rendered by the complete-row editor
-- `cells`: one or more row-id and column-id targets rendered by schema-aware cell components grouped by column
 
-Single-clicking a cell focuses it without opening or changing the pane. Double-clicking opens that cell in the cell pane;
-double-clicking the same cell again closes the pane and clears that cell's selection and focus.
+Single-clicking a cell focuses it without opening an editor or changing the pane. Double-clicking an editable scalar cell starts
+inline editing. JSON, Array, and Row values use an expanded code editor in an anchored inline dialog; its expand action opens the
+complete-row pane and focuses the corresponding field. Relation and binary cells open the complete-row pane focused on their
+field. Timestamp cells use an inline calendar editor when that control is available. Generated, unsupported, and otherwise read-only cells remain read-only
+in the grid; their complete representation remains available through the complete-row pane.
+
 Command/Control-click builds an additive multi-cell selection across rows and columns, while Shift-click selects the rectangular
-range between the anchor and target. A context-menu `Open selection` action
-opens that selection in column-grouped pane sections. Cell components dispatch from schema metadata: structured values can use formatted code or tree views,
-relations can show their target, dates can show formatted and raw values, binary values can show metadata and download actions,
-and scalar values can expose their exact value and type.
-
-The foundation reuses the existing schema-derived field rendering and type components in an inspection-only cell pane. Redesigning
-individual cell-type presentations and adding cell mutation, review, confirmation, or save behavior are outside that foundation.
+range between the anchor and target. Multi-cell copy and mutation actions remain explicit operations and do not open an
+inspection-only cell pane.
 
 Clicking checkboxes individually builds the checked-row set. Shift-clicking another checkbox selects the visible range from the
 checkbox anchor. The checkbox opens the complete-row editor for the checked-row set. Previous and next controls navigate checked
@@ -643,26 +641,26 @@ Row-pane Cancel is distinct from pane dismissal. Cancel discards the focused row
 rows remain, focus moves to the nearest checked row; otherwise the row pane closes. The pane close control and Escape dismiss a
 clean pane while preserving selection.
 
-Focusing a cell in the focused checked row keeps the row pane open and focuses that field's first available control. Cells in
-other rows do not silently retarget the row editor. Double-clicking a cell or explicitly opening a cell selection changes the pane
-presentation. Numeric row and column coordinates can support developer orientation, but row IDs and column IDs remain the
-selection identity.
+Focusing a cell in the focused checked row keeps the row pane open and focuses that field's first available control. A double-click
+that requests inline editing is a surface transition. If the open row pane is clean, the pane closes and inline editing starts on
+the target cell, including when the cell belongs to another row. If the row pane has staged changes, the mutation draft guard
+prevents the transition and presents Save and continue, Discard and continue, or Keep editing. Numeric row and column coordinates
+can support developer orientation, but row IDs and column IDs remain the selection identity.
 
 A focused cell receives the selected-cell background and blue focus border without changing its whole row background. A checked
 row uses the selected-row background without an additional row border. The focused checked row adds a distinct blue focus edge.
 The complete checkbox cell is the checkbox hit area: pressing empty space inside it toggles selection and opens the complete-row
 editor rather than focusing a data cell.
 
-Clicking a column header clears cell focus and selection, closes an open cell pane, then activates and highlights that column and
-its visible cells. Clicking the active header again, pressing Escape, clicking a cell, or pressing elsewhere in the interface
-clears the active column. Focus remains visible independently of color. Active column, active cell, checkbox selection, dirty
-state, validation state, and live-update highlights use distinct semantic states so one highlight does not imply several
-meanings.
+Clicking a column header clears cell focus and selection, then activates and highlights that column and its visible cells. Clicking
+the active header again, pressing Escape, clicking a cell, or pressing elsewhere in the interface clears the active column. Focus
+remains visible independently of color. Active column, active cell, checkbox selection, dirty state, validation state, and
+live-update highlights use distinct semantic states so one highlight does not imply several meanings.
 
-Editing supports pane and inline presentation selected by one workspace-level user preference persisted in localStorage. Pane mode
-always uses the side pane. Inline mode edits supported writable cells in place and falls back to the pane for unsuitable fields.
-The setting is not scoped to a table and does not change parsing, validation, dirty tracking, or save behavior. Inline controls
-remain deferred until the shared row-draft mutation layer drives the pane editor.
+Pane and inline editing are simultaneously available rather than selected through a workspace preference. Row checkbox selection
+opens the complete-row pane; cell double-click starts the schema-appropriate inline editor or routes to the complete-row pane for
+relation and binary fields. Both surfaces use the same parsing, validation, dirty tracking, live reconciliation, save, and discard
+behavior through the shared row-draft mutation layer.
 
 Columns use schema-aware initial widths rather than one width for every value. Boolean and numeric columns start narrow; ids,
 relations, timestamps, text, and structured values receive progressively wider defaults. Header resize handles update TanStack
@@ -681,11 +679,11 @@ Cell context menu:
 - copy row
 - filter by value
 - edit row
-- open selected cells
+- edit selected cells when a supported bulk operation exists
 
 `Filter by value` completes the FilterBar with the clicked cell value. The default operator is `eq`, and the user can still change the operator before or after applying the filter.
 
-Column selection is an explicit header context-menu action rather than a normal header click. `Open column selection` must state
+Column selection is an explicit header context-menu action rather than a normal header click. Each column operation must state
 whether it targets visible cells or every row matching the active query. Visible cells form a table selection; every matching row
 is a separate query-backed bulk operation.
 
@@ -748,12 +746,13 @@ Cells render values based on type and context:
 The goal is not to make every cell interactive. The goal is to make every cell understandable.
 
 Grid cells use bounded, schema-derived previews. The grid does not serialize complete structured or binary values into a cell,
-and it does not replace stored identifiers with inferred semantic labels. The side pane is the authoritative surface for the
-complete value, alternate representations, copying, validation, and editing. Cells do not open hover cards; click, double-click,
-context-menu, and relation navigation already provide the grid's interaction layers.
+and it does not replace stored identifiers with inferred semantic labels. The complete-row pane is the authoritative surface for
+complete values, alternate representations, copying, validation, and editing. Cells do not open hover cards or a separate
+inspection-only pane.
 
-In inline editing mode, double-click or Enter starts editing when the field supports a safe compact editor. Explicit pane and
-context commands continue to provide complete inspection. Inline mode does not replace stable inspection with hover details.
+Double-click or Enter starts the schema-appropriate inline editor. Structured values use an expanded code editor in an anchored
+inline dialog with Save, Cancel, and expand actions. Expand opens the complete-row pane focused on the field. Relation and binary values open the complete-row pane
+directly. Timestamp values use an inline calendar when available. Read-only values remain read-only in the grid.
 
 | Condition | Grid representation | Side-pane representation |
 | --------- | ------------------- | ------------------------ |
@@ -866,10 +865,9 @@ Side-panel row focus is row-id based and can survive page changes. Checkbox sele
 
 Clicking a row checkbox opens a side pane that gives the developer a focused place for reading and editing checked rows. Clicking
 additional checkboxes extends that row set, while one checked row remains focused and is represented as a position such as
-`2 / 4`. Single-clicking a data cell focuses it without opening the pane. Double-clicking a cell opens its schema-derived cell
-presentation in pane mode, starts supported inline editing in inline mode, or uses the pane fallback for an unsuitable inline
-field. Explicit context actions open multi-cell selections. The focused behavior specification defines the detailed transitions
-and visual precedence.
+`2 / 4`. Single-clicking a data cell focuses it without opening an editor. Double-clicking starts inline editing for scalar and
+structured fields, opens the complete-row pane for relation and binary fields, and leaves unsupported read-only values unchanged.
+The focused behavior specification defines the detailed transitions and visual precedence.
 
 The side panel answers:
 
@@ -883,8 +881,9 @@ The side panel answers:
 The active row remains stable when possible. Filtering, sorting, or refreshing data does not make the user lose context
 without a clear reason.
 
-Opening the cell pane preserves the focused cell. Opening the row pane renders all schema fields, including fields hidden from the
-table, and focuses the active row rather than treating every checked row as one implicit bulk mutation.
+Opening the row pane renders all schema fields, including fields hidden from the table, and focuses the active row rather than
+treating every checked row as one implicit bulk mutation. An expanded structured inline editor can open this pane and target its
+field without introducing a separate cell-inspection pane.
 
 UI representation:
 
@@ -990,20 +989,19 @@ UI representation:
 
 As a developer I want to write inside tables for debugging and test setup.
 
-v1 uses side-panel editing only.
-
 - row checkbox selection opens the complete-row side panel
-- cell double-click opens the schema-derived cell side panel
-- selected-cell context actions can open an explicit multi-column cell selection grouped by column
+- cell double-click starts schema-appropriate inline editing
+- JSON, Array, and Row cells use an expanded code editor in an anchored inline dialog whose expand action opens the row pane focused on that field
+- relation and binary cells open the complete-row side panel focused on their field
+- timestamp cells use an inline calendar when available
+- generated, unsupported, and otherwise read-only cells remain read-only in the grid
 - edits are staged before save
 - insert uses the same side-panel form pattern
 - unsupported field types are visible but read-only
-- inline cell editing is out of scope for v1
 
-Side-pane editing is the default and only v1 editing presentation. An optional inline presentation remains outside v1 for users
-who prefer direct cell editing. Both presentations must use the same row draft, schema parsing, dirty-field,
-validation, conflict, and mutation controller rather than implementing separate write paths. Adding inline presentation does
-not change the read-first default or cause cell activation to write immediately.
+Side-pane and inline editing are complementary presentations rather than workspace modes. Both presentations must use the same row
+draft, schema parsing, dirty-field, validation, conflict, and mutation controller rather than implementing separate write paths.
+Adding inline presentation does not cause single-click cell activation to write immediately.
 
 The shared row draft tracks the baseline row, baseline update metadata, raw input, parsed values, dirty fields, validation
 issues, unsupported fields, mutation status, and remote-change status. Saves send a partial patch for dirty fields rather than
@@ -1410,7 +1408,7 @@ UI representation:
 1. Developer connects a Jazz app, validates credentials, and opens the intended branch and schema hash.
 2. Developer reopens a saved local connection and understands whether the server/runtime is reachable.
 3. Developer opens a table, filters rows, distinguishes empty from filtered-empty, and inspects one record.
-4. Developer single-clicks a cell to focus it, then double-clicks or uses an explicit context action to open its side-pane presentation.
+4. Developer single-clicks a cell to focus it, then double-clicks to edit it inline or route a relation or binary field to the complete-row pane.
 5. Developer edits or inserts a row, sees staged changes, and gets a clear rejection if the runtime/server denies the mutation.
 6. Developer follows a relation cell to inspect linked data in another table tab without losing the original table context.
 7. Developer bookmarks rows in a large table, then jumps back to them after changing page or filter context.

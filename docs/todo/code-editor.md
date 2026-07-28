@@ -11,7 +11,7 @@
 
 ## Implemented foundation
 
-[24/07/26]
+[28/07/26]
 
 - [x] Keep editable `CodeEditor` and read-only `CodeBlock` as separate component contracts.
 - [x] Select CodeMirror 6 as the editing engine.
@@ -93,6 +93,8 @@
 - The editor toolbar owns editor-local actions such as Format, Wrap, Copy, Expand, and Collapse.
 - NULL remains explicit; a blank or disabled editor must not ambiguously represent NULL.
 - Toggling NULL preserves the last non-null source draft so returning to Value restores it.
+- Structured mutation fields use one compact Value/Default/NULL selector in the field header.
+- NULL and Default use compact code-value presentations while the inactive editor stays mounted.
 
 ## Open design decisions
 
@@ -103,7 +105,7 @@
 - [x] Keep one disclosure affordance in the normal-flow toolbar.
 - [x] Keep Format in the editor toolbar.
 - [x] Treat formatting as a source-text change and therefore as a dirty mutation.
-- [ ] Decide whether insert fields with schema defaults use a Value/Default/NULL selector while update fields use only Value/NULL.
+- [x] Use Value/Default/NULL for eligible insert fields and Value/NULL for nullable update fields.
 - [x] Keep capped content internal to `CodeEditor` until another product surface establishes a reusable contract.
 
 ## Validation checklist

@@ -100,10 +100,12 @@ describe("InsertRowForm structured values", () => {
     ] satisfies ColumnDescriptor[];
     render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
 
-    expect(screen.getByRole("checkbox", { name: "Status" }).getAttribute("aria-checked")).toBe(
-      "true",
-    );
-    fireEvent.click(screen.getByRole("checkbox", { name: "Status" }));
+    expect(
+      screen
+        .getByRole("checkbox", { name: "Use default for Status" })
+        .getAttribute("aria-checked"),
+    ).toBe("true");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use default for Status" }));
     fireEvent.change(screen.getByRole("textbox", { name: "Status" }), {
       target: { value: "archived" },
     });
@@ -112,6 +114,28 @@ describe("InsertRowForm structured values", () => {
     await vi.waitFor(() =>
       expect(onSave).toHaveBeenCalledWith({ status: "archived" }, { keepOpen: false }),
     );
+  });
+
+  it("allows an edited field to return to schema-default omission", async () => {
+    const onSave = vi.fn();
+    const columns = [
+      {
+        name: "status",
+        column_type: { type: "Text" },
+        nullable: false,
+        default: { type: "Text", value: "active" },
+      },
+    ] satisfies ColumnDescriptor[];
+    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use default for Status" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Status" }), {
+      target: { value: "archived" },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use default for Status" }));
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    await vi.waitFor(() => expect(onSave).toHaveBeenCalledWith({}, { keepOpen: false }));
   });
 
   it("keeps a default-backed read-only binary field omitted", () => {
@@ -127,7 +151,7 @@ describe("InsertRowForm structured values", () => {
 
     expect(screen.queryByRole("checkbox", { name: "Payload" })).toBeNull();
     expect((screen.getByRole("textbox", { name: "Payload" }) as HTMLInputElement).value).toBe(
-      "DEFAULT",
+      "(2 bytes)",
     );
   });
 
@@ -198,7 +222,7 @@ describe("InsertRowForm structured values", () => {
     ] satisfies ColumnDescriptor[];
     render(<InsertRowForm onSave={() => undefined} rowValues={{}} schemaColumns={columns} />);
 
-    fireEvent.click(screen.getByRole("checkbox", { name: /payload/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Value" }));
 
     expect((await screen.findByRole("textbox", { name: "Payload" })).textContent).toBe(seed);
   });

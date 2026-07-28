@@ -11,7 +11,6 @@ import {
 } from "@inspector/ds";
 
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
-import { CellInspectorSidePanel } from "@/components/table-explorer/data/cellInspectorSidePanel";
 import { DataTableColumnVisibility } from "@/components/table-explorer/data/dataTableColumnVisibility";
 import { RowEditorSidePanel } from "@/components/table-explorer/data/rowEditorSidePanel";
 import { TableFilter } from "@/components/table-explorer/data/tableFilter";
@@ -118,7 +117,6 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
               activeRowId={state.rowEditor.activeRowId}
               selectedCells={state.selectedCells}
               onCellActivate={state.handleCellActivate}
-              onCellOpen={state.handleCellOpen}
               onColumnActivate={state.handleColumnActivate}
               onColumnOrderChange={state.setColumnOrder}
             >
@@ -159,29 +157,17 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
         <>
           <ResizableHandle />
           <ResizablePanel defaultSize={420} minSize={320} maxSize={720}>
-            {state.detailPaneMode === "cells" ? (
-              <CellInspectorSidePanel
-                columnPosition={state.cellInspector.columnPosition}
-                rowPosition={state.cellInspector.rowPosition}
-                rowValues={state.cellInspector.rowValues}
-                schemaColumns={state.schemaColumns}
-                target={state.cellInspector.target}
-                onClose={() => {
-                  state.handleRowEditorOpenChange(false);
-                }}
-              />
-            ) : (
-              <RowEditorSidePanel
-                mode={state.detailPaneMode === "insert" ? "insert" : "edit"}
-                draftTransitionPending={state.draftTransition.isPending}
-                draftTransitionSaving={state.draftTransition.isSaving}
-                editedRowIds={state.rowEditor.editedRowIds}
-                activeRowIndex={state.rowEditor.activeRowIndex}
-                onDiscardAndContinue={state.draftTransition.discardAndContinue}
-                onKeepEditing={state.draftTransition.keepEditing}
-                onNavigatePrevious={state.rowEditor.goToPreviousRow}
-                onNavigateNext={state.rowEditor.goToNextRow}
-              >
+            <RowEditorSidePanel
+              mode={state.detailPaneMode === "insert" ? "insert" : "edit"}
+              draftTransitionPending={state.draftTransition.isPending}
+              draftTransitionSaving={state.draftTransition.isSaving}
+              editedRowIds={state.rowEditor.editedRowIds}
+              activeRowIndex={state.rowEditor.activeRowIndex}
+              onDiscardAndContinue={state.draftTransition.discardAndContinue}
+              onKeepEditing={state.draftTransition.keepEditing}
+              onNavigatePrevious={state.rowEditor.goToPreviousRow}
+              onNavigateNext={state.rowEditor.goToNextRow}
+            >
                 <Suspense
                   fallback={
                     <Box width="full" padding="l">
@@ -217,8 +203,7 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
                     />
                   )}
                 </Suspense>
-              </RowEditorSidePanel>
-            )}
+            </RowEditorSidePanel>
           </ResizablePanel>
         </>
       ) : null}

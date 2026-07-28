@@ -8,6 +8,7 @@ import { Checkbox } from "../checkbox/checkbox";
 import type { CheckboxProps } from "../checkbox/checkbox";
 import { FieldContext } from "../field/fieldContext";
 import type { InputSize } from "../input/input";
+import { Tooltip } from "../tooltip/tooltip";
 import { InputGroupContext } from "./inputGroupContext";
 import { inputGroupStyles } from "./inputGroup.styles";
 
@@ -63,6 +64,8 @@ export interface InputGroupCheckboxProps {
   disabled?: CheckboxProps["disabled"];
   /** Prevents changes while preserving focus. */
   readOnly?: CheckboxProps["readOnly"];
+  /** Provides supplementary guidance on hover and keyboard focus. */
+  tooltip?: string;
   /** Visible checkbox label. */
   children: ReactNode;
 }
@@ -181,6 +184,7 @@ function InputGroupCheckbox({
   onCheckedChange,
   disabled = false,
   readOnly = false,
+  tooltip,
   children,
 }: InputGroupCheckboxProps) {
   const context = useContext(InputGroupContext);
@@ -190,10 +194,17 @@ function InputGroupCheckbox({
     effectiveDisabled === true && inputGroupStyles.memberDisabled,
   );
 
-  return (
+  const field = (
     <BaseField.Root
       disabled={effectiveDisabled}
-      render={<label {...fieldStyleProps} aria-label={label} data-slot="input-group-checkbox" />}
+      render={
+        <label
+          {...fieldStyleProps}
+          aria-description={tooltip}
+          aria-label={label}
+          data-slot="input-group-checkbox"
+        />
+      }
     >
       <Checkbox
         size="s"
@@ -205,6 +216,15 @@ function InputGroupCheckbox({
       />
       <span>{children}</span>
     </BaseField.Root>
+  );
+
+  return tooltip === undefined ? (
+    field
+  ) : (
+    <Tooltip.Root>
+      <Tooltip.Trigger render={field} />
+      <Tooltip.Content>{tooltip}</Tooltip.Content>
+    </Tooltip.Root>
   );
 }
 

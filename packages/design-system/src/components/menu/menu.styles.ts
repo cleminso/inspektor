@@ -43,6 +43,21 @@ export const menuStyles = stylex.create({
     whiteSpace: "nowrap",
     height: 28,
   },
+  triggerGrouped: {
+    borderRadius: 0,
+    backgroundColor: {
+      default: "transparent",
+      ":hover": backgroundColors["bg-hover"],
+      ":active": backgroundColors["bg-pressed"],
+    },
+    borderBlockEndWidth: 0,
+    borderBlockStartWidth: 0,
+    borderInlineEndWidth: 0,
+    borderInlineStartColor: borderColors["border-secondary"],
+    borderInlineStartStyle: "solid",
+    borderInlineStartWidth: 1,
+    height: "100%",
+  },
   triggerOpen: { backgroundColor: backgroundColors["bg-selected"] },
   disabled: {
     backgroundColor: {

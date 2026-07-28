@@ -8,7 +8,6 @@ export const dataTableRootPropNames = [
   'onRowActivate',
   'onColumnActivate',
   'onCellActivate',
-  'onCellOpen',
   'onRowContextMenu',
   'onHeaderContextMenu',
   'onCellContextMenu',

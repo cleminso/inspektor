@@ -279,6 +279,58 @@ export const codeEditorItem = {
   componentId: "codeEditor",
 } satisfies NavItem;
 
+export const binaryValueItem = {
+  title: "Binary Value",
+  slug: "binary-value",
+  href: "/components/binary-value",
+  description: "Compact byte counts and callback-driven binary inspection actions.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "binaryValue.tsx",
+    path: "packages/design-system/src/components/binaryValue/binaryValue.tsx",
+  },
+  componentId: "binaryValue",
+} satisfies NavItem;
+
+export const timestampValueItem = {
+  title: "Timestamp Value",
+  slug: "timestamp-value",
+  href: "/components/timestamp-value",
+  description: "Compact local timestamps that preserve the exact ISO instant in semantic markup.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "timestampValue.tsx",
+    path: "packages/design-system/src/components/timestampValue/timestampValue.tsx",
+  },
+  componentId: "timestampValue",
+} satisfies NavItem;
+
+export const structuredValuePreviewItem = {
+  title: "Structured Value Preview",
+  slug: "structured-value-preview",
+  href: "/components/structured-value-preview",
+  description: "Bounded inline summaries from normalized array, object, and scalar models.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "structuredValuePreview.tsx",
+    path: "packages/design-system/src/components/structuredValuePreview/structuredValuePreview.tsx",
+  },
+  componentId: "structuredValuePreview",
+} satisfies NavItem;
+
+export const relationValueItem = {
+  title: "Relation Value",
+  slug: "relation-value",
+  href: "/components/relation-value",
+  description: "Separate compact relation identifiers and resolved target details.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "relationValue.tsx",
+    path: "packages/design-system/src/components/relationValue/relationValue.tsx",
+  },
+  componentId: "relationValue",
+} satisfies NavItem;
+
 export const menuItem = {
   title: "Menu",
   slug: "menu",
@@ -479,6 +531,7 @@ export const textFieldItem = {
 export const componentItems: NavItem[] = [
   accordionItem,
   actionListItem,
+  binaryValueItem,
   buttonItem,
   buttonLinkItem,
   buttonGroupItem,
@@ -496,13 +549,16 @@ export const componentItems: NavItem[] = [
   textLinkItem,
   textareaItem,
   menuItem,
+  relationValueItem,
   resizablePanelItem,
   searchItem,
   segmentedControlItem,
   sidePanelItem,
   selectItem,
   spinnerItem,
+  structuredValuePreviewItem,
   switchItem,
+  timestampValueItem,
   toastItem,
   tooltipItem,
   fieldItem,

@@ -8,7 +8,7 @@
 - [Behavior model](#behavior-model)
 - [Row selection scenarios](#row-selection-scenarios)
 - [Cell selection scenarios](#cell-selection-scenarios)
-- [Editing preference and surfaces](#editing-preference-and-surfaces)
+- [Editing surfaces](#editing-surfaces)
 - [Side-pane behavior](#side-pane-behavior)
 - [Mutation draft behavior](#mutation-draft-behavior)
 - [Column selection and bulk editing](#column-selection-and-bulk-editing)
@@ -43,20 +43,18 @@ The Inspector remains schema-driven. Selection behavior is generic and does not 
 - **Focused cell**: the cell that receives the strongest focus treatment and acts as the cell-selection anchor.
 - **Row selection**: checked row IDs plus the focused row ID and checkbox-range anchor.
 - **Cell selection**: selected row/column targets plus the focused cell. A selection can contain cells from several columns.
-- **Pane target**: the explicit row or cell selection presented in the side pane.
-- **Editing preference**: the workspace-level user setting that selects pane or inline editing.
+- **Pane target**: the checked row represented in the side pane.
 - **Row draft**: the latest live source row plus dirty field overlays, raw input, parsed values, and validation state.
 - **Query position**: a row's position in the active filtered and sorted result, not a stable row identity.
 
 ## Behavior model
 
-Selection and side-pane presentation are separate state.
+Selection, inline editing, and side-pane presentation are separate state.
 
 - A cell can be focused without opening the side pane.
-- Multiple cells can be selected before the user chooses `Open selection`.
+- Multiple cells can be selected before the user chooses an explicit copy or mutation operation.
 - Row selection and cell selection use stable row IDs and column IDs rather than visual coordinates.
-- Row and cell selections can coexist. Opening one selection changes the pane presentation without silently destroying the
-  other selection.
+- Row and cell selections can coexist. Opening or closing the row pane does not silently destroy cell selection.
 - Column reorder, visibility, sorting, filtering, and pagination must not reinterpret stored coordinates as different cells.
 
 The side pane has these presentation modes:
@@ -64,17 +62,17 @@ The side pane has these presentation modes:
 - `closed`: no pane target
 - `insert`: schema-driven row insertion
 - `rows`: checked row IDs plus one focused row
-- `cells`: one or more selected cells from one or more columns
 
 Pane precedence is explicit:
 
 - a row-checkbox interaction opens `rows`
-- a cell double-click opens `cells`
-- `Open selection` opens `cells`
 - the insert action opens `insert`
 - a single cell click changes cell focus without changing pane mode
+- a double-click starts schema-appropriate inline editing or routes relation and binary fields to `rows`
 
-Opening one pane mode does not destroy the stored row or cell selection owned by another mode.
+When a double-click requests inline editing while a clean row pane is open, the row pane closes before inline editing starts. When
+the row pane is dirty, the mutation draft guard prevents the transition until the user chooses Save and continue, Discard and
+continue, or Keep editing.
 
 Selection belongs to the represented query result:
 
@@ -134,23 +132,27 @@ cell.
 Native text selection is disabled on the table surface. Pointer gestures select cells rather than glyphs; field controls in the
 side pane remain the place for selecting and editing text.
 
-### Open one cell
+### Edit one cell
 
 - **Given** one cell is focused
 - **When** the user double-clicks that cell
-- **Then** the cell pane opens
-- **And** the pane renders the schema-derived component for that cell
+- **Then** the schema-appropriate inline editor opens when the field supports inline editing
 - **And** the cell remains focused
 
-The Enter key should offer an equivalent keyboard action when the table supports keyboard cell navigation.
+The Enter key offers an equivalent keyboard action when the table supports keyboard cell navigation. An unmodified double-click
+inside a multi-cell selection replaces that selection with the target cell before editing.
 
-In pane mode, double-click or Enter opens the cell or row editing flow in the side pane. In inline mode, the same actions start
-inline editing when the field supports it and otherwise open the pane fallback. Neither mode adds a hover card.
+Field routing is schema-derived:
 
-An unmodified double-click inside a multi-cell selection replaces that selection with the target cell and opens only that cell.
-Opening the complete multi-cell set requires the explicit `Open selection` action.
-Double-clicking the same cell while its cell pane is open closes the pane, clears the cell selection, and removes cell focus.
-Double-clicking a different cell retargets the open pane to that cell.
+- primitive scalar and enum values use constrained inline controls
+- JSON, Array, and Row values use an expanded code editor in an anchored inline dialog with Save and Cancel actions
+- the expanded structured editor exposes an expand action that opens the complete-row pane focused on that field
+- relation and binary values open the complete-row pane focused on their field
+- timestamps use an inline calendar when that control is available
+- generated, unsupported, and otherwise read-only values remain read-only in the grid
+
+Cells do not open a separate inspection-only pane or hover card. Complete and alternate field representations remain available
+through the complete-row pane.
 
 ### Select multiple cells
 
@@ -158,46 +160,33 @@ Double-clicking a different cell retargets the open pane to that cell.
 - **When** the user Command-clicks another data cell
 - **Then** the target cell is added to or removed from the cell-selection set
 - **And** the last included cell becomes focused
-- **And** the side pane remains unchanged until the user explicitly opens the selection
+- **And** the side pane remains unchanged until the user starts an explicit operation
 
 Control-click provides the equivalent modifier on platforms where Command is unavailable. Additive selection works across rows
 and columns like selecting several objects on a canvas. Shift-click selects the rectangular range between the anchor and target
 across the visible query rows and data columns.
 
-### Open a multi-cell selection
+### Operate on a multi-cell selection
 
 - **Given** multiple cells are selected
 - **When** the user right-clicks inside the selection
 - **Then** the existing selection remains intact
-- **And** the context menu offers `Open selection`
-- **When** the user chooses `Open selection`
-- **Then** the cells pane opens with the complete selected-cell set
+- **And** the context menu offers copy or supported mutation operations for that selection
 
 Right-clicking an unselected cell replaces the cell selection with that cell before opening the context menu.
 
-The pane groups selected cells by column. Each column section identifies its schema field and contains the selected cells for
-that field in active query row order. Each cell identifies its row, such as `Row 8 · room_id`; numeric coordinates may appear as
-secondary information but are not treated as identity.
+Bulk editing is a separate explicit workflow rather than a read-only cell-inspection pane. A same-column selection can expose one
+shared schema-derived editor for an explicit bulk operation. Large selections use summaries and incremental rendering rather than
+mounting one expanded control per cell.
 
-Large selections use column summaries and render cell controls incrementally rather than mounting every expanded control. A
-same-column group can expose one shared schema-derived editor for an explicit bulk operation.
+## Editing surfaces
 
-## Editing preference and surfaces
+Pane and inline editing are available together rather than selected through a workspace preference. Row checkbox selection opens
+the complete-row pane. Cell double-click or Enter starts inline editing when the schema-derived field interaction supports it.
+Relation and binary fields route to the complete-row pane, and unsupported read-only fields remain read-only in the grid.
 
-The Inspector workspace has one persisted user editing preference:
-
-- `pane`: every editable row or cell uses the side pane.
-- `inline`: supported writable cells edit in place; unsuitable fields use the side pane.
-
-The preference is not scoped to a table, schema, branch, or connection. It is user interface state and is initially persisted in
-localStorage. It changes the editing presentation but not mutation semantics.
-
-Inline suitability is schema-derived. Structured, binary, generated, unsupported, and other fields without a safe compact editor
-fall back to the pane. Selection remains separate from editing in both modes. Full inspection remains available through stable
-pane and command interactions; cells do not expose details through hover cards.
-
-Changing the preference cannot move a dirty draft between surfaces. The user must Save, Discard and continue, or keep the existing
-preference and draft.
+Both surfaces consume the same per-row draft, parsing, validation, dirty tracking, live reconciliation, save, and discard rules.
+Changing surfaces is a guarded transition when the active draft is dirty.
 
 ## Side-pane behavior
 
@@ -215,18 +204,31 @@ preference and draft.
 - If Cancel removes the only checked row, the row pane closes.
 - If checked rows remain, the nearest checked row becomes focused and remains represented in the pane.
 
-### Cell pane
+### Cell activation and pane transitions
 
-- One selected cell renders one schema-derived field section.
-- Multiple selected cells render column sections containing their ordered cell controls.
-- Cell sections reuse the existing schema-derived field rendering and type components without redesigning how individual field
-  types look.
-- Opening one cell focuses its first available schema-derived control, including read-only representations.
-- The foundation cell pane is inspection-only and exposes reading, copy, relation-navigation, and dismissal actions.
-- Cell editing, staged changes, review, confirmation, and save actions belong to the mutation behavior slice.
+- Double-clicking a cell while a clean row pane is open closes the pane before starting inline editing or opening another row.
+- Double-clicking a cell while the row pane has staged changes invokes the mutation draft guard with `The current row has staged changes.`
+- Save and continue completes the row mutation, closes or retargets the pane, and continues the requested cell action.
+- Discard and continue discards the row draft, closes or retargets the pane, and continues the requested cell action.
+- Keep editing leaves the row pane and its draft unchanged and cancels the requested cell action.
+- When a structured inline editor requests expansion, the complete-row pane opens for that row and focuses the structured field.
+- Relation and binary cell activation opens the complete-row pane for that row and focuses the corresponding field.
 
-A clean cell pane follows additive or subtractive cell-selection changes. Closing a row or cell pane preserves its table
-selection. A dirty pane does not silently retarget staged values to a different selection.
+#### Move from a clean row pane to inline editing
+
+- **Given** row A is checked and represented by a clean row pane
+- **When** the user double-clicks an inline-editable cell in row B
+- **Then** the row pane closes
+- **And** row A remains checked
+- **And** inline editing starts in the targeted cell in row B
+
+#### Protect a dirty row pane from cell activation
+
+- **Given** row A is checked and its row pane has staged changes
+- **When** the user double-clicks a cell
+- **Then** the requested cell action does not start
+- **And** the mutation draft guard presents `The current row has staged changes.`
+- **And** the user can Save and continue, Discard and continue, or Keep editing
 
 Pressing Escape follows progressive dismissal:
 
@@ -257,7 +259,7 @@ Insert fields distinguish `omitted`, `null`, `valid`, and `invalid`. Omitted fie
 can apply. Explicit NULL remains a separate user choice.
 
 The active draft survives movement between fields in one row and switching between editable Details and read-only JSON
-representations. Changing the focused row, query scope, table, schema, route, or editing preference requires Save, Discard, or
+representations. Changing the focused row, editing surface, query scope, table, schema, or route requires Save, Discard, or
 remaining on the active target when the draft is dirty. Relation navigation follows the same rule.
 
 Inline editing stages cells into the containing row draft. Saving persists that row's complete dirty-field patch. Supporting more
@@ -269,20 +271,19 @@ Column selection is an advanced, explicit action rather than the result of a nor
 
 - **Given** the user right-clicks a data-column header
 - **When** the header context menu opens
-- **And** the user chooses `Open column selection`
+- **And** the user chooses a scoped column operation
 - **Then** the application selects the cells in the command's declared scope
-- **And** the cells pane opens with that column selection
+- **And** the selected operation opens its own review or editing surface when required
 
 A normal header click remains available for column focus, dragging, resizing, and sorting behavior. The context action avoids an
 accidental large selection.
 
-Activating a column header clears cell focus and cell selection. If a cell pane is open, column activation closes it before the
-column receives its active treatment.
+Activating a column header clears cell focus and cell selection before the column receives its active treatment.
 
-The command must state its scope. `Open column selection` cannot silently mean both visible rows and every matching row.
+The command must state its scope. A column operation cannot silently mean both visible rows and every matching row.
 Appropriate scoped commands include:
 
-- `Open visible column cells`
+- `Copy visible column cells`
 - `Edit this column for matching rows…`
 
 Visible cells are a table selection. Every matching row is a query-backed bulk operation that can include unloaded rows and
@@ -333,8 +334,8 @@ that `Row 8` is an immutable database position.
 - Row selection, cell selection, row focus, cell focus, validation, dirty state, and live-update state remain visually distinct.
 - Pointer focus and keyboard focus must remain perceivable without relying only on color.
 
-Column sections in the cell pane follow visible table-column order. Cells inside each section follow active query row order. The
-most recently selected cell is focused. Row IDs and column IDs remain authoritative; displayed positions are supporting metadata.
+Multi-cell operations follow visible table-column order and active query row order. The most recently selected cell is focused.
+Row IDs and column IDs remain authoritative; displayed positions are supporting metadata.
 
 ## Side-pane layout
 
@@ -356,23 +357,24 @@ The foundation establishes:
 - individual row selection and Shift range selection
 - one focused row within checked rows
 - single-click cell focus without pane activation
-- double-click cell pane activation
-- same-cell double-click dismissal with cell selection and focus clearing
+- double-click inline editing activation
+- clean row-pane dismissal before inline editing starts
+- dirty row-pane transition protection through the mutation draft guard
 - Command/Control additive multi-cell selection across rows and columns
 - Shift rectangular cell-range selection across visible rows and data columns
 - selection state independent from pane state
 - stable row-ID and column-ID targets
-- schema-derived row and cell presentation
-- reuse of the existing schema-derived cell-type rendering without a field-component redesign
-- inspection-only cell panes; row editing continues through the existing row editor
+- schema-derived row and inline editor presentation
+- structured inline expansion into the complete-row pane
+- relation and binary activation into the complete-row pane
 - side-pane header, scrolling body, fixed footer, and accessible dismissal
 
 ## Recorded advanced behavior
 
 The following behavior is part of the product direction but is outside the foundation slice:
 
-- selected-cell context menu with `Open selection`
-- pane sections grouped by column with selected cells inside each section
+- selected-cell context menus with explicit copy and mutation commands
+- bulk-operation review and editing surfaces
 - header context menu with scoped column-selection commands
 - query-backed bulk editing across matching rows
 - transactional or batched mutation semantics
@@ -384,5 +386,5 @@ The following behavior is part of the product direction but is outside the found
 - Whether pane and inline orchestration retain drafts for more than one row.
 - The exact Save, Discard and continue, and remain-on-target presentation used when a dirty transition is requested.
 - The inline field commit and cancellation triggers for Enter, Escape, blur, and pointer selection.
-- The exact visible-page versus loaded-result scope of `Open column selection`.
+- The exact visible-page versus loaded-result scope of column-selection operations.
 - The error and recovery presentation for partial bulk-write failure when atomic writes are unavailable.

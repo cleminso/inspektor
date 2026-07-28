@@ -133,7 +133,6 @@ interface TestDataTableProps {
   loading?: boolean;
   onCellActivate?: (target: { columnId: string; rowId: string }) => void;
   onCellContextMenu?: (target: { columnId: string; rowId: string }) => void;
-  onCellOpen?: (target: { columnId: string; rowId: string }) => void;
   onColumnActivate?: (columnId: string | null) => void;
   onRowActivate?: (rowId: string) => void;
   selectedCells?: { columnId: string; rowId: string }[];
@@ -148,7 +147,6 @@ function TestDataTable({
   loading = false,
   onCellActivate,
   onCellContextMenu,
-  onCellOpen,
   onColumnActivate,
   onRowActivate,
   selectedCells = [],
@@ -171,7 +169,6 @@ function TestDataTable({
       activeRowId={activeRowId}
       onCellActivate={onCellActivate}
       onCellContextMenu={(target) => onCellContextMenu?.(target)}
-      onCellOpen={onCellOpen}
       onColumnActivate={onColumnActivate}
       onRowActivate={onRowActivate}
       selectedCells={selectedCells}
@@ -269,12 +266,8 @@ function DismissibleColumnDataTable() {
   );
 }
 
-function SelectionHitAreaDataTable({
-  onCellActivate,
-  onCellOpen,
-}: {
+function SelectionHitAreaDataTable({ onCellActivate }: {
   onCellActivate: (target: { columnId: string; rowId: string }) => void;
-  onCellOpen?: (target: { columnId: string; rowId: string }) => void;
 }) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const selectionColumns = [
@@ -314,7 +307,7 @@ function SelectionHitAreaDataTable({
   });
 
   return (
-    <DataTable.Root table={table} onCellActivate={onCellActivate} onCellOpen={onCellOpen}>
+    <DataTable.Root table={table} onCellActivate={onCellActivate}>
       <DataTable.Viewport>
         <DataTable.Table aria-label="Selectable people">
           <DataTable.Content />
@@ -490,26 +483,9 @@ describe("DataTable", () => {
     expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: "person-1", columnId: "role" });
   });
 
-  it("focuses a cell on click and opens it only on double click", () => {
+  it("activates a cell once across the click sequence of a double click", () => {
     const onCellActivate = vi.fn();
-    const onCellOpen = vi.fn();
-    render(<TestDataTable onCellActivate={onCellActivate} onCellOpen={onCellOpen} />);
-    const cell = screen.getByRole("cell", { name: "Engineer" });
-
-    fireEvent.click(cell);
-
-    expect(onCellActivate).toHaveBeenCalledOnce();
-    expect(onCellOpen).not.toHaveBeenCalled();
-
-    fireEvent.doubleClick(cell);
-
-    expect(onCellOpen).toHaveBeenCalledWith({ rowId: "person-1", columnId: "role" });
-  });
-
-  it("activates a cell once before opening it on double click", () => {
-    const onCellActivate = vi.fn();
-    const onCellOpen = vi.fn();
-    render(<TestDataTable onCellActivate={onCellActivate} onCellOpen={onCellOpen} />);
+    render(<TestDataTable onCellActivate={onCellActivate} />);
     const cell = screen.getByRole("cell", { name: "Engineer" });
 
     fireEvent.click(cell, { detail: 1 });
@@ -517,7 +493,6 @@ describe("DataTable", () => {
     fireEvent.doubleClick(cell);
 
     expect(onCellActivate).toHaveBeenCalledOnce();
-    expect(onCellOpen).toHaveBeenCalledOnce();
   });
 
   it("reports additive and range cell-selection intent from click modifiers", () => {
@@ -617,18 +592,6 @@ describe("DataTable", () => {
     expect((checkbox as HTMLInputElement).checked).toBe(true);
     expect(document.activeElement).not.toBe(checkboxCell);
     expect(onCellActivate).not.toHaveBeenCalled();
-  });
-
-  it("does not open a checkbox cell on double click", () => {
-    const onCellActivate = vi.fn();
-    const onCellOpen = vi.fn();
-    render(<SelectionHitAreaDataTable onCellActivate={onCellActivate} onCellOpen={onCellOpen} />);
-    const checkboxCell = screen.getByRole("checkbox", { name: "Select Ada" }).closest("td");
-
-    fireEvent.doubleClick(checkboxCell as HTMLTableCellElement);
-
-    expect(onCellActivate).not.toHaveBeenCalled();
-    expect(onCellOpen).not.toHaveBeenCalled();
   });
 
   it("moves headers and body cells together while a column is dragged", async () => {

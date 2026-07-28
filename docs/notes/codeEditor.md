@@ -77,8 +77,8 @@ The editor does not animate viewport height. Layout responds directly while tool
 The field follows the Inspector label and suffix pattern:
 
 - the field label appears at the start of the header
-- the schema type suffix, such as `JSON`, appears at the end
 - schema-level value-mode controls remain in the field header
+- the schema type, such as `JSON`, appears in the editor toolbar or inactive-value footer
 - editor-local controls remain inside the editor toolbar
 - descriptions and errors remain below the editor surface
 
@@ -92,11 +92,11 @@ Format, Wrap, Copy, Expand, and Collapse are editor-local actions. NULL and Defa
 - NULL for nullable columns
 - Default or omission when an insert flow supports a schema default
 
-For a nullable JSON field, an always-visible NULL control belongs in the field-header action area beside the `JSON` type suffix. It must not live in the hover toolbar because NULL is an essential field state rather than a secondary editor command.
+For a nullable JSON field, an always-visible Value/NULL selector belongs in the field-header action area. Insert fields with defaults add Default to the same selector. The selector must not live in the editor toolbar because these modes describe mutation intent rather than editor commands.
 
 When NULL is selected:
 
-- the field body presents an explicit `NULL` state rather than an empty editor
+- the field body presents an explicit compact `NULL` state with its schema type rather than an empty editor
 - the last non-null source draft remains in application state
 - the mounted editor session preserves selection, history, wrapping, diagnostics, and presentation state
 - returning to Value restores that draft

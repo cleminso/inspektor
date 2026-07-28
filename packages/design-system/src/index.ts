@@ -143,6 +143,32 @@ export type {
   CopyButtonSize,
   CopyButtonVariant,
 } from './components/copyButton/copyButton'
+export { BinaryDetails, BinaryValue } from './components/binaryValue/binaryValue'
+export type {
+  BinaryCopyFormat,
+  BinaryDetailsProps,
+  BinaryValueProps,
+} from './components/binaryValue/binaryValue'
+export { TimestampValue } from './components/timestampValue/timestampValue'
+export type { TimestampValueProps } from './components/timestampValue/timestampValue'
+export { StructuredValuePreview } from './components/structuredValuePreview/structuredValuePreview'
+export type {
+  StructuredValuePreviewArrayModel,
+  StructuredValuePreviewContinuation,
+  StructuredValuePreviewModel,
+  StructuredValuePreviewObjectEntry,
+  StructuredValuePreviewObjectModel,
+  StructuredValuePreviewProps,
+  StructuredValuePreviewScalarModel,
+  StructuredValuePreviewVariant,
+} from './components/structuredValuePreview/structuredValuePreview'
+export { RelationDetails, RelationValue } from './components/relationValue/relationValue'
+export type {
+  RelationDetailsProps,
+  RelationValueNavigation,
+  RelationValueProps,
+  RelationValueState,
+} from './components/relationValue/relationValue'
 export { CodeEditor } from './components/codeEditor/codeEditor'
 export type { CodeEditorLayout, CodeEditorProps } from './components/codeEditor/codeEditor'
 export {

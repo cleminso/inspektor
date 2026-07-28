@@ -28,7 +28,7 @@ describe("DataView module boundary", () => {
     expect(rowEditorModuleLoaded).not.toHaveBeenCalled();
   });
 
-  it("does not initialize CodeMirror when the cell inspector is imported", () => {
+  it("does not initialize CodeMirror when the base table view is imported", () => {
     expect(codeMirrorModuleLoaded).not.toHaveBeenCalled();
   });
 });

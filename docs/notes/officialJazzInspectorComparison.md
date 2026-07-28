@@ -8,7 +8,7 @@
 - [Patterns to adopt](#patterns-to-adopt)
 - [Patterns not to copy](#patterns-not-to-copy)
 - [Interaction decisions](#interaction-decisions)
-- [Workspace editing preference](#workspace-editing-preference)
+- [Editing surfaces](#editing-surfaces)
 - [Pane editing](#pane-editing)
 - [Inline editing](#inline-editing)
 - [Mutation model](#mutation-model)
@@ -82,34 +82,29 @@ Keep the current Inspector direction:
 
 ## Interaction decisions
 
-Selection, inspection, and editing are separate interactions:
+Selection, complete-row inspection, and editing are separate interactions:
 
 - **Selection** identifies the active cell or row. It does not imply mutation.
-- **Inspection** explains the value through compact presentation, the detail pane, copy actions, and relation navigation.
+- **Inspection** explains the value through compact presentation, the complete-row pane, copy actions, and relation navigation.
 - **Editing** changes a staged row draft through an explicit edit action or editing shortcut.
 
-Cells do not open hover cards. Inspection remains selection-driven and keyboard-accessible through the detail pane, explicit
-commands, copy actions, and relation navigation. Editing activation does not replace those stable inspection paths.
+Cells do not open hover cards or a separate inspection-only cell pane. Complete inspection remains available through the
+complete-row pane, explicit commands, copy actions, and relation navigation.
 
 Inspector will support two editing surfaces:
 
 - Side-pane editing.
 - Inline cell editing when the field type supports it.
 
-Inline editing remains deferred implementation work. This decision only constrains the mutation architecture being built now.
+## Editing surfaces
 
-## Workspace editing preference
+Pane and inline editing are simultaneously available. Row checkbox selection opens the complete-row pane. Cell double-click or
+Enter starts schema-appropriate inline editing. JSON, Array, and Row values use an expanded code editor in an anchored inline dialog whose expand action
+opens the complete-row pane focused on that field. Relation and binary cells open the complete-row pane directly. Timestamp cells
+use an inline calendar when available. Generated, unsupported, and otherwise read-only values remain read-only in the grid.
 
-The preferred editing surface is one user setting for the Inspector workspace rather than a per-table preference. Its values are
-`pane` and `inline`. The first persistence mechanism is localStorage so the preference survives navigation and browser reloads
-without becoming inspected application data.
-
-Pane mode always uses the side pane. Inline mode uses inline editing when the field type supports it and falls back to the pane for
-structured, binary, generated, unsupported, or otherwise unsuitable fields. The preference chooses presentation; it does not
-change parsing, validation, dirty tracking, save, discard, or live-update behavior.
-
-Changing the preference while a draft is dirty requires an explicit choice to Save, Discard and continue, or keep the existing
-preference and draft. A draft never moves from one editing surface to another implicitly.
+The activation route does not change parsing, validation, dirty tracking, save, discard, or live-update behavior. A dirty draft
+cannot move between surfaces or targets without Save and continue, Discard and continue, or Keep editing.
 
 ## Pane editing
 
@@ -131,8 +126,9 @@ preference and draft. A draft never moves from one editing surface to another im
 - Inline editing stages the changed cell in its row draft; it does not persist immediately.
 - Moving between fields in the same row preserves the row draft.
 - Saving persists the complete dirty-field patch for that row, including changes staged through more than one inline cell.
-- Unsupported inline fields open the pane fallback without changing mutation semantics.
-- Full value inspection remains available through explicit pane or context commands; inline mode does not add hover details.
+- JSON, Array, and Row values can use an expanded code editor in an anchored inline dialog and open the complete-row pane through an explicit expand action.
+- Relation and binary fields open the complete-row pane focused on their field.
+- Full value inspection remains available through the complete-row pane; inline editing does not add hover details.
 - Inline controls consume the same parsing, validation, NULL, omission, dirty, save, and discard rules as pane controls.
 
 ## Mutation model
@@ -197,7 +193,7 @@ return that field to clean state.
 ## Draft lifecycle
 
 - Changing fields inside one row preserves the row draft.
-- Changing the focused row, filter, sort, page, table, schema, route, or editing preference cannot silently discard a dirty draft.
+- Changing the focused row, editing surface, filter, sort, page, table, schema, or route cannot silently discard a dirty draft.
 - A dirty transition requires an explicit choice to Save, Discard and continue, or remain on the active target.
 - Row-pane Cancel discards the focused row draft and removes that row from checkbox selection.
 - Opening read-only details does not disturb the active draft.
