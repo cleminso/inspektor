@@ -1,3 +1,10 @@
+/**
+ * Orchestrates the table query, selection, detail panes, row mutations, and draft transitions.
+ *
+ * URL search state owns query scope and row-editor identity. Local React state owns cell, column,
+ * and checkbox selection. Row forms own field drafts. This hook connects those systems without
+ * duplicating parsing, dirty comparison, or Jazz mutation rules.
+ */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { DataTableCellSelectionMode, DataTableCellTarget } from "@inspector/ds";
@@ -12,6 +19,7 @@ import {
 } from "@/components/table-explorer/data/cellSelection";
 import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorFocus";
 import { useDataTable } from "@/components/table-explorer/data/useDataTable";
+import { useDraftTransitionGuard } from "@/components/table-explorer/data/useDraftTransitionGuard";
 import {
   getNearestSelectedRowId,
   updateRowSelection,
@@ -22,7 +30,6 @@ import { useTableExplorerSearchParams } from "@/hooks/useTableExplorerSearchPara
 import { useTableMutations } from "@/hooks/useTableMutations";
 import { useTableQuery } from "@/hooks/useTableQuery";
 import { GenericQueryBuilder } from "@/lib/table-explorer/genericQueryBuilder";
-import { getFieldReadOnlyReason } from "@/lib/table-explorer/mutationParsing";
 import { getTableColumns } from "@/lib/table-explorer/tableSchema";
 import type { TableFilterClause } from "@/types/tableFilters";
 import type { TableRowId } from "@/types/tableExplorer";
@@ -53,12 +60,20 @@ interface InsertRowSaveOptions {
   keepOpen: boolean;
 }
 
+interface DataViewDraftTransitionState {
+  discardAndContinue: () => void;
+  isPending: boolean;
+  isSaving: boolean;
+  keepEditing: () => void;
+}
+
 interface UseDataViewStateResult {
   activeCell: DataTableCellTarget | null;
   activeColumnId: string | null;
   columnOrder: string[];
   cellInspector: DataViewCellInspectorState;
   detailPaneMode: DataViewDetailPaneMode;
+  draftTransition: DataViewDraftTransitionState;
   fetchMore: () => void;
   filters: TableFilterClause[];
   handleDelete: (() => Promise<void>) | undefined;
@@ -75,6 +90,8 @@ interface UseDataViewStateResult {
   handleCellOpen: (target: DataTableCellTarget) => void;
   handleColumnActivate: (columnId: string | null) => void;
   handleRowEditorOpenChange: (open: boolean) => void;
+  handleRowEditorCancel: () => void;
+  handleRowDraftDirtyChange: (isDirty: boolean) => void;
   hasMore: boolean;
   isFetchingMore: boolean;
   loadedRowCount: number;
@@ -87,24 +104,28 @@ interface UseDataViewStateResult {
   table: Table<DynamicTableRow>;
 }
 
-function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record<string, unknown> {
-  return Object.fromEntries(
-    schemaColumns.map((column) => {
-      const readOnlyReason = getFieldReadOnlyReason(column);
-      const initialValue =
-        readOnlyReason === "binary" && column.column_type.type === "Bytea"
-          ? new Uint8Array()
-          : undefined;
-
-      return [column.name, initialValue];
-    }),
-  );
+/**
+ * Creates the empty source shape used to initialize an insert form.
+ *
+ * `undefined` means no value was supplied. `createInsertRowDraft` then decides from each descriptor
+ * whether that field starts omitted, NULL, or as an empty required value.
+ */
+export function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record<string, unknown> {
+  return Object.fromEntries(schemaColumns.map((column) => [column.name, undefined]));
 }
 
 function createEmptyCellSelection(): CellSelectionState {
   return { activeCell: null, anchorCell: null, selectedCells: [] };
 }
 
+/**
+ * Builds the state and actions consumed by `DataView` for one runtime-selected Jazz table.
+ *
+ * Target-changing actions are closures passed to `useDraftTransitionGuard`. For example, selecting
+ * row B while row A is dirty does not update selection or URL state immediately. The closure runs
+ * only after Save and continue or Discard and continue. Selection changes around row A can proceed
+ * because they do not replace the active draft target.
+ */
 export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDataViewStateResult {
   const { currentBranch, currentConnectionId, currentSchemaHash, runtime } = useInspector();
   const searchState = useTableExplorerSearchParams();
@@ -122,8 +143,10 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
     activeRowId === null ? [] : [activeRowId],
   );
+  const deletedRowIdsRef = useRef<Set<TableRowId>>(new Set());
   const [rowSelectionAnchorId, setRowSelectionAnchorId] = useState<TableRowId | null>(null);
   const mutations = useTableMutations(tableName);
+  const draftTransition = useDraftTransitionGuard();
   const tableKey = `${currentConnectionId ?? "unknown"}:${currentBranch ?? "unknown"}:${currentSchemaHash ?? "unknown"}:${tableName}`;
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns]);
   const visibility = useInspectorColumnVisibility({
@@ -137,6 +160,7 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
 
   const detailPaneMode: DataViewDetailPaneMode =
     cellPaneOpen === true ? "cells" : editorMode === "edit" ? "rows" : editorMode;
+  // Filters, sorting, connection, branch, schema, and table define one selection scope.
   const selectionScopeKey = useMemo(
     () =>
       JSON.stringify({
@@ -162,11 +186,20 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
   const editedRowIds = activeRowId === null ? [] : effectiveSelectedRowIds;
   const activeRowIndex = activeRowId === null ? 0 : Math.max(editedRowIds.indexOf(activeRowId), 0);
   const validRowIds = useMemo(() => query.rows.map((row) => String(row.id)), [query.rows]);
+  useEffect(() => {
+    const validRowIdSet = new Set(validRowIds);
+    for (const deletedRowId of deletedRowIdsRef.current) {
+      if (validRowIdSet.has(deletedRowId) === false) {
+        deletedRowIdsRef.current.delete(deletedRowId);
+      }
+    }
+  }, [validRowIds]);
   const visibleSelectedRowIds = useMemo(() => {
     const validRowIdSet = new Set(validRowIds);
     return effectiveSelectedRowIds.filter((rowId) => validRowIdSet.has(rowId) === true);
   }, [effectiveSelectedRowIds, validRowIds]);
 
+  // Keep the edited row available when filtering or pagination removes it from the visible query.
   const activeRowQueryBuilder = useMemo(() => {
     if (runtime.wasmSchema === null || activeRowId === null || searchState.editorMode !== "edit") {
       return null;
@@ -188,25 +221,46 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     activeRowQueryOptions,
   );
 
+  /**
+   * Applies checkbox selection and chooses the one row whose draft is shown in the pane.
+   *
+   * Replacing insert mode or active row A with row B is guarded. Checking or unchecking other rows
+   * while row A remains active does not disturb A's draft and therefore runs immediately.
+   */
   const openRows = (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
-    setSelectedRowIds(nextSelectedRowIds);
-    setActiveColumnId(null);
-    setCellPaneOpen(false);
-
-    if (nextSelectedRowIds.length === 0) {
-      void searchState.setRowEditor(null, null, { replace: false });
-      return;
-    }
-
-    const resolvedActiveRowId =
+    const requestedActiveRowId =
       nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
         ? nextActiveRowId
         : nextSelectedRowIds[0];
-    if (resolvedActiveRowId === undefined) {
-      return;
-    }
+    const transition = () => {
+      const availableRowIds = nextSelectedRowIds.filter(
+        (rowId) => deletedRowIdsRef.current.has(rowId) === false,
+      );
+      const resolvedActiveRowId =
+        requestedActiveRowId !== undefined && availableRowIds.includes(requestedActiveRowId)
+          ? requestedActiveRowId
+          : availableRowIds[0];
+      setSelectedRowIds(availableRowIds);
+      setActiveColumnId(null);
+      setCellPaneOpen(false);
 
-    void searchState.setRowEditor("edit", resolvedActiveRowId, { replace: false });
+      if (availableRowIds.length === 0) {
+        void searchState.setRowEditor(null, null, { replace: false });
+        return;
+      }
+      if (resolvedActiveRowId !== undefined) {
+        void searchState.setRowEditor("edit", resolvedActiveRowId, { replace: false });
+      }
+    };
+    const changesDraftTarget =
+      searchState.editorMode === "insert" ||
+      (searchState.editorMode === "edit" && requestedActiveRowId !== activeRowId);
+
+    if (changesDraftTarget === true) {
+      draftTransition.request(transition);
+    } else {
+      transition();
+    }
   };
 
   const handleSelectedRowIdsChange = (nextSelectedRowIds: TableRowId[]) => {
@@ -265,19 +319,23 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
       return;
     }
 
+    // URL-driven scope changes invalidate row and cell positions from the preceding query.
     selectionScopeKeyRef.current = selectionScopeKey;
     resetSelection();
   }, [resetSelection, selectionScopeKey]);
 
   const handleSortChange = (columnId: string, direction: "asc" | "desc") => {
-    selectionScopeKeyRef.current = JSON.stringify({
-      filters: searchState.filters,
-      sortColumn: columnId,
-      sortDirection: direction,
-      tableKey,
+    draftTransition.request(() => {
+      // Set the ref inside the guarded closure so Keep editing leaves selection and scope untouched.
+      selectionScopeKeyRef.current = JSON.stringify({
+        filters: searchState.filters,
+        sortColumn: columnId,
+        sortDirection: direction,
+        tableKey,
+      });
+      resetSelection();
+      void searchState.setSorting(columnId, direction);
     });
-    resetSelection();
-    void searchState.setSorting(columnId, direction);
   };
 
   const handleColumnVisibilityChange = (nextVisibility: Record<string, boolean>) => {
@@ -328,7 +386,8 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
       return visibleSelectedRow;
     }
 
-    return activeRows?.[0] ?? null;
+    // The dedicated row query is the fallback, not a second source for visible rows.
+    return activeRows?.find((row) => String(row.id) === activeRowId) ?? null;
   }, [activeRowId, activeRows, query.rows]);
   const rowValues = useMemo(() => {
     if (searchState.editorMode === "insert") {
@@ -357,6 +416,7 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     };
   }, [activeCell, order.columnOrder, query.rows, table, visibility.columnVisibility]);
 
+  /** Closes presentation state without applying the stronger explicit-Cancel selection behavior. */
   const closeDetailPane = () => {
     if (detailPaneMode === "cells") {
       setCellPaneOpen(false);
@@ -368,7 +428,7 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
 
   const handleEscape = () => {
     if (detailPaneMode !== "closed") {
-      closeDetailPane();
+      draftTransition.request(closeDetailPane);
       return;
     }
 
@@ -384,8 +444,10 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
   };
 
   const openInsert = () => {
-    setCellPaneOpen(false);
-    void searchState.setRowEditor("insert", null, { replace: false });
+    draftTransition.request(() => {
+      setCellPaneOpen(false);
+      void searchState.setRowEditor("insert", null, { replace: false });
+    });
   };
 
   const goToRowIndex = (nextActiveRowIndex: number) => {
@@ -394,7 +456,9 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
       return;
     }
 
-    void searchState.setRowEditor("edit", nextActiveRowId, { replace: false });
+    draftTransition.request(() => {
+      void searchState.setRowEditor("edit", nextActiveRowId, { replace: false });
+    });
   };
 
   const goToPreviousRow = () => {
@@ -414,7 +478,17 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
             return;
           }
 
-          await mutations.deleteRow(rowIdToDelete);
+          const continued = await draftTransition.runMutation(() =>
+            mutations.deleteRow(rowIdToDelete),
+          );
+          deletedRowIdsRef.current.add(rowIdToDelete);
+          setSelectedRowIds((currentRowIds) =>
+            currentRowIds.filter((rowId) => rowId !== rowIdToDelete),
+          );
+          if (continued === true) {
+            // Save/Discard continuation owns the destination; do not also choose a neighboring row.
+            return;
+          }
           const nextEditedRowIds = editedRowIds.filter((rowId) => rowId !== rowIdToDelete);
 
           if (nextEditedRowIds.length === 0) {
@@ -429,12 +503,36 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
         }
       : undefined;
 
+  /**
+   * Performs explicit form Cancel rather than guarded pane dismissal.
+   *
+   * Insert Cancel closes the pane. Edit Cancel discards the draft, unchecks the active row, and
+   * focuses the nearest remaining checked row or closes the pane when none remain.
+   */
+  const handleRowEditorCancel = () => {
+    draftTransition.clear();
+    if (activeRowId === null) {
+      closeDetailPane();
+      return;
+    }
+
+    const nextSelectedRowIds = effectiveSelectedRowIds.filter((rowId) => rowId !== activeRowId);
+    setSelectedRowIds(nextSelectedRowIds);
+    const nextActiveRowId = getNearestSelectedRowId(validRowIds, nextSelectedRowIds, activeRowId);
+    if (nextActiveRowId === null) {
+      void searchState.setRowEditor(null, null, { replace: false });
+      return;
+    }
+    void searchState.setRowEditor("edit", nextActiveRowId, { replace: false });
+  };
+
   return {
     activeCell,
     activeColumnId,
     cellInspector,
     columnOrder: order.columnOrder,
     detailPaneMode,
+    draftTransition,
     table,
     loadedRowCount: query.loadedRowCount,
     hasMore: query.hasMore,
@@ -442,14 +540,17 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     fetchMore: query.fetchMore,
     filters: searchState.filters,
     setFilters: async (filters) => {
-      selectionScopeKeyRef.current = JSON.stringify({
-        filters,
-        sortColumn: searchState.sortColumn,
-        sortDirection: searchState.sortDirection,
-        tableKey,
+      draftTransition.request(() => {
+        // Keep the existing selection when the user rejects this guarded filter change.
+        selectionScopeKeyRef.current = JSON.stringify({
+          filters,
+          sortColumn: searchState.sortColumn,
+          sortDirection: searchState.sortDirection,
+          tableKey,
+        });
+        resetSelection();
+        void searchState.setFilters(filters);
       });
-      resetSelection();
-      await searchState.setFilters(filters);
     },
     setColumnOrder: order.setColumnOrder,
     schemaColumns,
@@ -504,11 +605,19 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
         return;
       }
 
-      setCellSelection({ activeCell: target, anchorCell: target, selectedCells: [target] });
-      setActiveColumnId(null);
-      setCellPaneOpen(true);
+      const openCell = () => {
+        setCellSelection({ activeCell: target, anchorCell: target, selectedCells: [target] });
+        setActiveColumnId(null);
+        setCellPaneOpen(true);
+        if (searchState.editorMode !== null) {
+          void searchState.setRowEditor(null, null, { replace: false });
+        }
+      };
       if (searchState.editorMode !== null) {
-        void searchState.setRowEditor(null, null, { replace: false });
+        // Opening read-only cell details replaces the row editor and therefore its draft owner.
+        draftTransition.request(openCell);
+      } else {
+        openCell();
       }
     },
     handleEscape,
@@ -521,18 +630,26 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     },
     handleRowEditorOpenChange: (open) => {
       if (open === false) {
-        closeDetailPane();
+        draftTransition.request(closeDetailPane);
       }
     },
+    handleRowDraftDirtyChange: draftTransition.handleDirtyChange,
+    handleRowEditorCancel,
     handleDelete,
     handleEditSave: async (values) => {
       if (activeRowId !== null) {
-        await mutations.updateRow(activeRowId, values);
+        // Ordinary edit saves keep the pane open; live row reconciliation clears saved overlays.
+        await draftTransition.runMutation(() => mutations.updateRow(activeRowId, values));
       }
     },
     handleInsertSave: async (values, options) => {
-      await mutations.insertRow(values);
+      const continued = await draftTransition.runMutation(() => mutations.insertRow(values));
       query.resetLoadedRows();
+
+      if (continued === true) {
+        // A pending destination replaces normal close or Insert more behavior.
+        return;
+      }
 
       if (options?.keepOpen === true) {
         return;

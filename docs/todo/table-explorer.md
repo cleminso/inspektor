@@ -116,12 +116,27 @@ behavior discussion. Detailed acceptance rules remain in
 - [ ] Add header cell column type prefix/suffix
 - [ ] Add a chevron button icon to open context menu that display column actions
 
+### Compact grid value presentation
+
+[28/07/26]
+
+- [x] Classify schema values in an application-owned presentation model that preserves each raw value.
+- [x] Distinguish `NULL`, empty strings, unavailable values, malformed values, and unsupported values.
+- [x] Render full primitive text with width-aware end truncation and preserve complete row-ID text through width-aware middle truncation.
+- [x] Right-align numbers and render booleans with a non-interactive indicator plus `true` or `false` text.
+- [x] Format valid timestamps in the browser timezone without fractional seconds and preserve malformed raw timestamp states.
+- [x] Render `Uint8Array` values as byte counts without indexed-object serialization.
+- [x] Render stored scalar relation IDs as trailing-arrow links while preserving navigation and avoiding per-cell relation resolution.
+- [x] Classify scalar enum values against schema variants when variant metadata is available.
+- [x] Bound array, row, JSON, and unsupported previews without complete cell serialization.
+- [x] Cover compact schema-value classification and rendering with focused regression tests.
+
 ### Query referential stability
 
 [26/07/26]
 
-- [x] Pass a module-scope constant options object to relation label queries so `useAll` subscription memoization holds across
-      per-cell renders.
+- [x] Pass a module-scope constant options object to inspector-only relation resolution so `useAll` subscription memoization holds
+      across detail renders.
 - [x] Parse URL filters in a dedicated memo keyed on the raw search string so unrelated search changes no longer rebuild the
       filters array identity consumed by the query builder and selection-scope key.
 
@@ -135,7 +150,7 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Cover individual row selection, row ranges, focus recovery, and pane precedence.
 - [x] Cover additive cell selection, rectangular ranges, visibility changes, and column reorder.
 - [x] Cover cell-pane focus, row-editor field focus, navigation restoration, header activation, and same-cell dismissal.
-- [x] Validate package and application types, tests, generated props, and production builds.
+- [ ] Validate every package and application test, generated-props check, typecheck, and production build without unrelated repository failures.
 
 ### Deferred row editor boundary
 
@@ -149,16 +164,47 @@ behavior discussion. Detailed acceptance rules remain in
 
 ## Open product work
 
+### Shared mutation draft and editing surfaces
+
+[27/07/26]
+
+- [x] Replace reconstructed-row updates with dirty-field patches over the latest live source row.
+- [x] Keep raw input and parsed values in the shared per-row draft while pane orchestration retains field, row, and mutation errors.
+- [x] Reflect live source changes in untouched fields while preserving dirty field overlays.
+- [x] Remove a dirty overlay when its parsed value is semantically equal to the latest source value, including nested typed values.
+- [x] Represent insert fields as omitted, explicit NULL, valid, or invalid.
+- [x] Decode tagged Jazz defaults from stored schema metadata and omit untouched default-backed fields.
+- [x] Normalize descriptor-compatible Row tuples into named records before Jazz mutation conversion.
+- [x] Make the existing pane editor consume the shared mutation layer before adding inline controls.
+- [ ] Persist one `pane` or `inline` editing preference at workspace level in user localStorage settings.
+- [ ] Use pane fallback in inline mode for structured, binary, generated, unsupported, and otherwise unsuitable fields.
+- [x] Make pane Cancel explicitly discard the draft, closing insert mode directly and unchecking the focused edit row.
+- [x] When Cancel leaves checked rows, focus the nearest checked row; close the pane when no checked rows remain.
+- [x] Guard dirty row, query scope, route, and relation-navigation transitions with Save, Discard and continue, or remain on the
+      active target.
+- [x] Keep dirty-transition orchestration behind one lifecycle controller instead of coordinating draft, mutation, and route flags
+      inside the table view state.
+- [x] Return fields to a clean draft when restored to source NULL or insert DEFAULT while preserving inactive value text, and ignore
+      delayed editor changes outside value mode.
+- [x] Resolve the draft lifecycle before continuing a guarded navigation so Discard and continue completes in one action.
+- [x] Preserve drafts after update, insert, and delete failures and expose accessible mutation errors.
+- [x] Reject required read-only binary inserts instead of synthesizing empty byte values.
+- [ ] Apply the dirty-transition guard when the workspace editing preference is implemented.
+- [ ] Add inline cell editing as a second consumer without adding cell hover cards.
+- [x] Add direct contract tests around the generic Jazz mutation adapter.
+- [ ] Add direct contract tests around the generic Jazz query adapter.
+
 ### Cell rendering refactor
 
-[23/07/26]
+[28/07/26]
 
 - [x] Define the compact table-cell representation for every supported schema type.
 - [x] Define the expanded side-pane representation for every supported schema type.
-- [ ] Extract shared schema-derived value renderers for table cells and the cell pane.
-- [ ] Map Jazz schema metadata to constrained, Jazz-independent design-system value components in `apps/web`.
-- [ ] Create dedicated design-system components for binary preview and inspection, timestamp presentation and date-time editing,
-      structured-value preview and JSON viewing, and relation presentation and field actions.
+- [x] Extract a shared schema-derived presentation model used by compact cells and read-only cell inspection.
+- [x] Map Jazz schema metadata to constrained, Jazz-independent design-system value components in `apps/web`.
+- [x] Create dedicated design-system components for binary preview and inspection, timestamp presentation, structured-value
+      preview, and relation presentation and field actions.
+- [x] Add schema-derived browser-local date-time editing for valid timestamp fields while preserving malformed raw text.
 - [x] Create a read-only structured tree component inspired by Geist JSON View with bounded expansion, keyboard tree navigation,
       selectable text, search highlighting, and accessible tree semantics.
 - [x] Document and validate `JsonView` in `apps/design-system`.
@@ -166,30 +212,38 @@ behavior discussion. Detailed acceptance rules remain in
 - [x] Provide enum labels and values in the item shape required by `Select` and keep relation links on the canonical typed table route.
 - [x] Move editable structured type labels into the editor toolbar.
 - [x] Render NULL structured values as compact read-only inputs without repeating NULL inside the field body.
-- [ ] Keep primitive text, numeric, boolean, enum, copy, and null controls composed from existing design-system components unless a
+- [x] Keep primitive text, numeric, boolean, enum, copy, and null controls composed from existing design-system components unless a
       repeated semantic contract requires a dedicated component.
-- [ ] Render text, numeric, enum, boolean, timestamp, structured, binary, nullable, and relation values through the shared
-      renderers.
+- [x] Render table and inspection values from shared schema classification, using dedicated compact and detail components for
+      timestamp, structured, binary, and relation values.
 - [ ] Render enum arrays as repeatable `Select` rows that preserve order and duplicate values.
 - [ ] Render reference arrays as repeatable relation fields with stored IDs and navigation actions.
-- [ ] Preserve raw values for copying while displaying readable formatted values.
-- [ ] Add readable previews and expanded inspection for long strings and structured values.
-- [ ] Represent null distinctly from empty strings and unavailable values.
-- [ ] Keep binary and unsupported values explicitly read-only.
-- [ ] Replace indexed-object `Uint8Array` serialization with byte count only in table cells.
-- [ ] Add a read-only binary input group with byte count and a `Copy as` menu for Hex, Base64, and Download raw actions.
-- [ ] Render row IDs in full at their initial width and middle-truncate them only when the user narrows the column.
-- [ ] Render the stored relation ID as the relation cell's primary value instead of replacing it with a resolved display label.
-- [ ] Show target table, complete relation ID, resolved display value, and missing-target state in relation side-pane details.
-- [ ] Keep relation navigation available in compact and expanded representations.
-- [ ] Remove cell hover cards; expose complete values and alternate representations through the side pane and context commands.
-- [ ] Format timestamp previews without fractional seconds in the browser timezone and show browser-local, UTC, relative, and raw
+- [x] Preserve raw values in the presentation model for copy actions while displaying readable formatted values.
+- [x] Add readable previews and expanded inspection for long strings and structured values.
+- [x] Represent null distinctly from empty strings and unavailable values.
+- [x] Keep binary and unsupported values explicitly read-only.
+- [x] Normalize binary runtime values nested in read-only structured fields instead of exposing indexed-object JSON.
+- [x] Disable nullable mutation value controls while NULL and preserve drafts across NULL mode changes.
+- [x] Replace indexed-object `Uint8Array` serialization with byte count only in table cells.
+- [x] Add a read-only binary input group with byte count and a `Copy as` menu for Hex, Base64, and Download raw actions.
+- [x] Reject binary text encoding above 1 MiB before allocating Hex or Base64 output.
+- [x] Copy binary download views into an `ArrayBuffer` so Blob construction preserves only the selected bytes and satisfies the DOM boundary.
+- [x] Render complete row-ID text and use width-aware middle truncation only when it overflows the column.
+- [x] Render the stored relation ID as the relation cell's primary value instead of replacing it with a resolved display label.
+- [x] Resolve relation targets only in relation inspection rather than mounting a Jazz query for every visible relation cell.
+- [x] Show target table, complete relation ID, resolved display value, and missing-target state in relation side-pane details.
+- [x] Keep relation navigation available in compact and expanded representations.
+- [x] Remove cell hover cards and expose complete values and alternate representations through the side pane.
+- [x] Format timestamp previews without fractional seconds in the browser timezone and show browser-local, UTC, relative, and raw
       epoch representations in the side pane.
-- [ ] Show Jazz semantic type labels rather than SQL storage labels in side-pane fields.
+- [x] Show Jazz semantic type labels rather than SQL storage labels in side-pane fields.
 - [ ] Keep editable field click and double-click behavior consistent with native text controls.
 - [ ] Give the `NULL` suffix precedence over Copy when an editable input group cannot contain both.
-- [ ] Define behavior for malformed values that do not match their schema metadata.
+- [x] Render malformed schema/runtime mismatches as explicit invalid presentations with a bounded raw fallback and read-only cell inspection.
 - [ ] Cover every supported representation with focused tests.
+- [x] Separate read-only inspection from mutation field rendering while sharing only schema-field presentation utilities.
+- [x] Focus the first enabled inspection control and use an accessible field fallback when a representation has no enabled control.
+- [x] Pass only object or array fallbacks to `JsonView`; keep scalar structured values in the code representation.
 
 ### Editable one-cell pane
 
@@ -346,8 +400,11 @@ These items were identified in the behavior design but intentionally excluded fr
 - [x] Individual row checkboxes remain the single-row clear control after pane dismissal.
 - [x] The header checkbox remains the bulk row clear control.
 - [x] Cell identity uses row IDs and column IDs rather than displayed coordinates.
-- [x] Editing stays in the side pane rather than inline in table cells.
-- [x] Row IDs render in full at the initial width and truncate only when the user narrows the column.
+- [x] Support pane and inline editing through one workspace-level user preference, with pane fallback for unsuitable inline fields.
+- [x] Keep full inspection in stable pane and command surfaces without adding cell hover cards.
+- [x] Keep mutation parsing, validation, dirty tracking, live reconciliation, save, and discard independent from the editing surface.
+- [x] Distinguish pane dismissal, which preserves clean selection, from Cancel, which discards the focused draft and unchecks its row.
+- [x] Row IDs render as continuous text and use standard end truncation when the rendered value overflows.
 - [x] Relation cells show the stored relation ID as their primary value and keep click navigation to the target row.
 - [x] Relation details may resolve a target display value, but that value does not replace the stored relation ID.
 - [x] Binary grid cells show byte count only rather than complete, preview, or indexed-object serialization.
@@ -358,7 +415,7 @@ These items were identified in the behavior design but intentionally excluded fr
       objects.
 - [x] Cell values do not open hover cards; complete and alternate representations belong in the side pane.
 - [x] Timestamp previews use the browser timezone without trying to infer the sync server's deployment timezone.
-- [x] Side-pane field type labels use Jazz semantics rather than SQL storage labels.
+- [x] Side-pane field type labels should use Jazz semantics rather than SQL storage labels.
 - [x] The row pane provides editable `Details` and a read-only `JSON` tree.
 - [x] The `NULL` suffix takes precedence over Copy when an editable field cannot display both actions.
 - [x] Editable inputs preserve native single-click focus, double-click text selection, and clipboard behavior.
@@ -379,19 +436,21 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Validation checklist
 
-[24/07/26]
+[28/07/26]
 
 - [x] Every JsonView behavior change begins with a failing regression test.
 - [x] `pnpm --filter @inspector/ds test`
 - [x] `pnpm --filter @inspector/ds typecheck`
-- [x] `pnpm --filter @inspector/ds build`
+- [ ] `pnpm --filter @inspector/ds build`
 - [x] `pnpm --filter regarde.inspector test`
 - [x] `pnpm --filter regarde.inspector typecheck`
 - [x] `pnpm --filter regarde.inspector build`
-- [x] `pnpm --filter inspector.design-system test`
+- [ ] `pnpm --filter inspector.design-system test`
 - [x] `pnpm --filter inspector.design-system check:props`
 - [x] `pnpm --filter inspector.design-system typecheck`
 - [x] `pnpm --filter inspector.design-system build`
-- [x] Changed JsonView files pass focused lint.
+- [x] Changed value-presentation files pass focused lint.
+- [x] Changed value-presentation and binary files pass focused tests.
+- [ ] Direct `tsconfig.app.json` typecheck remains blocked by diagnostics outside the requested value-presentation and binary files.
 - [x] `git diff HEAD --check` passes.
 - [ ] Browser verification covers pointer, keyboard, pane, selection, scrolling, and navigation behavior.

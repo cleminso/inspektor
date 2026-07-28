@@ -1,50 +1,43 @@
-import { useMemo, useState } from "react";
+/**
+ * Connects the surface-independent row draft model to the pane form.
+ *
+ * This module owns form errors, focus, expanded editors, and duplicate-submit protection. Parsing,
+ * dirty comparison, live reconciliation, and patch construction remain in the shared mutation
+ * modules so an inline editor can reuse them without rendering this pane form.
+ */
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Link } from "@tanstack/react-router";
 import type { ColumnDescriptor } from "jazz-tools";
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  CodeEditor,
-  Field,
-  Input,
-  InputGroup,
-  JsonView,
-  Select,
-  Textarea,
-  ToggleGroup,
-} from "@inspector/ds";
+import { Box, Field, Input, Text } from "@inspector/ds";
 
-import { useInspector } from "@/components/providers/inspectorProvider";
+import { MutationField } from "@/components/table-explorer/data/mutationField";
+import { buildMutationFields, type MutationFormField } from "@/lib/table-explorer/mutationParsing";
 import {
-  buildMutationFields,
-  formatMutationFieldValue,
-  getFieldReadOnlyReason,
-  parseMutationFieldValue,
-  type MutationFormField,
-} from "@/lib/table-explorer/mutationParsing";
-import { buildRelationTableLink } from "@/lib/table-explorer/relationNavigation";
+  buildRowMutationSubmission,
+  createInsertRowDraft,
+  createUpdateRowDraft,
+  getMutationFieldInput,
+  isRowMutationDraftDirty,
+  reconcileRowMutationSource,
+  setMutationFieldMode,
+  setMutationFieldText,
+} from "@/lib/table-explorer/rowMutationDraft";
 import type { DetailPaneMode } from "@/types/tableExplorer";
-import {
-  createColumnJsonViewValue,
-  isJsonViewContainer,
-} from "@/components/table-explorer/data/jsonViewValue";
 import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorFocus";
 
-// TODO: investigate and when `checkbox NULL` is focus when press `enter` it target the Field.Root
+/** Renderable field state derived from a `MutationFieldInput`. */
 export interface FieldState {
   isNull: boolean;
+  isOmitted: boolean;
   text: string;
 }
-
-type BooleanFieldValue = "true" | "false" | "null";
 type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
 
 interface UseRowEditorFieldsOptions {
   initialRowValues: Record<string, unknown>;
   mode: DetailPaneMode;
+  onDirtyChange?: (isDirty: boolean) => void;
   onSubmit: (values: Record<string, unknown>) => Promise<void> | void;
   schemaColumns: ColumnDescriptor[];
 }
@@ -55,9 +48,11 @@ interface UseRowEditorFieldsResult {
   fieldStates: Record<string, FieldState>;
   formFields: MutationFormField[];
   isSaving: boolean;
+  isDirty: boolean;
   saveError: string | null;
   setFieldExpanded: (columnName: string, expanded: boolean) => void;
   setFieldNull: (columnName: string, isNull: boolean) => void;
+  setFieldOmitted: (columnName: string, isOmitted: boolean) => void;
   setFieldText: (columnName: string, text: string) => void;
   submit: FormSubmitHandler;
 }
@@ -71,59 +66,8 @@ interface RowEditorFieldsProps {
   mode: DetailPaneMode;
   onFieldExpandedChange: (columnName: string, expanded: boolean) => void;
   onFieldNullChange: (columnName: string, isNull: boolean) => void;
+  onFieldOmittedChange: (columnName: string, isOmitted: boolean) => void;
   onFieldTextChange: (columnName: string, text: string) => void;
-}
-
-function getInitialFieldState(
-  value: unknown,
-  mode: DetailPaneMode,
-  column: ColumnDescriptor,
-): FieldState {
-  if (mode === "insert") {
-    return {
-      text: formatMutationFieldValue(value, column.column_type),
-      isNull: column.nullable === true && (value === null || value === undefined),
-    };
-  }
-
-  return {
-    text: formatMutationFieldValue(value, column.column_type),
-    isNull: value === null || value === undefined,
-  };
-}
-
-function getFieldState(
-  fieldStates: Record<string, FieldState>,
-  rowValues: Record<string, unknown>,
-  mode: DetailPaneMode,
-  column: ColumnDescriptor,
-): FieldState {
-  return fieldStates[column.name] ?? getInitialFieldState(rowValues[column.name], mode, column);
-}
-
-function createInitialFields(
-  rowValues: Record<string, unknown>,
-  mode: DetailPaneMode,
-  schemaColumns: ColumnDescriptor[],
-): Record<string, FieldState> {
-  return Object.fromEntries(
-    schemaColumns.map((column) => [
-      column.name,
-      getInitialFieldState(rowValues[column.name], mode, column),
-    ]),
-  );
-}
-
-function formatColumnTypeLabel(column: ColumnDescriptor): string {
-  return column.column_type.type.toLowerCase();
-}
-
-function formatColumnNameLabel(columnName: string): string {
-  if (columnName.length === 0) {
-    return columnName;
-  }
-
-  return `${columnName.slice(0, 1).toUpperCase()}${columnName.slice(1)}`;
 }
 
 function isStructuredColumn(column: ColumnDescriptor): boolean {
@@ -134,66 +78,123 @@ function isStructuredColumn(column: ColumnDescriptor): boolean {
   );
 }
 
-function isBooleanFieldNull(fieldState: FieldState): BooleanFieldValue {
-  if (fieldState.isNull === true) {
-    return "null";
-  }
-
-  return fieldState.text === "true" ? "true" : "false";
-}
-
+/**
+ * Owns one pane form draft from initialization through submission.
+ *
+ * For edit mode, typing in `name` creates a sparse `name` overlay while every untouched field
+ * continues reading from the live row. For insert mode, the hook starts with the complete baseline
+ * created by `createInsertRowDraft`. Both modes report one semantic dirty state to the transition
+ * guard and send only validated values to `onSubmit`.
+ */
 export function useRowEditorFields({
   initialRowValues,
   mode,
+  onDirtyChange,
   onSubmit,
   schemaColumns,
 }: UseRowEditorFieldsOptions): UseRowEditorFieldsResult {
-  const [fieldStates, setFieldStates] = useState<Record<string, FieldState>>(() =>
-    createInitialFields(initialRowValues, mode, schemaColumns),
+  const [draft, setDraft] = useState(() =>
+    mode === "insert"
+      ? createInsertRowDraft(initialRowValues, schemaColumns)
+      : createUpdateRowDraft(initialRowValues),
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [expandedColumnName, setExpandedColumnName] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const isSavingRef = useRef(false);
   const formFields = useMemo(() => buildMutationFields(schemaColumns), [schemaColumns]);
+  const isDirty = useMemo(
+    () => isRowMutationDraftDirty(draft, schemaColumns),
+    [draft, schemaColumns],
+  );
+  const fieldStates = useMemo<Record<string, FieldState>>(
+    () =>
+      Object.fromEntries(
+        schemaColumns.map((column) => {
+          const input = getMutationFieldInput(draft, column);
+          return [
+            column.name,
+            {
+              isNull: input.mode === "null",
+              isOmitted: input.mode === "omitted",
+              text: input.text,
+            },
+          ];
+        }),
+      ),
+    [draft, schemaColumns],
+  );
+
+  useEffect(() => {
+    // Reconcile live rows and schema changes without resetting dirty field overlays.
+    setDraft((currentDraft) =>
+      reconcileRowMutationSource(currentDraft, initialRowValues, schemaColumns),
+    );
+  }, [initialRowValues, schemaColumns]);
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
+
+  useEffect(
+    () => () => {
+      // The mounted form owns the dirty report; release it when this draft leaves the tree.
+      onDirtyChange?.(false);
+    },
+    [onDirtyChange],
+  );
 
   const setFieldText = (columnName: string, text: string) => {
-    setFieldStates((currentFields) => ({
-      ...currentFields,
-      [columnName]: { ...currentFields[columnName], text },
-    }));
+    const column = schemaColumns.find((candidate) => candidate.name === columnName);
+    if (column === undefined) {
+      return;
+    }
+    setDraft((currentDraft) => {
+      // Disabled editors can emit delayed callbacks after NULL or DEFAULT becomes active.
+      if (getMutationFieldInput(currentDraft, column).mode !== "value") {
+        return currentDraft;
+      }
+      return setMutationFieldText(currentDraft, column, text);
+    });
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: "" }));
   };
 
   const setFieldNull = (columnName: string, isNull: boolean) => {
-    setFieldStates((currentFields) => {
-      const currentField = currentFields[columnName];
+    setDraft((currentDraft) => {
       const column = schemaColumns.find((candidate) => candidate.name === columnName);
+      if (column === undefined) {
+        return currentDraft;
+      }
+      const currentInput = getMutationFieldInput(currentDraft, column);
       const shouldSeedStructuredValue =
-        isNull === false &&
-        currentField?.text.length === 0 &&
-        column !== undefined &&
-        isStructuredColumn(column) === true;
-
-      return {
-        ...currentFields,
-        [columnName]: {
-          ...currentField,
-          isNull,
-          text:
-            shouldSeedStructuredValue === true
-              ? column.column_type.type === "Array"
-                ? "[]"
-                : "{}"
-              : (currentField?.text ?? ""),
-        },
-      };
+        isNull === false && currentInput.text.length === 0 && isStructuredColumn(column) === true;
+      if (shouldSeedStructuredValue === true) {
+        // Leaving NULL starts structured editors with valid JSON instead of an invalid blank value.
+        return setMutationFieldText(
+          currentDraft,
+          column,
+          column.column_type.type === "Array" ? "[]" : "{}",
+        );
+      }
+      return setMutationFieldMode(currentDraft, column, isNull === true ? "null" : "value");
     });
     if (isNull === true) {
       setExpandedColumnName((currentColumnName) =>
         currentColumnName === columnName ? null : currentColumnName,
       );
     }
+    setErrors((currentErrors) => ({ ...currentErrors, [columnName]: "" }));
+  };
+
+  const setFieldOmitted = (columnName: string, isOmitted: boolean) => {
+    const column = schemaColumns.find((candidate) => candidate.name === columnName);
+    if (column === undefined) {
+      return;
+    }
+    setDraft((currentDraft) =>
+      setMutationFieldMode(currentDraft, column, isOmitted === true ? "omitted" : "value"),
+    );
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: "" }));
   };
 
@@ -205,41 +206,16 @@ export function useRowEditorFields({
 
   const submit: FormSubmitHandler = async (event) => {
     event.preventDefault();
-    const nextErrors: Record<string, string> = {};
-    const updates: Record<string, unknown> = {};
-
-    for (const field of formFields) {
-      if (field.readOnlyReason !== null) {
-        const initialValue = initialRowValues[field.column.name];
-        if (mode === "insert" && initialValue !== undefined) {
-          updates[field.column.name] = initialValue;
-        }
-        continue;
-      }
-
-      const fieldState = getFieldState(fieldStates, initialRowValues, mode, field.column);
-      if (fieldState.isNull === true) {
-        if (field.column.nullable === false) {
-          nextErrors[field.column.name] = "This column is not nullable.";
-        } else {
-          updates[field.column.name] = null;
-        }
-        continue;
-      }
-
-      try {
-        updates[field.column.name] = parseMutationFieldValue(
-          field.column.column_type,
-          fieldState.text,
-        );
-      } catch (nextError) {
-        nextErrors[field.column.name] =
-          nextError instanceof Error ? nextError.message : String(nextError);
-      }
+    // React state cannot reject two submit events dispatched before the next render.
+    if (isSavingRef.current === true) {
+      return;
     }
+    const submission = buildRowMutationSubmission(draft, schemaColumns);
+    const nextErrors = submission.errors;
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
+      // Collapse expanded editors so the first invalid field can be revealed and focused.
       setExpandedColumnName(null);
       const firstInvalidField = formFields.find(
         (field) => nextErrors[field.column.name] !== undefined,
@@ -251,14 +227,19 @@ export function useRowEditorFields({
       }
       return;
     }
+    if (mode === "edit" && Object.keys(submission.values).length === 0) {
+      return;
+    }
 
     try {
+      isSavingRef.current = true;
       setIsSaving(true);
       setSaveError(null);
-      await onSubmit(updates);
+      await onSubmit(submission.values);
     } catch (nextError) {
       setSaveError(nextError instanceof Error ? nextError.message : String(nextError));
     } finally {
+      isSavingRef.current = false;
       setIsSaving(false);
     }
   };
@@ -268,15 +249,18 @@ export function useRowEditorFields({
     expandedColumnName,
     fieldStates,
     formFields,
+    isDirty,
     isSaving,
     saveError,
     setFieldExpanded,
     setFieldNull,
+    setFieldOmitted,
     setFieldText,
     submit,
   };
 }
 
+/** Renders schema-derived fields from state and actions owned by `useRowEditorFields`. */
 export function RowEditorFields({
   errors,
   expandedColumnName,
@@ -286,40 +270,22 @@ export function RowEditorFields({
   mode,
   onFieldExpandedChange,
   onFieldNullChange,
+  onFieldOmittedChange,
   onFieldTextChange,
 }: RowEditorFieldsProps): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
-  const readOnlyStructuredValues = useMemo(() => {
-    const values = new Map<string, ReturnType<typeof createColumnJsonViewValue>>();
-
-    for (const { column, readOnlyReason } of formFields) {
-      if (
-        isStructuredColumn(column) === true &&
-        readOnlyReason !== null &&
-        initialRowValues[column.name] !== null &&
-        initialRowValues[column.name] !== undefined
-      ) {
-        values.set(
-          column.name,
-          createColumnJsonViewValue(initialRowValues[column.name], column.column_type),
-        );
-      }
-    }
-
-    return values;
-  }, [formFields, initialRowValues]);
-
   return (
     <Box flexDirection="column" flexGrow={1} gap="2xl" minHeight={0} pr="xs">
       <Field.Root hidden={expandedColumnName !== null} id="row-editor-field-id">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2">
+        <Box alignItems="center" justifyContent="between" gap="s">
+          <Box alignItems="center" gap="s" minWidth={0}>
             <Field.Label htmlFor="row-editor-id">
-              <span>Id</span>
+              <Text as="span">Id</Text>
             </Field.Label>
-            <span className="text-xs text-muted-foreground">text</span>
-          </div>
-        </div>
+            <Text as="span" color="muted" variant="caption">
+              text
+            </Text>
+          </Box>
+        </Box>
         <Input
           id="row-editor-id"
           value={mode === "insert" ? "auto-generated" : String(initialRowValues.id ?? "")}
@@ -329,300 +295,28 @@ export function RowEditorFields({
       </Field.Root>
 
       {formFields.map(({ column, readOnlyReason }) => {
-        const fieldId = `row-editor-${column.name}`;
-        const fieldLabelId = `${fieldId}-label`;
-        const fieldState = getFieldState(fieldStates, initialRowValues, mode, column);
-        const fieldError = errors[column.name];
-        const isBooleanColumn = column.column_type.type === "Boolean";
-        const isBinaryColumn = column.column_type.type === "Bytea";
-        const isStructuredColumnType = isStructuredColumn(column);
-        const isEditableStructuredColumn =
-          isStructuredColumnType === true && readOnlyReason === null;
+        const fieldState = fieldStates[column.name];
+        if (fieldState === undefined) {
+          return null;
+        }
         const isExpanded = expandedColumnName === column.name;
-        const isHiddenByExpandedField =
-          expandedColumnName !== null && isExpanded === false;
-        const relationTarget =
-          column.references !== undefined &&
-          fieldState.isNull === false &&
-          fieldState.text.trim().length > 0
-            ? fieldState.text.trim()
-            : null;
-        const hasFieldError = fieldError !== undefined && fieldError.length > 0;
-        const usesTextInput =
-          isBooleanColumn === false &&
-          column.column_type.type !== "Enum" &&
-          isStructuredColumnType === false &&
-          isBinaryColumn === false;
-        const readOnlyStructuredValue =
-          isStructuredColumnType === true &&
-          readOnlyReason !== null &&
-          fieldState.isNull === false
-            ? (readOnlyStructuredValues.get(column.name) ?? null)
-            : null;
-        const usesJsonView =
-          readOnlyStructuredValue !== null &&
-          isJsonViewContainer(readOnlyStructuredValue) === true;
 
         return (
-          <Field.Root
-            data-value-mode={
-              isStructuredColumnType === true && readOnlyReason === null
-                ? fieldState.isNull === true
-                  ? "null"
-                  : "value"
-                : undefined
-            }
-            hidden={isHiddenByExpandedField}
-            id={`row-editor-field-${column.name}`}
+          <MutationField
+            column={column}
+            error={errors[column.name]}
+            expanded={isExpanded}
+            fieldState={fieldState}
+            hidden={expandedColumnName !== null && isExpanded === false}
+            initialValue={initialRowValues[column.name]}
+            onExpandedChange={(expanded) => onFieldExpandedChange(column.name, expanded)}
+            onNullChange={(isNull) => onFieldNullChange(column.name, isNull)}
+            onOmittedChange={(isOmitted) => onFieldOmittedChange(column.name, isOmitted)}
+            onTextChange={(text) => onFieldTextChange(column.name, text)}
+            canOmit={mode === "insert" && column.default !== undefined && readOnlyReason === null}
+            readOnlyReason={readOnlyReason}
             key={column.name}
-            invalid={hasFieldError}
-            render={
-              isEditableStructuredColumn === true ? (
-                <Box
-                  flexDirection="column"
-                  flexGrow={isExpanded === true ? 1 : 0}
-                  gap="xs"
-                  minHeight={isExpanded === true ? 0 : undefined}
-                  minWidth={0}
-                  width="full"
-                />
-              ) : undefined
-            }
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <Field.Label
-                  id={fieldLabelId}
-                  htmlFor={
-                    isBooleanColumn === true ||
-                    usesJsonView === true ||
-                    isEditableStructuredColumn === true
-                      ? undefined
-                      : fieldId
-                  }
-                  nativeLabel={
-                    isBooleanColumn === false &&
-                    usesJsonView === false &&
-                    isEditableStructuredColumn === false
-                  }
-                  onClickCapture={
-                    isEditableStructuredColumn === true
-                      ? (event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          focusRowEditorField(column.name);
-                        }
-                      : undefined
-                  }
-                >
-                  <span>{formatColumnNameLabel(column.name)}</span>
-                </Field.Label>
-                {isEditableStructuredColumn === false ? (
-                  <span className="text-xs text-muted-foreground">
-                    {formatColumnTypeLabel(column)}
-                  </span>
-                ) : null}
-              </div>
-              <div className="flex items-center gap-3">
-                {column.nullable === true &&
-                readOnlyReason === null &&
-                isBooleanColumn === false &&
-                usesTextInput === false ? (
-                  <Checkbox.Label>
-                    <Checkbox
-                      data-value-mode-control={isStructuredColumnType === true ? "" : undefined}
-                      aria-label={`Set ${formatColumnNameLabel(column.name)} to NULL`}
-                      checked={fieldState.isNull}
-                      onCheckedChange={(nextChecked) => {
-                        onFieldNullChange(column.name, nextChecked === true);
-                      }}
-                    />
-                    <span>NULL</span>
-                  </Checkbox.Label>
-                ) : null}
-              </div>
-            </div>
-            {isBooleanColumn === true && readOnlyReason === null ? (
-              <ToggleGroup
-                value={[isBooleanFieldNull(fieldState)]}
-                onValueChange={(values) => {
-                  const nextValue = values[0];
-                  if (nextValue === "true") {
-                    onFieldNullChange(column.name, false);
-                    onFieldTextChange(column.name, "true");
-                  } else if (nextValue === "false") {
-                    onFieldNullChange(column.name, false);
-                    onFieldTextChange(column.name, "false");
-                  } else if (nextValue === "null") {
-                    onFieldNullChange(column.name, true);
-                  }
-                }}
-                width="full"
-                itemWidth="equal"
-                aria-labelledby={fieldLabelId}
-              >
-                <ToggleGroup.Item value="true">True</ToggleGroup.Item>
-                <ToggleGroup.Item value="false">False</ToggleGroup.Item>
-                {column.nullable === true ? (
-                  <ToggleGroup.Item value="null">Null</ToggleGroup.Item>
-                ) : null}
-              </ToggleGroup>
-            ) : column.column_type.type === "Enum" && readOnlyReason === null ? (
-              <Select.Root
-                items={column.column_type.variants.map((variant) => ({
-                  label: variant,
-                  value: variant,
-                }))}
-                value={
-                  fieldState.isNull === true || fieldState.text.length === 0
-                    ? null
-                    : fieldState.text
-                }
-                onValueChange={(nextValue) => {
-                  if (typeof nextValue === "string") {
-                    onFieldTextChange(column.name, nextValue);
-                  }
-                }}
-                disabled={fieldState.isNull === true}
-              >
-                <Select.Trigger id={fieldId} fullWidth>
-                  <Select.Value
-                    placeholder={fieldState.isNull === true ? "NULL" : "Select value"}
-                  />
-                  <Select.Icon />
-                </Select.Trigger>
-                <Select.Portal>
-                  <Select.Positioner>
-                    <Select.Popup>
-                      <Select.List>
-                        {column.column_type.variants.map((variant) => (
-                          <Select.Item key={variant} value={variant}>
-                            <Select.ItemIndicator />
-                            <Select.ItemText>{variant}</Select.ItemText>
-                          </Select.Item>
-                        ))}
-                      </Select.List>
-                    </Select.Popup>
-                  </Select.Positioner>
-                </Select.Portal>
-              </Select.Root>
-            ) : usesJsonView === true ? (
-              <JsonView
-                accessibilityLabel={`${formatColumnNameLabel(column.name)} value`}
-                data={readOnlyStructuredValue}
-              />
-            ) : isStructuredColumnType === true && readOnlyReason === null ? (
-              <>
-                <Box
-                  flexDirection="column"
-                  flexGrow={isExpanded === true ? 1 : 0}
-                  hidden={fieldState.isNull === true}
-                  minHeight={isExpanded === true ? 0 : undefined}
-                  overflow={isExpanded === true ? "hidden" : undefined}
-                >
-                  <CodeEditor
-                    id={fieldId}
-                    labelledBy={fieldLabelId}
-                    describedBy={hasFieldError === true ? `${fieldId}-error` : undefined}
-                    disabled={fieldState.isNull === true}
-                    expanded={isExpanded}
-                    invalid={hasFieldError}
-                    layout={isExpanded === true ? "fill" : "intrinsic"}
-                    toolbarLabel={formatColumnTypeLabel(column).toUpperCase()}
-                    onExpandedChange={(expanded) => {
-                      onFieldExpandedChange(column.name, expanded);
-                    }}
-                    value={fieldState.text}
-                    onValueChange={(value) => {
-                      onFieldTextChange(column.name, value);
-                    }}
-                  />
-                </Box>
-                {fieldState.isNull === true ? (
-                  <Input
-                    data-null-value
-                    aria-label={`${formatColumnNameLabel(column.name)} value`}
-                    readOnly
-                    fullWidth
-                    value=""
-                  />
-                ) : null}
-              </>
-            ) : isBinaryColumn === true || isStructuredColumnType === true ? (
-              <div className="flex flex-col gap-2">
-                <Textarea
-                  id={fieldId}
-                  height="m"
-                  font="mono"
-                  value={fieldState.text}
-                  readOnly={readOnlyReason !== null || isBinaryColumn === true}
-                  disabled={fieldState.isNull === true}
-                  onValueChange={(value) => {
-                    onFieldTextChange(column.name, value);
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {relationTarget !== null &&
-                column.references !== undefined &&
-                currentConnectionId !== null &&
-                currentBranch !== null &&
-                currentSchemaHash !== null ? (
-                  <div className="flex justify-end">
-                    <Button
-                      variant="link"
-                      size="s"
-                      render={
-                        <Link
-                          {...buildRelationTableLink({
-                            connectionId: currentConnectionId,
-                            branch: currentBranch,
-                            schemaHash: currentSchemaHash,
-                            tableName: column.references,
-                            relationId: relationTarget,
-                          })}
-                        />
-                      }
-                    >
-                      Show
-                    </Button>
-                  </div>
-                ) : null}
-                <InputGroup fullWidth>
-                  <Input
-                    id={fieldId}
-                    value={fieldState.isNull === true ? "" : fieldState.text}
-                    readOnly={readOnlyReason !== null}
-                    disabled={fieldState.isNull === true}
-                    onValueChange={(value) => {
-                      onFieldTextChange(column.name, value);
-                    }}
-                  />
-                  {column.nullable === true && readOnlyReason === null ? (
-                    <InputGroup.Checkbox
-                      label={`Set ${formatColumnNameLabel(column.name)} to NULL`}
-                      checked={fieldState.isNull}
-                      onCheckedChange={(nextChecked) => {
-                        onFieldNullChange(column.name, nextChecked === true);
-                      }}
-                    >
-                      NULL
-                    </InputGroup.Checkbox>
-                  ) : null}
-                </InputGroup>
-              </div>
-            )}
-
-            {getFieldReadOnlyReason(column) === "binary" ? (
-              <Field.Description>Read-only: binary field</Field.Description>
-            ) : null}
-            {hasFieldError === true ? (
-              <Field.Error id={`${fieldId}-error`} match>
-                {fieldError}
-              </Field.Error>
-            ) : null}
-          </Field.Root>
+          />
         );
       })}
     </Box>

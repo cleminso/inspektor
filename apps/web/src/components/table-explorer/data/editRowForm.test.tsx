@@ -1,12 +1,13 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { CodeEditorProps } from "@inspector/ds";
 import type { ColumnDescriptor } from "jazz-tools";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-  EditRowForm,
-  focusRowEditorField,
-} from "@/components/table-explorer/data/editRowForm";
+import { EditRowForm, focusRowEditorField } from "@/components/table-explorer/data/editRowForm";
+
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children }: React.ComponentProps<"a">) => <a href="/relation">{children}</a>,
+}));
 
 vi.mock("@inspector/ds", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@inspector/ds")>();
@@ -23,14 +24,11 @@ vi.mock("@inspector/ds", async (importOriginal) => {
       labelledBy,
       onExpandedChange,
       onValueChange,
+      readOnly = false,
       toolbarLabel,
       value,
     }: CodeEditorProps) => (
-      <div
-        data-expanded={expanded}
-        data-layout={layout}
-        data-slot="code-editor"
-      >
+      <div data-expanded={expanded} data-layout={layout} data-slot="code-editor">
         {toolbarLabel === undefined ? null : <span>{toolbarLabel}</span>}
         <div
           id={id}
@@ -46,12 +44,12 @@ vi.mock("@inspector/ds", async (importOriginal) => {
         >
           {value}
         </div>
-        {disabled === false ? (
+        {disabled === false && readOnly === false ? (
           <button aria-label="Format JSON" type="button">
             Format JSON
           </button>
         ) : null}
-        {disabled === false ? (
+        {disabled === false && readOnly === false ? (
           <button
             type="button"
             aria-label={`${expanded === true ? "Collapse" : "Expand"} ${id}`}
@@ -207,6 +205,112 @@ describe("EditRowForm Details and JSON views", () => {
     expect((screen.getByLabelText("DisplayName") as HTMLInputElement).value).toBe("Grace Hopper");
   });
 
+  it("submits only fields changed from the latest live source row", async () => {
+    const onSave = vi.fn();
+    render(
+      <EditRowForm
+        onSave={onSave}
+        rowValues={{ id: "person-1", displayName: "Ada", age: 37, active: true }}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith({ displayName: "Grace" }));
+  });
+
+  it("reports dirty state and returns to clean when a field matches the live source", async () => {
+    const onDirtyChange = vi.fn();
+    render(
+      <EditRowForm
+        onDirtyChange={onDirtyChange}
+        onSave={() => undefined}
+        rowValues={{ id: "person-1", displayName: "Ada", age: 37, active: true }}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
+
+    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
+
+    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Ada" } });
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
+  });
+
+  it("returns to clean when edited JSON is restored to its source NULL value", async () => {
+    const onDirtyChange = vi.fn();
+    const columns = [
+      { name: "settings", column_type: { type: "Json" }, nullable: true },
+    ] satisfies ColumnDescriptor[];
+    render(
+      <EditRowForm
+        onDirtyChange={onDirtyChange}
+        onSave={() => undefined}
+        rowValues={{ id: "profile-1", settings: null }}
+        schemaColumns={columns}
+        targetRowId="profile-1"
+      />,
+    );
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
+
+    const nullToggle = screen.getByRole("checkbox", { name: "Settings" });
+    fireEvent.click(nullToggle);
+    const editor = await screen.findByRole("textbox", { name: "Settings" });
+    fireEvent.input(editor, { target: { textContent: '{"enabled":true}' } });
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
+
+    fireEvent.click(nullToggle);
+    fireEvent.input(editor, { target: { textContent: '{"enabled":true}' } });
+
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
+  });
+
+  it("does not submit a clean row", () => {
+    const onSave = vi.fn();
+    render(
+      <EditRowForm
+        onSave={onSave}
+        rowValues={{ id: "person-1", displayName: "Ada", age: 37, active: true }}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it("reflects live source changes in untouched fields while preserving dirty fields", () => {
+    const { rerender } = render(
+      <EditRowForm
+        onSave={() => undefined}
+        rowValues={{ id: "person-1", displayName: "Ada", age: 37, active: true }}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
+
+    rerender(
+      <EditRowForm
+        onSave={() => undefined}
+        rowValues={{ id: "person-1", displayName: "Katherine", age: 38, active: false }}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+
+    expect((screen.getByLabelText("DisplayName") as HTMLInputElement).value).toBe("Grace");
+    expect((screen.getByLabelText("Age") as HTMLInputElement).value).toBe("38");
+    expect(screen.getByRole("button", { name: "False" }).getAttribute("aria-pressed")).toBe("true");
+  });
+
   it("highlights a literal JSON search term", () => {
     const { container } = renderEditRowForm();
     fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
@@ -245,7 +349,7 @@ describe("EditRowForm Details and JSON views", () => {
     );
   });
 
-  it("uses JsonView for a read-only structured field containing binary values", () => {
+  it("uses a bounded CodeEditor marker for a read-only structured field containing binary values", () => {
     const binaryArrayColumns = [
       {
         name: "payloads",
@@ -262,12 +366,41 @@ describe("EditRowForm Details and JSON views", () => {
       />,
     );
 
-    const fieldTree = screen.getByRole("tree", { name: "Payloads value" });
-    fireEvent.click(within(fieldTree).getByRole("button", { name: "Expand 0" }));
+    const editor = screen.getByRole("textbox", { name: "Payloads" });
+    expect(editor.textContent).toContain('"$type": "bytes"');
+    expect(editor.textContent).toContain('"byteLength": 3');
+    expect(editor.textContent).not.toContain('"0": 0');
+    expect(screen.queryByRole("tree", { name: "Payloads value" })).toBeNull();
+  });
 
-    expect(within(fieldTree).getByRole("treeitem", { name: /encoding: base64/i })).toBeTruthy();
-    expect(screen.queryByRole("textbox", { name: "Payloads" })).toBeNull();
-    expect(screen.getByText("Payloads").closest("label")?.hasAttribute("for")).toBe(false);
+  it("disables a NULL relation control and submits an edit after switching back to a value", async () => {
+    const onSave = vi.fn();
+    const columns = [
+      {
+        name: "accountId",
+        column_type: { type: "Uuid" },
+        nullable: true,
+        references: "accounts",
+      },
+    ] satisfies ColumnDescriptor[];
+    render(
+      <EditRowForm
+        onSave={onSave}
+        rowValues={{ id: "profile-1", accountId: null }}
+        schemaColumns={columns}
+        targetRowId="profile-1"
+      />,
+    );
+
+    const input = screen.getByLabelText("AccountId") as HTMLInputElement;
+    expect(input.disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Set AccountId to NULL" }));
+    expect(input.disabled).toBe(false);
+    fireEvent.change(input, { target: { value: "account-2" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await vi.waitFor(() => expect(onSave).toHaveBeenCalledWith({ accountId: "account-2" }));
   });
 
   it("uses CodeEditor for an editable JSON field", async () => {
@@ -423,7 +556,7 @@ describe("EditRowForm Details and JSON views", () => {
     const nullValue = container.querySelector<HTMLInputElement>("input[data-null-value]");
     expect(nullValue?.readOnly).toBe(true);
     expect(nullValue?.hasAttribute("data-disabled")).toBe(false);
-    expect(nullValue?.value).toBe("");
+    expect(nullValue?.value).toBe("NULL");
     expect(focusRowEditorField("settings")).toBe(true);
     expect(document.activeElement).toBe(nullToggle);
 
@@ -445,7 +578,7 @@ describe("EditRowForm Details and JSON views", () => {
     const { container } = render(
       <EditRowForm
         onSave={() => undefined}
-        rowValues={{ id: "row-1", items: {} }}
+        rowValues={{ id: "row-1", items: [] }}
         schemaColumns={columns}
         targetRowId="row-1"
       />,
@@ -453,6 +586,7 @@ describe("EditRowForm Details and JSON views", () => {
     const field = container.querySelector<HTMLElement>("#row-editor-field-items");
     Object.defineProperty(field, "scrollIntoView", { configurable: true, value: scrollIntoView });
     const editor = await screen.findByRole("textbox", { name: "Items" });
+    fireEvent.input(editor, { target: { textContent: "{}" } });
 
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
@@ -472,13 +606,14 @@ describe("EditRowForm Details and JSON views", () => {
     render(
       <EditRowForm
         onSave={() => undefined}
-        rowValues={{ id: "profile-1", age: "not-a-number", settings: { enabled: true } }}
+        rowValues={{ id: "profile-1", age: 37, settings: { enabled: true } }}
         schemaColumns={columns}
         targetRowId="profile-1"
       />,
     );
     const age = screen.getByLabelText("Age");
     const settings = await screen.findByRole("textbox", { name: "Settings" });
+    fireEvent.change(age, { target: { value: "not-a-number" } });
 
     fireEvent.click(screen.getByRole("button", { name: "Expand row-editor-settings" }));
     await waitFor(() => {
@@ -511,8 +646,59 @@ describe("EditRowForm Details and JSON views", () => {
       />,
     );
 
+    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     expect((await screen.findByRole("alert")).textContent).toBe("Save failed");
+  });
+
+  it("does not submit the same dirty patch twice while a save is pending", async () => {
+    let resolveSave: (() => void) | undefined;
+    const onSave = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSave = resolve;
+        }),
+    );
+    render(
+      <EditRowForm
+        onSave={onSave}
+        rowValues={{ ...rowValues, age: 42 }}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    fireEvent.submit(
+      screen.getByRole("button", { name: "Save" }).closest("form") as HTMLFormElement,
+    );
+
+    expect(onSave).toHaveBeenCalledOnce();
+    await act(async () => {
+      resolveSave?.();
+    });
+  });
+
+  it("announces delete errors and retains the row controls", async () => {
+    render(
+      <EditRowForm
+        onDelete={() => {
+          throw new Error("Delete failed");
+        }}
+        onSave={() => undefined}
+        rowValues={rowValues}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm delete" }));
+
+    expect((await screen.findByRole("alert")).textContent).toBe("Delete failed");
+    expect(screen.getByRole("button", { name: "Delete" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Save" })).toBeTruthy();
   });
 });

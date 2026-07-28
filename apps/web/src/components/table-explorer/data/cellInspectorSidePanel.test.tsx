@@ -28,8 +28,9 @@ describe("CellInspectorSidePanel", () => {
 
     expect(screen.getByRole("heading", { name: "Cell 1:1" })).toBeTruthy();
     expect(screen.queryByText("Row row-1")).toBeNull();
-    expect(screen.getByText("row-1")).toBeTruthy();
-    expect(screen.queryByRole("textbox")).toBeNull();
+    const id = screen.getByRole("textbox", { name: "Id" }) as HTMLInputElement;
+    expect(id.value).toBe("row-1");
+    expect(id.readOnly).toBe(true);
     expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
 
     rerender(
@@ -43,7 +44,7 @@ describe("CellInspectorSidePanel", () => {
       />,
     );
 
-    expect(screen.getByText("row-2")).toBeTruthy();
+    expect((screen.getByRole("textbox", { name: "Id" }) as HTMLInputElement).value).toBe("row-2");
   });
 
   it("renders live value changes for the same cell", () => {
@@ -63,7 +64,8 @@ describe("CellInspectorSidePanel", () => {
       />,
     );
 
-    expect(screen.getByText("Ada")).toBeTruthy();
+    const input = screen.getByRole("textbox", { name: "Name" }) as HTMLInputElement;
+    expect(input.value).toBe("Ada");
 
     rerender(
       <CellInspectorSidePanel
@@ -76,7 +78,6 @@ describe("CellInspectorSidePanel", () => {
       />,
     );
 
-    expect(screen.getByText("Grace")).toBeTruthy();
-    expect(screen.queryByText("Ada")).toBeNull();
+    expect(input.value).toBe("Grace");
   });
 });

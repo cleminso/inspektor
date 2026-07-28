@@ -1,12 +1,16 @@
 // Defines `ColumnDef`
-import { useRef } from "react";
+import { useRef, type MouseEvent } from "react";
 
 import type { ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 
-import { Box, Checkbox, Text } from "@inspector/ds";
+import { BinaryValue, Box, Checkbox, StructuredValuePreview, Text, TimestampValue } from "@inspector/ds";
 
 import { RelationCellLink } from "@/components/table-explorer/data/relationCellLink";
+import {
+  classifySchemaValue,
+  type SchemaValuePresentation,
+} from "@/lib/table-explorer/schemaValuePresentation";
 import type { TableColumnMeta } from "@/types/tableExplorer";
 
 interface BuildDataTableColumnsOptions {
@@ -28,7 +32,7 @@ interface ColumnSizing {
 
 function getColumnSizing(column: TableColumnMeta): ColumnSizing {
   if (column.id === "id" || column.column === null) {
-    return { size: 224, minSize: 160, maxSize: 360 };
+    return { size: 320, minSize: 160, maxSize: 480 };
   }
 
   if (column.column.references !== undefined) {
@@ -60,32 +64,90 @@ function getColumnSizing(column: TableColumnMeta): ColumnSizing {
   }
 }
 
-function formatCellValue(value: unknown): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-  if (typeof value === "object") {
-    return JSON.stringify(value);
+function CompactCellValue({
+  isRowId,
+  presentation,
+}: {
+  isRowId: boolean;
+  presentation: SchemaValuePresentation;
+}): React.ReactElement {
+  if (presentation.kind === "relation") {
+    return (
+      <RelationCellLink
+        relationTable={presentation.relationTable}
+        relationId={presentation.relationId}
+      />
+    );
   }
 
-  return String(value);
-}
-
-function formatMiddleTruncated(value: string, maxLength = 22): string {
-  if (value.length <= maxLength) {
-    return value;
+  if (presentation.kind === "bytes") {
+    return <BinaryValue byteLength={presentation.byteLength} />;
   }
-  const sideLength = Math.floor((maxLength - 3) / 2);
-  return value.slice(0, sideLength) + "..." + value.slice(-sideLength);
+
+  if (presentation.kind === "timestamp") {
+    return <TimestampValue value={presentation.epochMilliseconds} />;
+  }
+
+  if (presentation.kind === "structured") {
+    return <StructuredValuePreview model={presentation.model} variant={presentation.variant} />;
+  }
+
+  if (isRowId === true && "displayValue" in presentation) {
+    return (
+      <Text
+        as="span"
+        aria-label={presentation.displayValue}
+        data-cell-overflow="truncate"
+        truncate
+      >
+        {presentation.displayValue}
+      </Text>
+    );
+  }
+
+  if (presentation.kind === "number") {
+    return (
+      <Box justifyContent="end" width="full">
+        <Text
+          as="span"
+          align="right"
+          data-cell-alignment="end"
+          tabularNums
+          truncate
+        >
+          {presentation.displayValue}
+        </Text>
+      </Box>
+    );
+  }
+
+  if (presentation.kind === "boolean") {
+    return (
+      <Box as="span" alignItems="center" gap="xs">
+        <Text as="span" aria-label={`Boolean ${String(presentation.value)}`} color="muted">
+        </Text>
+        <Text as="span">{String(presentation.value)}</Text>
+      </Box>
+    );
+  }
+
+  const isSubdued = presentation.kind === "null" || presentation.kind === "unavailable";
+  return (
+    <Text
+      as="span"
+      color={
+        presentation.kind === "unsupported" || presentation.kind === "invalid"
+          ? "danger"
+          : isSubdued === true
+            ? "muted"
+            : undefined
+      }
+      data-cell-overflow="truncate"
+      truncate
+    >
+      {presentation.displayValue}
+    </Text>
+  );
 }
 
 interface SelectionCheckboxProps {
@@ -109,10 +171,10 @@ function SelectionCheckbox({
       checked={checked}
       indeterminate={indeterminate}
       size="m"
-      onClickCapture={(event) => {
+      onClickCapture={(event: MouseEvent<HTMLElement>) => {
         shiftKeyRef.current = event.shiftKey;
       }}
-      onCheckedChange={(nextChecked) => {
+      onCheckedChange={(nextChecked: boolean) => {
         onCheckedChange(nextChecked === true, shiftKeyRef.current);
         shiftKeyRef.current = false;
       }}
@@ -204,16 +266,14 @@ export function buildDataTableColumns({
       header: () => <ColumnHeader dataType={dataType} label={column.label} />,
       cell: ({ row }) => {
         const rawValue = row.original[column.accessorKey];
-        const relationTable = column.column?.references;
+        const presentation = classifySchemaValue(rawValue, column.column);
 
-        if (relationTable !== undefined && typeof rawValue === "string" && rawValue.trim().length > 0) {
-          return <RelationCellLink relationTable={relationTable} relationId={rawValue} />;
-        }
-
-        const displayValue = formatCellValue(rawValue);
-        const visibleValue = column.id === "id" ? formatMiddleTruncated(displayValue) : displayValue;
-
-        return <Text as="span" title={displayValue} truncate>{visibleValue}</Text>;
+        return (
+          <CompactCellValue
+            isRowId={column.id === "id" && column.column === null}
+            presentation={presentation}
+          />
+        );
       },
     };
   });

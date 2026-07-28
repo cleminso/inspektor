@@ -173,8 +173,12 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
             ) : (
               <RowEditorSidePanel
                 mode={state.detailPaneMode === "insert" ? "insert" : "edit"}
+                draftTransitionPending={state.draftTransition.isPending}
+                draftTransitionSaving={state.draftTransition.isSaving}
                 editedRowIds={state.rowEditor.editedRowIds}
                 activeRowIndex={state.rowEditor.activeRowIndex}
+                onDiscardAndContinue={state.draftTransition.discardAndContinue}
+                onKeepEditing={state.draftTransition.keepEditing}
                 onNavigatePrevious={state.rowEditor.goToPreviousRow}
                 onNavigateNext={state.rowEditor.goToNextRow}
               >
@@ -193,8 +197,9 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
                       rowValues={state.rowValues ?? {}}
                       schemaColumns={state.schemaColumns}
                       onCancel={() => {
-                        state.handleRowEditorOpenChange(false);
+                        state.handleRowEditorCancel();
                       }}
+                      onDirtyChange={state.handleRowDraftDirtyChange}
                       onSave={state.handleInsertSave}
                     />
                   ) : (
@@ -204,9 +209,10 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
                       schemaColumns={state.schemaColumns}
                       targetRowId={state.rowEditor.activeRowId}
                       onCancel={() => {
-                        state.handleRowEditorOpenChange(false);
+                        state.handleRowEditorCancel();
                       }}
                       onDelete={state.handleDelete}
+                      onDirtyChange={state.handleRowDraftDirtyChange}
                       onSave={state.handleEditSave}
                     />
                   )}

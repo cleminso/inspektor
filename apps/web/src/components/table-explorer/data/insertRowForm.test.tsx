@@ -19,6 +19,7 @@ vi.mock("@inspector/ds", async (importOriginal) => {
       layout = "intrinsic",
       labelledBy,
       onExpandedChange,
+      readOnly = false,
       toolbarLabel,
       value,
     }: CodeEditorProps) => (
@@ -35,8 +36,10 @@ vi.mock("@inspector/ds", async (importOriginal) => {
         >
           {value}
         </div>
-        {disabled === false ? <button aria-label="Format JSON">Format JSON</button> : null}
-        {disabled === false ? (
+        {disabled === false && readOnly === false ? (
+          <button aria-label="Format JSON">Format JSON</button>
+        ) : null}
+        {disabled === false && readOnly === false ? (
           <button
             aria-label={`${expanded === true ? "Collapse" : "Expand"} ${id}`}
             onClick={() => {
@@ -65,12 +68,79 @@ afterEach(() => {
 });
 
 describe("InsertRowForm structured values", () => {
+  it("omits an untouched default-backed field from the insert payload", async () => {
+    const onSave = vi.fn();
+    const columns = [
+      { name: "name", column_type: { type: "Text" }, nullable: false },
+      {
+        name: "status",
+        column_type: { type: "Text" },
+        nullable: false,
+        default: { type: "Text", value: "active" },
+      },
+    ] satisfies ColumnDescriptor[];
+    render(<InsertRowForm onSave={onSave} rowValues={{ name: "Ada" }} schemaColumns={columns} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    await vi.waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith({ name: "Ada" }, { keepOpen: false }),
+    );
+  });
+
+  it("allows a default-backed field to be changed to an explicit value", async () => {
+    const onSave = vi.fn();
+    const columns = [
+      {
+        name: "status",
+        column_type: { type: "Text" },
+        nullable: false,
+        default: { type: "Text", value: "active" },
+      },
+    ] satisfies ColumnDescriptor[];
+    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+
+    expect(screen.getByRole("checkbox", { name: "Status" }).getAttribute("aria-checked")).toBe(
+      "true",
+    );
+    fireEvent.click(screen.getByRole("checkbox", { name: "Status" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Status" }), {
+      target: { value: "archived" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    await vi.waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith({ status: "archived" }, { keepOpen: false }),
+    );
+  });
+
+  it("keeps a default-backed read-only binary field omitted", () => {
+    const columns = [
+      {
+        name: "payload",
+        column_type: { type: "Bytea" },
+        nullable: false,
+        default: { type: "Bytea", value: new Uint8Array([1, 2]) },
+      },
+    ] satisfies ColumnDescriptor[];
+    render(<InsertRowForm onSave={() => undefined} rowValues={{}} schemaColumns={columns} />);
+
+    expect(screen.queryByRole("checkbox", { name: "Payload" })).toBeNull();
+    expect((screen.getByRole("textbox", { name: "Payload" }) as HTMLInputElement).value).toBe(
+      "DEFAULT",
+    );
+  });
+
   it("gives an expanded editor the insert form scroll area while preserving the footer", async () => {
     const columns = [
       { name: "settings", column_type: { type: "Json" }, nullable: false },
     ] satisfies ColumnDescriptor[];
     const { container } = render(
-      <InsertRowForm onSave={() => undefined} rowValues={{ settings: {} }} schemaColumns={columns} />,
+      <InsertRowForm
+        onSave={() => undefined}
+        rowValues={{ settings: {} }}
+        schemaColumns={columns}
+      />,
     );
     const editor = await screen.findByRole("textbox", { name: "Settings" });
     const editorRoot = editor.closest('[data-slot="code-editor"]');
@@ -106,7 +176,7 @@ describe("InsertRowForm structured values", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Insert" }));
 
-    expect(onSave).toHaveBeenCalledWith({ settings: { enabled: true } }, { keepOpen: false });
+    expect(onSave).toHaveBeenCalledWith({ settings: '{"enabled":true}' }, { keepOpen: false });
   });
 
   it.each([
@@ -131,5 +201,45 @@ describe("InsertRowForm structured values", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: /payload/i }));
 
     expect((await screen.findByRole("textbox", { name: "Payload" })).textContent).toBe(seed);
+  });
+
+  it("disables NULL primitive and enum controls and submits values after they are enabled", async () => {
+    const onSave = vi.fn();
+    const columns = [
+      { name: "name", column_type: { type: "Text" }, nullable: true },
+      {
+        name: "status",
+        column_type: { type: "Enum", variants: ["active", "archived"] },
+        nullable: true,
+      },
+      { name: "enabled", column_type: { type: "Boolean" }, nullable: true },
+    ] satisfies ColumnDescriptor[];
+    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+
+    const name = screen.getByLabelText("Name") as HTMLInputElement;
+    const status = screen.getByRole("combobox", { name: "Status" }) as HTMLButtonElement;
+    expect(name.disabled).toBe(true);
+    expect(status.disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "True" }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+    expect((screen.getByRole("button", { name: "False" }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+    expect((screen.getByRole("button", { name: "Null" }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Set Name to NULL" }));
+    fireEvent.change(name, { target: { value: "Ada" } });
+    fireEvent.click(screen.getByRole("button", { name: "True" }));
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    await vi.waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith(
+        { enabled: true, name: "Ada", status: null },
+        { keepOpen: false },
+      ),
+    );
   });
 });

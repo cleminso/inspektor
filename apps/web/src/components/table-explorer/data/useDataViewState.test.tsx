@@ -4,9 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DataTable } from "@inspector/ds";
 
-import { useDataViewState } from "@/components/table-explorer/data/useDataViewState";
+import {
+  createInsertRowValues,
+  useDataViewState,
+} from "@/components/table-explorer/data/useDataViewState";
 
 const setRowEditor = vi.fn();
+const deleteRow = vi.fn();
+const insertRow = vi.fn();
+const updateRow = vi.fn();
 const columnOrderState = {
   columnOrder: ["id", "name"],
   setColumnOrder: vi.fn((columnIds: string[]) => {
@@ -23,9 +29,26 @@ const searchState = {
   sortColumn: "id",
   sortDirection: "asc" as const,
 };
+let activeRows: Array<Record<string, unknown>> = [];
+const routeBlocker = {
+  action: undefined,
+  current: undefined,
+  next: undefined,
+  proceed: undefined,
+  reset: undefined,
+  status: "idle" as const,
+};
+let shouldBlockNavigation = () => false;
+
+vi.mock("@tanstack/react-router", () => ({
+  useBlocker: (options: { shouldBlockFn: () => boolean }) => {
+    shouldBlockNavigation = options.shouldBlockFn;
+    return routeBlocker;
+  },
+}));
 
 vi.mock("jazz-tools/react", () => ({
-  useAll: () => [],
+  useAll: () => activeRows,
 }));
 
 vi.mock("@/components/providers/inspectorProvider", () => ({
@@ -54,9 +77,9 @@ vi.mock("@/hooks/useTableExplorerSearchParams", () => ({
 
 vi.mock("@/hooks/useTableMutations", () => ({
   useTableMutations: () => ({
-    deleteRow: vi.fn(),
-    insertRow: vi.fn(),
-    updateRow: vi.fn(),
+    deleteRow,
+    insertRow,
+    updateRow,
   }),
 }));
 
@@ -92,6 +115,9 @@ vi.mock("@/hooks/useTableQuery", () => ({
 
 beforeEach(() => {
   setRowEditor.mockClear();
+  deleteRow.mockReset();
+  insertRow.mockReset();
+  updateRow.mockReset();
   setRowEditor.mockImplementation((mode: "edit" | "insert" | null, rowId: string | null) => {
     searchState.editorMode = mode;
     searchState.rowId = rowId;
@@ -100,6 +126,15 @@ beforeEach(() => {
   searchState.rowId = null;
   searchState.sortColumn = "id";
   columnOrderState.columnOrder = ["id", "name"];
+  activeRows = [];
+  Object.assign(routeBlocker, {
+    action: undefined,
+    current: undefined,
+    next: undefined,
+    proceed: undefined,
+    reset: undefined,
+    status: "idle",
+  });
 });
 
 afterEach(cleanup);
@@ -146,6 +181,41 @@ function DataViewInteractionHarness(): React.ReactElement {
 }
 
 describe("useDataViewState", () => {
+  it("leaves a default-backed binary insert field undefined so Jazz can apply its default", () => {
+    expect(
+      createInsertRowValues([
+        {
+          name: "payload",
+          column_type: { type: "Bytea" },
+          nullable: false,
+          default: { type: "Bytea", value: new Uint8Array([1, 2]) },
+        },
+      ]),
+    ).toEqual({ payload: undefined });
+  });
+
+  it("does not invent a value for a required read-only binary insert field", () => {
+    expect(
+      createInsertRowValues([
+        {
+          name: "payload",
+          column_type: { type: "Bytea" },
+          nullable: false,
+        },
+      ]),
+    ).toEqual({ payload: undefined });
+  });
+
+  it("ignores an active-row query result whose identity does not match the requested row", () => {
+    searchState.editorMode = "edit";
+    searchState.rowId = "row-3";
+    activeRows = [{ id: "row-previous", name: "Previous" }];
+
+    const { result } = renderHook(() => useDataViewState({ tableName: "accounts" }));
+
+    expect(result.current.rowValues).toBeNull();
+  });
+
   it("focuses and opens a cell through the composed DataTable", () => {
     render(<DataViewInteractionHarness />);
     const cell = screen.getByRole("cell", { name: "Ada" });
@@ -215,6 +285,138 @@ describe("useDataViewState", () => {
 
     expect(result.current.table.getRow("row-1").getIsSelected()).toBe(false);
     expect(result.current.rowEditor.editedRowIds).toEqual([]);
+  });
+
+  it("cancels the focused row by unchecking it and focusing the nearest checked row", () => {
+    const { result, rerender } = renderHook(() => useDataViewState({ tableName: "accounts" }));
+    act(() => {
+      result.current.table.getRow("row-1").toggleSelected(true);
+    });
+    rerender();
+    act(() => {
+      result.current.table.getRow("row-2").toggleSelected(true);
+    });
+    rerender();
+
+    act(() => {
+      result.current.handleRowEditorCancel();
+    });
+    rerender();
+
+    expect(result.current.table.getRow("row-2").getIsSelected()).toBe(false);
+    expect(result.current.table.getRow("row-1").getIsSelected()).toBe(true);
+    expect(setRowEditor).toHaveBeenLastCalledWith("edit", "row-1", { replace: false });
+  });
+
+  it("closes the row pane when cancelling its only checked row", () => {
+    const { result, rerender } = renderHook(() => useDataViewState({ tableName: "accounts" }));
+    act(() => {
+      result.current.table.getRow("row-1").toggleSelected(true);
+    });
+    rerender();
+
+    act(() => {
+      result.current.handleRowEditorCancel();
+    });
+    rerender();
+
+    expect(result.current.table.getRow("row-1").getIsSelected()).toBe(false);
+    expect(setRowEditor).toHaveBeenLastCalledWith(null, null, { replace: false });
+  });
+
+  it("requires an explicit decision before dismissing a dirty row draft", () => {
+    searchState.editorMode = "edit";
+    searchState.rowId = "row-1";
+    const { result } = renderHook(() => useDataViewState({ tableName: "accounts" }));
+    act(() => {
+      result.current.handleRowDraftDirtyChange(true);
+    });
+    setRowEditor.mockClear();
+
+    act(() => {
+      result.current.handleRowEditorOpenChange(false);
+    });
+
+    expect(result.current.draftTransition.isPending).toBe(true);
+    expect(setRowEditor).not.toHaveBeenCalled();
+    setRowEditor.mockImplementation(() => {
+      if (shouldBlockNavigation() === true) {
+        Object.assign(routeBlocker, { status: "blocked" });
+      }
+    });
+
+    act(() => {
+      result.current.draftTransition.discardAndContinue();
+    });
+
+    expect(result.current.draftTransition.isPending).toBe(false);
+    expect(setRowEditor).toHaveBeenCalledWith(null, null, { replace: false });
+    expect(routeBlocker.status).toBe("idle");
+  });
+
+  it("keeps the active dirty row when a requested transition is cancelled", () => {
+    searchState.editorMode = "edit";
+    searchState.rowId = "row-1";
+    const { result } = renderHook(() => useDataViewState({ tableName: "accounts" }));
+    act(() => {
+      result.current.handleRowDraftDirtyChange(true);
+    });
+    act(() => {
+      result.current.handleRowEditorOpenChange(false);
+    });
+
+    act(() => {
+      result.current.draftTransition.keepEditing();
+    });
+
+    expect(result.current.draftTransition.isPending).toBe(false);
+    expect(result.current.detailPaneMode).toBe("rows");
+  });
+
+  it("saves the dirty patch before completing a requested transition", async () => {
+    searchState.editorMode = "edit";
+    searchState.rowId = "row-1";
+    const { result } = renderHook(() => useDataViewState({ tableName: "accounts" }));
+    act(() => {
+      result.current.handleRowDraftDirtyChange(true);
+    });
+    act(() => {
+      result.current.handleRowEditorOpenChange(false);
+    });
+
+    await act(async () => {
+      await result.current.handleEditSave({ name: "Grace" });
+    });
+
+    expect(updateRow).toHaveBeenCalledWith("row-1", { name: "Grace" });
+    expect(result.current.draftTransition.isPending).toBe(false);
+    expect(setRowEditor).toHaveBeenLastCalledWith(null, null, { replace: false });
+  });
+
+  it("continues a blocked route transition only after the dirty draft is discarded", () => {
+    const proceed = vi.fn();
+    const reset = vi.fn();
+    searchState.editorMode = "edit";
+    searchState.rowId = "row-1";
+    const { result, rerender } = renderHook(() => useDataViewState({ tableName: "accounts" }));
+    act(() => {
+      result.current.handleRowDraftDirtyChange(true);
+    });
+    Object.assign(routeBlocker, {
+      proceed,
+      reset,
+      status: "blocked",
+    });
+    rerender();
+
+    expect(result.current.draftTransition.isPending).toBe(true);
+
+    act(() => {
+      result.current.draftTransition.discardAndContinue();
+    });
+
+    expect(proceed).toHaveBeenCalledOnce();
+    expect(reset).not.toHaveBeenCalled();
   });
 
   it("unchecks a row through its own checkbox after pane dismissal", () => {
@@ -400,10 +602,9 @@ describe("useDataViewState", () => {
   });
 
   it("clears selections when the table identity changes", () => {
-    const { result, rerender } = renderHook(
-      ({ tableName }) => useDataViewState({ tableName }),
-      { initialProps: { tableName: "accounts" } },
-    );
+    const { result, rerender } = renderHook(({ tableName }) => useDataViewState({ tableName }), {
+      initialProps: { tableName: "accounts" },
+    });
 
     act(() => {
       result.current.handleCellOpen({ columnId: "name", rowId: "row-1" });

@@ -1,5 +1,6 @@
 /**
  * Creates the minimal Jazz `TableProxy` for runtime-selected tables.
+ * Identifies a table and its schema when calling Jazz query and mutation APIs.
  *
  * App code imports generated proxies, but the Inspector only has a table name and stored
  * WASM schema. This proxy is the bridge that lets generic explorer code call Jazz APIs.

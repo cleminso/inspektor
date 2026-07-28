@@ -639,6 +639,10 @@ Closing a pane preserves its table selection. Filter, sort, page, table, or sche
 reorder preserves selected cells, hiding a selected column removes its cells, and loading more rows does not extend an existing
 selection.
 
+Row-pane Cancel is distinct from pane dismissal. Cancel discards the focused row draft and unchecks that row. If other checked
+rows remain, focus moves to the nearest checked row; otherwise the row pane closes. The pane close control and Escape dismiss a
+clean pane while preserving selection.
+
 Focusing a cell in the focused checked row keeps the row pane open and focuses that field's first available control. Cells in
 other rows do not silently retarget the row editor. Double-clicking a cell or explicitly opening a cell selection changes the pane
 presentation. Numeric row and column coordinates can support developer orientation, but row IDs and column IDs remain the
@@ -655,7 +659,10 @@ clears the active column. Focus remains visible independently of color. Active c
 state, validation state, and live-update highlights use distinct semantic states so one highlight does not imply several
 meanings.
 
-Editing happens in the side pane, not inline in the v1 data table.
+Editing supports pane and inline presentation selected by one workspace-level user preference persisted in localStorage. Pane mode
+always uses the side pane. Inline mode edits supported writable cells in place and falls back to the pane for unsuitable fields.
+The setting is not scoped to a table and does not change parsing, validation, dirty tracking, or save behavior. Inline controls
+remain deferred until the shared row-draft mutation layer drives the pane editor.
 
 Columns use schema-aware initial widths rather than one width for every value. Boolean and numeric columns start narrow; ids,
 relations, timestamps, text, and structured values receive progressively wider defaults. Header resize handles update TanStack
@@ -744,6 +751,9 @@ Grid cells use bounded, schema-derived previews. The grid does not serialize com
 and it does not replace stored identifiers with inferred semantic labels. The side pane is the authoritative surface for the
 complete value, alternate representations, copying, validation, and editing. Cells do not open hover cards; click, double-click,
 context-menu, and relation navigation already provide the grid's interaction layers.
+
+In inline editing mode, double-click or Enter starts editing when the field supports a safe compact editor. Explicit pane and
+context commands continue to provide complete inspection. Inline mode does not replace stable inspection with hover details.
 
 | Condition | Grid representation | Side-pane representation |
 | --------- | ------------------- | ------------------------ |
@@ -857,8 +867,9 @@ Side-panel row focus is row-id based and can survive page changes. Checkbox sele
 Clicking a row checkbox opens a side pane that gives the developer a focused place for reading and editing checked rows. Clicking
 additional checkboxes extends that row set, while one checked row remains focused and is represented as a position such as
 `2 / 4`. Single-clicking a data cell focuses it without opening the pane. Double-clicking a cell opens its schema-derived cell
-presentation. Explicit context actions open multi-cell selections. The focused behavior specification defines the detailed
-transitions and visual precedence.
+presentation in pane mode, starts supported inline editing in inline mode, or uses the pane fallback for an unsuitable inline
+field. Explicit context actions open multi-cell selections. The focused behavior specification defines the detailed transitions
+and visual precedence.
 
 The side panel answers:
 
@@ -881,6 +892,10 @@ UI representation:
 - Primary controls: close panel, save changes, reset changes, delete row, copy row, open relation target.
 - Primary content: active row id, field list, full values, relation targets, schema hints, staged changes, validation and mutation errors.
 - States: no active row, active row loading, clean row, dirty row, saving, saved, mutation rejected, row missing after refresh, unsupported read-only field.
+
+Pane and inline controls consume one application-owned row-draft model. It separates the latest live source row from dirty field
+overlays, preserves dirty values across live updates, reflects live values for untouched fields, and saves dirty-field patches
+rather than reconstructed rows. Insert drafts distinguish omitted, explicit NULL, valid, and invalid field states.
 
 #### Schema context inside the explorer
 

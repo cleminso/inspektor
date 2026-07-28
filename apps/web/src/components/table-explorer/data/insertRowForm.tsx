@@ -8,9 +8,11 @@ import {
   RowEditorFields,
   useRowEditorFields,
 } from "@/components/table-explorer/data/rowEditorFields";
+import { ROW_EDITOR_FORM_ID } from "@/components/table-explorer/data/rowEditorForm";
 
 interface InsertRowFormProps {
   onCancel?: () => void;
+  onDirtyChange?: (isDirty: boolean) => void;
   onSave: (
     values: Record<string, unknown>,
     options?: { keepOpen: boolean },
@@ -30,6 +32,7 @@ function InsertRowFormFields({
   onCancel,
   onInsertMoreEnabledChange,
   onKeepOpenInsert,
+  onDirtyChange,
   onSave,
   rowValues,
   schemaColumns,
@@ -39,6 +42,7 @@ function InsertRowFormFields({
   const rowEditor = useRowEditorFields({
     initialRowValues: rowValues,
     mode: "insert",
+    onDirtyChange,
     onSubmit: async (values) => {
       await onSave(values, { keepOpen: insertMoreEnabled === true });
 
@@ -50,7 +54,11 @@ function InsertRowFormFields({
   });
 
   return (
-    <form className="flex h-full min-h-0 flex-col overflow-hidden" onSubmit={rowEditor.submit}>
+    <form
+      id={ROW_EDITOR_FORM_ID}
+      className="flex h-full min-h-0 flex-col overflow-hidden"
+      onSubmit={rowEditor.submit}
+    >
       <Box
         data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
         unsafeClassName={rowEditor.expandedColumnName === null ? "app-scrollbar" : undefined}
@@ -72,6 +80,7 @@ function InsertRowFormFields({
           mode="insert"
           onFieldExpandedChange={rowEditor.setFieldExpanded}
           onFieldNullChange={rowEditor.setFieldNull}
+          onFieldOmittedChange={rowEditor.setFieldOmitted}
           onFieldTextChange={rowEditor.setFieldText}
         />
         {rowEditor.saveError !== null ? (
@@ -122,6 +131,7 @@ function InsertRowFormFields({
 
 export function InsertRowForm({
   onCancel,
+  onDirtyChange,
   onSave,
   rowValues,
   schemaColumns,
@@ -138,6 +148,7 @@ export function InsertRowForm({
         setFormVersion((currentVersion) => currentVersion + 1);
       }}
       onCancel={onCancel}
+      onDirtyChange={onDirtyChange}
       onSave={onSave}
       rowValues={rowValues}
       schemaColumns={schemaColumns}

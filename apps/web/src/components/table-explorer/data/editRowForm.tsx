@@ -4,8 +4,12 @@ import type { ColumnDescriptor } from "jazz-tools";
 
 import { Box, Button, CopyButton, JsonView, Search, SegmentedControl, Text } from "@inspector/ds";
 
-import { RowEditorFields, useRowEditorFields } from "@/components/table-explorer/data/rowEditorFields";
+import {
+  RowEditorFields,
+  useRowEditorFields,
+} from "@/components/table-explorer/data/rowEditorFields";
 import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorFocus";
+import { ROW_EDITOR_FORM_ID } from "@/components/table-explorer/data/rowEditorForm";
 import {
   createRowJsonViewValue,
   stringifyRowJsonViewValue,
@@ -14,6 +18,7 @@ import {
 interface EditRowFormProps {
   onCancel?: () => void;
   onDelete?: () => Promise<void> | void;
+  onDirtyChange?: (isDirty: boolean) => void;
   onSave: (values: Record<string, unknown>) => Promise<void> | void;
   rowValues: Record<string, unknown> | null;
   schemaColumns: ColumnDescriptor[];
@@ -25,6 +30,7 @@ export { focusRowEditorField };
 export function EditRowForm({
   onCancel,
   onDelete,
+  onDirtyChange,
   onSave,
   rowValues,
   schemaColumns,
@@ -39,6 +45,7 @@ export function EditRowForm({
       key={targetRowId ?? "unknown-row"}
       onCancel={onCancel}
       onDelete={onDelete}
+      onDirtyChange={onDirtyChange}
       onSave={onSave}
       rowValues={rowValues}
       schemaColumns={schemaColumns}
@@ -76,11 +83,7 @@ function RowJsonRepresentation({
           }}
           size="s"
         />
-        <CopyButton
-          label="Copy row JSON"
-          textToCopy={serializedValue}
-          tooltipSide="bottom"
-        />
+        <CopyButton label="Copy row JSON" textToCopy={serializedValue} tooltipSide="bottom" />
       </div>
       <div className="app-scrollbar min-h-0 flex-1 overflow-auto">
         <JsonView
@@ -96,16 +99,19 @@ function RowJsonRepresentation({
 function LoadedEditRowForm({
   onCancel,
   onDelete,
+  onDirtyChange,
   onSave,
   rowValues,
   schemaColumns,
 }: LoadedEditRowFormProps): React.ReactElement {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [representation, setRepresentation] = useState<RowRepresentation>("details");
   const rowEditor = useRowEditorFields({
     initialRowValues: rowValues,
     mode: "edit",
+    onDirtyChange,
     onSubmit: onSave,
     schemaColumns,
   });
@@ -120,20 +126,19 @@ function LoadedEditRowForm({
       }}
     >
       <div className="px-2 pt-2">
-        <SegmentedControl.List
-          aria-label="Row representation"
-          width="full"
-        >
+        <SegmentedControl.List aria-label="Row representation" width="full">
           <SegmentedControl.Item value="details">Details</SegmentedControl.Item>
           <SegmentedControl.Item value="json">JSON</SegmentedControl.Item>
         </SegmentedControl.List>
       </div>
       <SegmentedControl.Panel value="details">
-        <form className="flex h-full min-h-0 flex-col mt-2 overflow-hidden" onSubmit={rowEditor.submit}>
+        <form
+          id={ROW_EDITOR_FORM_ID}
+          className="flex h-full min-h-0 flex-col mt-2 overflow-hidden"
+          onSubmit={rowEditor.submit}
+        >
           <Box
-            data-row-editor-scroll-owner={
-              rowEditor.expandedColumnName === null ? "form" : "editor"
-            }
+            data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
             unsafeClassName={rowEditor.expandedColumnName === null ? "app-scrollbar" : undefined}
             flexDirection="column"
             flexGrow={1}
@@ -152,12 +157,13 @@ function LoadedEditRowForm({
               mode="edit"
               onFieldExpandedChange={rowEditor.setFieldExpanded}
               onFieldNullChange={rowEditor.setFieldNull}
+              onFieldOmittedChange={rowEditor.setFieldOmitted}
               onFieldTextChange={rowEditor.setFieldText}
             />
 
-            {rowEditor.saveError !== null ? (
+            {deleteError !== null || rowEditor.saveError !== null ? (
               <Text color="error" role="alert">
-                {rowEditor.saveError}
+                {deleteError ?? rowEditor.saveError}
               </Text>
             ) : null}
           </Box>
@@ -171,13 +177,19 @@ function LoadedEditRowForm({
                 disabled={isDeleting === true || rowEditor.isSaving === true}
                 onClick={async () => {
                   if (isDeleteConfirming === false) {
+                    setDeleteError(null);
                     setIsDeleteConfirming(true);
                     return;
                   }
 
                   try {
                     setIsDeleting(true);
+                    setDeleteError(null);
                     await onDelete();
+                  } catch (nextError) {
+                    setDeleteError(
+                      nextError instanceof Error ? nextError.message : String(nextError),
+                    );
                   } finally {
                     setIsDeleting(false);
                     setIsDeleteConfirming(false);
@@ -211,12 +223,18 @@ function LoadedEditRowForm({
 
                     onCancel();
                   }}
-                  disabled={rowEditor.isSaving === true}
+                  disabled={rowEditor.isSaving === true || isDeleting === true}
                 >
                   Cancel
                 </Button>
               ) : null}
-              <Button type="submit" variant="primary" size="s" loading={rowEditor.isSaving === true}>
+              <Button
+                type="submit"
+                variant="primary"
+                size="s"
+                loading={rowEditor.isSaving === true}
+                disabled={isDeleting === true}
+              >
                 Save
               </Button>
             </div>

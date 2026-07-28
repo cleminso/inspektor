@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
 const rowEditorModuleLoaded = vi.hoisted(() => vi.fn());
+const codeMirrorModuleLoaded = vi.hoisted(() => vi.fn());
+
+vi.mock("@codemirror/view", () => {
+  codeMirrorModuleLoaded();
+
+  return {};
+});
 
 vi.mock("@/components/table-explorer/data/editRowForm", () => {
   rowEditorModuleLoaded();
@@ -19,5 +26,9 @@ import "./view";
 describe("DataView module boundary", () => {
   it("does not initialize row-editor forms when the table view is imported", () => {
     expect(rowEditorModuleLoaded).not.toHaveBeenCalled();
+  });
+
+  it("does not initialize CodeMirror when the cell inspector is imported", () => {
+    expect(codeMirrorModuleLoaded).not.toHaveBeenCalled();
   });
 });

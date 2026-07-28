@@ -1,15 +1,20 @@
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
-import { Button } from "@inspector/ds";
+import { Box, Button, Text } from "@inspector/ds";
 
 import { DetailPane } from "@/components/table-explorer/detailPane";
+import { ROW_EDITOR_FORM_ID } from "@/components/table-explorer/data/rowEditorForm";
 import type { TableRowId } from "@/types/tableExplorer";
 
 interface RowEditorSidePanelProps {
   activeRowIndex: number;
   children: React.ReactNode;
+  draftTransitionPending: boolean;
+  draftTransitionSaving: boolean;
   editedRowIds: TableRowId[];
   mode: "insert" | "edit";
+  onDiscardAndContinue: () => void;
+  onKeepEditing: () => void;
   onNavigateNext: () => void;
   onNavigatePrevious: () => void;
 }
@@ -17,13 +22,18 @@ interface RowEditorSidePanelProps {
 export function RowEditorSidePanel({
   activeRowIndex,
   children,
+  draftTransitionPending,
+  draftTransitionSaving,
   editedRowIds,
   mode,
+  onDiscardAndContinue,
+  onKeepEditing,
   onNavigateNext,
   onNavigatePrevious,
 }: RowEditorSidePanelProps): React.ReactElement {
   const hasMultipleRows = editedRowIds.length > 1;
-  const title = mode === "insert" ? "Insert row" : editedRowIds.length > 1 ? "Edit rows" : "Edit row";
+  const title =
+    mode === "insert" ? "Insert row" : editedRowIds.length > 1 ? "Edit rows" : "Edit row";
 
   return (
     <DetailPane
@@ -32,7 +42,9 @@ export function RowEditorSidePanel({
           <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{title}</p>
           {hasMultipleRows === true ? (
             <div className="ml-auto flex shrink-0 items-center gap-1 text-sm text-muted-foreground">
-              <span>{activeRowIndex + 1} / {editedRowIds.length}</span>
+              <span>
+                {activeRowIndex + 1} / {editedRowIds.length}
+              </span>
               <div className="flex items-center">
                 <Button
                   type="button"
@@ -62,6 +74,57 @@ export function RowEditorSidePanel({
         </div>
       }
     >
+      {draftTransitionPending === true ? (
+        <Box
+          aria-label="Unsaved row changes"
+          role="alertdialog"
+          flexDirection="column"
+          flexShrink={0}
+          gap="m"
+          padding="m"
+          borderBottomWidth={1}
+          borderColor="border-secondary"
+          borderStyle="solid"
+        >
+          <Box flexDirection="column" gap="xs">
+            <Text variant="label">Save changes before continuing?</Text>
+            <Text color="muted" variant="caption">
+              The current row has staged changes.
+            </Text>
+          </Box>
+          <Box alignItems="center" gap="s" justifyContent="end">
+            <Button
+              type="button"
+              variant="ghost"
+              size="s"
+              autoFocus
+              disabled={draftTransitionSaving === true}
+              onClick={onKeepEditing}
+            >
+              Keep editing
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="s"
+              disabled={draftTransitionSaving === true}
+              onClick={onDiscardAndContinue}
+            >
+              Discard and continue
+            </Button>
+            <Button
+              type="submit"
+              form={ROW_EDITOR_FORM_ID}
+              variant="primary"
+              size="s"
+              loading={draftTransitionSaving === true}
+              disabled={draftTransitionSaving === true}
+            >
+              Save and continue
+            </Button>
+          </Box>
+        </Box>
+      ) : null}
       {children}
     </DetailPane>
   );

@@ -19,7 +19,12 @@ export interface UseTableMutationsResult {
   updateRow: (rowId: string, values: Record<string, unknown>) => Promise<void>;
 }
 
-/** Drops untouched optional form fields before sending mutation payloads to Jazz. */
+/**
+ * Drops `undefined` properties defensively before the Jazz boundary.
+ *
+ * Jazz also omits top-level `undefined` fields. Explicit `null` is retained because it represents
+ * SQL NULL, while an absent property lets inserts use a stored default and leaves updates untouched.
+ */
 function omitUndefinedValues(values: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(values).filter(([, value]) => value !== undefined));
 }
@@ -28,7 +33,9 @@ function omitUndefinedValues(values: Record<string, unknown>): Record<string, un
  * Provides insert, update, and delete actions for one schema-driven Inspector table.
  *
  * The hook converts stored runtime schema metadata into a dynamic Jazz table proxy, then
- * exposes mutation state that forms can use before closing panels or clearing input.
+ * exposes mutation state that forms can use before closing panels or clearing input. For example,
+ * an update `{ name: "Grace" }` reaches Jazz as a one-column patch; this hook never reconstructs
+ * the rest of the row.
  */
 export function useTableMutations(tableName: string): UseTableMutationsResult {
   const db = useDb();
@@ -44,7 +51,13 @@ export function useTableMutations(tableName: string): UseTableMutationsResult {
     return createTableProxy(tableName, runtime.wasmSchema);
   }, [runtime.wasmSchema, tableName]);
 
-  // Wait for the edge write so forms can surface Jazz errors before closing or resetting.
+  /**
+   * Waits for edge acknowledgement before treating a mutation as successful.
+   *
+   * Without the wait, the local mutation call could return before a remote permission or storage
+   * failure is known. Errors are stored for shared UI and rethrown so the active form keeps its
+   * draft and presents the same failure beside its controls.
+   */
   const runMutation = async (callback: () => Promise<void>) => {
     try {
       setPendingCount((currentPendingCount) => currentPendingCount + 1);

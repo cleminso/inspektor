@@ -4,7 +4,7 @@ import type { ColumnDescriptor } from "jazz-tools";
 import { Box, Button, Text, type DataTableCellTarget } from "@inspector/ds";
 
 import { DetailPane } from "@/components/table-explorer/detailPane";
-import { formatMutationFieldValue } from "@/lib/table-explorer/mutationParsing";
+import { InspectField } from "@/components/table-explorer/data/inspectField";
 
 interface CellInspectorSidePanelProps {
   columnPosition: number | null;
@@ -80,21 +80,12 @@ function CellValue({
 }): React.ReactElement {
   const column = schemaColumns.find((candidate) => candidate.name === target.columnId);
   const value = rowValues[target.columnId];
-  const formattedValue =
-    value === null || value === undefined
-      ? "NULL"
-      : column === undefined
-        ? String(value)
-        : formatMutationFieldValue(value, column.column_type);
 
   return (
-    <>
-      {column === undefined ? null : (
-        <Text color="muted" variant="caption">
-          {column.column_type.type.toLowerCase()}
-        </Text>
-      )}
-      <Text>{formattedValue}</Text>
-    </>
+    <InspectField
+      {...(column === undefined ? { column: null, name: target.columnId } : { column })}
+      targetIdentity={`${target.rowId}:${target.columnId}`}
+      value={value}
+    />
   );
 }
