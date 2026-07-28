@@ -7,7 +7,11 @@ export const options: Options = {
     "components/tooltip/tooltip": "./src/components/tooltip/tooltip.tsx",
   },
   format: ["esm"],
-  dts: true,
+  dts: {
+    compilerOptions: {
+      ignoreDeprecations: "6.0",
+    },
+  },
   sourcemap: true,
   clean: true,
   bundle: true,
