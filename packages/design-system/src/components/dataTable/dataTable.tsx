@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -98,6 +99,8 @@ interface DataTableRootBaseProps<TData extends RowData> {
 }
 
 interface ReorderableDataTableRootProps {
+  /** Renders the inert visual shown while a column header is dragged. */
+  columnDragPreview?: (columnId: string) => ReactNode;
   /** Column ids in their controlled draggable order. Omit fixed columns from this list. */
   columnOrder: readonly string[];
   /** Runs with the complete draggable column order after a header is moved. */
@@ -105,6 +108,7 @@ interface ReorderableDataTableRootProps {
 }
 
 interface StaticDataTableRootProps {
+  columnDragPreview?: never;
   columnOrder?: never;
   onColumnOrderChange?: never;
 }
@@ -235,11 +239,43 @@ function getVisibleColumnCount<TData extends RowData>(table: Table<TData>): numb
   return Math.max(table.getVisibleLeafColumns().length, 1);
 }
 
+function moveColumnByOffset(
+  columnOrder: readonly string[],
+  visibleColumnOrder: readonly string[],
+  columnId: string,
+  offset: -1 | 1,
+): string[] {
+  const currentIndex = columnOrder.indexOf(columnId);
+  const visibleIndex = visibleColumnOrder.indexOf(columnId);
+  const nextVisibleIndex = visibleIndex + offset;
+  if (
+    currentIndex < 0 ||
+    visibleIndex < 0 ||
+    nextVisibleIndex < 0 ||
+    nextVisibleIndex >= visibleColumnOrder.length
+  ) {
+    return [...columnOrder];
+  }
+  const targetColumnId = visibleColumnOrder[nextVisibleIndex];
+  if (targetColumnId === undefined) {
+    return [...columnOrder];
+  }
+  const nextIndex = columnOrder.indexOf(targetColumnId);
+
+  const nextColumnOrder = [...columnOrder];
+  const [column] = nextColumnOrder.splice(currentIndex, 1);
+  if (column !== undefined) {
+    nextColumnOrder.splice(nextIndex, 0, column);
+  }
+  return nextColumnOrder;
+}
+
 function DataTableRoot<TData extends RowData>({
   activeCell = null,
   activeColumnId = null,
   activeRowId = null,
   children,
+  columnDragPreview,
   columnOrder,
   density = "default",
   onCellActivate,
@@ -308,6 +344,24 @@ function DataTableRoot<TData extends RowData>({
         selectedColumnsByRow,
         columnReorderEnabled,
         getColumnReorderIndex: (columnId: string) => columnReorderIndices.get(columnId) ?? -1,
+        moveColumn: (columnId: string, offset: -1 | 1) => {
+          if (columnOrder === undefined || onColumnOrderChange === undefined) {
+            return;
+          }
+          const visibleColumnOrder = table
+            .getVisibleLeafColumns()
+            .map((column) => column.id)
+            .filter((candidateId) => columnReorderIndices.has(candidateId));
+          const nextColumnOrder = moveColumnByOffset(
+            columnOrder,
+            visibleColumnOrder,
+            columnId,
+            offset,
+          );
+          if (nextColumnOrder.some((value, index) => value !== columnOrder[index])) {
+            onColumnOrderChange(nextColumnOrder);
+          }
+        },
         table,
       } satisfies DataTableContextValue<TData>),
     [
@@ -316,10 +370,12 @@ function DataTableRoot<TData extends RowData>({
       activeRowId,
       columnReorderEnabled,
       columnReorderIndices,
+      columnOrder,
       density,
       onCellActivate,
       onCellContextMenu,
       onColumnActivate,
+      onColumnOrderChange,
       onHeaderContextMenu,
       onRowActivate,
       onRowContextMenu,
@@ -435,7 +491,7 @@ function DataTableRoot<TData extends RowData>({
             density === "compact" && dataTableStyles.compactHeaderDragContent,
           )}
         >
-          {source.element?.textContent ?? String(source.id)}
+          {columnDragPreview?.(String(source.id)) ?? source.element?.textContent ?? String(source.id)}
         </div>
       )}
     >
@@ -525,12 +581,22 @@ function DataTableHeaderCell<TData extends RowData>({
     columnReorderEnabled,
     density,
     getColumnReorderIndex,
+    moveColumn,
     onColumnActivate,
     onHeaderContextMenu,
   } = useDataTableContext<TData>();
   const isActive = activeCell === null && activeColumnId === header.column.id;
   const columnReorderIndex = getColumnReorderIndex(header.column.id);
   const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0;
+  const sortDirection = header.column.getIsSorted();
+  const ariaSort =
+    header.column.getCanSort() === false
+      ? undefined
+      : sortDirection === "asc"
+        ? "ascending"
+        : sortDirection === "desc"
+          ? "descending"
+          : "none";
 
   const handleClick = (event: MouseEvent<HTMLTableCellElement>) => {
     if (activateSelectionControlFromCell(event) === true) {
@@ -551,6 +617,34 @@ function DataTableHeaderCell<TData extends RowData>({
 
     event.preventDefault();
     onHeaderContextMenu(header.column.id, event);
+  };
+
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLTableCellElement>) => {
+    if (
+      event.shiftKey === true &&
+      event.altKey === false &&
+      event.ctrlKey === false &&
+      event.metaKey === false &&
+      columnReorderable === true &&
+      (event.key === "ArrowLeft" || event.key === "ArrowRight")
+    ) {
+      event.preventDefault();
+      moveColumn(header.column.id, event.key === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+
+    if (
+      event.key === "Enter" &&
+      event.altKey === false &&
+      event.ctrlKey === false &&
+      event.metaKey === false &&
+      event.shiftKey === false &&
+      event.target === event.currentTarget &&
+      header.column.getCanSort() === true
+    ) {
+      event.preventDefault();
+      header.column.toggleSorting(sortDirection === "asc");
+    }
   };
 
   const renderHeaderCell = ({
@@ -576,6 +670,7 @@ function DataTableHeaderCell<TData extends RowData>({
           isDragVisual === true && dataTableStyles.headerCellDragging,
         )}
         colSpan={header.colSpan}
+        aria-sort={ariaSort}
         data-active={isActive === true ? "" : undefined}
         data-column-id={header.column.id}
         data-dragging={isDragVisual === true ? "" : undefined}
@@ -583,6 +678,7 @@ function DataTableHeaderCell<TData extends RowData>({
         data-slot="data-table-header-cell"
         onClick={handleClick}
         onContextMenu={handleContextMenu}
+        onKeyDown={handleKeyDown}
         scope="col"
         style={{ width: header.getSize() }}
         tabIndex={-1}
@@ -594,6 +690,7 @@ function DataTableHeaderCell<TData extends RowData>({
             density === "compact" && dataTableStyles.compactHeaderDragContent,
             isDragVisual === true && dataTableStyles.headerDragSourceDragging,
           )}
+          aria-hidden={isDragVisual === true ? true : undefined}
           data-slot="data-table-header-drag-source"
         >
           {header.isPlaceholder === true

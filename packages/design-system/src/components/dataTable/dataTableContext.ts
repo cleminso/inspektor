@@ -47,6 +47,7 @@ export interface DataTableContextValue<TData extends RowData> {
   selectedColumnsByRow: ReadonlyMap<string, ReadonlySet<string>>;
   columnReorderEnabled: boolean;
   getColumnReorderIndex: (columnId: string) => number;
+  moveColumn: (columnId: string, offset: -1 | 1) => void;
   table: Table<TData>;
 }
 

@@ -11,6 +11,7 @@ import {
 } from "@inspector/ds";
 
 import { ActionsBar } from "@/components/table-explorer/actionsBar";
+import { ColumnDragPreview } from "@/components/table-explorer/data/buildDataTableColumns";
 import { DataTableColumnVisibility } from "@/components/table-explorer/data/dataTableColumnVisibility";
 import { RowEditorSidePanel } from "@/components/table-explorer/data/rowEditorSidePanel";
 import { TableFilter } from "@/components/table-explorer/data/tableFilter";
@@ -117,13 +118,17 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
               activeRowId={state.rowEditor.activeRowId}
               selectedCells={state.selectedCells}
               onCellActivate={state.handleCellActivate}
+              columnDragPreview={(columnId) => {
+                const column = state.tableColumns.find((candidate) => candidate.id === columnId);
+                return column === undefined ? columnId : <ColumnDragPreview column={column} />;
+              }}
               onColumnActivate={state.handleColumnActivate}
               onColumnOrderChange={state.setColumnOrder}
             >
               <DataTable.Viewport>
                 <DataTable.Table aria-label={`${tableName} rows`}>
                   <DataTable.Content
-                    loading={state.isFetchingMore === true && state.loadedRowCount === 0}
+                    loading={state.isInitialLoading}
                     loadingContent="Loading rows"
                     emptyContent={
                       state.filters.length > 0
@@ -135,13 +140,16 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
               </DataTable.Viewport>
               <DataTable.Footer>
                 <Text color="muted" variant="caption">
-                  {state.loadedRowCount} rows loaded
+                  {state.isRefreshing === true
+                    ? "Refreshing rows"
+                    : `${state.loadedRowCount} rows loaded`}
                 </Text>
                 {state.hasMore === true ? (
                   <Button
                     type="button"
                     variant="ghost"
                     size="s"
+                    disabled={state.isRefreshing}
                     loading={state.isFetchingMore}
                     onClick={state.fetchMore}
                   >

@@ -476,6 +476,20 @@ export const contextSwitcherItem = {
   componentId: "contextSwitcher",
 } satisfies NavItem;
 
+export const multiSelectItem = {
+  title: "Multi Select",
+  slug: "multi-select",
+  href: "/components/multi-select",
+  description:
+    "Searchable multiple selection with checkbox rows and contextual Check all and Only actions.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "multiSelect.tsx",
+    path: "packages/design-system/src/components/multiSelect/multiSelect.tsx",
+  },
+  componentId: "multiSelect",
+} satisfies NavItem;
+
 export const selectItem = {
   title: "Select",
   slug: "select",
@@ -549,6 +563,7 @@ export const componentItems: NavItem[] = [
   textLinkItem,
   textareaItem,
   menuItem,
+  multiSelectItem,
   relationValueItem,
   resizablePanelItem,
   searchItem,

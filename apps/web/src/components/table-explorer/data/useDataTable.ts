@@ -12,6 +12,7 @@ import {
 import type { DynamicTableRow } from "jazz-tools";
 
 import { buildDataTableColumns } from "@/components/table-explorer/data/buildDataTableColumns";
+import type { ColumnMoveDirection } from "@/hooks/useInspectorColumnOrder";
 import type { RowSelectionRequest } from "@/components/table-explorer/data/buildDataTableColumns";
 import type {
   TableColumnMeta,
@@ -24,6 +25,8 @@ interface UseDataTableOptions {
   columnOrder: string[];
   columnVisibility: TableColumnVisibilityState;
   columns: TableColumnMeta[];
+  onColumnMenuOpen: (columnId: string) => void;
+  onColumnMove: (columnId: string, direction: ColumnMoveDirection) => void;
   onColumnVisibilityChange: (next: TableColumnVisibilityState) => void;
   onSelectedRowIdsChange: (rowIds: TableRowId[]) => void;
   onRowSelectionRequest: (request: RowSelectionRequest) => void;
@@ -38,6 +41,8 @@ export function useDataTable({
   columnOrder,
   columnVisibility,
   columns,
+  onColumnMenuOpen,
+  onColumnMove,
   onColumnVisibilityChange,
   onSelectedRowIdsChange,
   onRowSelectionRequest,
@@ -53,11 +58,13 @@ export function useDataTable({
     () =>
       buildDataTableColumns({
         columns,
+        onColumnMenuOpen,
+        onColumnMove,
         onRowSelectionRequest: (request) => {
           onRowSelectionRequestRef.current(request);
         },
       }),
-    [columns],
+    [columns, onColumnMenuOpen, onColumnMove],
   );
 
   const rowSelection = useMemo<RowSelectionState>(() => {

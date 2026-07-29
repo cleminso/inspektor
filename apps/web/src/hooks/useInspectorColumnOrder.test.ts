@@ -1,9 +1,13 @@
 // @vitest-environment jsdom
 
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { normalizeColumnOrder, useInspectorColumnOrder } from "@/hooks/useInspectorColumnOrder";
+import {
+  moveColumnInOrder,
+  normalizeColumnOrder,
+  useInspectorColumnOrder,
+} from "@/hooks/useInspectorColumnOrder";
 
 beforeEach(() => {
   const values = new Map<string, string>();
@@ -30,6 +34,35 @@ describe("normalizeColumnOrder", () => {
   });
 });
 
+describe("moveColumnInOrder", () => {
+  it("moves one column relatively or to an order boundary", () => {
+    const order = ["id", "name", "role"];
+
+    expect(moveColumnInOrder(order, "name", "left")).toEqual(["name", "id", "role"]);
+    expect(moveColumnInOrder(order, "name", "right")).toEqual(["id", "role", "name"]);
+    expect(moveColumnInOrder(order, "name", "start")).toEqual(["name", "id", "role"]);
+    expect(moveColumnInOrder(order, "name", "end")).toEqual(["id", "role", "name"]);
+  });
+
+  it("moves relative to visible columns without disturbing hidden column positions", () => {
+    const order = ["id", "hidden", "name", "role"];
+    const visibleOrder = ["id", "name", "role"];
+
+    expect(moveColumnInOrder(order, "id", "right", visibleOrder)).toEqual([
+      "hidden",
+      "name",
+      "id",
+      "role",
+    ]);
+    expect(moveColumnInOrder(order, "role", "start", visibleOrder)).toEqual([
+      "role",
+      "id",
+      "hidden",
+      "name",
+    ]);
+  });
+});
+
 describe("useInspectorColumnOrder", () => {
   it("exposes persisted order without a default-order render", () => {
     window.localStorage.setItem(
@@ -48,5 +81,46 @@ describe("useInspectorColumnOrder", () => {
     });
 
     expect(renderedOrders[0]).toEqual(["role", "id"]);
+  });
+
+  it("falls back to schema order when storage cannot be read", () => {
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: {
+        getItem: () => {
+          throw new Error("Storage unavailable");
+        },
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useInspectorColumnOrder({
+        columnIds: ["id", "role"],
+        tableKey: "connection:accounts",
+      }),
+    );
+
+    expect(result.current.columnOrder).toEqual(["id", "role"]);
+  });
+
+  it("keeps order changes when storage cannot be written", () => {
+    Object.defineProperty(window.localStorage, "setItem", {
+      configurable: true,
+      value: () => {
+        throw new Error("Storage unavailable");
+      },
+    });
+    const { result } = renderHook(() =>
+      useInspectorColumnOrder({
+        columnIds: ["id", "role"],
+        tableKey: "connection:accounts",
+      }),
+    );
+
+    act(() => {
+      result.current.setColumnOrder(["role", "id"]);
+    });
+
+    expect(result.current.columnOrder).toEqual(["role", "id"]);
   });
 });

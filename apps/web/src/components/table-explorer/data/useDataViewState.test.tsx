@@ -68,6 +68,27 @@ vi.mock("@/hooks/useInspectorColumnVisibility", () => ({
 }));
 
 vi.mock("@/hooks/useInspectorColumnOrder", () => ({
+  moveColumnInOrder: (
+    columnOrder: string[],
+    columnId: string,
+    direction: "end" | "left" | "right" | "start",
+  ) => {
+    const currentIndex = columnOrder.indexOf(columnId);
+    const nextIndex =
+      direction === "start"
+        ? 0
+        : direction === "end"
+          ? columnOrder.length - 1
+          : direction === "left"
+            ? Math.max(currentIndex - 1, 0)
+            : Math.min(currentIndex + 1, columnOrder.length - 1);
+    const nextColumnOrder = [...columnOrder];
+    const [column] = nextColumnOrder.splice(currentIndex, 1);
+    if (column !== undefined) {
+      nextColumnOrder.splice(nextIndex, 0, column);
+    }
+    return nextColumnOrder;
+  },
   useInspectorColumnOrder: () => columnOrderState,
 }));
 
@@ -104,6 +125,8 @@ vi.mock("@/hooks/useTableQuery", () => ({
     fetchMore: vi.fn(),
     hasMore: false,
     isFetchingMore: false,
+    isInitialLoading: false,
+    isRefreshing: false,
     loadedRowCount: 1,
     resetLoadedRows: vi.fn(),
     rows: [
@@ -232,7 +255,7 @@ describe("useDataViewState", () => {
   it("moves focus from a selected cell to a clicked column header", () => {
     render(<DataViewInteractionHarness />);
     const cell = screen.getByRole("cell", { name: "Ada" });
-    const header = screen.getByRole("columnheader", { name: "Name" });
+    const header = screen.getByRole("columnheader", { name: /Name/ });
 
     fireEvent.click(cell);
     fireEvent.click(header);

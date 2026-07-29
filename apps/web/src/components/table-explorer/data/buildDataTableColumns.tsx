@@ -1,20 +1,50 @@
-// Defines `ColumnDef`
 import { useRef, type MouseEvent } from "react";
 
-import type { ColumnDef } from "@tanstack/react-table";
+import type { Column, ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowLeftToLine,
+  ArrowRight,
+  ArrowRightToLine,
+  ArrowUp,
+  ArrowUpRight,
+  ChevronDown,
+  EyeOff,
+  KeyRound,
+  MoveHorizontal,
+} from "lucide-react";
 
-import { BinaryValue, Box, Checkbox, StructuredValuePreview, Text, TimestampValue } from "@inspector/ds";
+import {
+  BinaryValue,
+  Box,
+  Button,
+  Checkbox,
+  ContextMenu,
+  KeyboardInput,
+  Menu,
+  StructuredValuePreview,
+  Text,
+  TimestampValue,
+} from "@inspector/ds";
 
+import {
+  getColumnTypeMarker,
+  type ColumnTypeMarker as ColumnTypeMarkerModel,
+} from "@/components/table-explorer/data/columnTypeMarker";
 import { RelationCellLink } from "@/components/table-explorer/data/relationCellLink";
 import {
   classifySchemaValue,
   type SchemaValuePresentation,
 } from "@/lib/table-explorer/schemaValuePresentation";
+import type { ColumnMoveDirection } from "@/hooks/useInspectorColumnOrder";
 import type { TableColumnMeta } from "@/types/tableExplorer";
 
 interface BuildDataTableColumnsOptions {
   columns: TableColumnMeta[];
+  onColumnMenuOpen?: (columnId: string) => void;
+  onColumnMove?: (columnId: string, direction: ColumnMoveDirection) => void;
   onRowSelectionRequest?: (request: RowSelectionRequest) => void;
 }
 
@@ -182,23 +212,301 @@ function SelectionCheckbox({
   );
 }
 
-function ColumnHeader({
-  dataType,
-  label,
+function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.ReactElement {
+  return (
+    <Text
+      as="span"
+      aria-label={marker.label}
+      color="muted"
+      title={marker.label}
+      variant="caption"
+    >
+      <Box as="span" alignItems="center" display="flex">
+        {marker.icon === "key" ? <KeyRound aria-hidden="true" size={12} /> : null}
+        {marker.icon === "relation" ? <ArrowUpRight aria-hidden="true" size={12} /> : null}
+        {marker.suffix}
+      </Box>
+    </Text>
+  );
+}
+
+export function ColumnDragPreview({ column }: { column: TableColumnMeta }): React.ReactElement {
+  return (
+    <Box as="span" alignItems="center" display="flex" gap="s" minWidth={0}>
+      <ColumnTypeMarker marker={getColumnTypeMarker(column)} />
+      <Text as="span" truncate variant="caption">
+        {column.label}
+      </Text>
+    </Box>
+  );
+}
+
+function MenuMoveActions({
+  columnId,
+  onMove,
 }: {
-  dataType: string | null;
-  label: string;
+  columnId: string;
+  onMove: (columnId: string, direction: ColumnMoveDirection) => void;
 }): React.ReactElement {
   return (
-    <Box as="span" alignItems="center" gap="s" minWidth={0}>
-      <Text as="span" truncate variant="caption">{label}</Text>
-      {dataType !== null ? <Text as="span" color="muted" variant="caption">{dataType}</Text> : null}
-    </Box>
+    <Menu.SubmenuRoot>
+      <Menu.SubmenuTrigger>
+        <Menu.Prefix>
+          <MoveHorizontal aria-hidden="true" size={14} />
+        </Menu.Prefix>
+        Move
+      </Menu.SubmenuTrigger>
+      <Menu.Content side="right" align="start">
+        <Menu.Item onClick={() => onMove(columnId, "left")}>
+          <Menu.Prefix>
+            <ArrowLeft aria-hidden="true" size={14} />
+          </Menu.Prefix>
+          Move left
+          <Menu.Shortcut>
+            <KeyboardInput modifiers={["shift"]} size="small">
+              ←
+            </KeyboardInput>
+          </Menu.Shortcut>
+        </Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, "right")}>
+          <Menu.Prefix>
+            <ArrowRight aria-hidden="true" size={14} />
+          </Menu.Prefix>
+          Move right
+          <Menu.Shortcut>
+            <KeyboardInput modifiers={["shift"]} size="small">
+              →
+            </KeyboardInput>
+          </Menu.Shortcut>
+        </Menu.Item>
+        <Menu.Separator />
+        <Menu.Item onClick={() => onMove(columnId, "start")}>
+          <Menu.Prefix>
+            <ArrowLeftToLine aria-hidden="true" size={14} />
+          </Menu.Prefix>
+          Move to start
+        </Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, "end")}>
+          <Menu.Prefix>
+            <ArrowRightToLine aria-hidden="true" size={14} />
+          </Menu.Prefix>
+          Move to end
+        </Menu.Item>
+      </Menu.Content>
+    </Menu.SubmenuRoot>
+  );
+}
+
+function MenuColumnActions({
+  column,
+  onMove,
+}: {
+  column: Column<DynamicTableRow>;
+  onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
+}): React.ReactElement {
+  return (
+    <>
+      <Menu.Item
+        disabled={column.getCanSort() === false}
+        onClick={() => column.toggleSorting(false)}
+      >
+        <Menu.Prefix><ArrowUp size={14} /></Menu.Prefix>
+        Sort Ascending
+      </Menu.Item>
+      <Menu.Item
+        disabled={column.getCanSort() === false}
+        onClick={() => column.toggleSorting(true)}
+      >
+        <Menu.Prefix><ArrowDown size={14} /></Menu.Prefix>
+        Sort Descending
+      </Menu.Item>
+      {onMove === undefined ? null : (
+        <>
+          <Menu.Separator />
+          <MenuMoveActions columnId={column.id} onMove={onMove} />
+        </>
+      )}
+      <Menu.Separator />
+      <Menu.Item
+        disabled={column.getCanHide() === false}
+        onClick={() => column.toggleVisibility(false)}
+      >
+        <Menu.Prefix><EyeOff size={14} /></Menu.Prefix>
+        Hide column
+      </Menu.Item>
+    </>
+  );
+}
+
+function ContextMoveActions({
+  columnId,
+  onMove,
+}: {
+  columnId: string;
+  onMove: (columnId: string, direction: ColumnMoveDirection) => void;
+}): React.ReactElement {
+  return (
+    <ContextMenu.SubmenuRoot>
+      <ContextMenu.SubmenuTrigger>
+        <ContextMenu.Prefix>
+          <MoveHorizontal aria-hidden="true" size={14} />
+        </ContextMenu.Prefix>
+        Move
+      </ContextMenu.SubmenuTrigger>
+      <ContextMenu.Content side="right" align="start">
+        <ContextMenu.Item onClick={() => onMove(columnId, "left")}>
+          <ContextMenu.Prefix>
+            <ArrowLeft aria-hidden="true" size={14} />
+          </ContextMenu.Prefix>
+          Move left
+          <ContextMenu.Shortcut>
+            <KeyboardInput modifiers={["shift"]} size="small">
+              ←
+            </KeyboardInput>
+          </ContextMenu.Shortcut>
+        </ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, "right")}>
+          <ContextMenu.Prefix>
+            <ArrowRight aria-hidden="true" size={14} />
+          </ContextMenu.Prefix>
+          Move right
+          <ContextMenu.Shortcut>
+            <KeyboardInput modifiers={["shift"]} size="small">
+              →
+            </KeyboardInput>
+          </ContextMenu.Shortcut>
+        </ContextMenu.Item>
+        <ContextMenu.Separator />
+        <ContextMenu.Item onClick={() => onMove(columnId, "start")}>
+          <ContextMenu.Prefix>
+            <ArrowLeftToLine aria-hidden="true" size={14} />
+          </ContextMenu.Prefix>
+          Move to start
+        </ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, "end")}>
+          <ContextMenu.Prefix>
+            <ArrowRightToLine aria-hidden="true" size={14} />
+          </ContextMenu.Prefix>
+          Move to end
+        </ContextMenu.Item>
+      </ContextMenu.Content>
+    </ContextMenu.SubmenuRoot>
+  );
+}
+
+function ContextColumnActions({
+  column,
+  onMove,
+}: {
+  column: Column<DynamicTableRow>;
+  onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
+}): React.ReactElement {
+  return (
+    <>
+      <ContextMenu.Item
+        disabled={column.getCanSort() === false}
+        onClick={() => column.toggleSorting(false)}
+      >
+        <ContextMenu.Prefix><ArrowUp size={14} /></ContextMenu.Prefix>
+        Sort Ascending
+      </ContextMenu.Item>
+      <ContextMenu.Item
+        disabled={column.getCanSort() === false}
+        onClick={() => column.toggleSorting(true)}
+      >
+        <ContextMenu.Prefix><ArrowDown size={14} /></ContextMenu.Prefix>
+        Sort Descending
+      </ContextMenu.Item>
+      {onMove === undefined ? null : (
+        <>
+          <ContextMenu.Separator />
+          <ContextMoveActions columnId={column.id} onMove={onMove} />
+        </>
+      )}
+      <ContextMenu.Separator />
+      <ContextMenu.Item
+        disabled={column.getCanHide() === false}
+        onClick={() => column.toggleVisibility(false)}
+      >
+        <ContextMenu.Prefix><EyeOff size={14} /></ContextMenu.Prefix>
+        Hide column
+      </ContextMenu.Item>
+    </>
+  );
+}
+
+function ColumnHeader({
+  column,
+  label,
+  marker,
+  onMenuOpen,
+  onMove,
+}: {
+  column: Column<DynamicTableRow>;
+  label: string;
+  marker: ColumnTypeMarkerModel;
+  onMenuOpen?: (columnId: string) => void;
+  onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
+}): React.ReactElement {
+  const handleOpenChange = (open: boolean) => {
+    if (open === true) {
+      onMenuOpen?.(column.id);
+    }
+  };
+
+  return (
+    <ContextMenu.Root onOpenChange={handleOpenChange}>
+      <ContextMenu.Trigger
+        render={
+          <Box
+            as="span"
+            alignItems="center"
+            display="flex"
+            justifyContent="between"
+            minWidth={0}
+            width="full"
+          />
+        }
+      >
+        <Box as="span" alignItems="center" display="flex" flex={1} gap="s" minWidth={0}>
+          <ColumnTypeMarker marker={marker} />
+          <Text as="span" truncate variant="caption">{label}</Text>
+        </Box>
+        <Menu.Root onOpenChange={handleOpenChange}>
+          <Menu.Trigger
+            render={
+              <Button
+                type="button"
+                aria-label={`Open ${label} column menu`}
+                shape="square"
+                size="xs"
+                variant="link"
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                <Text as="span" color="muted">
+                  <ChevronDown aria-hidden="true" size={14} />
+                </Text>
+              </Button>
+            }
+          />
+          <Menu.Content align="end">
+            <MenuColumnActions column={column} onMove={onMove} />
+          </Menu.Content>
+        </Menu.Root>
+      </ContextMenu.Trigger>
+      <ContextMenu.Content>
+        <ContextColumnActions column={column} onMove={onMove} />
+      </ContextMenu.Content>
+    </ContextMenu.Root>
   );
 }
 
 export function buildDataTableColumns({
   columns,
+  onColumnMenuOpen,
+  onColumnMove,
   onRowSelectionRequest,
 }: BuildDataTableColumnsOptions): ColumnDef<DynamicTableRow>[] {
   const selectionColumn: ColumnDef<DynamicTableRow> = {
@@ -252,7 +560,7 @@ export function buildDataTableColumns({
   };
 
   const dataColumns = columns.map<ColumnDef<DynamicTableRow>>((column) => {
-    const dataType = column.column !== null ? column.column.column_type.type.toLowerCase() : null;
+    const marker = getColumnTypeMarker(column);
     const sizing = getColumnSizing(column);
 
     return {
@@ -263,7 +571,15 @@ export function buildDataTableColumns({
       accessorFn: (row) => row[column.accessorKey],
       enableHiding: column.id !== "id",
       enableSorting: column.isSortable,
-      header: () => <ColumnHeader dataType={dataType} label={column.label} />,
+      header: ({ column: tableColumn }) => (
+        <ColumnHeader
+          column={tableColumn}
+          label={column.label}
+          marker={marker}
+          onMenuOpen={onColumnMenuOpen}
+          onMove={onColumnMove}
+        />
+      ),
       cell: ({ row }) => {
         const rawValue = row.original[column.accessorKey];
         const presentation = classifySchemaValue(rawValue, column.column);

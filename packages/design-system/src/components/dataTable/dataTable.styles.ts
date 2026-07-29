@@ -64,7 +64,7 @@ export const dataTableStyles = stylex.create({
     },
     outlineColor: {
       default: 'transparent',
-      ':focus-visible': borderColors['border-focused'],
+      ':focus-visible': borderColors['border-table-column-active'],
     },
     outlineOffset: -2,
     borderRightStyle: 'solid',
@@ -103,6 +103,7 @@ export const dataTableStyles = stylex.create({
     backgroundColor: 'transparent',
     cursor: 'grabbing',
     zIndex: 4,
+    borderBottomColor: borderColors['border-table-column-active'],
   },
   headerDragContent: {
     alignItems: 'center',

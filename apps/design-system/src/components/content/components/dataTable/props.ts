@@ -11,6 +11,7 @@ export const dataTableRootPropNames = [
   'onRowContextMenu',
   'onHeaderContextMenu',
   'onCellContextMenu',
+  'columnDragPreview',
   'columnOrder',
   'onColumnOrderChange',
   'children',

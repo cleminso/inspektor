@@ -249,6 +249,15 @@ export type {
   MenuSubmenuTriggerProps,
   MenuTriggerProps,
 } from './components/menu/menu'
+export { MultiSelect } from './components/multiSelect/multiSelect'
+export type {
+  MultiSelectContentHeight,
+  MultiSelectContentProps,
+  MultiSelectContentWidth,
+  MultiSelectItem,
+  MultiSelectRootProps,
+  MultiSelectTriggerProps,
+} from './components/multiSelect/multiSelect'
 export { Search } from './components/search/search'
 export type { SearchProps } from './components/search/search'
 export { SidePanel } from './components/sidePanel/sidePanel'

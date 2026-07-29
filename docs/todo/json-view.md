@@ -16,7 +16,7 @@
 - [x] Register the exported `JsonView` with package-authoritative prop extraction.
 - [x] Render JSON objects and arrays through a read-only syntax tree with native selectable text.
 - [x] Add disclosure, initial expansion depth, literal search highlighting, and long-string reveal behavior.
-- [x] Add WAI-ARIA tree semantics, roving focus, complete tree keyboard navigation, and focus recovery.
+- [x] Add WAI-ARIA tree semantics, roving focus, value-node keyboard navigation, and focus recovery.
 - [x] Scope pointer hover and keyboard focus treatment to the interactive row rather than the complete descendant subtree.
 - [x] Toggle expandable containers from the complete row without selecting non-leaf text on repeated pointer presses.
 - [x] Show the row focus ring for keyboard navigation without retaining it after pointer disclosure.
@@ -31,17 +31,21 @@
 - [x] Add executable examples for expansion, nested data, empty values, search, narrow long content, and bounded branches.
 - [x] Add a focused expansion and search playground.
 - [x] Add the static `/components/json-view` documentation route.
-- [x] Normalize Jazz rows without indexed `Uint8Array` serialization or loss of unsupported values.
+- [x] Normalize Jazz row values into strict JSON-compatible values, representing bytes, unavailable values, non-finite numbers,
+      cycles, and unsupported values through explicit tagged objects.
 - [x] Add read-only row `JSON` beside editable `Details` in the Table Explorer pane.
 - [x] Keep search and whole-row Copy JSON application-owned.
-- [x] Bound the complete expanded tree across simultaneously expanded branches.
-- [x] Reuse `JsonView` for read-only structured fields where the normalized root is an object or array.
+- [x] Use `JsonView` as an object-or-array fallback when a read-only structured runtime value cannot be represented safely as
+      `CodeEditor` source.
 
 ## Open product work
 
 [24/07/26]
 
-- None.
+- [ ] Render object and array rows with a selectable representation whose punctuation is valid JSON.
+- [ ] Add and test Arrow Left parent navigation from continuation tree items.
+- [ ] Cover active-path recovery when replacement data removes the focused or expanded path.
+- [ ] Add an executable keyboard-navigation and focus example.
 
 ## Work outside the foundation scope
 
@@ -62,7 +66,10 @@
 
 [24/07/26]
 
-- None.
+- [ ] Review semantic syntax-color tokens across supported themes.
+- [ ] Decide whether search needs previous and next match navigation.
+- [ ] Decide whether normalization, search, and Copy traversal require a worker or traversal budget.
+- [ ] Decide the accessible naming and visual representation of root-array indices.
 
 ## Validation checklist
 
@@ -72,5 +79,6 @@
 - [x] Generated prop metadata is current.
 - [x] Documentation typecheck and focused lint pass.
 - [x] Documentation production build passes.
-- [x] Design-system and Inspector tests, typechecks, focused lint, and builds pass with the application integration.
+- [ ] Re-run and record cross-package tests, typechecks, focused lint, generated-prop checks, and builds against the current
+      application integration.
 - [ ] Running-application verification covers narrow panes, keyboard navigation, search, copying, and row changes.

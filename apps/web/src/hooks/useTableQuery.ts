@@ -4,7 +4,7 @@
  * The hook turns route search state into a generic Jazz query, derives render columns from
  * stored schema metadata, and loads rows incrementally without app-generated table types.
  */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { useAll } from "jazz-tools/react";
 import { type DynamicTableRow } from "jazz-tools";
@@ -45,6 +45,8 @@ export interface UseTableQueryResult {
   fetchMore: () => void;
   hasMore: boolean;
   isFetchingMore: boolean;
+  isInitialLoading: boolean;
+  isRefreshing: boolean;
   loadedRowCount: number;
   resetLoadedRows: () => void;
   rows: DynamicTableRow[];
@@ -53,6 +55,13 @@ export interface UseTableQueryResult {
 interface RequestedRowCountState {
   queryKey: string;
   rowCount: number;
+}
+
+interface ResolvedRowsState {
+  dataScopeKey: string;
+  queryKey: string;
+  requestedRowCount: number;
+  rows: DynamicTableRow[];
 }
 
 /**
@@ -71,6 +80,10 @@ export function useTableQuery({
   const queryKey = useMemo(
     () => JSON.stringify({ chunkSize, currentSchemaHash, filters, sortColumn, sortDirection, tableName }),
     [chunkSize, currentSchemaHash, filters, sortColumn, sortDirection, tableName],
+  );
+  const dataScopeKey = useMemo(
+    () => JSON.stringify({ chunkSize, currentSchemaHash, filters, tableName }),
+    [chunkSize, currentSchemaHash, filters, tableName],
   );
   const [requestedRowCountState, setRequestedRowCountState] = useState<RequestedRowCountState>(() => ({
     queryKey,
@@ -138,16 +151,38 @@ export function useTableQuery({
   }, []);
 
   const rows = useAll<DynamicTableRow>(queryBuilder ?? undefined, queryOptions);
-  const resolvedRows = rows ?? EMPTY_ROWS;
+  const resolvedRowsRef = useRef<ResolvedRowsState | null>(null);
+  if (rows !== undefined) {
+    resolvedRowsRef.current = {
+      dataScopeKey,
+      queryKey,
+      requestedRowCount,
+      rows,
+    };
+  }
+  const previousRowsState = resolvedRowsRef.current;
+  const canPreserveRows =
+    rows === undefined && previousRowsState?.dataScopeKey === dataScopeKey;
+  const resolvedRows = rows ?? (canPreserveRows === true ? previousRowsState.rows : EMPTY_ROWS);
   const hasMore = resolvedRows.length > requestedRowCount;
   const visibleRows = hasMore === true ? resolvedRows.slice(0, requestedRowCount) : resolvedRows;
+  const isInitialLoading = rows === undefined && canPreserveRows === false;
+  const isRefreshing =
+    rows === undefined && canPreserveRows === true && previousRowsState.queryKey !== queryKey;
+  const isFetchingMore =
+    rows === undefined &&
+    canPreserveRows === true &&
+    previousRowsState.queryKey === queryKey &&
+    requestedRowCount > previousRowsState.requestedRowCount;
 
   return {
     columns,
     rows: visibleRows,
     loadedRowCount: visibleRows.length,
     hasMore,
-    isFetchingMore: rows === undefined,
+    isFetchingMore,
+    isInitialLoading,
+    isRefreshing,
     fetchMore: () => {
       if (hasMore === false || rows === undefined) {
         return;

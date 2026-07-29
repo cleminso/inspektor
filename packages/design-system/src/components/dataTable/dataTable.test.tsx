@@ -15,14 +15,21 @@ let onDataTableDragEnd: ((event: unknown) => void) | undefined;
 let onDataTableDragOver: ((event: unknown) => void) | undefined;
 let onDataTableDragStart: ((event: unknown) => void) | undefined;
 let dragOverlayDropAnimation: unknown;
+let dragOverlaySource: { element?: Element | null; id: string } = { id: "name" };
 const sortableInputs: unknown[] = [];
 const sortableTargetRefs = new Map<string, ReturnType<typeof vi.fn>>();
 let droppingSortableId: string | null = null;
 
 vi.mock("@dnd-kit/react", () => ({
-  DragOverlay: ({ dropAnimation }: { dropAnimation?: unknown }) => {
+  DragOverlay: ({
+    children,
+    dropAnimation,
+  }: {
+    children?: (source: { element?: Element | null; id: string }) => ReactNode;
+    dropAnimation?: unknown;
+  }) => {
     dragOverlayDropAnimation = dropAnimation;
-    return null;
+    return <div data-testid="column-drag-overlay">{children?.(dragOverlaySource)}</div>;
   },
   DragDropProvider: ({
     children,
@@ -242,6 +249,26 @@ function InteractiveHeaderDataTable({
   );
 }
 
+function KeyboardSortableDataTable({ onSortingChange }: { onSortingChange: () => void }) {
+  const table = useReactTable({
+    columns,
+    data: rows,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
+    onSortingChange,
+  });
+
+  return (
+    <DataTable.Root table={table}>
+      <DataTable.Viewport>
+        <DataTable.Table aria-label="Sortable people">
+          <DataTable.Content />
+        </DataTable.Table>
+      </DataTable.Viewport>
+    </DataTable.Root>
+  );
+}
+
 function DismissibleColumnDataTable() {
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const table = useReactTable({
@@ -318,9 +345,11 @@ function SelectionHitAreaDataTable({ onCellActivate }: {
 }
 
 function ReorderableDataTable({
+  columnDragPreview,
   initialColumnOrder = ["name", "role"],
   onColumnOrderChange,
 }: {
+  columnDragPreview?: (columnId: string) => ReactNode;
   initialColumnOrder?: string[];
   onColumnOrderChange: (columnIds: string[]) => void;
 }) {
@@ -336,6 +365,7 @@ function ReorderableDataTable({
   return (
     <DataTable.Root
       table={table}
+      columnDragPreview={columnDragPreview}
       columnOrder={columnOrder}
       onColumnOrderChange={(nextColumnOrder) => {
         setColumnOrder(nextColumnOrder);
@@ -355,6 +385,7 @@ afterEach(() => {
   cleanup();
   contextRenderCount.current = 0;
   dragOverlayDropAnimation = undefined;
+  dragOverlaySource = { id: "name" };
   droppingSortableId = null;
   onDataTableDragEnd = undefined;
   onDataTableDragOver = undefined;
@@ -637,6 +668,37 @@ describe("DataTable", () => {
     ).toEqual(["Engineer", "Ada"]);
   });
 
+  it("moves a focused header with Shift and horizontal arrow keys", async () => {
+    const onColumnOrderChange = vi.fn();
+    render(<ReorderableDataTable onColumnOrderChange={onColumnOrderChange} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-reorderable")).toBe(
+        true,
+      );
+    });
+
+    const header = screen.getByRole("columnheader", { name: "Name" });
+    header.focus();
+    fireEvent.keyDown(header, { key: "ArrowRight", shiftKey: true });
+
+    expect(onColumnOrderChange).toHaveBeenCalledWith(["role", "name"]);
+    expect(document.activeElement).toBe(screen.getByRole("columnheader", { name: "Name" }));
+  });
+
+  it("renders an application-provided drag preview", async () => {
+    render(
+      <ReorderableDataTable
+        columnDragPreview={(columnId) => <span>{`Marker ${columnId}`}</span>}
+        onColumnOrderChange={() => undefined}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("column-drag-overlay").textContent).toBe("Marker name");
+    });
+  });
+
   it("gives reorderable body cells row-scoped sortable transitions without making them draggable", async () => {
     render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
@@ -655,15 +717,32 @@ describe("DataTable", () => {
     });
   });
 
-  it("keeps the source header visually reserved while its overlay is dropping", async () => {
+  it("keeps the source header slot reserved without duplicating the overlay content", async () => {
     droppingSortableId = "name";
     render(<ReorderableDataTable onColumnOrderChange={() => undefined} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-dragging")).toBe(
-        true,
+      const header = document.querySelector<HTMLElement>('[data-column-id="name"]');
+      expect(header).not.toBeNull();
+      const source = header?.querySelector<HTMLElement>(
+        '[data-slot="data-table-header-drag-source"]',
       );
+      expect(header?.hasAttribute("data-dragging")).toBe(true);
+      expect(source).not.toBeNull();
+      expect(source?.getAttribute("aria-hidden")).toBe("true");
     });
+  });
+
+  it("reports sort state and toggles sorting from a focused header with Enter", () => {
+    const onSortingChange = vi.fn();
+    render(<KeyboardSortableDataTable onSortingChange={onSortingChange} />);
+
+    const header = screen.getByRole("columnheader", { name: "Name" });
+    expect(header.getAttribute("aria-sort")).toBe("none");
+    header.focus();
+    fireEvent.keyDown(header, { key: "Enter" });
+
+    expect(onSortingChange).toHaveBeenCalledOnce();
   });
 
   it("does not animate the drag overlay after the pointer is released", async () => {

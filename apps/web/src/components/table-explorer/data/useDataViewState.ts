@@ -25,14 +25,18 @@ import {
   updateRowSelection,
 } from "@/components/table-explorer/data/rowSelection";
 import { useInspectorColumnVisibility } from "@/hooks/useInspectorColumnVisibility";
-import { useInspectorColumnOrder } from "@/hooks/useInspectorColumnOrder";
+import {
+  moveColumnInOrder,
+  useInspectorColumnOrder,
+  type ColumnMoveDirection,
+} from "@/hooks/useInspectorColumnOrder";
 import { useTableExplorerSearchParams } from "@/hooks/useTableExplorerSearchParams";
 import { useTableMutations } from "@/hooks/useTableMutations";
 import { useTableQuery } from "@/hooks/useTableQuery";
 import { GenericQueryBuilder } from "@/lib/table-explorer/genericQueryBuilder";
 import { getTableColumns } from "@/lib/table-explorer/tableSchema";
 import type { TableFilterClause } from "@/types/tableFilters";
-import type { TableRowId } from "@/types/tableExplorer";
+import type { TableColumnMeta, TableRowId } from "@/types/tableExplorer";
 
 interface UseDataViewStateOptions {
   tableName: string;
@@ -85,6 +89,8 @@ interface UseDataViewStateResult {
   handleRowDraftDirtyChange: (isDirty: boolean) => void;
   hasMore: boolean;
   isFetchingMore: boolean;
+  isInitialLoading: boolean;
+  isRefreshing: boolean;
   loadedRowCount: number;
   rowEditor: DataViewRowEditorState;
   rowValues: Record<string, unknown> | null;
@@ -93,6 +99,7 @@ interface UseDataViewStateResult {
   setFilters: (filters: TableFilterClause[]) => Promise<void>;
   setColumnOrder: (columnIds: string[]) => void;
   table: Table<DynamicTableRow>;
+  tableColumns: TableColumnMeta[];
 }
 
 /**
@@ -351,6 +358,24 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     }
   };
 
+  const handleColumnActivate = useCallback((columnId: string | null) => {
+    if (columnId !== null) {
+      setCellSelection(createEmptyCellSelection());
+    }
+    setActiveColumnId(columnId);
+  }, []);
+  const handleColumnMove = useCallback(
+    (columnId: string, direction: ColumnMoveDirection) => {
+      const visibleColumnOrder = order.columnOrder.filter(
+        (candidateId) => visibility.columnVisibility[candidateId] !== false,
+      );
+      order.setColumnOrder(
+        moveColumnInOrder(order.columnOrder, columnId, direction, visibleColumnOrder),
+      );
+    },
+    [order.columnOrder, order.setColumnOrder, visibility.columnVisibility],
+  );
+
   const table = useDataTable({
     columnOrder: order.columnOrder,
     rows: query.rows,
@@ -363,6 +388,8 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     onSelectedRowIdsChange: handleSelectedRowIdsChange,
     onRowSelectionRequest: handleRowSelectionRequest,
     onColumnVisibilityChange: handleColumnVisibilityChange,
+    onColumnMenuOpen: handleColumnActivate,
+    onColumnMove: handleColumnMove,
   });
   const selectedRow = useMemo(() => {
     const visibleSelectedRow = query.rows.find((row) => String(row.id) === activeRowId) ?? null;
@@ -495,6 +522,8 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     loadedRowCount: query.loadedRowCount,
     hasMore: query.hasMore,
     isFetchingMore: query.isFetchingMore,
+    isInitialLoading: query.isInitialLoading,
+    isRefreshing: query.isRefreshing,
     fetchMore: query.fetchMore,
     filters: searchState.filters,
     setFilters: async (filters) => {
@@ -512,6 +541,7 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
     },
     setColumnOrder: order.setColumnOrder,
     schemaColumns,
+    tableColumns: query.columns,
     selectedCells: cellSelection.selectedCells,
     rowValues,
     rowEditor: {
@@ -545,12 +575,7 @@ export function useDataViewState({ tableName }: UseDataViewStateOptions): UseDat
       }
     },
     handleEscape,
-    handleColumnActivate: (columnId) => {
-      if (columnId !== null) {
-        setCellSelection(createEmptyCellSelection());
-      }
-      setActiveColumnId(columnId);
-    },
+    handleColumnActivate,
     handleRowEditorOpenChange: (open) => {
       if (open === false) {
         draftTransition.request(closeDetailPane);

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -11,11 +11,15 @@ function TestTable({
   columns,
   data,
   onRowSelectionRequest,
+  onColumnMenuOpen,
+  onColumnMove,
   onSortingChange,
 }: {
   columns?: Parameters<typeof buildDataTableColumns>[0]["columns"];
   data?: DynamicTableRow[];
   onRowSelectionRequest?: (request: { checked: boolean; rowId: string; shiftKey: boolean }) => void;
+  onColumnMenuOpen?: (columnId: string) => void;
+  onColumnMove?: Parameters<typeof buildDataTableColumns>[0]["onColumnMove"];
   onSortingChange: () => void;
 }): React.ReactElement {
   const table = useReactTable({
@@ -30,6 +34,8 @@ function TestTable({
         },
       ],
       onRowSelectionRequest,
+      onColumnMenuOpen,
+      onColumnMove,
     }),
     data: data ?? [{ id: "row-1", name: "Ada" } as DynamicTableRow],
     getCoreRowModel: getCoreRowModel(),
@@ -50,15 +56,84 @@ function TestTable({
 afterEach(cleanup);
 
 describe("buildDataTableColumns", () => {
-  it("renders sortable metadata without sorting on direct header click", () => {
+  it("keeps direct header clicks for column activation and sorts from the action menu", () => {
     const onSortingChange = vi.fn();
-    render(<TestTable onSortingChange={onSortingChange} />);
+    const onColumnMenuOpen = vi.fn();
+    render(
+      <TestTable onColumnMenuOpen={onColumnMenuOpen} onSortingChange={onSortingChange} />,
+    );
 
-    const header = screen.getByRole("columnheader", { name: "Name" });
+    const header = screen.getByRole("columnheader", { name: /Name/ });
     fireEvent.click(header);
 
-    expect(screen.queryByRole("button", { name: /sort name/i })).toBeNull();
     expect(onSortingChange).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+    expect(onColumnMenuOpen).toHaveBeenCalledWith("name");
+    fireEvent.click(screen.getByRole("menuitem", { name: "Sort Ascending" }));
+
+    expect(onSortingChange).toHaveBeenCalledOnce();
+  });
+
+  it("opens the same column actions by right-clicking a header", () => {
+    render(<TestTable onSortingChange={() => undefined} />);
+
+    fireEvent.contextMenu(screen.getByText("Name"));
+
+    expect(screen.getByRole("menuitem", { name: "Sort Descending" })).toBeTruthy();
+    expect(screen.getByRole("menuitem", { name: "Hide column" })).toBeTruthy();
+  });
+
+  it("moves a column through the shared Move submenu", async () => {
+    const onColumnMove = vi.fn();
+    render(<TestTable onColumnMove={onColumnMove} onSortingChange={() => undefined} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+    const move = screen.getByRole("menuitem", { name: "Move" });
+    fireEvent.keyDown(move, { key: "ArrowRight" });
+
+    await waitFor(() => {
+      expect(screen.getByRole("menuitem", { name: /Move right/ })).toBeTruthy();
+    });
+    fireEvent.click(screen.getByRole("menuitem", { name: /Move right/ }));
+
+    expect(onColumnMove).toHaveBeenCalledWith("name", "right");
+  });
+
+  it("hides a column through the header action menu", () => {
+    render(<TestTable onSortingChange={() => undefined} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Hide column" }));
+
+    expect(screen.queryByText("Ada")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Open Name column menu" })).toBeNull();
+  });
+
+  it("renders composed type markers before column names", () => {
+    render(
+      <TestTable
+        columns={[
+          { accessorKey: "id", column: null, id: "id", isSortable: true, label: "id" },
+          {
+            accessorKey: "accountIds",
+            column: {
+              column_type: { type: "Array", element: { type: "Uuid" } },
+              name: "accountIds",
+              nullable: true,
+              references: "accounts",
+            } as never,
+            id: "accountIds",
+            isSortable: false,
+            label: "Accounts",
+          },
+        ]}
+        onSortingChange={() => undefined}
+      />,
+    );
+
+    expect(screen.getByLabelText("Row ID").nextElementSibling?.textContent).toBe("id");
+    expect(screen.getByLabelText("Reference").textContent).toBe("");
   });
 
   it("uses schema-aware initial column widths", () => {
@@ -266,7 +341,7 @@ describe("buildDataTableColumns", () => {
       second: "2-digit",
       year: "numeric",
     }).format(timestamp)).tagName).toBe("TIME");
-    expect(screen.getByText("{T}")).toBeTruthy();
+    expect(screen.getByLabelText("Typed JSON value")).toBeTruthy();
     expect(screen.getByText(/enabled: true/).tagName).toBe("CODE");
     expect(nestedReads).toBe(0);
   });

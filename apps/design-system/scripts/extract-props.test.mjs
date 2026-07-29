@@ -988,6 +988,48 @@ test("extracts the constrained ContextSwitcher compound API", () => {
   );
 });
 
+test("extracts the constrained MultiSelect compound API", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.deepEqual(
+    metadata["multiSelect.root"]?.map(({ name }) => name),
+    [
+      "items",
+      "value",
+      "defaultValue",
+      "onValueChange",
+      "defaultOpen",
+      "open",
+      "onOpenChange",
+      "disabled",
+    ],
+  );
+  assert.equal(
+    metadata["multiSelect.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
+    "false",
+  );
+  assert.deepEqual(
+    metadata["multiSelect.trigger"]?.map(({ name }) => name),
+    ["label", "render", "disabled"],
+  );
+  assert.equal(
+    metadata["multiSelect.content"]?.find(({ name }) => name === "width")?.defaultValue,
+    '"m"',
+  );
+  assert.equal(
+    metadata["multiSelect.content"]?.find(({ name }) => name === "maxHeight")?.defaultValue,
+    '"m"',
+  );
+  assert.equal(
+    metadata["multiSelect.trigger"]?.find(({ name }) => name === "className"),
+    undefined,
+  );
+  assert.equal(
+    metadata["multiSelect.content"]?.find(({ name }) => name === "style"),
+    undefined,
+  );
+});
+
 test("extracts the constrained Select compound API", () => {
   const metadata = extractPropsMetadata();
 

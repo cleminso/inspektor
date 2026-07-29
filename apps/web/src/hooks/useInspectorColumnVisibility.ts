@@ -4,7 +4,7 @@
  * Jazz schema metadata can expose many columns. The Inspector remembers which known
  * columns the user hid without changing the saved Jazz connection or runtime schema.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { TableColumnVisibilityState } from "@/types/tableExplorer";
 
@@ -31,61 +31,64 @@ function areColumnVisibilityStatesEqual(
   return columnIds.every((columnId) => left[columnId] === right[columnId]);
 }
 
+function readColumnVisibility(
+  storageKey: string,
+  columnIds: string[],
+): TableColumnVisibilityState {
+  const defaultColumnVisibility = createDefaultColumnVisibility(columnIds);
+
+  try {
+    const storedValue = window.localStorage.getItem(storageKey);
+    if (storedValue === null) {
+      return defaultColumnVisibility;
+    }
+    const parsedValue = JSON.parse(storedValue) as unknown;
+    if (typeof parsedValue !== "object" || parsedValue === null || Array.isArray(parsedValue) === true) {
+      return defaultColumnVisibility;
+    }
+
+    const candidateVisibility = parsedValue as TableColumnVisibilityState;
+    for (const columnId of columnIds) {
+      if (candidateVisibility[columnId] === false) {
+        defaultColumnVisibility[columnId] = false;
+      }
+    }
+  } catch {
+    return defaultColumnVisibility;
+  }
+
+  return defaultColumnVisibility;
+}
+
 /** Returns the visible/hidden column map and a setter that mirrors it to localStorage. */
 export function useInspectorColumnVisibility({
   columnIds,
   tableKey,
 }: UseInspectorColumnVisibilityOptions): UseInspectorColumnVisibilityResult {
-  const storageKey = useMemo(() => `inspector:column-visibility:${tableKey}`, [tableKey]);
-  const columnIdsKey = useMemo(() => columnIds.join("|"), [columnIds]);
+  const storageKey = `inspector:column-visibility:${tableKey}`;
   const defaultColumnVisibility = useMemo(() => createDefaultColumnVisibility(columnIds), [columnIds]);
-  const [columnVisibility, setColumnVisibilityState] = useState<TableColumnVisibilityState>(defaultColumnVisibility);
+  const [columnVisibility, setColumnVisibilityState] = useState<TableColumnVisibilityState>(() =>
+    readColumnVisibility(storageKey, columnIds),
+  );
 
-  useEffect(() => {
-    const applyNextColumnVisibility = (nextColumnVisibility: TableColumnVisibilityState) => {
+  const setColumnVisibility = useCallback(
+    (next: TableColumnVisibilityState) => {
+      const nextValue: TableColumnVisibilityState = { ...defaultColumnVisibility, ...next };
       setColumnVisibilityState((currentColumnVisibility) => {
-        if (areColumnVisibilityStatesEqual(currentColumnVisibility, nextColumnVisibility, columnIds) === true) {
+        if (areColumnVisibilityStatesEqual(currentColumnVisibility, nextValue, columnIds) === true) {
           return currentColumnVisibility;
         }
 
-        return nextColumnVisibility;
+        return nextValue;
       });
-    };
-
-    const storedValue = window.localStorage.getItem(storageKey);
-    if (storedValue === null) {
-      applyNextColumnVisibility(defaultColumnVisibility);
-      return;
-    }
-
-    try {
-      const parsedValue = JSON.parse(storedValue) as TableColumnVisibilityState;
-      const nextColumnVisibility: TableColumnVisibilityState = { ...defaultColumnVisibility };
-
-      // Only restore hidden flags for columns that still exist in the active schema.
-      for (const columnId of columnIds) {
-        if (parsedValue[columnId] === false) {
-          nextColumnVisibility[columnId] = false;
-        }
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(nextValue));
+      } catch {
+        return;
       }
-
-      applyNextColumnVisibility(nextColumnVisibility);
-    } catch {
-      applyNextColumnVisibility(defaultColumnVisibility);
-    }
-  }, [columnIds, columnIdsKey, defaultColumnVisibility, storageKey]);
-
-  const setColumnVisibility = (next: TableColumnVisibilityState) => {
-    const nextValue: TableColumnVisibilityState = { ...defaultColumnVisibility, ...next };
-    setColumnVisibilityState((currentColumnVisibility) => {
-      if (areColumnVisibilityStatesEqual(currentColumnVisibility, nextValue, columnIds) === true) {
-        return currentColumnVisibility;
-      }
-
-      return nextValue;
-    });
-    window.localStorage.setItem(storageKey, JSON.stringify(nextValue));
-  };
+    },
+    [columnIds, defaultColumnVisibility, storageKey],
+  );
 
   return {
     columnVisibility,

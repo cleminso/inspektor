@@ -30,6 +30,7 @@ import { Route as ComponentsInputGroupRouteImport } from './routes/components/in
 import { Route as ComponentsJsonViewRouteImport } from './routes/components/json-view'
 import { Route as ComponentsKeyboardInputRouteImport } from './routes/components/keyboard-input'
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
+import { Route as ComponentsMultiSelectRouteImport } from './routes/components/multi-select'
 import { Route as ComponentsRelationValueRouteImport } from './routes/components/relation-value'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsSearchRouteImport } from './routes/components/search'
@@ -156,6 +157,11 @@ const ComponentsMenuRoute = ComponentsMenuRouteImport.update({
   path: '/components/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsMultiSelectRoute = ComponentsMultiSelectRouteImport.update({
+  id: '/components/multi-select',
+  path: '/components/multi-select',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsRelationValueRoute = ComponentsRelationValueRouteImport.update({
   id: '/components/relation-value',
   path: '/components/relation-value',
@@ -278,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
@@ -363,6 +371,7 @@ export interface FileRoutesById {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/search': typeof ComponentsSearchRoute
@@ -407,6 +416,7 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
     | '/components/search'
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
     | '/components/search'
@@ -491,6 +502,7 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
     | '/components/search'
@@ -534,6 +546,7 @@ export interface RootRouteChildren {
   ComponentsJsonViewRoute: typeof ComponentsJsonViewRoute
   ComponentsKeyboardInputRoute: typeof ComponentsKeyboardInputRoute
   ComponentsMenuRoute: typeof ComponentsMenuRoute
+  ComponentsMultiSelectRoute: typeof ComponentsMultiSelectRoute
   ComponentsRelationValueRoute: typeof ComponentsRelationValueRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsSearchRoute: typeof ComponentsSearchRoute
@@ -704,6 +717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/multi-select': {
+      id: '/components/multi-select'
+      path: '/components/multi-select'
+      fullPath: '/components/multi-select'
+      preLoaderRoute: typeof ComponentsMultiSelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/relation-value': {
       id: '/components/relation-value'
       path: '/components/relation-value'
@@ -862,6 +882,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsJsonViewRoute: ComponentsJsonViewRoute,
   ComponentsKeyboardInputRoute: ComponentsKeyboardInputRoute,
   ComponentsMenuRoute: ComponentsMenuRoute,
+  ComponentsMultiSelectRoute: ComponentsMultiSelectRoute,
   ComponentsRelationValueRoute: ComponentsRelationValueRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsSearchRoute: ComponentsSearchRoute,

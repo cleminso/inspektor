@@ -706,8 +706,9 @@ type. Optionality changes null handling around the base renderer. A transform do
 effective value uses the appropriate base renderer, while schema details disclose the transform when it affects filtering,
 editing, copying, or round-trip safety.
 
-Header markers compose these dimensions directly, including forms such as `T?`, `REF?`, `REF[]`, `{T}`, and `T FX`. The compact
-symbol remains secondary to the column name and exposes an accessible Jazz type label.
+Header markers compose these dimensions directly, including forms such as `T?`, a relation icon with `?` or `[]`, `{T}`, and
+`T FX`. The compact symbol remains secondary to the column name and exposes an accessible Jazz type label. The synthetic Jazz row
+ID uses a key icon, references use a relation icon, and stored UUID values use `ID`.
 
 | Symbol | Jazz DSL type              | TypeScript value      | SQL storage         | Notes                                                                 |
 | ------ | -------------------------- | --------------------- | ------------------- | --------------------------------------------------------------------- |
@@ -718,13 +719,17 @@ symbol remains secondary to the column name and exposes an accessible Jazz type 
 | `B`    | `s.boolean()`              | `boolean`             | `BOOLEAN`           | True/false values.                                                    |
 | `TS`   | `s.timestamp()`            | `Date`                | `TIMESTAMP`         | Render relative and absolute time where useful.                       |
 | `BIN`  | `s.bytes()`                | `Uint8Array`          | `BYTEA`             | Binary data. Prefer Files & Blobs patterns for uploads and images.    |
-| `ID`   | `s.ref("table")`           | row ID `string`       | `UUID` foreign key  | Relation to another table. Ref columns must end in `Id` or `_id`.     |
+| relation icon | `s.ref("table")`    | row ID `string`       | `UUID` foreign key  | Relation to another table. Ref columns must end in `Id` or `_id`.     |
 | `[]`   | `s.array(type)`            | array of base type    | base SQL array      | Render as an array container with the nested type marker when known.  |
-| `IDS`  | `s.array(s.ref())`         | row ID `string[]`     | `UUID[]`            | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
+| relation icon + `[]` | `s.array(s.ref())` | row ID `string[]` | `UUID[]`         | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
+| `ID`   | stored UUID                | UUID `string`         | `UUID`              | UUID value without relation metadata.                                 |
 | `E`    | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details, not the compact header.               |
 | `{}`   | `s.json()`                 | `JsonValue`           | `JSON`              | Untyped JSON; replace whole value on write.                           |
 | `{T}`  | `s.json(schema)`           | schema-inferred value | `JSON`              | Typed JSON; still atomic on write.                                    |
 | `FX`   | `.transform({ from, to })` | transformed value     | underlying SQL type | Modifier badge. Filters use the stored column value.                  |
+
+The synthetic row ID is not part of the stored column descriptor and renders with a key icon. Transform markers require a safe
+transform descriptor from the inspected application because stored WASM schema metadata does not contain transform information.
 
 #### Row reading and cell rendering
 

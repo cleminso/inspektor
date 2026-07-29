@@ -365,6 +365,12 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...["Root", "Trigger", "Content"].map((part) => ({
+    componentId: `multiSelect.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "MultiSelect",
+    part,
+    inheritedProps: [],
+  })),
   ...[
     "Root",
     "Label",
