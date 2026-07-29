@@ -27,6 +27,31 @@ function column(
 }
 
 describe("MutationField", () => {
+  it("places the column type at the trailing edge of the field header", () => {
+    render(
+      <MutationField
+        canOmit={false}
+        column={column("roomId", { type: "Uuid" }, { references: "rooms" })}
+        error={undefined}
+        expanded={false}
+        fieldState={{ isNull: false, isOmitted: false, text: "room-1" }}
+        hidden={false}
+        initialValue="room-1"
+        onExpandedChange={vi.fn()}
+        onNullChange={vi.fn()}
+        onOmittedChange={vi.fn()}
+        onTextChange={vi.fn()}
+        readOnlyReason={null}
+      />,
+    );
+
+    const type = screen.getByText("uuid");
+    const header = type.closest('[data-slot="mutation-field-header"]');
+
+    expect(header?.lastElementChild).toBe(type);
+    expect(header === null ? null : getComputedStyle(header).width).toBe("100%");
+  });
+
   it("keeps relation navigation inside the value input group", () => {
     render(
       <MutationField

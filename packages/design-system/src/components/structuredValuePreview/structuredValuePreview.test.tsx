@@ -18,7 +18,9 @@ describe("StructuredValuePreview", () => {
       />,
     );
 
-    expect(screen.getByText('[6] "Ada", 3, true, …')).toBeTruthy();
+    expect(screen.getByText('[6] "Ada", 3, true, …').getAttribute("data-typography")).toBe(
+      "sans",
+    );
   });
 
   it("renders normalized object entries without reading source objects", () => {

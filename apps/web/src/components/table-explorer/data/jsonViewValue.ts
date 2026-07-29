@@ -183,7 +183,3 @@ export function isJsonViewContainer(
 ): value is InspectorJsonObject | InspectorJsonValue[] {
   return value !== null && typeof value === "object";
 }
-
-export function stringifyRowJsonViewValue(value: InspectorJsonObject): string {
-  return JSON.stringify(value, null, 2);
-}

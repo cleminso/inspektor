@@ -27,7 +27,7 @@ export function JsonViewPage(): ReactElement {
     <JsonViewPlayground>
       <Section
         title="Nested data"
-        description="Objects and arrays expand one container level by default. Disclosure controls and tree keyboard commands reveal deeper values."
+        description="Objects and arrays expand one container level by default. The root copy action remains available while disclosure controls and tree keyboard commands reveal deeper values."
       >
         <Example source={defaultExpansionSource} align="stretch">
           <DefaultExpansionExample />

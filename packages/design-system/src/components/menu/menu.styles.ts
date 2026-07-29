@@ -105,11 +105,13 @@ export const menuStyles = stylex.create({
     width: "auto",
   },
   itemHighlighted: {
+    [keyboardInputVars.textColor]: textColors["text-default"],
     backgroundColor: backgroundColors["bg-hover"],
   },
   itemSelected: { backgroundColor: backgroundColors["bg-selected"] },
   itemOpen: { backgroundColor: backgroundColors["bg-selected"] },
   itemDisabled: {
+    [keyboardInputVars.textColor]: textColors["text-disabled"],
     backgroundColor: { default: "transparent", ":active": "transparent" },
     color: textColors["text-disabled"],
     cursor: "not-allowed",

@@ -34,6 +34,11 @@ export const dataTableStyles = stylex.create({
     minWidth: 0,
     width: '100%',
   },
+  scrollSurface: {
+    backgroundColor: backgroundColors['bg-page'],
+    position: 'relative',
+    minWidth: '100%',
+  },
   table: {
     borderCollapse: 'separate',
     borderSpacing: 0,
@@ -42,8 +47,27 @@ export const dataTableStyles = stylex.create({
     lineHeight: lineHeights.normal,
     tableLayout: 'fixed',
     userSelect: 'none',
-    minWidth: '100%',
-    width: 'max-content',
+  },
+  headerBackdropAnchor: {
+    position: 'sticky',
+    zIndex: 1,
+    height: 0,
+    top: 0,
+  },
+  headerBackdrop: {
+    backgroundColor: backgroundColors['bg-table-header'],
+    boxSizing: 'border-box',
+    borderBottomColor: borderColors['border-table-header-cell'],
+    borderBottomStyle: 'solid',
+    borderBottomWidth: 1,
+    borderTopColor: borderColors['border-table-header-cell'],
+    borderTopStyle: 'solid',
+    borderTopWidth: 1,
+    height: spatial['control-height-l'],
+    width: '100%',
+  },
+  compactHeaderBackdrop: {
+    height: spatial['control-height-m'],
   },
   header: {
     position: 'relative',
@@ -51,6 +75,7 @@ export const dataTableStyles = stylex.create({
   },
   headerCell: {
     backgroundColor: backgroundColors['bg-table-header'],
+    boxSizing: 'border-box',
     color: textColors['text-secondary'],
     borderBottomColor: borderColors['border-table-header-cell'],
     borderTopColor: borderColors['border-table-header-cell'],
@@ -178,6 +203,7 @@ export const dataTableStyles = stylex.create({
   },
   cell: {
     backgroundColor: 'transparent',
+    boxSizing: 'border-box',
     borderBottomColor: borderColors['border-table-cell'],
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,

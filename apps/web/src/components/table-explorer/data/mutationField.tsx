@@ -282,8 +282,14 @@ export function MutationField({
         ) : undefined
       }
     >
-      <Box alignItems="start" justifyContent="between" gap="m">
-        <Box alignItems="center" gap="s" minWidth={0}>
+      <Box
+        alignItems="end"
+        data-slot="mutation-field-header"
+        justifyContent="between"
+        gap="m"
+        width="full"
+      >
+        <Box alignItems="center" minWidth={0}>
           <Field.Label
             id={fieldLabelId}
             htmlFor={usesNonNativeControl === true ? undefined : fieldId}
@@ -300,11 +306,6 @@ export function MutationField({
           >
             <Text as="span">{label}</Text>
           </Field.Label>
-          {isEditableStructuredColumn === false ? (
-            <Text as="span" color="muted" variant="caption">
-              {formatColumnTypeLabel(column)}
-            </Text>
-          ) : null}
         </Box>
         {isEditableStructuredColumn === true &&
         (canOmit === true || column.nullable === true) ? (
@@ -339,6 +340,11 @@ export function MutationField({
             />
             <Text as="span">NULL</Text>
           </Checkbox.Label>
+          ) : null}
+        {isEditableStructuredColumn === false ? (
+          <Text as="span" color="muted" variant="caption">
+            {formatColumnTypeLabel(column)}
+          </Text>
         ) : null}
       </Box>
 

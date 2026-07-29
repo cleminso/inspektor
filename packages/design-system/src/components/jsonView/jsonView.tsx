@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { CopyButton } from "../copyButton/copyButton";
 import { jsonViewStyles } from "./jsonView.styles";
 
 export type JsonViewPrimitive = string | number | boolean | null;
@@ -725,6 +726,7 @@ export function JsonView({
   );
   const [revealedStrings, setRevealedStrings] = useState<ReadonlySet<string>>(new Set());
   const treeRef = useRef<HTMLDivElement>(null);
+  const serializedData = useMemo(() => JSON.stringify(data, null, 2), [data]);
   const normalizedSearchTerms = searchTerms.length === 0 ? emptySearchTerms : searchTerms;
   const searchModel = useMemo(
     () => createSearchModel(data, normalizedSearchTerms),
@@ -834,6 +836,16 @@ export function JsonView({
           Match outside visible limit
         </div>
       ) : null}
+      <div {...stylex.props(jsonViewStyles.copyActionLayer)}>
+        <div {...stylex.props(jsonViewStyles.copyAction)}>
+          <CopyButton
+            label="Copy JSON"
+            size="xs"
+            textToCopy={serializedData}
+            tooltipSide="bottom"
+          />
+        </div>
+      </div>
       <div
         aria-label={accessibilityLabel}
         ref={treeRef}

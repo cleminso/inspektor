@@ -12,8 +12,22 @@ import {
 
 export const jsonViewStyles = stylex.create({
   root: {
+    position: "relative",
     minWidth: 0,
     width: "100%",
+  },
+  copyActionLayer: {
+    display: "flex",
+    justifyContent: "flex-end",
+    pointerEvents: "none",
+    position: "sticky",
+    zIndex: 1,
+    height: 0,
+    top: 0,
+    width: "100%",
+  },
+  copyAction: {
+    pointerEvents: "auto",
   },
   tree: {
     color: textColors["text-default"],

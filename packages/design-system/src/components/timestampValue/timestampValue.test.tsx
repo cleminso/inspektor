@@ -24,6 +24,7 @@ describe("TimestampValue", () => {
 
     const time = screen.getByText(formatLocal(value));
     expect(time.getAttribute("datetime")).toBe("2023-11-14T22:13:20.123Z");
+    expect(time.getAttribute("data-numeric-variant")).toBe("tabular");
   });
 
   it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_VALUE, new Date(Number.NaN)])(

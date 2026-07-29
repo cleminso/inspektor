@@ -151,7 +151,7 @@ export const syntaxPalette = stylex.defineVars(syntaxPaletteValues)
 
 export const fontSizes = stylex.defineVars({
   1: '0.75rem', // 12
-  2: '0.875rem', // 14
+  2: '0.8125rem', // 13
   3: '1rem', // 16
   4: '1.25rem', // 20
   5: '1.5rem', // 24

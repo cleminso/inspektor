@@ -66,6 +66,10 @@
 - [x] Remove product-level DOM observation used to wait for the deferred editor control.
 - [x] Cover the static import boundary, loading fallback, retry behavior, and focus transition.
 
+[29/07/26]
+
+- [x] Prevent Format JSON from scrolling product-owned ancestor containers while returning the editor viewport to the document start.
+
 ## Work outside the foundation scope
 
 [24/07/26]

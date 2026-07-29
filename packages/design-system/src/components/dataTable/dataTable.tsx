@@ -509,14 +509,40 @@ function DataTableViewport({ children }: DataTableViewportProps) {
 }
 
 function DataTableTable({ "aria-label": ariaLabel, children }: DataTableTableProps) {
+  const { density, table } = useDataTableContext();
+  const columnGeometry = table
+    .getVisibleLeafColumns()
+    .map((column) => ({ id: column.id, size: column.getSize() }));
+  const tableWidth = columnGeometry.reduce((width, column) => width + column.size, 0);
+
   return (
-    <table
-      {...stylex.props(dataTableStyles.table)}
-      aria-label={ariaLabel}
-      data-slot="data-table-table"
+    <div
+      {...stylex.props(dataTableStyles.scrollSurface)}
+      data-slot="data-table-scroll-surface"
+      style={{ width: tableWidth }}
     >
-      {children}
-    </table>
+      <div {...stylex.props(dataTableStyles.headerBackdropAnchor)} aria-hidden="true">
+        <div
+          {...stylex.props(
+            dataTableStyles.headerBackdrop,
+            density === "compact" && dataTableStyles.compactHeaderBackdrop,
+          )}
+        />
+      </div>
+      <table
+        {...stylex.props(dataTableStyles.table)}
+        aria-label={ariaLabel}
+        data-slot="data-table-table"
+        style={{ width: tableWidth }}
+      >
+        <colgroup>
+          {columnGeometry.map((column) => (
+            <col key={column.id} style={{ width: column.size }} />
+          ))}
+        </colgroup>
+        {children}
+      </table>
+    </div>
   );
 }
 
@@ -680,7 +706,6 @@ function DataTableHeaderCell<TData extends RowData>({
         onContextMenu={handleContextMenu}
         onKeyDown={handleKeyDown}
         scope="col"
-        style={{ width: header.getSize() }}
         tabIndex={-1}
       >
         <div
@@ -872,7 +897,6 @@ function DataTableCell<TData extends RowData>({ children, cell }: DataTableCellP
       data-slot="data-table-cell"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      style={{ width: cell.column.getSize() }}
       tabIndex={-1}
     >
       {children ?? flexRender(cell.column.columnDef.cell, cell.getContext())}

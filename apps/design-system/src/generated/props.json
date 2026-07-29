@@ -2638,7 +2638,7 @@
       "description": "Contextual label for the JSON tree.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 24
+        "line": 25
       }
     },
     {
@@ -2648,7 +2648,7 @@
       "description": "JSON-compatible object or array to inspect.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -2659,7 +2659,7 @@
       "description": "Number of container levels expanded initially.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -2670,7 +2670,7 @@
       "description": "Literal terms highlighted in keys and primitive values.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 30
+        "line": 31
       }
     }
   ],

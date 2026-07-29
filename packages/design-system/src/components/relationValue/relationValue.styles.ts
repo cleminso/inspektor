@@ -18,7 +18,7 @@ export const relationValueStyles = stylex.create({
   },
   compactId: {
     color: textColors["text-default"],
-    fontFamily: fontFamilies.mono,
+    fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.normal,
     overflowWrap: "anywhere",

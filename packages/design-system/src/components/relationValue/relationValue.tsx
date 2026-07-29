@@ -78,10 +78,14 @@ export function RelationValue(props: RelationValueProps) {
   return (
     <span {...stylex.props(relationValueStyles.compact)}>
       {props.navigation === undefined ? (
-        <span {...stylex.props(relationValueStyles.compactId)}>{props.id}</span>
+        <span data-typography="sans" {...stylex.props(relationValueStyles.compactId)}>
+          {props.id}
+        </span>
       ) : (
         <TextLink {...props.navigation} trailingIcon={<ArrowIcon />}>
-          {props.id}
+          <span data-typography="sans" {...stylex.props(relationValueStyles.compactId)}>
+            {props.id}
+          </span>
         </TextLink>
       )}
     </span>

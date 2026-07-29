@@ -665,7 +665,6 @@ export function CodeMirrorEditor({
 
     editorView.dispatch({
       changes: { from: 0, to: editorView.state.doc.length, insert: formattedValue },
-      effects: EditorView.scrollIntoView(0, { y: "start" }),
       selection: {
         anchor: Math.min(anchor, formattedValue.length),
         head: Math.min(head, formattedValue.length),

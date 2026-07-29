@@ -356,6 +356,55 @@ function SelectionHitAreaDataTable({ onCellActivate }: {
   );
 }
 
+function FixedGeometryDataTable() {
+  const fixedColumns = [
+    columnHelper.accessor("name", { header: "Name", size: 120 }),
+    columnHelper.accessor("role", { header: "Role", size: 180 }),
+  ];
+  const table = useReactTable({
+    columns: fixedColumns,
+    data: rows,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
+  });
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          table.setColumnSizing({ name: 220 });
+        }}
+      >
+        Resize name
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          table.setColumnOrder(["role", "name"]);
+        }}
+      >
+        Move role first
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          table.setColumnVisibility({ role: false });
+        }}
+      >
+        Hide role
+      </button>
+      <DataTable.Root table={table}>
+        <DataTable.Viewport>
+          <DataTable.Table aria-label="Fixed geometry people">
+            <DataTable.Content />
+          </DataTable.Table>
+        </DataTable.Viewport>
+      </DataTable.Root>
+    </>
+  );
+}
+
 function ReorderableDataTable({
   columnDragPreview,
   initialColumnOrder = ["name", "role"],
@@ -454,6 +503,47 @@ describe("DataTable", () => {
     expect(screen.getAllByRole("columnheader")).toHaveLength(2);
     expect(screen.getAllByRole("row")).toHaveLength(3);
     expect(screen.getByRole("cell", { name: "Ada" })).toBeTruthy();
+  });
+
+  it("uses one explicit column geometry without redistributing unaffected columns", () => {
+    render(<FixedGeometryDataTable />);
+
+    const table = screen.getByRole("table", { name: "Fixed geometry people" });
+    const scrollSurface = table.closest('[data-slot="data-table-scroll-surface"]');
+    const columns = table.querySelectorAll("col");
+
+    expect(scrollSurface).not.toBeNull();
+    expect((scrollSurface as HTMLElement).style.width).toBe("300px");
+    expect(table.style.width).toBe("300px");
+    expect(Array.from(columns, (column) => column.style.width)).toEqual(["120px", "180px"]);
+    expect(table.querySelectorAll('[data-slot="data-table-filler-cell"]')).toHaveLength(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "Resize name" }));
+
+    expect((scrollSurface as HTMLElement).style.width).toBe("400px");
+    expect(table.style.width).toBe("400px");
+    expect(Array.from(columns, (column) => column.style.width)).toEqual(["220px", "180px"]);
+  });
+
+  it("updates shared column geometry for reordered and hidden columns", () => {
+    render(<FixedGeometryDataTable />);
+
+    const table = screen.getByRole("table", { name: "Fixed geometry people" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Move role first" }));
+
+    expect(Array.from(table.querySelectorAll("col"), (column) => column.style.width)).toEqual([
+      "180px",
+      "120px",
+    ]);
+    expect(table.style.width).toBe("300px");
+
+    fireEvent.click(screen.getByRole("button", { name: "Hide role" }));
+
+    expect(Array.from(table.querySelectorAll("col"), (column) => column.style.width)).toEqual([
+      "120px",
+    ]);
+    expect(table.style.width).toBe("120px");
   });
 
   it("renders explicit loading and empty content", () => {

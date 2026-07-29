@@ -204,7 +204,7 @@ describe("EditRowForm Details and JSON views", () => {
     fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
 
     expect(screen.getByRole("searchbox", { name: /search/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Copy row JSON" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Copy JSON" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
     expect(screen.queryByRole("textbox", { name: "DisplayName" })).toBeNull();
@@ -349,7 +349,7 @@ describe("EditRowForm Details and JSON views", () => {
     renderEditRowForm();
     fireEvent.click(screen.getByRole("tab", { name: "JSON" }));
 
-    fireEvent.click(screen.getByRole("button", { name: "Copy row JSON" }));
+    fireEvent.click(screen.getByRole("button", { name: "Copy JSON" }));
 
     expect(writeText).toHaveBeenCalledWith(
       [

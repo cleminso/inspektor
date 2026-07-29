@@ -7,6 +7,30 @@ import { RowEditorSidePanel } from "@/components/table-explorer/data/rowEditorSi
 afterEach(cleanup);
 
 describe("RowEditorSidePanel dirty transitions", () => {
+  it("renders compact selected-row navigation icons", () => {
+    render(
+      <RowEditorSidePanel
+        activeRowIndex={0}
+        draftTransitionPending={false}
+        draftTransitionSaving={false}
+        editedRowIds={["row-1", "row-2"]}
+        mode="edit"
+        onDiscardAndContinue={() => undefined}
+        onKeepEditing={() => undefined}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    for (const name of ["Previous selected row", "Next selected row"]) {
+      const icon = screen.getByRole("button", { name }).querySelector("svg");
+      expect(icon?.getAttribute("width")).toBe("14");
+      expect(icon?.getAttribute("height")).toBe("14");
+    }
+  });
+
   it("offers save, discard, and keep-editing decisions", () => {
     const onDiscardAndContinue = vi.fn();
     const onKeepEditing = vi.fn();

@@ -55,7 +55,7 @@ export function RowEditorSidePanel({
                   onClick={onNavigatePrevious}
                   aria-label="Previous selected row"
                 >
-                  <ArrowUpIcon />
+                  <ArrowUpIcon size={14} />
                 </Button>
                 <Button
                   type="button"
@@ -66,7 +66,7 @@ export function RowEditorSidePanel({
                   onClick={onNavigateNext}
                   aria-label="Next selected row"
                 >
-                  <ArrowDownIcon />
+                  <ArrowDownIcon size={14} />
                 </Button>
               </div>
             </div>

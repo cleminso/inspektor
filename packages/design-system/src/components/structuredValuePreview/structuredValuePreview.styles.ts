@@ -41,8 +41,8 @@ export const structuredValuePreviewStyles = stylex.create({
   preview: {
     overflow: "hidden",
     color: syntaxColors["syntax-property"],
-    fontFamily: fontFamilies.mono,
-    fontSize: fontSizes[1],
+    fontFamily: fontFamilies.sans,
+    fontSize: fontSizes[2],
     lineHeight: lineHeights.normal,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",

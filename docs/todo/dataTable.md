@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
+  - [Stable column geometry](#stable-column-geometry)
 - [Open product work](#open-product-work)
 - [Work outside the foundation scope](#work-outside-the-foundation-scope)
 - [Settled implementation decisions](#settled-implementation-decisions)
@@ -35,6 +36,22 @@
 - [x] Restore the active header's blue inline-end border only for resize hover, focus, and active resizing.
 - [x] Keep the active header's structural top border blue when its outward perimeter is clipped by the viewport.
 - [x] Document the complete border, fill, ring, focus, resize, and drag model in `docs/notes/dataTableStyleModel.md`.
+
+### Stable column geometry
+
+[29/07/26]
+
+- [x] Make each visible TanStack leaf-column size the authoritative rendered border-box width for its header and body cells.
+- [x] Render one shared native `colgroup` definition for the table instead of asking each header and body cell to participate independently in native table width resolution.
+- [x] Give the table an explicit width equal to the sum of its visible leaf-column sizes and remove viewport-driven minimum width expansion that redistributes width between columns.
+- [x] Keep the fixed row-selection column at the same width before rows load, after rows render, and while row selection changes.
+- [x] Keep every column width unchanged when the row side pane opens, closes, or resizes; represent reduced space through viewport clipping and horizontal scrolling.
+- [x] Keep empty, loading, and spanning rows from changing column geometry when they replace or precede data rows.
+- [x] Preserve the resized width of the target column while visibility and reorder changes derive table width from the remaining visible column order.
+- [x] Calculate visible column sizes once per sizing state and reuse them for table width and rendered columns instead of calling `getSize()` in every body cell.
+- [x] Fill unused viewport space with a scroll surface behind the exact-width semantic table instead of adding a layout-participating column.
+- [x] Size the scroll surface to the larger of the viewport and the sum of TanStack column widths so horizontal scrolling ends at the final data-column edge.
+- [x] Keep the semantic table at the exact sum of TanStack column widths so constrained space never redistributes unaffected columns.
 
 ## Open product work
 
@@ -72,6 +89,13 @@
 - [x] Active-header inline-start stroke is state decoration; its top stroke uses the header-owned structural border.
 - [x] Active rings visually replace shared neutral seams through paint order rather than neighbor-aware border mutation.
 - [x] Active states may suppress structural border color, but never structural border width.
+- [x] TanStack column sizing is the source of truth for grid geometry; native table intrinsic sizing must not produce a second width model.
+- [x] The fixed selection column has one width shared by its header and every represented row.
+- [x] Opening, closing, or resizing a companion pane changes the available viewport, not the column widths.
+- [x] When the viewport becomes narrower than the table, columns keep their widths and the viewport provides horizontal scrolling.
+- [x] Loading, empty, data, and selection state changes do not move existing column boundaries.
+- [x] Resizing one column changes that column and the table's total width without redistributing the delta across unaffected columns.
+- [x] Double-click reset restores the column's configured initial width without changing neighboring columns.
 
 ## Open design decisions
 
@@ -100,3 +124,8 @@
 - [x] Verify focused Data Table lint passes.
 - [x] Verify the design-system build passes.
 - [x] Verify active-header keyboard focus, resize hover, and active-cell presentation in a browser.
+- [ ] Add a browser geometry regression that compares selection header and body cell widths before and after rows render.
+- [ ] Add a browser geometry regression that compares every visible column boundary before and after a companion pane opens, closes, and resizes.
+- [ ] Add behavior coverage for pointer resize, constrained minimum and maximum widths, and double-click reset.
+- [x] Verify horizontal scroll appears without column redistribution when the viewport becomes narrower than the explicit table width.
+- [x] Verify hidden and reordered columns update the explicit table width without changing retained column sizes.

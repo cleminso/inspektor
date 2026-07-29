@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { KeyboardInput } from "../keyboardInput/keyboardInput";
 import { Menu } from "./menu";
 
 afterEach(cleanup);
@@ -92,5 +93,32 @@ describe("Menu", () => {
 
     fireEvent.click(screen.getByRole("menuitemradio", { name: "Compact" }));
     expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("highlights a keyboard shortcut with its menu item", () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger>Actions</Menu.Trigger>
+        <Menu.Content>
+          <Menu.Item>
+            Move left
+            <Menu.Shortcut>
+              <KeyboardInput modifiers={["shift"]} size="small">
+                ←
+              </KeyboardInput>
+            </Menu.Shortcut>
+          </Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    const item = screen.getByRole("menuitem", { name: /Move left/ });
+    const shortcut = screen.getByLabelText("Shift ←");
+    const restingItemClassName = item.className;
+
+    fireEvent.mouseMove(item);
+
+    expect(item.className).not.toBe(restingItemClassName);
+    expect(shortcut).toBeTruthy();
   });
 });

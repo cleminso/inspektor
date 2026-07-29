@@ -11,7 +11,7 @@
 
 ## Implemented foundation
 
-[24/07/26]
+[29/07/26]
 
 - [x] Register the exported `JsonView` with package-authoritative prop extraction.
 - [x] Render JSON objects and arrays through a read-only syntax tree with native selectable text.
@@ -34,7 +34,7 @@
 - [x] Normalize Jazz row values into strict JSON-compatible values, representing bytes, unavailable values, non-finite numbers,
       cycles, and unsupported values through explicit tagged objects.
 - [x] Add read-only row `JSON` beside editable `Details` in the Table Explorer pane.
-- [x] Keep search and whole-row Copy JSON application-owned.
+- [x] Keep search application-owned while `JsonView` owns a sticky root action that copies the complete two-space-formatted JSON.
 - [x] Use `JsonView` as an object-or-array fallback when a read-only structured runtime value cannot be represented safely as
       `CodeEditor` source.
 
@@ -55,9 +55,12 @@
 
 ## Settled interaction decisions
 
-[24/07/26]
+[29/07/26]
 
 - Search controls remain outside `JsonView`; the component accepts literal controlled terms.
+- Copy remains outside the ARIA tree while aligning with the root row and staying sticky within the JSON surface.
+- Copy serializes the complete input with two-space indentation, independent of disclosure, search, and rendering limits.
+- Root disclosure hover and focus treatment remains content-sized instead of extending beneath the separate copy action.
 - Large branches continue in fixed batches instead of exposing an expand-all action.
 - Branch, complete-tree, and string thresholds remain fixed internal safeguards rather than consumer configuration.
 - Search reports when a real match falls outside the visible budget instead of mounting beyond the limit.

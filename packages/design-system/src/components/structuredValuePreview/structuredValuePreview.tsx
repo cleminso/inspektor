@@ -84,7 +84,9 @@ export function StructuredValuePreview({ model, variant = "json" }: StructuredVa
           {"{T}"}
         </span>
       ) : null}
-      <code {...stylex.props(structuredValuePreviewStyles.preview)}>{createPreview(model)}</code>
+      <code data-typography="sans" {...stylex.props(structuredValuePreviewStyles.preview)}>
+        {createPreview(model)}
+      </code>
     </span>
   );
 }

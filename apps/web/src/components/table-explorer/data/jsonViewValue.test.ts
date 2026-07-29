@@ -1,7 +1,7 @@
 import type { ColumnDescriptor } from "jazz-tools";
 import { describe, expect, it } from "vitest";
 
-import { createRowJsonViewValue, stringifyRowJsonViewValue } from "./jsonViewValue";
+import { createRowJsonViewValue } from "./jsonViewValue";
 
 const scalarColumns = [
   { name: "name", column_type: { type: "Text" }, nullable: false },
@@ -216,26 +216,5 @@ describe("createRowJsonViewValue", () => {
     expect(row).toEqual({ id: "item-1", metadata: { labels: ["one", "two"] }, payload });
     expect(row.metadata).toBe(metadata);
     expect(row.payload).toBe(payload);
-  });
-});
-
-describe("stringifyRowJsonViewValue", () => {
-  it("pretty-serializes the normalized row value", () => {
-    const value = createRowJsonViewValue(
-      { id: "person-1", name: "Ada", age: 37, active: true, nickname: null },
-      scalarColumns,
-    );
-
-    expect(stringifyRowJsonViewValue(value)).toBe(
-      [
-        "{",
-        '  "id": "person-1",',
-        '  "name": "Ada",',
-        '  "age": 37,',
-        '  "active": true,',
-        '  "nickname": null',
-        "}",
-      ].join("\n"),
-    );
   });
 });

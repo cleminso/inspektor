@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Box, Button, CopyButton, JsonView, Search, SegmentedControl, Text } from "@inspector/ds";
+import { Box, Button, JsonView, Search, SegmentedControl, Text } from "@inspector/ds";
 
 import {
   RowEditorFields,
@@ -12,7 +12,6 @@ import { focusRowEditorField } from "@/components/table-explorer/data/rowEditorF
 import { ROW_EDITOR_FORM_ID } from "@/components/table-explorer/data/rowEditorForm";
 import {
   createRowJsonViewValue,
-  stringifyRowJsonViewValue,
 } from "@/components/table-explorer/data/jsonViewValue";
 
 interface EditRowFormProps {
@@ -70,8 +69,6 @@ function RowJsonRepresentation({
     () => createRowJsonViewValue(rowValues, schemaColumns),
     [rowValues, schemaColumns],
   );
-  const serializedValue = useMemo(() => stringifyRowJsonViewValue(value), [value]);
-
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 px-2 py-2">
       <div className="flex shrink-0 items-center gap-2">
@@ -83,7 +80,6 @@ function RowJsonRepresentation({
           }}
           size="s"
         />
-        <CopyButton label="Copy row JSON" textToCopy={serializedValue} tooltipSide="bottom" />
       </div>
       <div className="app-scrollbar min-h-0 flex-1 overflow-auto">
         <JsonView

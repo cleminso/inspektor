@@ -1,5 +1,5 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { JsonView } from "./jsonView";
 
@@ -59,6 +59,41 @@ describe("JsonView", () => {
     expect(tree.textContent).toContain("false");
     expect(tree.textContent).toContain("null");
     expect(getRootTreeItem().getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("copies the complete formatted JSON from a sticky action outside the tree", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+    render(
+      <JsonView
+        accessibilityLabel="Row JSON"
+        data={{ profile: { name: "Ada" }, active: true }}
+      />,
+    );
+
+    const tree = screen.getByRole("tree", { name: "Row JSON" });
+    const root = getRootTreeItem();
+    const copyButton = screen.getByRole("button", { name: "Copy JSON" });
+
+    expect(tree.contains(copyButton)).toBe(false);
+    fireEvent.click(copyButton);
+
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith(
+        [
+          "{",
+          '  "profile": {',
+          '    "name": "Ada"',
+          "  },",
+          '  "active": true',
+          "}",
+        ].join("\n"),
+      ),
+    );
+    expect(root.getAttribute("aria-expanded")).toBe("true");
   });
 
   it("escapes string keys and values as valid JSON text", () => {

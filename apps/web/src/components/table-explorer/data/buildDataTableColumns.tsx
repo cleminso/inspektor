@@ -62,11 +62,11 @@ interface ColumnSizing {
 
 function getColumnSizing(column: TableColumnMeta): ColumnSizing {
   if (column.id === "id" || column.column === null) {
-    return { size: 320, minSize: 160, maxSize: 480 };
+    return { size: 260, minSize: 160, maxSize: 260 };
   }
 
   if (column.column.references !== undefined) {
-    return { size: 240, minSize: 160, maxSize: 480 };
+    return { size: 280, minSize: 160, maxSize: 280 };
   }
 
   switch (column.column.column_type.type) {
@@ -81,16 +81,18 @@ function getColumnSizing(column: TableColumnMeta): ColumnSizing {
     case "Uuid":
       return { size: 220, minSize: 160, maxSize: 360 };
     case "Json":
+      return { size: 220, minSize: 160, maxSize: 510 };
     case "Array":
+      return { size: 220, minSize: 160, maxSize: 510 };
     case "Row":
       return { size: 320, minSize: 200, maxSize: 640 };
     case "Enum":
       return { size: 160, minSize: 120, maxSize: 320 };
     case "Bytea":
-      return { size: 200, minSize: 144, maxSize: 480 };
+      return { size: 144, minSize: 144, maxSize: 144 };
     case "Text":
     default:
-      return { size: 220, minSize: 120, maxSize: 480 };
+      return { size: 280, minSize: 120, maxSize: 480 };
   }
 }
 
@@ -142,6 +144,7 @@ function CompactCellValue({
           as="span"
           align="right"
           data-cell-alignment="end"
+          data-numeric-variant="tabular"
           tabularNums
           truncate
         >
@@ -523,7 +526,7 @@ export function buildDataTableColumns({
       const isSomeSelected = loadedRows.some((row) => row.getIsSelected() === true);
 
       return (
-        <Box alignItems="center" justifyContent="center">
+        <Box alignItems="center" justifyContent="center" width="full">
           <SelectionCheckbox
             checked={isAllSelected}
             indeterminate={isSomeSelected === true && isAllSelected === false}

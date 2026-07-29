@@ -8,6 +8,7 @@ export const timestampValueStyles = stylex.create({
     color: textColors["text-default"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
+    fontVariantNumeric: "tabular-nums",
     lineHeight: lineHeights.normal,
     whiteSpace: "nowrap",
   },

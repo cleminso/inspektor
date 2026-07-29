@@ -33,7 +33,11 @@ export function TimestampValue({ value }: TimestampValueProps) {
   }
 
   return (
-    <time dateTime={formatUtc(epochMilliseconds)} {...stylex.props(timestampValueStyles.preview)}>
+    <time
+      data-numeric-variant="tabular"
+      dateTime={formatUtc(epochMilliseconds)}
+      {...stylex.props(timestampValueStyles.preview)}
+    >
       {localFormatter.format(epochMilliseconds)}
     </time>
   );

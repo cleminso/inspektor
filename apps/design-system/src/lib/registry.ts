@@ -427,7 +427,7 @@ export const jsonViewItem = {
   slug: "json-view",
   href: "/components/json-view",
   description:
-    "Read-only JSON inspection with tree navigation, search highlighting, and bounded rendering.",
+    "Read-only JSON inspection with tree navigation, integrated copying, search highlighting, and bounded rendering.",
   importPath: "@inspector/ds",
   source: {
     label: "jsonView.tsx",

@@ -28,6 +28,9 @@ describe("RelationValue", () => {
     const link = screen.getByRole("link", { name: "account_0123456789" });
     expect(link.getAttribute("href")).toBe("/accounts/account_0123456789");
     expect(link.querySelector('[data-slot="text-link-trailing-icon"]')).toBeTruthy();
+    expect(screen.getByText("account_0123456789").getAttribute("data-typography")).toBe(
+      "sans",
+    );
   });
 
   it("does not accept detail or styling props", () => {

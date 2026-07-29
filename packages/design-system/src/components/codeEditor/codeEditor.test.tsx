@@ -85,7 +85,9 @@ describe("CodeEditor", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "Format JSON" }));
 
-    expect(onValueChange).toHaveBeenCalledWith('{\n  "enabled": true\n}');
+    await waitFor(() =>
+      expect(onValueChange).toHaveBeenCalledWith('{\n  "enabled": true\n}'),
+    );
   });
 
   it("formats the live editor document and returns focus to it", async () => {
@@ -111,12 +113,14 @@ describe("CodeEditor", () => {
       },
       selection: { anchor: 7 },
     });
+    const scrollIntoView = vi.spyOn(EditorView, "scrollIntoView");
     fireEvent.click(screen.getByRole("button", { name: "Format JSON" }));
 
     expect(onValueChange).toHaveBeenLastCalledWith('{\n  "live": true\n}');
     expect(editorView?.state.selection.main.anchor).toBe(7);
     expect(document.activeElement).toBe(editor);
     expect(editorView?.scrollDOM.scrollTop).toBe(0);
+    expect(scrollIntoView).not.toHaveBeenCalled();
   });
 
   it("shows line numbers and fold controls", async () => {

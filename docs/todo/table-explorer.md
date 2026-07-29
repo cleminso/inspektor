@@ -85,7 +85,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Schema-driven row forms and basic cell presentation
 
-[23/07/26]
+[29/07/26]
 
 - [x] Build row fields from stored schema metadata rather than returned object keys.
 - [x] Build table columns from stored schema metadata.
@@ -98,6 +98,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Keep structured editors mounted across NULL mode changes and connect visible errors to the editor control.
 - [x] Expand one structured editor into the form's available pane height while preserving the fixed action footer and mounted sibling fields.
 - [x] Keep row representation panels at the available pane height so editor collapse restores the form and its action footer remains at the bottom.
+- [x] Keep multi-row navigation arrows compact and make primitive field headers full-width with type labels aligned to the trailing bottom edge.
 
 ### Column and table behavior
 
@@ -127,9 +128,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Highlight an activated column only after cell focus and selection are cleared.
 - [x] Keep loaded-row extension from expanding an existing row or cell selection implicitly.
 
+[29/07/26]
+
+- [x] Give the selection header and row cells the same full-width centered layout inside their fixed column.
+
 ### Compact grid value presentation
 
-[28/07/26]
+[29/07/26]
 
 - [x] Classify schema values in an application-owned presentation model that preserves each raw value.
 - [x] Distinguish `NULL`, empty strings, unavailable values, malformed values, and unsupported values.
@@ -141,6 +146,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Classify scalar enum values against schema variants when variant metadata is available.
 - [x] Bound array, row, JSON, and unsupported previews without complete cell serialization.
 - [x] Cover compact schema-value classification and rendering with focused regression tests.
+- [x] Use one proportional compact-grid font across value types while retaining tabular numerals and right alignment for quantities and keeping expanded code surfaces monospace.
 
 ### Query referential stability
 
@@ -288,7 +294,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 [24/07/26]
 
 - [x] Add `Details` and `JSON` representations to the row side pane.
-- [x] Switch row representations through a full-width `SegmentedControl` whose indicator communicates alternate views of the same row.
+- [x] Switch row representations through a controlled, single-selection, full-width `ToggleGroup`.
 - [x] Keep `Details` as the schema-derived editing surface.
 - [x] Keep `JSON` permanently read-only; all row mutation remains in `Details`.
 - [x] Normalize Jazz row values into a bounded structured presentation model without pre-stringifying ordinary objects or arrays.

@@ -174,6 +174,19 @@ describe("buildDataTableColumns", () => {
     expect(columns.find((column) => column.id === "metadata")?.size).toBe(320);
   });
 
+  it("renders the selection header and row cells from one fixed-width column", () => {
+    render(<TestTable onSortingChange={() => undefined} />);
+
+    const table = screen.getByRole("table", { name: "People" });
+    const renderedColumns = table.querySelectorAll("col");
+    const headerCheckbox = screen.getByRole("checkbox", { name: "Select all loaded rows" });
+    const rowCheckbox = screen.getByRole("checkbox", { name: "Select row row-1" });
+
+    expect(renderedColumns).toHaveLength(2);
+    expect(renderedColumns[0]?.style.width).toBe("36px");
+    expect(headerCheckbox.parentElement?.className).toBe(rowCheckbox.parentElement?.className);
+  });
+
   it("reports the Shift modifier when a row checkbox requests selection", () => {
     const onRowSelectionRequest = vi.fn();
     render(
@@ -253,6 +266,58 @@ describe("buildDataTableColumns", () => {
     const idValue = screen.getByLabelText(id);
     expect(idValue.textContent).toBe(id);
     expect(idValue.getAttribute("data-cell-overflow")).toBe("truncate");
+  });
+
+  it("uses one proportional font for compact values while retaining tabular numbers", () => {
+    const rowId = "row_0123456789abcdef";
+    const uuid = "03c905ac-d9a6-58b8-8d90-5dc3b9df6038";
+    render(
+      <TestTable
+        columns={[
+          { accessorKey: "id", column: null, id: "id", isSortable: true, label: "Id" },
+          {
+            accessorKey: "sessionId",
+            column: { column_type: { type: "Uuid" }, name: "sessionId", nullable: false } as never,
+            id: "sessionId",
+            isSortable: true,
+            label: "Session ID",
+          },
+          {
+            accessorKey: "name",
+            column: { column_type: { type: "Text" }, name: "name", nullable: false } as never,
+            id: "name",
+            isSortable: true,
+            label: "Name",
+          },
+          {
+            accessorKey: "role",
+            column: {
+              column_type: { type: "Enum", variants: ["admin"] },
+              name: "role",
+              nullable: false,
+            } as never,
+            id: "role",
+            isSortable: true,
+            label: "Role",
+          },
+          {
+            accessorKey: "count",
+            column: { column_type: { type: "Integer" }, name: "count", nullable: false } as never,
+            id: "count",
+            isSortable: true,
+            label: "Count",
+          },
+        ]}
+        data={[{ id: rowId, sessionId: uuid, name: "Ada", role: "admin", count: 1203 } as DynamicTableRow]}
+        onSortingChange={() => undefined}
+      />,
+    );
+
+    expect(screen.getByLabelText(rowId).getAttribute("data-cell-typography")).toBeNull();
+    expect(screen.getByText(uuid).getAttribute("data-cell-typography")).toBeNull();
+    expect(screen.getByText("Ada").getAttribute("data-cell-typography")).toBeNull();
+    expect(screen.getByText("admin").getAttribute("data-cell-typography")).toBeNull();
+    expect(screen.getByText("1203").getAttribute("data-numeric-variant")).toBe("tabular");
   });
 
   it("renders bounded structured and binary previews", () => {
