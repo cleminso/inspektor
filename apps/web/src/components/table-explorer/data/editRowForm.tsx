@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Box, Button, JsonView, Search, SegmentedControl, Text } from "@inspector/ds";
+import { Box, Button, JsonView, Search, Text, ToggleGroup } from "@inspector/ds";
 
 import {
   RowEditorFields,
@@ -113,21 +113,25 @@ function LoadedEditRowForm({
   });
 
   return (
-    <SegmentedControl
-      value={representation}
-      onValueChange={(nextRepresentation) => {
-        if (nextRepresentation === "details" || nextRepresentation === "json") {
-          setRepresentation(nextRepresentation);
-        }
-      }}
-    >
+    <div className="flex h-full min-h-0 flex-col">
       <div className="px-2 pt-2">
-        <SegmentedControl.List aria-label="Row representation" width="full">
-          <SegmentedControl.Item value="details">Details</SegmentedControl.Item>
-          <SegmentedControl.Item value="json">JSON</SegmentedControl.Item>
-        </SegmentedControl.List>
+        <ToggleGroup<RowRepresentation>
+          aria-label="Row representation"
+          itemWidth="equal"
+          value={[representation]}
+          width="full"
+          onValueChange={(values) => {
+            const nextRepresentation = values[0];
+            if (nextRepresentation !== undefined) {
+              setRepresentation(nextRepresentation);
+            }
+          }}
+        >
+          <ToggleGroup.Item value="details">Details</ToggleGroup.Item>
+          <ToggleGroup.Item value="json">JSON</ToggleGroup.Item>
+        </ToggleGroup>
       </div>
-      <SegmentedControl.Panel value="details">
+      {representation === "details" ? (
         <form
           id={ROW_EDITOR_FORM_ID}
           className="flex h-full min-h-0 flex-col mt-2 overflow-hidden"
@@ -236,10 +240,9 @@ function LoadedEditRowForm({
             </div>
           </div>
         </form>
-      </SegmentedControl.Panel>
-      <SegmentedControl.Panel value="json">
+      ) : (
         <RowJsonRepresentation rowValues={rowValues} schemaColumns={schemaColumns} />
-      </SegmentedControl.Panel>
-    </SegmentedControl>
+      )}
+    </div>
   );
 }

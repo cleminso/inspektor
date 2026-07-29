@@ -85,7 +85,7 @@
   - Reference: [Data model](./design.md#data-model), [Inspector integration](./design.md#inspector-integration).
 
 - [x] 10. Integrate read-only `JSON` representation into the row side pane.
-  - Add `Details` and `JSON` representations through the design-system `SegmentedControl`.
+  - Add `Details` and `JSON` representations through the design-system `ToggleGroup`.
   - Keep every row mutation, validation error, dirty field, and Save action in `Details`.
   - Render `JsonView` with every schema field, including fields hidden from the data grid.
   - Key the representation by stable row identity so a row change restores configured expansion.

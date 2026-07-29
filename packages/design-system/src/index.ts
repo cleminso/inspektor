@@ -340,15 +340,6 @@ export type {
   ToggleGroupWidth,
   ToggleGroupRootProps,
 } from './components/toggleGroup/toggleGroup'
-export { SegmentedControl } from './components/segmentedControl/segmentedControl'
-export type {
-  SegmentedControlItemProps,
-  SegmentedControlListProps,
-  SegmentedControlPanelProps,
-  SegmentedControlRootProps,
-  SegmentedControlValue,
-  SegmentedControlWidth,
-} from './components/segmentedControl/segmentedControl'
 export { TabView } from './components/tabView/tabView'
 export type {
   TabViewItemProps,
