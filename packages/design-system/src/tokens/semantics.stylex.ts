@@ -22,7 +22,7 @@ export const backgroundColors = stylex.defineVars({
   'bg-tab': `light-dark(${palette.gray50}, ${palette.neutral950})`,
   'bg-tab-hover': `light-dark(color-mix(in oklch, ${palette.gray100} 35%, ${palette.gray200}), ${palette.neutral900})`,
   'bg-tab-selected': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'bg-table-header': `light-dark(${palette.gray200}, ${palette.neutralAlpha100})`,
+  'bg-table-header': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha200})`,
   'bg-table-header-cell-active': `light-dark(${palette.blue200}, ${palette.blue900})`,
   'bg-table-column-cell-active': `light-dark(${palette.blue100}, ${palette.blue950})`,
   'bg-table-row-cell-active': `light-dark(${palette.blue100}, ${palette.blue950})`,

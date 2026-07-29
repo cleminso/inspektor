@@ -1,4 +1,6 @@
 import { Button as BaseButton } from '@base-ui/react/button'
+import { mergeProps } from '@base-ui/react/merge-props'
+import { useRender } from '@base-ui/react/use-render'
 import * as stylex from '@stylexjs/stylex'
 import type { KeyboardEventHandler, ReactNode } from 'react'
 
@@ -26,6 +28,8 @@ export interface ActionListItemProps {
   active?: boolean
   /** Applies the bulk-selection treatment. */
   checked?: boolean
+  /** Composes item behavior and styles onto another list item. */
+  render?: useRender.ComponentProps<'li'>['render']
 }
 
 export interface ActionListSelectionControlProps {
@@ -91,21 +95,34 @@ function ActionListRoot({ children, onEscapeKeyDown, ...props }: ActionListRootP
   )
 }
 
-function ActionListItem({ children, active = false, checked = false }: ActionListItemProps) {
-  return (
-    <li
-      {...stylex.props(
-        actionListStyles.item,
-        checked === true && actionListStyles.itemChecked,
-        active === true && actionListStyles.itemActive,
-      )}
-      data-active={active === true ? '' : undefined}
-      data-checked={checked === true ? '' : undefined}
-      data-slot="action-list-item"
-    >
-      {children}
-    </li>
-  )
+function ActionListItem({
+  children,
+  active = false,
+  checked = false,
+  render,
+  ...props
+}: ActionListItemProps) {
+  const defaultProps = {
+    ...stylex.props(
+      actionListStyles.item,
+      checked === true && actionListStyles.itemChecked,
+      active === true && actionListStyles.itemActive,
+    ),
+    children,
+    'data-active': active === true ? '' : undefined,
+    'data-checked': checked === true ? '' : undefined,
+    'data-slot': 'action-list-item',
+  } as useRender.ComponentProps<'li'>
+
+  return useRender({
+    defaultTagName: 'li',
+    render,
+    props: mergeProps<'li'>(
+      defaultProps,
+      props,
+      { 'data-slot': 'action-list-item' } as useRender.ComponentProps<'li'>,
+    ),
+  })
 }
 
 function ActionListSelectionControl({

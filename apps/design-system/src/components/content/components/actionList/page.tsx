@@ -32,7 +32,7 @@ export function ActionListPage(): ReactElement {
       preview={<Box width="popup-width-m"><BasicExample /></Box>}
       sourceCode={basicSource}
     >
-      <Section title="Selection and actions" description="SelectionControl keeps bulk selection separate from the primary trigger. Compose Menu.Trigger around ActionList.Action for trailing item commands." />
+      <Section title="Selection and actions" description="SelectionControl keeps bulk selection separate from the primary trigger. Compose Menu.Trigger around ActionList.Action for trailing commands, or compose ContextMenu.Trigger onto ActionList.Item when the complete item should open a context menu." />
       <Section title="Root props"><PropsTable rows={rootProps} /></Section>
       <Section title="Item props"><PropsTable rows={itemProps} /></Section>
       <Section title="Selection control props"><PropsTable rows={selectionControlProps} /></Section>

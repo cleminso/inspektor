@@ -1737,7 +1737,7 @@
       "description": "Action-list items.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 13
+        "line": 15
       }
     },
     {
@@ -1747,7 +1747,7 @@
       "description": "Accessible name for the list.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 15
+        "line": 17
       }
     },
     {
@@ -1757,7 +1757,7 @@
       "description": "Identifies the element that labels the list.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 17
+        "line": 19
       }
     },
     {
@@ -1767,7 +1767,7 @@
       "description": "Runs when an unhandled Escape key event bubbles from within the list. Preventing default returns focus to the item's primary trigger.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 19
+        "line": 21
       }
     }
   ],
@@ -1779,7 +1779,7 @@
       "description": "Optional selection control, primary trigger, and optional trailing action.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 24
+        "line": 26
       }
     },
     {
@@ -1790,7 +1790,7 @@
       "description": "Applies the active navigation treatment.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 26
+        "line": 28
       }
     },
     {
@@ -1801,7 +1801,17 @@
       "description": "Applies the bulk-selection treatment.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 28
+        "line": 30
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Composes item behavior and styles onto another list item.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 32
       }
     }
   ],
@@ -1813,7 +1823,7 @@
       "description": "Accessible name describing which item the checkbox selects.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 33
+        "line": 37
       }
     },
     {
@@ -1823,7 +1833,7 @@
       "description": "Controls whether this item participates in the bulk selection.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 35
+        "line": 39
       }
     },
     {
@@ -1834,7 +1844,7 @@
       "description": "Disables selection for this item.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 37
+        "line": 41
       }
     },
     {
@@ -1844,7 +1854,7 @@
       "description": "Leading icon shown while the selection control is inactive.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 39
+        "line": 43
       }
     },
     {
@@ -1854,7 +1864,7 @@
       "description": "Runs when the checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 41
+        "line": 45
       }
     }
   ],
@@ -1866,7 +1876,7 @@
       "description": "Visible action label.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 47
+        "line": 51
       }
     },
     {
@@ -1876,7 +1886,7 @@
       "description": "Decorative content before the label.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 49
+        "line": 53
       }
     },
     {
@@ -1887,7 +1897,7 @@
       "description": "Disables the primary trigger.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 51
+        "line": 55
       }
     },
     {
@@ -1897,7 +1907,7 @@
       "description": "Composes trigger behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 53
+        "line": 57
       }
     }
   ],
@@ -1909,7 +1919,7 @@
       "description": "Accessible name for an icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 58
+        "line": 62
       }
     },
     {
@@ -1920,7 +1930,7 @@
       "description": "Disables the trailing action.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 60
+        "line": 64
       }
     },
     {
@@ -1930,7 +1940,7 @@
       "description": "Composes action behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 62
+        "line": 66
       }
     }
   ],

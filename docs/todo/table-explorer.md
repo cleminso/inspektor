@@ -110,6 +110,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Move columns left, right, to the start, or to the end through matching chevron and context-menu submenus.
 - [x] Move a focused reorderable column with Shift plus Left or Right and show those shortcuts in the move submenu.
 - [x] Expose each sortable header's current direction through `aria-sort` and toggle sorting with Enter when the header owns focus.
+- [x] Open table actions from the complete table-list item, including its checkbox, label, and surrounding item area.
 - [x] Keep resolved rows visible while a new sorting subscription resolves instead of replacing the body with loading content.
 - [x] Show the sorting refresh state and disable incremental loading until refreshed rows resolve.
 - [x] Keep the source header slot highlighted without duplicate content and render the complete marker-label composition in the drag overlay.

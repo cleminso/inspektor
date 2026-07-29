@@ -343,6 +343,32 @@ describe("TableListPane", () => {
     expect(onReplaceSelection).toHaveBeenCalledWith("users", "tables");
   });
 
+  it("opens selected table actions when right-clicking its checkbox", () => {
+    const onReplaceSelection = vi.fn();
+
+    render(
+      <TableListPane
+        {...defaultActionProps}
+        checkedTableNames={new Set(["accounts"])}
+        searchValue=""
+        selectedTableName={null}
+        tables={["accounts", "users"]}
+        onClearSelection={vi.fn()}
+        onReplaceSelection={onReplaceSelection}
+        onSearchValueChange={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    );
+
+    fireEvent.contextMenu(screen.getByRole("checkbox", { name: "Select accounts" }), {
+      clientX: 40,
+      clientY: 60,
+    });
+
+    expect(onReplaceSelection).not.toHaveBeenCalled();
+    expect(screen.getByRole("menuitem", { name: "Open 1 table" })).toBeTruthy();
+  });
+
   it("clears checked tables when the context menu is dismissed", () => {
     const onClearSelection = vi.fn();
 

@@ -142,6 +142,7 @@ interface TestDataTableProps {
   onCellContextMenu?: (target: { columnId: string; rowId: string }) => void;
   onColumnActivate?: (columnId: string | null) => void;
   onRowActivate?: (rowId: string) => void;
+  resizingColumnId?: string | null;
   selectedCells?: { columnId: string; rowId: string }[];
   selectedRowIds?: string[];
 }
@@ -156,6 +157,7 @@ function TestDataTable({
   onCellContextMenu,
   onColumnActivate,
   onRowActivate,
+  resizingColumnId = null,
   selectedCells = [],
   selectedRowIds = [],
 }: TestDataTableProps) {
@@ -165,7 +167,17 @@ function TestDataTable({
     data,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
-    state: { rowSelection },
+    state: {
+      columnSizingInfo: {
+        columnSizingStart: [],
+        deltaOffset: null,
+        deltaPercentage: null,
+        isResizingColumn: resizingColumnId ?? false,
+        startOffset: null,
+        startSize: null,
+      },
+      rowSelection,
+    },
   });
 
   return (
@@ -486,6 +498,21 @@ describe("DataTable", () => {
 
     expect(activeHeader.hasAttribute("data-active")).toBe(true);
     expect(activeColumnCell.hasAttribute("data-column-active")).toBe(true);
+  });
+
+  it("keeps resize emphasis on the header-owned border", () => {
+    const { rerender } = render(<TestDataTable activeColumnId="role" />);
+
+    const restingHandleClassName = screen.getByRole("button", {
+      name: "Resize role column",
+    }).className;
+
+    rerender(<TestDataTable activeColumnId="role" resizingColumnId="role" />);
+
+    const resizeHandle = screen.getByRole("button", { name: "Resize role column" });
+
+    expect(resizeHandle.hasAttribute("data-resizing")).toBe(true);
+    expect(resizeHandle.className).toBe(restingHandleClassName);
   });
 
   it("reports header, row, cell, and cell context-menu activation targets", () => {

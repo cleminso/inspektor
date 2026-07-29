@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ActionList } from './actionList'
+import { ContextMenu } from '../contextMenu/contextMenu'
 
 afterEach(cleanup)
 
@@ -45,6 +46,23 @@ describe('ActionList', () => {
 
     fireEvent.click(checkbox)
     expect(onCheckedChange).toHaveBeenCalledWith(true, expect.anything())
+  })
+
+  it('preserves item semantics when context-menu behavior is composed onto the item', () => {
+    render(
+      <ActionList>
+        <ContextMenu.Root>
+          <ContextMenu.Trigger render={<ActionList.Item />}>
+            <ActionList.Trigger>accounts</ActionList.Trigger>
+          </ContextMenu.Trigger>
+          <ContextMenu.Content>
+            <ContextMenu.Item>Open</ContextMenu.Item>
+          </ContextMenu.Content>
+        </ContextMenu.Root>
+      </ActionList>,
+    )
+
+    expect(screen.getByRole('button', { name: 'accounts' }).closest('[data-slot="action-list-item"]')).toBeTruthy()
   })
 
   it('delegates Escape from a descendant to the consumer', () => {

@@ -61,7 +61,7 @@ function ActionsBarRoot({
       gap="s"
       padding="s"
       backgroundColor="bg-page"
-      borderBottomWidth={1}
+      // borderBottomWidth={1}
       borderColor="border-secondary"
       borderStyle="solid"
     >

@@ -152,15 +152,12 @@ export function TableListPane({
           };
           const trigger =
             tableParams === null ? (
-              <ActionList.Trigger disabled onContextMenu={handleContextMenu}>
-                {tableName}
-              </ActionList.Trigger>
+              <ActionList.Trigger disabled>{tableName}</ActionList.Trigger>
             ) : hasCheckedTables === true ? (
               <ActionList.Trigger
                 onClick={(event) => {
                   changeChecked(isChecked === false, event.nativeEvent);
                 }}
-                onContextMenu={handleContextMenu}
               >
                 {tableName}
               </ActionList.Trigger>
@@ -175,7 +172,6 @@ export function TableListPane({
                     aria-current={isActive === true ? "page" : undefined}
                   />
                 }
-                onContextMenu={handleContextMenu}
               >
                 {tableName}
               </ActionList.Trigger>
@@ -183,7 +179,10 @@ export function TableListPane({
 
           return (
             <ContextMenu.Root key={tableName}>
-              <ActionList.Item active={isActive} checked={isChecked}>
+              <ContextMenu.Trigger
+                onContextMenu={handleContextMenu}
+                render={<ActionList.Item active={isActive} checked={isChecked} />}
+              >
                 <ActionList.SelectionControl
                   aria-label={`Select ${tableName}`}
                   checked={isChecked}
@@ -192,8 +191,8 @@ export function TableListPane({
                     changeChecked(checked === true, eventDetails.event);
                   }}
                 />
-                <ContextMenu.Trigger render={trigger} />
-              </ActionList.Item>
+                {trigger}
+              </ContextMenu.Trigger>
               <ContextMenu.Content>
                 <ContextMenu.Item onClick={() => onOpenTables(orderedCheckedTableNames)}>
                   {getActionLabel("Open", orderedCheckedTableNames.length)}

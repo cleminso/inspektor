@@ -113,11 +113,19 @@ function ContextMenuRoot({
   return <BaseContextMenu.Root {...props} defaultOpen={defaultOpen} disabled={disabled} />;
 }
 
-function ContextMenuTrigger(props: ContextMenuTriggerProps) {
+function ContextMenuTrigger({ render, ...props }: ContextMenuTriggerProps) {
+  const usesDefaultElement = render === undefined;
   const stateStyles = createStateStyleProps<BaseContextMenu.Trigger.State>(() => [
-    contextMenuStyles.trigger,
+    usesDefaultElement === true && contextMenuStyles.trigger,
   ]);
-  return <BaseContextMenu.Trigger {...props} {...stateStyles} data-slot="context-menu-trigger" />;
+  return (
+    <BaseContextMenu.Trigger
+      {...props}
+      render={render}
+      {...stateStyles}
+      data-slot={usesDefaultElement === true ? "context-menu-trigger" : undefined}
+    />
+  );
 }
 
 function ContextMenuPortal({ keepMounted = false, ...props }: ContextMenuPortalProps) {

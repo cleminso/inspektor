@@ -701,7 +701,6 @@ function DataTableHeaderCell<TData extends RowData>({
           <button
             {...stylex.props(
               dataTableStyles.resizeHandle,
-              header.column.getIsResizing() === true && dataTableStyles.resizeHandleActive,
               isDragVisual === true && dataTableStyles.resizeHandleDragging,
             )}
             aria-label={`Resize ${header.column.id} column`}

@@ -53,14 +53,19 @@ export const dataTableStyles = stylex.create({
     backgroundColor: backgroundColors['bg-table-header'],
     color: textColors['text-secondary'],
     borderBottomColor: borderColors['border-table-header-cell'],
+    borderTopColor: borderColors['border-table-header-cell'],
     borderBottomStyle: 'solid',
     overflow: 'hidden',
     borderBottomWidth: 1,
+    borderTopWidth: 1,
     fontWeight: fontWeights.regular,
     borderRightColor: {
-      default: borderColors['border-table-cell'],
-      ':has([data-slot="data-table-resize-handle"]:hover)': 'transparent',
-      ':has([data-resizing])': 'transparent',
+      default: borderColors['border-table-header-cell'],
+      ':has([data-resizing])': borderColors['border-table-column-active'],
+      ':has([data-slot="data-table-resize-handle"]:focus-visible)':
+        borderColors['border-table-column-active'],
+      ':has([data-slot="data-table-resize-handle"]:hover)':
+        borderColors['border-table-column-active'],
     },
     outlineColor: {
       default: 'transparent',
@@ -89,7 +94,26 @@ export const dataTableStyles = stylex.create({
   headerCellActive: {
     backgroundColor: backgroundColors['bg-table-header-cell-active'],
     color: textColors['text-default'],
-    borderBottomColor: borderColors['border-table-column-active'],
+    borderBottomColor: 'transparent',
+    borderRightColor: {
+      default: 'transparent',
+      ':has([data-resizing])': borderColors['border-table-column-active'],
+      ':has([data-slot="data-table-resize-handle"]:focus-visible)':
+        borderColors['border-table-column-active'],
+      ':has([data-slot="data-table-resize-handle"]:hover)':
+        borderColors['border-table-column-active'],
+    },
+    borderTopColor: borderColors['border-table-column-active'],
+    outlineColor: borderColors['border-table-column-active'],
+    outlineOffset: {
+      default: 0,
+      ':focus-visible': -1,
+    },
+    outlineWidth: {
+      default: 1,
+      ':focus-visible': spatial['focus-ring-width'],
+    },
+    zIndex: 3,
   },
   headerCellLayout: {
     paddingLeft: 0,
@@ -122,7 +146,6 @@ export const dataTableStyles = stylex.create({
     width: '100%',
   },
   headerDragSource: {
-    backgroundColor: 'inherit',
     color: 'inherit',
   },
   headerDragSourceDragging: {
@@ -191,17 +214,32 @@ export const dataTableStyles = stylex.create({
   },
   cellActive: {
     backgroundColor: backgroundColors['bg-table-cell-active'],
-    boxShadow: `inset 0 0 0 ${spatial['focus-ring-width']} ${borderColors['border-table-cell-active']}`,
+    borderBottomColor: 'transparent',
+    borderRightColor: 'transparent',
+    outlineColor: borderColors['border-table-cell-active'],
+    outlineOffset: {
+      default: 0,
+      ':focus-visible': -1,
+    },
+    outlineWidth: {
+      default: 1,
+      ':focus-visible': spatial['focus-ring-width'],
+    },
+    position: 'relative',
+    zIndex: 1,
   },
   resizeHandle: {
     backgroundColor: 'transparent',
     borderWidth: 0,
-    boxShadow: {
-      default: 'none',
-      ':hover': `inset -1px 0 0 ${borderColors['border-table-column-active']}`,
-    },
     cursor: 'col-resize',
     height: '100%',
+    outlineColor: borderColors['border-table-column-active'],
+    outlineOffset: -2,
+    outlineStyle: 'solid',
+    outlineWidth: {
+      default: 0,
+      ':focus-visible': spatial['focus-ring-width'],
+    },
     padding: 0,
     position: 'absolute',
     right: 0,
@@ -209,9 +247,6 @@ export const dataTableStyles = stylex.create({
     touchAction: 'none',
     width: spacing.s,
     zIndex: 3,
-  },
-  resizeHandleActive: {
-    boxShadow: `inset -1px 0 0 ${borderColors['border-table-column-active']}`,
   },
   resizeHandleDragging: {
     visibility: 'hidden',

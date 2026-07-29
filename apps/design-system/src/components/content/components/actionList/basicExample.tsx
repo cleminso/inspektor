@@ -1,4 +1,4 @@
-import { ActionList, Menu } from '@inspector/ds'
+import { ActionList, ContextMenu, Menu } from '@inspector/ds'
 import { type ReactElement, useState } from 'react'
 
 function TableIcon(): ReactElement {
@@ -54,15 +54,21 @@ export default function BasicExample(): ReactElement {
           </Menu.Content>
         </Menu.Root>
       </ActionList.Item>
-      <ActionList.Item checked={checkedNames.has('sessions')}>
-        <ActionList.SelectionControl
-          aria-label="Select sessions"
-          checked={checkedNames.has('sessions')}
-          icon={<TableIcon />}
-          onCheckedChange={(checked) => setNameChecked('sessions', checked === true)}
-        />
-        <ActionList.Trigger>sessions</ActionList.Trigger>
-      </ActionList.Item>
+      <ContextMenu.Root>
+        <ContextMenu.Trigger render={<ActionList.Item checked={checkedNames.has('sessions')} />}>
+          <ActionList.SelectionControl
+            aria-label="Select sessions"
+            checked={checkedNames.has('sessions')}
+            icon={<TableIcon />}
+            onCheckedChange={(checked) => setNameChecked('sessions', checked === true)}
+          />
+          <ActionList.Trigger>sessions</ActionList.Trigger>
+        </ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item>Copy name</ContextMenu.Item>
+          <ContextMenu.Item variant="danger">Delete</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>
     </ActionList>
   )
 }
