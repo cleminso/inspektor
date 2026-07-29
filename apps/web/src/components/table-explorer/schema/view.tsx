@@ -1,6 +1,5 @@
 import { CopyButton } from "@inspector/ds";
 
-import { ActionsBar } from "@/components/table-explorer/actionsBar";
 import { useInspector } from "@/components/providers/inspectorProvider";
 interface SchemaViewProps {
   tableName: string;
@@ -15,7 +14,6 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
-      <ActionsBar />
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden xl:grid-cols-2">
         <section className="flex min-h-0 flex-col overflow-hidden border-b border-border xl:border-r xl:border-b-0">
           <div className="flex h-10 shrink-0 items-center justify-between border-b border-border px-3">

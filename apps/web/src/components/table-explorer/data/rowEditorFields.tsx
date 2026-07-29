@@ -276,15 +276,21 @@ export function RowEditorFields({
   return (
     <Box flexDirection="column" flexGrow={1} gap="2xl" minHeight={0} pr="xs">
       <Field.Root hidden={expandedColumnName !== null} id="row-editor-field-id">
-        <Box alignItems="center" justifyContent="between" gap="s">
-          <Box alignItems="center" gap="s" minWidth={0}>
+        <Box
+          alignItems="end"
+          data-slot="row-id-field-header"
+          gap="m"
+          justifyContent="between"
+          width="full"
+        >
+          <Box alignItems="center" minWidth={0}>
             <Field.Label htmlFor="row-editor-id">
-              <Text as="span">Id</Text>
+              <Text as="span">ID</Text>
             </Field.Label>
-            <Text as="span" color="muted" variant="caption">
-              text
-            </Text>
           </Box>
+          <Text as="span" color="muted" variant="caption">
+            UUID
+          </Text>
         </Box>
         <Input
           id="row-editor-id"

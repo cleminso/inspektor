@@ -1,5 +1,6 @@
 import type { ColumnDescriptor } from "jazz-tools";
 
+import { formatColumnTypeName } from "@/components/table-explorer/data/columnTypePresentation";
 import type { TableColumnMeta } from "@/types/tableExplorer";
 
 export type ColumnTypeMarkerIcon = "key" | "relation";
@@ -16,33 +17,33 @@ interface BaseMarker {
 }
 
 function getBaseMarker(columnType: ColumnDescriptor["column_type"]): BaseMarker {
+  const label = formatColumnTypeName(columnType);
+
   switch (columnType.type) {
     case "Text":
-      return { label: "Text", symbol: "T" };
+      return { label, symbol: "T" };
     case "Integer":
-      return { label: "Integer", symbol: "#" };
+      return { label, symbol: "#" };
     case "BigInt":
-      return { label: "BigInt", symbol: "#" };
+      return { label, symbol: "#" };
     case "Double":
-      return { label: "Float", symbol: "F" };
+      return { label, symbol: "F" };
     case "Boolean":
-      return { label: "Boolean", symbol: "B" };
+      return { label, symbol: "B" };
     case "Timestamp":
-      return { label: "Timestamp", symbol: "TS" };
+      return { label, symbol: "TS" };
     case "Bytea":
-      return { label: "Binary", symbol: "BIN" };
+      return { label, symbol: "BIN" };
     case "Uuid":
-      return { label: "UUID", symbol: "ID" };
+      return { label, symbol: "ID" };
     case "Enum":
-      return { label: "Enum", symbol: "E" };
+      return { label, symbol: "E" };
     case "Json":
-      return columnType.schema === undefined
-        ? { label: "JSON", symbol: "{ }" }
-        : { label: "Typed JSON", symbol: "{T}" };
+      return { label, symbol: columnType.schema === undefined ? "{ }" : "{T}" };
     case "Row":
-      return { label: "Row", symbol: "{…}" };
+      return { label, symbol: "{…}" };
     case "Array":
-      return { label: "Array", symbol: "[ ]" };
+      return { label, symbol: "[ ]" };
   }
 }
 

@@ -45,7 +45,7 @@ describe("MutationField", () => {
       />,
     );
 
-    const type = screen.getByText("uuid");
+    const type = screen.getByText("UUID");
     const header = type.closest('[data-slot="mutation-field-header"]');
 
     expect(header?.lastElementChild).toBe(type);

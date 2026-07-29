@@ -98,7 +98,8 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Keep structured editors mounted across NULL mode changes and connect visible errors to the editor control.
 - [x] Expand one structured editor into the form's available pane height while preserving the fixed action footer and mounted sibling fields.
 - [x] Keep row representation panels at the available pane height so editor collapse restores the form and its action footer remains at the bottom.
-- [x] Keep multi-row navigation arrows compact and make primitive field headers full-width with type labels aligned to the trailing bottom edge.
+- [x] Keep multi-row navigation arrows compact and make primitive and synthetic ID field headers full-width with type labels aligned to the trailing bottom edge.
+- [x] Use shared semantic type names across table headers and row fields, preserve acronym casing, and present the implicit row ID as `ID` with type `UUID`.
 
 ### Column and table behavior
 
@@ -156,6 +157,16 @@ through the behavior discussion. Detailed acceptance rules remain in
       across detail renders.
 - [x] Parse URL filters in a dedicated memo keyed on the raw search string so unrelated search changes no longer rebuild the
       filters array identity consumed by the query builder and selection-scope key.
+
+### Filter builder replacement
+
+[29/07/26]
+
+- [x] Remove the existing data-table filter toggle and filter editor UI.
+- [x] Preserve URL filter parsing, serialization, query translation, relation navigation, and filtered empty-state behavior for the replacement filter builder.
+- [x] Keep the retired filter editor outside the base table-view import graph.
+- [x] Replace the action-bar child inspection with a toolbar whose primary content fills the available width and whose actions stay grouped on the right.
+- [x] Remove the empty toolbar from the schema view.
 
 ### Documentation and regression coverage
 

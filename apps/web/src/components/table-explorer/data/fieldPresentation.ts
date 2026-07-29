@@ -1,5 +1,6 @@
 import type { ColumnDescriptor } from "jazz-tools";
 
+import { formatColumnTypeName } from "@/components/table-explorer/data/columnTypePresentation";
 import {
   createColumnJsonViewValue,
   isJsonViewContainer,
@@ -9,23 +10,8 @@ import {
 
 export type BooleanFieldValue = "true" | "false" | "null";
 
-const columnTypeLabels = {
-  Array: "array",
-  BigInt: "bigint",
-  Boolean: "boolean",
-  Bytea: "binary",
-  Double: "float",
-  Enum: "enum",
-  Integer: "integer",
-  Json: "json",
-  Row: "row",
-  Text: "text",
-  Timestamp: "timestamp",
-  Uuid: "uuid",
-} satisfies Record<ColumnDescriptor["column_type"]["type"], string>;
-
 export function formatColumnTypeLabel(column: ColumnDescriptor | null): string | null {
-  return column === null ? null : columnTypeLabels[column.column_type.type];
+  return column === null ? null : formatColumnTypeName(column.column_type);
 }
 
 export function formatTimestampInputValue(valueText: string): string | null {

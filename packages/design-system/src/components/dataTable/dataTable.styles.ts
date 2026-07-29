@@ -55,7 +55,6 @@ export const dataTableStyles = stylex.create({
     top: 0,
   },
   headerBackdrop: {
-    backgroundColor: backgroundColors['bg-table-header'],
     boxSizing: 'border-box',
     borderBottomColor: borderColors['border-table-header-cell'],
     borderBottomStyle: 'solid',

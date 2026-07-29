@@ -182,6 +182,15 @@ describe("EditRowForm Details and JSON views", () => {
     expect(screen.getByLabelText("DisplayName")).toBeTruthy();
   });
 
+  it("places the synthetic ID type at the trailing edge of its field header", () => {
+    renderEditRowForm();
+
+    const header = screen.getByText("ID").closest('[data-slot="row-id-field-header"]');
+
+    expect(header?.lastElementChild?.textContent).toBe("UUID");
+    expect(header === null ? null : getComputedStyle(header).width).toBe("100%");
+  });
+
   it("renders the complete row in schema order and marks missing fields unavailable", () => {
     renderEditRowForm();
 

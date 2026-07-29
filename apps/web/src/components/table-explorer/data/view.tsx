@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useEffectEvent, useState } from "react";
+import { lazy, Suspense, useEffect, useEffectEvent } from "react";
 
 import {
   Box,
@@ -10,12 +10,11 @@ import {
   Text,
 } from "@inspector/ds";
 
-import { ActionsBar } from "@/components/table-explorer/actionsBar";
 import { ColumnDragPreview } from "@/components/table-explorer/data/buildDataTableColumns";
 import { DataTableColumnVisibility } from "@/components/table-explorer/data/dataTableColumnVisibility";
 import { RowEditorSidePanel } from "@/components/table-explorer/data/rowEditorSidePanel";
-import { TableFilter } from "@/components/table-explorer/data/tableFilter";
 import { useDataViewState } from "@/components/table-explorer/data/useDataViewState";
+import { Toolbar } from "@/components/table-explorer/toolbar";
 
 interface DataViewProps {
   tableName: string;
@@ -38,7 +37,6 @@ const InsertRowForm = lazy(async () => {
 });
 
 export function DataView({ tableName }: DataViewProps): React.ReactElement {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const state = useDataViewState({
     tableName,
   });
@@ -69,45 +67,27 @@ export function DataView({ tableName }: DataViewProps): React.ReactElement {
     <ResizablePanelGroup orientation="horizontal">
       <ResizablePanel>
         <div className="flex h-full flex-col overflow-hidden">
-          <ActionsBar
-            isFilterOpen={isFilterOpen}
-            filterCount={state.filters.length}
-            onFilterOpenChange={setIsFilterOpen}
-          >
-            <ActionsBar.Leading>
-              <Button
-                type="button"
-                variant="primary"
-                size="m"
-                onClick={() => {
-                  if (state.detailPaneMode === "insert") {
-                    state.handleRowEditorOpenChange(false);
-                  } else {
-                    state.rowEditor.openInsert();
-                  }
-                }}
-              >
-                Insert row
-              </Button>
-            </ActionsBar.Leading>
-            <ActionsBar.Trailing>
-              <DataTableColumnVisibility table={state.table} />
-            </ActionsBar.Trailing>
-          </ActionsBar>
-          {isFilterOpen === true ? (
-            <TableFilter
-              schemaColumns={state.schemaColumns}
-              filters={state.filters}
-              onFiltersChange={state.setFilters}
-              onClear={() => {
-                void state.setFilters([]);
-                setIsFilterOpen(false);
-              }}
-              onRequestClose={() => {
-                setIsFilterOpen(false);
-              }}
-            />
-          ) : null}
+          <Toolbar
+            actions={
+              <>
+                <DataTableColumnVisibility table={state.table} />
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="s"
+                  onClick={() => {
+                    if (state.detailPaneMode === "insert") {
+                      state.handleRowEditorOpenChange(false);
+                    } else {
+                      state.rowEditor.openInsert();
+                    }
+                  }}
+                >
+                  Insert row
+                </Button>
+              </>
+            }
+          />
           <Box minHeight={0} flex={1} overflow="hidden">
             <DataTable.Root
               table={state.table}
