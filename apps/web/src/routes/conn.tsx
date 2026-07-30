@@ -1,8 +1,8 @@
 import { Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 
-import { ConnectionsLayout } from "@/components/layout/connectionsLayout";
-import { ConnectionsView } from "@/components/onboarding/view";
-import { appRoutes } from "@/lib/navigation/appRoutes";
+import { appRoutes } from "@app/routing/appRoutes";
+import { ConnectionsLayout } from "@onboarding/connectionsLayout";
+import { ConnectionsView } from "@onboarding/view";
 
 export const Route = createFileRoute("/conn")({
   component: ConnRoute,

@@ -32,7 +32,7 @@ schema, permissions, and active sync-server query subscriptions from one interfa
 
 v1 continues the MVP direction with stronger UI/UX foundations, clearer interaction design, better performance, and more maintainable architecture.
 
-By better implementation/performance I mean faster browsing, clearer data-table interactions, stronger query subscription UX,
+By better implementation/performance I mean faster browsing, clearer data-grid interactions, stronger query subscription UX,
 reusable UI foundations, and better state handling, so future inspector features can be added without becoming one-off
 patches.
 
@@ -139,22 +139,22 @@ flowchart TD
     subgraph TableExplorerFlow["Table Data item"]
       DataItem --> SearchParams["useTableExplorerSearchParams"]
       SearchParams --> UrlSearch["URL search: filters sort row editor"]
-      SearchParams --> TableStorage["localStorage: data-table preferences"]
+      SearchParams --> TableStorage["localStorage: data-grid preferences"]
 
-      DataItem --> DataState["useDataViewState"]
-      DataState --> TableQuery["useTableQuery"]
+      DataItem --> DataState["useTableViewState"]
+      DataState --> TableQuery["useTableRows"]
       TableQuery --> QueryBuilder["GenericQueryBuilder"]
       QueryBuilder --> UseAll["Jazz useAll"]
       UseAll --> ReactiveRuntime["Jazz reactive query runtime"]
 
-      DataState --> DataTable["DataTable"]
+      DataState --> DataGrid["DataGrid"]
       DataState --> RowEditor["RowEditorSidePanel"]
       DataState --> Mutations["useTableMutations"]
       Mutations --> TableProxy["createTableProxy"]
       TableProxy --> UseDb["Jazz useDb"]
       UseDb --> MutationRuntime["Jazz mutation runtime"]
 
-      DataTable --> RelationCell["RelationCellLink"]
+      DataGrid --> RelationCell["RelationCellLink"]
       RelationCell --> RelationRow["useRelationRow"]
       RelationCell --> WorkspaceItems
       SchemaItem --> StoredSchema
@@ -169,9 +169,9 @@ flowchart TD
       QueryState --> QueryList["Grouped subscription navigator"]
       QueryList --> QueryItem
       QueryItem --> QueryOverview["Overview and Raw JSON"]
-      QueryOverview --> BuildExplorerLink["buildExplorerLink"]
-      BuildExplorerLink --> ExtractFilters["extractFiltersFromIR"]
-      BuildExplorerLink --> WorkspaceItems
+      QueryOverview --> buildTableExplorerLink["buildTableExplorerLink"]
+      buildTableExplorerLink --> ExtractFilters["extractFiltersFromIR"]
+      buildTableExplorerLink --> WorkspaceItems
     end
 
     subgraph JazzServer["Jazz sync server and APIs"]
@@ -601,7 +601,7 @@ Table workspace items follow this model:
 - open items and recently opened items are persisted as workspace state scoped by connection, branch, and schema hash
 - the active content route is URL-backed without exposing tab identity
 - filters and sort are URL-backed for the active Data item and also saved in workspace state
-- data-table column state is saved per table
+- data-grid column state is saved per table
 - page index is memory-only and resets when table, filters, or sort changes
 - if a saved item or content route references a table missing from the selected schema, Inspector renders an unavailable-table
   empty state, does not run table queries, and lets the user close the item or switch schema hash
@@ -610,7 +610,7 @@ State split:
 
 - URL: connection id, active resource, representation, shareable filters, shareable sort
 - localStorage: connection preferences, open workspace items, recent items, item state, pane layout, navigator state, saved
-  data-table preferences
+  data-grid preferences
 - memory: pagination, transient selection, live update highlights, row editor focus
 
 Do not add sessionStorage unless a specific table state needs to survive route navigation without surviving a browser restart.
@@ -635,7 +635,7 @@ Detailed row selection, cell selection, side-pane, column-selection, and bulk-ed
 [Table Explorer selection and pane behavior specification](./tableExplorerBehaviors.md). This document retains the product and
 architecture summary; the focused specification owns interaction scenarios and unresolved behavior decisions.
 
-The data table is the core product surface of the Data Explorer. It is read-first and record-oriented. `DataTable` is the
+The data table is the core product surface of the Data Explorer. It is read-first and record-oriented. `DataGrid` is the
 consistent name for the reusable design-system renderer and table surface. `DataGrid` names the spreadsheet behavior layer for
 opening complete multi-cell selections, column operations, matrix copy and paste, bulk cell editing, and complete keyboard cell
 navigation.
@@ -645,24 +645,24 @@ schema context, and safe edits into one coherent surface.
 
 The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspector rules.
 
-`@inspector/ds` owns the reusable `DataTable` presentation system. `apps/web` owns the Inspector composition, TanStack table
+`@inspector/ds` owns the reusable `DataGrid` presentation system. `apps/web` owns the Inspector composition, TanStack table
 construction, Jazz queries, schema-derived columns, filters, relations, routes, and mutations. The design-system root receives
 a controlled TanStack `Table<TData>` instance rather than receiving duplicate data, columns, sorting, pagination, or selection
 state.
 
 The design-system API uses compound parts so consumers can compose the required structure without styling escape hatches:
 
-- `DataTable.Root`
-- `DataTable.Viewport`
-- `DataTable.Header`
-- `DataTable.HeaderRow`
-- `DataTable.HeaderCell`
-- `DataTable.Body`
-- `DataTable.Row`
-- `DataTable.Cell`
-- `DataTable.Empty`
-- `DataTable.Loading`
-- `DataTable.Footer`
+- `DataGrid.Root`
+- `DataGrid.Viewport`
+- `DataGrid.Header`
+- `DataGrid.HeaderRow`
+- `DataGrid.HeaderCell`
+- `DataGrid.Body`
+- `DataGrid.Row`
+- `DataGrid.Cell`
+- `DataGrid.Empty`
+- `DataGrid.Loading`
+- `DataGrid.Footer`
 
 These parts own semantic table markup, StyleX styles, focus presentation, state attributes, and constrained variants. Consumers
 provide application content and state but do not receive `className`, inline `style`, raw CSS values, or broad styling slot
@@ -764,7 +764,7 @@ Column selection is an explicit header context-menu action rather than a normal 
 whether it targets visible cells or every row matching the active query. Visible cells form a table selection; every matching row
 is a separate query-backed bulk operation.
 
-Column-header, row, and cell context menus use the design-system `ContextMenu` component. `DataTable` identifies the interaction
+Column-header, row, and cell context menus use the design-system `ContextMenu` component. `DataGrid` identifies the interaction
 target; `apps/web` derives available actions from the Jazz schema, row state, and navigation context.
 
 UI representation:
@@ -787,23 +787,23 @@ Header markers compose these dimensions directly, including forms such as `T?`, 
 `T FX`. The compact symbol remains secondary to the column name and exposes an accessible Jazz type label. The synthetic Jazz row
 ID uses a key icon, references use a relation icon, and stored UUID values use `ID`.
 
-| Symbol | Jazz DSL type              | TypeScript value      | SQL storage         | Notes                                                                 |
-| ------ | -------------------------- | --------------------- | ------------------- | --------------------------------------------------------------------- |
-| `T`    | `s.string()`               | `string`              | `TEXT`              | Plain text. Do not infer semantic text types from the SQL type alone. |
-| `?`    | `.optional()`              | base type or `null`   | nullable column     | Modifier badge, not a standalone type.                                |
-| `#`    | `s.int()`                  | `number`              | `INTEGER`           | Whole numbers.                                                        |
-| `F`    | `s.float()`                | `number`              | `REAL`              | Floating-point numbers.                                               |
-| `B`    | `s.boolean()`              | `boolean`             | `BOOLEAN`           | True/false values.                                                    |
-| `TS`   | `s.timestamp()`            | `Date`                | `TIMESTAMP`         | Render relative and absolute time where useful.                       |
-| `BIN`  | `s.bytes()`                | `Uint8Array`          | `BYTEA`             | Binary data. Prefer Files & Blobs patterns for uploads and images.    |
-| relation icon | `s.ref("table")`    | row ID `string`       | `UUID` foreign key  | Relation to another table. Ref columns must end in `Id` or `_id`.     |
-| `[]`   | `s.array(type)`            | array of base type    | base SQL array      | Render as an array container with the nested type marker when known.  |
-| relation icon + `[]` | `s.array(s.ref())` | row ID `string[]` | `UUID[]`         | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
-| `ID`   | stored UUID                | UUID `string`         | `UUID`              | UUID value without relation metadata.                                 |
-| `E`    | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details, not the compact header.               |
-| `{}`   | `s.json()`                 | `JsonValue`           | `JSON`              | Untyped JSON; replace whole value on write.                           |
-| `{T}`  | `s.json(schema)`           | schema-inferred value | `JSON`              | Typed JSON; still atomic on write.                                    |
-| `FX`   | `.transform({ from, to })` | transformed value     | underlying SQL type | Modifier badge. Filters use the stored column value.                  |
+| Symbol               | Jazz DSL type              | TypeScript value      | SQL storage         | Notes                                                                 |
+| -------------------- | -------------------------- | --------------------- | ------------------- | --------------------------------------------------------------------- |
+| `T`                  | `s.string()`               | `string`              | `TEXT`              | Plain text. Do not infer semantic text types from the SQL type alone. |
+| `?`                  | `.optional()`              | base type or `null`   | nullable column     | Modifier badge, not a standalone type.                                |
+| `#`                  | `s.int()`                  | `number`              | `INTEGER`           | Whole numbers.                                                        |
+| `F`                  | `s.float()`                | `number`              | `REAL`              | Floating-point numbers.                                               |
+| `B`                  | `s.boolean()`              | `boolean`             | `BOOLEAN`           | True/false values.                                                    |
+| `TS`                 | `s.timestamp()`            | `Date`                | `TIMESTAMP`         | Render relative and absolute time where useful.                       |
+| `BIN`                | `s.bytes()`                | `Uint8Array`          | `BYTEA`             | Binary data. Prefer Files & Blobs patterns for uploads and images.    |
+| relation icon        | `s.ref("table")`           | row ID `string`       | `UUID` foreign key  | Relation to another table. Ref columns must end in `Id` or `_id`.     |
+| `[]`                 | `s.array(type)`            | array of base type    | base SQL array      | Render as an array container with the nested type marker when known.  |
+| relation icon + `[]` | `s.array(s.ref())`         | row ID `string[]`     | `UUID[]`            | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
+| `ID`                 | stored UUID                | UUID `string`         | `UUID`              | UUID value without relation metadata.                                 |
+| `E`                  | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details, not the compact header.               |
+| `{}`                 | `s.json()`                 | `JsonValue`           | `JSON`              | Untyped JSON; replace whole value on write.                           |
+| `{T}`                | `s.json(schema)`           | schema-inferred value | `JSON`              | Typed JSON; still atomic on write.                                    |
+| `FX`                 | `.transform({ from, to })` | transformed value     | underlying SQL type | Modifier badge. Filters use the stored column value.                  |
 
 The synthetic row ID is not part of the stored column descriptor and renders with a key icon. Transform markers require a safe
 transform descriptor from the inspected application because stored WASM schema metadata does not contain transform information.
@@ -836,32 +836,32 @@ Double-click or Enter starts the schema-appropriate inline editor. Structured va
 inline dialog with Save, Cancel, and expand actions. Expand opens the complete-row pane focused on the field. Relation and binary values open the complete-row pane
 directly. Timestamp values use an inline calendar when available. Read-only values remain read-only in the grid.
 
-| Condition | Grid representation | Side-pane representation |
-| --------- | ------------------- | ------------------------ |
-| Row ID | Full ID at the schema-derived initial width. Middle-truncate only when the user narrows the column. | Read-only input group with the complete ID and Copy action. |
-| Non-empty string | Text with end truncation when it exceeds the available width. | Auto-growing text control with native text selection and clipboard behavior. |
-| Empty string | Explicit `""` so it cannot be mistaken for `NULL`. | Empty editable text control. |
-| Integer | Right-aligned whole number. | Numeric text input with integer parsing and validation. |
-| Float | Right-aligned readable number; preserve full precision outside the compact preview. | Numeric text input that preserves intermediate editing states and validates finite values. |
-| Boolean | Non-interactive boolean indicator with `true` or `false` text. | `ToggleGroup` with `True` and `False`; add `Null` when optional. |
-| Valid timestamp | Absolute date and time in the browser timezone without fractional seconds. | Date-time field plus browser-local, UTC, relative, and raw epoch representations. |
-| Malformed timestamp | Explicit invalid-value treatment with the raw value preserved. | Raw value, validation message, and no misleading date formatting. |
-| Non-empty bytes | Byte count only, such as `317 B` or `2 KB`. | Read-only input group with byte count and a `Copy as` menu for Hex, Base64, and Download raw. |
-| Empty bytes | `0 B`. | Read-only input group with `0 B`; binary actions remain available when meaningful. |
-| Resolved reference | Stored relation ID as a `TextLink` with a trailing arrow. | Editable raw relation ID when writable, target table, resolved display value, Copy ID, and Open target. |
-| Missing reference target | Stored relation ID with a missing-target state; never replace it with an empty label. | Editable raw relation ID when writable, target table, missing-target message, and Copy ID. |
-| Scalar enum | Plain enum value. | `Select` constrained to schema values. |
-| Malformed enum | Raw value with an invalid-value treatment. | Current raw value, schema options, and validation message without silent replacement. |
-| Empty array | `[]`. | Empty structured array editor in `Details`; read-only expandable array in row `JSON`. |
-| Primitive array | Item count and bounded one-line preview, such as `[3] reader, writer, reader`. | Schema-derived repeatable fields when practical, with JSON text editing as the generic `Details` fallback. |
-| Enum array | Item count and bounded enum preview. | Repeatable `Select` rows that preserve order and duplicate values. |
-| Reference array | Item count and bounded raw-ID preview. | Repeatable relation fields with raw IDs and explicit navigation actions. |
-| Empty JSON object | `{}`. | JSON text field in `Details`; read-only expandable object in row `JSON`. |
-| Untyped JSON | Key or value count plus bounded one-line preview. | JSON text field with parsing feedback in `Details`; read-only expandable object or array in row `JSON`. |
-| Typed JSON | JSON summary with the `{T}` marker and bounded one-line preview. | JSON text field with schema-derived validation in `Details`; read-only expandable object or array in row `JSON`. |
-| `NULL` | Explicit subdued `NULL` marker. | `NULL` control layered around the base editor. |
-| Unavailable value | Explicit unavailable marker rather than an empty cell. | Unavailable explanation and disabled field actions. |
-| Unsupported or malformed value | Raw bounded preview with an invalid or unsupported state. | Raw value, schema expectation, and reason the value cannot be represented or edited safely. |
+| Condition                      | Grid representation                                                                                 | Side-pane representation                                                                                         |
+| ------------------------------ | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Row ID                         | Full ID at the schema-derived initial width. Middle-truncate only when the user narrows the column. | Read-only input group with the complete ID and Copy action.                                                      |
+| Non-empty string               | Text with end truncation when it exceeds the available width.                                       | Auto-growing text control with native text selection and clipboard behavior.                                     |
+| Empty string                   | Explicit `""` so it cannot be mistaken for `NULL`.                                                  | Empty editable text control.                                                                                     |
+| Integer                        | Right-aligned whole number.                                                                         | Numeric text input with integer parsing and validation.                                                          |
+| Float                          | Right-aligned readable number; preserve full precision outside the compact preview.                 | Numeric text input that preserves intermediate editing states and validates finite values.                       |
+| Boolean                        | Non-interactive boolean indicator with `true` or `false` text.                                      | `ToggleGroup` with `True` and `False`; add `Null` when optional.                                                 |
+| Valid timestamp                | Absolute date and time in the browser timezone without fractional seconds.                          | Date-time field plus browser-local, UTC, relative, and raw epoch representations.                                |
+| Malformed timestamp            | Explicit invalid-value treatment with the raw value preserved.                                      | Raw value, validation message, and no misleading date formatting.                                                |
+| Non-empty bytes                | Byte count only, such as `317 B` or `2 KB`.                                                         | Read-only input group with byte count and a `Copy as` menu for Hex, Base64, and Download raw.                    |
+| Empty bytes                    | `0 B`.                                                                                              | Read-only input group with `0 B`; binary actions remain available when meaningful.                               |
+| Resolved reference             | Stored relation ID as a `TextLink` with a trailing arrow.                                           | Editable raw relation ID when writable, target table, resolved display value, Copy ID, and Open target.          |
+| Missing reference target       | Stored relation ID with a missing-target state; never replace it with an empty label.               | Editable raw relation ID when writable, target table, missing-target message, and Copy ID.                       |
+| Scalar enum                    | Plain enum value.                                                                                   | `Select` constrained to schema values.                                                                           |
+| Malformed enum                 | Raw value with an invalid-value treatment.                                                          | Current raw value, schema options, and validation message without silent replacement.                            |
+| Empty array                    | `[]`.                                                                                               | Empty structured array editor in `Details`; read-only expandable array in row `JSON`.                            |
+| Primitive array                | Item count and bounded one-line preview, such as `[3] reader, writer, reader`.                      | Schema-derived repeatable fields when practical, with JSON text editing as the generic `Details` fallback.       |
+| Enum array                     | Item count and bounded enum preview.                                                                | Repeatable `Select` rows that preserve order and duplicate values.                                               |
+| Reference array                | Item count and bounded raw-ID preview.                                                              | Repeatable relation fields with raw IDs and explicit navigation actions.                                         |
+| Empty JSON object              | `{}`.                                                                                               | JSON text field in `Details`; read-only expandable object in row `JSON`.                                         |
+| Untyped JSON                   | Key or value count plus bounded one-line preview.                                                   | JSON text field with parsing feedback in `Details`; read-only expandable object or array in row `JSON`.          |
+| Typed JSON                     | JSON summary with the `{T}` marker and bounded one-line preview.                                    | JSON text field with schema-derived validation in `Details`; read-only expandable object or array in row `JSON`. |
+| `NULL`                         | Explicit subdued `NULL` marker.                                                                     | `NULL` control layered around the base editor.                                                                   |
+| Unavailable value              | Explicit unavailable marker rather than an empty cell.                                              | Unavailable explanation and disabled field actions.                                                              |
+| Unsupported or malformed value | Raw bounded preview with an invalid or unsupported state.                                           | Raw value, schema expectation, and reason the value cannot be represented or edited safely.                      |
 
 Timestamp display uses the user's browser timezone, available through the browser's internationalization APIs. The sync server's
 deployment location does not determine display timezone and cannot be inferred reliably from a timestamp or server URL. UTC and
@@ -935,7 +935,7 @@ Defaults:
 - page size options: 100, 500, 1000
 - default sort: deterministic latest-first row order when Jazz can express it, otherwise stable `id` order
 - page index: memory-only
-- page size: saved as a data-table preference
+- page size: saved as a data-grid preference
 
 The page number input can jump to a known page by mapping `pageIndex` to `offset`. If the requested page has no rows, Inspector falls back to the nearest page with rows.
 
@@ -1004,8 +1004,8 @@ Since the target audience is developers, I opt for a component that handles both
 
 v1 keeps the existing generic filter query semantics and exposes two synchronized interfaces over one controlled filter model:
 
-- `DataTableFilterBuilder` sits below the workspace-item tabs and provides a command-style, keyboard-friendly experience
-- `DataTableFilterControl` sits in the Tables navigator and provides direct field and operator controls
+- `DataGridFilterBuilder` sits below the workspace-item tabs and provides a command-style, keyboard-friendly experience
+- `DataGridFilterControl` sits in the Tables navigator and provides direct field and operator controls
 
 Both interfaces read and update the same URL-backed applied clauses. Adding, editing, or removing a clause in either interface
 updates the other. Switching the left dock away from Tables does not limit filtering because the builder remains available.
@@ -1238,14 +1238,14 @@ Current code path:
 2. It calls `fetchServerSubscriptions(serverUrl, { adminSecret, appId })`.
 3. The server returns a snapshot with `generatedAt` and `queries`.
 4. Inspector stores the last successful snapshot in module memory to avoid empty flashes during navigation.
-5. `useQuerySubscriptionsState(...)` derives table counts, selected table filtering, and data-table rows.
+5. `useQuerySubscriptionsState(...)` derives table counts, selected table filtering, and data-grid rows.
 6. `expandedRow.tsx` and query-subscription helpers parse the serialized query JSON when building the Data Explorer link.
 
 Relevant files:
 
 - `apps/web/src/hooks/useQuerySubscriptionsTelemetry.ts`
 - `apps/web/src/components/query-subscriptions/useQuerySubscriptionsState.ts`
-- `apps/web/src/components/query-subscriptions/dataTable.tsx`
+- `apps/web/src/components/query-subscriptions/dataGrid.tsx`
 - `apps/web/src/components/query-subscriptions/expandedRow.tsx`
 - `apps/web/src/lib/query-subscriptions/buildExplorerUrl.ts`
 - `apps/web/src/lib/query-subscriptions/extractFiltersFromIR.ts`
@@ -1294,7 +1294,7 @@ The Query Subscriptions view does not show returned row data. To inspect data, I
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Show current grouped subscriptions | Show active server-visible query shapes returned by the latest snapshot.                                                                       |
 | Filter by table and propagation    | Keep table and returned propagation values in the Queries navigator.                                                                           |
-| Browse grouped subscriptions       | Start with table and count in the Queries navigator without replacing the active workspace item.                                                |
+| Browse grouped subscriptions       | Start with table and count in the Queries navigator without replacing the active workspace item.                                               |
 | Inspect one subscription           | Opening a grouped subscription creates or focuses a Query workspace item with Overview and Raw JSON representations.                           |
 | Explain empty states               | Explain no active queries, local-only queries, short-lived reads, mismatched connection context, hidden inspector reads, and failed telemetry. |
 | Manual refresh                     | Keep auto-refresh and let the user refresh immediately.                                                                                        |
@@ -1484,7 +1484,7 @@ This interface **must answer**:
 - Not a schema editor.
 - Not a visual schema designer.
 - Not a replacement for Table Explorer schema hints.
-- No schema-field-to-data-table navigation unless a clear workflow appears.
+- No schema-field-to-data-grid navigation unless a clear workflow appears.
 
 The Data toolbar exposes an action that opens or focuses the Schema workspace item for the current table. It does not mutate a
 Data item into Schema search state. Data and Schema keep distinct item identities so they can later appear in separate panes.

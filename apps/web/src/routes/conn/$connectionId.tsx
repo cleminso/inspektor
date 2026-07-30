@@ -1,12 +1,10 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
 
-import { InspectorProvider } from "@/components/providers/inspectorProvider";
-import { useInspectorSessionContext } from "@/components/providers/inspectorSessionProvider";
 import {
   redirectToConnections,
   resolveStoredTablesNavigationTarget,
-} from "@/lib/navigation/inspectorNavigation";
+} from "@app/routing/inspectorNavigation";
+import { InspectorRuntimeBoundary } from "@app/runtime/inspectorRuntimeBoundary";
 
 export const Route = createFileRoute("/conn/$connectionId")({
   gcTime: 0,
@@ -24,30 +22,12 @@ export const Route = createFileRoute("/conn/$connectionId")({
   component: InspectorRuntimeRoute,
 });
 
-function InspectorRuntimeRoute(): React.ReactElement | null {
+function InspectorRuntimeRoute(): React.ReactElement {
   const target = Route.useLoaderData();
-  const session = useInspectorSessionContext();
-  const isContextReady =
-    session.currentConnectionId === target.connectionId &&
-    session.currentBranch === target.branch &&
-    session.currentSchemaHash === target.schemaHash;
-  const targetKey = `${target.connectionId}:${target.branch}:${target.schemaHash}`;
-  const appliedTargetKeyRef = useRef<string | null>(isContextReady === true ? targetKey : null);
-
-  useEffect(() => {
-    if (appliedTargetKeyRef.current !== targetKey) {
-      appliedTargetKeyRef.current = targetKey;
-      session.setConnectionContext(target.connectionId, target.branch, target.schemaHash);
-    }
-  }, [session, target.branch, target.connectionId, target.schemaHash, targetKey]);
-
-  if (isContextReady === false && appliedTargetKeyRef.current !== targetKey) {
-    return null;
-  }
 
   return (
-    <InspectorProvider initialRuntimeTarget={target}>
+    <InspectorRuntimeBoundary target={target}>
       <Outlet />
-    </InspectorProvider>
+    </InspectorRuntimeBoundary>
   );
 }

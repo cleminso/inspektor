@@ -16,6 +16,7 @@
 - [x] Keep only the saved connection id in connected content routes.
 - [x] Restore branch and schema hash from the selected connection preferences.
 - [x] Mount the shared Jazz runtime provider at `/conn/:connectionId` after validating the saved runtime context.
+- [x] Keep session-target synchronization in an app-owned runtime boundary so the connection route remains a loader and composition adapter.
 - [x] Use `/conn/:connectionId/tables/:tableName` for the default Data representation.
 - [x] Use `/conn/:connectionId/queries` for the Queries entry point.
 - [x] Keep branch and schema hash in runtime, workspace, tab, and table-preference scopes without exposing them in content URLs.
@@ -68,6 +69,7 @@
 - [x] Focused connection-context and route-link tests pass.
 - [x] Focused table-tab route-search tests pass.
 - [x] Connection-target and runtime schema-hash reuse tests pass.
+- [x] Runtime-boundary synchronization tests pass.
 - [x] Application typecheck passes.
 - [x] Production route generation removes branch and schema path segments.
 - [ ] Browser verification covers direct table reload, connection switching, branch switching, and schema switching.

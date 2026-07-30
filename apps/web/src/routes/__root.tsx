@@ -1,7 +1,7 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Toaster } from "@inspector/ds";
 
-import { InspectorSessionProvider } from "@/components/providers/inspectorSessionProvider";
+import { InspectorSessionProvider } from "@app/providers/inspectorSessionProvider";
 
 export const Route = createRootRoute({
   component: RootComponent,

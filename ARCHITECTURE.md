@@ -198,7 +198,7 @@ The fallback is part of the feature contract, not decorative loading UI. A user 
 
 ### Reordering behavior
 
-Data Table and Tab View initially render non-reorderable usable content. Their DnD implementation is deferred. The static component owns markup; the deferred module owns DnD providers and hooks; a small dependency-free context bridges constrained slots between them.
+Data Grid and Tab View initially render non-reorderable usable content. Their DnD implementation is deferred. The static component owns markup; the deferred module owns DnD providers and hooks; a small dependency-free context bridges constrained slots between them.
 
 The bridge must not use DOM discovery, positional matching, `MutationObserver`, or a sibling runtime to attach behavior to rendered elements. React components own their elements and attach behavioral refs directly. Adding a provider can remount a subtree, so focus and required user state must be restored by semantic identity.
 

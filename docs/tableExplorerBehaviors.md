@@ -29,9 +29,9 @@ acceptance rules so the main document does not accumulate every pointer, keyboar
 
 ## Product boundary
 
-The foundation is a read-first `DataTable` with controlled cell-selection primitives. Opening complete multi-cell selections,
+The foundation is a read-first `DataGrid` with controlled cell-selection primitives. Opening complete multi-cell selections,
 column selection, and bulk cell editing cross the product boundary into `DataGrid` behavior. The richer behavior may reuse
-DataTable rendering and schema-derived components without making the record-oriented DataTable API ambiguous.
+DataGrid rendering and schema-derived components without making the record-oriented DataGrid API ambiguous.
 
 The Inspector remains schema-driven. Selection behavior is generic and does not depend on generated table-specific code.
 

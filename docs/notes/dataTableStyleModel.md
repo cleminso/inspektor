@@ -1,4 +1,4 @@
-# Data Table style model
+# Data Grid style model
 
 ## Table of contents
 
@@ -24,7 +24,7 @@
 
 ## Purpose
 
-This note defines the visual model for Data Table gridlines, state fills, focus rings, active-cell rings, resize indicators, and drag presentation.
+This note defines the visual model for Data Grid gridlines, state fills, focus rings, active-cell rings, resize indicators, and drag presentation.
 
 The goal is to keep borders crisp and continuous while active, selected, focused, resizing, and dragging states combine. The model applies to default and compact densities, sticky headers, reordered columns, light and dark themes, and spanning message or expanded rows.
 
@@ -124,31 +124,31 @@ Use logical edge properties when directionality matters. The ownership rule is i
 
 Each channel communicates one kind of information.
 
-| Channel | Meaning | Examples |
-| --- | --- | --- |
-| Structural border | Table geometry | Header and body gridlines |
-| Background | Membership or scope | Active column, selected row, selected cells |
-| State ring | Current product target | Active header and cell |
-| Focus outline | Current keyboard target | Focused header or cell |
-| Emphasized edge | Direct boundary manipulation | Resize hover and resizing |
-| Detached frame | Moving representation | Column drag overlay |
+| Channel           | Meaning                      | Examples                                    |
+| ----------------- | ---------------------------- | ------------------------------------------- |
+| Structural border | Table geometry               | Header and body gridlines                   |
+| Background        | Membership or scope          | Active column, selected row, selected cells |
+| State ring        | Current product target       | Active header and cell                      |
+| Focus outline     | Current keyboard target      | Focused header or cell                      |
+| Emphasized edge   | Direct boundary manipulation | Resize hover and resizing                   |
+| Detached frame    | Moving representation        | Column drag overlay                         |
 
 States should combine across channels instead of overriding unrelated properties. Competition should occur only between states using the same channel.
 
 ## State presentation
 
-| State | Background | Structural border | Active ring | Focus outline |
-| --- | --- | --- | --- | --- |
-| Default header | Neutral header | Neutral bottom and inline-end | None | None |
-| Active-column header | Active header | Active bottom, neutral inline-end | One-pixel seam-aligned perimeter | Two pixels when focused |
-| Focused header | Preserve state fill | Preserve geometry | None | Complete seam-aligned ring |
-| Resize-hover header | Preserve state fill | Active inline-end | None | Preserve header focus |
-| Default cell | Page surface | Neutral bottom and inline-end | None | None |
-| Active-column cell | Subtle column fill | Neutral | None | When focused |
-| Selected-row cell | Selected-row fill | Neutral | None | When focused |
-| Selected cell | Selected-cell fill | Neutral | None | When focused |
-| Active cell | Active-cell fill | Owned bottom and inline-end colors transparent | Complete seam-aligned ring | Two pixels when focused |
-| Active row | Row-level emphasis | Neutral | No cell rings by default | Per focused cell |
+| State                | Background          | Structural border                              | Active ring                      | Focus outline              |
+| -------------------- | ------------------- | ---------------------------------------------- | -------------------------------- | -------------------------- |
+| Default header       | Neutral header      | Neutral bottom and inline-end                  | None                             | None                       |
+| Active-column header | Active header       | Active bottom, neutral inline-end              | One-pixel seam-aligned perimeter | Two pixels when focused    |
+| Focused header       | Preserve state fill | Preserve geometry                              | None                             | Complete seam-aligned ring |
+| Resize-hover header  | Preserve state fill | Active inline-end                              | None                             | Preserve header focus      |
+| Default cell         | Page surface        | Neutral bottom and inline-end                  | None                             | None                       |
+| Active-column cell   | Subtle column fill  | Neutral                                        | None                             | When focused               |
+| Selected-row cell    | Selected-row fill   | Neutral                                        | None                             | When focused               |
+| Selected cell        | Selected-cell fill  | Neutral                                        | None                             | When focused               |
+| Active cell          | Active-cell fill    | Owned bottom and inline-end colors transparent | Complete seam-aligned ring       | Two pixels when focused    |
+| Active row           | Row-level emphasis  | Neutral                                        | No cell rings by default         | Per focused cell           |
 
 The active cell may visually subsume selected-cell, selected-row, and active-column backgrounds. It must not remove structural gridlines or keyboard focus.
 
@@ -298,7 +298,7 @@ TanStack Table owns:
 - Column order and sorting state.
 - Logical column offsets and total sizes.
 
-The Data Table owns:
+The Data Grid owns:
 
 - Semantic markup.
 - Rendered widths and table layout.
@@ -379,11 +379,11 @@ Visual regression coverage should include border corners and intersections. Beha
 
 ## References
 
-- `packages/design-system/src/components/dataTable/dataTable.tsx`
-- `packages/design-system/src/components/dataTable/dataTable.styles.ts`
-- `packages/design-system/src/components/dataTable/dataTableReorder.tsx`
+- `packages/design-system/src/components/dataGrid/dataGrid.tsx`
+- `packages/design-system/src/components/dataGrid/dataGrid.styles.ts`
+- `packages/design-system/src/components/dataGrid/dataGridReorder.tsx`
 - `packages/design-system/src/tokens/semantics.stylex.ts`
-- `apps/web/src/components/table-explorer/data/useDataTable.ts`
+- `apps/web/src/components/table-explorer/data/useDataGrid.ts`
 - [TanStack Table data guide](https://tanstack.com/table/latest/docs/guide/data)
 - [TanStack Table column sizing guide](https://tanstack.com/table/latest/docs/guide/column-sizing)
 - [TanStack Table column sizing API](https://tanstack.com/table/latest/docs/api/features/column-sizing)

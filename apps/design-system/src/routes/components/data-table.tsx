@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { DataTablePage } from '@/components/content/components/dataTable/page'
+import { DataGridPage } from '@/components/content/components/dataGrid/page'
 
 export const Route = createFileRoute('/components/data-table')({
-  component: DataTablePage,
-  head: () => ({ meta: [{ title: 'Data Table · Inspector Design System' }] }),
+  component: DataGridPage,
+  head: () => ({ meta: [{ title: 'Data Grid · Inspector Design System' }] }),
 })

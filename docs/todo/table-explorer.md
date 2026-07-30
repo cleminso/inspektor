@@ -19,12 +19,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
-### DataTable interaction API
+### DataGrid interaction API
 
 [23/07/26]
 
-- [x] Keep `DataTable` controlled through a TanStack `Table<TData>` instance.
-- [x] Keep the internal `DataTable` context referentially stable across unrelated root renders without branding the public TanStack table prop.
+- [x] Keep `DataGrid` controlled through a TanStack `Table<TData>` instance.
+- [x] Keep the internal `DataGrid` context referentially stable across unrelated root renders without branding the public TanStack table prop.
 - [x] Represent cell identity with stable row IDs and column IDs.
 - [x] Expose controlled active-cell, selected-cell, active-column, and active-row state.
 - [x] Report replace, additive, and range cell-selection intent without exposing raw pointer events as application state.
@@ -170,7 +170,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [29/07/26]
 
-- [x] Remove the existing data-table filter toggle and filter editor UI.
+- [x] Remove the existing data-grid filter toggle and filter editor UI.
 - [x] Preserve URL filter parsing, serialization, query translation, relation navigation, and filtered empty-state behavior for the replacement filter builder.
 - [x] Keep the retired filter editor outside the base table-view import graph.
 - [x] Replace the action-bar child inspection with a toolbar whose primary content fills the available width and whose actions stay grouped on the right.
@@ -180,15 +180,19 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [23/07/26]
 
-- [x] Document the `DataTable` API through generated package-authoritative metadata.
+- [x] Document the `DataGrid` API through generated package-authoritative metadata.
 - [x] Record row, cell, pane, column, lifecycle, visual, and bulk-operation behavior.
-- [x] Cover DataTable click, double-click, modifier, checkbox, drag registration, and state attributes.
+- [x] Cover DataGrid click, double-click, modifier, checkbox, drag registration, and state attributes.
 - [x] Cover individual row selection, row ranges, focus recovery, and pane precedence.
 - [x] Cover additive cell selection, rectangular ranges, visibility changes, and column reorder.
 - [x] Cover row-editor field focus, navigation restoration, and header activation.
 - [x] Validate every package and application test, generated-props check, typecheck, and production build without unrelated repository failures.
 
 ### Deferred row editor boundary
+
+[30/07/26]
+
+- [x] Keep the active edited row available through a dedicated `useTableRowById` query when filters or pagination remove it from the visible grid query.
 
 [27/07/26]
 

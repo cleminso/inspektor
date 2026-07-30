@@ -7,11 +7,11 @@
     "dev": "concurrently \"PORTLESS_PORT=1355 PORTLESS_HTTPS=1 portless inspector --force vite\" \"agentation-mcp server\" --names \"vite,agentation\" --prefix-colors \"cyan,magenta\"",
     "dev:vite": "concurrently \"vite\" \"agentation-mcp server\" --names \"vite,agentation\" --prefix-colors \"cyan,magenta\"",
     "portless:proxy": "portless proxy start --port 1355 --https",
-    "build": "vite build && tsc",
+    "build": "vite build && tsc -p tsconfig.app.json --noEmit",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",

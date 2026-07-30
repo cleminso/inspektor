@@ -1830,15 +1830,15 @@
       }
     }
   ],
-  "dataTable.root": [
+  "dataGrid.root": [
     {
       "name": "activeCell",
-      "type": "DataTableCellTarget",
+      "type": "DataGridCellTarget",
       "required": false,
       "defaultValue": "null",
       "description": "Active row and column intersection.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 74
       }
     },
@@ -1849,7 +1849,7 @@
       "defaultValue": "null",
       "description": "Column highlighted across the header and visible rows.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 76
       }
     },
@@ -1860,7 +1860,7 @@
       "defaultValue": "null",
       "description": "Row currently targeted for inspection.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 78
       }
     },
@@ -1870,7 +1870,7 @@
       "required": true,
       "description": "Data-table regions and companion controls.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 80
       }
     },
@@ -1881,27 +1881,27 @@
       "defaultValue": "\"default\"",
       "description": "Controls table row and cell spacing.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 82
       }
     },
     {
       "name": "onCellActivate",
-      "type": "(target: DataTableCellTarget, selectionMode: DataTableCellSelectionMode) => void",
+      "type": "(target: DataGridCellTarget, selectionMode: DataGridCellSelectionMode) => void",
       "required": false,
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 84
       }
     },
     {
       "name": "onCellContextMenu",
-      "type": "DataTableCellContextMenuHandler",
+      "type": "DataGridCellContextMenuHandler",
       "required": false,
       "description": "Runs when a cell context menu is requested.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 86
       }
     },
@@ -1911,17 +1911,17 @@
       "required": false,
       "description": "Runs when a column header is activated.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 88
       }
     },
     {
       "name": "onHeaderContextMenu",
-      "type": "DataTableHeaderContextMenuHandler",
+      "type": "DataGridHeaderContextMenuHandler",
       "required": false,
       "description": "Runs when a column-header context menu is requested.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 90
       }
     },
@@ -1931,17 +1931,17 @@
       "required": false,
       "description": "Runs when a non-interactive row is activated.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 92
       }
     },
     {
       "name": "onRowContextMenu",
-      "type": "DataTableRowContextMenuHandler",
+      "type": "DataGridRowContextMenuHandler",
       "required": false,
       "description": "Runs when a row context menu is requested.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 94
       }
     },
@@ -1951,18 +1951,18 @@
       "required": true,
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 96
       }
     },
     {
       "name": "selectedCells",
-      "type": "readonly DataTableCellTarget[]",
+      "type": "readonly DataGridCellTarget[]",
       "required": false,
       "defaultValue": "emptySelectedCells",
       "description": "Cells included in the current cell-selection set.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 98
       }
     },
@@ -1972,7 +1972,7 @@
       "required": false,
       "description": "Renders the inert visual shown while a column header is dragged.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 103
       }
     },
@@ -1982,7 +1982,7 @@
       "required": false,
       "description": "Column ids in their controlled draggable order. Omit fixed columns from this list.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 105
       }
     },
@@ -1992,31 +1992,31 @@
       "required": false,
       "description": "Runs with the complete draggable column order after a header is moved.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 107
       }
     }
   ],
-  "dataTable.viewport": [
+  "dataGrid.viewport": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": true,
       "description": "Table or custom viewport content.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 121
       }
     }
   ],
-  "dataTable.table": [
+  "dataGrid.table": [
     {
       "name": "aria-label",
       "type": "string",
       "required": true,
       "description": "Accessible name for the table.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 126
       }
     },
@@ -2026,12 +2026,12 @@
       "required": true,
       "description": "Header and body composition.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 128
       }
     }
   ],
-  "dataTable.content": [
+  "dataGrid.content": [
     {
       "name": "emptyContent",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
@@ -2039,7 +2039,7 @@
       "defaultValue": "\"No data available\"",
       "description": "Content shown when the table has no rows.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 133
       }
     },
@@ -2050,7 +2050,7 @@
       "defaultValue": "false",
       "description": "Whether loading content replaces the current row model.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 135
       }
     },
@@ -2061,31 +2061,31 @@
       "defaultValue": "\"Loading data\"",
       "description": "Content shown while rows are loading.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 137
       }
     }
   ],
-  "dataTable.header": [
+  "dataGrid.header": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 142
       }
     }
   ],
-  "dataTable.headerRow": [
+  "dataGrid.headerRow": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 147
       }
     },
@@ -2095,19 +2095,19 @@
       "required": true,
       "description": "TanStack header group represented by this row.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 149
       }
     }
   ],
-  "dataTable.headerCell": [
+  "dataGrid.headerCell": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 154
       }
     },
@@ -2117,31 +2117,31 @@
       "required": true,
       "description": "TanStack header represented by this cell.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 156
       }
     }
   ],
-  "dataTable.body": [
+  "dataGrid.body": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 161
       }
     }
   ],
-  "dataTable.row": [
+  "dataGrid.row": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 166
       }
     },
@@ -2151,19 +2151,19 @@
       "required": true,
       "description": "TanStack row represented by this table row.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 168
       }
     }
   ],
-  "dataTable.cell": [
+  "dataGrid.cell": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 173
       }
     },
@@ -2173,19 +2173,19 @@
       "required": true,
       "description": "TanStack cell represented by this table cell.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 175
       }
     }
   ],
-  "dataTable.expandedRow": [
+  "dataGrid.expandedRow": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": true,
       "description": "Expanded content associated with the row.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 180
       }
     },
@@ -2195,43 +2195,43 @@
       "required": true,
       "description": "TanStack row represented by this expanded region.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 182
       }
     }
   ],
-  "dataTable.empty": [
+  "dataGrid.empty": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": true,
       "description": "Loading or empty-state content.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 187
       }
     }
   ],
-  "dataTable.loading": [
+  "dataGrid.loading": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": true,
       "description": "Loading or empty-state content.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 187
       }
     }
   ],
-  "dataTable.footer": [
+  "dataGrid.footer": [
     {
       "name": "children",
       "type": "string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": true,
       "description": "Status and table companion controls.",
       "source": {
-        "path": "packages/design-system/src/components/dataTable/dataTable.tsx",
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
         "line": 192
       }
     }

@@ -395,17 +395,17 @@ export const sidePanelItem = {
   componentId: "sidePanel",
 } satisfies NavItem;
 
-export const dataTableItem = {
-  title: "Data Table",
-  slug: "data-table",
-  href: "/components/data-table",
+export const dataGridItem = {
+  title: "Data Grid",
+  slug: "data-grid",
+  href: "/components/data-grid",
   description: "Controlled TanStack table rendering with semantic structure and inspection states.",
   importPath: "@inspector/ds",
   source: {
-    label: "dataTable.tsx",
-    path: "packages/design-system/src/components/dataTable/dataTable.tsx",
+    label: "dataGrid.tsx",
+    path: "packages/design-system/src/components/dataGrid/dataGrid.tsx",
   },
-  componentId: "dataTable",
+  componentId: "dataGrid",
 } satisfies NavItem;
 
 export const jsonViewItem = {
@@ -541,7 +541,7 @@ export const componentItems: NavItem[] = [
   contextMenuItem,
   contextSwitcherItem,
   copyButtonItem,
-  dataTableItem,
+  dataGridItem,
   inputItem,
   inputGroupItem,
   jsonViewItem,

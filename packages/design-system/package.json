@@ -18,20 +18,20 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "inspector-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./theme": {
-      "types": "./dist/tokens/tokens.stylex.d.ts",
       "inspector-source": "./src/tokens/tokens.stylex.ts",
+      "types": "./dist/tokens/tokens.stylex.d.ts",
       "import": "./dist/tokens/tokens.stylex.js",
       "default": "./dist/tokens/tokens.stylex.js"
     },
     "./tooltip": {
-      "types": "./dist/components/tooltip/tooltip.d.ts",
       "inspector-source": "./src/components/tooltip/tooltip.tsx",
+      "types": "./dist/components/tooltip/tooltip.d.ts",
       "import": "./dist/components/tooltip/tooltip.js",
       "default": "./dist/components/tooltip/tooltip.js"
     }

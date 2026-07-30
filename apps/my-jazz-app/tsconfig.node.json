@@ -7,7 +7,6 @@
     "paths": {
       "@regarde/jazz-dev-tools": ["../../packages/jazz-dev-tools/dist/index.d.ts"]
     },
-    "ignoreDeprecations": "5.0",
     "types": ["node"],
     "skipLibCheck": true,
 

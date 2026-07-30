@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 
-import { TableExplorerScreen } from "@/components/table-explorer/tableExplorerScreen";
-import { useInspectorTables } from "@/hooks/useInspectorTables";
-import { appRoutes } from "@/lib/navigation/appRoutes";
+import { appRoutes } from "@app/routing/appRoutes";
+import { useAvailableTables } from "@tables/schema/useAvailableTables";
+import { TableExplorerScreen } from "@tables/view";
 
 export const Route = createFileRoute("/conn/$connectionId/tables/")({
   component: TablesRoute,
@@ -13,7 +13,7 @@ function TablesRoute(): React.ReactElement {
   const navigate = useNavigate();
   const params = Route.useParams();
   const search = useSearch({ strict: false }) as { empty?: string };
-  const { isSchemaReady, tables } = useInspectorTables();
+  const { isSchemaReady, tables } = useAvailableTables();
 
   useEffect(() => {
     if (

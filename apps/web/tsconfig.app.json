@@ -3,22 +3,18 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "customConditions": ["inspector-source"],
 
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client", "node"],
     "skipLibCheck": true,
     "paths": {
-      "#/*": ["./src/components/*"],
-      "@/*": ["./src/*"],
-      "#auth": ["./src/components/auth"],
-      "#layout": ["./src/components/layout"],
-      "#query-subscriptions": ["./src/components/query-subscriptions"],
-      "#navigation": ["./src/components/navigation"],
-      "#onboarding": ["./src/components/onboarding"],
-      "#settings": ["./src/components/settings"],
-      "table-explorer": ["./src/components/table-explorer"],
-      "#lib": ["./src/lib"],
+      "@app/*": ["./src/app/*"],
+      "@tables/*": ["./src/features/tables/*"],
+      "@queries/*": ["./src/features/queries/*"],
+      "@onboarding/*": ["./src/features/onboarding/*"],
+      "@shared/*": ["./src/shared/*"]
     },
 
     "allowImportingTsExtensions": true,
@@ -28,7 +24,6 @@
     "jsx": "react-jsx",
 
     "strict": true,
-    "ignoreDeprecations": "5.0",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,

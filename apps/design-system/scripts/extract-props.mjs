@@ -125,8 +125,8 @@ const componentEntries = [
     "Loading",
     "Footer",
   ].map((part) => ({
-    componentId: `dataTable.${part[0].toLowerCase()}${part.slice(1)}`,
-    exportName: "DataTable",
+    componentId: `dataGrid.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "DataGrid",
     part,
     inheritedProps: [],
   })),

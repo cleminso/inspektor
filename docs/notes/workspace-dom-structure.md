@@ -55,7 +55,7 @@ This split is intentional because:
 
 ## How the data grid itself works
 
-`useTableQuery`
+`useTableRows`
 Provides:
 
 - rows
@@ -68,7 +68,7 @@ Provides:
 `useTableSelection`
 Tracks selected row ids separately from TanStack.
 
-`useInspectorColumnVisibility`
+`useColumnVisibility`
 Persists visible/hidden columns for the current table key.
 
 `useInspectorDataGrid`

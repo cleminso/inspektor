@@ -1,4 +1,4 @@
-# Data Table
+# Data Grid
 
 ## Table of contents
 
@@ -35,7 +35,7 @@
 - [x] Use a one-pixel active-cell perimeter and upgrade it to two pixels only for focus-visible.
 - [x] Restore the active header's blue inline-end border only for resize hover, focus, and active resizing.
 - [x] Keep the active header's structural top border blue when its outward perimeter is clipped by the viewport.
-- [x] Document the complete border, fill, ring, focus, resize, and drag model in `docs/notes/dataTableStyleModel.md`.
+- [x] Document the complete border, fill, ring, focus, resize, and drag model in `docs/notes/dataGridStyleModel.md`.
 
 ### Stable column geometry
 
@@ -74,7 +74,7 @@
 
 [26/07/26]
 
-- [x] Keep every `@dnd-kit` import in `dataTableReorder.tsx`; a static import originally placed the shared sortable code in the initial application load.
+- [x] Keep every `@dnd-kit` import in `dataGridReorder.tsx`; a static import originally placed the shared sortable code in the initial application load.
 - [x] Load reorder behavior after the static table mounts, then restore focus to the equivalent column when the deferred boundary remounts the table.
 - [x] Register sortable headers and cells through their owning React refs.
 - [x] Do not restore the discarded sibling-runtime approach based on DOM queries, mutation observers, or external element registration. It made behavior depend on private rendered markup and added synchronization complexity.
@@ -109,19 +109,19 @@
 
 [26/07/26]
 
-- [x] Verify static `DataTable` module evaluation does not configure DND sensors.
+- [x] Verify static `DataGrid` module evaluation does not configure DND sensors.
 - [x] Verify loading reorder behavior preserves the focused header.
 - [x] Verify sortable behavior registers through the owning header and cell refs.
-- [x] Run focused Data Table behavior tests.
+- [x] Run focused Data Grid behavior tests.
 - [x] Run design-system typecheck and focused lint.
 - [x] Run design-system and product production builds.
 - [x] Confirm shared DND dependencies are absent from module-preloaded entry dependencies.
 
 [29/07/26]
 
-- [x] Verify the focused Data Table tests pass.
+- [x] Verify the focused Data Grid tests pass.
 - [x] Verify design-system typecheck passes.
-- [x] Verify focused Data Table lint passes.
+- [x] Verify focused Data Grid lint passes.
 - [x] Verify the design-system build passes.
 - [x] Verify active-header keyboard focus, resize hover, and active-cell presentation in a browser.
 - [ ] Add a browser geometry regression that compares selection header and body cell widths before and after rows render.

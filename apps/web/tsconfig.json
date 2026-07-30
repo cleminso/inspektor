@@ -5,9 +5,12 @@
     { "path": "./tsconfig.node.json" },
   ],
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
     "paths": {
-      "@/*": ["./src/*"],
-    },
+      "@app/*": ["./src/app/*"],
+      "@tables/*": ["./src/features/tables/*"],
+      "@queries/*": ["./src/features/queries/*"],
+      "@onboarding/*": ["./src/features/onboarding/*"],
+      "@shared/*": ["./src/shared/*"]
+    }
   },
 }

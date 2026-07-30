@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { appRoutes } from "@/lib/navigation/appRoutes";
+import { appRoutes } from "@app/routing/appRoutes";
 
 export const Route = createFileRoute("/conn/$connectionId/")({
   loader: ({ params }) => {

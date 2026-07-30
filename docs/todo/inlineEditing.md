@@ -52,7 +52,7 @@
 
 ### Draft ownership
 
-- [ ] Add one row-level inline draft owner above individual table cells, at the data-grid or `DataView` orchestration level.
+- [ ] Add one row-level inline draft owner above individual table cells, at the data-grid or `TableView` orchestration level.
 - [ ] Preserve that draft when focus moves between editable cells in the same row.
 - [ ] Keep the draft mounted when a cell renderer unmounts because of pagination, column visibility, or table rendering changes.
 - [ ] Key the draft by semantic row identity so changing rows never retargets an existing draft.

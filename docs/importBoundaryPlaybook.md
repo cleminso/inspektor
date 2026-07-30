@@ -24,7 +24,7 @@ The goal is not to maximize code splitting. The goal is to keep the initial depe
 
 The application consumes `@inspector/ds` through its public barrel. A static import from any exported component can therefore make that dependency eligible for an initial application chunk, even when only one optional component uses it.
 
-Data Table and Tab View use the established deferred interaction pattern:
+Data Grid and Tab View use the established deferred interaction pattern:
 
 1. The static component renders complete, non-reorderable content.
 2. A post-mount dynamic import loads the reorder implementation.

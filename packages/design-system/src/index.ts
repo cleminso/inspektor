@@ -16,28 +16,28 @@ export type {
   ActionListSelectionControlProps,
   ActionListTriggerProps,
 } from './components/actionList/actionList'
-export { DataTable } from './components/dataTable/dataTable'
+export { DataGrid } from './components/dataGrid/dataGrid'
 export type {
-  DataTableBodyProps,
-  DataTableCellContextMenuHandler,
-  DataTableCellProps,
-  DataTableCellSelectionMode,
-  DataTableCellTarget,
-  DataTableContentProps,
-  DataTableDensity,
-  DataTableExpandedRowProps,
-  DataTableFooterProps,
-  DataTableHeaderCellProps,
-  DataTableHeaderContextMenuHandler,
-  DataTableHeaderProps,
-  DataTableHeaderRowProps,
-  DataTableMessageProps,
-  DataTableRootProps,
-  DataTableRowContextMenuHandler,
-  DataTableRowProps,
-  DataTableTableProps,
-  DataTableViewportProps,
-} from './components/dataTable/dataTable'
+  DataGridBodyProps,
+  DataGridCellContextMenuHandler,
+  DataGridCellProps,
+  DataGridCellSelectionMode,
+  DataGridCellTarget,
+  DataGridContentProps,
+  DataGridDensity,
+  DataGridExpandedRowProps,
+  DataGridFooterProps,
+  DataGridHeaderCellProps,
+  DataGridHeaderContextMenuHandler,
+  DataGridHeaderProps,
+  DataGridHeaderRowProps,
+  DataGridMessageProps,
+  DataGridRootProps,
+  DataGridRowContextMenuHandler,
+  DataGridRowProps,
+  DataGridTableProps,
+  DataGridViewportProps,
+} from './components/dataGrid/dataGrid'
 export { Box } from './components//box/box'
 export type { BoxProps } from './components/box/box'
 export { Checkbox } from './components/checkbox/checkbox'

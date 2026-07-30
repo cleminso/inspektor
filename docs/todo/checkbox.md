@@ -23,7 +23,7 @@
 - A centered pseudo-element expands the checkbox pointer target to the semantic 28px medium-control dimension without changing layout or visual size. This covers the complete 6px gap between the visual checkbox and its label text.
 - `Checkbox.Label` sets an inherited interaction variable on hover, so nested unchecked checkboxes receive the same `border-focused` feedback when either the box or visible label text is hovered.
 - `Checkbox.Label` owns native label activation, hover propagation, pointer cursor, non-selectable label text, and content/row layouts. Generic `Box` and `Field.Label` no longer carry checkbox-specific interaction styles.
-- Standalone usage with `aria-label` only is applied where no visible text exists (table row-selection checkboxes in `buildDataTableColumns.tsx`).
+- Standalone usage with `aria-label` only is applied where no visible text exists (table row-selection checkboxes in `buildDataGridColumns.tsx`).
 - `tableListPane.tsx` composes `Checkbox.Label layout="row"` around `Checkbox` + `Text`, giving full-row toggle and label-derived naming.
 
 ## Open product work
@@ -38,7 +38,7 @@
 
 [25/07/26]
 
-- The Data Table's complete-cell selection hit area remains table-specific event delegation. Checkbox target expansion is component-local CSS geometry and does not replace that behavior.
+- The Data Grid's complete-cell selection hit area remains table-specific event delegation. Checkbox target expansion is component-local CSS geometry and does not replace that behavior.
 
 ## Settled interaction decisions
 

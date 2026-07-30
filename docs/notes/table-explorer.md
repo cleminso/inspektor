@@ -41,9 +41,9 @@ Current data flow:
 1. The active route selects a saved connection and table; the connection preferences select branch and schema hash.
 2. `useInspectorRuntime(...)` creates an in-memory Jazz client with `createJazzClient(...)`.
 3. `useInspectorRuntime(...)` fetches the selected stored schema and stored permissions.
-4. `useTableQuery(...)` builds a generic query for the selected table.
+4. `useTableRows(...)` builds a generic query for the selected table.
 5. `useAll(...)` subscribes to that query and returns live rows.
-6. `DataView` passes those rows into the grid.
+6. `TableView` passes those rows into the grid.
 
 Relevant Regarde files:
 
@@ -52,7 +52,7 @@ Relevant Regarde files:
 - `apps/web/src/routes/conn/$connectionId/tables/$tableName/index.tsx`
 - `apps/web/src/components/table-explorer/tableExplorerScreen.tsx`
 - `apps/web/src/components/table-explorer/selectedTableView.tsx`
-- `apps/web/src/hooks/useTableQuery.ts`
+- `apps/web/src/hooks/useTableRows.ts`
 - `apps/web/src/components/table-explorer/data/view.tsx`
 
 ## Schema metadata
@@ -99,7 +99,7 @@ Regarde uses schema metadata to derive:
 Relevant Regarde files:
 
 - `apps/web/src/lib/table-explorer/tableSchema.ts`
-- `apps/web/src/components/table-explorer/data/buildDataTableColumns.tsx`
+- `apps/web/src/components/table-explorer/data/buildDataGridColumns.tsx`
 - `apps/web/src/lib/table-explorer/whereOperators.ts`
 - `apps/web/src/lib/table-explorer/filterParsing.ts`
 - `apps/web/src/lib/table-explorer/mutationParsing.ts`
@@ -109,14 +109,14 @@ Relevant Regarde files:
 
 Jazz exposes admin helpers for schema and permission metadata.
 
-| API | Method and path | Shape |
-| --- | --- | --- |
-| `fetchSchemaHashes(...)` | `GET /apps/:appId/schemas` | `{ hashes, schemas }` |
-| `fetchStoredWasmSchema(...)` | `GET /apps/:appId/schema/:hash` | `{ schema, publishedAt }` |
-| `fetchStoredPermissions(...)` | `GET /apps/:appId/admin/permissions` | `{ head, permissions }` |
-| `fetchPermissionsHead(...)` | `GET /apps/:appId/admin/permissions/head` | `{ head }` |
-| `publishStoredSchema(...)` | `POST /apps/:appId/admin/schemas` | `{ objectId, hash }` |
-| `publishStoredPermissions(...)` | `POST /apps/:appId/admin/permissions` | `{ head }` |
+| API                             | Method and path                           | Shape                     |
+| ------------------------------- | ----------------------------------------- | ------------------------- |
+| `fetchSchemaHashes(...)`        | `GET /apps/:appId/schemas`                | `{ hashes, schemas }`     |
+| `fetchStoredWasmSchema(...)`    | `GET /apps/:appId/schema/:hash`           | `{ schema, publishedAt }` |
+| `fetchStoredPermissions(...)`   | `GET /apps/:appId/admin/permissions`      | `{ head, permissions }`   |
+| `fetchPermissionsHead(...)`     | `GET /apps/:appId/admin/permissions/head` | `{ head }`                |
+| `publishStoredSchema(...)`      | `POST /apps/:appId/admin/schemas`         | `{ objectId, hash }`      |
+| `publishStoredPermissions(...)` | `POST /apps/:appId/admin/permissions`     | `{ head }`                |
 
 These APIs use `X-Jazz-Admin-Secret`.
 
@@ -250,7 +250,7 @@ Relevant files:
 - `apps/web/src/components/table-explorer/data/tableFilter.tsx`
 - `apps/web/src/lib/table-explorer/filterParsing.ts`
 - `apps/web/src/lib/table-explorer/whereOperators.ts`
-- `apps/web/src/hooks/useTableQuery.ts`
+- `apps/web/src/hooks/useTableRows.ts`
 
 Current supported filter operators:
 
@@ -286,7 +286,7 @@ Example meaning:
 
 Current Regarde flow:
 
-1. `buildDataTableColumns(...)` checks `column.column?.references`.
+1. `buildDataGridColumns(...)` checks `column.column?.references`.
 2. If the current cell value is a non-empty string, it renders `RelationCellLink`.
 3. `RelationCellLink` shows the stored relation id without starting a per-cell relation query.
 4. It links to the referenced table with an empty search state.
@@ -295,7 +295,7 @@ Relation navigation opens or focuses the referenced table's default unfiltered t
 
 Relevant Regarde files:
 
-- `apps/web/src/components/table-explorer/data/buildDataTableColumns.tsx`
+- `apps/web/src/components/table-explorer/data/buildDataGridColumns.tsx`
 - `apps/web/src/components/table-explorer/data/relationCellLink.tsx`
 - `apps/web/src/lib/table-explorer/relationNavigation.ts`
 - `apps/web/src/lib/table-explorer/tableSchema.ts`
