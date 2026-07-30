@@ -178,7 +178,7 @@ export function MutationField({
   onTextChange,
   readOnlyReason,
 }: MutationFieldProps): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
+  const { currentConnectionId } = useInspector();
   const label = formatColumnNameLabel(column.name);
   const fieldId = `row-editor-${column.name}`;
   const fieldLabelId = `${fieldId}-label`;
@@ -502,19 +502,14 @@ export function MutationField({
             {defaultCheckbox}
             {relationTarget !== null &&
             column.references !== undefined &&
-            currentConnectionId !== null &&
-            currentBranch !== null &&
-            currentSchemaHash !== null ? (
+            currentConnectionId !== null ? (
               <InputGroup.Suffix>
                 <TextLink
                   render={
                     <Link
                       {...buildRelationTableLink({
                         connectionId: currentConnectionId,
-                        branch: currentBranch,
-                        schemaHash: currentSchemaHash,
                         tableName: column.references,
-                        relationId: relationTarget,
                       })}
                     />
                   }

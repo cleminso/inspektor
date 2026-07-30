@@ -18,6 +18,7 @@ interface UseInspectorRuntimeOptions {
   connection: StoredConnection | null;
   branch: string | null;
   schemaHash: string | null;
+  initialSchemaHashes?: readonly string[];
 }
 
 /**
@@ -34,6 +35,7 @@ export function useInspectorRuntime({
   connection,
   branch,
   schemaHash,
+  initialSchemaHashes,
 }: UseInspectorRuntimeOptions): InspectorRuntimeState {
   const [client, setClient] = useState<JazzClient | null>(null);
   const [wasmSchema, setWasmSchema] = useState<WasmSchema | null>(null);
@@ -89,16 +91,20 @@ export function useInspectorRuntime({
           return;
         }
 
+        const schemaHashesRequest =
+          initialSchemaHashes !== undefined && initialSchemaHashes.length > 0
+            ? Promise.resolve({ hashes: [...initialSchemaHashes] })
+            : fetchSchemaHashes(connection.serverUrl, {
+                appId: connection.appId,
+                adminSecret: connection.adminSecret,
+              });
         const [{ schema }, { hashes }, permissions] = await Promise.all([
           fetchStoredWasmSchema(connection.serverUrl, {
             appId: connection.appId,
             adminSecret: connection.adminSecret,
             schemaHash,
           }),
-          fetchSchemaHashes(connection.serverUrl, {
-            appId: connection.appId,
-            adminSecret: connection.adminSecret,
-          }),
+          schemaHashesRequest,
           // Permissions enrich the UI but should not block the runtime if unavailable.
           fetchStoredPermissions(connection.serverUrl, {
             appId: connection.appId,
@@ -154,7 +160,7 @@ export function useInspectorRuntime({
         setClient((currentClient) => (currentClient === clientToShutdown ? null : currentClient));
       }
     };
-  }, [branch, clearRuntime, connection, schemaHash]);
+  }, [branch, clearRuntime, connection, initialSchemaHashes, schemaHash]);
 
   // Keep the returned object stable for consumers that use it in dependency arrays.
   return useMemo(

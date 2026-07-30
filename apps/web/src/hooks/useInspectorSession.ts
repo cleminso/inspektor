@@ -1,18 +1,16 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   createConnectionFromDraft,
   getActiveConnection,
   getConnectionById,
   getConnectionDisplayName,
-  getConnectionPreferences,
+  getConnectionPreferences as getStoredConnectionPreferences,
   readStoredConnections,
-  rememberBranch,
   removeConnection,
   resolveDefaultBranch,
   resolveDefaultSchemaHash,
-  setActiveConnectionId,
-  updateConnectionPreferences,
+  setActiveConnectionContext,
   upsertConnection,
   writeStoredConnections,
   type ConnectionDraft,
@@ -36,6 +34,7 @@ export interface UseInspectorSessionResult {
   prefill: PrefillConfig | null;
   getConnection: (connectionId: string | null | undefined) => StoredConnection | null;
   getConnectionLabel: (connectionId: string) => string | null;
+  getConnectionPreferences: (connectionId: string) => ReturnType<typeof getStoredConnectionPreferences>;
   getRememberedBranches: (connectionId: string) => string[];
   resolveBranch: (connectionId: string, branch?: string | null) => string;
   resolveSchemaHash: (
@@ -45,8 +44,7 @@ export interface UseInspectorSessionResult {
   ) => string | null;
   saveConnection: (draft: ConnectionDraft, connectionId?: string) => StoredConnection;
   deleteConnection: (connectionId: string) => void;
-  setActiveConnection: (connectionId: string | null) => void;
-  rememberContext: (connectionId: string, branch: string, schemaHash?: string | null) => void;
+  setConnectionContext: (connectionId: string, branch: string, schemaHash: string) => void;
 }
 
 interface SessionState {
@@ -68,14 +66,13 @@ export function useInspectorSession(): UseInspectorSessionResult {
     store: readStoredConnections(),
     prefill: readPrefillConfig(),
   }));
+  const storeRef = useRef(state.store);
 
-  // Keep saved connection storage and React state in sync through one write path.
-  const persistStore = useCallback((store: StoredConnectionsStore) => {
+  const updateStore = useCallback((update: (store: StoredConnectionsStore) => StoredConnectionsStore) => {
+    const store = update(storeRef.current);
+    storeRef.current = store;
     writeStoredConnections(store);
-    setState((currentState) => ({
-      ...currentState,
-      store,
-    }));
+    setState((currentState) => ({ ...currentState, store }));
   }, []);
 
   const getConnection = useCallback(
@@ -86,50 +83,24 @@ export function useInspectorSession(): UseInspectorSessionResult {
   const saveConnection = useCallback(
     (draft: ConnectionDraft, connectionId?: string) => {
       const connection = createConnectionFromDraft(draft, connectionId);
-      persistStore(upsertConnection(state.store, connection));
+      updateStore((store) => upsertConnection(store, connection));
       return connection;
     },
-    [persistStore, state.store],
+    [updateStore],
   );
 
   const deleteConnection = useCallback(
     (connectionId: string) => {
-      persistStore(removeConnection(state.store, connectionId));
+      updateStore((store) => removeConnection(store, connectionId));
     },
-    [persistStore, state.store],
+    [updateStore],
   );
 
-  const setActiveConnection = useCallback(
-    (connectionId: string | null) => {
-      persistStore(setActiveConnectionId(state.store, connectionId));
+  const setConnectionContext = useCallback(
+    (connectionId: string, branch: string, schemaHash: string) => {
+      updateStore((store) => setActiveConnectionContext(store, connectionId, branch, schemaHash));
     },
-    [persistStore, state.store],
-  );
-
-  const rememberContext = useCallback(
-    (connectionId: string, branch: string, schemaHash?: string | null) => {
-      const currentPreferences = getConnectionPreferences(state.store, connectionId);
-      const nextBranch = branch.trim() || currentPreferences.lastBranch;
-      const nextSchemaHash = schemaHash ?? null;
-      const hasRememberedBranch = currentPreferences.rememberedBranches.includes(nextBranch);
-
-      // Avoid rewriting storage when navigation did not change the remembered runtime context.
-      if (
-        currentPreferences.lastBranch === nextBranch &&
-        currentPreferences.lastSchemaHash === nextSchemaHash &&
-        hasRememberedBranch
-      ) {
-        return;
-      }
-
-      const nextStore = updateConnectionPreferences(
-        rememberBranch(state.store, connectionId, nextBranch),
-        connectionId,
-        { lastSchemaHash: nextSchemaHash },
-      );
-      persistStore(nextStore);
-    },
-    [persistStore, state.store],
+    [updateStore],
   );
 
   // Keep the returned session object stable for consumers that depend on it as one value.
@@ -145,17 +116,25 @@ export function useInspectorSession(): UseInspectorSessionResult {
         const connection = getConnection(connectionId);
         return connection ? getConnectionDisplayName(connection) : null;
       },
+      getConnectionPreferences: (connectionId: string) =>
+        getStoredConnectionPreferences(state.store, connectionId),
       getRememberedBranches: (connectionId: string) =>
-        getConnectionPreferences(state.store, connectionId).rememberedBranches,
+        getStoredConnectionPreferences(state.store, connectionId).rememberedBranches,
       resolveBranch: (connectionId: string, branch?: string | null) =>
         resolveDefaultBranch(state.store, connectionId, branch),
       resolveSchemaHash: (connectionId: string, availableSchemaHashes: string[], schemaHash?: string | null) =>
         resolveDefaultSchemaHash(state.store, connectionId, availableSchemaHashes, schemaHash),
       saveConnection,
       deleteConnection,
-      setActiveConnection,
-      rememberContext,
+      setConnectionContext,
     }),
-    [deleteConnection, getConnection, rememberContext, saveConnection, setActiveConnection, state.prefill, state.store],
+    [
+      deleteConnection,
+      getConnection,
+      saveConnection,
+      setConnectionContext,
+      state.prefill,
+      state.store,
+    ],
   );
 }

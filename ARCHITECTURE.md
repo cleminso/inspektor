@@ -80,7 +80,7 @@ The normal Inspector path is:
 2. The entry module mounts React and creates the TanStack Router.
 3. The root route mounts `InspectorSessionProvider`. It can read local connection and route state without creating a Jazz client.
 4. TanStack Router loads route modules according to the current URL. It can preload a route when user intent suggests navigation.
-5. A route with complete connection, branch, and schema-hash identity mounts `InspectorProvider`.
+5. The connection route resolves its saved branch and schema-hash preferences, then mounts `InspectorProvider`.
 6. `InspectorProvider` creates the Inspector runtime and provides the Jazz client to its descendants.
 7. Product feature routes compose `@inspector/ds` components with product data and callbacks.
 
@@ -188,7 +188,7 @@ Dynamic imports are not always beneficial. Do not defer a dependency that is req
 
 `InspectorSessionProvider` is mounted at the root route and handles session state, route parameters, connection selection, and navigation. It does not import the Jazz React runtime.
 
-`InspectorProvider` is mounted by the route with `connectionId`, `branch`, and `schemaHash`. It imports `JazzClientProvider`, creates the runtime through `useInspectorRuntime`, and makes it available to child routes. This keeps Jazz work out of onboarding and connection-management paths while preserving one runtime for table and query descendants.
+`InspectorProvider` is mounted by `/conn/:connectionId` after the route validates the saved branch and schema-hash preferences for that connection. It imports `JazzClientProvider`, creates the runtime through `useInspectorRuntime`, and makes it available to child routes. This keeps Jazz work out of onboarding and connection-management paths while preserving one runtime for table and query descendants.
 
 ### Code editor
 

@@ -27,6 +27,7 @@ interface SearchValues {
   mode?: string | null;
   rowId?: string | null;
   sort?: string;
+  tab?: string;
   view?: string;
 }
 
@@ -130,6 +131,7 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     };
 
     // Remove default values so generated URLs stay readable and shareable.
+    delete nextSearch.tab;
     if (nextSearch.view === "data" || nextSearch.view === undefined) {
       delete nextSearch.view;
     }

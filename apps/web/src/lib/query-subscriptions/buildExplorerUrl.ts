@@ -10,27 +10,21 @@ import { appRoutes } from "@/lib/navigation/appRoutes";
 import { extractFiltersFromIR } from "./extractFiltersFromIR";
 
 interface BuildExplorerLinkOptions {
-  branch: string;
   connectionId: string;
   query: string;
-  schemaHash: string;
   tableName: string;
 }
 
 /** Adds recovered query filters to the table link when telemetry exposes a supported relation IR. */
 export function buildExplorerLink({
-  branch,
   connectionId,
   query,
-  schemaHash,
   tableName,
 }: BuildExplorerLinkOptions) {
   const link = {
     to: appRoutes.table,
     params: {
       connectionId,
-      branch,
-      schemaHash,
       tableName,
     },
   } as const;

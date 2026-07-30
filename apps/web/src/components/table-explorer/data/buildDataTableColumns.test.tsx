@@ -169,9 +169,9 @@ describe("buildDataTableColumns", () => {
       ],
     });
 
-    expect(columns.find((column) => column.id === "id")?.size).toBe(320);
+    expect(columns.find((column) => column.id === "id")?.size).toBe(260);
     expect(columns.find((column) => column.id === "enabled")?.size).toBe(96);
-    expect(columns.find((column) => column.id === "metadata")?.size).toBe(320);
+    expect(columns.find((column) => column.id === "metadata")?.size).toBe(220);
   });
 
   it("renders the selection header and row cells from one fixed-width column", () => {

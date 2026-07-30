@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -14,7 +13,7 @@ import { useInspector } from "@/components/providers/inspectorProvider";
 import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
-  createBaseTableTabId,
+  createTableTabRouteSearch,
   loadTableTabsState,
   openBaseTableTabs,
   openNewViewTab,
@@ -27,11 +26,11 @@ import {
   type TableTab,
   type TableTabSearch,
   type TableTabsState,
+  type TableTabsRouteSearch,
 } from "@/components/table-explorer/tableTabs";
 import { appRoutes } from "@/lib/navigation/appRoutes";
 
-interface RouteSearch extends TableTabSearch {
-  empty?: string;
+interface RouteSearch extends TableTabsRouteSearch {
   tab?: string;
 }
 
@@ -41,7 +40,6 @@ interface TableTabsContextValue {
   tabs: readonly TableTab[];
   activateTab: (tabId: string) => void;
   closeTab: (tabId: string) => void;
-  getBaseTabSearch: (tableName: string) => RouteSearch;
   openBaseTabs: (orderedTableNames: readonly string[]) => void;
   openNewView: () => void;
   openRecentView: (view: TableDataTab) => void;
@@ -87,15 +85,18 @@ interface TableTabsProviderProps {
   scope: string;
 }
 
+interface TableTabsProviderState extends TableTabsState {
+  activeTabId: string | null;
+}
+
 export function TableTabsProvider({ children, scope }: TableTabsProviderProps): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
-    useInspector();
+  const { currentConnectionId, currentTableName } = useInspector();
   const navigate = useNavigate();
   const routeSearch = useSearch({ strict: false }) as RouteSearch;
-  const [state, setState] = useState<TableTabsState>(() => loadTableTabsState(scope));
-  const [activeTabId, setActiveTabId] = useState<string | null>(null);
-  const closingActiveTabIdRef = useRef<string | null>(null);
-  const pendingNavigationTabIdRef = useRef<string | null>(null);
+  const [state, setState] = useState<TableTabsProviderState>(() => ({
+    ...loadTableTabsState(scope),
+    activeTabId: null,
+  }));
   const currentSearch = useMemo<TableTabSearch>(
     () => ({
       dir: routeSearch.dir,
@@ -105,111 +106,87 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     }),
     [routeSearch.dir, routeSearch.filters, routeSearch.sort, routeSearch.view],
   );
-  const tabsById = useMemo(
-    () => new Map(state.tabs.map((tab) => [tab.id, tab])),
-    [state.tabs],
-  );
+  useEffect(() => {
+    saveTableTabsState(scope, { tabs: state.tabs, recentViews: state.recentViews });
+  }, [scope, state.recentViews, state.tabs]);
 
   useEffect(() => {
-    saveTableTabsState(scope, state);
-  }, [scope, state]);
-
-  useEffect(() => {
-    if (
-      pendingNavigationTabIdRef.current !== null &&
-      pendingNavigationTabIdRef.current !== routeSearch.tab
-    ) {
+    if (routeSearch.tab === undefined) {
       return;
     }
-    pendingNavigationTabIdRef.current = null;
 
-    if (currentTableName === null) {
-      closingActiveTabIdRef.current = null;
-      if (routeSearch.tab === NEW_VIEW_TAB_ID) {
-        const result = openNewViewTab(state.tabs);
-        if (tabsMatch(result.tabs, state.tabs) === false) {
-          setState((currentState) => ({ ...currentState, tabs: result.tabs }));
+    void navigate({
+      replace: true,
+      search: (search) => {
+        const nextSearch = { ...search } as RouteSearch;
+        delete nextSearch.tab;
+        return nextSearch;
+      },
+    });
+  }, [navigate, routeSearch.tab]);
+
+  useEffect(() => {
+    setState((currentState) => {
+      if (currentTableName === null) {
+        if (routeSearch.empty === "true") {
+          const result = openNewViewTab(currentState.tabs);
+          if (
+            tabsMatch(result.tabs, currentState.tabs) === true &&
+            currentState.activeTabId === NEW_VIEW_TAB_ID
+          ) {
+            return currentState;
+          }
+
+          return { ...currentState, tabs: result.tabs, activeTabId: NEW_VIEW_TAB_ID };
         }
-        setActiveTabId(NEW_VIEW_TAB_ID);
-        return;
+
+        return currentState.activeTabId === null
+          ? currentState
+          : { ...currentState, activeTabId: null };
       }
 
-      setActiveTabId(null);
-      return;
-    }
-
-    if (closingActiveTabIdRef.current === routeSearch.tab) {
-      return;
-    }
-    closingActiveTabIdRef.current = null;
-
-    const tabsWithoutNewView = state.tabs.filter((tab) => tab.kind !== "newView");
-    const result = reconcileTableTab({
-      createId: createViewId,
-      requestedTabId: routeSearch.tab ?? null,
-      search: currentSearch,
-      tableName: currentTableName,
-      tabs: tabsWithoutNewView,
-    });
-    const activeTableTab = result.tabs.find(
-      (tab): tab is TableDataTab => tab.kind === "table" && tab.id === result.activeTabId,
-    );
-    const recentViews =
-      activeTableTab === undefined
-        ? state.recentViews
-        : recordRecentTableView(state.recentViews, activeTableTab);
-    if (
-      tabsMatch(result.tabs, state.tabs) === false ||
-      tabsMatch(recentViews, state.recentViews) === false
-    ) {
-      setState({ tabs: result.tabs, recentViews });
-    }
-    setActiveTabId(result.activeTabId);
-
-    if (
-      routeSearch.tab === undefined &&
-      currentConnectionId !== null &&
-      currentBranch !== null &&
-      currentSchemaHash !== null
-    ) {
-      void navigate({
-        to: appRoutes.table,
-        params: {
-          connectionId: currentConnectionId,
-          branch: currentBranch,
-          schemaHash: currentSchemaHash,
-          tableName: currentTableName,
-        },
-        search: { ...currentSearch, tab: result.activeTabId },
-        replace: true,
+      const tabsWithoutNewView = currentState.tabs.filter((tab) => tab.kind !== "newView");
+      const result = reconcileTableTab({
+        activeTabId: currentState.activeTabId,
+        createId: createViewId,
+        search: currentSearch,
+        tableName: currentTableName,
+        tabs: tabsWithoutNewView,
       });
-    }
-  }, [
-    currentBranch,
-    currentConnectionId,
-    currentSchemaHash,
-    currentSearch,
-    currentTableName,
-    navigate,
-    routeSearch.tab,
-    state,
-  ]);
+      const activeTableTab = result.tabs.find(
+        (tab): tab is TableDataTab => tab.kind === "table" && tab.id === result.activeTabId,
+      );
+      const recentViews =
+        activeTableTab === undefined
+          ? currentState.recentViews
+          : recordRecentTableView(currentState.recentViews, activeTableTab);
+      if (
+        tabsMatch(result.tabs, currentState.tabs) === true &&
+        tabsMatch(recentViews, currentState.recentViews) === true &&
+        currentState.activeTabId === result.activeTabId
+      ) {
+        return currentState;
+      }
+
+      return { tabs: result.tabs, recentViews, activeTabId: result.activeTabId };
+    });
+  }, [currentSearch, currentTableName, routeSearch.empty]);
 
   const navigateToTab = useCallback(
     (tab: TableTab) => {
-      if (currentConnectionId === null || currentBranch === null || currentSchemaHash === null) {
+      if (currentConnectionId === null) {
         return;
       }
+
+      const search = createTableTabRouteSearch(tab);
 
       if (tab.kind === "newView") {
         void navigate({
           to: appRoutes.tables,
           params: {
             connectionId: currentConnectionId,
-            branch: currentBranch,
-            schemaHash: currentSchemaHash,
           },
-          search: { tab: NEW_VIEW_TAB_ID },
+          search,
         });
         return;
       }
@@ -218,21 +195,18 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
         to: appRoutes.table,
         params: {
           connectionId: currentConnectionId,
-          branch: currentBranch,
-          schemaHash: currentSchemaHash,
           tableName: tab.tableName,
         },
-        search: { ...tab.search, tab: tab.id },
+        search,
       });
     },
-    [currentBranch, currentConnectionId, currentSchemaHash, navigate],
+    [currentConnectionId, navigate],
   );
 
   const activateTab = useCallback(
     (tabId: string) => {
       const tab = state.tabs.find((candidate) => candidate.id === tabId);
       if (tab !== undefined) {
-        pendingNavigationTabIdRef.current = tab.id;
         navigateToTab(tab);
       }
     },
@@ -242,47 +216,47 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const closeTab = useCallback(
     (tabId: string) => {
       const result = closeTableTab(state.tabs, tabId);
-      setState((currentState) => ({ ...currentState, tabs: result.tabs }));
-      if (tabId !== activeTabId) {
+      if (tabId !== state.activeTabId) {
+        setState((currentState) => ({ ...currentState, tabs: result.tabs }));
         return;
       }
 
-      closingActiveTabIdRef.current = tabId;
-      setActiveTabId(result.nextActiveTab?.id ?? null);
+      setState((currentState) => ({
+        ...currentState,
+        tabs: result.tabs,
+        activeTabId: result.nextActiveTab?.id ?? null,
+      }));
       if (result.nextActiveTab !== null) {
-        pendingNavigationTabIdRef.current = result.nextActiveTab.id;
         navigateToTab(result.nextActiveTab);
         return;
       }
 
-      if (currentConnectionId !== null && currentBranch !== null && currentSchemaHash !== null) {
+      if (currentConnectionId !== null) {
         void navigate({
           to: appRoutes.tables,
           params: {
             connectionId: currentConnectionId,
-            branch: currentBranch,
-            schemaHash: currentSchemaHash,
           },
           search: { empty: "true" },
         });
       }
     },
     [
-      activeTabId,
-      currentBranch,
       currentConnectionId,
-      currentSchemaHash,
       navigate,
       navigateToTab,
+      state.activeTabId,
       state.tabs,
     ],
   );
 
   const openNewView = useCallback(() => {
     const result = openNewViewTab(state.tabs);
-    setState((currentState) => ({ ...currentState, tabs: result.tabs }));
-    setActiveTabId(result.activeTabId);
-    pendingNavigationTabIdRef.current = result.activeTabId;
+    setState((currentState) => ({
+      ...currentState,
+      tabs: result.tabs,
+      activeTabId: result.activeTabId,
+    }));
     navigateToTab({ kind: "newView", id: NEW_VIEW_TAB_ID });
   }, [navigateToTab, state.tabs]);
 
@@ -298,9 +272,11 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
         return;
       }
 
-      setState((currentState) => ({ ...currentState, tabs: result.tabs }));
-      setActiveTabId(result.activeTabId);
-      pendingNavigationTabIdRef.current = result.activeTabId;
+      setState((currentState) => ({
+        ...currentState,
+        tabs: result.tabs,
+        activeTabId: result.activeTabId,
+      }));
       navigateToTab(activeTab);
     },
     [navigateToTab, state.tabs],
@@ -309,7 +285,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const openRecentView = useCallback(
     (view: TableDataTab) => {
       const tabs =
-        activeTabId === NEW_VIEW_TAB_ID
+        state.activeTabId === NEW_VIEW_TAB_ID
           ? replaceNewViewTab(state.tabs, view)
           : replaceNewViewTab(
               state.tabs.filter((tab) => tab.kind !== "newView"),
@@ -318,12 +294,11 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       setState({
         tabs,
         recentViews: recordRecentTableView(state.recentViews, view),
+        activeTabId: view.id,
       });
-      setActiveTabId(view.id);
-      pendingNavigationTabIdRef.current = view.id;
       navigateToTab(view);
     },
-    [activeTabId, navigateToTab, state.recentViews, state.tabs],
+    [navigateToTab, state.activeTabId, state.recentViews, state.tabs],
   );
 
   const reorderTabs = useCallback((orderedTabIds: readonly string[]) => {
@@ -333,34 +308,21 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     }));
   }, []);
 
-  const getBaseTabSearch = useCallback(
-    (tableName: string): RouteSearch => {
-      const id = createBaseTableTabId(tableName);
-      const candidate = tabsById.get(id);
-      const savedTab = candidate?.kind === "table" ? candidate : undefined;
-      return { ...savedTab?.search, tab: id };
-    },
-    [tabsById],
-  );
-
   const value = useMemo<TableTabsContextValue>(
     () => ({
-      activeTabId,
+      activeTabId: state.activeTabId,
       recentViews: state.recentViews,
       tabs: state.tabs,
       activateTab,
       closeTab,
-      getBaseTabSearch,
       openBaseTabs,
       openNewView,
       openRecentView,
       reorderTabs,
     }),
     [
-      activeTabId,
       activateTab,
       closeTab,
-      getBaseTabSearch,
       openBaseTabs,
       openNewView,
       openRecentView,

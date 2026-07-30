@@ -29,7 +29,7 @@ describe("RelationCellLink", () => {
 
     const link = screen.getByRole("link", { name: "account_0123456789" });
     expect(link.getAttribute("href")).toBe(
-      "/conn/$connectionId/$branch/$schemaHash/tables/$tableName",
+      "/conn/$connectionId/tables/$tableName",
     );
     expect(link.querySelector('[data-slot="text-link-trailing-icon"]')).toBeTruthy();
     expect(link.getAttribute("title")).toBeNull();

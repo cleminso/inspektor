@@ -126,6 +126,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Reset a resized column through resize-handle double-click.
 - [x] Reorder data columns while keeping the checkbox column fixed.
 - [x] Persist column order and visibility by connection, branch, schema hash, and table.
+
+### Workspace tabs
+
+[30/07/26]
+
+- [x] Keep active workspace-item identity internal while filters and sorting remain URL-backed.
+- [x] Update an active filtered table item in place instead of creating a new item for each route-search edit.
+- [x] Reconcile completed route navigation through one atomic tab-state update without a pending-navigation ref gate.
 - [x] Highlight an activated column only after cell focus and selection are cleared.
 - [x] Keep loaded-row extension from expanding an existing row or cell selection implicitly.
 
@@ -450,7 +458,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] Keep mutation parsing, validation, dirty tracking, live reconciliation, save, and discard independent from the editing surface.
 - [x] Distinguish pane dismissal, which preserves clean selection, from Cancel, which discards the focused draft and unchecks its row.
 - [x] Row IDs render as continuous text and use width-aware end truncation when the rendered value overflows.
-- [x] Relation cells show the stored relation ID as their primary value and keep click navigation to the target row.
+- [x] Relation cells show the stored relation ID as their primary value and navigate to the target table's default unfiltered tab.
 - [x] Relation details may resolve a target display value, but that value does not replace the stored relation ID.
 - [x] Binary grid cells show byte count only rather than complete, preview, or indexed-object serialization.
 - [x] Binary clipboard actions state their encoding explicitly: Copy as hex or Copy as Base64.

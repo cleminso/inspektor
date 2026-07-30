@@ -4,6 +4,7 @@ import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
   createBaseTableTabId,
+  createTableTabRouteSearch,
   loadTableTabsState,
   openBaseTableTabs,
   openNewViewTab,
@@ -37,6 +38,20 @@ describe("table tabs", () => {
     expect(createBaseTableTabId("better_auth_account")).toBe("table:better_auth_account");
   });
 
+  it("keeps internal tab identity out of route search parameters", () => {
+    expect(
+      createTableTabRouteSearch({
+        kind: "table",
+        id: "view:accounts-filtered",
+        tableName: "accounts",
+        search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
+      }),
+    ).toEqual({ filters: "active-filter", sort: "createdAt", dir: "desc" });
+    expect(createTableTabRouteSearch({ kind: "newView", id: NEW_VIEW_TAB_ID })).toEqual({
+      empty: "true",
+    });
+  });
+
   it("opens missing base tabs without duplicating existing tabs", () => {
     const existingTab: TableTab = {
       kind: "table",
@@ -55,7 +70,7 @@ describe("table tabs", () => {
     });
   });
 
-  it("updates an existing tab with the current URL-backed view state", () => {
+  it("keeps filtered route state separate from the base table tab", () => {
     const tabs: TableTab[] = [
       {
         kind: "table",
@@ -66,25 +81,55 @@ describe("table tabs", () => {
     ];
 
     const result = reconcileTableTab({
-      createId: () => "unused",
-      requestedTabId: "table:accounts",
+      activeTabId: "table:accounts",
+      createId: () => "accounts-filtered",
       search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
       tableName: "accounts",
       tabs,
     });
 
-    expect(result.activeTabId).toBe("table:accounts");
-    expect(result.tabs[0]?.search).toEqual({
+    expect(result.activeTabId).toBe("view:accounts-filtered");
+    expect(result.tabs).toHaveLength(2);
+    expect(result.tabs[1]?.kind === "table" ? result.tabs[1].search : null).toEqual({
       filters: "active-filter",
       sort: "createdAt",
       dir: "desc",
     });
   });
 
+  it("updates the active filtered tab when its route search changes", () => {
+    const tabs: TableTab[] = [
+      { kind: "table", id: "table:accounts", tableName: "accounts", search: {} },
+      {
+        kind: "table",
+        id: "view:accounts-filtered",
+        tableName: "accounts",
+        search: { filters: "active-filter" },
+      },
+    ];
+
+    const result = reconcileTableTab({
+      activeTabId: "view:accounts-filtered",
+      createId: () => "unused",
+      search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
+      tableName: "accounts",
+      tabs,
+    });
+
+    expect(result.activeTabId).toBe("view:accounts-filtered");
+    expect(result.tabs).toHaveLength(2);
+    expect(result.tabs[1]).toEqual({
+      kind: "table",
+      id: "view:accounts-filtered",
+      tableName: "accounts",
+      search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
+    });
+  });
+
   it("creates a separate tab for a filtered relation view", () => {
     const result = reconcileTableTab({
+      activeTabId: "table:users",
       createId: () => "relation-view",
-      requestedTabId: null,
       search: { filters: "relation-filter" },
       tableName: "users",
       tabs: [

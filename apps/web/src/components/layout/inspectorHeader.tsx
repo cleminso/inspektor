@@ -10,23 +10,17 @@ import { appRoutes } from "@/lib/navigation/appRoutes";
 export function InspectorHeader(): React.ReactElement {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
+  const { currentConnectionId } = useInspector();
   const { resolvedTheme, setTheme } = useTheme();
   const isDarkTheme = resolvedTheme === "dark";
   const routeParams =
-    currentConnectionId !== null && currentBranch !== null && currentSchemaHash !== null
-      ? {
-          branch: currentBranch,
-          connectionId: currentConnectionId,
-          schemaHash: currentSchemaHash,
-        }
-      : null;
+    currentConnectionId === null ? null : { connectionId: currentConnectionId };
   const isTablesActive =
     routeParams !== null &&
     matchRoute({ to: appRoutes.tables, params: routeParams, fuzzy: true }) !== false;
   const isSubscriptionsActive =
     routeParams !== null &&
-    matchRoute({ to: appRoutes.QuerySubscriptions, params: routeParams, fuzzy: true }) !== false;
+    matchRoute({ to: appRoutes.queries, params: routeParams, fuzzy: true }) !== false;
   const activeView = isTablesActive === true ? ["tables"] : isSubscriptionsActive === true ? ["subscriptions"] : [];
 
   return (
@@ -69,7 +63,7 @@ export function InspectorHeader(): React.ReactElement {
               to:
                 selectedView === "tables"
                   ? appRoutes.tables
-                  : appRoutes.QuerySubscriptions,
+                  : appRoutes.queries,
               params: routeParams,
             });
           }}

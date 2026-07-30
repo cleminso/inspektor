@@ -1,196 +1,168 @@
-# Inspector Route Structure
+# Inspector route structure
 
-## Table of Contents
+## Table of contents
 
-- [Mental Model](#mental-model)
-- [Decisions](#decisions)
-  - [Route Structure](#route-structure)
-  - [Key Design Decisions](#key-design-decisions)
-  - [Alternative Approaches Considered](#alternative-approaches-considered)
-- [Key Questions Explored](#key-questions-explored)
-- [UI Pattern](#ui-pattern)
-- [Inspector Link Prefill](#inspector-link-prefill)
-- [Extension Mode](#extension-mode)
+- [Mental model](#mental-model)
+- [Route structure](#route-structure)
+- [Context ownership](#context-ownership)
+- [Workspace-item routing](#workspace-item-routing)
+- [State ownership](#state-ownership)
+- [Key decisions](#key-decisions)
+- [Browser-tab behavior](#browser-tab-behavior)
+- [Inspector link prefill](#inspector-link-prefill)
 - [Example URLs](#example-urls)
 
-## Mental Model
+## Mental model
 
-The route structure follows a clear hierarchy of narrowing context:
+The route identifies one saved local connection and the active content inside its workbench.
 
-```
-where → when → which version
-(Conn) (Branch) (Schema)
-```
+- Header: connection, branch, schema hash, and global context controls.
+- Left dock: Tables or Queries resource navigator.
+- Main workspace: open workspace items represented by tabs.
+- Route: active resource, representation, and shareable representation state.
 
-**Header (Context)**: Where you're working
+The route does not represent the visual tab strip, open item order, pane arrangement, or dock selection.
 
-- **Connection**: Who and where (server URL, appId, credentials)
-- **Branch**: Which timeline (main, feature-x)
-- **Schema**: Which version of the database structure (schema hash)
+## Route structure
 
-**Sidebar (What)**: What you're viewing
-
-- **Data Explorer**: Browse tables and their data
-- **Query Subscriptions**: Monitor active subscriptions and queries
-
-## Decisions
-
-### Route Structure
-
-```
-/conn/:connectionId/:branch/:schema/
+```text
+/conn/:connectionId/
 ├── tables/
-│   └── $tableName/
-│       ├── index.tsx       → Data view
-│       └── schema.tsx      → Schema definition view
-└── queries.tsx             → Live queries
+│   └── :tableName/
+│       ├── index          → Data representation
+│       ├── schema         → Schema representation
+│       └── stats          → later Stats representation
+└── queries/
+    ├── index              → Queries navigator entry
+    └── :queryId           → Query workspace item
 ```
 
-**TanStack Router file layout:**
+Data is the primary table surface and does not add a `/data` segment.
 
-```
-src/routes/
-├── conn/
-│   └── $connectionId/
-│       └── $branch/
-│           └── $schemaHash/
-│               ├── tables/
-│               │   ├── index.tsx           → Tables list
-│               │   └── $tableName/
-│               │       ├── index.tsx       → Data view
-│               │       └── schema.tsx      → Schema definition view
-│               ├── queries.tsx             → Live queries/subscriptions
-│               └── index.tsx               → Redirect to data-explorer
-├── conn/
-│   └── index.tsx                         → Connection manager
-└── __root.tsx
-```
+Filters, sorting, and other shareable Data state use search parameters. Schema is a distinct representation and uses a path
+segment instead of `view=schema` search state.
 
-### Key Design Decisions
+## Context ownership
 
-| Decision                                   | Rationale                                                                      |
-| ------------------------------------------ | ------------------------------------------------------------------------------ |
-| **Connection as top-level param**          | Primary unit of work; enables multiple tabs with different connections         |
-| **Branch in URL path**                     | Frequently switched; users want to compare data across branches                |
-| **Schema in URL path**                     | Frequently switched for debugging; enables historical schema viewing           |
-| **Schema nested without label**            | Schema is the only thing at this level; `/schema/` would be redundant          |
-| **Tables in sidebar**                      | Tables are "what" you view, not context; sidebar navigation keeps header clean |
-| **Connection picker shows appId + server** | Clarifies which environment (e.g., "019df714 @ prod.server.com")               |
+`connectionId` remains in the path because it resolves one profile from the local `regarde-inspector-connections` store. It
+lets separate browser tabs open different saved connections and restore the intended profile after reload.
 
-### Alternative Approaches Considered
+Branch and schema hash do not remain in ordinary content routes. They are workspace preferences for the selected connection:
 
-1. **Without schema in path**: `/conn/:id/:branch/tables/:name?schema=abc123`
-   - Rejected: Schema switching is frequent enough to warrant first-class URL treatment
+- the header displays and changes them
+- `preferencesByConnectionId` remembers the last branch and schema hash
+- runtime bootstrap validates the remembered schema against available schema hashes
+- changing either value replaces the Inspector runtime and restores workspace state for the resolved context
 
-2. **With explicit schema segment**: `/conn/:id/:branch/schema/:schema/tables/:name`
-   - Rejected: The word "schema" adds no disambiguation (nothing else occupies that level)
+A content URL is local-context-relative. It is expected to reopen an item using the saved connection profile on the same
+Inspector installation. It is not a portable remote-admin URL and does not carry credentials.
 
-3. **App-first hierarchy**: `/app/:appId/conn/:connId/:branch/...`
-   - Rejected: Creates false hierarchy; connection IS the primary context
+## Workspace-item routing
 
-4. **Branch as query param**: `/conn/:id/tables/:name?branch=feature-x`
-   - Rejected: Branch is fundamental to the view, not an optional filter
+The route describes active content, not `TabView` or a tab id.
 
-## Key Questions Explored
+A workspace item has:
 
-### Q: Should we include connection ID in the route?
+- a stable local instance identity
+- a resource
+- a representation
+- representation-specific state
 
-**A:** Yes. Connection is the primary context that determines server, appId, and credentials. Without it in the URL, bookmarking and multi-tab workflows are impossible.
+The active route can focus an equivalent persisted item or create an item when no equivalent item exists. Direct navigation
+therefore remains useful without coupling browser history to the visual tab implementation.
 
-### Q: Can we group connections by appId in the URL?
+Opening rules:
 
-**A:** No. While multiple connections can share an appId, they point to different servers (prod vs staging vs local). Grouping by appId would add navigation friction (app → connection → branch vs just connection → branch).
+- clicking a table in the Tables navigator opens or focuses its default unfiltered Data item
+- the same table can have several Data items when their filters differ
+- clicking a relation opens or focuses the referenced table's default unfiltered Data item
+- clicking Schema in a Data toolbar opens or focuses the Schema item for that table
+- clicking a grouped subscription in the Queries navigator opens or focuses its Query item
 
-### Q: Is there only one schema per branch?
+Data, Schema, and Query items use distinct icons derived from their explicit item kind. Generated ids do not determine item
+meaning.
 
-**A:** No. Schema and branch are orthogonal. A branch can have multiple schema versions over time, and you may want to view historical schemas on any branch.
+## State ownership
 
-### Q: Should schema be in the URL path or query param?
+### URL
 
-**A:** Path. Users switch schemas frequently for debugging and comparison. Treating it as a query param makes it feel secondary.
+- connection id
+- active resource
+- active representation
+- shareable filters and sorting
+- shareable row-editor target when required
 
-### Q: What's the difference between header "Schema" dropdown and table "Schema" button?
+### Local storage
 
-**A:** Two different concepts with confusingly similar names:
+- saved connection profiles and credentials
+- last branch and schema hash per connection
+- open workspace items and recent items
+- item order and representation-specific saved state
+- pane layout and left-dock selection
+- table column preferences
 
-- **Header dropdown**: Schema _version_ selection (app-wide, affects all tables)
-- **Table button**: Schema _definition_ view (structure of the selected table)
+Workspace state remains scoped by connection, branch, and schema hash even though branch and schema hash are not part of the
+visible content route.
 
-In the new design, the header dropdown becomes the schema breadcrumb segment.
+### Memory
 
-## UI Pattern
+- pagination
+- transient row and cell selection
+- focus
+- live-update highlights
+- drag state
+- other interaction state that does not need restoration
 
-**Header (Context Bar)** - Three-level breadcrumb:
+Do not add `sessionStorage` unless a specific state must survive navigation without surviving a browser restart.
 
-```
-[My App @ prod.server ▼] / [main ▼] / [c2e394d6 ▼]
-```
+## Key decisions
 
-Each segment is clickable:
+| Decision                                     | Rationale                                                                                |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Keep connection id in the path               | Resolves one saved local profile and preserves connection-level browser-tab isolation.   |
+| Keep branch and schema out of content routes | They are visible header context and saved preferences of the selected connection.        |
+| Omit `/data`                                 | Data is the default table representation.                                                |
+| Give Schema its own path                     | Schema is a distinct workspace-item representation, not Data search state.               |
+| Keep tabs out of routes                      | Tabs are one presentation of workspace items and may later exist in several panes.       |
+| Keep filters in search parameters            | Filters are shareable state of a Data item.                                              |
+| Keep Tables and Queries in the left dock     | They are different resource navigators and switching them must not replace main content. |
 
-- **Connection**: Shows all saved connections grouped by server
-- **Branch**: Shows remembered branches for this connection and allows manual branch entry
-- **Schema**: Shows available schema hashes for this connection context
+## Browser-tab behavior
 
-**Sidebar (Navigation)** - What you're viewing:
+Each browser tab mounts an independent React state tree. The connection store is shared through `localStorage`, but Inspector
+does not automatically ingest another tab's writes while mounted.
 
-```
-TABLES
-├── users
-├── posts
-├── orders
-└── ...
+This allows two tabs using the same connection to keep independent grid presentation, filters, selection, and editor state.
+After reload, each tab resolves the connection from its route and branch and schema from the saved preferences for that
+connection.
 
-QUERY SUBSCRIPTIONS
-```
+The model does not promise that two tabs using the same connection can permanently restore different branch or schema choices.
+That would require branch and schema route identity or a separate per-window workspace id.
 
-Clicking a table navigates to `/conn/:id/:branch/:schema/tables/:tableName`
+## Inspector link prefill
 
-## Inspector Link Prefill
+Local development can still open the connection flow with credentials in the URL hash:
 
-Verified upstream behavior:
+`/conn/new#serverUrl=<encoded>&appId=<encoded>&adminSecret=<encoded>`
 
-- `packages/jazz-tools/src/dev/managed-runtime.ts` emits runtime facts such as server URL, app id, and schema publication state
-- `packages/jazz-tools/src/dev/vite.ts` emits the `Open the inspector:` log line
-- `packages/jazz-tools/src/dev/inspector-link.ts` builds the inspector URL with hash params for:
-  - `serverUrl`
-  - `appId`
-  - `adminSecret`
-
-For this repo, the local equivalent should target:
-
-`https://regarde.inspector.localhost:1355/conn/new#serverUrl=<encoded>&appId=<encoded>&adminSecret=<encoded>`
-
-This preserves strict upstream emitted-link parity while routing into the local add-connection flow.
-
-## Extension Mode
-
-For the browser extension (no saved connections):
-
-```
-/conn/extension/default/current/tables/:name
-```
-
-Uses fixed "extension" connectionId and "default" branch identifiers.
+The hash pre-fills and validates a saved local connection. After validation, Inspector assigns a local connection id and opens
+its workbench. Ordinary content routes never include the admin secret.
 
 ## Example URLs
 
-```
-# Production app, main branch, current schema, users table
-/conn/prod-app/main/c2e394d6/tables/users
+```text
+# Default Data representation
+/conn/local-profile-id/tables/users
 
-# Same table in historical schema
-/conn/prod-app/main/abc1234f/tables/users
+# Filtered Data representation
+/conn/local-profile-id/tables/users?filters=<encoded>
 
-# Same table on feature branch
-/conn/prod-app/feature-auth/c2e394d6/tables/users
+# Table Schema representation
+/conn/local-profile-id/tables/users/schema
 
-# Schema definition view for a table
-/conn/prod-app/main/c2e394d6/tables/users/schema
+# Queries navigator
+/conn/local-profile-id/queries
 
-# Tables list (default view)
-/conn/prod-app/main/c2e394d6/tables
-
-# Live queries
-/conn/prod-app/main/c2e394d6/queries
+# Query workspace item
+/conn/local-profile-id/queries/group-key
 ```

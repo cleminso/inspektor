@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, type PropsWithChildren } from "react";
+import { createContext, useContext, useMemo, type PropsWithChildren } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 
 import { useInspectorSession } from "@/hooks/useInspectorSession";
@@ -21,12 +21,12 @@ export interface InspectorSessionContextValue {
   currentTableName: string | null;
   connectionLabel: string | null;
   rememberedBranches: string[];
-  openConnection: (connectionId: string, reusableSchemaHashes?: string[]) => Promise<void>;
-  switchBranch: (branch: string, reusableSchemaHashes?: string[]) => Promise<void>;
+  openConnection: (connectionId: string, knownSchemaHashes?: string[]) => Promise<void>;
+  switchBranch: (branch: string, knownSchemaHashes?: string[]) => Promise<void>;
   switchSchema: (schemaHash: string) => Promise<void>;
   saveConnection: ReturnType<typeof useInspectorSession>["saveConnection"];
   deleteConnection: ReturnType<typeof useInspectorSession>["deleteConnection"];
-  setActiveConnection: ReturnType<typeof useInspectorSession>["setActiveConnection"];
+  setConnectionContext: ReturnType<typeof useInspectorSession>["setConnectionContext"];
   prefill: ReturnType<typeof useInspectorSession>["prefill"];
 }
 
@@ -44,43 +44,36 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
 
   const routeConnectionId = routeParams.connectionId ?? null;
   const currentConnectionId = routeConnectionId ?? session.activeConnectionId;
-  const currentBranch = routeParams.branch ?? null;
-  const currentSchemaHash = routeParams.schemaHash ?? null;
   const currentTableName = routeParams.tableName ?? null;
   const activeConnection =
     routeConnectionId !== null ? session.getConnection(routeConnectionId) : session.activeConnection;
+  const connectionPreferences =
+    activeConnection === null ? null : session.getConnectionPreferences(activeConnection.id);
+  const currentBranch = connectionPreferences?.lastBranch ?? null;
+  const currentSchemaHash = connectionPreferences?.lastSchemaHash ?? null;
 
-  useEffect(() => {
-    if (activeConnection === null || currentBranch === null) {
-      return;
-    }
-
-    session.rememberContext(activeConnection.id, currentBranch, currentSchemaHash);
-  }, [activeConnection, currentBranch, currentSchemaHash, session]);
-
-  const openConnection = async (connectionId: string, reusableSchemaHashes?: string[]) => {
+  const openConnection = async (connectionId: string, knownSchemaHashes?: string[]) => {
     const nextTarget = await resolveTablesNavigationTarget({
       connectionId,
       getConnection: (nextConnectionId) => session.getConnection(nextConnectionId),
       resolveBranch: (nextConnectionId, branchOverride) => session.resolveBranch(nextConnectionId, branchOverride),
       resolveSchemaHash: (nextConnectionId, availableSchemaHashes, schemaHashOverride) =>
         session.resolveSchemaHash(nextConnectionId, availableSchemaHashes, schemaHashOverride),
-      reusableSchemaHashes,
+      knownSchemaHashes,
     });
     if (nextTarget === null) {
       return;
     }
 
-    session.setActiveConnection(connectionId);
-    session.rememberContext(connectionId, nextTarget.branch, nextTarget.schemaHash);
+    session.setConnectionContext(connectionId, nextTarget.branch, nextTarget.schemaHash);
 
     await navigate({
       to: appRoutes.tables,
-      params: nextTarget,
+      params: { connectionId },
     });
   };
 
-  const switchBranch = async (branch: string, reusableSchemaHashes?: string[]) => {
+  const switchBranch = async (branch: string, knownSchemaHashes?: string[]) => {
     if (activeConnection === null) {
       return;
     }
@@ -93,18 +86,17 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       resolveBranch: (nextConnectionId, branchOverride) => session.resolveBranch(nextConnectionId, branchOverride),
       resolveSchemaHash: (nextConnectionId, availableSchemaHashes, schemaHashOverride) =>
         session.resolveSchemaHash(nextConnectionId, availableSchemaHashes, schemaHashOverride),
-      reusableSchemaHashes,
+      knownSchemaHashes,
     });
     if (nextTarget === null) {
       return;
     }
 
-    session.rememberContext(activeConnection.id, nextTarget.branch, nextTarget.schemaHash);
-
-    await navigate({
-      to: appRoutes.tables,
-      params: nextTarget,
-    });
+    session.setConnectionContext(
+      activeConnection.id,
+      nextTarget.branch,
+      nextTarget.schemaHash,
+    );
   };
 
   const switchSchema = async (schemaHash: string) => {
@@ -112,16 +104,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       return;
     }
 
-    session.rememberContext(activeConnection.id, currentBranch, schemaHash);
-
-    await navigate({
-      to: appRoutes.tables,
-      params: {
-        connectionId: activeConnection.id,
-        branch: currentBranch,
-        schemaHash,
-      },
-    });
+    session.setConnectionContext(activeConnection.id, currentBranch, schemaHash);
   };
 
   const value = useMemo<InspectorSessionContextValue>(
@@ -139,7 +122,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       switchSchema,
       saveConnection: session.saveConnection,
       deleteConnection: session.deleteConnection,
-      setActiveConnection: session.setActiveConnection,
+      setConnectionContext: session.setConnectionContext,
       prefill: session.prefill,
     }),
     [activeConnection, currentBranch, currentConnectionId, currentSchemaHash, currentTableName, session],

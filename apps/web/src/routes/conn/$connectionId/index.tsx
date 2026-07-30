@@ -1,20 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import {
-  redirectToConnections,
-  redirectToTablesTarget,
-  resolveStoredTablesNavigationTarget,
-} from "@/lib/navigation/inspectorNavigation";
+import { appRoutes } from "@/lib/navigation/appRoutes";
 
 export const Route = createFileRoute("/conn/$connectionId/")({
-  loader: async ({ params }) => {
-    const target = await resolveStoredTablesNavigationTarget({
-      connectionId: params.connectionId,
+  loader: ({ params }) => {
+    throw redirect({
+      to: appRoutes.tables,
+      params: { connectionId: params.connectionId },
     });
-    if (target === null) {
-      redirectToConnections();
-    }
-
-    redirectToTablesTarget(target);
   },
 });

@@ -44,11 +44,9 @@ describe("InspectorHeader", () => {
     fireEvent.click(screen.getByRole("button", { name: "Subscriptions" }));
 
     expect(navigate).toHaveBeenCalledWith({
-      to: "/conn/$connectionId/$branch/$schemaHash/query-subscriptions",
+      to: "/conn/$connectionId/queries",
       params: {
-        branch: "main",
         connectionId: "connection-1",
-        schemaHash: "schema-1",
       },
     });
     expect(screen.getByRole("button", { name: "Toggle theme" })).toBeTruthy();

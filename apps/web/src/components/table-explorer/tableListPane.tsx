@@ -4,7 +4,6 @@ import { Table2 } from "lucide-react";
 import { useEffect, useEffectEvent } from "react";
 
 import { useInspector } from "@/components/providers/inspectorProvider";
-import { useTableTabs } from "@/components/table-explorer/tableTabsProvider";
 import { TableViewToggle } from "@/components/table-explorer/tableViewToggle";
 import { appRoutes } from "@/lib/navigation/appRoutes";
 
@@ -71,10 +70,8 @@ export function TableListPane({
   onTableCheckedChange,
   onUnpinTables,
 }: TableListPaneProps): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
-  const { getBaseTabSearch } = useTableTabs();
-  const canBuildHref =
-    currentConnectionId !== null && currentBranch !== null && currentSchemaHash !== null;
+  const { currentConnectionId } = useInspector();
+  const canBuildHref = currentConnectionId !== null;
   const normalizedSearchValue = searchValue.trim().toLowerCase();
   const pinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName));
   const unpinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName) === false);
@@ -133,8 +130,6 @@ export function TableListPane({
             canBuildHref === true
               ? {
                   connectionId: currentConnectionId,
-                  branch: currentBranch,
-                  schemaHash: currentSchemaHash,
                   tableName,
                 }
               : null;
@@ -168,7 +163,7 @@ export function TableListPane({
                   <Link
                     to={appRoutes.table}
                     params={tableParams}
-                    search={getBaseTabSearch(tableName)}
+                    search={{}}
                     aria-current={isActive === true ? "page" : undefined}
                   />
                 }

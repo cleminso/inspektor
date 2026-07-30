@@ -5,6 +5,10 @@ export interface TableTabSearch {
   view?: string;
 }
 
+export interface TableTabsRouteSearch extends TableTabSearch {
+  empty?: "true";
+}
+
 export interface TableDataTab {
   kind: "table";
   id: string;
@@ -25,8 +29,8 @@ export interface TableTabsState {
 }
 
 interface ReconcileTableTabInput {
+  activeTabId: string | null;
   createId: () => string;
-  requestedTabId: string | null;
   search: TableTabSearch;
   tableName: string;
   tabs: readonly TableTab[];
@@ -65,6 +69,10 @@ const emptyTableTabsState = (): TableTabsState => ({
 
 export function createBaseTableTabId(tableName: string): string {
   return `table:${encodeURIComponent(tableName)}`;
+}
+
+export function createTableTabRouteSearch(tab: TableTab): TableTabsRouteSearch {
+  return tab.kind === "newView" ? { empty: "true" } : { ...tab.search };
 }
 
 export function openBaseTableTabs(
@@ -130,31 +138,29 @@ function tableViewsMatch(left: TableDataTab, right: TableDataTab): boolean {
 }
 
 export function reconcileTableTab({
+  activeTabId: currentActiveTabId,
   createId,
-  requestedTabId,
   search,
   tableName,
   tabs,
 }: ReconcileTableTabInput): ReconcileTableTabResult {
-  const requestedTab =
-    requestedTabId === null ? undefined : tabs.find((tab) => tab.id === requestedTabId);
   const matchingView = tabs.find(
     (tab): tab is TableDataTab =>
       tab.kind === "table" &&
       tab.tableName === tableName &&
       searchesMatch(tab.search, search),
   );
-  const reusableRequestedTabId =
-    requestedTab?.kind === "table" && requestedTab.tableName === tableName
-      ? requestedTab.id
-      : requestedTab === undefined
-        ? requestedTabId
-        : null;
+  const activeView = tabs.find(
+    (tab): tab is TableDataTab =>
+      tab.kind === "table" &&
+      tab.id === currentActiveTabId &&
+      tab.tableName === tableName &&
+      tab.id !== createBaseTableTabId(tableName),
+  );
   const activeTabId =
-    reusableRequestedTabId ??
-    (isBaseSearch(search) === true
+    isBaseSearch(search) === true
       ? createBaseTableTabId(tableName)
-      : (matchingView?.id ?? `view:${createId()}`));
+      : (matchingView?.id ?? activeView?.id ?? `view:${createId()}`);
   const nextTab: TableDataTab = {
     kind: "table",
     id: activeTabId,

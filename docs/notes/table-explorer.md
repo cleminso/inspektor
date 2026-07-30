@@ -38,7 +38,7 @@ Regarde gets table data through the Jazz runtime, not through a bespoke REST end
 
 Current data flow:
 
-1. The active route selects a connection, branch, schema hash, and table.
+1. The active route selects a saved connection and table; the connection preferences select branch and schema hash.
 2. `useInspectorRuntime(...)` creates an in-memory Jazz client with `createJazzClient(...)`.
 3. `useInspectorRuntime(...)` fetches the selected stored schema and stored permissions.
 4. `useTableQuery(...)` builds a generic query for the selected table.
@@ -49,7 +49,7 @@ Relevant Regarde files:
 
 - `apps/web/src/hooks/useInspectorRuntime.ts`
 - `apps/web/src/components/providers/inspectorProvider.tsx`
-- `apps/web/src/routes/conn/$connectionId/$branch/$schemaHash/tables/$tableName/index.tsx`
+- `apps/web/src/routes/conn/$connectionId/tables/$tableName/index.tsx`
 - `apps/web/src/components/table-explorer/tableExplorerScreen.tsx`
 - `apps/web/src/components/table-explorer/selectedTableView.tsx`
 - `apps/web/src/hooks/useTableQuery.ts`
@@ -288,43 +288,26 @@ Current Regarde flow:
 
 1. `buildDataTableColumns(...)` checks `column.column?.references`.
 2. If the current cell value is a non-empty string, it renders `RelationCellLink`.
-3. `RelationCellLink` calls `useRelationRow(relationTable, relationId)`.
-4. `useRelationRow(...)` queries the referenced table with `id = relationId` and `limit(1)`.
-5. It picks a display column using schema heuristics.
-6. It links to the referenced table with an `id eq relationId` filter.
+3. `RelationCellLink` shows the stored relation id without starting a per-cell relation query.
+4. It links to the referenced table with an empty search state.
 
-v1 relation navigation opens or focuses a table tab view for the referenced table. If no matching filtered tab view exists, it creates one with an `id = relationId` filter.
+Relation navigation opens or focuses the referenced table's default unfiltered tab view. The relation id remains cell content and does not become URL state.
 
 Relevant Regarde files:
 
 - `apps/web/src/components/table-explorer/data/buildDataTableColumns.tsx`
 - `apps/web/src/components/table-explorer/data/relationCellLink.tsx`
-- `apps/web/src/hooks/useRelationRow.ts`
 - `apps/web/src/lib/table-explorer/relationNavigation.ts`
 - `apps/web/src/lib/table-explorer/tableSchema.ts`
 
-Relation display column priority:
-
-- `name`
-- `title`
-- `label`
-- `displayName`
-- `display_name`
-- `username`
-- `handle`
-- `slug`
-- `email`
-
 Current limitation:
 
-- Relation labels may create one secondary live query per relation cell.
-- Relation display labels are schema-only heuristics.
 - No app-defined display label metadata was found.
 
 v1 direction:
 
 - Show the raw relation id immediately.
-- Resolve friendly labels progressively when affordable.
+- Resolve friendly labels only in expanded relation details when affordable.
 - Cache relation labels by connection, branch, schema hash, table, and id.
 - Never block grid rendering on relation label loading.
 

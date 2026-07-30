@@ -18,11 +18,12 @@ import {
 
 import { appRoutes } from "./appRoutes";
 
-/** Route params that identify one inspectable Jazz runtime context. */
+/** Internal values that identify one inspectable Jazz runtime context. */
 export interface ResolvedTablesNavigationTarget {
   connectionId: string;
   branch: string;
   schemaHash: string;
+  availableSchemaHashes: string[];
 }
 
 interface ResolveTablesNavigationTargetOptions {
@@ -36,7 +37,8 @@ interface ResolveTablesNavigationTargetOptions {
     availableSchemaHashes: string[],
     schemaHashOverride?: string | null,
   ) => string | null;
-  reusableSchemaHashes?: string[];
+  knownSchemaHashes?: string[];
+  schemaFetchError?: "ignore" | "throw";
 }
 
 interface ResolveStoredTablesNavigationTargetOptions {
@@ -51,7 +53,7 @@ interface ResolveStoredTablesNavigationTargetOptions {
  * provider.
  *
  * The Jazz metadata import stays inside this user-triggered navigation path so onboarding does not
- * make it part of the application-root graph. `reusableSchemaHashes` prevents refetching when the
+ * make it part of the application-root graph. `knownSchemaHashes` prevents refetching when the
  * mounted runtime already has the hash list.
  */
 export async function resolveTablesNavigationTarget({
@@ -61,7 +63,8 @@ export async function resolveTablesNavigationTarget({
   getConnection,
   resolveBranch,
   resolveSchemaHash,
-  reusableSchemaHashes,
+  knownSchemaHashes,
+  schemaFetchError = "ignore",
 }: ResolveTablesNavigationTargetOptions): Promise<ResolvedTablesNavigationTarget | null> {
   const connection = getConnection(connectionId);
   if (connection === null) {
@@ -77,12 +80,19 @@ export async function resolveTablesNavigationTarget({
       adminSecret: connection.adminSecret,
     });
   };
-  const availableSchemaHashes =
-    reusableSchemaHashes !== undefined && reusableSchemaHashes.length > 0
-      ? reusableSchemaHashes
-      : await fetchSchemaHashes()
-          .then((response) => response.hashes)
-          .catch(() => []);
+  let availableSchemaHashes: string[];
+  if (knownSchemaHashes !== undefined && knownSchemaHashes.length > 0) {
+    availableSchemaHashes = knownSchemaHashes;
+  } else {
+    try {
+      availableSchemaHashes = (await fetchSchemaHashes()).hashes;
+    } catch (error) {
+      if (schemaFetchError === "throw") {
+        throw error;
+      }
+      availableSchemaHashes = [];
+    }
+  }
 
   const schemaHash = resolveSchemaHash(connectionId, availableSchemaHashes, schemaHashOverride);
   if (schemaHash === null) {
@@ -93,6 +103,7 @@ export async function resolveTablesNavigationTarget({
     connectionId,
     branch,
     schemaHash,
+    availableSchemaHashes,
   };
 }
 
@@ -113,18 +124,11 @@ export async function resolveStoredTablesNavigationTarget({
     resolveBranch: (nextConnectionId, nextBranchOverride) => resolveDefaultBranch(resolvedStore, nextConnectionId, nextBranchOverride),
     resolveSchemaHash: (nextConnectionId, availableSchemaHashes, nextSchemaHashOverride) =>
       resolveDefaultSchemaHash(resolvedStore, nextConnectionId, availableSchemaHashes, nextSchemaHashOverride),
+    schemaFetchError: "throw",
   });
 }
 
 /** Sends users back to connection setup when a Jazz runtime target is unavailable. */
 export function redirectToConnections(): never {
   throw redirect({ to: appRoutes.connections });
-}
-
-/** Enters the schema-driven table explorer for a resolved runtime context. */
-export function redirectToTablesTarget(target: ResolvedTablesNavigationTarget): never {
-  throw redirect({
-    to: appRoutes.tables,
-    params: target,
-  });
 }

@@ -11,18 +11,15 @@ interface RelationCellLinkProps {
 }
 
 export function RelationCellLink({ relationId, relationTable }: RelationCellLinkProps): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
+  const { currentConnectionId } = useInspector();
 
-  if (currentConnectionId === null || currentBranch === null || currentSchemaHash === null) {
+  if (currentConnectionId === null) {
     return <RelationValue id={relationId} />;
   }
 
   const relationLink = buildRelationTableLink({
     connectionId: currentConnectionId,
-    branch: currentBranch,
-    schemaHash: currentSchemaHash,
     tableName: relationTable,
-    relationId,
   });
 
   return (

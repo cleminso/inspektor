@@ -4,7 +4,7 @@ import { InspectorLayout } from "@/components/layout/inspectorLayout";
 import { useInspector } from "@/components/providers/inspectorProvider";
 import { TableTabsProvider } from "@/components/table-explorer/tableTabsProvider";
 
-export const Route = createFileRoute("/conn/$connectionId/$branch/$schemaHash/tables")({
+export const Route = createFileRoute("/conn/$connectionId/tables")({
   component: TablesLayoutRoute,
 });
 

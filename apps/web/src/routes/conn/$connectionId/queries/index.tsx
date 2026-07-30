@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { Box, Text } from "@inspector/ds";
 
-export const Route = createFileRoute("/conn/$connectionId/$branch/$schemaHash/query-subscriptions/")({
+export const Route = createFileRoute("/conn/$connectionId/queries/")({
   component: QuerySubscriptionsRoute,
 });
 

@@ -29,7 +29,8 @@ export interface UseAddConnectionFlowResult {
 }
 
 export function useAddConnectionFlow(): UseAddConnectionFlowResult {
-  const { connections, prefill, saveConnection, setActiveConnection } = useInspectorSessionContext();
+  const { connections, prefill, saveConnection, setConnectionContext } =
+    useInspectorSessionContext();
   const navigate = useNavigate();
   const [step, setStep] = useState<AddConnectionStep>("form");
   const [formValues, setFormValues] = useState<AddConnectionFormValues>(() => createInitialFormValues(prefill));
@@ -61,16 +62,12 @@ export function useAddConnectionFlow(): UseAddConnectionFlowResult {
     const existingConnection = findConnectionByCredentials(connections, draft);
     const connection = existingConnection ?? saveConnection(draft);
 
-    if (existingConnection !== null) {
-      setActiveConnection(connection.id);
-    }
+    setConnectionContext(connection.id, branch, schemaHash);
 
     await navigate({
       to: appRoutes.tables,
       params: {
         connectionId: connection.id,
-        branch,
-        schemaHash,
       },
     });
   };

@@ -47,7 +47,7 @@ describe("useTableExplorerSearchParams", () => {
     expect(useNavigateMock).toHaveBeenCalledWith();
   });
 
-  it("preserves the tab param when switching to schema view from the new-view surface", async () => {
+  it("removes legacy tab identity when updating the route search", async () => {
     searchState.value = { tab: "new-view" };
     const { result } = renderHook(() => useTableExplorerSearchParams());
 
@@ -57,7 +57,7 @@ describe("useTableExplorerSearchParams", () => {
 
     const nextSearch = captureSearchUpdater()({ tab: "new-view" });
 
-    expect(nextSearch).toMatchObject({ tab: "new-view", view: "schema" });
+    expect(nextSearch).toEqual({ view: "schema" });
   });
 
   it("strips default view value when returning to data", async () => {
@@ -70,7 +70,7 @@ describe("useTableExplorerSearchParams", () => {
 
     const nextSearch = captureSearchUpdater()({ tab: "table:accounts", view: "schema" });
 
-    expect(nextSearch).toMatchObject({ tab: "table:accounts" });
+    expect(nextSearch.tab).toBeUndefined();
     expect(nextSearch.view).toBeUndefined();
   });
 
@@ -89,7 +89,8 @@ describe("useTableExplorerSearchParams", () => {
       rowId: "row-1",
     });
 
-    expect(nextSearch).toMatchObject({ tab: "new-view", custom: "kept" });
+    expect(nextSearch).toMatchObject({ custom: "kept" });
+    expect(nextSearch.tab).toBeUndefined();
     expect(nextSearch.mode).toBeUndefined();
     expect(nextSearch.rowId).toBeUndefined();
   });

@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, type PropsWithChildren
 import { JazzClientProvider } from "jazz-tools/react";
 
 import { useInspectorRuntime } from "@/hooks/useInspectorRuntime";
+import type { ResolvedTablesNavigationTarget } from "@/lib/navigation/inspectorNavigation";
 import {
   useInspectorSessionContext,
   type InspectorSessionContextValue,
@@ -18,13 +19,24 @@ const InspectorContext = createContext<InspectorContextValue | null>(null);
  * identity. This provider must remain below `InspectorSessionProvider` and at the shared route
  * boundary for runtime-dependent descendants.
  */
-export function InspectorProvider({ children }: PropsWithChildren) {
+interface InspectorProviderProps extends PropsWithChildren {
+  initialRuntimeTarget?: ResolvedTablesNavigationTarget;
+}
+
+export function InspectorProvider({ children, initialRuntimeTarget }: InspectorProviderProps) {
   const session = useInspectorSessionContext();
+  const initialSchemaHashes =
+    initialRuntimeTarget?.connectionId === session.currentConnectionId &&
+    initialRuntimeTarget.branch === session.currentBranch &&
+    initialRuntimeTarget.schemaHash === session.currentSchemaHash
+      ? initialRuntimeTarget.availableSchemaHashes
+      : undefined;
 
   const runtime = useInspectorRuntime({
     connection: session.activeConnection,
     branch: session.currentBranch,
     schemaHash: session.currentSchemaHash,
+    initialSchemaHashes,
   });
   const openConnection = useCallback(
     (connectionId: string) =>

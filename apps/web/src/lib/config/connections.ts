@@ -144,6 +144,19 @@ export function setActiveConnectionId(
   };
 }
 
+export function setActiveConnectionContext(
+  store: StoredConnectionsStore,
+  connectionId: string,
+  branch: string,
+  schemaHash: string,
+): StoredConnectionsStore {
+  return updateConnectionPreferences(
+    rememberBranch(setActiveConnectionId(store, connectionId), connectionId, branch),
+    connectionId,
+    { lastSchemaHash: schemaHash },
+  );
+}
+
 /** Saves a Jazz connection profile, marks it active, and ensures it has preferences. */
 export function upsertConnection(
   store: StoredConnectionsStore,
