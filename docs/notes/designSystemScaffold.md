@@ -7,7 +7,7 @@
 - [Why StyleX](#why-stylex)
 - [Why `@stylexjs/unplugin`](#why-stylexjsunplugin)
 - [Why Oxlint and Oxfmt](#why-oxlint-and-oxfmt)
-- [Why `tsup` for the Package](#why-tsup-for-the-package)
+- [Why TSDown for the Package](#why-tsdown-for-the-package)
 - [Polar-Inspired Workflow](#polar-inspired-workflow)
 - [Generated Props](#generated-props)
 - [Validation Intent](#validation-intent)
@@ -51,9 +51,11 @@ For StyleX-specific rules, Oxlint can load `@stylexjs/eslint-plugin` through JS 
 
 If Oxlint plugin compatibility becomes a blocker for a StyleX rule, the fallback should be a narrow lint command for StyleX checks only, not a full parallel linting stack.
 
-## Why `tsup` for the Package
+## Why TSDown for the Package
 
-`tsup` keeps the package build simple: source entry in, ESM/CJS/types out.
+TSDown provides ESM-first React library compilation through Rolldown and Oxc. Unbundle mode preserves each StyleX source module instead of collapsing StyleX variable definitions and component styles into a package-level bundle.
+
+The package build runs TSDown for JavaScript followed by one declaration-emitting TypeScript pass. TSDown's declaration generator is not used because declaration emission alone does not reject semantic type errors; `tsc -p tsconfig.build.json` checks and emits declarations in one operation.
 
 The package should build distributable JavaScript and declarations, but it should not own final StyleX CSS extraction. CSS extraction belongs to the consuming app because the app owns the final bundle and can combine styles across app code and workspace packages.
 

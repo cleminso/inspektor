@@ -37,7 +37,7 @@ The repository is a PNPM workspace. The root workspace configuration includes ap
 | `packages/design-system`  | The `@inspector/ds` reusable UI package         | UI primitives and reusable interaction dependencies                       |
 | `packages/jazz-dev-tools` | Separate Jazz tooling package                   | Outside this frontend replacement architecture unless explicitly in scope |
 
-`apps/web` and `apps/design-system` are consumers of `@inspector/ds`. They must use its published public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
+`apps/web` and `apps/design-system` are consumers of `@inspector/ds`. They must use its public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
 
 ## Ownership boundaries
 
@@ -134,11 +134,11 @@ Both Vite applications declare these resolution conditions:
 
 `resolve.conditions` tells Vite that `inspector-source` is an allowed package condition. The package export map declares `inspector-source` before its built `import` and `default` targets, so Vite selects the TypeScript source target for an `@inspector/ds` public import. Vite then processes that source as part of the consuming application build.
 
-This is required by the current StyleX architecture. The StyleX Vite plugin needs to transform the components and collect their styles while Vite builds the consuming application. Resolving only the prebuilt `dist` files would change that pipeline.
+This is the workspace development path for the current StyleX architecture. The StyleX Vite plugin transforms the source components and collects their styles while Vite builds each application. A distribution consumer can instead resolve the uncompiled ESM modules in `dist`; its StyleX plugin must still transform those modules and own final CSS extraction.
 
 Both applications also exclude `@inspector/ds` from Vite dependency optimization. The dependency optimizer is designed for third-party dependencies that Vite can prebundle as opaque inputs. `@inspector/ds` is linked workspace source that must remain available to the Vite and StyleX transforms.
 
-This means a design-system `tsup` build verifies its distribution contract, while `apps/web` and `apps/design-system` builds verify source consumption. Neither check replaces the other.
+This means the design-system TSDown build verifies artifact generation, while `apps/web` and `apps/design-system` builds verify source consumption. Neither check replaces the other.
 
 ## Vite configuration
 
@@ -241,7 +241,7 @@ Before adding a design-system export, answer these questions:
 2. Is the root barrel appropriate, or does a focused public subpath express a useful boundary?
 3. Would re-exporting it statically make an intentionally deferred implementation reachable from a broad entry?
 4. Does the design-system documentation application need a page or example for it?
-5. Does the export map, tsup entry configuration, and package declaration output support the new public path?
+5. Does the export map, TSDown entry configuration, and package declaration output support the new public path?
 
 ## Validation
 
@@ -249,13 +249,13 @@ Use validation that matches the boundary changed:
 
 | Change                                  | Evidence to collect                                                                                      |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| DS component or export                  | DS tests, typecheck, lint, tsup build, documentation prop generation when applicable                     |
+| DS component or export                  | DS tests, typecheck, lint, TSDown build, and documentation prop generation when applicable                                 |
 | Vite resolution or StyleX configuration | Both application builds and source-consumption behavior                                                  |
 | Deferred dependency                     | Static-import regression test, fallback behavior test, focus/state test, and production chunk inspection |
 | Route boundary                          | Route behavior test and product build output inspection                                                  |
 | Package metadata such as `sideEffects`  | Verify modules have no required import-time effects and inspect consumer build behavior                  |
 
-Run the focused validation commands recorded in `AGENTS.md` and the relevant feature checklist. A passing package build does not prove the application resolves the same contract; a passing application build does not prove the publishable package artifact is valid.
+Run the focused validation commands recorded in `AGENTS.md` and the relevant feature checklist. A passing package build does not prove the application resolves the same contract; a passing source-consuming application build does not prove that the private package distribution is valid.
 
 ## Glossary
 
@@ -266,7 +266,7 @@ Run the focused validation commands recorded in `AGENTS.md` and the relevant fea
 | Export map              | The `package.json` `exports` declaration that defines allowed import paths and resolution conditions        |
 | Export condition        | A named branch in an export map selected by a consumer or bundler, such as `inspector-source` or `import`   |
 | Source contract         | Public imports resolve to package source for workspace application compilation                              |
-| Distribution contract   | Public imports resolve to built `dist` artifacts for external consumers                                     |
+| Distribution contract   | Public imports resolve to built `dist` artifacts for consumers that do not select `inspector-source`        |
 | Peer dependency         | A dependency supplied by the consuming application, such as React for the design system                     |
 | Static dependency graph | Modules reachable through static imports from an entry or loaded route                                      |
 | Deferred closure        | The module graph loaded by one dynamic import boundary                                                      |

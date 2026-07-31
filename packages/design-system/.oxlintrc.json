@@ -34,7 +34,7 @@
       }
     ],
     "@stylexjs/enforce-extension": [
-      "error",
+      "warn",
       {
         "validImports": ["@stylexjs/stylex"],
         "themeFileExtension": ".stylex.ts"

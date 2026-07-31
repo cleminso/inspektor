@@ -7,6 +7,29 @@ import { defineConfig } from "vite";
 
 // Explicitly use PORT from portless
 const PORT = parseInt(process.env.PORT || "5173");
+const designSystemSourceId = /\/packages\/design-system\/src\/.*\.[cm]?[jt]sx?(?:\?.*)?$/;
+
+const createStylexPlugin = () => {
+  const plugin = stylex.vite({
+    importSources: ["@stylexjs/stylex"],
+  });
+  const transform = plugin.transform;
+
+  if (typeof transform !== "function") {
+    throw new TypeError("Expected the StyleX Vite plugin to expose a transform hook");
+  }
+
+  plugin.transform = {
+    filter: {
+      id: {
+        include: [designSystemSourceId],
+      },
+    },
+    handler: transform,
+  };
+
+  return plugin;
+};
 
 export default defineConfig(({ mode }) => ({
   resolve: {
@@ -24,7 +47,7 @@ export default defineConfig(({ mode }) => ({
       target: "react",
       autoCodeSplitting: true,
     }),
-    stylex.vite(),
+    createStylexPlugin(),
     viteReact(),
     tailwindcss(),
   ],
@@ -33,6 +56,12 @@ export default defineConfig(({ mode }) => ({
     outDir: "dist",
     sourcemap: true,
     target: "es2022",
+    rolldownOptions: {
+      checks: {
+        // StyleX is intentionally the dominant transform after its hook is restricted to DS source.
+        pluginTimings: false,
+      },
+    },
   },
   test: {
     environment: "jsdom",

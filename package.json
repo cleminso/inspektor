@@ -15,7 +15,14 @@
   "scripts": {
     "dev": "pnpm -r dev",
     "dev:web": "pnpm --filter regarde.inspector dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "engines": {
+    "node": "^22.18.0 || >=24.11.0"
   },
   "author": "cleminso",
   "packageManager": "pnpm@11.14.0"

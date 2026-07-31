@@ -24,6 +24,8 @@ The goal is not to maximize code splitting. The goal is to keep the initial depe
 
 The application consumes `@inspector/ds` through its public barrel. A static import from any exported component can therefore make that dependency eligible for an initial application chunk, even when only one optional component uses it.
 
+The Inspector application limits its StyleX transform hook to `packages/design-system/src`. The design system is the only source owner that imports StyleX, so Rolldown can reject unrelated application and dependency modules before invoking the JavaScript plugin hook. The application suppresses only Rolldown's relative plugin-timing diagnostic after applying this boundary; all other build checks remain enabled. Expand or remove the filter before introducing StyleX imports under another owner.
+
 Data Grid and Tab View use the established deferred interaction pattern:
 
 1. The static component renders complete, non-reorderable content.
@@ -70,7 +72,9 @@ The original performance issue was caused by static `@dnd-kit` imports in public
 
 - Verify the package export selected by each consumer before interpreting a library build. A source export means the consumer does not execute the package bundler output.
 - Keep source and distribution contracts explicit. Use a package-specific source condition for workspace consumers and `import` for the built ESM artifact.
+- Preserve the design-system module graph in distribution output so StyleX variable definitions, dynamic imports, and consumer tree-shaking retain their source boundaries.
 - Add component subpath exports at broad application boundaries when the public barrel retains unrelated modules or creates excessive development traversal.
+- Use a bundler-native hook filter when a transform has one explicit source owner. Keep the filter aligned with ownership so valid source files cannot bypass the transform.
 - Declare `sideEffects` only after verifying that modules do not rely on import-time CSS registration, globals, polyfills, or singleton setup.
 - Prefer ESM-only package output when no CommonJS consumer exists. Removing CommonJS simplifies package output but does not reduce application cost when the application consumes source.
 - Treat chunk names as assignment hints rather than ownership reports. Measure the HTML entry's complete static module-preload closure and each deferred closure.
