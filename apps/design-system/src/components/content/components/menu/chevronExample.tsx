@@ -1,11 +1,13 @@
-import { Button, Menu } from "@inspector/ds";
+import { Button, Icon, Menu } from "@inspector/ds";
 import { ChevronDown } from "lucide-react";
 import { type ReactElement } from "react";
 
 export default function ChevronExample(): ReactElement {
   return (
     <Menu.Root>
-      <Menu.Trigger render={<Button variant="secondary" suffix={<ChevronDown size={16} />} />}>
+      <Menu.Trigger
+        render={<Button variant="secondary" suffix={<Icon render={<ChevronDown />} size="s" />} />}
+      >
         View
       </Menu.Trigger>
       <Menu.Content>

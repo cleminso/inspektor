@@ -27,6 +27,7 @@ import {
   StructuredValuePreview,
   Text,
   TimestampValue,
+  Icon,
 } from "@inspector/ds";
 
 import {
@@ -225,8 +226,8 @@ function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.
       variant="caption"
     >
       <Box as="span" alignItems="center" display="flex">
-        {marker.icon === "key" ? <KeyRound aria-hidden="true" size={12} /> : null}
-        {marker.icon === "relation" ? <ArrowUpRight aria-hidden="true" size={12} /> : null}
+        {marker.icon === "key" ? <Icon render={<KeyRound />} size="xs" /> : null}
+        {marker.icon === "relation" ? <Icon render={<ArrowUpRight />} size="xs" /> : null}
         {marker.suffix}
       </Box>
     </Text>

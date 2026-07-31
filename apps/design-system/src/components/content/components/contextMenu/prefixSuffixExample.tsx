@@ -1,4 +1,4 @@
-import { ContextMenu, KeyboardInput } from "@inspector/ds";
+import { ContextMenu, KeyboardInput, Icon } from "@inspector/ds";
 import { Copy, Pencil, X } from "lucide-react";
 import { type ReactElement } from "react";
 
@@ -9,7 +9,7 @@ export default function PrefixSuffixExample(): ReactElement {
       <ContextMenu.Content>
         <ContextMenu.Item onClick={() => undefined}>
           <ContextMenu.Prefix>
-            <Pencil size={14} />
+            <Icon render={<Pencil />} size="s" />
           </ContextMenu.Prefix>
           Rename tab
           <ContextMenu.Suffix>
@@ -18,7 +18,7 @@ export default function PrefixSuffixExample(): ReactElement {
         </ContextMenu.Item>
         <ContextMenu.Item onClick={() => undefined}>
           <ContextMenu.Prefix>
-            <Copy size={14} />
+            <Icon render={<Copy />} size="s" />
           </ContextMenu.Prefix>
           Duplicate tab
           <ContextMenu.Suffix>
@@ -29,7 +29,7 @@ export default function PrefixSuffixExample(): ReactElement {
         </ContextMenu.Item>
         <ContextMenu.Item variant="danger" onClick={() => undefined}>
           <ContextMenu.Prefix>
-            <X size={14} />
+            <Icon render={<X />} size="s" />
           </ContextMenu.Prefix>
           Close tab
           <ContextMenu.Suffix>

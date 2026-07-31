@@ -1,4 +1,4 @@
-import { Box, CopyButton } from "@inspector/ds";
+import { Box, CopyButton, Icon } from "@inspector/ds";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronDown } from "lucide-react";
 import { type ReactElement, useId, useState } from "react";
@@ -43,9 +43,12 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
         >
           <span
             aria-hidden="true"
-            {...stylex.props(styles.triggerIcon, isExpanded === false && styles.triggerIconCollapsed)}
+            {...stylex.props(
+              styles.triggerIcon,
+              isExpanded === false && styles.triggerIconCollapsed,
+            )}
           >
-            <ChevronDown size={16} />
+            <Icon render={<ChevronDown />} size="s" />
           </span>
           {isExpanded === true ? "Hide code" : "Show code"}
         </button>

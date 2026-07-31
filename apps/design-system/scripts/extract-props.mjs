@@ -147,6 +147,11 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "icon",
+    exportName: "Icon",
+    inheritedProps: [],
+  },
+  {
     componentId: "jsonView",
     exportName: "JsonView",
     inheritedProps: [],

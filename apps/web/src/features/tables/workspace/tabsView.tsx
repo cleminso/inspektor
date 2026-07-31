@@ -1,4 +1,4 @@
-import { Box, Button, TabView } from "@inspector/ds";
+import { Box, Button, Icon, TabView } from "@inspector/ds";
 import { Layers3, Plus, Table2 } from "lucide-react";
 
 import { useTableTabs } from "@tables/workspace/tabsProvider";
@@ -73,9 +73,9 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   value={tab.id}
                   prefix={
                     isBaseTab === true ? (
-                      <Table2 aria-hidden="true" size={14} />
+                      <Icon render={<Table2 />} size="s" />
                     ) : (
-                      <Layers3 aria-hidden="true" size={14} />
+                      <Icon render={<Layers3 />} size="s" />
                     )
                   }
                   details={isBaseTab === false ? `Filtered view of ${tab.tableName}` : undefined}
@@ -98,7 +98,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
             title="Open new table view"
             onClick={openNewView}
           >
-            <Plus aria-hidden="true" size={14} />
+            <Icon render={<Plus />} size="s" />
           </Button>
         </Box>
       </Box>

@@ -7,6 +7,15 @@ import { InspectorDock } from "./view";
 afterEach(cleanup);
 
 describe("InspectorDock", () => {
+  it("uses semantic extra-small icons", () => {
+    render(<InspectorDock leftDock={{ isOpen: false, onToggle: () => undefined }} />);
+
+    for (const name of ["Open left dock", "Open subscriptions dock"]) {
+      const icon = screen.getByRole("button", { name }).querySelector('[data-slot="icon"]');
+      expect(icon?.getAttribute("data-size")).toBe("xs");
+    }
+  });
+
   it("opens and closes the left dock from one button", () => {
     function DockHarness(): React.ReactElement {
       const [isOpen, setIsOpen] = useState(false);

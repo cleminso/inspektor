@@ -200,6 +200,19 @@ export const spinnerItem = {
   componentId: "spinner",
 } satisfies NavItem;
 
+export const iconItem = {
+  title: "Icon",
+  slug: "icon",
+  href: "/components/icon",
+  description: "Decorative SVG artwork with constrained semantic sizing.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "icon.tsx",
+    path: "packages/design-system/src/components/icon/icon.tsx",
+  },
+  componentId: "icon",
+} satisfies NavItem;
+
 export const inputItem = {
   title: "Input",
   slug: "input",
@@ -542,6 +555,7 @@ export const componentItems: NavItem[] = [
   contextSwitcherItem,
   copyButtonItem,
   dataGridItem,
+  iconItem,
   inputItem,
   inputGroupItem,
   jsonViewItem,

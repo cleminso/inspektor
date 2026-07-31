@@ -1,4 +1,4 @@
-import { Box, Button, ContextSwitcher, Spinner, Text } from "@inspector/ds";
+import { Box, Button, ContextSwitcher, Spinner, Text, Icon } from "@inspector/ds";
 import { HashIcon } from "lucide-react";
 import { type ReactElement, useState } from "react";
 
@@ -61,7 +61,7 @@ export default function StatusExample(): ReactElement {
         isItemEqualToValue={(item, selected) => item.hash === selected.hash}
       >
         <ContextSwitcher.Trigger label="Switch schema" title={schema?.hash} width="m">
-          <HashIcon aria-hidden="true" size={14} />
+          <Icon render={<HashIcon />} size="s" />
           <Text as="span" color="inherit" monospace truncate>
             {schema === null ? "Select schema" : truncateMiddle(schema.hash)}
           </Text>

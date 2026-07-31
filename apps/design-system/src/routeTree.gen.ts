@@ -25,6 +25,7 @@ import { Route as ComponentsCopyButtonRouteImport } from './routes/components/co
 import { Route as ComponentsDataTableRouteImport } from './routes/components/data-table'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
+import { Route as ComponentsIconRouteImport } from './routes/components/icon'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsInputGroupRouteImport } from './routes/components/input-group'
 import { Route as ComponentsJsonViewRouteImport } from './routes/components/json-view'
@@ -129,6 +130,11 @@ const ComponentsFieldRoute = ComponentsFieldRouteImport.update({
 const ComponentsFieldsetRoute = ComponentsFieldsetRouteImport.update({
   id: '/components/fieldset',
   path: '/components/fieldset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsIconRoute = ComponentsIconRouteImport.update({
+  id: '/components/icon',
+  path: '/components/icon',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsInputRoute = ComponentsInputRouteImport.update({
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/components/data-table': typeof ComponentsDataTableRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
+  '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
   '/components/json-view': typeof ComponentsJsonViewRoute
@@ -314,6 +321,7 @@ export interface FileRoutesByTo {
   '/components/data-table': typeof ComponentsDataTableRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
+  '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
   '/components/json-view': typeof ComponentsJsonViewRoute
@@ -357,6 +365,7 @@ export interface FileRoutesById {
   '/components/data-table': typeof ComponentsDataTableRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
+  '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
   '/components/json-view': typeof ComponentsJsonViewRoute
@@ -401,6 +410,7 @@ export interface FileRouteTypes {
     | '/components/data-table'
     | '/components/field'
     | '/components/fieldset'
+    | '/components/icon'
     | '/components/input'
     | '/components/input-group'
     | '/components/json-view'
@@ -443,6 +453,7 @@ export interface FileRouteTypes {
     | '/components/data-table'
     | '/components/field'
     | '/components/fieldset'
+    | '/components/icon'
     | '/components/input'
     | '/components/input-group'
     | '/components/json-view'
@@ -485,6 +496,7 @@ export interface FileRouteTypes {
     | '/components/data-table'
     | '/components/field'
     | '/components/fieldset'
+    | '/components/icon'
     | '/components/input'
     | '/components/input-group'
     | '/components/json-view'
@@ -528,6 +540,7 @@ export interface RootRouteChildren {
   ComponentsDataTableRoute: typeof ComponentsDataTableRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
+  ComponentsIconRoute: typeof ComponentsIconRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsInputGroupRoute: typeof ComponentsInputGroupRoute
   ComponentsJsonViewRoute: typeof ComponentsJsonViewRoute
@@ -666,6 +679,13 @@ declare module '@tanstack/react-router' {
       path: '/components/fieldset'
       fullPath: '/components/fieldset'
       preLoaderRoute: typeof ComponentsFieldsetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/icon': {
+      id: '/components/icon'
+      path: '/components/icon'
+      fullPath: '/components/icon'
+      preLoaderRoute: typeof ComponentsIconRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/input': {
@@ -856,6 +876,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsDataTableRoute: ComponentsDataTableRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
+  ComponentsIconRoute: ComponentsIconRoute,
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsInputGroupRoute: ComponentsInputGroupRoute,
   ComponentsJsonViewRoute: ComponentsJsonViewRoute,

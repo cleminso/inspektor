@@ -1,4 +1,4 @@
-import { Box, Button, ButtonLink, Text } from "@inspector/ds";
+import { Box, Button, ButtonLink, Icon, Text } from "@inspector/ds";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { HeadContent, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Moon, Sun } from "lucide-react";
@@ -45,11 +45,7 @@ function ThemeSwitch(): ReactElement {
       aria-label={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
       title={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
     >
-      {resolvedTheme === "dark" ? (
-        <Sun aria-hidden="true" size={16} />
-      ) : (
-        <Moon aria-hidden="true" size={16} />
-      )}
+      <Icon render={resolvedTheme === "dark" ? <Sun /> : <Moon />} size="s" />
     </Button>
   );
 }

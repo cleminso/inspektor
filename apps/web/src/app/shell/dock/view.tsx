@@ -1,4 +1,4 @@
-import { Box, Button } from "@inspector/ds";
+import { Box, Button, Icon } from "@inspector/ds";
 import { Activity, Table } from "lucide-react";
 
 export interface InspectorLeftDockControl {
@@ -38,7 +38,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
             title={leftDockLabel}
             onClick={leftDock.onToggle}
           >
-            <Table aria-hidden="true" size={12} />
+            <Icon render={<Table />} size="xs" />
           </Button>
         ) : null}
         <Button
@@ -49,7 +49,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
           iconOnly
           title="Open subscriptions dock"
         >
-          <Activity aria-hidden="true" size={12} />
+          <Icon render={<Activity />} size="xs" />
         </Button>
       </Box>
     </Box>

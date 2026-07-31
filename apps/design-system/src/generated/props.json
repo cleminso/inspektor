@@ -2468,6 +2468,29 @@
       }
     }
   ],
+  "icon": [
+    {
+      "name": "render",
+      "type": "NonNullable<ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}> | undefined>",
+      "required": true,
+      "description": "Composes semantic icon presentation onto SVG artwork.",
+      "source": {
+        "path": "packages/design-system/src/components/icon/icon.tsx",
+        "line": 11
+      }
+    },
+    {
+      "name": "size",
+      "type": "\"xs\" | \"s\" | \"m\"",
+      "required": false,
+      "defaultValue": "\"s\"",
+      "description": "Controls the rendered icon dimensions.",
+      "source": {
+        "path": "packages/design-system/src/components/icon/icon.tsx",
+        "line": 13
+      }
+    }
+  ],
   "jsonView": [
     {
       "name": "accessibilityLabel",

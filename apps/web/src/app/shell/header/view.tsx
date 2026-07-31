@@ -1,4 +1,4 @@
-import { Box, Button, Text } from "@inspector/ds";
+import { Box, Button, Icon, Text } from "@inspector/ds";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -47,9 +47,9 @@ export function InspectorHeader(): React.ReactElement {
           }}
         >
           {isDarkTheme === true ? (
-            <Sun aria-hidden="true" size={14} />
+            <Icon render={<Sun />} size="s" />
           ) : (
-            <Moon aria-hidden="true" size={14} />
+            <Icon render={<Moon />} size="s" />
           )}
         </Button>
       </Box>

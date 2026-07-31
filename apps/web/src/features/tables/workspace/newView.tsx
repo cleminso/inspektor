@@ -1,4 +1,4 @@
-import { ActionList, Box, Text } from "@inspector/ds";
+import { ActionList, Box, Icon, Text } from "@inspector/ds";
 import { Layers3, Table2 } from "lucide-react";
 
 import { useTableTabs } from "@tables/workspace/tabsProvider";
@@ -8,18 +8,20 @@ export function NewTableView(): React.ReactElement {
   const { openRecentView, recentViews } = useTableTabs();
 
   return (
-    <Box width="full" height="full" minHeight={0} alignItems="center" justifyContent="center" paddingTop="5xl">
+    <Box
+      width="full"
+      height="full"
+      minHeight={0}
+      alignItems="center"
+      justifyContent="center"
+      paddingTop="5xl"
+    >
       <Box width="full" maxWidth="popup-width-l" flexDirection="column" gap="xl">
         <Box width="full" alignItems="center" gap="s">
           <Text variant="caption" color="muted">
             RECENT VIEWS
           </Text>
-          <Box
-            flex={1}
-            borderTopWidth={1}
-            borderColor="border-secondary"
-            borderStyle="solid"
-          />
+          <Box flex={1} borderTopWidth={1} borderColor="border-secondary" borderStyle="solid" />
         </Box>
         {recentViews.length === 0 ? (
           <Box paddingTop="m" paddingBottom="m">
@@ -36,9 +38,9 @@ export function NewTableView(): React.ReactElement {
                   <ActionList.Trigger
                     prefix={
                       isBaseView === true ? (
-                        <Table2 aria-hidden="true" size={14} />
+                        <Icon render={<Table2 />} size="s" />
                       ) : (
-                        <Layers3 aria-hidden="true" size={14} />
+                        <Icon render={<Layers3 />} size="s" />
                       )
                     }
                     onClick={() => {

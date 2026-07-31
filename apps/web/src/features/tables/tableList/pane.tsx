@@ -1,4 +1,4 @@
-import { Accordion, ActionList, Box, ContextMenu, SidePanel, Text } from "@inspector/ds";
+import { Accordion, ActionList, Box, ContextMenu, Icon, SidePanel, Text } from "@inspector/ds";
 import { Link } from "@tanstack/react-router";
 import { Table2 } from "lucide-react";
 import { useEffect, useEffectEvent } from "react";
@@ -167,7 +167,7 @@ export function TableListPane({
                 <ActionList.SelectionControl
                   aria-label={`Select ${tableName}`}
                   checked={isChecked}
-                  icon={<Table2 size={14} />}
+                  icon={<Icon render={<Table2 />} size="s" />}
                   onCheckedChange={(checked, eventDetails) => {
                     changeChecked(checked === true, eventDetails.event);
                   }}

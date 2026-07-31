@@ -2,13 +2,15 @@ import type { Table } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 import { Settings2 } from "lucide-react";
 
-import { Button, MultiSelect, type MultiSelectItem } from "@inspector/ds";
+import { Button, Icon, MultiSelect, type MultiSelectItem } from "@inspector/ds";
 
 interface DataGridColumnVisibilityProps {
   table: Table<DynamicTableRow>;
 }
 
-export function DataGridColumnVisibility({ table }: DataGridColumnVisibilityProps): React.ReactElement {
+export function DataGridColumnVisibility({
+  table,
+}: DataGridColumnVisibilityProps): React.ReactElement {
   const columns = table.getAllLeafColumns().filter((column) => column.id !== "_select");
   const items: readonly MultiSelectItem[] = columns.map((column) => ({
     disabled: column.getCanHide() === false,
@@ -47,7 +49,7 @@ export function DataGridColumnVisibility({ table }: DataGridColumnVisibilityProp
           />
         }
       >
-        <Settings2 aria-hidden="true" size={14} />
+        <Icon render={<Settings2 />} size="s" />
       </MultiSelect.Trigger>
       <MultiSelect.Content
         align="end"

@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Icon,
   type ButtonJustify,
   type ButtonRadius,
   type ButtonSize,
@@ -128,7 +129,7 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
   const preview = state.iconOnly === true ? (
     <Box>
       <Button {...sharedPreviewProps} iconOnly aria-label="Primary action">
-        <ArrowRight aria-hidden="true" size={14} />
+        <Icon render={<ArrowRight />} size="s" />
       </Button>
     </Box>
   ) : (
@@ -137,8 +138,8 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
         {...sharedPreviewProps}
         justify={state.justify}
         fullWidth={state.fullWidth}
-        prefix={state.prefix === true ? <ArrowLeft size={14} /> : undefined}
-        suffix={state.suffix === true ? <ArrowRight size={14} /> : undefined}
+        prefix={state.prefix === true ? <Icon render={<ArrowLeft />} size="s" /> : undefined}
+        suffix={state.suffix === true ? <Icon render={<ArrowRight />} size="s" /> : undefined}
       >
         Primary
       </Button>

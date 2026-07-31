@@ -16,6 +16,7 @@
 - [x] Enter connected workspaces through the Tables route.
 - [x] Remove the Tables and Subscriptions ToggleGroup from the connected header.
 - [x] Reserve an inactive Activity control in the bottom dock for the Subscriptions dock.
+- [x] Pair compact dock controls with semantic extra-small icons.
 
 [30/07/26]
 

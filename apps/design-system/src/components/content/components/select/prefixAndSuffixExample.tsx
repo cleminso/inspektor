@@ -1,4 +1,4 @@
-import { Box, Select } from "@inspector/ds";
+import { Box, Select, Icon } from "@inspector/ds";
 import { GitBranch } from "lucide-react";
 import { type ReactElement } from "react";
 
@@ -11,7 +11,7 @@ export default function PrefixAndSuffixExample(): ReactElement {
   return (
     <Box gap="m" flexWrap="wrap">
       <Select.Root items={branches} defaultValue="main">
-        <Select.Trigger aria-label="Source branch" prefix={<GitBranch aria-hidden="true" size={14} />}>
+        <Select.Trigger aria-label="Source branch" prefix={<Icon render={<GitBranch />} size="s" />}>
           <Select.Value />
         </Select.Trigger>
         <Select.Content>

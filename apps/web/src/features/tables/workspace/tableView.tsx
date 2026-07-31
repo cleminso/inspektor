@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   DataGrid,
+  Icon,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -84,7 +85,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                     void openSchema();
                   }}
                 >
-                  <Layers aria-hidden="true" size={14} />
+                  <Icon render={<Layers />} size="s" />
                 </Button>
                 <DataGridColumnVisibility table={state.table} />
                 <Button
