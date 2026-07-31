@@ -1,4 +1,4 @@
-import { CopyButton } from "@inspector/ds";
+import { Box, CopyButton } from "@inspector/ds";
 
 import { useInspector } from "@app/providers/inspectorProvider";
 interface SchemaViewProps {
@@ -13,27 +13,60 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
   const permissionsJson = JSON.stringify({ [tableName]: tablePermissions }, null, 2);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
-      <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden xl:grid-cols-2">
-        <section className="flex min-h-0 flex-col overflow-hidden border-b border-border xl:border-r xl:border-b-0">
-          <div className="flex h-10 shrink-0 items-center justify-between border-b border-border px-3">
+    <Box minHeight={0} flex={1} flexDirection="column" overflow="hidden" backgroundColor="bg-page">
+      <Box
+        display="grid"
+        minHeight={0}
+        flex={1}
+        gridTemplateColumns={{ base: "one", xl: "two" }}
+        overflow="hidden"
+      >
+        <Box
+          as="section"
+          minHeight={0}
+          flexDirection="column"
+          overflow="hidden"
+          borderBottomWidth={{ base: 1, xl: 0 }}
+          borderRightWidth={{ base: 0, xl: 1 }}
+          borderColor="border"
+          borderStyle="solid"
+        >
+          <Box
+            height="panel-bar-height"
+            flexShrink={0}
+            alignItems="center"
+            justifyContent="between"
+            borderBottomWidth={1}
+            borderColor="border"
+            borderStyle="solid"
+            px="l"
+          >
             <h2 className="text-sm font-medium text-foreground">Schema</h2>
             <CopyButton textToCopy={schemaJson} label="Copy schema" />
-          </div>
-          <div className="app-scrollbar min-h-0 flex-1 overflow-auto p-3">
+          </Box>
+          <Box unsafeClassName="app-scrollbar" minHeight={0} flex={1} overflow="auto" padding="l">
             <pre className="text-xs text-muted-foreground">{schemaJson}</pre>
-          </div>
-        </section>
-        <section className="flex min-h-0 flex-col overflow-hidden">
-          <div className="flex h-10 shrink-0 items-center justify-between border-b border-border px-3">
+          </Box>
+        </Box>
+        <Box as="section" minHeight={0} flexDirection="column" overflow="hidden">
+          <Box
+            height="panel-bar-height"
+            flexShrink={0}
+            alignItems="center"
+            justifyContent="between"
+            borderBottomWidth={1}
+            borderColor="border"
+            borderStyle="solid"
+            px="l"
+          >
             <h2 className="text-sm font-medium text-foreground">Permissions</h2>
             <CopyButton textToCopy={permissionsJson} label="Copy permissions" />
-          </div>
-          <div className="app-scrollbar min-h-0 flex-1 overflow-auto p-3">
+          </Box>
+          <Box unsafeClassName="app-scrollbar" minHeight={0} flex={1} overflow="auto" padding="l">
             <pre className="text-xs text-muted-foreground">{permissionsJson}</pre>
-          </div>
-        </section>
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 }

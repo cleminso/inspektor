@@ -625,9 +625,9 @@ Workspace-item tab context menu:
 UI representation:
 
 - Surface: Tables panel inside the left dock.
-- Primary controls: table search, table selection, pinning, and bulk open.
+- Primary controls: table selection, pinning, and bulk open.
 - Primary content: schema table names and active item relationships.
-- States: loading schema, no tables, search-empty, active table unavailable, no open workspace item.
+- States: loading schema, no tables, active table unavailable, no open workspace item.
 
 #### Data table
 

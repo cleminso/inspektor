@@ -15,10 +15,6 @@ vi.mock("@app/providers/inspectorProvider", () => ({
   }),
 }));
 
-vi.mock("@tables/tableList/viewToggle", () => ({
-  TableViewToggle: () => null,
-}));
-
 afterEach(cleanup);
 
 describe("TableListPane", () => {
@@ -37,11 +33,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set()}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts"]}
         onClearSelection={vi.fn()}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={onTableCheckedChange}
       />,
     );
@@ -62,11 +56,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set(["accounts"])}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "sessions", "users"]}
         onClearSelection={vi.fn()}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={onTableCheckedChange}
       />,
     );
@@ -87,11 +79,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set()}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts"]}
         onClearSelection={vi.fn()}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -106,11 +96,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set(["accounts"])}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "sessions", "users"]}
         onClearSelection={vi.fn()}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={onTableCheckedChange}
       />,
     );
@@ -133,11 +121,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set(["accounts"])}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "users"]}
         onClearSelection={vi.fn()}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={onTableCheckedChange}
       />,
     );
@@ -158,11 +144,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set(["accounts"])}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "users"]}
         onClearSelection={onClearSelection}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -180,11 +164,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set(["accounts"])}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "users"]}
         onClearSelection={onClearSelection}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={onTableCheckedChange}
       />,
     );
@@ -208,11 +190,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set(["accounts"])}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts"]}
         onClearSelection={onClearSelection}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -224,29 +204,6 @@ describe("TableListPane", () => {
     expect(onClearSelection).toHaveBeenCalledOnce();
   });
 
-  it("does not clear selection when Escape originates from search", () => {
-    const onClearSelection = vi.fn();
-
-    render(
-      <TableListPane
-        checkedTableNames={new Set(["accounts"])}
-        {...defaultActionProps}
-        searchValue="accounts"
-        selectedTableName={null}
-        tables={["accounts"]}
-        onClearSelection={onClearSelection}
-        onSearchValueChange={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    );
-
-    fireEvent.keyDown(screen.getByRole("searchbox", { name: "Search tables" }), {
-      key: "Escape",
-    });
-
-    expect(onClearSelection).not.toHaveBeenCalled();
-  });
-
   it("ignores Escape when no tables are checked", () => {
     const onClearSelection = vi.fn();
 
@@ -254,11 +211,9 @@ describe("TableListPane", () => {
       <TableListPane
         checkedTableNames={new Set()}
         {...defaultActionProps}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts"]}
         onClearSelection={onClearSelection}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -276,11 +231,9 @@ describe("TableListPane", () => {
         {...defaultActionProps}
         checkedTableNames={new Set()}
         pinnedTableNames={new Set(["users"])}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "sessions", "users"]}
         onClearSelection={vi.fn()}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -296,11 +249,9 @@ describe("TableListPane", () => {
         {...defaultActionProps}
         checkedTableNames={new Set()}
         pinnedTableNames={new Set(["users"])}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "users"]}
         onClearSelection={vi.fn()}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -322,12 +273,10 @@ describe("TableListPane", () => {
       <TableListPane
         {...defaultActionProps}
         checkedTableNames={new Set(["accounts"])}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "users"]}
         onClearSelection={vi.fn()}
         onReplaceSelection={onReplaceSelection}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -344,12 +293,10 @@ describe("TableListPane", () => {
       <TableListPane
         {...defaultActionProps}
         checkedTableNames={new Set(["accounts"])}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "users"]}
         onClearSelection={vi.fn()}
         onReplaceSelection={onReplaceSelection}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -370,11 +317,9 @@ describe("TableListPane", () => {
       <TableListPane
         {...defaultActionProps}
         checkedTableNames={new Set(["accounts"])}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts"]}
         onClearSelection={onClearSelection}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );
@@ -392,12 +337,10 @@ describe("TableListPane", () => {
       <TableListPane
         {...defaultActionProps}
         checkedTableNames={new Set(["accounts", "users"])}
-        searchValue=""
         selectedTableName={null}
         tables={["accounts", "sessions", "users"]}
         onClearSelection={vi.fn()}
         onOpenTables={onOpenTables}
-        onSearchValueChange={vi.fn()}
         onTableCheckedChange={vi.fn()}
       />,
     );

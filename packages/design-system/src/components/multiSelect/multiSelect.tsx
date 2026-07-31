@@ -391,7 +391,7 @@ function MultiSelectOption({
         aria-label={`Select ${item.label}`}
         checked={checked}
         disabled={disabled}
-        size="m"
+        size="s"
         tabIndex={-1}
         onCheckedChange={(nextChecked) => setItemChecked(nextChecked === true)}
         onKeyDown={(event) => {

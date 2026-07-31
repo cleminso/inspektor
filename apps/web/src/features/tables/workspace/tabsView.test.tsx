@@ -17,12 +17,6 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@tables/tableList/layout", () => ({
-  SidePanelLayout: {
-    Toggle: () => <button type="button">Toggle table list</button>,
-  },
-}));
-
 vi.mock("@tables/workspace/newView", () => ({
   NewTableView: () => <div>New table view content</div>,
 }));

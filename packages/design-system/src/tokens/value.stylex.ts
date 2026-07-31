@@ -1,12 +1,11 @@
 // Primitive tokens value
-import * as stylex from "@stylexjs/stylex";
-
+import * as stylex from '@stylexjs/stylex'
 
 export const paletteValues = stylex.defineConsts({
   white: 'oklch(1 0 0)',
   black: 'oklch(0 0 0)',
 
-  gray50:  'oklch(0.985 0 none)',
+  gray50: 'oklch(0.985 0 none)',
   gray100: 'oklch(0.97 0 none)',
   gray200: 'oklch(0.922 0 none)',
   gray300: 'oklch(0.87 0 none)',
@@ -19,7 +18,7 @@ export const paletteValues = stylex.defineConsts({
   gray950: 'oklch(0.145 0 none)',
 
   // Dark tint on light surfaces
-  grayAlpha50:  'oklch(0.145 0 none / 0.03)',
+  grayAlpha50: 'oklch(0.145 0 none / 0.03)',
   grayAlpha100: 'oklch(0.145 0 none / 0.06)',
   grayAlpha200: 'oklch(0.145 0 none / 0.10)',
   grayAlpha300: 'oklch(0.145 0 none / 0.16)',
@@ -31,7 +30,7 @@ export const paletteValues = stylex.defineConsts({
   grayAlpha900: 'oklch(0.145 0 none / 0.84)',
   grayAlpha950: 'oklch(0.145 0 none / 0.92)',
 
-  neutral50:  'oklch(0.985 0 none)',
+  neutral50: 'oklch(0.985 0 none)',
   neutral100: 'oklch(0.97 0 none)',
   neutral200: 'oklch(0.922 0 none)',
   neutral300: 'oklch(0.87 0 none)',
@@ -44,7 +43,7 @@ export const paletteValues = stylex.defineConsts({
   neutral950: 'oklch(0.145 0 none)',
 
   // Light tint on dark surfaces
-  neutralAlpha50:  'oklch(0.985 0 none / 0.03)',
+  neutralAlpha50: 'oklch(0.985 0 none / 0.03)',
   neutralAlpha100: 'oklch(0.985 0 none / 0.06)',
   neutralAlpha200: 'oklch(0.985 0 none / 0.10)',
   neutralAlpha300: 'oklch(0.985 0 none / 0.16)',
@@ -207,6 +206,7 @@ export const dimensions = stylex.defineVars({
   26: '26px',
   28: '28px',
   32: '32px',
+  40: '40px',
   100: '100px',
   120: '120px',
   160: '160px',

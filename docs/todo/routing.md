@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[31/07/26]
+
+- [x] Enter connected workspaces through the Tables route.
+- [x] Remove the Tables and Subscriptions ToggleGroup from the connected header.
+- [x] Reserve an inactive Activity control in the bottom dock for the Subscriptions dock.
+
 [30/07/26]
 
 - [x] Keep only the saved connection id in connected content routes.
@@ -37,6 +43,10 @@
 
 ## Open product work
 
+[31/07/26]
+
+- [ ] Define and connect the Activity control to the Subscriptions left-dock interaction.
+
 [30/07/26]
 
 - [ ] Add explicit Schema workspace-item routing when the Schema item implementation starts.
@@ -45,9 +55,14 @@
 
 [30/07/26]
 
-- Workspace-item generalization, left-dock navigation, Schema items, Query items, and split panes remain separate product work.
+- Workspace-item generalization, Subscriptions dock content, Schema items, Query items, and split panes remain separate product work.
 
 ## Settled interaction decisions
+
+[31/07/26]
+
+- Connected entry flows open Tables without a header-level view switcher.
+- Workspace controls belong in the bottom dock rather than the connected header.
 
 [27/07/26]
 

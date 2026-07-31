@@ -1,19 +1,15 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { SidePanelLayout } from "./layout";
+import { SidePanelLayout, SidePanelLayoutProvider, useSidePanelLayout } from "./layout";
 
 const panel = vi.hoisted(() => ({
   collapse: vi.fn(),
   expand: vi.fn(),
-  isCollapsed: vi.fn(() => false),
 }));
 
 vi.mock("@inspector/ds", () => ({
   Box: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-    <button {...props}>{children}</button>
-  ),
   ResizableHandle: () => <div data-testid="resize-handle" />,
   ResizablePanel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ResizablePanelGroup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -24,41 +20,44 @@ afterEach(() => {
   cleanup();
   panel.collapse.mockClear();
   panel.expand.mockClear();
-  panel.isCollapsed.mockReset();
-  panel.isCollapsed.mockReturnValue(false);
 });
 
 describe("SidePanelLayout", () => {
-  it("shares the panel toggle with content descendants", () => {
-    render(
-      <SidePanelLayout>
-        <SidePanelLayout.Panel>Panel</SidePanelLayout.Panel>
-        <SidePanelLayout.Content>
-          <SidePanelLayout.Toggle label="Toggle tables panel" />
-        </SidePanelLayout.Content>
-      </SidePanelLayout>,
-    );
+  it("opens and closes the panel from a control outside the resizable layout", () => {
+    function DockToggle(): React.ReactElement {
+      const { isOpen, toggle } = useSidePanelLayout();
 
-    fireEvent.click(screen.getByRole("button", { name: "Toggle tables panel" }));
-
-    expect(panel.collapse).toHaveBeenCalledOnce();
-    expect(screen.getByTestId("resize-handle")).toBeTruthy();
-  });
-
-  it("expands a collapsed panel", () => {
-    panel.isCollapsed.mockReturnValue(true);
+      return (
+        <button type="button" aria-pressed={isOpen} onClick={toggle}>
+          Toggle left dock
+        </button>
+      );
+    }
 
     render(
-      <SidePanelLayout>
-        <SidePanelLayout.Panel>Panel</SidePanelLayout.Panel>
-        <SidePanelLayout.Content>
-          <SidePanelLayout.Toggle label="Toggle tables panel" />
-        </SidePanelLayout.Content>
-      </SidePanelLayout>,
+      <SidePanelLayoutProvider>
+        <DockToggle />
+        <SidePanelLayout>
+          <SidePanelLayout.Panel>Panel</SidePanelLayout.Panel>
+          <SidePanelLayout.Content>Content</SidePanelLayout.Content>
+        </SidePanelLayout>
+      </SidePanelLayoutProvider>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Toggle tables panel" }));
+    const toggle = screen.getByRole("button", { name: "Toggle left dock" });
+    expect(toggle.getAttribute("aria-pressed")).toBe("false");
+    expect(screen.queryByTestId("resize-handle")).toBeNull();
+
+    fireEvent.click(toggle);
 
     expect(panel.expand).toHaveBeenCalledOnce();
+    expect(toggle.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByTestId("resize-handle")).toBeTruthy();
+
+    fireEvent.click(toggle);
+
+    expect(panel.collapse).toHaveBeenCalledOnce();
+    expect(toggle.getAttribute("aria-pressed")).toBe("false");
+    expect(screen.queryByTestId("resize-handle")).toBeNull();
   });
 });

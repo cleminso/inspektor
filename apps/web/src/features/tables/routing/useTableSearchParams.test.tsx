@@ -49,12 +49,12 @@ describe("useTableExplorerSearchParams", () => {
     });
   });
 
-  it("removes legacy tab identity when updating the route search", async () => {
+  it("opens schema and removes legacy tab identity", async () => {
     searchState.value = { tab: "new-view" };
     const { result } = renderHook(() => useTableExplorerSearchParams());
 
     await act(async () => {
-      await result.current.setView("schema");
+      await result.current.openSchema();
     });
 
     const nextSearch = captureSearchUpdater()({ tab: "new-view" });
@@ -62,12 +62,12 @@ describe("useTableExplorerSearchParams", () => {
     expect(nextSearch).toEqual({ view: "schema" });
   });
 
-  it("strips default view value when returning to data", async () => {
+  it("returns to the default data view when opening the row editor", async () => {
     searchState.value = { tab: "table:accounts", view: "schema" };
     const { result } = renderHook(() => useTableExplorerSearchParams());
 
     await act(async () => {
-      await result.current.setView("data");
+      await result.current.setRowEditor("insert");
     });
 
     const nextSearch = captureSearchUpdater()({ tab: "table:accounts", view: "schema" });

@@ -38,14 +38,21 @@ export function RowEditorSidePanel({
   return (
     <DetailPane
       title={
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+        <Box minWidth={0} flex={1} alignItems="center" gap="l">
           <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{title}</p>
           {hasMultipleRows === true ? (
-            <div className="ml-auto flex shrink-0 items-center gap-1 text-sm text-muted-foreground">
+            <Box
+              unsafeClassName="text-sm"
+              ml="auto"
+              flexShrink={0}
+              alignItems="center"
+              gap="xs"
+              color="text-muted"
+            >
               <span>
                 {activeRowIndex + 1} / {editedRowIds.length}
               </span>
-              <div className="flex items-center">
+              <Box alignItems="center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -68,10 +75,10 @@ export function RowEditorSidePanel({
                 >
                   <ArrowDownIcon size={14} />
                 </Button>
-              </div>
-            </div>
+              </Box>
+            </Box>
           ) : null}
-        </div>
+        </Box>
       }
     >
       {draftTransitionPending === true ? (

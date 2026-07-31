@@ -3,8 +3,13 @@ import type { PropsWithChildren } from "react";
 import { Box } from "@inspector/ds";
 
 import { InspectorHeader } from "./header/view";
+import { InspectorDock, type InspectorLeftDockControl } from "./dock/view";
 
-export function InspectorLayout({ children }: PropsWithChildren): React.ReactElement {
+interface InspectorLayoutProps extends PropsWithChildren {
+  leftDock?: InspectorLeftDockControl;
+}
+
+export function InspectorLayout({ children, leftDock }: InspectorLayoutProps): React.ReactElement {
   return (
     <Box
       minHeight={0}
@@ -19,6 +24,7 @@ export function InspectorLayout({ children }: PropsWithChildren): React.ReactEle
       <Box as="main" minHeight={0} minWidth={0} flex={1} overflow="hidden">
         {children}
       </Box>
+      <InspectorDock leftDock={leftDock} />
     </Box>
   );
 }

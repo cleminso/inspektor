@@ -2,6 +2,7 @@ import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 import { InspectorLayout } from "@app/shell/layout";
 import { useInspector } from "@app/providers/inspectorProvider";
+import { SidePanelLayoutProvider, useSidePanelLayout } from "@tables/tableList/layout";
 import { TableTabsProvider } from "@tables/workspace/tabsProvider";
 import type { TableRouteSearch } from "@tables/tableTypes";
 
@@ -25,7 +26,21 @@ function TablesLayoutRoute(): React.ReactElement {
   const tabScope = `${currentConnectionId ?? "none"}:${currentBranch ?? "none"}:${currentSchemaHash ?? "none"}`;
 
   return (
-    <InspectorLayout>
+    <SidePanelLayoutProvider>
+      <TablesLayoutContent tabScope={tabScope} />
+    </SidePanelLayoutProvider>
+  );
+}
+
+interface TablesLayoutContentProps {
+  tabScope: string;
+}
+
+function TablesLayoutContent({ tabScope }: TablesLayoutContentProps): React.ReactElement {
+  const { isOpen, toggle } = useSidePanelLayout();
+
+  return (
+    <InspectorLayout leftDock={{ isOpen, onToggle: toggle }}>
       <TableTabsProvider key={tabScope} scope={tabScope}>
         <Outlet />
       </TableTabsProvider>

@@ -98,6 +98,36 @@ describe("table tabs", () => {
     });
   });
 
+  it("opens schema in a separate tab while preserving the base data tab", () => {
+    const baseTab: TableDataTab = {
+      kind: "table",
+      id: "table:accounts",
+      tableName: "accounts",
+      search: {},
+    };
+
+    const result = reconcileTableTab({
+      activeTabId: baseTab.id,
+      createId: () => "accounts-schema",
+      search: { view: "schema" },
+      tableName: "accounts",
+      tabs: [baseTab],
+    });
+
+    expect(result).toEqual({
+      activeTabId: "view:accounts-schema",
+      tabs: [
+        baseTab,
+        {
+          kind: "table",
+          id: "view:accounts-schema",
+          tableName: "accounts",
+          search: { view: "schema" },
+        },
+      ],
+    });
+  });
+
   it("updates the active filtered tab when its route search changes", () => {
     const tabs: TableTab[] = [
       { kind: "table", id: "table:accounts", tableName: "accounts", search: {} },
@@ -127,26 +157,6 @@ describe("table tabs", () => {
     });
   });
 
-  it("creates a separate tab for a filtered relation view", () => {
-    const result = reconcileTableTab({
-      activeTabId: "table:users",
-      createId: () => "relation-view",
-      search: { filters: "relation-filter" },
-      tableName: "users",
-      tabs: [
-        {
-          kind: "table",
-          id: "table:users",
-          tableName: "users",
-          search: {},
-        },
-      ],
-    });
-
-    expect(result.activeTabId).toBe("view:relation-view");
-    expect(result.tabs).toHaveLength(2);
-  });
-
   it("selects the tab to the right when the active tab closes", () => {
     const tabs: TableTab[] = [
       { kind: "table", id: "one", tableName: "accounts", search: {} },
@@ -167,11 +177,7 @@ describe("table tabs", () => {
       { kind: "table", id: "three", tableName: "sessions", search: {} },
     ];
 
-    expect(reorderTableTabs(tabs, ["three", "one", "two"])).toEqual([
-      tabs[2],
-      tabs[0],
-      tabs[1],
-    ]);
+    expect(reorderTableTabs(tabs, ["three", "one", "two"])).toEqual([tabs[2], tabs[0], tabs[1]]);
     expect(reorderTableTabs(tabs, ["three", "one"])).toEqual(tabs);
   });
 

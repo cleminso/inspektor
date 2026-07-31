@@ -37,6 +37,7 @@ interface UpdateSearchOptions {
 
 /** Parsed table explorer URL state plus setters that write back to route search params. */
 export interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
+  openSchema: () => Promise<void>;
   setFilters: (filters: TableFilterClause[]) => Promise<void>;
   setRowEditor: (
     mode: DetailPaneMode | null,
@@ -44,7 +45,6 @@ export interface UseTableExplorerSearchParamsResult extends TableExplorerSearchS
     options?: UpdateSearchOptions,
   ) => Promise<void>;
   setSorting: (sortColumn: string, sortDirection: TableSortDirection) => Promise<void>;
-  setView: (view: TableExplorerView) => Promise<void>;
 }
 
 function parseView(value: string | undefined): TableExplorerView {
@@ -176,8 +176,8 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
 
   return {
     ...state,
-    setView: async (view) => {
-      await updateSearch(view === "schema" ? { mode: null, rowId: null, view } : { view });
+    openSchema: async () => {
+      await updateSearch({ mode: null, rowId: null, view: "schema" });
     },
     setFilters: async (filters) => {
       await updateSearch({

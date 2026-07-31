@@ -70,8 +70,8 @@ function RowJsonRepresentation({
     [rowValues, schemaColumns],
   );
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2 px-2 py-2">
-      <div className="flex shrink-0 items-center gap-2">
+    <Box height="full" minHeight={0} flexDirection="column" gap="m" px="m" py="m">
+      <Box flexShrink={0} alignItems="center" gap="m">
         <Search
           aria-label="Search row JSON"
           value={searchQuery}
@@ -80,15 +80,15 @@ function RowJsonRepresentation({
           }}
           size="s"
         />
-      </div>
-      <div className="app-scrollbar min-h-0 flex-1 overflow-auto">
+      </Box>
+      <Box unsafeClassName="app-scrollbar" minHeight={0} flex={1} overflow="auto">
         <JsonView
           accessibilityLabel="Row JSON"
           data={value}
           searchTerms={searchQuery.length === 0 ? emptySearchTerms : [searchQuery]}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
 
@@ -113,8 +113,8 @@ function LoadedEditRowForm({
   });
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="px-2 pt-2">
+    <Box height="full" minHeight={0} flexDirection="column">
+      <Box px="m" pt="m">
         <ToggleGroup<RowRepresentation>
           aria-label="Row representation"
           itemWidth="equal"
@@ -130,11 +130,16 @@ function LoadedEditRowForm({
           <ToggleGroup.Item value="details">Details</ToggleGroup.Item>
           <ToggleGroup.Item value="json">JSON</ToggleGroup.Item>
         </ToggleGroup>
-      </div>
+      </Box>
       {representation === "details" ? (
-        <form
+        <Box
+          as="form"
           id={ROW_EDITOR_FORM_ID}
-          className="flex h-full min-h-0 flex-col mt-2 overflow-hidden"
+          height="full"
+          minHeight={0}
+          flexDirection="column"
+          mt="m"
+          overflow="hidden"
           onSubmit={rowEditor.submit}
         >
           <Box
@@ -168,7 +173,18 @@ function LoadedEditRowForm({
             ) : null}
           </Box>
 
-          <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
+          <Box
+            height="panel-bar-height"
+            flexShrink={0}
+            alignItems="center"
+            justifyContent="between"
+            gap="m"
+            borderTopWidth={1}
+            borderColor="border"
+            borderStyle="solid"
+            backgroundColor="bg-page"
+            px="l"
+          >
             {onDelete !== undefined ? (
               <Button
                 type="button"
@@ -203,13 +219,7 @@ function LoadedEditRowForm({
                     : "Delete"}
               </Button>
             ) : null}
-            <div
-              className={
-                onDelete === undefined
-                  ? "ml-auto flex items-center gap-2"
-                  : "flex items-center gap-2"
-              }
-            >
+            <Box ml={onDelete === undefined ? "auto" : "none"} alignItems="center" gap="m">
               {onCancel !== undefined ? (
                 <Button
                   type="button"
@@ -237,12 +247,12 @@ function LoadedEditRowForm({
               >
                 Save
               </Button>
-            </div>
-          </div>
-        </form>
+            </Box>
+          </Box>
+        </Box>
       ) : (
         <RowJsonRepresentation rowValues={rowValues} schemaColumns={schemaColumns} />
       )}
-    </div>
+    </Box>
   );
 }

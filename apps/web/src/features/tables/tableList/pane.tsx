@@ -1,11 +1,10 @@
-import { Accordion, ActionList, Box, ContextMenu, Search, SidePanel, Text } from "@inspector/ds";
+import { Accordion, ActionList, Box, ContextMenu, SidePanel, Text } from "@inspector/ds";
 import { Link } from "@tanstack/react-router";
 import { Table2 } from "lucide-react";
 import { useEffect, useEffectEvent } from "react";
 
 import { useInspector } from "@app/providers/inspectorProvider";
 import { appRoutes } from "@app/routing/appRoutes";
-import { TableViewToggle } from "@tables/tableList/viewToggle";
 
 export type TableListSection = "pinned" | "tables";
 
@@ -18,14 +17,12 @@ export interface TableCheckedChangeOptions {
 interface TableListPaneProps {
   checkedTableNames: ReadonlySet<string>;
   pinnedTableNames: ReadonlySet<string>;
-  searchValue: string;
   selectedTableName: string | null;
   tables: string[];
   onClearSelection: () => void;
   onOpenTables: (orderedTableNames: readonly string[]) => void;
   onPinTables: (tableNames: readonly string[]) => void;
   onReplaceSelection: (tableName: string, section: TableListSection) => void;
-  onSearchValueChange: (value: string) => void;
   onTableCheckedChange: (
     tableName: string,
     checked: boolean,
@@ -59,30 +56,19 @@ function isTableSelectionInteraction(target: EventTarget | null): boolean {
 export function TableListPane({
   checkedTableNames,
   pinnedTableNames,
-  searchValue,
   selectedTableName,
   tables,
   onClearSelection,
   onOpenTables,
   onPinTables,
   onReplaceSelection,
-  onSearchValueChange,
   onTableCheckedChange,
   onUnpinTables,
 }: TableListPaneProps): React.ReactElement {
   const { currentConnectionId } = useInspector();
   const canBuildHref = currentConnectionId !== null;
-  const normalizedSearchValue = searchValue.trim().toLowerCase();
   const pinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName));
   const unpinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName) === false);
-  const filterTables = (sectionTables: readonly string[]) =>
-    normalizedSearchValue.length === 0
-      ? sectionTables
-      : sectionTables.filter((tableName) =>
-          tableName.toLowerCase().includes(normalizedSearchValue),
-        );
-  const filteredPinnedTables = filterTables(pinnedTables);
-  const filteredUnpinnedTables = filterTables(unpinnedTables);
   const hasCheckedTables = checkedTableNames.size > 0;
   const clearSelection = useEffectEvent(onClearSelection);
 
@@ -221,16 +207,6 @@ export function TableListPane({
 
   return (
     <SidePanel>
-      <SidePanel.Header>
-        <Search
-          aria-label="Search tables"
-          value={searchValue}
-          onValueChange={onSearchValueChange}
-          placeholder="Search"
-          size="m"
-          fullWidth
-        />
-      </SidePanel.Header>
       <SidePanel.Body>
         <Accordion defaultValue={["pinned", "tables"]} multiple>
           {pinnedTables.length > 0 ? (
@@ -248,7 +224,7 @@ export function TableListPane({
               </Accordion.Header>
               <Accordion.Panel>
                 <Box paddingTop="xxs" flexDirection="column">
-                  {renderTableList("pinned", filteredPinnedTables)}
+                  {renderTableList("pinned", pinnedTables)}
                 </Box>
               </Accordion.Panel>
             </Accordion.Item>
@@ -274,25 +250,14 @@ export function TableListPane({
                       No published tables found in this schema.
                     </Text>
                   </Box>
-                ) : filteredPinnedTables.length === 0 &&
-                  filteredUnpinnedTables.length === 0 ? (
-                  <Box padding="m" flexDirection="column" gap="xs">
-                    <Text variant="label">No results</Text>
-                    <Text variant="caption" color="muted">
-                      Try a different table search.
-                    </Text>
-                  </Box>
                 ) : (
-                  renderTableList("tables", filteredUnpinnedTables)
+                  renderTableList("tables", unpinnedTables)
                 )}
               </Box>
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
       </SidePanel.Body>
-      <SidePanel.Footer>
-        <TableViewToggle />
-      </SidePanel.Footer>
     </SidePanel>
   );
 }

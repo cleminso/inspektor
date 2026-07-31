@@ -21,7 +21,7 @@ export interface TableRouteSearch {
  * contract around runtime table metadata instead of generated inspected-app types.
  */
 
-/** Top-level panes available for a selected schema table. */
+/** Content variants available in a selected table tab. */
 export type TableExplorerView = "data" | "schema";
 
 /** Row detail panel modes that can be encoded in URL search params. */

@@ -66,6 +66,7 @@ describe('semantic token contract', () => {
       'grid-track-m': expect.any(String),
       'example-height': expect.any(String),
       'panel-height': expect.any(String),
+      'panel-bar-height': expect.any(String),
       'viewport-height-s': expect.any(String),
       'viewport-height-m': expect.any(String),
       'viewport-height-l': expect.any(String),

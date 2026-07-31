@@ -12,7 +12,6 @@ import {
   syntaxPalette,
 } from './value.stylex'
 
-
 export const backgroundColors = stylex.defineVars({
   // Surfaces
   'bg-page': `light-dark(${palette.gray50}, ${palette.neutral950})`,
@@ -83,9 +82,8 @@ export const textColors = stylex.defineVars({
   'fg-notification-loading': `light-dark(${palette.gray700}, ${palette.neutral300})`,
 } as const)
 
-
 export const borderColors = stylex.defineVars({
-  'border': `light-dark(${palette.gray300}, ${palette.neutral700})`,
+  border: `light-dark(${palette.gray300}, ${palette.neutral700})`,
   'border-secondary': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'border-focused': `light-dark(${palette.gray400}, ${palette.neutral500})`,
 
@@ -149,6 +147,7 @@ export const spatial = stylex.defineVars({
   'popup-width-m': dimensions[320],
   'popup-width-l': dimensions[400],
   'panel-height': dimensions[280],
+  'panel-bar-height': dimensions[40],
   'panel-handle-size': dimensions[1],
   'tab-height': dimensions[26],
   'tooltip-width': dimensions[180],
@@ -231,7 +230,7 @@ export const textColorStyles = stylex.create({
   accent: { color: textColors['fg-accent'] },
   inverse: { color: textColors['fg-inverse'] },
   inherit: {},
- // inherit color from its parent. Usefull inside components where parents has controls color.
+  // inherit color from its parent. Usefull inside components where parents has controls color.
 })
 
 type StyleXTokenKeys<T> = Exclude<
@@ -243,8 +242,4 @@ export type BackgroundColorToken = StyleXTokenKeys<typeof backgroundColors>
 export type TextColorToken = StyleXTokenKeys<typeof textColors>
 export type BorderColorToken = StyleXTokenKeys<typeof borderColors>
 export type SyntaxColorToken = StyleXTokenKeys<typeof syntaxColors>
-export type ColorToken =
-  | BackgroundColorToken
-  | TextColorToken
-  | BorderColorToken
-  | SyntaxColorToken
+export type ColorToken = BackgroundColorToken | TextColorToken | BorderColorToken | SyntaxColorToken

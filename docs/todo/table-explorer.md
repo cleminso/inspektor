@@ -130,6 +130,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Workspace tabs
 
+[31/07/26]
+
+- [x] Keep data grid as the default table content and remove the table-list Data/Schema toggle.
+- [x] Open the selected table schema in its own workspace tab from a `Layers` action beside column visibility.
+
 [30/07/26]
 
 - [x] Keep active workspace-item identity internal while filters and sorting remain URL-backed.
@@ -137,6 +142,17 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Reconcile completed route navigation through one atomic tab-state update without a pending-navigation ref gate.
 - [x] Highlight an activated column only after cell focus and selection are cleared.
 - [x] Keep loaded-row extension from expanding an existing row or cell selection implicitly.
+
+### Table-list dock
+
+[31/07/26]
+
+- [x] Keep left-dock visibility and resizable-panel ownership inside the Tables feature.
+- [x] Compose the feature-owned visibility control into the application dock at the Tables parent route.
+- [x] Open and close the table-list dock through one persistent dock icon.
+- [x] Remove the duplicate table-list toggle from the workspace tab bar.
+- [x] Start the table-list dock collapsed.
+- [x] Remove table search and its empty-result state from the table-list dock.
 
 [29/07/26]
 
@@ -178,6 +194,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Remove the empty toolbar from the schema view.
 
 ### Documentation and regression coverage
+
+[31/07/26]
+
+- [x] Replace application-owned table workspace layout `div` elements with constrained `Box` composition while retaining test fixture elements.
 
 [23/07/26]
 
@@ -479,6 +499,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] The row pane provides editable `Details` and a read-only `JSON` tree.
 - [x] The `NULL` suffix takes precedence over Copy when an editable field cannot display both actions.
 - [x] Editable inputs preserve native single-click focus, double-click text selection, and clipboard behavior.
+- [x] The application dock icon is the only table-list visibility toggle: the first activation opens the dock and the next activation closes it.
 
 ## Open design decisions
 

@@ -54,9 +54,13 @@ function InsertRowFormFields({
   });
 
   return (
-    <form
+    <Box
+      as="form"
       id={ROW_EDITOR_FORM_ID}
-      className="flex h-full min-h-0 flex-col overflow-hidden"
+      height="full"
+      minHeight={0}
+      flexDirection="column"
+      overflow="hidden"
       onSubmit={rowEditor.submit}
     >
       <Box
@@ -90,7 +94,18 @@ function InsertRowFormFields({
         ) : null}
       </Box>
 
-      <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
+      <Box
+        height="panel-bar-height"
+        flexShrink={0}
+        alignItems="center"
+        justifyContent="between"
+        gap="m"
+        borderTopWidth={1}
+        borderColor="border"
+        borderStyle="solid"
+        backgroundColor="bg-page"
+        px="l"
+      >
         <label
           htmlFor={insertMoreFieldId}
           className="flex items-center gap-2 text-sm text-muted-foreground"
@@ -108,7 +123,7 @@ function InsertRowFormFields({
           />
           <span id={`${insertMoreFieldId}-label`}>Insert more</span>
         </label>
-        <div className="flex items-center gap-2">
+        <Box alignItems="center" gap="m">
           {onCancel !== undefined ? (
             <Button
               type="button"
@@ -123,9 +138,9 @@ function InsertRowFormFields({
           <Button type="submit" variant="primary" size="s" loading={rowEditor.isSaving === true}>
             Insert
           </Button>
-        </div>
-      </div>
-    </form>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

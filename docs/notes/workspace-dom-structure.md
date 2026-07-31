@@ -1,105 +1,29 @@
-## High-level
+# Table workspace structure
 
-1. `content.tsx` orchestrates everything
+## Table of contents
 
-- reads route/search state
-- loads table rows and schema
-- manages selection
-- manages row editor open/close state
-- manages column visibility
-- builds the TanStack table instance
-- renders either:
-  - schema view, or
-  - data grid
+- [Workspace flow](#workspace-flow)
+- [Data view](#data-view)
+- [Schema view](#schema-view)
 
-2. `actionBar` is the outer row container
+## Workspace flow
 
-- render the left-side view switch (data / schema)
-- render whatever is passed as children on the right side
+`TableExplorerScreen` composes the table-list dock and `TableTabsView`. Route search state identifies the selected table content. Data is the default content because table links omit `view` and the search parser resolves a missing value to `data`.
 
-- left slot = view switch
-- right slot = injected action
+Setting `view=schema` makes the route search non-base. `TableTabsProvider` reconciles that search into a separate workspace tab while retaining the table's base data tab. `SelectedTableView` then renders `SchemaView` for that tab.
 
-`InspectorDataGridToolbar` return actions related to the grid itself
+## Data view
 
-`content.tsx` does this:
+`TableView` renders:
 
-- render ActionsBar
-- pass InspectorDataGridToolbar as children
+- A toolbar whose trailing actions are column visibility, schema, and insert row.
+- The compact `DataGrid` and loaded-row footer.
+- The deferred row editor when insert or edit mode is active.
 
-Then ActionsBar decides where those children go.
-So visually the DOM becomes roughly:
+The schema action uses the route search setter. Tab creation remains owned by `TableTabsProvider` rather than the toolbar.
 
-- top bar row
-  - left: data/schema buttons
-  - right: columns row buttons
+`useTableViewState` connects URL-backed filters and sorting, Jazz row queries, persisted column preferences, TanStack Table state, selection, and row-editor state.
 
-- Content
-  - ActionsBar
-    - left: view toggle
-    - right: InspectorDataGridToolbar children
-  - either:
-    - SchemaView
-    - or InspectorDataGrid
-  - RowEditorSidePanel
+## Schema view
 
-Conceptually
-
-- ActionsBar = page-level row layout
-- InspectorDataGridToolbar = data-specific controls placed into that layout
-
-This split is intentional because:
-
-- ActionsBar should always exist
-- InspectorDataGridToolbar should exist only in data view
-
-## How the data grid itself works
-
-`useTableRows`
-Provides:
-
-- rows
-- columns
-- loadedRowCount
-- hasMore
-- isFetchingMore
-- fetchMore
-
-`useTableSelection`
-Tracks selected row ids separately from TanStack.
-
-`useColumnVisibility`
-Persists visible/hidden columns for the current table key.
-
-`useInspectorDataGrid`
-Bridges app state to TanStack Table:
-
-- builds column defs from schema
-- maps selected row ids into TanStack rowSelection
-- maps sorting state
-- handles callbacks from TanStack back into app state
-
-`InspectorDataGrid`
-Renders the actual ReUI/TanStack table:
-
-- sticky header
-- virtual rows
-- infinite load on scroll
-- bottom footer with loaded-row status
-
-## Render tree
-
-- ActionsBar
-
-- Content
-  - ActionsBar
-    - left:
-      - button toggle `tableListPane`
-      - view switch
-      - Insert row
-    - right:
-      - InspectorDataGridToolbar with Columns
-  - either:
-    - SchemaView
-    - or InspectorDataGrid
-  - RowEditorSidePanel
+`SchemaView` renders schema and permission data without an empty data-grid toolbar. Its workspace tab retains the selected table name and schema route search.

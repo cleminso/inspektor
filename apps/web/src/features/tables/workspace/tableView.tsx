@@ -9,10 +9,12 @@ import {
   ResizablePanelGroup,
   Text,
 } from "@inspector/ds";
+import { Layers } from "lucide-react";
 
 import { ColumnDragPreview } from "@tables/grid/buildColumns";
 import { DataGridColumnVisibility } from "@tables/grid/columnVisibility";
 import { Toolbar } from "@tables/grid/toolbar";
+import { useTableExplorerSearchParams } from "@tables/routing/useTableSearchParams";
 import { RowEditorSidePanel } from "@tables/rowEditor/sidePane";
 import { useTableViewState } from "@tables/workspace/useTableViewState";
 
@@ -37,6 +39,7 @@ const InsertRowForm = lazy(async () => {
 });
 
 export function TableView({ tableName }: TableViewProps): React.ReactElement {
+  const { openSchema } = useTableExplorerSearchParams();
   const state = useTableViewState({
     tableName,
   });
@@ -66,10 +69,23 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
   return (
     <ResizablePanelGroup orientation="horizontal">
       <ResizablePanel>
-        <div className="flex h-full flex-col overflow-hidden">
+        <Box height="full" flexDirection="column" overflow="hidden">
           <Toolbar
             actions={
               <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="s"
+                  aria-label="Open schema"
+                  iconOnly
+                  title="Open schema"
+                  onClick={() => {
+                    void openSchema();
+                  }}
+                >
+                  <Layers aria-hidden="true" size={14} />
+                </Button>
                 <DataGridColumnVisibility table={state.table} />
                 <Button
                   type="button"
@@ -139,7 +155,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               </DataGrid.Footer>
             </DataGrid.Root>
           </Box>
-        </div>
+        </Box>
       </ResizablePanel>
       {state.detailPaneMode !== "closed" ? (
         <>
@@ -156,41 +172,41 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               onNavigatePrevious={state.rowEditor.goToPreviousRow}
               onNavigateNext={state.rowEditor.goToNextRow}
             >
-                <Suspense
-                  fallback={
-                    <Box width="full" padding="l">
-                      <Text color="muted" variant="caption">
-                        Loading row editor
-                      </Text>
-                    </Box>
-                  }
-                >
-                  {state.detailPaneMode === "insert" ? (
-                    <InsertRowForm
-                      key={`${tableName}:insert`}
-                      rowValues={state.rowValues ?? {}}
-                      schemaColumns={state.schemaColumns}
-                      onCancel={() => {
-                        state.handleRowEditorCancel();
-                      }}
-                      onDirtyChange={state.handleRowDraftDirtyChange}
-                      onSave={state.handleInsertSave}
-                    />
-                  ) : (
-                    <EditRowForm
-                      key={`${tableName}:${state.rowEditor.activeRowId ?? "none"}`}
-                      rowValues={state.rowValues}
-                      schemaColumns={state.schemaColumns}
-                      targetRowId={state.rowEditor.activeRowId}
-                      onCancel={() => {
-                        state.handleRowEditorCancel();
-                      }}
-                      onDelete={state.handleDelete}
-                      onDirtyChange={state.handleRowDraftDirtyChange}
-                      onSave={state.handleEditSave}
-                    />
-                  )}
-                </Suspense>
+              <Suspense
+                fallback={
+                  <Box width="full" padding="l">
+                    <Text color="muted" variant="caption">
+                      Loading row editor
+                    </Text>
+                  </Box>
+                }
+              >
+                {state.detailPaneMode === "insert" ? (
+                  <InsertRowForm
+                    key={`${tableName}:insert`}
+                    rowValues={state.rowValues ?? {}}
+                    schemaColumns={state.schemaColumns}
+                    onCancel={() => {
+                      state.handleRowEditorCancel();
+                    }}
+                    onDirtyChange={state.handleRowDraftDirtyChange}
+                    onSave={state.handleInsertSave}
+                  />
+                ) : (
+                  <EditRowForm
+                    key={`${tableName}:${state.rowEditor.activeRowId ?? "none"}`}
+                    rowValues={state.rowValues}
+                    schemaColumns={state.schemaColumns}
+                    targetRowId={state.rowEditor.activeRowId}
+                    onCancel={() => {
+                      state.handleRowEditorCancel();
+                    }}
+                    onDelete={state.handleDelete}
+                    onDirtyChange={state.handleRowDraftDirtyChange}
+                    onSave={state.handleEditSave}
+                  />
+                )}
+              </Suspense>
             </RowEditorSidePanel>
           </ResizablePanel>
         </>

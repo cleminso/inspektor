@@ -18,15 +18,12 @@ import { useAvailableTables } from "@tables/schema/useAvailableTables";
 import { TableTabsView } from "@tables/workspace/tabsView";
 
 export function TableExplorerScreen(): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } = useInspector();
+  const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
+    useInspector();
   const scope = `${currentConnectionId ?? "none"}:${currentBranch ?? "none"}:${currentSchemaHash ?? "none"}`;
 
   return (
-    <ScopedTableExplorerScreen
-      key={scope}
-      currentTableName={currentTableName}
-      scope={scope}
-    />
+    <ScopedTableExplorerScreen key={scope} currentTableName={currentTableName} scope={scope} />
   );
 }
 
@@ -39,7 +36,6 @@ function ScopedTableExplorerScreen({
   currentTableName,
   scope,
 }: ScopedTableExplorerScreenProps): React.ReactElement {
-  const [tableSearch, setTableSearch] = useState("");
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set());
   const [pinnedTableNames, setPinnedTableNames] = useState<ReadonlySet<string>>(() =>
     loadPinnedTableNames(scope),
@@ -92,19 +88,10 @@ function ScopedTableExplorerScreen({
   };
 
   const handlePinnedTablesChange = (tableNames: readonly string[], pinned: boolean) => {
-    const nextPinnedTableNames = updatePinnedTableNames(
-      pinnedTableNames,
-      tableNames,
-      pinned,
-    );
+    const nextPinnedTableNames = updatePinnedTableNames(pinnedTableNames, tableNames, pinned);
     setPinnedTableNames(nextPinnedTableNames);
     savePinnedTableNames(scope, nextPinnedTableNames);
     clearTableSelection();
-  };
-
-  const handleSearchValueChange = (value: string) => {
-    clearTableSelection();
-    setTableSearch(value);
   };
 
   const handleOpenTables = (orderedTableNames: readonly string[]) => {
@@ -118,14 +105,12 @@ function ScopedTableExplorerScreen({
         <TableListPane
           checkedTableNames={checkedTableNames}
           pinnedTableNames={pinnedTableNames}
-          searchValue={tableSearch}
           selectedTableName={currentTableName}
           tables={tables}
           onClearSelection={clearTableSelection}
           onOpenTables={handleOpenTables}
           onPinTables={(tableNames) => handlePinnedTablesChange(tableNames, true)}
           onReplaceSelection={replaceTableSelection}
-          onSearchValueChange={handleSearchValueChange}
           onTableCheckedChange={handleTableCheckedChange}
           onUnpinTables={(tableNames) => handlePinnedTablesChange(tableNames, false)}
         />
