@@ -43,7 +43,7 @@
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
@@ -73,7 +73,7 @@
     "oxfmt": "^0.58.0",
     "oxlint": "^1.73.0",
     "tsdown": "catalog:",
-    "typescript": "catalog:",
+    "typescript": "^7.0.2",
     "vite": "catalog:",
     "vitest": "^4.1.10"
   },

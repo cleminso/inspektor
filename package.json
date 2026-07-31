@@ -25,5 +25,5 @@
     "node": "^22.18.0 || >=24.11.0"
   },
   "author": "cleminso",
-  "packageManager": "pnpm@11.14.0"
+  "packageManager": "pnpm@11.18.0"
 }

@@ -17,8 +17,8 @@
   },
   "scripts": {
     "dev": "tsup --watch",
-    "build": "tsup",
-    "typecheck": "tsc --noEmit"
+    "build": "tsup && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "jazz-tools": "catalog:"

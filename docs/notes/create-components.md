@@ -50,10 +50,6 @@ Polar's `resolveProperties.ts` resolves constrained layout props to static Tailw
 
 The adapter removes duplicated selection logic. It does not cache `stylex.props(...)`, because callback state identity and prop-dependent styles do not justify that complexity.
 
-## Strict package ownership
-
-shadcn components are copied into applications, so they expose `className` for local customization. `@inspector/ds` is a maintained package, so it owns styling decisions and exposes constrained props, tokens, primitives, and composition instead of consumer CSS escape hatches.
-
 ## Field composition decisions
 
 The connection form benefits from `Form`, `Field`, `Input`, `Field.Description`, and `Field.Error`. Repeated text controls may justify the planned `TextField`. Its vertical list and two-column row can use constrained layout primitives; they do not require `Field.Item` or `Field.Validity`.
