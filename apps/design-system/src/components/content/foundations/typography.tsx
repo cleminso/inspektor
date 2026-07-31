@@ -40,7 +40,7 @@ export function TypographyFoundationPage(): ReactElement {
           borderWidth={1}
           borderStyle="solid"
           borderColor="border"
-          borderRadius="l"
+          borderRadius="m"
           overflow="hidden"
         >
           {textVariants.map(({ variant, sample }) => (
@@ -73,7 +73,7 @@ export function TypographyFoundationPage(): ReactElement {
           borderWidth={1}
           borderStyle="solid"
           borderColor="border"
-          borderRadius="l"
+          borderRadius="m"
         >
           {textColors.map((color) => (
             <Text key={color} color={color}>

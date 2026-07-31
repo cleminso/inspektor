@@ -19,7 +19,7 @@ export const tooltipStyles = stylex.create({
     maxWidth: 'var(--available-width)',
   },
   popup: {
-    borderRadius: borderRadii.s,
+    borderRadius: borderRadii.xs,
     paddingBlock: spacing.xs,
     paddingInline: spacing.m,
     backgroundColor: backgroundColors['bg-inverse'],

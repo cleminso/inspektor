@@ -42,11 +42,11 @@ export function serializeButtonGroupPlayground(state: ButtonGroupPlaygroundState
   const separatorOrientation = state.orientation === "horizontal" ? "vertical" : "horizontal";
   const items = [
     state.text === true ? "      <ButtonGroupText>Document</ButtonGroupText>" : null,
-    '      <Button variant="outline">Archive</Button>',
+    '      <Button variant="secondary">Archive</Button>',
     state.separator === true
       ? `      <ButtonGroupSeparator orientation="${separatorOrientation}" />`
       : null,
-    '      <Button variant="outline">Report</Button>',
+    '      <Button variant="secondary">Report</Button>',
   ].filter((line): line is string => line !== null);
 
   return createPlaygroundSource({
@@ -66,11 +66,11 @@ export function ButtonGroupPreview({ state }: { state: ButtonGroupPlaygroundStat
   return (
     <ButtonGroup orientation={state.orientation} aria-label="Document actions">
       {state.text === true ? <ButtonGroupText>Document</ButtonGroupText> : null}
-      <Button variant="outline">Archive</Button>
+      <Button variant="secondary">Archive</Button>
       {state.separator === true ? (
         <ButtonGroupSeparator orientation={separatorOrientation} />
       ) : null}
-      <Button variant="outline">Report</Button>
+      <Button variant="secondary">Report</Button>
     </ButtonGroup>
   );
 }

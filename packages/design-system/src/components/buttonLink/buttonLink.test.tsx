@@ -11,6 +11,29 @@ function RouterLink({ to, ...props }: { to: string } & ComponentProps<'a'>) {
 }
 
 describe('ButtonLink', () => {
+  it('renders an accessible square link for icon-only navigation', () => {
+    render(
+      <ButtonLink iconOnly aria-label="Open source" href="/source">
+        <svg data-testid="source-icon" />
+      </ButtonLink>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Open source' })
+
+    expect(link.getAttribute('data-icon-only')).toBe('')
+    expect(screen.getByTestId('source-icon').parentElement?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('requires icon-only links to use their constrained content API', () => {
+    // @ts-expect-error Icon-only links require an accessible label.
+    const missingLabel = <ButtonLink iconOnly href="/source" />
+    // @ts-expect-error Icon-only links do not accept labelled-link suffixes.
+    const suffix = <ButtonLink iconOnly aria-label="Open source" href="/source" suffix={<svg />} />
+
+    expect(missingLabel).toBeDefined()
+    expect(suffix).toBeDefined()
+  })
+
   it('renders button presentation with native link semantics', () => {
     render(<ButtonLink href="/catalog">Open catalog</ButtonLink>)
 

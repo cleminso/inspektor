@@ -24,7 +24,7 @@ export function Example({ children, source, align = "center" }: ExampleProps): R
       borderWidth={1}
       borderStyle="solid"
       borderColor="border"
-      borderRadius="m"
+      borderRadius="s"
       overflow="hidden"
       backgroundColor="bg-page"
     >

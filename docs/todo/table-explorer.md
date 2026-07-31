@@ -107,6 +107,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 - [x] Render accessible muted base-type column markers before names, with compact spacing and dedicated key and relation icons.
 - [x] Add a quiet trailing chevron menu and direct header context menu for ascending sort, descending sort, and hide-column actions.
+- [x] Balance column-header markers and trailing chevrons with matching 20px slots and the shared icon-only Button.
 - [x] Activate a column before its chevron or context menu opens so selection does not wait for a bubbled header click.
 - [x] List fixed and hideable data columns in a searchable action-bar Multi Select, keep checkbox selection open, and provide contextual `Check all` and `Only` actions.
 - [x] Move columns left, right, to the start, or to the end through matching chevron and context-menu submenus.

@@ -65,7 +65,7 @@ export function ComponentDocsPage({
               borderWidth={1}
               borderStyle="solid"
               borderColor="border"
-              borderRadius="m"
+              borderRadius="s"
               overflow="hidden"
               backgroundColor="bg-page"
             >

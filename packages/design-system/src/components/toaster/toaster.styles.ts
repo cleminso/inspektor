@@ -44,7 +44,7 @@ export const toasterStyles = stylex.create({
   },
   toast: {
     borderColor: borderColors.border,
-    borderRadius: borderRadii.s,
+    borderRadius: borderRadii.xs,
     borderStyle: 'solid',
     borderWidth: 1,
     alignItems: 'stretch',

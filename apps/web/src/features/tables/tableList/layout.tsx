@@ -122,8 +122,9 @@ function SidePanelLayoutToggle({ label }: SidePanelLayoutToggleProps): React.Rea
       type="button"
       variant="ghost"
       size="s"
-      shape="square"
       aria-label={label}
+      aria-pressed={isOpen}
+      iconOnly
       title={label}
       onClick={toggle}
     >

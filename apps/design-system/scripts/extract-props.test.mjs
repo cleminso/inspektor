@@ -34,36 +34,32 @@ test("extracts Button API facts from the public package export", () => {
     [
       "variant",
       "size",
-      "shape",
       "loading",
-      "fullWidth",
-      "justify",
       "radius",
-      "inset",
-      "prefix",
-      "suffix",
       "disabled",
       "render",
+      "iconOnly",
+      "fullWidth",
+      "justify",
+      "prefix",
+      "suffix",
+      "aria-label",
     ],
   );
 
   const radius = buttonProps.find(({ name }) => name === "radius");
   assert.equal(radius?.defaultValue, '"xs"');
-  assert.match(radius?.type ?? "", /"none".*"xs".*"s".*"m".*"l".*"xl"/);
+  assert.match(radius?.type ?? "", /"none".*"xs".*"s".*"m"/);
+  assert.doesNotMatch(radius?.type ?? "", /"l"|"xl"/);
   assert.equal(radius?.required, false);
   assert.equal(radius?.description, "Selects a design-system corner radius.");
 
-  const inset = buttonProps.find(({ name }) => name === "inset");
-  assert.equal(inset?.defaultValue, '"default"');
-  assert.match(inset?.type ?? "", /"default".*"flush"/);
-  assert.equal(inset?.required, false);
-  assert.equal(
-    inset?.description,
-    "Controls the inline inset for actions aligned with compact popup content.",
-  );
-
   const ariaLabel = buttonProps.find(({ name }) => name === "aria-label");
-  assert.equal(ariaLabel, undefined);
+  assert.ok(ariaLabel);
+
+  const size = buttonProps.find(({ name }) => name === "size");
+  assert.match(size?.type ?? "", /"xs".*"s".*"m"/);
+  assert.doesNotMatch(size?.type ?? "", /"l"/);
 });
 
 test("extracts the semantic TextLink API", () => {
@@ -95,15 +91,15 @@ test("extracts ButtonLink navigation and presentation props", () => {
     [
       "variant",
       "size",
-      "shape",
-      "fullWidth",
-      "justify",
       "radius",
-      "inset",
-      "prefix",
-      "suffix",
       "href",
       "render",
+      "iconOnly",
+      "fullWidth",
+      "justify",
+      "prefix",
+      "suffix",
+      "aria-label",
     ],
   );
   assert.equal(
@@ -131,6 +127,7 @@ test("extracts runtime defaults instead of JSDoc default tags", () => {
   assert.equal(buttonProps.find(({ name }) => name === "variant")?.defaultValue, '"primary"');
   assert.equal(buttonProps.find(({ name }) => name === "size")?.defaultValue, '"m"');
   assert.equal(buttonProps.find(({ name }) => name === "loading")?.defaultValue, "false");
+  assert.equal(buttonProps.find(({ name }) => name === "iconOnly")?.defaultValue, "false");
   assert.equal(buttonProps.find(({ name }) => name === "fullWidth")?.defaultValue, "false");
   assert.equal(buttonProps.find(({ name }) => name === "justify")?.defaultValue, '"center"');
   assert.equal(buttonProps.find(({ name }) => name === "disabled")?.defaultValue, "false");
@@ -858,10 +855,7 @@ test("extracts the constrained Combobox compound API", () => {
     metadata["combobox.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
     "false",
   );
-  assert.equal(
-    metadata["combobox.trigger"]?.find(({ name }) => name === "variant")?.defaultValue,
-    '"ghost"',
-  );
+  assert.equal(metadata["combobox.trigger"]?.find(({ name }) => name === "variant"), undefined);
   assert.equal(
     metadata["combobox.inputTrigger"]?.find(({ name }) => name === "disabled")?.defaultValue,
     "false",

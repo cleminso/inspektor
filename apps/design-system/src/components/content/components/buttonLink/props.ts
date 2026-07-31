@@ -1,11 +1,11 @@
 export const buttonLinkPropNames = [
   "variant",
   "size",
-  "shape",
+  "iconOnly",
+  "aria-label",
   "fullWidth",
   "justify",
   "radius",
-  "inset",
   "prefix",
   "suffix",
   "href",

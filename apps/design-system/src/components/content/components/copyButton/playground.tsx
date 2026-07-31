@@ -36,13 +36,13 @@ const controls = [
     kind: "select",
     key: "variant",
     label: "Variant",
-    options: ["ghost", "secondary", "outline"].map((value) => ({ label: value, value })),
+    options: ["ghost", "secondary"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",
     key: "size",
     label: "Size",
-    options: ["s", "m", "l"].map((value) => ({ label: value, value })),
+    options: ["xs", "s", "m"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",

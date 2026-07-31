@@ -25,7 +25,7 @@ export function NotFoundPage(): ReactElement {
         title="Page not found"
         description="This design-system page does not exist or is not documented."
       />
-      <ButtonLink variant="outline" render={<RouterLink to="/" />}>
+      <ButtonLink variant="secondary" render={<RouterLink to="/" />}>
         Return to the catalog
       </ButtonLink>
     </DocsPage>

@@ -134,7 +134,7 @@ function AppShellContent(): ReactElement {
                           <ButtonLink
                             key={item.href}
                             variant={isActive === true ? "secondary" : "ghost"}
-                            size="l"
+                            size="m"
                             fullWidth
                             justify="start"
                             render={<Link to={item.href} />}

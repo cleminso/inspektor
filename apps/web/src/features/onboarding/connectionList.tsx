@@ -16,7 +16,6 @@ export function ConnectionList(): React.ReactElement {
           size="s"
           fullWidth
           justify="start"
-          inset="default"
           onClick={() => {
             void openConnection(connection.id);
           }}

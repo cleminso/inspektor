@@ -42,7 +42,6 @@ export function ConnectionsView(): React.ReactElement {
           size="s"
           fullWidth
           justify="start"
-          inset="flush"
           render={<Link to={appRoutes.newConnection} />}
         >
           Add connection
@@ -52,7 +51,6 @@ export function ConnectionsView(): React.ReactElement {
           size="s"
           fullWidth
           justify="start"
-          inset="flush"
           render={<a href="https://jazz.tools/docs" target="_blank" rel="noreferrer" />}
         >
           Jazz documentation

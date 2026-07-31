@@ -18,8 +18,8 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
       position="relative"
       backgroundColor="bg-page"
       borderColor="border"
-      borderBottomLeftRadius="xl"
-      borderBottomRightRadius="xl"
+      borderBottomLeftRadius="m"
+      borderBottomRightRadius="m"
       borderStyle="solid"
       borderWidth={0}
       borderTopWidth={1}
@@ -27,8 +27,8 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
       <Box
         flexDirection="column"
         width="full"
-        borderBottomLeftRadius="xl"
-        borderBottomRightRadius="xl"
+        borderBottomLeftRadius="m"
+        borderBottomRightRadius="m"
         data-state={isExpanded === true ? "open" : "closed"}
       >
         <button

@@ -47,7 +47,7 @@ export default function ConnectionExample(): ReactElement {
           </ContextSwitcher.List>
         </ContextSwitcher.Viewport>
         <ContextSwitcher.Footer>
-          <Button inset="flush" variant="ghost" size="s" fullWidth justify="start" onClick={() => setOpen(false)}>
+          <Button variant="ghost" size="s" fullWidth justify="start" onClick={() => setOpen(false)}>
             Add new connection
           </Button>
         </ContextSwitcher.Footer>

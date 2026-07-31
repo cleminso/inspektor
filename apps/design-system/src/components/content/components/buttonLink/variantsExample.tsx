@@ -6,7 +6,6 @@ const variants: ButtonVariant[] = [
   "secondary",
   "danger",
   "ghost",
-  "outline",
   "link",
 ];
 

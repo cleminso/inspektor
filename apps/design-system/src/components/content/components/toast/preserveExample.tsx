@@ -4,7 +4,7 @@ import { type ReactElement } from "react";
 export default function PreserveExample(): ReactElement {
   return (
     <Button
-      variant="outline"
+      variant="secondary"
       onClick={() => toasts.message("Inspector connection lost", { preserve: true })}
     >
       Show preserved toast

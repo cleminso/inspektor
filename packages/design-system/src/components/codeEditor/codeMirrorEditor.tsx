@@ -35,8 +35,8 @@ import {
   lineHeights,
   spacing,
 } from "../../tokens/value.stylex";
-import { Button } from "../button/button";
 import { CopyButton } from "../copyButton/copyButton";
+import { Button } from "../button/button";
 import type { CodeEditorProps } from "./codeEditor";
 import { codeEditorStyles } from "./codeEditor.styles";
 import { codeEditorVars } from "./codeEditorVars.stylex";
@@ -712,10 +712,10 @@ export function CodeMirrorEditor({
         )}
         <Button
           aria-label="Format JSON"
+          iconOnly
           disabled={readOnly === true || disabled === true}
           onClick={format}
-          shape="square"
-          size="xs"
+          size="s"
           title="Format JSON"
           variant="ghost"
         >
@@ -724,6 +724,7 @@ export function CodeMirrorEditor({
         <Button
           aria-label={lineWrapping === true ? "Disable line wrapping" : "Enable line wrapping"}
           aria-pressed={lineWrapping}
+          iconOnly
           disabled={disabled}
           onClick={() => {
             setLineWrapping((enabled) => enabled === false);
@@ -731,17 +732,16 @@ export function CodeMirrorEditor({
               editorViewRef.current?.focus();
             }
           }}
-          shape="square"
-          size="xs"
+          size="s"
           title={lineWrapping === true ? "Disable line wrapping" : "Enable line wrapping"}
-          variant={lineWrapping === true ? "secondary" : "ghost"}
+          variant="ghost"
         >
           <WrapIcon />
         </Button>
         <CopyButton
           disabled={disabled}
           label="Copy JSON"
-          size="xs"
+          size="s"
           textToCopy={value}
           tooltipSide="bottom"
           variant="ghost"
@@ -751,11 +751,11 @@ export function CodeMirrorEditor({
             aria-controls={viewportId}
             aria-expanded={isExpanded}
             aria-label={isExpanded === true ? "Collapse code editor" : "Expand code editor"}
+            iconOnly
             onClick={() => {
               setExpanded(isExpanded === false);
             }}
-            shape="square"
-            size="xs"
+            size="s"
             title={isExpanded === true ? "Collapse" : "Expand"}
             variant="ghost"
           >

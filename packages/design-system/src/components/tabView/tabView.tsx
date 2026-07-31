@@ -3,7 +3,6 @@
 // - handle behavior: select tab + press shit + click another tab = select all tabs range
 //  - right click = open context menu
 //  - direct press `delete` = close all tabView from the selected range
-import { Button as BaseButton } from '@base-ui/react/button'
 import { Tabs as BaseTabs } from '@base-ui/react/tabs'
 import * as stylex from '@stylexjs/stylex'
 import {
@@ -20,6 +19,7 @@ import {
 } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { Button } from '../button/button'
 import { Tooltip } from '../tooltip/tooltip'
 import { tabViewStyles } from './tabView.styles'
 import { TabViewReorderContext, type TabViewValue } from './tabViewReorderContext'
@@ -279,7 +279,7 @@ function TabViewItemContent({
   prefix,
   disabled = false,
   onClose,
-  closeLabel,
+  closeLabel = 'Close tab',
   isDragSource = false,
   setReorderRef,
 }: TabViewItemContentProps) {
@@ -412,12 +412,15 @@ function TabViewItemContent({
           )}
           data-slot="tab-view-close"
         >
-          <BaseButton
+          <Button
             aria-label={closeLabel}
             disabled={disabled}
+            iconOnly
             onClick={handleCloseClick}
-            {...stylex.props(tabViewStyles.closeButton)}
-            data-slot="tab-view-close-button"
+            radius="xs"
+            render={<button type="button" {...stylex.props(tabViewStyles.closeAction)} />}
+            size="xs"
+            variant="ghost"
           >
             <svg
               aria-hidden="true"
@@ -431,7 +434,7 @@ function TabViewItemContent({
                 strokeWidth="1.5"
               />
             </svg>
-          </BaseButton>
+          </Button>
         </div>
       ) : null}
     </div>

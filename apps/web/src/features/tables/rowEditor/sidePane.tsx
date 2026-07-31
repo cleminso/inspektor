@@ -50,10 +50,10 @@ export function RowEditorSidePanel({
                   type="button"
                   variant="ghost"
                   size="s"
-                  shape="square"
                   disabled={activeRowIndex === 0}
                   onClick={onNavigatePrevious}
                   aria-label="Previous selected row"
+                  iconOnly
                 >
                   <ArrowUpIcon size={14} />
                 </Button>
@@ -61,10 +61,10 @@ export function RowEditorSidePanel({
                   type="button"
                   variant="ghost"
                   size="s"
-                  shape="square"
                   disabled={activeRowIndex >= editedRowIds.length - 1}
                   onClick={onNavigateNext}
                   aria-label="Next selected row"
+                  iconOnly
                 >
                   <ArrowDownIcon size={14} />
                 </Button>

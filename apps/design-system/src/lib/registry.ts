@@ -48,7 +48,7 @@ export const buttonItem = {
   title: "Button",
   slug: "button",
   href: "/components/button",
-  description: "Action primitive with variants, sizes, loading, and composition support.",
+  description: "Labelled and icon-only actions with variants, sizes, loading, and composition support.",
   importPath: "@inspector/ds",
   source: {
     label: "button.tsx",

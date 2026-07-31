@@ -202,7 +202,9 @@ export const dimensions = stylex.defineVars({
   14: '14px',
   16: '16px',
   20: '20px',
+  22: '22px',
   24: '24px',
+  26: '26px',
   28: '28px',
   32: '32px',
   100: '100px',
@@ -222,11 +224,8 @@ export const dimensions = stylex.defineVars({
 export const borderRadii = stylex.defineVars({
   none: '0',
   xs: '2px',
-  s: '3px',
-  m: '4px',
-  l: '6px',
-  xl: '8px',
-  full: '9999px',
+  s: '4px',
+  m: '6px',
 } as const)
 
 export const shadows = stylex.defineVars({

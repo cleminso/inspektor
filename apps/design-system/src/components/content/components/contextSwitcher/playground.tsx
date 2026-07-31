@@ -36,7 +36,7 @@ const controls = [
     kind: "select",
     key: "size",
     label: "Trigger size",
-    options: ["s", "m", "l"].map((value) => ({ label: value, value })),
+    options: ["s", "m"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",

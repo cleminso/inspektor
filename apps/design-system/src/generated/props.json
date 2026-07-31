@@ -310,34 +310,24 @@
   "button": [
     {
       "name": "variant",
-      "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | \"outline\" | \"link\"",
+      "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | \"link\"",
       "required": false,
       "defaultValue": "\"primary\"",
       "description": "Controls the visual treatment and emphasis of the action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 34
+        "line": 31
       }
     },
     {
       "name": "size",
-      "type": "\"xs\" | \"s\" | \"m\" | \"l\"",
+      "type": "\"xs\" | \"s\" | \"m\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the button height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 36
-      }
-    },
-    {
-      "name": "shape",
-      "type": "\"square\"",
-      "required": false,
-      "description": "Makes an icon-only button square. Pair with an accessible label.",
-      "source": {
-        "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 38
+        "line": 33
       }
     },
     {
@@ -348,71 +338,18 @@
       "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 40
-      }
-    },
-    {
-      "name": "fullWidth",
-      "type": "boolean",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Stretches the button to the width of its container.",
-      "source": {
-        "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 42
-      }
-    },
-    {
-      "name": "justify",
-      "type": "\"center\" | \"start\" | \"between\"",
-      "required": false,
-      "defaultValue": "\"center\"",
-      "description": "Controls how content is distributed inside the button.",
-      "source": {
-        "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 44
+        "line": 35
       }
     },
     {
       "name": "radius",
-      "type": "\"none\" | \"xs\" | \"s\" | \"m\" | \"l\" | \"xl\"",
+      "type": "\"none\" | \"xs\" | \"s\" | \"m\"",
       "required": false,
       "defaultValue": "\"xs\"",
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 46
-      }
-    },
-    {
-      "name": "inset",
-      "type": "\"default\" | \"flush\"",
-      "required": false,
-      "defaultValue": "\"default\"",
-      "description": "Controls the inline inset for actions aligned with compact popup content.",
-      "source": {
-        "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 48
-      }
-    },
-    {
-      "name": "prefix",
-      "type": "string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
-      "required": false,
-      "description": "Renders decorative content before the visible label.",
-      "source": {
-        "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 50
-      }
-    },
-    {
-      "name": "suffix",
-      "type": "string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
-      "required": false,
-      "description": "Renders decorative content after the visible label.",
-      "source": {
-        "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 52
+        "line": 37
       }
     },
     {
@@ -423,51 +360,146 @@
       "description": "Disables interaction and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 54
+        "line": 39
       }
     },
     {
       "name": "render",
       "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ButtonState>",
       "required": false,
-      "description": "Composes Button behavior and styles onto another native button component.",
+      "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes Button behavior and styles onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 56
+        "line": 41
+      }
+    },
+    {
+      "name": "iconOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Makes the button a square icon-only action.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 46
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Stretches the button to the width of its container.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 48
+      }
+    },
+    {
+      "name": "justify",
+      "type": "\"center\" | \"start\" | \"between\"",
+      "required": false,
+      "defaultValue": "\"center\"",
+      "description": "Controls how content is distributed inside the button.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 50
+      }
+    },
+    {
+      "name": "prefix",
+      "type": "string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Renders decorative content before the visible label.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 52
+      }
+    },
+    {
+      "name": "suffix",
+      "type": "string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Renders decorative content after the visible label.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 54
+      }
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Defines a string value that labels the current element.\nIdentifies the icon-only action for assistive technology.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 61
       }
     }
   ],
   "buttonLink": [
     {
       "name": "variant",
-      "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | \"outline\" | \"link\"",
+      "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | \"link\"",
       "required": false,
       "defaultValue": "\"primary\"",
       "description": "Controls the visual treatment and emphasis of the navigation link.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 25
+        "line": 24
       }
     },
     {
       "name": "size",
-      "type": "\"xs\" | \"s\" | \"m\" | \"l\"",
+      "type": "\"xs\" | \"s\" | \"m\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the link height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 27
+        "line": 26
       }
     },
     {
-      "name": "shape",
-      "type": "\"square\"",
+      "name": "radius",
+      "type": "\"none\" | \"xs\" | \"s\" | \"m\"",
       "required": false,
-      "description": "Makes an icon-only link square. Pair with an accessible label.",
+      "defaultValue": "\"xs\"",
+      "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 29
+        "line": 28
+      }
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the native anchor destination when render composition is not used.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
+      "required": false,
+      "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes ButtonLink presentation onto a router link component.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "iconOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Makes the link a square icon-only action.",
+      "source": {
+        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
+        "line": 37
       }
     },
     {
@@ -478,7 +510,7 @@
       "description": "Stretches the link to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 31
+        "line": 39
       }
     },
     {
@@ -489,29 +521,7 @@
       "description": "Controls how content is distributed inside the link.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 33
-      }
-    },
-    {
-      "name": "radius",
-      "type": "\"none\" | \"xs\" | \"s\" | \"m\" | \"l\" | \"xl\"",
-      "required": false,
-      "defaultValue": "\"xs\"",
-      "description": "Selects a design-system corner radius.",
-      "source": {
-        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 35
-      }
-    },
-    {
-      "name": "inset",
-      "type": "\"default\" | \"flush\"",
-      "required": false,
-      "defaultValue": "\"default\"",
-      "description": "Controls the inline inset for navigation aligned with compact popup content.",
-      "source": {
-        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 37
+        "line": 41
       }
     },
     {
@@ -521,7 +531,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 39
+        "line": 43
       }
     },
     {
@@ -531,27 +541,17 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 41
+        "line": 45
       }
     },
     {
-      "name": "href",
+      "name": "aria-label",
       "type": "string",
       "required": false,
-      "description": "Identifies the native anchor destination when render composition is not used.",
+      "description": "Defines a string value that labels the current element.\nIdentifies the icon-only navigation action for assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 43
-      }
-    },
-    {
-      "name": "render",
-      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
-      "required": false,
-      "description": "Composes ButtonLink presentation onto a router link component.",
-      "source": {
-        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 45
+        "line": 52
       }
     }
   ],
@@ -643,7 +643,7 @@
     },
     {
       "name": "size",
-      "type": "\"xs\" | \"s\" | \"m\" | \"l\"",
+      "type": "\"xs\" | \"s\" | \"m\"",
       "required": false,
       "defaultValue": "\"s\"",
       "description": "Controls the square button and icon size.",
@@ -654,7 +654,7 @@
     },
     {
       "name": "variant",
-      "type": "\"secondary\" | \"ghost\" | \"outline\"",
+      "type": "\"secondary\" | \"ghost\"",
       "required": false,
       "defaultValue": "\"ghost\"",
       "description": "Controls the visual treatment and emphasis of the copy action.",
@@ -4623,7 +4623,7 @@
       "description": "Composes the label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 99
+        "line": 96
       }
     }
   ],
@@ -4635,7 +4635,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 104
+        "line": 101
       }
     }
   ],
@@ -4672,29 +4672,18 @@
       "description": "Content displayed by the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 86
-      }
-    },
-    {
-      "name": "variant",
-      "type": "\"ghost\" | \"outline\"",
-      "required": false,
-      "defaultValue": "\"ghost\"",
-      "description": "Controls the trigger treatment.",
-      "source": {
-        "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 88
+        "line": 85
       }
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"s\" | \"m\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 90
+        "line": 87
       }
     },
     {
@@ -4705,7 +4694,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 92
+        "line": 89
       }
     },
     {
@@ -4716,7 +4705,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 94
+        "line": 91
       }
     }
   ],
@@ -4742,7 +4731,7 @@
       "description": "Keeps the portal mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 109
+        "line": 106
       }
     }
   ],
@@ -4755,7 +4744,7 @@
       "description": "Sets the gap between the control and popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 114
+        "line": 111
       }
     },
     {
@@ -4766,7 +4755,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 116
+        "line": 113
       }
     }
   ],
@@ -4779,7 +4768,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 123
+        "line": 120
       }
     }
   ],
@@ -4791,7 +4780,7 @@
       "description": "Content rendered inside the positioned popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 128
+        "line": 125
       }
     },
     {
@@ -4802,7 +4791,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 130
+        "line": 127
       }
     },
     {
@@ -4813,7 +4802,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 132
+        "line": 129
       }
     },
     {
@@ -4824,7 +4813,7 @@
       "description": "Sets the gap between the control and popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 134
+        "line": 131
       }
     },
     {
@@ -4835,7 +4824,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 136
+        "line": 133
       }
     }
   ],
@@ -4847,7 +4836,7 @@
       "description": "Composes the header layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 144
+        "line": 141
       }
     }
   ],
@@ -4859,7 +4848,7 @@
       "description": "Composes the footer layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 152
+        "line": 149
       }
     }
   ],
@@ -4872,7 +4861,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 162
+        "line": 159
       }
     },
     {
@@ -4882,7 +4871,7 @@
       "description": "Composes the viewport layout onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 164
+        "line": 161
       }
     }
   ],
@@ -4895,7 +4884,7 @@
       "description": "Accessible label for the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 179
+        "line": 176
       }
     },
     {
@@ -4906,7 +4895,7 @@
       "description": "Keeps the clear action mounted when no value is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 181
+        "line": 178
       }
     },
     {
@@ -4917,7 +4906,7 @@
       "description": "Disables the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 183
+        "line": 180
       }
     }
   ],
@@ -4935,7 +4924,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 188
+        "line": 185
       }
     },
     {
@@ -4946,7 +4935,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 190
+        "line": 187
       }
     }
   ],
@@ -4958,7 +4947,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 192
       }
     },
     {
@@ -4968,7 +4957,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 197
+        "line": 194
       }
     }
   ],
@@ -4981,7 +4970,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 205
+        "line": 202
       }
     }
   ],
@@ -5122,7 +5111,7 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"s\" | \"m\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the trigger height and padding.",
@@ -5172,7 +5161,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 104
+        "line": 101
       }
     }
   ],
@@ -5266,7 +5255,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 188
+        "line": 185
       }
     },
     {
@@ -5277,7 +5266,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 190
+        "line": 187
       }
     }
   ],
@@ -5289,7 +5278,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 192
       }
     },
     {
@@ -5299,7 +5288,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 197
+        "line": 194
       }
     }
   ],

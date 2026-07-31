@@ -68,7 +68,13 @@ describe("buildDataGridColumns", () => {
 
     expect(onSortingChange).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+    const menuButton = screen.getByRole("button", { name: "Open Name column menu" });
+
+    expect(menuButton.getAttribute("data-icon-only")).toBe("");
+    expect(menuButton.getAttribute("data-size")).toBe("xs");
+    expect(menuButton.getAttribute("data-radius")).toBe("xs");
+
+    fireEvent.click(menuButton);
     expect(onColumnMenuOpen).toHaveBeenCalledWith("name");
     fireEvent.click(screen.getByRole("menuitem", { name: "Sort Ascending" }));
 
@@ -132,7 +138,10 @@ describe("buildDataGridColumns", () => {
       />,
     );
 
-    expect(screen.getByLabelText("Row ID").nextElementSibling?.textContent).toBe("id");
+    expect(
+      screen.getByLabelText("Row ID").compareDocumentPosition(screen.getByText("id")) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
     expect(screen.getByLabelText("Reference").textContent).toBe("");
   });
 

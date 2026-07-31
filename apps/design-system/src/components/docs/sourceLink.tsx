@@ -61,8 +61,8 @@ export function SourceLink({ source, title }: SourceLinkProps): ReactElement {
     <ButtonLink
       variant="link"
       size="s"
-      shape="square"
-      radius="m"
+      iconOnly
+      radius="s"
       href={href}
       target="_blank"
       rel="noreferrer"

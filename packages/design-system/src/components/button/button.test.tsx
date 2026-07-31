@@ -6,16 +6,30 @@ import { Button } from "./button";
 afterEach(cleanup);
 
 describe("Button", () => {
-  it("uses the flush inset for footer-aligned actions", () => {
+  it("renders an accessible square button for icon-only actions", () => {
     render(
-      <Button inset="flush" size="s">
-        Add new connection
+      <Button iconOnly aria-label="Toggle panel" aria-pressed>
+        <svg data-testid="panel-icon" />
       </Button>,
     );
 
-    const button = screen.getByRole("button", { name: "Add new connection" });
+    const button = screen.getByRole("button", { name: "Toggle panel" });
+    const icon = screen.getByTestId("panel-icon");
 
-    expect(button.getAttribute("data-inset")).toBe("flush");
+    expect(button.getAttribute("data-icon-only")).toBe("");
+    expect(button.getAttribute("data-pressed")).toBe("");
+    expect(button.getAttribute("aria-pressed")).toBe("true");
+    expect(icon.parentElement?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("requires icon-only actions to use their constrained content API", () => {
+    // @ts-expect-error Icon-only actions require an accessible label.
+    const missingLabel = <Button iconOnly><svg /></Button>;
+    // @ts-expect-error Icon-only actions do not accept labelled-button prefixes.
+    const prefix = <Button iconOnly aria-label="Add item" prefix={<svg />} />;
+
+    expect(missingLabel).toBeDefined();
+    expect(prefix).toBeDefined();
   });
 
   it("uses disabled button semantics while loading and prevents activation", () => {
@@ -74,33 +88,11 @@ describe("Button", () => {
     );
 
     expect(button.getAttribute("data-optical-alignment")).toBeNull();
-  });
 
-  it("does not optically rebalance distributed or square content", () => {
-    const { rerender } = render(
+    rerender(
       <Button justify="between" suffix={<span>Suffix</span>}>Label</Button>,
     );
 
-    const button = screen.getByRole("button", { name: "Label" });
-
     expect(button.getAttribute("data-optical-alignment")).toBeNull();
-
-    rerender(
-      <Button shape="square" suffix={<span>Suffix</span>} aria-label="Action">
-        Label
-      </Button>,
-    );
-
-    expect(button.getAttribute("data-optical-alignment")).toBeNull();
-  });
-
-  it("supports extra-small icon actions", () => {
-    render(
-      <Button size="xs" shape="square" aria-label="More actions">
-        More
-      </Button>,
-    );
-
-    expect(screen.getByRole("button", { name: "More actions" }).getAttribute("data-size")).toBe("xs");
   });
 });

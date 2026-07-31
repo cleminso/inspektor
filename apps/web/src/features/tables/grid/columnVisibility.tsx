@@ -42,8 +42,8 @@ export function DataGridColumnVisibility({ table }: DataGridColumnVisibilityProp
             type="button"
             variant="ghost"
             size="s"
-            shape="square"
             aria-label="Choose visible columns"
+            iconOnly
           />
         }
       >

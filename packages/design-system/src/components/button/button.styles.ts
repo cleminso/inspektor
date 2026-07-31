@@ -74,15 +74,6 @@ export const buttonStyles = stylex.create({
     },
     color: textColors['text-default'],
   },
-  outline: {
-    borderColor: borderColors['border'],
-    backgroundColor: {
-      default: 'transparent',
-      ':hover': backgroundColors['bg-hover'],
-      ':active': backgroundColors['bg-pressed'],
-    },
-    color: textColors['text-default'],
-  },
   link: {
     paddingInline: 0,
     backgroundColor: 'transparent',
@@ -96,45 +87,32 @@ export const buttonStyles = stylex.create({
   sizeXS: {
     paddingInline: spacing.s,
     fontSize: fontSizes[2],
-    minHeight: spatial['control-height-xs'],
+    height: spatial['button-height-xs'],
   },
   sizeS: {
     paddingInline: spacing.s,
     fontSize: fontSizes[2],
-    minHeight: spatial['control-height-s'],
+    height: spatial['button-height-s'],
   },
   sizeM: {
     paddingInline: spacing.s,
     fontSize: fontSizes[2],
-    minHeight: spatial['control-height-m'],
+    height: spatial['button-height-m'],
   },
-  sizeL: {
-    paddingInline: spacing.m,
-    fontSize: fontSizes[2],
-    minHeight: spatial['control-height-l'],
-  },
-  insetFlush: {
-    paddingInline: spacing.xxs,
-  },
-  opticalPrefixCompact: {
+  opticalPrefix: {
     paddingInlineStart: `calc(${spacing.s} - ${spacing.xxs})`,
     paddingInlineEnd: `calc(${spacing.s} + ${spacing.xxs})`,
   },
-  opticalSuffixCompact: {
+  opticalSuffix: {
     paddingInlineStart: `calc(${spacing.s} + ${spacing.xxs})`,
     paddingInlineEnd: `calc(${spacing.s} - ${spacing.xxs})`,
-  },
-  opticalPrefixLarge: {
-    paddingInlineStart: `calc(${spacing.m} - ${spacing.xxs})`,
-    paddingInlineEnd: `calc(${spacing.m} + ${spacing.xxs})`,
-  },
-  opticalSuffixLarge: {
-    paddingInlineStart: `calc(${spacing.m} + ${spacing.xxs})`,
-    paddingInlineEnd: `calc(${spacing.m} - ${spacing.xxs})`,
   },
   square: {
     aspectRatio: '1 / 1',
     paddingInline: 0,
+  },
+  pressed: {
+    color: textColors['text-selected'],
   },
   radiusNone: {
     borderRadius: borderRadii.none,
@@ -147,12 +125,6 @@ export const buttonStyles = stylex.create({
   },
   radiusM: {
     borderRadius: borderRadii.m,
-  },
-  radiusL: {
-    borderRadius: borderRadii.l,
-  },
-  radiusXL: {
-    borderRadius: borderRadii.xl,
   },
   fullWidth: {
     width: '100%',

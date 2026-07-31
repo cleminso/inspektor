@@ -176,8 +176,8 @@ export const dataGridStyles = stylex.create({
     visibility: 'hidden',
   },
   compactHeaderDragContent: {
-    paddingLeft: spacing.s,
-    paddingRight: spacing.s,
+    paddingLeft: spacing.xs,
+    paddingRight: spacing.xs,
   },
   columnDragOverlay: {
     boxSizing: 'border-box',
@@ -299,7 +299,7 @@ export const dataGridStyles = stylex.create({
     backgroundColor: backgroundColors['bg-page'],
     color: textColors['text-muted'],
     display: 'flex',
-    flexShrink: 0,
+  flexShrink: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     borderTopColor: borderColors['border-secondary'],

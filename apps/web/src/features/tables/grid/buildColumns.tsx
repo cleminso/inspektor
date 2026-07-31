@@ -19,9 +19,9 @@ import {
 import {
   BinaryValue,
   Box,
-  Button,
   Checkbox,
   ContextMenu,
+  Button,
   KeyboardInput,
   Menu,
   StructuredValuePreview,
@@ -464,7 +464,9 @@ function ColumnHeader({
           <Box
             as="span"
             alignItems="center"
+            data-slot="column-type-marker-slot"
             display="flex"
+            gap="s"
             justifyContent="between"
             minWidth={0}
             width="full"
@@ -472,7 +474,17 @@ function ColumnHeader({
         }
       >
         <Box as="span" alignItems="center" display="flex" flex={1} gap="s" minWidth={0}>
-          <ColumnTypeMarker marker={marker} />
+          <Box
+            as="span"
+            alignItems="center"
+            display="flex"
+            flexShrink={0}
+            height="control-height-xs"
+            justifyContent="center"
+            width="control-height-xs"
+          >
+            <ColumnTypeMarker marker={marker} />
+          </Box>
           <Text as="span" truncate variant="caption">{label}</Text>
         </Box>
         <Menu.Root onOpenChange={handleOpenChange}>
@@ -481,9 +493,9 @@ function ColumnHeader({
               <Button
                 type="button"
                 aria-label={`Open ${label} column menu`}
-                shape="square"
+                iconOnly
                 size="xs"
-                variant="link"
+                variant="ghost"
                 onClick={(event) => {
                   event.stopPropagation();
                 }}

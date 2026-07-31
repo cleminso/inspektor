@@ -6,11 +6,11 @@
  */
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, textColors } from "../../tokens/semantics.stylex";
+import { textColors } from "../../tokens/semantics.stylex";
 import { shadows } from "../../tokens/value.stylex";
 
 export const keyboardInputVars = stylex.defineVars({
-  backgroundColor: backgroundColors["bg-card"],
+  // backgroundColor: backgroundColors["bg-card"],
   boxShadow: shadows.border,
   textColor: {
     default: textColors['text-muted'],

@@ -59,7 +59,7 @@ export const resizablePanelStyles = stylex.create({
     },
   },
   grip: {
-    borderRadius: borderRadii.xl,
+    borderRadius: borderRadii.m,
     backgroundColor: 'currentColor',
     flexShrink: 0,
     pointerEvents: 'none',

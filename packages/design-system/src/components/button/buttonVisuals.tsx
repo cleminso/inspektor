@@ -3,7 +3,7 @@ import * as stylex from '@stylexjs/stylex'
 
 import { buttonGroupStyles } from '../buttonGroup/buttonGroup.styles'
 import type { ButtonGroupOrientation } from '../buttonGroup/buttonGroupContext'
-import { Spinner } from '../spinner/spinner'
+import { Spinner, type SpinnerSize } from '../spinner/spinner'
 import { buttonStyles } from './button.styles'
 
 export type ButtonVariant =
@@ -11,14 +11,11 @@ export type ButtonVariant =
   | 'secondary'
   | 'danger'
   | 'ghost'
-  | 'outline'
   | 'link'
 
-export type ButtonSize = 'xs' | 's' | 'm' | 'l'
-export type ButtonShape = 'square'
+export type ButtonSize = 'xs' | 's' | 'm'
 export type ButtonJustify = 'center' | 'start' | 'between'
-export type ButtonRadius = 'none' | 'xs' | 's' | 'm' | 'l' | 'xl'
-export type ButtonInset = 'default' | 'flush'
+export type ButtonRadius = 'none' | 'xs' | 's' | 'm'
 type ButtonOpticalAlignment = 'prefix' | 'suffix'
 
 const variantStyles = {
@@ -26,7 +23,6 @@ const variantStyles = {
   secondary: buttonStyles.secondary,
   danger: buttonStyles.danger,
   ghost: buttonStyles.ghost,
-  outline: buttonStyles.outline,
   link: buttonStyles.link,
 } satisfies Record<ButtonVariant, unknown>
 
@@ -34,7 +30,6 @@ const sizeStyles = {
   xs: buttonStyles.sizeXS,
   s: buttonStyles.sizeS,
   m: buttonStyles.sizeM,
-  l: buttonStyles.sizeL,
 } satisfies Record<ButtonSize, unknown>
 
 const justifyStyles = {
@@ -48,23 +43,22 @@ const radiusStyles = {
   xs: buttonStyles.radiusXS,
   s: buttonStyles.radiusS,
   m: buttonStyles.radiusM,
-  l: buttonStyles.radiusL,
-  xl: buttonStyles.radiusXL,
 } satisfies Record<ButtonRadius, unknown>
 
-const insetStyles = {
-  default: undefined,
-  flush: buttonStyles.insetFlush,
-} satisfies Record<ButtonInset, unknown>
+const spinnerSizes = {
+  xs: 's',
+  s: 'm',
+  m: 'l',
+} satisfies Record<ButtonSize, SpinnerSize>
 
 interface ButtonVisualStylesOptions {
   variant: ButtonVariant
   size: ButtonSize
-  shape: ButtonShape | undefined
+  square: boolean
+  pressed: boolean
   fullWidth: boolean
   justify: ButtonJustify
   radius: ButtonRadius
-  inset: ButtonInset
   orientation: ButtonGroupOrientation | null
   disabled: boolean
   opticalAlignment?: ButtonOpticalAlignment
@@ -74,13 +68,9 @@ export function getButtonOpticalAlignment({
   prefix,
   suffix,
   loading,
-  shape,
   justify,
-  inset,
-}: Pick<ButtonContentProps, 'prefix' | 'suffix' | 'loading' | 'shape' | 'justify'> & {
-  inset: ButtonInset
-}): ButtonOpticalAlignment | undefined {
-  if (shape === 'square' || justify !== 'center' || inset !== 'default') {
+}: Pick<ButtonContentProps, 'prefix' | 'suffix' | 'loading' | 'justify'>): ButtonOpticalAlignment | undefined {
+  if (justify !== 'center') {
     return undefined
   }
 
@@ -97,11 +87,11 @@ export function getButtonOpticalAlignment({
 export function getButtonVisualStyles({
   variant,
   size,
-  shape,
+  square,
+  pressed,
   fullWidth,
   justify,
   radius,
-  inset,
   orientation,
   disabled,
   opticalAlignment,
@@ -110,27 +100,25 @@ export function getButtonVisualStyles({
     buttonStyles.base,
     variantStyles[variant],
     sizeStyles[size],
-    shape === 'square' && buttonStyles.square,
+    square === true && buttonStyles.square,
+    pressed === true && buttonStyles.pressed,
     radiusStyles[radius],
-    insetStyles[inset],
     orientation !== null && buttonGroupStyles.member,
     orientation === 'horizontal' && buttonGroupStyles.memberHorizontal,
     orientation === 'vertical' && buttonGroupStyles.memberVertical,
     fullWidth === true && buttonStyles.fullWidth,
     justifyStyles[justify],
-    opticalAlignment === 'prefix' && size !== 'l' && buttonStyles.opticalPrefixCompact,
-    opticalAlignment === 'suffix' && size !== 'l' && buttonStyles.opticalSuffixCompact,
-    opticalAlignment === 'prefix' && size === 'l' && buttonStyles.opticalPrefixLarge,
-    opticalAlignment === 'suffix' && size === 'l' && buttonStyles.opticalSuffixLarge,
+    opticalAlignment === 'prefix' && buttonStyles.opticalPrefix,
+    opticalAlignment === 'suffix' && buttonStyles.opticalSuffix,
     disabled === true && buttonStyles.disabled,
   ]
 }
 
 interface ButtonContentProps {
   children: ReactNode
+  iconOnly?: boolean
   prefix?: ReactNode
   suffix?: ReactNode
-  shape?: ButtonShape
   loading?: boolean
   justify: ButtonJustify
   size: ButtonSize
@@ -138,14 +126,23 @@ interface ButtonContentProps {
 
 export function ButtonContent({
   children,
+  iconOnly = false,
   prefix,
   suffix,
-  shape,
   loading = false,
   justify,
   size,
 }: ButtonContentProps) {
-  const spinnerSize = size === 'xs' ? 's' : size
+  const spinnerSize = spinnerSizes[size]
+
+  if (iconOnly === true) {
+    return (
+      <span aria-hidden="true" data-slot="button-icon" {...stylex.props(buttonStyles.iconSlot)}>
+        {loading === true ? <Spinner size={spinnerSize} /> : children}
+      </span>
+    )
+  }
+
   const prefixContent = loading === true || prefix !== undefined ? (
     <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
       {loading === true ? <Spinner size={spinnerSize} /> : prefix}
@@ -160,9 +157,7 @@ export function ButtonContent({
         justify === 'between' && buttonStyles.contentBetween,
       )}
     >
-      {shape === 'square' ? (
-        loading === true ? <Spinner size={spinnerSize} /> : children
-      ) : justify === 'between' ? (
+      {justify === 'between' ? (
         <>
           <span data-slot="button-leading" {...stylex.props(buttonStyles.leadingContent)}>
             {prefixContent}

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   backgroundColors,
+  borderRadii,
   borderColors,
   layerIndexes,
   spatial,
@@ -42,13 +43,16 @@ describe('semantic token contract', () => {
       drag: expect.any(Number),
     })
     expect(spatial).toMatchObject({
+      'button-height-xs': expect.any(String),
+      'button-height-s': expect.any(String),
+      'button-height-m': expect.any(String),
+      'tab-height': expect.any(String),
       'control-height-s': expect.any(String),
       'control-height-m': expect.any(String),
       'control-height-l': expect.any(String),
       'icon-size-xs': expect.any(String),
       'icon-size-s': expect.any(String),
       'icon-size-m': expect.any(String),
-      'icon-size-l': expect.any(String),
       'focus-ring-width': expect.any(String),
       'popup-width-s': expect.any(String),
       'popup-width-m': expect.any(String),
@@ -67,5 +71,17 @@ describe('semantic token contract', () => {
       'viewport-height-l': expect.any(String),
       'panel-handle-size': expect.any(String),
     })
+  })
+
+  it('exposes the reduced radius scale', () => {
+    expect(borderRadii).toMatchObject({
+      none: expect.any(String),
+      xs: expect.any(String),
+      s: expect.any(String),
+      m: expect.any(String),
+    })
+    expect(borderRadii).not.toHaveProperty('l')
+    expect(borderRadii).not.toHaveProperty('xl')
+    expect(borderRadii).not.toHaveProperty('full')
   })
 })

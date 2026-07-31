@@ -840,7 +840,7 @@ export function JsonView({
         <div {...stylex.props(jsonViewStyles.copyAction)}>
           <CopyButton
             label="Copy JSON"
-            size="xs"
+            size="s"
             textToCopy={serializedData}
             tooltipSide="bottom"
           />

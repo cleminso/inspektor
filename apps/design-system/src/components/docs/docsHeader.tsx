@@ -48,7 +48,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
         <Button
           variant="ghost"
           size="icon-s"
-          radius="m"
+          radius="s"
           aria-label={isNavigationOpen === true ? "Hide navigation" : "Show navigation"}
           aria-pressed={isNavigationOpen}
           onClick={toggleNavigation}
@@ -61,7 +61,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
         <Button
           variant="ghost"
           size="icon-s"
-          radius="m"
+          radius="s"
           aria-label={
             previousItem !== undefined ? `Previous page: ${previousItem.title}` : "No previous page"
           }
@@ -73,7 +73,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
         <Button
           variant="ghost"
           size="icon-s"
-          radius="m"
+          radius="s"
           aria-label={nextItem !== undefined ? `Next page: ${nextItem.title}` : "No next page"}
           disabled={nextItem === undefined}
           onClick={navigateNext}
@@ -84,7 +84,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
           <Button
             variant="ghost"
             size="icon-s"
-            radius="m"
+            radius="s"
             aria-label={isControlsOpen === true ? "Hide controls" : "Show controls"}
             aria-pressed={isControlsOpen}
             onClick={toggleControls}

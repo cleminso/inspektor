@@ -41,7 +41,6 @@ function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): R
             type="button"
             variant="link"
             size="s"
-            inset="flush"
             onClick={flow.goBackToForm}
             disabled={flow.isSubmitting === true}
           >

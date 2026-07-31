@@ -12,7 +12,7 @@ import { copyButtonStyles } from './copyButton.styles'
 export type CopyButtonSize = ButtonSize
 export type CopyButtonVariant = Extract<
   ButtonVariant,
-  'ghost' | 'secondary' | 'outline'
+  'ghost' | 'secondary'
 >
 
 export interface CopyButtonProps {
@@ -42,7 +42,6 @@ const iconSizeStyles = {
   xs: copyButtonStyles.iconXS,
   s: copyButtonStyles.iconS,
   m: copyButtonStyles.iconM,
-  l: copyButtonStyles.iconL,
 } satisfies Record<CopyButtonSize, unknown>
 
 function CopyIcon({ size }: { size: CopyButtonSize }) {
@@ -100,8 +99,8 @@ export function CopyButton({
           <Button
             aria-label={label}
             disabled={disabled}
+            iconOnly
             onClick={() => void handleCopy()}
-            shape="square"
             size={size}
             variant={variant}
           >

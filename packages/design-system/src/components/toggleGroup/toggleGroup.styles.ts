@@ -19,7 +19,7 @@ import {
 export const toggleGroupStyles = stylex.create({
   root: {
     padding: spacing.xxs,
-    borderRadius: borderRadii.s,
+    borderRadius: borderRadii.xs,
     gap: spacing.xxs,
     overflow: 'clip',
     alignItems: 'stretch',

@@ -82,10 +82,10 @@ export default function BasicExample(): ReactElement {
           </TabView.List>
           <Button
             aria-label="Add table view"
+            iconOnly
             variant="ghost"
             size="m"
-            shape="square"
-            radius="l"
+            radius="m"
             onClick={addView}
           >
             <PlusIcon />

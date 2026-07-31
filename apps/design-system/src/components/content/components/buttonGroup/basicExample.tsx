@@ -5,9 +5,9 @@ export default function BasicExample(): ReactElement {
   return (
     <ButtonGroup aria-label="Document actions">
       <ButtonGroupText>Document</ButtonGroupText>
-      <Button variant="outline">Archive</Button>
-      <Button variant="outline">Report</Button>
-      <Button variant="outline">Snooze</Button>
+      <Button variant="secondary">Archive</Button>
+      <Button variant="secondary">Report</Button>
+      <Button variant="secondary">Snooze</Button>
     </ButtonGroup>
   );
 }

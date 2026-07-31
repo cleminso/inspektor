@@ -232,7 +232,15 @@ describe('TabView', () => {
       </TabView.Root>,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close Active accounts' }))
+    const closeButton = screen.getByRole('button', { name: 'Close Active accounts' })
+
+    expect(closeButton.getAttribute('data-slot')).toBe('button')
+    expect(closeButton.getAttribute('data-icon-only')).toBe('')
+    expect(closeButton.getAttribute('data-size')).toBe('xs')
+    expect(closeButton.getAttribute('data-radius')).toBe('xs')
+    expect(closeButton.getAttribute('data-variant')).toBe('ghost')
+
+    fireEvent.click(closeButton)
 
     expect(closedValue).toBe('active')
     expect(screen.getByRole('tab', { name: 'All accounts' }).getAttribute('data-active')).toBe('')

@@ -7,7 +7,7 @@ export default function SelectionItemsExample(): ReactElement {
 
   return (
     <Menu.Root>
-      <Menu.Trigger render={<Button variant="outline" />}>Table options</Menu.Trigger>
+      <Menu.Trigger render={<Button variant="secondary" />}>Table options</Menu.Trigger>
       <Menu.Content>
         <Menu.CheckboxItem checked={showSystemTables} onCheckedChange={setShowSystemTables}>
           <Menu.CheckboxItemIndicator />

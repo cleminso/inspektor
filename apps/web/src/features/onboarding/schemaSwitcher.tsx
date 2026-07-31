@@ -47,7 +47,6 @@ export function SchemaSwitcher({
                 type="button"
                 variant="ghost"
                 size="s"
-                inset="flush"
                 fullWidth
                 justify="start"
                 onClick={() => {

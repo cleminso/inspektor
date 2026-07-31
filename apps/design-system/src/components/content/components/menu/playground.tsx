@@ -63,7 +63,7 @@ export function serializeMenuPlayground(state: MenuPlaygroundState): string {
 
   return createPlaygroundSource({
     imports: { Button: true, Menu: true },
-    example: `(\n    <Menu.Root${rootProp}>\n      <Menu.Trigger render={<Button variant="outline" />}>Actions</Menu.Trigger>\n      ${contentOpen}\n        <Menu.Item onClick={() => undefined}>Rename</Menu.Item>\n        <Menu.Item${dangerProp} onClick={() => undefined}>Delete</Menu.Item>\n      </Menu.Content>\n    </Menu.Root>\n  )`,
+    example: `(\n    <Menu.Root${rootProp}>\n      <Menu.Trigger render={<Button variant="secondary" />}>Actions</Menu.Trigger>\n      ${contentOpen}\n        <Menu.Item onClick={() => undefined}>Rename</Menu.Item>\n        <Menu.Item${dangerProp} onClick={() => undefined}>Delete</Menu.Item>\n      </Menu.Content>\n    </Menu.Root>\n  )`,
   });
 }
 
@@ -71,7 +71,7 @@ export function MenuPlayground({ children }: { children?: ReactNode }): ReactEle
   const [state, setState] = useState<MenuPlaygroundState>(initialState);
   const preview = (
     <Menu.Root disabled={state.disabled}>
-      <Menu.Trigger render={<Button variant="outline" />}>Actions</Menu.Trigger>
+      <Menu.Trigger render={<Button variant="secondary" />}>Actions</Menu.Trigger>
       <Menu.Content width={state.width} side={state.side} align={state.align}>
         <Menu.Item onClick={() => undefined}>Rename</Menu.Item>
         <Menu.Item variant={state.danger === true ? "danger" : "default"} onClick={() => undefined}>

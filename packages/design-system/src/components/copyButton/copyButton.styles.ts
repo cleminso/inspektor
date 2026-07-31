@@ -1,5 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
+import { spatial } from '../../tokens/semantics.stylex'
+
 export const copyButtonStyles = stylex.create({
   icon: {
     fill: 'none',
@@ -10,20 +12,16 @@ export const copyButtonStyles = stylex.create({
     flexShrink: 0,
   },
   iconXS: {
-    height: 14,
-    width: 14,
+    height: spatial['icon-size-xs'],
+    width: spatial['icon-size-xs'],
   },
   iconS: {
-    height: 14,
-    width: 14,
+    height: spatial['icon-size-s'],
+    width: spatial['icon-size-s'],
   },
   iconM: {
-    height: 16,
-    width: 16,
-  },
-  iconL: {
-    height: 20,
-    width: 20,
+    height: spatial['icon-size-m'],
+    width: spatial['icon-size-m'],
   },
   visuallyHidden: {
     padding: 0,

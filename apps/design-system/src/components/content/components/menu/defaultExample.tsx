@@ -4,7 +4,7 @@ import { type ReactElement } from "react";
 export default function DefaultExample(): ReactElement {
   return (
     <Menu.Root>
-      <Menu.Trigger render={<Button variant="outline" />}>Actions</Menu.Trigger>
+      <Menu.Trigger render={<Button variant="secondary" />}>Actions</Menu.Trigger>
       <Menu.Content>
         <Menu.Item onClick={() => undefined}>Rename</Menu.Item>
         <Menu.Item onClick={() => undefined}>Duplicate</Menu.Item>

@@ -74,8 +74,7 @@ export interface ComboboxInputTriggerProps extends Omit<
   disabled?: boolean;
 }
 
-export type ComboboxTriggerVariant = "ghost" | "outline";
-export type ComboboxTriggerSize = "s" | "m" | "l";
+export type ComboboxTriggerSize = "s" | "m";
 export type ComboboxTriggerWidth = "content" | "s" | "m" | "full";
 
 export interface ComboboxTriggerProps extends Omit<
@@ -84,8 +83,6 @@ export interface ComboboxTriggerProps extends Omit<
 > {
   /** Content displayed by the trigger. */
   children: ReactNode;
-  /** Controls the trigger treatment. */
-  variant?: ComboboxTriggerVariant;
   /** Controls the trigger height and padding. */
   size?: ComboboxTriggerSize;
   /** Constrains the trigger width. */
@@ -294,7 +291,6 @@ function ComboboxInputTrigger({ disabled = false, ...props }: ComboboxInputTrigg
 
 function ComboboxTrigger({
   children,
-  variant = "ghost",
   size = "m",
   width = "content",
   disabled = false,
@@ -312,7 +308,7 @@ function ComboboxTrigger({
   ]);
   return (
     <Button
-      variant={variant}
+      variant="ghost"
       size={size}
       fullWidth={width === "full"}
       justify="start"

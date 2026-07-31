@@ -4,7 +4,7 @@ import { type ReactElement } from "react";
 export default function DisabledItemsExample(): ReactElement {
   return (
     <Menu.Root>
-      <Menu.Trigger render={<Button variant="outline" />}>Connection actions</Menu.Trigger>
+      <Menu.Trigger render={<Button variant="secondary" />}>Connection actions</Menu.Trigger>
       <Menu.Content>
         <Menu.Item onClick={() => undefined}>Reconnect</Menu.Item>
         <Menu.Item disabled>Pause sync</Menu.Item>

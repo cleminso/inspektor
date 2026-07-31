@@ -8,14 +8,7 @@ export default function VariantsExample(): ReactElement {
       <CopyButton
         textToCopy="Secondary action"
         label="Copy secondary action"
-        size="icon-m"
         variant="secondary"
-      />
-      <CopyButton
-        textToCopy="Outlined action"
-        label="Copy outlined action"
-        size="icon-l"
-        variant="outline"
       />
     </Box>
   );

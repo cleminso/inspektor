@@ -8,7 +8,7 @@ function saveConnection(): Promise<string> {
 export default function PromiseExample(): ReactElement {
   return (
     <Button
-      variant="outline"
+      variant="secondary"
       onClick={() =>
         toasts.promise(saveConnection(), {
           loading: "Saving connection",

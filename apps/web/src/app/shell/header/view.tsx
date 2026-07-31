@@ -90,8 +90,8 @@ export function InspectorHeader(): React.ReactElement {
           type="button"
           variant="ghost"
           size="s"
-          shape="square"
           aria-label="Toggle theme"
+          iconOnly
           title={isDarkTheme === true ? "Switch to light theme" : "Switch to dark theme"}
           onClick={() => {
             setTheme(isDarkTheme === true ? "light" : "dark");

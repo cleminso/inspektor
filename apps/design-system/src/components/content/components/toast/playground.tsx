@@ -56,7 +56,7 @@ export function serializeToastPlayground(state: ToastPlaygroundState): string {
 
   return createPlaygroundSource({
     imports: { Button: true, Toaster: true, toasts: true },
-    example: `(\n    <>\n      <Button variant="outline" onClick={() => ${invocation}}>\n        Show toast\n      </Button>\n      <Toaster />\n    </>\n  )`,
+    example: `(\n    <>\n      <Button variant="secondary" onClick={() => ${invocation}}>\n        Show toast\n      </Button>\n      <Toaster />\n    </>\n  )`,
   });
 }
 
@@ -81,7 +81,7 @@ export function ToastPlayground({
 
   const preview = (
     <>
-      <Button variant="outline" onClick={showToast}>
+      <Button variant="secondary" onClick={showToast}>
         Show toast
       </Button>
       {withToaster === true ? <Toaster /> : null}

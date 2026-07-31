@@ -4,7 +4,7 @@ import { type ReactElement } from "react";
 export default function LinkItemsExample(): ReactElement {
   return (
     <Menu.Root>
-      <Menu.Trigger render={<Button variant="outline" />}>Resources</Menu.Trigger>
+      <Menu.Trigger render={<Button variant="secondary" />}>Resources</Menu.Trigger>
       <Menu.Content>
         <Menu.LinkItem href="/components/menu">Menu documentation</Menu.LinkItem>
         <Menu.LinkItem href="https://base-ui.com/react/components/menu">

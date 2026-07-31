@@ -107,8 +107,8 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
             type="button"
             variant="ghost"
             size="s"
-            shape="square"
             aria-label="Open new table view"
+            iconOnly
             title="Open new table view"
             onClick={openNewView}
           >

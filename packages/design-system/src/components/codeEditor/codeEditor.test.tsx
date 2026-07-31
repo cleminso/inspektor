@@ -341,7 +341,8 @@ describe("CodeEditor", () => {
     const wrap = screen.getByRole("button", { name: "Disable line wrapping" });
 
     expect(wrap.getAttribute("aria-pressed")).toBe("true");
-    expect(wrap.getAttribute("data-variant")).toBe("secondary");
+    expect(wrap.getAttribute("data-pressed")).toBe("");
+    expect(wrap.getAttribute("data-variant")).toBe("ghost");
     expect(wrap.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 24 24");
     expect(wrap.querySelector("svg")?.getAttribute("stroke-width")).toBe("1.5");
 
@@ -383,7 +384,7 @@ describe("CodeEditor", () => {
     ];
 
     for (const action of actions) {
-      expect(action.getAttribute("data-size")).toBe("xs");
+      expect(action.getAttribute("data-size")).toBe("s");
     }
   });
 

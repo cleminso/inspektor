@@ -75,7 +75,6 @@ export type {
   ComboboxStatusProps,
   ComboboxTriggerSize,
   ComboboxTriggerProps,
-  ComboboxTriggerVariant,
   ComboboxTriggerWidth,
   ComboboxValueProps,
   ComboboxViewportHeight,
@@ -127,7 +126,6 @@ export type {
   ButtonJustify,
   ButtonProps,
   ButtonRadius,
-  ButtonShape,
   ButtonSize,
   ButtonVariant,
 } from './components/button/button'

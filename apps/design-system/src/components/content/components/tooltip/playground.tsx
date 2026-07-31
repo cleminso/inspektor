@@ -52,7 +52,7 @@ export function serializeTooltipPlayground(state: TooltipPlaygroundState): strin
   ].filter((prop): prop is string => prop !== null);
   return createPlaygroundSource({
     imports: { Button: true, Tooltip: true },
-    example: `(\n    <Tooltip.Provider>\n      <Tooltip.Root>\n        <Tooltip.Trigger render={<Button variant="outline" />}${triggerProps.length > 0 ? ` ${triggerProps.join(" ")}` : ""}>Hover or focus</Tooltip.Trigger>\n        <Tooltip.Content${contentProps.length > 0 ? ` ${contentProps.join(" ")}` : ""}>Supplementary context</Tooltip.Content>\n      </Tooltip.Root>\n    </Tooltip.Provider>\n  )`,
+    example: `(\n    <Tooltip.Provider>\n      <Tooltip.Root>\n        <Tooltip.Trigger render={<Button variant="secondary" />}${triggerProps.length > 0 ? ` ${triggerProps.join(" ")}` : ""}>Hover or focus</Tooltip.Trigger>\n        <Tooltip.Content${contentProps.length > 0 ? ` ${contentProps.join(" ")}` : ""}>Supplementary context</Tooltip.Content>\n      </Tooltip.Root>\n    </Tooltip.Provider>\n  )`,
   });
 }
 
@@ -67,7 +67,7 @@ export function TooltipPlayground({ children }: { children?: ReactNode }): React
         <Tooltip.Provider>
           <Tooltip.Root>
             <Tooltip.Trigger
-              render={<Button variant="outline" />}
+              render={<Button variant="secondary" />}
               disabled={state.disabled}
               closeOnClick={state.closeOnClick}
             >

@@ -5,7 +5,7 @@ import { type ReactElement } from "react";
 export default function ChevronExample(): ReactElement {
   return (
     <Menu.Root>
-      <Menu.Trigger render={<Button variant="outline" suffix={<ChevronDown size={16} />} />}>
+      <Menu.Trigger render={<Button variant="secondary" suffix={<ChevronDown size={16} />} />}>
         View
       </Menu.Trigger>
       <Menu.Content>

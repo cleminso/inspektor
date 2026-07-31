@@ -1,7 +1,7 @@
 import { Box, Button } from "@inspector/ds";
 import { type ReactElement } from "react";
 
-const sizes = ["s", "m", "l"] as const;
+const sizes = ["xs", "s", "m"] as const;
 
 export default function VariantsExample(): ReactElement {
   return (
@@ -14,9 +14,6 @@ export default function VariantsExample(): ReactElement {
           </Button>
           <Button size={size} variant="danger">
             Danger
-          </Button>
-          <Button size={size} variant="outline">
-            Outline
           </Button>
           <Button size={size} variant="ghost">
             Ghost

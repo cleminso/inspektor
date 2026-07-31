@@ -17,6 +17,9 @@
 - [x] Attach deferred sortable behavior through each tab item's ref instead of matching values to DOM positions.
 - [x] Restore keyboard focus to the equivalent tab when the deferred boundary mounts.
 - [x] Preserve the existing `TabView.List` reorder API while reorder behavior becomes available.
+- [x] Use a fixed 26px tab height between compact Button actions and 28px form controls.
+- [x] Keep close actions vertically centered within the tab height.
+- [x] Compose close actions from the shared 20px icon-only Button with a 14px glyph and 2px radius while retaining TabView-owned positioning and overflow fading.
 
 ## Settled implementation decisions
 

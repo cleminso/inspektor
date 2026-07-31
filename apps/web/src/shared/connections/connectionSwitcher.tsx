@@ -104,7 +104,6 @@ export function ConnectionSwitcher({
         </ContextSwitcher.Viewport>
         <ContextSwitcher.Footer>
           <Button
-            inset="flush"
             variant="ghost"
             size="s"
             fullWidth

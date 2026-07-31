@@ -16,7 +16,7 @@ import {
 } from "../combobox/combobox";
 import { contextSwitcherStyles } from "./contextSwitcher.styles";
 
-export type ContextSwitcherTriggerSize = "s" | "m" | "l";
+export type ContextSwitcherTriggerSize = "s" | "m";
 export type ContextSwitcherTriggerWidth = "content" | "s" | "m";
 
 export type ContextSwitcherRootProps<Value> = PropsWithChildren<{
@@ -141,7 +141,6 @@ function ContextSwitcherTrigger({
       aria-label={label}
       title={title}
       data-width={width}
-      variant="ghost"
       size={size}
       width={width}
       disabled={disabled}

@@ -5,7 +5,7 @@ import { type ReactElement } from "react";
 export default function PrefixSuffixExample(): ReactElement {
   return (
     <Menu.Root>
-      <Menu.Trigger render={<Button variant="outline" />}>Edit</Menu.Trigger>
+      <Menu.Trigger render={<Button variant="secondary" />}>Edit</Menu.Trigger>
       <Menu.Content>
         <Menu.Item onClick={() => undefined}>
           <Menu.Prefix>
