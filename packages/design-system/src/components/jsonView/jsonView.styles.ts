@@ -62,7 +62,7 @@ export const jsonViewStyles = stylex.create({
     userSelect: "none",
   },
   focusedRow: {
-    outlineColor: borderColors["border-focused"],
+    outlineColor: borderColors["outline"],
     outlineOffset: -2,
     outlineStyle: "solid",
     outlineWidth: spatial["focus-ring-width"],

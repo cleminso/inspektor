@@ -34,7 +34,7 @@ export const resizablePanelStyles = stylex.create({
     },
     display: 'flex',
     justifyContent: 'center',
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: -1,
     outlineStyle: {
       default: 'none',

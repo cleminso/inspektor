@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { backgroundColors, textColors } from '../../tokens/semantics.stylex'
+import { spacing } from '../../tokens/value.stylex'
 import { Toaster, toasts } from './toaster'
 import { toasterStyles } from './toaster.styles'
 import { toasterVars } from './toasterVars.stylex'
@@ -19,7 +20,7 @@ const stackContractStyles = stylex.create({
   },
   expandedGap: {
     transform:
-      'translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * 8px + var(--toast-swipe-movement-y)))',
+      `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${spacing.m} + var(--toast-swipe-movement-y)))`,
   },
 })
 

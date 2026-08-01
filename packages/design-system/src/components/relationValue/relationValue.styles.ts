@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { textColors } from "../../tokens/semantics.stylex";
+import { spatial, textColors } from "../../tokens/semantics.stylex";
 import {
   fontFamilies,
   fontSizes,
@@ -38,8 +38,8 @@ export const relationValueStyles = stylex.create({
     strokeLinejoin: "round",
     strokeWidth: 1.25,
     display: "block",
-    height: 12,
-    width: 12,
+    height: spatial["icon-size-xs"],
+    width: spatial["icon-size-xs"],
   },
   details: {
     display: "flex",

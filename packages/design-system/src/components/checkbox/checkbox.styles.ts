@@ -57,7 +57,7 @@ export const checkboxStyles = stylex.create({
     display: "inline-flex",
     flexShrink: 0,
     justifyContent: "center",
-    outlineColor: borderColors["border-focused"],
+    outlineColor: borderColors["outline"],
     outlineOffset: 2,
     outlineStyle: "solid",
     outlineWidth: {
@@ -82,12 +82,12 @@ export const checkboxStyles = stylex.create({
     },
   },
   sizeS: {
-    height: 14,
-    width: 14,
+    height: spatial["icon-size-s"],
+    width: spatial["icon-size-s"],
   },
   sizeM: {
-    height: 16,
-    width: 16,
+    height: spatial["icon-size-m"],
+    width: spatial["icon-size-m"],
   },
   selected: {
     borderColor: backgroundColors["bg-inverse"],

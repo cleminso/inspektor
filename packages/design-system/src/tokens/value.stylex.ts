@@ -148,7 +148,7 @@ export const syntaxPaletteValues = stylex.defineConsts({
 
 export const syntaxPalette = stylex.defineVars(syntaxPaletteValues)
 
-export const fontSizes = stylex.defineVars({
+export const fontSizeValues = stylex.defineConsts({
   1: '0.75rem', // 12
   2: '0.8125rem', // 13
   3: '1rem', // 16
@@ -157,6 +157,8 @@ export const fontSizes = stylex.defineVars({
   6: '1.875rem', // 30
   7: '2.25rem', // 36
 } as const)
+
+export const fontSizes = stylex.defineVars(fontSizeValues)
 
 export const lineHeights = stylex.defineVars({
   none: '1',
@@ -180,66 +182,72 @@ export const fontFamilies = stylex.defineVars({
   mono: "'GeistMono', monospace",
 } as const)
 
-export const spacing = stylex.defineVars({
+export const spacingValues = stylex.defineConsts({
   none: '0',
-  xxs: '2px',
-  xs: '4px',
-  s: '6px',
-  m: '8px',
-  l: '12px',
-  xl: '16px',
-  '2xl': '24px',
-  '3xl': '32px',
-  '4xl': '48px',
-  '5xl': '64px',
+  xxs: '0.125rem', // 2px
+  xs: '0.25rem', // 4px
+  s: '0.375rem', // 6px
+  m: '0.5rem', // 8px
+  l: '0.75rem', // 12px
+  xl: '1rem', // 16px
+  '2xl': '1.5rem', // 24px
+  '3xl': '2rem', // 32px
+  '4xl': '3rem', // 48px
+  '5xl': '4rem', // 64px
 } as const)
 
-export const dimensions = stylex.defineVars({
+export const spacing = stylex.defineVars(spacingValues)
+
+export const dimensionValues = stylex.defineConsts({
   1: '1px',
   2: '2px',
-  12: '12px',
-  14: '14px',
-  16: '16px',
-  20: '20px',
-  22: '22px',
-  24: '24px',
-  26: '26px',
-  28: '28px',
-  32: '32px',
-  40: '40px',
-  100: '100px',
-  120: '120px',
-  160: '160px',
-  180: '180px',
-  224: '224px',
-  240: '240px',
-  280: '280px',
-  320: '320px',
-  400: '400px',
-  680: '680px',
-  1220: '1220px',
-  1440: '1440px',
+  12: '0.75rem',
+  14: '0.875rem',
+  16: '1rem',
+  20: '1.25rem',
+  22: '1.375rem',
+  24: '1.5rem',
+  26: '1.625rem',
+  28: '1.75rem',
+  32: '2rem',
+  36: '2.25rem',
+  40: '2.5rem',
+  56: '3.5rem',
+  72: '4.5rem',
+  100: '6.25rem',
+  112: '7rem',
+  120: '7.5rem',
+  140: '8.75rem',
+  160: '10rem',
+  180: '11.25rem',
+  200: '12.5rem',
+  224: '14rem',
+  240: '15rem',
+  280: '17.5rem',
+  320: '20rem',
+  360: '22.5rem',
+  400: '25rem',
+  680: '42.5rem',
+  1220: '76.25rem',
+  1440: '90rem',
 } as const)
 
-export const borderRadii = stylex.defineVars({
+export const dimensions = stylex.defineVars(dimensionValues)
+
+export const borderRadiusValues = stylex.defineConsts({
   none: '0',
-  xs: '2px',
-  s: '4px',
-  m: '6px',
+  xs: '0.125rem',
+  s: '0.25rem',
+  m: '0.375rem',
 } as const)
+
+export const borderRadii = stylex.defineVars(borderRadiusValues)
 
 export const shadows = stylex.defineVars({
   none: 'none',
   border: `0 0 0 1px light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
   small: `0 0 0 1px light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200}), 0 2px 2px ${palette.grayAlpha100}`,
   medium: `0 0 0 1px light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200}), 0 2px 2px ${palette.grayAlpha100}, 0 8px 8px -8px ${palette.grayAlpha200}`,
-} as const)
-
-export const breakpoints = stylex.defineConsts({
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
 } as const)
 
 // Remove keys that are not actual design tokens
@@ -258,4 +266,3 @@ export type FontFamilyToken = StyleXTokenKeys<typeof fontFamilies>
 export type SpacingToken = StyleXTokenKeys<typeof spacing>
 export type BorderRadiusToken = StyleXTokenKeys<typeof borderRadii>
 export type ShadowToken = StyleXTokenKeys<typeof shadows>
-export type BreakpointKey = keyof typeof breakpoints

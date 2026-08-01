@@ -5,10 +5,10 @@ import type {
 } from '../tokens/semantics.stylex'
 import type {
   BorderRadiusToken,
-  BreakpointKey,
   ShadowToken,
   SpacingToken,
 } from '../tokens/value.stylex'
+import type { BreakpointKey } from '../tokens/breakpointTypes'
 import { layerIndexes } from '../tokens/layers.stylex'
 import { spatial } from '../tokens/semantics.stylex'
 

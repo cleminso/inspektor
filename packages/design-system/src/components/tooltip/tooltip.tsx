@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex'
 import type { PropsWithChildren } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { popupPositioning } from '../../primitives/popupPositioning'
 import { tooltipStyles } from './tooltip.styles'
 
 export type TooltipProviderProps = PropsWithChildren<{
@@ -52,8 +53,6 @@ export type TooltipContentProps = PropsWithChildren<{
   side?: BaseTooltip.Positioner.Props['side']
   /** Aligns the tooltip along its trigger. */
   align?: BaseTooltip.Positioner.Props['align']
-  /** Sets the distance between the tooltip and its trigger. */
-  sideOffset?: BaseTooltip.Positioner.Props['sideOffset']
 }>
 
 function TooltipProvider({ timeout = 400, ...props }: TooltipProviderProps) {
@@ -105,7 +104,6 @@ const arrowSideStyles = {
 function TooltipContent({
   side = 'top',
   align = 'center',
-  sideOffset = 8,
   children,
 }: TooltipContentProps) {
   const positionerStyleProps = createStateStyleProps<BaseTooltip.Positioner.State>(() => [
@@ -127,7 +125,7 @@ function TooltipContent({
       <BaseTooltip.Positioner
         side={side}
         align={align}
-        sideOffset={sideOffset}
+        sideOffset={popupPositioning.tooltipSideOffset}
         {...positionerStyleProps}
       >
         <BaseTooltip.Popup {...popupStyleProps} data-slot="tooltip-content">

@@ -16,4 +16,4 @@ export const tooltipTriggerPropNames = [
   "disabled",
   "render",
 ] as const;
-export const tooltipContentPropNames = ["side", "align", "sideOffset"] as const;
+export const tooltipContentPropNames = ["side", "align"] as const;

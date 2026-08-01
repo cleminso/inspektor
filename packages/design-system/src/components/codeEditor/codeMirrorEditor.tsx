@@ -136,15 +136,15 @@ const editorTheme = EditorView.theme({
     scrollbarWidth: "thin",
   },
   ".cm-scroller::-webkit-scrollbar": {
-    height: "6px",
-    width: "6px",
+    height: spacing.s,
+    width: spacing.s,
   },
   ".cm-scroller::-webkit-scrollbar-track": {
     backgroundColor: "transparent",
   },
   ".cm-scroller::-webkit-scrollbar-thumb": {
     backgroundColor: "transparent",
-    borderRadius: "999px",
+    borderRadius: borderRadii.m,
   },
   "&:hover .cm-scroller, &.cm-focused .cm-scroller": {
     scrollbarColor: `${textColors["text-muted"]} transparent`,

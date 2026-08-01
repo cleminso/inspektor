@@ -29,7 +29,7 @@ export const inputStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.normal,
-    outlineColor: borderColors["border-focused"],
+    outlineColor: borderColors["outline"],
     outlineStyle: "solid",
     outlineWidth: 0,
     minWidth: 0,

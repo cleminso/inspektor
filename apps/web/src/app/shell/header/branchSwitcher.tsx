@@ -14,7 +14,7 @@ interface BranchSwitcherProps {
 }
 
 export function BranchSwitcher({
-  size = "m",
+  size = "s",
   triggerLabel,
   width = "content",
 }: BranchSwitcherProps = {}): React.ReactElement {

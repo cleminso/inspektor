@@ -37,7 +37,7 @@ export function SidePanelLayoutProvider({
   children,
 }: SidePanelLayoutRootProps): React.ReactElement {
   const panelRef = useResizablePanelRef();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const setIsOpenFromSize = useCallback((size: ResizablePanelSize) => {
     setIsOpen(size.inPixels > 0);
@@ -83,7 +83,7 @@ interface SidePanelLayoutPartProps {
 }
 
 function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.ReactElement {
-  const { isOpen, panelRef, setIsOpenFromSize } = useSidePanelLayout();
+  const { panelRef, setIsOpenFromSize } = useSidePanelLayout();
 
   return (
     <>
@@ -91,7 +91,6 @@ function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.Rea
         panelRef={panelRef}
         collapsible
         collapsedSize={0}
-        defaultSize={0}
         minSize={160}
         maxSize={360}
         onResize={setIsOpenFromSize}
@@ -100,7 +99,7 @@ function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.Rea
           {children}
         </Box>
       </ResizablePanel>
-      {isOpen === true ? <ResizableHandle /> : null}
+      <ResizableHandle />
     </>
   );
 }

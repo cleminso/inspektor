@@ -7,8 +7,9 @@ import {
   textColors,
 } from '../tokens/semantics.stylex'
 import { layerIndexes } from '../tokens/layers.stylex'
+import { breakpointValues } from '../tokens/breakpoints.stylex'
 import { spatial } from '../tokens/semantics.stylex'
-import { borderRadii, breakpoints, shadows, spacing } from '../tokens/value.stylex'
+import { borderRadii, shadows, spacing } from '../tokens/value.stylex'
 import {
   alignContentStyles,
   alignItemsStyles,
@@ -389,7 +390,7 @@ export function resolveBoxStyles(
           continue
         }
 
-        const breakpoint = breakpoints[key as keyof typeof breakpoints]
+        const breakpoint = breakpointValues[key as keyof typeof breakpointValues]
         if (breakpoint !== undefined) {
           addBreakpointStyle(breakpoint, cssProp, transform(nextValue))
         }
@@ -432,7 +433,7 @@ export function resolveBoxStyles(
           continue
         }
 
-        const breakpoint = breakpoints[key as keyof typeof breakpoints]
+        const breakpoint = breakpointValues[key as keyof typeof breakpointValues]
         if (breakpoint !== undefined) {
           addBreakpointStyle(breakpoint, cssProp, cssValue)
         }

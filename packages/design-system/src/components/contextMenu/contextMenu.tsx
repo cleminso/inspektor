@@ -3,6 +3,7 @@ import { useRender } from "@base-ui/react/use-render";
 import * as stylex from "@stylexjs/stylex";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { popupPositioning } from "../../primitives/popupPositioning";
 import { menuStyles } from "../menu/menu.styles";
 import { contextMenuStyles } from "./contextMenu.styles";
 
@@ -27,30 +28,20 @@ export interface ContextMenuTriggerProps extends WithoutStyles<BaseContextMenu.T
 }
 export type ContextMenuPortalProps = WithoutStyles<BaseContextMenu.Portal.Props>;
 
-export interface ContextMenuPositionerProps extends WithoutStyles<BaseContextMenu.Positioner.Props> {
-  /** Aligns the popup along its pointer anchor. */
-  align?: BaseContextMenu.Positioner.Props["align"];
-  /** Offsets alignment along the pointer anchor. */
-  alignOffset?: BaseContextMenu.Positioner.Props["alignOffset"];
-  /** Places the popup on a side of its pointer anchor. */
-  side?: BaseContextMenu.Positioner.Props["side"];
-  /** Sets the gap between the pointer anchor and popup. */
-  sideOffset?: BaseContextMenu.Positioner.Props["sideOffset"];
-}
+export type ContextMenuPositionerProps = Pick<
+  WithoutStyles<BaseContextMenu.Positioner.Props>,
+  "align" | "children" | "side"
+>;
 
 export type ContextMenuPopupProps = WithoutStyles<BaseContextMenu.Popup.Props>;
 
 export interface ContextMenuContentProps extends ContextMenuPopupProps {
   /** Aligns the popup along its pointer anchor. */
   align?: ContextMenuPositionerProps["align"];
-  /** Offsets alignment along the pointer anchor. */
-  alignOffset?: ContextMenuPositionerProps["alignOffset"];
   /** Keeps the content mounted while closed. */
   keepMounted?: boolean;
   /** Places the popup on a side of its pointer anchor. */
   side?: ContextMenuPositionerProps["side"];
-  /** Sets the gap between the pointer anchor and popup. */
-  sideOffset?: ContextMenuPositionerProps["sideOffset"];
 }
 
 export interface ContextMenuItemProps extends WithoutStyles<BaseContextMenu.Item.Props> {
@@ -134,14 +125,18 @@ function ContextMenuPortal({ keepMounted = false, ...props }: ContextMenuPortalP
 
 function ContextMenuPositioner({
   align = "start",
-  sideOffset = 4,
   ...props
 }: ContextMenuPositionerProps) {
   const stateStyles = createStateStyleProps<BaseContextMenu.Positioner.State>(() => [
     menuStyles.positioner,
   ]);
   return (
-    <BaseContextMenu.Positioner {...props} align={align} sideOffset={sideOffset} {...stateStyles} />
+    <BaseContextMenu.Positioner
+      {...props}
+      align={align}
+      sideOffset={popupPositioning.dropdownSideOffset}
+      {...stateStyles}
+    />
   );
 }
 
@@ -157,20 +152,13 @@ function ContextMenuPopup(props: ContextMenuPopupProps) {
 
 function ContextMenuContent({
   align = "start",
-  alignOffset,
   keepMounted = false,
   side,
-  sideOffset = 4,
   ...props
 }: ContextMenuContentProps) {
   return (
     <ContextMenuPortal keepMounted={keepMounted}>
-      <ContextMenuPositioner
-        align={align}
-        alignOffset={alignOffset}
-        side={side}
-        sideOffset={sideOffset}
-      >
+      <ContextMenuPositioner align={align} side={side}>
         <ContextMenuPopup {...props} />
       </ContextMenuPositioner>
     </ContextMenuPortal>
@@ -214,16 +202,30 @@ function ContextMenuGroup(props: ContextMenuGroupProps) {
 }
 
 function ContextMenuGroupLabel(props: ContextMenuGroupLabelProps) {
-  return <BaseContextMenu.GroupLabel {...props} {...stylex.props(menuStyles.groupLabel)} />;
+  return (
+    <BaseContextMenu.GroupLabel
+      {...props}
+      {...stylex.props(menuStyles.groupLabel)}
+    />
+  );
 }
 
 function ContextMenuSeparator(props: ContextMenuSeparatorProps) {
-  return <BaseContextMenu.Separator {...props} {...stylex.props(menuStyles.separator)} />;
+  return (
+    <BaseContextMenu.Separator
+      {...props}
+      {...stylex.props(menuStyles.separator)}
+    />
+  );
 }
 
 function ContextMenuShortcut(props: ContextMenuShortcutProps) {
   return (
-    <span {...props} {...stylex.props(menuStyles.shortcut)} data-slot="context-menu-shortcut" />
+    <span
+      {...props}
+      {...stylex.props(menuStyles.shortcut)}
+      data-slot="context-menu-shortcut"
+    />
   );
 }
 

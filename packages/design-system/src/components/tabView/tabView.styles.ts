@@ -16,6 +16,8 @@ import {
 } from '../../tokens/value.stylex'
 import { tabViewVars } from './tabViewVars.stylex'
 
+const compactTab = '@container (max-width: 4rem)'
+
 export const tabViewStyles = stylex.create({
   root: {
     display: 'flex',
@@ -72,7 +74,7 @@ export const tabViewStyles = stylex.create({
     flexBasis: spatial['tab-view-width'],
     flexGrow: 0,
     flexShrink: 1,
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',
@@ -107,14 +109,15 @@ export const tabViewStyles = stylex.create({
     opacity: 0.6,
   },
   tab: {
+    borderRadius: borderRadii.xs,
     borderStyle: 'none',
     gap: {
       default: spacing.s,
-      '@container (max-width: 64px)': 0,
+      [compactTab]: 0,
     },
     paddingInline: {
       default: spacing.s,
-      '@container (max-width: 64px)': 0,
+      [compactTab]: 0,
     },
     alignItems: 'center',
     appearance: 'none',
@@ -130,7 +133,7 @@ export const tabViewStyles = stylex.create({
     fontWeight: fontWeights.regular,
     justifyContent: {
       default: 'flex-start',
-      '@container (max-width: 64px)': 'center',
+      [compactTab]: 'center',
     },
     lineHeight: lineHeights.none,
     outlineStyle: 'none',
@@ -159,7 +162,7 @@ export const tabViewStyles = stylex.create({
     overflow: 'hidden',
     display: {
       default: 'block',
-      '@container (max-width: 64px)': 'none',
+      [compactTab]: 'none',
     },
     flexGrow: 1,
     flexShrink: 1,
@@ -176,20 +179,20 @@ export const tabViewStyles = stylex.create({
     position: 'absolute',
     transform: {
       default: 'translateY(-50%)',
-      '@container (max-width: 64px)': 'translate(-50%, -50%)',
+      [compactTab]: 'translate(-50%, -50%)',
     },
     zIndex: 1,
-    height: 20,
+    height: spatial['button-height-xs'],
     left: {
       default: 'auto',
-      '@container (max-width: 64px)': '50%',
+      [compactTab]: '50%',
     },
     right: {
       default: spacing.xs,
-      '@container (max-width: 64px)': 'auto',
+      [compactTab]: 'auto',
     },
     top: '50%',
-    width: 20,
+    width: spatial['button-height-xs'],
   },
   closeContainerOverflowing: {
     '::before': {
@@ -197,7 +200,7 @@ export const tabViewStyles = stylex.create({
       content: '',
       display: {
         default: 'block',
-        '@container (max-width: 64px)': 'none',
+        [compactTab]: 'none',
       },
       pointerEvents: 'none',
       position: 'absolute',
@@ -205,7 +208,7 @@ export const tabViewStyles = stylex.create({
       height: '100%',
       right: tabViewVars.fadeRight,
       top: 0,
-      width: 16,
+      width: spacing.xl,
     },
   },
   closeAction: {
@@ -227,7 +230,7 @@ export const tabViewStyles = stylex.create({
   panel: {
     overflow: 'hidden',
     flexGrow: 1,
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',

@@ -77,7 +77,7 @@ export function ComboboxPage(): ReactElement {
       </Section>
       <Section
         title="Trigger sizing"
-        description="Combobox.Trigger defaults to the medium 28px control. Use its size prop when a different constrained control height is required."
+        description="Combobox.Trigger defaults to the medium control height. Use its size prop when a different constrained control height is required."
       >
         <Example source={triggerSource} align="start">
           <TriggerExample />

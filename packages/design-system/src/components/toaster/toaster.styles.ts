@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
+import { breakpointQueries } from '../../tokens/breakpoints.stylex'
 import { layerIndexes } from '../../tokens/layers.stylex'
 import { backgroundColors, borderColors, spatial, textColors } from '../../tokens/semantics.stylex'
 import {
@@ -14,7 +15,7 @@ import {
 import { toasterVars } from './toasterVars.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
-const compactViewport = '@media (max-width: 639px)'
+const compactViewport = breakpointQueries.belowSm
 
 const pulseEven = stylex.keyframes({
   '0%, 100%': { scale: 1 },
@@ -56,7 +57,7 @@ export const toasterStyles = stylex.create({
     overflowWrap: 'anywhere',
     position: 'absolute',
     transform:
-      'translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-swipe-movement-y) - var(--toast-index) * 8px)) scale(calc(1 - var(--toast-index) * 0.04))',
+      `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-swipe-movement-y) - var(--toast-index) * ${spacing.m})) scale(calc(1 - var(--toast-index) * 0.04))`,
     transformOrigin: 'bottom right',
     transitionDuration: { default: '240ms', [reducedMotion]: '0ms' },
     transitionProperty: 'transform, opacity, height',
@@ -124,7 +125,7 @@ export const toasterStyles = stylex.create({
   toastExpanded: {
     height: 'var(--toast-height)',
     transform:
-      'translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * 8px + var(--toast-swipe-movement-y)))',
+      `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${spacing.m} + var(--toast-swipe-movement-y)))`,
   },
   toastLimited: { opacity: 0, zIndex: 0 },
   toastStarting: { opacity: 0, transform: 'translateY(100%)' },
@@ -145,7 +146,7 @@ export const toasterStyles = stylex.create({
     transitionProperty: 'opacity',
     transitionTimingFunction: 'ease-out',
     height: '100%',
-    minHeight: 56,
+    minHeight: spatial['toast-min-height'],
   },
   contentBehind: { opacity: 0 },
   contentExpanded: { opacity: 1 },
@@ -188,7 +189,7 @@ export const toasterStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: 1,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
@@ -212,7 +213,7 @@ export const toasterStyles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: 1,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },

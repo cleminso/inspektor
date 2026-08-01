@@ -5,7 +5,8 @@ import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useState } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
-import { Button } from "../button/button";
+import { popupPositioning } from "../../primitives/popupPositioning";
+import { ButtonContent, getButtonVisualStyles } from "../button/buttonVisuals";
 import { comboboxStyles } from "./combobox.styles";
 
 type WithoutStyles<Props> = Omit<Props, "className" | "style" | "render">;
@@ -106,12 +107,10 @@ export interface ComboboxPortalProps extends WithoutStyles<BaseCombobox.Portal.P
   keepMounted?: boolean;
 }
 
-export interface ComboboxPositionerProps extends WithoutStyles<BaseCombobox.Positioner.Props> {
-  /** Sets the gap between the control and popup. */
-  sideOffset?: BaseCombobox.Positioner.Props["sideOffset"];
-  /** Aligns the popup along the control. */
-  align?: BaseCombobox.Positioner.Props["align"];
-}
+export type ComboboxPositionerProps = Pick<
+  WithoutStyles<BaseCombobox.Positioner.Props>,
+  "align" | "children"
+>;
 
 export type ComboboxPopupWidth = "anchor" | "content" | "s" | "m" | "l";
 
@@ -127,8 +126,6 @@ export interface ComboboxContentProps {
   width?: ComboboxPopupWidth;
   /** Keeps the popup mounted while closed. */
   keepMounted?: boolean;
-  /** Sets the gap between the control and popup. */
-  sideOffset?: ComboboxPositionerProps["sideOffset"];
   /** Aligns the popup along the control. */
   align?: ComboboxPositionerProps["align"];
 }
@@ -302,28 +299,37 @@ function ComboboxTrigger({
     m: comboboxStyles.triggerWidthM,
     full: comboboxStyles.triggerWidthFull,
   } satisfies Record<ComboboxTriggerWidth, unknown>;
-  const triggerStyles = createStateStyleProps<BaseCombobox.Trigger.State>(() => [
+  const triggerStyles = createStateStyleProps<BaseCombobox.Trigger.State>((state) => [
+    ...getButtonVisualStyles({
+      variant: "ghost",
+      size,
+      square: false,
+      pressed: false,
+      fullWidth: width === "full",
+      justify: "start",
+      radius: "xs",
+      orientation: null,
+      disabled: state.disabled,
+    }),
     comboboxStyles.trigger,
     triggerWidthStyles[width],
+    state.open === true && comboboxStyles.triggerOpen,
   ]);
   return (
-    <Button
-      variant="ghost"
-      size={size}
-      fullWidth={width === "full"}
-      justify="start"
+    <BaseCombobox.Trigger
+      {...props}
       disabled={disabled}
-      render={
-        <BaseCombobox.Trigger
-          {...props}
-          disabled={disabled}
-          {...triggerStyles}
-          render={(triggerProps) => <button {...triggerProps}>{triggerProps.children}</button>}
-        />
-      }
+      {...triggerStyles}
+      data-full-width={width === "full" ? "" : undefined}
+      data-radius="xs"
+      data-size={size}
+      data-slot="button"
+      data-variant="ghost"
     >
-      {children}
-    </Button>
+      <ButtonContent justify="start" size={size}>
+        {children}
+      </ButtonContent>
+    </BaseCombobox.Trigger>
   );
 }
 
@@ -356,16 +362,17 @@ function ComboboxPortal({ keepMounted = false, ...props }: ComboboxPortalProps) 
   return <BaseCombobox.Portal {...props} keepMounted={keepMounted} />;
 }
 
-function ComboboxPositioner({
-  sideOffset = 4,
-  align = "start",
-  ...props
-}: ComboboxPositionerProps) {
+function ComboboxPositioner({ align = "start", ...props }: ComboboxPositionerProps) {
   const stateStyles = createStateStyleProps<BaseCombobox.Positioner.State>(() => [
     comboboxStyles.positioner,
   ]);
   return (
-    <BaseCombobox.Positioner {...props} sideOffset={sideOffset} align={align} {...stateStyles} />
+    <BaseCombobox.Positioner
+      {...props}
+      sideOffset={popupPositioning.dropdownSideOffset}
+      align={align}
+      {...stateStyles}
+    />
   );
 }
 
@@ -391,12 +398,11 @@ function ComboboxContent({
   children,
   width = "anchor",
   keepMounted = false,
-  sideOffset = 4,
   align = "start",
 }: ComboboxContentProps) {
   return (
     <ComboboxPortal keepMounted={keepMounted}>
-      <ComboboxPositioner sideOffset={sideOffset} align={align}>
+      <ComboboxPositioner align={align}>
         <ComboboxPopup width={width} data-slot="combobox-content">
           {children}
         </ComboboxPopup>
@@ -406,7 +412,10 @@ function ComboboxContent({
 }
 
 function ComboboxPopupHeader({ render, ...props }: ComboboxPopupHeaderProps) {
-  const styles = stylex.props(comboboxStyles.popupHeader);
+  const styles = stylex.props(
+    comboboxStyles.popupSection,
+    comboboxStyles.popupHeader,
+  );
   const defaultProps = {
     ...styles,
     "data-slot": "combobox-popup-header",
@@ -419,7 +428,10 @@ function ComboboxPopupHeader({ render, ...props }: ComboboxPopupHeaderProps) {
 }
 
 function ComboboxPopupFooter({ render, ...props }: ComboboxPopupFooterProps) {
-  const styles = stylex.props(comboboxStyles.popupFooter);
+  const styles = stylex.props(
+    comboboxStyles.popupSection,
+    comboboxStyles.popupFooter,
+  );
   const defaultProps = {
     ...styles,
     "data-slot": "combobox-popup-footer",
@@ -439,7 +451,10 @@ const viewportHeightStyles = {
 } satisfies Record<ComboboxViewportHeight, unknown>;
 
 function ComboboxViewport({ maxHeight = "m", render, ...props }: ComboboxViewportProps) {
-  const styles = stylex.props(comboboxStyles.viewport, viewportHeightStyles[maxHeight]);
+  const styles = stylex.props(
+    comboboxStyles.viewport,
+    viewportHeightStyles[maxHeight],
+  );
   const defaultProps = {
     ...styles,
     "data-slot": "combobox-viewport",
@@ -550,7 +565,9 @@ function ComboboxItem<Value>({
 function ComboboxItemText({ label, description }: ComboboxItemTextProps) {
   const textStyles = stylex.props(comboboxStyles.itemText);
   const labelStyles = stylex.props(comboboxStyles.itemLabel);
-  const descriptionStyles = stylex.props(comboboxStyles.itemDescription);
+  const descriptionStyles = stylex.props(
+    comboboxStyles.itemDescription,
+  );
   return (
     <span {...textStyles}>
       <span {...labelStyles}>{label}</span>

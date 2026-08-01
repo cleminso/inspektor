@@ -1,13 +1,13 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { backgroundColors, borderColors, spatial } from '../../tokens/semantics.stylex'
-import { borderRadii } from '../../tokens/value.stylex'
+import { borderRadii, spacing } from '../../tokens/value.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
 
 export const switchStyles = stylex.create({
   root: {
-    padding: 2,
+    padding: spacing.xxs,
     borderColor: 'transparent',
     borderRadius: borderRadii.xs,
     borderStyle: 'solid',
@@ -15,10 +15,11 @@ export const switchStyles = stylex.create({
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: backgroundColors['bg-secondary'],
+    boxSizing: 'border-box',
     cursor: 'pointer',
     display: 'inline-flex',
     flexShrink: 0,
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: 1,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
@@ -65,12 +66,12 @@ export const switchStyles = stylex.create({
     cursor: 'default',
   },
   rootSizeS: {
-    height: 16,
-    width: 28,
+    height: spatial['switch-height-s'],
+    width: spatial['switch-width-s'],
   },
   rootSizeM: {
-    height: 20,
-    width: 36,
+    height: spatial['switch-height-m'],
+    width: spatial['switch-width-m'],
   },
   thumb: {
     borderRadius: borderRadii.xs,
@@ -85,17 +86,17 @@ export const switchStyles = stylex.create({
     backgroundColor: backgroundColors['bg-page'],
   },
   thumbSizeS: {
-    height: 12,
-    width: 12,
+    height: spatial['switch-thumb-s'],
+    width: spatial['switch-thumb-s'],
   },
   thumbSizeSChecked: {
-    transform: 'translateX(10px)',
+    transform: `translateX(calc(${spatial['switch-width-s']} - ${spatial['switch-thumb-s']} - ${spacing.xxs} - ${spacing.xxs} - 2px))`,
   },
   thumbSizeM: {
-    height: 14,
-    width: 14,
+    height: spatial['switch-thumb-m'],
+    width: spatial['switch-thumb-m'],
   },
   thumbSizeMChecked: {
-    transform: 'translateX(16px)',
+    transform: `translateX(calc(${spatial['switch-width-m']} - ${spatial['switch-thumb-m']} - ${spacing.xxs} - ${spacing.xxs} - 2px))`,
   },
 })

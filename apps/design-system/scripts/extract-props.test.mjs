@@ -296,7 +296,7 @@ test("extracts the constrained Tooltip compound API", () => {
   );
   assert.deepEqual(
     metadata["tooltip.content"]?.map(({ name }) => name),
-    ["side", "align", "sideOffset"],
+    ["side", "align"],
   );
   assert.equal(
     metadata["tooltip.content"]?.find(({ name }) => name === "side")?.defaultValue,
@@ -751,8 +751,8 @@ test("extracts the constrained Menu compound API", () => {
     "false",
   );
   assert.equal(
-    metadata["menu.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue,
-    "4",
+    metadata["menu.positioner"]?.find(({ name }) => name === "sideOffset"),
+    undefined,
   );
   assert.equal(
     metadata["menu.popup"]?.find(({ name }) => name === "width")?.defaultValue,
@@ -790,8 +790,8 @@ test("extracts the constrained Menu compound API", () => {
     undefined,
   );
   assert.equal(
-    metadata["menu.content"]?.find(({ name }) => name === "sideOffset")?.defaultValue,
-    "4",
+    metadata["menu.content"]?.find(({ name }) => name === "sideOffset"),
+    undefined,
   );
   assert.equal(
     metadata["menu.linkItem"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
@@ -815,8 +815,8 @@ test("extracts the constrained ContextMenu compound API", () => {
     "false",
   );
   assert.equal(
-    metadata["contextMenu.content"]?.find(({ name }) => name === "sideOffset")?.defaultValue,
-    "4",
+    metadata["contextMenu.content"]?.find(({ name }) => name === "sideOffset"),
+    undefined,
   );
   assert.equal(
     metadata["contextMenu.item"]?.find(({ name }) => name === "variant")?.defaultValue,
@@ -894,8 +894,8 @@ test("extracts the constrained Combobox compound API", () => {
     '"m"',
   );
   assert.equal(
-    metadata["combobox.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue,
-    "4",
+    metadata["combobox.positioner"]?.find(({ name }) => name === "sideOffset"),
+    undefined,
   );
   assert.deepEqual(
     metadata["combobox.item"]?.map(({ name }) => name),
@@ -1040,14 +1040,14 @@ test("extracts the constrained Select compound API", () => {
     "false",
   );
   assert.equal(
-    metadata["select.positioner"]?.find(({ name }) => name === "sideOffset")?.defaultValue,
-    "4",
+    metadata["select.positioner"]?.find(({ name }) => name === "sideOffset"),
+    undefined,
   );
   assert.equal(
     metadata["select.itemIndicator"]?.find(({ name }) => name === "keepMounted")?.defaultValue,
     "false",
   );
-  assert.equal(metadata["select.item"]?.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(metadata["select.item"]?.find(({ name }) => name === "size")?.defaultValue, '"s"');
   assert.equal(
     metadata["select.trigger"]?.find(({ name }) => name === "className"),
     undefined,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { breakpointQueries, breakpointValues } from './breakpoints.stylex'
 import {
   backgroundColors,
   borderRadii,
@@ -8,6 +9,15 @@ import {
   spatial,
   textColors,
 } from './tokens.stylex'
+import {
+  borderRadiusValues,
+  dimensionValues,
+  fontSizeValues,
+  spacingValues,
+} from './value.stylex'
+
+const nonzeroValues = (values: Readonly<Record<string, string>>) =>
+  Object.values(values).filter((value) => value !== '0')
 
 describe('semantic token contract', () => {
   it('defines notification color roles', () => {
@@ -84,5 +94,31 @@ describe('semantic token contract', () => {
     expect(borderRadii).not.toHaveProperty('l')
     expect(borderRadii).not.toHaveProperty('xl')
     expect(borderRadii).not.toHaveProperty('full')
+  })
+})
+
+describe('primitive length policy', () => {
+  it('keeps scalable primitive lengths relative to the root font size', () => {
+    expect(nonzeroValues(fontSizeValues).every((value) => value.endsWith('rem'))).toBe(true)
+    expect(nonzeroValues(spacingValues).every((value) => value.endsWith('rem'))).toBe(true)
+    expect(nonzeroValues(borderRadiusValues).every((value) => value.endsWith('rem'))).toBe(true)
+    expect(
+      Object.entries(dimensionValues)
+        .filter(([key]) => key !== '1' && key !== '2')
+        .every(([, value]) => value.endsWith('rem')),
+    ).toBe(true)
+  })
+
+  it('keeps physical boundary and focus geometry pixel-backed', () => {
+    expect(dimensionValues[1]).toBe('1px')
+    expect(dimensionValues[2]).toBe('2px')
+  })
+})
+
+describe('breakpoint contract', () => {
+  it('derives global media queries from one value owner', () => {
+    expect(breakpointValues).toEqual({ sm: 640, md: 768, lg: 1024, xl: 1280 })
+    expect(breakpointQueries.belowSm).toBe('@media (max-width: 639px)')
+    expect(breakpointQueries.md).toBe('@media (min-width: 768px)')
   })
 })

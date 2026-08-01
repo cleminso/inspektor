@@ -96,7 +96,7 @@ export const inputGroupStyles = stylex.create({
     display: "inline-flex",
     flexShrink: 0,
     justifyContent: "center",
-    outlineColor: borderColors["border-focused"],
+    outlineColor: borderColors["outline"],
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: {
@@ -112,13 +112,13 @@ export const inputGroupStyles = stylex.create({
     },
   },
   actionS: {
-    width: 22,
+    width: spatial["control-inner-height-s"],
   },
   actionM: {
-    width: 26,
+    width: spatial["control-inner-height-m"],
   },
   actionL: {
-    width: 30,
+    width: spatial["control-inner-height-l"],
   },
   checkboxField: {
     gap: spacing.s,

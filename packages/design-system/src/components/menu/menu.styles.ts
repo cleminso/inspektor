@@ -1,7 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { layerIndexes } from "../../tokens/layers.stylex";
-import { backgroundColors, borderColors, textColors } from "../../tokens/semantics.stylex";
+import {
+  backgroundColors,
+  borderColors,
+  spatial,
+  textColors,
+} from "../../tokens/semantics.stylex";
 import {
   borderRadii,
   fontFamilies,
@@ -35,13 +40,13 @@ export const menuStyles = stylex.create({
     fontSize: fontSizes[2],
     justifyContent: "center",
     lineHeight: lineHeights.none,
-    outlineColor: borderColors["border-focused"],
+    outlineColor: borderColors["outline"],
     outlineOffset: -1,
     outlineStyle: "solid",
-    outlineWidth: { default: 0, ":focus-visible": 2 },
+    outlineWidth: { default: 0, ":focus-visible": spatial["focus-ring-width"] },
     userSelect: "none",
     whiteSpace: "nowrap",
-    height: 28,
+    height: spatial["control-height-m"],
   },
   triggerGrouped: {
     borderRadius: 0,
@@ -70,12 +75,11 @@ export const menuStyles = stylex.create({
   },
   positioner: { outline: "none", zIndex: layerIndexes.popup },
   popup: {
-    padding: spacing.xxs,
+    padding: spatial["popup-collection-padding"],
     borderColor: borderColors.border,
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
-    // gap: spacing.xxs,
     outline: "none",
     backgroundColor: backgroundColors["bg-popover"],
     boxShadow: shadows.medium,
@@ -83,14 +87,14 @@ export const menuStyles = stylex.create({
     transformOrigin: "var(--transform-origin)",
     maxWidth: "var(--available-width)",
   },
-  popupWidthContent: { minWidth: 140, width: "max-content" },
+  popupWidthContent: { minWidth: spatial["menu-min-width"], width: "max-content" },
   popupWidthAnchor: { width: "var(--anchor-width)" },
   popupTransition: { opacity: 0, transform: "scale(0.98)" },
   item: {
     borderRadius: borderRadii.xs,
-    gap: spacing.m,
+    gap: spacing.s,
     outline: "none",
-    paddingInline: spacing.s,
+    paddingInline: spatial["popup-item-inline-padding"],
     alignItems: "center",
     backgroundColor: { default: "transparent", ":active": backgroundColors["bg-hover"] },
     boxSizing: "border-box",
@@ -99,9 +103,10 @@ export const menuStyles = stylex.create({
     display: "flex",
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.none,
+    fontWeight: fontWeights.regular,
+    lineHeight: lineHeights.normal,
     userSelect: "none",
-    minHeight: 24,
+    minHeight: spatial["popup-row-min-height"],
     width: "auto",
   },
   itemHighlighted: {
@@ -122,7 +127,10 @@ export const menuStyles = stylex.create({
     backgroundColor: backgroundColors["bg-danger"],
     color: textColors["fg-danger"],
   },
-  choiceItem: { display: "grid", gridTemplateColumns: "16px minmax(0, 1fr) auto" },
+  choiceItem: {
+    display: "grid",
+    gridTemplateColumns: `${spatial["icon-size-m"]} minmax(0, 1fr) auto`,
+  },
   indicator: {
     alignItems: "center",
     display: "inline-flex",
@@ -131,13 +139,17 @@ export const menuStyles = stylex.create({
     justifyContent: "center",
     justifySelf: "start",
   },
-  icon: { display: "block", height: 14, width: 14 },
+  icon: {
+    display: "block",
+    height: spatial["icon-size-s"],
+    width: spatial["icon-size-s"],
+  },
   prefix: {
     alignItems: "center",
     display: "inline-flex",
     flexShrink: 0,
     justifyContent: "center",
-    width: 16,
+    width: spatial["icon-size-m"],
   },
   suffix: {
     alignItems: "center",
@@ -146,17 +158,23 @@ export const menuStyles = stylex.create({
     justifyContent: "center",
     marginInlineStart: "auto",
   },
-  submenuIcon: { display: "block", height: 12, width: 12 },
+  submenuIcon: {
+    display: "block",
+    height: spatial["icon-size-xs"],
+    width: spatial["icon-size-xs"],
+  },
   shortcut: {
     color: textColors["text-subtle"],
     flexShrink: 0,
+    fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
+    fontWeight: fontWeights.regular,
+    lineHeight: lineHeights.tight,
     marginInlineStart: "auto",
   },
   groupLabel: {
-    marginInline: spacing.xxs,
-    paddingBlock: spacing.xxs,
-    paddingInline: spacing.xxs,
+    paddingBlock: spatial["popup-collection-padding"],
+    paddingInline: spatial["popup-item-inline-padding"],
     color: textColors["text-subtle"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
@@ -164,7 +182,7 @@ export const menuStyles = stylex.create({
     lineHeight: lineHeights.tight,
   },
   separator: {
-    marginBlock: spacing.xxs,
+    marginBlock: spatial["popup-collection-padding"],
     marginInline: spacing.none,
     backgroundColor: borderColors["border-secondary"],
     height: 1,

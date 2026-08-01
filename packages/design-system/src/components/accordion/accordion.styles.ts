@@ -52,7 +52,7 @@ export const accordionStyles = stylex.create({
     fontWeight: fontWeights.regular,
     justifyContent: 'space-between',
     lineHeight: lineHeights.tight,
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',

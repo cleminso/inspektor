@@ -33,7 +33,6 @@ export default function CollapsibleExample(): ReactElement {
         <ResizablePanelGroup>
           <ResizablePanel
             panelRef={listPanelRef}
-            defaultSize={180}
             minSize={140}
             maxSize={280}
             collapsedSize={0}
@@ -44,7 +43,7 @@ export default function CollapsibleExample(): ReactElement {
               <Text>Table list</Text>
             </Box>
           </ResizablePanel>
-          {isCollapsed === false ? <ResizableHandle /> : null}
+          <ResizableHandle />
           <ResizablePanel>
             <Box height="full" alignItems="center" justifyContent="center">
               <Text>Table explorer</Text>

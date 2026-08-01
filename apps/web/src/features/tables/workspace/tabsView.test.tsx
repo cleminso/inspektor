@@ -76,6 +76,7 @@ describe("TableTabsView", () => {
 
     render(<TableTabsView tableName="accounts" />);
 
+    expect(screen.getByRole("tabpanel").tabIndex).toBe(-1);
     expect(screen.getByText("Selected table: accounts")).toBeTruthy();
     expect(screen.queryByText("New table view content")).toBeNull();
   });

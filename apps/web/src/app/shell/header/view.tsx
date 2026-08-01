@@ -23,9 +23,9 @@ export function InspectorHeader(): React.ReactElement {
       borderColor="border-secondary"
       borderStyle="solid"
     >
-      <Box minWidth={0} flex={1} alignItems="center" gap="none">
+      <Box minWidth={0} flex={1} alignItems="center" gap="xxs">
         <ConnectionSwitcher width="m" />
-        <Box minWidth={0} alignItems="center" gap="s">
+        <Box minWidth={0} alignItems="center" gap="xxs">
           <BranchSwitcher width="s" />
           <Text as="span" color="muted" aria-hidden="true">
             /

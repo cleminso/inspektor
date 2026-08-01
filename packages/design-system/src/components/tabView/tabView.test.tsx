@@ -101,6 +101,23 @@ describe('TabView', () => {
     expect(document.activeElement).toBe(reorderedTab)
   })
 
+  it('leaves item focus-visible styling to the parent selector', () => {
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List aria-label="Table views">
+          <TabView.Item value="all">All accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    const tab = screen.getByRole('tab', { name: 'All accounts' })
+    const item = tab.closest('[data-slot="tab-view-item"]')
+    vi.spyOn(tab, 'matches').mockReturnValue(true)
+
+    fireEvent.focus(tab)
+    expect(item?.getAttribute('data-focus-visible')).toBeNull()
+  })
+
   it('registers each sortable through its owning tab item ref', async () => {
     render(
       <TabView.Root defaultValue="all">
@@ -208,6 +225,7 @@ describe('TabView', () => {
     expect(screen.getByRole('tab', { name: 'Active accounts' }).getAttribute('data-active')).toBe(
       '',
     )
+    expect(screen.getByRole('tabpanel').tabIndex).toBe(-1)
     expect(screen.getByText('Active account rows')).toBeTruthy()
     expect(screen.queryByText('All account rows')).toBeNull()
   })

@@ -20,5 +20,4 @@ export const multiSelectContentPropNames = [
   "maxHeight",
   "keepMounted",
   "align",
-  "sideOffset",
 ] as const;

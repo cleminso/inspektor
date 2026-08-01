@@ -39,7 +39,7 @@ export const actionListStyles = stylex.create({
     },
     color: { default: textColors['text-muted'], ':hover': textColors['text-secondary'], },
     display: 'flex',
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',
@@ -171,7 +171,7 @@ export const actionListStyles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',

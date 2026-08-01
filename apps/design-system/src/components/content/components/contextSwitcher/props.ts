@@ -25,7 +25,6 @@ export const contextSwitcherSearchPropNames = ["label", "placeholder"] as const;
 export const contextSwitcherContentPropNames = [
   "width",
   "keepMounted",
-  "sideOffset",
   "align",
 ] as const;
 export const contextSwitcherViewportPropNames = ["maxHeight"] as const;

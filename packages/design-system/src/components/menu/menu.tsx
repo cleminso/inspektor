@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { useContext } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { popupPositioning } from "../../primitives/popupPositioning";
 import { InputGroupContext } from "../inputGroup/inputGroupContext";
 import { menuStyles } from "./menu.styles";
 
@@ -35,16 +36,10 @@ export interface MenuPortalProps extends WithoutStyles<BaseMenu.Portal.Props> {
   keepMounted?: boolean;
 }
 
-export interface MenuPositionerProps extends WithoutStyles<BaseMenu.Positioner.Props> {
-  /** Sets the gap between the trigger and popup. */
-  sideOffset?: BaseMenu.Positioner.Props["sideOffset"];
-  /** Aligns the popup along the trigger. */
-  align?: BaseMenu.Positioner.Props["align"];
-  /** Places the popup on a side of the trigger. */
-  side?: BaseMenu.Positioner.Props["side"];
-  /** Offsets alignment along the trigger. */
-  alignOffset?: BaseMenu.Positioner.Props["alignOffset"];
-}
+export type MenuPositionerProps = Pick<
+  WithoutStyles<BaseMenu.Positioner.Props>,
+  "align" | "children" | "side"
+>;
 
 export type MenuPopupWidth = "content" | "anchor";
 
@@ -56,14 +51,10 @@ export interface MenuPopupProps extends Omit<WithoutStyles<BaseMenu.Popup.Props>
 export interface MenuContentProps extends MenuPopupProps {
   /** Aligns the popup along the trigger. */
   align?: MenuPositionerProps["align"];
-  /** Offsets alignment along the trigger. */
-  alignOffset?: MenuPositionerProps["alignOffset"];
   /** Keeps the content mounted while closed. */
   keepMounted?: boolean;
   /** Places the popup on a side of the trigger. */
   side?: MenuPositionerProps["side"];
-  /** Sets the gap between the trigger and popup. */
-  sideOffset?: MenuPositionerProps["sideOffset"];
 }
 
 export interface MenuItemProps extends WithoutStyles<BaseMenu.Item.Props> {
@@ -183,11 +174,18 @@ function MenuPortal({ keepMounted = false, ...props }: MenuPortalProps) {
   return <BaseMenu.Portal {...props} keepMounted={keepMounted} />;
 }
 
-function MenuPositioner({ sideOffset = 4, align = "start", ...props }: MenuPositionerProps) {
+function MenuPositioner({ align = "start", ...props }: MenuPositionerProps) {
   const stateStyles = createStateStyleProps<BaseMenu.Positioner.State>(() => [
     menuStyles.positioner,
   ]);
-  return <BaseMenu.Positioner {...props} sideOffset={sideOffset} align={align} {...stateStyles} />;
+  return (
+    <BaseMenu.Positioner
+      {...props}
+      sideOffset={popupPositioning.dropdownSideOffset}
+      align={align}
+      {...stateStyles}
+    />
+  );
 }
 
 const popupWidthStyles = {
@@ -207,15 +205,13 @@ function MenuPopup({ width = "content", ...props }: MenuPopupProps) {
 
 function MenuContent({
   align = "start",
-  alignOffset,
   keepMounted = false,
   side,
-  sideOffset = 4,
   ...props
 }: MenuContentProps) {
   return (
     <MenuPortal keepMounted={keepMounted}>
-      <MenuPositioner align={align} alignOffset={alignOffset} side={side} sideOffset={sideOffset}>
+      <MenuPositioner align={align} side={side}>
         <MenuPopup {...props} />
       </MenuPositioner>
     </MenuPortal>

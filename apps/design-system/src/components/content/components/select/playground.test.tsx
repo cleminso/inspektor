@@ -11,7 +11,7 @@ describe("Select playground", () => {
   it("serializes a constrained Select composition without default props", () => {
     const source = serializeSelectPlayground({
       size: "m",
-      itemSize: "m",
+      itemSize: "s",
       width: "content",
       disabled: false,
       prefix: false,
@@ -21,7 +21,7 @@ describe("Select playground", () => {
     expect(source).toContain('<Select.Root items={options} defaultValue="main">');
     expect(source).toContain('<Select.Trigger aria-label="Branch">');
     expect(source).not.toContain('size="m"');
-    expect(source).not.toContain('<Select.Item key={option.value} value={option.value} size="m">');
+    expect(source).not.toContain('<Select.Item key={option.value} value={option.value} size="s">');
     expect(source).not.toContain('width="content"');
   });
 

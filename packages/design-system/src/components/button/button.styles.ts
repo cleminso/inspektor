@@ -34,7 +34,7 @@ export const buttonStyles = stylex.create({
     fontWeight: fontWeights.regular,
     justifyContent: 'center',
     lineHeight: lineHeights.relaxed,
-    outlineColor: borderColors['border-focused'],
+    outlineColor: borderColors['outline'],
     outlineOffset: 2,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
@@ -82,7 +82,7 @@ export const buttonStyles = stylex.create({
       default: 'none',
       ':hover': 'underline',
     },
-    textUnderlineOffset: 3,
+    textUnderlineOffset: `calc(${spacing.s} / 2)`,
   },
   sizeXS: {
     paddingInline: spacing.s,

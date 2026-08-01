@@ -27,7 +27,7 @@ function truncateMiddle(value: string, maxLength: number): string {
 }
 
 export function SchemaSwitcher({
-  size = "m",
+  size = "s",
   triggerLabel,
   width = "content",
 }: SchemaSwitcherProps = {}): React.ReactElement {
@@ -56,7 +56,7 @@ export function SchemaSwitcher({
         width={width}
         title={triggerTitle}
       >
-        <Text as="span" color="inherit" monospace truncate>
+        <Text as="span" color="inherit" truncate>
           {displayTriggerText}
         </Text>
       </ContextSwitcher.Trigger>
@@ -71,7 +71,7 @@ export function SchemaSwitcher({
               <ContextSwitcher.List>
                 {(schemaHash: string) => (
                   <ContextSwitcher.Item key={schemaHash} value={schemaHash}>
-                    <Text as="span" color="inherit" monospace>
+                    <Text as="span" color="inherit">
                       {schemaHash}
                     </Text>
                   </ContextSwitcher.Item>

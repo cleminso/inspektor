@@ -2,10 +2,8 @@ export const menuRootPropNames = ["defaultOpen", "open", "onOpenChange", "disabl
 export const menuTriggerPropNames = ["disabled", "render"] as const;
 export const menuContentPropNames = [
   "align",
-  "alignOffset",
   "keepMounted",
   "side",
-  "sideOffset",
   "width",
 ] as const;
 export const menuItemPropNames = ["variant", "disabled", "closeOnClick"] as const;

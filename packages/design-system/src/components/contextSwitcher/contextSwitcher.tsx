@@ -73,8 +73,6 @@ export type ContextSwitcherContentProps = PropsWithChildren<{
   width?: ComboboxPopupWidth;
   /** Keeps the popup mounted while closed. */
   keepMounted?: ComboboxContentProps["keepMounted"];
-  /** Sets the gap between the trigger and popup. */
-  sideOffset?: ComboboxContentProps["sideOffset"];
   /** Aligns the popup along the trigger. */
   align?: ComboboxContentProps["align"];
 }>;
@@ -159,12 +157,11 @@ function ContextSwitcherValue(props: ContextSwitcherValueProps) {
 function ContextSwitcherContent({
   width = "m",
   keepMounted = false,
-  sideOffset,
   align,
   children,
 }: ContextSwitcherContentProps) {
   return (
-    <Combobox.Content width={width} keepMounted={keepMounted} sideOffset={sideOffset} align={align}>
+    <Combobox.Content width={width} keepMounted={keepMounted} align={align}>
       {children}
     </Combobox.Content>
   );

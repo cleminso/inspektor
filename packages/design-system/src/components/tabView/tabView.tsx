@@ -108,7 +108,7 @@ export interface TabViewItemProps {
   children: ReactNode
   /** Supplementary context shown in a tooltip even when the view name fits. */
   details?: ReactNode
-  /** Renders a decorative 16px icon before the view name. */
+  /** Renders a decorative medium icon before the view name. */
   prefix?: ReactNode
   /** Disables selection and closing for this view. */
   disabled?: boolean
@@ -448,6 +448,7 @@ function TabViewPanel({ value, children, keepMounted = false }: TabViewPanelProp
     <BaseTabs.Panel
       value={value}
       keepMounted={keepMounted}
+      tabIndex={-1}
       {...panelStyles}
       data-slot="tab-view-panel"
     >

@@ -145,13 +145,18 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Table-list dock
 
+[31/08/26]
+
+- [x] Start the table-list dock open at 200px while keeping its 160px to 360px resize range.
+- [x] Keep the resize handle mounted while collapsed so pointer and keyboard interaction can reopen the dock.
+- [x] Delegate dock collapse and expansion directly to the design-system panel ref.
+
 [31/07/26]
 
 - [x] Keep left-dock visibility and resizable-panel ownership inside the Tables feature.
 - [x] Compose the feature-owned visibility control into the application dock at the Tables parent route.
 - [x] Open and close the table-list dock through one persistent dock icon.
 - [x] Remove the duplicate table-list toggle from the workspace tab bar.
-- [x] Start the table-list dock collapsed.
 - [x] Remove table search and its empty-result state from the table-list dock.
 
 [29/07/26]

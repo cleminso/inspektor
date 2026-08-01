@@ -1,5 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
+import { spatial } from '../../tokens/semantics.stylex'
+
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
 
 const spin = stylex.keyframes({
@@ -17,15 +19,15 @@ export const spinnerStyles = stylex.create({
     flexShrink: 0,
   },
   sizeS: {
-    height: 12,
-    width: 12,
+    height: spatial['icon-size-xs'],
+    width: spatial['icon-size-xs'],
   },
   sizeM: {
-    height: 14,
-    width: 14,
+    height: spatial['icon-size-s'],
+    width: spatial['icon-size-s'],
   },
   sizeL: {
-    height: 16,
-    width: 16,
+    height: spatial['icon-size-m'],
+    width: spatial['icon-size-m'],
   },
 })

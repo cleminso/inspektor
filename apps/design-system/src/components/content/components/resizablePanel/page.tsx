@@ -34,7 +34,7 @@ export function ResizablePanelPage(): ReactElement {
 
       <Section
         title="Collapsible panel"
-        description="Use the panel ref for explicit collapse controls while onResize keeps application state synchronized."
+        description="Collapsible panels open at 200px by default. Use the panel ref for explicit collapse controls while onResize keeps application state synchronized."
       >
         <Example source={collapsibleSource} align="stretch">
           <CollapsibleExample />

@@ -13,6 +13,7 @@ import {
 } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { popupPositioning } from "../../primitives/popupPositioning";
 import { Button } from "../button/button";
 import { Checkbox } from "../checkbox/checkbox";
 import { Search } from "../search/search";
@@ -77,8 +78,6 @@ export interface MultiSelectContentProps {
   keepMounted?: boolean;
   /** Aligns the popup along the trigger. */
   align?: BasePopover.Positioner.Props["align"];
-  /** Sets the gap between trigger and popup. */
-  sideOffset?: BasePopover.Positioner.Props["sideOffset"];
 }
 
 interface ItemControls {
@@ -223,7 +222,6 @@ function MultiSelectContent({
   maxHeight = "m",
   keepMounted = false,
   align = "start",
-  sideOffset = 4,
 }: MultiSelectContentProps): React.ReactElement {
   const context = useMultiSelectContext();
   const positionerStyles = createStateStyleProps<BasePopover.Positioner.State>(() => [
@@ -257,7 +255,7 @@ function MultiSelectContent({
     <BasePopover.Portal keepMounted={keepMounted}>
       <BasePopover.Positioner
         align={align}
-        sideOffset={sideOffset}
+        sideOffset={popupPositioning.dropdownSideOffset}
         {...positionerStyles}
       >
         <BasePopover.Popup
@@ -267,7 +265,7 @@ function MultiSelectContent({
           role="dialog"
           {...popupStyles}
         >
-          <div {...stylex.props(multiSelectStyles.header)}>
+          <div {...stylex.props(multiSelectStyles.section)}>
             <Search
               ref={context.searchRef}
               aria-label={searchLabel}
@@ -293,7 +291,10 @@ function MultiSelectContent({
             <div
               aria-label={label}
               role="group"
-              {...stylex.props(multiSelectStyles.options, optionsHeightStyles[maxHeight])}
+              {...stylex.props(
+                multiSelectStyles.options,
+                optionsHeightStyles[maxHeight],
+              )}
             >
               {context.filteredItems.map((item) => (
                 <MultiSelectOption
@@ -409,7 +410,12 @@ function MultiSelectOption({
         }}
       />
       {disabled === true ? (
-        <span {...stylex.props(multiSelectStyles.optionButton, multiSelectStyles.optionButtonDisabled)}>
+        <span
+          {...stylex.props(
+            multiSelectStyles.optionButton,
+            multiSelectStyles.optionButtonDisabled,
+          )}
+        >
           <span {...stylex.props(multiSelectStyles.optionText)}>{item.label}</span>
         </span>
       ) : (

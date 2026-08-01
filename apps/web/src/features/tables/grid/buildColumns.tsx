@@ -3,17 +3,9 @@ import { useRef, type MouseEvent } from "react";
 import type { Column, ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowLeftToLine,
-  ArrowRight,
-  ArrowRightToLine,
-  ArrowUp,
   ArrowUpRight,
   ChevronDown,
-  EyeOff,
   KeyRound,
-  MoveHorizontal,
 } from "lucide-react";
 
 import {
@@ -35,10 +27,7 @@ import {
   type ColumnTypeMarker as ColumnTypeMarkerModel,
 } from "@tables/grid/columnTypeMarker";
 import { RelationCellLink } from "@tables/grid/relationCellLink";
-import {
-  classifySchemaValue,
-  type SchemaValuePresentation,
-} from "@tables/grid/valuePresentation";
+import { classifySchemaValue, type SchemaValuePresentation } from "@tables/grid/valuePresentation";
 import type { ColumnMoveDirection } from "@tables/grid/useColumnOrder";
 import type { TableColumnMeta } from "@tables/tableTypes";
 
@@ -127,12 +116,7 @@ function CompactCellValue({
 
   if (isRowId === true && "displayValue" in presentation) {
     return (
-      <Text
-        as="span"
-        aria-label={presentation.displayValue}
-        data-cell-overflow="truncate"
-        truncate
-      >
+      <Text as="span" aria-label={presentation.displayValue} data-cell-overflow="truncate" truncate>
         {presentation.displayValue}
       </Text>
     );
@@ -158,8 +142,7 @@ function CompactCellValue({
   if (presentation.kind === "boolean") {
     return (
       <Box as="span" alignItems="center" gap="xs">
-        <Text as="span" aria-label={`Boolean ${String(presentation.value)}`} color="muted">
-        </Text>
+        <Text as="span" aria-label={`Boolean ${String(presentation.value)}`} color="muted"></Text>
         <Text as="span">{String(presentation.value)}</Text>
       </Box>
     );
@@ -218,13 +201,7 @@ function SelectionCheckbox({
 
 function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.ReactElement {
   return (
-    <Text
-      as="span"
-      aria-label={marker.label}
-      color="muted"
-      title={marker.label}
-      variant="caption"
-    >
+    <Text as="span" aria-label={marker.label} color="muted" title={marker.label} variant="caption">
       <Box as="span" alignItems="center" display="flex">
         {marker.icon === "key" ? <Icon render={<KeyRound />} size="xs" /> : null}
         {marker.icon === "relation" ? <Icon render={<ArrowUpRight />} size="xs" /> : null}
@@ -255,16 +232,10 @@ function MenuMoveActions({
   return (
     <Menu.SubmenuRoot>
       <Menu.SubmenuTrigger>
-        <Menu.Prefix>
-          <MoveHorizontal aria-hidden="true" size={14} />
-        </Menu.Prefix>
         Move
       </Menu.SubmenuTrigger>
       <Menu.Content side="right" align="start">
         <Menu.Item onClick={() => onMove(columnId, "left")}>
-          <Menu.Prefix>
-            <ArrowLeft aria-hidden="true" size={14} />
-          </Menu.Prefix>
           Move left
           <Menu.Shortcut>
             <KeyboardInput modifiers={["shift"]} size="small">
@@ -273,9 +244,6 @@ function MenuMoveActions({
           </Menu.Shortcut>
         </Menu.Item>
         <Menu.Item onClick={() => onMove(columnId, "right")}>
-          <Menu.Prefix>
-            <ArrowRight aria-hidden="true" size={14} />
-          </Menu.Prefix>
           Move right
           <Menu.Shortcut>
             <KeyboardInput modifiers={["shift"]} size="small">
@@ -285,15 +253,9 @@ function MenuMoveActions({
         </Menu.Item>
         <Menu.Separator />
         <Menu.Item onClick={() => onMove(columnId, "start")}>
-          <Menu.Prefix>
-            <ArrowLeftToLine aria-hidden="true" size={14} />
-          </Menu.Prefix>
           Move to start
         </Menu.Item>
         <Menu.Item onClick={() => onMove(columnId, "end")}>
-          <Menu.Prefix>
-            <ArrowRightToLine aria-hidden="true" size={14} />
-          </Menu.Prefix>
           Move to end
         </Menu.Item>
       </Menu.Content>
@@ -314,14 +276,12 @@ function MenuColumnActions({
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(false)}
       >
-        <Menu.Prefix><ArrowUp size={14} /></Menu.Prefix>
         Sort Ascending
       </Menu.Item>
       <Menu.Item
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(true)}
       >
-        <Menu.Prefix><ArrowDown size={14} /></Menu.Prefix>
         Sort Descending
       </Menu.Item>
       {onMove === undefined ? null : (
@@ -335,7 +295,6 @@ function MenuColumnActions({
         disabled={column.getCanHide() === false}
         onClick={() => column.toggleVisibility(false)}
       >
-        <Menu.Prefix><EyeOff size={14} /></Menu.Prefix>
         Hide column
       </Menu.Item>
     </>
@@ -352,16 +311,10 @@ function ContextMoveActions({
   return (
     <ContextMenu.SubmenuRoot>
       <ContextMenu.SubmenuTrigger>
-        <ContextMenu.Prefix>
-          <MoveHorizontal aria-hidden="true" size={14} />
-        </ContextMenu.Prefix>
         Move
       </ContextMenu.SubmenuTrigger>
       <ContextMenu.Content side="right" align="start">
         <ContextMenu.Item onClick={() => onMove(columnId, "left")}>
-          <ContextMenu.Prefix>
-            <ArrowLeft aria-hidden="true" size={14} />
-          </ContextMenu.Prefix>
           Move left
           <ContextMenu.Shortcut>
             <KeyboardInput modifiers={["shift"]} size="small">
@@ -370,9 +323,6 @@ function ContextMoveActions({
           </ContextMenu.Shortcut>
         </ContextMenu.Item>
         <ContextMenu.Item onClick={() => onMove(columnId, "right")}>
-          <ContextMenu.Prefix>
-            <ArrowRight aria-hidden="true" size={14} />
-          </ContextMenu.Prefix>
           Move right
           <ContextMenu.Shortcut>
             <KeyboardInput modifiers={["shift"]} size="small">
@@ -382,15 +332,9 @@ function ContextMoveActions({
         </ContextMenu.Item>
         <ContextMenu.Separator />
         <ContextMenu.Item onClick={() => onMove(columnId, "start")}>
-          <ContextMenu.Prefix>
-            <ArrowLeftToLine aria-hidden="true" size={14} />
-          </ContextMenu.Prefix>
           Move to start
         </ContextMenu.Item>
         <ContextMenu.Item onClick={() => onMove(columnId, "end")}>
-          <ContextMenu.Prefix>
-            <ArrowRightToLine aria-hidden="true" size={14} />
-          </ContextMenu.Prefix>
           Move to end
         </ContextMenu.Item>
       </ContextMenu.Content>
@@ -411,14 +355,12 @@ function ContextColumnActions({
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(false)}
       >
-        <ContextMenu.Prefix><ArrowUp size={14} /></ContextMenu.Prefix>
         Sort Ascending
       </ContextMenu.Item>
       <ContextMenu.Item
         disabled={column.getCanSort() === false}
         onClick={() => column.toggleSorting(true)}
       >
-        <ContextMenu.Prefix><ArrowDown size={14} /></ContextMenu.Prefix>
         Sort Descending
       </ContextMenu.Item>
       {onMove === undefined ? null : (
@@ -432,7 +374,6 @@ function ContextColumnActions({
         disabled={column.getCanHide() === false}
         onClick={() => column.toggleVisibility(false)}
       >
-        <ContextMenu.Prefix><EyeOff size={14} /></ContextMenu.Prefix>
         Hide column
       </ContextMenu.Item>
     </>
@@ -486,7 +427,9 @@ function ColumnHeader({
           >
             <ColumnTypeMarker marker={marker} />
           </Box>
-          <Text as="span" truncate variant="caption">{label}</Text>
+          <Text as="span" truncate variant="caption">
+            {label}
+          </Text>
         </Box>
         <Menu.Root onOpenChange={handleOpenChange}>
           <Menu.Trigger
@@ -502,7 +445,7 @@ function ColumnHeader({
                 }}
               >
                 <Text as="span" color="muted">
-                  <ChevronDown aria-hidden="true" size={14} />
+                  <Icon render={<ChevronDown />} size="s" />
                 </Text>
               </Button>
             }
@@ -535,7 +478,8 @@ export function buildDataGridColumns({
     enableSorting: false,
     header: ({ table }) => {
       const loadedRows = table.getRowModel().rows;
-      const isAllSelected = loadedRows.length > 0 && loadedRows.every((row) => row.getIsSelected() === true);
+      const isAllSelected =
+        loadedRows.length > 0 && loadedRows.every((row) => row.getIsSelected() === true);
       const isSomeSelected = loadedRows.some((row) => row.getIsSelected() === true);
 
       return (

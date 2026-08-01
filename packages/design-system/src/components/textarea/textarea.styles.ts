@@ -1,6 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, textColors } from "../../tokens/semantics.stylex";
+import {
+  backgroundColors,
+  borderColors,
+  spatial,
+  textColors,
+} from "../../tokens/semantics.stylex";
 import {
   borderRadii,
   fontFamilies,
@@ -27,7 +32,7 @@ export const textareaStyles = stylex.create({
     color: textColors["text-default"],
     fontSize: fontSizes[2],
     lineHeight: lineHeights.normal,
-    outlineColor: borderColors["border-focused"],
+    outlineColor: borderColors["outline"],
     outlineStyle: "solid",
     outlineWidth: 0,
     resize: "vertical",
@@ -37,13 +42,13 @@ export const textareaStyles = stylex.create({
     },
   },
   heightS: {
-    minHeight: 72,
+    minHeight: spatial["textarea-height-s"],
   },
   heightM: {
-    minHeight: 112,
+    minHeight: spatial["textarea-height-m"],
   },
   heightL: {
-    minHeight: 160,
+    minHeight: spatial["textarea-height-l"],
   },
   fontSans: {
     fontFamily: fontFamilies.sans,

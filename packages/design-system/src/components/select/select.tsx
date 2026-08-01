@@ -3,6 +3,7 @@ import { Select as BaseSelect } from "@base-ui/react/select";
 import * as stylex from "@stylexjs/stylex";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { popupPositioning } from "../../primitives/popupPositioning";
 import { selectStyles } from "./select.styles";
 
 type WithoutStyles<Props> = Omit<Props, "className" | "style" | "render">;
@@ -54,14 +55,10 @@ export type SelectValueProps = WithoutStyles<BaseSelect.Value.Props>;
 export type SelectIconProps = Omit<WithoutStyles<BaseSelect.Icon.Props>, "children">;
 export type SelectPortalProps = WithoutStyles<BaseSelect.Portal.Props>;
 
-export interface SelectPositionerProps extends WithoutStyles<BaseSelect.Positioner.Props> {
-  /** Sets the gap between the trigger and popup. */
-  sideOffset?: BaseSelect.Positioner.Props["sideOffset"];
-  /** Aligns the popup along the trigger. */
-  align?: BaseSelect.Positioner.Props["align"];
-  /** Aligns the selected item text with the trigger value. */
-  alignItemWithTrigger?: boolean;
-}
+export type SelectPositionerProps = Pick<
+  WithoutStyles<BaseSelect.Positioner.Props>,
+  "align" | "alignItemWithTrigger" | "children" | "side"
+>;
 
 export type SelectPopupProps = WithoutStyles<BaseSelect.Popup.Props>;
 export type SelectListProps = WithoutStyles<BaseSelect.List.Props>;
@@ -71,12 +68,8 @@ export interface SelectContentProps {
   children?: React.ReactNode;
   /** Places the popup on this side of the trigger. */
   side?: BaseSelect.Positioner.Props["side"];
-  /** Sets the gap between the trigger and popup. */
-  sideOffset?: BaseSelect.Positioner.Props["sideOffset"];
   /** Aligns the popup along the trigger. */
   align?: BaseSelect.Positioner.Props["align"];
-  /** Offsets the popup along its alignment axis. */
-  alignOffset?: BaseSelect.Positioner.Props["alignOffset"];
   /** Aligns the selected item text with the trigger value. */
   alignItemWithTrigger?: BaseSelect.Positioner.Props["alignItemWithTrigger"];
 }
@@ -84,7 +77,7 @@ export interface SelectContentProps {
 export type SelectItemProps<Value> = Omit<WithoutStyles<BaseSelect.Item.Props>, "value"> & {
   /** The value represented by this option. */
   value: Value;
-  /** Controls the option height and horizontal padding. */
+  /** Controls the option minimum height. */
   size?: SelectSize;
   /** Disables the option. */
   disabled?: BaseSelect.Item.Props["disabled"];
@@ -199,7 +192,6 @@ function SelectPortal(props: SelectPortalProps) {
 }
 
 function SelectPositioner({
-  sideOffset = 4,
   align = "start",
   alignItemWithTrigger = false,
   ...props
@@ -208,7 +200,7 @@ function SelectPositioner({
   return (
     <BaseSelect.Positioner
       {...props}
-      sideOffset={sideOffset}
+      sideOffset={popupPositioning.dropdownSideOffset}
       align={align}
       alignItemWithTrigger={alignItemWithTrigger}
       {...stateStyles}
@@ -233,18 +225,14 @@ function SelectList(props: SelectListProps) {
 function SelectContent({
   children,
   side = "bottom",
-  sideOffset = 4,
   align = "start",
-  alignOffset = 0,
   alignItemWithTrigger = false,
 }: SelectContentProps) {
   return (
     <SelectPortal>
       <SelectPositioner
         side={side}
-        sideOffset={sideOffset}
         align={align}
-        alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
       >
         <SelectPopup>
@@ -263,7 +251,7 @@ const itemSizeStyles = {
 
 function SelectItem<Value>({
   value,
-  size = "m",
+  size = "s",
   disabled = false,
   children,
   ...props
@@ -322,8 +310,7 @@ function SelectItemIndicator({ keepMounted = false, ...props }: SelectItemIndica
 }
 
 function SelectGroup(props: SelectGroupProps) {
-  const styles = stylex.props(selectStyles.group);
-  return <BaseSelect.Group {...props} {...styles} data-slot="select-group" />;
+  return <BaseSelect.Group {...props} data-slot="select-group" />;
 }
 
 function SelectGroupLabel(props: SelectGroupLabelProps) {

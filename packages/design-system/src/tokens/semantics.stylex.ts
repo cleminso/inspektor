@@ -2,6 +2,7 @@
 // Themes follow: https://stylexjs.com/docs/learn/recipes/light-dark-themes
 import * as stylex from '@stylexjs/stylex'
 
+import { breakpointQueries } from './breakpoints.stylex'
 import {
   fontFamilies,
   fontSizes,
@@ -9,6 +10,7 @@ import {
   lineHeights,
   palette,
   dimensions,
+  spacing,
   syntaxPalette,
 } from './value.stylex'
 
@@ -90,6 +92,7 @@ export const borderColors = stylex.defineVars({
   'border-table-header-cell': `light-dark(${palette.gray300}, ${palette.neutral700})`,
   'border-table-cell': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'border-table-column-active': `light-dark(${palette.blue500}, ${palette.blue500})`,
+  'outline': `light-dark(${palette.blue500}, ${palette.blue500})`,
   'border-table-cell-active': `light-dark(${palette.blue500}, ${palette.blue500})`,
 
   'border-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
@@ -132,6 +135,9 @@ export const spatial = stylex.defineVars({
   'control-height-s': dimensions[24],
   'control-height-m': dimensions[28],
   'control-height-l': dimensions[32],
+  'control-inner-height-s': `calc(${dimensions[24]} - 2px)`,
+  'control-inner-height-m': `calc(${dimensions[28]} - 2px)`,
+  'control-inner-height-l': `calc(${dimensions[32]} - 2px)`,
   'content-measure': dimensions[680],
   'content-width': dimensions[1220],
   'content-width-wide': dimensions[1440],
@@ -143,21 +149,42 @@ export const spatial = stylex.defineVars({
   'icon-size-s': dimensions[14],
   'icon-size-m': dimensions[16],
   'label-width': dimensions[100],
+  'menu-min-width': dimensions[140],
+  'combobox-min-width': dimensions[200],
+  'combobox-trigger-width-s': dimensions[200],
+  'combobox-trigger-width-m': dimensions[280],
+  'multi-select-width-s': dimensions[240],
+  'multi-select-width-m': dimensions[280],
+  'multi-select-width-l': dimensions[360],
+  'popup-collection-padding': spacing.xxs,
+  'popup-item-inline-padding': spacing.s,
+  'popup-row-min-height': dimensions[22],
+  'popup-row-min-height-m': dimensions[24],
+  'popup-row-min-height-l': dimensions[28],
   'popup-width-s': dimensions[240],
   'popup-width-m': dimensions[320],
   'popup-width-l': dimensions[400],
   'panel-height': dimensions[280],
   'panel-bar-height': dimensions[40],
   'panel-handle-size': dimensions[1],
+  'select-min-width': dimensions[160],
+  'switch-height-s': dimensions[16],
+  'switch-height-m': dimensions[20],
+  'switch-width-s': dimensions[28],
+  'switch-width-m': dimensions[36],
+  'switch-thumb-s': dimensions[12],
+  'switch-thumb-m': dimensions[14],
   'tab-height': dimensions[26],
+  'textarea-height-s': dimensions[72],
+  'textarea-height-m': dimensions[112],
+  'textarea-height-l': dimensions[160],
+  'toast-min-height': dimensions[56],
   'tooltip-width': dimensions[180],
   'tab-view-width': dimensions[180],
   'viewport-height-s': dimensions[160],
   'viewport-height-m': dimensions[240],
   'viewport-height-l': dimensions[320],
 } as const)
-
-const md = '@media (min-width: 768px)'
 
 export const textRoleStyles = stylex.create({
   default: {
@@ -189,28 +216,28 @@ export const textRoleStyles = stylex.create({
   },
   'heading-l': {
     fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[7], [md]: fontSizes[7] },
+    fontSize: { default: fontSizes[7], [breakpointQueries.md]: fontSizes[7] },
     lineHeight: lineHeights.tight,
     fontWeight: fontWeights.medium,
     letterSpacing: '0em',
   },
   'heading-m': {
     fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[6], [md]: fontSizes[7] },
+    fontSize: { default: fontSizes[6], [breakpointQueries.md]: fontSizes[7] },
     lineHeight: lineHeights.tight,
     fontWeight: fontWeights.medium,
     letterSpacing: '0em',
   },
   'heading-s': {
     fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[5], [md]: fontSizes[6] },
+    fontSize: { default: fontSizes[5], [breakpointQueries.md]: fontSizes[6] },
     lineHeight: lineHeights.normal,
     fontWeight: fontWeights.medium,
     letterSpacing: '0em',
   },
   'heading-xs': {
     fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[4], [md]: fontSizes[5] },
+    fontSize: { default: fontSizes[4], [breakpointQueries.md]: fontSizes[5] },
     lineHeight: lineHeights.normal,
     fontWeight: fontWeights.medium,
   },

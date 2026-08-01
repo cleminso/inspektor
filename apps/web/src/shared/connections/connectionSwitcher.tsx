@@ -35,7 +35,7 @@ function sortConnections(
 }
 
 export function ConnectionSwitcher({
-  size = "m",
+  size = "s",
   triggerLabel,
   width = "content",
 }: ConnectionSwitcherProps = {}): React.ReactElement {

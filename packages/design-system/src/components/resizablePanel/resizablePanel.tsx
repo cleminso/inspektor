@@ -26,6 +26,7 @@ export type ResizableHandleAppearance = 'line' | 'grip'
 type ResizablePanelOrientation = NonNullable<BaseGroupProps['orientation']>
 
 const ResizablePanelOrientationContext = createContext<ResizablePanelOrientation>('horizontal')
+const DEFAULT_COLLAPSIBLE_PANEL_SIZE = 200
 
 const gripOrientationStyles = {
   horizontal: resizablePanelStyles.gripVertical,
@@ -119,11 +120,14 @@ export function ResizablePanelGroup({
 export function ResizablePanel({
   collapsedSize = 0,
   collapsible = false,
+  defaultSize,
   disabled = false,
   groupResizeBehavior = 'preserve-relative-size',
   ...props
 }: ResizablePanelProps) {
   const panelStyleProps = stylex.props(resizablePanelStyles.panel)
+  const resolvedDefaultSize =
+    defaultSize ?? (collapsible === true ? DEFAULT_COLLAPSIBLE_PANEL_SIZE : undefined)
 
   return (
     <BasePanel
@@ -132,6 +136,7 @@ export function ResizablePanel({
       style={panelStyleProps.style}
       collapsedSize={collapsedSize}
       collapsible={collapsible}
+      defaultSize={resolvedDefaultSize}
       disabled={disabled}
       groupResizeBehavior={groupResizeBehavior}
       data-slot="resizable-panel"

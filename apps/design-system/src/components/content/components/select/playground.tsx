@@ -19,7 +19,7 @@ export interface SelectPlaygroundState {
 
 const initialState: SelectPlaygroundState = {
   size: "m",
-  itemSize: "m",
+  itemSize: "s",
   width: "content",
   disabled: false,
   prefix: false,
@@ -65,7 +65,7 @@ export function serializeSelectPlayground(state: SelectPlaygroundState): string 
   if (state.width !== "content") triggerProps.push(`width="${state.width}"`);
   if (state.prefix === true) triggerProps.push('prefix="Branch"');
   if (state.suffix === true) triggerProps.push('suffix="Active"');
-  if (state.itemSize !== "m") itemProps.push(`size="${state.itemSize}"`);
+  if (state.itemSize !== "s") itemProps.push(`size="${state.itemSize}"`);
 
   return createPlaygroundSource({
     imports: { Select: true },
