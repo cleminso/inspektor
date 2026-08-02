@@ -270,31 +270,18 @@ export const backgroundColorStyles = stylex.create({
   'bg-secondary': { backgroundColor: backgroundColors['bg-secondary'] },
   'bg-danger': { backgroundColor: backgroundColors['bg-danger'] },
   'bg-danger-hover': { backgroundColor: backgroundColors['bg-danger-hover'] },
-  'bg-success': { backgroundColor: backgroundColors['bg-success'] },
-  'bg-accent': { backgroundColor: backgroundColors['bg-accent'] },
-  'bg-notification-warning': { backgroundColor: backgroundColors['bg-notification-warning'] },
-  'bg-notification-error': { backgroundColor: backgroundColors['bg-notification-error'] },
-  'bg-notification-info': { backgroundColor: backgroundColors['bg-notification-info'] },
-  'bg-notification-loading': { backgroundColor: backgroundColors['bg-notification-loading'] },
 })
 
 export const colorStyles = stylex.create({
   'text-default': { color: textColors['text-default'] },
+  'text-secondary': { color: textColors['text-secondary'] },
   'text-muted': { color: textColors['text-muted'] },
-  'text-subtle': { color: textColors['text-subtle'] },
   'text-disabled': { color: textColors['text-disabled'] },
   'text-link': { color: textColors['text-link'] },
+  'text-selected': { color: textColors['text-selected'] },
   'text-danger': { color: textColors['text-danger'] },
-  'fg-primary': { color: textColors['fg-primary'] },
-  'fg-secondary': { color: textColors['fg-secondary'] },
-  'fg-danger': { color: textColors['fg-danger'] },
-  'fg-success': { color: textColors['fg-success'] },
-  'fg-accent': { color: textColors['fg-accent'] },
-  'fg-inverse': { color: textColors['fg-inverse'] },
-  'fg-notification-warning': { color: textColors['fg-notification-warning'] },
-  'fg-notification-error': { color: textColors['fg-notification-error'] },
-  'fg-notification-info': { color: textColors['fg-notification-info'] },
-  'fg-notification-loading': { color: textColors['fg-notification-loading'] },
+  'text-on-primary': { color: textColors['text-on-primary'] },
+  'text-on-inverse': { color: textColors['text-on-inverse'] },
 })
 
 export const borderColorStyles = stylex.create({
@@ -305,10 +292,6 @@ export const borderColorStyles = stylex.create({
   'border-danger': { borderColor: borderColors['border-danger'] },
   'border-success': { borderColor: borderColors['border-success'] },
   'border-danger-subtle': { borderColor: borderColors['border-danger-subtle'] },
-  'border-notification-warning': { borderColor: borderColors['border-notification-warning'] },
-  'border-notification-error': { borderColor: borderColors['border-notification-error'] },
-  'border-notification-info': { borderColor: borderColors['border-notification-info'] },
-  'border-notification-loading': { borderColor: borderColors['border-notification-loading'] },
 })
 
 export const borderRadiusStyles = stylex.create({

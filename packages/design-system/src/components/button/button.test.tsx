@@ -67,32 +67,4 @@ describe("Button", () => {
     expect(leading?.textContent).toBe("PrefixLabel");
     expect(leading?.nextElementSibling?.textContent).toBe("Suffix");
   });
-
-  it("optically balances centered content with a visual on only one side", () => {
-    const { rerender } = render(
-      <Button suffix={<span>Suffix</span>}>Label</Button>,
-    );
-
-    const button = screen.getByRole("button", { name: "Label" });
-
-    expect(button.getAttribute("data-optical-alignment")).toBe("suffix");
-
-    rerender(<Button prefix={<span>Prefix</span>}>Label</Button>);
-
-    expect(button.getAttribute("data-optical-alignment")).toBe("prefix");
-
-    rerender(
-      <Button prefix={<span>Prefix</span>} suffix={<span>Suffix</span>}>
-        Label
-      </Button>,
-    );
-
-    expect(button.getAttribute("data-optical-alignment")).toBeNull();
-
-    rerender(
-      <Button justify="between" suffix={<span>Suffix</span>}>Label</Button>,
-    );
-
-    expect(button.getAttribute("data-optical-alignment")).toBeNull();
-  });
 });

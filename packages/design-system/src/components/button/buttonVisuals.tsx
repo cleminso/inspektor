@@ -16,7 +16,6 @@ export type ButtonVariant =
 export type ButtonSize = 'xs' | 's' | 'm'
 export type ButtonJustify = 'center' | 'start' | 'between'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm'
-type ButtonOpticalAlignment = 'prefix' | 'suffix'
 
 const variantStyles = {
   primary: buttonStyles.primary,
@@ -61,27 +60,8 @@ interface ButtonVisualStylesOptions {
   radius: ButtonRadius
   orientation: ButtonGroupOrientation | null
   disabled: boolean
-  opticalAlignment?: ButtonOpticalAlignment
-}
-
-export function getButtonOpticalAlignment({
-  prefix,
-  suffix,
-  loading,
-  justify,
-}: Pick<ButtonContentProps, 'prefix' | 'suffix' | 'loading' | 'justify'>): ButtonOpticalAlignment | undefined {
-  if (justify !== 'center') {
-    return undefined
-  }
-
-  const hasPrefix = loading === true || prefix !== undefined
-  const hasSuffix = suffix !== undefined
-
-  if (hasPrefix === hasSuffix) {
-    return undefined
-  }
-
-  return hasPrefix === true ? 'prefix' : 'suffix'
+  hasPrefix: boolean
+  hasSuffix: boolean
 }
 
 export function getButtonVisualStyles({
@@ -94,12 +74,15 @@ export function getButtonVisualStyles({
   radius,
   orientation,
   disabled,
-  opticalAlignment,
+  hasPrefix,
+  hasSuffix,
 }: ButtonVisualStylesOptions) {
   return [
     buttonStyles.base,
-    variantStyles[variant],
     sizeStyles[size],
+    hasPrefix === true && buttonStyles.withPrefix,
+    hasSuffix === true && buttonStyles.withSuffix,
+    variantStyles[variant],
     square === true && buttonStyles.square,
     pressed === true && buttonStyles.pressed,
     radiusStyles[radius],
@@ -108,8 +91,6 @@ export function getButtonVisualStyles({
     orientation === 'vertical' && buttonGroupStyles.memberVertical,
     fullWidth === true && buttonStyles.fullWidth,
     justifyStyles[justify],
-    opticalAlignment === 'prefix' && buttonStyles.opticalPrefix,
-    opticalAlignment === 'suffix' && buttonStyles.opticalSuffix,
     disabled === true && buttonStyles.disabled,
   ]
 }

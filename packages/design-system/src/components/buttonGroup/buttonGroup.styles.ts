@@ -62,7 +62,7 @@ export const buttonGroupStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     fontWeight: fontWeights.medium,
-    lineHeight: lineHeights.relaxed,
+    lineHeight: lineHeights.ui,
     whiteSpace: 'nowrap',
   },
   separator: {

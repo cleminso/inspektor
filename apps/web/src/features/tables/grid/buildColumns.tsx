@@ -422,8 +422,7 @@ function ColumnHeader({
             display="flex"
             flexShrink={0}
             height="control-height-xs"
-            justifyContent="center"
-            width="control-height-xs"
+            justifyContent="start"
           >
             <ColumnTypeMarker marker={marker} />
           </Box>

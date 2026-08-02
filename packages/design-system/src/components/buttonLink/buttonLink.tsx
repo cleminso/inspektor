@@ -6,7 +6,6 @@ import { useContext, type ReactNode } from 'react'
 import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
 import {
   ButtonContent,
-  getButtonOpticalAlignment,
   getButtonVisualStyles,
   type ButtonJustify,
   type ButtonRadius,
@@ -74,12 +73,6 @@ export function ButtonLink({
   ...props
 }: ButtonLinkProps) {
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
-  const opticalAlignment = getButtonOpticalAlignment({
-    prefix,
-    suffix,
-    loading: false,
-    justify,
-  })
   const styleProps = stylex.props(
     ...getButtonVisualStyles({
       variant,
@@ -91,7 +84,8 @@ export function ButtonLink({
       radius,
       orientation: buttonGroupOrientation,
       disabled: false,
-      opticalAlignment,
+      hasPrefix: prefix !== undefined,
+      hasSuffix: suffix !== undefined,
     }),
   )
   const defaultProps = {
@@ -109,7 +103,6 @@ export function ButtonLink({
     ),
     'data-full-width': fullWidth === true ? '' : undefined,
     'data-icon-only': iconOnly === true ? '' : undefined,
-    'data-optical-alignment': opticalAlignment,
     'data-radius': radius,
     'data-size': size,
     'data-slot': 'button-link',

@@ -488,7 +488,7 @@ function DataGridRoot<TData extends RowData>({
           {...stylex.props(
             dataGridStyles.headerDragContent,
             dataGridStyles.columnDragOverlayContent,
-            density === "compact" && dataGridStyles.compactHeaderDragContent,
+            density === "compact" && dataGridStyles.compactCellInlinePadding,
           )}
         >
           {columnDragPreview?.(String(source.id)) ?? source.element?.textContent ?? String(source.id)}
@@ -712,7 +712,7 @@ function DataGridHeaderCell<TData extends RowData>({
           {...stylex.props(
             dataGridStyles.headerDragContent,
             dataGridStyles.headerDragSource,
-            density === "compact" && dataGridStyles.compactHeaderDragContent,
+            density === "compact" && dataGridStyles.compactCellInlinePadding,
             isDragVisual === true && dataGridStyles.headerDragSourceDragging,
           )}
           aria-hidden={isDragVisual === true ? true : undefined}
@@ -883,6 +883,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       {...stylex.props(
         dataGridStyles.cell,
         density === "compact" && dataGridStyles.compactCell,
+        density === "compact" && dataGridStyles.compactCellInlinePadding,
         isColumnActive === true && dataGridStyles.cellColumnActive,
         isSelected === true && dataGridStyles.cellSelected,
         isCellSelected === true && dataGridStyles.cellSelection,

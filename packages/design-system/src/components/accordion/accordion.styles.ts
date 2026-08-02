@@ -51,7 +51,7 @@ export const accordionStyles = stylex.create({
     fontSize: fontSizes[1],
     fontWeight: fontWeights.regular,
     justifyContent: 'space-between',
-    lineHeight: lineHeights.tight,
+    lineHeight: lineHeights.compact,
     outlineColor: borderColors['outline'],
     outlineOffset: -2,
     outlineStyle: {

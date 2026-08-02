@@ -12,7 +12,7 @@ export const binaryValueStyles = stylex.create({
     color: textColors["text-default"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
     whiteSpace: "nowrap",
   },
   inspection: {

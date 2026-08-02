@@ -67,7 +67,7 @@ export const toggleGroupStyles = stylex.create({
     fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
     justifyContent: 'center',
-    lineHeight: lineHeights.none,
+    lineHeight: lineHeights.ui,
     outlineColor: borderColors['outline'],
     outlineOffset: 1,
     outlineStyle: {

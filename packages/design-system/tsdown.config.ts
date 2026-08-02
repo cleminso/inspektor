@@ -13,6 +13,8 @@ export default defineConfig({
   sourcemap: true,
   report: false,
   clean: true,
+  // Preserve the opt-in CSS export alongside the JavaScript package output.
+  copy: [{ from: "src/styles/baseline.css", to: "dist" }],
   unbundle: true,
   outDir: "dist",
   deps: {

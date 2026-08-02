@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { backgroundColors, textColors } from '../../tokens/semantics.stylex'
+import { backgroundColors, borderColors, textColors } from '../../tokens/semantics.stylex'
 import { spacing } from '../../tokens/value.stylex'
 import { Toaster, toasts } from './toaster'
 import { toasterStyles } from './toaster.styles'
@@ -26,22 +26,17 @@ const stackContractStyles = stylex.create({
 
 const semanticStatusStyles = stylex.create({
   error: {
-    [toasterVars.actionBackground]: backgroundColors['bg-danger'],
-    backgroundColor: backgroundColors['bg-danger'],
-    boxShadow: 'none',
-    color: textColors['fg-danger'],
+    borderColor: borderColors['border-danger'],
   },
   success: {
-    [toasterVars.actionBackground]: backgroundColors['bg-success'],
-    backgroundColor: backgroundColors['bg-success'],
-    boxShadow: 'none',
-    color: textColors['fg-success'],
+    borderColor: borderColors['border-success'],
   },
   warning: {
-    [toasterVars.actionBackground]: backgroundColors['bg-warning'],
-    backgroundColor: backgroundColors['bg-warning'],
-    boxShadow: 'none',
-    color: textColors['fg-warning'],
+    borderColor: borderColors['border-warning'],
+  },
+  neutral: {
+    backgroundColor: backgroundColors['bg-popover'],
+    color: textColors['text-default'],
   },
   action: {
     backgroundColor: toasterVars.actionBackground,
@@ -107,7 +102,7 @@ describe('Toaster', () => {
     expect(closeButton?.className).toContain(stylex.props(toasterStyles.close).className)
   })
 
-  it('uses semantic status surfaces without leading icons', async () => {
+  it('uses neutral status surfaces with semantic borders and no leading icons', async () => {
     render(<Toaster />)
 
     toasts.error('Danger notification', { preserve: true, undo: () => undefined })
@@ -124,6 +119,9 @@ describe('Toaster', () => {
     expectStyleClasses(errorToast, stylex.props(semanticStatusStyles.error).className)
     expectStyleClasses(warningToast, stylex.props(semanticStatusStyles.warning).className)
     expectStyleClasses(successToast, stylex.props(semanticStatusStyles.success).className)
+    expectStyleClasses(errorToast, stylex.props(semanticStatusStyles.neutral).className)
+    expectStyleClasses(warningToast, stylex.props(semanticStatusStyles.neutral).className)
+    expectStyleClasses(successToast, stylex.props(semanticStatusStyles.neutral).className)
     expectStyleClasses(action, stylex.props(semanticStatusStyles.action).className)
     expect(document.querySelector('[data-slot="toast-icon"]')).toBeNull()
   })

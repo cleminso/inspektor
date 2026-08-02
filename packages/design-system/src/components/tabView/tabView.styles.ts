@@ -135,7 +135,7 @@ export const tabViewStyles = stylex.create({
       default: 'flex-start',
       [compactTab]: 'center',
     },
-    lineHeight: lineHeights.none,
+    lineHeight: lineHeights.ui,
     outlineStyle: 'none',
     textAlign: 'start',
     userSelect: 'none',

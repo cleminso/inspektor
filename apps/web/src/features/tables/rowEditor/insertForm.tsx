@@ -106,9 +106,12 @@ function InsertRowFormFields({
         backgroundColor="bg-page"
         px="l"
       >
-        <label
+        <Box
+          as="label"
           htmlFor={insertMoreFieldId}
-          className="flex items-center gap-2 text-sm text-muted-foreground"
+          display="flex"
+          alignItems="center"
+          gap="m"
         >
           <Switch
             id={insertMoreFieldId}
@@ -121,8 +124,10 @@ function InsertRowFormFields({
             }}
             disabled={rowEditor.isSaving === true}
           />
-          <span id={`${insertMoreFieldId}-label`}>Insert more</span>
-        </label>
+          <Text as="span" id={`${insertMoreFieldId}-label`} color="muted">
+            Insert more
+          </Text>
+        </Box>
         <Box alignItems="center" gap="m">
           {onCancel !== undefined ? (
             <Button

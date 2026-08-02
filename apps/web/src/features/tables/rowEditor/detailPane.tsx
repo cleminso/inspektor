@@ -20,9 +20,7 @@ export function DetailPane({
         borderStyle="solid"
         px="l"
       >
-        <h2 className="flex min-w-0 flex-1 items-center text-sm font-medium text-foreground">
-          {title}
-        </h2>
+        {title}
       </Box>
       <Box minHeight={0} flex={1} flexDirection="column" overflow="hidden">
         {children}

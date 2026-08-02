@@ -65,7 +65,7 @@ export const codeEditorStyles = stylex.create({
     color: "inherit",
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     outlineWidth: 0,
     resize: "none",
     minHeight: spatial["viewport-height-s"],
@@ -77,7 +77,7 @@ export const codeEditorStyles = stylex.create({
     borderStyle: "solid",
     color: textColors["text-danger"],
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     borderTopWidth: 1,
   },
   toolbar: {
@@ -95,7 +95,7 @@ export const codeEditorStyles = stylex.create({
   toolbarLabel: {
     color: textColors["text-muted"],
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     textTransform: "uppercase",
     marginRight: "auto",
   },

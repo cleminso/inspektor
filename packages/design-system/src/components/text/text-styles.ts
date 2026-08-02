@@ -17,7 +17,6 @@ export const textBaseStyles = stylex.create({
 export const textColorStyles = stylex.create({
   default: { color: textColors['text-default'] },
   muted: { color: textColors['text-muted'] },
-  subtle: { color: textColors['text-subtle'] },
   disabled: { color: textColors['text-disabled'] },
   link: { color: textColors['text-link'] },
   danger: { color: textColors['text-danger'] },

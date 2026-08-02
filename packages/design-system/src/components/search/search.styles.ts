@@ -22,7 +22,7 @@ export const searchStyles = stylex.create({
   },
   icon: {
     alignSelf: "center",
-    color: textColors["text-subtle"],
+    color: textColors["text-muted"],
     gridColumnStart: "1",
     gridRowStart: "1",
     marginInlineStart: spacing.m,

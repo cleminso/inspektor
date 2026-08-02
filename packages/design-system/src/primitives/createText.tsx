@@ -26,6 +26,7 @@ type TextTag =
   | 'em'
   | 'small'
   | 'code'
+  | 'pre'
   | 'div'
   | 'h1'
   | 'h2'
@@ -41,15 +42,11 @@ export type TextVariant =
   | 'body'
   | 'label'
   | 'caption'
-  | 'heading-l'
-  | 'heading-m'
-  | 'heading-s'
-  | 'heading-xs'
+  | 'heading'
 
 export type TextColor =
   | 'default'
   | 'muted'
-  | 'subtle'
   | 'disabled'
   | 'link'
   | 'danger'
@@ -72,18 +69,12 @@ const VARIANT_DEFAULT_TAG: Record<TextVariant, TextTag> = {
   body: 'p',
   label: 'p',
   caption: 'p',
-  'heading-l': 'h2',
-  'heading-m': 'h3',
-  'heading-s': 'h4',
-  'heading-xs': 'h5',
+  heading: 'h2',
 }
 
 const VARIANT_DEFAULT_WRAP: Partial<Record<TextVariant, TextWrap>> = {
   body: 'pretty',
-  'heading-l': 'balance',
-  'heading-m': 'balance',
-  'heading-s': 'balance',
-  'heading-xs': 'balance',
+  heading: 'balance',
 }
 
 const numberFormatter = new Intl.NumberFormat('en-US')

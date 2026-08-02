@@ -7,10 +7,7 @@ import { typographyFoundationItem } from "@/lib/registry";
 
 const textVariants: Array<{ variant: TextVariant; sample: string }> = [
   { variant: "default", sample: "Default interface text" },
-  { variant: "heading-l", sample: "Large heading" },
-  { variant: "heading-m", sample: "Medium heading" },
-  { variant: "heading-s", sample: "Small heading" },
-  { variant: "heading-xs", sample: "Extra-small heading" },
+  { variant: "heading", sample: "Section heading" },
   { variant: "title", sample: "Interface title" },
   { variant: "body", sample: "Body text supports readable product descriptions and guidance." },
   { variant: "label", sample: "Control label" },
@@ -20,7 +17,6 @@ const textVariants: Array<{ variant: TextVariant; sample: string }> = [
 const textColors = [
   "default",
   "muted",
-  "subtle",
   "disabled",
   "danger",
   "error",

@@ -310,6 +310,8 @@ function ComboboxTrigger({
       radius: "xs",
       orientation: null,
       disabled: state.disabled,
+      hasPrefix: false,
+      hasSuffix: false,
     }),
     comboboxStyles.trigger,
     triggerWidthStyles[width],

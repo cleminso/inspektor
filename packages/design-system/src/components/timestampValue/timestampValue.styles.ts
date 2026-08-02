@@ -9,7 +9,7 @@ export const timestampValueStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     fontVariantNumeric: "tabular-nums",
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
     whiteSpace: "nowrap",
   },
 });

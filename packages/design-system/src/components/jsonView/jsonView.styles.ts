@@ -33,7 +33,7 @@ export const jsonViewStyles = stylex.create({
     color: textColors["text-default"],
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     minWidth: 0,
     width: "100%",
   },
@@ -147,7 +147,7 @@ export const jsonViewStyles = stylex.create({
     color: textColors["text-muted"],
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     paddingBlockEnd: spacing.xs,
   },
 });

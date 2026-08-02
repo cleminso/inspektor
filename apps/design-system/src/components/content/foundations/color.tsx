@@ -213,7 +213,7 @@ const styles = stylex.create({
   },
   stepHeaderItem: {
     color: "light-dark(oklch(0.205 0 none), oklch(0.97 0 none))",
-    fontFamily: "'Geist', 'Inter', sans-serif",
+    fontFamily: "'Geist Variable', 'Inter', sans-serif",
     fontSize: 14,
     fontWeight: 500,
     lineHeight: "20px",

@@ -20,6 +20,15 @@
 - [x] Keep component-specific relationships, including switch thumb endpoints and inner control dimensions, valid while borders remain fixed.
 - [x] Keep the shared focus-ring width fixed at `2px` while scalable dimensions use `rem`.
 - [x] Define global breakpoint values and media queries in one breakpoint token module.
+- [x] Keep application color, typography, radius, shadow, and tracking values out of consumer stylesheets.
+- [x] Load Geist Sans and Geist Mono as application assets while the design system owns their semantic use.
+- [x] Reduce the product type scale to `12px`, `13px`, `16px`, and `20px` roles.
+- [x] Remove unused letter-spacing tokens and inherited application tracking.
+- [x] Export an optional design-system baseline that consumers import once to normalize browser layout without defining theme values.
+- [x] Document why the baseline exists and where its responsibility ends.
+- [x] Normalize native links, lists, form controls, and implicit border widths that were previously covered by Tailwind Preflight.
+- [x] Pair `12px` compact text with an explicit `1rem` line height.
+- [x] Pair `13px` interface text with an explicit `1.125rem` line height.
 
 ## Open product work
 
@@ -36,6 +45,7 @@
 - Focus-ring thickness and offsets.
 - Shadow geometry.
 - Application-specific documentation layout styles.
+- Application scrollbar styling pending a dedicated design-system contract.
 - Component-local container and viewport thresholds that describe component behavior rather than device categories.
 
 ## Settled interaction decisions
@@ -48,6 +58,8 @@
 - [x] Preserve the default-density design at a `16px` root.
 - [x] Allow controls and popup content to expand proportionally at larger root font sizes.
 - [x] Keep global viewport breakpoints centralized while component-specific thresholds remain local and named.
+- [x] Consumer applications do not define design-system color or typography values.
+- [x] Use one `20px` heading role until a larger product hierarchy has a concrete use case.
 
 ## Open design decisions
 
@@ -68,3 +80,8 @@
 - [x] Documentation tests, typecheck, lint, and build pass.
 - [x] Browser verification preserves nominal geometry at a `16px` root.
 - [x] Browser verification scales representative components at a `20px` root while retaining one-pixel boundaries.
+- [x] Inspector application tests, typecheck, lint, and build pass without Tailwind.
+- [x] Geist Sans and Geist Mono load from built application assets.
+- [x] Browser verification confirms Geist rendering in light and dark color schemes.
+- [x] Browser verification confirms zero body margin and border-box sizing without Tailwind Preflight.
+- [x] Browser verification confirms normalized links, lists, buttons, implicit borders, and an `18px` interface line box.

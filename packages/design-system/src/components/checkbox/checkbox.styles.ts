@@ -30,7 +30,7 @@ export const checkboxStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
-    lineHeight: lineHeights.tight,
+    lineHeight: lineHeights.compact,
     userSelect: "none",
   },
   labelRow: {
@@ -92,7 +92,7 @@ export const checkboxStyles = stylex.create({
   selected: {
     borderColor: backgroundColors["bg-inverse"],
     backgroundColor: backgroundColors["bg-inverse"],
-    color: textColors["fg-inverse"],
+    color: textColors["text-on-inverse"],
   },
   invalid: {
     borderColor: borderColors["border-danger"],

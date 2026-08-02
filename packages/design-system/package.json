@@ -12,7 +12,10 @@
   },
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/styles/baseline.css",
+    "./dist/baseline.css"
+  ],
   "files": [
     "dist"
   ],
@@ -28,6 +31,10 @@
       "types": "./dist/tokens/tokens.stylex.d.ts",
       "import": "./dist/tokens/tokens.stylex.js",
       "default": "./dist/tokens/tokens.stylex.js"
+    },
+    "./baseline.css": {
+      "inspector-source": "./src/styles/baseline.css",
+      "default": "./dist/baseline.css"
     },
     "./tooltip": {
       "inspector-source": "./src/components/tooltip/tooltip.tsx",

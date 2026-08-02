@@ -26,21 +26,15 @@ describe('Box', () => {
       'bg-page', 'bg-card', 'bg-popover', 'bg-subtle', 'bg-overlay',
       'bg-backdrop', 'bg-inverse', 'bg-hover', 'bg-pressed', 'bg-selected',
       'bg-disabled', 'bg-primary', 'bg-primary-hover', 'bg-secondary',
-      'bg-danger', 'bg-danger-hover', 'bg-success', 'bg-accent',
-      'bg-notification-warning', 'bg-notification-error',
-      'bg-notification-info', 'bg-notification-loading',
+      'bg-danger', 'bg-danger-hover',
     ] as const
     const colors = [
-      'text-default', 'text-muted', 'text-subtle', 'text-disabled', 'text-link',
-      'text-danger', 'fg-primary', 'fg-secondary', 'fg-danger', 'fg-success',
-      'fg-accent', 'fg-inverse', 'fg-notification-warning',
-      'fg-notification-error', 'fg-notification-info', 'fg-notification-loading',
+      'text-default', 'text-secondary', 'text-muted', 'text-disabled', 'text-link',
+      'text-selected', 'text-danger', 'text-on-primary', 'text-on-inverse',
     ] as const
     const borderColors = [
       'border', 'border-secondary', 'border-focused', 'border-warning',
       'border-danger', 'border-danger-subtle', 'border-success',
-      'border-notification-warning', 'border-notification-error',
-      'border-notification-info', 'border-notification-loading',
     ] as const
 
     for (const backgroundColor of backgroundColors) {
@@ -132,5 +126,14 @@ describe('Box', () => {
       gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
       gridTemplateRows: 'repeat(3, minmax(0, 1fr))',
     })
+  })
+
+  it('does not allow border style to activate the browser medium border width', () => {
+    const resolved = resolveBoxStyles(
+      { borderColor: 'border', borderStyle: 'solid' },
+      'box-border-default',
+    )
+
+    expect(resolved.inlineStyle.borderWidth).toBe(0)
   })
 })

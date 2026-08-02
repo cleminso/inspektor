@@ -27,13 +27,13 @@ export const fieldStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
-    lineHeight: lineHeights.tight,
+    lineHeight: lineHeights.compact,
   },
   message: {
     margin: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.tight,
+    lineHeight: lineHeights.compact,
   },
   description: {
     color: textColors["text-muted"],

@@ -11,8 +11,6 @@ export const sidePanelStyles = stylex.create({
     backgroundColor: backgroundColors['bg-page'],
     display: 'flex',
     flexDirection: 'column',
-    borderRightStyle: 'solid',
-    borderRightWidth: 1,
     minHeight: 0,
     width: '100%',
   },

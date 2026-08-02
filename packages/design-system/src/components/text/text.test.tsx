@@ -23,7 +23,6 @@ describe('Text', () => {
       <>
         <Text color="default">Default</Text>
         <Text color="muted">Muted</Text>
-        <Text color="subtle">Subtle</Text>
         <Text color="disabled">Disabled</Text>
         <Text color="link">Link</Text>
         <Text color="danger">Danger</Text>
@@ -32,10 +31,18 @@ describe('Text', () => {
 
     expect(screen.getByText('Default').className).not.toBe('')
     expect(screen.getByText('Muted').className).not.toBe('')
-    expect(screen.getByText('Subtle').className).not.toBe('')
     expect(screen.getByText('Disabled').className).not.toBe('')
     expect(screen.getByText('Link').className).not.toBe('')
     expect(screen.getByText('Danger').className).not.toBe('')
+  })
+
+  it('renders preserved monospace source text', () => {
+    render(<Text as="pre" monospace>{`line one\nline two`}</Text>)
+
+    const source = screen.getByText(/line one/)
+
+    expect(source.tagName).toBe('PRE')
+    expect(source.textContent).toBe('line one\nline two')
   })
 
   it('reserves interactive link styling for the TextLink component', () => {

@@ -39,19 +39,21 @@ export function RowEditorSidePanel({
     <DetailPane
       title={
         <Box minWidth={0} flex={1} alignItems="center" gap="l">
-          <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{title}</p>
+          <Box minWidth={0} flex={1}>
+            <Text as="h2" variant="label" truncate>
+              {title}
+            </Text>
+          </Box>
           {hasMultipleRows === true ? (
             <Box
-              unsafeClassName="text-sm"
               ml="auto"
               flexShrink={0}
               alignItems="center"
               gap="xs"
-              color="text-muted"
             >
-              <span>
+              <Text as="span" color="muted" tabularNums>
                 {activeRowIndex + 1} / {editedRowIds.length}
-              </span>
+              </Text>
               <Box alignItems="center">
                 <Button
                   type="button"

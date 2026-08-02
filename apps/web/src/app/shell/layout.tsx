@@ -18,7 +18,7 @@ export function InspectorLayout({ children, leftDock }: InspectorLayoutProps): R
       overflow="hidden"
       backgroundColor="bg-page"
       color="text-default"
-      unsafeClassName="h-dvh"
+      height="screen-height-dynamic"
     >
       <InspectorHeader />
       <Box as="main" minHeight={0} minWidth={0} flex={1} overflow="hidden">

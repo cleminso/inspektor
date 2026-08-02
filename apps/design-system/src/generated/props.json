@@ -316,7 +316,7 @@
       "description": "Controls the visual treatment and emphasis of the action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 31
+        "line": 30
       }
     },
     {
@@ -327,7 +327,7 @@
       "description": "Controls the button height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 33
+        "line": 32
       }
     },
     {
@@ -338,7 +338,7 @@
       "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 35
+        "line": 34
       }
     },
     {
@@ -349,7 +349,7 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 37
+        "line": 36
       }
     },
     {
@@ -360,7 +360,7 @@
       "description": "Disables interaction and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 39
+        "line": 38
       }
     },
     {
@@ -370,7 +370,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes Button behavior and styles onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 41
+        "line": 40
       }
     },
     {
@@ -381,7 +381,7 @@
       "description": "Makes the button a square icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 46
+        "line": 45
       }
     },
     {
@@ -392,7 +392,7 @@
       "description": "Stretches the button to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 48
+        "line": 47
       }
     },
     {
@@ -403,7 +403,7 @@
       "description": "Controls how content is distributed inside the button.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 50
+        "line": 49
       }
     },
     {
@@ -413,7 +413,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 52
+        "line": 51
       }
     },
     {
@@ -423,7 +423,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 54
+        "line": 53
       }
     },
     {
@@ -433,7 +433,7 @@
       "description": "Defines a string value that labels the current element.\nIdentifies the icon-only action for assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 61
+        "line": 60
       }
     }
   ],
@@ -446,7 +446,7 @@
       "description": "Controls the visual treatment and emphasis of the navigation link.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 24
+        "line": 23
       }
     },
     {
@@ -457,7 +457,7 @@
       "description": "Controls the link height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 26
+        "line": 25
       }
     },
     {
@@ -468,7 +468,7 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 28
+        "line": 27
       }
     },
     {
@@ -478,7 +478,7 @@
       "description": "Identifies the native anchor destination when render composition is not used.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 30
+        "line": 29
       }
     },
     {
@@ -488,7 +488,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes ButtonLink presentation onto a router link component.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 32
+        "line": 31
       }
     },
     {
@@ -499,7 +499,7 @@
       "description": "Makes the link a square icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 37
+        "line": 36
       }
     },
     {
@@ -510,7 +510,7 @@
       "description": "Stretches the link to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 39
+        "line": 38
       }
     },
     {
@@ -521,7 +521,7 @@
       "description": "Controls how content is distributed inside the link.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 41
+        "line": 40
       }
     },
     {
@@ -531,7 +531,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 43
+        "line": 42
       }
     },
     {
@@ -541,7 +541,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 45
+        "line": 44
       }
     },
     {
@@ -551,14 +551,14 @@
       "description": "Defines a string value that labels the current element.\nIdentifies the icon-only navigation action for assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 52
+        "line": 51
       }
     }
   ],
   "textLink": [
     {
       "name": "variant",
-      "type": "\"default\" | \"title\" | \"body\" | \"label\" | \"caption\" | \"heading-l\" | \"heading-m\" | \"heading-s\" | \"heading-xs\"",
+      "type": "\"default\" | \"title\" | \"body\" | \"label\" | \"caption\" | \"heading\"",
       "required": false,
       "defaultValue": "\"default\"",
       "description": "Controls the typography role used by the link label.",

@@ -130,7 +130,7 @@ const editorTheme = EditorView.theme({
   },
   ".cm-scroller": {
     fontFamily: fontFamilies.mono,
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     overflow: "auto",
     scrollbarColor: "transparent transparent",
     scrollbarWidth: "thin",

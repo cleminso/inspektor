@@ -33,7 +33,7 @@ export const buttonStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontWeight: fontWeights.regular,
     justifyContent: 'center',
-    lineHeight: lineHeights.relaxed,
+    lineHeight: lineHeights.ui,
     outlineColor: borderColors['outline'],
     outlineOffset: 2,
     outlineStyle: 'solid',
@@ -48,7 +48,7 @@ export const buttonStyles = stylex.create({
       ':hover': backgroundColors['bg-primary-hover'],
       ':active': backgroundColors['bg-primary-hover'],
     },
-    color: textColors['fg-primary'],
+    color: textColors['text-on-primary'],
   },
   secondary: {
     backgroundColor: {
@@ -64,7 +64,7 @@ export const buttonStyles = stylex.create({
       ':hover': backgroundColors['bg-danger-hover'],
       ':active': backgroundColors['bg-danger-hover'],
     },
-    color: textColors['fg-danger'],
+    color: textColors['text-default'],
   },
   ghost: {
     backgroundColor: {
@@ -99,12 +99,10 @@ export const buttonStyles = stylex.create({
     fontSize: fontSizes[2],
     height: spatial['button-height-m'],
   },
-  opticalPrefix: {
+  withPrefix: {
     paddingInlineStart: `calc(${spacing.s} - ${spacing.xxs})`,
-    paddingInlineEnd: `calc(${spacing.s} + ${spacing.xxs})`,
   },
-  opticalSuffix: {
-    paddingInlineStart: `calc(${spacing.s} + ${spacing.xxs})`,
+  withSuffix: {
     paddingInlineEnd: `calc(${spacing.s} - ${spacing.xxs})`,
   },
   square: {
@@ -153,7 +151,7 @@ export const buttonStyles = stylex.create({
     alignItems: 'center',
     display: 'inline-flex',
     justifyContent: 'center',
-    lineHeight: lineHeights.none,
+    lineHeight: lineHeights.ui,
     minWidth: 0,
   },
   contentBetween: {

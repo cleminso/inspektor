@@ -28,13 +28,13 @@ export const inputStyles = stylex.create({
     color: textColors["text-default"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
     outlineColor: borderColors["outline"],
     outlineStyle: "solid",
     outlineWidth: 0,
     minWidth: 0,
     "::placeholder": {
-      color: textColors["text-subtle"],
+      color: textColors["text-muted"],
     },
   },
   sizeS: {

@@ -24,7 +24,7 @@ export const keyboardInputStyles = stylex.create({
     fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
     justifyContent: "center",
-    lineHeight: lineHeights.relaxed,
+    lineHeight: lineHeights.ui,
     userSelect: "none",
     whiteSpace: "nowrap",
     minHeight: spatial["control-height-s"],
@@ -38,6 +38,7 @@ export const keyboardInputStyles = stylex.create({
   small: {
     paddingInline: spacing.xs,
     fontSize: fontSizes[1],
+    lineHeight: lineHeights.compact,
     height: spatial["icon-size-m"],
     minHeight: spatial["icon-size-m"],
     minWidth: spatial["icon-size-m"],

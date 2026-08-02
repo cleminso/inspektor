@@ -9,13 +9,12 @@ interface ConnectionsLayoutProps {
 export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.ReactElement {
   return (
     <Box
-      height="full"
+      height="screen-height-small"
       minHeight={0}
       width="full"
       flexDirection="column"
       overflow="hidden"
       backgroundColor="bg-page"
-      unsafeClassName="h-svh"
     >
       <Box
         as="header"

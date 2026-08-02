@@ -37,6 +37,13 @@
 - [x] Keep the active header's structural top border blue when its outward perimeter is clipped by the viewport.
 - [x] Document the complete border, fill, ring, focus, resize, and drag model in `docs/notes/dataGridStyleModel.md`.
 
+[01/08/26]
+
+- [x] Align compact header-content and body-cell inline padding through one shared style contract.
+- [x] Keep the compact column drag preview on the same inline padding as the rendered header and body cells.
+- [x] Align each live schema type marker to the shared header and body content inset instead of centering it inside its reserved marker slot.
+- [x] Size schema type-marker slots to their content and use an `xs` gap between each marker and column name.
+
 ### Stable column geometry
 
 [29/07/26]
@@ -129,3 +136,9 @@
 - [ ] Add behavior coverage for pointer resize, constrained minimum and maximum widths, and double-click reset.
 - [x] Verify horizontal scroll appears without column redistribution when the viewport becomes narrower than the explicit table width.
 - [x] Verify hidden and reordered columns update the explicit table width without changing retained column sizes.
+
+[01/08/26]
+
+- [x] Verify compact header and body computed inline padding match in a browser.
+- [x] Verify row-ID, text, and reference marker edges have zero horizontal offset from their corresponding body-cell content in the live column composition.
+- [x] Verify row-ID, text, and reference markers use the shared `xs` gap before their column names.

@@ -20,7 +20,7 @@ export const relationValueStyles = stylex.create({
     color: textColors["text-default"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
     overflowWrap: "anywhere",
   },
   compactMissing: {
@@ -29,7 +29,7 @@ export const relationValueStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
-    lineHeight: lineHeights.tight,
+    lineHeight: lineHeights.compact,
   },
   arrow: {
     fill: "none",
@@ -63,14 +63,14 @@ export const relationValueStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
-    lineHeight: lineHeights.tight,
+    lineHeight: lineHeights.compact,
   },
   value: {
     margin: 0,
     color: textColors["text-default"],
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
     overflowWrap: "anywhere",
   },
   displayValue: {

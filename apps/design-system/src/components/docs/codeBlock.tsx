@@ -96,7 +96,7 @@ const styles = stylex.create({
     color: "inherit",
     cursor: "pointer",
     display: "flex",
-    fontFamily: "'Geist', 'Inter', sans-serif",
+    fontFamily: "'Geist Variable', 'Inter', sans-serif",
     fontSize: 14,
     gap: 12,
     height: 48,
@@ -128,7 +128,7 @@ const styles = stylex.create({
   },
   pre: {
     color: "inherit",
-    fontFamily: "'GeistMono', ui-monospace, SFMono-Regular, Consolas, monospace",
+    fontFamily: "'Geist Mono Variable', ui-monospace, SFMono-Regular, Consolas, monospace",
     fontSize: 13,
     lineHeight: "20px",
     margin: 0,

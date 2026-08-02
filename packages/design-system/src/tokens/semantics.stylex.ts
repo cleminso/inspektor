@@ -2,7 +2,6 @@
 // Themes follow: https://stylexjs.com/docs/learn/recipes/light-dark-themes
 import * as stylex from '@stylexjs/stylex'
 
-import { breakpointQueries } from './breakpoints.stylex'
 import {
   fontFamilies,
   fontSizes,
@@ -46,15 +45,6 @@ export const backgroundColors = stylex.defineVars({
   'bg-secondary-hover': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'bg-danger': `light-dark(${palette.red100}, ${palette.red950})`,
   'bg-danger-hover': `light-dark(${palette.red200}, ${palette.red900})`,
-  'bg-success': `light-dark(${palette.green200}, ${palette.green900})`,
-  'bg-warning': `light-dark(${palette.orange100}, ${palette.orange900})`,
-  'bg-accent': `light-dark(${palette.yellow400}, ${palette.yellow500})`,
-
-  // Notifications
-  'bg-notification-warning': `light-dark(${palette.orange100}, ${palette.orange900})`,
-  'bg-notification-error': `light-dark(${palette.red100}, ${palette.red900})`,
-  'bg-notification-info': `light-dark(${palette.blue100}, ${palette.blue900})`,
-  'bg-notification-loading': `light-dark(${palette.gray100}, ${palette.neutral900})`,
 } as const)
 
 export const textColors = stylex.defineVars({
@@ -62,26 +52,14 @@ export const textColors = stylex.defineVars({
   'text-default': `light-dark(${palette.gray900}, ${palette.neutral100})`,
   'text-secondary': `light-dark(${palette.grayAlpha900}, ${palette.neutralAlpha900})`,
   'text-muted': `light-dark(${palette.gray600}, ${palette.neutral400})`,
-  'text-subtle': `light-dark(${palette.gray500}, ${palette.neutral500})`,
   'text-disabled': `light-dark(${palette.gray400}, ${palette.neutral600})`,
   'text-link': `light-dark(${palette.blue600}, ${palette.blue400})`,
-  'text-selected': `light-dark(${palette.blue600}, ${palette.blue400})`,
-  'text-danger': `light-dark(${palette.red600}, ${palette.red500})`,
+  'text-selected': `light-dark(${palette.blue700}, ${palette.blue400})`,
+  'text-danger': `light-dark(${palette.red700}, ${palette.red500})`,
 
   // Text on color-role surfaces
-  'fg-primary': `light-dark(${palette.gray50}, ${palette.gray50})`,
-  'fg-secondary': `light-dark(${palette.gray900}, ${palette.neutral50})`,
-  'fg-danger': `light-dark(${palette.red600}, ${palette.red500})`,
-  'fg-success': `light-dark(${palette.green700}, ${palette.green400})`,
-  'fg-warning': `light-dark(${palette.orange700}, ${palette.orange400})`,
-  'fg-accent': `light-dark(${palette.gray900}, ${palette.neutral50})`,
-  'fg-inverse': `light-dark(${palette.gray50}, ${palette.neutral950})`,
-
-  // Notifications
-  'fg-notification-warning': `light-dark(${palette.orange700}, ${palette.orange300})`,
-  'fg-notification-error': `light-dark(${palette.red700}, ${palette.red300})`,
-  'fg-notification-info': `light-dark(${palette.blue700}, ${palette.blue300})`,
-  'fg-notification-loading': `light-dark(${palette.gray700}, ${palette.neutral300})`,
+  'text-on-primary': palette.gray50,
+  'text-on-inverse': `light-dark(${palette.gray50}, ${palette.neutral950})`,
 } as const)
 
 export const borderColors = stylex.defineVars({
@@ -99,12 +77,6 @@ export const borderColors = stylex.defineVars({
   'border-danger': `light-dark(${palette.red500}, ${palette.red400})`,
   'border-danger-subtle': `light-dark(${palette.red200}, ${palette.red900})`,
   'border-success': `light-dark(${palette.green600}, ${palette.green300})`,
-
-  // Notifications
-  'border-notification-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
-  'border-notification-error': `light-dark(${palette.red500}, ${palette.red400})`,
-  'border-notification-info': `light-dark(${palette.blue600}, ${palette.blue400})`,
-  'border-notification-loading': `light-dark(${palette.gray300}, ${palette.neutral700})`,
 } as const)
 
 export const syntaxColors = stylex.defineVars({
@@ -184,80 +156,44 @@ export const spatial = stylex.defineVars({
   'viewport-height-s': dimensions[160],
   'viewport-height-m': dimensions[240],
   'viewport-height-l': dimensions[320],
+  'screen-height-dynamic': '100dvh',
+  'screen-height-small': '100svh',
 } as const)
 
 export const textRoleStyles = stylex.create({
   default: {
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
   },
   title: {
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[3],
-    lineHeight: lineHeights.normal,
     fontWeight: fontWeights.medium,
+    lineHeight: lineHeights.normal,
   },
   body: {
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
   },
   label: {
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.tight,
     fontWeight: fontWeights.medium,
+    lineHeight: lineHeights.compact,
   },
   caption: {
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
+    lineHeight: lineHeights.compact,
+  },
+  heading: {
+    fontFamily: fontFamilies.sans,
+    fontSize: fontSizes[4],
+    fontWeight: fontWeights.medium,
     lineHeight: lineHeights.tight,
   },
-  'heading-l': {
-    fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[7], [breakpointQueries.md]: fontSizes[7] },
-    lineHeight: lineHeights.tight,
-    fontWeight: fontWeights.medium,
-    letterSpacing: '0em',
-  },
-  'heading-m': {
-    fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[6], [breakpointQueries.md]: fontSizes[7] },
-    lineHeight: lineHeights.tight,
-    fontWeight: fontWeights.medium,
-    letterSpacing: '0em',
-  },
-  'heading-s': {
-    fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[5], [breakpointQueries.md]: fontSizes[6] },
-    lineHeight: lineHeights.normal,
-    fontWeight: fontWeights.medium,
-    letterSpacing: '0em',
-  },
-  'heading-xs': {
-    fontFamily: fontFamilies.sans,
-    fontSize: { default: fontSizes[4], [breakpointQueries.md]: fontSizes[5] },
-    lineHeight: lineHeights.normal,
-    fontWeight: fontWeights.medium,
-  },
-})
-
-export const textColorStyles = stylex.create({
-  default: { color: textColors['text-default'] },
-  muted: { color: textColors['text-muted'] },
-  subtle: { color: textColors['text-subtle'] },
-  disabled: { color: textColors['text-disabled'] },
-
-  primary: { color: textColors['fg-primary'] },
-  secondary: { color: textColors['fg-secondary'] },
-  danger: { color: textColors['text-danger'] },
-  error: { color: textColors['text-danger'] },
-  success: { color: textColors['fg-success'] },
-  accent: { color: textColors['fg-accent'] },
-  inverse: { color: textColors['fg-inverse'] },
-  inherit: {},
-  // inherit color from its parent. Usefull inside components where parents has controls color.
 })
 
 type StyleXTokenKeys<T> = Exclude<

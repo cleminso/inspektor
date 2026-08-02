@@ -153,33 +153,27 @@ export const fontSizeValues = stylex.defineConsts({
   2: '0.8125rem', // 13
   3: '1rem', // 16
   4: '1.25rem', // 20
-  5: '1.5rem', // 24
-  6: '1.875rem', // 30
-  7: '2.25rem', // 36
 } as const)
 
 export const fontSizes = stylex.defineVars(fontSizeValues)
 
-export const lineHeights = stylex.defineVars({
-  none: '1',
+export const lineHeightValues = stylex.defineConsts({
+  compact: '1rem',
   tight: '1.25',
+  ui: '1.125rem',
   normal: '1.5',
-  relaxed: '1.625',
 } as const)
+
+export const lineHeights = stylex.defineVars(lineHeightValues)
 
 export const fontWeights = stylex.defineVars({
   regular: '400',
   medium: '500',
 } as const)
 
-export const letterSpacings = stylex.defineVars({
-  tight: '-0.02em',
-  normal: '0',
-} as const)
-
 export const fontFamilies = stylex.defineVars({
-  sans: "'Geist', 'Inter', sans-serif",
-  mono: "'GeistMono', monospace",
+  sans: "'Geist Variable', 'Inter', sans-serif",
+  mono: "'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Consolas, monospace",
 } as const)
 
 export const spacingValues = stylex.defineConsts({
@@ -261,7 +255,6 @@ export type SyntaxPaletteToken = StyleXTokenKeys<typeof syntaxPalette>
 export type FontSizeToken = StyleXTokenKeys<typeof fontSizes>
 export type LineHeightToken = StyleXTokenKeys<typeof lineHeights>
 export type FontWeightToken = StyleXTokenKeys<typeof fontWeights>
-export type LetterSpacingToken = StyleXTokenKeys<typeof letterSpacings>
 export type FontFamilyToken = StyleXTokenKeys<typeof fontFamilies>
 export type SpacingToken = StyleXTokenKeys<typeof spacing>
 export type BorderRadiusToken = StyleXTokenKeys<typeof borderRadii>

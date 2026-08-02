@@ -13,7 +13,7 @@
 
 [31/07/26]
 
-- [x] Preserve symmetric padding for text-only, two-sided, start-aligned, and distributed buttons.
+- [x] Preserve symmetric padding for text-only and two-sided buttons.
 - [x] Support labelled and icon-only actions through one `Button` component.
 - [x] Remove the `outline` variant from the shared button vocabulary.
 - [x] Remove the large Button size and inset API.
@@ -45,7 +45,6 @@
 [31/07/26]
 
 - Optical padding is automatic and is not exposed as a consumer styling prop.
-- One-sided content redistributes existing inline padding without changing the button width.
 - `iconOnly` makes Button and ButtonLink square and requires an accessible label.
 - Icon-only actions do not accept labelled-button layout props.
 - Button sizes use fixed heights so icon-only hit areas remain exact squares.

@@ -8,11 +8,13 @@ import {
   layerIndexes,
   spatial,
   textColors,
+  textRoleStyles,
 } from './tokens.stylex'
 import {
   borderRadiusValues,
   dimensionValues,
   fontSizeValues,
+  lineHeightValues,
   spacingValues,
 } from './value.stylex'
 
@@ -20,25 +22,38 @@ const nonzeroValues = (values: Readonly<Record<string, string>>) =>
   Object.values(values).filter((value) => value !== '0')
 
 describe('semantic token contract', () => {
-  it('defines notification color roles', () => {
-    expect(backgroundColors).toMatchObject({
-      'bg-notification-warning': expect.any(String),
-      'bg-notification-error': expect.any(String),
-      'bg-notification-info': expect.any(String),
-      'bg-notification-loading': expect.any(String),
-    })
-    expect(textColors).toMatchObject({
-      'fg-notification-warning': expect.any(String),
-      'fg-notification-error': expect.any(String),
-      'fg-notification-info': expect.any(String),
-      'fg-notification-loading': expect.any(String),
-    })
+  it('defines neutral toast border roles without notification surfaces', () => {
+    expect(backgroundColors).not.toHaveProperty('bg-notification-warning')
+    expect(backgroundColors).not.toHaveProperty('bg-notification-error')
+    expect(backgroundColors).not.toHaveProperty('bg-notification-info')
+    expect(backgroundColors).not.toHaveProperty('bg-notification-loading')
+    expect(Object.keys(textColors).some((token) => token.startsWith('fg-'))).toBe(false)
     expect(borderColors).toMatchObject({
-      'border-notification-warning': expect.any(String),
-      'border-notification-error': expect.any(String),
-      'border-notification-info': expect.any(String),
-      'border-notification-loading': expect.any(String),
+      'border-warning': expect.any(String),
+      'border-danger': expect.any(String),
+      'border-success': expect.any(String),
     })
+  })
+
+  it('exposes only the Inspector text scale and roles', () => {
+    expect(fontSizeValues).toEqual({
+      1: '0.75rem',
+      2: '0.8125rem',
+      3: '1rem',
+      4: '1.25rem',
+    })
+    expect(textRoleStyles).toMatchObject({
+      default: expect.any(Object),
+      title: expect.any(Object),
+      body: expect.any(Object),
+      label: expect.any(Object),
+      caption: expect.any(Object),
+      heading: expect.any(Object),
+    })
+    expect(textRoleStyles).not.toHaveProperty('heading-l')
+    expect(textRoleStyles).not.toHaveProperty('heading-m')
+    expect(textRoleStyles).not.toHaveProperty('heading-s')
+    expect(textRoleStyles).not.toHaveProperty('heading-xs')
   })
 
   it('defines layer and spatial roles', () => {
@@ -80,6 +95,8 @@ describe('semantic token contract', () => {
       'viewport-height-s': expect.any(String),
       'viewport-height-m': expect.any(String),
       'viewport-height-l': expect.any(String),
+      'screen-height-dynamic': expect.any(String),
+      'screen-height-small': expect.any(String),
       'panel-handle-size': expect.any(String),
     })
   })
@@ -112,6 +129,14 @@ describe('primitive length policy', () => {
   it('keeps physical boundary and focus geometry pixel-backed', () => {
     expect(dimensionValues[1]).toBe('1px')
     expect(dimensionValues[2]).toBe('2px')
+  })
+
+  it('pairs 13px interface text with an explicit 18px line height', () => {
+    expect(lineHeightValues.ui).toBe('1.125rem')
+  })
+
+  it('pairs 12px compact text with an explicit 16px line height', () => {
+    expect(lineHeightValues.compact).toBe('1rem')
   })
 })
 

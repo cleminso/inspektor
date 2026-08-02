@@ -18,6 +18,7 @@
 - [x] Allow `ActionList.Item` to receive composed behavior through Base UI's `render` contract.
 - [x] Preserve the semantic `<ul>` and `<li>` structure when context-menu behavior is composed onto an item.
 - [x] Keep composed context-menu metadata and focus styles from replacing the item's semantic slot and visual treatment.
+- [x] Make list, trigger, and composed-link presentation independent from consumer reset styles.
 
 ## Open product work
 
@@ -55,3 +56,4 @@
 - [x] Run application tests, typecheck, lint, and build.
 - [x] Validate the documented example and generated prop metadata.
 - [x] Verify checkbox and label context-menu activation in a browser.
+- [x] Verify native list and composed-link normalization without Tailwind Preflight.

@@ -1,4 +1,3 @@
-import tailwindcss from "@tailwindcss/vite";
 import stylex from "@stylexjs/unplugin";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
@@ -49,7 +48,6 @@ export default defineConfig(({ mode }) => ({
     }),
     createStylexPlugin(),
     viteReact(),
-    tailwindcss(),
   ],
   server: { port: PORT, host: true },
   build: {

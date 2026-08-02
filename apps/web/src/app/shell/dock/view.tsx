@@ -38,7 +38,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
             title={leftDockLabel}
             onClick={leftDock.onToggle}
           >
-            <Icon render={<Table />} size="xs" />
+            <Icon render={<Table />} size="s" />
           </Button>
         ) : null}
         <Button
@@ -49,7 +49,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
           iconOnly
           title="Open subscriptions dock"
         >
-          <Icon render={<Activity />} size="xs" />
+          <Icon render={<Activity />} size="s" />
         </Button>
       </Box>
     </Box>

@@ -44,7 +44,7 @@ export function SourceLink({ source, title }: SourceLinkProps): ReactElement {
     return (
       <Text as="h1" variant="title" aria-label={title}>
         <TextLink
-          variant="headingdefault"
+          variant="title"
           href={href}
           target="_blank"
           rel="noreferrer"

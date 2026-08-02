@@ -1,8 +1,29 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ActionList } from './actionList'
+import { actionListStyles } from './actionList.styles'
 import { ContextMenu } from '../contextMenu/contextMenu'
+
+const normalizationContractStyles = stylex.create({
+  root: {
+    margin: 0,
+    padding: 0,
+    listStyle: 'none',
+  },
+  trigger: {
+    margin: 0,
+    paddingBlock: 0,
+    textDecoration: 'none',
+  },
+})
+
+function expectStyleClasses(element: Element, className: string | undefined) {
+  for (const atomicClassName of className?.split(' ') ?? []) {
+    expect(element.className).toContain(atomicClassName)
+  }
+}
 
 afterEach(cleanup)
 
@@ -63,6 +84,27 @@ describe('ActionList', () => {
     )
 
     expect(screen.getByRole('button', { name: 'accounts' }).closest('[data-slot="action-list-item"]')).toBeTruthy()
+  })
+
+  it('normalizes native list and composed link presentation', () => {
+    render(
+      <ActionList aria-label="Accounts">
+        <ActionList.Item>
+          <ActionList.Trigger nativeButton={false} render={<a href="/accounts" />}>
+            accounts
+          </ActionList.Trigger>
+        </ActionList.Item>
+      </ActionList>,
+    )
+
+    const list = screen.getByRole('list', { name: 'Accounts' })
+    const link = screen.getByRole('button', { name: 'accounts' })
+
+    expect(link.tagName).toBe('A')
+    expect(link.getAttribute('href')).toBe('/accounts')
+    expectStyleClasses(list, stylex.props(normalizationContractStyles.root).className)
+    expectStyleClasses(link, stylex.props(normalizationContractStyles.trigger).className)
+    expectStyleClasses(link, stylex.props(actionListStyles.trigger).className)
   })
 
   it('delegates Escape from a descendant to the consumer', () => {

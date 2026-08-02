@@ -44,7 +44,7 @@ export const dataGridStyles = stylex.create({
     borderSpacing: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     tableLayout: 'fixed',
     userSelect: 'none',
   },
@@ -161,7 +161,7 @@ export const dataGridStyles = stylex.create({
     fontSize: fontSizes[1],
     fontWeight: fontWeights.regular,
     height: '100%',
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.compact,
     overflow: 'hidden',
     paddingLeft: spacing.m,
     paddingRight: spacing.m,
@@ -175,9 +175,9 @@ export const dataGridStyles = stylex.create({
   headerDragSourceDragging: {
     visibility: 'hidden',
   },
-  compactHeaderDragContent: {
-    paddingLeft: spacing.xs,
-    paddingRight: spacing.xs,
+  compactCellInlinePadding: {
+    paddingLeft: spacing.s,
+    paddingRight: spacing.s,
   },
   columnDragOverlay: {
     boxSizing: 'border-box',
@@ -278,8 +278,6 @@ export const dataGridStyles = stylex.create({
   },
   compactCell: {
     height: spatial['control-height-m'],
-    paddingLeft: spacing.s,
-    paddingRight: spacing.s,
   },
   messageCell: {
     padding: spacing.xl,
@@ -302,6 +300,7 @@ export const dataGridStyles = stylex.create({
   flexShrink: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
+    lineHeight: lineHeights.compact,
     borderTopColor: borderColors['border-secondary'],
     borderTopStyle: 'solid',
     borderTopWidth: 1,

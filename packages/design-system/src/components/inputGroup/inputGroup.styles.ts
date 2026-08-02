@@ -60,7 +60,7 @@ export const inputGroupStyles = stylex.create({
     flexShrink: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
     whiteSpace: "nowrap",
   },
   prefix: {
@@ -133,7 +133,7 @@ export const inputGroupStyles = stylex.create({
     flexShrink: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
-    lineHeight: lineHeights.tight,
+    lineHeight: lineHeights.compact,
     whiteSpace: "nowrap",
   },
   memberDisabled: {

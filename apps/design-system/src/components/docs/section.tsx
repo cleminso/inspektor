@@ -11,7 +11,7 @@ export function Section({ title, description, children }: SectionProps): ReactEl
   return (
     <Box as="section" flexDirection="column" gap="xl">
       <Box flexDirection="column" gap="xs">
-        <Text as="h2" variant="heading-xs">
+        <Text as="h2" variant="heading">
           {title}
         </Text>
         {description !== undefined ? (

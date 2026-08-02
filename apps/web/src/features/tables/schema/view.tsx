@@ -1,4 +1,4 @@
-import { Box, CopyButton } from "@inspector/ds";
+import { Box, CopyButton, Text } from "@inspector/ds";
 
 import { useInspector } from "@app/providers/inspectorProvider";
 interface SchemaViewProps {
@@ -41,11 +41,15 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
             borderStyle="solid"
             px="l"
           >
-            <h2 className="text-sm font-medium text-foreground">Schema</h2>
+            <Text as="h2" variant="label">
+              Schema
+            </Text>
             <CopyButton textToCopy={schemaJson} label="Copy schema" />
           </Box>
           <Box unsafeClassName="app-scrollbar" minHeight={0} flex={1} overflow="auto" padding="l">
-            <pre className="text-xs text-muted-foreground">{schemaJson}</pre>
+            <Text as="pre" variant="caption" color="muted" monospace>
+              {schemaJson}
+            </Text>
           </Box>
         </Box>
         <Box as="section" minHeight={0} flexDirection="column" overflow="hidden">
@@ -59,11 +63,15 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
             borderStyle="solid"
             px="l"
           >
-            <h2 className="text-sm font-medium text-foreground">Permissions</h2>
+            <Text as="h2" variant="label">
+              Permissions
+            </Text>
             <CopyButton textToCopy={permissionsJson} label="Copy permissions" />
           </Box>
           <Box unsafeClassName="app-scrollbar" minHeight={0} flex={1} overflow="auto" padding="l">
-            <pre className="text-xs text-muted-foreground">{permissionsJson}</pre>
+            <Text as="pre" variant="caption" color="muted" monospace>
+              {permissionsJson}
+            </Text>
           </Box>
         </Box>
       </Box>

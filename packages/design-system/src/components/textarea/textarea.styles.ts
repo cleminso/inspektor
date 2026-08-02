@@ -31,14 +31,14 @@ export const textareaStyles = stylex.create({
     boxSizing: "border-box",
     color: textColors["text-default"],
     fontSize: fontSizes[2],
-    lineHeight: lineHeights.normal,
+    lineHeight: lineHeights.ui,
     outlineColor: borderColors["outline"],
     outlineStyle: "solid",
     outlineWidth: 0,
     resize: "vertical",
     minWidth: 0,
     "::placeholder": {
-      color: textColors["text-subtle"],
+      color: textColors["text-muted"],
     },
   },
   heightS: {

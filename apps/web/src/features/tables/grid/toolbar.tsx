@@ -14,8 +14,6 @@ export function Toolbar({ actions, children }: ToolbarProps): React.ReactElement
       gap="s"
       padding="s"
       backgroundColor="bg-page"
-      borderColor="border-secondary"
-      borderStyle="solid"
     >
       <Box minWidth={0} flex={1}>
         {children}

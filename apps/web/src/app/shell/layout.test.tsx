@@ -10,7 +10,7 @@ vi.mock("./header/view", () => ({
 afterEach(cleanup);
 
 describe("InspectorLayout", () => {
-  it("lets the viewport-height integration class define the root height", () => {
+  it("uses the constrained viewport height without an integration class", () => {
     const { container } = render(
       <InspectorLayout>
         <div>Content</div>
@@ -18,7 +18,8 @@ describe("InspectorLayout", () => {
     );
     const root = container.firstElementChild as HTMLElement;
 
-    expect(root.classList.contains("h-dvh")).toBe(true);
-    expect(root.style.height).toBe("");
+    expect(root.classList.contains("h-dvh")).toBe(false);
+    expect(root.className).not.toBe("");
+    expect(root.style.height).toMatch(/^var\(--/);
   });
 });

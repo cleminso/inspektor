@@ -21,10 +21,13 @@ const selectionVisibility = `clamp(0, calc(${actionListVars.selectionChecked} + 
 
 export const actionListStyles = stylex.create({
   root: {
+    margin: 0,
+    padding: 0,
+    gap: spacing.xxs,
+    listStyle: 'none',
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    gap: spacing.xxs,
   },
   item: {
     [actionListVars.selectionHoverVisible]: {
@@ -73,11 +76,14 @@ export const actionListStyles = stylex.create({
     },
   },
   trigger: {
+    margin: 0,
     borderStyle: 'none',
     flex: '1',
     gap: spacing.s,
     overflow: 'hidden',
+    paddingBlock: 0,
     paddingInline: spacing.s,
+    textDecoration: 'none',
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: 'transparent',
@@ -87,7 +93,7 @@ export const actionListStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
-    lineHeight: lineHeights.none,
+    lineHeight: lineHeights.ui,
     outlineStyle: 'none',
     textAlign: 'start',
     userSelect: 'none',
