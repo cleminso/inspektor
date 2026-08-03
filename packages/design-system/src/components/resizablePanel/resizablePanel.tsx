@@ -21,7 +21,7 @@ import {
 
 import { resizablePanelStyles } from './resizablePanel.styles'
 
-export type ResizableHandleAppearance = 'line' | 'grip'
+export type ResizableHandleAppearance = 'line' | 'gutter' | 'grip'
 
 type ResizablePanelOrientation = NonNullable<BaseGroupProps['orientation']>
 
@@ -31,6 +31,11 @@ const DEFAULT_COLLAPSIBLE_PANEL_SIZE = 200
 const gripOrientationStyles = {
   horizontal: resizablePanelStyles.gripVertical,
   vertical: resizablePanelStyles.gripHorizontal,
+} satisfies Record<ResizablePanelOrientation, unknown>
+
+const gutterOrientationStyles = {
+  horizontal: resizablePanelStyles.gutterHorizontal,
+  vertical: resizablePanelStyles.gutterVertical,
 } satisfies Record<ResizablePanelOrientation, unknown>
 
 export interface ResizablePanelGroupProps
@@ -82,7 +87,7 @@ export interface ResizablePanelProps extends Omit<BasePanelProps, 'className' | 
 
 export interface ResizableHandleProps
   extends Omit<BaseSeparatorProps, 'children' | 'className' | 'style'> {
-  /** Controls whether the separator is a line or includes a visible grip. */
+  /** Controls whether the separator is a line, a transparent gutter, or includes a visible grip. */
   appearance?: ResizableHandleAppearance
   /** Uniquely identifies the handle within its group. */
   id?: BaseSeparatorProps['id']
@@ -151,7 +156,11 @@ export function ResizableHandle({
   ...props
 }: ResizableHandleProps) {
   const groupOrientation = useContext(ResizablePanelOrientationContext)
-  const handleStyleProps = stylex.props(resizablePanelStyles.handle)
+  const handleStyleProps = stylex.props(
+    resizablePanelStyles.handle,
+    appearance === 'gutter' && resizablePanelStyles.gutter,
+    appearance === 'gutter' && gutterOrientationStyles[groupOrientation],
+  )
   const gripStyleProps = stylex.props(
     resizablePanelStyles.grip,
     gripOrientationStyles[groupOrientation],

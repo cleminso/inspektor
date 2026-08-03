@@ -72,7 +72,13 @@ export function SidePanelLayoutProvider({
 
 function SidePanelLayoutRoot({ children }: SidePanelLayoutRootProps): React.ReactElement {
   return (
-    <Box width="full" height="full" minHeight={0} flex={1} overflow="hidden">
+    <Box
+      width="full"
+      height="full"
+      minHeight={0}
+      flex={1}
+      overflow="hidden"
+    >
       <ResizablePanelGroup orientation="horizontal">{children}</ResizablePanelGroup>
     </Box>
   );
@@ -83,7 +89,7 @@ interface SidePanelLayoutPartProps {
 }
 
 function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.ReactElement {
-  const { panelRef, setIsOpenFromSize } = useSidePanelLayout();
+  const { isOpen, panelRef, setIsOpenFromSize } = useSidePanelLayout();
 
   return (
     <>
@@ -95,11 +101,19 @@ function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.Rea
         maxSize={360}
         onResize={setIsOpenFromSize}
       >
-        <Box width="full" height="full" minHeight={0} overflow="hidden">
+        <Box
+          width="full"
+          height="full"
+          minHeight={0}
+          overflow="hidden"
+          backgroundColor="bg-page"
+          borderBottomRightRadius="xs"
+          borderTopRightRadius="xs"
+        >
           {children}
         </Box>
       </ResizablePanel>
-      <ResizableHandle />
+      {isOpen === true ? <ResizableHandle appearance="gutter" /> : null}
     </>
   );
 }
@@ -107,7 +121,15 @@ function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.Rea
 function SidePanelLayoutContent({ children }: SidePanelLayoutPartProps): React.ReactElement {
   return (
     <ResizablePanel>
-      <Box width="full" height="full" minHeight={0} overflow="hidden">
+      <Box
+        width="full"
+        height="full"
+        minHeight={0}
+        overflow="hidden"
+        backgroundColor="bg-page"
+        borderBottomLeftRadius="xs"
+        borderTopLeftRadius="xs"
+      >
         {children}
       </Box>
     </ResizablePanel>

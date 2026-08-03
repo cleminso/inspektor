@@ -112,11 +112,11 @@ export const tabViewStyles = stylex.create({
     borderRadius: borderRadii.xs,
     borderStyle: 'none',
     gap: {
-      default: spacing.s,
+      default: spacing.xs,
       [compactTab]: 0,
     },
     paddingInline: {
-      default: spacing.s,
+      default: spacing.xs,
       [compactTab]: 0,
     },
     alignItems: 'center',

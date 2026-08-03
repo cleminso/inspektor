@@ -74,7 +74,7 @@ describe("SidePanelLayout", () => {
 
     expect(panel.collapse).toHaveBeenCalledOnce();
     expect(toggle.getAttribute("aria-pressed")).toBe("false");
-    expect(screen.getByTestId("resize-handle")).toBeTruthy();
+    expect(screen.queryByTestId("resize-handle")).toBeNull();
 
     fireEvent.click(toggle);
 
@@ -83,7 +83,7 @@ describe("SidePanelLayout", () => {
     expect(screen.getByTestId("resize-handle")).toBeTruthy();
   });
 
-  it("keeps the resize handle available after it collapses the panel", () => {
+  it("hides the resize handle after the panel collapses during resize", () => {
     function DockToggle(): React.ReactElement {
       const { isOpen, toggle } = useSidePanelLayout();
 
@@ -111,10 +111,11 @@ describe("SidePanelLayout", () => {
 
     const toggle = screen.getByRole("button", { name: "Toggle left dock" });
     expect(toggle.getAttribute("aria-pressed")).toBe("false");
-    expect(screen.getByTestId("resize-handle")).toBeTruthy();
+    expect(screen.queryByTestId("resize-handle")).toBeNull();
 
     fireEvent.click(toggle);
 
     expect(panel.expand).toHaveBeenCalledOnce();
+    expect(screen.getByTestId("resize-handle")).toBeTruthy();
   });
 });

@@ -16,6 +16,7 @@ import {
 export const backgroundColors = stylex.defineVars({
   // Surfaces
   'bg-page': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  'bg-layout': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha100})`,
   'bg-card': `light-dark(${palette.gray100}, ${palette.neutral900})`,
   'bg-popover': `light-dark(${palette.gray100}, ${palette.neutral900})`,
   'bg-subtle': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
@@ -139,6 +140,7 @@ export const spatial = stylex.defineVars({
   'panel-height': dimensions[280],
   'panel-bar-height': dimensions[40],
   'panel-handle-size': dimensions[1],
+  'panel-gutter-size': spacing.xs,
   'select-min-width': dimensions[160],
   'switch-height-s': dimensions[16],
   'switch-height-m': dimensions[20],

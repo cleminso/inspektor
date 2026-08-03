@@ -16,7 +16,7 @@ export default function BasicExample(): ReactElement {
             <Text>Tables</Text>
           </Box>
         </ResizablePanel>
-        <ResizableHandle />
+        <ResizableHandle appearance="gutter" />
         <ResizablePanel minSize="30%">
           <Box height="full" alignItems="center" justifyContent="center">
             <Text>Data grid</Text>

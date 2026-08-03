@@ -146,10 +146,22 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Table-list dock
 
+[03/08/26]
+
+- [x] Use the semantic layout canvas color behind page surfaces instead of the secondary interaction color.
+- [x] Express shell separation as a row gap and derive both shell and resizable gutters from the four-pixel spacing token.
+- [x] Remove the resize handle and its gutter while the table-list dock is collapsed; reopen it from the application dock.
+
+[02/08/26]
+
+- [x] Let the application shell own four-pixel gutters above and below the workspace.
+- [x] Render the header and bottom dock as page surfaces over the shell gutter surface.
+- [x] Separate the table-list dock from the workspace with a transparent four-pixel resizable gutter.
+- [x] Round the adjacent dock and workspace top and bottom corners with the two-pixel radius token.
+
 [31/08/26]
 
 - [x] Start the table-list dock open at 200px while keeping its 160px to 360px resize range.
-- [x] Keep the resize handle mounted while collapsed so pointer and keyboard interaction can reopen the dock.
 - [x] Delegate dock collapse and expansion directly to the design-system panel ref.
 
 [31/07/26]
@@ -521,6 +533,23 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[02/08/26]
+
+- [x] Focused resizable-handle, token, table-layout, and playground tests pass.
+- [x] `pnpm --filter @inspector/ds test`
+- [x] `pnpm --filter @inspector/ds typecheck`
+- [x] `pnpm --filter @inspector/ds build`
+- [x] `pnpm --filter @inspector/ds lint`
+- [x] `pnpm --filter inspector.design-system test`
+- [x] `pnpm --filter inspector.design-system check:props`
+- [x] `pnpm --filter inspector.design-system typecheck`
+- [x] `pnpm --filter inspector.design-system lint`
+- [x] `pnpm --filter inspector.design-system build`
+- [x] `pnpm --filter regarde.inspector lint`
+- [x] Browser verification confirms line, transparent four-pixel gutter, and grip handle rendering.
+- [ ] Full Inspector tests remain blocked by the existing dock icon size expectation.
+- [ ] Full Inspector typecheck and build remain blocked by existing case-duplicate grid module names.
 
 [28/07/26]
 

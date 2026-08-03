@@ -15,13 +15,20 @@ export function InspectorLayout({ children, leftDock }: InspectorLayoutProps): R
       minHeight={0}
       width="full"
       flexDirection="column"
+      rowGap="xs"
       overflow="hidden"
-      backgroundColor="bg-page"
+      backgroundColor="bg-layout"
       color="text-default"
       height="screen-height-dynamic"
     >
       <InspectorHeader />
-      <Box as="main" minHeight={0} minWidth={0} flex={1} overflow="hidden">
+      <Box
+        as="main"
+        minHeight={0}
+        minWidth={0}
+        flex={1}
+        overflow="hidden"
+      >
         {children}
       </Box>
       <InspectorDock leftDock={leftDock} />

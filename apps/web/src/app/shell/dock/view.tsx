@@ -20,11 +20,9 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
       flexShrink={0}
       alignItems="center"
       gap="s"
-      padding="xs"
-      backgroundColor="bg-secondary"
-      borderTopWidth={1}
-      borderColor="border-secondary"
-      borderStyle="solid"
+      paddingVertical="s"
+      paddingHorizontal="xs"
+      backgroundColor="bg-page"
     >
       <Box minWidth={0} flex={1} alignItems="center" gap="xs">
         {leftDock !== undefined ? (

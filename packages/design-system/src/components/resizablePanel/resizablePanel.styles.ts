@@ -58,6 +58,21 @@ export const resizablePanelStyles = stylex.create({
       ':is([aria-orientation="horizontal"])': '100%',
     },
   },
+  gutter: {
+    backgroundColor: {
+      default: 'transparent',
+      ':focus-visible': 'transparent',
+      ':is([data-disabled])': 'transparent',
+      ':not([data-disabled]):hover': 'transparent',
+      ':not([data-disabled]):is([data-separator="active"])': 'transparent',
+    },
+  },
+  gutterHorizontal: {
+    width: spatial['panel-gutter-size'],
+  },
+  gutterVertical: {
+    height: spatial['panel-gutter-size'],
+  },
   grip: {
     borderRadius: borderRadii.m,
     backgroundColor: 'currentColor',

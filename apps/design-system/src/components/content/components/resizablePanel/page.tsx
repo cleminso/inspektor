@@ -25,7 +25,7 @@ export function ResizablePanelPage(): ReactElement {
     <ResizablePanelPlayground>
       <Section
         title="Split layout"
-        description="Combine pixel-sized side panels with a flexible center panel. Handles support keyboard and pointer resizing."
+        description="Combine pixel-sized side panels with a flexible center panel. Handles can render as a line, transparent gutter, or visible grip while preserving keyboard and pointer resizing."
       >
         <Example source={basicSource} align="stretch">
           <BasicExample />

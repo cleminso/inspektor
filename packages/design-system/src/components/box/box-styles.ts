@@ -255,6 +255,7 @@ export const columnGapStyles = stylex.create({
 
 export const backgroundColorStyles = stylex.create({
   'bg-page': { backgroundColor: backgroundColors['bg-page'] },
+  'bg-layout': { backgroundColor: backgroundColors['bg-layout'] },
   'bg-card': { backgroundColor: backgroundColors['bg-card'] },
   'bg-popover': { backgroundColor: backgroundColors['bg-popover'] },
   'bg-subtle': { backgroundColor: backgroundColors['bg-subtle'] },

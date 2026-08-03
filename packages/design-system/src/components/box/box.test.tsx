@@ -23,7 +23,7 @@ describe('Box', () => {
 
   it('resolves every semantic color token accepted by Box', () => {
     const backgroundColors = [
-      'bg-page', 'bg-card', 'bg-popover', 'bg-subtle', 'bg-overlay',
+      'bg-page', 'bg-layout', 'bg-card', 'bg-popover', 'bg-subtle', 'bg-overlay',
       'bg-backdrop', 'bg-inverse', 'bg-hover', 'bg-pressed', 'bg-selected',
       'bg-disabled', 'bg-primary', 'bg-primary-hover', 'bg-secondary',
       'bg-danger', 'bg-danger-hover',

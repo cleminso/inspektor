@@ -43,7 +43,7 @@ const controls = [
     kind: "select",
     key: "appearance",
     label: "Handle",
-    options: ["line", "grip"].map((value) => ({ label: value, value })),
+    options: ["line", "gutter", "grip"].map((value) => ({ label: value, value })),
   },
   { kind: "boolean", key: "disabled", label: "Disabled" },
   { kind: "boolean", key: "collapsible", label: "Collapsible" },
@@ -64,7 +64,9 @@ export function serializeResizablePanelPlayground(state: ResizablePanelPlaygroun
     state.collapsible === true ? "collapsible" : null,
   ].filter((prop): prop is string => prop !== null);
   const handle =
-    state.appearance === "line" ? "<ResizableHandle />" : '<ResizableHandle appearance="grip" />';
+    state.appearance === "line"
+      ? "<ResizableHandle />"
+      : `<ResizableHandle appearance="${state.appearance}" />`;
 
   return createPlaygroundSource({
     imports: {

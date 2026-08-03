@@ -17,11 +17,9 @@ export function InspectorHeader(): React.ReactElement {
       flexShrink={0}
       alignItems="center"
       gap="s"
-      padding="s"
-      backgroundColor="bg-secondary"
-      borderBottomWidth={1}
-      borderColor="border-secondary"
-      borderStyle="solid"
+      paddingVertical="s"
+      paddingHorizontal="xs"
+      backgroundColor="bg-page"
     >
       <Box minWidth={0} flex={1} alignItems="center" gap="xxs">
         <ConnectionSwitcher width="m" />

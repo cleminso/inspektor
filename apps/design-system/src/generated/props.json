@@ -715,7 +715,7 @@
       "description": "Controls whether panels are arranged and resized horizontally or vertically.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 39
+        "line": 44
       }
     },
     {
@@ -725,7 +725,7 @@
       "description": "Restores a previously saved layout keyed by panel id.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 41
+        "line": 46
       }
     },
     {
@@ -736,7 +736,7 @@
       "description": "Disables resizing for every panel and handle in the group.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 43
+        "line": 48
       }
     },
     {
@@ -747,7 +747,7 @@
       "description": "Prevents the library from changing the pointer cursor during resizing.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 45
+        "line": 50
       }
     },
     {
@@ -757,7 +757,7 @@
       "description": "Uniquely identifies the group and its persisted layout.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 47
+        "line": 52
       }
     },
     {
@@ -767,7 +767,7 @@
       "description": "Runs continuously while the group layout changes.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 49
+        "line": 54
       }
     },
     {
@@ -777,7 +777,7 @@
       "description": "Runs after a group layout change is committed.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 51
+        "line": 56
       }
     },
     {
@@ -787,7 +787,7 @@
       "description": "Provides access to the group's imperative layout controls.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 53
+        "line": 58
       }
     },
     {
@@ -797,7 +797,7 @@
       "description": "Provides access to the group's root element.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 55
+        "line": 60
       }
     }
   ],
@@ -809,7 +809,7 @@
       "description": "Uniquely identifies the panel within its group.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 60
+        "line": 65
       }
     },
     {
@@ -819,7 +819,7 @@
       "description": "Sets the panel size used when no persisted layout is available.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 62
+        "line": 67
       }
     },
     {
@@ -829,7 +829,7 @@
       "description": "Sets the smallest expanded panel size.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 64
+        "line": 69
       }
     },
     {
@@ -839,7 +839,7 @@
       "description": "Sets the largest panel size.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 66
+        "line": 71
       }
     },
     {
@@ -850,7 +850,7 @@
       "description": "Sets the panel size when collapsed.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 68
+        "line": 73
       }
     },
     {
@@ -861,7 +861,7 @@
       "description": "Allows the panel to collapse when resized below its minimum size.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 70
+        "line": 75
       }
     },
     {
@@ -872,7 +872,7 @@
       "description": "Prevents this panel from being resized directly or indirectly.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 72
+        "line": 77
       }
     },
     {
@@ -883,7 +883,7 @@
       "description": "Controls how the panel responds when its group changes size.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 74
+        "line": 79
       }
     },
     {
@@ -893,7 +893,7 @@
       "description": "Runs when the panel size changes.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 76
+        "line": 81
       }
     },
     {
@@ -903,7 +903,7 @@
       "description": "Provides access to collapse, expand, size, and resize controls.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 78
+        "line": 83
       }
     },
     {
@@ -913,20 +913,20 @@
       "description": "Provides access to the panel's root element.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 80
+        "line": 85
       }
     }
   ],
   "resizableHandle": [
     {
       "name": "appearance",
-      "type": "\"line\" | \"grip\"",
+      "type": "\"line\" | \"gutter\" | \"grip\"",
       "required": false,
       "defaultValue": "\"line\"",
-      "description": "Controls whether the separator is a line or includes a visible grip.",
+      "description": "Controls whether the separator is a line, a transparent gutter, or includes a visible grip.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 86
+        "line": 91
       }
     },
     {
@@ -936,7 +936,7 @@
       "description": "Uniquely identifies the handle within its group.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 88
+        "line": 93
       }
     },
     {
@@ -947,7 +947,7 @@
       "description": "Prevents the handle from resizing its neighboring panels.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 90
+        "line": 95
       }
     },
     {
@@ -958,7 +958,7 @@
       "description": "Prevents a double click from restoring the adjacent panel's default size.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 92
+        "line": 97
       }
     },
     {
@@ -968,7 +968,7 @@
       "description": "Provides access to the handle element.",
       "source": {
         "path": "packages/design-system/src/components/resizablePanel/resizablePanel.tsx",
-        "line": 94
+        "line": 99
       }
     }
   ],

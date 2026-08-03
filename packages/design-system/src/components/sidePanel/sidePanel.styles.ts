@@ -26,14 +26,14 @@ export const sidePanelStyles = stylex.create({
     width: '100%',
   },
   body: {
-    padding: spacing.s,
+    padding: spacing.xs,
     flex: '1',
     gap: spacing.s,
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
     overflowY: 'auto',
-    paddingTop: spacing.s,
+    paddingTop: spacing.xs,
     width: '100%',
   },
   footer: {

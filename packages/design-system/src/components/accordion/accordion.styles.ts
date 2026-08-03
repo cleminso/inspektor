@@ -34,8 +34,8 @@ export const accordionStyles = stylex.create({
   },
   trigger: {
     [accordionVars.indicatorTransform]: 'rotate(0deg)',
-    borderStyle: 'none',
     borderRadius: borderRadii.xs,
+    borderStyle: 'none',
     gap: spacing.s,
     paddingInline: spacing.s,
     alignItems: 'center',
@@ -48,10 +48,10 @@ export const accordionStyles = stylex.create({
     cursor: 'pointer',
     display: 'flex',
     fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[1],
+    fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
     justifyContent: 'space-between',
-    lineHeight: lineHeights.compact,
+    lineHeight: lineHeights.ui,
     outlineColor: borderColors['outline'],
     outlineOffset: -2,
     outlineStyle: {
@@ -61,7 +61,7 @@ export const accordionStyles = stylex.create({
     outlineWidth: spatial['focus-ring-width'],
     textAlign: 'start',
     userSelect: 'none',
-    minHeight: spatial['control-height-s'],
+    height: spatial['tab-height'],
     width: '100%',
   },
   triggerOpen: {
