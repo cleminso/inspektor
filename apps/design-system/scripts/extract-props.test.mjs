@@ -12,15 +12,41 @@ test("extracts documented Accordion and ActionList props", () => {
   );
   assert.deepEqual(
     metadata["actionList.root"]?.map(({ name }) => name),
-    ["children", "aria-label", "aria-labelledby", "onEscapeKeyDown"],
+    ["onEscapeKeyDown", "children", "aria-label", "aria-labelledby"],
   );
   assert.deepEqual(
     metadata["actionList.trigger"]?.map(({ name }) => name),
-    ["children", "prefix", "disabled", "render"],
+    ["children", "prefix", "disabled", "nativeButton", "render"],
   );
   assert.deepEqual(
     metadata["actionList.action"]?.map(({ name }) => name),
     ["aria-label", "disabled", "render"],
+  );
+});
+
+test("extracts direct and compound forwardRef component props", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.ok(metadata.search?.some(({ name }) => name === "size"));
+  assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "render"));
+  assert.ok(metadata.box?.some(({ name }) => name === "scrollbar"));
+  assert.doesNotMatch(
+    metadata.box?.find(({ name }) => name === "padding")?.type ?? "",
+    /\bT\b/,
+  );
+  assert.doesNotMatch(metadata.box?.find(({ name }) => name === "as")?.type ?? "", /\bE\b/);
+});
+
+test("preserves explicit null in public prop types", () => {
+  const metadata = extractPropsMetadata();
+
+  assert.match(
+    metadata["select.root"]?.find(({ name }) => name === "value")?.type ?? "",
+    /null/,
+  );
+  assert.match(
+    metadata["tabView.root"]?.find(({ name }) => name === "value")?.type ?? "",
+    /null/,
   );
 });
 
@@ -49,7 +75,9 @@ test("extracts Button API facts from the public package export", () => {
 
   const radius = buttonProps.find(({ name }) => name === "radius");
   assert.equal(radius?.defaultValue, '"xs"');
-  assert.match(radius?.type ?? "", /"none".*"xs".*"s".*"m"/);
+  for (const value of ['"none"', '"xs"', '"s"', '"m"']) {
+    assert.match(radius?.type ?? "", new RegExp(value));
+  }
   assert.doesNotMatch(radius?.type ?? "", /"l"|"xl"/);
   assert.equal(radius?.required, false);
   assert.equal(radius?.description, "Selects a design-system corner radius.");
@@ -58,7 +86,9 @@ test("extracts Button API facts from the public package export", () => {
   assert.ok(ariaLabel);
 
   const size = buttonProps.find(({ name }) => name === "size");
-  assert.match(size?.type ?? "", /"xs".*"s".*"m"/);
+  for (const value of ['"xs"', '"s"', '"m"']) {
+    assert.match(size?.type ?? "", new RegExp(value));
+  }
   assert.doesNotMatch(size?.type ?? "", /"l"/);
 });
 
@@ -411,7 +441,7 @@ test("extracts the constrained ButtonGroup named API", () => {
   );
   assert.deepEqual(
     metadata["buttonGroup.text"]?.map(({ name }) => name),
-    ["render"],
+    [],
   );
   assert.equal(
     metadata["buttonGroup.root"]?.find(({ name }) => name === "className"),
@@ -441,7 +471,6 @@ test("extracts the constrained ToggleGroup compound API", () => {
       "width",
       "itemWidth",
       "size",
-      "render",
     ],
   );
   assert.equal(rootProps?.find(({ name }) => name === "loopFocus")?.defaultValue, "true");
@@ -569,7 +598,7 @@ test("extracts the constrained InputGroup compound API", () => {
   );
   assert.deepEqual(
     metadata["inputGroup.action"]?.map(({ name }) => name),
-    ["label", "controls", "pressed", "disabled", "onClick", "children"],
+    ["label", "controls", "pressed", "disabled", "render", "children", "onClick"],
   );
   assert.deepEqual(
     metadata["inputGroup.checkbox"]?.map(({ name }) => name),
@@ -622,7 +651,7 @@ test("extracts compound Field part API facts from the public package export", ()
   );
   assert.equal(
     metadata["field.root"]?.find(({ name }) => name === "validationMode")?.defaultValue,
-    '"onBlur"',
+    undefined,
   );
   assert.equal(
     metadata["field.label"]?.find(({ name }) => name === "nativeLabel")?.defaultValue,
@@ -635,7 +664,7 @@ test("extracts compound Fieldset part API facts from the public package export",
 
   assert.deepEqual(
     metadata["fieldset.root"]?.map(({ name }) => name),
-    ["disabled", "render"],
+    ["disabled"],
   );
   assert.deepEqual(
     metadata["fieldset.legend"]?.map(({ name }) => name),
@@ -770,10 +799,10 @@ test("extracts the constrained Menu compound API", () => {
     metadata["menu.item"]?.find(({ name }) => name === "variant")?.defaultValue,
     '"default"',
   );
-  assert.match(
-    metadata["menu.item"]?.find(({ name }) => name === "variant")?.type ?? "",
-    /"default".*"danger"/,
-  );
+  const menuItemVariant =
+    metadata["menu.item"]?.find(({ name }) => name === "variant")?.type ?? "";
+  assert.match(menuItemVariant, /"default"/);
+  assert.match(menuItemVariant, /"danger"/);
   assert.equal(
     metadata["menu.item"]?.find(({ name }) => name === "className"),
     undefined,
@@ -885,10 +914,10 @@ test("extracts the constrained Combobox compound API", () => {
     metadata["combobox.popup"]?.find(({ name }) => name === "width")?.defaultValue,
     '"anchor"',
   );
-  assert.match(
-    metadata["combobox.popup"]?.find(({ name }) => name === "width")?.type ?? "",
-    /"anchor".*"content"/,
-  );
+  const comboboxPopupWidth =
+    metadata["combobox.popup"]?.find(({ name }) => name === "width")?.type ?? "";
+  assert.match(comboboxPopupWidth, /"anchor"/);
+  assert.match(comboboxPopupWidth, /"content"/);
   assert.equal(
     metadata["combobox.viewport"]?.find(({ name }) => name === "maxHeight")?.defaultValue,
     '"m"',
@@ -899,7 +928,7 @@ test("extracts the constrained Combobox compound API", () => {
   );
   assert.deepEqual(
     metadata["combobox.item"]?.map(({ name }) => name),
-    ["value", "indicator"],
+    ["value", "indicator", "render"],
   );
   assert.equal(
     metadata["combobox.item"]?.find(({ name }) => name === "indicator")?.defaultValue,

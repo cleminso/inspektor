@@ -63,7 +63,9 @@ describe('ActionList', () => {
     const trigger = screen.getByRole('button', { name: 'accounts' })
 
     expect(trigger.contains(checkbox)).toBe(false)
-    expect(trigger.closest('[data-slot="action-list-item"]')?.hasAttribute('data-checked')).toBe(true)
+    expect(trigger.closest('[data-slot="action-list-item"]')?.hasAttribute('data-checked')).toBe(
+      true,
+    )
 
     fireEvent.click(checkbox)
     expect(onCheckedChange).toHaveBeenCalledWith(true, expect.anything())
@@ -83,14 +85,16 @@ describe('ActionList', () => {
       </ActionList>,
     )
 
-    expect(screen.getByRole('button', { name: 'accounts' }).closest('[data-slot="action-list-item"]')).toBeTruthy()
+    expect(
+      screen.getByRole('button', { name: 'accounts' }).closest('[data-slot="action-list-item"]'),
+    ).toBeTruthy()
   })
 
-  it('normalizes native list and composed link presentation', () => {
+  it('normalizes native list and composed button presentation', () => {
     render(
       <ActionList aria-label="Accounts">
         <ActionList.Item>
-          <ActionList.Trigger nativeButton={false} render={<a href="/accounts" />}>
+          <ActionList.Trigger render={<button type="button" data-composed="" />}>
             accounts
           </ActionList.Trigger>
         </ActionList.Item>
@@ -98,13 +102,12 @@ describe('ActionList', () => {
     )
 
     const list = screen.getByRole('list', { name: 'Accounts' })
-    const link = screen.getByRole('button', { name: 'accounts' })
+    const trigger = screen.getByRole('button', { name: 'accounts' })
 
-    expect(link.tagName).toBe('A')
-    expect(link.getAttribute('href')).toBe('/accounts')
+    expect(trigger.getAttribute('data-composed')).toBe('')
     expectStyleClasses(list, stylex.props(normalizationContractStyles.root).className)
-    expectStyleClasses(link, stylex.props(normalizationContractStyles.trigger).className)
-    expectStyleClasses(link, stylex.props(actionListStyles.trigger).className)
+    expectStyleClasses(trigger, stylex.props(normalizationContractStyles.trigger).className)
+    expectStyleClasses(trigger, stylex.props(actionListStyles.trigger).className)
   })
 
   it('delegates Escape from a descendant to the consumer', () => {
@@ -145,11 +148,7 @@ describe('ActionList', () => {
     render(
       <ActionList onEscapeKeyDown={(event) => event.preventDefault()}>
         <ActionList.Item>
-          <ActionList.SelectionControl
-            aria-label="Select accounts"
-            checked
-            icon="Icon"
-          />
+          <ActionList.SelectionControl aria-label="Select accounts" checked icon="Icon" />
           <ActionList.Trigger>accounts</ActionList.Trigger>
         </ActionList.Item>
       </ActionList>,

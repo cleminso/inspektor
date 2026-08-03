@@ -1,43 +1,46 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
+import { forwardRef } from 'react'
 
-import { Input, type InputProps, type InputSize } from "../input/input";
-import { KeyboardInput } from "../keyboardInput/keyboardInput";
-import { searchStyles } from "./search.styles";
+import { Input, type InputProps, type InputSize } from '../input/input'
+import { KeyboardInput } from '../keyboardInput/keyboardInput'
+import { searchStyles } from './search.styles'
 
-export interface SearchProps
-  extends Omit<InputProps, "invalid" | "readOnly" | "render" | "type" | "variant"> {
+export interface SearchProps extends Omit<
+  InputProps,
+  'invalid' | 'readOnly' | 'render' | 'type' | 'variant'
+> {
   /** Controls the search input height. */
-  size?: InputSize;
+  size?: InputSize
   /** Stretches the search control to the width of its container. */
-  fullWidth?: boolean;
+  fullWidth?: boolean
   /** Disables editing and exposes the disabled state to assistive technology. */
-  disabled?: InputProps["disabled"];
+  disabled?: InputProps['disabled']
   /** Shows the Command K keyboard shortcut hint. */
-  shortcut?: "command-k";
+  shortcut?: 'command-k'
   /** Sets the initial query when uncontrolled. */
-  defaultValue?: InputProps["defaultValue"];
+  defaultValue?: InputProps['defaultValue']
   /** Sets the current query when controlled. */
-  value?: InputProps["value"];
+  value?: InputProps['value']
   /** Runs when the query changes. */
-  onValueChange?: InputProps["onValueChange"];
+  onValueChange?: InputProps['onValueChange']
 }
 
-export function Search({
-  size = "m",
-  fullWidth = true,
-  disabled = false,
-  shortcut,
-  ...props
-}: SearchProps) {
+export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
+  { size = 'm', fullWidth = true, disabled = false, shortcut, ...props },
+  ref,
+) {
   const rootStyleProps = stylex.props(
     searchStyles.root,
     fullWidth === true && searchStyles.fullWidth,
-  );
+  )
   const inputStyleProps = stylex.props(
     searchStyles.input,
-    shortcut === "command-k" && searchStyles.inputWithShortcut,
-  );
-  const iconStyleProps = stylex.props(searchStyles.icon, disabled === true && searchStyles.iconDisabled);
+    shortcut === 'command-k' && searchStyles.inputWithShortcut,
+  )
+  const iconStyleProps = stylex.props(
+    searchStyles.icon,
+    disabled === true && searchStyles.iconDisabled,
+  )
 
   return (
     <span {...rootStyleProps} data-slot="search">
@@ -48,7 +51,9 @@ export function Search({
         variant="subtle"
         fullWidth={fullWidth}
         disabled={disabled}
-        render={<input className={inputStyleProps.className} style={inputStyleProps.style} />}
+        render={
+          <input ref={ref} className={inputStyleProps.className} style={inputStyleProps.style} />
+        }
       />
       <svg
         aria-hidden="true"
@@ -62,18 +67,18 @@ export function Search({
         <circle cx="7" cy="7" r="4" />
         <path d="m10 10 3 3" />
       </svg>
-      {shortcut === "command-k" ? (
+      {shortcut === 'command-k' ? (
         <span
           {...stylex.props(
             searchStyles.shortcut,
             disabled === true && searchStyles.shortcutDisabled,
           )}
         >
-          <KeyboardInput modifiers={["meta"]} platform="macos" size="small">
+          <KeyboardInput modifiers={['meta']} platform="macos" size="small">
             K
           </KeyboardInput>
         </span>
       ) : null}
     </span>
-  );
-}
+  )
+})

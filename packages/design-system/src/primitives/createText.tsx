@@ -18,7 +18,7 @@ import {
   textWrapStyles,
 } from '../components/text/text-styles'
 
-type TextTag =
+export type TextTag =
   | 'p'
   | 'span'
   | 'label'
@@ -36,22 +36,9 @@ type TextTag =
   | 'h6'
   | 'a'
 
-export type TextVariant =
-  | 'default'
-  | 'title'
-  | 'body'
-  | 'label'
-  | 'caption'
-  | 'heading'
+export type TextVariant = 'default' | 'title' | 'body' | 'label' | 'caption' | 'heading'
 
-export type TextColor =
-  | 'default'
-  | 'muted'
-  | 'disabled'
-  | 'link'
-  | 'danger'
-  | 'error'
-  | 'inherit'
+export type TextColor = 'default' | 'muted' | 'disabled' | 'link' | 'danger' | 'error' | 'inherit'
 
 export type TextAlign = 'left' | 'center' | 'right' | 'justify'
 export type TextWrap = 'wrap' | 'nowrap' | 'balance' | 'pretty'
@@ -82,15 +69,9 @@ const compactFormatter = new Intl.NumberFormat('en-US', {
   notation: 'compact',
 })
 
-export type TextFormatter =
-  | 'number'
-  | 'compact'
-  | ((value: string | number) => string)
+export type TextFormatter = 'number' | 'compact' | ((value: string | number) => string)
 
-function applyFormatter(
-  formatter: TextFormatter,
-  value: string | number,
-): string {
+function applyFormatter(formatter: TextFormatter, value: string | number): string {
   if (typeof formatter === 'function') {
     return formatter(value)
   }
@@ -126,7 +107,7 @@ export type TextProps<E extends TextTag = 'p'> = TextStyleProps & {
   truncate?: boolean | number
   formatter?: TextFormatter
 } & Omit<
-  ComponentPropsWithoutRef<E>,
+    ComponentPropsWithoutRef<E>,
     keyof TextStyleProps | 'as' | 'className' | 'style' | 'children'
   >
 
@@ -154,18 +135,18 @@ function TextInner<E extends TextTag = 'p'>(
 ): JSX.Element {
   const resolvedVariant = variant ?? 'default'
   const Tag = (as ?? VARIANT_DEFAULT_TAG[resolvedVariant]) as ElementType
-  const isHeading = resolvedVariant.startsWith('heading-')
+  const isHeading = resolvedVariant === 'heading'
   const loadingLineCount = Number.isFinite(placeholderNumberOfLines)
     ? Math.max(1, Math.floor(placeholderNumberOfLines))
     : 1
   const resolvedWrap =
-    wrap ?? (truncate === true || typeof truncate === 'number'
+    wrap ??
+    (truncate === true || typeof truncate === 'number'
       ? undefined
       : VARIANT_DEFAULT_WRAP[resolvedVariant])
 
   const formattedContent =
-    formatter !== undefined &&
-    (typeof children === 'string' || typeof children === 'number')
+    formatter !== undefined && (typeof children === 'string' || typeof children === 'number')
       ? applyFormatter(formatter, children)
       : children
 
@@ -177,7 +158,9 @@ function TextInner<E extends TextTag = 'p'>(
       ? String(formattedContent)
       : 'Loading')
   const content =
-    loading === false ? formattedContent : loadingLineCount > 1 ? (
+    loading === false ? (
+      formattedContent
+    ) : loadingLineCount > 1 ? (
       <span data-slot="text-skeleton" aria-hidden="true" {...stylex.props(textLoadingStyles.lines)}>
         {Array.from({ length: loadingLineCount }, (_, index) => (
           <span
@@ -192,7 +175,11 @@ function TextInner<E extends TextTag = 'p'>(
     ) : (
       <span {...stylex.props(textLoadingStyles.inline)}>
         <span {...stylex.props(textLoadingStyles.placeholder)}>{loadingPlaceholder}</span>
-        <span data-slot="text-skeleton" aria-hidden="true" {...stylex.props(textLoadingStyles.skeleton)} />
+        <span
+          data-slot="text-skeleton"
+          aria-hidden="true"
+          {...stylex.props(textLoadingStyles.skeleton)}
+        />
       </span>
     )
   const contentWithTrailingIcon =
@@ -207,7 +194,9 @@ function TextInner<E extends TextTag = 'p'>(
           {trailingIcon}
         </span>
       </>
-    ) : content
+    ) : (
+      content
+    )
 
   const stylexProps = stylex.props(
     textBaseStyles.base,

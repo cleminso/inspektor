@@ -4,6 +4,7 @@ import type { InputSize } from "../input/input";
 
 export interface InputGroupContextValue {
   disabled: boolean;
+  invalid: boolean;
   size: InputSize;
 }
 

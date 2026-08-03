@@ -1,10 +1,14 @@
 import { Field as BaseField } from "@base-ui/react/field";
+import { type ComponentRef, forwardRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { FieldContext } from "./fieldContext";
 import { fieldStyles } from "./field.styles";
 
-export interface FieldRootProps extends Omit<BaseField.Root.Props, "className" | "style"> {
+export interface FieldRootProps extends Omit<
+  BaseField.Root.Props,
+  "className" | "render" | "style"
+> {
   /** Disables the field and its control. */
   disabled?: BaseField.Root.Props["disabled"];
   /** Identifies the field when a form is submitted. */
@@ -23,7 +27,7 @@ export interface FieldRootProps extends Omit<BaseField.Root.Props, "className" |
   validationDebounceTime?: BaseField.Root.Props["validationDebounceTime"];
   /** Provides access to imperative field actions. */
   actionsRef?: BaseField.Root.Props["actionsRef"];
-  /** Composes Field.Root behavior and styles onto another element. */
+  /** Composes the field root onto a design-system structural element. */
   render?: BaseField.Root.Props["render"];
 }
 
@@ -34,8 +38,10 @@ export interface FieldLabelProps extends Omit<BaseField.Label.Props, "className"
   render?: BaseField.Label.Props["render"];
 }
 
-export interface FieldDescriptionProps
-  extends Omit<BaseField.Description.Props, "className" | "style"> {
+export interface FieldDescriptionProps extends Omit<
+  BaseField.Description.Props,
+  "className" | "style"
+> {
   /** Composes Field.Description behavior and styles onto another element. */
   render?: BaseField.Description.Props["render"];
 }
@@ -47,45 +53,53 @@ export interface FieldErrorProps extends Omit<BaseField.Error.Props, "className"
   render?: BaseField.Error.Props["render"];
 }
 
-function FieldRoot({ disabled = false, validationMode = "onBlur", ...props }: FieldRootProps) {
-  const stateStyleProps = createStateStyleProps<BaseField.Root.State>((state) => [
-    fieldStyles.root,
-    state.valid === false && fieldStyles.inputGroupInvalid,
-    state.disabled === true && fieldStyles.inputGroupDisabled,
-  ]);
+const FieldRoot = forwardRef<ComponentRef<typeof BaseField.Root>, FieldRootProps>(
+  function FieldRoot({ disabled = false, ...props }, forwardedRef) {
+    const stateStyleProps = createStateStyleProps<BaseField.Root.State>((state) => [
+      fieldStyles.root,
+      state.valid === false && fieldStyles.inputGroupInvalid,
+      state.disabled === true && fieldStyles.inputGroupDisabled,
+    ]);
 
-  return (
-    <FieldContext.Provider value={{ disabled }}>
-      <BaseField.Root
+    return (
+      <FieldContext.Provider value={{ disabled }}>
+        <BaseField.Root
+          {...props}
+          ref={forwardedRef}
+          disabled={disabled}
+          className={stateStyleProps.className}
+          style={stateStyleProps.style}
+          data-slot="field"
+        />
+      </FieldContext.Provider>
+    );
+  },
+);
+
+const FieldLabel = forwardRef<ComponentRef<typeof BaseField.Label>, FieldLabelProps>(
+  function FieldLabel({ nativeLabel = true, ...props }, forwardedRef) {
+    const stateStyleProps = createStateStyleProps<BaseField.Label.State>((state) => [
+      fieldStyles.label,
+      state.disabled === true && fieldStyles.disabled,
+    ]);
+
+    return (
+      <BaseField.Label
         {...props}
-        disabled={disabled}
-        validationMode={validationMode}
+        ref={forwardedRef}
+        nativeLabel={nativeLabel}
         className={stateStyleProps.className}
         style={stateStyleProps.style}
-        data-slot="field"
+        data-slot="field-label"
       />
-    </FieldContext.Provider>
-  );
-}
+    );
+  },
+);
 
-function FieldLabel({ nativeLabel = true, ...props }: FieldLabelProps) {
-  const stateStyleProps = createStateStyleProps<BaseField.Label.State>((state) => [
-    fieldStyles.label,
-    state.disabled === true && fieldStyles.disabled,
-  ]);
-
-  return (
-    <BaseField.Label
-      {...props}
-      nativeLabel={nativeLabel}
-      className={stateStyleProps.className}
-      style={stateStyleProps.style}
-      data-slot="field-label"
-    />
-  );
-}
-
-function FieldDescription(props: FieldDescriptionProps) {
+const FieldDescription = forwardRef<
+  ComponentRef<typeof BaseField.Description>,
+  FieldDescriptionProps
+>(function FieldDescription(props, forwardedRef) {
   const stateStyleProps = createStateStyleProps<BaseField.Description.State>((state) => [
     fieldStyles.message,
     fieldStyles.description,
@@ -95,29 +109,33 @@ function FieldDescription(props: FieldDescriptionProps) {
   return (
     <BaseField.Description
       {...props}
+      ref={forwardedRef}
       className={stateStyleProps.className}
       style={stateStyleProps.style}
       data-slot="field-description"
     />
   );
-}
+});
 
-function FieldError(props: FieldErrorProps) {
-  const stateStyleProps = createStateStyleProps<BaseField.Error.State>((state) => [
-    fieldStyles.message,
-    fieldStyles.error,
-    state.disabled === true && fieldStyles.disabled,
-  ]);
+const FieldError = forwardRef<ComponentRef<typeof BaseField.Error>, FieldErrorProps>(
+  function FieldError(props, forwardedRef) {
+    const stateStyleProps = createStateStyleProps<BaseField.Error.State>((state) => [
+      fieldStyles.message,
+      fieldStyles.error,
+      state.disabled === true && fieldStyles.disabled,
+    ]);
 
-  return (
-    <BaseField.Error
-      {...props}
-      className={stateStyleProps.className}
-      style={stateStyleProps.style}
-      data-slot="field-error"
-    />
-  );
-}
+    return (
+      <BaseField.Error
+        {...props}
+        ref={forwardedRef}
+        className={stateStyleProps.className}
+        style={stateStyleProps.style}
+        data-slot="field-error"
+      />
+    );
+  },
+);
 
 export const Field = Object.assign(FieldRoot, {
   Root: FieldRoot,

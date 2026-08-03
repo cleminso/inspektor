@@ -1,7 +1,7 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
 import * as stylex from '@stylexjs/stylex'
-import { useContext, type ReactNode } from 'react'
+import { forwardRef, useContext, type ReactNode } from 'react'
 
 import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
 import {
@@ -59,19 +59,22 @@ export type ButtonLinkProps = BaseButtonLinkProps &
   ButtonLinkSharedProps &
   (LabelButtonLinkProps | IconOnlyButtonLinkProps)
 
-export function ButtonLink({
-  variant = 'primary',
-  size = 'm',
-  iconOnly = false,
-  fullWidth = false,
-  justify = 'center',
-  radius = 'xs',
-  prefix,
-  suffix,
-  render,
-  children,
-  ...props
-}: ButtonLinkProps) {
+export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
+  {
+    variant = 'primary',
+    size = 'm',
+    iconOnly = false,
+    fullWidth = false,
+    justify = 'center',
+    radius = 'xs',
+    prefix,
+    suffix,
+    render,
+    children,
+    ...props
+  },
+  forwardedRef,
+) {
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const styleProps = stylex.props(
     ...getButtonVisualStyles({
@@ -115,6 +118,7 @@ export function ButtonLink({
   return useRender({
     defaultTagName: 'a',
     render,
+    ref: forwardedRef,
     props: mergeProps<'a'>(defaultProps, domProps),
   })
-}
+})

@@ -1,6 +1,6 @@
 import { Input as BaseInput } from "@base-ui/react/input";
 
-import { useContext } from "react";
+import { forwardRef, useContext, type ComponentRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { InputGroupContext } from "../inputGroup/inputGroupContext";
@@ -43,17 +43,13 @@ export interface InputProps extends Omit<BaseInput.Props, "className" | "style" 
   render?: BaseInput.Props["render"];
 }
 
-export function Input({
-  size = "m",
-  variant = "default",
-  fullWidth = false,
-  invalid = false,
-  disabled = false,
-  readOnly = false,
-  ...props
-}: InputProps) {
+export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(function Input(
+  { size = "m", variant = "default", fullWidth = false, invalid = false, disabled = false, readOnly = false, ...props },
+  ref,
+) {
   const inputGroup = useContext(InputGroupContext);
   const effectiveDisabled = disabled === true || inputGroup?.disabled === true;
+  const effectiveInvalid = invalid === true || inputGroup?.invalid === true;
   const effectiveSize = inputGroup?.size ?? size;
   const stateStyleProps = createStateStyleProps<BaseInput.State>((state) => [
     inputStyles.base,
@@ -63,22 +59,23 @@ export function Input({
     inputGroup !== null && inputStyles.grouped,
     state.disabled === true && inputStyles.disabled,
     readOnly === true && inputStyles.readOnly,
-    (invalid === true || state.valid === false) && inputStyles.invalid,
+    (effectiveInvalid === true || state.valid === false) && inputStyles.invalid,
   ]);
 
   return (
     <BaseInput
       {...props}
+      ref={ref}
       disabled={effectiveDisabled}
       readOnly={readOnly}
-      aria-invalid={invalid === true ? true : props["aria-invalid"]}
+      aria-invalid={effectiveInvalid === true ? true : props["aria-invalid"]}
       className={stateStyleProps.className}
       style={stateStyleProps.style}
       data-slot="input"
-      data-size={size}
+      data-size={effectiveSize}
       data-variant={variant}
       data-full-width={fullWidth === true ? "" : undefined}
       data-grouped={inputGroup !== null ? "" : undefined}
     />
   );
-}
+});

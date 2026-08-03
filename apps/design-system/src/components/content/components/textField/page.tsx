@@ -22,7 +22,7 @@ export function TextFieldPage(): ReactElement {
     <TextFieldPlayground>
       <Section
         title="Text field"
-        description="Import only TextField for the standard composition. Required fields become invalid after an empty blur and clear while editing."
+        description="Import only TextField for the standard composition. Field owns validation state, while native required validity remains available to forms."
       >
         <Example source={basicSource} align="stretch">
           <BasicExample />

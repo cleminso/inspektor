@@ -73,19 +73,16 @@ describe('Box', () => {
     expect(box.style.color).not.toBe('red')
   })
 
-  it('supports an explicitly unsafe class name without reopening native style', () => {
-    render(
-      <Box
-        data-testid="box"
-        unsafeClassName="integration-class"
-        {...({ style: { color: 'red' } } as object)}
-      />,
-    )
+  it('provides a constrained scrollbar treatment', () => {
+    render(<Box data-testid="box" scrollbar="thin" />)
 
     const box = screen.getByTestId('box')
 
-    expect(box.className).toContain('integration-class')
-    expect(box.style.color).not.toBe('red')
+    expect(box.getAttribute('data-scrollbar')).toBe('thin')
+
+    // @ts-expect-error Arbitrary integration classes are not part of the Box contract.
+    const unsafe = <Box unsafeClassName="integration-class" />
+    expect(unsafe).toBeDefined()
   })
 
   it('types refs from the selected element', () => {

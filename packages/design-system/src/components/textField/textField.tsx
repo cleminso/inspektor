@@ -1,31 +1,34 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from 'react'
 
-import { Field } from "../field/field";
-import type { FieldRootProps } from "../field/field";
-import { Input } from "../input/input";
-import type { InputProps } from "../input/input";
+import { Field } from '../field/field'
+import type { FieldRootProps } from '../field/field'
+import { Input } from '../input/input'
+import type { InputProps } from '../input/input'
 
-export interface TextFieldProps extends Omit<InputProps, "disabled" | "fullWidth" | "name"> {
+export interface TextFieldProps extends Omit<
+  InputProps,
+  'disabled' | 'fullWidth' | 'name' | 'render'
+> {
   /** Provides the input's accessible label. */
-  label: ReactNode;
+  label: ReactNode
   /** Provides supporting information associated with the input. */
-  description?: ReactNode;
+  description?: ReactNode
   /** Displays an externally controlled error message. */
-  error?: ReactNode;
+  error?: ReactNode
   /** Identifies the field during form submission. */
-  name?: FieldRootProps["name"];
+  name?: FieldRootProps['name']
   /** Disables the field and input. */
-  disabled?: FieldRootProps["disabled"];
+  disabled?: FieldRootProps['disabled']
   /** Controls invalid state from an external form library. */
-  invalid?: FieldRootProps["invalid"];
+  invalid?: FieldRootProps['invalid']
   /** Validates the input value and returns validation messages. */
-  validate?: FieldRootProps["validate"];
+  validate?: FieldRootProps['validate']
   /** Selects when field validation runs. */
-  validationMode?: FieldRootProps["validationMode"];
+  validationMode?: FieldRootProps['validationMode']
   /** Delays validation while using change validation. */
-  validationDebounceTime?: FieldRootProps["validationDebounceTime"];
+  validationDebounceTime?: FieldRootProps['validationDebounceTime']
   /** Stretches the input to the width of its container. */
-  fullWidth?: boolean;
+  fullWidth?: boolean
 }
 
 /**
@@ -40,15 +43,12 @@ export function TextField({
   disabled = false,
   invalid,
   validate,
-  validationMode,
+  validationMode = 'onBlur',
   validationDebounceTime,
   fullWidth = true,
   ...inputProps
 }: TextFieldProps) {
-  const [requiredTouched, setRequiredTouched] = useState(false);
-  const [requiredInvalid, setRequiredInvalid] = useState(false);
-  const { onBlur, onValueChange, required, ...controlProps } = inputProps;
-  const effectiveInvalid = invalid === true || error !== undefined || requiredInvalid === true;
+  const effectiveInvalid = invalid === true || error != null
 
   return (
     <Field.Root
@@ -60,24 +60,9 @@ export function TextField({
       validationDebounceTime={validationDebounceTime}
     >
       <Field.Label>{label}</Field.Label>
-      <Input
-        {...controlProps}
-        required={required}
-        fullWidth={fullWidth}
-        onBlur={(event) => {
-          setRequiredTouched(true);
-          setRequiredInvalid(required === true && event.currentTarget.value.trim().length === 0);
-          onBlur?.(event);
-        }}
-        onValueChange={(value, eventDetails) => {
-          if (required === true && requiredTouched === true) {
-            setRequiredInvalid(value.trim().length === 0);
-          }
-          onValueChange?.(value, eventDetails);
-        }}
-      />
+      <Input {...inputProps} fullWidth={fullWidth} />
       {description === undefined ? null : <Field.Description>{description}</Field.Description>}
-      {error === undefined ? <Field.Error /> : <Field.Error match>{error}</Field.Error>}
+      {error == null ? <Field.Error /> : <Field.Error match>{error}</Field.Error>}
     </Field.Root>
-  );
+  )
 }

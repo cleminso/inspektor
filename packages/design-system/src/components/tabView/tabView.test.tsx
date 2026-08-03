@@ -230,6 +230,60 @@ describe('TabView', () => {
     expect(screen.queryByText('All account rows')).toBeNull()
   })
 
+  it('keeps Base and Inspector active state aligned when a value change is canceled', () => {
+    render(
+      <TabView.Root
+        defaultValue="all"
+        onValueChange={(_value, eventDetails) => {
+          eventDetails.cancel()
+        }}
+      >
+        <TabView.List aria-label="Table views">
+          <TabView.Item value="all">All accounts</TabView.Item>
+          <TabView.Item value="active">Active accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Active accounts' }))
+
+    const allTab = screen.getByRole('tab', { name: 'All accounts' })
+    const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
+    expect(allTab.getAttribute('data-active')).toBe('')
+    expect(allTab.closest('[data-slot="tab-view-item"]')?.getAttribute('data-active')).toBe('')
+    expect(activeTab.getAttribute('data-active')).toBeNull()
+    expect(activeTab.closest('[data-slot="tab-view-item"]')?.getAttribute('data-active')).toBeNull()
+  })
+
+  it('keeps automatic fallback changes aligned when cancellation is requested', () => {
+    const onValueChange = vi.fn((_value, eventDetails) => {
+      eventDetails.cancel()
+    })
+    const { rerender } = render(
+      <TabView.Root defaultValue="all" onValueChange={onValueChange}>
+        <TabView.List aria-label="Table views">
+          <TabView.Item value="all">All accounts</TabView.Item>
+          <TabView.Item value="active">Active accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    rerender(
+      <TabView.Root defaultValue="all" onValueChange={onValueChange}>
+        <TabView.List aria-label="Table views">
+          <TabView.Item value="all" disabled>
+            All accounts
+          </TabView.Item>
+          <TabView.Item value="active">Active accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
+    expect(activeTab.getAttribute('data-active')).toBe('')
+    expect(activeTab.closest('[data-slot="tab-view-item"]')?.getAttribute('data-active')).toBe('')
+  })
+
   it('closes a view without selecting it', () => {
     let closedValue: string | number | undefined
 

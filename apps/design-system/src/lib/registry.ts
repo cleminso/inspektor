@@ -395,6 +395,19 @@ export const actionListItem = {
   componentId: "actionList",
 } satisfies NavItem;
 
+export const boxItem = {
+  title: "Box",
+  slug: "box",
+  href: "/components/box",
+  description: "Token-constrained layout primitive for native structural elements.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "box.tsx",
+    path: "packages/design-system/src/components/box/box.tsx",
+  },
+  componentId: "box",
+} satisfies NavItem;
+
 export const sidePanelItem = {
   title: "Side Panel",
   slug: "side-panel",
@@ -545,6 +558,7 @@ export const componentItems: NavItem[] = [
   accordionItem,
   actionListItem,
   binaryValueItem,
+  boxItem,
   buttonItem,
   buttonLinkItem,
   buttonGroupItem,

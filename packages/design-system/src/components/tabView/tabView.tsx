@@ -139,10 +139,13 @@ function TabViewRoot({ children, value, defaultValue, onValueChange }: TabViewRo
     eventDetails,
   ) => {
     const nextTabViewValue = nextValue as TabViewValue | null
+    onValueChange?.(nextTabViewValue, eventDetails)
+    if (eventDetails.reason === 'none' && eventDetails.isCanceled === true) {
+      return
+    }
     if (value === undefined) {
       setUncontrolledValue(nextTabViewValue)
     }
-    onValueChange?.(nextTabViewValue, eventDetails)
   }
 
   return (

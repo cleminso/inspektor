@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsAccordionRouteImport } from './routes/components/accordion'
 import { Route as ComponentsActionListRouteImport } from './routes/components/action-list'
 import { Route as ComponentsBinaryValueRouteImport } from './routes/components/binary-value'
+import { Route as ComponentsBoxRouteImport } from './routes/components/box'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
@@ -22,7 +23,7 @@ import { Route as ComponentsComboboxRouteImport } from './routes/components/comb
 import { Route as ComponentsContextMenuRouteImport } from './routes/components/context-menu'
 import { Route as ComponentsContextSwitcherRouteImport } from './routes/components/context-switcher'
 import { Route as ComponentsCopyButtonRouteImport } from './routes/components/copy-button'
-import { Route as ComponentsDataTableRouteImport } from './routes/components/data-table'
+import { Route as ComponentsDataGridRouteImport } from './routes/components/data-grid'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsIconRouteImport } from './routes/components/icon'
@@ -71,6 +72,11 @@ const ComponentsBinaryValueRoute = ComponentsBinaryValueRouteImport.update({
   path: '/components/binary-value',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsBoxRoute = ComponentsBoxRouteImport.update({
+  id: '/components/box',
+  path: '/components/box',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
   id: '/components/button',
   path: '/components/button',
@@ -117,9 +123,9 @@ const ComponentsCopyButtonRoute = ComponentsCopyButtonRouteImport.update({
   path: '/components/copy-button',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsDataTableRoute = ComponentsDataTableRouteImport.update({
-  id: '/components/data-table',
-  path: '/components/data-table',
+const ComponentsDataGridRoute = ComponentsDataGridRouteImport.update({
+  id: '/components/data-grid',
+  path: '/components/data-grid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsFieldRoute = ComponentsFieldRouteImport.update({
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
+  '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -275,7 +282,7 @@ export interface FileRoutesByFullPath {
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
-  '/components/data-table': typeof ComponentsDataTableRoute
+  '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/icon': typeof ComponentsIconRoute
@@ -309,6 +316,7 @@ export interface FileRoutesByTo {
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
+  '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -318,7 +326,7 @@ export interface FileRoutesByTo {
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
-  '/components/data-table': typeof ComponentsDataTableRoute
+  '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/icon': typeof ComponentsIconRoute
@@ -353,6 +361,7 @@ export interface FileRoutesById {
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
+  '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
@@ -362,7 +371,7 @@ export interface FileRoutesById {
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
-  '/components/data-table': typeof ComponentsDataTableRoute
+  '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/icon': typeof ComponentsIconRoute
@@ -398,6 +407,7 @@ export interface FileRouteTypes {
     | '/components/accordion'
     | '/components/action-list'
     | '/components/binary-value'
+    | '/components/box'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -407,7 +417,7 @@ export interface FileRouteTypes {
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
-    | '/components/data-table'
+    | '/components/data-grid'
     | '/components/field'
     | '/components/fieldset'
     | '/components/icon'
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/components/accordion'
     | '/components/action-list'
     | '/components/binary-value'
+    | '/components/box'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -450,7 +461,7 @@ export interface FileRouteTypes {
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
-    | '/components/data-table'
+    | '/components/data-grid'
     | '/components/field'
     | '/components/fieldset'
     | '/components/icon'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/components/accordion'
     | '/components/action-list'
     | '/components/binary-value'
+    | '/components/box'
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
@@ -493,7 +505,7 @@ export interface FileRouteTypes {
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
-    | '/components/data-table'
+    | '/components/data-grid'
     | '/components/field'
     | '/components/fieldset'
     | '/components/icon'
@@ -528,6 +540,7 @@ export interface RootRouteChildren {
   ComponentsAccordionRoute: typeof ComponentsAccordionRoute
   ComponentsActionListRoute: typeof ComponentsActionListRoute
   ComponentsBinaryValueRoute: typeof ComponentsBinaryValueRoute
+  ComponentsBoxRoute: typeof ComponentsBoxRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
@@ -537,7 +550,7 @@ export interface RootRouteChildren {
   ComponentsContextMenuRoute: typeof ComponentsContextMenuRoute
   ComponentsContextSwitcherRoute: typeof ComponentsContextSwitcherRoute
   ComponentsCopyButtonRoute: typeof ComponentsCopyButtonRoute
-  ComponentsDataTableRoute: typeof ComponentsDataTableRoute
+  ComponentsDataGridRoute: typeof ComponentsDataGridRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsIconRoute: typeof ComponentsIconRoute
@@ -595,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/components/binary-value'
       fullPath: '/components/binary-value'
       preLoaderRoute: typeof ComponentsBinaryValueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/box': {
+      id: '/components/box'
+      path: '/components/box'
+      fullPath: '/components/box'
+      preLoaderRoute: typeof ComponentsBoxRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/button': {
@@ -660,11 +680,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsCopyButtonRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/components/data-table': {
-      id: '/components/data-table'
-      path: '/components/data-table'
-      fullPath: '/components/data-table'
-      preLoaderRoute: typeof ComponentsDataTableRouteImport
+    '/components/data-grid': {
+      id: '/components/data-grid'
+      path: '/components/data-grid'
+      fullPath: '/components/data-grid'
+      preLoaderRoute: typeof ComponentsDataGridRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/field': {
@@ -864,6 +884,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsAccordionRoute: ComponentsAccordionRoute,
   ComponentsActionListRoute: ComponentsActionListRoute,
   ComponentsBinaryValueRoute: ComponentsBinaryValueRoute,
+  ComponentsBoxRoute: ComponentsBoxRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
@@ -873,7 +894,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsContextMenuRoute: ComponentsContextMenuRoute,
   ComponentsContextSwitcherRoute: ComponentsContextSwitcherRoute,
   ComponentsCopyButtonRoute: ComponentsCopyButtonRoute,
-  ComponentsDataTableRoute: ComponentsDataTableRoute,
+  ComponentsDataGridRoute: ComponentsDataGridRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsIconRoute: ComponentsIconRoute,

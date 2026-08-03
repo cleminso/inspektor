@@ -12,22 +12,3 @@
   --lightningcss-dark: initial;
   color-scheme: dark;
 }
-
-.app-scrollbar {
-  scrollbar-color: gray transparent;
-  scrollbar-width: thin;
-}
-
-.app-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.app-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.app-scrollbar::-webkit-scrollbar-thumb {
-  background: gray;
-  border-radius: 9999px;
-}

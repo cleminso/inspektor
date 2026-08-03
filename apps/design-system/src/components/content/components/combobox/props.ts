@@ -21,14 +21,14 @@ export const comboboxRootPropNames = [
   "disabled",
 ] as const;
 export const comboboxContentPropNames = ["width", "keepMounted", "align"] as const;
-export const comboboxClearPropNames = ["label", "keepMounted", "disabled"] as const;
-export const comboboxTriggerPropNames = ["size", "width", "disabled"] as const;
+export const comboboxClearPropNames = ["label", "keepMounted", "disabled", "render"] as const;
+export const comboboxTriggerPropNames = ["size", "width", "disabled", "render"] as const;
 export const comboboxInputTriggerPropNames = ["disabled"] as const;
 export const comboboxPositionerPropNames = ["align"] as const;
 export const comboboxPopupPropNames = ["width"] as const;
-export const comboboxPopupHeaderPropNames = ["render"] as const;
-export const comboboxPopupFooterPropNames = ["render"] as const;
-export const comboboxViewportPropNames = ["maxHeight", "render"] as const;
-export const comboboxItemPropNames = ["value", "indicator"] as const;
+export const comboboxPopupHeaderPropNames = [] as const;
+export const comboboxPopupFooterPropNames = [] as const;
+export const comboboxViewportPropNames = ["maxHeight"] as const;
+export const comboboxItemPropNames = ["value", "indicator", "render"] as const;
 export const comboboxItemTextPropNames = ["label", "description"] as const;
 export const comboboxIndicatorPropNames = ["keepMounted"] as const;

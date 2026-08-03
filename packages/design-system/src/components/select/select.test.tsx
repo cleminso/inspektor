@@ -1,14 +1,14 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 
-import { Select, type SelectRootProps } from "./select";
+import { Select, type SelectRootProps } from './select'
 
-afterEach(cleanup);
+afterEach(cleanup)
 
 const items = [
-  { label: "Main", value: "main" },
-  { label: "Preview", value: "preview" },
-] as const;
+  { label: 'Main', value: 'main' },
+  { label: 'Preview', value: 'preview' },
+] as const
 
 function Options() {
   return (
@@ -16,20 +16,20 @@ function Options() {
       <Select.Item value="main">Main</Select.Item>
       <Select.Item value="preview">Preview</Select.Item>
     </Select.Content>
-  );
+  )
 }
 
-describe("Select", () => {
-  it("preserves single-select value types", () => {
-    expectTypeOf<SelectRootProps<"main" | "preview">["value"]>().toEqualTypeOf<
-      "main" | "preview" | null | undefined
-    >();
-    expectTypeOf<SelectRootProps<"main" | "preview">["defaultValue"]>().toEqualTypeOf<
-      "main" | "preview" | null | undefined
-    >();
-  });
+describe('Select', () => {
+  it('preserves single-select value types', () => {
+    expectTypeOf<SelectRootProps<'main' | 'preview'>['value']>().toEqualTypeOf<
+      'main' | 'preview' | null | undefined
+    >()
+    expectTypeOf<SelectRootProps<'main' | 'preview'>['defaultValue']>().toEqualTypeOf<
+      'main' | 'preview' | null | undefined
+    >()
+  })
 
-  it("updates an uncontrolled value through a composed item", () => {
+  it('updates an uncontrolled value through a composed item', () => {
     render(
       <Select.Root items={items} defaultValue="main" defaultOpen>
         <Select.Trigger>
@@ -37,17 +37,17 @@ describe("Select", () => {
         </Select.Trigger>
         <Options />
       </Select.Root>,
-    );
+    )
 
-    const option = screen.getByRole("option", { name: "Preview" });
-    fireEvent.pointerDown(option, { pointerType: "mouse" });
-    fireEvent.click(option);
+    const option = screen.getByRole('option', { name: 'Preview' })
+    fireEvent.pointerDown(option, { pointerType: 'mouse' })
+    fireEvent.click(option)
 
-    expect(screen.getByRole("combobox").textContent).toContain("Preview");
-  });
+    expect(screen.getByRole('combobox').textContent).toContain('Preview')
+  })
 
-  it("reports a controlled value change without replacing the controlled value", () => {
-    const onValueChange = vi.fn();
+  it('reports a controlled value change without replacing the controlled value', () => {
+    const onValueChange = vi.fn()
     render(
       <Select.Root items={items} value="main" onValueChange={onValueChange} defaultOpen>
         <Select.Trigger>
@@ -55,18 +55,18 @@ describe("Select", () => {
         </Select.Trigger>
         <Options />
       </Select.Root>,
-    );
+    )
 
-    const option = screen.getByRole("option", { name: "Preview" });
-    fireEvent.pointerDown(option, { pointerType: "mouse" });
-    fireEvent.click(option);
+    const option = screen.getByRole('option', { name: 'Preview' })
+    fireEvent.pointerDown(option, { pointerType: 'mouse' })
+    fireEvent.click(option)
 
-    expect(onValueChange).toHaveBeenCalledWith("preview", expect.any(Object));
-    expect(screen.getByRole("combobox").textContent).toContain("Main");
-  });
+    expect(onValueChange).toHaveBeenCalledWith('preview', expect.any(Object))
+    expect(screen.getByRole('combobox').textContent).toContain('Main')
+  })
 
-  it("disables the control and individual options", () => {
-    const onDisabledControlChange = vi.fn();
+  it('disables the control and individual options', () => {
+    const onDisabledControlChange = vi.fn()
     const { rerender } = render(
       <Select.Root items={items} disabled onValueChange={onDisabledControlChange} defaultOpen>
         <Select.Trigger>
@@ -74,15 +74,15 @@ describe("Select", () => {
         </Select.Trigger>
         <Options />
       </Select.Root>,
-    );
+    )
 
-    expect(screen.getByRole("combobox").hasAttribute("disabled")).toBe(true);
-    const disabledRootOption = screen.getByRole("option", { name: "Preview" });
-    fireEvent.pointerDown(disabledRootOption, { pointerType: "mouse" });
-    fireEvent.click(disabledRootOption);
-    expect(onDisabledControlChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('combobox').hasAttribute('disabled')).toBe(true)
+    const disabledRootOption = screen.getByRole('option', { name: 'Preview' })
+    fireEvent.pointerDown(disabledRootOption, { pointerType: 'mouse' })
+    fireEvent.click(disabledRootOption)
+    expect(onDisabledControlChange).not.toHaveBeenCalled()
 
-    const onDisabledOptionChange = vi.fn();
+    const onDisabledOptionChange = vi.fn()
     rerender(
       <Select.Root items={items} onValueChange={onDisabledOptionChange} defaultOpen>
         <Select.Trigger>
@@ -95,16 +95,16 @@ describe("Select", () => {
           </Select.Item>
         </Select.Content>
       </Select.Root>,
-    );
+    )
 
-    const disabledOption = screen.getByRole("option", { name: "Preview" });
-    fireEvent.pointerDown(disabledOption, { pointerType: "mouse" });
-    fireEvent.click(disabledOption);
-    expect(disabledOption.getAttribute("aria-disabled")).toBe("true");
-    expect(onDisabledOptionChange).not.toHaveBeenCalled();
-  });
+    const disabledOption = screen.getByRole('option', { name: 'Preview' })
+    fireEvent.pointerDown(disabledOption, { pointerType: 'mouse' })
+    fireEvent.click(disabledOption)
+    expect(disabledOption.getAttribute('aria-disabled')).toBe('true')
+    expect(onDisabledOptionChange).not.toHaveBeenCalled()
+  })
 
-  it("associates its label with the trigger", () => {
+  it('associates its label with the trigger', () => {
     render(
       <Select.Root>
         <Select.Label>Branch</Select.Label>
@@ -112,12 +112,12 @@ describe("Select", () => {
           <Select.Value placeholder="Choose" />
         </Select.Trigger>
       </Select.Root>,
-    );
+    )
 
-    expect(screen.getByRole("combobox", { name: "Branch" })).toBeTruthy();
-  });
+    expect(screen.getByRole('combobox', { name: 'Branch' })).toBeTruthy()
+  })
 
-  it("associates grouped options with their group label", () => {
+  it('associates grouped options with their group label', () => {
     render(
       <Select.Root defaultOpen>
         <Select.Trigger aria-label="Branch">
@@ -132,54 +132,56 @@ describe("Select", () => {
           <Select.Item value="archived">Archived</Select.Item>
         </Select.Content>
       </Select.Root>,
-    );
+    )
 
-    expect(screen.getByRole("group", { name: "Active branches" })).toBeTruthy();
-    expect(screen.getByRole("separator")).toBeTruthy();
-  });
+    expect(screen.getByRole('group', { name: 'Active branches' })).toBeTruthy()
+    expect(screen.getByRole('separator')).toBeTruthy()
+  })
 
-  it("applies constrained size and width options", () => {
+  it('applies constrained size and width options', () => {
     render(
       <Select.Root>
         <Select.Trigger size="l" width="full">
           <Select.Value placeholder="Branch" />
         </Select.Trigger>
       </Select.Root>,
-    );
+    )
 
-    const trigger = screen.getByRole("combobox");
-    expect(trigger.getAttribute("data-size")).toBe("l");
-    expect(trigger.getAttribute("data-width")).toBe("full");
-  });
+    const trigger = screen.getByRole('combobox')
+    expect(trigger.getAttribute('data-size')).toBe('l')
+    expect(trigger.getAttribute('data-width')).toBe('full')
+  })
 
-  it("applies a constrained size to popup items", () => {
+  it('applies a constrained size to popup items', () => {
     render(
       <Select.Root defaultOpen>
         <Select.Trigger aria-label="Branch">
           <Select.Value />
         </Select.Trigger>
         <Select.Content>
-          <Select.Item value="main" size="l">Main</Select.Item>
+          <Select.Item value="main" size="l">
+            Main
+          </Select.Item>
         </Select.Content>
       </Select.Root>,
-    );
+    )
 
-    expect(screen.getByRole("option", { name: "Main" }).getAttribute("data-size")).toBe("l");
-  });
+    expect(screen.getByRole('option', { name: 'Main' }).getAttribute('data-size')).toBe('l')
+  })
 
-  it("composes trigger adornments and owned icons without duplicating legacy parts", () => {
+  it('composes trigger adornments and owned icons without duplicating legacy parts', () => {
     const { rerender } = render(
       <Select.Root>
         <Select.Trigger prefix={<span>Repository</span>} suffix={<span>Required</span>}>
           <Select.Value placeholder="Branch" />
         </Select.Trigger>
       </Select.Root>,
-    );
+    )
 
-    const trigger = screen.getByRole("combobox");
-    expect(trigger.querySelectorAll('[data-slot="select-icon"]')).toHaveLength(1);
-    expect(trigger.textContent).toContain("Repository");
-    expect(trigger.textContent).toContain("Required");
+    const trigger = screen.getByRole('combobox')
+    expect(trigger.querySelectorAll('[data-slot="select-icon"]')).toHaveLength(1)
+    expect(trigger.textContent).toContain('Repository')
+    expect(trigger.textContent).toContain('Required')
 
     rerender(
       <Select.Root>
@@ -190,12 +192,14 @@ describe("Select", () => {
           </>
         </Select.Trigger>
       </Select.Root>,
-    );
+    )
 
-    expect(screen.getByRole("combobox").querySelectorAll('[data-slot="select-icon"]')).toHaveLength(1);
-  });
+    expect(screen.getByRole('combobox').querySelectorAll('[data-slot="select-icon"]')).toHaveLength(
+      1,
+    )
+  })
 
-  it("owns one selected-item indicator while accepting legacy item composition", () => {
+  it('owns one selected-item indicator while accepting legacy item composition', () => {
     const { rerender } = render(
       <Select.Root defaultValue="main" defaultOpen>
         <Select.Trigger aria-label="Branch">
@@ -205,9 +209,13 @@ describe("Select", () => {
           <Select.Item value="main">Main</Select.Item>
         </Select.Content>
       </Select.Root>,
-    );
+    )
 
-    expect(screen.getByRole("option", { name: "Main" }).querySelectorAll('[data-slot="select-item-indicator"]')).toHaveLength(1);
+    expect(
+      screen
+        .getByRole('option', { name: 'Main' })
+        .querySelectorAll('[data-slot="select-item-indicator"]'),
+    ).toHaveLength(1)
 
     rerender(
       <Select.Root defaultValue="main" defaultOpen>
@@ -223,8 +231,12 @@ describe("Select", () => {
           </Select.Item>
         </Select.Content>
       </Select.Root>,
-    );
+    )
 
-    expect(screen.getByRole("option", { name: "Main" }).querySelectorAll('[data-slot="select-item-indicator"]')).toHaveLength(1);
-  });
-});
+    expect(
+      screen
+        .getByRole('option', { name: 'Main' })
+        .querySelectorAll('[data-slot="select-item-indicator"]'),
+    ).toHaveLength(1)
+  })
+})

@@ -38,7 +38,7 @@ export type {
   DataGridTableProps,
   DataGridViewportProps,
 } from './components/dataGrid/dataGrid'
-export { Box } from './components//box/box'
+export { Box } from './components/box/box'
 export type { BoxProps } from './components/box/box'
 export { Checkbox } from './components/checkbox/checkbox'
 export type {
@@ -310,7 +310,16 @@ export type {
   SelectWidth,
 } from './components/select/select'
 export { Text } from './components/text/text'
-export type { TextColor, TextProps, TextStyleProps, TextVariant } from './components/text/text'
+export type {
+  TextAlign,
+  TextColor,
+  TextFormatter,
+  TextProps,
+  TextStyleProps,
+  TextTag,
+  TextVariant,
+  TextWrap,
+} from './components/text/text'
 export { TextField } from './components/textField/textField'
 export type { TextFieldProps } from './components/textField/textField'
 export { Switch } from './components/switch/switch'

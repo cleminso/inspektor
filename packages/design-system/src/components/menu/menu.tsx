@@ -2,7 +2,7 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import * as stylex from "@stylexjs/stylex";
-import { useContext } from "react";
+import { forwardRef, useContext, type ComponentRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
@@ -38,7 +38,7 @@ export interface MenuPortalProps extends WithoutStyles<BaseMenu.Portal.Props> {
 
 export type MenuPositionerProps = Pick<
   WithoutStyles<BaseMenu.Positioner.Props>,
-  "align" | "children" | "side"
+  "align" | "children" | "ref" | "side"
 >;
 
 export type MenuPopupWidth = "content" | "anchor";
@@ -57,7 +57,7 @@ export interface MenuContentProps extends MenuPopupProps {
   side?: MenuPositionerProps["side"];
 }
 
-export interface MenuItemProps extends WithoutStyles<BaseMenu.Item.Props> {
+export interface MenuItemProps extends Omit<WithoutStyles<BaseMenu.Item.Props>, "nativeButton"> {
   /** Controls the action's semantic emphasis. */
   variant?: MenuItemVariant;
   /** Disables the action. */
@@ -83,15 +83,12 @@ export interface MenuGroupLabelProps extends WithoutStyles<BaseMenu.GroupLabel.P
   render?: BaseMenu.GroupLabel.Props["render"];
 }
 
-export interface MenuShortcutProps extends Omit<
-  useRender.ComponentProps<"span">,
-  "className" | "style"
-> {
+export interface MenuShortcutProps extends Omit<useRender.ComponentProps<"span">, "className" | "style"> {
   /** Composes the shortcut label onto another element. */
   render?: useRender.ComponentProps<"span">["render"];
 }
 
-export interface MenuCheckboxItemProps extends WithoutStyles<BaseMenu.CheckboxItem.Props> {
+export interface MenuCheckboxItemProps extends Omit<WithoutStyles<BaseMenu.CheckboxItem.Props>, "nativeButton"> {
   /** Controls the checked state. */
   checked?: boolean;
   /** Sets the initial checked state. */
@@ -117,7 +114,7 @@ export interface MenuRadioGroupProps extends WithoutStyles<BaseMenu.RadioGroup.P
   disabled?: boolean;
 }
 
-export interface MenuRadioItemProps extends WithoutStyles<BaseMenu.RadioItem.Props> {
+export interface MenuRadioItemProps extends Omit<WithoutStyles<BaseMenu.RadioItem.Props>, "nativeButton"> {
   /** Controls whether changing the option closes the menu. */
   closeOnClick?: boolean;
   /** Disables the option. */
@@ -139,18 +136,20 @@ export type MenuSubmenuRootProps = WithoutStyles<BaseMenu.SubmenuRoot.Props>;
 export interface MenuSubmenuTriggerProps extends WithoutStyles<BaseMenu.SubmenuTrigger.Props> {
   /** Disables the submenu trigger. */
   disabled?: boolean;
+  /** Composes submenu trigger behavior onto another interactive element. */
+  render?: BaseMenu.SubmenuTrigger.Props["render"];
 }
 
-export type MenuPresentationProps = Omit<
-  useRender.ComponentProps<"span">,
-  "className" | "style" | "render"
->;
+export type MenuPresentationProps = Omit<useRender.ComponentProps<"span">, "className" | "style" | "render">;
 
 function MenuRoot({ defaultOpen = false, disabled = false, ...props }: MenuRootProps) {
   return <BaseMenu.Root {...props} defaultOpen={defaultOpen} disabled={disabled} />;
 }
 
-function MenuTrigger({ disabled = false, ...props }: MenuTriggerProps) {
+const MenuTrigger = forwardRef<ComponentRef<typeof BaseMenu.Trigger>, MenuTriggerProps>(function MenuTrigger(
+  { disabled = false, ...props },
+  ref,
+) {
   const inputGroup = useContext(InputGroupContext);
   const effectiveDisabled = disabled === true || inputGroup?.disabled === true;
   const stateStyles = createStateStyleProps<BaseMenu.Trigger.State>((state) => [
@@ -162,68 +161,69 @@ function MenuTrigger({ disabled = false, ...props }: MenuTriggerProps) {
   return (
     <BaseMenu.Trigger
       {...props}
+      ref={ref as BaseMenu.Trigger.Props["ref"]}
       disabled={effectiveDisabled}
       {...stateStyles}
       data-slot="menu-trigger"
       data-grouped={inputGroup === null ? undefined : ""}
     />
   );
-}
+});
 
-function MenuPortal({ keepMounted = false, ...props }: MenuPortalProps) {
-  return <BaseMenu.Portal {...props} keepMounted={keepMounted} />;
-}
+const MenuPortal = forwardRef<HTMLDivElement, MenuPortalProps>(function MenuPortal(
+  { keepMounted = false, ...props },
+  ref,
+) {
+  return <BaseMenu.Portal {...props} ref={ref} keepMounted={keepMounted} />;
+});
 
-function MenuPositioner({ align = "start", ...props }: MenuPositionerProps) {
-  const stateStyles = createStateStyleProps<BaseMenu.Positioner.State>(() => [
-    menuStyles.positioner,
-  ]);
+const MenuPositioner = forwardRef<HTMLDivElement, MenuPositionerProps>(function MenuPositioner(
+  { align = "start", ...props },
+  ref,
+) {
+  const stateStyles = createStateStyleProps<BaseMenu.Positioner.State>(() => [menuStyles.positioner]);
   return (
     <BaseMenu.Positioner
       {...props}
+      ref={ref}
       sideOffset={popupPositioning.dropdownSideOffset}
       align={align}
       {...stateStyles}
     />
   );
-}
+});
 
 const popupWidthStyles = {
   content: menuStyles.popupWidthContent,
   anchor: menuStyles.popupWidthAnchor,
 } satisfies Record<MenuPopupWidth, unknown>;
 
-function MenuPopup({ width = "content", ...props }: MenuPopupProps) {
+const MenuPopup = forwardRef<HTMLDivElement, MenuPopupProps>(function MenuPopup({ width = "content", ...props }, ref) {
   const stateStyles = createStateStyleProps<BaseMenu.Popup.State>((state) => [
     menuStyles.popup,
     popupWidthStyles[width],
-    (state.transitionStatus === "starting" || state.transitionStatus === "ending") &&
-      menuStyles.popupTransition,
+    (state.transitionStatus === "starting" || state.transitionStatus === "ending") && menuStyles.popupTransition,
   ]);
-  return <BaseMenu.Popup {...props} {...stateStyles} data-slot="menu-popup" />;
-}
+  return <BaseMenu.Popup {...props} ref={ref} {...stateStyles} data-slot="menu-popup" />;
+});
 
-function MenuContent({
-  align = "start",
-  keepMounted = false,
-  side,
-  ...props
-}: MenuContentProps) {
+const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(function MenuContent(
+  { align = "start", keepMounted = false, side, ...props },
+  ref,
+) {
   return (
     <MenuPortal keepMounted={keepMounted}>
       <MenuPositioner align={align} side={side}>
-        <MenuPopup {...props} />
+        <MenuPopup {...props} ref={ref} />
       </MenuPositioner>
     </MenuPortal>
   );
-}
+});
 
-function MenuItem({
-  variant = "default",
-  disabled = false,
-  closeOnClick = true,
-  ...props
-}: MenuItemProps) {
+const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuItem(
+  { variant = "default", disabled = false, closeOnClick = true, ...props },
+  ref,
+) {
   const stateStyles = createStateStyleProps<BaseMenu.Item.State>((state) => [
     menuStyles.item,
     variant === "danger" && menuStyles.itemDanger,
@@ -234,37 +234,41 @@ function MenuItem({
   return (
     <BaseMenu.Item
       {...props}
+      ref={ref}
       disabled={disabled}
       closeOnClick={closeOnClick}
       {...stateStyles}
       data-variant={variant}
     />
   );
-}
+});
 
-function MenuLinkItem({ closeOnClick = true, ...props }: MenuLinkItemProps) {
+const MenuLinkItem = forwardRef<HTMLAnchorElement, MenuLinkItemProps>(function MenuLinkItem(
+  { closeOnClick = true, ...props },
+  ref,
+) {
   const stateStyles = createStateStyleProps<BaseMenu.LinkItem.State>((state) => [
     menuStyles.item,
     state.highlighted === true && menuStyles.itemHighlighted,
   ]);
-  return <BaseMenu.LinkItem {...props} closeOnClick={closeOnClick} {...stateStyles} />;
-}
+  return <BaseMenu.LinkItem {...props} ref={ref} closeOnClick={closeOnClick} {...stateStyles} />;
+});
 
-function MenuSeparator(props: MenuSeparatorProps) {
+const MenuSeparator = forwardRef<HTMLDivElement, MenuSeparatorProps>(function MenuSeparator(props, ref) {
   const styles = stylex.props(menuStyles.separator);
-  return <BaseMenu.Separator {...props} {...styles} />;
-}
+  return <BaseMenu.Separator {...props} ref={ref} {...styles} />;
+});
 
-function MenuGroup(props: MenuGroupProps) {
-  return <BaseMenu.Group {...props} data-slot="menu-group" />;
-}
+const MenuGroup = forwardRef<ComponentRef<typeof BaseMenu.Group>, MenuGroupProps>(function MenuGroup(props, ref) {
+  return <BaseMenu.Group {...props} ref={ref} data-slot="menu-group" />;
+});
 
-function MenuGroupLabel(props: MenuGroupLabelProps) {
+const MenuGroupLabel = forwardRef<ComponentRef<typeof BaseMenu.GroupLabel>, MenuGroupLabelProps>(function MenuGroupLabel(props, ref) {
   const styles = stylex.props(menuStyles.groupLabel);
-  return <BaseMenu.GroupLabel {...props} {...styles} data-slot="menu-group-label" />;
-}
+  return <BaseMenu.GroupLabel {...props} ref={ref} {...styles} data-slot="menu-group-label" />;
+});
 
-function MenuShortcut({ render, ...props }: MenuShortcutProps) {
+const MenuShortcut = forwardRef<HTMLElement, MenuShortcutProps>(function MenuShortcut({ render, ...props }, ref) {
   const styles = stylex.props(menuStyles.shortcut);
   const defaultProps = {
     ...styles,
@@ -275,14 +279,14 @@ function MenuShortcut({ render, ...props }: MenuShortcutProps) {
     defaultTagName: "span",
     render,
     props: mergeProps<"span">(defaultProps, props),
+    ref,
   });
-}
+});
 
-function MenuCheckboxItem({
-  disabled = false,
-  closeOnClick = false,
-  ...props
-}: MenuCheckboxItemProps) {
+const MenuCheckboxItem = forwardRef<HTMLDivElement, MenuCheckboxItemProps>(function MenuCheckboxItem(
+  { disabled = false, closeOnClick = false, ...props },
+  ref,
+) {
   const stateStyles = createStateStyleProps<BaseMenu.CheckboxItem.State>((state) => [
     menuStyles.item,
     menuStyles.choiceItem,
@@ -291,44 +295,35 @@ function MenuCheckboxItem({
     state.disabled === true && menuStyles.itemDisabled,
   ]);
   return (
-    <BaseMenu.CheckboxItem
-      {...props}
-      disabled={disabled}
-      closeOnClick={closeOnClick}
-      {...stateStyles}
-    />
+    <BaseMenu.CheckboxItem {...props} ref={ref} disabled={disabled} closeOnClick={closeOnClick} {...stateStyles} />
   );
-}
+});
 
-function MenuCheckboxItemIndicator({
-  keepMounted = false,
-  ...props
-}: MenuCheckboxItemIndicatorProps) {
-  const stateStyles = createStateStyleProps<BaseMenu.CheckboxItemIndicator.State>(() => [
-    menuStyles.indicator,
-  ]);
-  const iconStyles = stylex.props(menuStyles.icon);
-  return (
-    <BaseMenu.CheckboxItemIndicator {...props} keepMounted={keepMounted} {...stateStyles}>
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        {...iconStyles}
-      >
-        <path d="m3 8 3 3 7-7" />
-      </svg>
-    </BaseMenu.CheckboxItemIndicator>
-  );
-}
+const MenuCheckboxItemIndicator = forwardRef<HTMLSpanElement, MenuCheckboxItemIndicatorProps>(
+  function MenuCheckboxItemIndicator({ keepMounted = false, ...props }, ref) {
+    const stateStyles = createStateStyleProps<BaseMenu.CheckboxItemIndicator.State>(() => [menuStyles.indicator]);
+    const iconStyles = stylex.props(menuStyles.icon);
+    return (
+      <BaseMenu.CheckboxItemIndicator {...props} ref={ref} keepMounted={keepMounted} {...stateStyles}>
+        <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" {...iconStyles}>
+          <path d="m3 8 3 3 7-7" />
+        </svg>
+      </BaseMenu.CheckboxItemIndicator>
+    );
+  },
+);
 
-function MenuRadioGroup({ disabled = false, ...props }: MenuRadioGroupProps) {
-  return <BaseMenu.RadioGroup {...props} disabled={disabled} />;
-}
+const MenuRadioGroup = forwardRef<HTMLDivElement, MenuRadioGroupProps>(function MenuRadioGroup(
+  { disabled = false, ...props },
+  ref,
+) {
+  return <BaseMenu.RadioGroup {...props} ref={ref} disabled={disabled} />;
+});
 
-function MenuRadioItem({ disabled = false, closeOnClick = false, ...props }: MenuRadioItemProps) {
+const MenuRadioItem = forwardRef<HTMLDivElement, MenuRadioItemProps>(function MenuRadioItem(
+  { disabled = false, closeOnClick = false, ...props },
+  ref,
+) {
   const stateStyles = createStateStyleProps<BaseMenu.RadioItem.State>((state) => [
     menuStyles.item,
     menuStyles.choiceItem,
@@ -336,35 +331,32 @@ function MenuRadioItem({ disabled = false, closeOnClick = false, ...props }: Men
     state.highlighted === true && menuStyles.itemHighlighted,
     state.disabled === true && menuStyles.itemDisabled,
   ]);
-  return (
-    <BaseMenu.RadioItem
-      {...props}
-      disabled={disabled}
-      closeOnClick={closeOnClick}
-      {...stateStyles}
-    />
-  );
-}
+  return <BaseMenu.RadioItem {...props} ref={ref} disabled={disabled} closeOnClick={closeOnClick} {...stateStyles} />;
+});
 
-function MenuRadioItemIndicator({ keepMounted = false, ...props }: MenuRadioItemIndicatorProps) {
-  const stateStyles = createStateStyleProps<BaseMenu.RadioItemIndicator.State>(() => [
-    menuStyles.indicator,
-  ]);
+const MenuRadioItemIndicator = forwardRef<HTMLSpanElement, MenuRadioItemIndicatorProps>(function MenuRadioItemIndicator(
+  { keepMounted = false, ...props },
+  ref,
+) {
+  const stateStyles = createStateStyleProps<BaseMenu.RadioItemIndicator.State>(() => [menuStyles.indicator]);
   const iconStyles = stylex.props(menuStyles.icon);
   return (
-    <BaseMenu.RadioItemIndicator {...props} keepMounted={keepMounted} {...stateStyles}>
+    <BaseMenu.RadioItemIndicator {...props} ref={ref} keepMounted={keepMounted} {...stateStyles}>
       <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" {...iconStyles}>
         <circle cx="8" cy="8" r="3" />
       </svg>
     </BaseMenu.RadioItemIndicator>
   );
-}
+});
 
 function MenuSubmenuRoot({ defaultOpen = false, ...props }: MenuSubmenuRootProps) {
   return <BaseMenu.SubmenuRoot {...props} defaultOpen={defaultOpen} />;
 }
 
-function MenuSubmenuTrigger({ disabled = false, children, ...props }: MenuSubmenuTriggerProps) {
+const MenuSubmenuTrigger = forwardRef<HTMLElement, MenuSubmenuTriggerProps>(function MenuSubmenuTrigger(
+  { disabled = false, children, ...props },
+  ref,
+) {
   const stateStyles = createStateStyleProps<BaseMenu.SubmenuTrigger.State>((state) => [
     menuStyles.item,
     state.open === true && menuStyles.itemOpen,
@@ -373,7 +365,7 @@ function MenuSubmenuTrigger({ disabled = false, children, ...props }: MenuSubmen
   ]);
   const iconStyles = stylex.props(menuStyles.submenuIcon);
   return (
-    <BaseMenu.SubmenuTrigger {...props} disabled={disabled} {...stateStyles}>
+    <BaseMenu.SubmenuTrigger {...props} ref={ref} disabled={disabled} {...stateStyles}>
       {children}
       <MenuSuffix>
         <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" {...iconStyles}>
@@ -382,29 +374,25 @@ function MenuSubmenuTrigger({ disabled = false, children, ...props }: MenuSubmen
       </MenuSuffix>
     </BaseMenu.SubmenuTrigger>
   );
-}
+});
 
-function MenuPrefix({ "aria-hidden": ariaHidden = true, ...props }: MenuPresentationProps) {
+const MenuPrefix = forwardRef<HTMLSpanElement, MenuPresentationProps>(function MenuPrefix(
+  { "aria-hidden": ariaHidden = true, ...props },
+  ref,
+) {
   return (
-    <span
-      {...props}
-      aria-hidden={ariaHidden}
-      {...stylex.props(menuStyles.prefix)}
-      data-slot="menu-prefix"
-    />
+    <span {...props} ref={ref} aria-hidden={ariaHidden} {...stylex.props(menuStyles.prefix)} data-slot="menu-prefix" />
   );
-}
+});
 
-function MenuSuffix({ "aria-hidden": ariaHidden = true, ...props }: MenuPresentationProps) {
+const MenuSuffix = forwardRef<HTMLSpanElement, MenuPresentationProps>(function MenuSuffix(
+  { "aria-hidden": ariaHidden = true, ...props },
+  ref,
+) {
   return (
-    <span
-      {...props}
-      aria-hidden={ariaHidden}
-      {...stylex.props(menuStyles.suffix)}
-      data-slot="menu-suffix"
-    />
+    <span {...props} ref={ref} aria-hidden={ariaHidden} {...stylex.props(menuStyles.suffix)} data-slot="menu-suffix" />
   );
-}
+});
 
 export const Menu = Object.assign(MenuRoot, {
   Root: MenuRoot,

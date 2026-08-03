@@ -62,11 +62,21 @@ function getToastOptions(
   }
 }
 
+function addToast(
+  content: string,
+  status: Exclude<ToastStatus, 'loading'>,
+  options?: ToastOptions,
+): ToastId {
+  const id = options?.id ?? content
+  toastManager.add(getToastOptions(content, status, options))
+  return id
+}
+
 export const toasts: Toasts = {
-  message: (content, options) => toastManager.add(getToastOptions(content, 'message', options)),
-  success: (content, options) => toastManager.add(getToastOptions(content, 'success', options)),
-  warning: (content, options) => toastManager.add(getToastOptions(content, 'warning', options)),
-  error: (content, options) => toastManager.add(getToastOptions(content, 'error', options)),
+  message: (content, options) => addToast(content, 'message', options),
+  success: (content, options) => addToast(content, 'success', options),
+  warning: (content, options) => addToast(content, 'warning', options),
+  error: (content, options) => addToast(content, 'error', options),
   promise: (promise, options) => {
     const managedPromise = toastManager.promise(promise, {
       loading: { title: options.loading, type: 'loading' },

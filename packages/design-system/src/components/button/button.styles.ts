@@ -51,8 +51,9 @@ export const buttonStyles = stylex.create({
     color: textColors['text-on-primary'],
   },
   secondary: {
+    borderColor: borderColors['border'],
     backgroundColor: {
-      default: backgroundColors['bg-secondary'],
+      default: null,
       ':hover': backgroundColors['bg-secondary-hover'],
       ':active': backgroundColors['bg-pressed'],
     },

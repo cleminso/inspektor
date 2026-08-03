@@ -1,3 +1,4 @@
+import { CheckboxGroup } from "@base-ui/react/checkbox-group";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -54,5 +55,20 @@ describe("Checkbox", () => {
     fireEvent.keyDown(checkbox, { key: "Enter" });
     fireEvent.keyUp(checkbox, { key: "Enter" });
     expect(checkbox.getAttribute("aria-checked")).toBe("false");
+  });
+
+  it("uses the effective group state for the parent icon", () => {
+    render(
+      <CheckboxGroup allValues={["email", "sms"]} defaultValue={["email"]}>
+        <Checkbox parent aria-label="Select all notifications" />
+        <Checkbox value="email" aria-label="Email" />
+        <Checkbox value="sms" aria-label="SMS" />
+      </CheckboxGroup>,
+    );
+
+    const parent = screen.getByRole("checkbox", { name: "Select all notifications" });
+
+    expect(parent.getAttribute("aria-checked")).toBe("mixed");
+    expect(parent.querySelector("path")?.getAttribute("d")).toBe("M4 8h8");
   });
 });

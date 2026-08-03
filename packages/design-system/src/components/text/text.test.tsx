@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react'
+import * as stylex from '@stylexjs/stylex'
 import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { Text } from './text'
+import { textUtilityStyles } from './text-styles'
 
 describe('Text', () => {
   it('rejects native styling escape hatches', () => {
@@ -34,6 +36,14 @@ describe('Text', () => {
     expect(screen.getByText('Disabled').className).not.toBe('')
     expect(screen.getByText('Link').className).not.toBe('')
     expect(screen.getByText('Danger').className).not.toBe('')
+  })
+
+  it('applies heading typography utilities to the heading variant', () => {
+    render(<Text variant="heading">Heading</Text>)
+
+    expect(screen.getByRole('heading').className).toContain(
+      stylex.props(textUtilityStyles.heading).className,
+    )
   })
 
   it('renders preserved monospace source text', () => {
@@ -73,9 +83,7 @@ describe('Text', () => {
 
   it('renders a text-shaped placeholder while loading', () => {
     const { container } = render(
-      <Text {...({ loading: true, placeholderText: 'Account name' } as object)}>
-        Account
-      </Text>,
+      <Text {...({ loading: true, placeholderText: 'Account name' } as object)}>Account</Text>,
     )
 
     expect(container.querySelector('[data-slot="text-skeleton"]')).not.toBeNull()
@@ -87,19 +95,27 @@ describe('Text', () => {
     render(
       <>
         <Text data-testid="regular">Regular</Text>
-        <Text data-testid="struck" {...({ lineThrough: true } as object)}>Struck</Text>
+        <Text data-testid="struck" {...({ lineThrough: true } as object)}>
+          Struck
+        </Text>
       </>,
     )
 
-    expect(screen.getByTestId('struck').className).not.toBe(
-      screen.getByTestId('regular').className,
-    )
+    expect(screen.getByTestId('struck').className).not.toBe(screen.getByTestId('regular').className)
   })
 
   it('types refs from the selected text element', () => {
-    const label = <Text as="label" ref={createRef<HTMLLabelElement>()}>Label</Text>
-    // @ts-expect-error A paragraph ref does not match a label.
-    const invalidLabel = <Text as="label" ref={createRef<HTMLParagraphElement>()}>Label</Text>
+    const label = (
+      <Text as="label" ref={createRef<HTMLLabelElement>()}>
+        Label
+      </Text>
+    )
+    const invalidLabel = (
+      // @ts-expect-error A paragraph ref does not match a label.
+      <Text as="label" ref={createRef<HTMLParagraphElement>()}>
+        Label
+      </Text>
+    )
 
     expect(label).toBeDefined()
     expect(invalidLabel).toBeDefined()

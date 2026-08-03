@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[03/08/26]
+
+- [x] Preserve the shared ghost Button hover and active backgrounds on switcher triggers.
+
 [01/08/26]
 
 - [x] Keep the trigger background visible while its popup is open.
@@ -30,6 +34,10 @@
 - No changes to popup layout, search behavior, or item styling.
 
 ## Settled interaction decisions
+
+[03/08/26]
+
+- The design-system trigger owns ghost Button visuals; application switchers provide inherited text content.
 
 [01/08/26]
 

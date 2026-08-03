@@ -21,7 +21,9 @@ describe('ButtonLink', () => {
     const link = screen.getByRole('link', { name: 'Open source' })
 
     expect(link.getAttribute('data-icon-only')).toBe('')
-    expect(screen.getByTestId('source-icon').parentElement?.getAttribute('aria-hidden')).toBe('true')
+    expect(screen.getByTestId('source-icon').parentElement?.getAttribute('aria-hidden')).toBe(
+      'true',
+    )
   })
 
   it('requires icon-only links to use their constrained content API', () => {
@@ -47,10 +49,7 @@ describe('ButtonLink', () => {
 
   it('composes button presentation onto a router link without button semantics', () => {
     render(
-      <ButtonLink
-        variant="secondary"
-        render={<RouterLink to="/components" />}
-      >
+      <ButtonLink variant="secondary" render={<RouterLink to="/components" />}>
         Browse components
       </ButtonLink>,
     )

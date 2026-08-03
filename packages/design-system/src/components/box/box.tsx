@@ -6,6 +6,7 @@ import React, { useId } from 'react'
 
 import { BOX_STYLE_PROP_KEYS, resolveBoxStyles } from '../../utils/resolvers'
 import type { BoxStyleProps } from '../../utils/types'
+import { boxStyles } from './box.styles'
 
 type BoxElement =
   | 'div'
@@ -35,8 +36,8 @@ const NON_FLEX_DEFAULT_ELEMENTS = new Set<BoxElement>([
 type BoxOwnProps<E extends BoxElement = 'div'> = BoxStyleProps & {
   as?: E
   children?: React.ReactNode
-  /** Applies an auditable integration class when the constrained Box API cannot represent a requirement. */
-  unsafeClassName?: string
+  /** Uses the design-system treatment for a compact scrollbar. */
+  scrollbar?: 'thin'
 }
 
 export type BoxProps<E extends BoxElement = 'div'> = BoxOwnProps<E> &
@@ -46,7 +47,7 @@ function BoxInner<E extends BoxElement = 'div'>(
   {
     as,
     children,
-    unsafeClassName,
+    scrollbar,
     ...rest
   }: BoxProps<E>,
   ref: React.ForwardedRef<HTMLElement>,
@@ -78,11 +79,13 @@ function BoxInner<E extends BoxElement = 'div'>(
     scopeClass,
   )
 
-  const stylexProps =
-    stylexStyles.length > 0 ? stylex.props(...stylexStyles) : null
+  const stylexProps = stylex.props(
+    ...stylexStyles,
+    scrollbar === 'thin' && boxStyles.scrollbarThin,
+  )
 
   const mergedStyle = {
-    ...stylexProps?.style,
+    ...stylexProps.style,
     ...inlineStyle,
   }
 
@@ -90,9 +93,8 @@ function BoxInner<E extends BoxElement = 'div'>(
 
   const classes =
     [
-      stylexProps?.className ?? null,
+      stylexProps.className ?? null,
       responsiveCSS !== null ? scopeClass : null,
-      unsafeClassName ?? null,
     ]
       .filter(Boolean)
       .join(' ') || undefined
@@ -106,6 +108,7 @@ function BoxInner<E extends BoxElement = 'div'>(
         ref={ref}
         className={classes}
         style={hasStyle === true ? mergedStyle : undefined}
+        data-scrollbar={scrollbar}
         {...domProps}
       >
         {children}

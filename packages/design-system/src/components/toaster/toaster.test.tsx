@@ -19,8 +19,7 @@ const stackContractStyles = stylex.create({
     zIndex: 1,
   },
   expandedGap: {
-    transform:
-      `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${spacing.m} + var(--toast-swipe-movement-y)))`,
+    transform: `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${spacing.m} + var(--toast-swipe-movement-y)))`,
   },
 })
 
@@ -204,6 +203,19 @@ describe('Toaster', () => {
 
     await screen.findAllByText('Export complete')
     expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(2)
+  })
+
+  it('dismisses a notification by the id returned from an add method', async () => {
+    render(<Toaster />)
+
+    const id = toasts.message('Dismiss by returned id', { preserve: true })
+    expect(await screen.findByText('Dismiss by returned id')).not.toBeNull()
+
+    toasts.dismiss(id)
+
+    await waitFor(() => {
+      expect(screen.queryByText('Dismiss by returned id')).toBeNull()
+    })
   })
 
   it('updates a promise toast when its lifecycle completes', async () => {

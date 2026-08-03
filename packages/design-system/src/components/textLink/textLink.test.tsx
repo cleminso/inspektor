@@ -1,12 +1,16 @@
-import { render, screen } from '@testing-library/react'
-import { createRef, type ComponentProps } from 'react'
-import { describe, expect, it } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import React, { createRef, type ComponentProps } from 'react'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { TextLink } from './textLink'
 
-function RouterLink({ to, ...props }: { to: string } & ComponentProps<'a'>) {
-  return <a href={to} {...props} />
-}
+const RouterLink = React.forwardRef<HTMLAnchorElement, { to: string } & ComponentProps<'a'>>(
+  function RouterLink({ to, ...props }, ref) {
+    return <a ref={ref} href={to} {...props} />
+  },
+)
+
+afterEach(cleanup)
 
 describe('TextLink', () => {
   it('renders native link semantics', () => {
@@ -20,11 +24,7 @@ describe('TextLink', () => {
   })
 
   it('composes styles and semantics onto a router link', () => {
-    render(
-      <TextLink render={<RouterLink to="/components" />}>
-        Browse components
-      </TextLink>,
-    )
+    render(<TextLink render={<RouterLink to="/components" />}>Browse components</TextLink>)
 
     const link = screen.getByRole('link', { name: 'Browse components' })
 
@@ -52,6 +52,7 @@ describe('TextLink', () => {
         {...({
           'data-testid': 'link',
           className: 'consumer-style',
+          color: 'red',
           style: { color: 'red' },
         } as object)}
       >
@@ -62,6 +63,8 @@ describe('TextLink', () => {
     const link = screen.getByTestId('link')
 
     expect(link.className).not.toContain('consumer-style')
+    expect(link.getAttribute('color')).toBeNull()
     expect(link.style.color).not.toBe('red')
   })
+
 })

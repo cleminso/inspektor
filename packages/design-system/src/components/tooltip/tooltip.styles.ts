@@ -13,6 +13,17 @@ import {
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
 
 export const tooltipStyles = stylex.create({
+  trigger: {
+    padding: 0,
+    borderStyle: 'none',
+    appearance: 'none',
+    backgroundColor: 'transparent',
+    color: 'inherit',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    fontSize: 'inherit',
+    lineHeight: 'inherit',
+  },
   positioner: {
     outline: 'none',
     zIndex: layerIndexes.tooltip,

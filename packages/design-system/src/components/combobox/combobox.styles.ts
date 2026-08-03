@@ -99,10 +99,6 @@ export const comboboxStyles = stylex.create({
   trigger: {
     [comboboxStyleVars.triggerTextColor]: textColors["text-default"],
     paddingInline: spacing.xs,
-    backgroundColor: {
-      default: "transparent",
-      ":disabled": backgroundColors["bg-disabled"],
-    },
     color: { default: textColors["text-default"], ":disabled": textColors["text-disabled"] },
   },
   triggerOpen: {

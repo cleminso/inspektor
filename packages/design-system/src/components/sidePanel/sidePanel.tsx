@@ -1,49 +1,59 @@
 import * as stylex from '@stylexjs/stylex'
-import type { ReactNode } from 'react'
+import { forwardRef, type ComponentPropsWithRef } from 'react'
 
 import { sidePanelStyles } from './sidePanel.styles'
 
-interface SidePanelPartProps {
-  /** Content rendered in this panel region. */
-  children?: ReactNode
-}
+export type SidePanelRootProps = Omit<ComponentPropsWithRef<'aside'>, 'className' | 'style'>
+export type SidePanelHeaderProps = Omit<ComponentPropsWithRef<'div'>, 'className' | 'style'>
+export type SidePanelBodyProps = Omit<ComponentPropsWithRef<'div'>, 'className' | 'style'>
+export type SidePanelFooterProps = Omit<ComponentPropsWithRef<'div'>, 'className' | 'style'>
 
-export type SidePanelRootProps = SidePanelPartProps
-export type SidePanelHeaderProps = SidePanelPartProps
-export type SidePanelBodyProps = SidePanelPartProps
-export type SidePanelFooterProps = SidePanelPartProps
+const SidePanelRoot = forwardRef<HTMLElement, SidePanelRootProps>(
+  function SidePanelRoot(props, ref) {
+    return (
+      <aside {...props} ref={ref} {...stylex.props(sidePanelStyles.root)} data-slot="side-panel" />
+    )
+  },
+)
 
-function SidePanelRoot({ children }: SidePanelRootProps) {
-  return (
-    <aside {...stylex.props(sidePanelStyles.root)} data-slot="side-panel">
-      {children}
-    </aside>
-  )
-}
+const SidePanelHeader = forwardRef<HTMLDivElement, SidePanelHeaderProps>(
+  function SidePanelHeader(props, ref) {
+    return (
+      <div
+        {...props}
+        ref={ref}
+        {...stylex.props(sidePanelStyles.header)}
+        data-slot="side-panel-header"
+      />
+    )
+  },
+)
 
-function SidePanelHeader({ children }: SidePanelHeaderProps) {
-  return (
-    <div {...stylex.props(sidePanelStyles.header)} data-slot="side-panel-header">
-      {children}
-    </div>
-  )
-}
+const SidePanelBody = forwardRef<HTMLDivElement, SidePanelBodyProps>(
+  function SidePanelBody(props, ref) {
+    return (
+      <div
+        {...props}
+        ref={ref}
+        {...stylex.props(sidePanelStyles.body)}
+        data-slot="side-panel-body"
+      />
+    )
+  },
+)
 
-function SidePanelBody({ children }: SidePanelBodyProps) {
-  return (
-    <div {...stylex.props(sidePanelStyles.body)} data-slot="side-panel-body">
-      {children}
-    </div>
-  )
-}
-
-function SidePanelFooter({ children }: SidePanelFooterProps) {
-  return (
-    <div {...stylex.props(sidePanelStyles.footer)} data-slot="side-panel-footer">
-      {children}
-    </div>
-  )
-}
+const SidePanelFooter = forwardRef<HTMLDivElement, SidePanelFooterProps>(
+  function SidePanelFooter(props, ref) {
+    return (
+      <div
+        {...props}
+        ref={ref}
+        {...stylex.props(sidePanelStyles.footer)}
+        data-slot="side-panel-footer"
+      />
+    )
+  },
+)
 
 export const SidePanel = Object.assign(SidePanelRoot, {
   Root: SidePanelRoot,

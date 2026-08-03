@@ -67,4 +67,15 @@ describe("Button", () => {
     expect(leading?.textContent).toBe("PrefixLabel");
     expect(leading?.nextElementSibling?.textContent).toBe("Suffix");
   });
+
+  it("propagates type through a custom render target", () => {
+    render(
+      <Button type="submit" render={<button data-testid="submit" />}>
+        Save changes
+      </Button>,
+    );
+
+    const button = screen.getByTestId("submit");
+    expect(button.getAttribute("type")).toBe("submit");
+  });
 });

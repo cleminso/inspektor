@@ -9,9 +9,7 @@ describe("Input", () => {
   it("exposes its constrained visual variant", () => {
     render(<Input aria-label="Filter" variant="subtle" />);
 
-    expect(screen.getByRole("textbox", { name: "Filter" }).getAttribute("data-variant")).toBe(
-      "subtle",
-    );
+    expect(screen.getByRole("textbox", { name: "Filter" }).getAttribute("data-variant")).toBe("subtle");
   });
 
   it("exposes an explicit invalid state to assistive technology", () => {

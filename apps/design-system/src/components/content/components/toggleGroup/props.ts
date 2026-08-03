@@ -9,7 +9,6 @@ export const toggleGroupRootPropNames = [
   "size",
   "width",
   "itemWidth",
-  "render",
 ] as const;
 
 export const toggleGroupItemPropNames = [

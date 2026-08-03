@@ -1,6 +1,6 @@
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion'
 import * as stylex from '@stylexjs/stylex'
-import type { ReactNode } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { accordionStyles } from './accordion.styles'
@@ -9,8 +9,10 @@ type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
 
 export type AccordionValue = string | number
 
-export interface AccordionRootProps
-  extends Omit<WithoutStyles<BaseAccordion.Root.Props<AccordionValue>>, 'orientation'> {
+export interface AccordionRootProps extends Omit<
+  WithoutStyles<BaseAccordion.Root.Props<AccordionValue>>,
+  'orientation'
+> {
   /** Accordion items and their panels. */
   children?: ReactNode
   /** Values expanded when the accordion is uncontrolled. */
@@ -32,14 +34,21 @@ export interface AccordionItemProps extends WithoutStyles<BaseAccordion.Item.Pro
   disabled?: boolean
 }
 
-export type AccordionHeaderProps = WithoutStyles<BaseAccordion.Header.Props>
+export interface AccordionHeaderProps extends WithoutStyles<BaseAccordion.Header.Props> {
+  /** Composes the heading behavior and styles onto another heading element. */
+  render?: BaseAccordion.Header.Props['render']
+}
 
-export interface AccordionTriggerProps
-  extends Omit<WithoutStyles<BaseAccordion.Trigger.Props>, 'children'> {
+export interface AccordionTriggerProps extends Omit<
+  WithoutStyles<BaseAccordion.Trigger.Props>,
+  'children'
+> {
   /** Visible heading text. */
   children: ReactNode
   /** Optional content aligned opposite the heading. */
   suffix?: ReactNode
+  /** Composes trigger behavior and styles onto another button component. */
+  render?: BaseAccordion.Trigger.Props['render']
 }
 
 export interface AccordionPanelProps extends WithoutStyles<BaseAccordion.Panel.Props> {
@@ -51,24 +60,43 @@ export interface AccordionPanelProps extends WithoutStyles<BaseAccordion.Panel.P
   hiddenUntilFound?: BaseAccordion.Panel.Props['hiddenUntilFound']
 }
 
-function AccordionRoot({ multiple = false, disabled = false, ...props }: AccordionRootProps) {
+const AccordionRoot = forwardRef<HTMLDivElement, AccordionRootProps>(function AccordionRoot(
+  { multiple = false, disabled = false, ...props },
+  forwardedRef,
+) {
   const stateStyles = createStateStyleProps<BaseAccordion.Root.State>(() => [accordionStyles.root])
-  return <BaseAccordion.Root {...props} multiple={multiple} disabled={disabled} {...stateStyles} />
-}
+  return (
+    <BaseAccordion.Root
+      {...props}
+      ref={forwardedRef}
+      multiple={multiple}
+      disabled={disabled}
+      {...stateStyles}
+    />
+  )
+})
 
-function AccordionItem({ disabled = false, ...props }: AccordionItemProps) {
+const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(function AccordionItem(
+  { disabled = false, ...props },
+  forwardedRef,
+) {
   const stateStyles = createStateStyleProps<BaseAccordion.Item.State>(() => [accordionStyles.item])
-  return <BaseAccordion.Item {...props} disabled={disabled} {...stateStyles} />
-}
+  return <BaseAccordion.Item {...props} ref={forwardedRef} disabled={disabled} {...stateStyles} />
+})
 
-function AccordionHeader(props: AccordionHeaderProps) {
-  const stateStyles = createStateStyleProps<BaseAccordion.Header.State>(() => [
-    accordionStyles.header,
-  ])
-  return <BaseAccordion.Header {...props} {...stateStyles} />
-}
+const AccordionHeader = forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
+  function AccordionHeader(props, forwardedRef) {
+    const stateStyles = createStateStyleProps<BaseAccordion.Header.State>(() => [
+      accordionStyles.header,
+    ])
+    return <BaseAccordion.Header {...props} ref={forwardedRef} {...stateStyles} />
+  },
+)
 
-function AccordionTrigger({ children, suffix, ...props }: AccordionTriggerProps) {
+const AccordionTrigger = forwardRef<HTMLElement, AccordionTriggerProps>(function AccordionTrigger(
+  { children, suffix, ...props },
+  forwardedRef,
+) {
   const stateStyles = createStateStyleProps<BaseAccordion.Trigger.State>((state) => [
     accordionStyles.trigger,
     state.open === true && accordionStyles.triggerOpen,
@@ -76,7 +104,7 @@ function AccordionTrigger({ children, suffix, ...props }: AccordionTriggerProps)
   ])
 
   return (
-    <BaseAccordion.Trigger {...props} {...stateStyles}>
+    <BaseAccordion.Trigger {...props} ref={forwardedRef} {...stateStyles}>
       <span {...stylex.props(accordionStyles.leading)}>
         <span {...stylex.props(accordionStyles.label)}>{children}</span>
         <svg aria-hidden="true" viewBox="0 0 14 14" {...stylex.props(accordionStyles.indicator)}>
@@ -88,16 +116,18 @@ function AccordionTrigger({ children, suffix, ...props }: AccordionTriggerProps)
       )}
     </BaseAccordion.Trigger>
   )
-}
+})
 
-function AccordionPanel(props: AccordionPanelProps) {
-  const stateStyles = createStateStyleProps<BaseAccordion.Panel.State>((state) => [
-    accordionStyles.panel,
-    (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
-      accordionStyles.panelTransitioning,
-  ])
-  return <BaseAccordion.Panel {...props} {...stateStyles} />
-}
+const AccordionPanel = forwardRef<HTMLDivElement, AccordionPanelProps>(
+  function AccordionPanel(props, forwardedRef) {
+    const stateStyles = createStateStyleProps<BaseAccordion.Panel.State>((state) => [
+      accordionStyles.panel,
+      (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
+        accordionStyles.panelTransitioning,
+    ])
+    return <BaseAccordion.Panel {...props} ref={forwardedRef} {...stateStyles} />
+  },
+)
 
 export const Accordion = Object.assign(AccordionRoot, {
   Root: AccordionRoot,

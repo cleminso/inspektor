@@ -1,12 +1,15 @@
 import { Switch as BaseSwitch } from '@base-ui/react/switch'
+import { forwardRef } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { switchStyles } from './switch.styles'
 
 export type SwitchSize = 's' | 'm'
 
-export interface SwitchProps
-  extends Omit<BaseSwitch.Root.Props, 'children' | 'className' | 'style'> {
+export interface SwitchProps extends Omit<
+  BaseSwitch.Root.Props,
+  'children' | 'className' | 'style'
+> {
   /** Controls the switch dimensions. */
   size?: SwitchSize
   /** Controls whether the switch is checked. */
@@ -37,14 +40,17 @@ export interface SwitchProps
   render?: BaseSwitch.Root.Props['render']
 }
 
-export function Switch({
-  size = 'm',
-  disabled = false,
-  readOnly = false,
-  required = false,
-  nativeButton = false,
-  ...props
-}: SwitchProps) {
+export const Switch = forwardRef<HTMLElement, SwitchProps>(function Switch(
+  {
+    size = 'm',
+    disabled = false,
+    readOnly = false,
+    required = false,
+    nativeButton = false,
+    ...props
+  },
+  ref,
+) {
   const rootStyleProps = createStateStyleProps<BaseSwitch.Root.State>((state) => [
     switchStyles.root,
     size === 's' ? switchStyles.rootSizeS : switchStyles.rootSizeM,
@@ -65,6 +71,7 @@ export function Switch({
   return (
     <BaseSwitch.Root
       {...props}
+      ref={ref}
       disabled={disabled}
       readOnly={readOnly}
       required={required}
@@ -76,4 +83,4 @@ export function Switch({
       <BaseSwitch.Thumb {...thumbStyleProps} data-slot="switch-thumb" />
     </BaseSwitch.Root>
   )
-}
+})

@@ -2,7 +2,14 @@ import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import * as stylex from "@stylexjs/stylex";
-import { type ReactNode, useState } from "react";
+import {
+  type ComponentRef,
+  type ForwardedRef,
+  type ReactElement,
+  type ReactNode,
+  forwardRef,
+  useState,
+} from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
@@ -66,10 +73,16 @@ export interface ComboboxInputGroupProps extends WithoutStyles<BaseCombobox.Inpu
   /** Controls whether the input group follows its content or fills its container. */
   width?: ComboboxInputGroupWidth;
 }
-export type ComboboxInputProps = Omit<WithoutStyles<BaseCombobox.Input.Props>, "size" | "value">;
+export interface ComboboxInputProps extends Omit<
+  WithoutStyles<BaseCombobox.Input.Props>,
+  "size" | "value"
+> {
+  /** Composes input behavior onto another input component. */
+  render?: BaseCombobox.Input.Props["render"];
+}
 export interface ComboboxInputTriggerProps extends Omit<
   WithoutStyles<BaseCombobox.Trigger.Props>,
-  "children"
+  "children" | "nativeButton"
 > {
   /** Disables the input action trigger. */
   disabled?: boolean;
@@ -80,7 +93,7 @@ export type ComboboxTriggerWidth = "content" | "s" | "m" | "full";
 
 export interface ComboboxTriggerProps extends Omit<
   WithoutStyles<BaseCombobox.Trigger.Props>,
-  "children" | "render"
+  "children"
 > {
   /** Content displayed by the trigger. */
   children: ReactNode;
@@ -90,6 +103,8 @@ export interface ComboboxTriggerProps extends Omit<
   width?: ComboboxTriggerWidth;
   /** Disables the trigger. */
   disabled?: boolean;
+  /** Composes trigger behavior onto another button component. */
+  render?: BaseCombobox.Trigger.Props["render"];
 }
 
 export interface ComboboxLabelProps extends WithoutStyles<BaseCombobox.Label.Props> {
@@ -109,7 +124,7 @@ export interface ComboboxPortalProps extends WithoutStyles<BaseCombobox.Portal.P
 
 export type ComboboxPositionerProps = Pick<
   WithoutStyles<BaseCombobox.Positioner.Props>,
-  "align" | "children"
+  "align" | "children" | "ref"
 >;
 
 export type ComboboxPopupWidth = "anchor" | "content" | "s" | "m" | "l";
@@ -132,30 +147,22 @@ export interface ComboboxContentProps {
 
 export interface ComboboxPopupHeaderProps extends Omit<
   useRender.ComponentProps<"div">,
-  "className" | "style"
-> {
-  /** Composes the header layout onto another element. */
-  render?: useRender.ComponentProps<"div">["render"];
-}
+  "className" | "render" | "style"
+> {}
 
 export interface ComboboxPopupFooterProps extends Omit<
   useRender.ComponentProps<"div">,
-  "className" | "style"
-> {
-  /** Composes the footer layout onto another element. */
-  render?: useRender.ComponentProps<"div">["render"];
-}
+  "className" | "render" | "style"
+> {}
 
 export type ComboboxViewportHeight = "s" | "m" | "l" | "available";
 
 export interface ComboboxViewportProps extends Omit<
   useRender.ComponentProps<"div">,
-  "className" | "style"
+  "className" | "render" | "style"
 > {
   /** Controls the maximum height of the scrolling results region. */
   maxHeight?: ComboboxViewportHeight;
-  /** Composes the viewport layout onto another element. */
-  render?: useRender.ComponentProps<"div">["render"];
 }
 
 export type ComboboxSeparatorProps = WithoutStyles<BaseCombobox.Separator.Props>;
@@ -175,6 +182,8 @@ export interface ComboboxClearProps extends Omit<
   keepMounted?: BaseCombobox.Clear.Props["keepMounted"];
   /** Disables the clear action. */
   disabled?: BaseCombobox.Clear.Props["disabled"];
+  /** Composes clear behavior onto another button component. */
+  render?: BaseCombobox.Clear.Props["render"];
 }
 
 export type ComboboxItemProps<Value> = Omit<WithoutStyles<BaseCombobox.Item.Props>, "value"> & {
@@ -182,6 +191,8 @@ export type ComboboxItemProps<Value> = Omit<WithoutStyles<BaseCombobox.Item.Prop
   value: Value;
   /** Controls whether the standard selected indicator is displayed. */
   indicator?: "check" | "none";
+  /** Composes option behavior onto another compatible element. */
+  render?: BaseCombobox.Item.Props["render"];
 };
 
 export interface ComboboxItemTextProps {
@@ -217,7 +228,13 @@ function ComboboxRoot<Value>({
   );
 }
 
-function ComboboxInputGroup({ appearance = "default", width = "content", ...props }: ComboboxInputGroupProps) {
+const ComboboxInputGroup = forwardRef<
+  ComponentRef<typeof BaseCombobox.InputGroup>,
+  ComboboxInputGroupProps
+>(function ComboboxInputGroup(
+  { appearance = "default", width = "content", ...props },
+  forwardedRef,
+) {
   const [focusVisible, setFocusVisible] = useState(false);
   const stateStyles = createStateStyleProps<BaseCombobox.InputGroup.State>((state) => [
     comboboxStyles.inputGroup,
@@ -230,6 +247,7 @@ function ComboboxInputGroup({ appearance = "default", width = "content", ...prop
   return (
     <BaseCombobox.InputGroup
       {...props}
+      ref={forwardedRef}
       {...stateStyles}
       data-slot="combobox-input-group"
       data-focus-visible={focusVisible === true ? "" : undefined}
@@ -256,17 +274,29 @@ function ComboboxInputGroup({ appearance = "default", width = "content", ...prop
       }}
     />
   );
-}
+});
 
-function ComboboxInput(props: ComboboxInputProps) {
-  const stateStyles = createStateStyleProps<BaseCombobox.Input.State>((state) => [
-    comboboxStyles.input,
-    state.disabled === true && comboboxStyles.inputDisabled,
-  ]);
-  return <BaseCombobox.Input {...props} {...stateStyles} data-slot="combobox-input" />;
-}
+const ComboboxInput = forwardRef<ComponentRef<typeof BaseCombobox.Input>, ComboboxInputProps>(
+  function ComboboxInput(props, forwardedRef) {
+    const stateStyles = createStateStyleProps<BaseCombobox.Input.State>((state) => [
+      comboboxStyles.input,
+      state.disabled === true && comboboxStyles.inputDisabled,
+    ]);
+    return (
+      <BaseCombobox.Input
+        {...props}
+        ref={forwardedRef}
+        {...stateStyles}
+        data-slot="combobox-input"
+      />
+    );
+  },
+);
 
-function ComboboxInputTrigger({ disabled = false, ...props }: ComboboxInputTriggerProps) {
+const ComboboxInputTrigger = forwardRef<
+  ComponentRef<typeof BaseCombobox.Trigger>,
+  ComboboxInputTriggerProps
+>(function ComboboxInputTrigger({ disabled = false, ...props }, forwardedRef) {
   const stateStyles = createStateStyleProps<BaseCombobox.Trigger.State>((state) => [
     comboboxStyles.action,
     state.disabled === true && comboboxStyles.actionDisabled,
@@ -275,6 +305,7 @@ function ComboboxInputTrigger({ disabled = false, ...props }: ComboboxInputTrigg
     <BaseCombobox.Trigger
       aria-label="Open options"
       {...props}
+      ref={forwardedRef}
       disabled={disabled}
       {...stateStyles}
       render={(triggerProps, state) => (
@@ -284,56 +315,56 @@ function ComboboxInputTrigger({ disabled = false, ...props }: ComboboxInputTrigg
       )}
     />
   );
-}
+});
 
-function ComboboxTrigger({
-  children,
-  size = "m",
-  width = "content",
-  disabled = false,
-  ...props
-}: ComboboxTriggerProps) {
-  const triggerWidthStyles = {
-    content: comboboxStyles.triggerWidthContent,
-    s: comboboxStyles.triggerWidthS,
-    m: comboboxStyles.triggerWidthM,
-    full: comboboxStyles.triggerWidthFull,
-  } satisfies Record<ComboboxTriggerWidth, unknown>;
-  const triggerStyles = createStateStyleProps<BaseCombobox.Trigger.State>((state) => [
-    ...getButtonVisualStyles({
-      variant: "ghost",
-      size,
-      square: false,
-      pressed: false,
-      fullWidth: width === "full",
-      justify: "start",
-      radius: "xs",
-      orientation: null,
-      disabled: state.disabled,
-      hasPrefix: false,
-      hasSuffix: false,
-    }),
-    comboboxStyles.trigger,
-    triggerWidthStyles[width],
-    state.open === true && comboboxStyles.triggerOpen,
-  ]);
-  return (
-    <BaseCombobox.Trigger
-      {...props}
-      disabled={disabled}
-      {...triggerStyles}
-      data-full-width={width === "full" ? "" : undefined}
-      data-radius="xs"
-      data-size={size}
-      data-slot="button"
-      data-variant="ghost"
-    >
-      <ButtonContent justify="start" size={size}>
-        {children}
-      </ButtonContent>
-    </BaseCombobox.Trigger>
-  );
-}
+const ComboboxTrigger = forwardRef<ComponentRef<typeof BaseCombobox.Trigger>, ComboboxTriggerProps>(
+  function ComboboxTrigger(
+    { children, size = "m", width = "content", disabled = false, ...props },
+    forwardedRef,
+  ) {
+    const triggerWidthStyles = {
+      content: comboboxStyles.triggerWidthContent,
+      s: comboboxStyles.triggerWidthS,
+      m: comboboxStyles.triggerWidthM,
+      full: comboboxStyles.triggerWidthFull,
+    } satisfies Record<ComboboxTriggerWidth, unknown>;
+    const triggerStyles = createStateStyleProps<BaseCombobox.Trigger.State>((state) => [
+      ...getButtonVisualStyles({
+        variant: "ghost",
+        size,
+        square: false,
+        pressed: false,
+        fullWidth: width === "full",
+        justify: "start",
+        radius: "xs",
+        orientation: null,
+        disabled: state.disabled,
+        hasPrefix: false,
+        hasSuffix: false,
+      }),
+      comboboxStyles.trigger,
+      triggerWidthStyles[width],
+      state.open === true && comboboxStyles.triggerOpen,
+    ]);
+    return (
+      <BaseCombobox.Trigger
+        {...props}
+        ref={forwardedRef}
+        disabled={disabled}
+        {...triggerStyles}
+        data-full-width={width === "full" ? "" : undefined}
+        data-radius="xs"
+        data-size={size}
+        data-slot="button"
+        data-variant="ghost"
+      >
+        <ButtonContent justify="start" size={size}>
+          {children}
+        </ButtonContent>
+      </BaseCombobox.Trigger>
+    );
+  },
+);
 
 function ComboboxChevron({ open }: { open: boolean }) {
   const iconStyles = stylex.props(comboboxStyles.icon, open === true && comboboxStyles.iconOpen);
@@ -351,32 +382,40 @@ function ComboboxChevron({ open }: { open: boolean }) {
   );
 }
 
-function ComboboxLabel(props: ComboboxLabelProps) {
-  const styles = stylex.props(comboboxStyles.label);
-  return <BaseCombobox.Label {...props} {...styles} />;
-}
+const ComboboxLabel = forwardRef<ComponentRef<typeof BaseCombobox.Label>, ComboboxLabelProps>(
+  function ComboboxLabel(props, forwardedRef) {
+    const styles = stylex.props(comboboxStyles.label);
+    return <BaseCombobox.Label {...props} ref={forwardedRef} {...styles} />;
+  },
+);
 
 function ComboboxValue(props: ComboboxValueProps) {
   return <BaseCombobox.Value {...props} />;
 }
 
-function ComboboxPortal({ keepMounted = false, ...props }: ComboboxPortalProps) {
-  return <BaseCombobox.Portal {...props} keepMounted={keepMounted} />;
-}
+const ComboboxPortal = forwardRef<ComponentRef<typeof BaseCombobox.Portal>, ComboboxPortalProps>(
+  function ComboboxPortal({ keepMounted = false, ...props }, forwardedRef) {
+    return <BaseCombobox.Portal {...props} ref={forwardedRef} keepMounted={keepMounted} />;
+  },
+);
 
-function ComboboxPositioner({ align = "start", ...props }: ComboboxPositionerProps) {
+const ComboboxPositioner = forwardRef<
+  ComponentRef<typeof BaseCombobox.Positioner>,
+  ComboboxPositionerProps
+>(function ComboboxPositioner({ align = "start", ...props }, forwardedRef) {
   const stateStyles = createStateStyleProps<BaseCombobox.Positioner.State>(() => [
     comboboxStyles.positioner,
   ]);
   return (
     <BaseCombobox.Positioner
       {...props}
+      ref={forwardedRef}
       sideOffset={popupPositioning.dropdownSideOffset}
       align={align}
       {...stateStyles}
     />
   );
-}
+});
 
 const popupWidthStyles = {
   anchor: comboboxStyles.popupWidthAnchor,
@@ -386,15 +425,17 @@ const popupWidthStyles = {
   l: comboboxStyles.popupWidthL,
 } satisfies Record<ComboboxPopupWidth, unknown>;
 
-function ComboboxPopup({ width = "anchor", ...props }: ComboboxPopupProps) {
-  const stateStyles = createStateStyleProps<BaseCombobox.Popup.State>((state) => [
-    comboboxStyles.popup,
-    popupWidthStyles[width],
-    (state.transitionStatus === "starting" || state.transitionStatus === "ending") &&
-      comboboxStyles.popupTransition,
-  ]);
-  return <BaseCombobox.Popup {...props} {...stateStyles} />;
-}
+const ComboboxPopup = forwardRef<ComponentRef<typeof BaseCombobox.Popup>, ComboboxPopupProps>(
+  function ComboboxPopup({ width = "anchor", ...props }, forwardedRef) {
+    const stateStyles = createStateStyleProps<BaseCombobox.Popup.State>((state) => [
+      comboboxStyles.popup,
+      popupWidthStyles[width],
+      (state.transitionStatus === "starting" || state.transitionStatus === "ending") &&
+        comboboxStyles.popupTransition,
+    ]);
+    return <BaseCombobox.Popup {...props} ref={forwardedRef} {...stateStyles} />;
+  },
+);
 
 function ComboboxContent({
   children,
@@ -413,37 +454,35 @@ function ComboboxContent({
   );
 }
 
-function ComboboxPopupHeader({ render, ...props }: ComboboxPopupHeaderProps) {
-  const styles = stylex.props(
-    comboboxStyles.popupSection,
-    comboboxStyles.popupHeader,
-  );
-  const defaultProps = {
-    ...styles,
-    "data-slot": "combobox-popup-header",
-  } as useRender.ComponentProps<"div">;
-  return useRender({
-    defaultTagName: "div",
-    render,
-    props: mergeProps<"div">(defaultProps, props),
-  });
-}
+const ComboboxPopupHeader = forwardRef<HTMLDivElement, ComboboxPopupHeaderProps>(
+  function ComboboxPopupHeader(props, forwardedRef) {
+    const styles = stylex.props(comboboxStyles.popupSection, comboboxStyles.popupHeader);
+    const defaultProps = {
+      ...styles,
+      "data-slot": "combobox-popup-header",
+    } as useRender.ComponentProps<"div">;
+    return useRender({
+      defaultTagName: "div",
+      props: mergeProps<"div">(defaultProps, props),
+      ref: forwardedRef,
+    });
+  },
+);
 
-function ComboboxPopupFooter({ render, ...props }: ComboboxPopupFooterProps) {
-  const styles = stylex.props(
-    comboboxStyles.popupSection,
-    comboboxStyles.popupFooter,
-  );
-  const defaultProps = {
-    ...styles,
-    "data-slot": "combobox-popup-footer",
-  } as useRender.ComponentProps<"div">;
-  return useRender({
-    defaultTagName: "div",
-    render,
-    props: mergeProps<"div">(defaultProps, props),
-  });
-}
+const ComboboxPopupFooter = forwardRef<HTMLDivElement, ComboboxPopupFooterProps>(
+  function ComboboxPopupFooter(props, forwardedRef) {
+    const styles = stylex.props(comboboxStyles.popupSection, comboboxStyles.popupFooter);
+    const defaultProps = {
+      ...styles,
+      "data-slot": "combobox-popup-footer",
+    } as useRender.ComponentProps<"div">;
+    return useRender({
+      defaultTagName: "div",
+      props: mergeProps<"div">(defaultProps, props),
+      ref: forwardedRef,
+    });
+  },
+);
 
 const viewportHeightStyles = {
   s: comboboxStyles.viewportHeightS,
@@ -452,103 +491,115 @@ const viewportHeightStyles = {
   available: comboboxStyles.viewportHeightAvailable,
 } satisfies Record<ComboboxViewportHeight, unknown>;
 
-function ComboboxViewport({ maxHeight = "m", render, ...props }: ComboboxViewportProps) {
-  const styles = stylex.props(
-    comboboxStyles.viewport,
-    viewportHeightStyles[maxHeight],
-  );
-  const defaultProps = {
-    ...styles,
-    "data-slot": "combobox-viewport",
-  } as useRender.ComponentProps<"div">;
-  return useRender({
-    defaultTagName: "div",
-    render,
-    props: mergeProps<"div">(defaultProps, props),
-  });
-}
+const ComboboxViewport = forwardRef<HTMLDivElement, ComboboxViewportProps>(
+  function ComboboxViewport({ maxHeight = "m", ...props }, forwardedRef) {
+    const styles = stylex.props(comboboxStyles.viewport, viewportHeightStyles[maxHeight]);
+    const defaultProps = {
+      ...styles,
+      "data-slot": "combobox-viewport",
+    } as useRender.ComponentProps<"div">;
+    return useRender({
+      defaultTagName: "div",
+      props: mergeProps<"div">(defaultProps, props),
+      ref: forwardedRef,
+    });
+  },
+);
 
-function ComboboxSeparator(props: ComboboxSeparatorProps) {
+const ComboboxSeparator = forwardRef<
+  ComponentRef<typeof BaseCombobox.Separator>,
+  ComboboxSeparatorProps
+>(function ComboboxSeparator(props, forwardedRef) {
   const styles = stylex.props(comboboxStyles.separator);
-  return <BaseCombobox.Separator {...props} {...styles} />;
-}
+  return <BaseCombobox.Separator {...props} ref={forwardedRef} {...styles} />;
+});
 
-function ComboboxClear({
-  label = "Clear selection",
-  keepMounted = false,
-  disabled = false,
-  ...props
-}: ComboboxClearProps) {
-  const stateStyles = createStateStyleProps<BaseCombobox.Clear.State>((state) => [
-    comboboxStyles.action,
-    state.disabled === true && comboboxStyles.actionDisabled,
-  ]);
-  const iconStyles = stylex.props(comboboxStyles.icon);
+const ComboboxClear = forwardRef<ComponentRef<typeof BaseCombobox.Clear>, ComboboxClearProps>(
+  function ComboboxClear(
+    { label = "Clear selection", keepMounted = false, disabled = false, ...props },
+    forwardedRef,
+  ) {
+    const stateStyles = createStateStyleProps<BaseCombobox.Clear.State>((state) => [
+      comboboxStyles.action,
+      state.disabled === true && comboboxStyles.actionDisabled,
+    ]);
+    const iconStyles = stylex.props(comboboxStyles.icon);
 
-  return (
-    <BaseCombobox.Clear
-      aria-label={label}
-      {...props}
-      keepMounted={keepMounted}
-      disabled={disabled}
-      {...stateStyles}
-    >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        {...iconStyles}
+    return (
+      <BaseCombobox.Clear
+        aria-label={label}
+        {...props}
+        ref={forwardedRef}
+        keepMounted={keepMounted}
+        disabled={disabled}
+        {...stateStyles}
       >
-        <path d="m4 4 8 8M12 4l-8 8" />
-      </svg>
-    </BaseCombobox.Clear>
-  );
-}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          {...iconStyles}
+        >
+          <path d="m4 4 8 8M12 4l-8 8" />
+        </svg>
+      </BaseCombobox.Clear>
+    );
+  },
+);
 
-function ComboboxEmpty({ children, ...props }: ComboboxEmptyProps) {
-  const styles = stylex.props(comboboxStyles.empty);
-  return (
-    <BaseCombobox.Empty {...props} {...styles}>
-      {children}
-    </BaseCombobox.Empty>
-  );
-}
+const ComboboxEmpty = forwardRef<ComponentRef<typeof BaseCombobox.Empty>, ComboboxEmptyProps>(
+  function ComboboxEmpty({ children, ...props }, forwardedRef) {
+    const styles = stylex.props(comboboxStyles.empty);
+    return (
+      <BaseCombobox.Empty {...props} ref={forwardedRef} {...styles}>
+        {children}
+      </BaseCombobox.Empty>
+    );
+  },
+);
 
-function ComboboxStatus({ children, ...props }: ComboboxStatusProps) {
-  const styles = stylex.props(comboboxStyles.status);
-  return (
-    <BaseCombobox.Status {...props} {...styles}>
-      {children}
-    </BaseCombobox.Status>
-  );
-}
+const ComboboxStatus = forwardRef<ComponentRef<typeof BaseCombobox.Status>, ComboboxStatusProps>(
+  function ComboboxStatus({ children, ...props }, forwardedRef) {
+    const styles = stylex.props(comboboxStyles.status);
+    return (
+      <BaseCombobox.Status {...props} ref={forwardedRef} {...styles}>
+        {children}
+      </BaseCombobox.Status>
+    );
+  },
+);
 
-function ComboboxList(props: ComboboxListProps) {
-  const stateStyles = createStateStyleProps<BaseCombobox.List.State>((state) => [
-    comboboxStyles.list,
-    state.empty === true && comboboxStyles.listEmpty,
-  ]);
-  return <BaseCombobox.List {...props} {...stateStyles} />;
-}
+const ComboboxList = forwardRef<ComponentRef<typeof BaseCombobox.List>, ComboboxListProps>(
+  function ComboboxList(props, forwardedRef) {
+    const stateStyles = createStateStyleProps<BaseCombobox.List.State>((state) => [
+      comboboxStyles.list,
+      state.empty === true && comboboxStyles.listEmpty,
+    ]);
+    return <BaseCombobox.List {...props} ref={forwardedRef} {...stateStyles} />;
+  },
+);
 
-function ComboboxGroup(props: ComboboxGroupProps) {
-  const styles = stylex.props(comboboxStyles.group);
-  return <BaseCombobox.Group {...props} {...styles} />;
-}
+const ComboboxGroup = forwardRef<ComponentRef<typeof BaseCombobox.Group>, ComboboxGroupProps>(
+  function ComboboxGroup(props, forwardedRef) {
+    const styles = stylex.props(comboboxStyles.group);
+    return <BaseCombobox.Group {...props} ref={forwardedRef} {...styles} />;
+  },
+);
 
-function ComboboxGroupLabel(props: ComboboxGroupLabelProps) {
+const ComboboxGroupLabel = forwardRef<
+  ComponentRef<typeof BaseCombobox.GroupLabel>,
+  ComboboxGroupLabelProps
+>(function ComboboxGroupLabel(props, forwardedRef) {
   const styles = stylex.props(comboboxStyles.groupLabel);
-  return <BaseCombobox.GroupLabel {...props} {...styles} />;
-}
+  return <BaseCombobox.GroupLabel {...props} ref={forwardedRef} {...styles} />;
+});
 
-function ComboboxItem<Value>({
-  value,
-  indicator = "check",
-  children,
-  ...props
-}: ComboboxItemProps<Value>) {
+function ComboboxItemInner<Value>(
+  { value, indicator = "check", children, ...props }: ComboboxItemProps<Value>,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const stateStyles = createStateStyleProps<BaseCombobox.Item.State>((state) => [
     comboboxStyles.item,
     comboboxStyles.itemInteractive,
@@ -557,19 +608,21 @@ function ComboboxItem<Value>({
     state.disabled === true && comboboxStyles.itemDisabled,
   ]);
   return (
-    <BaseCombobox.Item {...props} value={value} {...stateStyles}>
+    <BaseCombobox.Item {...props} ref={forwardedRef} value={value} {...stateStyles}>
       {children}
       {indicator === "check" ? <ComboboxItemIndicator /> : null}
     </BaseCombobox.Item>
   );
 }
 
+const ComboboxItem = forwardRef(ComboboxItemInner) as <Value>(
+  props: ComboboxItemProps<Value>,
+) => ReactElement | null;
+
 function ComboboxItemText({ label, description }: ComboboxItemTextProps) {
   const textStyles = stylex.props(comboboxStyles.itemText);
   const labelStyles = stylex.props(comboboxStyles.itemLabel);
-  const descriptionStyles = stylex.props(
-    comboboxStyles.itemDescription,
-  );
+  const descriptionStyles = stylex.props(comboboxStyles.itemDescription);
   return (
     <span {...textStyles}>
       <span {...labelStyles}>{label}</span>
@@ -578,13 +631,21 @@ function ComboboxItemText({ label, description }: ComboboxItemTextProps) {
   );
 }
 
-function ComboboxItemIndicator({ keepMounted = false, ...props }: ComboboxItemIndicatorProps) {
+const ComboboxItemIndicator = forwardRef<
+  ComponentRef<typeof BaseCombobox.ItemIndicator>,
+  ComboboxItemIndicatorProps
+>(function ComboboxItemIndicator({ keepMounted = false, ...props }, forwardedRef) {
   const stateStyles = createStateStyleProps<BaseCombobox.ItemIndicator.State>(() => [
     comboboxStyles.indicator,
   ]);
   const iconStyles = stylex.props(comboboxStyles.icon);
   return (
-    <BaseCombobox.ItemIndicator {...props} keepMounted={keepMounted} {...stateStyles}>
+    <BaseCombobox.ItemIndicator
+      {...props}
+      ref={forwardedRef}
+      keepMounted={keepMounted}
+      {...stateStyles}
+    >
       <svg
         aria-hidden="true"
         viewBox="0 0 16 16"
@@ -597,7 +658,7 @@ function ComboboxItemIndicator({ keepMounted = false, ...props }: ComboboxItemIn
       </svg>
     </BaseCombobox.ItemIndicator>
   );
-}
+});
 
 export const Combobox = Object.assign(ComboboxRoot, {
   Root: ComboboxRoot,

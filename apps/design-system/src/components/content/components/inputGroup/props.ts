@@ -6,6 +6,7 @@ export const inputGroupActionPropNames = [
   "controls",
   "pressed",
   "disabled",
+  "render",
   "onClick",
   "children",
 ] as const;

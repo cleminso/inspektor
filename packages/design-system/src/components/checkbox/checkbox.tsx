@@ -1,6 +1,6 @@
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import * as stylex from "@stylexjs/stylex";
-import type { ComponentPropsWithoutRef } from "react";
+import { forwardRef, type ComponentPropsWithRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { checkboxStyles } from "./checkbox.styles";
@@ -46,20 +46,23 @@ export interface CheckboxProps
 }
 
 export interface CheckboxLabelProps
-  extends Omit<ComponentPropsWithoutRef<"label">, "className" | "style"> {
+  extends Omit<ComponentPropsWithRef<"label">, "className" | "style"> {
   /** Controls whether the label sizes to its content or fills a selectable row. */
   layout?: CheckboxLabelLayout;
 }
 
-function CheckboxRoot({
-  size = "m",
-  disabled = false,
-  readOnly = false,
-  required = false,
-  indeterminate = false,
-  nativeButton = false,
-  ...props
-}: CheckboxProps) {
+const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoot(
+  {
+    size = "m",
+    disabled = false,
+    readOnly = false,
+    required = false,
+    indeterminate = false,
+    nativeButton = false,
+    ...props
+  },
+  forwardedRef,
+) {
   const stateStyleProps = createStateStyleProps<BaseCheckbox.Root.State>((state) => [
     checkboxStyles.root,
     sizeStyles[size],
@@ -83,6 +86,7 @@ function CheckboxRoot({
   return (
     <BaseCheckbox.Root
       {...props}
+      ref={forwardedRef}
       disabled={disabled}
       readOnly={readOnly}
       required={required}
@@ -96,26 +100,32 @@ function CheckboxRoot({
         className={indicatorStylexProps.className}
         style={indicatorStylexProps.style}
         data-slot="checkbox-indicator"
-      >
-        <svg
-          aria-hidden="true"
-          className={iconStylexProps.className}
-          style={iconStylexProps.style}
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-        >
-          <path d={indeterminate === true ? "M4 8h8" : "m3 8 3 3 7-7"} />
-        </svg>
-      </BaseCheckbox.Indicator>
+        render={(indicatorProps, state) => (
+          <span {...indicatorProps}>
+            <svg
+              aria-hidden="true"
+              className={iconStylexProps.className}
+              style={iconStylexProps.style}
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            >
+              <path d={state.indeterminate === true ? "M4 8h8" : "m3 8 3 3 7-7"} />
+            </svg>
+          </span>
+        )}
+      />
     </BaseCheckbox.Root>
   );
-}
+});
 
-function CheckboxLabel({ layout = "content", ...props }: CheckboxLabelProps) {
+const CheckboxLabel = forwardRef<HTMLLabelElement, CheckboxLabelProps>(function CheckboxLabel(
+  { layout = "content", ...props },
+  forwardedRef,
+) {
   const labelStylexProps = stylex.props(
     checkboxStyles.label,
     layout === "row" && checkboxStyles.labelRow,
@@ -124,13 +134,14 @@ function CheckboxLabel({ layout = "content", ...props }: CheckboxLabelProps) {
   return (
     <label
       {...props}
+      ref={forwardedRef}
       className={labelStylexProps.className}
       style={labelStylexProps.style}
       data-slot="checkbox-label"
       data-layout={layout}
     />
   );
-}
+});
 
 export const Checkbox = Object.assign(CheckboxRoot, {
   Root: CheckboxRoot,

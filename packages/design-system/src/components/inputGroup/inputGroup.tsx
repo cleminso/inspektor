@@ -1,7 +1,7 @@
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Field as BaseField } from "@base-ui/react/field";
 import * as stylex from "@stylexjs/stylex";
-import { useContext, useState, type MouseEventHandler, type ReactNode } from "react";
+import { forwardRef, useContext, useState, type ComponentRef, type ReactNode } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { Checkbox } from "../checkbox/checkbox";
@@ -12,8 +12,7 @@ import { Tooltip } from "../tooltip/tooltip";
 import { InputGroupContext } from "./inputGroupContext";
 import { inputGroupStyles } from "./inputGroup.styles";
 
-export interface InputGroupRootProps
-  extends Pick<React.ComponentPropsWithoutRef<"div">, "children"> {
+export interface InputGroupRootProps extends Pick<React.ComponentPropsWithoutRef<"div">, "children"> {
   /** Controls the height of the compound input. */
   size?: InputSize;
   /** Stretches the group to the width of its container. */
@@ -24,19 +23,28 @@ export interface InputGroupRootProps
   disabled?: boolean;
 }
 
-export interface InputGroupPrefixProps
-  extends Pick<React.ComponentPropsWithoutRef<"span">, "children"> {
+export interface InputGroupPrefixProps extends Pick<React.ComponentPropsWithoutRef<"span">, "children"> {
   /** Static content displayed before the editable value. */
   children: ReactNode;
 }
 
-export interface InputGroupSuffixProps
-  extends Pick<React.ComponentPropsWithoutRef<"span">, "children"> {
+export interface InputGroupSuffixProps extends Pick<React.ComponentPropsWithoutRef<"span">, "children"> {
   /** Static content displayed after the editable value. */
   children: ReactNode;
 }
 
-export interface InputGroupActionProps {
+export interface InputGroupActionProps extends Omit<
+  BaseButton.Props,
+  | "aria-controls"
+  | "aria-label"
+  | "aria-pressed"
+  | "children"
+  | "className"
+  | "disabled"
+  | "nativeButton"
+  | "style"
+  | "type"
+> {
   /** Accessible name for the action. */
   label: string;
   /** Identifies the input controlled by the action. */
@@ -44,9 +52,9 @@ export interface InputGroupActionProps {
   /** Exposes toggle state for actions such as password visibility. */
   pressed?: boolean;
   /** Disables the action. */
-  disabled?: boolean;
-  /** Runs when the action is activated. */
-  onClick?: MouseEventHandler<HTMLButtonElement>;
+  disabled?: BaseButton.Props["disabled"];
+  /** Composes action behavior and styles onto another native button. */
+  render?: BaseButton.Props["render"];
   /** Decorative action content. */
   children: ReactNode;
 }
@@ -102,7 +110,7 @@ function InputGroupRoot({
   );
 
   return (
-    <InputGroupContext.Provider value={{ disabled: effectiveDisabled, size }}>
+    <InputGroupContext.Provider value={{ disabled: effectiveDisabled, invalid, size }}>
       <div
         {...rootStyleProps}
         data-slot="input-group"
@@ -142,14 +150,10 @@ function InputGroupSuffix({ children }: InputGroupSuffixProps) {
   );
 }
 
-function InputGroupAction({
-  label,
-  controls,
-  pressed,
-  disabled = false,
-  onClick,
-  children,
-}: InputGroupActionProps) {
+const InputGroupAction = forwardRef<ComponentRef<typeof BaseButton>, InputGroupActionProps>(function InputGroupAction(
+  { label, controls, pressed, disabled = false, render, children, ...props },
+  ref,
+) {
   const context = useContext(InputGroupContext);
   const effectiveDisabled = disabled === true || context?.disabled === true;
   const size = context?.size ?? "m";
@@ -162,12 +166,15 @@ function InputGroupAction({
 
   return (
     <BaseButton
+      {...props}
+      ref={ref}
       type="button"
+      nativeButton
       aria-label={label}
       aria-controls={controls}
       aria-pressed={pressed}
       disabled={effectiveDisabled}
-      onClick={onClick}
+      render={render ?? <button type="button" />}
       {...stateStyleProps}
       data-slot="input-group-action"
       data-pressed={pressed === true ? "" : undefined}
@@ -175,7 +182,7 @@ function InputGroupAction({
       {children}
     </BaseButton>
   );
-}
+});
 
 function InputGroupCheckbox({
   label,
@@ -198,12 +205,7 @@ function InputGroupCheckbox({
     <BaseField.Root
       disabled={effectiveDisabled}
       render={
-        <label
-          {...fieldStyleProps}
-          aria-description={tooltip}
-          aria-label={label}
-          data-slot="input-group-checkbox"
-        />
+        <label {...fieldStyleProps} aria-description={tooltip} aria-label={label} data-slot="input-group-checkbox" />
       }
     >
       <Checkbox

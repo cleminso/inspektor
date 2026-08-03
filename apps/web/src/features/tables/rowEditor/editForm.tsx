@@ -81,7 +81,7 @@ function RowJsonRepresentation({
           size="s"
         />
       </Box>
-      <Box unsafeClassName="app-scrollbar" minHeight={0} flex={1} overflow="auto">
+      <Box scrollbar="thin" minHeight={0} flex={1} overflow="auto">
         <JsonView
           accessibilityLabel="Row JSON"
           data={value}
@@ -144,7 +144,7 @@ function LoadedEditRowForm({
         >
           <Box
             data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
-            unsafeClassName={rowEditor.expandedColumnName === null ? "app-scrollbar" : undefined}
+            scrollbar={rowEditor.expandedColumnName === null ? "thin" : undefined}
             flexDirection="column"
             flexGrow={1}
             gap="xl"

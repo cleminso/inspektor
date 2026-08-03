@@ -50,6 +50,11 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "box",
+    exportName: "Box",
+    inheritedProps: [],
+  },
+  {
     componentId: "resizablePanelGroup",
     exportName: "ResizablePanelGroup",
     inheritedProps: [],
@@ -101,13 +106,14 @@ const componentEntries = [
     componentId: `actionList.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "ActionList",
     part,
-    inheritedProps: [],
+    inheritedProps:
+      part === "Root" ? ["children", "aria-label", "aria-labelledby"] : [],
   })),
   ...["Root", "Header", "Body", "Footer"].map((part) => ({
     componentId: `sidePanel.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "SidePanel",
     part,
-    inheritedProps: [],
+    inheritedProps: ["children"],
   })),
   ...[
     "Root",
@@ -205,7 +211,7 @@ const componentEntries = [
     componentId: `inputGroup.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "InputGroup",
     part,
-    inheritedProps: [],
+    inheritedProps: part === "Action" ? ["onClick"] : [],
   })),
   {
     componentId: "keyboardInput",
@@ -419,14 +425,30 @@ function getDeprecation(symbol, typeChecker) {
 }
 
 function formatType(type, location) {
-  const normalizedType = type.getNonNullableType();
+  const unionTypes = type.getUnionTypes();
+  const definedUnionTypes = unionTypes.filter((unionType) => unionType.isUndefined() === false);
+  if (definedUnionTypes.length > 0 && definedUnionTypes.length !== unionTypes.length) {
+    return definedUnionTypes.map((unionType) => formatType(unionType, location)).join(" | ");
+  }
+
+  const normalizedType = type;
+  if (normalizedType.isTypeParameter()) {
+    const constraint = normalizedType.getConstraint();
+    if (constraint !== undefined) {
+      return formatType(constraint, location);
+    }
+  }
   const aliasDeclaration = normalizedType
     .getAliasSymbol()
     ?.getDeclarations()
     .find(Node.isTypeAliasDeclaration);
   const aliasTypeNode = aliasDeclaration?.getTypeNode();
 
-  if (aliasTypeNode !== undefined && Node.isUnionTypeNode(aliasTypeNode)) {
+  if (
+    aliasTypeNode !== undefined &&
+    Node.isUnionTypeNode(aliasTypeNode) &&
+    aliasDeclaration?.getTypeParameters().length === 0
+  ) {
     return aliasTypeNode
       .getTypeNodes()
       .map((typeNode) => {
@@ -442,10 +464,15 @@ function formatType(type, location) {
       .join(" | ");
   }
 
-  const unionTypes = normalizedType.getUnionTypes();
+  const normalizedUnionTypes = normalizedType.getUnionTypes();
 
-  if (unionTypes.length > 0 && unionTypes.every((unionType) => unionType.isStringLiteral())) {
-    return unionTypes.map((unionType) => JSON.stringify(unionType.getLiteralValue())).join(" | ");
+  if (
+    normalizedUnionTypes.length > 0 &&
+    normalizedUnionTypes.every((unionType) => unionType.isStringLiteral())
+  ) {
+    return normalizedUnionTypes
+      .map((unionType) => JSON.stringify(unionType.getLiteralValue()))
+      .join(" | ");
   }
 
   return normalizedType.getText(
@@ -482,6 +509,62 @@ function getRuntimeDefaults(componentDeclaration) {
   );
 }
 
+function unwrapExpression(expression) {
+  let current = expression;
+
+  while (
+    Node.isAsExpression(current) ||
+    Node.isParenthesizedExpression(current) ||
+    Node.isSatisfiesExpression(current)
+  ) {
+    current = current.getExpression();
+  }
+
+  return current;
+}
+
+function resolveForwardRefFunction(variableDeclaration) {
+  const initializer = variableDeclaration.getInitializer();
+  if (initializer === undefined) {
+    return undefined;
+  }
+
+  const unwrappedInitializer = unwrapExpression(initializer);
+  if (Node.isCallExpression(unwrappedInitializer) === false) {
+    return undefined;
+  }
+
+  const expressionText = unwrappedInitializer.getExpression().getText();
+  if (expressionText !== "forwardRef" && expressionText.endsWith(".forwardRef") === false) {
+    return undefined;
+  }
+
+  const renderFunction = unwrappedInitializer.getArguments()[0];
+  if (renderFunction === undefined) {
+    return undefined;
+  }
+
+  if (Node.isFunctionExpression(renderFunction) || Node.isArrowFunction(renderFunction)) {
+    return renderFunction;
+  }
+
+  return Node.isIdentifier(renderFunction)
+    ? variableDeclaration.getSourceFile().getFunction(renderFunction.getText())
+    : undefined;
+}
+
+function resolveNamedComponent(sourceFile, name) {
+  const functionDeclaration = sourceFile.getFunction(name);
+  if (functionDeclaration !== undefined) {
+    return functionDeclaration;
+  }
+
+  const variableDeclaration = sourceFile.getVariableDeclaration(name);
+  return variableDeclaration === undefined
+    ? undefined
+    : resolveForwardRefFunction(variableDeclaration);
+}
+
 function resolveAssignedFunction(variableDeclaration, part) {
   const initializer = variableDeclaration.getInitializer();
   if (initializer === undefined || Node.isCallExpression(initializer) === false) {
@@ -513,7 +596,7 @@ function resolveAssignedFunction(variableDeclaration, part) {
 
   return functionName === undefined
     ? undefined
-    : variableDeclaration.getSourceFile().getFunction(functionName);
+    : resolveNamedComponent(variableDeclaration.getSourceFile(), functionName);
 }
 
 function resolveComponentDeclaration(declarations, entry) {
@@ -523,9 +606,18 @@ function resolveComponentDeclaration(declarations, entry) {
   }
 
   const variableDeclaration = declarations?.find(Node.isVariableDeclaration);
-  return variableDeclaration === undefined
-    ? undefined
-    : resolveAssignedFunction(variableDeclaration, entry.part);
+  if (variableDeclaration === undefined) {
+    return undefined;
+  }
+
+  if (entry.part === undefined) {
+    return (
+      resolveForwardRefFunction(variableDeclaration) ??
+      resolveAssignedFunction(variableDeclaration, entry.part)
+    );
+  }
+
+  return resolveAssignedFunction(variableDeclaration, entry.part);
 }
 
 function extractComponentProps(project, entry) {

@@ -48,11 +48,7 @@ describe("Menu", () => {
       <Menu.Root defaultOpen>
         <Menu.Trigger>Actions</Menu.Trigger>
         <Menu.Content>
-          <Menu.LinkItem
-            href="/settings"
-            closeOnClick={false}
-            onClick={(event) => event.preventDefault()}
-          >
+          <Menu.LinkItem href="/settings" closeOnClick={false} onClick={(event) => event.preventDefault()}>
             <Menu.Prefix>Icon</Menu.Prefix>
             Settings
             <Menu.Suffix>External</Menu.Suffix>

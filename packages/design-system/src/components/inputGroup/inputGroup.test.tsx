@@ -18,6 +18,26 @@ describe("InputGroup", () => {
     expect(screen.getByRole("textbox", { name: "Domain" }).getAttribute("data-grouped")).toBe("");
   });
 
+  it("reports the effective group size from a nested Input", () => {
+    render(
+      <InputGroup size="l">
+        <Input aria-label="Domain" size="s" />
+      </InputGroup>,
+    );
+
+    expect(screen.getByRole("textbox", { name: "Domain" }).getAttribute("data-size")).toBe("l");
+  });
+
+  it("propagates explicit invalid state to a nested Input", () => {
+    render(
+      <InputGroup invalid>
+        <Input aria-label="Domain" />
+      </InputGroup>,
+    );
+
+    expect(screen.getByRole("textbox", { name: "Domain" }).getAttribute("aria-invalid")).toBe("true");
+  });
+
   it("moves focus-visible treatment to the compound root", () => {
     render(
       <InputGroup>
@@ -79,10 +99,7 @@ describe("InputGroup", () => {
     );
 
     expect(
-      screen
-        .getByRole("checkbox", { name: "Set value to NULL" })
-        .parentElement
-        ?.getAttribute("aria-description"),
+      screen.getByRole("checkbox", { name: "Set value to NULL" }).parentElement?.getAttribute("aria-description"),
     ).toBe("Insert NULL explicitly.");
   });
 

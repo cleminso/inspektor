@@ -1,5 +1,5 @@
 import { Button as BaseButton } from '@base-ui/react/button'
-import { useContext } from 'react'
+import { forwardRef, useContext } from 'react'
 import type React from 'react'
 
 import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
@@ -68,23 +68,26 @@ export type ButtonProps = BaseButtonProps &
   ButtonSharedProps &
   (LabelButtonProps | IconOnlyButtonProps)
 
-export function Button({
-  variant = 'primary',
-  size = 'm',
-  loading = false,
-  iconOnly = false,
-  fullWidth = false,
-  justify = 'center',
-  radius = 'xs',
-  prefix,
-  suffix,
-  disabled = false,
-  render,
-  children,
-  'aria-pressed': ariaPressed,
-  type = 'button',
-  ...props
-}: ButtonProps) {
+export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
+  {
+    variant = 'primary',
+    size = 'm',
+    loading = false,
+    iconOnly = false,
+    fullWidth = false,
+    justify = 'center',
+    radius = 'xs',
+    prefix,
+    suffix,
+    disabled = false,
+    render,
+    children,
+    'aria-pressed': ariaPressed,
+    type = 'button',
+    ...props
+  },
+  forwardedRef,
+) {
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const isDisabled = disabled === true
   const isInteractionBlocked = isDisabled === true || loading === true
@@ -107,10 +110,12 @@ export function Button({
   return (
     <BaseButton
       {...props}
+      ref={forwardedRef}
       aria-pressed={ariaPressed}
       disabled={isInteractionBlocked}
       focusableWhenDisabled={loading === true}
-      render={render ?? <button type={type} />}
+      render={render}
+      type={type}
       {...stateStyleProps}
       aria-busy={loading === true ? true : undefined}
       data-full-width={fullWidth === true ? '' : undefined}
@@ -134,4 +139,4 @@ export function Button({
       </ButtonContent>
     </BaseButton>
   )
-}
+})

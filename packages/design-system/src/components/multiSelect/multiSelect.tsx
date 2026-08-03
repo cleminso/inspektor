@@ -2,13 +2,16 @@ import { Popover as BasePopover } from "@base-ui/react/popover";
 import * as stylex from "@stylexjs/stylex";
 import {
   createContext,
+  forwardRef,
   useCallback,
   useContext,
   useMemo,
   useRef,
   useState,
+  type ComponentRef,
   type KeyboardEvent,
   type PropsWithChildren,
+  type RefCallback,
   type RefObject,
 } from "react";
 
@@ -48,13 +51,13 @@ export type MultiSelectRootProps = PropsWithChildren<{
 }>;
 
 export type MultiSelectTriggerProps = PropsWithChildren<
-  Omit<BasePopover.Trigger.Props, "children" | "className" | "style"> & {
-  /** Stable accessible name for the trigger. */
-  label: string;
-  /** Composes trigger behavior onto another native button. */
-  render?: BasePopover.Trigger.Props["render"];
-  /** Disables the trigger. */
-  disabled?: boolean;
+  Omit<BasePopover.Trigger.Props, "aria-label" | "children" | "className" | "style"> & {
+    /** Stable accessible name for the trigger. */
+    label: string;
+    /** Composes trigger behavior onto another native button. */
+    render?: BasePopover.Trigger.Props["render"];
+    /** Disables the trigger. */
+    disabled?: boolean;
   }
 >;
 
@@ -91,7 +94,7 @@ interface MultiSelectContextValue {
   items: readonly MultiSelectItem[];
   query: string;
   searchRef: RefObject<HTMLInputElement | null>;
-  triggerRef: RefObject<HTMLButtonElement | null>;
+  triggerRef: RefObject<ComponentRef<typeof BasePopover.Trigger> | null>;
   selectedValues: readonly string[];
   setQuery: (query: string) => void;
   setSelectedValues: (values: string[]) => void;
@@ -123,7 +126,7 @@ function MultiSelectRoot({
   const [query, setQuery] = useState("");
   const controlsRef = useRef(new Map<string, ItemControls>());
   const searchRef = useRef<HTMLInputElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<ComponentRef<typeof BasePopover.Trigger>>(null);
   const selectedValues = value ?? uncontrolledValue;
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const filteredItems = useMemo(
@@ -176,26 +179,53 @@ function MultiSelectRoot({
   );
 }
 
-function MultiSelectTrigger({
-  label,
-  children,
-  render,
-  disabled = false,
-  ...props
-}: MultiSelectTriggerProps): React.ReactElement {
+const MultiSelectTrigger = forwardRef<
+  ComponentRef<typeof BasePopover.Trigger>,
+  MultiSelectTriggerProps
+>(function MultiSelectTrigger(
+  { label, children, render, disabled = false, ...props },
+  forwardedRef,
+): React.ReactElement {
   const context = useMultiSelectContext();
+  const triggerRef = useCallback(
+    (element: ComponentRef<typeof BasePopover.Trigger> | null) => {
+      context.triggerRef.current = element;
+      const cleanup =
+        typeof forwardedRef === "function"
+          ? (forwardedRef as RefCallback<ComponentRef<typeof BasePopover.Trigger>>)(element)
+          : (() => {
+              if (forwardedRef !== null) {
+                forwardedRef.current = element;
+              }
+              return undefined;
+            })();
+
+      return () => {
+        context.triggerRef.current = null;
+        if (typeof cleanup === "function") {
+          cleanup();
+        } else if (typeof forwardedRef === "function") {
+          forwardedRef(null);
+        } else if (forwardedRef !== null) {
+          forwardedRef.current = null;
+        }
+      };
+    },
+    [context.triggerRef, forwardedRef],
+  );
+
   return (
     <BasePopover.Trigger
       {...props}
       aria-label={label}
       disabled={disabled === true || context.disabled === true}
-      ref={context.triggerRef}
+      ref={triggerRef as BasePopover.Trigger.Props["ref"]}
       render={render ?? <Button type="button" variant="secondary" size="m" />}
     >
       {children}
     </BasePopover.Trigger>
   );
-}
+});
 
 const popupWidthStyles = {
   s: multiSelectStyles.popupWidthS,
@@ -403,7 +433,7 @@ function MultiSelectOption({
           if (event.key === "ArrowRight" && disabled === false) {
             event.preventDefault();
             context.controls.get(item.value)?.action?.focus();
-          } else if (event.key === "Enter") {
+          } else if (event.key === "Enter" && disabled === false) {
             event.preventDefault();
             setItemChecked(checked === false);
           }

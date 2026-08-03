@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[03/08/26]
+
+- [x] Preserve Base UI's `nativeButton` contract when a primary trigger renders a navigation link.
+
 [29/07/26]
 
 - [x] Keep selection controls, primary triggers, and trailing actions as separate interactive elements.
@@ -34,6 +38,10 @@
 - Table-specific navigation, pinning, opening, and deletion behavior.
 
 ## Settled interaction decisions
+
+[03/08/26]
+
+- [x] Composed link triggers use `nativeButton={false}` so Base UI preserves link semantics.
 
 [29/07/26]
 

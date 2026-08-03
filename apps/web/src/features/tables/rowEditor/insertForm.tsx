@@ -65,7 +65,7 @@ function InsertRowFormFields({
     >
       <Box
         data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
-        unsafeClassName={rowEditor.expandedColumnName === null ? "app-scrollbar" : undefined}
+        scrollbar={rowEditor.expandedColumnName === null ? "thin" : undefined}
         flexDirection="column"
         flexGrow={1}
         gap="xl"

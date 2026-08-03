@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useState } from "react";
+import { createRef, useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { MultiSelect, type MultiSelectItem } from "./multiSelect";
@@ -36,9 +36,7 @@ describe("MultiSelect", () => {
     fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
 
     expect(document.activeElement).toBe(screen.getByRole("searchbox", { name: "Search options" }));
-    expect(
-      screen.getByRole("checkbox", { name: "Select Design System" }).getAttribute("aria-disabled"),
-    ).toBe("true");
+    expect(screen.getByRole("checkbox", { name: "Select Design System" }).getAttribute("aria-disabled")).toBe("true");
     expect(screen.getByRole("checkbox", { name: "Select Components" })).toBeTruthy();
   });
 
@@ -50,9 +48,7 @@ describe("MultiSelect", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Select Design Tokens" }));
 
     expect(screen.getByRole("dialog", { name: "Options" })).toBeTruthy();
-    expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe(
-      "design,tokens",
-    );
+    expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe("design,tokens");
   });
 
   it("offers Check all and Only actions based on selection state", () => {
@@ -60,14 +56,10 @@ describe("MultiSelect", () => {
     fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Check all from Components" }));
-    expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe(
-      "design,components,tokens",
-    );
+    expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe("design,components,tokens");
 
     fireEvent.click(screen.getByRole("button", { name: "Only Design Tokens" }));
-    expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe(
-      "design,tokens",
-    );
+    expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe("design,tokens");
   });
 
   it("navigates rows and their actions with arrow keys", () => {
@@ -80,19 +72,13 @@ describe("MultiSelect", () => {
     expect(document.activeElement).toBe(components);
 
     fireEvent.keyDown(components, { key: "ArrowRight" });
-    expect(document.activeElement).toBe(
-      screen.getByRole("button", { name: "Check all from Components" }),
-    );
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Check all from Components" }));
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowDown" });
-    expect(document.activeElement).toBe(
-      screen.getByRole("button", { name: "Only Design Tokens" }),
-    );
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Only Design Tokens" }));
 
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: "ArrowLeft" });
-    expect(document.activeElement).toBe(
-      screen.getByRole("checkbox", { name: "Select Design Tokens" }),
-    );
+    expect(document.activeElement).toBe(screen.getByRole("checkbox", { name: "Select Design Tokens" }));
   });
 
   it("toggles a focused checkbox with Enter", () => {
@@ -104,6 +90,40 @@ describe("MultiSelect", () => {
     fireEvent.keyDown(checkbox, { key: "Enter" });
 
     expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe("design");
+  });
+
+  it("does not change a disabled option when Enter is dispatched", () => {
+    render(<TestMultiSelect />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
+
+    fireEvent.keyDown(screen.getByRole("checkbox", { name: "Select Design System" }), {
+      key: "Enter",
+    });
+
+    expect(screen.getByRole("status", { name: "Selected values" }).textContent).toBe("design,components");
+  });
+
+  it("preserves the consumer Trigger ref while retaining internal focus behavior", async () => {
+    const ref = createRef<HTMLButtonElement>();
+
+    render(
+      <MultiSelect.Root items={items}>
+        <MultiSelect.Trigger ref={ref} label="Choose options">
+          Options
+        </MultiSelect.Trigger>
+        <MultiSelect.Content label="Options" searchLabel="Search options" emptyLabel="options" />
+      </MultiSelect.Root>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Choose options" });
+    expect(ref.current).toBe(trigger);
+
+    fireEvent.click(trigger);
+    fireEvent.keyDown(screen.getByRole("searchbox", { name: "Search options" }), {
+      key: "Escape",
+    });
+
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
   it("filters options and names the empty query", () => {

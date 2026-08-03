@@ -1,6 +1,6 @@
 import { Toggle as BaseToggle } from '@base-ui/react/toggle'
 import { ToggleGroup as BaseToggleGroup } from '@base-ui/react/toggle-group'
-import { useContext } from 'react'
+import React, { useContext, type ReactElement, type RefAttributes } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { toggleGroupStyles } from './toggleGroup.styles'
@@ -13,8 +13,10 @@ export type ToggleGroupWidth = 'content' | 'full'
 export type ToggleGroupItemWidth = 'content' | 'equal'
 export type ToggleGroupSize = 's' | 'm'
 
-export interface ToggleGroupRootProps<Value extends string = string>
-  extends WithoutStyles<BaseToggleGroup.Props<Value>> {
+export interface ToggleGroupRootProps<Value extends string = string> extends Omit<
+  WithoutStyles<BaseToggleGroup.Props<Value>>,
+  'ref' | 'render'
+> {
   /** The values of the pressed items when controlled. */
   value?: readonly Value[]
   /** The initial values of the pressed items when uncontrolled. */
@@ -35,12 +37,12 @@ export interface ToggleGroupRootProps<Value extends string = string>
   itemWidth?: ToggleGroupItemWidth
   /** Controls the group height; items inherit the selected size. */
   size?: ToggleGroupSize
-  /** Composes ToggleGroup behavior and styles onto another element. */
-  render?: BaseToggleGroup.Props<Value>['render']
 }
 
-export interface ToggleGroupItemProps
-  extends Omit<WithoutStyles<BaseToggle.Props>, 'defaultPressed' | 'pressed' | 'value'> {
+export interface ToggleGroupItemProps extends Omit<
+  WithoutStyles<BaseToggle.Props>,
+  'defaultPressed' | 'pressed' | 'ref' | 'value'
+> {
   /** Uniquely identifies the item within its group. */
   value: string
   /** Called before the group commits the next pressed state. */
@@ -53,25 +55,26 @@ export interface ToggleGroupItemProps
   render?: BaseToggle.Props['render']
 }
 
-function ToggleGroupRoot<Value extends string>({
-  loopFocus = true,
-  multiple = false,
-  disabled = false,
-  orientation = 'horizontal',
-  width = 'content',
-  itemWidth = 'content',
-  size = 'm',
-  ...props
-}: ToggleGroupRootProps<Value>) {
+function ToggleGroupRootInner<Value extends string>(
+  {
+    loopFocus = true,
+    multiple = false,
+    disabled = false,
+    orientation = 'horizontal',
+    width = 'content',
+    itemWidth = 'content',
+    size = 'm',
+    ...props
+  }: ToggleGroupRootProps<Value>,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
   const sizeStyles = {
     s: toggleGroupStyles.rootSizeS,
     m: toggleGroupStyles.rootSizeM,
   } satisfies Record<ToggleGroupSize, unknown>
   const stateStyles = createStateStyleProps<BaseToggleGroup.State>((state) => [
     toggleGroupStyles.root,
-    state.orientation === 'horizontal'
-      ? toggleGroupStyles.horizontal
-      : toggleGroupStyles.vertical,
+    state.orientation === 'horizontal' ? toggleGroupStyles.horizontal : toggleGroupStyles.vertical,
     state.disabled === true && toggleGroupStyles.rootDisabled,
     width === 'full' && toggleGroupStyles.rootFullWidth,
     state.orientation === 'horizontal' && sizeStyles[size],
@@ -81,6 +84,7 @@ function ToggleGroupRoot<Value extends string>({
     <ToggleGroupContext.Provider value={{ equalWidth: itemWidth === 'equal', size }}>
       <BaseToggleGroup
         {...props}
+        ref={ref}
         loopFocus={loopFocus}
         multiple={multiple}
         disabled={disabled}
@@ -93,36 +97,39 @@ function ToggleGroupRoot<Value extends string>({
   )
 }
 
-function ToggleGroupItem({
-  nativeButton = true,
-  disabled = false,
-  ...props
-}: ToggleGroupItemProps) {
-  const { equalWidth, size } = useContext(ToggleGroupContext)
-  const sizeStyles = {
-    s: toggleGroupStyles.itemSizeS,
-    m: toggleGroupStyles.itemSizeM,
-  } satisfies Record<ToggleGroupSize, unknown>
-  const stateStyles = createStateStyleProps<BaseToggle.State>((state) => [
-    toggleGroupStyles.item,
-    sizeStyles[size],
-    equalWidth === true && toggleGroupStyles.itemEqualWidth,
-    state.pressed === true && toggleGroupStyles.itemPressed,
-    state.disabled === true && toggleGroupStyles.itemDisabled,
-    state.pressed === true && state.disabled === true && toggleGroupStyles.itemPressedDisabled,
-  ])
+const ToggleGroupRoot = React.forwardRef(ToggleGroupRootInner) as <Value extends string = string>(
+  props: ToggleGroupRootProps<Value> & RefAttributes<HTMLDivElement>,
+) => ReactElement
 
-  return (
-    <BaseToggle
-      {...props}
-      nativeButton={nativeButton}
-      disabled={disabled}
-      {...stateStyles}
-      data-size={size}
-      data-slot="toggle-group-item"
-    />
-  )
-}
+const ToggleGroupItem = React.forwardRef<React.ComponentRef<typeof BaseToggle>, ToggleGroupItemProps>(
+  function ToggleGroupItem({ nativeButton = true, disabled = false, ...props }, ref) {
+    const { equalWidth, size } = useContext(ToggleGroupContext)
+    const sizeStyles = {
+      s: toggleGroupStyles.itemSizeS,
+      m: toggleGroupStyles.itemSizeM,
+    } satisfies Record<ToggleGroupSize, unknown>
+    const stateStyles = createStateStyleProps<BaseToggle.State>((state) => [
+      toggleGroupStyles.item,
+      sizeStyles[size],
+      equalWidth === true && toggleGroupStyles.itemEqualWidth,
+      state.pressed === true && toggleGroupStyles.itemPressed,
+      state.disabled === true && toggleGroupStyles.itemDisabled,
+      state.pressed === true && state.disabled === true && toggleGroupStyles.itemPressedDisabled,
+    ])
+
+    return (
+      <BaseToggle
+        {...props}
+        ref={ref}
+        nativeButton={nativeButton}
+        disabled={disabled}
+        {...stateStyles}
+        data-size={size}
+        data-slot="toggle-group-item"
+      />
+    )
+  },
+)
 
 export const ToggleGroup = Object.assign(ToggleGroupRoot, {
   Root: ToggleGroupRoot,
