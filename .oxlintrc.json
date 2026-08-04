@@ -1,0 +1,124 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "import",
+    "jsx-a11y",
+    "oxc",
+    "react",
+    "react-perf",
+    "typescript",
+    "unicorn"
+  ],
+  "jsPlugins": [
+    {
+      "name": "@stylexjs",
+      "specifier": "@stylexjs/eslint-plugin"
+    }
+  ],
+  "categories": {
+    "correctness": "error"
+  },
+  "settings": {
+    "jsx-a11y": {
+      "polymorphicPropName": "as",
+      "attributes": {
+        "href": ["href", "to"]
+      },
+      "components": {
+        "Input": "input",
+        "Textarea": "textarea"
+      }
+    }
+  },
+  "rules": {
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/prefer-tag-over-role": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "packages/design-system/**/*.ts",
+        "packages/design-system/**/*.tsx"
+      ],
+      "rules": {
+        "@stylexjs/valid-styles": [
+          "error",
+          {
+            "validImports": ["@stylexjs/stylex"]
+          }
+        ],
+        "@stylexjs/valid-shorthands": [
+          "error",
+          {
+            "validImports": ["@stylexjs/stylex"],
+            "preferInline": true
+          }
+        ],
+        "@stylexjs/no-unused": [
+          "error",
+          {
+            "validImports": ["@stylexjs/stylex"]
+          }
+        ],
+        "@stylexjs/no-legacy-contextual-styles": [
+          "error",
+          {
+            "validImports": ["@stylexjs/stylex"]
+          }
+        ],
+        "@stylexjs/enforce-extension": [
+          "warn",
+          {
+            "validImports": ["@stylexjs/stylex"],
+            "themeFileExtension": ".stylex.ts"
+          }
+        ],
+        "@stylexjs/sort-keys": [
+          "warn",
+          {
+            "validImports": ["@stylexjs/stylex"],
+            "minKeys": 3,
+            "allowLineSeparatedGroups": true
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        "jsx-a11y/anchor-has-content": "off",
+        "jsx-a11y/anchor-is-valid": "off",
+        "jsx-a11y/control-has-associated-label": "off",
+        "jsx-a11y/label-has-associated-control": "off"
+      }
+    },
+    {
+      "files": [
+        "**/components/checkbox/checkbox.tsx",
+        "**/components/inputGroup/inputGroup.tsx"
+      ],
+      "rules": {
+        "jsx-a11y/label-has-associated-control": "off"
+      }
+    },
+    {
+      "files": ["**/components/actionList/actionList.tsx"],
+      "rules": {
+        "jsx-a11y/no-noninteractive-element-interactions": "off"
+      }
+    },
+    {
+      "files": ["**/components/jsonView/jsonView.tsx"],
+      "rules": {
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/no-static-element-interactions": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "apps/my-jazz-app/**",
+    "packages/jazz-dev-tools/**"
+  ]
+}

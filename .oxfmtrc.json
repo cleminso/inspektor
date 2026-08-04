@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": false,
+  "singleQuote": true,
+  "singleAttributePerLine": true,
+  "ignorePatterns": ["apps/my-jazz-app/**", "packages/jazz-dev-tools/**"],
+  "overrides": [
+    {
+      "files": ["**/*.test.tsx"],
+      "options": {
+        "singleAttributePerLine": false
+      }
+    }
+  ]
+}
