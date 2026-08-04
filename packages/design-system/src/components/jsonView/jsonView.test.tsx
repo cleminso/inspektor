@@ -396,12 +396,13 @@ describe("JsonView", () => {
     expectFocused(secondProfile);
   });
 
-  it("highlights literal search terms in keys and primitive display values", () => {
+  it("reports and highlights ordered literal occurrences", async () => {
+    const onResultsChange = vi.fn();
     const { container } = render(
       <JsonView
         accessibilityLabel="Search results"
         data={{ "profile.name": "Ada.Lovelace", untouched: "No match" }}
-        searchTerms={["."]}
+        search={{ query: ".", activeMatchIndex: 1, onResultsChange }}
       />,
     );
 
@@ -409,9 +410,117 @@ describe("JsonView", () => {
 
     expect(marks).toHaveLength(2);
     expect(marks.map((mark) => mark.textContent)).toEqual([".", "."]);
+    expect(marks[0]?.hasAttribute("data-active")).toBe(false);
+    expect(marks[1]?.hasAttribute("data-active")).toBe(true);
     expect(getTreeItem(/profile\.name/i).textContent).toContain('"profile.name"');
     expect(getTreeItem(/profile\.name/i).textContent).toContain('"Ada.Lovelace"');
     expect(getTreeItem(/untouched/i).querySelector("mark")).toBeNull();
+    await waitFor(() => {
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2 });
+    });
+  });
+
+  it("supports case-sensitive, whole-word, and regular-expression searches", async () => {
+    const onResultsChange = vi.fn();
+    const { container, rerender } = render(
+      <JsonView
+        accessibilityLabel="Search options"
+        data={{ message: "User username user_01 user_02" }}
+        search={{
+          query: "User",
+          activeMatchIndex: 0,
+          caseSensitive: true,
+          wholeWord: false,
+          regularExpression: false,
+          onResultsChange,
+        }}
+      />,
+    );
+
+    expect(Array.from(container.querySelectorAll("mark"), (mark) => mark.textContent)).toEqual([
+      "User",
+    ]);
+    await waitFor(() => {
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 0, count: 1 });
+    });
+
+    rerender(
+      <JsonView
+        accessibilityLabel="Search options"
+        data={{ message: "User username user_01 user_02" }}
+        search={{
+          query: "user",
+          activeMatchIndex: 0,
+          caseSensitive: false,
+          wholeWord: true,
+          regularExpression: false,
+          onResultsChange,
+        }}
+      />,
+    );
+
+    expect(Array.from(container.querySelectorAll("mark"), (mark) => mark.textContent)).toEqual([
+      "User",
+    ]);
+
+    rerender(
+      <JsonView
+        accessibilityLabel="Search options"
+        data={{ message: "User username user-01 user-02" }}
+        search={{
+          query: "user-\\d+",
+          activeMatchIndex: 0,
+          caseSensitive: false,
+          wholeWord: false,
+          regularExpression: true,
+          onResultsChange,
+        }}
+      />,
+    );
+
+    expect(Array.from(container.querySelectorAll("mark"), (mark) => mark.textContent)).toEqual([
+      "user-01",
+      "user-02",
+    ]);
+
+    rerender(
+      <JsonView
+        accessibilityLabel="Search options"
+        data={{ message: "User username user-01 user-02" }}
+        search={{
+          query: "[",
+          activeMatchIndex: 0,
+          caseSensitive: false,
+          wholeWord: false,
+          regularExpression: true,
+          onResultsChange,
+        }}
+      />,
+    );
+
+    expect(container.querySelector("mark")).toBeNull();
+    await waitFor(() => {
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0 });
+    });
+  });
+
+  it("wraps an active occurrence index outside the result range", async () => {
+    const onResultsChange = vi.fn();
+    const { container } = render(
+      <JsonView
+        accessibilityLabel="Wrapped search results"
+        data={{ message: "match match" }}
+        search={{ query: "match", activeMatchIndex: -1, onResultsChange }}
+      />,
+    );
+
+    const marks = Array.from(container.querySelectorAll("mark"));
+    expect(marks).toHaveLength(2);
+    expect(marks[0]?.hasAttribute("data-active")).toBe(false);
+    expect(marks[1]?.hasAttribute("data-active")).toBe(true);
+    await waitFor(() => {
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2 });
+    });
   });
 
   it("opens collapsed ancestors to expose a search match without moving focus", () => {
@@ -420,7 +529,7 @@ describe("JsonView", () => {
         accessibilityLabel="Collapsed search"
         data={{ profile: { contact: { email: "needle@example.com" } } }}
         defaultExpandDepth={0}
-        searchTerms={["needle"]}
+        search={{ query: "needle", activeMatchIndex: 0, onResultsChange: () => undefined }}
       />,
     );
 
@@ -431,16 +540,19 @@ describe("JsonView", () => {
     expect(document.activeElement).toBe(document.body);
   });
 
-  it("communicates when an active search has no matches", () => {
+  it("reports when an active search has no matches", async () => {
+    const onResultsChange = vi.fn();
     render(
       <JsonView
         accessibilityLabel="No search results"
         data={{ profile: { name: "Ada" } }}
-        searchTerms={["missing"]}
+        search={{ query: "missing", activeMatchIndex: 0, onResultsChange }}
       />,
     );
 
-    expect(screen.getByRole("status").textContent).toBe("No matches");
+    await waitFor(() => {
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0 });
+    });
   });
 
   it("bounds expanded children and reveals them through keyboard-ordered continuation nodes", () => {
@@ -508,7 +620,11 @@ describe("JsonView", () => {
       ]),
     );
     render(
-      <JsonView accessibilityLabel="Budgeted search" data={data} searchTerms={["unique-target"]} />,
+      <JsonView
+        accessibilityLabel="Budgeted search"
+        data={data}
+        search={{ query: "unique-target", activeMatchIndex: 0, onResultsChange: () => undefined }}
+      />,
     );
 
     expect(screen.getByRole("status").textContent).toBe("Match outside visible limit");
@@ -537,7 +653,7 @@ describe("JsonView", () => {
         accessibilityLabel="Budget focus"
         data={data}
         defaultExpandDepth={1}
-        searchTerms={["field-599"]}
+        search={{ query: "field-599", activeMatchIndex: 0, onResultsChange: () => undefined }}
       />,
     );
 
@@ -588,11 +704,56 @@ describe("JsonView", () => {
       <JsonView
         accessibilityLabel="Long string search"
         data={{ description: longValue }}
-        searchTerms={["final-marker"]}
+        search={{ query: "final-marker", activeMatchIndex: 0, onResultsChange: () => undefined }}
       />,
     );
 
     expect(within(getTreeItem(/description/i)).getByText("final-marker", { selector: "mark" })).toBeTruthy();
+  });
+
+  it("reveals every occurrence when a long string matches before and after the display limit", () => {
+    const longValue = `needle-${"segment-".repeat(1_000)}needle`;
+    const { container, rerender } = render(
+      <JsonView
+        accessibilityLabel="Repeated long-string search"
+        data={{ description: longValue }}
+        search={{ query: "needle", activeMatchIndex: 0, onResultsChange: () => undefined }}
+      />,
+    );
+
+    expect(Array.from(container.querySelectorAll("mark"), (mark) => mark.textContent)).toEqual([
+      "needle",
+    ]);
+    expect(screen.getByRole("button", { name: "Show full string" })).toBeTruthy();
+
+    rerender(
+      <JsonView
+        accessibilityLabel="Repeated long-string search"
+        data={{ description: longValue }}
+        search={{ query: "needle", activeMatchIndex: 1, onResultsChange: () => undefined }}
+      />,
+    );
+
+    const marks = Array.from(container.querySelectorAll("mark"));
+    expect(marks.map((mark) => mark.textContent)).toEqual(["needle", "needle"]);
+    expect(marks[1]?.hasAttribute("data-active")).toBe(true);
+    expect(screen.queryByRole("button", { name: "Show full string" })).toBeNull();
+  });
+
+  it("bounds highlighted nodes while retaining an active occurrence beyond the highlight limit", () => {
+    const onResultsChange = vi.fn();
+    const { container } = render(
+      <JsonView
+        accessibilityLabel="Dense search results"
+        data={{ description: "a".repeat(600) }}
+        search={{ query: "a", activeMatchIndex: 599, onResultsChange }}
+      />,
+    );
+
+    const marks = Array.from(container.querySelectorAll("mark"));
+    expect(marks).toHaveLength(501);
+    expect(marks.at(-1)?.hasAttribute("data-active")).toBe(true);
+    expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 599, count: 600 });
   });
 
   it("keeps bounded string content out of the tree item label", () => {

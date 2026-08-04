@@ -11,4 +11,5 @@ export const boxPropNames = [
   'borderWidth',
   'overflow',
   'scrollbar',
+  'scrollbarGutter',
 ] as const

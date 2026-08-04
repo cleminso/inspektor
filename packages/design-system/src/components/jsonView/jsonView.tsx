@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -10,6 +11,7 @@ import {
 } from "react";
 
 import { CopyButton } from "../copyButton/copyButton";
+import { Text } from "../text/text";
 import { jsonViewStyles } from "./jsonView.styles";
 
 export type JsonViewPrimitive = string | number | boolean | null;
@@ -20,6 +22,28 @@ export interface JsonViewObject {
 
 export type JsonViewValue = JsonViewPrimitive | JsonViewObject | readonly JsonViewValue[];
 
+export interface JsonViewSearchResults {
+  /** Zero-based index of the active occurrence, or null when no occurrence matches. */
+  activeIndex: number | null;
+  /** Number of textual occurrences found in the complete JSON value. */
+  count: number;
+}
+
+export interface JsonViewSearch {
+  /** Query highlighted in keys and primitive values. */
+  query: string;
+  /** Matches uppercase and lowercase characters separately. */
+  caseSensitive?: boolean;
+  /** Matches the query only when it forms a complete word. */
+  wholeWord?: boolean;
+  /** Interprets the query as a regular expression. */
+  regularExpression?: boolean;
+  /** Requested zero-based occurrence index. Values outside the result range wrap. */
+  activeMatchIndex: number;
+  /** Runs when the effective active occurrence or result count changes. */
+  onResultsChange: (results: JsonViewSearchResults) => void;
+}
+
 export interface JsonViewProps {
   /** Contextual label for the JSON tree. */
   accessibilityLabel: string;
@@ -27,11 +51,12 @@ export interface JsonViewProps {
   data: JsonViewObject | readonly JsonViewValue[];
   /** Number of container levels expanded initially. */
   defaultExpandDepth?: 0 | 1 | 2;
-  /** Literal terms highlighted in keys and primitive values. */
-  searchTerms?: readonly string[];
+  /** Controls occurrence highlighting and active-match navigation. */
+  search?: JsonViewSearch;
 }
 
 const childBatchSize = 100;
+const highlightedSearchMatchLimit = 500;
 const stringDisplayLimit = 4_000;
 const visibleTreeItemLimit = 500;
 const rootPath = "$";
@@ -55,6 +80,7 @@ interface DisplayedString {
 
 interface JsonNodeProps {
   activePath: string;
+  activeSearchMatchId: string | undefined;
   expandedPaths: ReadonlySet<string>;
   focusVisiblePath: string | null;
   keyName?: string;
@@ -68,19 +94,31 @@ interface JsonNodeProps {
   position: number;
   revealedStrings: ReadonlySet<string>;
   renderPlan: ReadonlyMap<string, ContainerRenderPlan>;
-  searchTerms: readonly string[];
+  searchPattern: SearchPattern;
   setSize: number;
   value: JsonViewValue;
 }
 
 interface SearchModel {
   expandedPaths: ReadonlySet<string>;
-  firstMatchPath: string | undefined;
-  matchCount: number;
+  matches: readonly SearchMatch[];
   revealedChildCounts: ReadonlyMap<string, number>;
 }
 
-const emptySearchTerms: readonly string[] = [];
+interface SearchMatch {
+  id: string;
+  path: string;
+}
+
+interface SearchOccurrence {
+  index: number;
+  length: number;
+}
+
+interface SearchPattern {
+  expression: RegExp | null;
+  wholeWord: boolean;
+}
 
 function isContainer(value: JsonViewValue): value is JsonViewObject | readonly JsonViewValue[] {
   return value !== null && typeof value === "object";
@@ -162,51 +200,107 @@ function createInitialExpansion(
   return paths;
 }
 
-function includesSearchTerm(text: string, searchTerms: readonly string[]): boolean {
-  const normalizedText = text.toLocaleLowerCase();
-  return searchTerms.some(
-    (term) => term.length > 0 && normalizedText.includes(term.toLocaleLowerCase()),
+function escapeRegularExpression(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function createSearchPattern({
+  query,
+  caseSensitive,
+  wholeWord,
+  regularExpression,
+}: Pick<
+  JsonViewSearch,
+  "query" | "caseSensitive" | "wholeWord" | "regularExpression"
+>): SearchPattern {
+  if (query.length === 0) {
+    return { expression: null, wholeWord: wholeWord === true };
+  }
+
+  try {
+    return {
+      expression: new RegExp(
+        regularExpression === true ? query : escapeRegularExpression(query),
+        caseSensitive === true ? "gu" : "giu",
+      ),
+      wholeWord: wholeWord === true,
+    };
+  } catch {
+    return { expression: null, wholeWord: wholeWord === true };
+  }
+}
+
+const wordCharacterAtEnd = /[\p{L}\p{N}_]$/u;
+const wordCharacterAtStart = /^[\p{L}\p{N}_]/u;
+
+function isWholeWordOccurrence(text: string, occurrence: SearchOccurrence): boolean {
+  return (
+    wordCharacterAtEnd.test(text.slice(0, occurrence.index)) === false &&
+    wordCharacterAtStart.test(text.slice(occurrence.index + occurrence.length)) === false
   );
+}
+
+function getSearchOccurrences(
+  text: string,
+  searchPattern: SearchPattern,
+): readonly SearchOccurrence[] {
+  if (searchPattern.expression === null) {
+    return [];
+  }
+
+  const occurrences = Array.from(
+    text.matchAll(searchPattern.expression),
+    (match): SearchOccurrence => ({ index: match.index, length: match[0].length }),
+  ).filter((occurrence) => occurrence.length > 0);
+
+  return searchPattern.wholeWord === true
+    ? occurrences.filter((occurrence) => isWholeWordOccurrence(text, occurrence))
+    : occurrences;
+}
+
+function getSearchMatchId(path: string, target: "key" | "value", matchIndex: number): string {
+  return `${path}#search-${target}-${matchIndex}`;
 }
 
 function createSearchModel(
   data: JsonViewObject | readonly JsonViewValue[],
-  searchTerms: readonly string[],
+  searchPattern: SearchPattern,
 ): SearchModel {
-  if (searchTerms.some((term) => term.length > 0) === false) {
+  if (searchPattern.expression === null) {
     return {
       expandedPaths: new Set(),
-      firstMatchPath: undefined,
-      matchCount: 0,
+      matches: [],
       revealedChildCounts: new Map(),
     };
   }
 
   const expandedPaths = new Set<string>();
+  const matches: SearchMatch[] = [];
   const revealedChildCounts = new Map<string, number>();
-  let firstMatchPath: string | undefined;
-  let matchCount = 0;
 
   function visit(value: JsonViewValue, path: string, keyName?: string): boolean {
     const container = isContainer(value);
-    const keyMatches =
-      keyName !== undefined && includesSearchTerm(escapeJsonString(keyName), searchTerms);
-    const valueMatches =
-      container === false &&
-      includesSearchTerm(
-        typeof value === "string"
-          ? escapeJsonString(value)
-          : value === null
-            ? "null"
-            : String(value),
-        searchTerms,
-      );
-    const selfMatches = keyMatches || valueMatches;
+    const keyOccurrences =
+      keyName === undefined ? [] : getSearchOccurrences(escapeJsonString(keyName), searchPattern);
+    const valueOccurrences =
+      container === true
+        ? []
+        : getSearchOccurrences(
+            typeof value === "string"
+              ? escapeJsonString(value)
+              : value === null
+                ? "null"
+                : String(value),
+            searchPattern,
+          );
+    const selfMatches = keyOccurrences.length > 0 || valueOccurrences.length > 0;
     let descendantMatches = false;
 
-    if (selfMatches === true) {
-      matchCount += 1;
-      firstMatchPath ??= path;
+    for (const occurrence of keyOccurrences) {
+      matches.push({ id: getSearchMatchId(path, "key", occurrence.index), path });
+    }
+    for (const occurrence of valueOccurrences) {
+      matches.push({ id: getSearchMatchId(path, "value", occurrence.index), path });
     }
 
     if (container === true) {
@@ -229,8 +323,7 @@ function createSearchModel(
 
   return {
     expandedPaths,
-    firstMatchPath,
-    matchCount,
+    matches,
     revealedChildCounts,
   };
 }
@@ -292,73 +385,95 @@ function createRenderPlan(
 function getDisplayedString(
   value: string,
   revealed: boolean,
-  searchTerms: readonly string[],
+  searchPattern: SearchPattern,
+  path: string,
+  activeSearchMatchId: string | undefined,
 ): DisplayedString {
   if (revealed === true) {
     return { text: value, truncated: false };
   }
 
   const bounded = truncateString(value, stringDisplayLimit);
-  const hiddenMatch =
+  const boundedOccurrences = getSearchOccurrences(
+    escapeJsonString(bounded.text),
+    searchPattern,
+  );
+  const activeValueMatchPrefix = `${path}#search-value-`;
+  const hiddenActiveMatch =
     bounded.truncated === true &&
-    searchTerms.some((term) => term.length > 0) === true &&
-    includesSearchTerm(escapeJsonString(value), searchTerms) === true &&
-    includesSearchTerm(escapeJsonString(bounded.text), searchTerms) === false;
+    activeSearchMatchId?.startsWith(activeValueMatchPrefix) === true &&
+    boundedOccurrences.some(
+      (occurrence) =>
+        getSearchMatchId(path, "value", occurrence.index) === activeSearchMatchId,
+    ) === false;
 
-  return hiddenMatch === true ? { text: value, truncated: false } : bounded;
+  return hiddenActiveMatch === true ? { text: value, truncated: false } : bounded;
 }
 
-function HighlightedText({ searchTerms, text }: { searchTerms: readonly string[]; text: string }) {
-  const terms = searchTerms.filter((term) => term.length > 0);
-  if (terms.length === 0) {
+function HighlightedText({
+  activeSearchMatchId,
+  path,
+  searchPattern,
+  target,
+  text,
+}: {
+  activeSearchMatchId: string | undefined;
+  path: string;
+  searchPattern: SearchPattern;
+  target: "key" | "value";
+  text: string;
+}) {
+  if (searchPattern.expression === null) {
     return text;
   }
 
-  const lowerText = text.toLocaleLowerCase();
   const parts: ReactNode[] = [];
   let cursor = 0;
+  const occurrences = getSearchOccurrences(text, searchPattern).filter((occurrence, index) => {
+    const matchId = getSearchMatchId(path, target, occurrence.index);
+    return index < highlightedSearchMatchLimit || matchId === activeSearchMatchId;
+  });
 
-  while (cursor < text.length) {
-    let matchIndex = -1;
-    let matchLength = 0;
-
-    for (const term of terms) {
-      const index = lowerText.indexOf(term.toLocaleLowerCase(), cursor);
-      if (index !== -1 && (matchIndex === -1 || index < matchIndex)) {
-        matchIndex = index;
-        matchLength = term.length;
-      }
+  for (const occurrence of occurrences) {
+    if (occurrence.index > cursor) {
+      parts.push(text.slice(cursor, occurrence.index));
     }
-
-    if (matchIndex === -1) {
-      parts.push(text.slice(cursor));
-      break;
-    }
-
-    if (matchIndex > cursor) {
-      parts.push(text.slice(cursor, matchIndex));
-    }
+    const matchId = getSearchMatchId(path, target, occurrence.index);
     parts.push(
-      <mark key={`${matchIndex}-${parts.length}`} {...stylex.props(jsonViewStyles.mark)}>
-        {text.slice(matchIndex, matchIndex + matchLength)}
+      <mark
+        key={matchId}
+        data-active={activeSearchMatchId === matchId ? "" : undefined}
+        data-json-search-match={matchId}
+        {...stylex.props(
+          jsonViewStyles.mark,
+          activeSearchMatchId === matchId && jsonViewStyles.activeMark,
+        )}
+      >
+        {text.slice(occurrence.index, occurrence.index + occurrence.length)}
       </mark>,
     );
-    cursor = matchIndex + matchLength;
+    cursor = occurrence.index + occurrence.length;
+  }
+
+  if (cursor < text.length) {
+    parts.push(text.slice(cursor));
   }
 
   return parts;
 }
 
 function PrimitiveValue({
+  activeSearchMatchId,
   displayedString,
   path,
-  searchTerms,
+  searchPattern,
   value,
   onReveal,
 }: {
+  activeSearchMatchId: string | undefined;
   displayedString: DisplayedString | null;
   path: string;
-  searchTerms: readonly string[];
+  searchPattern: SearchPattern;
   value: JsonViewPrimitive;
   onReveal: (path: string) => void;
 }) {
@@ -370,7 +485,13 @@ function PrimitiveValue({
       <>
         <span {...stylex.props(jsonViewStyles.string)}>
           &quot;
-          <HighlightedText searchTerms={searchTerms} text={escaped} />
+          <HighlightedText
+            activeSearchMatchId={activeSearchMatchId}
+            path={path}
+            searchPattern={searchPattern}
+            target="value"
+            text={escaped}
+          />
           {truncated === true ? "…" : null}&quot;
         </span>
         {truncated === true ? (
@@ -398,13 +519,20 @@ function PrimitiveValue({
 
   return (
     <span {...stylex.props(valueStyle)}>
-      <HighlightedText searchTerms={searchTerms} text={text} />
+      <HighlightedText
+        activeSearchMatchId={activeSearchMatchId}
+        path={path}
+        searchPattern={searchPattern}
+        target="value"
+        text={text}
+      />
     </span>
   );
 }
 
 function JsonNode({
   activePath,
+  activeSearchMatchId,
   expandedPaths,
   focusVisiblePath,
   keyName,
@@ -418,7 +546,7 @@ function JsonNode({
   position,
   revealedStrings,
   renderPlan,
-  searchTerms,
+  searchPattern,
   setSize,
   value,
 }: JsonNodeProps) {
@@ -428,7 +556,13 @@ function JsonNode({
   const expanded = expandable === true && expandedPaths.has(path);
   const displayedString =
     typeof value === "string"
-      ? getDisplayedString(value, revealedStrings.has(path), searchTerms)
+      ? getDisplayedString(
+          value,
+          revealedStrings.has(path),
+          searchPattern,
+          path,
+          activeSearchMatchId,
+        )
       : null;
   const containerPunctuation = Array.isArray(value) === true ? ["[", "]"] : ["{", "}"];
   const name =
@@ -595,7 +729,13 @@ function JsonNode({
             <>
               <span {...stylex.props(jsonViewStyles.key)}>
                 &quot;
-                <HighlightedText searchTerms={searchTerms} text={escapeJsonString(keyName)} />
+                <HighlightedText
+                  activeSearchMatchId={activeSearchMatchId}
+                  path={path}
+                  searchPattern={searchPattern}
+                  target="key"
+                  text={escapeJsonString(keyName)}
+                />
                 &quot;
               </span>
               <span {...stylex.props(jsonViewStyles.punctuation)}>: </span>
@@ -610,10 +750,11 @@ function JsonNode({
             </span>
           ) : (
             <PrimitiveValue
+              activeSearchMatchId={activeSearchMatchId}
               displayedString={displayedString}
               onReveal={onStringReveal}
               path={path}
-              searchTerms={searchTerms}
+              searchPattern={searchPattern}
               value={value}
             />
           )}
@@ -624,6 +765,7 @@ function JsonNode({
           {entries.slice(0, visibleChildCount).map(([key, child], index) => (
             <JsonNode
               activePath={activePath}
+              activeSearchMatchId={activeSearchMatchId}
               expandedPaths={expandedPaths}
               focusVisiblePath={focusVisiblePath}
               key={key}
@@ -638,7 +780,7 @@ function JsonNode({
               position={index + 1}
               revealedStrings={revealedStrings}
               renderPlan={renderPlan}
-              searchTerms={searchTerms}
+              searchPattern={searchPattern}
               setSize={entries.length}
               value={child}
             />
@@ -714,7 +856,7 @@ export function JsonView({
   accessibilityLabel,
   data,
   defaultExpandDepth = 1,
-  searchTerms = [],
+  search,
 }: JsonViewProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(() =>
     createInitialExpansion(data, defaultExpandDepth),
@@ -726,12 +868,31 @@ export function JsonView({
   );
   const [revealedStrings, setRevealedStrings] = useState<ReadonlySet<string>>(new Set());
   const treeRef = useRef<HTMLDivElement>(null);
+  const onSearchResultsChangeRef = useRef(search?.onResultsChange);
   const serializedData = useMemo(() => JSON.stringify(data, null, 2), [data]);
-  const normalizedSearchTerms = searchTerms.length === 0 ? emptySearchTerms : searchTerms;
-  const searchModel = useMemo(
-    () => createSearchModel(data, normalizedSearchTerms),
-    [data, normalizedSearchTerms],
+  const searchQuery = search?.query ?? "";
+  const searchPattern = useMemo(
+    () =>
+      createSearchPattern({
+        query: searchQuery,
+        caseSensitive: search?.caseSensitive,
+        wholeWord: search?.wholeWord,
+        regularExpression: search?.regularExpression,
+      }),
+    [search?.caseSensitive, search?.regularExpression, search?.wholeWord, searchQuery],
   );
+  const searchModel = useMemo(
+    () => createSearchModel(data, searchPattern),
+    [data, searchPattern],
+  );
+  const activeSearchMatchIndex =
+    searchModel.matches.length === 0
+      ? null
+      : (((search?.activeMatchIndex ?? 0) % searchModel.matches.length) +
+          searchModel.matches.length) %
+        searchModel.matches.length;
+  const activeSearchMatch =
+    activeSearchMatchIndex === null ? undefined : searchModel.matches[activeSearchMatchIndex];
   const effectiveExpandedPaths = useMemo(
     () => new Set([...expandedPaths, ...searchModel.expandedPaths]),
     [expandedPaths, searchModel.expandedPaths],
@@ -747,21 +908,31 @@ export function JsonView({
     () => createRenderPlan(data, effectiveExpandedPaths, effectiveRevealedChildCounts),
     [data, effectiveExpandedPaths, effectiveRevealedChildCounts],
   );
-  const hasActiveSearch = normalizedSearchTerms.some((term) => term.length > 0);
   const searchMatchLimited =
-    searchModel.firstMatchPath !== undefined &&
-    renderPlan.visiblePaths.has(searchModel.firstMatchPath) === false;
+    activeSearchMatch !== undefined && renderPlan.visiblePaths.has(activeSearchMatch.path) === false;
+  const activeSearchMatchVisible = activeSearchMatch !== undefined && searchMatchLimited === false;
+
+  useLayoutEffect(() => {
+    onSearchResultsChangeRef.current = search?.onResultsChange;
+  }, [search?.onResultsChange]);
+
+  useLayoutEffect(() => {
+    onSearchResultsChangeRef.current?.({
+      activeIndex: activeSearchMatchIndex,
+      count: searchModel.matches.length,
+    });
+  }, [activeSearchMatchIndex, searchModel.matches.length, searchPattern, searchQuery]);
 
   useEffect(() => {
-    if (searchModel.firstMatchPath === undefined) {
+    if (activeSearchMatch === undefined || activeSearchMatchVisible === false) {
       return;
     }
 
     const match = Array.from(
-      treeRef.current?.querySelectorAll<HTMLElement>("[data-json-path]") ?? [],
-    ).find((item) => item.dataset.jsonPath === searchModel.firstMatchPath);
+      treeRef.current?.querySelectorAll<HTMLElement>("[data-json-search-match]") ?? [],
+    ).find((item) => item.dataset.jsonSearchMatch === activeSearchMatch.id);
     match?.scrollIntoView?.({ block: "nearest" });
-  }, [searchModel.firstMatchPath]);
+  }, [activeSearchMatch, activeSearchMatchVisible]);
 
   useEffect(() => {
     const tree = treeRef.current;
@@ -827,13 +998,11 @@ export function JsonView({
 
   return (
     <div {...stylex.props(jsonViewStyles.root)}>
-      {hasActiveSearch === true && searchModel.matchCount === 0 ? (
-        <div role="status" {...stylex.props(jsonViewStyles.status)}>
-          No matches
-        </div>
-      ) : searchMatchLimited === true ? (
-        <div role="status" {...stylex.props(jsonViewStyles.status)}>
-          Match outside visible limit
+      {searchMatchLimited === true ? (
+        <div {...stylex.props(jsonViewStyles.status)}>
+          <Text as="div" color="muted" monospace role="status" variant="caption">
+            Match outside visible limit
+          </Text>
         </div>
       ) : null}
       <div {...stylex.props(jsonViewStyles.copyActionLayer)}>
@@ -854,6 +1023,7 @@ export function JsonView({
       >
         <JsonNode
           activePath={activePath}
+          activeSearchMatchId={activeSearchMatch?.id}
           expandedPaths={effectiveExpandedPaths}
           focusVisiblePath={focusVisiblePath}
           level={1}
@@ -874,7 +1044,7 @@ export function JsonView({
           position={1}
           revealedStrings={revealedStrings}
           renderPlan={renderPlan.containers}
-          searchTerms={normalizedSearchTerms}
+          searchPattern={searchPattern}
           setSize={1}
           value={data}
         />

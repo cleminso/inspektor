@@ -26,6 +26,7 @@ import { Route as ComponentsCopyButtonRouteImport } from './routes/components/co
 import { Route as ComponentsDataGridRouteImport } from './routes/components/data-grid'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
+import { Route as ComponentsFindBarRouteImport } from './routes/components/find-bar'
 import { Route as ComponentsIconRouteImport } from './routes/components/icon'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsInputGroupRouteImport } from './routes/components/input-group'
@@ -35,7 +36,6 @@ import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
 import { Route as ComponentsMultiSelectRouteImport } from './routes/components/multi-select'
 import { Route as ComponentsRelationValueRouteImport } from './routes/components/relation-value'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
-import { Route as ComponentsSearchRouteImport } from './routes/components/search'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSidePanelRouteImport } from './routes/components/side-panel'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
@@ -138,6 +138,11 @@ const ComponentsFieldsetRoute = ComponentsFieldsetRouteImport.update({
   path: '/components/fieldset',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsFindBarRoute = ComponentsFindBarRouteImport.update({
+  id: '/components/find-bar',
+  path: '/components/find-bar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsIconRoute = ComponentsIconRouteImport.update({
   id: '/components/icon',
   path: '/components/icon',
@@ -184,11 +189,6 @@ const ComponentsResizablePanelRoute =
     path: '/components/resizable-panel',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ComponentsSearchRoute = ComponentsSearchRouteImport.update({
-  id: '/components/search',
-  path: '/components/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
   id: '/components/select',
   path: '/components/select',
@@ -285,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
+  '/components/find-bar': typeof ComponentsFindBarRoute
   '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
@@ -294,7 +295,6 @@ export interface FileRoutesByFullPath {
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
-  '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -329,6 +329,7 @@ export interface FileRoutesByTo {
   '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
+  '/components/find-bar': typeof ComponentsFindBarRoute
   '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
@@ -338,7 +339,6 @@ export interface FileRoutesByTo {
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
-  '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -374,6 +374,7 @@ export interface FileRoutesById {
   '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
+  '/components/find-bar': typeof ComponentsFindBarRoute
   '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
@@ -383,7 +384,6 @@ export interface FileRoutesById {
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
-  '/components/search': typeof ComponentsSearchRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -420,6 +420,7 @@ export interface FileRouteTypes {
     | '/components/data-grid'
     | '/components/field'
     | '/components/fieldset'
+    | '/components/find-bar'
     | '/components/icon'
     | '/components/input'
     | '/components/input-group'
@@ -429,7 +430,6 @@ export interface FileRouteTypes {
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
-    | '/components/search'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -464,6 +464,7 @@ export interface FileRouteTypes {
     | '/components/data-grid'
     | '/components/field'
     | '/components/fieldset'
+    | '/components/find-bar'
     | '/components/icon'
     | '/components/input'
     | '/components/input-group'
@@ -473,7 +474,6 @@ export interface FileRouteTypes {
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
-    | '/components/search'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -508,6 +508,7 @@ export interface FileRouteTypes {
     | '/components/data-grid'
     | '/components/field'
     | '/components/fieldset'
+    | '/components/find-bar'
     | '/components/icon'
     | '/components/input'
     | '/components/input-group'
@@ -517,7 +518,6 @@ export interface FileRouteTypes {
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
-    | '/components/search'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -553,6 +553,7 @@ export interface RootRouteChildren {
   ComponentsDataGridRoute: typeof ComponentsDataGridRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
+  ComponentsFindBarRoute: typeof ComponentsFindBarRoute
   ComponentsIconRoute: typeof ComponentsIconRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsInputGroupRoute: typeof ComponentsInputGroupRoute
@@ -562,7 +563,6 @@ export interface RootRouteChildren {
   ComponentsMultiSelectRoute: typeof ComponentsMultiSelectRoute
   ComponentsRelationValueRoute: typeof ComponentsRelationValueRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
-  ComponentsSearchRoute: typeof ComponentsSearchRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidePanelRoute: typeof ComponentsSidePanelRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
@@ -701,6 +701,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsFieldsetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/find-bar': {
+      id: '/components/find-bar'
+      path: '/components/find-bar'
+      fullPath: '/components/find-bar'
+      preLoaderRoute: typeof ComponentsFindBarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/icon': {
       id: '/components/icon'
       path: '/components/icon'
@@ -762,13 +769,6 @@ declare module '@tanstack/react-router' {
       path: '/components/resizable-panel'
       fullPath: '/components/resizable-panel'
       preLoaderRoute: typeof ComponentsResizablePanelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/components/search': {
-      id: '/components/search'
-      path: '/components/search'
-      fullPath: '/components/search'
-      preLoaderRoute: typeof ComponentsSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/select': {
@@ -897,6 +897,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsDataGridRoute: ComponentsDataGridRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
+  ComponentsFindBarRoute: ComponentsFindBarRoute,
   ComponentsIconRoute: ComponentsIconRoute,
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsInputGroupRoute: ComponentsInputGroupRoute,
@@ -906,7 +907,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsMultiSelectRoute: ComponentsMultiSelectRoute,
   ComponentsRelationValueRoute: ComponentsRelationValueRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
-  ComponentsSearchRoute: ComponentsSearchRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidePanelRoute: ComponentsSidePanelRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,

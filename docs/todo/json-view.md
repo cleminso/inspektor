@@ -38,6 +38,13 @@
 - [x] Use `JsonView` as an object-or-array fallback when a read-only structured runtime value cannot be represented safely as
       `CodeEditor` source.
 
+[04/08/26]
+
+- [x] Expose ordered occurrence results, wrap controlled navigation, distinguish the active mark, and preserve focus in
+      an external Find Bar.
+- [x] Support controlled case-sensitive, whole-word, and regular-expression matching without moving search controls into the tree.
+- [x] Reserve the row JSON scroll gutter so search-driven expansion does not resize the tree or sticky copy action.
+
 ## Open product work
 
 [24/07/26]
@@ -57,20 +64,22 @@
 
 [29/07/26]
 
-- Search controls remain outside `JsonView`; the component accepts literal controlled terms.
+- Search controls remain outside `JsonView`; the component accepts a controlled query and matching options.
+- Search navigation uses ordered textual occurrences, wraps at both ends, highlights the active occurrence, and preserves focus in
+  the external Find Bar.
 - Copy remains outside the ARIA tree while aligning with the root row and staying sticky within the JSON surface.
 - Copy serializes the complete input with two-space indentation, independent of disclosure, search, and rendering limits.
 - Root disclosure hover and focus treatment remains content-sized instead of extending beneath the separate copy action.
 - Large branches continue in fixed batches instead of exposing an expand-all action.
 - Branch, complete-tree, and string thresholds remain fixed internal safeguards rather than consumer configuration.
 - Search reports when a real match falls outside the visible budget instead of mounting beyond the limit.
+- The application-owned row JSON scroll container reserves a stable classic-scrollbar gutter below the external Find Bar.
 
 ## Open design decisions
 
 [24/07/26]
 
 - [ ] Review semantic syntax-color tokens across supported themes.
-- [ ] Decide whether search needs previous and next match navigation.
 - [ ] Decide whether normalization, search, and Copy traversal require a worker or traversal budget.
 - [ ] Decide the accessible naming and visual representation of root-array indices.
 
@@ -85,3 +94,4 @@
 - [ ] Re-run and record cross-package tests, typechecks, focused lint, generated-prop checks, and builds against the current
       application integration.
 - [ ] Running-application verification covers narrow panes, keyboard navigation, search, copying, and row changes.
+- [x] Row JSON search expansion preserves the tree and copy-action inline positions when vertical overflow changes.

@@ -144,6 +144,8 @@ export const syntaxPaletteValues = stylex.defineConsts({
   syntaxCommentLight: 'oklch(0.708 0.007 5.71)',
   syntaxMarkBackgroundDark: 'oklch(0.376 0.008 317.73)',
   syntaxMarkBackgroundLight: 'oklch(0.901 0.025 39.36)',
+  syntaxMarkActiveBackgroundLight: 'oklch(0.860 0.120 60)',
+  syntaxMarkActiveBackgroundDark: 'oklch(0.450 0.120 120)',
 } as const)
 
 export const syntaxPalette = stylex.defineVars(syntaxPaletteValues)

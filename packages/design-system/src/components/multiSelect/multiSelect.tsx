@@ -19,7 +19,8 @@ import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
 import { Button } from "../button/button";
 import { Checkbox } from "../checkbox/checkbox";
-import { Search } from "../search/search";
+import { Input } from "../input/input";
+import { InputGroup } from "../inputGroup/inputGroup";
 import { multiSelectStyles } from "./multiSelect.styles";
 
 export interface MultiSelectItem {
@@ -296,21 +297,23 @@ function MultiSelectContent({
           {...popupStyles}
         >
           <div {...stylex.props(multiSelectStyles.section)}>
-            <Search
-              ref={context.searchRef}
-              aria-label={searchLabel}
-              autoFocus
-              placeholder={searchPlaceholder}
-              size="s"
-              value={context.query}
-              onValueChange={context.setQuery}
-              onKeyDown={(event) => {
-                if (event.key === "ArrowDown") {
-                  event.preventDefault();
-                  focusControl(0, "checkbox");
-                }
-              }}
-            />
+            <InputGroup size="s" fullWidth>
+              <Input
+                ref={context.searchRef}
+                aria-label={searchLabel}
+                autoFocus
+                type="search"
+                placeholder={searchPlaceholder}
+                value={context.query}
+                onValueChange={context.setQuery}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    focusControl(0, "checkbox");
+                  }
+                }}
+              />
+            </InputGroup>
           </div>
           <div {...stylex.props(multiSelectStyles.separator)} />
           {context.filteredItems.length === 0 ? (

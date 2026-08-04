@@ -4,6 +4,9 @@ import { borderColors } from '../../tokens/semantics.stylex'
 import { borderRadii, spacing } from '../../tokens/value.stylex'
 
 export const boxStyles = stylex.create({
+  scrollbarGutterStable: {
+    scrollbarGutter: 'stable',
+  },
   scrollbarThin: {
     scrollbarColor: `${borderColors['border-secondary']} transparent`,
     scrollbarWidth: 'thin',

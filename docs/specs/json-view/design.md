@@ -85,7 +85,8 @@ arrays remain collapsed.
 - Enter and Space toggle the focused container.
 - Home and End move to the first and last visible tree item.
 - Collapsing a branch moves focus to the branch when focus was inside a descendant.
-- Search terms highlight matching keys and primitive display values without changing the source value.
+- Search highlights matching keys and primitive display values without changing the source value.
+- Search supports controlled case-sensitive, whole-word, and regular-expression matching.
 - Search temporarily expands matching ancestor branches, reveals the first matching path within the visible budget, and scrolls it
   into view without moving keyboard focus away from the application-owned search control.
 - An active search with no key or primitive match displays and announces `No matches` while preserving the tree.
@@ -123,7 +124,8 @@ component does not import Jazz packages or know about rows, columns, references,
 The implementation exports `JsonView` and consumer-facing value types from `packages/design-system/src/index.ts`.
 
 The API does not expose `className`, `style`, arbitrary CSS values, arbitrary renderers, syntax-color overrides, node component
-slots, Jazz schema objects, mutation callbacks, or an `editable` prop.
+slots, Jazz schema objects, mutation callbacks, or an `editable` prop. Its controlled search contract accepts a query, matching
+options, active occurrence index, and result callback.
 
 ## Data model
 
@@ -221,7 +223,7 @@ Design-system tests cover:
 - focus recovery when an ancestor collapses
 - `tree`, `treeitem`, `group`, `aria-expanded`, and logical position metadata
 - selectable text without per-value Tab stops
-- literal search matching and highlighted keys and values
+- literal and regular-expression search matching with case and whole-word options
 - long-string and child-count continuation behavior
 - stable behavior when `data` changes
 
@@ -251,6 +253,5 @@ and isolation from grid keyboard behavior.
 ## Open questions
 
 - Decide the exact semantic syntax-color tokens after reviewing the component in supported themes.
-- Decide whether search needs explicit previous and next match navigation beyond automatic first-match disclosure.
 - Decide whether full-source search and normalization need a worker or application-level traversal budget for unusually large data.
 - Decide whether a root array uses numeric item labels, visual indices, or punctuation alone in its accessible names.

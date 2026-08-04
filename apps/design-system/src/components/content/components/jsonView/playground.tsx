@@ -11,7 +11,6 @@ type ExpandDepth = "0" | "1" | "2";
 
 export interface JsonViewPlaygroundState {
   expandDepth: ExpandDepth;
-  highlightMatches: boolean;
   [key: string]: boolean | string;
 }
 
@@ -21,9 +20,7 @@ const data = {
 };
 
 const expandDepthByValue = { "0": 0, "1": 1, "2": 2 } as const;
-const initialState: JsonViewPlaygroundState = { expandDepth: "1", highlightMatches: false };
-const accountSearchTerms = ["account"] as const;
-const emptySearchTerms: readonly string[] = [];
+const initialState: JsonViewPlaygroundState = { expandDepth: "1" };
 const controls = [
   {
     kind: "select",
@@ -31,7 +28,6 @@ const controls = [
     label: "Initial depth",
     options: ["0", "1", "2"].map((value) => ({ label: value, value })),
   },
-  { kind: "boolean", key: "highlightMatches", label: "Highlight account" },
 ] as const satisfies readonly PlaygroundControl<JsonViewPlaygroundState>[];
 
 export function serializeJsonViewPlayground(state: JsonViewPlaygroundState): string {
@@ -39,7 +35,6 @@ export function serializeJsonViewPlayground(state: JsonViewPlaygroundState): str
     'accessibilityLabel="Account payload"',
     "data={data}",
     state.expandDepth === "1" ? null : `defaultExpandDepth={${state.expandDepth}}`,
-    state.highlightMatches === true ? 'searchTerms={["account"]}' : null,
   ].filter((prop): prop is string => prop !== null);
 
   return createPlaygroundSource({
@@ -66,7 +61,6 @@ export function JsonViewPlayground({ children }: { children?: ReactNode }): Reac
             accessibilityLabel="Account payload"
             data={data}
             defaultExpandDepth={expandDepthByValue[state.expandDepth]}
-            searchTerms={state.highlightMatches === true ? accountSearchTerms : emptySearchTerms}
           />
         </Box>
       }

@@ -2,10 +2,30 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Button } from "./button";
+import { buttonStyles } from "./button.styles";
+import { getButtonVisualStyles } from "./buttonVisuals";
 
 afterEach(cleanup);
 
 describe("Button", () => {
+  it("does not give disabled ghost actions a filled surface", () => {
+    const visualStyles = getButtonVisualStyles({
+      variant: "ghost",
+      size: "xs",
+      square: true,
+      pressed: false,
+      fullWidth: false,
+      justify: "center",
+      radius: "xs",
+      orientation: null,
+      disabled: true,
+      hasPrefix: false,
+      hasSuffix: false,
+    });
+
+    expect(visualStyles).not.toContain(buttonStyles.disabled);
+  });
+
   it("renders an accessible square button for icon-only actions", () => {
     render(
       <Button iconOnly aria-label="Toggle panel" aria-pressed>

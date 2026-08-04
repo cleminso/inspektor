@@ -38,6 +38,8 @@ type BoxOwnProps<E extends BoxElement = 'div'> = BoxStyleProps & {
   children?: React.ReactNode
   /** Uses the design-system treatment for a compact scrollbar. */
   scrollbar?: 'thin'
+  /** Reserves inline space for a classic scrollbar so overflow changes do not resize content. */
+  scrollbarGutter?: 'stable'
 }
 
 export type BoxProps<E extends BoxElement = 'div'> = BoxOwnProps<E> &
@@ -48,6 +50,7 @@ function BoxInner<E extends BoxElement = 'div'>(
     as,
     children,
     scrollbar,
+    scrollbarGutter,
     ...rest
   }: BoxProps<E>,
   ref: React.ForwardedRef<HTMLElement>,
@@ -82,6 +85,7 @@ function BoxInner<E extends BoxElement = 'div'>(
   const stylexProps = stylex.props(
     ...stylexStyles,
     scrollbar === 'thin' && boxStyles.scrollbarThin,
+    scrollbarGutter === 'stable' && boxStyles.scrollbarGutterStable,
   )
 
   const mergedStyle = {
@@ -109,6 +113,7 @@ function BoxInner<E extends BoxElement = 'div'>(
         className={classes}
         style={hasStyle === true ? mergedStyle : undefined}
         data-scrollbar={scrollbar}
+        data-scrollbar-gutter={scrollbarGutter}
         {...domProps}
       >
         {children}

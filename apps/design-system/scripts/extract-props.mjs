@@ -260,8 +260,8 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
-    componentId: "search",
-    exportName: "Search",
+    componentId: "findBar",
+    exportName: "FindBar",
     inheritedProps: [],
   },
   ...[

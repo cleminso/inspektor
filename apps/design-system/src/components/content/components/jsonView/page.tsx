@@ -11,14 +11,14 @@ import DefaultExpansionExample from "./defaultExpansionExample";
 import defaultExpansionSource from "./defaultExpansionExample.tsx?raw";
 import EmptyValuesExample from "./emptyValuesExample";
 import emptyValuesSource from "./emptyValuesExample.tsx?raw";
+import FindNavigationExample from "./findNavigationExample";
+import findNavigationSource from "./findNavigationExample.tsx?raw";
 import LargeBranchExample from "./largeBranchExample";
 import largeBranchSource from "./largeBranchExample.tsx?raw";
 import LongContentExample from "./longContentExample";
 import longContentSource from "./longContentExample.tsx?raw";
 import { JsonViewPlayground } from "./playground";
 import { jsonViewPropNames } from "./props";
-import SearchHighlightingExample from "./searchHighlightingExample";
-import searchHighlightingSource from "./searchHighlightingExample.tsx?raw";
 
 const jsonViewProps = getGeneratedProps("jsonView", jsonViewPropNames);
 
@@ -53,11 +53,11 @@ export function JsonViewPage(): ReactElement {
       </Section>
 
       <Section
-        title="Search highlighting"
-        description="Pass literal terms from an application-owned search control to highlight matching keys and primitive values."
+        title="Find navigation"
+        description="Pair JsonView with Find Bar to control case, whole-word, and regular-expression matching and navigate ordered occurrences without moving focus from the query field."
       >
-        <Example source={searchHighlightingSource} align="stretch">
-          <SearchHighlightingExample />
+        <Example source={findNavigationSource} align="stretch">
+          <FindNavigationExample />
         </Example>
       </Section>
 

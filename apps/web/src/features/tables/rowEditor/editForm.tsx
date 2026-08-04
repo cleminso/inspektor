@@ -2,7 +2,17 @@ import { useMemo, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
-import { Box, Button, JsonView, Search, Text, ToggleGroup } from "@inspector/ds";
+import {
+  Box,
+  Button,
+  FindBar,
+  JsonView,
+  Text,
+  ToggleGroup,
+  type FindBarSearchOptions,
+  type FindBarState,
+  type JsonViewSearchResults,
+} from "@inspector/ds";
 
 import {
   RowEditorFields,
@@ -58,34 +68,79 @@ interface LoadedEditRowFormProps extends Omit<EditRowFormProps, "rowValues" | "t
 
 type RowRepresentation = "details" | "json";
 
-const emptySearchTerms: readonly string[] = [];
+const defaultFindOptions: FindBarSearchOptions = {
+  caseSensitive: false,
+  wholeWord: false,
+  regularExpression: false,
+};
 
 function RowJsonRepresentation({
   rowValues,
   schemaColumns,
 }: Pick<LoadedEditRowFormProps, "rowValues" | "schemaColumns">): React.ReactElement {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchOptions, setSearchOptions] = useState(defaultFindOptions);
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
+  const [searchResults, setSearchResults] = useState<JsonViewSearchResults>({
+    activeIndex: null,
+    count: 0,
+  });
   const value = useMemo(
     () => createRowJsonViewValue(rowValues, schemaColumns),
     [rowValues, schemaColumns],
   );
+  const findState: FindBarState =
+    searchQuery.length === 0
+      ? { status: "idle" }
+      : searchResults.activeIndex === null
+        ? { status: "empty" }
+        : {
+            status: "matched",
+            activeIndex: searchResults.activeIndex,
+            count: searchResults.count,
+          };
   return (
     <Box height="full" minHeight={0} flexDirection="column" gap="m" px="m" py="m">
       <Box flexShrink={0} alignItems="center" gap="m">
-        <Search
-          aria-label="Search row JSON"
+        <FindBar
+          label="Find in row JSON"
           value={searchQuery}
           onValueChange={(nextValue) => {
-            setSearchQuery(String(nextValue));
+            setSearchQuery(nextValue);
+            setActiveMatchIndex(0);
+            setSearchResults({ activeIndex: null, count: 0 });
           }}
-          size="s"
+          state={findState}
+          searchOptions={searchOptions}
+          onSearchOptionsChange={(nextOptions) => {
+            setSearchOptions(nextOptions);
+            setActiveMatchIndex(0);
+            setSearchResults({ activeIndex: null, count: 0 });
+          }}
+          onPreviousMatch={() => {
+            setActiveMatchIndex((searchResults.activeIndex ?? 0) - 1);
+          }}
+          onNextMatch={() => {
+            setActiveMatchIndex((searchResults.activeIndex ?? 0) + 1);
+          }}
         />
       </Box>
-      <Box scrollbar="thin" minHeight={0} flex={1} overflow="auto">
+      <Box
+        scrollbar="thin"
+        scrollbarGutter="stable"
+        minHeight={0}
+        flex={1}
+        overflow="auto"
+      >
         <JsonView
           accessibilityLabel="Row JSON"
           data={value}
-          searchTerms={searchQuery.length === 0 ? emptySearchTerms : [searchQuery]}
+          search={{
+            query: searchQuery,
+            ...searchOptions,
+            activeMatchIndex,
+            onResultsChange: setSearchResults,
+          }}
         />
       </Box>
     </Box>

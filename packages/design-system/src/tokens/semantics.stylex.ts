@@ -97,6 +97,7 @@ export const syntaxColors = stylex.defineVars({
   'syntax-type': `light-dark(${syntaxPalette.syntaxCyanLight}, ${syntaxPalette.syntaxCyanDark})`,
   'syntax-variable': `light-dark(${syntaxPalette.syntaxForegroundLight}, ${syntaxPalette.syntaxForegroundDark})`,
   'syntax-mark-background': `light-dark(${syntaxPalette.syntaxMarkBackgroundLight}, ${syntaxPalette.syntaxMarkBackgroundDark})`,
+  'syntax-mark-active-background': `light-dark(${syntaxPalette.syntaxMarkActiveBackgroundLight}, ${syntaxPalette.syntaxMarkActiveBackgroundDark})`,
   'syntax-mark-foreground': `light-dark(${syntaxPalette.syntaxForegroundLight}, ${syntaxPalette.syntaxForegroundDark})`,
 } as const)
 
@@ -115,6 +116,7 @@ export const spatial = stylex.defineVars({
   'content-width': dimensions[1220],
   'content-width-wide': dimensions[1440],
   'example-height': dimensions[120],
+  'find-bar-status-width': dimensions[72],
   'focus-ring-width': dimensions[2],
   'grid-track-s': dimensions[160],
   'grid-track-m': dimensions[240],

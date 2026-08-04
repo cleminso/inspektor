@@ -21,7 +21,7 @@ export const inputStyles = stylex.create({
     borderStyle: "solid",
     borderWidth: 1,
     paddingBlock: 0,
-    paddingInline: spacing.m,
+    paddingInline: spacing.xs,
     appearance: "none",
     backgroundColor: backgroundColors["bg-card"],
     boxSizing: "border-box",

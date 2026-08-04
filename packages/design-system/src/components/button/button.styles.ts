@@ -147,6 +147,16 @@ export const buttonStyles = stylex.create({
     color: textColors['text-disabled'],
     cursor: 'not-allowed',
   },
+  disabledBare: {
+    borderColor: 'transparent',
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'transparent',
+      ':active': 'transparent',
+    },
+    color: textColors['text-disabled'],
+    cursor: 'not-allowed',
+  },
   content: {
     gap: spacing.s,
     alignItems: 'center',

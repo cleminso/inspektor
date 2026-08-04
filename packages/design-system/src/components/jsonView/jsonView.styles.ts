@@ -123,6 +123,10 @@ export const jsonViewStyles = stylex.create({
     backgroundColor: syntaxColors["syntax-mark-background"],
     color: syntaxColors["syntax-mark-foreground"],
   },
+  activeMark: {
+    backgroundColor: syntaxColors["syntax-mark-active-background"],
+    color: syntaxColors["syntax-mark-foreground"],
+  },
   inlineAction: {
     borderStyle: "none",
     paddingBlock: 0,
@@ -144,10 +148,6 @@ export const jsonViewStyles = stylex.create({
     userSelect: "none",
   },
   status: {
-    color: textColors["text-muted"],
-    fontFamily: fontFamilies.mono,
-    fontSize: fontSizes[1],
-    lineHeight: lineHeights.compact,
     paddingBlockEnd: spacing.xs,
   },
 });

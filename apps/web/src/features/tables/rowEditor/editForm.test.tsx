@@ -212,15 +212,27 @@ describe("EditRowForm Details and JSON views", () => {
   });
 
   it("shows JSON tools without visible mutation controls", () => {
-    renderEditRowForm();
+    const { container } = renderEditRowForm();
 
     fireEvent.click(screen.getByRole("button", { name: "JSON" }));
 
-    expect(screen.getByRole("searchbox", { name: /search/i })).toBeTruthy();
+    expect(screen.getByRole("searchbox", { name: "Find in row JSON" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Previous match" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Next match" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Copy JSON" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
     expect(screen.queryByRole("textbox", { name: "DisplayName" })).toBeNull();
+    expect(
+      screen
+        .getByRole("tree", { name: "Row JSON" })
+        .closest("[data-scrollbar-gutter]")
+        ?.getAttribute("data-scrollbar-gutter"),
+    ).toBe("stable");
+    expect(
+      screen.getByRole("searchbox", { name: "Find in row JSON" }).closest("[data-scrollbar-gutter]"),
+    ).toBeNull();
+    expect(container.querySelectorAll('[data-scrollbar-gutter="stable"]')).toHaveLength(1);
   });
 
   it("preserves edited Details text after switching to JSON and back", () => {
@@ -340,17 +352,44 @@ describe("EditRowForm Details and JSON views", () => {
     expect(screen.getByRole("button", { name: "False" }).getAttribute("aria-pressed")).toBe("true");
   });
 
-  it("highlights a literal JSON search term", () => {
+  it("highlights and reports a literal JSON find query", async () => {
     const { container } = renderEditRowForm();
     fireEvent.click(screen.getByRole("button", { name: "JSON" }));
 
-    fireEvent.change(screen.getByRole("searchbox", { name: /search/i }), {
+    fireEvent.change(screen.getByRole("searchbox", { name: "Find in row JSON" }), {
       target: { value: "." },
     });
 
     expect(Array.from(container.querySelectorAll("mark"), (mark) => mark.textContent)).toEqual([
       ".",
     ]);
+    expect(await screen.findByRole("status", { name: "Match 1 of 1" })).toBeTruthy();
+    expect(container.querySelector("mark")?.hasAttribute("data-active")).toBe(true);
+
+    fireEvent.change(screen.getByRole("searchbox", { name: "Find in row JSON" }), {
+      target: { value: "missing" },
+    });
+    expect(await screen.findByRole("status", { name: "No matches" })).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Next match" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
+  });
+
+  it("applies Find Bar query options to row JSON matches", async () => {
+    renderEditRowForm();
+    fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+
+    fireEvent.change(screen.getByRole("searchbox", { name: "Find in row JSON" }), {
+      target: { value: "ada" },
+    });
+    expect(await screen.findByRole("status", { name: "Match 1 of 1" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Match case" }));
+
+    expect(screen.getByRole("button", { name: "Match case" }).getAttribute("aria-pressed")).toBe(
+      "true",
+    );
+    expect(await screen.findByRole("status", { name: "No matches" })).toBeTruthy();
   });
 
   it("copies the pretty normalized row JSON", () => {

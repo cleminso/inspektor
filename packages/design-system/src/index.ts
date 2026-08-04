@@ -209,6 +209,8 @@ export type {
   JsonViewObject,
   JsonViewPrimitive,
   JsonViewProps,
+  JsonViewSearch,
+  JsonViewSearchResults,
   JsonViewValue,
 } from './components/jsonView/jsonView'
 export { KeyboardInput } from './components/keyboardInput/keyboardInput'
@@ -258,8 +260,12 @@ export type {
   MultiSelectRootProps,
   MultiSelectTriggerProps,
 } from './components/multiSelect/multiSelect'
-export { Search } from './components/search/search'
-export type { SearchProps } from './components/search/search'
+export { FindBar } from './components/findBar/findBar'
+export type {
+  FindBarProps,
+  FindBarSearchOptions,
+  FindBarState,
+} from './components/findBar/findBar'
 export { SidePanel } from './components/sidePanel/sidePanel'
 export type {
   SidePanelBodyProps,

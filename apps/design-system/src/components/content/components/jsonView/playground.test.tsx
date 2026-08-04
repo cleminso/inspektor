@@ -9,17 +9,15 @@ afterEach(cleanup);
 
 describe("JsonView playground", () => {
   it("omits package defaults from the initial source", () => {
-    const source = serializeJsonViewPlayground({ expandDepth: "1", highlightMatches: false });
+    const source = serializeJsonViewPlayground({ expandDepth: "1" });
 
     expect(source).not.toContain("defaultExpandDepth");
-    expect(source).not.toContain("searchTerms");
   });
 
-  it("serializes expansion and highlighting controls", () => {
-    const source = serializeJsonViewPlayground({ expandDepth: "0", highlightMatches: true });
+  it("serializes the expansion control", () => {
+    const source = serializeJsonViewPlayground({ expandDepth: "0" });
 
     expect(source).toContain("defaultExpandDepth={0}");
-    expect(source).toContain('searchTerms={["account"]}');
   });
 
   it("renders the initial JSON tree and reset control", () => {

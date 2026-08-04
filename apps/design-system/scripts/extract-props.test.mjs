@@ -27,7 +27,7 @@ test("extracts documented Accordion and ActionList props", () => {
 test("extracts direct and compound forwardRef component props", () => {
   const metadata = extractPropsMetadata();
 
-  assert.ok(metadata.search?.some(({ name }) => name === "size"));
+  assert.ok(metadata.input?.some(({ name }) => name === "size"));
   assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "render"));
   assert.ok(metadata.box?.some(({ name }) => name === "scrollbar"));
   assert.doesNotMatch(
@@ -372,10 +372,9 @@ test("extracts the constrained JsonView API", () => {
 
   assert.deepEqual(
     jsonViewProps?.map(({ name }) => name),
-    ["accessibilityLabel", "data", "defaultExpandDepth", "searchTerms"],
+    ["accessibilityLabel", "data", "defaultExpandDepth", "search"],
   );
   assert.equal(jsonViewProps?.find(({ name }) => name === "defaultExpandDepth")?.defaultValue, "1");
-  assert.equal(jsonViewProps?.find(({ name }) => name === "searchTerms")?.defaultValue, "[]");
   assert.equal(
     jsonViewProps?.find(({ name }) => name === "className"),
     undefined,
@@ -747,23 +746,29 @@ test("extracts TextField composition props from the public package export", () =
   );
 });
 
-test("extracts the constrained Search API", () => {
+test("extracts the constrained FindBar API", () => {
   const metadata = extractPropsMetadata();
-  const searchProps = metadata.search;
+  const findBarProps = metadata.findBar;
 
   assert.deepEqual(
-    searchProps?.map(({ name }) => name),
-    ["size", "fullWidth", "disabled", "shortcut", "defaultValue", "value", "onValueChange"],
+    findBarProps?.map(({ name }) => name),
+    [
+      "label",
+      "value",
+      "onValueChange",
+      "state",
+      "searchOptions",
+      "onSearchOptionsChange",
+      "onPreviousMatch",
+      "onNextMatch",
+    ],
   );
-  assert.equal(searchProps?.find(({ name }) => name === "size")?.defaultValue, '"m"');
-  assert.equal(searchProps?.find(({ name }) => name === "fullWidth")?.defaultValue, "true");
-  assert.equal(searchProps?.find(({ name }) => name === "shortcut")?.type, '"command-k"');
   assert.equal(
-    searchProps?.find(({ name }) => name === "className"),
+    findBarProps?.find(({ name }) => name === "className"),
     undefined,
   );
   assert.equal(
-    searchProps?.find(({ name }) => name === "preSlot"),
+    findBarProps?.find(({ name }) => name === "fullWidth"),
     undefined,
   );
 });

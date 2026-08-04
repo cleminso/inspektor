@@ -1,11 +1,11 @@
-import { Button, Search, SidePanel, Text } from '@inspector/ds'
+import { Button, Input, SidePanel, Text } from '@inspector/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {
   return (
     <SidePanel>
       <SidePanel.Header>
-        <Search aria-label="Search tables" placeholder="Search" fullWidth />
+        <Input aria-label="Filter tables" placeholder="Filter" type="search" fullWidth />
       </SidePanel.Header>
       <SidePanel.Body>
         <Text color="muted">Scrollable panel content</Text>

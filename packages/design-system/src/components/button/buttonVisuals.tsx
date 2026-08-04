@@ -91,7 +91,10 @@ export function getButtonVisualStyles({
     orientation === 'vertical' && buttonGroupStyles.memberVertical,
     fullWidth === true && buttonStyles.fullWidth,
     justifyStyles[justify],
-    disabled === true && buttonStyles.disabled,
+    disabled === true &&
+      (variant === 'ghost' || variant === 'link'
+        ? buttonStyles.disabledBare
+        : buttonStyles.disabled),
   ]
 }
 

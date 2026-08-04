@@ -356,17 +356,17 @@ export const contextMenuItem = {
   componentId: "contextMenu",
 } satisfies NavItem;
 
-export const searchItem = {
-  title: "Search",
-  slug: "search",
-  href: "/components/search",
-  description: "Free-form search input with a fixed leading search indicator.",
+export const findBarItem = {
+  title: "Find Bar",
+  slug: "find-bar",
+  href: "/components/find-bar",
+  description: "Controlled document-find input with query options, match position, and occurrence navigation.",
   importPath: "@inspector/ds",
   source: {
-    label: "search.tsx",
-    path: "packages/design-system/src/components/search/search.tsx",
+    label: "findBar.tsx",
+    path: "packages/design-system/src/components/findBar/findBar.tsx",
   },
-  componentId: "search",
+  componentId: "findBar",
 } satisfies NavItem;
 
 export const accordionItem = {
@@ -569,6 +569,7 @@ export const componentItems: NavItem[] = [
   contextSwitcherItem,
   copyButtonItem,
   dataGridItem,
+  findBarItem,
   iconItem,
   inputItem,
   inputGroupItem,
@@ -580,7 +581,6 @@ export const componentItems: NavItem[] = [
   multiSelectItem,
   relationValueItem,
   resizablePanelItem,
-  searchItem,
   sidePanelItem,
   selectItem,
   spinnerItem,

@@ -14,7 +14,12 @@ export default function BasicExample(): ReactElement {
       borderRadius="s"
     >
       <Text as="h2" variant="label">Layout region</Text>
-      <Box maxHeight="viewport-height-s" overflow="auto" scrollbar="thin">
+      <Box
+        maxHeight="viewport-height-s"
+        overflow="auto"
+        scrollbar="thin"
+        scrollbarGutter="stable"
+      >
         <Text color="muted">Box keeps layout and surface choices inside the token system.</Text>
       </Box>
     </Box>
