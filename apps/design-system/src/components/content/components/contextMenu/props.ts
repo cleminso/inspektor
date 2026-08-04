@@ -9,6 +9,7 @@ export const contextMenuContentPropNames = [
   "keepMounted",
   "side",
 ] as const;
+export const contextMenuPositionerPropNames = ["side", "align"] as const;
 export const contextMenuItemPropNames = ["variant", "disabled", "closeOnClick", "render"] as const;
 export const contextMenuLinkItemPropNames = ["closeOnClick", "render"] as const;
 export const contextMenuCheckboxItemPropNames = ["disabled", "closeOnClick", "render"] as const;

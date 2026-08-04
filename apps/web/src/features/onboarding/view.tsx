@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { Box, Button, Text } from "@inspector/ds";
+import { Box, ButtonLink, Text } from "@inspector/ds";
 
 import { useInspectorSessionContext } from "@app/providers/inspectorSessionProvider";
 import { appRoutes } from "@app/routing/appRoutes";
@@ -36,8 +36,7 @@ export function ConnectionsView(): React.ReactElement {
   return (
     <Box width="full" maxWidth="popup-width-l" flexDirection="column" alignItems="start" gap="3xl">
       <ConnectionsSection title="GET STARTED">
-        <Button
-          type="button"
+        <ButtonLink
           variant="ghost"
           size="s"
           fullWidth
@@ -45,16 +44,18 @@ export function ConnectionsView(): React.ReactElement {
           render={<Link to={appRoutes.newConnection} />}
         >
           Add connection
-        </Button>
-        <Button
+        </ButtonLink>
+        <ButtonLink
           variant="ghost"
           size="s"
           fullWidth
           justify="start"
-          render={<a href="https://jazz.tools/docs" target="_blank" rel="noreferrer" />}
+          href="https://jazz.tools/docs"
+          target="_blank"
+          rel="noreferrer"
         >
           Jazz documentation
-        </Button>
+        </ButtonLink>
       </ConnectionsSection>
 
       {hasConnections === true ? (

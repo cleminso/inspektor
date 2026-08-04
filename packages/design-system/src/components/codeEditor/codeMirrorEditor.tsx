@@ -422,6 +422,7 @@ export function CodeMirrorEditor({
   onValueChangeRef.current = onValueChange;
   isExpandedRef.current = isExpanded;
 
+  /* oxlint-disable react-hooks/exhaustive-deps -- This effect owns one EditorView lifetime. The effects below synchronize changing inputs through compartments. */
   useEffect(() => {
     const parent = editorParentRef.current;
 
@@ -518,6 +519,7 @@ export function CodeMirrorEditor({
       editorView.destroy();
     };
   }, [compartments]);
+  /* oxlint-enable react-hooks/exhaustive-deps */
 
   useEffect(() => {
     const editorView = editorViewRef.current;

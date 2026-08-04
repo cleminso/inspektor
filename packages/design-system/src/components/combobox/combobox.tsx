@@ -124,7 +124,7 @@ export interface ComboboxPortalProps extends WithoutStyles<BaseCombobox.Portal.P
 
 export type ComboboxPositionerProps = Pick<
   WithoutStyles<BaseCombobox.Positioner.Props>,
-  "align" | "children" | "ref"
+  "align" | "children" | "ref" | "side"
 >;
 
 export type ComboboxPopupWidth = "anchor" | "content" | "s" | "m" | "l";
@@ -143,6 +143,8 @@ export interface ComboboxContentProps {
   keepMounted?: boolean;
   /** Aligns the popup along the control. */
   align?: ComboboxPositionerProps["align"];
+  /** Places the popup on this side of the control. */
+  side?: ComboboxPositionerProps["side"];
 }
 
 export interface ComboboxPopupHeaderProps extends Omit<
@@ -402,7 +404,7 @@ const ComboboxPortal = forwardRef<ComponentRef<typeof BaseCombobox.Portal>, Comb
 const ComboboxPositioner = forwardRef<
   ComponentRef<typeof BaseCombobox.Positioner>,
   ComboboxPositionerProps
->(function ComboboxPositioner({ align = "start", ...props }, forwardedRef) {
+>(function ComboboxPositioner({ align = "start", side = "bottom", ...props }, forwardedRef) {
   const stateStyles = createStateStyleProps<BaseCombobox.Positioner.State>(() => [
     comboboxStyles.positioner,
   ]);
@@ -412,6 +414,7 @@ const ComboboxPositioner = forwardRef<
       ref={forwardedRef}
       sideOffset={popupPositioning.dropdownSideOffset}
       align={align}
+      side={side}
       {...stateStyles}
     />
   );
@@ -442,10 +445,11 @@ function ComboboxContent({
   width = "anchor",
   keepMounted = false,
   align = "start",
+  side = "bottom",
 }: ComboboxContentProps) {
   return (
     <ComboboxPortal keepMounted={keepMounted}>
-      <ComboboxPositioner align={align}>
+      <ComboboxPositioner align={align} side={side}>
         <ComboboxPopup width={width} data-slot="combobox-content">
           {children}
         </ComboboxPopup>

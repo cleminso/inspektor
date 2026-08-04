@@ -17,12 +17,17 @@ import {
   contextMenuContentPropNames,
   contextMenuItemPropNames,
   contextMenuLinkItemPropNames,
+  contextMenuPositionerPropNames,
   contextMenuRadioItemPropNames,
   contextMenuRootPropNames,
 } from "./props";
 
 const rootProps = getGeneratedProps("contextMenu.root", contextMenuRootPropNames);
 const contentProps = getGeneratedProps("contextMenu.content", contextMenuContentPropNames);
+const positionerProps = getGeneratedProps(
+  "contextMenu.positioner",
+  contextMenuPositionerPropNames,
+);
 const itemProps = getGeneratedProps("contextMenu.item", contextMenuItemPropNames);
 const linkItemProps = getGeneratedProps("contextMenu.linkItem", contextMenuLinkItemPropNames);
 const checkboxItemProps = getGeneratedProps(
@@ -63,6 +68,12 @@ export function ContextMenuPage(): ReactElement {
       </Section>
       <Section title="Content props">
         <PropsTable rows={contentProps} />
+      </Section>
+      <Section
+        title="Positioner props"
+        description="Use Positioner when composing the popup layers directly instead of using Content."
+      >
+        <PropsTable rows={positionerProps} />
       </Section>
       <Section
         title="Item props"

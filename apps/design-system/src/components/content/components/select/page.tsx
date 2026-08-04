@@ -14,12 +14,18 @@ import labelSource from "./labelExample.tsx?raw";
 import PrefixAndSuffixExample from "./prefixAndSuffixExample";
 import prefixAndSuffixSource from "./prefixAndSuffixExample.tsx?raw";
 import { SelectPlayground } from "./playground";
-import { selectItemPropNames, selectRootPropNames, selectTriggerPropNames } from "./props";
+import {
+  selectItemPropNames,
+  selectPositionerPropNames,
+  selectRootPropNames,
+  selectTriggerPropNames,
+} from "./props";
 import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
 
 const rootProps = getGeneratedProps("select.root", selectRootPropNames);
 const triggerProps = getGeneratedProps("select.trigger", selectTriggerPropNames);
+const positionerProps = getGeneratedProps("select.positioner", selectPositionerPropNames);
 const itemProps = getGeneratedProps("select.item", selectItemPropNames);
 
 export function SelectPage(): ReactElement {
@@ -67,6 +73,12 @@ export function SelectPage(): ReactElement {
       </Section>
       <Section title="Trigger props">
         <PropsTable rows={triggerProps} />
+      </Section>
+      <Section
+        title="Positioner props"
+        description="Use Positioner when composing the popup layers directly instead of using Content."
+      >
+        <PropsTable rows={positionerProps} />
       </Section>
       <Section title="Item props">
         <PropsTable rows={itemProps} />

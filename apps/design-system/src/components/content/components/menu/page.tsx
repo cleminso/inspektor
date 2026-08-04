@@ -21,6 +21,7 @@ import {
   menuContentPropNames,
   menuItemPropNames,
   menuLinkItemPropNames,
+  menuPositionerPropNames,
   menuRadioItemPropNames,
   menuRootPropNames,
   menuTriggerPropNames,
@@ -31,6 +32,7 @@ import selectionItemsSource from "./selectionItemsExample.tsx?raw";
 const rootProps = getGeneratedProps("menu.root", menuRootPropNames);
 const triggerProps = getGeneratedProps("menu.trigger", menuTriggerPropNames);
 const contentProps = getGeneratedProps("menu.content", menuContentPropNames);
+const positionerProps = getGeneratedProps("menu.positioner", menuPositionerPropNames);
 const itemProps = getGeneratedProps("menu.item", menuItemPropNames);
 const linkItemProps = getGeneratedProps("menu.linkItem", menuLinkItemPropNames);
 const checkboxItemProps = getGeneratedProps("menu.checkboxItem", menuCheckboxItemPropNames);
@@ -95,6 +97,12 @@ export function MenuPage(): ReactElement {
       </Section>
       <Section title="Content props">
         <PropsTable rows={contentProps} />
+      </Section>
+      <Section
+        title="Positioner props"
+        description="Use Positioner when composing the popup layers directly instead of using Content."
+      >
+        <PropsTable rows={positionerProps} />
       </Section>
       <Section
         title="Item props"

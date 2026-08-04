@@ -227,7 +227,10 @@ const SelectPortal = React.forwardRef<HTMLDivElement, SelectPortalProps>(
 )
 
 const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositionerProps>(
-  function SelectPositioner({ align = 'start', alignItemWithTrigger = false, ...props }, ref) {
+  function SelectPositioner(
+    { align = 'start', alignItemWithTrigger = false, side = 'bottom', ...props },
+    ref,
+  ) {
     const stateStyles = createStateStyleProps<BaseSelect.Positioner.State>(() => [
       selectStyles.positioner,
     ])
@@ -238,6 +241,7 @@ const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositionerProps>
         sideOffset={popupPositioning.dropdownSideOffset}
         align={align}
         alignItemWithTrigger={alignItemWithTrigger}
+        side={side}
         {...stateStyles}
       />
     )

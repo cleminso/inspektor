@@ -1,30 +1,24 @@
-import { useState } from "react";
+import { useState } from 'react'
 
-import type { ColumnDescriptor } from "jazz-tools";
+import type { ColumnDescriptor } from 'jazz-tools'
 
-import { Box, Button, Switch, Text } from "@inspector/ds";
+import { Box, Button, Switch, Text } from '@inspector/ds'
 
-import {
-  RowEditorFields,
-  useRowEditorFields,
-} from "@tables/rowEditor/editorFields";
-import { ROW_EDITOR_FORM_ID } from "@tables/rowEditor/editorForm";
+import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
+import { ROW_EDITOR_FORM_ID } from '@tables/rowEditor/editorForm'
 
 interface InsertRowFormProps {
-  onCancel?: () => void;
-  onDirtyChange?: (isDirty: boolean) => void;
-  onSave: (
-    values: Record<string, unknown>,
-    options?: { keepOpen: boolean },
-  ) => Promise<void> | void;
-  rowValues: Record<string, unknown>;
-  schemaColumns: ColumnDescriptor[];
+  onCancel?: () => void
+  onDirtyChange?: (isDirty: boolean) => void
+  onSave: (values: Record<string, unknown>, options?: { keepOpen: boolean }) => Promise<void> | void
+  rowValues: Record<string, unknown>
+  schemaColumns: ColumnDescriptor[]
 }
 
 interface InsertRowFormFieldsProps extends InsertRowFormProps {
-  insertMoreEnabled: boolean;
-  onInsertMoreEnabledChange: (enabled: boolean) => void;
-  onKeepOpenInsert: () => void;
+  insertMoreEnabled: boolean
+  onInsertMoreEnabledChange: (enabled: boolean) => void
+  onKeepOpenInsert: () => void
 }
 
 function InsertRowFormFields({
@@ -37,21 +31,21 @@ function InsertRowFormFields({
   rowValues,
   schemaColumns,
 }: InsertRowFormFieldsProps): React.ReactElement {
-  const insertMoreFieldId = "insert-more";
+  const insertMoreFieldId = 'insert-more'
 
   const rowEditor = useRowEditorFields({
     initialRowValues: rowValues,
-    mode: "insert",
+    mode: 'insert',
     onDirtyChange,
     onSubmit: async (values) => {
-      await onSave(values, { keepOpen: insertMoreEnabled === true });
+      await onSave(values, { keepOpen: insertMoreEnabled === true })
 
       if (insertMoreEnabled === true) {
-        onKeepOpenInsert();
+        onKeepOpenInsert()
       }
     },
     schemaColumns,
-  });
+  })
 
   return (
     <Box
@@ -64,14 +58,14 @@ function InsertRowFormFields({
       onSubmit={rowEditor.submit}
     >
       <Box
-        data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
-        scrollbar={rowEditor.expandedColumnName === null ? "thin" : undefined}
+        data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? 'form' : 'editor'}
+        scrollbar={rowEditor.expandedColumnName === null ? 'thin' : undefined}
         flexDirection="column"
         flexGrow={1}
         gap="xl"
         mb="m"
         minHeight={0}
-        overflowY={rowEditor.expandedColumnName === null ? "auto" : "hidden"}
+        overflowY={rowEditor.expandedColumnName === null ? 'auto' : 'hidden'}
         px="m"
         py="m"
       >
@@ -88,7 +82,10 @@ function InsertRowFormFields({
           onFieldTextChange={rowEditor.setFieldText}
         />
         {rowEditor.saveError !== null ? (
-          <Text color="error" role="alert">
+          <Text
+            color="error"
+            role="alert"
+          >
             {rowEditor.saveError}
           </Text>
         ) : null}
@@ -118,17 +115,23 @@ function InsertRowFormFields({
             aria-labelledby={`${insertMoreFieldId}-label`}
             checked={insertMoreEnabled}
             nativeButton={true}
-            render={<button type="button" />}
             onCheckedChange={(nextChecked) => {
-              onInsertMoreEnabledChange(nextChecked === true);
+              onInsertMoreEnabledChange(nextChecked === true)
             }}
             disabled={rowEditor.isSaving === true}
           />
-          <Text as="span" id={`${insertMoreFieldId}-label`} color="muted">
+          <Text
+            as="span"
+            id={`${insertMoreFieldId}-label`}
+            color="muted"
+          >
             Insert more
           </Text>
         </Box>
-        <Box alignItems="center" gap="m">
+        <Box
+          alignItems="center"
+          gap="m"
+        >
           {onCancel !== undefined ? (
             <Button
               type="button"
@@ -140,13 +143,18 @@ function InsertRowFormFields({
               Cancel
             </Button>
           ) : null}
-          <Button type="submit" variant="primary" size="s" loading={rowEditor.isSaving === true}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="s"
+            loading={rowEditor.isSaving === true}
+          >
             Insert
           </Button>
         </Box>
       </Box>
     </Box>
-  );
+  )
 }
 
 export function InsertRowForm({
@@ -156,8 +164,8 @@ export function InsertRowForm({
   rowValues,
   schemaColumns,
 }: InsertRowFormProps): React.ReactElement {
-  const [insertMoreEnabled, setInsertMoreEnabled] = useState(false);
-  const [formVersion, setFormVersion] = useState(0);
+  const [insertMoreEnabled, setInsertMoreEnabled] = useState(false)
+  const [formVersion, setFormVersion] = useState(0)
 
   return (
     <InsertRowFormFields
@@ -165,7 +173,7 @@ export function InsertRowForm({
       insertMoreEnabled={insertMoreEnabled}
       onInsertMoreEnabledChange={setInsertMoreEnabled}
       onKeepOpenInsert={() => {
-        setFormVersion((currentVersion) => currentVersion + 1);
+        setFormVersion((currentVersion) => currentVersion + 1)
       }}
       onCancel={onCancel}
       onDirtyChange={onDirtyChange}
@@ -173,5 +181,5 @@ export function InsertRowForm({
       rowValues={rowValues}
       schemaColumns={schemaColumns}
     />
-  );
+  )
 }

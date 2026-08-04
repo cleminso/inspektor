@@ -12,7 +12,9 @@ import { Tooltip } from "../tooltip/tooltip";
 import { InputGroupContext } from "./inputGroupContext";
 import { inputGroupStyles } from "./inputGroup.styles";
 
-export interface InputGroupRootProps extends Pick<React.ComponentPropsWithoutRef<"div">, "children"> {
+export interface InputGroupRootProps {
+  /** Input, adornments, and actions contained by the compound control. */
+  children?: ReactNode;
   /** Controls the height of the compound input. */
   size?: InputSize;
   /** Stretches the group to the width of its container. */
@@ -23,12 +25,12 @@ export interface InputGroupRootProps extends Pick<React.ComponentPropsWithoutRef
   disabled?: boolean;
 }
 
-export interface InputGroupPrefixProps extends Pick<React.ComponentPropsWithoutRef<"span">, "children"> {
+export interface InputGroupPrefixProps {
   /** Static content displayed before the editable value. */
   children: ReactNode;
 }
 
-export interface InputGroupSuffixProps extends Pick<React.ComponentPropsWithoutRef<"span">, "children"> {
+export interface InputGroupSuffixProps {
   /** Static content displayed after the editable value. */
   children: ReactNode;
 }
@@ -174,7 +176,7 @@ const InputGroupAction = forwardRef<ComponentRef<typeof BaseButton>, InputGroupA
       aria-controls={controls}
       aria-pressed={pressed}
       disabled={effectiveDisabled}
-      render={render ?? <button type="button" />}
+      render={render}
       {...stateStyleProps}
       data-slot="input-group-action"
       data-pressed={pressed === true ? "" : undefined}

@@ -290,7 +290,7 @@ const componentEntries = [
     componentId: `menu.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "Menu",
     part,
-    inheritedProps: [],
+    inheritedProps: part === "Positioner" ? ["side", "align"] : [],
   })),
   ...[
     "Root",
@@ -318,7 +318,7 @@ const componentEntries = [
     componentId: `contextMenu.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "ContextMenu",
     part,
-    inheritedProps: [],
+    inheritedProps: part === "Positioner" ? ["side", "align"] : [],
   })),
   ...[
     "Root",
@@ -349,7 +349,7 @@ const componentEntries = [
     componentId: `combobox.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "Combobox",
     part,
-    inheritedProps: [],
+    inheritedProps: part === "Positioner" ? ["side", "align"] : [],
   })),
   ...[
     "Root",
@@ -397,7 +397,8 @@ const componentEntries = [
     componentId: `select.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "Select",
     part,
-    inheritedProps: [],
+    inheritedProps:
+      part === "Positioner" ? ["side", "align", "alignItemWithTrigger"] : [],
   })),
 ];
 

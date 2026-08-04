@@ -51,7 +51,6 @@ export function ComponentDocsPage({
         >
           <Box
             as="section"
-            role="region"
             aria-label={`${title} playground`}
             flexDirection="column"
             width="full"
@@ -86,7 +85,6 @@ export function ComponentDocsPage({
           {children !== undefined ? (
             <Box
               as="section"
-              role="region"
               aria-label={`${title} documentation`}
               width="full"
               minWidth={0}

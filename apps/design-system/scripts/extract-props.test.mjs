@@ -586,7 +586,7 @@ test("extracts the constrained InputGroup compound API", () => {
 
   assert.deepEqual(
     metadata["inputGroup.root"]?.map(({ name }) => name),
-    ["size", "fullWidth", "invalid", "disabled"],
+    ["children", "size", "fullWidth", "invalid", "disabled"],
   );
   assert.deepEqual(
     metadata["inputGroup.prefix"]?.map(({ name }) => name),
@@ -783,6 +783,18 @@ test("extracts the constrained Menu compound API", () => {
     metadata["menu.positioner"]?.find(({ name }) => name === "sideOffset"),
     undefined,
   );
+  assert.deepEqual(
+    metadata["menu.positioner"]?.map(({ name }) => name),
+    ["side", "align"],
+  );
+  assert.equal(
+    metadata["menu.positioner"]?.find(({ name }) => name === "side")?.defaultValue,
+    '"bottom"',
+  );
+  assert.equal(
+    metadata["menu.positioner"]?.find(({ name }) => name === "align")?.defaultValue,
+    '"start"',
+  );
   assert.equal(
     metadata["menu.popup"]?.find(({ name }) => name === "width")?.defaultValue,
     '"content"',
@@ -846,6 +858,18 @@ test("extracts the constrained ContextMenu compound API", () => {
   assert.equal(
     metadata["contextMenu.content"]?.find(({ name }) => name === "sideOffset"),
     undefined,
+  );
+  assert.deepEqual(
+    metadata["contextMenu.positioner"]?.map(({ name }) => name),
+    ["side", "align"],
+  );
+  assert.equal(
+    metadata["contextMenu.positioner"]?.find(({ name }) => name === "side")?.defaultValue,
+    '"bottom"',
+  );
+  assert.equal(
+    metadata["contextMenu.positioner"]?.find(({ name }) => name === "align")?.defaultValue,
+    '"start"',
   );
   assert.equal(
     metadata["contextMenu.item"]?.find(({ name }) => name === "variant")?.defaultValue,
@@ -925,6 +949,14 @@ test("extracts the constrained Combobox compound API", () => {
   assert.equal(
     metadata["combobox.positioner"]?.find(({ name }) => name === "sideOffset"),
     undefined,
+  );
+  assert.equal(
+    metadata["combobox.positioner"]?.find(({ name }) => name === "side")?.defaultValue,
+    '"bottom"',
+  );
+  assert.equal(
+    metadata["combobox.positioner"]?.find(({ name }) => name === "align")?.defaultValue,
+    '"start"',
   );
   assert.deepEqual(
     metadata["combobox.item"]?.map(({ name }) => name),
@@ -1071,6 +1103,22 @@ test("extracts the constrained Select compound API", () => {
   assert.equal(
     metadata["select.positioner"]?.find(({ name }) => name === "sideOffset"),
     undefined,
+  );
+  assert.deepEqual(
+    metadata["select.positioner"]?.map(({ name }) => name),
+    ["side", "align", "alignItemWithTrigger"],
+  );
+  assert.equal(
+    metadata["select.positioner"]?.find(({ name }) => name === "side")?.defaultValue,
+    '"bottom"',
+  );
+  assert.equal(
+    metadata["select.positioner"]?.find(({ name }) => name === "align")?.defaultValue,
+    '"start"',
+  );
+  assert.equal(
+    metadata["select.positioner"]?.find(({ name }) => name === "alignItemWithTrigger")?.defaultValue,
+    "false",
   );
   assert.equal(
     metadata["select.itemIndicator"]?.find(({ name }) => name === "keepMounted")?.defaultValue,

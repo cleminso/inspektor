@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[04/08/26]
+
+- [x] Expose semantic popup side and alignment choices through selective Positioner prop allowlists without exposing arbitrary offset, collision, or tracking geometry.
+- [x] Document each public Positioner separately from its high-level Content composition.
+
 [01/08/26]
 
 - [x] Keep Menu and Context Menu on one action-menu style family.
@@ -27,7 +32,6 @@
 - [x] Align Context Switcher search and footer content through nominal `2px` section padding and nested `6px` control padding.
 - [x] Keep structural Combobox separators flush so section and collection padding are not doubled at boundaries.
 - [x] Keep dropdown and tooltip anchor gaps centralized as internal positioning defaults.
-- [x] Expose semantic popup side and alignment choices without arbitrary offset or collision geometry.
 
 ## Open product work
 

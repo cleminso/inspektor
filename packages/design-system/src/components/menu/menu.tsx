@@ -178,7 +178,7 @@ const MenuPortal = forwardRef<HTMLDivElement, MenuPortalProps>(function MenuPort
 });
 
 const MenuPositioner = forwardRef<HTMLDivElement, MenuPositionerProps>(function MenuPositioner(
-  { align = "start", ...props },
+  { align = "start", side = "bottom", ...props },
   ref,
 ) {
   const stateStyles = createStateStyleProps<BaseMenu.Positioner.State>(() => [menuStyles.positioner]);
@@ -188,6 +188,7 @@ const MenuPositioner = forwardRef<HTMLDivElement, MenuPositionerProps>(function 
       ref={ref}
       sideOffset={popupPositioning.dropdownSideOffset}
       align={align}
+      side={side}
       {...stateStyles}
     />
   );

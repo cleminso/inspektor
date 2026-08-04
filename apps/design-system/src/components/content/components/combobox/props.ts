@@ -20,11 +20,11 @@ export const comboboxRootPropNames = [
   "readOnly",
   "disabled",
 ] as const;
-export const comboboxContentPropNames = ["width", "keepMounted", "align"] as const;
+export const comboboxContentPropNames = ["width", "keepMounted", "side", "align"] as const;
 export const comboboxClearPropNames = ["label", "keepMounted", "disabled", "render"] as const;
 export const comboboxTriggerPropNames = ["size", "width", "disabled", "render"] as const;
 export const comboboxInputTriggerPropNames = ["disabled"] as const;
-export const comboboxPositionerPropNames = ["align"] as const;
+export const comboboxPositionerPropNames = ["side", "align"] as const;
 export const comboboxPopupPropNames = ["width"] as const;
 export const comboboxPopupHeaderPropNames = [] as const;
 export const comboboxPopupFooterPropNames = [] as const;

@@ -3895,6 +3895,16 @@
   ],
   "inputGroup.root": [
     {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Input, adornments, and actions contained by the compound control.",
+      "source": {
+        "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
+        "line": 17
+      }
+    },
+    {
       "name": "size",
       "type": "\"s\" | \"m\" | \"l\"",
       "required": false,
@@ -3902,7 +3912,7 @@
       "description": "Controls the height of the compound input.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 17
+        "line": 19
       }
     },
     {
@@ -3913,7 +3923,7 @@
       "description": "Stretches the group to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 19
+        "line": 21
       }
     },
     {
@@ -3924,7 +3934,7 @@
       "description": "Marks the compound input as invalid. Field.Root supplies this automatically.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 21
+        "line": 23
       }
     },
     {
@@ -3935,7 +3945,7 @@
       "description": "Disables the input and every interactive group member.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 23
+        "line": 25
       }
     }
   ],
@@ -3947,7 +3957,7 @@
       "description": "Static content displayed before the editable value.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 28
+        "line": 30
       }
     }
   ],
@@ -3959,7 +3969,7 @@
       "description": "Static content displayed after the editable value.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 33
+        "line": 35
       }
     }
   ],
@@ -3971,7 +3981,7 @@
       "description": "Accessible name for the action.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 49
+        "line": 51
       }
     },
     {
@@ -3981,7 +3991,7 @@
       "description": "Identifies the input controlled by the action.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 51
+        "line": 53
       }
     },
     {
@@ -3991,7 +4001,7 @@
       "description": "Exposes toggle state for actions such as password visibility.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 53
+        "line": 55
       }
     },
     {
@@ -4002,7 +4012,7 @@
       "description": "Disables the action.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 55
+        "line": 57
       }
     },
     {
@@ -4012,7 +4022,7 @@
       "description": "Composes action behavior and styles onto another native button.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 57
+        "line": 59
       }
     },
     {
@@ -4022,7 +4032,7 @@
       "description": "Decorative action content.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 59
+        "line": 61
       }
     },
     {
@@ -4044,7 +4054,7 @@
       "description": "Accessible name that identifies the value controlled by the checkbox.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 64
+        "line": 66
       }
     },
     {
@@ -4054,7 +4064,7 @@
       "description": "Controls whether the option is checked.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 66
+        "line": 68
       }
     },
     {
@@ -4064,7 +4074,7 @@
       "description": "Sets the initial checked state when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 68
+        "line": 70
       }
     },
     {
@@ -4074,7 +4084,7 @@
       "description": "Runs when checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 70
+        "line": 72
       }
     },
     {
@@ -4085,7 +4095,7 @@
       "description": "Disables the checkbox.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 72
+        "line": 74
       }
     },
     {
@@ -4096,7 +4106,7 @@
       "description": "Prevents changes while preserving focus.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 74
+        "line": 76
       }
     },
     {
@@ -4106,7 +4116,7 @@
       "description": "Provides supplementary guidance on hover and keyboard focus.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 76
+        "line": 78
       }
     },
     {
@@ -4116,7 +4126,7 @@
       "description": "Visible checkbox label.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
-        "line": 78
+        "line": 80
       }
     }
   ],
@@ -4670,7 +4680,30 @@
       }
     }
   ],
-  "menu.positioner": [],
+  "menu.positioner": [
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
+      "required": false,
+      "defaultValue": "\"bottom\"",
+      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 86
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"center\" | \"start\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "How to align the popup relative to the specified side.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 116
+      }
+    }
+  ],
   "menu.popup": [
     {
       "name": "width",
@@ -5023,7 +5056,30 @@
     }
   ],
   "contextMenu.portal": [],
-  "contextMenu.positioner": [],
+  "contextMenu.positioner": [
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
+      "required": false,
+      "defaultValue": "\"bottom\"",
+      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 86
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"center\" | \"start\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "How to align the popup relative to the specified side.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 116
+      }
+    }
+  ],
   "contextMenu.popup": [],
   "contextMenu.content": [
     {
@@ -5574,7 +5630,30 @@
       }
     }
   ],
-  "combobox.positioner": [],
+  "combobox.positioner": [
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
+      "required": false,
+      "defaultValue": "\"bottom\"",
+      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 86
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"center\" | \"start\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "How to align the popup relative to the specified side.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 116
+      }
+    }
+  ],
   "combobox.popup": [
     {
       "name": "width",
@@ -5631,6 +5710,17 @@
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
         "line": 145
       }
+    },
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
+      "required": false,
+      "defaultValue": "\"bottom\"",
+      "description": "Places the popup on this side of the control.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 147
+      }
     }
   ],
   "combobox.popupHeader": [],
@@ -5644,7 +5734,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 165
+        "line": 167
       }
     }
   ],
@@ -5657,7 +5747,7 @@
       "description": "Accessible label for the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 180
+        "line": 182
       }
     },
     {
@@ -5668,7 +5758,7 @@
       "description": "Keeps the clear action mounted when no value is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 182
+        "line": 184
       }
     },
     {
@@ -5679,7 +5769,7 @@
       "description": "Disables the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 184
+        "line": 186
       }
     },
     {
@@ -5689,7 +5779,7 @@
       "description": "Composes clear behavior onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 186
+        "line": 188
       }
     }
   ],
@@ -5707,7 +5797,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 191
+        "line": 193
       }
     },
     {
@@ -5718,7 +5808,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 193
+        "line": 195
       }
     },
     {
@@ -5728,7 +5818,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 197
       }
     }
   ],
@@ -5740,7 +5830,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 200
+        "line": 202
       }
     },
     {
@@ -5750,7 +5840,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 202
+        "line": 204
       }
     }
   ],
@@ -5763,7 +5853,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 210
+        "line": 212
       }
     }
   ],
@@ -6038,7 +6128,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 191
+        "line": 193
       }
     },
     {
@@ -6049,7 +6139,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 193
+        "line": 195
       }
     },
     {
@@ -6059,7 +6149,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 197
       }
     }
   ],
@@ -6071,7 +6161,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 200
+        "line": 202
       }
     },
     {
@@ -6081,7 +6171,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 202
+        "line": 204
       }
     }
   ],
@@ -6435,7 +6525,41 @@
   "select.value": [],
   "select.icon": [],
   "select.portal": [],
-  "select.positioner": [],
+  "select.positioner": [
+    {
+      "name": "side",
+      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
+      "required": false,
+      "defaultValue": "\"bottom\"",
+      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 86
+      }
+    },
+    {
+      "name": "align",
+      "type": "\"center\" | \"start\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "How to align the popup relative to the specified side.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "line": 116
+      }
+    },
+    {
+      "name": "alignItemWithTrigger",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the positioner overlaps the trigger so the selected item's text is aligned with the trigger's value text. This only applies to mouse input and is automatically disabled if there is not enough space.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/select/positioner/SelectPositioner.d.mts",
+        "line": 34
+      }
+    }
+  ],
   "select.popup": [],
   "select.list": [],
   "select.content": [

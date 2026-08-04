@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type PropsWithChildren } from "react";
+import { createContext, useCallback, useContext, useMemo, type PropsWithChildren } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 
 import { getConnectionDisplayName, type StoredConnection } from "@app/connections/connections";
@@ -52,7 +52,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
   const currentBranch = connectionPreferences?.lastBranch ?? null;
   const currentSchemaHash = connectionPreferences?.lastSchemaHash ?? null;
 
-  const openConnection = async (connectionId: string, knownSchemaHashes?: string[]) => {
+  const openConnection = useCallback(async (connectionId: string, knownSchemaHashes?: string[]) => {
     const nextTarget = await resolveTablesNavigationTarget({
       connectionId,
       getConnection: (nextConnectionId) => session.getConnection(nextConnectionId),
@@ -71,9 +71,9 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       to: appRoutes.tables,
       params: { connectionId },
     });
-  };
+  }, [navigate, session]);
 
-  const switchBranch = async (branch: string, knownSchemaHashes?: string[]) => {
+  const switchBranch = useCallback(async (branch: string, knownSchemaHashes?: string[]) => {
     if (activeConnection === null) {
       return;
     }
@@ -97,15 +97,15 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       nextTarget.branch,
       nextTarget.schemaHash,
     );
-  };
+  }, [activeConnection, currentSchemaHash, session]);
 
-  const switchSchema = async (schemaHash: string) => {
+  const switchSchema = useCallback(async (schemaHash: string) => {
     if (activeConnection === null || currentBranch === null) {
       return;
     }
 
     session.setConnectionContext(activeConnection.id, currentBranch, schemaHash);
-  };
+  }, [activeConnection, currentBranch, session]);
 
   const value = useMemo<InspectorSessionContextValue>(
     () => ({
@@ -125,7 +125,17 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       setConnectionContext: session.setConnectionContext,
       prefill: session.prefill,
     }),
-    [activeConnection, currentBranch, currentConnectionId, currentSchemaHash, currentTableName, session],
+    [
+      activeConnection,
+      currentBranch,
+      currentConnectionId,
+      currentSchemaHash,
+      currentTableName,
+      openConnection,
+      session,
+      switchBranch,
+      switchSchema,
+    ],
   );
 
   return <InspectorSessionContext.Provider value={value}>{children}</InspectorSessionContext.Provider>;

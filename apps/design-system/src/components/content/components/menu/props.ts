@@ -6,6 +6,7 @@ export const menuContentPropNames = [
   "side",
   "width",
 ] as const;
+export const menuPositionerPropNames = ["side", "align"] as const;
 export const menuItemPropNames = ["variant", "disabled", "closeOnClick"] as const;
 export const menuLinkItemPropNames = ["closeOnClick"] as const;
 export const menuCheckboxItemPropNames = [

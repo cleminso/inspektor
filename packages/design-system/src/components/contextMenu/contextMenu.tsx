@@ -145,7 +145,7 @@ const ContextMenuPortal = forwardRef<
 const ContextMenuPositioner = forwardRef<
   ComponentRef<typeof BaseContextMenu.Positioner>,
   ContextMenuPositionerProps
->(function ContextMenuPositioner({ align = "start", ...props }, forwardedRef) {
+>(function ContextMenuPositioner({ align = "start", side = "bottom", ...props }, forwardedRef) {
   const stateStyles = createStateStyleProps<BaseContextMenu.Positioner.State>(() => [
     menuStyles.positioner,
   ]);
@@ -154,6 +154,7 @@ const ContextMenuPositioner = forwardRef<
       {...props}
       ref={forwardedRef}
       align={align}
+      side={side}
       sideOffset={popupPositioning.dropdownSideOffset}
       {...stateStyles}
     />

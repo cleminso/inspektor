@@ -344,16 +344,17 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
     }
     setActiveColumnId(columnId);
   }, []);
+  const setColumnOrder = order.setColumnOrder;
   const handleColumnMove = useCallback(
     (columnId: string, direction: ColumnMoveDirection) => {
       const visibleColumnOrder = order.columnOrder.filter(
         (candidateId) => visibility.columnVisibility[candidateId] !== false,
       );
-      order.setColumnOrder(
+      setColumnOrder(
         moveColumnInOrder(order.columnOrder, columnId, direction, visibleColumnOrder),
       );
     },
-    [order.columnOrder, order.setColumnOrder, visibility.columnVisibility],
+    [order.columnOrder, setColumnOrder, visibility.columnVisibility],
   );
 
   const table = useTableGrid({
