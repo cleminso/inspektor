@@ -118,6 +118,12 @@ const SelectLabel = React.forwardRef<HTMLDivElement, SelectLabelProps>(
     const stateStyles = createStateStyleProps<BaseSelect.Label.State>((state) => [
       selectStyles.label,
       state.disabled === true && selectStyles.labelDisabled,
+      state.valid === true && selectStyles.labelValid,
+      state.valid === false && selectStyles.labelInvalid,
+      state.touched === true && selectStyles.labelTouched,
+      state.dirty === true && selectStyles.labelDirty,
+      state.filled === true && selectStyles.labelFilled,
+      state.focused === true && selectStyles.labelFocused,
     ])
     return <BaseSelect.Label {...props} ref={ref} {...stateStyles} />
   },
@@ -160,8 +166,22 @@ const SelectTrigger = React.forwardRef<React.ComponentRef<typeof BaseSelect.Trig
       sizeStyles[size],
       widthStyles[resolvedWidth],
       state.open === true && selectStyles.triggerOpen,
+      state.open === true && selectStyles.triggerPressed,
       state.valid === false && selectStyles.triggerInvalid,
       state.disabled === true && selectStyles.disabled,
+      state.readOnly === true && selectStyles.triggerReadOnly,
+      state.valid === true && selectStyles.triggerValid,
+      state.touched === true && selectStyles.triggerTouched,
+      state.dirty === true && selectStyles.triggerDirty,
+      state.filled === true && selectStyles.triggerFilled,
+      state.focused === true && selectStyles.triggerFocused,
+      state.placeholder === true && selectStyles.triggerPlaceholder,
+      state.popupSide === 'top' && selectStyles.triggerSideTop,
+      state.popupSide === 'bottom' && selectStyles.triggerSideBottom,
+      state.popupSide === 'left' && selectStyles.triggerSideLeft,
+      state.popupSide === 'right' && selectStyles.triggerSideRight,
+      state.popupSide === 'inline-start' && selectStyles.triggerSideInlineStart,
+      state.popupSide === 'inline-end' && selectStyles.triggerSideInlineEnd,
     ])
     const adornmentStyles = stylex.props(selectStyles.adornment)
     const hasIcon = hasChild(children, SelectIcon)
@@ -206,8 +226,9 @@ const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
 
 const SelectIcon = React.forwardRef<HTMLSpanElement, SelectIconProps>(
   function SelectIcon(props, ref) {
-    const stateStyles = createStateStyleProps<BaseSelect.Icon.State>(() => [
+    const stateStyles = createStateStyleProps<BaseSelect.Icon.State>((state) => [
       selectStyles.iconContainer,
+      state.open === true && selectStyles.iconOpen,
     ])
     const iconStyles = stylex.props(selectStyles.icon)
     return (
@@ -231,8 +252,21 @@ const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositionerProps>
     { align = 'start', alignItemWithTrigger = false, side = 'bottom', ...props },
     ref,
   ) {
-    const stateStyles = createStateStyleProps<BaseSelect.Positioner.State>(() => [
+    const stateStyles = createStateStyleProps<BaseSelect.Positioner.State>((state) => [
       selectStyles.positioner,
+      state.open === true && selectStyles.positionerOpen,
+      state.open === false && selectStyles.positionerClosed,
+      state.side === 'none' && selectStyles.positionerSideNone,
+      state.side === 'top' && selectStyles.positionerSideTop,
+      state.side === 'bottom' && selectStyles.positionerSideBottom,
+      state.side === 'left' && selectStyles.positionerSideLeft,
+      state.side === 'right' && selectStyles.positionerSideRight,
+      state.side === 'inline-start' && selectStyles.positionerSideInlineStart,
+      state.side === 'inline-end' && selectStyles.positionerSideInlineEnd,
+      state.align === 'start' && selectStyles.positionerAlignStart,
+      state.align === 'center' && selectStyles.positionerAlignCenter,
+      state.align === 'end' && selectStyles.positionerAlignEnd,
+      state.anchorHidden === true && selectStyles.positionerAnchorHidden,
     ])
     return (
       <BaseSelect.Positioner
@@ -254,6 +288,20 @@ const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(
       selectStyles.popup,
       (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
         selectStyles.popupTransition,
+      state.open === true && selectStyles.popupOpen,
+      state.open === false && selectStyles.popupClosed,
+      state.transitionStatus === 'starting' && selectStyles.popupStarting,
+      state.transitionStatus === 'ending' && selectStyles.popupEnding,
+      state.side === 'none' && selectStyles.popupSideNone,
+      state.side === 'top' && selectStyles.popupSideTop,
+      state.side === 'bottom' && selectStyles.popupSideBottom,
+      state.side === 'left' && selectStyles.popupSideLeft,
+      state.side === 'right' && selectStyles.popupSideRight,
+      state.side === 'inline-start' && selectStyles.popupSideInlineStart,
+      state.side === 'inline-end' && selectStyles.popupSideInlineEnd,
+      state.align === 'start' && selectStyles.popupAlignStart,
+      state.align === 'center' && selectStyles.popupAlignCenter,
+      state.align === 'end' && selectStyles.popupAlignEnd,
     ])
     return <BaseSelect.Popup {...props} ref={ref} {...stateStyles} />
   },
@@ -342,8 +390,11 @@ const SelectItemText = React.forwardRef<HTMLDivElement, SelectItemTextProps>(
 
 const SelectItemIndicator = React.forwardRef<HTMLSpanElement, SelectItemIndicatorProps>(
   function SelectItemIndicator({ keepMounted = false, ...props }, ref) {
-    const stateStyles = createStateStyleProps<BaseSelect.ItemIndicator.State>(() => [
+    const stateStyles = createStateStyleProps<BaseSelect.ItemIndicator.State>((state) => [
       selectStyles.indicator,
+      state.selected === true && selectStyles.indicatorSelected,
+      state.transitionStatus === 'starting' && selectStyles.indicatorStarting,
+      state.transitionStatus === 'ending' && selectStyles.indicatorEnding,
     ])
     const iconStyles = stylex.props(selectStyles.icon)
     return (
@@ -371,7 +422,7 @@ const SelectItemIndicator = React.forwardRef<HTMLSpanElement, SelectItemIndicato
 
 const SelectGroup = React.forwardRef<HTMLDivElement, SelectGroupProps>(
   function SelectGroup(props, ref) {
-    return <BaseSelect.Group {...props} ref={ref} data-slot="select-group" />
+    return <BaseSelect.Group {...props} ref={ref} {...stylex.props(selectStyles.group)} data-slot="select-group" />
   },
 )
 
@@ -384,8 +435,12 @@ const SelectGroupLabel = React.forwardRef<HTMLDivElement, SelectGroupLabelProps>
 
 const SelectSeparator = React.forwardRef<HTMLDivElement, SelectSeparatorProps>(
   function SelectSeparator(props, ref) {
-    const styles = stylex.props(selectStyles.separator)
-    return <BaseSelect.Separator {...props} ref={ref} {...styles} />
+    const stateStyles = createStateStyleProps<BaseSelect.Separator.State>((state) => [
+      selectStyles.separator,
+      state.orientation === 'horizontal' && selectStyles.separatorHorizontal,
+      state.orientation === 'vertical' && selectStyles.separatorVertical,
+    ])
+    return <BaseSelect.Separator {...props} ref={ref} {...stateStyles} />
   },
 )
 

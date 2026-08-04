@@ -76,6 +76,7 @@ function ToggleGroupRootInner<Value extends string>(
     toggleGroupStyles.root,
     state.orientation === 'horizontal' ? toggleGroupStyles.horizontal : toggleGroupStyles.vertical,
     state.disabled === true && toggleGroupStyles.rootDisabled,
+    state.multiple === true && toggleGroupStyles.rootMultiple,
     width === 'full' && toggleGroupStyles.rootFullWidth,
     state.orientation === 'horizontal' && sizeStyles[size],
   ])

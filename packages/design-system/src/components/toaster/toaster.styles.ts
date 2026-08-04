@@ -43,6 +43,7 @@ export const toasterStyles = stylex.create({
     right: { default: spacing.xl, [compactViewport]: spacing.m },
     width: { default: spatial['popup-width-l'], [compactViewport]: 'auto' },
   },
+  viewportExpanded: {},
   toast: {
     borderColor: borderColors.border,
     borderRadius: borderRadii.xs,
@@ -98,6 +99,8 @@ export const toasterStyles = stylex.create({
   toastError: {
     borderColor: borderColors['border-danger'],
   },
+  toastMessage: {},
+  toastLoading: {},
   toastExpanded: {
     height: 'var(--toast-height)',
     transform:
@@ -110,6 +113,11 @@ export const toasterStyles = stylex.create({
   toastEndingRight: { transform: 'translateX(calc(var(--toast-swipe-movement-x) + 125%))' },
   toastEndingUp: { transform: 'translateY(calc(var(--toast-swipe-movement-y) - 125%))' },
   toastEndingDown: { transform: 'translateY(calc(var(--toast-swipe-movement-y) + 125%))' },
+  toastSwiping: {},
+  toastSwipeLeft: {},
+  toastSwipeRight: {},
+  toastSwipeUp: {},
+  toastSwipeDown: {},
   content: {
     gap: spacing.xs,
     overflow: 'hidden',
@@ -140,6 +148,11 @@ export const toasterStyles = stylex.create({
     fontWeight: fontWeights.medium,
     lineHeight: lineHeights.ui,
   },
+  titleMessage: {},
+  titleSuccess: {},
+  titleWarning: {},
+  titleError: {},
+  titleLoading: {},
   description: {
     margin: 0,
     color: toasterVars.descriptionColor,
@@ -147,6 +160,11 @@ export const toasterStyles = stylex.create({
     fontWeight: fontWeights.regular,
     lineHeight: lineHeights.compact,
   },
+  descriptionMessage: {},
+  descriptionSuccess: {},
+  descriptionWarning: {},
+  descriptionError: {},
+  descriptionLoading: {},
   action: {
     borderRadius: borderRadii.xs,
     borderWidth: 0,
@@ -172,6 +190,11 @@ export const toasterStyles = stylex.create({
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
     height: spatial['control-height-s'],
   },
+  actionMessage: {},
+  actionSuccess: {},
+  actionWarning: {},
+  actionError: {},
+  actionLoading: {},
   close: {
     padding: 0,
     borderColor: 'transparent',
@@ -197,5 +220,10 @@ export const toasterStyles = stylex.create({
     height: spatial['control-height-s'],
     width: spatial['control-height-s'],
   },
+  closeMessage: {},
+  closeSuccess: {},
+  closeWarning: {},
+  closeError: {},
+  closeLoading: {},
   closeIcon: { display: 'block', height: spatial['icon-size-s'], width: spatial['icon-size-s'] },
 })

@@ -37,6 +37,7 @@ export const toggleGroupStyles = stylex.create({
   rootDisabled: {
     opacity: 0.6,
   },
+  rootMultiple: {},
   rootFullWidth: {
     width: '100%',
   },

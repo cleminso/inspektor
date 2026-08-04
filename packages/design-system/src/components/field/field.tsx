@@ -59,6 +59,13 @@ const FieldRoot = forwardRef<ComponentRef<typeof BaseField.Root>, FieldRootProps
       fieldStyles.root,
       state.valid === false && fieldStyles.inputGroupInvalid,
       state.disabled === true && fieldStyles.inputGroupDisabled,
+      state.disabled === true && fieldStyles.rootDisabled,
+      state.valid === true && fieldStyles.rootValid,
+      state.valid === false && fieldStyles.rootInvalid,
+      state.touched === true && fieldStyles.rootTouched,
+      state.dirty === true && fieldStyles.rootDirty,
+      state.filled === true && fieldStyles.rootFilled,
+      state.focused === true && fieldStyles.rootFocused,
     ]);
 
     return (
@@ -81,6 +88,13 @@ const FieldLabel = forwardRef<ComponentRef<typeof BaseField.Label>, FieldLabelPr
     const stateStyleProps = createStateStyleProps<BaseField.Label.State>((state) => [
       fieldStyles.label,
       state.disabled === true && fieldStyles.disabled,
+      state.disabled === true && fieldStyles.labelDisabled,
+      state.valid === true && fieldStyles.labelValid,
+      state.valid === false && fieldStyles.labelInvalid,
+      state.touched === true && fieldStyles.labelTouched,
+      state.dirty === true && fieldStyles.labelDirty,
+      state.filled === true && fieldStyles.labelFilled,
+      state.focused === true && fieldStyles.labelFocused,
     ]);
 
     return (
@@ -104,6 +118,13 @@ const FieldDescription = forwardRef<
     fieldStyles.message,
     fieldStyles.description,
     state.disabled === true && fieldStyles.disabled,
+    state.disabled === true && fieldStyles.descriptionDisabled,
+    state.valid === true && fieldStyles.descriptionValid,
+    state.valid === false && fieldStyles.descriptionInvalid,
+    state.touched === true && fieldStyles.descriptionTouched,
+    state.dirty === true && fieldStyles.descriptionDirty,
+    state.filled === true && fieldStyles.descriptionFilled,
+    state.focused === true && fieldStyles.descriptionFocused,
   ]);
 
   return (
@@ -123,6 +144,15 @@ const FieldError = forwardRef<ComponentRef<typeof BaseField.Error>, FieldErrorPr
       fieldStyles.message,
       fieldStyles.error,
       state.disabled === true && fieldStyles.disabled,
+      state.disabled === true && fieldStyles.errorDisabled,
+      state.valid === true && fieldStyles.errorValid,
+      state.valid === false && fieldStyles.errorInvalid,
+      state.touched === true && fieldStyles.errorTouched,
+      state.dirty === true && fieldStyles.errorDirty,
+      state.filled === true && fieldStyles.errorFilled,
+      state.focused === true && fieldStyles.errorFocused,
+      state.transitionStatus === "starting" && fieldStyles.errorStarting,
+      state.transitionStatus === "ending" && fieldStyles.errorEnding,
     ]);
 
     return (

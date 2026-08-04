@@ -9,4 +9,6 @@ export const contextMenuStyles = stylex.create({
     outlineStyle: "solid",
     outlineWidth: { default: 0, ":focus-visible": spatial["focus-ring-width"] },
   },
+  triggerOpen: {},
+  triggerPressed: {},
 });

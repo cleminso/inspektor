@@ -69,6 +69,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
     state.disabled === true && textareaStyles.disabled,
     readOnly === true && textareaStyles.readOnly,
     (invalid === true || state.valid === false) && textareaStyles.invalid,
+    state.valid === true && textareaStyles.valid,
+    state.touched === true && textareaStyles.touched,
+    state.dirty === true && textareaStyles.dirty,
+    state.filled === true && textareaStyles.filled,
+    state.focused === true && textareaStyles.focused,
   ])
 
   return (

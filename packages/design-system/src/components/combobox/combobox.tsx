@@ -245,6 +245,22 @@ const ComboboxInputGroup = forwardRef<
     focusVisible === true && comboboxStyles.inputGroupFocusVisible,
     state.valid === false && comboboxStyles.inputGroupInvalid,
     state.disabled === true && comboboxStyles.inputGroupDisabled,
+    state.open === true && comboboxStyles.inputGroupOpen,
+    state.open === true && comboboxStyles.inputGroupPressed,
+    state.readOnly === true && comboboxStyles.inputGroupReadOnly,
+    state.valid === true && comboboxStyles.inputGroupValid,
+    state.touched === true && comboboxStyles.inputGroupTouched,
+    state.dirty === true && comboboxStyles.inputGroupDirty,
+    state.filled === true && comboboxStyles.inputGroupFilled,
+    state.focused === true && comboboxStyles.inputGroupFocused,
+    state.listEmpty === true && comboboxStyles.inputGroupListEmpty,
+    state.placeholder === true && comboboxStyles.inputGroupPlaceholder,
+    state.popupSide === "top" && comboboxStyles.inputGroupSideTop,
+    state.popupSide === "bottom" && comboboxStyles.inputGroupSideBottom,
+    state.popupSide === "left" && comboboxStyles.inputGroupSideLeft,
+    state.popupSide === "right" && comboboxStyles.inputGroupSideRight,
+    state.popupSide === "inline-start" && comboboxStyles.inputGroupSideInlineStart,
+    state.popupSide === "inline-end" && comboboxStyles.inputGroupSideInlineEnd,
   ]);
   return (
     <BaseCombobox.InputGroup
@@ -283,6 +299,22 @@ const ComboboxInput = forwardRef<ComponentRef<typeof BaseCombobox.Input>, Combob
     const stateStyles = createStateStyleProps<BaseCombobox.Input.State>((state) => [
       comboboxStyles.input,
       state.disabled === true && comboboxStyles.inputDisabled,
+      state.open === true && comboboxStyles.inputOpen,
+      state.open === true && comboboxStyles.inputPressed,
+      state.readOnly === true && comboboxStyles.inputReadOnly,
+      state.valid === true && comboboxStyles.inputValid,
+      state.valid === false && comboboxStyles.inputInvalid,
+      state.touched === true && comboboxStyles.inputTouched,
+      state.dirty === true && comboboxStyles.inputDirty,
+      state.filled === true && comboboxStyles.inputFilled,
+      state.focused === true && comboboxStyles.inputFocused,
+      state.listEmpty === true && comboboxStyles.inputListEmpty,
+      state.popupSide === "top" && comboboxStyles.inputSideTop,
+      state.popupSide === "bottom" && comboboxStyles.inputSideBottom,
+      state.popupSide === "left" && comboboxStyles.inputSideLeft,
+      state.popupSide === "right" && comboboxStyles.inputSideRight,
+      state.popupSide === "inline-start" && comboboxStyles.inputSideInlineStart,
+      state.popupSide === "inline-end" && comboboxStyles.inputSideInlineEnd,
     ]);
     return (
       <BaseCombobox.Input
@@ -302,6 +334,22 @@ const ComboboxInputTrigger = forwardRef<
   const stateStyles = createStateStyleProps<BaseCombobox.Trigger.State>((state) => [
     comboboxStyles.action,
     state.disabled === true && comboboxStyles.actionDisabled,
+    state.open === true && comboboxStyles.inputTriggerOpen,
+    state.open === true && comboboxStyles.inputTriggerPressed,
+    state.valid === true && comboboxStyles.inputTriggerValid,
+    state.valid === false && comboboxStyles.inputTriggerInvalid,
+    state.touched === true && comboboxStyles.inputTriggerTouched,
+    state.dirty === true && comboboxStyles.inputTriggerDirty,
+    state.filled === true && comboboxStyles.inputTriggerFilled,
+    state.focused === true && comboboxStyles.inputTriggerFocused,
+    state.listEmpty === true && comboboxStyles.inputTriggerListEmpty,
+    state.placeholder === true && comboboxStyles.inputTriggerPlaceholder,
+    state.popupSide === "top" && comboboxStyles.inputTriggerSideTop,
+    state.popupSide === "bottom" && comboboxStyles.inputTriggerSideBottom,
+    state.popupSide === "left" && comboboxStyles.inputTriggerSideLeft,
+    state.popupSide === "right" && comboboxStyles.inputTriggerSideRight,
+    state.popupSide === "inline-start" && comboboxStyles.inputTriggerSideInlineStart,
+    state.popupSide === "inline-end" && comboboxStyles.inputTriggerSideInlineEnd,
   ]);
   return (
     <BaseCombobox.Trigger
@@ -347,6 +395,22 @@ const ComboboxTrigger = forwardRef<ComponentRef<typeof BaseCombobox.Trigger>, Co
       comboboxStyles.trigger,
       triggerWidthStyles[width],
       state.open === true && comboboxStyles.triggerOpen,
+      state.open === true && comboboxStyles.triggerPressed,
+      state.disabled === true && comboboxStyles.triggerDisabled,
+      state.valid === true && comboboxStyles.triggerValid,
+      state.valid === false && comboboxStyles.triggerInvalid,
+      state.touched === true && comboboxStyles.triggerTouched,
+      state.dirty === true && comboboxStyles.triggerDirty,
+      state.filled === true && comboboxStyles.triggerFilled,
+      state.focused === true && comboboxStyles.triggerFocused,
+      state.listEmpty === true && comboboxStyles.triggerListEmpty,
+      state.placeholder === true && comboboxStyles.triggerPlaceholder,
+      state.popupSide === "top" && comboboxStyles.triggerSideTop,
+      state.popupSide === "bottom" && comboboxStyles.triggerSideBottom,
+      state.popupSide === "left" && comboboxStyles.triggerSideLeft,
+      state.popupSide === "right" && comboboxStyles.triggerSideRight,
+      state.popupSide === "inline-start" && comboboxStyles.triggerSideInlineStart,
+      state.popupSide === "inline-end" && comboboxStyles.triggerSideInlineEnd,
     ]);
     return (
       <BaseCombobox.Trigger
@@ -386,8 +450,17 @@ function ComboboxChevron({ open }: { open: boolean }) {
 
 const ComboboxLabel = forwardRef<ComponentRef<typeof BaseCombobox.Label>, ComboboxLabelProps>(
   function ComboboxLabel(props, forwardedRef) {
-    const styles = stylex.props(comboboxStyles.label);
-    return <BaseCombobox.Label {...props} ref={forwardedRef} {...styles} />;
+    const stateStyles = createStateStyleProps<BaseCombobox.Label.State>((state) => [
+      comboboxStyles.label,
+      state.disabled === true && comboboxStyles.labelDisabled,
+      state.valid === true && comboboxStyles.labelValid,
+      state.valid === false && comboboxStyles.labelInvalid,
+      state.touched === true && comboboxStyles.labelTouched,
+      state.dirty === true && comboboxStyles.labelDirty,
+      state.filled === true && comboboxStyles.labelFilled,
+      state.focused === true && comboboxStyles.labelFocused,
+    ]);
+    return <BaseCombobox.Label {...props} ref={forwardedRef} {...stateStyles} />;
   },
 );
 
@@ -405,8 +478,21 @@ const ComboboxPositioner = forwardRef<
   ComponentRef<typeof BaseCombobox.Positioner>,
   ComboboxPositionerProps
 >(function ComboboxPositioner({ align = "start", side = "bottom", ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseCombobox.Positioner.State>(() => [
+  const stateStyles = createStateStyleProps<BaseCombobox.Positioner.State>((state) => [
     comboboxStyles.positioner,
+    state.open === true && comboboxStyles.positionerOpen,
+    state.open === false && comboboxStyles.positionerClosed,
+    state.anchorHidden === true && comboboxStyles.positionerAnchorHidden,
+    state.empty === true && comboboxStyles.positionerEmpty,
+    state.side === "top" && comboboxStyles.positionerSideTop,
+    state.side === "bottom" && comboboxStyles.positionerSideBottom,
+    state.side === "left" && comboboxStyles.positionerSideLeft,
+    state.side === "right" && comboboxStyles.positionerSideRight,
+    state.side === "inline-start" && comboboxStyles.positionerSideInlineStart,
+    state.side === "inline-end" && comboboxStyles.positionerSideInlineEnd,
+    state.align === "start" && comboboxStyles.positionerAlignStart,
+    state.align === "center" && comboboxStyles.positionerAlignCenter,
+    state.align === "end" && comboboxStyles.positionerAlignEnd,
   ]);
   return (
     <BaseCombobox.Positioner
@@ -435,6 +521,21 @@ const ComboboxPopup = forwardRef<ComponentRef<typeof BaseCombobox.Popup>, Combob
       popupWidthStyles[width],
       (state.transitionStatus === "starting" || state.transitionStatus === "ending") &&
         comboboxStyles.popupTransition,
+      state.open === true && comboboxStyles.popupOpen,
+      state.open === false && comboboxStyles.popupClosed,
+      state.anchorHidden === true && comboboxStyles.popupAnchorHidden,
+      state.empty === true && comboboxStyles.popupEmpty,
+      state.transitionStatus === "starting" && comboboxStyles.popupStarting,
+      state.transitionStatus === "ending" && comboboxStyles.popupEnding,
+      state.side === "top" && comboboxStyles.popupSideTop,
+      state.side === "bottom" && comboboxStyles.popupSideBottom,
+      state.side === "left" && comboboxStyles.popupSideLeft,
+      state.side === "right" && comboboxStyles.popupSideRight,
+      state.side === "inline-start" && comboboxStyles.popupSideInlineStart,
+      state.side === "inline-end" && comboboxStyles.popupSideInlineEnd,
+      state.align === "start" && comboboxStyles.popupAlignStart,
+      state.align === "center" && comboboxStyles.popupAlignCenter,
+      state.align === "end" && comboboxStyles.popupAlignEnd,
     ]);
     return <BaseCombobox.Popup {...props} ref={forwardedRef} {...stateStyles} />;
   },
@@ -514,8 +615,12 @@ const ComboboxSeparator = forwardRef<
   ComponentRef<typeof BaseCombobox.Separator>,
   ComboboxSeparatorProps
 >(function ComboboxSeparator(props, forwardedRef) {
-  const styles = stylex.props(comboboxStyles.separator);
-  return <BaseCombobox.Separator {...props} ref={forwardedRef} {...styles} />;
+  const stateStyles = createStateStyleProps<BaseCombobox.Separator.State>((state) => [
+    comboboxStyles.separator,
+    state.orientation === "horizontal" && comboboxStyles.separatorHorizontal,
+    state.orientation === "vertical" && comboboxStyles.separatorVertical,
+  ]);
+  return <BaseCombobox.Separator {...props} ref={forwardedRef} {...stateStyles} />;
 });
 
 const ComboboxClear = forwardRef<ComponentRef<typeof BaseCombobox.Clear>, ComboboxClearProps>(
@@ -526,6 +631,10 @@ const ComboboxClear = forwardRef<ComponentRef<typeof BaseCombobox.Clear>, Combob
     const stateStyles = createStateStyleProps<BaseCombobox.Clear.State>((state) => [
       comboboxStyles.action,
       state.disabled === true && comboboxStyles.actionDisabled,
+      state.open === true && comboboxStyles.clearOpen,
+      state.visible === true && comboboxStyles.clearVisible,
+      state.transitionStatus === "starting" && comboboxStyles.clearStarting,
+      state.transitionStatus === "ending" && comboboxStyles.clearEnding,
     ]);
     const iconStyles = stylex.props(comboboxStyles.icon);
 
@@ -639,8 +748,11 @@ const ComboboxItemIndicator = forwardRef<
   ComponentRef<typeof BaseCombobox.ItemIndicator>,
   ComboboxItemIndicatorProps
 >(function ComboboxItemIndicator({ keepMounted = false, ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseCombobox.ItemIndicator.State>(() => [
+  const stateStyles = createStateStyleProps<BaseCombobox.ItemIndicator.State>((state) => [
     comboboxStyles.indicator,
+    state.selected === true && comboboxStyles.indicatorSelected,
+    state.transitionStatus === "starting" && comboboxStyles.indicatorStarting,
+    state.transitionStatus === "ending" && comboboxStyles.indicatorEnding,
   ]);
   const iconStyles = stylex.props(comboboxStyles.icon);
   return (

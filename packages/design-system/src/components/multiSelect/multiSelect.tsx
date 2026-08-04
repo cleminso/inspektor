@@ -214,6 +214,10 @@ const MultiSelectTrigger = forwardRef<
     },
     [context.triggerRef, forwardedRef],
   );
+  const triggerStyles = createStateStyleProps<BasePopover.Trigger.State>((state) => [
+    state.open === true && multiSelectStyles.triggerOpen,
+    state.disabled === true && multiSelectStyles.triggerDisabled,
+  ]);
 
   return (
     <BasePopover.Trigger
@@ -222,6 +226,7 @@ const MultiSelectTrigger = forwardRef<
       disabled={disabled === true || context.disabled === true}
       ref={triggerRef as BasePopover.Trigger.Props["ref"]}
       render={render ?? <Button type="button" variant="secondary" size="m" />}
+      {...triggerStyles}
     >
       {children}
     </BasePopover.Trigger>
@@ -255,12 +260,39 @@ function MultiSelectContent({
   align = "start",
 }: MultiSelectContentProps): React.ReactElement {
   const context = useMultiSelectContext();
-  const positionerStyles = createStateStyleProps<BasePopover.Positioner.State>(() => [
+  const positionerStyles = createStateStyleProps<BasePopover.Positioner.State>((state) => [
     multiSelectStyles.positioner,
+    state.open === true && multiSelectStyles.positionerOpen,
+    state.open === false && multiSelectStyles.positionerClosed,
+    state.anchorHidden === true && multiSelectStyles.positionerAnchorHidden,
+    state.instant !== undefined && multiSelectStyles.positionerInstant,
+    state.side === "top" && multiSelectStyles.positionerSideTop,
+    state.side === "bottom" && multiSelectStyles.positionerSideBottom,
+    state.side === "left" && multiSelectStyles.positionerSideLeft,
+    state.side === "right" && multiSelectStyles.positionerSideRight,
+    state.side === "inline-start" && multiSelectStyles.positionerSideInlineStart,
+    state.side === "inline-end" && multiSelectStyles.positionerSideInlineEnd,
+    state.align === "start" && multiSelectStyles.positionerAlignStart,
+    state.align === "center" && multiSelectStyles.positionerAlignCenter,
+    state.align === "end" && multiSelectStyles.positionerAlignEnd,
   ]);
-  const popupStyles = createStateStyleProps<BasePopover.Popup.State>(() => [
+  const popupStyles = createStateStyleProps<BasePopover.Popup.State>((state) => [
     multiSelectStyles.popup,
     popupWidthStyles[width],
+    state.open === true && multiSelectStyles.popupOpen,
+    state.open === false && multiSelectStyles.popupClosed,
+    state.transitionStatus === "starting" && multiSelectStyles.popupStarting,
+    state.transitionStatus === "ending" && multiSelectStyles.popupEnding,
+    state.instant !== undefined && multiSelectStyles.popupInstant,
+    state.side === "top" && multiSelectStyles.popupSideTop,
+    state.side === "bottom" && multiSelectStyles.popupSideBottom,
+    state.side === "left" && multiSelectStyles.popupSideLeft,
+    state.side === "right" && multiSelectStyles.popupSideRight,
+    state.side === "inline-start" && multiSelectStyles.popupSideInlineStart,
+    state.side === "inline-end" && multiSelectStyles.popupSideInlineEnd,
+    state.align === "start" && multiSelectStyles.popupAlignStart,
+    state.align === "center" && multiSelectStyles.popupAlignCenter,
+    state.align === "end" && multiSelectStyles.popupAlignEnd,
   ]);
   const selectedSet = useMemo(() => new Set(context.selectedValues), [context.selectedValues]);
   const mutableItems = useMemo(() => getMutableItems(context.items), [context.items]);

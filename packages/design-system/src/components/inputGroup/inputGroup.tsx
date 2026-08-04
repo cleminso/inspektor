@@ -159,11 +159,12 @@ const InputGroupAction = forwardRef<ComponentRef<typeof BaseButton>, InputGroupA
   const context = useContext(InputGroupContext);
   const effectiveDisabled = disabled === true || context?.disabled === true;
   const size = context?.size ?? "m";
-  const stateStyleProps = createStateStyleProps<BaseButton.State>(() => [
+  const stateStyleProps = createStateStyleProps<BaseButton.State>((state) => [
     inputGroupStyles.action,
     actionSizeStyles[size],
     pressed === true && inputGroupStyles.actionPressed,
-    effectiveDisabled === true && inputGroupStyles.memberDisabled,
+    state.disabled === true && inputGroupStyles.memberDisabled,
+    state.disabled === true && inputGroupStyles.actionDisabled,
   ]);
 
   return (
@@ -198,16 +199,24 @@ function InputGroupCheckbox({
 }: InputGroupCheckboxProps) {
   const context = useContext(InputGroupContext);
   const effectiveDisabled = disabled === true || context?.disabled === true;
-  const fieldStyleProps = stylex.props(
+  const fieldStyleProps = createStateStyleProps<BaseField.Root.State>((state) => [
     inputGroupStyles.checkboxField,
-    effectiveDisabled === true && inputGroupStyles.memberDisabled,
-  );
+    state.disabled === true && inputGroupStyles.memberDisabled,
+    state.disabled === true && inputGroupStyles.checkboxDisabled,
+    state.valid === true && inputGroupStyles.checkboxValid,
+    state.valid === false && inputGroupStyles.checkboxInvalid,
+    state.touched === true && inputGroupStyles.checkboxTouched,
+    state.dirty === true && inputGroupStyles.checkboxDirty,
+    state.filled === true && inputGroupStyles.checkboxFilled,
+    state.focused === true && inputGroupStyles.checkboxFocused,
+  ]);
 
   const field = (
     <BaseField.Root
       disabled={effectiveDisabled}
+      {...fieldStyleProps}
       render={
-        <label {...fieldStyleProps} aria-description={tooltip} aria-label={label} data-slot="input-group-checkbox" />
+        <label aria-description={tooltip} aria-label={label} data-slot="input-group-checkbox" />
       }
     >
       <Checkbox

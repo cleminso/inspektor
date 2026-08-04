@@ -22,8 +22,9 @@ export interface FieldsetLegendProps extends Omit<
 
 const FieldsetRoot = forwardRef<ComponentRef<typeof BaseFieldset.Root>, FieldsetRootProps>(
   function FieldsetRoot({ disabled = false, ...props }, forwardedRef) {
-    const stateStyleProps = createStateStyleProps<BaseFieldset.Root.State>(() => [
+    const stateStyleProps = createStateStyleProps<BaseFieldset.Root.State>((state) => [
       fieldsetStyles.root,
+      state.disabled === true && fieldsetStyles.rootDisabled,
     ]);
 
     return (
@@ -43,6 +44,7 @@ const FieldsetLegend = forwardRef<ComponentRef<typeof BaseFieldset.Legend>, Fiel
     const stateStyleProps = createStateStyleProps<BaseFieldset.Legend.State>((state) => [
       fieldsetStyles.legend,
       state.disabled === true && fieldsetStyles.disabled,
+      state.disabled === true && fieldsetStyles.legendDisabled,
     ]);
 
     return (

@@ -146,4 +146,12 @@ export const inputGroupStyles = stylex.create({
     cursor: "not-allowed",
     outlineWidth: 0,
   },
+  actionDisabled: {},
+  checkboxDisabled: {},
+  checkboxValid: {},
+  checkboxInvalid: {},
+  checkboxTouched: {},
+  checkboxDirty: {},
+  checkboxFilled: {},
+  checkboxFocused: {},
 });

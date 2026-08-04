@@ -64,7 +64,12 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionRootProps>(function Ac
   { multiple = false, disabled = false, ...props },
   forwardedRef,
 ) {
-  const stateStyles = createStateStyleProps<BaseAccordion.Root.State>(() => [accordionStyles.root])
+  const stateStyles = createStateStyleProps<BaseAccordion.Root.State>((state) => [
+    accordionStyles.root,
+    state.disabled === true && accordionStyles.rootDisabled,
+    state.orientation === 'horizontal' && accordionStyles.rootHorizontal,
+    state.orientation === 'vertical' && accordionStyles.rootVertical,
+  ])
   return (
     <BaseAccordion.Root
       {...props}
@@ -80,14 +85,30 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(function Ac
   { disabled = false, ...props },
   forwardedRef,
 ) {
-  const stateStyles = createStateStyleProps<BaseAccordion.Item.State>(() => [accordionStyles.item])
+  const stateStyles = createStateStyleProps<BaseAccordion.Item.State>((state) => [
+    accordionStyles.item,
+    state.open === true && accordionStyles.itemOpen,
+    state.open === false && accordionStyles.itemClosed,
+    state.disabled === true && accordionStyles.itemDisabled,
+    state.orientation === 'horizontal' && accordionStyles.itemHorizontal,
+    state.orientation === 'vertical' && accordionStyles.itemVertical,
+    state.hidden === true && accordionStyles.itemHidden,
+    accordionStyles.itemIndexed,
+  ])
   return <BaseAccordion.Item {...props} ref={forwardedRef} disabled={disabled} {...stateStyles} />
 })
 
 const AccordionHeader = forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
   function AccordionHeader(props, forwardedRef) {
-    const stateStyles = createStateStyleProps<BaseAccordion.Header.State>(() => [
+    const stateStyles = createStateStyleProps<BaseAccordion.Header.State>((state) => [
       accordionStyles.header,
+      state.open === true && accordionStyles.headerOpen,
+      state.open === false && accordionStyles.headerClosed,
+      state.disabled === true && accordionStyles.headerDisabled,
+      state.orientation === 'horizontal' && accordionStyles.headerHorizontal,
+      state.orientation === 'vertical' && accordionStyles.headerVertical,
+      state.hidden === true && accordionStyles.headerHidden,
+      accordionStyles.headerIndexed,
     ])
     return <BaseAccordion.Header {...props} ref={forwardedRef} {...stateStyles} />
   },
@@ -101,6 +122,11 @@ const AccordionTrigger = forwardRef<HTMLElement, AccordionTriggerProps>(function
     accordionStyles.trigger,
     state.open === true && accordionStyles.triggerOpen,
     state.disabled === true && accordionStyles.triggerDisabled,
+    state.orientation === 'horizontal' && accordionStyles.triggerHorizontal,
+    state.orientation === 'vertical' && accordionStyles.triggerVertical,
+    state.hidden === true && accordionStyles.triggerHidden,
+    state.index !== 0 && accordionStyles.triggerIndexed,
+    accordionStyles.triggerValue,
   ])
 
   return (
@@ -124,6 +150,15 @@ const AccordionPanel = forwardRef<HTMLDivElement, AccordionPanelProps>(
       accordionStyles.panel,
       (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
         accordionStyles.panelTransitioning,
+      state.open === true && accordionStyles.panelOpen,
+      state.open === false && accordionStyles.panelClosed,
+      state.disabled === true && accordionStyles.panelDisabled,
+      state.orientation === 'horizontal' && accordionStyles.panelHorizontal,
+      state.orientation === 'vertical' && accordionStyles.panelVertical,
+      state.hidden === true && accordionStyles.panelHidden,
+      accordionStyles.panelIndexed,
+      state.transitionStatus === 'starting' && accordionStyles.panelStarting,
+      state.transitionStatus === 'ending' && accordionStyles.panelEnding,
     ])
     return <BaseAccordion.Panel {...props} ref={forwardedRef} {...stateStyles} />
   },

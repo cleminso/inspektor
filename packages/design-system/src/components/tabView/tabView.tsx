@@ -132,7 +132,16 @@ function TabViewRoot({ children, value, defaultValue, onValueChange }: TabViewRo
     defaultValue ?? null,
   )
   const selectedValue = value === undefined ? uncontrolledValue : value
-  const rootStyles = createStateStyleProps<BaseTabs.Root.State>(() => [tabViewStyles.root])
+  const rootStyles = createStateStyleProps<BaseTabs.Root.State>((state) => [
+    tabViewStyles.root,
+    state.orientation === 'horizontal' && tabViewStyles.rootHorizontal,
+    state.orientation === 'vertical' && tabViewStyles.rootVertical,
+    state.tabActivationDirection === 'left' && tabViewStyles.rootActivationLeft,
+    state.tabActivationDirection === 'right' && tabViewStyles.rootActivationRight,
+    state.tabActivationDirection === 'up' && tabViewStyles.rootActivationUp,
+    state.tabActivationDirection === 'down' && tabViewStyles.rootActivationDown,
+    state.tabActivationDirection === 'none' && tabViewStyles.rootActivationNone,
+  ])
 
   const handleValueChange: NonNullable<BaseTabs.Root.Props['onValueChange']> = (
     nextValue,
@@ -173,7 +182,16 @@ function TabViewList({
 }: TabViewListProps) {
   const listRef = useRef<HTMLDivElement>(null)
   const focusedValueKeyRef = useRef<string | null>(null)
-  const listStyles = createStateStyleProps<BaseTabs.List.State>(() => [tabViewStyles.list])
+  const listStyles = createStateStyleProps<BaseTabs.List.State>((state) => [
+    tabViewStyles.list,
+    state.orientation === 'horizontal' && tabViewStyles.listHorizontal,
+    state.orientation === 'vertical' && tabViewStyles.listVertical,
+    state.tabActivationDirection === 'left' && tabViewStyles.listActivationLeft,
+    state.tabActivationDirection === 'right' && tabViewStyles.listActivationRight,
+    state.tabActivationDirection === 'up' && tabViewStyles.listActivationUp,
+    state.tabActivationDirection === 'down' && tabViewStyles.listActivationDown,
+    state.tabActivationDirection === 'none' && tabViewStyles.listActivationNone,
+  ])
   const [ReorderComponent, setReorderComponent] = useState<
     TabViewReorderModule['TabViewReorder'] | null
   >(null)
@@ -296,6 +314,13 @@ function TabViewItemContent({
     tabViewStyles.tab,
     state.active === true && tabViewStyles.tabActive,
     state.disabled === true && tabViewStyles.tabDisabled,
+    state.orientation === 'horizontal' && tabViewStyles.tabHorizontal,
+    state.orientation === 'vertical' && tabViewStyles.tabVertical,
+    state.tabActivationDirection === 'left' && tabViewStyles.tabActivationLeft,
+    state.tabActivationDirection === 'right' && tabViewStyles.tabActivationRight,
+    state.tabActivationDirection === 'up' && tabViewStyles.tabActivationUp,
+    state.tabActivationDirection === 'down' && tabViewStyles.tabActivationDown,
+    state.tabActivationDirection === 'none' && tabViewStyles.tabActivationNone,
   ])
 
   const handleClose = () => {
@@ -445,7 +470,19 @@ function TabViewItemContent({
 }
 
 function TabViewPanel({ value, children, keepMounted = false }: TabViewPanelProps) {
-  const panelStyles = createStateStyleProps<BaseTabs.Panel.State>(() => [tabViewStyles.panel])
+  const panelStyles = createStateStyleProps<BaseTabs.Panel.State>((state) => [
+    tabViewStyles.panel,
+    state.hidden === true && tabViewStyles.panelHidden,
+    state.orientation === 'horizontal' && tabViewStyles.panelHorizontal,
+    state.orientation === 'vertical' && tabViewStyles.panelVertical,
+    state.tabActivationDirection === 'left' && tabViewStyles.panelActivationLeft,
+    state.tabActivationDirection === 'right' && tabViewStyles.panelActivationRight,
+    state.tabActivationDirection === 'up' && tabViewStyles.panelActivationUp,
+    state.tabActivationDirection === 'down' && tabViewStyles.panelActivationDown,
+    state.tabActivationDirection === 'none' && tabViewStyles.panelActivationNone,
+    state.transitionStatus === 'starting' && tabViewStyles.panelStarting,
+    state.transitionStatus === 'ending' && tabViewStyles.panelEnding,
+  ])
 
   return (
     <BaseTabs.Panel

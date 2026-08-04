@@ -57,7 +57,7 @@ export const switchStyles = stylex.create({
     },
     cursor: 'not-allowed',
   },
-  rootReadOnly: {
+  rootUncheckedReadOnly: {
     backgroundColor: {
       default: backgroundColors['bg-secondary'],
       ':hover': backgroundColors['bg-secondary'],
@@ -65,6 +65,14 @@ export const switchStyles = stylex.create({
     },
     cursor: 'default',
   },
+  rootUnchecked: {},
+  rootReadOnly: {},
+  rootRequired: {},
+  rootValid: {},
+  rootTouched: {},
+  rootDirty: {},
+  rootFilled: {},
+  rootFocused: {},
   rootSizeS: {
     height: spatial['switch-height-s'],
     width: spatial['switch-width-s'],
@@ -85,6 +93,16 @@ export const switchStyles = stylex.create({
   thumbChecked: {
     backgroundColor: backgroundColors['bg-page'],
   },
+  thumbUnchecked: {},
+  thumbDisabled: {},
+  thumbReadOnly: {},
+  thumbRequired: {},
+  thumbValid: {},
+  thumbInvalid: {},
+  thumbTouched: {},
+  thumbDirty: {},
+  thumbFilled: {},
+  thumbFocused: {},
   thumbSizeS: {
     height: spatial['switch-thumb-s'],
     width: spatial['switch-thumb-s'],

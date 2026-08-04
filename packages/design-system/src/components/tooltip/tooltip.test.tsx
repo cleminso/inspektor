@@ -9,6 +9,18 @@ import { tooltipStyles } from './tooltip.styles'
 afterEach(cleanup)
 
 describe('Tooltip', () => {
+  it('preserves root-derived disabled state on its trigger', () => {
+    render(
+      <Tooltip.Root disabled>
+        <Tooltip.Trigger>Trigger</Tooltip.Trigger>
+      </Tooltip.Root>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Trigger' }).getAttribute('data-trigger-disabled')).toBe(
+      '',
+    )
+  })
+
   it('does not apply transition start styles during an instant focus open', async () => {
     render(
       <Tooltip.Provider delay={0}>

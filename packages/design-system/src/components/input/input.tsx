@@ -60,6 +60,11 @@ export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(func
     state.disabled === true && inputStyles.disabled,
     readOnly === true && inputStyles.readOnly,
     (effectiveInvalid === true || state.valid === false) && inputStyles.invalid,
+    state.valid === true && inputStyles.valid,
+    state.touched === true && inputStyles.touched,
+    state.dirty === true && inputStyles.dirty,
+    state.filled === true && inputStyles.filled,
+    state.focused === true && inputStyles.focused,
   ]);
 
   return (

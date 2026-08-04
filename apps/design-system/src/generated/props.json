@@ -3284,7 +3284,6 @@
       "name": "disabled",
       "type": "false | true",
       "required": false,
-      "defaultValue": "false",
       "description": "Prevents this trigger from opening the tooltip.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
@@ -3381,7 +3380,7 @@
       "description": "Contextual label for the JSON tree.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 48
+        "line": 49
       }
     },
     {
@@ -3391,7 +3390,7 @@
       "description": "JSON-compatible object or array to inspect.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 50
+        "line": 51
       }
     },
     {
@@ -3402,7 +3401,7 @@
       "description": "Number of container levels expanded initially.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 52
+        "line": 53
       }
     },
     {
@@ -3412,7 +3411,7 @@
       "description": "Controls occurrence highlighting and active-match navigation.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 54
+        "line": 55
       }
     }
   ],

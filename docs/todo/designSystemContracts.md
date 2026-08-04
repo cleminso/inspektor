@@ -45,6 +45,12 @@
 - [x] Add Box component documentation and align changed component prop selections.
 - [x] Align Data Grid registry navigation with its generated route.
 
+[04/08/26]
+
+- [x] Give every finite Base UI-generated state and data attribute a named StyleX rule in each wrapper callback, including empty rules for intentionally unstyled capabilities.
+- [x] Keep empty capability rules internal so Base UI remains the source of DOM attributes and consumers do not gain styling escape hatches.
+- [x] Require the same attribute-rule inventory in the `create-inspector-component` workflow.
+
 ## Component audit
 
 [03/08/26]
@@ -76,7 +82,7 @@
 | MultiSelect | High-level Popover composition | Open state remains Base-owned; selection, filtering, and option keyboard behavior are Inspector-owned; trigger refs and disabled option behavior are preserved. |
 | RelationValue | High-level value and details composition | Navigation and copy capabilities are constrained to product semantics; unresolved pending and missing presentation is recorded separately. |
 | ResizablePanel | `react-resizable-panels` wrapper | Group, Panel, and Handle preserve imperative refs and callbacks while Inspector owns defaults and handle anatomy. Upstream focus callback behavior is recorded separately. |
-| Search | High-level Input composition | Search semantics, subtle variant, icon, and shortcut are fixed; remaining native Input props and input ref are preserved. |
+| Find Bar | High-level Input Group composition | Query options, match status, and navigation are fixed; document search results remain consumer-owned. |
 | Select | Base Select compound component | Trigger and Item preserve approved composition and refs; structural parts remain fixed; popup geometry remains constrained to semantic placement. |
 | SidePanel | Inspector native compound layout | Aside and div props, ARIA, events, and refs are preserved while layout styling remains package-owned. |
 | Spinner | High-level SVG status presentation | Decorative and labeled status modes are explicit; no arbitrary SVG styling surface is exposed. |
@@ -120,6 +126,7 @@
 - Popup Positioner parts expose semantic `side`, `align`, and selected alignment behavior, plus children and refs. Offsets, collision geometry, and tracking controls stay behind `popupPositioning`.
 - High-level compositions do not reproduce every child primitive prop. Their public API describes package-owned semantic operations and delegates internal behavior to audited lower-level parts.
 - Fixed visual anatomy such as Checkbox Indicator, Switch Thumb, menu indicators, Select Icon, and popup arrows is not publicly replaceable.
+- Popover trigger press reason and Tooltip root-derived trigger disability are emitted outside their typed trigger state callbacks. Their empty rules remain discoverable without recreating Base UI state in parallel.
 - `render` remains available on approved behavioral and semantic endpoints, plus Field Root's concrete design-system layout requirement. Native-button targets must preserve the endpoint's semantics.
 - Box responsive values continue to use generated scoped CSS because StyleX does not receive arbitrary runtime breakpoint objects.
 
@@ -151,7 +158,8 @@
 - [x] Support React 18 and 19 by forwarding refs instead of narrowing peer support.
 - [x] Keep wrapper presentation closed while preserving behavior and native interoperability by default.
 - [x] Treat popup geometry as an existing documented Inspector constraint rather than reopening raw numeric values.
-- [x] Treat Code Editor, Context Switcher, Copy Button, Data Grid, Input Group, Json View, Multi Select, Search, Tab View, Text Field, and Toaster as high-level compositions.
+- [x] Treat Code Editor, Context Switcher, Copy Button, Data Grid, Find Bar, Input Group, Json View, Multi Select, Tab View, Text Field, and Toaster as high-level compositions.
+- [x] Treat empty state rules as a discoverability inventory rather than emitted CSS or a public styling API.
 - [x] Keep tests focused on Inspector transformations and regressions instead of retesting Base UI internals.
 
 ## Validation checklist

@@ -54,7 +54,7 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 - Keep variants in typed lookup objects with `satisfies Record<Variant, unknown>`.
 - Apply Base UI state and interaction styling without replacing its behavior.
 - Use `createStateStyleProps` from `packages/design-system/src/primitives/createStateStyleProps.ts` when Base UI provides state-based `className` and `style` callbacks. Define the state-to-style selection once and pass both returned callbacks to the primitive.
-- Inventory every state property, data attribute, transition state, and CSS variable for each wrapped part. Empty StyleX rules may record intentionally unstyled state capabilities.
+- For every new Base UI wrapper, represent each callback state and generated data attribute with a named StyleX rule and callback check, using an empty rule when no styling applies. Base UI remains responsible for emitting the DOM attributes.
 - Express StyleX pseudo-class conditions inside property values, such as `borderColor: { default: token, ':focus': focusedToken }`. Top-level conditional blocks are invalid under the package lint rules; top-level pseudo-elements such as `::placeholder` remain valid.
 - Apply StyleX output through the primitive's internal `className`, `style`, or render interface without forwarding consumer styling values.
 - Do not add app-specific layout or documentation styling to the package.

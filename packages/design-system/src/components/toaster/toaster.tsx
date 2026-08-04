@@ -97,11 +97,43 @@ export const toasts: Toasts = {
 }
 
 const statusStyles = {
-  message: undefined,
+  message: toasterStyles.toastMessage,
   success: toasterStyles.toastSuccess,
   warning: toasterStyles.toastWarning,
   error: toasterStyles.toastError,
-  loading: undefined,
+  loading: toasterStyles.toastLoading,
+} satisfies Record<ToastStatus, unknown>
+
+const titleStatusStyles = {
+  message: toasterStyles.titleMessage,
+  success: toasterStyles.titleSuccess,
+  warning: toasterStyles.titleWarning,
+  error: toasterStyles.titleError,
+  loading: toasterStyles.titleLoading,
+} satisfies Record<ToastStatus, unknown>
+
+const descriptionStatusStyles = {
+  message: toasterStyles.descriptionMessage,
+  success: toasterStyles.descriptionSuccess,
+  warning: toasterStyles.descriptionWarning,
+  error: toasterStyles.descriptionError,
+  loading: toasterStyles.descriptionLoading,
+} satisfies Record<ToastStatus, unknown>
+
+const actionStatusStyles = {
+  message: toasterStyles.actionMessage,
+  success: toasterStyles.actionSuccess,
+  warning: toasterStyles.actionWarning,
+  error: toasterStyles.actionError,
+  loading: toasterStyles.actionLoading,
+} satisfies Record<ToastStatus, unknown>
+
+const closeStatusStyles = {
+  message: toasterStyles.closeMessage,
+  success: toasterStyles.closeSuccess,
+  warning: toasterStyles.closeWarning,
+  error: toasterStyles.closeError,
+  loading: toasterStyles.closeLoading,
 } satisfies Record<ToastStatus, unknown>
 
 const stackOrderStyles = [
@@ -145,11 +177,32 @@ function ToastList() {
       state.transitionStatus === 'ending' &&
         state.swipeDirection === 'down' &&
         toasterStyles.toastEndingDown,
+      state.swiping === true && toasterStyles.toastSwiping,
+      state.swipeDirection === 'left' && toasterStyles.toastSwipeLeft,
+      state.swipeDirection === 'right' && toasterStyles.toastSwipeRight,
+      state.swipeDirection === 'up' && toasterStyles.toastSwipeUp,
+      state.swipeDirection === 'down' && toasterStyles.toastSwipeDown,
     ])
     const contentStyleProps = createStateStyleProps<BaseToast.Content.State>((state) => [
       toasterStyles.content,
       state.behind === true && toasterStyles.contentBehind,
       state.expanded === true && toasterStyles.contentExpanded,
+    ])
+    const titleStyleProps = createStateStyleProps<BaseToast.Title.State>((state) => [
+      toasterStyles.title,
+      state.type !== undefined && titleStatusStyles[getToastStatus(state.type)],
+    ])
+    const descriptionStyleProps = createStateStyleProps<BaseToast.Description.State>((state) => [
+      toasterStyles.description,
+      state.type !== undefined && descriptionStatusStyles[getToastStatus(state.type)],
+    ])
+    const actionStyleProps = createStateStyleProps<BaseToast.Action.State>((state) => [
+      toasterStyles.action,
+      state.type !== undefined && actionStatusStyles[getToastStatus(state.type)],
+    ])
+    const closeStyleProps = createStateStyleProps<BaseToast.Close.State>((state) => [
+      toasterStyles.close,
+      state.type !== undefined && closeStatusStyles[getToastStatus(state.type)],
     ])
 
     return (
@@ -163,14 +216,14 @@ function ToastList() {
       >
         <BaseToast.Content {...contentStyleProps}>
           <span {...stylex.props(toasterStyles.text)}>
-            <BaseToast.Title {...stylex.props(toasterStyles.title)} />
+            <BaseToast.Title {...titleStyleProps} />
             <BaseToast.Description
-              {...stylex.props(toasterStyles.description)}
+              {...descriptionStyleProps}
               data-slot="toast-description"
             />
           </span>
-          <BaseToast.Action {...stylex.props(toasterStyles.action)} />
-          <BaseToast.Close {...stylex.props(toasterStyles.close)} aria-label="Dismiss notification">
+          <BaseToast.Action {...actionStyleProps} />
+          <BaseToast.Close {...closeStyleProps} aria-label="Dismiss notification">
             <svg
               aria-hidden="true"
               fill="none"
@@ -192,11 +245,15 @@ function ToastList() {
 }
 
 export function Toaster(_props: ToasterProps) {
+  const viewportStyleProps = createStateStyleProps<BaseToast.Viewport.State>((state) => [
+    toasterStyles.viewport,
+    state.expanded === true && toasterStyles.viewportExpanded,
+  ])
   return (
     <BaseToast.Provider toastManager={toastManager} limit={3} timeout={5_000}>
       <BaseToast.Portal>
         <BaseToast.Viewport
-          {...stylex.props(toasterStyles.viewport)}
+          {...viewportStyleProps}
           aria-label="Notifications"
           data-slot="toast-viewport"
         >

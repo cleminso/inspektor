@@ -79,8 +79,36 @@ const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoo
       (state.checked === true || state.indeterminate === true) &&
       checkboxStyles.selectedDisabled,
     state.readOnly === true && checkboxStyles.readOnly,
+    state.checked === true && checkboxStyles.rootChecked,
+    state.checked === false && state.indeterminate === false && checkboxStyles.rootUnchecked,
+    state.indeterminate === true && checkboxStyles.rootIndeterminate,
+    state.disabled === true && checkboxStyles.rootDisabled,
+    state.readOnly === true && checkboxStyles.rootReadOnly,
+    state.required === true && checkboxStyles.rootRequired,
+    state.valid === true && checkboxStyles.rootValid,
+    state.valid === false && checkboxStyles.rootInvalid,
+    state.touched === true && checkboxStyles.rootTouched,
+    state.dirty === true && checkboxStyles.rootDirty,
+    state.filled === true && checkboxStyles.rootFilled,
+    state.focused === true && checkboxStyles.rootFocused,
   ]);
-  const indicatorStylexProps = stylex.props(checkboxStyles.indicator);
+  const indicatorStyleProps = createStateStyleProps<BaseCheckbox.Indicator.State>((state) => [
+    checkboxStyles.indicator,
+    state.checked === true && checkboxStyles.indicatorChecked,
+    state.checked === false && state.indeterminate === false && checkboxStyles.indicatorUnchecked,
+    state.indeterminate === true && checkboxStyles.indicatorIndeterminate,
+    state.disabled === true && checkboxStyles.indicatorDisabled,
+    state.readOnly === true && checkboxStyles.indicatorReadOnly,
+    state.required === true && checkboxStyles.indicatorRequired,
+    state.valid === true && checkboxStyles.indicatorValid,
+    state.valid === false && checkboxStyles.indicatorInvalid,
+    state.touched === true && checkboxStyles.indicatorTouched,
+    state.dirty === true && checkboxStyles.indicatorDirty,
+    state.filled === true && checkboxStyles.indicatorFilled,
+    state.focused === true && checkboxStyles.indicatorFocused,
+    state.transitionStatus === "starting" && checkboxStyles.indicatorStarting,
+    state.transitionStatus === "ending" && checkboxStyles.indicatorEnding,
+  ]);
   const iconStylexProps = stylex.props(checkboxStyles.icon);
 
   return (
@@ -97,8 +125,8 @@ const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoo
       data-slot="checkbox"
     >
       <BaseCheckbox.Indicator
-        className={indicatorStylexProps.className}
-        style={indicatorStylexProps.style}
+        className={indicatorStyleProps.className}
+        style={indicatorStyleProps.style}
         data-slot="checkbox-indicator"
         render={(indicatorProps, state) => (
           <span {...indicatorProps}>

@@ -35,4 +35,6 @@ export const fieldsetStyles = stylex.create({
   disabled: {
     color: textColors["text-disabled"],
   },
+  rootDisabled: {},
+  legendDisabled: {},
 });

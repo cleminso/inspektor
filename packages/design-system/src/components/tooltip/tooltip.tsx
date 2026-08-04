@@ -81,9 +81,10 @@ function TooltipRoot({
 }
 
 const TooltipTrigger = React.forwardRef<React.ComponentRef<typeof BaseTooltip.Trigger>, TooltipTriggerProps>(
-  function TooltipTrigger({ closeOnClick = true, disabled = false, render, ...props }, ref) {
-    const stateStyleProps = createStateStyleProps<BaseTooltip.Trigger.State>(() => [
+  function TooltipTrigger({ closeOnClick = true, disabled, render, ...props }, ref) {
+    const stateStyleProps = createStateStyleProps<BaseTooltip.Trigger.State>((state) => [
       render === undefined && tooltipStyles.trigger,
+      state.open === true && tooltipStyles.triggerOpen,
     ])
     return (
       <BaseTooltip.Trigger
@@ -121,18 +122,54 @@ function getArrowSideStyle(
 
 function TooltipContent({ side = 'top', align = 'center', children }: TooltipContentProps) {
   const direction = useDirection()
-  const positionerStyleProps = createStateStyleProps<BaseTooltip.Positioner.State>(() => [
+  const positionerStyleProps = createStateStyleProps<BaseTooltip.Positioner.State>((state) => [
     tooltipStyles.positioner,
+    state.open === true && tooltipStyles.positionerOpen,
+    state.open === false && tooltipStyles.positionerClosed,
+    state.anchorHidden === true && tooltipStyles.positionerAnchorHidden,
+    state.instant !== undefined && tooltipStyles.positionerInstant,
+    state.side === 'top' && tooltipStyles.positionerSideTop,
+    state.side === 'bottom' && tooltipStyles.positionerSideBottom,
+    state.side === 'left' && tooltipStyles.positionerSideLeft,
+    state.side === 'right' && tooltipStyles.positionerSideRight,
+    state.side === 'inline-start' && tooltipStyles.positionerSideInlineStart,
+    state.side === 'inline-end' && tooltipStyles.positionerSideInlineEnd,
+    state.align === 'start' && tooltipStyles.positionerAlignStart,
+    state.align === 'center' && tooltipStyles.positionerAlignCenter,
+    state.align === 'end' && tooltipStyles.positionerAlignEnd,
   ])
   const popupStyleProps = createStateStyleProps<BaseTooltip.Popup.State>((state) => [
     tooltipStyles.popup,
     state.instant === undefined &&
       (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
       tooltipStyles.popupTransition,
+    state.open === true && tooltipStyles.popupOpen,
+    state.open === false && tooltipStyles.popupClosed,
+    state.transitionStatus === 'starting' && tooltipStyles.popupStarting,
+    state.transitionStatus === 'ending' && tooltipStyles.popupEnding,
+    state.instant !== undefined && tooltipStyles.popupInstant,
+    state.side === 'top' && tooltipStyles.popupSideTop,
+    state.side === 'bottom' && tooltipStyles.popupSideBottom,
+    state.side === 'left' && tooltipStyles.popupSideLeft,
+    state.side === 'right' && tooltipStyles.popupSideRight,
+    state.side === 'inline-start' && tooltipStyles.popupSideInlineStart,
+    state.side === 'inline-end' && tooltipStyles.popupSideInlineEnd,
+    state.align === 'start' && tooltipStyles.popupAlignStart,
+    state.align === 'center' && tooltipStyles.popupAlignCenter,
+    state.align === 'end' && tooltipStyles.popupAlignEnd,
   ])
   const arrowStyleProps = createStateStyleProps<BaseTooltip.Arrow.State>((state) => [
     tooltipStyles.arrow,
     getArrowSideStyle(state.side, direction),
+    state.open === true && tooltipStyles.arrowOpen,
+    state.open === false && tooltipStyles.arrowClosed,
+    state.side === 'inline-start' && tooltipStyles.arrowSideInlineStart,
+    state.side === 'inline-end' && tooltipStyles.arrowSideInlineEnd,
+    state.align === 'start' && tooltipStyles.arrowAlignStart,
+    state.align === 'center' && tooltipStyles.arrowAlignCenter,
+    state.align === 'end' && tooltipStyles.arrowAlignEnd,
+    state.uncentered === true && tooltipStyles.arrowUncentered,
+    state.instant !== undefined && tooltipStyles.arrowInstant,
   ])
   const arrowIconStyleProps = stylex.props(tooltipStyles.arrowIcon)
 

@@ -88,4 +88,9 @@ export const textareaStyles = stylex.create({
     },
     cursor: "default",
   },
+  valid: {},
+  touched: {},
+  dirty: {},
+  filled: {},
+  focused: {},
 });

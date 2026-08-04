@@ -100,4 +100,9 @@ export const inputStyles = stylex.create({
       ":focus-visible": spatial["focus-ring-width"],
     },
   },
+  valid: {},
+  touched: {},
+  dirty: {},
+  filled: {},
+  focused: {},
 });
