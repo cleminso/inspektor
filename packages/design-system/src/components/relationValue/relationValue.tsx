@@ -87,7 +87,12 @@ export function RelationValue(props: RelationValueProps) {
         ) : (
           <TextLink {...props.navigation}>
             <span {...stylex.props(relationValueStyles.compactNavigation)}>
-              <span {...stylex.props(relationValueStyles.compactNavigationValue)}>
+              <span
+                {...stylex.props(
+                  relationValueStyles.compactNavigationValue,
+                  relationValueStyles.compactId,
+                )}
+              >
                 <MiddleTruncate value={props.id} />
               </span>
               <span

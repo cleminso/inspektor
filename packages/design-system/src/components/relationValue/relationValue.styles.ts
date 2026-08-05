@@ -50,7 +50,7 @@ export const relationValueStyles = stylex.create({
   compactMissing: {
     color: textColors["text-danger"],
     flexShrink: 0,
-    fontFamily: fontFamilies.sans,
+    fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
     lineHeight: lineHeights.compact,

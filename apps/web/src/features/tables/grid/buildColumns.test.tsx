@@ -11,12 +11,14 @@ import { buildDataGridColumns } from "@tables/grid/buildColumns";
 function TestTable({
   columns,
   data,
+  initialColumnSizing,
   onColumnMenuOpen,
   onColumnMove,
   onSortingChange,
 }: {
   columns?: Parameters<typeof buildDataGridColumns>[0]["columns"];
   data?: DynamicTableRow[];
+  initialColumnSizing?: Record<string, number>;
   onColumnMenuOpen?: (columnId: string) => void;
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]["onColumnMove"];
   onSortingChange: () => void;
@@ -38,6 +40,7 @@ function TestTable({
       onColumnMove,
     }),
     data: data ?? [{ id: "row-1", name: "Ada" } as DynamicTableRow],
+    initialState: initialColumnSizing === undefined ? undefined : { columnSizing: initialColumnSizing },
     state: { sorting },
     onSortingChange: (updater) => {
       setSorting(updater);
@@ -89,6 +92,46 @@ describe("buildDataGridColumns", () => {
 
     expect(screen.getByRole("menuitem", { name: "Sort Descending" })).toBeTruthy();
     expect(screen.getByRole("menuitem", { name: "Hide column" })).toBeTruthy();
+  });
+
+  it("resets only the context column to its schema-aware initial width", () => {
+    render(
+      <TestTable
+        columns={[
+          {
+            accessorKey: "name",
+            column: null,
+            id: "name",
+            isSortable: true,
+            label: "Name",
+          },
+          {
+            accessorKey: "email",
+            column: null,
+            id: "email",
+            isSortable: true,
+            label: "Email",
+          },
+        ]}
+        data={[{ id: "row-1", name: "Ada", email: "ada@example.com" } as DynamicTableRow]}
+        initialColumnSizing={{ name: 420, email: 360 }}
+        onSortingChange={() => undefined}
+      />,
+    );
+
+    const table = screen.getByRole("table", { name: "People" });
+    const renderedColumns = table.querySelectorAll("col");
+    const nameColumn = renderedColumns[1];
+    const emailColumn = renderedColumns[2];
+
+    expect(nameColumn?.style.width).toBe("420px");
+    expect(emailColumn?.style.width).toBe("360px");
+
+    fireEvent.contextMenu(screen.getByText("Name"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Reset column width" }));
+
+    expect(nameColumn?.style.width).toBe("280px");
+    expect(emailColumn?.style.width).toBe("360px");
   });
 
   it("moves a column through the shared Move submenu", async () => {

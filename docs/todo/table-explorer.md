@@ -21,8 +21,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [05/08/26]
 
+- [x] Reset an individually resized data column to its schema-aware initial width from both header action menus.
+
+[05/08/26]
+
 - [x] Keep the selection column strictly `36px` and render data columns at their TanStack constrained sizes without proportional viewport redistribution.
-- [x] Align schema markers and structured preview counts through a shared leading rail.
+- [x] Keep a compact gap between schema markers and header labels while structured preview counts use a fixed leading rail.
 - [x] Supersede viewport-stretched semantic-table columns with an intrinsic-width table over a viewport-filling background surface.
 
 [05/08/26]
@@ -533,6 +537,10 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [05/08/26]
 
+- [x] A column header action resets only that column; a grid-wide reset requires a separate table-level action.
+
+[05/08/26]
+
 Checked markers in this section mean the interaction decision is settled; they do not mean the behavior is implemented.
 
 - [x] A single click selects and focuses a cell without opening a pane.
@@ -589,6 +597,10 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify a context-menu width reset restores the selected column's schema-aware size without changing another resized column.
 
 [05/08/26]
 

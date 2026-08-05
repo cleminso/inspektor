@@ -55,7 +55,7 @@ function getColumnSizing(column: TableColumnMeta): ColumnSizing {
   }
 
   if (column.column.references !== undefined) {
-    return { size: 290, minSize: 156 };
+    return { size: 310, minSize: 170 };
   }
 
   switch (column.column.column_type.type) {
@@ -295,6 +295,7 @@ function MenuColumnActions({
         </>
       )}
       <Menu.Separator />
+      <Menu.Item onClick={() => column.resetSize()}>Reset column width</Menu.Item>
       <Menu.Item
         disabled={column.getCanHide() === false}
         onClick={() => column.toggleVisibility(false)}
@@ -368,6 +369,7 @@ function ContextColumnActions({
         </>
       )}
       <ContextMenu.Separator />
+      <ContextMenu.Item onClick={() => column.resetSize()}>Reset column width</ContextMenu.Item>
       <ContextMenu.Item
         disabled={column.getCanHide() === false}
         onClick={() => column.toggleVisibility(false)}
