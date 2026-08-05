@@ -56,6 +56,8 @@ export const textColors = stylex.defineVars({
   'text-disabled': `light-dark(${palette.gray400}, ${palette.neutral600})`,
   'text-link': `light-dark(${palette.blue600}, ${palette.blue400})`,
   'text-selected': `light-dark(${palette.blue700}, ${palette.blue400})`,
+  'text-success': `light-dark(${palette.green700}, ${palette.green400})`,
+  'text-warning': `light-dark(${palette.orange700}, ${palette.orange400})`,
   'text-danger': `light-dark(${palette.red700}, ${palette.red500})`,
 
   // Text on color-role surfaces

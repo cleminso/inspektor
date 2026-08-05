@@ -11,6 +11,24 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Let content determine toast height instead of reserving unused minimum-height space.
+- [x] Center titles against the fixed-height trailing controls.
+- [x] Compose Close behavior with the design-system ghost icon button.
+
+[05/08/26]
+
+- [x] Omit the description row when no supporting content is provided.
+
+[05/08/26]
+
+- [x] Place the title and trailing Undo and Close controls in one header row.
+- [x] Place supporting descriptions below the header so they use the full content width.
+- [x] Use the neutral popover background and neutral border for every toast status.
+- [x] Express success, warning, and error status through semantic title text colors.
+- [x] Add shared `text-success` and `text-warning` semantic color tokens.
+
 [01/08/26]
 
 - [x] Deduplicate matching notifications by using their content as the default semantic ID.
@@ -33,6 +51,11 @@
 
 ## Settled interaction decisions
 
+[05/08/26]
+
+- Toast status changes only the title text color; the surface, border, description, and controls remain neutral.
+- Undo and Close form a fixed trailing control group aligned with the title row.
+
 [01/08/26]
 
 - Matching notification content updates the mounted notification and refreshes its dismissal timer.
@@ -46,6 +69,15 @@
 - None.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Run the focused toaster tests.
+- [x] Run the design-system typecheck.
+- [x] Run focused lint for the toaster and semantic-token files.
+- [x] Build the design-system package.
+- [x] Verify the header layout and description placement in the design-system application.
+- [x] Verify neutral status surfaces and semantic title colors in light and dark themes.
 
 [01/08/26]
 

@@ -4,6 +4,7 @@ import { Toast as BaseToast } from '@base-ui/react/toast'
 import * as stylex from '@stylexjs/stylex'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { Button } from '../button/button'
 import { toasterStyles } from './toaster.styles'
 
 export type ToastId = string | number
@@ -96,44 +97,12 @@ export const toasts: Toasts = {
   dismiss: (id) => toastManager.close(id === undefined ? undefined : normalizeToastId(id)),
 }
 
-const statusStyles = {
-  message: toasterStyles.toastMessage,
-  success: toasterStyles.toastSuccess,
-  warning: toasterStyles.toastWarning,
-  error: toasterStyles.toastError,
-  loading: toasterStyles.toastLoading,
-} satisfies Record<ToastStatus, unknown>
-
 const titleStatusStyles = {
   message: toasterStyles.titleMessage,
   success: toasterStyles.titleSuccess,
   warning: toasterStyles.titleWarning,
   error: toasterStyles.titleError,
   loading: toasterStyles.titleLoading,
-} satisfies Record<ToastStatus, unknown>
-
-const descriptionStatusStyles = {
-  message: toasterStyles.descriptionMessage,
-  success: toasterStyles.descriptionSuccess,
-  warning: toasterStyles.descriptionWarning,
-  error: toasterStyles.descriptionError,
-  loading: toasterStyles.descriptionLoading,
-} satisfies Record<ToastStatus, unknown>
-
-const actionStatusStyles = {
-  message: toasterStyles.actionMessage,
-  success: toasterStyles.actionSuccess,
-  warning: toasterStyles.actionWarning,
-  error: toasterStyles.actionError,
-  loading: toasterStyles.actionLoading,
-} satisfies Record<ToastStatus, unknown>
-
-const closeStatusStyles = {
-  message: toasterStyles.closeMessage,
-  success: toasterStyles.closeSuccess,
-  warning: toasterStyles.closeWarning,
-  error: toasterStyles.closeError,
-  loading: toasterStyles.closeLoading,
 } satisfies Record<ToastStatus, unknown>
 
 const stackOrderStyles = [
@@ -156,7 +125,6 @@ function ToastList() {
     const status = getToastStatus(toast.type)
     const rootStyleProps = createStateStyleProps<BaseToast.Root.State>((state) => [
       toasterStyles.toast,
-      statusStyles[status],
       stackOrderStyles[Math.min(index, stackOrderStyles.length - 1)],
       toast.updateKey !== undefined &&
         toast.updateKey > 0 &&
@@ -192,19 +160,6 @@ function ToastList() {
       toasterStyles.title,
       state.type !== undefined && titleStatusStyles[getToastStatus(state.type)],
     ])
-    const descriptionStyleProps = createStateStyleProps<BaseToast.Description.State>((state) => [
-      toasterStyles.description,
-      state.type !== undefined && descriptionStatusStyles[getToastStatus(state.type)],
-    ])
-    const actionStyleProps = createStateStyleProps<BaseToast.Action.State>((state) => [
-      toasterStyles.action,
-      state.type !== undefined && actionStatusStyles[getToastStatus(state.type)],
-    ])
-    const closeStyleProps = createStateStyleProps<BaseToast.Close.State>((state) => [
-      toasterStyles.close,
-      state.type !== undefined && closeStatusStyles[getToastStatus(state.type)],
-    ])
-
     return (
       <BaseToast.Root
         key={toast.id}
@@ -215,29 +170,42 @@ function ToastList() {
         data-status={status}
       >
         <BaseToast.Content {...contentStyleProps}>
-          <span {...stylex.props(toasterStyles.text)}>
+          <div {...stylex.props(toasterStyles.header)}>
             <BaseToast.Title {...titleStyleProps} />
+            <div {...stylex.props(toasterStyles.controls)}>
+              <BaseToast.Action {...stylex.props(toasterStyles.action)} />
+              <BaseToast.Close
+                render={
+                  <Button
+                    iconOnly
+                    aria-label="Dismiss notification"
+                    size="s"
+                    variant="ghost"
+                  />
+                }
+              >
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  viewBox="0 0 16 16"
+                  {...stylex.props(toasterStyles.closeIcon)}
+                >
+                  <path
+                    d="M4.5 4.5l7 7m0-7-7 7"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </BaseToast.Close>
+            </div>
+          </div>
+          {toast.description !== undefined && toast.description !== null ? (
             <BaseToast.Description
-              {...descriptionStyleProps}
+              {...stylex.props(toasterStyles.description)}
               data-slot="toast-description"
             />
-          </span>
-          <BaseToast.Action {...actionStyleProps} />
-          <BaseToast.Close {...closeStyleProps} aria-label="Dismiss notification">
-            <svg
-              aria-hidden="true"
-              fill="none"
-              viewBox="0 0 16 16"
-              {...stylex.props(toasterStyles.closeIcon)}
-            >
-              <path
-                d="M4.5 4.5l7 7m0-7-7 7"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </BaseToast.Close>
+          ) : null}
         </BaseToast.Content>
       </BaseToast.Root>
     )
