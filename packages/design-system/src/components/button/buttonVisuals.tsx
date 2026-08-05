@@ -14,8 +14,13 @@ export type ButtonVariant =
   | 'link'
 
 export type ButtonSize = 'xs' | 's' | 'm'
-export type ButtonJustify = 'center' | 'start' | 'between'
+export type ButtonLayout = 'inline' | 'row'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm'
+
+interface ButtonLayoutOptions {
+  alignment: 'center' | 'start'
+  fill: boolean
+}
 
 const variantStyles = {
   primary: buttonStyles.primary,
@@ -31,11 +36,10 @@ const sizeStyles = {
   m: buttonStyles.sizeM,
 } satisfies Record<ButtonSize, unknown>
 
-const justifyStyles = {
-  center: buttonStyles.justifyCenter,
-  start: buttonStyles.justifyStart,
-  between: buttonStyles.justifyBetween,
-} satisfies Record<ButtonJustify, unknown>
+export const buttonLayoutOptions = {
+  inline: { alignment: 'center', fill: false },
+  row: { alignment: 'start', fill: true },
+} satisfies Record<ButtonLayout, ButtonLayoutOptions>
 
 const radiusStyles = {
   none: buttonStyles.radiusNone,
@@ -55,8 +59,8 @@ interface ButtonVisualStylesOptions {
   size: ButtonSize
   square: boolean
   pressed: boolean
-  fullWidth: boolean
-  justify: ButtonJustify
+  fill: boolean
+  alignment: ButtonLayoutOptions['alignment']
   radius: ButtonRadius
   orientation: ButtonGroupOrientation | null
   disabled: boolean
@@ -69,8 +73,8 @@ export function getButtonVisualStyles({
   size,
   square,
   pressed,
-  fullWidth,
-  justify,
+  fill,
+  alignment,
   radius,
   orientation,
   disabled,
@@ -89,8 +93,8 @@ export function getButtonVisualStyles({
     orientation !== null && buttonGroupStyles.member,
     orientation === 'horizontal' && buttonGroupStyles.memberHorizontal,
     orientation === 'vertical' && buttonGroupStyles.memberVertical,
-    fullWidth === true && buttonStyles.fullWidth,
-    justifyStyles[justify],
+    fill === true && buttonStyles.fill,
+    alignment === 'start' && buttonStyles.alignStart,
     disabled === true &&
       (variant === 'ghost' || variant === 'link'
         ? buttonStyles.disabledBare
@@ -104,7 +108,6 @@ interface ButtonContentProps {
   prefix?: ReactNode
   suffix?: ReactNode
   loading?: boolean
-  justify: ButtonJustify
   size: ButtonSize
 }
 
@@ -114,7 +117,6 @@ export function ButtonContent({
   prefix,
   suffix,
   loading = false,
-  justify,
   size,
 }: ButtonContentProps) {
   const spinnerSize = spinnerSizes[size]
@@ -136,34 +138,15 @@ export function ButtonContent({
   return (
     <span
       data-slot="button-content"
-      {...stylex.props(
-        buttonStyles.content,
-        justify === 'between' && buttonStyles.contentBetween,
-      )}
+      {...stylex.props(buttonStyles.content)}
     >
-      {justify === 'between' ? (
-        <>
-          <span data-slot="button-leading" {...stylex.props(buttonStyles.leadingContent)}>
-            {prefixContent}
-            {children}
-          </span>
-          {suffix !== undefined ? (
-            <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
-              {suffix}
-            </span>
-          ) : null}
-        </>
-      ) : (
-        <>
-          {prefixContent}
-          {children}
-          {suffix !== undefined ? (
-            <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
-              {suffix}
-            </span>
-          ) : null}
-        </>
-      )}
+      {prefixContent}
+      {children}
+      {suffix !== undefined ? (
+        <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
+          {suffix}
+        </span>
+      ) : null}
     </span>
   )
 }

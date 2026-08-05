@@ -5,18 +5,20 @@ import * as stylex from '@stylexjs/stylex'
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { popupPositioning } from '../../primitives/popupPositioning'
+import type { FormControlSize } from '../../utils/formControlSize'
 import { selectStyles } from './select.styles'
 
 type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
 
-export type SelectSize = 's' | 'm' | 'l'
+export type SelectTriggerSize = FormControlSize
+export type SelectItemSize = 's' | 'm' | 'l'
 export type SelectWidth = 'content' | 'full'
 
 const sizeStyles = {
   s: selectStyles.sizeS,
   m: selectStyles.sizeM,
   l: selectStyles.sizeL,
-} satisfies Record<SelectSize, unknown>
+} satisfies Record<SelectTriggerSize, unknown>
 
 export type SelectRootProps<Value> = Omit<
   BaseSelect.Root.Props<Value, false>,
@@ -41,7 +43,7 @@ export interface SelectTriggerProps extends Omit<
   'nativeButton' | 'prefix' | 'size'
 > {
   /** Controls the trigger height and padding. */
-  size?: SelectSize
+  size?: SelectTriggerSize
   /** Controls whether the trigger follows its content or fills its container. */
   width?: SelectWidth
   /** Content displayed before the selected value. */
@@ -88,7 +90,7 @@ export type SelectItemProps<Value> = Omit<
   /** The value represented by this option. */
   value: Value
   /** Controls the option minimum height. */
-  size?: SelectSize
+  size?: SelectItemSize
   /** Disables the option. */
   disabled?: BaseSelect.Item.Props['disabled']
   /** Indicates whether the rendered option is a native button. */
@@ -336,7 +338,7 @@ const itemSizeStyles = {
   s: selectStyles.itemSizeS,
   m: selectStyles.itemSizeM,
   l: selectStyles.itemSizeL,
-} satisfies Record<SelectSize, unknown>
+} satisfies Record<SelectItemSize, unknown>
 
 function SelectItemInner<Value>(
   {

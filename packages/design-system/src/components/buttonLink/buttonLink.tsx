@@ -6,8 +6,9 @@ import { forwardRef, useContext, type ReactNode } from 'react'
 import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
 import {
   ButtonContent,
+  buttonLayoutOptions,
   getButtonVisualStyles,
-  type ButtonJustify,
+  type ButtonLayout,
   type ButtonRadius,
   type ButtonSize,
   type ButtonVariant,
@@ -34,10 +35,8 @@ interface ButtonLinkSharedProps {
 interface LabelButtonLinkProps {
   /** Makes the link a square icon-only action. */
   iconOnly?: false
-  /** Stretches the link to the width of its container. */
-  fullWidth?: boolean
-  /** Controls how content is distributed inside the link. */
-  justify?: ButtonJustify
+  /** Selects inline or full-width row navigation layout. */
+  layout?: ButtonLayout
   /** Renders decorative content before the visible label. */
   prefix?: ReactNode
   /** Renders decorative content after the visible label. */
@@ -49,8 +48,7 @@ interface IconOnlyButtonLinkProps {
   iconOnly: true
   /** Identifies the icon-only navigation action for assistive technology. */
   'aria-label': string
-  fullWidth?: never
-  justify?: never
+  layout?: never
   prefix?: never
   suffix?: never
 }
@@ -64,8 +62,7 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(functio
     variant = 'primary',
     size = 'm',
     iconOnly = false,
-    fullWidth = false,
-    justify = 'center',
+    layout = 'inline',
     radius = 'xs',
     prefix,
     suffix,
@@ -76,15 +73,16 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(functio
   forwardedRef,
 ) {
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
+  const layoutOptions = buttonLayoutOptions[layout]
   const styleProps = stylex.props(
     ...getButtonVisualStyles({
       variant,
       size,
       square: iconOnly,
       pressed: false,
-      fullWidth,
-      justify,
       radius,
+      fill: layoutOptions.fill,
+      alignment: layoutOptions.alignment,
       orientation: buttonGroupOrientation,
       disabled: false,
       hasPrefix: prefix !== undefined,
@@ -97,15 +95,15 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(functio
       <ButtonContent
         prefix={prefix}
         suffix={suffix}
-        justify={justify}
         size={size}
         iconOnly={iconOnly}
       >
         {children}
       </ButtonContent>
     ),
-    'data-full-width': fullWidth === true ? '' : undefined,
+    'data-full-width': layoutOptions.fill === true ? '' : undefined,
     'data-icon-only': iconOnly === true ? '' : undefined,
+    'data-layout': layout,
     'data-radius': radius,
     'data-size': size,
     'data-slot': 'button-link',

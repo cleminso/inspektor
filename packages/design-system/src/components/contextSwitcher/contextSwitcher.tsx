@@ -11,13 +11,15 @@ import {
   type ComboboxPopupWidth,
   type ComboboxRootProps,
   type ComboboxStatusProps,
+  type ComboboxTriggerSize,
+  type ComboboxTriggerWidth,
   type ComboboxValueProps,
   type ComboboxViewportHeight,
 } from "../combobox/combobox";
 import { contextSwitcherStyles } from "./contextSwitcher.styles";
 
-export type ContextSwitcherTriggerSize = "s" | "m";
-export type ContextSwitcherTriggerWidth = "content" | "s" | "m";
+export type ContextSwitcherTriggerSize = ComboboxTriggerSize;
+export type ContextSwitcherTriggerWidth = Exclude<ComboboxTriggerWidth, "full">;
 
 export type ContextSwitcherRootProps<Value> = PropsWithChildren<{
   /** Items available for filtering and context selection. */

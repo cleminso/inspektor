@@ -14,8 +14,7 @@ export function ConnectionList(): React.ReactElement {
           type="button"
           variant="ghost"
           size="s"
-          fullWidth
-          justify="start"
+          layout="row"
           onClick={() => {
             void openConnection(connection.id);
           }}

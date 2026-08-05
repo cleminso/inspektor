@@ -26,6 +26,13 @@
 
 [05/08/26]
 
+- [x] Share form-control size ownership between Input and Select Trigger while preserving their consumer-facing type names.
+- [x] Split Select Trigger size from Select Item row size so identical literals do not imply identical geometry.
+- [x] Keep Combobox trigger size policy explicit and derive Context Switcher forwarding types from Combobox's public trigger types.
+- [x] Keep component-specific size types separate when identical literals describe different physical domains.
+
+[05/08/26]
+
 - [x] Remove Multi Select query ownership so its high-level Popover composition owns selection and two-column option keyboard behavior only.
 
 [03/08/26]
@@ -167,6 +174,12 @@
 - [x] Keep tests focused on Inspector transformations and regressions instead of retesting Base UI internals.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Design-system package tests, typecheck, lint, and build pass.
+- [x] Documentation generated props, tests, typecheck, lint, and build pass.
+- [x] Inspector application typecheck, lint, and build pass with the revised public types.
 
 [03/08/26]
 

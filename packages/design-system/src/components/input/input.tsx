@@ -3,10 +3,11 @@ import { Input as BaseInput } from "@base-ui/react/input";
 import { forwardRef, useContext, type ComponentRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import type { FormControlSize } from "../../utils/formControlSize";
 import { InputGroupContext } from "../inputGroup/inputGroupContext";
 import { inputStyles } from "./input.styles";
 
-export type InputSize = "s" | "m" | "l";
+export type InputSize = FormControlSize;
 export type InputVariant = "default" | "subtle";
 export type InputFont = "sans" | "mono";
 

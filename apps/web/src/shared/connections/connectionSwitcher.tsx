@@ -106,8 +106,7 @@ export function ConnectionSwitcher({
           <Button
             variant="ghost"
             size="s"
-            fullWidth
-            justify="start"
+            layout="row"
             onClick={() => {
               setOpen(false);
               void navigate({ to: appRoutes.newConnection });

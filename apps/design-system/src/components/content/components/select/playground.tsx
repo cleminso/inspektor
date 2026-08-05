@@ -1,4 +1,10 @@
-import { Box, Select, type SelectSize, type SelectWidth } from "@inspector/ds";
+import {
+  Box,
+  Select,
+  type SelectItemSize,
+  type SelectTriggerSize,
+  type SelectWidth,
+} from "@inspector/ds";
 import { type ReactElement, type ReactNode, useState } from "react";
 
 import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
@@ -8,8 +14,8 @@ import { type PlaygroundControl } from "@/components/docs/playground/playgroundT
 import { selectItem } from "@/lib/registry";
 
 export interface SelectPlaygroundState {
-  size: SelectSize;
-  itemSize: SelectSize;
+  size: SelectTriggerSize;
+  itemSize: SelectItemSize;
   width: SelectWidth;
   disabled: boolean;
   prefix: boolean;

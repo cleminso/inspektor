@@ -66,8 +66,7 @@ test("extracts Button API facts from the public package export", () => {
       "disabled",
       "render",
       "iconOnly",
-      "fullWidth",
-      "justify",
+      "layout",
       "prefix",
       "suffix",
       "aria-label",
@@ -82,6 +81,15 @@ test("extracts Button API facts from the public package export", () => {
   assert.doesNotMatch(radius?.type ?? "", /"l"|"xl"/);
   assert.equal(radius?.required, false);
   assert.equal(radius?.description, "Selects a design-system corner radius.");
+
+  const layout = buttonProps.find(({ name }) => name === "layout");
+  assert.equal(layout?.defaultValue, '"inline"');
+  for (const value of ['"inline"', '"row"']) {
+    assert.match(layout?.type ?? "", new RegExp(value));
+  }
+  assert.doesNotMatch(layout?.type ?? "", /"fill"/);
+  assert.equal(layout?.required, false);
+  assert.equal(layout?.description, "Selects inline or full-width row action layout.");
 
   const ariaLabel = buttonProps.find(({ name }) => name === "aria-label");
   assert.ok(ariaLabel);
@@ -126,8 +134,7 @@ test("extracts ButtonLink navigation and presentation props", () => {
       "href",
       "render",
       "iconOnly",
-      "fullWidth",
-      "justify",
+      "layout",
       "prefix",
       "suffix",
       "aria-label",
@@ -159,8 +166,8 @@ test("extracts runtime defaults instead of JSDoc default tags", () => {
   assert.equal(buttonProps.find(({ name }) => name === "size")?.defaultValue, '"m"');
   assert.equal(buttonProps.find(({ name }) => name === "loading")?.defaultValue, "false");
   assert.equal(buttonProps.find(({ name }) => name === "iconOnly")?.defaultValue, "false");
-  assert.equal(buttonProps.find(({ name }) => name === "fullWidth")?.defaultValue, "false");
-  assert.equal(buttonProps.find(({ name }) => name === "justify")?.defaultValue, '"center"');
+  assert.equal(buttonProps.find(({ name }) => name === "radius")?.defaultValue, '"xs"');
+  assert.equal(buttonProps.find(({ name }) => name === "layout")?.defaultValue, '"inline"');
   assert.equal(buttonProps.find(({ name }) => name === "disabled")?.defaultValue, "false");
 });
 
@@ -399,7 +406,6 @@ test("extracts the constrained CodeEditor API", () => {
       "id",
       "labelledBy",
       "describedBy",
-      "toolbarLabel",
       "readOnly",
       "disabled",
       "invalid",

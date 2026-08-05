@@ -2,7 +2,7 @@ import {
   Box,
   Button,
   Icon,
-  type ButtonJustify,
+  type ButtonLayout,
   type ButtonRadius,
   type ButtonSize,
   type ButtonVariant,
@@ -23,11 +23,10 @@ export interface ButtonPlaygroundState {
   variant: ButtonVariant;
   size: ButtonSize;
   radius: ButtonRadius;
-  justify: ButtonJustify;
+  layout: ButtonLayout;
   loading: boolean;
   disabled: boolean;
   iconOnly: boolean;
-  fullWidth: boolean;
   prefix: boolean;
   suffix: boolean;
   [key: string]: boolean | string;
@@ -37,11 +36,10 @@ const initialState: ButtonPlaygroundState = {
   variant: "primary",
   size: "m",
   radius: "xs",
-  justify: "center",
+  layout: "inline",
   loading: false,
   disabled: false,
   iconOnly: false,
-  fullWidth: false,
   prefix: false,
   suffix: false,
 };
@@ -70,14 +68,13 @@ const controls = [
   },
   {
     kind: "select",
-    key: "justify",
-    label: "Justify",
-    options: ["center", "start", "between"].map((value) => ({ label: value, value })),
+    key: "layout",
+    label: "Layout",
+    options: ["inline", "row"].map((value) => ({ label: value, value })),
   },
   { kind: "boolean", key: "loading", label: "Loading" },
   { kind: "boolean", key: "disabled", label: "Disabled" },
   { kind: "boolean", key: "iconOnly", label: "Icon only" },
-  { kind: "boolean", key: "fullWidth", label: "Full width" },
   { kind: "boolean", key: "prefix", label: "Prefix" },
   { kind: "boolean", key: "suffix", label: "Suffix" },
 ] as const satisfies readonly PlaygroundControl<ButtonPlaygroundState>[];
@@ -87,7 +84,7 @@ function serializeProps(state: ButtonPlaygroundState): string[] {
   if (state.variant !== "primary") props.push(`variant="${state.variant}"`);
   if (state.size !== "m") props.push(`size="${state.size}"`);
   if (state.radius !== "xs") props.push(`radius="${state.radius}"`);
-  if (state.justify !== "center") props.push(`justify="${state.justify}"`);
+  if (state.iconOnly === false && state.layout !== "inline") props.push(`layout="${state.layout}"`);
   if (state.loading === true) props.push("loading");
   if (state.disabled === true) props.push("disabled");
   if (state.iconOnly === true) {
@@ -95,7 +92,6 @@ function serializeProps(state: ButtonPlaygroundState): string[] {
     props.push('aria-label="Primary action"');
     return props;
   }
-  if (state.fullWidth === true) props.push("fullWidth");
   if (state.prefix === true) {
     props.push(`prefix={${playgroundIconSource.arrowLeft}}`);
   }
@@ -136,8 +132,7 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
     <Box>
       <Button
         {...sharedPreviewProps}
-        justify={state.justify}
-        fullWidth={state.fullWidth}
+        layout={state.layout}
         prefix={state.prefix === true ? <Icon render={<ArrowLeft />} size="s" /> : undefined}
         suffix={state.suffix === true ? <Icon render={<ArrowRight />} size="s" /> : undefined}
       >
@@ -155,15 +150,13 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
             return {
               ...current,
               iconOnly: true,
-              fullWidth: false,
-              justify: "center",
+              layout: "inline",
               prefix: false,
               suffix: false,
             };
           }
 
-          const usesLabelLayout =
-            key === "fullWidth" || key === "justify" || key === "prefix" || key === "suffix";
+          const usesLabelLayout = key === "layout" || key === "prefix" || key === "suffix";
           return {
             ...current,
             [key]: value,

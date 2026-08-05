@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import * as stylex from "@stylexjs/stylex";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Button } from "./button";
@@ -14,8 +15,8 @@ describe("Button", () => {
       size: "xs",
       square: true,
       pressed: false,
-      fullWidth: false,
-      justify: "center",
+      fill: false,
+      alignment: "center",
       radius: "xs",
       orientation: null,
       disabled: true,
@@ -72,20 +73,60 @@ describe("Button", () => {
     expect(activationCount).toBe(0);
   });
 
-  it("keeps leading content together while pushing a suffix to the far edge", () => {
+  it("uses a full-width start-aligned row layout", () => {
     render(
-      <Button fullWidth justify="between" prefix={<span>Prefix</span>} suffix={<span>Suffix</span>}>
+      <Button layout="row" prefix={<span>Prefix</span>} suffix={<span>Suffix</span>}>
         Label
       </Button>,
     );
 
     const button = screen.getByRole("button", { name: "Label" });
-    const content = button.querySelector<HTMLElement>('[data-slot="button-content"]');
-    const leading = button.querySelector<HTMLElement>('[data-slot="button-leading"]');
+    const fillClassName = stylex.props(buttonStyles.fill).className;
+    const alignStartClassName = stylex.props(buttonStyles.alignStart).className;
 
-    expect(content?.children).toHaveLength(2);
-    expect(leading?.textContent).toBe("PrefixLabel");
-    expect(leading?.nextElementSibling?.textContent).toBe("Suffix");
+    expect(button.getAttribute("data-layout")).toBe("row");
+    expect(button.getAttribute("data-full-width")).toBe("");
+    expect(fillClassName).toBeDefined();
+    expect(alignStartClassName).toBeDefined();
+    if (fillClassName !== undefined && alignStartClassName !== undefined) {
+      expect(button.classList.contains(fillClassName)).toBe(true);
+      expect(button.classList.contains(alignStartClassName)).toBe(true);
+    }
+    expect(button.querySelector('[data-slot="button-leading"]')).toBeNull();
+    expect(button.textContent).toBe("PrefixLabelSuffix");
+  });
+
+  it("retains constrained radius choices", () => {
+    render(<Button radius="m">Save</Button>);
+
+    const button = screen.getByRole("button", { name: "Save" });
+    const radiusClassName = stylex.props(buttonStyles.radiusM).className;
+
+    expect(button.getAttribute("data-radius")).toBe("m");
+    expect(radiusClassName).toBeDefined();
+    if (radiusClassName !== undefined) {
+      expect(button.classList.contains(radiusClassName)).toBe(true);
+    }
+  });
+
+  it("rejects removed width and alignment combinations", () => {
+    // @ts-expect-error Button content distribution is selected through layout.
+    const justify = <Button justify="start">Save</Button>;
+    // @ts-expect-error Button width is selected through layout.
+    const fullWidth = <Button fullWidth>Save</Button>;
+    // @ts-expect-error Button exposes only supported inline and row layouts.
+    const fill = <Button layout="fill">Save</Button>;
+    const iconLayout = (
+      // @ts-expect-error Icon-only actions do not accept labelled-button layout.
+      <Button iconOnly aria-label="Save" layout="row">
+        <svg />
+      </Button>
+    );
+
+    expect(justify).toBeDefined();
+    expect(fullWidth).toBeDefined();
+    expect(fill).toBeDefined();
+    expect(iconLayout).toBeDefined();
   });
 
   it("propagates type through a custom render target", () => {

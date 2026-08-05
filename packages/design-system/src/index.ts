@@ -127,7 +127,7 @@ export type {
 } from './components/contextMenu/contextMenu'
 export { Button } from './components/button/button'
 export type {
-  ButtonJustify,
+  ButtonLayout,
   ButtonProps,
   ButtonRadius,
   ButtonSize,
@@ -305,7 +305,8 @@ export type {
   SelectPositionerProps,
   SelectRootProps,
   SelectSeparatorProps,
-  SelectSize,
+  SelectItemSize,
+  SelectTriggerSize,
   SelectTriggerProps,
   SelectValueProps,
   SelectWidth,

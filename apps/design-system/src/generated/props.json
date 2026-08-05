@@ -316,7 +316,7 @@
       "description": "Controls the visual treatment and emphasis of the action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 30
+        "line": 26
       }
     },
     {
@@ -327,7 +327,7 @@
       "description": "Controls the button height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 32
+        "line": 28
       }
     },
     {
@@ -338,7 +338,7 @@
       "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 34
+        "line": 30
       }
     },
     {
@@ -349,7 +349,7 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 36
+        "line": 32
       }
     },
     {
@@ -360,7 +360,7 @@
       "description": "Disables interaction and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 38
+        "line": 34
       }
     },
     {
@@ -370,7 +370,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes Button behavior and styles onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 40
+        "line": 36
       }
     },
     {
@@ -381,29 +381,18 @@
       "description": "Makes the button a square icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 45
+        "line": 41
       }
     },
     {
-      "name": "fullWidth",
-      "type": "false | true",
+      "name": "layout",
+      "type": "\"row\" | \"inline\"",
       "required": false,
-      "defaultValue": "false",
-      "description": "Stretches the button to the width of its container.",
+      "defaultValue": "\"inline\"",
+      "description": "Selects inline or full-width row action layout.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 47
-      }
-    },
-    {
-      "name": "justify",
-      "type": "\"center\" | \"start\" | \"between\"",
-      "required": false,
-      "defaultValue": "\"center\"",
-      "description": "Controls how content is distributed inside the button.",
-      "source": {
-        "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 49
+        "line": 43
       }
     },
     {
@@ -413,7 +402,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 51
+        "line": 45
       }
     },
     {
@@ -423,7 +412,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 53
+        "line": 47
       }
     },
     {
@@ -433,7 +422,7 @@
       "description": "Defines a string value that labels the current element.\nIdentifies the icon-only action for assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 60
+        "line": 54
       }
     }
   ],
@@ -446,7 +435,7 @@
       "description": "Controls the visual treatment and emphasis of the navigation link.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 23
+        "line": 24
       }
     },
     {
@@ -457,7 +446,7 @@
       "description": "Controls the link height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -468,7 +457,7 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -478,7 +467,7 @@
       "description": "Identifies the native anchor destination when render composition is not used.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -488,7 +477,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes ButtonLink presentation onto a router link component.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -499,29 +488,18 @@
       "description": "Makes the link a square icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
-      "name": "fullWidth",
-      "type": "false | true",
+      "name": "layout",
+      "type": "\"row\" | \"inline\"",
       "required": false,
-      "defaultValue": "false",
-      "description": "Stretches the link to the width of its container.",
+      "defaultValue": "\"inline\"",
+      "description": "Selects inline or full-width row navigation layout.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 38
-      }
-    },
-    {
-      "name": "justify",
-      "type": "\"center\" | \"start\" | \"between\"",
-      "required": false,
-      "defaultValue": "\"center\"",
-      "description": "Controls how content is distributed inside the link.",
-      "source": {
-        "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 40
+        "line": 39
       }
     },
     {
@@ -531,7 +509,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 42
+        "line": 41
       }
     },
     {
@@ -541,7 +519,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 44
+        "line": 43
       }
     },
     {
@@ -551,7 +529,7 @@
       "description": "Defines a string value that labels the current element.\nIdentifies the icon-only navigation action for assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/buttonLink/buttonLink.tsx",
-        "line": 51
+        "line": 50
       }
     }
   ],
@@ -1199,7 +1177,7 @@
     },
     {
       "name": "display",
-      "type": "\"none\" | \"grid\" | \"inline\" | \"flex\" | \"block\" | \"inline-flex\" | \"inline-grid\" | \"inline-block\" | \"contents\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"none\" | \"grid\" | \"inline\" | \"flex\" | \"block\" | \"inline-flex\" | \"inline-grid\" | \"inline-block\" | \"contents\">>",
+      "type": "\"none\" | \"inline\" | \"grid\" | \"flex\" | \"block\" | \"inline-flex\" | \"inline-grid\" | \"inline-block\" | \"contents\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"none\" | \"inline\" | \"grid\" | \"flex\" | \"block\" | \"inline-flex\" | \"inline-grid\" | \"inline-block\" | \"contents\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1379,7 +1357,7 @@
     },
     {
       "name": "alignSelf",
-      "type": "\"center\" | \"start\" | \"auto\" | \"end\" | \"baseline\" | \"stretch\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"start\" | \"auto\" | \"end\" | \"baseline\" | \"stretch\">>",
+      "type": "\"center\" | \"auto\" | \"start\" | \"end\" | \"baseline\" | \"stretch\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"auto\" | \"start\" | \"end\" | \"baseline\" | \"stretch\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1389,7 +1367,7 @@
     },
     {
       "name": "justifyContent",
-      "type": "\"center\" | \"start\" | \"between\" | \"end\" | \"around\" | \"evenly\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"start\" | \"between\" | \"end\" | \"around\" | \"evenly\">>",
+      "type": "\"center\" | \"start\" | \"end\" | \"between\" | \"around\" | \"evenly\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"start\" | \"end\" | \"between\" | \"around\" | \"evenly\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1399,7 +1377,7 @@
     },
     {
       "name": "alignContent",
-      "type": "\"center\" | \"start\" | \"between\" | \"end\" | \"stretch\" | \"around\" | \"evenly\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"start\" | \"between\" | \"end\" | \"stretch\" | \"around\" | \"evenly\">>",
+      "type": "\"center\" | \"start\" | \"end\" | \"stretch\" | \"between\" | \"around\" | \"evenly\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"start\" | \"end\" | \"stretch\" | \"between\" | \"around\" | \"evenly\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1579,7 +1557,7 @@
     },
     {
       "name": "textAlign",
-      "type": "\"center\" | \"justify\" | \"left\" | \"right\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"justify\" | \"left\" | \"right\">>",
+      "type": "\"center\" | \"left\" | \"right\" | \"justify\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"center\" | \"left\" | \"right\" | \"justify\">>",
       "required": false,
       "description": "",
       "source": {
@@ -3698,7 +3676,7 @@
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -3709,7 +3687,7 @@
       "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -3720,7 +3698,7 @@
       "description": "Selects proportional or data-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -3731,7 +3709,7 @@
       "description": "Stretches the input to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -3742,7 +3720,7 @@
       "description": "Marks the input as invalid and exposes that state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 39
+        "line": 40
       }
     },
     {
@@ -3753,7 +3731,7 @@
       "description": "Disables editing and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -3764,7 +3742,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -3774,7 +3752,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -3784,7 +3762,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -3794,7 +3772,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 49
+        "line": 50
       }
     },
     {
@@ -3804,7 +3782,7 @@
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 51
+        "line": 52
       }
     }
   ],
@@ -4484,7 +4462,7 @@
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -4494,7 +4472,7 @@
       "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -4504,7 +4482,7 @@
       "description": "Selects proportional or data-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -4514,7 +4492,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -4524,7 +4502,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -4534,7 +4512,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -4544,7 +4522,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 49
+        "line": 50
       }
     }
   ],
@@ -4639,7 +4617,7 @@
       "description": "Whether the menu is initially open.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 19
+        "line": 34
       }
     },
     {
@@ -4649,7 +4627,7 @@
       "description": "Whether the menu is currently open.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 21
+        "line": 36
       }
     },
     {
@@ -4659,7 +4637,7 @@
       "description": "Runs when the menu opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 23
+        "line": 38
       }
     },
     {
@@ -4670,7 +4648,7 @@
       "description": "Disables interaction with the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 25
+        "line": 40
       }
     }
   ],
@@ -4683,7 +4661,7 @@
       "description": "Disables the menu trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 30
+        "line": 45
       }
     },
     {
@@ -4693,7 +4671,7 @@
       "description": "Composes trigger behavior onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 32
+        "line": 47
       }
     }
   ],
@@ -4706,7 +4684,7 @@
       "description": "Keeps the portal mounted while the menu is closed.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 37
+        "line": 52
       }
     }
   ],
@@ -4743,7 +4721,7 @@
       "description": "Controls whether the popup follows its content or trigger width.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 49
+        "line": 64
       }
     }
   ],
@@ -4755,7 +4733,7 @@
       "description": "Controls whether the popup follows its content or trigger width.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 49
+        "line": 64
       }
     },
     {
@@ -4766,7 +4744,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 54
+        "line": 69
       }
     },
     {
@@ -4777,7 +4755,7 @@
       "description": "Keeps the content mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 56
+        "line": 71
       }
     },
     {
@@ -4787,7 +4765,7 @@
       "description": "Places the popup on a side of the trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 58
+        "line": 73
       }
     }
   ],
@@ -4800,7 +4778,7 @@
       "description": "Controls the action's semantic emphasis.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 63
+        "line": 78
       }
     },
     {
@@ -4811,7 +4789,7 @@
       "description": "Disables the action.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 65
+        "line": 80
       }
     },
     {
@@ -4822,7 +4800,7 @@
       "description": "Controls whether activating the item closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 67
+        "line": 82
       }
     }
   ],
@@ -4835,7 +4813,7 @@
       "description": "Controls whether activating the link closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 72
+        "line": 87
       }
     }
   ],
@@ -4847,7 +4825,7 @@
       "description": "Composes the group semantics onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 79
+        "line": 94
       }
     }
   ],
@@ -4859,7 +4837,7 @@
       "description": "Composes the group label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 84
+        "line": 99
       }
     }
   ],
@@ -4871,7 +4849,7 @@
       "description": "Composes the shortcut label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 89
+        "line": 104
       }
     }
   ],
@@ -4884,7 +4862,7 @@
       "description": "Controls the checked state.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 94
+        "line": 109
       }
     },
     {
@@ -4894,7 +4872,7 @@
       "description": "Sets the initial checked state.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 96
+        "line": 111
       }
     },
     {
@@ -4904,7 +4882,7 @@
       "description": "Runs when the checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 98
+        "line": 113
       }
     },
     {
@@ -4915,7 +4893,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 100
+        "line": 115
       }
     },
     {
@@ -4926,7 +4904,7 @@
       "description": "Controls whether changing the option closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 102
+        "line": 117
       }
     }
   ],
@@ -4939,7 +4917,7 @@
       "description": "Keeps the indicator mounted while unchecked.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 110
+        "line": 125
       }
     }
   ],
@@ -4952,7 +4930,7 @@
       "description": "Disables every option in the group.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 115
+        "line": 130
       }
     }
   ],
@@ -4965,7 +4943,7 @@
       "description": "Controls whether changing the option closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 120
+        "line": 135
       }
     },
     {
@@ -4976,7 +4954,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 122
+        "line": 137
       }
     },
     {
@@ -4986,7 +4964,7 @@
       "description": "Value represented by the option.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 124
+        "line": 139
       }
     }
   ],
@@ -4999,7 +4977,7 @@
       "description": "Keeps the indicator mounted while unchecked.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 132
+        "line": 147
       }
     }
   ],
@@ -5013,7 +4991,7 @@
       "description": "Disables the submenu trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 139
+        "line": 154
       }
     },
     {
@@ -5023,7 +5001,7 @@
       "description": "Composes submenu trigger behavior onto another interactive element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 141
+        "line": 156
       }
     }
   ],
@@ -5038,7 +5016,7 @@
       "description": "Whether the context menu is initially open.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 18
+        "line": 33
       }
     },
     {
@@ -5049,7 +5027,7 @@
       "description": "Disables interaction with the context menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 20
+        "line": 35
       }
     },
     {
@@ -5059,7 +5037,7 @@
       "description": "Runs when the context menu opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 22
+        "line": 37
       }
     },
     {
@@ -5069,7 +5047,7 @@
       "description": "Whether the context menu is currently open.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 24
+        "line": 39
       }
     }
   ],
@@ -5081,7 +5059,7 @@
       "description": "Composes context-menu behavior onto another element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 29
+        "line": 44
       }
     }
   ],
@@ -5120,7 +5098,7 @@
       "description": "Aligns the popup along its pointer anchor.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 42
+        "line": 57
       }
     },
     {
@@ -5131,7 +5109,7 @@
       "description": "Keeps the content mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 44
+        "line": 59
       }
     },
     {
@@ -5141,7 +5119,7 @@
       "description": "Places the popup on a side of its pointer anchor.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 46
+        "line": 61
       }
     }
   ],
@@ -5154,7 +5132,7 @@
       "description": "Controls whether activating the item closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 51
+        "line": 66
       }
     },
     {
@@ -5165,7 +5143,7 @@
       "description": "Disables the action.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 53
+        "line": 68
       }
     },
     {
@@ -5176,7 +5154,7 @@
       "description": "Controls the action's semantic emphasis.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 55
+        "line": 70
       }
     },
     {
@@ -5186,7 +5164,7 @@
       "description": "Composes item behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 57
+        "line": 72
       }
     }
   ],
@@ -5199,7 +5177,7 @@
       "description": "Controls whether activating the link closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 62
+        "line": 77
       }
     },
     {
@@ -5209,7 +5187,7 @@
       "description": "Composes link-item behavior onto another link component.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 64
+        "line": 79
       }
     }
   ],
@@ -5218,42 +5196,6 @@
   "contextMenu.shortcut": [],
   "contextMenu.separator": [],
   "contextMenu.checkboxItem": [
-    {
-      "name": "closeOnClick",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Controls whether changing the option closes the menu.",
-      "source": {
-        "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 78
-      }
-    },
-    {
-      "name": "disabled",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Disables the option.",
-      "source": {
-        "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 80
-      }
-    },
-    {
-      "name": "render",
-      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, MenuCheckboxItemState>",
-      "required": false,
-      "description": "Composes checkbox-item behavior onto another compatible element.",
-      "source": {
-        "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 82
-      }
-    }
-  ],
-  "contextMenu.checkboxItemIndicator": [],
-  "contextMenu.radioGroup": [],
-  "contextMenu.radioItem": [
     {
       "name": "closeOnClick",
       "type": "false | true",
@@ -5277,13 +5219,49 @@
       }
     },
     {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, MenuCheckboxItemState>",
+      "required": false,
+      "description": "Composes checkbox-item behavior onto another compatible element.",
+      "source": {
+        "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
+        "line": 97
+      }
+    }
+  ],
+  "contextMenu.checkboxItemIndicator": [],
+  "contextMenu.radioGroup": [],
+  "contextMenu.radioItem": [
+    {
+      "name": "closeOnClick",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Controls whether changing the option closes the menu.",
+      "source": {
+        "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
+        "line": 108
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the option.",
+      "source": {
+        "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
+        "line": 110
+      }
+    },
+    {
       "name": "value",
       "type": "any",
       "required": true,
       "description": "Value represented by the option.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 97
+        "line": 112
       }
     },
     {
@@ -5293,7 +5271,7 @@
       "description": "Composes radio-item behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 99
+        "line": 114
       }
     }
   ],
@@ -5307,7 +5285,7 @@
       "description": "Composes submenu-trigger behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 109
+        "line": 124
       }
     }
   ],
@@ -5895,7 +5873,7 @@
       "description": "Items available for filtering and context selection.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 24
+        "line": 26
       }
     },
     {
@@ -5905,7 +5883,7 @@
       "description": "The active context item.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 26
+        "line": 28
       }
     },
     {
@@ -5915,7 +5893,7 @@
       "description": "The initially active context item.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 28
+        "line": 30
       }
     },
     {
@@ -5925,7 +5903,7 @@
       "description": "Runs when the active context item changes.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 30
+        "line": 32
       }
     },
     {
@@ -5936,7 +5914,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 32
+        "line": 34
       }
     },
     {
@@ -5946,7 +5924,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 34
+        "line": 36
       }
     },
     {
@@ -5956,7 +5934,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 36
+        "line": 38
       }
     },
     {
@@ -5966,7 +5944,7 @@
       "description": "Converts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 38
+        "line": 40
       }
     },
     {
@@ -5976,7 +5954,7 @@
       "description": "Converts an item into a stable string value.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 40
+        "line": 42
       }
     },
     {
@@ -5986,7 +5964,7 @@
       "description": "Compares an item with the active context value.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 42
+        "line": 44
       }
     },
     {
@@ -5996,7 +5974,7 @@
       "description": "Filters an item against the switcher query.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 44
+        "line": 46
       }
     },
     {
@@ -6007,7 +5985,7 @@
       "description": "Disables the switcher.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 46
+        "line": 48
       }
     }
   ],
@@ -6019,7 +5997,7 @@
       "description": "Accessible label that identifies the context being switched.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 53
+        "line": 55
       }
     },
     {
@@ -6030,7 +6008,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 55
+        "line": 57
       }
     },
     {
@@ -6041,7 +6019,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 57
+        "line": 59
       }
     },
     {
@@ -6052,7 +6030,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 59
+        "line": 61
       }
     },
     {
@@ -6062,7 +6040,7 @@
       "description": "Provides supplemental text for truncated trigger content.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 61
+        "line": 63
       }
     }
   ],
@@ -6086,7 +6064,7 @@
       "description": "Accessible label for the search input.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 66
+        "line": 68
       }
     },
     {
@@ -6096,7 +6074,7 @@
       "description": "Placeholder displayed while the search input is empty.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 68
+        "line": 70
       }
     }
   ],
@@ -6109,7 +6087,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 73
+        "line": 75
       }
     },
     {
@@ -6120,7 +6098,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 75
+        "line": 77
       }
     },
     {
@@ -6130,7 +6108,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 77
+        "line": 79
       }
     }
   ],
@@ -6143,7 +6121,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 82
+        "line": 84
       }
     }
   ],
@@ -6388,7 +6366,7 @@
       "description": "Data structure of the items rendered in the select popup.\nWhen specified, `<Select.Value>` renders the label of the selected item instead of the raw value.\nItems used to resolve selected value labels.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 26
+        "line": 28
       }
     },
     {
@@ -6398,7 +6376,7 @@
       "description": "The value of the select. Use when controlled.\nThe selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 28
+        "line": 30
       }
     },
     {
@@ -6408,7 +6386,7 @@
       "description": "The uncontrolled value of the select when it's initially rendered.\n\nTo render a controlled select, use the `value` prop instead.\nThe initially selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 30
+        "line": 32
       }
     },
     {
@@ -6418,7 +6396,7 @@
       "description": "Event handler called when the value of the select changes.\nRuns when the selected value changes.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 32
+        "line": 34
       }
     },
     {
@@ -6429,7 +6407,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the select.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 34
+        "line": 36
       }
     }
   ],
@@ -6443,7 +6421,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 44
+        "line": 46
       }
     },
     {
@@ -6454,7 +6432,7 @@
       "description": "Controls whether the trigger follows its content or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 46
+        "line": 48
       }
     },
     {
@@ -6464,7 +6442,7 @@
       "description": "Content displayed before the selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 48
+        "line": 50
       }
     },
     {
@@ -6474,7 +6452,7 @@
       "description": "Content displayed after the selected value and before the chevron.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 50
+        "line": 52
       }
     },
     {
@@ -6486,7 +6464,7 @@
       "deprecated": "Use `width=\"full\"`.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 52
+        "line": 54
       }
     },
     {
@@ -6497,7 +6475,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 54
+        "line": 56
       }
     },
     {
@@ -6508,7 +6486,7 @@
       "description": "Indicates whether the rendered trigger is a native button.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 56
+        "line": 58
       }
     },
     {
@@ -6518,7 +6496,7 @@
       "description": "Composes trigger behavior onto a compatible element.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 58
+        "line": 60
       }
     }
   ],
@@ -6570,7 +6548,7 @@
       "description": "Select options, groups, and separators rendered in the popup.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 75
+        "line": 77
       }
     },
     {
@@ -6581,7 +6559,7 @@
       "description": "Places the popup on this side of the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 77
+        "line": 79
       }
     },
     {
@@ -6592,7 +6570,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 79
+        "line": 81
       }
     },
     {
@@ -6603,7 +6581,7 @@
       "description": "Aligns the selected item text with the trigger value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 81
+        "line": 83
       }
     }
   ],
@@ -6618,7 +6596,7 @@
       "description": "The value represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 89
+        "line": 91
       }
     },
     {
@@ -6629,7 +6607,7 @@
       "description": "Controls the option minimum height.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 91
+        "line": 93
       }
     },
     {
@@ -6640,7 +6618,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 93
+        "line": 95
       }
     },
     {
@@ -6651,7 +6629,7 @@
       "description": "Indicates whether the rendered option is a native button.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 95
+        "line": 97
       }
     },
     {
@@ -6661,7 +6639,7 @@
       "description": "Composes option behavior onto a compatible element.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 97
+        "line": 99
       }
     }
   ],
@@ -6675,7 +6653,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 110
+        "line": 112
       }
     }
   ]

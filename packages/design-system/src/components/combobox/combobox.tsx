@@ -385,9 +385,9 @@ const ComboboxTrigger = forwardRef<ComponentRef<typeof BaseCombobox.Trigger>, Co
         size,
         square: false,
         pressed: false,
-        fullWidth: width === "full",
-        justify: "start",
         radius: "xs",
+        fill: width === "full",
+        alignment: "start",
         orientation: null,
         disabled: state.disabled,
         hasPrefix: false,
@@ -425,7 +425,7 @@ const ComboboxTrigger = forwardRef<ComponentRef<typeof BaseCombobox.Trigger>, Co
         data-slot="button"
         data-variant="ghost"
       >
-        <ButtonContent justify="start" size={size}>
+        <ButtonContent size={size}>
           {children}
         </ButtonContent>
       </BaseCombobox.Trigger>

@@ -5,8 +5,23 @@ import { type ComponentRef, forwardRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
-import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { menuStyles } from "../menu/menu.styles";
+import {
+  getMenuCheckboxIndicatorStyles,
+  getMenuCheckboxItemStyles,
+  getMenuItemStyles,
+  getMenuLinkItemStyles,
+  getMenuPopupStyles,
+  getMenuPositionerStyles,
+  getMenuRadioGroupStyles,
+  getMenuRadioIndicatorStyles,
+  getMenuRadioItemStyles,
+  getMenuSeparatorStyles,
+  getMenuSubmenuTriggerStyles,
+  MenuCheckIcon,
+  MenuRadioIcon,
+  MenuSubmenuIcon,
+} from "../menu/menuPresentation";
 import { contextMenuStyles } from "./contextMenu.styles";
 
 type WithoutStyles<Props> = Omit<Props, "className" | "style" | "render">;
@@ -149,23 +164,7 @@ const ContextMenuPositioner = forwardRef<
   ComponentRef<typeof BaseContextMenu.Positioner>,
   ContextMenuPositionerProps
 >(function ContextMenuPositioner({ align = "start", side = "bottom", ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.Positioner.State>((state) => [
-    menuStyles.positioner,
-    state.open === true && menuStyles.positionerOpen,
-    state.open === false && menuStyles.positionerClosed,
-    state.side === "top" && menuStyles.positionerSideTop,
-    state.side === "bottom" && menuStyles.positionerSideBottom,
-    state.side === "left" && menuStyles.positionerSideLeft,
-    state.side === "right" && menuStyles.positionerSideRight,
-    state.side === "inline-start" && menuStyles.positionerSideInlineStart,
-    state.side === "inline-end" && menuStyles.positionerSideInlineEnd,
-    state.align === "start" && menuStyles.positionerAlignStart,
-    state.align === "center" && menuStyles.positionerAlignCenter,
-    state.align === "end" && menuStyles.positionerAlignEnd,
-    state.anchorHidden === true && menuStyles.positionerAnchorHidden,
-    state.nested === true && menuStyles.positionerNested,
-    state.instant !== undefined && menuStyles.positionerInstant,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.Positioner.State>(getMenuPositionerStyles);
   return (
     <BaseContextMenu.Positioner
       {...props}
@@ -183,26 +182,8 @@ const ContextMenuPopup = forwardRef<
   ContextMenuPopupProps
 >(function ContextMenuPopup(props, forwardedRef) {
   const stateStyles = createStateStyleProps<BaseContextMenu.Popup.State>((state) => [
-    menuStyles.popup,
-    scrollbarStyles.standard,
+    ...getMenuPopupStyles(state),
     menuStyles.popupWidthContent,
-    (state.transitionStatus === "starting" || state.transitionStatus === "ending") &&
-      menuStyles.popupTransition,
-    state.open === true && menuStyles.popupOpen,
-    state.open === false && menuStyles.popupClosed,
-    state.transitionStatus === "starting" && menuStyles.popupStarting,
-    state.transitionStatus === "ending" && menuStyles.popupEnding,
-    state.side === "top" && menuStyles.popupSideTop,
-    state.side === "bottom" && menuStyles.popupSideBottom,
-    state.side === "left" && menuStyles.popupSideLeft,
-    state.side === "right" && menuStyles.popupSideRight,
-    state.side === "inline-start" && menuStyles.popupSideInlineStart,
-    state.side === "inline-end" && menuStyles.popupSideInlineEnd,
-    state.align === "start" && menuStyles.popupAlignStart,
-    state.align === "center" && menuStyles.popupAlignCenter,
-    state.align === "end" && menuStyles.popupAlignEnd,
-    state.nested === true && menuStyles.popupNested,
-    state.instant !== undefined && menuStyles.popupInstant,
   ]);
   return (
     <BaseContextMenu.Popup
@@ -236,14 +217,9 @@ const ContextMenuItem = forwardRef<ComponentRef<typeof BaseContextMenu.Item>, Co
     { closeOnClick = true, disabled = false, variant = "default", ...props },
     forwardedRef,
   ) {
-    const stateStyles = createStateStyleProps<BaseContextMenu.Item.State>((state) => [
-      menuStyles.item,
-      variant === "danger" && menuStyles.itemDanger,
-      state.highlighted === true && menuStyles.itemHighlighted,
-      variant === "danger" && state.highlighted === true && menuStyles.itemDangerHighlighted,
-      state.disabled === true && menuStyles.itemDisabled,
-      state.disabled === true && menuStyles.itemDisabledState,
-    ]);
+    const stateStyles = createStateStyleProps<BaseContextMenu.Item.State>((state) =>
+      getMenuItemStyles(state, variant),
+    );
     return (
       <BaseContextMenu.Item
         {...props}
@@ -261,10 +237,7 @@ const ContextMenuLinkItem = forwardRef<
   ComponentRef<typeof BaseContextMenu.LinkItem>,
   ContextMenuLinkItemProps
 >(function ContextMenuLinkItem({ closeOnClick = true, ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.LinkItem.State>((state) => [
-    menuStyles.item,
-    state.highlighted === true && menuStyles.itemHighlighted,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.LinkItem.State>(getMenuLinkItemStyles);
   return (
     <BaseContextMenu.LinkItem
       {...props}
@@ -299,11 +272,7 @@ const ContextMenuSeparator = forwardRef<
   ComponentRef<typeof BaseContextMenu.Separator>,
   ContextMenuSeparatorProps
 >(function ContextMenuSeparator(props, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.Separator.State>((state) => [
-    menuStyles.separator,
-    state.orientation === "horizontal" && menuStyles.separatorHorizontal,
-    state.orientation === "vertical" && menuStyles.separatorVertical,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.Separator.State>(getMenuSeparatorStyles);
   return <BaseContextMenu.Separator {...props} ref={forwardedRef} {...stateStyles} />;
 });
 
@@ -327,14 +296,9 @@ const ContextMenuCheckboxItem = forwardRef<
   { closeOnClick = false, disabled = false, ...props },
   forwardedRef,
 ) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.CheckboxItem.State>((state) => [
-    menuStyles.item,
-    menuStyles.choiceItem,
-    state.checked === true && menuStyles.itemSelected,
-    state.checked === false && menuStyles.itemUnchecked,
-    state.highlighted === true && menuStyles.itemHighlighted,
-    state.disabled === true && menuStyles.itemDisabled,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.CheckboxItem.State>(
+    getMenuCheckboxItemStyles,
+  );
   return (
     <BaseContextMenu.CheckboxItem
       {...props}
@@ -350,15 +314,9 @@ const ContextMenuCheckboxItemIndicator = forwardRef<
   ComponentRef<typeof BaseContextMenu.CheckboxItemIndicator>,
   ContextMenuCheckboxItemIndicatorProps
 >(function ContextMenuCheckboxItemIndicator({ keepMounted = false, ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.CheckboxItemIndicator.State>((state) => [
-    menuStyles.indicator,
-    state.checked === true && menuStyles.checkboxIndicatorChecked,
-    state.checked === false && menuStyles.checkboxIndicatorUnchecked,
-    state.disabled === true && menuStyles.checkboxIndicatorDisabled,
-    state.highlighted === true && menuStyles.checkboxIndicatorHighlighted,
-    state.transitionStatus === "starting" && menuStyles.checkboxIndicatorStarting,
-    state.transitionStatus === "ending" && menuStyles.checkboxIndicatorEnding,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.CheckboxItemIndicator.State>(
+    getMenuCheckboxIndicatorStyles,
+  );
   return (
     <BaseContextMenu.CheckboxItemIndicator
       {...props}
@@ -366,16 +324,7 @@ const ContextMenuCheckboxItemIndicator = forwardRef<
       keepMounted={keepMounted}
       {...stateStyles}
     >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 16 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        {...stylex.props(menuStyles.icon)}
-      >
-        <path d="m3 8 3 3 7-7" />
-      </svg>
+      <MenuCheckIcon />
     </BaseContextMenu.CheckboxItemIndicator>
   );
 });
@@ -384,9 +333,7 @@ const ContextMenuRadioGroup = forwardRef<
   ComponentRef<typeof BaseContextMenu.RadioGroup>,
   ContextMenuRadioGroupProps
 >(function ContextMenuRadioGroup({ disabled = false, ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.RadioGroup.State>((state) => [
-    state.disabled === true && menuStyles.radioGroupDisabled,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.RadioGroup.State>(getMenuRadioGroupStyles);
   return <BaseContextMenu.RadioGroup {...props} ref={forwardedRef} disabled={disabled} {...stateStyles} />;
 });
 
@@ -397,14 +344,7 @@ const ContextMenuRadioItem = forwardRef<
   { closeOnClick = false, disabled = false, ...props },
   forwardedRef,
 ) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.RadioItem.State>((state) => [
-    menuStyles.item,
-    menuStyles.choiceItem,
-    state.checked === true && menuStyles.itemSelected,
-    state.checked === false && menuStyles.itemUnchecked,
-    state.highlighted === true && menuStyles.itemHighlighted,
-    state.disabled === true && menuStyles.itemDisabled,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.RadioItem.State>(getMenuRadioItemStyles);
   return (
     <BaseContextMenu.RadioItem
       {...props}
@@ -420,15 +360,9 @@ const ContextMenuRadioItemIndicator = forwardRef<
   ComponentRef<typeof BaseContextMenu.RadioItemIndicator>,
   ContextMenuRadioItemIndicatorProps
 >(function ContextMenuRadioItemIndicator({ keepMounted = false, ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.RadioItemIndicator.State>((state) => [
-    menuStyles.indicator,
-    state.checked === true && menuStyles.radioIndicatorChecked,
-    state.checked === false && menuStyles.radioIndicatorUnchecked,
-    state.disabled === true && menuStyles.radioIndicatorDisabled,
-    state.highlighted === true && menuStyles.radioIndicatorHighlighted,
-    state.transitionStatus === "starting" && menuStyles.radioIndicatorStarting,
-    state.transitionStatus === "ending" && menuStyles.radioIndicatorEnding,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.RadioItemIndicator.State>(
+    getMenuRadioIndicatorStyles,
+  );
   return (
     <BaseContextMenu.RadioItemIndicator
       {...props}
@@ -436,14 +370,7 @@ const ContextMenuRadioItemIndicator = forwardRef<
       keepMounted={keepMounted}
       {...stateStyles}
     >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        {...stylex.props(menuStyles.icon)}
-      >
-        <circle cx="8" cy="8" r="3" />
-      </svg>
+      <MenuRadioIcon />
     </BaseContextMenu.RadioItemIndicator>
   );
 });
@@ -456,12 +383,9 @@ const ContextMenuSubmenuTrigger = forwardRef<
   ComponentRef<typeof BaseContextMenu.SubmenuTrigger>,
   ContextMenuSubmenuTriggerProps
 >(function ContextMenuSubmenuTrigger({ disabled = false, children, ...props }, forwardedRef) {
-  const stateStyles = createStateStyleProps<BaseContextMenu.SubmenuTrigger.State>((state) => [
-    menuStyles.item,
-    state.open === true && menuStyles.itemOpen,
-    state.highlighted === true && menuStyles.itemHighlighted,
-    state.disabled === true && menuStyles.itemDisabled,
-  ]);
+  const stateStyles = createStateStyleProps<BaseContextMenu.SubmenuTrigger.State>(
+    getMenuSubmenuTriggerStyles,
+  );
   return (
     <BaseContextMenu.SubmenuTrigger
       {...props}
@@ -471,14 +395,7 @@ const ContextMenuSubmenuTrigger = forwardRef<
     >
       {children}
       <ContextMenuSuffix>
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          {...stylex.props(menuStyles.submenuIcon)}
-        >
-          <path d="m6 3 5 5-5 5z" />
-        </svg>
+        <MenuSubmenuIcon />
       </ContextMenuSuffix>
     </BaseContextMenu.SubmenuTrigger>
   );

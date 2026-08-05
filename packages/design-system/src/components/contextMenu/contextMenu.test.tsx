@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { createRef } from "react";
 
 import { ContextMenu } from "./contextMenu";
 
@@ -65,6 +66,19 @@ describe("ContextMenu", () => {
     expect(link.querySelectorAll("[data-slot^='context-menu-']")).toHaveLength(2);
     fireEvent.click(link);
     expect(screen.getByRole("menu")).toBeTruthy();
+  });
+
+  it("preserves native props and refs on presentation parts", () => {
+    const prefixRef = createRef<HTMLSpanElement>();
+
+    render(
+      <ContextMenu.Prefix ref={prefixRef} slot="leading">
+        Record
+      </ContextMenu.Prefix>,
+    );
+
+    expect(prefixRef.current?.getAttribute("data-slot")).toBe("context-menu-prefix");
+    expect(prefixRef.current?.getAttribute("slot")).toBe("leading");
   });
 
   it("keeps checkbox choices open and closes radio choices when requested", () => {

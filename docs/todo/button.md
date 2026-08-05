@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Preserve token-constrained Button and Button Link radius selection for contexts with different corner treatments.
+- [x] Replace `fullWidth` and flex-level `justify` choices with semantic `inline` and `row` layouts.
+- [x] Remove the unsupported far-edge `between` content structure.
+
 [31/07/26]
 
 - [x] Preserve symmetric padding for text-only and two-sided buttons.
@@ -42,6 +48,12 @@
 
 ## Settled interaction decisions
 
+[05/08/26]
+
+- Button and Button Link radius remains limited to the design-system radius scale.
+- Labelled actions use one layout mode instead of independently combining width and justification.
+- Icon-only actions use inline layout and cannot select labelled-action layout modes.
+
 [31/07/26]
 
 - Optical padding is automatic and is not exposed as a consumer styling prop.
@@ -56,6 +68,14 @@
 - None.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Design-system Button and Button Link tests cover the semantic row layout and rejected width/alignment combinations.
+- [x] Design-system package tests, typecheck, lint, and build pass.
+- [x] Documentation tests, generated props check, typecheck, lint, and build pass.
+- [x] Inspector application typecheck, lint, and build pass after consumer migration.
+- [x] Browser verification confirms the Button playground and generated layout prop documentation render correctly.
 
 [31/07/26]
 

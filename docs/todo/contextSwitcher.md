@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Derive Context Switcher trigger size and width from the constrained Combobox Trigger contract instead of redeclaring forwarded unions.
+
 [03/08/26]
 
 - [x] Preserve the shared ghost Button hover and active backgrounds on switcher triggers.
@@ -35,6 +39,10 @@
 
 ## Settled interaction decisions
 
+[05/08/26]
+
+- Context Switcher retains consumer-facing trigger type names while Combobox owns the forwarded size and width values.
+
 [03/08/26]
 
 - The design-system trigger owns ghost Button visuals; application switchers provide inherited text content.
@@ -51,6 +59,12 @@
 - None.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Focused Context Switcher and Combobox tests pass.
+- [x] Design-system package typecheck and build pass with derived trigger types.
+- [x] Documentation and Inspector consumers pass typecheck and build.
 
 [01/08/26]
 

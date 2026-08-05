@@ -131,8 +131,7 @@ function AppShellContent(): ReactElement {
                             key={item.href}
                             variant={isActive === true ? "secondary" : "ghost"}
                             size="m"
-                            fullWidth
-                            justify="start"
+                            layout="row"
                             render={<Link to={item.href} />}
                             aria-current={isActive === true ? "page" : undefined}
                             radius="none"

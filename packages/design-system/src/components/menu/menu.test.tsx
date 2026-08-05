@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { createRef } from "react";
 
 import { KeyboardInput } from "../keyboardInput/keyboardInput";
 import { Menu } from "./menu";
@@ -61,7 +62,11 @@ describe("Menu", () => {
       <Menu.Root defaultOpen>
         <Menu.Trigger>Actions</Menu.Trigger>
         <Menu.Content>
-          <Menu.LinkItem href="/settings" closeOnClick={false} onClick={(event) => event.preventDefault()}>
+          <Menu.LinkItem
+            href="/settings"
+            closeOnClick={false}
+            onClick={(event) => event.preventDefault()}
+          >
             <Menu.Prefix>Icon</Menu.Prefix>
             Settings
             <Menu.Suffix>External</Menu.Suffix>
@@ -76,6 +81,19 @@ describe("Menu", () => {
 
     fireEvent.click(link);
     expect(screen.getByRole("menu")).toBeTruthy();
+  });
+
+  it("preserves native props and refs on presentation parts", () => {
+    const prefixRef = createRef<HTMLSpanElement>();
+
+    render(
+      <Menu.Prefix ref={prefixRef} slot="leading">
+        Icon
+      </Menu.Prefix>,
+    );
+
+    expect(prefixRef.current?.getAttribute("data-slot")).toBe("menu-prefix");
+    expect(prefixRef.current?.getAttribute("slot")).toBe("leading");
   });
 
   it("keeps checkbox and radio choices open unless closeOnClick is requested", () => {

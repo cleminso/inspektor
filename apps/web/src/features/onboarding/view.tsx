@@ -39,8 +39,7 @@ export function ConnectionsView(): React.ReactElement {
         <ButtonLink
           variant="ghost"
           size="s"
-          fullWidth
-          justify="start"
+          layout="row"
           render={<Link to={appRoutes.newConnection} />}
         >
           Add connection
@@ -48,8 +47,7 @@ export function ConnectionsView(): React.ReactElement {
         <ButtonLink
           variant="ghost"
           size="s"
-          fullWidth
-          justify="start"
+          layout="row"
           href="https://jazz.tools/docs"
           target="_blank"
           rel="noreferrer"

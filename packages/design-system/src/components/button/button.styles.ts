@@ -125,17 +125,11 @@ export const buttonStyles = stylex.create({
   radiusM: {
     borderRadius: borderRadii.m,
   },
-  fullWidth: {
+  fill: {
     width: '100%',
   },
-  justifyCenter: {
-    justifyContent: 'center',
-  },
-  justifyStart: {
+  alignStart: {
     justifyContent: 'flex-start',
-  },
-  justifyBetween: {
-    justifyContent: 'space-between',
   },
   disabled: {
     borderColor: 'transparent',
@@ -163,16 +157,6 @@ export const buttonStyles = stylex.create({
     display: 'inline-flex',
     justifyContent: 'center',
     lineHeight: lineHeights.ui,
-    minWidth: 0,
-  },
-  contentBetween: {
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  leadingContent: {
-    gap: spacing.s,
-    alignItems: 'center',
-    display: 'inline-flex',
     minWidth: 0,
   },
   iconSlot: {

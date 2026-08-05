@@ -6,19 +6,15 @@ import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import {
   ButtonContent,
+  buttonLayoutOptions,
   getButtonVisualStyles,
-  type ButtonJustify,
+  type ButtonLayout,
   type ButtonRadius,
   type ButtonSize,
   type ButtonVariant,
 } from './buttonVisuals'
 
-export type {
-  ButtonJustify,
-  ButtonRadius,
-  ButtonSize,
-  ButtonVariant,
-} from './buttonVisuals'
+export type { ButtonLayout, ButtonRadius, ButtonSize, ButtonVariant } from './buttonVisuals'
 
 type BaseButtonProps = Omit<
   BaseButton.Props,
@@ -43,10 +39,8 @@ interface ButtonSharedProps {
 interface LabelButtonProps {
   /** Makes the button a square icon-only action. */
   iconOnly?: false
-  /** Stretches the button to the width of its container. */
-  fullWidth?: boolean
-  /** Controls how content is distributed inside the button. */
-  justify?: ButtonJustify
+  /** Selects inline or full-width row action layout. */
+  layout?: ButtonLayout
   /** Renders decorative content before the visible label. */
   prefix?: React.ReactNode
   /** Renders decorative content after the visible label. */
@@ -58,8 +52,7 @@ interface IconOnlyButtonProps {
   iconOnly: true
   /** Identifies the icon-only action for assistive technology. */
   'aria-label': string
-  fullWidth?: never
-  justify?: never
+  layout?: never
   prefix?: never
   suffix?: never
 }
@@ -74,8 +67,7 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
     size = 'm',
     loading = false,
     iconOnly = false,
-    fullWidth = false,
-    justify = 'center',
+    layout = 'inline',
     radius = 'xs',
     prefix,
     suffix,
@@ -89,6 +81,7 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
   forwardedRef,
 ) {
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
+  const layoutOptions = buttonLayoutOptions[layout]
   const isDisabled = disabled === true
   const isInteractionBlocked = isDisabled === true || loading === true
   const stateStyleProps = createStateStyleProps<BaseButton.State>((state) =>
@@ -97,9 +90,9 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
       size,
       square: iconOnly,
       pressed: ariaPressed === true,
-      fullWidth,
-      justify,
       radius,
+      fill: layoutOptions.fill,
+      alignment: layoutOptions.alignment,
       orientation: buttonGroupOrientation,
       disabled: state.disabled,
       hasPrefix: loading === true || prefix !== undefined,
@@ -118,10 +111,11 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
       type={type}
       {...stateStyleProps}
       aria-busy={loading === true ? true : undefined}
-      data-full-width={fullWidth === true ? '' : undefined}
+      data-full-width={layoutOptions.fill === true ? '' : undefined}
       data-icon-only={iconOnly === true ? '' : undefined}
       data-loading={loading === true ? '' : undefined}
       data-pressed={ariaPressed === true ? '' : undefined}
+      data-layout={layout}
       data-radius={radius}
       data-size={size}
       data-slot="button"
@@ -132,7 +126,6 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
         suffix={suffix}
         loading={loading}
         iconOnly={iconOnly}
-        justify={justify}
         size={size}
       >
         {children}

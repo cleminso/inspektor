@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Share Menu and Context Menu state-to-style selectors, indicator artwork, and submenu artwork through one internal menu presentation owner.
+- [x] Preserve separate Menu and Context Menu Root and Trigger wrappers for their distinct activation, ref, and composition contracts.
+- [x] Preserve separate public compound APIs while removing duplicated presentation policy.
+
 [04/08/26]
 
 - [x] Expose semantic popup side and alignment choices through selective Positioner prop allowlists without exposing arbitrary offset, collision, or tracking geometry.
@@ -49,6 +55,11 @@
 
 ## Settled interaction decisions
 
+[05/08/26]
+
+- Menu and Context Menu share internal presentation without hiding their exact Base UI namespaces behind a generic component factory.
+- Public API parity decisions remain separate from internal presentation deduplication.
+
 [01/08/26]
 
 - [x] Compact menu items use `min-height` rather than fixed `height`.
@@ -68,6 +79,13 @@
 - None.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Menu and Context Menu tests preserve activation, selection, close behavior, and native presentation-part props while sharing selectors and artwork.
+- [x] Design-system package tests, typecheck, lint, and build pass.
+- [x] Documentation tests, generated props check, typecheck, lint, and build pass.
+- [x] Browser verification confirms Menu opens with its action items and generated API documentation intact.
 
 [01/08/26]
 
