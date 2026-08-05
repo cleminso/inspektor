@@ -2,11 +2,7 @@ import { useRef, type MouseEvent } from "react";
 
 import type { Column, ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
-import {
-  ArrowUpRight,
-  ChevronDown,
-  KeyRound,
-} from "lucide-react";
+import { ArrowUpRight, ChevronDown, KeyRound } from "lucide-react";
 
 import {
   BinaryValue,
@@ -20,6 +16,7 @@ import {
   Text,
   TimestampValue,
   Icon,
+  type DataGridFeatures,
 } from "@inspector/ds";
 
 import {
@@ -231,9 +228,7 @@ function MenuMoveActions({
 }): React.ReactElement {
   return (
     <Menu.SubmenuRoot>
-      <Menu.SubmenuTrigger>
-        Move
-      </Menu.SubmenuTrigger>
+      <Menu.SubmenuTrigger>Move</Menu.SubmenuTrigger>
       <Menu.Content side="right" align="start">
         <Menu.Item onClick={() => onMove(columnId, "left")}>
           Move left
@@ -252,12 +247,8 @@ function MenuMoveActions({
           </Menu.Shortcut>
         </Menu.Item>
         <Menu.Separator />
-        <Menu.Item onClick={() => onMove(columnId, "start")}>
-          Move to start
-        </Menu.Item>
-        <Menu.Item onClick={() => onMove(columnId, "end")}>
-          Move to end
-        </Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, "start")}>Move to start</Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, "end")}>Move to end</Menu.Item>
       </Menu.Content>
     </Menu.SubmenuRoot>
   );
@@ -267,7 +258,7 @@ function MenuColumnActions({
   column,
   onMove,
 }: {
-  column: Column<DynamicTableRow>;
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>;
   onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
 }): React.ReactElement {
   return (
@@ -310,9 +301,7 @@ function ContextMoveActions({
 }): React.ReactElement {
   return (
     <ContextMenu.SubmenuRoot>
-      <ContextMenu.SubmenuTrigger>
-        Move
-      </ContextMenu.SubmenuTrigger>
+      <ContextMenu.SubmenuTrigger>Move</ContextMenu.SubmenuTrigger>
       <ContextMenu.Content side="right" align="start">
         <ContextMenu.Item onClick={() => onMove(columnId, "left")}>
           Move left
@@ -331,12 +320,8 @@ function ContextMoveActions({
           </ContextMenu.Shortcut>
         </ContextMenu.Item>
         <ContextMenu.Separator />
-        <ContextMenu.Item onClick={() => onMove(columnId, "start")}>
-          Move to start
-        </ContextMenu.Item>
-        <ContextMenu.Item onClick={() => onMove(columnId, "end")}>
-          Move to end
-        </ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, "start")}>Move to start</ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, "end")}>Move to end</ContextMenu.Item>
       </ContextMenu.Content>
     </ContextMenu.SubmenuRoot>
   );
@@ -346,7 +331,7 @@ function ContextColumnActions({
   column,
   onMove,
 }: {
-  column: Column<DynamicTableRow>;
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>;
   onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
 }): React.ReactElement {
   return (
@@ -387,7 +372,7 @@ function ColumnHeader({
   onMenuOpen,
   onMove,
 }: {
-  column: Column<DynamicTableRow>;
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>;
   label: string;
   marker: ColumnTypeMarkerModel;
   onMenuOpen?: (columnId: string) => void;
@@ -466,20 +451,19 @@ export function buildDataGridColumns({
   onColumnMenuOpen,
   onColumnMove,
   onRowSelectionRequest,
-}: BuildDataGridColumnsOptions): ColumnDef<DynamicTableRow>[] {
-  const selectionColumn: ColumnDef<DynamicTableRow> = {
+}: BuildDataGridColumnsOptions): ColumnDef<DataGridFeatures, DynamicTableRow, unknown>[] {
+  const selectionColumn: ColumnDef<DataGridFeatures, DynamicTableRow, unknown> = {
     id: "_select",
     size: 36,
     minSize: 36,
     maxSize: 36,
     enableHiding: false,
+    enableCellSelection: false,
     enableResizing: false,
     enableSorting: false,
     header: ({ table }) => {
-      const loadedRows = table.getRowModel().rows;
-      const isAllSelected =
-        loadedRows.length > 0 && loadedRows.every((row) => row.getIsSelected() === true);
-      const isSomeSelected = loadedRows.some((row) => row.getIsSelected() === true);
+      const isAllSelected = table.getIsAllPageRowsSelected();
+      const isSomeSelected = table.getIsSomePageRowsSelected();
 
       return (
         <Box alignItems="center" justifyContent="center" width="full">
@@ -501,16 +485,15 @@ export function buildDataGridColumns({
             checked={row.getIsSelected()}
             ariaLabel={`Select row ${String(row.original.id)}`}
             onCheckedChange={(value, shiftKey) => {
-              if (onRowSelectionRequest !== undefined) {
-                onRowSelectionRequest({
-                  checked: value,
-                  rowId: String(row.original.id),
-                  shiftKey,
-                });
-                return;
-              }
-
-              row.toggleSelected(value);
+              onRowSelectionRequest?.({
+                checked: value,
+                rowId: String(row.original.id),
+                shiftKey,
+              });
+              row.getToggleSelectedHandler({ selectChildren: false })({
+                shiftKey,
+                target: { checked: value },
+              });
             }}
           />
         </Box>
@@ -518,40 +501,42 @@ export function buildDataGridColumns({
     },
   };
 
-  const dataColumns = columns.map<ColumnDef<DynamicTableRow>>((column) => {
-    const marker = getColumnTypeMarker(column);
-    const sizing = getColumnSizing(column);
+  const dataColumns = columns.map<ColumnDef<DataGridFeatures, DynamicTableRow, unknown>>(
+    (column) => {
+      const marker = getColumnTypeMarker(column);
+      const sizing = getColumnSizing(column);
 
-    return {
-      id: column.id,
-      size: sizing.size,
-      minSize: sizing.minSize,
-      maxSize: sizing.maxSize,
-      accessorFn: (row) => row[column.accessorKey],
-      enableHiding: column.id !== "id",
-      enableSorting: column.isSortable,
-      header: ({ column: tableColumn }) => (
-        <ColumnHeader
-          column={tableColumn}
-          label={column.label}
-          marker={marker}
-          onMenuOpen={onColumnMenuOpen}
-          onMove={onColumnMove}
-        />
-      ),
-      cell: ({ row }) => {
-        const rawValue = row.original[column.accessorKey];
-        const presentation = classifySchemaValue(rawValue, column.column);
-
-        return (
-          <CompactCellValue
-            isRowId={column.id === "id" && column.column === null}
-            presentation={presentation}
+      return {
+        id: column.id,
+        size: sizing.size,
+        minSize: sizing.minSize,
+        maxSize: sizing.maxSize,
+        accessorFn: (row) => row[column.accessorKey],
+        enableHiding: column.id !== "id",
+        enableSorting: column.isSortable,
+        header: ({ column: tableColumn }) => (
+          <ColumnHeader
+            column={tableColumn}
+            label={column.label}
+            marker={marker}
+            onMenuOpen={onColumnMenuOpen}
+            onMove={onColumnMove}
           />
-        );
-      },
-    };
-  });
+        ),
+        cell: ({ row }) => {
+          const rawValue = row.original[column.accessorKey];
+          const presentation = classifySchemaValue(rawValue, column.column);
+
+          return (
+            <CompactCellValue
+              isRowId={column.id === "id" && column.column === null}
+              presentation={presentation}
+            />
+          );
+        },
+      };
+    },
+  );
 
   return [selectionColumn, ...dataColumns];
 }

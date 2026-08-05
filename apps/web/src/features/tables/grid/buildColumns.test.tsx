@@ -1,28 +1,29 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { type SortingState, useTable } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { DataGrid } from "@inspector/ds";
+import { DataGrid, dataGridFeatures } from "@inspector/ds";
 
 import { buildDataGridColumns } from "@tables/grid/buildColumns";
 
 function TestTable({
   columns,
   data,
-  onRowSelectionRequest,
   onColumnMenuOpen,
   onColumnMove,
   onSortingChange,
 }: {
   columns?: Parameters<typeof buildDataGridColumns>[0]["columns"];
   data?: DynamicTableRow[];
-  onRowSelectionRequest?: (request: { checked: boolean; rowId: string; shiftKey: boolean }) => void;
   onColumnMenuOpen?: (columnId: string) => void;
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]["onColumnMove"];
   onSortingChange: () => void;
 }): React.ReactElement {
-  const table = useReactTable({
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const table = useTable({
+    features: dataGridFeatures,
     columns: buildDataGridColumns({
       columns: columns ?? [
         {
@@ -33,13 +34,15 @@ function TestTable({
           label: "Name",
         },
       ],
-      onRowSelectionRequest,
       onColumnMenuOpen,
       onColumnMove,
     }),
     data: data ?? [{ id: "row-1", name: "Ada" } as DynamicTableRow],
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange,
+    state: { sorting },
+    onSortingChange: (updater) => {
+      setSorting(updater);
+      onSortingChange();
+    },
   });
 
   return (
@@ -59,9 +62,7 @@ describe("buildDataGridColumns", () => {
   it("keeps direct header clicks for column activation and sorts from the action menu", () => {
     const onSortingChange = vi.fn();
     const onColumnMenuOpen = vi.fn();
-    render(
-      <TestTable onColumnMenuOpen={onColumnMenuOpen} onSortingChange={onSortingChange} />,
-    );
+    render(<TestTable onColumnMenuOpen={onColumnMenuOpen} onSortingChange={onSortingChange} />);
 
     const header = screen.getByRole("columnheader", { name: /Name/ });
     fireEvent.click(header);
@@ -196,23 +197,32 @@ describe("buildDataGridColumns", () => {
     expect(headerCheckbox.parentElement?.className).toBe(rowCheckbox.parentElement?.className);
   });
 
-  it("reports the Shift modifier when a row checkbox requests selection", () => {
-    const onRowSelectionRequest = vi.fn();
+  it("selects an inclusive row range through TanStack Shift handling", () => {
     render(
       <TestTable
-        onRowSelectionRequest={onRowSelectionRequest}
+        data={[
+          { id: "row-1", name: "Ada" } as DynamicTableRow,
+          { id: "row-2", name: "Grace" } as DynamicTableRow,
+          { id: "row-3", name: "Linus" } as DynamicTableRow,
+        ]}
         onSortingChange={() => undefined}
       />,
     );
 
-    const checkboxCell = screen.getByRole("checkbox", { name: "Select row row-1" }).closest("td");
-    fireEvent.click(checkboxCell as HTMLTableCellElement, { shiftKey: true });
-
-    expect(onRowSelectionRequest).toHaveBeenCalledWith({
-      checked: true,
-      rowId: "row-1",
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select row row-1" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select row row-3" }), {
       shiftKey: true,
     });
+
+    expect(
+      screen.getByRole("checkbox", { name: "Select row row-1" }).getAttribute("aria-checked"),
+    ).toBe("true");
+    expect(
+      screen.getByRole("checkbox", { name: "Select row row-2" }).getAttribute("aria-checked"),
+    ).toBe("true");
+    expect(
+      screen.getByRole("checkbox", { name: "Select row row-3" }).getAttribute("aria-checked"),
+    ).toBe("true");
   });
 
   it("renders explicit compact primitive states and aligns numbers", () => {
@@ -317,7 +327,15 @@ describe("buildDataGridColumns", () => {
             label: "Count",
           },
         ]}
-        data={[{ id: rowId, sessionId: uuid, name: "Ada", role: "admin", count: 1203 } as DynamicTableRow]}
+        data={[
+          {
+            id: rowId,
+            sessionId: uuid,
+            name: "Ada",
+            role: "admin",
+            count: 1203,
+          } as DynamicTableRow,
+        ]}
         onSortingChange={() => undefined}
       />,
     );
@@ -407,14 +425,18 @@ describe("buildDataGridColumns", () => {
       />,
     );
 
-    expect(screen.getByText(new Intl.DateTimeFormat(undefined, {
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      month: "short",
-      second: "2-digit",
-      year: "numeric",
-    }).format(timestamp)).tagName).toBe("TIME");
+    expect(
+      screen.getByText(
+        new Intl.DateTimeFormat(undefined, {
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          month: "short",
+          second: "2-digit",
+          year: "numeric",
+        }).format(timestamp),
+      ).tagName,
+    ).toBe("TIME");
     expect(screen.getByLabelText("Typed JSON value")).toBeTruthy();
     expect(screen.getByText(/enabled: true/).tagName).toBe("CODE");
     expect(nestedReads).toBe(0);

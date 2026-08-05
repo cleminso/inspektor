@@ -41,8 +41,8 @@ The visual states have distinct meanings:
 - **Active column:** the column selected as a product scope. It includes the header and visible body cells.
 - **Focused header:** the header that owns DOM focus and receives keyboard commands.
 - **Reorder target:** the focused header moved with Shift+ArrowLeft or Shift+ArrowRight.
-- **Selected cell:** a member of the controlled cell selection.
-- **Active cell:** the current cell and selection anchor. It may also be selected and focused.
+- **Selected cell:** a member of the resolved TanStack cell-range selection.
+- **Active cell:** the anchor of the latest TanStack range operation. An exclusion anchor can be active without being selected.
 - **Selected row:** a row selected through TanStack row-selection state.
 - **Active row:** the current row-level product target.
 - **Resize target:** the column boundary under resize hover, keyboard focus, or active resizing.

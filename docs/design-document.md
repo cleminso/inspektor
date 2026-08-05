@@ -645,10 +645,10 @@ schema context, and safe edits into one coherent surface.
 
 The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspector rules.
 
-`@inspector/ds` owns the reusable `DataGrid` presentation system. `apps/web` owns the Inspector composition, TanStack table
-construction, Jazz queries, schema-derived columns, filters, relations, routes, and mutations. The design-system root receives
-a controlled TanStack `Table<TData>` instance rather than receiving duplicate data, columns, sorting, pagination, or selection
-state.
+`@inspector/ds` owns the reusable `DataGrid` presentation system and its explicit TanStack Table feature registry. `apps/web`
+owns the Inspector composition, TanStack table construction, Jazz queries, schema-derived columns, filters, relations, routes,
+and mutations. The design-system root receives a controlled feature-aware `DataGridTable<TData>` instance rather than receiving
+duplicate data, columns, sorting, pagination, or selection state.
 
 The design-system API uses compound parts so consumers can compose the required structure without styling escape hatches:
 
@@ -679,8 +679,8 @@ v1 uses page-windowed table browsing. Virtualization can still render the curren
 Interaction state keeps these concepts separate:
 
 - the active column is the transient column inspection target
-- the focused cell is the row and column intersection receiving the strongest cell focus treatment
-- selected cells are an explicit cell operation set that can span rows and columns
+- the focused cell is the anchor of the latest TanStack cell-range operation and receives the strongest cell focus treatment
+- selected cells resolve from ordered rectangular include and exclude operations against the displayed row and column order
 - selected rows are the checkbox-controlled, page-local bulk operation set
 - the focused row is the selected row represented by the row side pane
 - bookmarked rows are persistent developer reference points
@@ -699,20 +699,22 @@ complete-row pane and focuses the corresponding field. Relation and binary cells
 field. Timestamp cells use an inline calendar editor when that control is available. Generated, unsupported, and otherwise read-only cells remain read-only
 in the grid; their complete representation remains available through the complete-row pane.
 
-Command/Control-click builds an additive multi-cell selection across rows and columns, while Shift-click selects the rectangular
-range between the anchor and target. Multi-cell copy and mutation actions remain explicit operations and do not open an
-inspection-only cell pane.
+Command/Control interaction includes a range when it starts outside the selection and excludes a range when it starts inside,
+while Shift interaction extends the latest rectangle from its fixed anchor. Multi-cell copy and mutation actions remain explicit
+operations and do not open an inspection-only cell pane.
 
-Clicking checkboxes individually builds the checked-row set. Shift-clicking another checkbox selects the visible range from the
-checkbox anchor. The checkbox opens the complete-row editor for the checked-row set. Previous and next controls navigate checked
-rows in active query order, while edit actions remain scoped to the focused row unless explicitly labelled as bulk actions.
+Clicking checkboxes individually builds the checked-row set. TanStack's row-selection handler owns the checkbox anchor and selects
+the visible range when another checkbox is Shift-clicked. The application chooses the focused row and opens the complete-row editor
+for the checked-row set. Previous and next controls navigate checked rows in active query order, while edit actions remain scoped
+to the focused row unless explicitly labelled as bulk actions.
 Insert remains a separate pane mode. Unless an open nested control consumes Escape first, Escape closes an open pane while
 preserving its table selection. With no pane open, Escape clears cell selection, cell focus, and column focus without unchecking
 rows.
 
 Closing a pane preserves its table selection. Filter, sort, page, table, or schema changes clear row and cell selections. Column
-reorder preserves selected cells, hiding a selected column removes its cells, and loading more rows does not extend an existing
-selection.
+reorder preserves range corners and recomputes the rectangle in displayed order. Hidden columns contract or suspend affected
+ranges without deleting their operation state. Loading more rows preserves existing ranges because stable row IDs and explicit
+query-scope resets define the selection lifecycle.
 
 Row-pane Cancel is distinct from pane dismissal. Cancel discards the focused row draft and unchecks that row. If other checked
 rows remain, focus moves to the nearest checked row; otherwise the row pane closes. The pane close control and Escape dismiss a

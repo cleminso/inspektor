@@ -29,8 +29,8 @@ acceptance rules so the main document does not accumulate every pointer, keyboar
 
 ## Product boundary
 
-The foundation is a read-first `DataGrid` with controlled cell-selection primitives. Opening complete multi-cell selections,
-column selection, and bulk cell editing cross the product boundary into `DataGrid` behavior. The richer behavior may reuse
+The foundation is a read-first `DataGrid` with TanStack Table cell-selection ranges. Opening complete multi-cell selections,
+column selection, and bulk cell editing cross the product boundary into application behavior. The richer behavior may reuse
 DataGrid rendering and schema-derived components without making the record-oriented DataGrid API ambiguous.
 
 The Inspector remains schema-driven. Selection behavior is generic and does not depend on generated table-specific code.
@@ -40,9 +40,9 @@ The Inspector remains schema-driven. Selection behavior is generic and does not 
 - **Checked row**: a row included through its checkbox. Checked rows form the row-selection set.
 - **Focused row**: the checked row represented in the side pane. Only one checked row is focused.
 - **Selected cell**: a cell included in the cell-selection set.
-- **Focused cell**: the cell that receives the strongest focus treatment and acts as the cell-selection anchor.
+- **Focused cell**: the anchor of the latest TanStack cell-range operation and the cell receiving the strongest focus treatment.
 - **Row selection**: checked row IDs plus the focused row ID and checkbox-range anchor.
-- **Cell selection**: selected row/column targets plus the focused cell. A selection can contain cells from several columns.
+- **Cell selection**: ordered rectangular include and exclude operations resolved against the displayed rows and columns.
 - **Pane target**: the checked row represented in the side pane.
 - **Row draft**: the latest live source row plus dirty field overlays, raw input, parsed values, and validation state.
 - **Query position**: a row's position in the active filtered and sorted result, not a stable row identity.
@@ -53,9 +53,10 @@ Selection, inline editing, and side-pane presentation are separate state.
 
 - A cell can be focused without opening the side pane.
 - Multiple cells can be selected before the user chooses an explicit copy or mutation operation.
-- Row selection and cell selection use stable row IDs and column IDs rather than visual coordinates.
+- Row selection and cell-range corners use stable row IDs and column IDs rather than stored visual coordinates.
 - Row and cell selections can coexist. Opening or closing the row pane does not silently destroy cell selection.
-- Column reorder, visibility, sorting, filtering, and pagination must not reinterpret stored coordinates as different cells.
+- While the application preserves cell-selection state, column reorder, visibility, and live data refreshes resolve range interiors
+  against the displayed table while keeping each operation's corner IDs stable.
 
 The side pane has these presentation modes:
 
@@ -77,9 +78,9 @@ continue, or Keep editing.
 Selection belongs to the represented query result:
 
 - changing the filter, sort, page, table, or schema clears row and cell selections
-- reordering columns preserves selected cells because selection uses column IDs
-- hiding a selected column removes its cells from the selection
-- loading additional rows does not implicitly add their cells to an existing selection
+- reordering columns preserves range corners and recomputes the cells between them in displayed order
+- hiding an interior column contracts a visible range, while hiding a corner suspends that range until the corner returns
+- loading additional rows preserves cell-selection state; appended rows outside existing corner intervals remain unselected
 
 ## Row selection scenarios
 
@@ -158,13 +159,13 @@ through the complete-row pane.
 
 - **Given** one cell is focused
 - **When** the user Command-clicks another data cell
-- **Then** the target cell is added to or removed from the cell-selection set
-- **And** the last included cell becomes focused
+- **Then** an inclusion starts when the target is outside the selection and an exclusion starts when it is inside
+- **And** the interaction target becomes the anchor of the latest range operation
 - **And** the side pane remains unchanged until the user starts an explicit operation
 
-Control-click provides the equivalent modifier on platforms where Command is unavailable. Additive selection works across rows
-and columns like selecting several objects on a canvas. Shift-click selects the rectangular range between the anchor and target
-across the visible query rows and data columns.
+Control-click provides the equivalent modifier on platforms where Command is unavailable. Include and exclude operations compose
+across rows and columns. Shift-click extends the latest range from its fixed anchor to the target across the displayed query rows
+and data columns. Dragging across body cells moves the latest operation's focus corner.
 
 ### Operate on a multi-cell selection
 
@@ -334,8 +335,8 @@ that `Row 8` is an immutable database position.
 - Row selection, cell selection, row focus, cell focus, validation, dirty state, and live-update state remain visually distinct.
 - Pointer focus and keyboard focus must remain perceivable without relying only on color.
 
-Multi-cell operations follow visible table-column order and active query row order. The most recently selected cell is focused.
-Row IDs and column IDs remain authoritative; displayed positions are supporting metadata.
+Multi-cell operations follow visible table-column order and active query row order. The latest operation's anchor is focused.
+Row IDs and column IDs identify range corners; displayed order determines each range interior.
 
 ## Side-pane layout
 

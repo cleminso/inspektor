@@ -1,21 +1,23 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { getCoreRowModel, useReactTable, type VisibilityState } from "@tanstack/react-table";
+import { useTable, type ColumnVisibilityState } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { dataGridFeatures } from "@inspector/ds";
+
 import { DataGridColumnVisibility } from "@tables/grid/columnVisibility";
 
 function VisibilityMenu(): React.ReactElement {
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const table = useReactTable({
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({});
+  const table = useTable({
+    features: dataGridFeatures,
     columns: [
       { accessorKey: "id", enableHiding: false },
       { accessorKey: "name" },
       { accessorKey: "role" },
     ],
     data: [] as DynamicTableRow[],
-    getCoreRowModel: getCoreRowModel(),
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
   });

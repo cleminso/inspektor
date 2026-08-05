@@ -47,6 +47,22 @@ beforeEach(() => {
 });
 
 describe("useTableRows", () => {
+  it("keeps the capped row array stable across unrelated renders", () => {
+    queryRows = [
+      { id: "row-1", name: "Ada" } as DynamicTableRow,
+      { id: "row-2", name: "Grace" } as DynamicTableRow,
+      { id: "row-3", name: "Linus" } as DynamicTableRow,
+    ];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({ chunkSize: 2, tableName: "users" }),
+    );
+    const initialRows = result.current.rows;
+
+    rerender();
+
+    expect(result.current.rows).toBe(initialRows);
+  });
+
   it("keeps resolved rows visible while a new sort subscription resolves", () => {
     queryRows = [
       { id: "row-1", name: "Ada" } as DynamicTableRow,

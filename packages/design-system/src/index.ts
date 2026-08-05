@@ -20,11 +20,12 @@ export type {
   ActionListTriggerProps,
 } from './components/actionList/actionList'
 export { DataGrid } from './components/dataGrid/dataGrid'
+export { dataGridFeatures } from './components/dataGrid/dataGridFeatures'
+export type { DataGridFeatures, DataGridTable } from './components/dataGrid/dataGridFeatures'
 export type {
   DataGridBodyProps,
   DataGridCellContextMenuHandler,
   DataGridCellProps,
-  DataGridCellSelectionMode,
   DataGridCellTarget,
   DataGridContentProps,
   DataGridDensity,
@@ -193,10 +194,7 @@ export type {
   FieldRootProps,
 } from './components/field/field'
 export { Fieldset } from './components/fieldset/fieldset'
-export type {
-  FieldsetLegendProps,
-  FieldsetRootProps,
-} from './components/fieldset/fieldset'
+export type { FieldsetLegendProps, FieldsetRootProps } from './components/fieldset/fieldset'
 export { Input } from './components/input/input'
 export type { InputProps, InputSize, InputVariant } from './components/input/input'
 export { InputGroup } from './components/inputGroup/inputGroup'
@@ -224,11 +222,7 @@ export type {
   KeyboardInputSize,
 } from './components/keyboardInput/keyboardInput'
 export { Textarea } from './components/textarea/textarea'
-export type {
-  TextareaFont,
-  TextareaHeight,
-  TextareaProps,
-} from './components/textarea/textarea'
+export type { TextareaFont, TextareaHeight, TextareaProps } from './components/textarea/textarea'
 export { Menu } from './components/menu/menu'
 export type {
   MenuCheckboxItemIndicatorProps,
@@ -264,11 +258,7 @@ export type {
   MultiSelectTriggerProps,
 } from './components/multiSelect/multiSelect'
 export { FindBar } from './components/findBar/findBar'
-export type {
-  FindBarProps,
-  FindBarSearchOptions,
-  FindBarState,
-} from './components/findBar/findBar'
+export type { FindBarProps, FindBarSearchOptions, FindBarState } from './components/findBar/findBar'
 export { SidePanel } from './components/sidePanel/sidePanel'
 export type {
   SidePanelBodyProps,

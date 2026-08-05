@@ -3,8 +3,6 @@ export const dataGridRootPropNames = [
   'density',
   'activeRowId',
   'activeColumnId',
-  'activeCell',
-  'selectedCells',
   'onRowActivate',
   'onColumnActivate',
   'onCellActivate',

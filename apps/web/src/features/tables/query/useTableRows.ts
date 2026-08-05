@@ -165,7 +165,10 @@ export function useTableRows({
     rows === undefined && previousRowsState?.dataScopeKey === dataScopeKey;
   const resolvedRows = rows ?? (canPreserveRows === true ? previousRowsState.rows : EMPTY_ROWS);
   const hasMore = resolvedRows.length > requestedRowCount;
-  const visibleRows = hasMore === true ? resolvedRows.slice(0, requestedRowCount) : resolvedRows;
+  const visibleRows = useMemo(
+    () => (hasMore === true ? resolvedRows.slice(0, requestedRowCount) : resolvedRows),
+    [hasMore, requestedRowCount, resolvedRows],
+  );
   const isInitialLoading = rows === undefined && canPreserveRows === false;
   const isRefreshing =
     rows === undefined && canPreserveRows === true && previousRowsState.queryKey !== queryKey;

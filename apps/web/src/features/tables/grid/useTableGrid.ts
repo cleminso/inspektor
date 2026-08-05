@@ -2,14 +2,16 @@
 import { useMemo, useRef } from "react";
 
 import {
-  getCoreRowModel,
+  type CellSelectionState,
+  type ColumnVisibilityState,
+  type OnChangeFn,
   type RowSelectionState,
   type SortingState,
-  useReactTable,
-  type Table,
-  type VisibilityState,
+  useTable,
 } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
+
+import { dataGridFeatures, type DataGridTable } from "@inspector/ds";
 
 import { buildDataGridColumns } from "@tables/grid/buildColumns";
 import type { ColumnMoveDirection } from "@tables/grid/useColumnOrder";
@@ -22,14 +24,16 @@ import type {
 } from "@tables/tableTypes";
 
 interface UseTableGridOptions {
+  cellSelection: CellSelectionState;
   columnOrder: string[];
   columnVisibility: TableColumnVisibilityState;
   columns: TableColumnMeta[];
   onColumnMenuOpen: (columnId: string) => void;
   onColumnMove: (columnId: string, direction: ColumnMoveDirection) => void;
+  onColumnOrderChange: (columnIds: string[]) => void;
   onColumnVisibilityChange: (next: TableColumnVisibilityState) => void;
-  onSelectedRowIdsChange: (rowIds: TableRowId[]) => void;
-  onRowSelectionRequest: (request: RowSelectionRequest) => void;
+  onCellSelectionChange: OnChangeFn<CellSelectionState>;
+  onSelectedRowIdsChange: (rowIds: TableRowId[], request: RowSelectionRequest | null) => void;
   onSortChange: (columnId: string, direction: TableSortDirection) => void;
   rows: DynamicTableRow[];
   selectedRowIds: TableRowId[];
@@ -38,22 +42,23 @@ interface UseTableGridOptions {
 }
 
 export function useTableGrid({
+  cellSelection,
   columnOrder,
   columnVisibility,
   columns,
   onColumnMenuOpen,
   onColumnMove,
+  onColumnOrderChange,
   onColumnVisibilityChange,
+  onCellSelectionChange,
   onSelectedRowIdsChange,
-  onRowSelectionRequest,
   onSortChange,
   rows,
   selectedRowIds,
   sortColumn,
   sortDirection,
-}: UseTableGridOptions): Table<DynamicTableRow> {
-  const onRowSelectionRequestRef = useRef(onRowSelectionRequest);
-  onRowSelectionRequestRef.current = onRowSelectionRequest;
+}: UseTableGridOptions): DataGridTable<DynamicTableRow> {
+  const rowSelectionRequestRef = useRef<RowSelectionRequest | null>(null);
   const columnDefs = useMemo(
     () =>
       buildDataGridColumns({
@@ -61,7 +66,7 @@ export function useTableGrid({
         onColumnMenuOpen,
         onColumnMove,
         onRowSelectionRequest: (request) => {
-          onRowSelectionRequestRef.current(request);
+          rowSelectionRequestRef.current = request;
         },
       }),
     [columns, onColumnMenuOpen, onColumnMove],
@@ -77,31 +82,42 @@ export function useTableGrid({
   );
   const tableColumnOrder = useMemo(() => ["_select", ...columnOrder], [columnOrder]);
 
-  return useReactTable({
+  return useTable({
+    features: dataGridFeatures,
     data: rows,
     columns: columnDefs,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => String(row.id),
+    autoResetCellSelection: false,
     columnResizeMode: "onChange",
     enableRowSelection: true,
     manualSorting: true,
     state: {
-      columnVisibility: columnVisibility as VisibilityState,
+      cellSelection,
+      columnVisibility: columnVisibility as ColumnVisibilityState,
       columnOrder: tableColumnOrder,
       rowSelection,
       sorting,
+    },
+    onCellSelectionChange,
+    onColumnOrderChange: (updater) => {
+      const nextColumnOrder = typeof updater === "function" ? updater(tableColumnOrder) : updater;
+      onColumnOrderChange(nextColumnOrder.filter((columnId) => columnId !== "_select"));
     },
     onRowSelectionChange: (updater) => {
       const nextRowSelection = typeof updater === "function" ? updater(rowSelection) : updater;
       const nextSelectedRowIds = rows
         .filter((row) => nextRowSelection[String(row.id)] === true)
         .map((row) => String(row.id));
+      const request = rowSelectionRequestRef.current;
+      rowSelectionRequestRef.current = null;
 
-      onSelectedRowIdsChange(nextSelectedRowIds);
+      onSelectedRowIdsChange(nextSelectedRowIds, request);
     },
     onColumnVisibilityChange: (updater) => {
       const nextColumnVisibility =
-        typeof updater === "function" ? updater(columnVisibility as VisibilityState) : updater;
+        typeof updater === "function"
+          ? updater(columnVisibility as ColumnVisibilityState)
+          : updater;
       onColumnVisibilityChange(nextColumnVisibility as TableColumnVisibilityState);
     },
     onSortingChange: (updater) => {

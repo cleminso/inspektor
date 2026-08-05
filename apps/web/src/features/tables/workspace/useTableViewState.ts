@@ -7,16 +7,13 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { DataGridCellSelectionMode, DataGridCellTarget } from "@inspector/ds";
-import type { Table } from "@tanstack/react-table";
+import type { DataGridCellTarget, DataGridTable } from "@inspector/ds";
+import type { CellSelectionState } from "@tanstack/react-table";
 import type { ColumnDescriptor, DynamicTableRow } from "jazz-tools";
 
 import { useInspector } from "@app/providers/inspectorProvider";
-import {
-  type CellSelectionState,
-  updateCellSelection,
-} from "@tables/grid/cellSelection";
 import { useColumnVisibility } from "@tables/grid/useColumnVisibility";
+import type { RowSelectionRequest } from "@tables/grid/buildColumns";
 import {
   moveColumnInOrder,
   useColumnOrder,
@@ -32,10 +29,7 @@ import { useTableExplorerSearchParams } from "@tables/routing/useTableSearchPara
 import { getTableColumns } from "@tables/schema/tableSchema";
 import type { TableFilterClause } from "@tables/filters/tableFilters";
 import type { TableColumnMeta, TableRowId } from "@tables/tableTypes";
-import {
-  getNearestSelectedRowId,
-  updateRowSelection,
-} from "@tables/grid/rowSelection";
+import { getNearestSelectedRowId } from "@tables/grid/rowSelectionFocus";
 
 interface UseTableViewStateOptions {
   tableName: string;
@@ -64,7 +58,6 @@ interface TableViewDraftTransitionState {
 }
 
 interface UseTableViewStateResult {
-  activeCell: DataGridCellTarget | null;
   activeColumnId: string | null;
   columnOrder: string[];
   detailPaneMode: TableViewDetailPaneMode;
@@ -78,15 +71,13 @@ interface UseTableViewStateResult {
     values: Record<string, unknown>,
     options?: InsertRowSaveOptions,
   ) => Promise<void>;
-  handleCellActivate: (
-    target: DataGridCellTarget,
-    selectionMode: DataGridCellSelectionMode,
-  ) => void;
+  handleCellActivate: (target: DataGridCellTarget) => void;
   handleColumnActivate: (columnId: string | null) => void;
   handleRowEditorOpenChange: (open: boolean) => void;
   handleRowEditorCancel: () => void;
   handleRowDraftDirtyChange: (isDirty: boolean) => void;
   hasMore: boolean;
+  hasCellSelection: boolean;
   isFetchingMore: boolean;
   isInitialLoading: boolean;
   isRefreshing: boolean;
@@ -94,10 +85,9 @@ interface UseTableViewStateResult {
   rowEditor: TableViewRowEditorState;
   rowValues: Record<string, unknown> | null;
   schemaColumns: ColumnDescriptor[];
-  selectedCells: DataGridCellTarget[];
   setFilters: (filters: TableFilterClause[]) => Promise<void>;
   setColumnOrder: (columnIds: string[]) => void;
-  table: Table<DynamicTableRow>;
+  table: DataGridTable<DynamicTableRow>;
   tableColumns: TableColumnMeta[];
 }
 
@@ -111,10 +101,6 @@ export function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record
   return Object.fromEntries(schemaColumns.map((column) => [column.name, undefined]));
 }
 
-function createEmptyCellSelection(): CellSelectionState {
-  return { activeCell: null, anchorCell: null, selectedCells: [] };
-}
-
 /**
  * Builds the state and actions consumed by `TableView` for one runtime-selected Jazz table.
  *
@@ -123,7 +109,9 @@ function createEmptyCellSelection(): CellSelectionState {
  * only after Save and continue or Discard and continue. Selection changes around row A can proceed
  * because they do not replace the active draft target.
  */
-export function useTableViewState({ tableName }: UseTableViewStateOptions): UseTableViewStateResult {
+export function useTableViewState({
+  tableName,
+}: UseTableViewStateOptions): UseTableViewStateResult {
   const { currentBranch, currentConnectionId, currentSchemaHash, runtime } = useInspector();
   const searchState = useTableExplorerSearchParams();
   const query = useTableRows({ tableName });
@@ -133,14 +121,12 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
   );
   const editorMode = searchState.editorMode ?? "closed";
   const activeRowId = searchState.editorMode === "edit" ? searchState.rowId : null;
-  const [cellSelection, setCellSelection] = useState<CellSelectionState>(createEmptyCellSelection);
-  const activeCell = cellSelection.activeCell;
+  const [cellSelection, setCellSelection] = useState<CellSelectionState>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
     activeRowId === null ? [] : [activeRowId],
   );
   const deletedRowIdsRef = useRef<Set<TableRowId>>(new Set());
-  const [rowSelectionAnchorId, setRowSelectionAnchorId] = useState<TableRowId | null>(null);
   const mutations = useTableMutations(tableName);
   const draftTransition = useDraftTransitionGuard();
   const tableKey = `${currentConnectionId ?? "unknown"}:${currentBranch ?? "unknown"}:${currentSchemaHash ?? "unknown"}:${tableName}`;
@@ -238,7 +224,24 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
     }
   };
 
-  const handleSelectedRowIdsChange = (nextSelectedRowIds: TableRowId[]) => {
+  const handleSelectedRowIdsChange = (
+    nextSelectedRowIds: TableRowId[],
+    request: RowSelectionRequest | null,
+  ) => {
+    if (request !== null) {
+      const nextActiveRowId =
+        request.checked === true
+          ? request.rowId
+          : activeRowId !== null &&
+              activeRowId !== request.rowId &&
+              nextSelectedRowIds.includes(activeRowId) === true
+            ? activeRowId
+            : getNearestSelectedRowId(validRowIds, nextSelectedRowIds, request.rowId);
+
+      openRows(nextSelectedRowIds, nextActiveRowId);
+      return;
+    }
+
     const newlySelectedRowId = nextSelectedRowIds.find(
       (rowId) => selectedRowIds.includes(rowId) === false,
     );
@@ -251,40 +254,9 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
     openRows(nextSelectedRowIds, nextActiveRowId);
   };
 
-  const handleRowSelectionRequest = ({
-    checked,
-    rowId,
-    shiftKey,
-  }: {
-    checked: boolean;
-    rowId: string;
-    shiftKey: boolean;
-  }) => {
-    const nextSelection = updateRowSelection({
-      anchorRowId: rowSelectionAnchorId,
-      checked,
-      rowIds: validRowIds,
-      selectedRowIds: effectiveSelectedRowIds,
-      shiftKey,
-      targetRowId: rowId,
-    });
-    const nextActiveRowId =
-      checked === true
-        ? rowId
-        : activeRowId !== null &&
-            activeRowId !== rowId &&
-            nextSelection.selectedRowIds.includes(activeRowId) === true
-          ? activeRowId
-          : getNearestSelectedRowId(validRowIds, nextSelection.selectedRowIds, rowId);
-
-    setRowSelectionAnchorId(nextSelection.anchorRowId);
-    openRows(nextSelection.selectedRowIds, nextActiveRowId);
-  };
-
   const resetSelection = useCallback(() => {
     setSelectedRowIds([]);
-    setRowSelectionAnchorId(null);
-    setCellSelection(createEmptyCellSelection());
+    setCellSelection([]);
     setActiveColumnId(null);
   }, []);
 
@@ -314,25 +286,6 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
 
   const handleColumnVisibilityChange = (nextVisibility: Record<string, boolean>) => {
     visibility.setColumnVisibility(nextVisibility);
-    if (cellSelection.selectedCells.some((cell) => nextVisibility[cell.columnId] === false)) {
-      setCellSelection((currentSelection) => {
-        const selectedCells = currentSelection.selectedCells.filter(
-          (cell) => nextVisibility[cell.columnId] !== false,
-        );
-        const activeCell =
-          currentSelection.activeCell !== null &&
-          nextVisibility[currentSelection.activeCell.columnId] !== false
-            ? currentSelection.activeCell
-            : (selectedCells.at(-1) ?? null);
-        const anchorCell =
-          currentSelection.anchorCell !== null &&
-          nextVisibility[currentSelection.anchorCell.columnId] !== false
-            ? currentSelection.anchorCell
-            : activeCell;
-
-        return { activeCell, anchorCell, selectedCells };
-      });
-    }
     if (activeColumnId !== null && nextVisibility[activeColumnId] === false) {
       setActiveColumnId(null);
     }
@@ -340,7 +293,7 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
 
   const handleColumnActivate = useCallback((columnId: string | null) => {
     if (columnId !== null) {
-      setCellSelection(createEmptyCellSelection());
+      setCellSelection([]);
     }
     setActiveColumnId(columnId);
   }, []);
@@ -350,14 +303,13 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
       const visibleColumnOrder = order.columnOrder.filter(
         (candidateId) => visibility.columnVisibility[candidateId] !== false,
       );
-      setColumnOrder(
-        moveColumnInOrder(order.columnOrder, columnId, direction, visibleColumnOrder),
-      );
+      setColumnOrder(moveColumnInOrder(order.columnOrder, columnId, direction, visibleColumnOrder));
     },
     [order.columnOrder, setColumnOrder, visibility.columnVisibility],
   );
 
   const table = useTableGrid({
+    cellSelection,
     columnOrder: order.columnOrder,
     rows: query.rows,
     columns: query.columns,
@@ -367,10 +319,11 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
     columnVisibility: visibility.columnVisibility,
     onSortChange: handleSortChange,
     onSelectedRowIdsChange: handleSelectedRowIdsChange,
-    onRowSelectionRequest: handleRowSelectionRequest,
     onColumnVisibilityChange: handleColumnVisibilityChange,
+    onCellSelectionChange: setCellSelection,
     onColumnMenuOpen: handleColumnActivate,
     onColumnMove: handleColumnMove,
+    onColumnOrderChange: setColumnOrder,
   });
   const selectedRow = useMemo(() => {
     const visibleSelectedRow = query.rows.find((row) => String(row.id) === activeRowId) ?? null;
@@ -407,7 +360,7 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
     ) {
       activeElement.blur();
     }
-    setCellSelection(createEmptyCellSelection());
+    setCellSelection([]);
     setActiveColumnId(null);
   };
 
@@ -494,7 +447,6 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
   };
 
   return {
-    activeCell,
     activeColumnId,
     columnOrder: order.columnOrder,
     detailPaneMode,
@@ -502,6 +454,7 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
     table,
     loadedRowCount: query.loadedRowCount,
     hasMore: query.hasMore,
+    hasCellSelection: cellSelection.length > 0,
     isFetchingMore: query.isFetchingMore,
     isInitialLoading: query.isInitialLoading,
     isRefreshing: query.isRefreshing,
@@ -523,7 +476,6 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
     setColumnOrder: order.setColumnOrder,
     schemaColumns,
     tableColumns: query.columns,
-    selectedCells: cellSelection.selectedCells,
     rowValues,
     rowEditor: {
       activeRowId: detailPaneMode === "rows" ? activeRowId : null,
@@ -533,21 +485,7 @@ export function useTableViewState({ tableName }: UseTableViewStateOptions): UseT
       goToPreviousRow,
       openInsert,
     },
-    handleCellActivate: (target, selectionMode) => {
-      const visibleColumnIds = table
-        .getVisibleLeafColumns()
-        .map((column) => column.id)
-        .filter((columnId) => columnId !== "_select");
-      setCellSelection((currentSelection) =>
-        updateCellSelection({
-          anchorCell: currentSelection.anchorCell,
-          columnIds: visibleColumnIds,
-          mode: selectionMode,
-          rowIds: validRowIds,
-          selectedCells: currentSelection.selectedCells,
-          target,
-        }),
-      );
+    handleCellActivate: (target) => {
       setActiveColumnId(null);
       if (detailPaneMode === "rows" && target.rowId === activeRowId) {
         requestAnimationFrame(() => {

@@ -3,7 +3,8 @@
 ## Table of contents
 
 - [Implemented foundation](#implemented-foundation)
-  - [Stable column geometry](#stable-column-geometry)
+- [TanStack Table v9 selection](#tanstack-table-v9-selection)
+- [Stable column geometry](#stable-column-geometry)
 - [Open product work](#open-product-work)
 - [Work outside the foundation scope](#work-outside-the-foundation-scope)
 - [Settled implementation decisions](#settled-implementation-decisions)
@@ -11,6 +12,29 @@
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+### TanStack Table v9 selection
+
+[05/08/26]
+
+- [x] Replace the application row-range calculation and anchor state with TanStack's row-selection handler.
+- [x] Use TanStack's page row-selection predicates for the header checkbox.
+- [x] Keep column drag sensors, drop targets, overlays, constraints, and rollback in the deferred dnd-kit module because TanStack owns column order state but does not provide drag-and-drop behavior.
+- [x] Remove redundant migration tests while retaining interaction and application-policy coverage.
+
+[05/08/26]
+
+- [x] Register the exact sorting, visibility, ordering, sizing, resizing, row-selection, and cell-selection features used by `DataGrid`.
+- [x] Export one feature-aware `DataGridTable<TData>` contract for the design system, product, tests, and examples.
+- [x] Use TanStack cell-selection ranges as the canonical selection state instead of duplicating expanded cell targets in `DataGrid.Root`.
+- [x] Bind primary-mouse-button selection start and drag extension through the owning body-cell element.
+- [x] Keep links, buttons, form controls, checkbox cells, and secondary mouse buttons outside parent cell selection.
+- [x] Render selected and focused cells through `cell.getIsSelected()` and `cell.getIsFocused()`.
+- [x] Preserve cell-selection ranges across live data refreshes and loaded-row extension with stable row IDs and `autoResetCellSelection: false`.
+- [x] Remove the obsolete application-owned rectangular cell-selection engine.
+- [x] Audit the migration against the installed TanStack Intent v9 migration, feature, state, TypeScript, and cell-selection guidance.
+- [x] Keep controlled TanStack state slices paired with their update callbacks and render headers and cells through the v9 `FlexRender` component.
+- [x] Keep capped query-row arrays referentially stable so cell-selection updates do not invalidate the core row model.
 
 [26/07/26]
 
@@ -113,6 +137,22 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify TanStack row range selection through rendered checkbox interactions.
+- [x] Verify focused-row and pane routing remain application-owned after native row-range selection.
+- [x] Verify the reduced design-system and Inspector test suites, typechecks, lint, generated props, and production builds.
+
+[05/08/26]
+
+- [x] Verify TanStack replacement, Shift-range, and pointer-drag cell selection through `DataGrid`.
+- [x] Verify checkbox cells and secondary mouse buttons do not start cell selection.
+- [x] Verify `@inspector/ds` and Inspector tests, typechecks, lint, and production builds.
+- [x] Verify generated Data Grid prop metadata no longer exposes duplicate active-cell or selected-cell props.
+- [x] Verify the documentation example renders native focused and selected cell state without console errors.
+- [x] Verify the production table route contains `cellSelectionFeature` without unused spanning, pagination, or grouping features.
+- [x] Verify the migration contains no v8 constructor, row-model, state, sizing, sorting, pinning, legacy, or internal API residue.
 
 [26/07/26]
 

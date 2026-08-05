@@ -25,13 +25,17 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### DataGrid interaction API
 
-[23/07/26]
+[05/08/26]
 
-- [x] Keep `DataGrid` controlled through a TanStack `Table<TData>` instance.
-- [x] Keep the internal `DataGrid` context referentially stable across unrelated root renders without branding the public TanStack table prop.
-- [x] Represent cell identity with stable row IDs and column IDs.
-- [x] Expose controlled active-cell, selected-cell, active-column, and active-row state.
-- [x] Report replace, additive, and range cell-selection intent without exposing raw pointer events as application state.
+- [x] Keep dnd-kit as the renderer-owned column drag interaction while TanStack owns the resulting column-order state.
+
+[05/08/26]
+
+- [x] Keep `DataGrid` controlled through a TanStack table instance.
+- [x] Configure the controlled table through the feature-aware `DataGridTable<TData>` contract exported by `@inspector/ds`.
+- [x] Represent range corners with stable row IDs and column IDs while resolving range interiors against displayed row and column order.
+- [x] Keep cell-selection ranges in TanStack state while exposing controlled active-column and active-row product state.
+- [x] Bind TanStack replacement, include, exclude, Shift-extension, and drag-selection behavior without exposing raw pointer events as application state.
 - [x] Keep single-click cell activation separate from double-click and do not expose cell opening until inline editor routing exists.
 - [x] Register body cells only as column drop targets so dnd-kit does not consume normal cell clicks.
 - [x] Preserve header dragging, resizing, sorting, checkbox controls, relation links, and context-menu hooks.
@@ -39,7 +43,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Row selection
 
-[23/07/26]
+[05/08/26]
+
+- [x] Use TanStack's row toggle handler and table-owned range anchor for Shift-click selection.
+- [x] Keep focused-row choice, nearest-row fallback, pane routing, and draft guards in the application.
+
+[05/08/26]
 
 - [x] Toggle an individual row through its checkbox or complete checkbox-cell hit area.
 - [x] Add rows through independent checkbox clicks.
@@ -57,14 +66,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Cell selection
 
-[23/07/26]
+[05/08/26]
 
 - [x] Make an unmodified single click replace the cell selection and focus the target cell.
 - [x] Keep single-click cell focus independent from side-pane presentation.
-- [x] Toggle arbitrary cells through Command/Control-click additive selection.
+- [x] Add or subtract cell ranges through Command/Control pointer selection.
 - [x] Select a rectangular visible range from the anchor through Shift-click.
-- [x] Preserve cell identity through column reorder.
-- [x] Remove selected cells when their column is hidden.
+- [x] Preserve range-corner identity through column reorder and recompute the visible rectangle in the reordered layout.
+- [x] Keep hidden-column ranges in TanStack state so they contract, become dormant, or restore with column visibility.
 - [x] Clear row and cell selections when filter, sort, table, schema, or query scope changes.
 - [x] Render selected-cell background independently from the focused-cell border.
 - [x] Keep double-click from opening an inspection-only cell pane while inline editor routing is unavailable.
@@ -472,11 +481,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [ ] Verify that removing panel outlines does not remove the resizable handle's keyboard focus indicator.
 - [ ] Add keyboard-visible focus without restoring pointer-only browser outlines.
 - [ ] Verify high zoom, narrow panes, horizontal scrolling, long values, and hidden-column behavior.
-- [ ] Review relation links and other interactive cell descendants under additive and range selection modifiers.
+- [ ] Review relation links and other interactive cell descendants under include, exclude, and range-selection modifiers.
 
 ## Work outside the foundation scope
 
-[23/07/26]
+[05/08/26]
 
 These items were identified in the behavior design but intentionally excluded from the implemented foundation:
 
@@ -492,7 +501,7 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
-[23/07/26]
+[05/08/26]
 
 Checked markers in this section mean the interaction decision is settled; they do not mean the behavior is implemented.
 
@@ -502,7 +511,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] Relation and binary cells open the complete-row pane focused on their field.
 - [x] Timestamp cells use an inline calendar when that control is implemented.
 - [x] Generated, unsupported, and otherwise read-only cells remain read-only in the grid.
-- [x] Command/Control-click toggles arbitrary cells.
+- [x] Command/Control interaction includes a range when it starts outside the selection and excludes a range when it starts inside.
 - [x] Shift-click selects a rectangular visible cell range.
 - [x] Table pointer gestures select cells rather than native text.
 - [x] Text remains selectable inside side-pane field controls.
@@ -510,7 +519,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] Escape does not uncheck rows.
 - [x] Individual row checkboxes remain the single-row clear control after pane dismissal.
 - [x] The header checkbox remains the bulk row clear control.
-- [x] Cell identity uses row IDs and column IDs rather than displayed coordinates.
+- [x] Cell-range corners use row IDs and column IDs while range interiors follow the displayed table layout.
 - [x] Keep pane and inline editing simultaneously available without a workspace mode preference.
 - [x] Keep full inspection in the complete-row pane without adding a separate cell-inspection pane or hover cards.
 - [x] Close a clean row pane before starting inline editing on a double-clicked cell.
@@ -550,6 +559,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify native TanStack row-range selection and application pane focus through rendered checkbox interactions.
+- [x] Verify Inspector tests, typecheck, lint, and production build.
+- [x] Verify design-system tests, typecheck, lint, generated props, and production builds.
 
 [04/08/26]
 

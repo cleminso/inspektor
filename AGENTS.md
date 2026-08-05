@@ -1,3 +1,14 @@
+<!-- intent-skills:start -->
+## Skill Loading
+
+Before editing files for a substantial task:
+- Run `pnpm dlx @tanstack/intent@latest list` from the workspace root to see available local skills.
+- If a listed skill matches the task, run `pnpm dlx @tanstack/intent@latest load <package>#<skill>` before changing files.
+- Use the loaded `SKILL.md` guidance while making the change.
+- Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
+- Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
+<!-- intent-skills:end -->
+
 # Agent Notes
 
 ## Table of contents
@@ -39,12 +50,12 @@ A checklist file follows this structure:
 - Open design decisions: questions that still need a product decision before implementation.
 - Validation checklist: commands and verification steps to run before considering the work done.
 
-Record a date at the start of each section so it is easy to see when items were added or last updated. Use the format `[DD/MM/YY]`.
+Record a date at the start of each checklist block so it is easy to see when items were added. Use the format `[DD/MM/YY]`. Keep existing dated blocks unchanged and add each new block above the older blocks in its section.
 
 When working on an implementation:
 
 - Create or update the relevant `docs/todo/{elementName}.md` file for the UI element in scope.
-- Mark completed items with `[x]` and keep the date current for the section.
+- Mark completed items with `[x]`. Do not update an existing block's date or append new work to it; add a newly dated block above it.
 - Add new open items, design decisions, or exclusions as they appear, with the current date, instead of holding them in memory.
 - Do not implement items marked as open or out of scope unless the user explicitly asks for them.
 - Keep the checklist focused on one UI element. If an idea belongs to a different element, add it to that element's checklist instead.

@@ -1,11 +1,10 @@
-import type { Table } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 import { Settings2 } from "lucide-react";
 
-import { Button, Icon, MultiSelect, type MultiSelectItem } from "@inspector/ds";
+import { Button, Icon, MultiSelect, type DataGridTable, type MultiSelectItem } from "@inspector/ds";
 
 interface DataGridColumnVisibilityProps {
-  table: Table<DynamicTableRow>;
+  table: DataGridTable<DynamicTableRow>;
 }
 
 export function DataGridColumnVisibility({

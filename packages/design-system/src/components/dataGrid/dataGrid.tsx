@@ -1,6 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
-import type { Cell, Header, HeaderGroup, Row, RowData, Table } from "@tanstack/react-table";
-import { flexRender } from "@tanstack/react-table";
+import {
+  FlexRender,
+  type Cell,
+  type Header,
+  type HeaderGroup,
+  type Row,
+  type RowData,
+} from "@tanstack/react-table";
 import {
   useEffect,
   useLayoutEffect,
@@ -14,13 +20,8 @@ import {
 
 import { ScrollAreaPrivate } from "../scrollArea/scrollArea";
 import { dataGridStyles } from "./dataGrid.styles";
-import {
-  asStable,
-  DataGridContext,
-  type DataGridContextValue,
-  type Stable,
-  useDataGridContext,
-} from "./dataGridContext";
+import { DataGridContext, type DataGridContextValue, useDataGridContext } from "./dataGridContext";
+import type { DataGridFeatures, DataGridTable } from "./dataGridFeatures";
 import { useDataGridReorderContext } from "./dataGridReorderContext";
 
 export type DataGridDensity = "compact" | "default";
@@ -53,10 +54,6 @@ export interface DataGridCellTarget {
   rowId: string;
 }
 
-const emptySelectedCells: readonly DataGridCellTarget[] = [];
-
-export type DataGridCellSelectionMode = "additive" | "range" | "replace";
-
 export type DataGridHeaderContextMenuHandler = (
   columnId: string,
   event: MouseEvent<HTMLTableCellElement>,
@@ -71,8 +68,6 @@ export type DataGridCellContextMenuHandler = (
 ) => void;
 
 interface DataGridRootBaseProps<TData extends RowData> {
-  /** Active row and column intersection. */
-  activeCell?: DataGridCellTarget | null;
   /** Column highlighted across the header and visible rows. */
   activeColumnId?: string | null;
   /** Row currently targeted for inspection. */
@@ -82,7 +77,7 @@ interface DataGridRootBaseProps<TData extends RowData> {
   /** Controls table row and cell spacing. */
   density?: DataGridDensity;
   /** Runs when a non-interactive cell is activated. */
-  onCellActivate?: (target: DataGridCellTarget, selectionMode: DataGridCellSelectionMode) => void;
+  onCellActivate?: (target: DataGridCellTarget) => void;
   /** Runs when a cell context menu is requested. */
   onCellContextMenu?: DataGridCellContextMenuHandler;
   /** Runs when a column header is activated. */
@@ -94,9 +89,7 @@ interface DataGridRootBaseProps<TData extends RowData> {
   /** Runs when a row context menu is requested. */
   onRowContextMenu?: DataGridRowContextMenuHandler;
   /** Controlled TanStack table instance rendered by the compound parts. */
-  table: Table<TData>;
-  /** Cells included in the current cell-selection set. */
-  selectedCells?: readonly DataGridCellTarget[];
+  table: DataGridTable<TData>;
 }
 
 interface ReorderableDataGridRootProps {
@@ -147,14 +140,14 @@ export interface DataGridHeaderRowProps<TData extends RowData> {
   /** Custom header cells. TanStack headers render when omitted. */
   children?: ReactNode;
   /** TanStack header group represented by this row. */
-  headerGroup: HeaderGroup<TData>;
+  headerGroup: HeaderGroup<DataGridFeatures, TData>;
 }
 
 export interface DataGridHeaderCellProps<TData extends RowData> {
   /** Custom header content. The column header definition renders when omitted. */
   children?: ReactNode;
   /** TanStack header represented by this cell. */
-  header: Header<TData, unknown>;
+  header: Header<DataGridFeatures, TData, unknown>;
 }
 
 export interface DataGridBodyProps {
@@ -166,21 +159,21 @@ export interface DataGridRowProps<TData extends RowData> {
   /** Custom cells. Visible TanStack cells render when omitted. */
   children?: ReactNode;
   /** TanStack row represented by this table row. */
-  row: Row<TData>;
+  row: Row<DataGridFeatures, TData>;
 }
 
 export interface DataGridCellProps<TData extends RowData> {
   /** Custom cell content. The column cell definition renders when omitted. */
   children?: ReactNode;
   /** TanStack cell represented by this table cell. */
-  cell: Cell<TData, unknown>;
+  cell: Cell<DataGridFeatures, TData, unknown>;
 }
 
 export interface DataGridExpandedRowProps<TData extends RowData> {
   /** Expanded content associated with the row. */
   children: ReactNode;
   /** TanStack row represented by this expanded region. */
-  row: Row<TData>;
+  row: Row<DataGridFeatures, TData>;
 }
 
 export interface DataGridMessageProps {
@@ -199,8 +192,9 @@ function isInteractiveTarget(target: EventTarget | null): boolean {
   }
 
   return (
-    target.closest('a, button, input, select, textarea, [role="button"], [role="checkbox"]') !==
-    null
+    target.closest(
+      'a, button, input, select, textarea, [contenteditable="true"], [role="button"], [role="checkbox"], [role="combobox"], [role="link"], [role="menuitem"], [role="option"], [role="radio"], [role="switch"], [role="textbox"]',
+    ) !== null
   );
 }
 
@@ -236,7 +230,7 @@ function activateSelectionControlFromCell(event: MouseEvent<HTMLTableCellElement
   return true;
 }
 
-function getVisibleColumnCount<TData extends RowData>(table: Table<TData>): number {
+function getVisibleColumnCount<TData extends RowData>(table: DataGridTable<TData>): number {
   return Math.max(table.getVisibleLeafColumns().length, 1);
 }
 
@@ -272,7 +266,6 @@ function moveColumnByOffset(
 }
 
 function DataGridRoot<TData extends RowData>({
-  activeCell = null,
   activeColumnId = null,
   activeRowId = null,
   children,
@@ -286,7 +279,6 @@ function DataGridRoot<TData extends RowData>({
   onHeaderContextMenu,
   onRowActivate,
   onRowContextMenu,
-  selectedCells = emptySelectedCells,
   table,
 }: DataGridRootProps<TData>) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -306,33 +298,9 @@ function DataGridRoot<TData extends RowData>({
   const columnReorderConfigured = columnOrder !== undefined && onColumnOrderChange !== undefined;
   const columnReorderReady = ReorderComponent !== null;
   const columnReorderEnabled = columnReorderConfigured === true && columnReorderReady === true;
-  const selectedColumnsByRow = useMemo(() => {
-    const columnsByRow = new Map<string, Set<string>>();
-
-    for (const cell of selectedCells) {
-      const columns = columnsByRow.get(cell.rowId) ?? new Set<string>();
-      columns.add(cell.columnId);
-      columnsByRow.set(cell.rowId, columns);
-    }
-
-    return columnsByRow;
-  }, [selectedCells]);
-  /**
-   * Why: React compares context values by reference. Recreating this object on every Root render
-   * would notify every compound DataGrid part even when no table input changed.
-   *
-   * How: useMemo retains the object while every field used to build it is unchanged. Derived
-   * functions are created inside the memo so their identities follow the same dependency set.
-   *
-   * What: asStable records that runtime guarantee in the context type. It does not make the
-   * mutable TanStack Table instance immutable; it only preserves this wrapper's identity across
-   * unrelated renders. Consumers therefore avoid context-driven renders and can safely depend on
-   * the complete context reference instead of reconstructing their own stability assumptions.
-   */
   const value = useMemo(
     () =>
-      asStable({
-        activeCell,
+      ({
         activeColumnId,
         activeRowId,
         density,
@@ -342,7 +310,6 @@ function DataGridRoot<TData extends RowData>({
         onHeaderContextMenu,
         onRowActivate,
         onRowContextMenu,
-        selectedColumnsByRow,
         columnReorderEnabled,
         getColumnReorderIndex: (columnId: string) => columnReorderIndices.get(columnId) ?? -1,
         moveColumn: (columnId: string, offset: -1 | 1) => {
@@ -364,9 +331,8 @@ function DataGridRoot<TData extends RowData>({
           }
         },
         table,
-      } satisfies DataGridContextValue<TData>),
+      }) satisfies DataGridContextValue<TData>,
     [
-      activeCell,
       activeColumnId,
       activeRowId,
       columnReorderEnabled,
@@ -380,7 +346,6 @@ function DataGridRoot<TData extends RowData>({
       onHeaderContextMenu,
       onRowActivate,
       onRowContextMenu,
-      selectedColumnsByRow,
       table,
     ],
   );
@@ -458,7 +423,7 @@ function DataGridRoot<TData extends RowData>({
   }, [activeColumnId]);
 
   const root = (
-    <DataGridContext.Provider value={value as Stable<DataGridContextValue<RowData>>}>
+    <DataGridContext.Provider value={value as DataGridContextValue<RowData>}>
       <div
         {...stylex.props(dataGridStyles.root)}
         data-density={density}
@@ -492,7 +457,9 @@ function DataGridRoot<TData extends RowData>({
             density === "compact" && dataGridStyles.compactCellInlinePadding,
           )}
         >
-          {columnDragPreview?.(String(source.id)) ?? source.element?.textContent ?? String(source.id)}
+          {columnDragPreview?.(String(source.id)) ??
+            source.element?.textContent ??
+            String(source.id)}
         </div>
       )}
     >
@@ -579,11 +546,7 @@ function DataGridHeader({ children }: DataGridHeaderProps) {
   const { table } = useDataGridContext();
 
   return (
-    <thead
-      {...stylex.props(dataGridStyles.header)}
-      data-slot="data-grid-header"
-      data-sticky="true"
-    >
+    <thead {...stylex.props(dataGridStyles.header)} data-slot="data-grid-header" data-sticky="true">
       {children ??
         table
           .getHeaderGroups()
@@ -601,9 +564,7 @@ function DataGridHeaderRow<TData extends RowData>({
   return (
     <tr data-slot="data-grid-header-row">
       {children ??
-        headerGroup.headers.map((header) => (
-          <DataGridHeaderCell key={header.id} header={header} />
-        ))}
+        headerGroup.headers.map((header) => <DataGridHeaderCell key={header.id} header={header} />)}
     </tr>
   );
 }
@@ -614,7 +575,6 @@ function DataGridHeaderCell<TData extends RowData>({
 }: DataGridHeaderCellProps<TData>) {
   const reorderContext = useDataGridReorderContext();
   const {
-    activeCell,
     activeColumnId,
     columnReorderEnabled,
     density,
@@ -622,8 +582,9 @@ function DataGridHeaderCell<TData extends RowData>({
     moveColumn,
     onColumnActivate,
     onHeaderContextMenu,
+    table,
   } = useDataGridContext<TData>();
-  const isActive = activeCell === null && activeColumnId === header.column.id;
+  const isActive = table.getFocusedCell() === undefined && activeColumnId === header.column.id;
   const columnReorderIndex = getColumnReorderIndex(header.column.id);
   const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0;
   const sortDirection = header.column.getIsSorted();
@@ -730,9 +691,7 @@ function DataGridHeaderCell<TData extends RowData>({
           aria-hidden={isDragVisual === true ? true : undefined}
           data-slot="data-grid-header-drag-source"
         >
-          {header.isPlaceholder === true
-            ? null
-            : (children ?? flexRender(header.column.columnDef.header, header.getContext()))}
+          {header.isPlaceholder === true ? null : (children ?? <FlexRender header={header} />)}
         </div>
         {header.column.getCanResize() === true ? (
           <button
@@ -833,7 +792,6 @@ function DataGridRow<TData extends RowData>({ children, row }: DataGridRowProps<
 function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellProps<TData>) {
   const reorderContext = useDataGridReorderContext();
   const {
-    activeCell,
     activeColumnId,
     activeRowId,
     columnReorderEnabled,
@@ -842,14 +800,14 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     onCellActivate,
     onCellContextMenu,
     onColumnActivate,
-    selectedColumnsByRow,
+    table,
   } = useDataGridContext<TData>();
   const target = { rowId: cell.row.id, columnId: cell.column.id };
-  const isColumnActive = activeCell === null && activeColumnId === target.columnId;
+  const isColumnActive = table.getFocusedCell() === undefined && activeColumnId === target.columnId;
   const isRowActive = activeRowId === target.rowId;
   const isSelected = cell.row.getIsSelected();
-  const isCellSelected = selectedColumnsByRow.get(target.rowId)?.has(target.columnId) === true;
-  const isActive = activeCell?.rowId === target.rowId && activeCell.columnId === target.columnId;
+  const isCellSelected = cell.getIsSelected();
+  const isActive = cell.getIsFocused();
   const columnReorderIndex = getColumnReorderIndex(target.columnId);
   const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0;
 
@@ -870,13 +828,20 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     event.stopPropagation();
     event.currentTarget.focus();
     onColumnActivate?.(null);
-    const selectionMode: DataGridCellSelectionMode =
-      event.metaKey === true || event.ctrlKey === true
-        ? "additive"
-        : event.shiftKey === true
-          ? "range"
-          : "replace";
-    onCellActivate?.(target, selectionMode);
+    onCellActivate?.(target);
+  };
+
+  const handleMouseDown = (event: MouseEvent<HTMLTableCellElement>) => {
+    if (
+      event.defaultPrevented === true ||
+      event.button !== 0 ||
+      isInteractiveTarget(event.target) === true ||
+      isSelectionControlTarget(event.target) === true
+    ) {
+      return;
+    }
+
+    cell.getSelectionStartHandler()(event);
   };
 
   const handleContextMenu = (event: MouseEvent<HTMLTableCellElement>) => {
@@ -910,9 +875,11 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       data-slot="data-grid-cell"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
-      tabIndex={-1}
+      onMouseDown={handleMouseDown}
+      onMouseEnter={cell.getSelectionExtendHandler()}
+      tabIndex={cell.getTabIndex()}
     >
-      {children ?? flexRender(cell.column.columnDef.cell, cell.getContext())}
+      {children ?? <FlexRender cell={cell} />}
     </td>
   );
 

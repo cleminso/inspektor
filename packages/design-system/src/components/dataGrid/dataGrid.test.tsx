@@ -1,15 +1,16 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import {
   createColumnHelper,
-  getCoreRowModel,
+  type CellSelectionState,
   type RowSelectionState,
-  useReactTable,
+  type SortingState,
+  useTable,
 } from "@tanstack/react-table";
-import { memo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DataGrid } from "./dataGrid";
-import { useDataGridContext } from "./dataGridContext";
+import { dataGridFeatures, type DataGridFeatures } from "./dataGridFeatures";
 
 let onDataGridDragEnd: ((event: unknown) => void) | undefined;
 let onDataGridDragOver: ((event: unknown) => void) | undefined;
@@ -89,86 +90,61 @@ interface Person {
   role: string;
 }
 
-const columnHelper = createColumnHelper<Person>();
-const columns = [
+const columnHelper = createColumnHelper<DataGridFeatures, Person>();
+const columns = columnHelper.columns([
   columnHelper.accessor("name", { header: "Name" }),
   columnHelper.accessor("role", { header: "Role" }),
-];
+]);
+const interactiveCellColumns = columnHelper.columns([
+  columnHelper.accessor("name", {
+    header: "Name",
+    cell: ({ getValue }) => <a href="#person">{getValue()}</a>,
+  }),
+]);
 const rows: Person[] = [
   { id: "person-1", name: "Ada", role: "Engineer" },
   { id: "person-2", name: "Grace", role: "Admiral" },
 ];
 
-const contextRenderCount = { current: 0 };
-
-const ContextRenderProbe = memo(function ContextRenderProbe() {
-  useDataGridContext<Person>();
-  contextRenderCount.current += 1;
-  return null;
-});
-
-function StableContextDataGrid() {
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-  const [, setRenderCount] = useState(0);
-  const table = useReactTable({
-    columns,
-    data: rows,
-    getCoreRowModel: getCoreRowModel(),
-    getRowId: (row) => row.id,
-  });
-
-  return (
-    <>
-      <button type="button" onClick={() => setRenderCount((count) => count + 1)}>
-        Rerender
-      </button>
-      <button type="button" onClick={() => setActiveColumnId("name")}>
-        Activate column
-      </button>
-      <DataGrid.Root table={table} activeColumnId={activeColumnId}>
-        <ContextRenderProbe />
-      </DataGrid.Root>
-    </>
-  );
-}
-
 interface TestDataGridProps {
-  activeCell?: { columnId: string; rowId: string } | null;
   activeColumnId?: string | null;
   activeRowId?: string | null;
   data?: Person[];
+  initialCellSelection?: CellSelectionState;
   loading?: boolean;
   onCellActivate?: (target: { columnId: string; rowId: string }) => void;
   onCellContextMenu?: (target: { columnId: string; rowId: string }) => void;
   onColumnActivate?: (columnId: string | null) => void;
   onRowActivate?: (rowId: string) => void;
   resizingColumnId?: string | null;
-  selectedCells?: { columnId: string; rowId: string }[];
   selectedRowIds?: string[];
 }
 
 function TestDataGrid({
-  activeCell = null,
   activeColumnId = null,
   activeRowId = null,
   data = rows,
+  initialCellSelection = [],
   loading = false,
   onCellActivate,
   onCellContextMenu,
   onColumnActivate,
   onRowActivate,
   resizingColumnId = null,
-  selectedCells = [],
   selectedRowIds = [],
 }: TestDataGridProps) {
-  const rowSelection = Object.fromEntries(selectedRowIds.map((rowId) => [rowId, true]));
-  const table = useReactTable({
+  const [cellSelection, setCellSelection] = useState(initialCellSelection);
+  const rowSelection = Object.fromEntries(
+    selectedRowIds.map((rowId) => [rowId, true as const]),
+  ) satisfies RowSelectionState;
+  const table = useTable({
+    features: dataGridFeatures,
     columns,
     data,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     state: {
-      columnSizingInfo: {
+      cellSelection,
+      columnResizing: {
         columnSizingStart: [],
         deltaOffset: null,
         deltaPercentage: null,
@@ -178,19 +154,18 @@ function TestDataGrid({
       },
       rowSelection,
     },
+    onCellSelectionChange: setCellSelection,
   });
 
   return (
     <DataGrid.Root
       table={table}
-      activeCell={activeCell}
       activeColumnId={activeColumnId}
       activeRowId={activeRowId}
       onCellActivate={onCellActivate}
       onCellContextMenu={(target) => onCellContextMenu?.(target)}
       onColumnActivate={onColumnActivate}
       onRowActivate={onRowActivate}
-      selectedCells={selectedCells}
     >
       <DataGrid.Viewport>
         <DataGrid.Table aria-label="People">
@@ -250,10 +225,10 @@ describe("DataGrid scrollbar", () => {
 });
 
 function ExpandedTestDataGrid() {
-  const table = useReactTable({
+  const table = useTable({
+    features: dataGridFeatures,
     columns,
     data: rows,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
   });
   const firstRow = table.getRowModel().rows[0];
@@ -282,15 +257,15 @@ function InteractiveHeaderDataGrid({
 }: {
   onColumnActivate: (columnId: string | null) => void;
 }) {
-  const interactiveColumns = [
+  const interactiveColumns = columnHelper.columns([
     columnHelper.accessor("name", {
       header: () => <button type="button">Sort name</button>,
     }),
-  ];
-  const table = useReactTable({
+  ]);
+  const table = useTable({
+    features: dataGridFeatures,
     columns: interactiveColumns,
     data: rows,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
   });
 
@@ -305,13 +280,40 @@ function InteractiveHeaderDataGrid({
   );
 }
 
+function InteractiveCellDataGrid() {
+  const [cellSelection, setCellSelection] = useState<CellSelectionState>([]);
+  const table = useTable({
+    features: dataGridFeatures,
+    columns: interactiveCellColumns,
+    data: rows,
+    getRowId: (row) => row.id,
+    state: { cellSelection },
+    onCellSelectionChange: setCellSelection,
+  });
+
+  return (
+    <DataGrid.Root table={table}>
+      <DataGrid.Viewport>
+        <DataGrid.Table aria-label="Linked people">
+          <DataGrid.Content />
+        </DataGrid.Table>
+      </DataGrid.Viewport>
+    </DataGrid.Root>
+  );
+}
+
 function KeyboardSortableDataGrid({ onSortingChange }: { onSortingChange: () => void }) {
-  const table = useReactTable({
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const table = useTable({
+    features: dataGridFeatures,
     columns,
     data: rows,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
-    onSortingChange,
+    state: { sorting },
+    onSortingChange: (updater) => {
+      setSorting(updater);
+      onSortingChange();
+    },
   });
 
   return (
@@ -327,10 +329,10 @@ function KeyboardSortableDataGrid({ onSortingChange }: { onSortingChange: () => 
 
 function DismissibleColumnDataGrid() {
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-  const table = useReactTable({
+  const table = useTable({
+    features: dataGridFeatures,
     columns,
     data: rows,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
   });
 
@@ -349,13 +351,16 @@ function DismissibleColumnDataGrid() {
   );
 }
 
-function SelectionHitAreaDataGrid({ onCellActivate }: {
+function SelectionHitAreaDataGrid({
+  onCellActivate,
+}: {
   onCellActivate: (target: { columnId: string; rowId: string }) => void;
 }) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const selectionColumns = [
+  const selectionColumns = columnHelper.columns([
     columnHelper.display({
       id: "select",
+      enableCellSelection: false,
       header: ({ table }) => (
         <input
           aria-label="Select all rows"
@@ -378,12 +383,12 @@ function SelectionHitAreaDataGrid({ onCellActivate }: {
       ),
     }),
     ...columns,
-  ];
-  const table = useReactTable({
+  ]);
+  const table = useTable({
+    features: dataGridFeatures,
     columns: selectionColumns,
     data: rows,
     enableRowSelection: true,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     onRowSelectionChange: setRowSelection,
     state: { rowSelection },
@@ -401,14 +406,14 @@ function SelectionHitAreaDataGrid({ onCellActivate }: {
 }
 
 function FixedGeometryDataGrid() {
-  const fixedColumns = [
+  const fixedColumns = columnHelper.columns([
     columnHelper.accessor("name", { header: "Name", size: 120 }),
     columnHelper.accessor("role", { header: "Role", size: 180 }),
-  ];
-  const table = useReactTable({
+  ]);
+  const table = useTable({
+    features: dataGridFeatures,
     columns: fixedColumns,
     data: rows,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
   });
 
@@ -459,12 +464,13 @@ function ReorderableDataGrid({
   onColumnOrderChange: (columnIds: string[]) => void;
 }) {
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder);
-  const table = useReactTable({
+  const table = useTable({
+    features: dataGridFeatures,
     columns,
     data: rows,
-    getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     state: { columnOrder },
+    onColumnOrderChange: setColumnOrder,
   });
 
   return (
@@ -488,7 +494,6 @@ function ReorderableDataGrid({
 
 afterEach(() => {
   cleanup();
-  contextRenderCount.current = 0;
   dragOverlayDropAnimation = undefined;
   dragOverlaySource = { id: "name" };
   droppingSortableId = null;
@@ -524,20 +529,6 @@ describe("DataGrid", () => {
     const reorderedHeader = screen.getByRole("columnheader", { name: "Name" });
     expect(document.activeElement).toBe(reorderedHeader);
     expect(reorderedHeader.hasAttribute("data-reorderable")).toBe(true);
-  });
-
-  it("preserves context identity until a meaningful input changes", () => {
-    render(<StableContextDataGrid />);
-
-    expect(contextRenderCount.current).toBe(1);
-
-    fireEvent.click(screen.getByRole("button", { name: "Rerender" }));
-
-    expect(contextRenderCount.current).toBe(1);
-
-    fireEvent.click(screen.getByRole("button", { name: "Activate column" }));
-
-    expect(contextRenderCount.current).toBe(2);
   });
 
   it("renders semantic headers, rows, and visible cells from TanStack state", () => {
@@ -600,12 +591,19 @@ describe("DataGrid", () => {
     expect(screen.getByText("No people")).toBeTruthy();
   });
 
-  it("gives active-cell state precedence over column highlighting", () => {
+  it("gives TanStack focused-cell state precedence over column highlighting", () => {
     render(
       <TestDataGrid
         activeRowId="person-1"
         activeColumnId="role"
-        activeCell={{ rowId: "person-1", columnId: "role" }}
+        initialCellSelection={[
+          {
+            anchorRowId: "person-1",
+            anchorColumnId: "role",
+            focusRowId: "person-1",
+            focusColumnId: "role",
+          },
+        ]}
         selectedRowIds={["person-2"]}
       />,
     );
@@ -619,6 +617,7 @@ describe("DataGrid", () => {
     expect(graceRow.hasAttribute("data-selected")).toBe(true);
     expect(activeHeader.hasAttribute("data-active")).toBe(false);
     expect(activeCell.hasAttribute("data-active")).toBe(true);
+    expect(activeCell.hasAttribute("data-cell-selected")).toBe(true);
     expect(activeCell.hasAttribute("data-column-active")).toBe(false);
     expect(activeCell.hasAttribute("data-row-active")).toBe(true);
     expect(graceRow.querySelectorAll("[data-selected]")).toHaveLength(2);
@@ -666,12 +665,15 @@ describe("DataGrid", () => {
 
     fireEvent.click(screen.getByRole("columnheader", { name: "Role" }));
     fireEvent.click(screen.getByRole("row", { name: /Ada Engineer/ }));
-    fireEvent.click(screen.getByRole("cell", { name: "Admiral" }));
+    const admiralCell = screen.getByRole("cell", { name: "Admiral" });
+    fireEvent.mouseDown(admiralCell);
+    fireEvent.mouseUp(document);
+    fireEvent.click(admiralCell);
     fireEvent.contextMenu(screen.getByRole("cell", { name: "Engineer" }));
 
     expect(onColumnActivate).toHaveBeenCalledWith("role");
     expect(onRowActivate).toHaveBeenCalledWith("person-1");
-    expect(onCellActivate).toHaveBeenCalledWith({ rowId: "person-2", columnId: "role" }, "replace");
+    expect(onCellActivate).toHaveBeenCalledWith({ rowId: "person-2", columnId: "role" });
     expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: "person-1", columnId: "role" });
   });
 
@@ -687,43 +689,49 @@ describe("DataGrid", () => {
     expect(onCellActivate).toHaveBeenCalledOnce();
   });
 
-  it("reports additive and range cell-selection intent from click modifiers", () => {
-    const onCellActivate = vi.fn();
-    render(<TestDataGrid onCellActivate={onCellActivate} />);
-    const cell = screen.getByRole("cell", { name: "Engineer" });
+  it("renders TanStack replacement and Shift-range selection", () => {
+    render(<TestDataGrid />);
+    const adaCell = screen.getByRole("cell", { name: "Ada" });
+    const admiralCell = screen.getByRole("cell", { name: "Admiral" });
 
-    fireEvent.click(cell, { metaKey: true });
-    fireEvent.click(cell, { shiftKey: true });
+    fireEvent.mouseDown(adaCell);
+    fireEvent.mouseUp(document);
+    expect(adaCell.hasAttribute("data-cell-selected")).toBe(true);
+    expect(adaCell.hasAttribute("data-active")).toBe(true);
 
-    expect(onCellActivate).toHaveBeenNthCalledWith(
-      1,
-      { rowId: "person-1", columnId: "role" },
-      "additive",
-    );
-    expect(onCellActivate).toHaveBeenNthCalledWith(
-      2,
-      { rowId: "person-1", columnId: "role" },
-      "range",
-    );
+    fireEvent.mouseDown(admiralCell, { shiftKey: true });
+    fireEvent.mouseUp(document);
+
+    for (const cell of screen.getAllByRole("cell")) {
+      expect(cell.hasAttribute("data-cell-selected")).toBe(true);
+    }
+    expect(adaCell.hasAttribute("data-active")).toBe(true);
   });
 
-  it("marks every selected cell independently from checked rows", () => {
-    render(
-      <TestDataGrid
-        selectedCells={[
-          { rowId: "person-1", columnId: "name" },
-          { rowId: "person-2", columnId: "role" },
-        ]}
-      />,
-    );
+  it("extends TanStack selection while a primary-button drag enters cells", () => {
+    render(<TestDataGrid />);
+    const adaCell = screen.getByRole("cell", { name: "Ada" });
+    const admiralCell = screen.getByRole("cell", { name: "Admiral" });
 
-    expect(screen.getByRole("cell", { name: "Ada" }).hasAttribute("data-cell-selected")).toBe(true);
-    expect(screen.getByRole("cell", { name: "Admiral" }).hasAttribute("data-cell-selected")).toBe(
-      true,
-    );
-    expect(screen.getByRole("cell", { name: "Engineer" }).hasAttribute("data-cell-selected")).toBe(
-      false,
-    );
+    fireEvent.mouseDown(adaCell);
+    fireEvent.mouseEnter(admiralCell);
+    fireEvent.mouseUp(document);
+
+    for (const cell of screen.getAllByRole("cell")) {
+      expect(cell.hasAttribute("data-cell-selected")).toBe(true);
+    }
+  });
+
+  it("does not start parent cell selection from an interactive descendant", () => {
+    render(<InteractiveCellDataGrid />);
+    const link = screen.getByRole("link", { name: "Ada" });
+    const cell = link.closest("td");
+
+    expect(cell).not.toBeNull();
+    fireEvent.mouseDown(link);
+    fireEvent.mouseUp(document);
+
+    expect(cell?.hasAttribute("data-cell-selected")).toBe(false);
   });
 
   it("registers body cells only as column drop targets", async () => {
@@ -779,11 +787,14 @@ describe("DataGrid", () => {
     const checkboxCell = checkbox.closest("td");
 
     expect(checkboxCell).not.toBeNull();
+    fireEvent.mouseDown(checkboxCell as HTMLTableCellElement);
+    fireEvent.mouseUp(document);
     fireEvent.click(checkboxCell as HTMLTableCellElement);
 
     expect((checkbox as HTMLInputElement).checked).toBe(true);
     expect(document.activeElement).not.toBe(checkboxCell);
     expect(onCellActivate).not.toHaveBeenCalled();
+    expect(checkboxCell?.hasAttribute("data-cell-selected")).toBe(false);
   });
 
   it("moves headers and body cells together while a column is dragged", async () => {
@@ -834,9 +845,9 @@ describe("DataGrid", () => {
     render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />);
 
     await waitFor(() => {
-      expect(screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-reorderable")).toBe(
-        true,
-      );
+      expect(
+        screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-reorderable"),
+      ).toBe(true);
     });
 
     const header = screen.getByRole("columnheader", { name: "Name" });

@@ -49,7 +49,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
   useEffect(() => {
     if (
       state.detailPaneMode === "closed" &&
-      state.activeCell === null &&
+      state.hasCellSelection === false &&
       state.activeColumnId === null
     ) {
       return;
@@ -65,7 +65,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [state.activeCell, state.activeColumnId, state.detailPaneMode]);
+  }, [state.activeColumnId, state.detailPaneMode, state.hasCellSelection]);
 
   return (
     <ResizablePanelGroup orientation="horizontal">
@@ -110,10 +110,8 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               table={state.table}
               columnOrder={state.columnOrder}
               density="compact"
-              activeCell={state.activeCell}
               activeColumnId={state.activeColumnId}
               activeRowId={state.rowEditor.activeRowId}
-              selectedCells={state.selectedCells}
               onCellActivate={state.handleCellActivate}
               columnDragPreview={(columnId) => {
                 const column = state.tableColumns.find((candidate) => candidate.id === columnId);

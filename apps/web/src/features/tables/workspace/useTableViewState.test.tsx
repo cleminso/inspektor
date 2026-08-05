@@ -4,10 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DataGrid } from "@inspector/ds";
 
-import {
-  createInsertRowValues,
-  useTableViewState,
-} from "@tables/workspace/useTableViewState";
+import { createInsertRowValues, useTableViewState } from "@tables/workspace/useTableViewState";
 
 const setRowEditor = vi.fn();
 const deleteRow = vi.fn();
@@ -184,10 +181,8 @@ function TableViewInteractionHarness(): React.ReactElement {
       <DataGrid.Root
         table={state.table}
         columnOrder={state.columnOrder}
-        activeCell={state.activeCell}
         activeColumnId={state.activeColumnId}
         activeRowId={state.rowEditor.activeRowId}
-        selectedCells={state.selectedCells}
         onCellActivate={state.handleCellActivate}
         onColumnActivate={state.handleColumnActivate}
         onColumnOrderChange={state.setColumnOrder}
@@ -242,6 +237,8 @@ describe("useTableViewState", () => {
     render(<TableViewInteractionHarness />);
     const cell = screen.getByRole("cell", { name: "Ada" });
 
+    fireEvent.mouseDown(cell);
+    fireEvent.mouseUp(document);
     fireEvent.click(cell);
 
     expect(cell.hasAttribute("data-active")).toBe(true);
@@ -257,6 +254,8 @@ describe("useTableViewState", () => {
     const cell = screen.getByRole("cell", { name: "Ada" });
     const header = screen.getByRole("columnheader", { name: /Name/ });
 
+    fireEvent.mouseDown(cell);
+    fireEvent.mouseUp(document);
     fireEvent.click(cell);
     fireEvent.click(header);
 
@@ -266,13 +265,14 @@ describe("useTableViewState", () => {
   });
 
   it("opens the complete-row pane when a row is checked", () => {
-    const { result } = renderHook(() => useTableViewState({ tableName: "accounts" }));
+    render(<TableViewInteractionHarness />);
 
-    act(() => {
-      result.current.table.getRow("row-1").toggleSelected(true);
-    });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select row row-1" }));
 
-    expect(result.current.table.getRow("row-1").getIsSelected()).toBe(true);
+    expect(
+      screen.getByRole("checkbox", { name: "Select row row-1" }).getAttribute("aria-checked"),
+    ).toBe("true");
+    expect(screen.getByRole("status", { name: "Pane mode" }).textContent).toBe("rows");
     expect(setRowEditor).toHaveBeenCalledWith("edit", "row-1", { replace: false });
   });
 
@@ -439,43 +439,6 @@ describe("useTableViewState", () => {
     expect(screen.getByRole("status", { name: "Selected row count" }).textContent).toBe("0");
   });
 
-  it("focuses a cell without opening or changing the pane", () => {
-    const { result } = renderHook(() => useTableViewState({ tableName: "accounts" }));
-
-    act(() => {
-      result.current.handleCellActivate({ columnId: "id", rowId: "row-1" }, "replace");
-    });
-
-    expect(result.current.activeCell).toEqual({ columnId: "id", rowId: "row-1" });
-    expect(result.current.detailPaneMode).toBe("closed");
-    expect(setRowEditor).not.toHaveBeenCalled();
-  });
-
-  it("adds Command-clicked cells and selects a Shift range", () => {
-    const { result } = renderHook(() => useTableViewState({ tableName: "accounts" }));
-
-    act(() => {
-      result.current.handleCellActivate({ columnId: "id", rowId: "row-1" }, "replace");
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-2" }, "additive");
-    });
-
-    expect(result.current.selectedCells).toEqual([
-      { columnId: "id", rowId: "row-1" },
-      { columnId: "name", rowId: "row-2" },
-    ]);
-
-    act(() => {
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-2" }, "range");
-    });
-
-    expect(result.current.selectedCells).toEqual([
-      { columnId: "id", rowId: "row-1" },
-      { columnId: "name", rowId: "row-1" },
-      { columnId: "id", rowId: "row-2" },
-      { columnId: "name", rowId: "row-2" },
-    ]);
-  });
-
   it("restores the checked row represented by URL-backed edit state", () => {
     searchState.editorMode = "edit";
     searchState.rowId = "row-2";
@@ -510,7 +473,8 @@ describe("useTableViewState", () => {
     document.body.append(field);
 
     act(() => {
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
+      result.current.table.setFocusedCell("row-1", "name");
+      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" });
     });
     await act(async () => {
       await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -524,7 +488,8 @@ describe("useTableViewState", () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: "accounts" }));
 
     act(() => {
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-2" }, "replace");
+      result.current.table.setFocusedCell("row-2", "name");
+      result.current.handleCellActivate({ columnId: "name", rowId: "row-2" });
     });
     act(() => {
       result.current.table.getRow("row-1").toggleSelected(true);
@@ -532,7 +497,8 @@ describe("useTableViewState", () => {
     rerender();
 
     expect(result.current.detailPaneMode).toBe("rows");
-    expect(result.current.activeCell).toEqual({ columnId: "name", rowId: "row-2" });
+    expect(result.current.table.getFocusedCell()?.row.id).toBe("row-2");
+    expect(result.current.table.getFocusedCell()?.column.id).toBe("name");
     expect(result.current.rowEditor.activeRowId).toBe("row-1");
   });
 
@@ -540,39 +506,26 @@ describe("useTableViewState", () => {
     const { result } = renderHook(() => useTableViewState({ tableName: "accounts" }));
 
     act(() => {
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
+      result.current.table.setFocusedCell("row-1", "name");
     });
     await act(async () => {
       await result.current.setFilters([]);
     });
 
-    expect(result.current.activeCell).toBeNull();
+    expect(result.current.hasCellSelection).toBe(false);
     expect(result.current.detailPaneMode).toBe("closed");
-  });
-
-  it("clears a focused cell when its column becomes hidden", () => {
-    const { result } = renderHook(() => useTableViewState({ tableName: "accounts" }));
-
-    act(() => {
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
-    });
-    act(() => {
-      result.current.table.getColumn("name")?.toggleVisibility(false);
-    });
-
-    expect(result.current.activeCell).toBeNull();
   });
 
   it("clears selections when URL-backed query state changes externally", () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: "accounts" }));
 
     act(() => {
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
+      result.current.table.setFocusedCell("row-1", "name");
     });
     searchState.sortColumn = "name";
     rerender();
 
-    expect(result.current.activeCell).toBeNull();
+    expect(result.current.hasCellSelection).toBe(false);
     expect(result.current.detailPaneMode).toBe("closed");
   });
 
@@ -582,12 +535,11 @@ describe("useTableViewState", () => {
     });
 
     act(() => {
-      result.current.handleCellActivate({ columnId: "name", rowId: "row-1" }, "replace");
+      result.current.table.setFocusedCell("row-1", "name");
     });
     rerender({ tableName: "profiles" });
 
-    expect(result.current.activeCell).toBeNull();
+    expect(result.current.hasCellSelection).toBe(false);
     expect(result.current.detailPaneMode).toBe("closed");
   });
-
 });
