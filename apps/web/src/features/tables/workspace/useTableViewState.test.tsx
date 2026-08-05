@@ -180,12 +180,11 @@ function TableViewInteractionHarness(): React.ReactElement {
       </button>
       <DataGrid.Root
         table={state.table}
-        columnOrder={state.columnOrder}
+        reorderableColumnIds={state.reorderableColumnIds}
         activeColumnId={state.activeColumnId}
         activeRowId={state.rowEditor.activeRowId}
         onCellActivate={state.handleCellActivate}
         onColumnActivate={state.handleColumnActivate}
-        onColumnOrderChange={state.setColumnOrder}
       >
         <DataGrid.Viewport>
           <DataGrid.Table aria-label="Accounts">

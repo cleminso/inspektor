@@ -747,10 +747,11 @@ column-sizing state within constrained minimum and maximum widths. A double-clic
 width. Column sizing preferences are scoped to the active connection, branch, schema hash, and table.
 
 Data columns can be reordered by dragging their header horizontally. A short movement threshold preserves normal header clicks,
-and interactive header controls such as checkboxes, resize handles, and menu actions do not start dragging. Column order is
-controlled by the Inspector, persisted with the other table preferences, and normalized when schema columns are added or
-removed. During dragging, the header and every visible body cell use the same preview order so the complete column moves as one
-unit. The checkbox column remains fixed at the leading edge and is not part of the draggable order.
+and interactive header controls such as checkboxes, resize handles, and menu actions do not start dragging. TanStack column-order
+state is the single rendered-order authority. The drag layer identifies the reorderable subset, shows a detached preview, and
+publishes one complete TanStack order only after a successful drop; canceled and in-progress drags do not publish transient table
+orders. Column order is persisted with the other table preferences and normalized when schema columns are added or removed. The
+checkbox column remains fixed at the leading edge and is not part of the draggable order.
 
 Cell context menu:
 

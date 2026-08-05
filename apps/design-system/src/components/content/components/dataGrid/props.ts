@@ -10,8 +10,7 @@ export const dataGridRootPropNames = [
   'onHeaderContextMenu',
   'onCellContextMenu',
   'columnDragPreview',
-  'columnOrder',
-  'onColumnOrderChange',
+  'reorderableColumnIds',
   'children',
 ] as const
 

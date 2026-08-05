@@ -11,12 +11,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DataGrid } from "./dataGrid";
 import { dataGridFeatures, type DataGridFeatures } from "./dataGridFeatures";
+import { getDataGridCellSortableId, getDataGridHeaderSortableId } from "./dataGridReorder";
 
 let onDataGridDragEnd: ((event: unknown) => void) | undefined;
-let onDataGridDragOver: ((event: unknown) => void) | undefined;
-let onDataGridDragStart: ((event: unknown) => void) | undefined;
 let dragOverlayDropAnimation: unknown;
-let dragOverlaySource: { element?: Element | null; id: string } = { id: "name" };
+let dragOverlaySource: { element?: Element | null; id: string } = {
+  id: getDataGridHeaderSortableId("name"),
+};
 const sortableInputs: unknown[] = [];
 const sortableTargetRefs = new Map<string, ReturnType<typeof vi.fn>>();
 let droppingSortableId: string | null = null;
@@ -35,17 +36,11 @@ vi.mock("@dnd-kit/react", () => ({
   DragDropProvider: ({
     children,
     onDragEnd,
-    onDragOver,
-    onDragStart,
   }: {
     children: ReactNode;
     onDragEnd?: (event: unknown) => void;
-    onDragOver?: (event: unknown) => void;
-    onDragStart?: (event: unknown) => void;
   }) => {
     onDataGridDragEnd = onDragEnd;
-    onDataGridDragOver = onDragOver;
-    onDataGridDragStart = onDragStart;
     return children;
   },
 }));
@@ -92,6 +87,11 @@ interface Person {
 
 const columnHelper = createColumnHelper<DataGridFeatures, Person>();
 const columns = columnHelper.columns([
+  columnHelper.accessor("name", { header: "Name" }),
+  columnHelper.accessor("role", { header: "Role" }),
+]);
+const columnsWithFixedId = columnHelper.columns([
+  columnHelper.accessor("id", { header: "ID" }),
   columnHelper.accessor("name", { header: "Name" }),
   columnHelper.accessor("role", { header: "Role" }),
 ]);
@@ -457,31 +457,38 @@ function FixedGeometryDataGrid() {
 function ReorderableDataGrid({
   columnDragPreview,
   initialColumnOrder = ["name", "role"],
+  includeFixedId = false,
   onColumnOrderChange,
+  reorderableColumnIds = ["name", "role"],
 }: {
   columnDragPreview?: (columnId: string) => ReactNode;
   initialColumnOrder?: string[];
+  includeFixedId?: boolean;
   onColumnOrderChange: (columnIds: string[]) => void;
+  reorderableColumnIds?: string[];
 }) {
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder);
   const table = useTable({
     features: dataGridFeatures,
-    columns,
+    columns: includeFixedId === true ? columnsWithFixedId : columns,
     data: rows,
     getRowId: (row) => row.id,
     state: { columnOrder },
-    onColumnOrderChange: setColumnOrder,
+    onColumnOrderChange: (updater) => {
+      setColumnOrder((currentColumnOrder) => {
+        const nextColumnOrder =
+          typeof updater === "function" ? updater(currentColumnOrder) : updater;
+        onColumnOrderChange(nextColumnOrder);
+        return nextColumnOrder;
+      });
+    },
   });
 
   return (
     <DataGrid.Root
       table={table}
       columnDragPreview={columnDragPreview}
-      columnOrder={columnOrder}
-      onColumnOrderChange={(nextColumnOrder) => {
-        setColumnOrder(nextColumnOrder);
-        onColumnOrderChange(nextColumnOrder);
-      }}
+      reorderableColumnIds={reorderableColumnIds}
     >
       <DataGrid.Viewport>
         <DataGrid.Table aria-label="Reorderable people">
@@ -495,11 +502,9 @@ function ReorderableDataGrid({
 afterEach(() => {
   cleanup();
   dragOverlayDropAnimation = undefined;
-  dragOverlaySource = { id: "name" };
+  dragOverlaySource = { id: getDataGridHeaderSortableId("name") };
   droppingSortableId = null;
   onDataGridDragEnd = undefined;
-  onDataGridDragOver = undefined;
-  onDataGridDragStart = undefined;
   sortableInputs.length = 0;
   sortableTargetRefs.clear();
 });
@@ -509,11 +514,11 @@ describe("DataGrid", () => {
     expect(() =>
       render(
         <ReorderableDataGrid
-          initialColumnOrder={["name", "name"]}
+          reorderableColumnIds={["name", "name"]}
           onColumnOrderChange={() => undefined}
         />,
       ),
-    ).toThrow("DataGrid columnOrder values must be unique");
+    ).toThrow("DataGrid reorderableColumnIds values must be unique");
   });
 
   it("preserves the focused header when reorder behavior loads", async () => {
@@ -523,7 +528,7 @@ describe("DataGrid", () => {
     expect(header.hasAttribute("data-reorderable")).toBe(false);
 
     await waitFor(() => {
-      expect(onDataGridDragStart).toBeTypeOf("function");
+      expect(onDataGridDragEnd).toBeTypeOf("function");
     });
 
     const reorderedHeader = screen.getByRole("columnheader", { name: "Name" });
@@ -739,7 +744,9 @@ describe("DataGrid", () => {
     const cell = screen.getByRole("cell", { name: "Engineer" });
 
     await waitFor(() => {
-      expect(sortableTargetRefs.get("person-1:role")).toHaveBeenCalledWith(cell);
+      expect(
+        sortableTargetRefs.get(getDataGridCellSortableId("person-1", "role")),
+      ).toHaveBeenCalledWith(cell);
     });
   });
 
@@ -797,34 +804,44 @@ describe("DataGrid", () => {
     expect(checkboxCell?.hasAttribute("data-cell-selected")).toBe(false);
   });
 
-  it("moves headers and body cells together while a column is dragged", async () => {
+  it("keeps table content stable until a column drag is dropped", async () => {
     const onColumnOrderChange = vi.fn();
     render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />);
 
     await waitFor(() => {
-      expect(onDataGridDragOver).toBeTypeOf("function");
+      expect(onDataGridDragEnd).toBeTypeOf("function");
     });
 
+    const operation = {
+      source: {
+        id: getDataGridHeaderSortableId("role"),
+        initialIndex: 1,
+        index: 1,
+        sortable: true,
+        type: "column",
+      },
+      target: {
+        id: getDataGridHeaderSortableId("name"),
+        index: 0,
+        sortable: true,
+        type: "column",
+      },
+    };
+
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
+    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
+      "Name",
+      "Role",
+    ]);
+    expect(
+      screen
+        .getAllByRole("cell")
+        .slice(0, 2)
+        .map((cell) => cell.textContent),
+    ).toEqual(["Ada", "Engineer"]);
+
     act(() => {
-      onDataGridDragStart?.({ operation: {} });
-      onDataGridDragOver?.({
-        operation: {
-          source: {
-            id: "role",
-            initialIndex: 1,
-            index: 1,
-            sortable: true,
-            type: "column",
-          },
-          target: {
-            id: "name",
-            index: 0,
-            sortable: true,
-            type: "column",
-          },
-        },
-        preventDefault: () => undefined,
-      });
+      onDataGridDragEnd?.({ canceled: false, operation });
     });
 
     expect(onColumnOrderChange).toHaveBeenCalledWith(["role", "name"]);
@@ -832,12 +849,58 @@ describe("DataGrid", () => {
       "Role",
       "Name",
     ]);
-    expect(
-      screen
-        .getAllByRole("cell")
-        .slice(0, 2)
-        .map((cell) => cell.textContent),
-    ).toEqual(["Engineer", "Ada"]);
+  });
+
+  it("preserves fixed columns when TanStack commits a reordered subset", async () => {
+    const onColumnOrderChange = vi.fn();
+    render(
+      <ReorderableDataGrid
+        includeFixedId
+        initialColumnOrder={["id", "name", "role"]}
+        onColumnOrderChange={onColumnOrderChange}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(onDataGridDragEnd).toBeTypeOf("function");
+    });
+
+    act(() => {
+      onDataGridDragEnd?.({
+        canceled: false,
+        operation: {
+          source: {
+            id: getDataGridHeaderSortableId("role"),
+            initialIndex: 1,
+            index: 1,
+            sortable: true,
+            type: "column",
+          },
+          target: {
+            id: getDataGridHeaderSortableId("name"),
+            index: 0,
+            sortable: true,
+            type: "column",
+          },
+        },
+      });
+    });
+
+    expect(onColumnOrderChange).toHaveBeenCalledWith(["id", "role", "name"]);
+    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
+      "ID",
+      "Role",
+      "Name",
+    ]);
+  });
+
+  it("namespaces sortable ids without delimiter collisions", () => {
+    expect(getDataGridCellSortableId("row:one", "role")).not.toBe(
+      getDataGridCellSortableId("row", "one:role"),
+    );
+    expect(getDataGridHeaderSortableId('["data-grid","cell"]')).not.toBe(
+      getDataGridCellSortableId("data-grid", "cell"),
+    );
   });
 
   it("moves a focused header with Shift and horizontal arrow keys", async () => {
@@ -877,9 +940,9 @@ describe("DataGrid", () => {
     await waitFor(() => {
       expect(sortableInputs).toContainEqual({
         accept: "column-cell",
-        id: "person-1:role",
+        id: getDataGridCellSortableId("person-1", "role"),
         index: 1,
-        group: "data-grid-row:person-1",
+        group: JSON.stringify(["data-grid", "row", "person-1"]),
         disabled: {
           draggable: true,
           droppable: false,
@@ -890,7 +953,7 @@ describe("DataGrid", () => {
   });
 
   it("keeps the source header slot reserved without duplicating the overlay content", async () => {
-    droppingSortableId = "name";
+    droppingSortableId = getDataGridHeaderSortableId("name");
     render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />);
 
     await waitFor(() => {
@@ -925,40 +988,35 @@ describe("DataGrid", () => {
     });
   });
 
-  it("restores the complete column order when a drag is canceled", async () => {
+  it("does not publish a transient column order when a drag is canceled", async () => {
     const onColumnOrderChange = vi.fn();
     render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />);
 
     await waitFor(() => {
-      expect(onDataGridDragOver).toBeTypeOf("function");
+      expect(onDataGridDragEnd).toBeTypeOf("function");
     });
 
+    const operation = {
+      source: {
+        id: getDataGridHeaderSortableId("role"),
+        initialIndex: 1,
+        index: 1,
+        sortable: true,
+        type: "column",
+      },
+      target: {
+        id: getDataGridHeaderSortableId("name"),
+        index: 0,
+        sortable: true,
+        type: "column",
+      },
+    };
+
     act(() => {
-      onDataGridDragStart?.({ operation: {} });
-      onDataGridDragOver?.({
-        operation: {
-          source: {
-            id: "role",
-            initialIndex: 1,
-            index: 1,
-            sortable: true,
-            type: "column",
-          },
-          target: {
-            id: "name",
-            index: 0,
-            sortable: true,
-            type: "column",
-          },
-        },
-        preventDefault: () => undefined,
-      });
-    });
-    act(() => {
-      onDataGridDragEnd?.({ canceled: true, operation: {} });
+      onDataGridDragEnd?.({ canceled: true, operation });
     });
 
-    expect(onColumnOrderChange).toHaveBeenLastCalledWith(["name", "role"]);
+    expect(onColumnOrderChange).not.toHaveBeenCalled();
     expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
       "Name",
       "Role",

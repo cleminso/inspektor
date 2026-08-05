@@ -20,6 +20,7 @@ const columns = columnHelper.columns([
   columnHelper.accessor("email", { header: "Email", size: 220 }),
   columnHelper.accessor("role", { header: "Role", size: 120 }),
 ]);
+const reorderableColumnIds = ["id", "email", "role"];
 
 export default function BasicExample() {
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([]);
@@ -42,8 +43,7 @@ export default function BasicExample() {
       density="compact"
       activeColumnId={activeColumnId}
       activeRowId={activeRowId}
-      columnOrder={columnOrder}
-      onColumnOrderChange={setColumnOrder}
+      reorderableColumnIds={reorderableColumnIds}
       onColumnActivate={(columnId) => {
         if (columnId !== null) {
           setCellSelection([]);

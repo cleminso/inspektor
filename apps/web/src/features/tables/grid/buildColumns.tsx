@@ -24,6 +24,7 @@ import {
   type ColumnTypeMarker as ColumnTypeMarkerModel,
 } from "@tables/grid/columnTypeMarker";
 import { RelationCellLink } from "@tables/grid/relationCellLink";
+import { tableGridSelectionColumnId } from "@tables/grid/tableGridColumnIds";
 import { classifySchemaValue, type SchemaValuePresentation } from "@tables/grid/valuePresentation";
 import type { ColumnMoveDirection } from "@tables/grid/useColumnOrder";
 import type { TableColumnMeta } from "@tables/tableTypes";
@@ -453,7 +454,7 @@ export function buildDataGridColumns({
   onRowSelectionRequest,
 }: BuildDataGridColumnsOptions): ColumnDef<DataGridFeatures, DynamicTableRow, unknown>[] {
   const selectionColumn: ColumnDef<DataGridFeatures, DynamicTableRow, unknown> = {
-    id: "_select",
+    id: tableGridSelectionColumnId,
     size: 36,
     minSize: 36,
     maxSize: 36,

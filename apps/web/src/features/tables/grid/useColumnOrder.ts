@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import type { ColumnOrderState, OnChangeFn } from "@tanstack/react-table";
+import { useCallback, useRef, useState } from "react";
 
 interface UseColumnOrderOptions {
   columnIds: string[];
@@ -7,7 +8,7 @@ interface UseColumnOrderOptions {
 
 interface UseColumnOrderResult {
   columnOrder: string[];
-  setColumnOrder: (columnIds: string[]) => void;
+  setColumnOrder: OnChangeFn<ColumnOrderState>;
 }
 
 export type ColumnMoveDirection = "end" | "left" | "right" | "start";
@@ -102,15 +103,20 @@ export function useColumnOrder({
   const [columnOrder, setColumnOrderState] = useState<string[]>(() =>
     readColumnOrder(storageKey, columnIds),
   );
+  const columnOrderRef = useRef(columnOrder);
+  columnOrderRef.current = columnOrder;
 
   const setColumnOrder = useCallback(
-    (nextColumnIds: string[]) => {
+    (updater: ColumnOrderState | ((current: ColumnOrderState) => ColumnOrderState)) => {
+      const currentColumnOrder = columnOrderRef.current;
+      const nextColumnIds = typeof updater === "function" ? updater(currentColumnOrder) : updater;
       const nextColumnOrder = normalizeColumnOrder(nextColumnIds, columnIds);
-      setColumnOrderState((currentColumnOrder) =>
-        areColumnOrdersEqual(currentColumnOrder, nextColumnOrder) === true
-          ? currentColumnOrder
-          : nextColumnOrder,
-      );
+      if (areColumnOrdersEqual(currentColumnOrder, nextColumnOrder) === true) {
+        return;
+      }
+
+      columnOrderRef.current = nextColumnOrder;
+      setColumnOrderState(nextColumnOrder);
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(nextColumnOrder));
       } catch {

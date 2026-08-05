@@ -59,7 +59,7 @@ interface TableViewDraftTransitionState {
 
 interface UseTableViewStateResult {
   activeColumnId: string | null;
-  columnOrder: string[];
+  reorderableColumnIds: readonly string[];
   detailPaneMode: TableViewDetailPaneMode;
   draftTransition: TableViewDraftTransitionState;
   fetchMore: () => void;
@@ -86,7 +86,6 @@ interface UseTableViewStateResult {
   rowValues: Record<string, unknown> | null;
   schemaColumns: ColumnDescriptor[];
   setFilters: (filters: TableFilterClause[]) => Promise<void>;
-  setColumnOrder: (columnIds: string[]) => void;
   table: DataGridTable<DynamicTableRow>;
   tableColumns: TableColumnMeta[];
 }
@@ -448,7 +447,7 @@ export function useTableViewState({
 
   return {
     activeColumnId,
-    columnOrder: order.columnOrder,
+    reorderableColumnIds: columnIds,
     detailPaneMode,
     draftTransition,
     table,
@@ -473,7 +472,6 @@ export function useTableViewState({
         void searchState.setFilters(filters);
       });
     },
-    setColumnOrder: order.setColumnOrder,
     schemaColumns,
     tableColumns: query.columns,
     rowValues,

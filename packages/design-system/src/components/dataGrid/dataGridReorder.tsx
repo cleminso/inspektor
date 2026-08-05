@@ -4,7 +4,7 @@ import { RestrictToElement } from "@dnd-kit/dom/modifiers";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { useMemo, useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useMemo, type CSSProperties, type ReactNode, type RefObject } from "react";
 
 import {
   DataGridReorderContext,
@@ -15,6 +15,43 @@ import {
 interface DataGridDragSource {
   element?: Element | null;
   id: string | number;
+}
+
+type DataGridSortableKind = "cell" | "header" | "row";
+
+function createDataGridSortableId(kind: DataGridSortableKind, ...parts: string[]): string {
+  return JSON.stringify(["data-grid", kind, ...parts]);
+}
+
+export function getDataGridHeaderSortableId(columnId: string): string {
+  return createDataGridSortableId("header", columnId);
+}
+
+export function getDataGridCellSortableId(rowId: string, columnId: string): string {
+  return createDataGridSortableId("cell", rowId, columnId);
+}
+
+function getDataGridRowSortableGroup(rowId: string): string {
+  return createDataGridSortableId("row", rowId);
+}
+
+function getColumnIdFromHeaderSortableId(sortableId: string | number): string | null {
+  if (typeof sortableId !== "string") {
+    return null;
+  }
+
+  try {
+    const value = JSON.parse(sortableId) as unknown;
+    return Array.isArray(value) === true &&
+      value.length === 3 &&
+      value[0] === "data-grid" &&
+      value[1] === "header" &&
+      typeof value[2] === "string"
+      ? value[2]
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 export interface DataGridReorderProps {
@@ -50,7 +87,7 @@ const dataGridSensors = [dataGridPointerSensor];
 function DataGridSortableHeader({ children, columnId, index }: DataGridHeaderSortableProps) {
   const sortable = useSortable({
     accept: "column",
-    id: columnId,
+    id: getDataGridHeaderSortableId(columnId),
     index,
     disabled: {
       draggable: false,
@@ -69,9 +106,9 @@ function DataGridSortableHeader({ children, columnId, index }: DataGridHeaderSor
 function DataGridDroppableCell({ children, columnId, index, rowId }: DataGridCellDroppableProps) {
   const sortable = useSortable({
     accept: "column-cell",
-    id: `${rowId}:${columnId}`,
+    id: getDataGridCellSortableId(rowId, columnId),
     index,
-    group: `data-grid-row:${rowId}`,
+    group: getDataGridRowSortableGroup(rowId),
     disabled: {
       draggable: true,
       droppable: false,
@@ -94,7 +131,6 @@ export function DataGridReorder({
   renderOverlay,
   rootRef,
 }: DataGridReorderProps) {
-  const initialColumnOrderRef = useRef<readonly string[]>([]);
   const reorderContext = useMemo(
     () => ({ Cell: DataGridDroppableCell, Header: DataGridSortableHeader }),
     [],
@@ -116,31 +152,28 @@ export function DataGridReorder({
           ...defaults,
           AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
         ]}
-        onDragStart={() => {
-          initialColumnOrderRef.current = columnOrder;
-        }}
-        onDragOver={(event) => {
-          if (event.operation.source?.type !== "column") {
+        onDragEnd={(event) => {
+          if (event.canceled === true || event.operation.source?.type !== "column") {
             return;
           }
-          const nextColumnOrder = move([...columnOrder], event);
+
+          const sortableColumnOrder = columnOrder.map(getDataGridHeaderSortableId);
+          const nextSortableColumnOrder = move(sortableColumnOrder, event);
+          const nextColumnOrder = nextSortableColumnOrder.flatMap((sortableId) => {
+            const columnId = getColumnIdFromHeaderSortableId(sortableId);
+            return columnId === null ? [] : [columnId];
+          });
           if (areColumnOrdersEqual(columnOrder, nextColumnOrder) === false) {
             onColumnOrderChange(nextColumnOrder);
-          }
-        }}
-        onDragEnd={(event) => {
-          if (event.canceled === false) {
-            return;
-          }
-          const initialColumnOrder = initialColumnOrderRef.current;
-          if (areColumnOrdersEqual(columnOrder, initialColumnOrder) === false) {
-            onColumnOrderChange([...initialColumnOrder]);
           }
         }}
       >
         {children}
         <DragOverlay {...overlayProps} dropAnimation={null}>
-          {(source) => renderOverlay(source)}
+          {(source) => {
+            const columnId = getColumnIdFromHeaderSortableId(source.id);
+            return renderOverlay(columnId === null ? source : { ...source, id: columnId });
+          }}
         </DragOverlay>
       </DragDropProvider>
     </DataGridReorderContext.Provider>

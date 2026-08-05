@@ -19,6 +19,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Keep Data Grid content in its committed TanStack order while a header drag is in progress and apply one persisted order on drop.
+- [x] Preserve the fixed selection-column slot while the reorderable data-column subset changes order.
+- [x] Use collision-safe drag identities and an internal selection-column namespace that does not consume `_select` from inspected schemas.
+
 [04/08/26]
 
 - [x] Keep the Data Grid header group sticky above body rows and use an opaque semantic header surface so scrolling text cannot show through it.
@@ -559,6 +565,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify dropped data-column order preserves the fixed selection-column slot and updates matching header and body content.
+- [x] Verify canceled and in-progress drags do not persist transient column order.
+- [x] Verify Inspector tests, typecheck, lint, production build, and browser interaction.
 
 [05/08/26]
 

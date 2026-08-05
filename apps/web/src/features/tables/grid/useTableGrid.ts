@@ -3,6 +3,7 @@ import { useMemo, useRef } from "react";
 
 import {
   type CellSelectionState,
+  type ColumnOrderState,
   type ColumnVisibilityState,
   type OnChangeFn,
   type RowSelectionState,
@@ -14,6 +15,7 @@ import type { DynamicTableRow } from "jazz-tools";
 import { dataGridFeatures, type DataGridTable } from "@inspector/ds";
 
 import { buildDataGridColumns } from "@tables/grid/buildColumns";
+import { tableGridSelectionColumnId } from "@tables/grid/tableGridColumnIds";
 import type { ColumnMoveDirection } from "@tables/grid/useColumnOrder";
 import type { RowSelectionRequest } from "@tables/grid/buildColumns";
 import type {
@@ -30,7 +32,7 @@ interface UseTableGridOptions {
   columns: TableColumnMeta[];
   onColumnMenuOpen: (columnId: string) => void;
   onColumnMove: (columnId: string, direction: ColumnMoveDirection) => void;
-  onColumnOrderChange: (columnIds: string[]) => void;
+  onColumnOrderChange: OnChangeFn<ColumnOrderState>;
   onColumnVisibilityChange: (next: TableColumnVisibilityState) => void;
   onCellSelectionChange: OnChangeFn<CellSelectionState>;
   onSelectedRowIdsChange: (rowIds: TableRowId[], request: RowSelectionRequest | null) => void;
@@ -80,7 +82,10 @@ export function useTableGrid({
     () => [{ id: sortColumn, desc: sortDirection === "desc" }],
     [sortColumn, sortDirection],
   );
-  const tableColumnOrder = useMemo(() => ["_select", ...columnOrder], [columnOrder]);
+  const tableColumnOrder = useMemo(
+    () => [tableGridSelectionColumnId, ...columnOrder],
+    [columnOrder],
+  );
 
   return useTable({
     features: dataGridFeatures,
@@ -100,8 +105,12 @@ export function useTableGrid({
     },
     onCellSelectionChange,
     onColumnOrderChange: (updater) => {
-      const nextColumnOrder = typeof updater === "function" ? updater(tableColumnOrder) : updater;
-      onColumnOrderChange(nextColumnOrder.filter((columnId) => columnId !== "_select"));
+      onColumnOrderChange((currentColumnOrder) => {
+        const currentTableColumnOrder = [tableGridSelectionColumnId, ...currentColumnOrder];
+        const nextTableColumnOrder =
+          typeof updater === "function" ? updater(currentTableColumnOrder) : updater;
+        return nextTableColumnOrder.filter((columnId) => columnId !== tableGridSelectionColumnId);
+      });
     },
     onRowSelectionChange: (updater) => {
       const nextRowSelection = typeof updater === "function" ? updater(rowSelection) : updater;

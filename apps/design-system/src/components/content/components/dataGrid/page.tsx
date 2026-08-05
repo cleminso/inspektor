@@ -51,7 +51,7 @@ export function DataGridPage(): ReactElement {
     >
       <Section
         title="Composition"
-        description="Configure TanStack Table with the exported dataGridFeatures registry, pass the controlled table to Root, and use Content for standard rendering or compose structural parts for specialized rows. TanStack owns cell-selection ranges while DataGrid binds mouse behavior and renders selection state."
+        description="Configure TanStack Table with the exported dataGridFeatures registry, pass the controlled table to Root, and use Content for standard rendering or compose structural parts for specialized rows. TanStack owns cell selection and rendered column order. DataGrid binds mouse behavior, identifies reorderable columns, and commits one column order after a successful drop."
       />
       <Section title="Root props">
         <PropsTable rows={rootProps} />

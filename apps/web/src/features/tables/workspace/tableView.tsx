@@ -108,7 +108,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
           <Box minHeight={0} flex={1} overflow="hidden">
             <DataGrid.Root
               table={state.table}
-              columnOrder={state.columnOrder}
+              reorderableColumnIds={state.reorderableColumnIds}
               density="compact"
               activeColumnId={state.activeColumnId}
               activeRowId={state.rowEditor.activeRowId}
@@ -118,7 +118,6 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                 return column === undefined ? columnId : <ColumnDragPreview column={column} />;
               }}
               onColumnActivate={state.handleColumnActivate}
-              onColumnOrderChange={state.setColumnOrder}
             >
               <DataGrid.Viewport>
                 <DataGrid.Table aria-label={`${tableName} rows`}>

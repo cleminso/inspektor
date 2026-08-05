@@ -123,4 +123,23 @@ describe("useColumnOrder", () => {
 
     expect(result.current.columnOrder).toEqual(["role", "id"]);
   });
+
+  it("composes functional order updates before React renders", () => {
+    const { result } = renderHook(() =>
+      useColumnOrder({
+        columnIds: ["id", "name", "role"],
+        tableKey: "connection:accounts",
+      }),
+    );
+
+    act(() => {
+      result.current.setColumnOrder((current) => [current[1]!, current[0]!, current[2]!]);
+      result.current.setColumnOrder((current) => [current[0]!, current[2]!, current[1]!]);
+    });
+
+    expect(result.current.columnOrder).toEqual(["name", "role", "id"]);
+    expect(window.localStorage.getItem("inspector:column-order:connection:accounts")).toBe(
+      JSON.stringify(["name", "role", "id"]),
+    );
+  });
 });

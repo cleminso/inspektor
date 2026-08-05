@@ -95,16 +95,13 @@ interface DataGridRootBaseProps<TData extends RowData> {
 interface ReorderableDataGridRootProps {
   /** Renders the inert visual shown while a column header is dragged. */
   columnDragPreview?: (columnId: string) => ReactNode;
-  /** Column ids in their controlled draggable order. Omit fixed columns from this list. */
-  columnOrder: readonly string[];
-  /** Runs with the complete draggable column order after a header is moved. */
-  onColumnOrderChange: (columnIds: string[]) => void;
+  /** Leaf column ids that can be reordered. TanStack table state owns their current order. */
+  reorderableColumnIds: readonly string[];
 }
 
 interface StaticDataGridRootProps {
   columnDragPreview?: never;
-  columnOrder?: never;
-  onColumnOrderChange?: never;
+  reorderableColumnIds?: never;
 }
 
 export type DataGridRootProps<TData extends RowData> = DataGridRootBaseProps<TData> &
@@ -265,20 +262,36 @@ function moveColumnByOffset(
   return nextColumnOrder;
 }
 
+function mergeReorderableColumnOrder(
+  completeColumnOrder: readonly string[],
+  reorderableColumnIds: ReadonlySet<string>,
+  nextReorderableColumnOrder: readonly string[],
+): string[] {
+  let nextReorderableIndex = 0;
+  return completeColumnOrder.map((columnId) => {
+    if (reorderableColumnIds.has(columnId) === false) {
+      return columnId;
+    }
+
+    const nextColumnId = nextReorderableColumnOrder[nextReorderableIndex];
+    nextReorderableIndex += 1;
+    return nextColumnId ?? columnId;
+  });
+}
+
 function DataGridRoot<TData extends RowData>({
   activeColumnId = null,
   activeRowId = null,
   children,
   columnDragPreview,
-  columnOrder,
   density = "default",
   onCellActivate,
   onCellContextMenu,
   onColumnActivate,
-  onColumnOrderChange,
   onHeaderContextMenu,
   onRowActivate,
   onRowContextMenu,
+  reorderableColumnIds,
   table,
 }: DataGridRootProps<TData>) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -287,15 +300,30 @@ function DataGridRoot<TData extends RowData>({
   const [ReorderComponent, setReorderComponent] = useState<
     DataGridReorderModule["DataGridReorder"] | null
   >(null);
+  const reorderableColumnIdSet = useMemo(
+    () => new Set(reorderableColumnIds ?? []),
+    [reorderableColumnIds],
+  );
+  if (
+    reorderableColumnIds !== undefined &&
+    reorderableColumnIdSet.size !== reorderableColumnIds.length
+  ) {
+    throw new Error("DataGrid reorderableColumnIds values must be unique");
+  }
+  const completeColumnOrder = useMemo(
+    () => table.getAllLeafColumns().map((column) => column.id),
+    [table],
+  );
+  const columnOrder = useMemo(
+    () => completeColumnOrder.filter((columnId) => reorderableColumnIdSet.has(columnId)),
+    [completeColumnOrder, reorderableColumnIdSet],
+  );
   const columnReorderIndices = useMemo(
-    () => new Map(columnOrder?.map((columnId, index) => [columnId, index]) ?? []),
+    () => new Map(columnOrder.map((columnId, index) => [columnId, index])),
     [columnOrder],
   );
-  if (columnOrder !== undefined && columnReorderIndices.size !== columnOrder.length) {
-    throw new Error("DataGrid columnOrder values must be unique");
-  }
 
-  const columnReorderConfigured = columnOrder !== undefined && onColumnOrderChange !== undefined;
+  const columnReorderConfigured = reorderableColumnIds !== undefined;
   const columnReorderReady = ReorderComponent !== null;
   const columnReorderEnabled = columnReorderConfigured === true && columnReorderReady === true;
   const value = useMemo(
@@ -313,7 +341,7 @@ function DataGridRoot<TData extends RowData>({
         columnReorderEnabled,
         getColumnReorderIndex: (columnId: string) => columnReorderIndices.get(columnId) ?? -1,
         moveColumn: (columnId: string, offset: -1 | 1) => {
-          if (columnOrder === undefined || onColumnOrderChange === undefined) {
+          if (reorderableColumnIds === undefined) {
             return;
           }
           const visibleColumnOrder = table
@@ -327,7 +355,13 @@ function DataGridRoot<TData extends RowData>({
             offset,
           );
           if (nextColumnOrder.some((value, index) => value !== columnOrder[index])) {
-            onColumnOrderChange(nextColumnOrder);
+            table.setColumnOrder(
+              mergeReorderableColumnOrder(
+                completeColumnOrder,
+                reorderableColumnIdSet,
+                nextColumnOrder,
+              ),
+            );
           }
         },
         table,
@@ -338,14 +372,16 @@ function DataGridRoot<TData extends RowData>({
       columnReorderEnabled,
       columnReorderIndices,
       columnOrder,
+      completeColumnOrder,
       density,
       onCellActivate,
       onCellContextMenu,
       onColumnActivate,
-      onColumnOrderChange,
       onHeaderContextMenu,
       onRowActivate,
       onRowContextMenu,
+      reorderableColumnIdSet,
+      reorderableColumnIds,
       table,
     ],
   );
@@ -435,18 +471,18 @@ function DataGridRoot<TData extends RowData>({
     </DataGridContext.Provider>
   );
 
-  if (
-    columnReorderEnabled === false ||
-    columnOrder === undefined ||
-    onColumnOrderChange === undefined
-  ) {
+  if (columnReorderEnabled === false || reorderableColumnIds === undefined) {
     return root;
   }
 
   return (
     <ReorderComponent
       columnOrder={columnOrder}
-      onColumnOrderChange={onColumnOrderChange}
+      onColumnOrderChange={(nextColumnOrder) => {
+        table.setColumnOrder(
+          mergeReorderableColumnOrder(completeColumnOrder, reorderableColumnIdSet, nextColumnOrder),
+        );
+      }}
       overlayProps={stylex.props(dataGridStyles.columnDragOverlay)}
       rootRef={rootRef}
       renderOverlay={(source) => (

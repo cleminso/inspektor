@@ -17,6 +17,14 @@
 
 [05/08/26]
 
+- [x] Make TanStack column-order state the single rendered-order authority and expose only reorderable column membership from `DataGrid.Root`.
+- [x] Commit pointer-driven column order once on a successful drop instead of publishing transient orders during drag-over.
+- [x] Keep canceled drags state-free, preserve fixed-column slots when merging the reordered subset, and retain hidden columns in the complete order.
+- [x] Namespace header, body-cell, and row-group drag identities so arbitrary row and column IDs cannot collide.
+- [x] Namespace the Inspector selection column separately from schema column IDs and preserve composable TanStack order updaters through persistence.
+
+[05/08/26]
+
 - [x] Replace the application row-range calculation and anchor state with TanStack's row-selection handler.
 - [x] Use TanStack's page row-selection predicates for the header checkbox.
 - [x] Keep column drag sensors, drop targets, overlays, constraints, and rollback in the deferred dnd-kit module because TanStack owns column order state but does not provide drag-and-drop behavior.
@@ -137,6 +145,13 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify pointer reorder keeps committed header and body order stable until drop and publishes no order for canceled drags.
+- [x] Verify fixed-column merging, collision-safe drag IDs, schema `_select` support, and composable persisted order updaters.
+- [x] Verify focused Data Grid and Inspector interaction tests, full Inspector tests, package and application typechecks, production builds, generated props, and changed-file lint.
+- [x] Verify the Data Grid documentation example reorders matching headers and body cells after drop in a browser.
 
 [05/08/26]
 

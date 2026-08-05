@@ -3,6 +3,8 @@ import { Settings2 } from "lucide-react";
 
 import { Button, Icon, MultiSelect, type DataGridTable, type MultiSelectItem } from "@inspector/ds";
 
+import { tableGridSelectionColumnId } from "@tables/grid/tableGridColumnIds";
+
 interface DataGridColumnVisibilityProps {
   table: DataGridTable<DynamicTableRow>;
 }
@@ -10,7 +12,9 @@ interface DataGridColumnVisibilityProps {
 export function DataGridColumnVisibility({
   table,
 }: DataGridColumnVisibilityProps): React.ReactElement {
-  const columns = table.getAllLeafColumns().filter((column) => column.id !== "_select");
+  const columns = table
+    .getAllLeafColumns()
+    .filter((column) => column.id !== tableGridSelectionColumnId);
   const items: readonly MultiSelectItem[] = columns.map((column) => ({
     disabled: column.getCanHide() === false,
     label: column.id,

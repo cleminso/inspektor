@@ -197,6 +197,24 @@ describe("buildDataGridColumns", () => {
     expect(headerCheckbox.parentElement?.className).toBe(rowCheckbox.parentElement?.className);
   });
 
+  it("keeps the internal selection column distinct from inspected schema columns", () => {
+    const columns = buildDataGridColumns({
+      columns: [
+        {
+          accessorKey: "_select",
+          column: null,
+          id: "_select",
+          isSortable: true,
+          label: "_select",
+        },
+      ],
+    });
+    const columnIds = columns.map((column) => column.id);
+
+    expect(new Set(columnIds).size).toBe(columnIds.length);
+    expect(columnIds).toContain("_select");
+  });
+
   it("selects an inclusive row range through TanStack Shift handling", () => {
     render(
       <TestTable
