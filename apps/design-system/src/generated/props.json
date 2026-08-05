@@ -2864,7 +2864,7 @@
     },
     {
       "name": "table",
-      "type": "Table<TData>",
+      "type": "any",
       "required": true,
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
@@ -3008,7 +3008,7 @@
     },
     {
       "name": "headerGroup",
-      "type": "HeaderGroup<TData>",
+      "type": "any",
       "required": true,
       "description": "TanStack header group represented by this row.",
       "source": {
@@ -3064,7 +3064,7 @@
     },
     {
       "name": "row",
-      "type": "Row<TData>",
+      "type": "any",
       "required": true,
       "description": "TanStack row represented by this table row.",
       "source": {
@@ -3108,7 +3108,7 @@
     },
     {
       "name": "row",
-      "type": "Row<TData>",
+      "type": "any",
       "required": true,
       "description": "TanStack row represented by this expanded region.",
       "source": {
@@ -3501,16 +3501,6 @@
       }
     },
     {
-      "name": "toolbarLabel",
-      "type": "string",
-      "required": false,
-      "description": "Displays a short source-type label at the start of the editor toolbar.",
-      "source": {
-        "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 37
-      }
-    },
-    {
       "name": "readOnly",
       "type": "false | true",
       "required": false,
@@ -3518,7 +3508,7 @@
       "description": "Prevents source changes while preserving focus, selection, and copying.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 39
+        "line": 37
       }
     },
     {
@@ -3529,7 +3519,7 @@
       "description": "Prevents editing and removes the editor from sequential keyboard focus.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 41
+        "line": 39
       }
     },
     {
@@ -3540,7 +3530,7 @@
       "description": "Marks the editor value as invalid.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 43
+        "line": 41
       }
     },
     {
@@ -3550,7 +3540,7 @@
       "description": "Controls whether the editor uses its expanded viewport.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 45
+        "line": 43
       }
     },
     {
@@ -3561,7 +3551,7 @@
       "description": "Sets the initial viewport presentation when expansion is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 47
+        "line": 45
       }
     },
     {
@@ -3571,7 +3561,7 @@
       "description": "Runs when Expand or Collapse requests a presentation change.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 49
+        "line": 47
       }
     },
     {
@@ -3582,7 +3572,7 @@
       "description": "Uses intrinsic sizing by default or fills a constrained parent when expanded.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 51
+        "line": 49
       }
     }
   ],

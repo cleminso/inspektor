@@ -40,7 +40,6 @@ const controls = [
 export function serializeCodeEditorPlayground(state: CodeEditorPlaygroundState): string {
   const props = [
     'accessibilityLabel="Account JSON"',
-    'toolbarLabel="JSON"',
     "value={value}",
     "onValueChange={setValue}",
     state.expanded === true ? "expanded" : null,
@@ -78,7 +77,6 @@ export function CodeEditorPlayground({ children }: { children?: ReactNode }): Re
         <Box minWidth={0} width="popup-width-l">
           <CodeEditor
             accessibilityLabel="Account JSON"
-            toolbarLabel="JSON"
             value={value}
             onValueChange={setValue}
             expanded={state.expanded}

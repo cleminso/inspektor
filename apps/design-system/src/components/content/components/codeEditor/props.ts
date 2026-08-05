@@ -5,7 +5,6 @@ export const codeEditorPropNames = [
   "id",
   "labelledBy",
   "describedBy",
-  "toolbarLabel",
   "readOnly",
   "disabled",
   "invalid",

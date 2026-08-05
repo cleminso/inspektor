@@ -33,8 +33,6 @@ export interface CodeEditorProps {
   labelledBy?: string;
   /** Identifies external description and error elements for the editor. */
   describedBy?: string;
-  /** Displays a short source-type label at the start of the editor toolbar. */
-  toolbarLabel?: string;
   /** Prevents source changes while preserving focus, selection, and copying. */
   readOnly?: boolean;
   /** Prevents editing and removes the editor from sequential keyboard focus. */

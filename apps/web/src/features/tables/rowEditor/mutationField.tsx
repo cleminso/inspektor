@@ -441,7 +441,6 @@ export function MutationField({
               invalid={hasFieldError}
               layout={expanded === true ? "fill" : "intrinsic"}
               readOnly={isReadOnly}
-              toolbarLabel={structuredToolbarLabel}
               onExpandedChange={onExpandedChange}
               value={structuredPresentation?.source ?? fieldState.text}
               onValueChange={onTextChange}

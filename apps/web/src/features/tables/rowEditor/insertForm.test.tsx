@@ -20,11 +20,9 @@ vi.mock("@inspector/ds", async (importOriginal) => {
       labelledBy,
       onExpandedChange,
       readOnly = false,
-      toolbarLabel,
       value,
     }: CodeEditorProps) => (
       <div data-expanded={expanded} data-layout={layout} data-slot="code-editor">
-        {toolbarLabel === undefined ? null : <span>{toolbarLabel}</span>}
         <div
           id={id}
           aria-describedby={describedBy}

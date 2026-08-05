@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Remove source-type text from the editor toolbar and its public component API.
+
 [04/08/26]
 
 - [x] Align CodeMirror scrollbar width, thumb color, and reveal states with the shared scrollbar contract without reserving an empty gutter.
@@ -55,7 +59,6 @@
 - [x] Preserve the active selection when formatting instead of forcing matching-bracket highlighting at the document boundary.
 - [x] Show line numbers and JSON fold controls in the editor gutter.
 - [x] Use the Iconoir `wrap-text` geometry for the line-wrapping action.
-- [x] Support a short uppercase source label at the start of the editor toolbar.
 - [x] Keep toolbar actions on the same compact button size and use consistent icon strokes.
 - [x] Reveal editor scrollbars only while the editor is hovered or focused.
 - [x] Replace font-dependent fold glyphs with token-sized SVG disclosure markers matching `JsonView`.

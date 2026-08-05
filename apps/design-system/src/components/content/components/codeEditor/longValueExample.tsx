@@ -26,7 +26,6 @@ export default function LongValueExample() {
   return (
     <CodeEditor
       accessibilityLabel="Long JSON value"
-      toolbarLabel="JSON"
       value={value}
       onValueChange={setValue}
     />

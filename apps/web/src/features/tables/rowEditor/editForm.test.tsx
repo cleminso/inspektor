@@ -25,11 +25,9 @@ vi.mock("@inspector/ds", async (importOriginal) => {
       onExpandedChange,
       onValueChange,
       readOnly = false,
-      toolbarLabel,
       value,
     }: CodeEditorProps) => (
       <div data-expanded={expanded} data-layout={layout} data-slot="code-editor">
-        {toolbarLabel === undefined ? null : <span>{toolbarLabel}</span>}
         <div
           id={id}
           aria-describedby={describedBy}
@@ -493,7 +491,7 @@ describe("EditRowForm Details and JSON views", () => {
 
     expect(editor.tagName).toBe("DIV");
     expect(editor.textContent).toContain('"enabled"');
-    expect(within(editorRoot as HTMLElement).getByText("JSON")).toBeTruthy();
+    expect(within(editorRoot as HTMLElement).queryByText("JSON")).toBeNull();
     expect(screen.getByRole("button", { name: "Format JSON" })).toBeTruthy();
   });
 

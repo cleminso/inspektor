@@ -160,15 +160,6 @@ describe("CodeEditor", () => {
     expect(styles).toContain("cm-focused");
   });
 
-  it("shows a source label at the start of the toolbar", async () => {
-    render(
-      <CodeEditor accessibilityLabel="Settings JSON" toolbarLabel="JSON" value={longJson} />,
-    );
-
-    await findCodeMirrorTextbox();
-    expect(screen.getByText("JSON").getAttribute("data-slot")).toBe("code-editor-toolbar-label");
-  });
-
   it("shows the document beginning when paste replaces the whole source", async () => {
     const onValueChange = vi.fn();
 

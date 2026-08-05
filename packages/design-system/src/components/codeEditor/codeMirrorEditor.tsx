@@ -384,7 +384,6 @@ export function CodeMirrorEditor({
   id,
   labelledBy,
   describedBy,
-  toolbarLabel,
   readOnly = false,
   disabled = false,
   invalid = false,
@@ -701,14 +700,6 @@ export function CodeMirrorEditor({
       />
 
       <div {...stylex.props(codeEditorStyles.toolbar)}>
-        {toolbarLabel === undefined ? null : (
-          <span
-            {...stylex.props(codeEditorStyles.toolbarLabel)}
-            data-slot="code-editor-toolbar-label"
-          >
-            {toolbarLabel}
-          </span>
-        )}
         <Button
           aria-label="Format JSON"
           iconOnly

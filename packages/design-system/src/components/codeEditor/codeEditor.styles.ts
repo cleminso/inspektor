@@ -92,13 +92,6 @@ export const codeEditorStyles = stylex.create({
     justifyContent: "flex-end",
     borderTopWidth: 1,
   },
-  toolbarLabel: {
-    color: textColors["text-muted"],
-    fontSize: fontSizes[1],
-    lineHeight: lineHeights.compact,
-    textTransform: "uppercase",
-    marginRight: "auto",
-  },
   icon: {
     fill: "none",
     stroke: "currentColor",

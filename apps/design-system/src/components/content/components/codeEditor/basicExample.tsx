@@ -23,7 +23,6 @@ export default function BasicExample() {
       <CodeEditor
         id="settings-json"
         labelledBy="settings-json-label"
-        toolbarLabel="JSON"
         value={value}
         onValueChange={setValue}
       />
