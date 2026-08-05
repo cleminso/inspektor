@@ -6,6 +6,19 @@ import { ContextMenu } from "./contextMenu";
 afterEach(cleanup);
 
 describe("ContextMenu", () => {
+  it("uses the standard treatment on its bounded popup", () => {
+    render(
+      <ContextMenu.Root defaultOpen>
+        <ContextMenu.Trigger>Canvas</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item>Inspect</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>,
+    );
+
+    expect(screen.getByRole("menu").getAttribute("data-scrollbar")).toBe("standard");
+  });
+
   it("opens from its trigger on a context-menu event", () => {
     render(
       <ContextMenu.Root>

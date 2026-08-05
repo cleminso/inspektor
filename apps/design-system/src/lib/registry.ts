@@ -421,6 +421,19 @@ export const sidePanelItem = {
   componentId: "sidePanel",
 } satisfies NavItem;
 
+export const scrollAreaItem = {
+  title: "Scroll Area",
+  slug: "scroll-area",
+  href: "/components/scroll-area",
+  description: "A native scroll viewport with token-backed overlay scrollbars that do not change content geometry.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "scrollArea.tsx",
+    path: "packages/design-system/src/components/scrollArea/scrollArea.tsx",
+  },
+  componentId: "scrollArea",
+} satisfies NavItem;
+
 export const dataGridItem = {
   title: "Data Grid",
   slug: "data-grid",
@@ -581,6 +594,7 @@ export const componentItems: NavItem[] = [
   multiSelectItem,
   relationValueItem,
   resizablePanelItem,
+  scrollAreaItem,
   sidePanelItem,
   selectItem,
   spinnerItem,

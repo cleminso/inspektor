@@ -73,20 +73,20 @@ describe('Box', () => {
     expect(box.style.color).not.toBe('red')
   })
 
-  it('provides a constrained scrollbar treatment', () => {
-    render(<Box data-testid="box" scrollbar="thin" scrollbarGutter="stable" />)
+  it('automatically applies the standard scrollbar treatment without reserving empty space', () => {
+    render(<Box data-testid="box" overflow="auto" />)
 
     const box = screen.getByTestId('box')
 
-    expect(box.getAttribute('data-scrollbar')).toBe('thin')
-    expect(box.getAttribute('data-scrollbar-gutter')).toBe('stable')
+    expect(box.getAttribute('data-scrollbar')).toBe('standard')
+    expect(box.getAttribute('data-scrollbar-gutter')).toBeNull()
 
     // @ts-expect-error Arbitrary integration classes are not part of the Box contract.
     const unsafe = <Box unsafeClassName="integration-class" />
-    // @ts-expect-error Scrollbar gutters only expose the stable layout treatment.
-    const unstableGutter = <Box scrollbarGutter="auto" />
+    // @ts-expect-error Scrollbar appearance is automatic for Box scroll containers.
+    const customScrollbar = <Box scrollbar="thin" />
     expect(unsafe).toBeDefined()
-    expect(unstableGutter).toBeDefined()
+    expect(customScrollbar).toBeDefined()
   })
 
   it('types refs from the selected element', () => {

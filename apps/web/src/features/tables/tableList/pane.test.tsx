@@ -26,6 +26,27 @@ describe("TableListPane", () => {
     onUnpinTables: vi.fn(),
   };
 
+  it("keeps table overflow inside the expanded accordion panel", () => {
+    const { container } = render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={["accounts", "sessions", "users"]}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector('[data-layout="fill"]')).toBeTruthy();
+    expect(
+      screen
+        .getByText("accounts")
+        .closest('[data-scrollbar="overlay"]')
+        ?.getAttribute("data-slot"),
+    ).toBe("scroll-area");
+  });
+
   it("delegates bulk table selection to the consumer", () => {
     const onTableCheckedChange = vi.fn();
 

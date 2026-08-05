@@ -40,7 +40,6 @@ export const tabViewStyles = stylex.create({
     alignItems: 'center',
     display: 'flex',
     flexShrink: 1,
-    scrollbarWidth: 'none',
     minWidth: 0,
     overflowX: 'auto',
     overflowY: 'clip',

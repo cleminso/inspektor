@@ -55,6 +55,11 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "scrollArea",
+    exportName: "ScrollArea",
+    inheritedProps: ["aria-label", "children"],
+  },
+  {
     componentId: "resizablePanelGroup",
     exportName: "ResizablePanelGroup",
     inheritedProps: [],

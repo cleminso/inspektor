@@ -6,6 +6,27 @@ import { Combobox } from "./combobox";
 afterEach(cleanup);
 
 describe("Combobox", () => {
+  it("uses the standard treatment on its scrolling viewport", () => {
+    const { container } = render(
+      <Combobox.Root items={["main"]} defaultOpen>
+        <Combobox.Input aria-label="Branch" />
+        <Combobox.Content keepMounted>
+          <Combobox.Viewport>
+            <Combobox.List>
+              <Combobox.Item value="main">main</Combobox.Item>
+            </Combobox.List>
+          </Combobox.Viewport>
+        </Combobox.Content>
+      </Combobox.Root>,
+    );
+
+    expect(
+      container.ownerDocument
+        .querySelector('[data-slot="combobox-viewport"]')
+        ?.getAttribute("data-scrollbar"),
+    ).toBe("standard");
+  });
+
   it("keeps the input as the generic combobox control", () => {
     render(
       <Combobox.Root items={["main"]}>

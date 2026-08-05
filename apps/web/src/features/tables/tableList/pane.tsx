@@ -208,7 +208,7 @@ export function TableListPane({
   return (
     <SidePanel>
       <SidePanel.Body>
-        <Accordion defaultValue={["pinned", "tables"]} multiple>
+        <Accordion defaultValue={["pinned", "tables"]} layout="fill" multiple>
           {pinnedTables.length > 0 ? (
             <Accordion.Item value="pinned">
               <Accordion.Header>

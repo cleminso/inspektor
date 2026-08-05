@@ -27,12 +27,11 @@ export const sidePanelStyles = stylex.create({
   },
   body: {
     padding: spacing.xs,
-    flex: '1',
     gap: spacing.s,
     display: 'flex',
     flexDirection: 'column',
+    flexGrow: 1,
     minHeight: 0,
-    overflowY: 'auto',
     paddingTop: spacing.xs,
     width: '100%',
   },

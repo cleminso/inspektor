@@ -2,6 +2,7 @@ export const accordionRootPropNames = [
   'defaultValue',
   'value',
   'onValueChange',
+  'layout',
   'multiple',
   'disabled',
 ] as const

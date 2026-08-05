@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[04/08/26]
+
+- [x] Align CodeMirror scrollbar width, thumb color, and reveal states with the shared scrollbar contract without reserving an empty gutter.
+
 [28/07/26]
 
 - [x] Keep editable `CodeEditor` and read-only `CodeBlock` as separate component contracts.

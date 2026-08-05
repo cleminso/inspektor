@@ -43,7 +43,7 @@
 - [x] Expose ordered occurrence results, wrap controlled navigation, distinguish the active mark, and preserve focus in
       an external Find Bar.
 - [x] Support controlled case-sensitive, whole-word, and regular-expression matching without moving search controls into the tree.
-- [x] Reserve the row JSON scroll gutter so search-driven expansion does not resize the tree or sticky copy action.
+- [x] Keep the row JSON scroll container free of reserved gutter space while search-driven expansion remains inside its bounded viewport.
 
 ## Open product work
 
@@ -73,7 +73,7 @@
 - Large branches continue in fixed batches instead of exposing an expand-all action.
 - Branch, complete-tree, and string thresholds remain fixed internal safeguards rather than consumer configuration.
 - Search reports when a real match falls outside the visible budget instead of mounting beyond the limit.
-- The application-owned row JSON scroll container reserves a stable classic-scrollbar gutter below the external Find Bar.
+- The application-owned row JSON scroll container uses the shared scrollbar treatment below the external Find Bar without reserving an empty inline strip.
 
 ## Open design decisions
 

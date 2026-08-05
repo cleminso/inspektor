@@ -19,6 +19,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[04/08/26]
+
+- [x] Keep the Data Grid header group sticky above body rows and use an opaque semantic header surface so scrolling text cannot show through it.
+
 ### DataGrid interaction API
 
 [23/07/26]
@@ -145,6 +149,19 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Keep loaded-row extension from expanding an existing row or cell selection implicitly.
 
 ### Table-list dock
+
+[04/08/26]
+
+- [x] Keep table overflow inside constrained Accordion panels so section headers and the outer dock width remain stable as sections open and close.
+- [x] Hide constrained Table List scrollbar chrome across standard and WebKit scrollbar APIs while preserving wheel, touch, and keyboard scrolling.
+- [x] Preserve inter-section spacing inside each indexed fill-layout item so flex shrinking cannot remove it.
+- [x] Lock the Inspector shell to the viewport so the page never becomes a scroll owner and the header and bottom dock remain stationary.
+- [x] Give the bottom dock a fixed semantic height and use extra-small dock icons.
+- [x] Provide shell dock controls directly from `SidePanelLayoutProvider` so the route does not consume layout context outside its provider boundary.
+- [x] Stretch a Data Grid table to its viewport when its intrinsic column width is smaller, while retaining horizontal overflow for wider grids.
+- [x] Keep complete Accordion triggers above shrinkable panel viewports so sections cannot paint over one another at short viewport heights.
+- [x] Use overlay scrollbars for the Table List, Row Editor, and Data Grid so overflow does not change content width.
+- [x] Start the Data Grid vertical track below the sticky header while retaining one semantic table and one native two-axis viewport.
 
 [03/08/26]
 
@@ -534,6 +551,17 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 ## Validation checklist
 
+[04/08/26]
+
+- [x] Accordion, Table List, shell layout, and bottom dock regression tests pass.
+- [x] Inspector application tests and production build pass.
+- [x] Changed Accordion, Table List, shell, dock, and documentation files pass focused lint.
+- [x] Design-system and documentation production builds pass.
+- [x] Browser verification confirms the constrained Accordion root and trigger retain their width while panel content owns vertical overflow.
+- [x] Browser verification confirms constrained Accordion panels use overlay scrollbars, preserve indexed item spacing, and keep complete triggers at short heights.
+- [x] Browser verification confirms Data Grid tables fill unused viewport width.
+- [x] Browser verification confirms the Data Grid has no native gutter and its compact vertical track starts at the 28px body boundary.
+
 [02/08/26]
 
 - [x] Focused resizable-handle, token, table-layout, and playground tests pass.
@@ -548,8 +576,8 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] `pnpm --filter inspector.design-system build`
 - [x] `pnpm --filter regarde.inspector lint`
 - [x] Browser verification confirms line, transparent four-pixel gutter, and grip handle rendering.
-- [ ] Full Inspector tests remain blocked by the existing dock icon size expectation.
-- [ ] Full Inspector typecheck and build remain blocked by existing case-duplicate grid module names.
+- [x] `pnpm --filter regarde.inspector test`
+- [x] `pnpm --filter regarde.inspector typecheck` and `pnpm --filter regarde.inspector build`
 
 [28/07/26]
 

@@ -47,7 +47,7 @@ export function DataGridPage(): ReactElement {
     >
       <Section
         title="Composition"
-        description="Pass a controlled TanStack table to Root, use Content for standard rendering, or compose structural parts for expanded and specialized rows."
+        description="Pass a controlled TanStack table to Root, use Content for standard rendering, or compose structural parts for expanded and specialized rows. The native two-axis viewport keeps its vertical overlay track aligned with the body below the sticky header."
       />
       <Section title="Root props"><PropsTable rows={rootProps} /></Section>
       <Section title="Viewport props"><PropsTable rows={viewportProps} /></Section>

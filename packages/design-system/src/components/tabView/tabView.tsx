@@ -19,6 +19,7 @@ import {
 } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { Button } from '../button/button'
 import { Tooltip } from '../tooltip/tooltip'
 import { tabViewStyles } from './tabView.styles'
@@ -184,6 +185,7 @@ function TabViewList({
   const focusedValueKeyRef = useRef<string | null>(null)
   const listStyles = createStateStyleProps<BaseTabs.List.State>((state) => [
     tabViewStyles.list,
+    scrollbarStyles.hidden,
     state.orientation === 'horizontal' && tabViewStyles.listHorizontal,
     state.orientation === 'vertical' && tabViewStyles.listVertical,
     state.tabActivationDirection === 'left' && tabViewStyles.listActivationLeft,
@@ -250,6 +252,7 @@ function TabViewList({
       activateOnFocus={activateOnFocus}
       loopFocus={loopFocus}
       {...listStyles}
+      data-scrollbar="hidden"
       data-slot="tab-view-list"
     />
   )

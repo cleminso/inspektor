@@ -238,6 +238,7 @@ export const comboboxStyles = stylex.create({
   },
   viewport: {
     padding: spatial["popup-collection-padding"],
+    overscrollBehavior: "contain",
     minHeight: 0,
     overflowY: "auto",
   },
@@ -248,7 +249,6 @@ export const comboboxStyles = stylex.create({
   list: {
     gap: spacing.xxs,
     outline: "none",
-    overscrollBehavior: "contain",
     display: "flex",
     flexDirection: "column",
   },

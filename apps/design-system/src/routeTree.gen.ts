@@ -36,6 +36,7 @@ import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
 import { Route as ComponentsMultiSelectRouteImport } from './routes/components/multi-select'
 import { Route as ComponentsRelationValueRouteImport } from './routes/components/relation-value'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
+import { Route as ComponentsScrollAreaRouteImport } from './routes/components/scroll-area'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsSidePanelRouteImport } from './routes/components/side-panel'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
@@ -189,6 +190,11 @@ const ComponentsResizablePanelRoute =
     path: '/components/resizable-panel',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ComponentsScrollAreaRoute = ComponentsScrollAreaRouteImport.update({
+  id: '/components/scroll-area',
+  path: '/components/scroll-area',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
   id: '/components/select',
   path: '/components/select',
@@ -295,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
+  '/components/scroll-area': typeof ComponentsScrollAreaRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -339,6 +346,7 @@ export interface FileRoutesByTo {
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
+  '/components/scroll-area': typeof ComponentsScrollAreaRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
+  '/components/scroll-area': typeof ComponentsScrollAreaRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
@@ -430,6 +439,7 @@ export interface FileRouteTypes {
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
+    | '/components/scroll-area'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -474,6 +484,7 @@ export interface FileRouteTypes {
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
+    | '/components/scroll-area'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -518,6 +529,7 @@ export interface FileRouteTypes {
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
+    | '/components/scroll-area'
     | '/components/select'
     | '/components/side-panel'
     | '/components/spinner'
@@ -563,6 +575,7 @@ export interface RootRouteChildren {
   ComponentsMultiSelectRoute: typeof ComponentsMultiSelectRoute
   ComponentsRelationValueRoute: typeof ComponentsRelationValueRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
+  ComponentsScrollAreaRoute: typeof ComponentsScrollAreaRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidePanelRoute: typeof ComponentsSidePanelRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
@@ -771,6 +784,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsResizablePanelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/scroll-area': {
+      id: '/components/scroll-area'
+      path: '/components/scroll-area'
+      fullPath: '/components/scroll-area'
+      preLoaderRoute: typeof ComponentsScrollAreaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/select': {
       id: '/components/select'
       path: '/components/select'
@@ -907,6 +927,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsMultiSelectRoute: ComponentsMultiSelectRoute,
   ComponentsRelationValueRoute: ComponentsRelationValueRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
+  ComponentsScrollAreaRoute: ComponentsScrollAreaRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidePanelRoute: ComponentsSidePanelRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,

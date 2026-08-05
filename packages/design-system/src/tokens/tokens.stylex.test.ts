@@ -99,6 +99,8 @@ describe('semantic token contract', () => {
       'screen-height-small': expect.any(String),
       'panel-handle-size': expect.any(String),
       'panel-gutter-size': expect.any(String),
+      'scrollbar-track-size': expect.any(String),
+      'scrollbar-thumb-size': expect.any(String),
     })
   })
 

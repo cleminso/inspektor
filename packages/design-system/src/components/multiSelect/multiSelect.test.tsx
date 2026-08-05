@@ -30,6 +30,15 @@ function TestMultiSelect({ initialValue = ["design", "components"] }: { initialV
 afterEach(cleanup);
 
 describe("MultiSelect", () => {
+  it("uses the standard treatment on its scrolling options", () => {
+    render(<TestMultiSelect />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
+
+    expect(screen.getByRole("group", { name: "Options" }).getAttribute("data-scrollbar")).toBe(
+      "standard",
+    );
+  });
+
   it("opens with a focused search and exposes named checkbox rows", () => {
     render(<TestMultiSelect />);
 

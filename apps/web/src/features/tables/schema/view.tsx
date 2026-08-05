@@ -46,7 +46,7 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
             </Text>
             <CopyButton textToCopy={schemaJson} label="Copy schema" />
           </Box>
-          <Box scrollbar="thin" minHeight={0} flex={1} overflow="auto" padding="l">
+          <Box minHeight={0} flex={1} overflow="auto" padding="l">
             <Text as="pre" variant="caption" color="muted" monospace>
               {schemaJson}
             </Text>
@@ -68,7 +68,7 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
             </Text>
             <CopyButton textToCopy={permissionsJson} label="Copy permissions" />
           </Box>
-          <Box scrollbar="thin" minHeight={0} flex={1} overflow="auto" padding="l">
+          <Box minHeight={0} flex={1} overflow="auto" padding="l">
             <Text as="pre" variant="caption" color="muted" monospace>
               {permissionsJson}
             </Text>

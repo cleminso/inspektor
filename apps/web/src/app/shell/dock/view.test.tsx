@@ -7,6 +7,14 @@ import { InspectorDock } from "./view";
 afterEach(cleanup);
 
 describe("InspectorDock", () => {
+  it("keeps a fixed semantic height", () => {
+    const { container } = render(<InspectorDock />);
+    const dock = container.querySelector("footer") as HTMLElement;
+
+    expect(dock.style.height).toMatch(/^var\(--/);
+    expect(dock.getAttribute("data-height")).toBe("fixed");
+  });
+
   it("uses semantic extra-small icons", () => {
     render(<InspectorDock leftDock={{ isOpen: false, onToggle: () => undefined }} />);
 

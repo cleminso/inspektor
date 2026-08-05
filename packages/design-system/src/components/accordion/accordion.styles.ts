@@ -25,12 +25,26 @@ export const accordionStyles = stylex.create({
     flexDirection: 'column',
     width: '100%',
   },
+  rootFill: {
+    gap: spacing.none,
+    overflow: 'hidden',
+    height: '100%',
+    minHeight: 0,
+  },
   rootDisabled: {},
   rootHorizontal: {},
   rootVertical: {},
   item: {
     minWidth: 0,
     width: '100%',
+  },
+  itemFill: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: spatial['tab-height'],
+  },
+  itemFillIndexed: {
+    marginTop: spacing.xs,
   },
   itemOpen: {},
   itemClosed: {},
@@ -41,6 +55,9 @@ export const accordionStyles = stylex.create({
   itemIndexed: {},
   header: {
     margin: 0,
+  },
+  headerFill: {
+    flexShrink: 0,
   },
   headerOpen: {},
   headerClosed: {},
@@ -123,7 +140,6 @@ export const accordionStyles = stylex.create({
     flexShrink: 0,
   },
   panel: {
-    overflow: 'hidden',
     transitionDuration: {
       default: '150ms',
       [reducedMotion]: '0ms',
@@ -131,6 +147,12 @@ export const accordionStyles = stylex.create({
     transitionProperty: 'height',
     transitionTimingFunction: 'ease-out',
     height: 'var(--accordion-panel-height)',
+    overflowX: 'hidden',
+    overflowY: 'hidden',
+  },
+  panelFill: {
+    minHeight: 0,
+    overflow: 'hidden',
   },
   panelTransitioning: {
     height: 0,

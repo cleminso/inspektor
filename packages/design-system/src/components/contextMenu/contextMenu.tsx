@@ -5,6 +5,7 @@ import { type ComponentRef, forwardRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
+import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { menuStyles } from "../menu/menu.styles";
 import { contextMenuStyles } from "./contextMenu.styles";
 
@@ -183,6 +184,7 @@ const ContextMenuPopup = forwardRef<
 >(function ContextMenuPopup(props, forwardedRef) {
   const stateStyles = createStateStyleProps<BaseContextMenu.Popup.State>((state) => [
     menuStyles.popup,
+    scrollbarStyles.standard,
     menuStyles.popupWidthContent,
     (state.transitionStatus === "starting" || state.transitionStatus === "ending") &&
       menuStyles.popupTransition,
@@ -207,6 +209,7 @@ const ContextMenuPopup = forwardRef<
       {...props}
       ref={forwardedRef}
       {...stateStyles}
+      data-scrollbar="standard"
       data-slot="context-menu-popup"
     />
   );

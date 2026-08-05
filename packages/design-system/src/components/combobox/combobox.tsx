@@ -13,6 +13,7 @@ import {
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
+import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { ButtonContent, getButtonVisualStyles } from "../button/buttonVisuals";
 import { comboboxStyles } from "./combobox.styles";
 
@@ -598,9 +599,14 @@ const viewportHeightStyles = {
 
 const ComboboxViewport = forwardRef<HTMLDivElement, ComboboxViewportProps>(
   function ComboboxViewport({ maxHeight = "m", ...props }, forwardedRef) {
-    const styles = stylex.props(comboboxStyles.viewport, viewportHeightStyles[maxHeight]);
+    const styles = stylex.props(
+      comboboxStyles.viewport,
+      viewportHeightStyles[maxHeight],
+      scrollbarStyles.standard,
+    );
     const defaultProps = {
       ...styles,
+      "data-scrollbar": "standard",
       "data-slot": "combobox-viewport",
     } as useRender.ComponentProps<"div">;
     return useRender({

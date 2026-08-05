@@ -17,8 +17,6 @@ export default function BasicExample(): ReactElement {
       <Box
         maxHeight="viewport-height-s"
         overflow="auto"
-        scrollbar="thin"
-        scrollbarGutter="stable"
       >
         <Text color="muted">Box keeps layout and surface choices inside the token system.</Text>
       </Box>

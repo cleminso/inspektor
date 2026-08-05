@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { ScrollAreaPrivate } from "../scrollArea/scrollArea";
 import { dataGridStyles } from "./dataGrid.styles";
 import {
   asStable,
@@ -501,10 +502,16 @@ function DataGridRoot<TData extends RowData>({
 }
 
 function DataGridViewport({ children }: DataGridViewportProps) {
+  const { density } = useDataGridContext();
+
   return (
-    <div {...stylex.props(dataGridStyles.viewport)} data-slot="data-grid-viewport">
+    <ScrollAreaPrivate
+      axis="both"
+      verticalTrackOffset={density === "compact" ? "control-height-m" : "control-height-l"}
+      viewportSlot="data-grid-viewport"
+    >
       {children}
-    </div>
+    </ScrollAreaPrivate>
   );
 }
 
@@ -532,6 +539,7 @@ function DataGridTable({ "aria-label": ariaLabel, children }: DataGridTableProps
       <table
         {...stylex.props(dataGridStyles.table)}
         aria-label={ariaLabel}
+        data-layout="fill-viewport"
         data-slot="data-grid-table"
         style={{ width: tableWidth }}
       >
@@ -571,7 +579,11 @@ function DataGridHeader({ children }: DataGridHeaderProps) {
   const { table } = useDataGridContext();
 
   return (
-    <thead {...stylex.props(dataGridStyles.header)} data-slot="data-grid-header">
+    <thead
+      {...stylex.props(dataGridStyles.header)}
+      data-slot="data-grid-header"
+      data-sticky="true"
+    >
       {children ??
         table
           .getHeaderGroups()

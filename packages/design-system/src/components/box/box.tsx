@@ -4,9 +4,9 @@
 import * as stylex from '@stylexjs/stylex'
 import React, { useId } from 'react'
 
+import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { BOX_STYLE_PROP_KEYS, resolveBoxStyles } from '../../utils/resolvers'
 import type { BoxStyleProps } from '../../utils/types'
-import { boxStyles } from './box.styles'
 
 type BoxElement =
   | 'div'
@@ -36,23 +36,13 @@ const NON_FLEX_DEFAULT_ELEMENTS = new Set<BoxElement>([
 type BoxOwnProps<E extends BoxElement = 'div'> = BoxStyleProps & {
   as?: E
   children?: React.ReactNode
-  /** Uses the design-system treatment for a compact scrollbar. */
-  scrollbar?: 'thin'
-  /** Reserves inline space for a classic scrollbar so overflow changes do not resize content. */
-  scrollbarGutter?: 'stable'
 }
 
 export type BoxProps<E extends BoxElement = 'div'> = BoxOwnProps<E> &
   Omit<React.ComponentPropsWithoutRef<E>, keyof BoxOwnProps<E> | 'className' | 'style'>
 
 function BoxInner<E extends BoxElement = 'div'>(
-  {
-    as,
-    children,
-    scrollbar,
-    scrollbarGutter,
-    ...rest
-  }: BoxProps<E>,
+  { as, children, ...rest }: BoxProps<E>,
   ref: React.ForwardedRef<HTMLElement>,
 ) {
   const id = useId()
@@ -81,11 +71,25 @@ function BoxInner<E extends BoxElement = 'div'>(
     styleProps as BoxStyleProps,
     scopeClass,
   )
+  const hasScrollableOverflow = [
+    styleProps.overflow,
+    styleProps.overflowX,
+    styleProps.overflowY,
+  ].some((value) => {
+    if (value === 'auto' || value === 'scroll') {
+      return true
+    }
+    if (typeof value !== 'object' || value === null) {
+      return false
+    }
+    return Object.values(value).some(
+      (responsiveValue) => responsiveValue === 'auto' || responsiveValue === 'scroll',
+    )
+  })
 
   const stylexProps = stylex.props(
     ...stylexStyles,
-    scrollbar === 'thin' && boxStyles.scrollbarThin,
-    scrollbarGutter === 'stable' && boxStyles.scrollbarGutterStable,
+    hasScrollableOverflow === true && scrollbarStyles.standard,
   )
 
   const mergedStyle = {
@@ -112,8 +116,7 @@ function BoxInner<E extends BoxElement = 'div'>(
         ref={ref}
         className={classes}
         style={hasStyle === true ? mergedStyle : undefined}
-        data-scrollbar={scrollbar}
-        data-scrollbar-gutter={scrollbarGutter}
+        data-scrollbar={hasScrollableOverflow === true ? 'standard' : undefined}
         {...domProps}
       >
         {children}

@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[04/08/26]
+
+- [x] Move scrollbar appearance into one token-backed design-system recipe without reserving empty gutter space.
+
 [01/08/26]
 
 - [x] Express typography, spacing, scalable dimensions, and radii relative to the root font size.
@@ -45,7 +49,6 @@
 - Focus-ring thickness and offsets.
 - Shadow geometry.
 - Application-specific documentation layout styles.
-- Application scrollbar styling pending a dedicated design-system contract.
 - Component-local container and viewport thresholds that describe component behavior rather than device categories.
 
 ## Settled interaction decisions

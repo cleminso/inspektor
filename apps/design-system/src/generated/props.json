@@ -788,16 +788,6 @@
       }
     },
     {
-      "name": "scrollbar",
-      "type": "\"thin\"",
-      "required": false,
-      "description": "Uses the design-system treatment for a compact scrollbar.",
-      "source": {
-        "path": "packages/design-system/src/components/box/box.tsx",
-        "line": 40
-      }
-    },
-    {
       "name": "paddingVertical",
       "type": "\"s\" | \"m\" | \"none\" | \"xs\" | \"xl\" | \"xxs\" | \"l\" | \"2xl\" | \"3xl\" | \"4xl\" | \"5xl\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpacingToken>>",
       "required": false,
@@ -814,16 +804,6 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 42
-      }
-    },
-    {
-      "name": "scrollbarGutter",
-      "type": "\"stable\"",
-      "required": false,
-      "description": "Reserves inline space for a classic scrollbar so overflow changes do not resize content.",
-      "source": {
-        "path": "packages/design-system/src/components/box/box.tsx",
         "line": 42
       }
     },
@@ -1259,7 +1239,7 @@
     },
     {
       "name": "width",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1269,7 +1249,7 @@
     },
     {
       "name": "height",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1279,7 +1259,7 @@
     },
     {
       "name": "minWidth",
-      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1289,7 +1269,7 @@
     },
     {
       "name": "maxWidth",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1299,7 +1279,7 @@
     },
     {
       "name": "minHeight",
-      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1309,7 +1289,7 @@
     },
     {
       "name": "maxHeight",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1608,6 +1588,39 @@
       }
     }
   ],
+  "scrollArea": [
+    {
+      "name": "axis",
+      "type": "\"none\" | \"both\" | \"vertical\"",
+      "required": false,
+      "defaultValue": "\"vertical\"",
+      "description": "Controls which native scroll axes and overlay tracks are available.",
+      "source": {
+        "path": "packages/design-system/src/components/scrollArea/scrollArea.tsx",
+        "line": 14
+      }
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "Defines a string value that labels the current element.",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
+        "line": 2603
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
+        "line": 2267
+      }
+    }
+  ],
   "resizablePanelGroup": [
     {
       "name": "orientation",
@@ -1694,7 +1707,7 @@
     },
     {
       "name": "elementRef",
-      "type": "null | (instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES] | RefObject<HTMLDivElement | null>",
+      "type": "null | RefObject<HTMLDivElement | null> | (instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]",
       "required": false,
       "description": "Provides access to the group's root element.",
       "source": {
@@ -1810,7 +1823,7 @@
     },
     {
       "name": "elementRef",
-      "type": "null | (instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES] | RefObject<HTMLDivElement | null>",
+      "type": "null | RefObject<HTMLDivElement | null> | (instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]",
       "required": false,
       "description": "Provides access to the panel's root element.",
       "source": {
@@ -2082,7 +2095,7 @@
       "description": "The tab views and their associated panels.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 64
+        "line": 65
       }
     },
     {
@@ -2092,7 +2105,7 @@
       "description": "The active view value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 66
+        "line": 67
       }
     },
     {
@@ -2102,7 +2115,7 @@
       "description": "The initially active view value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 68
+        "line": 69
       }
     },
     {
@@ -2112,7 +2125,7 @@
       "description": "Called when the active view changes.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 70
+        "line": 71
       }
     }
   ],
@@ -2124,7 +2137,7 @@
       "description": "The tab view items.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 78
+        "line": 79
       }
     },
     {
@@ -2134,7 +2147,7 @@
       "description": "An accessible name for the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 80
+        "line": 81
       }
     },
     {
@@ -2144,7 +2157,7 @@
       "description": "Identifies the element that labels the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 82
+        "line": 83
       }
     },
     {
@@ -2155,7 +2168,7 @@
       "description": "Activates a view as arrow-key navigation moves focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 84
+        "line": 85
       }
     },
     {
@@ -2166,7 +2179,7 @@
       "description": "Loops keyboard focus between the first and last views.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 86
+        "line": 87
       }
     },
     {
@@ -2176,7 +2189,7 @@
       "description": "The tab values in their controlled visual order.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 91
+        "line": 92
       }
     },
     {
@@ -2186,7 +2199,7 @@
       "description": "Called with the complete ordered value list after a tab is dragged.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 93
+        "line": 94
       }
     }
   ],
@@ -2198,7 +2211,7 @@
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 106
+        "line": 107
       }
     },
     {
@@ -2208,7 +2221,7 @@
       "description": "The visible view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 108
+        "line": 109
       }
     },
     {
@@ -2218,7 +2231,7 @@
       "description": "Supplementary context shown in a tooltip even when the view name fits.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 110
+        "line": 111
       }
     },
     {
@@ -2228,7 +2241,7 @@
       "description": "Renders a decorative medium icon before the view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 112
+        "line": 113
       }
     },
     {
@@ -2238,7 +2251,7 @@
       "description": "Disables selection and closing for this view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 114
+        "line": 115
       }
     },
     {
@@ -2248,7 +2261,7 @@
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 116
+        "line": 117
       }
     },
     {
@@ -2259,7 +2272,7 @@
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 118
+        "line": 119
       }
     }
   ],
@@ -2271,7 +2284,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 123
+        "line": 124
       }
     },
     {
@@ -2281,7 +2294,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 125
+        "line": 126
       }
     },
     {
@@ -2292,7 +2305,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 127
+        "line": 128
       }
     }
   ],
@@ -2304,7 +2317,7 @@
       "description": "Accordion items and their panels.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 17
+        "line": 21
       }
     },
     {
@@ -2314,7 +2327,7 @@
       "description": "Values expanded when the accordion is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 19
+        "line": 23
       }
     },
     {
@@ -2324,7 +2337,7 @@
       "description": "Values expanded when the accordion is controlled.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 21
+        "line": 25
       }
     },
     {
@@ -2334,7 +2347,7 @@
       "description": "Runs when expanded values change.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 23
+        "line": 27
       }
     },
     {
@@ -2345,7 +2358,7 @@
       "description": "Allows more than one panel to remain expanded.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 25
+        "line": 29
       }
     },
     {
@@ -2356,7 +2369,18 @@
       "description": "Disables every accordion item.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 27
+        "line": 31
+      }
+    },
+    {
+      "name": "layout",
+      "type": "\"content\" | \"fill\"",
+      "required": false,
+      "defaultValue": "\"content\"",
+      "description": "Controls whether panels use their content height or overlay scrolling in a constrained parent.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 33
       }
     }
   ],
@@ -2368,7 +2392,7 @@
       "description": "Identifies the item for controlled and initial state.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 32
+        "line": 38
       }
     },
     {
@@ -2379,7 +2403,7 @@
       "description": "Disables this accordion item.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 34
+        "line": 40
       }
     }
   ],
@@ -2391,7 +2415,7 @@
       "description": "Composes the heading behavior and styles onto another heading element.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 39
+        "line": 45
       }
     }
   ],
@@ -2403,7 +2427,7 @@
       "description": "Visible heading text.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 47
+        "line": 53
       }
     },
     {
@@ -2413,7 +2437,7 @@
       "description": "Optional content aligned opposite the heading.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 49
+        "line": 55
       }
     },
     {
@@ -2423,7 +2447,7 @@
       "description": "Composes trigger behavior and styles onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 51
+        "line": 57
       }
     }
   ],
@@ -2435,7 +2459,7 @@
       "description": "Panel content.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 56
+        "line": 62
       }
     },
     {
@@ -2445,7 +2469,7 @@
       "description": "Keeps the panel mounted while collapsed.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 58
+        "line": 64
       }
     },
     {
@@ -2455,7 +2479,7 @@
       "description": "Allows browser find-in-page to reveal collapsed panel content.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 60
+        "line": 66
       }
     }
   ],
@@ -2732,7 +2756,7 @@
       "description": "Active row and column intersection.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 74
+        "line": 75
       }
     },
     {
@@ -2743,7 +2767,7 @@
       "description": "Column highlighted across the header and visible rows.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 76
+        "line": 77
       }
     },
     {
@@ -2754,7 +2778,7 @@
       "description": "Row currently targeted for inspection.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 78
+        "line": 79
       }
     },
     {
@@ -2764,7 +2788,7 @@
       "description": "Data-table regions and companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 80
+        "line": 81
       }
     },
     {
@@ -2775,7 +2799,7 @@
       "description": "Controls table row and cell spacing.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 82
+        "line": 83
       }
     },
     {
@@ -2785,7 +2809,7 @@
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 84
+        "line": 85
       }
     },
     {
@@ -2795,7 +2819,7 @@
       "description": "Runs when a cell context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 86
+        "line": 87
       }
     },
     {
@@ -2805,7 +2829,7 @@
       "description": "Runs when a column header is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 88
+        "line": 89
       }
     },
     {
@@ -2815,7 +2839,7 @@
       "description": "Runs when a column-header context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 90
+        "line": 91
       }
     },
     {
@@ -2825,7 +2849,7 @@
       "description": "Runs when a non-interactive row is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 92
+        "line": 93
       }
     },
     {
@@ -2835,7 +2859,7 @@
       "description": "Runs when a row context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 94
+        "line": 95
       }
     },
     {
@@ -2845,7 +2869,7 @@
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 96
+        "line": 97
       }
     },
     {
@@ -2856,7 +2880,7 @@
       "description": "Cells included in the current cell-selection set.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 98
+        "line": 99
       }
     },
     {
@@ -2866,7 +2890,7 @@
       "description": "Renders the inert visual shown while a column header is dragged.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 103
+        "line": 104
       }
     },
     {
@@ -2876,7 +2900,7 @@
       "description": "Column ids in their controlled draggable order. Omit fixed columns from this list.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 105
+        "line": 106
       }
     },
     {
@@ -2886,7 +2910,7 @@
       "description": "Runs with the complete draggable column order after a header is moved.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 107
+        "line": 108
       }
     }
   ],
@@ -2898,7 +2922,7 @@
       "description": "Table or custom viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 121
+        "line": 122
       }
     }
   ],
@@ -2910,7 +2934,7 @@
       "description": "Accessible name for the table.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 126
+        "line": 127
       }
     },
     {
@@ -2920,7 +2944,7 @@
       "description": "Header and body composition.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 128
+        "line": 129
       }
     }
   ],
@@ -2933,7 +2957,7 @@
       "description": "Content shown when the table has no rows.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 133
+        "line": 134
       }
     },
     {
@@ -2944,7 +2968,7 @@
       "description": "Whether loading content replaces the current row model.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 135
+        "line": 136
       }
     },
     {
@@ -2955,7 +2979,7 @@
       "description": "Content shown while rows are loading.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 137
+        "line": 138
       }
     }
   ],
@@ -2967,7 +2991,7 @@
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 142
+        "line": 143
       }
     }
   ],
@@ -2979,7 +3003,7 @@
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 147
+        "line": 148
       }
     },
     {
@@ -2989,7 +3013,7 @@
       "description": "TanStack header group represented by this row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 149
+        "line": 150
       }
     }
   ],
@@ -3001,7 +3025,7 @@
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 154
+        "line": 155
       }
     },
     {
@@ -3011,7 +3035,7 @@
       "description": "TanStack header represented by this cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 156
+        "line": 157
       }
     }
   ],
@@ -3023,7 +3047,7 @@
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 161
+        "line": 162
       }
     }
   ],
@@ -3035,7 +3059,7 @@
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 166
+        "line": 167
       }
     },
     {
@@ -3045,7 +3069,7 @@
       "description": "TanStack row represented by this table row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 168
+        "line": 169
       }
     }
   ],
@@ -3057,7 +3081,7 @@
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 173
+        "line": 174
       }
     },
     {
@@ -3067,7 +3091,7 @@
       "description": "TanStack cell represented by this table cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 175
+        "line": 176
       }
     }
   ],
@@ -3079,7 +3103,7 @@
       "description": "Expanded content associated with the row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 180
+        "line": 181
       }
     },
     {
@@ -3089,7 +3113,7 @@
       "description": "TanStack row represented by this expanded region.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 182
+        "line": 183
       }
     }
   ],
@@ -3101,7 +3125,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 187
+        "line": 188
       }
     }
   ],
@@ -3113,7 +3137,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 187
+        "line": 188
       }
     }
   ],
@@ -3125,7 +3149,7 @@
       "description": "Status and table companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 192
+        "line": 193
       }
     }
   ],
@@ -3812,7 +3836,7 @@
       "description": "Controls the minimum editor height.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 15
+        "line": 16
       }
     },
     {
@@ -3823,7 +3847,7 @@
       "description": "Selects proportional or code-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 17
+        "line": 18
       }
     },
     {
@@ -3834,7 +3858,7 @@
       "description": "Stretches the textarea to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 19
+        "line": 20
       }
     },
     {
@@ -3845,7 +3869,7 @@
       "description": "Marks the textarea as invalid and exposes that state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 21
+        "line": 22
       }
     },
     {
@@ -3856,7 +3880,7 @@
       "description": "Disables editing and focus.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 23
+        "line": 24
       }
     },
     {
@@ -3867,7 +3891,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -3877,7 +3901,7 @@
       "description": "Sets the initial value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -3887,7 +3911,7 @@
       "description": "Sets the current value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -3897,7 +3921,7 @@
       "description": "Runs when the textarea value changes.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 31
+        "line": 32
       }
     }
   ],
@@ -4624,7 +4648,7 @@
       "description": "Whether the menu is initially open.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 18
+        "line": 19
       }
     },
     {
@@ -4634,7 +4658,7 @@
       "description": "Whether the menu is currently open.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 20
+        "line": 21
       }
     },
     {
@@ -4644,7 +4668,7 @@
       "description": "Runs when the menu opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 22
+        "line": 23
       }
     },
     {
@@ -4655,7 +4679,7 @@
       "description": "Disables interaction with the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 24
+        "line": 25
       }
     }
   ],
@@ -4668,7 +4692,7 @@
       "description": "Disables the menu trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -4678,7 +4702,7 @@
       "description": "Composes trigger behavior onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 31
+        "line": 32
       }
     }
   ],
@@ -4691,7 +4715,7 @@
       "description": "Keeps the portal mounted while the menu is closed.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 36
+        "line": 37
       }
     }
   ],
@@ -4728,7 +4752,7 @@
       "description": "Controls whether the popup follows its content or trigger width.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 48
+        "line": 49
       }
     }
   ],
@@ -4740,7 +4764,7 @@
       "description": "Controls whether the popup follows its content or trigger width.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 48
+        "line": 49
       }
     },
     {
@@ -4751,7 +4775,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 53
+        "line": 54
       }
     },
     {
@@ -4762,7 +4786,7 @@
       "description": "Keeps the content mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 55
+        "line": 56
       }
     },
     {
@@ -4772,7 +4796,7 @@
       "description": "Places the popup on a side of the trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 57
+        "line": 58
       }
     }
   ],
@@ -4785,7 +4809,7 @@
       "description": "Controls the action's semantic emphasis.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 62
+        "line": 63
       }
     },
     {
@@ -4796,7 +4820,7 @@
       "description": "Disables the action.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 64
+        "line": 65
       }
     },
     {
@@ -4807,7 +4831,7 @@
       "description": "Controls whether activating the item closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 66
+        "line": 67
       }
     }
   ],
@@ -4820,7 +4844,7 @@
       "description": "Controls whether activating the link closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 71
+        "line": 72
       }
     }
   ],
@@ -4832,7 +4856,7 @@
       "description": "Composes the group semantics onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 78
+        "line": 79
       }
     }
   ],
@@ -4844,7 +4868,7 @@
       "description": "Composes the group label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 83
+        "line": 84
       }
     }
   ],
@@ -4856,7 +4880,7 @@
       "description": "Composes the shortcut label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 88
+        "line": 89
       }
     }
   ],
@@ -4869,7 +4893,7 @@
       "description": "Controls the checked state.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 93
+        "line": 94
       }
     },
     {
@@ -4879,7 +4903,7 @@
       "description": "Sets the initial checked state.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 95
+        "line": 96
       }
     },
     {
@@ -4889,7 +4913,7 @@
       "description": "Runs when the checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 97
+        "line": 98
       }
     },
     {
@@ -4900,7 +4924,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 99
+        "line": 100
       }
     },
     {
@@ -4911,7 +4935,7 @@
       "description": "Controls whether changing the option closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 101
+        "line": 102
       }
     }
   ],
@@ -4924,7 +4948,7 @@
       "description": "Keeps the indicator mounted while unchecked.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 109
+        "line": 110
       }
     }
   ],
@@ -4937,7 +4961,7 @@
       "description": "Disables every option in the group.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 114
+        "line": 115
       }
     }
   ],
@@ -4950,7 +4974,7 @@
       "description": "Controls whether changing the option closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 119
+        "line": 120
       }
     },
     {
@@ -4961,7 +4985,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 121
+        "line": 122
       }
     },
     {
@@ -4971,7 +4995,7 @@
       "description": "Value represented by the option.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 123
+        "line": 124
       }
     }
   ],
@@ -4984,7 +5008,7 @@
       "description": "Keeps the indicator mounted while unchecked.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 131
+        "line": 132
       }
     }
   ],
@@ -4998,7 +5022,7 @@
       "description": "Disables the submenu trigger.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 138
+        "line": 139
       }
     },
     {
@@ -5008,7 +5032,7 @@
       "description": "Composes submenu trigger behavior onto another interactive element.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
-        "line": 140
+        "line": 141
       }
     }
   ],
@@ -5023,7 +5047,7 @@
       "description": "Whether the context menu is initially open.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 17
+        "line": 18
       }
     },
     {
@@ -5034,7 +5058,7 @@
       "description": "Disables interaction with the context menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 19
+        "line": 20
       }
     },
     {
@@ -5044,7 +5068,7 @@
       "description": "Runs when the context menu opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 21
+        "line": 22
       }
     },
     {
@@ -5054,7 +5078,7 @@
       "description": "Whether the context menu is currently open.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 23
+        "line": 24
       }
     }
   ],
@@ -5066,7 +5090,7 @@
       "description": "Composes context-menu behavior onto another element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 28
+        "line": 29
       }
     }
   ],
@@ -5105,7 +5129,7 @@
       "description": "Aligns the popup along its pointer anchor.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -5116,7 +5140,7 @@
       "description": "Keeps the content mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -5126,7 +5150,7 @@
       "description": "Places the popup on a side of its pointer anchor.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 45
+        "line": 46
       }
     }
   ],
@@ -5139,7 +5163,7 @@
       "description": "Controls whether activating the item closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 50
+        "line": 51
       }
     },
     {
@@ -5150,7 +5174,7 @@
       "description": "Disables the action.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 52
+        "line": 53
       }
     },
     {
@@ -5161,7 +5185,7 @@
       "description": "Controls the action's semantic emphasis.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 54
+        "line": 55
       }
     },
     {
@@ -5171,7 +5195,7 @@
       "description": "Composes item behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 56
+        "line": 57
       }
     }
   ],
@@ -5184,7 +5208,7 @@
       "description": "Controls whether activating the link closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 61
+        "line": 62
       }
     },
     {
@@ -5194,7 +5218,7 @@
       "description": "Composes link-item behavior onto another link component.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 63
+        "line": 64
       }
     }
   ],
@@ -5211,7 +5235,7 @@
       "description": "Controls whether changing the option closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 77
+        "line": 78
       }
     },
     {
@@ -5222,7 +5246,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 79
+        "line": 80
       }
     },
     {
@@ -5232,7 +5256,7 @@
       "description": "Composes checkbox-item behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 81
+        "line": 82
       }
     }
   ],
@@ -5247,7 +5271,7 @@
       "description": "Controls whether changing the option closes the menu.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 92
+        "line": 93
       }
     },
     {
@@ -5258,7 +5282,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 94
+        "line": 95
       }
     },
     {
@@ -5268,7 +5292,7 @@
       "description": "Value represented by the option.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 96
+        "line": 97
       }
     },
     {
@@ -5278,7 +5302,7 @@
       "description": "Composes radio-item behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 98
+        "line": 99
       }
     }
   ],
@@ -5292,7 +5316,7 @@
       "description": "Composes submenu-trigger behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
-        "line": 108
+        "line": 109
       }
     }
   ],
@@ -5306,7 +5330,7 @@
       "description": "The items to be displayed in the list.\nCan be either a flat array of items or an array of groups with items.\nItems available for filtering and selection.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -5316,7 +5340,7 @@
       "description": "The selected value of the combobox. Use when controlled.\nThe selected item.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -5326,7 +5350,7 @@
       "description": "The uncontrolled selected value of the combobox when it's initially rendered.\n\nTo render a controlled combobox, use the `value` prop instead.\nThe initially selected item.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
@@ -5336,7 +5360,7 @@
       "description": "Event handler called when the selected value of the combobox changes.\nRuns when the selected item changes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -5346,7 +5370,7 @@
       "description": "The input value of the combobox. Use when controlled.\nThe current filter input value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -5356,7 +5380,7 @@
       "description": "The uncontrolled input value when initially rendered.\n\nTo render a controlled input, use the `inputValue` prop instead.\nThe initial filter input value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -5366,7 +5390,7 @@
       "description": "Event handler called when the input value changes.\nRuns when the filter input value changes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 38
+        "line": 39
       }
     },
     {
@@ -5377,7 +5401,7 @@
       "description": "Whether the popup is initially open.\n\nTo render a controlled popup, use the `open` prop instead.\nWhether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 40
+        "line": 41
       }
     },
     {
@@ -5387,7 +5411,7 @@
       "description": "Whether the popup is currently open. Use when controlled.\nWhether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 42
+        "line": 43
       }
     },
     {
@@ -5397,7 +5421,7 @@
       "description": "Event handler called when the popup is opened or closed.\nRuns when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -5407,7 +5431,7 @@
       "description": "Event handler called after any animations complete when the popup is opened or closed.\nRuns after an opening or closing transition completes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 46
+        "line": 47
       }
     },
     {
@@ -5417,7 +5441,7 @@
       "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for display in the input.\nIf the shape of the object is `{ value, label }`, the label will be used automatically without needing to specify this prop.\nConverts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 48
+        "line": 49
       }
     },
     {
@@ -5427,7 +5451,7 @@
       "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for form submission.\nIf the shape of the object is `{ value, label }`, the value will be used automatically without needing to specify this prop.\nConverts an item into the value submitted with a form.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 50
+        "line": 51
       }
     },
     {
@@ -5437,7 +5461,7 @@
       "description": "Custom comparison logic used to determine if a combobox item value matches the current selected value. Useful when item values are objects without matching referentially.\nDefaults to `Object.is` comparison.\nCompares an item with the selected value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 52
+        "line": 53
       }
     },
     {
@@ -5447,7 +5471,7 @@
       "description": "Filter function used to match items vs input query.\nFilters an item against the current query.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 54
+        "line": 55
       }
     },
     {
@@ -5457,7 +5481,7 @@
       "description": "Identifies the field when a form is submitted.\nIdentifies the value when the combobox participates in form submission.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 56
+        "line": 57
       }
     },
     {
@@ -5467,7 +5491,7 @@
       "description": "Identifies the form that owns the internal input.\nUseful when the combobox is rendered outside the form.\nAssociates the combobox with a form element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 58
+        "line": 59
       }
     },
     {
@@ -5478,7 +5502,7 @@
       "description": "Whether the user must choose a value before submitting a form.\nRequires a selection before form submission.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 60
+        "line": 61
       }
     },
     {
@@ -5489,7 +5513,7 @@
       "description": "Whether the user should be unable to choose a different option from the popup.\nPrevents selection changes while preserving focus and form participation.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 62
+        "line": 63
       }
     },
     {
@@ -5500,7 +5524,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the combobox.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 64
+        "line": 65
       }
     }
   ],
@@ -5512,7 +5536,7 @@
       "description": "Composes the label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 112
+        "line": 113
       }
     }
   ],
@@ -5524,7 +5548,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 117
+        "line": 118
       }
     }
   ],
@@ -5537,7 +5561,7 @@
       "description": "Controls the input-group surface treatment.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 72
+        "line": 73
       }
     },
     {
@@ -5548,7 +5572,7 @@
       "description": "Controls whether the input group follows its content or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 74
+        "line": 75
       }
     }
   ],
@@ -5560,7 +5584,7 @@
       "description": "Composes input behavior onto another input component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 81
+        "line": 82
       }
     }
   ],
@@ -5572,7 +5596,7 @@
       "description": "Content displayed by the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 99
+        "line": 100
       }
     },
     {
@@ -5583,7 +5607,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 101
+        "line": 102
       }
     },
     {
@@ -5594,7 +5618,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 103
+        "line": 104
       }
     },
     {
@@ -5605,7 +5629,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 105
+        "line": 106
       }
     },
     {
@@ -5615,7 +5639,7 @@
       "description": "Composes trigger behavior onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 107
+        "line": 108
       }
     }
   ],
@@ -5628,7 +5652,7 @@
       "description": "Disables the input action trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 88
+        "line": 89
       }
     }
   ],
@@ -5641,7 +5665,7 @@
       "description": "Keeps the portal mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 122
+        "line": 123
       }
     }
   ],
@@ -5678,7 +5702,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 134
+        "line": 135
       }
     }
   ],
@@ -5690,7 +5714,7 @@
       "description": "Content rendered inside the positioned popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 139
+        "line": 140
       }
     },
     {
@@ -5701,7 +5725,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 141
+        "line": 142
       }
     },
     {
@@ -5712,7 +5736,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 143
+        "line": 144
       }
     },
     {
@@ -5723,7 +5747,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 145
+        "line": 146
       }
     },
     {
@@ -5734,7 +5758,7 @@
       "description": "Places the popup on this side of the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 147
+        "line": 148
       }
     }
   ],
@@ -5749,7 +5773,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 167
+        "line": 168
       }
     }
   ],
@@ -5762,7 +5786,7 @@
       "description": "Accessible label for the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 182
+        "line": 183
       }
     },
     {
@@ -5773,7 +5797,7 @@
       "description": "Keeps the clear action mounted when no value is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 184
+        "line": 185
       }
     },
     {
@@ -5784,7 +5808,7 @@
       "description": "Disables the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 186
+        "line": 187
       }
     },
     {
@@ -5794,7 +5818,7 @@
       "description": "Composes clear behavior onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 188
+        "line": 189
       }
     }
   ],
@@ -5812,7 +5836,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 193
+        "line": 194
       }
     },
     {
@@ -5823,7 +5847,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 196
       }
     },
     {
@@ -5833,7 +5857,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 197
+        "line": 198
       }
     }
   ],
@@ -5845,7 +5869,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 202
+        "line": 203
       }
     },
     {
@@ -5855,7 +5879,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 204
+        "line": 205
       }
     }
   ],
@@ -5868,7 +5892,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 212
+        "line": 213
       }
     }
   ],
@@ -6059,7 +6083,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 117
+        "line": 118
       }
     }
   ],
@@ -6143,7 +6167,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 193
+        "line": 194
       }
     },
     {
@@ -6154,7 +6178,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 196
       }
     },
     {
@@ -6164,7 +6188,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 197
+        "line": 198
       }
     }
   ],
@@ -6176,7 +6200,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 202
+        "line": 203
       }
     },
     {
@@ -6186,7 +6210,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 204
+        "line": 205
       }
     }
   ],
@@ -6199,7 +6223,7 @@
       "description": "Known options displayed by the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -6209,7 +6233,7 @@
       "description": "Controlled selected values.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 39
+        "line": 40
       }
     },
     {
@@ -6220,7 +6244,7 @@
       "description": "Initially selected values when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -6230,7 +6254,7 @@
       "description": "Runs when the selected values change.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -6241,7 +6265,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -6251,7 +6275,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -6261,7 +6285,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 49
+        "line": 50
       }
     },
     {
@@ -6272,7 +6296,7 @@
       "description": "Disables the trigger and every mutable option.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 51
+        "line": 52
       }
     }
   ],
@@ -6284,7 +6308,7 @@
       "description": "Stable accessible name for the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 57
+        "line": 58
       }
     },
     {
@@ -6294,7 +6318,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 59
+        "line": 60
       }
     },
     {
@@ -6305,7 +6329,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 61
+        "line": 62
       }
     }
   ],
@@ -6317,7 +6341,7 @@
       "description": "Accessible name for the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 70
+        "line": 71
       }
     },
     {
@@ -6327,7 +6351,7 @@
       "description": "Accessible name for the search input.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 72
+        "line": 73
       }
     },
     {
@@ -6337,7 +6361,7 @@
       "description": "Placeholder displayed while the query is empty.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 74
+        "line": 75
       }
     },
     {
@@ -6347,7 +6371,7 @@
       "description": "Plural noun used in the empty-query message.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 76
+        "line": 77
       }
     },
     {
@@ -6358,7 +6382,7 @@
       "description": "Controls the popup width.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 78
+        "line": 79
       }
     },
     {
@@ -6369,7 +6393,7 @@
       "description": "Controls the scrolling option-list height.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 80
+        "line": 81
       }
     },
     {
@@ -6380,7 +6404,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 82
+        "line": 83
       }
     },
     {
@@ -6391,7 +6415,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 84
+        "line": 85
       }
     }
   ],
@@ -6403,7 +6427,7 @@
       "description": "Data structure of the items rendered in the select popup.\nWhen specified, `<Select.Value>` renders the label of the selected item instead of the raw value.\nItems used to resolve selected value labels.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -6413,7 +6437,7 @@
       "description": "The value of the select. Use when controlled.\nThe selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -6423,7 +6447,7 @@
       "description": "The uncontrolled value of the select when it's initially rendered.\n\nTo render a controlled select, use the `value` prop instead.\nThe initially selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -6433,7 +6457,7 @@
       "description": "Event handler called when the value of the select changes.\nRuns when the selected value changes.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -6444,7 +6468,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the select.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 33
+        "line": 34
       }
     }
   ],
@@ -6458,7 +6482,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -6469,7 +6493,7 @@
       "description": "Controls whether the trigger follows its content or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -6479,7 +6503,7 @@
       "description": "Content displayed before the selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -6489,7 +6513,7 @@
       "description": "Content displayed after the selected value and before the chevron.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 49
+        "line": 50
       }
     },
     {
@@ -6501,7 +6525,7 @@
       "deprecated": "Use `width=\"full\"`.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 51
+        "line": 52
       }
     },
     {
@@ -6512,7 +6536,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 53
+        "line": 54
       }
     },
     {
@@ -6523,7 +6547,7 @@
       "description": "Indicates whether the rendered trigger is a native button.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 55
+        "line": 56
       }
     },
     {
@@ -6533,7 +6557,7 @@
       "description": "Composes trigger behavior onto a compatible element.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 57
+        "line": 58
       }
     }
   ],
@@ -6585,7 +6609,7 @@
       "description": "Select options, groups, and separators rendered in the popup.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 74
+        "line": 75
       }
     },
     {
@@ -6596,7 +6620,7 @@
       "description": "Places the popup on this side of the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 76
+        "line": 77
       }
     },
     {
@@ -6607,7 +6631,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 78
+        "line": 79
       }
     },
     {
@@ -6618,7 +6642,7 @@
       "description": "Aligns the selected item text with the trigger value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 80
+        "line": 81
       }
     }
   ],
@@ -6633,7 +6657,7 @@
       "description": "The value represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 88
+        "line": 89
       }
     },
     {
@@ -6644,7 +6668,7 @@
       "description": "Controls the option minimum height.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 90
+        "line": 91
       }
     },
     {
@@ -6655,7 +6679,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 92
+        "line": 93
       }
     },
     {
@@ -6666,7 +6690,7 @@
       "description": "Indicates whether the rendered option is a native button.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 94
+        "line": 95
       }
     },
     {
@@ -6676,7 +6700,7 @@
       "description": "Composes option behavior onto a compatible element.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 96
+        "line": 97
       }
     }
   ],
@@ -6690,7 +6714,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 109
+        "line": 110
       }
     }
   ]

@@ -17,6 +17,7 @@ import {
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
+import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { Button } from "../button/button";
 import { Checkbox } from "../checkbox/checkbox";
 import { Input } from "../input/input";
@@ -355,10 +356,12 @@ function MultiSelectContent({
           ) : (
             <div
               aria-label={label}
+              data-scrollbar="standard"
               role="group"
               {...stylex.props(
                 multiSelectStyles.options,
                 optionsHeightStyles[maxHeight],
+                scrollbarStyles.standard,
               )}
             >
               {context.filteredItems.map((item) => (

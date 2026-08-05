@@ -1,6 +1,6 @@
 ---
 name: create-inspector-component
-description: Creates or updates `@inspector/ds` components by wrapping Base UI primitives and applying Inspector StyleX tokens and styles. Use when adding components under `packages/design-system/src/components`, changing component APIs, wrapping Base UI, or building compound design-system components.
+description: Creates or updates `@inspector/ds` components by wrapping Base UI primitives and applying Inspector StyleX tokens and styles. Use when adding components under `packages/design-system/src/components`, changing component APIs, wrapping Base UI, building compound design-system components, or implementing Base UI Scroll Area, overlay scrollbars, scrollbar gutter fixes, and nested scroll ownership.
 ---
 
 # Create Inspector Component
@@ -12,6 +12,7 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 - [Public contract](#public-contract)
 - [StyleX workflow](#stylex-workflow)
 - [Compound components](#compound-components)
+- [Specialized recipes](#specialized-recipes)
 - [Validation](#validation)
 
 ## Quick start
@@ -23,6 +24,8 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 5. Write the required behavioral, type, or contract test.
 6. Implement the wrapper with the policies in [REFERENCE.md](REFERENCE.md).
 7. Add documentation with the `document-inspector-component` skill.
+
+For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nested scroll-owner work, also follow [scrollArea.md](references/scrollArea.md).
 
 ## Wrapper workflow
 
@@ -68,6 +71,10 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 - Export part props needed by consumers.
 - Prefer separate semantic parts such as `Item` and `LinkItem` over unconstrained polymorphism.
 - Add extractor support and tests if the public export shape is not a function declaration.
+
+## Specialized recipes
+
+- Follow [scrollArea.md](references/scrollArea.md) for Base UI Scroll Area composition, overlay track geometry, scroll ownership, and browser validation.
 
 ## Validation
 

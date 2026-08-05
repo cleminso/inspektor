@@ -29,13 +29,22 @@ export function useSidePanelLayout(): SidePanelLayoutContextValue {
   return value;
 }
 
+interface SidePanelLayoutControl {
+  isOpen: boolean;
+  toggle: () => void;
+}
+
+interface SidePanelLayoutProviderProps {
+  children: React.ReactNode | ((control: SidePanelLayoutControl) => React.ReactNode);
+}
+
 interface SidePanelLayoutRootProps {
   children: React.ReactNode;
 }
 
 export function SidePanelLayoutProvider({
   children,
-}: SidePanelLayoutRootProps): React.ReactElement {
+}: SidePanelLayoutProviderProps): React.ReactElement {
   const panelRef = useResizablePanelRef();
   const [isOpen, setIsOpen] = useState(true);
 
@@ -62,10 +71,11 @@ export function SidePanelLayoutProvider({
     () => ({ isOpen, panelRef, setIsOpenFromSize, toggle }),
     [isOpen, panelRef, setIsOpenFromSize, toggle],
   );
+  const content = typeof children === "function" ? children({ isOpen, toggle }) : children;
 
   return (
     <SidePanelLayoutContext.Provider value={contextValue}>
-      {children}
+      {content}
     </SidePanelLayoutContext.Provider>
   );
 }

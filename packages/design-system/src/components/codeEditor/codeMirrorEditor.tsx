@@ -24,6 +24,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import {
   backgroundColors,
+  borderColors,
   spatial,
   syntaxColors,
   textColors,
@@ -135,10 +136,6 @@ const editorTheme = EditorView.theme({
     scrollbarColor: "transparent transparent",
     scrollbarWidth: "thin",
   },
-  ".cm-scroller::-webkit-scrollbar": {
-    height: spacing.s,
-    width: spacing.s,
-  },
   ".cm-scroller::-webkit-scrollbar-track": {
     backgroundColor: "transparent",
   },
@@ -147,10 +144,10 @@ const editorTheme = EditorView.theme({
     borderRadius: borderRadii.m,
   },
   "&:hover .cm-scroller, &.cm-focused .cm-scroller": {
-    scrollbarColor: `${textColors["text-muted"]} transparent`,
+    scrollbarColor: `${borderColors["border-secondary"]} transparent`,
   },
   "&:hover .cm-scroller::-webkit-scrollbar-thumb, &.cm-focused .cm-scroller::-webkit-scrollbar-thumb": {
-    backgroundColor: textColors["text-muted"],
+    backgroundColor: borderColors["border-secondary"],
   },
   ".cm-content": {
     caretColor: textColors["text-default"],

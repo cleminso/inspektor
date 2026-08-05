@@ -3,11 +3,14 @@ export { Accordion } from './components/accordion/accordion'
 export type {
   AccordionHeaderProps,
   AccordionItemProps,
+  AccordionLayout,
   AccordionPanelProps,
   AccordionRootProps,
   AccordionTriggerProps,
   AccordionValue,
 } from './components/accordion/accordion'
+export { ScrollArea } from './components/scrollArea/scrollArea'
+export type { ScrollAreaAxis, ScrollAreaProps } from './components/scrollArea/scrollArea'
 export { ActionList } from './components/actionList/actionList'
 export type {
   ActionListActionProps,

@@ -10,7 +10,7 @@ vi.mock("./header/view", () => ({
 afterEach(cleanup);
 
 describe("InspectorLayout", () => {
-  it("uses the constrained viewport height without an integration class", () => {
+  it("locks the application shell to the viewport", () => {
     const { container } = render(
       <InspectorLayout>
         <div>Content</div>
@@ -21,5 +21,7 @@ describe("InspectorLayout", () => {
     expect(root.classList.contains("h-dvh")).toBe(false);
     expect(root.className).not.toBe("");
     expect(root.style.height).toMatch(/^var\(--/);
+    expect(root.getAttribute("data-layout")).toBe("viewport");
+    expect(root.getAttribute("data-page-scroll")).toBe("locked");
   });
 });

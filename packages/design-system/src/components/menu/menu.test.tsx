@@ -7,6 +7,19 @@ import { Menu } from "./menu";
 afterEach(cleanup);
 
 describe("Menu", () => {
+  it("uses the standard treatment on its bounded popup", () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger>Actions</Menu.Trigger>
+        <Menu.Content>
+          <Menu.Item>Duplicate</Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    expect(screen.getByRole("menu").getAttribute("data-scrollbar")).toBe("standard");
+  });
+
   it("composes content and closes action items after activation", () => {
     const onClick = vi.fn();
     render(

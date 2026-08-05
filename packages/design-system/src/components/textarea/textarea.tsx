@@ -2,6 +2,7 @@ import { Field as BaseField } from '@base-ui/react/field'
 import { forwardRef, type ComponentPropsWithRef } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { textareaStyles } from './textarea.styles'
 
 export type TextareaHeight = 's' | 'm' | 'l'
@@ -63,6 +64,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   >
   const stateStyleProps = createStateStyleProps<BaseField.Control.State>((state) => [
     textareaStyles.base,
+    scrollbarStyles.standard,
     heightStyles[height],
     fontStyles[font],
     fullWidth === true && textareaStyles.fullWidth,
@@ -87,6 +89,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
       readOnly={readOnly}
       aria-invalid={invalid === true ? true : props['aria-invalid']}
       {...stateStyleProps}
+      data-scrollbar="standard"
       data-slot="textarea"
       data-height={height}
       data-font={font}

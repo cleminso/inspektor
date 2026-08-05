@@ -3,6 +3,7 @@ import { Select as BaseSelect } from '@base-ui/react/select'
 import * as stylex from '@stylexjs/stylex'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { popupPositioning } from '../../primitives/popupPositioning'
 import { selectStyles } from './select.styles'
 
@@ -309,8 +310,8 @@ const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(
 
 const SelectList = React.forwardRef<HTMLDivElement, SelectListProps>(
   function SelectList(props, ref) {
-    const styles = stylex.props(selectStyles.list)
-    return <BaseSelect.List {...props} ref={ref} {...styles} />
+    const styles = stylex.props(selectStyles.list, scrollbarStyles.standard)
+    return <BaseSelect.List {...props} ref={ref} {...styles} data-scrollbar="standard" />
   },
 )
 

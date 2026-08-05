@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 import { forwardRef, type ComponentPropsWithRef } from 'react'
 
+import { ScrollAreaPrivate } from '../scrollArea/scrollArea'
 import { sidePanelStyles } from './sidePanel.styles'
 
 export type SidePanelRootProps = Omit<ComponentPropsWithRef<'aside'>, 'className' | 'style'>
@@ -30,14 +31,17 @@ const SidePanelHeader = forwardRef<HTMLDivElement, SidePanelHeaderProps>(
 )
 
 const SidePanelBody = forwardRef<HTMLDivElement, SidePanelBodyProps>(
-  function SidePanelBody(props, ref) {
+  function SidePanelBody({ children, ...props }, ref) {
     return (
-      <div
+      <ScrollAreaPrivate
         {...props}
         ref={ref}
-        {...stylex.props(sidePanelStyles.body)}
-        data-slot="side-panel-body"
-      />
+        viewportSlot="side-panel-body"
+      >
+        <div {...stylex.props(sidePanelStyles.body)} data-slot="side-panel-body-content">
+          {children}
+        </div>
+      </ScrollAreaPrivate>
     )
   },
 )

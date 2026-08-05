@@ -39,7 +39,7 @@
 - [x] Fix Tab View state after canceled user changes and automatic fallback changes.
 - [x] Fix returned Toast IDs so `toasts.dismiss()` accepts them.
 - [x] Fix Tooltip instant transitions and logical arrow placement in RTL.
-- [x] Replace `Box.unsafeClassName` with the constrained `scrollbar="thin"` capability.
+- [x] Replace `Box.unsafeClassName` and manual scrollbar props with the automatic scroll-container recipe.
 - [x] Extend prop extraction to direct and compound `forwardRef` exports.
 - [x] Preserve explicit `null` and instantiated generic aliases in generated prop metadata.
 - [x] Add Box component documentation and align changed component prop selections.

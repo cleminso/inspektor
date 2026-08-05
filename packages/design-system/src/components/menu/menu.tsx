@@ -6,6 +6,7 @@ import { forwardRef, useContext, type ComponentRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
+import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { InputGroupContext } from "../inputGroup/inputGroupContext";
 import { menuStyles } from "./menu.styles";
 
@@ -220,6 +221,7 @@ const popupWidthStyles = {
 const MenuPopup = forwardRef<HTMLDivElement, MenuPopupProps>(function MenuPopup({ width = "content", ...props }, ref) {
   const stateStyles = createStateStyleProps<BaseMenu.Popup.State>((state) => [
     menuStyles.popup,
+    scrollbarStyles.standard,
     popupWidthStyles[width],
     (state.transitionStatus === "starting" || state.transitionStatus === "ending") && menuStyles.popupTransition,
     state.open === true && menuStyles.popupOpen,
@@ -238,7 +240,15 @@ const MenuPopup = forwardRef<HTMLDivElement, MenuPopupProps>(function MenuPopup(
     state.nested === true && menuStyles.popupNested,
     state.instant !== undefined && menuStyles.popupInstant,
   ]);
-  return <BaseMenu.Popup {...props} ref={ref} {...stateStyles} data-slot="menu-popup" />;
+  return (
+    <BaseMenu.Popup
+      {...props}
+      ref={ref}
+      {...stateStyles}
+      data-scrollbar="standard"
+      data-slot="menu-popup"
+    />
+  );
 });
 
 const MenuContent = forwardRef<HTMLDivElement, MenuContentProps>(function MenuContent(

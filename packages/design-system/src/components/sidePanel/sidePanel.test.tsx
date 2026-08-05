@@ -17,7 +17,7 @@ describe('SidePanel', () => {
 
     expect(screen.getByRole('complementary', { name: 'Inspector panel' })).toBeTruthy()
     expect(screen.getByText('Header')).toBeTruthy()
-    expect(screen.getByText('Body')).toBeTruthy()
+    expect(screen.getByText('Body').closest('[data-scrollbar="overlay"]')).toBeTruthy()
     expect(screen.getByText('Footer')).toBeTruthy()
   })
 })

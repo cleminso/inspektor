@@ -29,7 +29,8 @@ test("extracts direct and compound forwardRef component props", () => {
 
   assert.ok(metadata.input?.some(({ name }) => name === "size"));
   assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "render"));
-  assert.ok(metadata.box?.some(({ name }) => name === "scrollbar"));
+  assert.ok(metadata.box?.some(({ name }) => name === "overflow"));
+  assert.equal(metadata.box?.some(({ name }) => name === "scrollbar"), false);
   assert.doesNotMatch(
     metadata.box?.find(({ name }) => name === "padding")?.type ?? "",
     /\bT\b/,

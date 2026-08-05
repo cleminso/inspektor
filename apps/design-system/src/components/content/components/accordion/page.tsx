@@ -2,6 +2,7 @@ import { Box } from '@inspector/ds'
 import { type ReactElement } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { Example } from '@/components/docs/example'
 import { PropsTable } from '@/components/docs/propsTable'
 import { Section } from '@/components/docs/section'
 import { getGeneratedProps } from '@/lib/propsData'
@@ -9,6 +10,8 @@ import { accordionItem } from '@/lib/registry'
 
 import BasicExample from './basicExample'
 import basicSource from './basicExample.tsx?raw'
+import FillExample from './fillExample'
+import fillSource from './fillExample.tsx?raw'
 import {
   accordionItemPropNames,
   accordionPanelPropNames,
@@ -31,6 +34,14 @@ export function AccordionPage(): ReactElement {
       sourceCode={basicSource}
     >
       <Section title="Composition" description="Use one item for each related collapsible section." />
+      <Section
+        title="Constrained height"
+        description="Use the fill layout to keep complete section headers separated while overflowing panel content scrolls under overlay scrollbar chrome."
+      >
+        <Example source={fillSource} align="start">
+          <FillExample />
+        </Example>
+      </Section>
       <Section title="Root props"><PropsTable rows={rootProps} /></Section>
       <Section title="Item props"><PropsTable rows={itemProps} /></Section>
       <Section title="Trigger props"><PropsTable rows={triggerProps} /></Section>

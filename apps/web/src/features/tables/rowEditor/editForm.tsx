@@ -7,6 +7,7 @@ import {
   Button,
   FindBar,
   JsonView,
+  ScrollArea,
   Text,
   ToggleGroup,
   type FindBarSearchOptions,
@@ -125,13 +126,7 @@ function RowJsonRepresentation({
           }}
         />
       </Box>
-      <Box
-        scrollbar="thin"
-        scrollbarGutter="stable"
-        minHeight={0}
-        flex={1}
-        overflow="auto"
-      >
+      <ScrollArea>
         <JsonView
           accessibilityLabel="Row JSON"
           data={value}
@@ -142,7 +137,7 @@ function RowJsonRepresentation({
             onResultsChange: setSearchResults,
           }}
         />
-      </Box>
+      </ScrollArea>
     </Box>
   );
 }
@@ -197,35 +192,34 @@ function LoadedEditRowForm({
           overflow="hidden"
           onSubmit={rowEditor.submit}
         >
-          <Box
-            data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
-            scrollbar={rowEditor.expandedColumnName === null ? "thin" : undefined}
-            flexDirection="column"
-            flexGrow={1}
-            gap="xl"
-            mb="m"
-            minHeight={0}
-            overflowY={rowEditor.expandedColumnName === null ? "auto" : "hidden"}
-            px="m"
-          >
-            <RowEditorFields
-              errors={rowEditor.errors}
-              expandedColumnName={rowEditor.expandedColumnName}
-              fieldStates={rowEditor.fieldStates}
-              formFields={rowEditor.formFields}
-              initialRowValues={rowValues}
-              mode="edit"
-              onFieldExpandedChange={rowEditor.setFieldExpanded}
-              onFieldNullChange={rowEditor.setFieldNull}
-              onFieldOmittedChange={rowEditor.setFieldOmitted}
-              onFieldTextChange={rowEditor.setFieldText}
-            />
+          <Box flexGrow={1} mb="m" minHeight={0} overflow="hidden">
+            <ScrollArea
+              axis={rowEditor.expandedColumnName === null ? "vertical" : "none"}
+              data-row-editor-scroll-owner={
+                rowEditor.expandedColumnName === null ? "form" : "editor"
+              }
+            >
+              <Box flexDirection="column" flexGrow={1} gap="xl" minHeight={0} px="m">
+                <RowEditorFields
+                  errors={rowEditor.errors}
+                  expandedColumnName={rowEditor.expandedColumnName}
+                  fieldStates={rowEditor.fieldStates}
+                  formFields={rowEditor.formFields}
+                  initialRowValues={rowValues}
+                  mode="edit"
+                  onFieldExpandedChange={rowEditor.setFieldExpanded}
+                  onFieldNullChange={rowEditor.setFieldNull}
+                  onFieldOmittedChange={rowEditor.setFieldOmitted}
+                  onFieldTextChange={rowEditor.setFieldText}
+                />
 
-            {deleteError !== null || rowEditor.saveError !== null ? (
-              <Text color="error" role="alert">
-                {deleteError ?? rowEditor.saveError}
-              </Text>
-            ) : null}
+                {deleteError !== null || rowEditor.saveError !== null ? (
+                  <Text color="error" role="alert">
+                    {deleteError ?? rowEditor.saveError}
+                  </Text>
+                ) : null}
+              </Box>
+            </ScrollArea>
           </Box>
 
           <Box

@@ -154,6 +154,7 @@ describe("CodeEditor", () => {
     const styles = document.head.textContent ?? "";
 
     expect(styles).toMatch(/scrollbar-color:\s*transparent transparent/);
+    expect(styles).not.toContain("scrollbar-gutter");
     expect(styles).toContain("::-webkit-scrollbar-thumb");
     expect(styles).toContain(":hover");
     expect(styles).toContain("cm-focused");

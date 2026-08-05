@@ -20,6 +20,19 @@ function Options() {
 }
 
 describe('Select', () => {
+  it('uses the standard treatment on its scrolling list', () => {
+    render(
+      <Select.Root items={items} defaultOpen>
+        <Select.Trigger>
+          <Select.Value />
+        </Select.Trigger>
+        <Options />
+      </Select.Root>,
+    )
+
+    expect(screen.getByRole('listbox').getAttribute('data-scrollbar')).toBe('standard')
+  })
+
   it('preserves single-select value types', () => {
     expectTypeOf<SelectRootProps<'main' | 'preview'>['value']>().toEqualTypeOf<
       'main' | 'preview' | null | undefined

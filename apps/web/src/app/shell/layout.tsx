@@ -17,9 +17,13 @@ export function InspectorLayout({ children, leftDock }: InspectorLayoutProps): R
       flexDirection="column"
       rowGap="xs"
       overflow="hidden"
+      position="fixed"
+      inset="none"
       backgroundColor="bg-layout"
       color="text-default"
       height="screen-height-dynamic"
+      data-layout="viewport"
+      data-page-scroll="locked"
     >
       <InspectorHeader />
       <Box

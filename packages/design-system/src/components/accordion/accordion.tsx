@@ -1,13 +1,17 @@
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion'
 import * as stylex from '@stylexjs/stylex'
-import { forwardRef, type ReactNode } from 'react'
+import { createContext, forwardRef, useContext, type ReactNode } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { ScrollAreaPrivate } from '../scrollArea/scrollArea'
 import { accordionStyles } from './accordion.styles'
 
 type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
 
 export type AccordionValue = string | number
+export type AccordionLayout = 'content' | 'fill'
+
+const AccordionLayoutContext = createContext<AccordionLayout>('content')
 
 export interface AccordionRootProps extends Omit<
   WithoutStyles<BaseAccordion.Root.Props<AccordionValue>>,
@@ -25,6 +29,8 @@ export interface AccordionRootProps extends Omit<
   multiple?: boolean
   /** Disables every accordion item. */
   disabled?: boolean
+  /** Controls whether panels use their content height or overlay scrolling in a constrained parent. */
+  layout?: AccordionLayout
 }
 
 export interface AccordionItemProps extends WithoutStyles<BaseAccordion.Item.Props> {
@@ -61,23 +67,28 @@ export interface AccordionPanelProps extends WithoutStyles<BaseAccordion.Panel.P
 }
 
 const AccordionRoot = forwardRef<HTMLDivElement, AccordionRootProps>(function AccordionRoot(
-  { multiple = false, disabled = false, ...props },
+  { multiple = false, disabled = false, layout = 'content', ...props },
   forwardedRef,
 ) {
   const stateStyles = createStateStyleProps<BaseAccordion.Root.State>((state) => [
     accordionStyles.root,
+    layout === 'fill' && accordionStyles.rootFill,
     state.disabled === true && accordionStyles.rootDisabled,
     state.orientation === 'horizontal' && accordionStyles.rootHorizontal,
     state.orientation === 'vertical' && accordionStyles.rootVertical,
   ])
   return (
-    <BaseAccordion.Root
-      {...props}
-      ref={forwardedRef}
-      multiple={multiple}
-      disabled={disabled}
-      {...stateStyles}
-    />
+    <AccordionLayoutContext.Provider value={layout}>
+      <BaseAccordion.Root
+        {...props}
+        ref={forwardedRef}
+        multiple={multiple}
+        disabled={disabled}
+        data-item-spacing={layout === 'fill' ? 'inset' : undefined}
+        data-layout={layout}
+        {...stateStyles}
+      />
+    </AccordionLayoutContext.Provider>
   )
 })
 
@@ -85,8 +96,11 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(function Ac
   { disabled = false, ...props },
   forwardedRef,
 ) {
+  const layout = useContext(AccordionLayoutContext)
   const stateStyles = createStateStyleProps<BaseAccordion.Item.State>((state) => [
     accordionStyles.item,
+    layout === 'fill' && accordionStyles.itemFill,
+    layout === 'fill' && state.index !== 0 && accordionStyles.itemFillIndexed,
     state.open === true && accordionStyles.itemOpen,
     state.open === false && accordionStyles.itemClosed,
     state.disabled === true && accordionStyles.itemDisabled,
@@ -100,8 +114,10 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(function Ac
 
 const AccordionHeader = forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
   function AccordionHeader(props, forwardedRef) {
+    const layout = useContext(AccordionLayoutContext)
     const stateStyles = createStateStyleProps<BaseAccordion.Header.State>((state) => [
       accordionStyles.header,
+      layout === 'fill' && accordionStyles.headerFill,
       state.open === true && accordionStyles.headerOpen,
       state.open === false && accordionStyles.headerClosed,
       state.disabled === true && accordionStyles.headerDisabled,
@@ -145,9 +161,11 @@ const AccordionTrigger = forwardRef<HTMLElement, AccordionTriggerProps>(function
 })
 
 const AccordionPanel = forwardRef<HTMLDivElement, AccordionPanelProps>(
-  function AccordionPanel(props, forwardedRef) {
+  function AccordionPanel({ children, ...props }, forwardedRef) {
+    const layout = useContext(AccordionLayoutContext)
     const stateStyles = createStateStyleProps<BaseAccordion.Panel.State>((state) => [
       accordionStyles.panel,
+      layout === 'fill' && accordionStyles.panelFill,
       (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
         accordionStyles.panelTransitioning,
       state.open === true && accordionStyles.panelOpen,
@@ -160,7 +178,17 @@ const AccordionPanel = forwardRef<HTMLDivElement, AccordionPanelProps>(
       state.transitionStatus === 'starting' && accordionStyles.panelStarting,
       state.transitionStatus === 'ending' && accordionStyles.panelEnding,
     ])
-    return <BaseAccordion.Panel {...props} ref={forwardedRef} {...stateStyles} />
+    return (
+      <BaseAccordion.Panel
+        {...props}
+        ref={forwardedRef}
+        data-overflow={layout === 'fill' ? 'clipped' : undefined}
+        data-slot="accordion-panel"
+        {...stateStyles}
+      >
+        {layout === 'fill' ? <ScrollAreaPrivate>{children}</ScrollAreaPrivate> : children}
+      </BaseAccordion.Panel>
+    )
   },
 )
 

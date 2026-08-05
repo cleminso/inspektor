@@ -64,6 +64,18 @@ afterEach(() => {
 })
 
 describe('TabView', () => {
+  it('keeps horizontal scrolling without visible scrollbar chrome', () => {
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List aria-label="Table views">
+          <TabView.Item value="all">All accounts</TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    expect(screen.getByRole('tablist').getAttribute('data-scrollbar')).toBe('hidden')
+  })
+
   it('rejects duplicate reorder values', () => {
     expect(() =>
       render(

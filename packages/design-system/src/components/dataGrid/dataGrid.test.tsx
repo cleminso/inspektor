@@ -205,6 +205,50 @@ function TestDataGrid({
   );
 }
 
+describe("DataGrid scrollbar", () => {
+  it("uses overlay tracks outside its two-axis viewport", () => {
+    const { container } = render(<TestDataGrid />);
+
+    const viewport = container.querySelector('[data-slot="data-grid-viewport"]');
+    const scrollbars = Array.from(
+      container.querySelectorAll('[data-slot="scroll-area-scrollbar"]'),
+    );
+
+    expect(viewport?.getAttribute("data-scrollbar")).toBe("hidden");
+    expect(scrollbars.map((scrollbar) => scrollbar.getAttribute("data-orientation"))).toEqual([
+      "vertical",
+      "horizontal",
+    ]);
+    expect(scrollbars.every((scrollbar) => viewport?.contains(scrollbar) === false)).toBe(true);
+  });
+
+  it("starts its vertical scrollbar below the sticky header", () => {
+    const { container } = render(<TestDataGrid />);
+
+    expect(
+      container
+        .querySelector('[data-slot="scroll-area-scrollbar"][data-orientation="vertical"]')
+        ?.getAttribute("data-placement"),
+    ).toBe("body");
+  });
+
+  it("fills unused viewport width before horizontal overflow is needed", () => {
+    const { container } = render(<TestDataGrid />);
+
+    expect(
+      container.querySelector('[data-slot="data-grid-table"]')?.getAttribute("data-layout"),
+    ).toBe("fill-viewport");
+  });
+
+  it("keeps the header group above scrolling body rows", () => {
+    const { container } = render(<TestDataGrid />);
+
+    expect(
+      container.querySelector('[data-slot="data-grid-header"]')?.getAttribute("data-sticky"),
+    ).toBe("true");
+  });
+});
+
 function ExpandedTestDataGrid() {
   const table = useReactTable({
     columns,

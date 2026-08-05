@@ -45,6 +45,26 @@ afterEach(() => {
 });
 
 describe("SidePanelLayout", () => {
+  it("provides shell controls through its render boundary", () => {
+    render(
+      <SidePanelLayoutProvider>
+        {({ isOpen, toggle }) => (
+          <button type="button" aria-pressed={isOpen} onClick={toggle}>
+            Toggle shell dock
+          </button>
+        )}
+      </SidePanelLayoutProvider>,
+    );
+
+    const toggle = screen.getByRole("button", { name: "Toggle shell dock" });
+    expect(toggle.getAttribute("aria-pressed")).toBe("true");
+
+    fireEvent.click(toggle);
+
+    expect(panel.collapse).toHaveBeenCalledOnce();
+    expect(toggle.getAttribute("aria-pressed")).toBe("false");
+  });
+
   it("starts open and toggles from a control outside the resizable layout", () => {
     function DockToggle(): React.ReactElement {
       const { isOpen, toggle } = useSidePanelLayout();

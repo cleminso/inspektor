@@ -224,15 +224,19 @@ describe("EditRowForm Details and JSON views", () => {
     expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
     expect(screen.queryByRole("textbox", { name: "DisplayName" })).toBeNull();
     expect(
-      screen
-        .getByRole("tree", { name: "Row JSON" })
-        .closest("[data-scrollbar-gutter]")
-        ?.getAttribute("data-scrollbar-gutter"),
-    ).toBe("stable");
-    expect(
-      screen.getByRole("searchbox", { name: "Find in row JSON" }).closest("[data-scrollbar-gutter]"),
-    ).toBeNull();
-    expect(container.querySelectorAll('[data-scrollbar-gutter="stable"]')).toHaveLength(1);
+      screen.getByRole("tree", { name: "Row JSON" }).closest('[data-scrollbar="overlay"]'),
+    ).toBeTruthy();
+    expect(container.querySelectorAll("[data-scrollbar-gutter]")).toHaveLength(0);
+  });
+
+  it("overlays the Details scrollbar without placing actions in the viewport", () => {
+    const { container } = renderEditRowForm();
+
+    const viewport = container.querySelector('[data-row-editor-scroll-owner="form"]');
+
+    expect(viewport?.getAttribute("data-scrollbar")).toBe("hidden");
+    expect(viewport?.closest('[data-scrollbar="overlay"]')).toBeTruthy();
+    expect(viewport?.contains(screen.getByRole("button", { name: "Save" }))).toBe(false);
   });
 
   it("preserves edited Details text after switching to JSON and back", () => {

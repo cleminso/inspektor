@@ -47,6 +47,7 @@ export const dataGridStyles = stylex.create({
     lineHeight: lineHeights.compact,
     tableLayout: 'fixed',
     userSelect: 'none',
+    minWidth: '100%',
   },
   headerBackdropAnchor: {
     position: 'sticky',
@@ -69,8 +70,9 @@ export const dataGridStyles = stylex.create({
     height: spatial['control-height-m'],
   },
   header: {
-    position: 'relative',
-    zIndex: 1,
+    position: 'sticky',
+    zIndex: 4,
+    top: 0,
   },
   headerCell: {
     backgroundColor: backgroundColors['bg-table-header'],

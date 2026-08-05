@@ -17,12 +17,14 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
     <Box
       as="footer"
       width="full"
+      height="control-height-l"
       flexShrink={0}
       alignItems="center"
       gap="s"
       paddingVertical="s"
       paddingHorizontal="xs"
       backgroundColor="bg-page"
+      data-height="fixed"
     >
       <Box minWidth={0} flex={1} alignItems="center" gap="xs">
         {leftDock !== undefined ? (
@@ -36,7 +38,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
             title={leftDockLabel}
             onClick={leftDock.onToggle}
           >
-            <Icon render={<Table />} size="s" />
+            <Icon render={<Table />} size="xs" />
           </Button>
         ) : null}
         <Button
@@ -47,7 +49,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
           iconOnly
           title="Open subscriptions dock"
         >
-          <Icon render={<Activity />} size="s" />
+          <Icon render={<Activity />} size="xs" />
         </Button>
       </Box>
     </Box>

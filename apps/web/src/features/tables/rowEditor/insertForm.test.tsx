@@ -182,6 +182,21 @@ describe("InsertRowForm structured values", () => {
     expect(screen.getByRole("button", { name: "Insert" })).toBeTruthy();
   });
 
+  it("overlays the form scrollbar without placing the footer in the viewport", () => {
+    const columns = [
+      { name: "name", column_type: { type: "Text" }, nullable: false },
+    ] satisfies ColumnDescriptor[];
+    const { container } = render(
+      <InsertRowForm onSave={() => undefined} rowValues={{}} schemaColumns={columns} />,
+    );
+
+    const viewport = container.querySelector('[data-row-editor-scroll-owner="form"]');
+
+    expect(viewport?.getAttribute("data-scrollbar")).toBe("hidden");
+    expect(viewport?.closest('[data-scrollbar="overlay"]')).toBeTruthy();
+    expect(viewport?.contains(screen.getByRole("button", { name: "Insert" }))).toBe(false);
+  });
+
   it("respects a supplied value for a nullable structured field", async () => {
     const onSave = vi.fn();
     const columns = [

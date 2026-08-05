@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import type { ColumnDescriptor } from 'jazz-tools'
 
-import { Box, Button, Switch, Text } from '@inspector/ds'
+import { Box, Button, ScrollArea, Switch, Text } from '@inspector/ds'
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
 import { ROW_EDITOR_FORM_ID } from '@tables/rowEditor/editorForm'
@@ -57,38 +57,31 @@ function InsertRowFormFields({
       overflow="hidden"
       onSubmit={rowEditor.submit}
     >
-      <Box
-        data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? 'form' : 'editor'}
-        scrollbar={rowEditor.expandedColumnName === null ? 'thin' : undefined}
-        flexDirection="column"
-        flexGrow={1}
-        gap="xl"
-        mb="m"
-        minHeight={0}
-        overflowY={rowEditor.expandedColumnName === null ? 'auto' : 'hidden'}
-        px="m"
-        py="m"
-      >
-        <RowEditorFields
-          errors={rowEditor.errors}
-          expandedColumnName={rowEditor.expandedColumnName}
-          fieldStates={rowEditor.fieldStates}
-          formFields={rowEditor.formFields}
-          initialRowValues={rowValues}
-          mode="insert"
-          onFieldExpandedChange={rowEditor.setFieldExpanded}
-          onFieldNullChange={rowEditor.setFieldNull}
-          onFieldOmittedChange={rowEditor.setFieldOmitted}
-          onFieldTextChange={rowEditor.setFieldText}
-        />
-        {rowEditor.saveError !== null ? (
-          <Text
-            color="error"
-            role="alert"
-          >
-            {rowEditor.saveError}
-          </Text>
-        ) : null}
+      <Box flexGrow={1} mb="m" minHeight={0} overflow="hidden">
+        <ScrollArea
+          axis={rowEditor.expandedColumnName === null ? 'vertical' : 'none'}
+          data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? 'form' : 'editor'}
+        >
+          <Box flexDirection="column" flexGrow={1} gap="xl" minHeight={0} px="m" py="m">
+            <RowEditorFields
+              errors={rowEditor.errors}
+              expandedColumnName={rowEditor.expandedColumnName}
+              fieldStates={rowEditor.fieldStates}
+              formFields={rowEditor.formFields}
+              initialRowValues={rowValues}
+              mode="insert"
+              onFieldExpandedChange={rowEditor.setFieldExpanded}
+              onFieldNullChange={rowEditor.setFieldNull}
+              onFieldOmittedChange={rowEditor.setFieldOmitted}
+              onFieldTextChange={rowEditor.setFieldText}
+            />
+            {rowEditor.saveError !== null ? (
+              <Text color="error" role="alert">
+                {rowEditor.saveError}
+              </Text>
+            ) : null}
+          </Box>
+        </ScrollArea>
       </Box>
 
       <Box
