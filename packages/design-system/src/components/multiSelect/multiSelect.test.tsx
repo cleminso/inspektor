@@ -25,13 +25,16 @@ function TestMultiSelect({ initialValue = ["design", "components"] }: { initialV
 afterEach(cleanup);
 
 describe("MultiSelect", () => {
-  it("uses the standard treatment on its scrolling options", () => {
-    render(<TestMultiSelect />);
+  it("uses an overflow-aware overlay scrollbar for its options", () => {
+    const { container } = render(<TestMultiSelect />);
     fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
 
-    expect(screen.getByRole("group", { name: "Options" }).getAttribute("data-scrollbar")).toBe(
-      "standard",
-    );
+    const options = screen.getByRole("group", { name: "Options" });
+    const scrollArea = container.ownerDocument.querySelector('[data-slot="multi-select-scroll-area"]');
+    const viewport = container.ownerDocument.querySelector('[data-slot="multi-select-viewport"]');
+
+    expect(scrollArea?.getAttribute("data-scrollbar")).toBe("overlay");
+    expect(viewport?.contains(options)).toBe(true);
   });
 
   it("opens with dialog focus and exposes named checkbox rows", async () => {

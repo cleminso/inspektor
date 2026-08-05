@@ -23,6 +23,22 @@ export const scrollAreaStyles = stylex.create({
     minWidth: 0,
     width: '100%',
   },
+  rootContent: {
+    display: 'flex',
+    flexBasis: 'auto',
+    flexDirection: 'column',
+    flexGrow: 0,
+    height: 'auto',
+  },
+  maxHeightS: {
+    maxHeight: spatial['viewport-height-s'],
+  },
+  maxHeightM: {
+    maxHeight: spatial['viewport-height-m'],
+  },
+  maxHeightL: {
+    maxHeight: spatial['viewport-height-l'],
+  },
   viewport: {
     outlineColor: borderColors.outline,
     outlineOffset: -2,
@@ -35,6 +51,11 @@ export const scrollAreaStyles = stylex.create({
     minHeight: 0,
     minWidth: 0,
     width: '100%',
+  },
+  viewportContent: {
+    flexGrow: 1,
+    flexShrink: 1,
+    height: 'auto',
   },
   viewportVertical: {
     overflowX: 'hidden',

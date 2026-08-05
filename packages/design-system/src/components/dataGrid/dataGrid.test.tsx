@@ -207,12 +207,13 @@ describe("DataGrid scrollbar", () => {
     ).toBe("body");
   });
 
-  it("fills unused viewport width before horizontal overflow is needed", () => {
+  it("uses intrinsic TanStack column widths instead of redistributing viewport space", () => {
     const { container } = render(<TestDataGrid />);
+    const table = container.querySelector<HTMLElement>('[data-slot="data-grid-table"]');
 
-    expect(
-      container.querySelector('[data-slot="data-grid-table"]')?.getAttribute("data-layout"),
-    ).toBe("fill-viewport");
+    expect(table?.getAttribute("data-layout")).toBe("intrinsic");
+    expect(table?.style.width).toBe("300px");
+    expect(table === null ? null : getComputedStyle(table).minWidth).not.toBe("100%");
   });
 
   it("keeps the header group above scrolling body rows", () => {
@@ -542,7 +543,9 @@ describe("DataGrid", () => {
     expect(screen.getByRole("table", { name: "People" })).toBeTruthy();
     expect(screen.getAllByRole("columnheader")).toHaveLength(2);
     expect(screen.getAllByRole("row")).toHaveLength(3);
-    expect(screen.getByRole("cell", { name: "Ada" })).toBeTruthy();
+    expect(screen.getByRole("cell", { name: "Ada" }).getAttribute("data-typography")).toBe(
+      "mono",
+    );
   });
 
   it("uses one explicit column geometry without redistributing unaffected columns", () => {

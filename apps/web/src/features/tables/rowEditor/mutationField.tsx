@@ -250,7 +250,7 @@ export function MutationField({
   const defaultRestoreControl =
     canOmit === true && fieldState.isOmitted === false && isStructuredColumnType === false ? (
       <InputGroup fullWidth>
-        <Input aria-label={`${label} schema default`} readOnly value={defaultValue} />
+        <Input aria-label={`${label} schema default`} font="mono" readOnly value={defaultValue} />
         {defaultCheckbox}
       </InputGroup>
     ) : null;
@@ -357,7 +357,7 @@ export function MutationField({
           />
         ) : (
           <InputGroup fullWidth>
-            <Input id={fieldId} aria-label={label} disabled value={defaultValue} />
+            <Input id={fieldId} aria-label={label} disabled font="mono" value={defaultValue} />
             {defaultCheckbox}
           </InputGroup>
         )
@@ -465,6 +465,7 @@ export function MutationField({
         <InputGroup fullWidth>
           <Input
             id={fieldId}
+            font="mono"
             type="text"
             placeholder="YYYY-MM-DDTHH:mm:ss"
             value={timestampInputValue}
@@ -486,6 +487,7 @@ export function MutationField({
           <InputGroup fullWidth>
             <Input
               id={fieldId}
+              font="mono"
               value={fieldState.text}
               disabled={fieldState.isNull === true}
               readOnly={isReadOnly || isBinaryColumn === true}

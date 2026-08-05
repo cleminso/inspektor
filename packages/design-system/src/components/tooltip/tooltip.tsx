@@ -82,10 +82,13 @@ function TooltipRoot({
 
 const TooltipTrigger = React.forwardRef<React.ComponentRef<typeof BaseTooltip.Trigger>, TooltipTriggerProps>(
   function TooltipTrigger({ closeOnClick = true, disabled, render, ...props }, ref) {
-    const stateStyleProps = createStateStyleProps<BaseTooltip.Trigger.State>((state) => [
-      render === undefined && tooltipStyles.trigger,
-      state.open === true && tooltipStyles.triggerOpen,
-    ])
+    const stateStyleProps =
+      render === undefined
+        ? createStateStyleProps<BaseTooltip.Trigger.State>((state) => [
+            tooltipStyles.trigger,
+            state.open === true && tooltipStyles.triggerOpen,
+          ])
+        : undefined
     return (
       <BaseTooltip.Trigger
         {...props}

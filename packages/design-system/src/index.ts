@@ -166,6 +166,8 @@ export type {
   StructuredValuePreviewScalarModel,
   StructuredValuePreviewVariant,
 } from './components/structuredValuePreview/structuredValuePreview'
+export { MiddleTruncate } from './components/middleTruncate/middleTruncate'
+export type { MiddleTruncateProps } from './components/middleTruncate/middleTruncate'
 export { RelationDetails, RelationValue } from './components/relationValue/relationValue'
 export type {
   RelationDetailsProps,
@@ -196,7 +198,7 @@ export type {
 export { Fieldset } from './components/fieldset/fieldset'
 export type { FieldsetLegendProps, FieldsetRootProps } from './components/fieldset/fieldset'
 export { Input } from './components/input/input'
-export type { InputProps, InputSize, InputVariant } from './components/input/input'
+export type { InputFont, InputProps, InputSize, InputVariant } from './components/input/input'
 export { InputGroup } from './components/inputGroup/inputGroup'
 export type {
   InputGroupActionProps,

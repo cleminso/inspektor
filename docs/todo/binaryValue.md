@@ -16,6 +16,14 @@ This checklist tracks the reusable binary preview and inspection component.
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Keep byte-count values compact by joining the number and unit without a space in grid and inspection presentations.
+
+[05/08/26]
+
+- [x] Render compact byte-count values in monospace typography while keeping inspection controls proportional.
+
 [28/07/26]
 
 - [x] Document compact and inspection presentations with an executable consumer example.
@@ -42,6 +50,10 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[05/08/26]
+
+- [x] Format binary sizes as compact values such as `27B` and `3.5KB`.
+
 [27/07/26]
 
 - [x] Use `BinaryDetails` when copy and raw download actions are required.
@@ -53,6 +65,14 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify compact unit formatting and monospace inspection values through focused tests, typechecks, builds, and browser rendering.
+
+[05/08/26]
+
+- [x] Verify focused component tests, package typecheck, changed-file lint, and package and documentation builds.
 
 [28/07/26]
 

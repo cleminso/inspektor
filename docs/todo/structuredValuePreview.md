@@ -16,6 +16,15 @@ This checklist tracks the reusable compact structured-value preview component.
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Split structural counts from bounded payload text and place counts in a fixed leading rail.
+- [x] Preserve one accessible preview label while rendering marker and payload as separate visual elements.
+
+[05/08/26]
+
+- [x] Render compact structured-value markers and previews in monospace typography.
+
 [27/07/26]
 
 - [x] Document typed and untyped bounded summaries with an executable consumer example.
@@ -48,6 +57,14 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify marker and payload separation, accessible labels, shared rail width, focused tests, typechecks, lint, builds, and browser rendering.
+
+[05/08/26]
+
+- [x] Verify focused component tests, package typecheck, changed-file lint, package and documentation builds, and computed mono typography in the browser.
 
 [27/07/26]
 

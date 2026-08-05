@@ -10,7 +10,7 @@ import {
 export const binaryValueStyles = stylex.create({
   preview: {
     color: textColors["text-default"],
-    fontFamily: fontFamilies.sans,
+    fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
     whiteSpace: "nowrap",

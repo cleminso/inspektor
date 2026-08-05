@@ -73,6 +73,7 @@ describe("MutationField", () => {
     const input = screen.getByRole("textbox", { name: "RoomId" });
     const targetLink = screen.getByRole("link", { name: "Open target" });
     expect(input.closest('[data-slot="input-group"]')?.contains(targetLink)).toBe(true);
+    expect(input.getAttribute("data-font")).toBe("mono");
     expect(screen.queryByRole("link", { name: "Show" })).toBeNull();
   });
 
@@ -334,9 +335,9 @@ describe("MutationField", () => {
       />,
     );
 
-    expect((screen.getByRole("textbox", { name: "State" }) as HTMLInputElement).value).toBe(
-      "3 B",
-    );
+    const input = screen.getByRole("textbox", { name: "State" }) as HTMLInputElement;
+    expect(input.value).toBe("3B");
+    expect(input.getAttribute("data-font")).toBe("mono");
     expect(screen.getByRole("button", { name: "Copy as" })).toBeTruthy();
   });
 });

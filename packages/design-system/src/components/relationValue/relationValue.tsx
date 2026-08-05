@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import { CopyButton } from "../copyButton/copyButton";
 import { Input } from "../input/input";
 import { InputGroup } from "../inputGroup/inputGroup";
+import { MiddleTruncate } from "../middleTruncate/middleTruncate";
 import { TextLink } from "../textLink/textLink";
 import { relationValueStyles } from "./relationValue.styles";
 
@@ -76,18 +77,30 @@ export function RelationDetails(props: RelationDetailsProps) {
 
 export function RelationValue(props: RelationValueProps) {
   return (
-    <span {...stylex.props(relationValueStyles.compact)}>
-      {props.navigation === undefined ? (
-        <span data-typography="sans" {...stylex.props(relationValueStyles.compactId)}>
-          {props.id}
-        </span>
-      ) : (
-        <TextLink {...props.navigation} trailingIcon={<ArrowIcon />}>
-          <span data-typography="sans" {...stylex.props(relationValueStyles.compactId)}>
-            {props.id}
-          </span>
-        </TextLink>
-      )}
+    <span data-slot="relation-value" {...stylex.props(relationValueStyles.compact)}>
+      <span
+        data-typography="mono"
+        {...stylex.props(relationValueStyles.compactValue, relationValueStyles.compactId)}
+      >
+        {props.navigation === undefined ? (
+          <MiddleTruncate value={props.id} />
+        ) : (
+          <TextLink {...props.navigation}>
+            <span {...stylex.props(relationValueStyles.compactNavigation)}>
+              <span {...stylex.props(relationValueStyles.compactNavigationValue)}>
+                <MiddleTruncate value={props.id} />
+              </span>
+              <span
+                aria-hidden="true"
+                data-slot="relation-value-navigation-icon"
+                {...stylex.props(relationValueStyles.compactNavigationIcon)}
+              >
+                <ArrowIcon />
+              </span>
+            </span>
+          </TextLink>
+        )}
+      </span>
     </span>
   );
 }

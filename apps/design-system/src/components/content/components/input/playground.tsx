@@ -1,4 +1,4 @@
-import { Box, Input, type InputSize, type InputVariant } from "@inspector/ds";
+import { Box, Input, type InputFont, type InputSize, type InputVariant } from "@inspector/ds";
 import { type ReactElement, type ReactNode, useState } from "react";
 
 import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
@@ -10,6 +10,7 @@ import { inputItem } from "@/lib/registry";
 export interface InputPlaygroundState {
   size: InputSize;
   variant: InputVariant;
+  font: InputFont;
   fullWidth: boolean;
   invalid: boolean;
   disabled: boolean;
@@ -20,6 +21,7 @@ export interface InputPlaygroundState {
 const initialState: InputPlaygroundState = {
   size: "m",
   variant: "default",
+  font: "sans",
   fullWidth: false,
   invalid: false,
   disabled: false,
@@ -39,6 +41,12 @@ const controls = [
     label: "Variant",
     options: ["default", "subtle"].map((value) => ({ label: value, value })),
   },
+  {
+    kind: "select",
+    key: "font",
+    label: "Font",
+    options: ["sans", "mono"].map((value) => ({ label: value, value })),
+  },
   { kind: "boolean", key: "fullWidth", label: "Full width" },
   { kind: "boolean", key: "invalid", label: "Invalid" },
   { kind: "boolean", key: "disabled", label: "Disabled" },
@@ -49,6 +57,7 @@ export function serializeInputPlayground(state: InputPlaygroundState): string {
   const props = ['aria-label="Email"', 'placeholder="name@example.com"'];
   if (state.size !== "m") props.push(`size="${state.size}"`);
   if (state.variant !== "default") props.push(`variant="${state.variant}"`);
+  if (state.font !== "sans") props.push(`font="${state.font}"`);
   if (state.fullWidth === true) props.push("fullWidth");
   if (state.invalid === true) props.push("invalid");
   if (state.disabled === true) props.push("disabled");

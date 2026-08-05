@@ -70,16 +70,11 @@ export const multiSelectStyles = stylex.create({
   popupWidthL: { width: spatial["multi-select-width-l"] },
   options: {
     padding: spatial["popup-collection-padding"],
+    overflow: "clip",
     overscrollBehavior: "contain",
     display: "flex",
     flexDirection: "column",
-    flexShrink: 1,
-    minHeight: 0,
-    overflowY: "auto",
   },
-  optionsHeightS: { maxHeight: spatial["viewport-height-s"] },
-  optionsHeightM: { maxHeight: spatial["viewport-height-m"] },
-  optionsHeightL: { maxHeight: spatial["viewport-height-l"] },
   row: {
     [multiSelectVars.actionOpacity]: {
       default: 0,

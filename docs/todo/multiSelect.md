@@ -13,6 +13,11 @@
 
 [05/08/26]
 
+- [x] Size the option viewport to its collection until the configured maximum height is reached.
+- [x] Replace the native option scrollbar treatment with an overflow-aware overlay track.
+
+[05/08/26]
+
 - [x] Present the complete known item collection without query state, filtering, or search-specific content props.
 - [x] Focus the dialog surface on open and enter the first or last mutable row with Down or Up.
 
@@ -59,6 +64,10 @@
 
 [05/08/26]
 
+- [x] Keep scrollbar chrome hidden when the complete option collection fits in the viewport.
+
+[05/08/26]
+
 - [x] Multi Select presents a known collection directly rather than combining selection with search.
 - [x] Initial dialog focus keeps checkbox and contextual-action focus as separate row columns.
 
@@ -80,6 +89,12 @@
 - [ ] Decide whether large item collections require persistent action labels on touch interfaces.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Focused Multi Select and Scroll Area tests pass.
+- [x] Package typecheck, build, and changed-file lint pass.
+- [x] Browser verification covers fitting and overflowing option collections.
 
 [05/08/26]
 

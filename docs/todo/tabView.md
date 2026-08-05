@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Preserve Tab View state-driven presentation while its composed tooltip trigger opens.
+
 [01/08/26]
 
 - [x] Keep resting and active Tab View items free of a persistent outline.
@@ -60,6 +64,10 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Browser verification confirms tooltip opening preserves the tab's classes and `180px` by `26px` geometry.
 
 [01/08/26]
 

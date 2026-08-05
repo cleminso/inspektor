@@ -167,6 +167,12 @@ describe("focusRowEditorField", () => {
 });
 
 describe("EditRowForm Details and JSON views", () => {
+  it("uses monospace typography for the synthetic row ID value", () => {
+    renderEditRowForm();
+
+    expect(screen.getByRole("textbox", { name: "ID" }).getAttribute("data-font")).toBe("mono");
+  });
+
   it("selects Details by default", () => {
     renderEditRowForm();
 

@@ -30,7 +30,7 @@ Chunked file storage:
 ## What our Inspector Does
 
 Our value classification verifies that a Bytea value is a Uint8Array.
-The table cell displays the byte count, such as 12 KB, rather than attempting to display arbitrary binary content.
+The table cell displays the byte count, such as 12KB, rather than attempting to display arbitrary binary content.
 The inspection panel supports:
 
 - Copy as hexadecimal

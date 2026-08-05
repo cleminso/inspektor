@@ -47,7 +47,6 @@ export const dataGridStyles = stylex.create({
     lineHeight: lineHeights.compact,
     tableLayout: 'fixed',
     userSelect: 'none',
-    minWidth: '100%',
   },
   headerBackdropAnchor: {
     position: 'sticky',
@@ -205,6 +204,7 @@ export const dataGridStyles = stylex.create({
   cell: {
     backgroundColor: 'transparent',
     boxSizing: 'border-box',
+    fontFamily: fontFamilies.mono,
     borderBottomColor: borderColors['border-table-cell'],
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
@@ -223,7 +223,6 @@ export const dataGridStyles = stylex.create({
       default: 0,
       ':focus-visible': spatial['focus-ring-width'],
     },
-    textOverflow: 'ellipsis',
     paddingBottom: 0,
     whiteSpace: 'nowrap',
     paddingLeft: spacing.m,

@@ -27,7 +27,12 @@ describe("RelationCellLink", () => {
     expect(link.getAttribute("href")).toBe(
       "/conn/$connectionId/tables/$tableName",
     );
-    expect(link.querySelector('[data-slot="text-link-trailing-icon"]')).toBeTruthy();
+    expect(link.querySelector('[data-slot="middle-truncate"]')).toBeTruthy();
+    expect(
+      link
+        .closest('[data-slot="relation-value"]')
+        ?.querySelector('[data-slot="relation-value-navigation-icon"]'),
+    ).toBeTruthy();
     expect(link.getAttribute("title")).toBeNull();
   });
 });

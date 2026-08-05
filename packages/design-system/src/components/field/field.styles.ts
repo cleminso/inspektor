@@ -26,7 +26,7 @@ export const fieldStyles = stylex.create({
     display: "inline-flex",
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
-    fontWeight: fontWeights.medium,
+    fontWeight: fontWeights.regular,
     lineHeight: lineHeights.compact,
   },
   message: {

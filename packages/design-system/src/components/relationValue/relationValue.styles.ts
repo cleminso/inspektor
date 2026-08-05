@@ -13,15 +13,39 @@ export const relationValueStyles = stylex.create({
   compact: {
     gap: spacing.xs,
     alignItems: "center",
-    display: "inline-flex",
+    display: "flex",
+    minWidth: 0,
+    width: "100%",
+  },
+  compactValue: {
+    overflow: "hidden",
+    flexBasis: 0,
+    flexGrow: 1,
     minWidth: 0,
   },
   compactId: {
     color: textColors["text-default"],
-    fontFamily: fontFamilies.sans,
+    fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    overflowWrap: "anywhere",
+  },
+  compactNavigation: {
+    gap: spacing.xs,
+    alignItems: "center",
+    display: "flex",
+    minWidth: 0,
+    width: "100%",
+  },
+  compactNavigationValue: {
+    overflow: "hidden",
+    flexBasis: 0,
+    flexGrow: 1,
+    minWidth: 0,
+  },
+  compactNavigationIcon: {
+    alignItems: "center",
+    display: "inline-flex",
+    flexShrink: 0,
   },
   compactMissing: {
     color: textColors["text-danger"],

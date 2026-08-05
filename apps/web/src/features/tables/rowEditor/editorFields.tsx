@@ -294,6 +294,7 @@ export function RowEditorFields({
         </Box>
         <Input
           id="row-editor-id"
+          font="mono"
           value={mode === "insert" ? "auto-generated" : String(initialRowValues.id ?? "")}
           fullWidth
           readOnly

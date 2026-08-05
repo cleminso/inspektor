@@ -179,8 +179,8 @@ describe("buildDataGridColumns", () => {
       ],
     });
 
-    expect(columns.find((column) => column.id === "id")?.size).toBe(260);
-    expect(columns.find((column) => column.id === "enabled")?.size).toBe(96);
+    expect(columns.find((column) => column.id === "id")?.size).toBe(280);
+    expect(columns.find((column) => column.id === "enabled")?.size).toBe(220);
     expect(columns.find((column) => column.id === "metadata")?.size).toBe(220);
   });
 
@@ -290,7 +290,7 @@ describe("buildDataGridColumns", () => {
     expect(screen.getByLabelText("Boolean false")).toBeTruthy();
   });
 
-  it("renders row IDs as continuous truncated text", () => {
+  it("renders row IDs with middle truncation", () => {
     const id = "row_0123456789abcdefghijklmnopqrstuvwxyz";
     render(
       <TestTable
@@ -300,12 +300,11 @@ describe("buildDataGridColumns", () => {
       />,
     );
 
-    const idValue = screen.getByLabelText(id);
-    expect(idValue.textContent).toBe(id);
-    expect(idValue.getAttribute("data-cell-overflow")).toBe("truncate");
+    const idValue = screen.getByText(id).closest('[data-cell-overflow="middle-truncate"]');
+    expect(idValue?.querySelector('[data-slot="middle-truncate"]')).toBeTruthy();
   });
 
-  it("uses one proportional font for compact values while retaining tabular numbers", () => {
+  it("uses monospace typography for raw values while retaining tabular numbers", () => {
     const rowId = "row_0123456789abcdef";
     const uuid = "03c905ac-d9a6-58b8-8d90-5dc3b9df6038";
     render(
@@ -358,11 +357,13 @@ describe("buildDataGridColumns", () => {
       />,
     );
 
-    expect(screen.getByLabelText(rowId).getAttribute("data-cell-typography")).toBeNull();
-    expect(screen.getByText(uuid).getAttribute("data-cell-typography")).toBeNull();
-    expect(screen.getByText("Ada").getAttribute("data-cell-typography")).toBeNull();
-    expect(screen.getByText("admin").getAttribute("data-cell-typography")).toBeNull();
-    expect(screen.getByText("1203").getAttribute("data-numeric-variant")).toBe("tabular");
+    expect(screen.getByText(rowId).closest('[data-cell-typography="mono"]')).toBeTruthy();
+    expect(screen.getByText(uuid).getAttribute("data-cell-typography")).toBe("mono");
+    expect(screen.getByText("Ada").getAttribute("data-cell-typography")).toBe("mono");
+    expect(screen.getByText("admin").getAttribute("data-cell-typography")).toBe("mono");
+    const numericValue = screen.getByText("1203");
+    expect(numericValue.getAttribute("data-cell-typography")).toBe("mono");
+    expect(numericValue.getAttribute("data-numeric-variant")).toBe("tabular");
   });
 
   it("renders bounded structured and binary previews", () => {
@@ -399,10 +400,11 @@ describe("buildDataGridColumns", () => {
       />,
     );
 
-    expect(screen.getByText("317 B")).toBeTruthy();
-    expect(screen.getByText(/^\[4\] "reader", "writer", "reader"/)).toBeTruthy();
+    expect(screen.getByText("317B")).toBeTruthy();
+    expect(screen.getByText("[4]")).toBeTruthy();
+    expect(screen.getByText(/^"reader", "writer", "reader"/)).toBeTruthy();
     expect(screen.queryByText(/0,0,0/)).toBeNull();
-    expect(screen.getByText("317 B").closest("[title]")).toBeNull();
+    expect(screen.getByText("317B").closest("[title]")).toBeNull();
     expect(screen.getByText(/reader/).closest("[title]")).toBeNull();
   });
 
@@ -456,7 +458,7 @@ describe("buildDataGridColumns", () => {
       ).tagName,
     ).toBe("TIME");
     expect(screen.getByLabelText("Typed JSON value")).toBeTruthy();
-    expect(screen.getByText(/enabled: true/).tagName).toBe("CODE");
+    expect(screen.getByText(/enabled: true/).closest("code")).toBeTruthy();
     expect(nestedReads).toBe(0);
   });
 });

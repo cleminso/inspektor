@@ -16,6 +16,14 @@ This checklist tracks the reusable relation preview and detail component.
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Middle-truncate compact stored identifiers while reserving a fixed slot for the navigation arrow.
+
+[05/08/26]
+
+- [x] Render compact stored relation identifiers in monospace typography so equal-length identifiers align while navigation remains attached.
+
 [28/07/26]
 
 - [x] Document compact and detail relation presentations with an executable consumer example.
@@ -45,6 +53,10 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[05/08/26]
+
+- [x] Align the compact navigation indicator to the trailing cell edge so relation rows scan consistently and retain a stable target.
+
 [27/07/26]
 
 - [x] Demonstrate the constrained navigation API through `href` rather than `render`.
@@ -57,6 +69,14 @@ No open product work is recorded.
 - [ ] Decide whether `Open target` should expose the target collection as supplementary tooltip text.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify focused relation tests and browser resizing keep the navigation arrow visible beside middle-truncated text.
+
+[05/08/26]
+
+- [x] Verify focused component tests, package typecheck, changed-file lint, package and documentation builds, and computed mono typography in the browser.
 
 [28/07/26]
 

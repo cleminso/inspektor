@@ -26,7 +26,7 @@ export function StructuredValuePreviewPage(): ReactElement {
     >
       <Section
         title="Bounded summaries"
-        description="Consumers provide bounded normalized labels and explicit continuation state. The component renders array, object, or scalar models without reading arbitrary source objects."
+        description="Consumers provide bounded normalized labels and explicit continuation state. Array and object counts occupy a stable leading rail before the bounded payload. The component never reads arbitrary source objects."
       />
       <Section title="StructuredValuePreview props">
         <PropsTable rows={structuredValuePreviewProps} />

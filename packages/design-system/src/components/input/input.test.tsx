@@ -23,4 +23,12 @@ describe("Input", () => {
 
     expect((screen.getByRole("textbox", { name: "Identifier" }) as HTMLInputElement).readOnly).toBe(true);
   });
+
+  it("supports monospace value typography", () => {
+    render(<Input aria-label="Identifier" font="mono" value="row-1" />);
+
+    expect(screen.getByRole("textbox", { name: "Identifier" }).getAttribute("data-font")).toBe(
+      "mono",
+    );
+  });
 });

@@ -13,6 +13,11 @@
 
 [05/08/26]
 
+- [x] Support content-sized private Scroll Areas that grow to a semantic viewport limit.
+- [x] Move Multi Select option scrolling onto Base UI overflow measurement and overlay tracks.
+
+[05/08/26]
+
 - [x] Define one package-owned scrollbar recipe using semantic border, spacing, and radius tokens.
 - [x] Keep the thumb and track transparent while a scroll container is inactive.
 - [x] Reveal the thumb when the scroll container is hovered or contains focus.
@@ -66,6 +71,12 @@
 - None.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Focused Scroll Area and Multi Select tests pass.
+- [x] Package typecheck, build, and changed-file lint pass.
+- [x] Browser verification confirms short Multi Select collections have no visible track and long collections remain scrollable.
 
 [05/08/26]
 

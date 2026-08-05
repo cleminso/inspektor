@@ -12,6 +12,8 @@ import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
 import StatesExample from "./statesExample";
 import statesSource from "./statesExample.tsx?raw";
+import TypographyExample from "./typographyExample";
+import typographySource from "./typographyExample.tsx?raw";
 import VariantsExample from "./variantsExample";
 import variantsSource from "./variantsExample.tsx?raw";
 
@@ -41,6 +43,15 @@ export function InputPage(): ReactElement {
       >
         <Example source={statesSource} align="stretch">
           <StatesExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Typography"
+        description="Use monospace for stored identifiers and other raw data values."
+      >
+        <Example source={typographySource} align="stretch">
+          <TypographyExample />
         </Example>
       </Section>
 

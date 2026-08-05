@@ -26,7 +26,6 @@ export const inputStyles = stylex.create({
     backgroundColor: backgroundColors["bg-card"],
     boxSizing: "border-box",
     color: textColors["text-default"],
-    fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
     outlineColor: borderColors["outline"],
@@ -45,6 +44,12 @@ export const inputStyles = stylex.create({
   },
   sizeL: {
     height: spatial["control-height-l"],
+  },
+  fontSans: {
+    fontFamily: fontFamilies.sans,
+  },
+  fontMono: {
+    fontFamily: fontFamilies.mono,
   },
   subtle: {
     borderColor: {

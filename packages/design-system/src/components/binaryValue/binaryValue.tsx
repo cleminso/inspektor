@@ -33,7 +33,7 @@ function formatByteCount(byteCount: number): string {
   }
 
   if (byteCount < 1_024) {
-    return `${byteCount} B`;
+    return `${byteCount}B`;
   }
 
   const unitIndex = Math.min(
@@ -41,11 +41,15 @@ function formatByteCount(byteCount: number): string {
     byteUnits.length - 1,
   );
   const amount = byteCount / 1_024 ** unitIndex;
-  return `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(amount)} ${byteUnits[unitIndex]}`;
+  return `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(amount)}${byteUnits[unitIndex]}`;
 }
 
 export function BinaryValue({ byteLength }: BinaryValueProps) {
-  return <span {...stylex.props(binaryValueStyles.preview)}>{formatByteCount(byteLength)}</span>;
+  return (
+    <span data-typography="mono" {...stylex.props(binaryValueStyles.preview)}>
+      {formatByteCount(byteLength)}
+    </span>
+  );
 }
 
 export function BinaryDetails({ byteLength, onCopy, onDownload }: BinaryDetailsProps) {
@@ -81,7 +85,7 @@ export function BinaryDetails({ byteLength, onCopy, onDownload }: BinaryDetailsP
   return (
     <div {...stylex.props(binaryValueStyles.inspection)} data-slot="binary-details">
       <InputGroup fullWidth size="s">
-        <Input aria-label="Binary value" readOnly value={byteCount} />
+        <Input aria-label="Binary value" font="mono" readOnly value={byteCount} />
         {isValidByteCount === true ? (
           <Menu.Root>
             <Menu.Trigger>Copy as</Menu.Trigger>

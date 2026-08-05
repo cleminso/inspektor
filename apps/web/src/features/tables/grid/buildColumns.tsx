@@ -12,6 +12,7 @@ import {
   Button,
   KeyboardInput,
   Menu,
+  MiddleTruncate,
   StructuredValuePreview,
   Text,
   TimestampValue,
@@ -43,44 +44,44 @@ export interface RowSelectionRequest {
 }
 
 interface ColumnSizing {
-  maxSize: number;
+  maxSize?: number;
   minSize: number;
   size: number;
 }
 
 function getColumnSizing(column: TableColumnMeta): ColumnSizing {
   if (column.id === "id" || column.column === null) {
-    return { size: 260, minSize: 160, maxSize: 260 };
+    return { size: 280, minSize: 156 };
   }
 
   if (column.column.references !== undefined) {
-    return { size: 280, minSize: 160, maxSize: 280 };
+    return { size: 290, minSize: 156 };
   }
 
   switch (column.column.column_type.type) {
     case "Boolean":
-      return { size: 96, minSize: 72, maxSize: 120 };
+      return { size: 220, minSize: 120 };
     case "Integer":
     case "BigInt":
     case "Double":
-      return { size: 120, minSize: 88, maxSize: 180 };
+      return { size: 220, minSize: 120 };
     case "Timestamp":
-      return { size: 180, minSize: 144, maxSize: 260 };
+      return { size: 210, minSize: 114 };
     case "Uuid":
-      return { size: 220, minSize: 160, maxSize: 360 };
+      return { size: 220, minSize: 156 };
     case "Json":
-      return { size: 220, minSize: 160, maxSize: 510 };
+      return { size: 220, minSize: 160 };
     case "Array":
-      return { size: 220, minSize: 160, maxSize: 510 };
+      return { size: 220, minSize: 160 };
     case "Row":
-      return { size: 320, minSize: 200, maxSize: 640 };
+      return { size: 220, minSize: 160 };
     case "Enum":
-      return { size: 160, minSize: 120, maxSize: 320 };
+      return { size: 160, minSize: 120 };
     case "Bytea":
-      return { size: 144, minSize: 144, maxSize: 144 };
+      return { size: 144, minSize: 144 };
     case "Text":
     default:
-      return { size: 280, minSize: 120, maxSize: 480 };
+      return { size: 280, minSize: 120 };
   }
 }
 
@@ -114,8 +115,13 @@ function CompactCellValue({
 
   if (isRowId === true && "displayValue" in presentation) {
     return (
-      <Text as="span" aria-label={presentation.displayValue} data-cell-overflow="truncate" truncate>
-        {presentation.displayValue}
+      <Text
+        as="span"
+        data-cell-overflow="middle-truncate"
+        data-cell-typography="mono"
+        monospace
+      >
+        <MiddleTruncate value={presentation.displayValue} />
       </Text>
     );
   }
@@ -127,7 +133,9 @@ function CompactCellValue({
           as="span"
           align="right"
           data-cell-alignment="end"
+          data-cell-typography="mono"
           data-numeric-variant="tabular"
+          monospace
           tabularNums
           truncate
         >
@@ -141,7 +149,9 @@ function CompactCellValue({
     return (
       <Box as="span" alignItems="center" gap="xs">
         <Text as="span" aria-label={`Boolean ${String(presentation.value)}`} color="muted"></Text>
-        <Text as="span">{String(presentation.value)}</Text>
+        <Text as="span" data-cell-typography="mono" monospace>
+          {String(presentation.value)}
+        </Text>
       </Box>
     );
   }
@@ -158,6 +168,8 @@ function CompactCellValue({
             : undefined
       }
       data-cell-overflow="truncate"
+      data-cell-typography="mono"
+      monospace
       truncate
     >
       {presentation.displayValue}
@@ -211,7 +223,7 @@ function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.
 
 export function ColumnDragPreview({ column }: { column: TableColumnMeta }): React.ReactElement {
   return (
-    <Box as="span" alignItems="center" display="flex" gap="s" minWidth={0}>
+    <Box as="span" alignItems="center" display="flex" gap="xxs" minWidth={0}>
       <ColumnTypeMarker marker={getColumnTypeMarker(column)} />
       <Text as="span" truncate variant="caption">
         {column.label}
@@ -392,7 +404,6 @@ function ColumnHeader({
           <Box
             as="span"
             alignItems="center"
-            data-slot="column-type-marker-slot"
             display="flex"
             gap="s"
             justifyContent="between"
@@ -401,17 +412,8 @@ function ColumnHeader({
           />
         }
       >
-        <Box as="span" alignItems="center" display="flex" flex={1} gap="s" minWidth={0}>
-          <Box
-            as="span"
-            alignItems="center"
-            display="flex"
-            flexShrink={0}
-            height="control-height-xs"
-            justifyContent="start"
-          >
-            <ColumnTypeMarker marker={marker} />
-          </Box>
+        <Box as="span" alignItems="center" display="flex" flex={1} gap="xxs" minWidth={0}>
+          <ColumnTypeMarker marker={marker} />
           <Text as="span" truncate variant="caption">
             {label}
           </Text>

@@ -69,6 +69,10 @@
 - [x] Keep the active header's structural top border blue when its outward perimeter is clipped by the viewport.
 - [x] Document the complete border, fill, ring, focus, resize, and drag model in `docs/notes/dataGridStyleModel.md`.
 
+[05/08/26]
+
+- [x] Give schema type markers and structured-value count markers a shared fixed leading rail so labels and preview payloads use the same content anchor.
+
 [01/08/26]
 
 - [x] Align compact header-content and body-cell inline padding through one shared style contract.
@@ -77,6 +81,12 @@
 - [x] Size schema type-marker slots to their content and use an `xs` gap between each marker and column name.
 
 ### Stable column geometry
+
+[05/08/26]
+
+- [x] Remove viewport-driven semantic-table expansion so TanStack `minSize`, `size`, and `maxSize` remain the only column-width model.
+- [x] Keep the row-selection header and cells at their configured `36px` width when the table is narrower than its viewport.
+- [x] Keep the scroll surface filling unused viewport space behind the intrinsic-width semantic table.
 
 [29/07/26]
 
@@ -145,6 +155,12 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify intrinsic semantic-table width preserves TanStack column sizes while the background scroll surface fills the viewport.
+- [x] Verify package and application tests, typechecks, changed-file lint, generated props, and production builds.
+- [x] Verify browser geometry reports the exact configured column sum instead of the wider viewport width.
 
 [05/08/26]
 

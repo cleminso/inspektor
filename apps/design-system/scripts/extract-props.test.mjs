@@ -539,6 +539,7 @@ test("extracts Input API facts from the public package export", () => {
     [
       "size",
       "variant",
+      "font",
       "fullWidth",
       "invalid",
       "disabled",
@@ -551,6 +552,7 @@ test("extracts Input API facts from the public package export", () => {
   );
   assert.equal(inputProps.find(({ name }) => name === "size")?.defaultValue, '"m"');
   assert.equal(inputProps.find(({ name }) => name === "variant")?.defaultValue, '"default"');
+  assert.equal(inputProps.find(({ name }) => name === "font")?.defaultValue, '"sans"');
   assert.equal(inputProps.find(({ name }) => name === "fullWidth")?.defaultValue, "false");
   assert.equal(
     inputProps.find(({ name }) => name === "className"),

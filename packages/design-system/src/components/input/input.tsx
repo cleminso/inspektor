@@ -8,6 +8,7 @@ import { inputStyles } from "./input.styles";
 
 export type InputSize = "s" | "m" | "l";
 export type InputVariant = "default" | "subtle";
+export type InputFont = "sans" | "mono";
 
 const sizeStyles = {
   s: inputStyles.sizeS,
@@ -20,11 +21,18 @@ const variantStyles = {
   subtle: inputStyles.subtle,
 } satisfies Record<InputVariant, unknown>;
 
+const fontStyles = {
+  sans: inputStyles.fontSans,
+  mono: inputStyles.fontMono,
+} satisfies Record<InputFont, unknown>;
+
 export interface InputProps extends Omit<BaseInput.Props, "className" | "style" | "size"> {
   /** Controls the input height. */
   size?: InputSize;
   /** Controls the input's visual prominence. */
   variant?: InputVariant;
+  /** Selects proportional or data-oriented typography. */
+  font?: InputFont;
   /** Stretches the input to the width of its container. */
   fullWidth?: boolean;
   /** Marks the input as invalid and exposes that state to assistive technology. */
@@ -44,7 +52,16 @@ export interface InputProps extends Omit<BaseInput.Props, "className" | "style" 
 }
 
 export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(function Input(
-  { size = "m", variant = "default", fullWidth = false, invalid = false, disabled = false, readOnly = false, ...props },
+  {
+    size = "m",
+    variant = "default",
+    font = "sans",
+    fullWidth = false,
+    invalid = false,
+    disabled = false,
+    readOnly = false,
+    ...props
+  },
   ref,
 ) {
   const inputGroup = useContext(InputGroupContext);
@@ -55,6 +72,7 @@ export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(func
     inputStyles.base,
     variantStyles[variant],
     sizeStyles[effectiveSize],
+    fontStyles[font],
     fullWidth === true && inputStyles.fullWidth,
     inputGroup !== null && inputStyles.grouped,
     state.disabled === true && inputStyles.disabled,
@@ -79,6 +97,7 @@ export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(func
       data-slot="input"
       data-size={effectiveSize}
       data-variant={variant}
+      data-font={font}
       data-full-width={fullWidth === true ? "" : undefined}
       data-grouped={inputGroup !== null ? "" : undefined}
     />

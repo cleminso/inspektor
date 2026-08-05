@@ -4,6 +4,7 @@ import {
   backgroundColors,
   borderColors,
   syntaxColors,
+  spatial,
   textColors,
 } from "../../tokens/semantics.stylex";
 import {
@@ -23,7 +24,7 @@ export const structuredValuePreviewStyles = stylex.create({
     maxWidth: "100%",
     minWidth: 0,
   },
-  marker: {
+  typedMarker: {
     borderColor: borderColors["border-secondary"],
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
@@ -33,17 +34,30 @@ export const structuredValuePreviewStyles = stylex.create({
     backgroundColor: backgroundColors["bg-subtle"],
     color: textColors["text-secondary"],
     flexShrink: 0,
-    fontFamily: fontFamilies.sans,
+    fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
     lineHeight: lineHeights.compact,
   },
-  preview: {
-    overflow: "hidden",
+  value: {
+    alignItems: "baseline",
     color: syntaxColors["syntax-property"],
-    fontFamily: fontFamilies.sans,
+    columnGap: spacing.s,
+    display: "inline-flex",
+    fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
+    maxWidth: "100%",
+    minWidth: 0,
+  },
+  markerRail: {
+    overflow: "hidden",
+    flexShrink: 0,
+    textOverflow: "ellipsis",
+    width: spatial["control-height-l"],
+  },
+  preview: {
+    overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
     minWidth: 0,

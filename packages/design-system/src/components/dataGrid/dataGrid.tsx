@@ -542,7 +542,7 @@ function DataGridTable({ "aria-label": ariaLabel, children }: DataGridTableProps
       <table
         {...stylex.props(dataGridStyles.table)}
         aria-label={ariaLabel}
-        data-layout="fill-viewport"
+        data-layout="intrinsic"
         data-slot="data-grid-table"
         style={{ width: tableWidth }}
       >
@@ -909,6 +909,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       data-row-active={isRowActive === true ? "" : undefined}
       data-selected={isSelected === true ? "" : undefined}
       data-slot="data-grid-cell"
+      data-typography="mono"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onMouseDown={handleMouseDown}

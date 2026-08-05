@@ -17,7 +17,7 @@ describe("RelationValue", () => {
     expect(screen.queryByRole("status")).toBeNull();
   });
 
-  it("composes router-independent navigation with a trailing arrow", () => {
+  it("keeps navigation beside the middle-truncated identifier", () => {
     render(
       <RelationValue
         id="account_0123456789"
@@ -26,11 +26,17 @@ describe("RelationValue", () => {
     );
 
     const link = screen.getByRole("link", { name: "account_0123456789" });
-    expect(link.getAttribute("href")).toBe("/accounts/account_0123456789");
-    expect(link.querySelector('[data-slot="text-link-trailing-icon"]')).toBeTruthy();
-    expect(screen.getByText("account_0123456789").getAttribute("data-typography")).toBe(
-      "sans",
+    const relationValue = link.closest('[data-slot="relation-value"]');
+    const navigationIcon = relationValue?.querySelector(
+      '[data-slot="relation-value-navigation-icon"]',
     );
+    expect(link.getAttribute("href")).toBe("/accounts/account_0123456789");
+    const middleTruncate = link.querySelector('[data-slot="middle-truncate"]');
+    expect(middleTruncate).toBeTruthy();
+    expect(navigationIcon).toBeTruthy();
+    expect(link.contains(navigationIcon ?? null)).toBe(true);
+    expect(middleTruncate?.contains(navigationIcon ?? null)).toBe(false);
+    expect(link.closest('[data-typography="mono"]')).toBeTruthy();
   });
 
   it("does not accept detail or styling props", () => {

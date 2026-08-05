@@ -3623,6 +3623,18 @@
       }
     }
   ],
+  "middleTruncate": [
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Complete string whose start and end remain visible when space is constrained.",
+      "source": {
+        "path": "packages/design-system/src/components/middleTruncate/middleTruncate.tsx",
+        "line": 9
+      }
+    }
+  ],
   "relationValue": [
     {
       "name": "id",
@@ -3631,7 +3643,7 @@
       "description": "Complete relation identifier stored in the source record.",
       "source": {
         "path": "packages/design-system/src/components/relationValue/relationValue.tsx",
-        "line": 20
+        "line": 21
       }
     },
     {
@@ -3641,7 +3653,7 @@
       "description": "Optional target navigation without coupling the component to an application router.",
       "source": {
         "path": "packages/design-system/src/components/relationValue/relationValue.tsx",
-        "line": 22
+        "line": 23
       }
     }
   ],
@@ -3653,7 +3665,7 @@
       "description": "Complete relation identifier stored in the source record.",
       "source": {
         "path": "packages/design-system/src/components/relationValue/relationValue.tsx",
-        "line": 20
+        "line": 21
       }
     },
     {
@@ -3663,7 +3675,7 @@
       "description": "Optional target navigation without coupling the component to an application router.",
       "source": {
         "path": "packages/design-system/src/components/relationValue/relationValue.tsx",
-        "line": 22
+        "line": 23
       }
     },
     {
@@ -3673,7 +3685,7 @@
       "description": "Current state of target resolution.",
       "source": {
         "path": "packages/design-system/src/components/relationValue/relationValue.tsx",
-        "line": 27
+        "line": 28
       }
     }
   ],
@@ -3686,7 +3698,7 @@
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 25
+        "line": 31
       }
     },
     {
@@ -3697,7 +3709,18 @@
       "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 27
+        "line": 33
+      }
+    },
+    {
+      "name": "font",
+      "type": "\"sans\" | \"mono\"",
+      "required": false,
+      "defaultValue": "\"sans\"",
+      "description": "Selects proportional or data-oriented typography.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 35
       }
     },
     {
@@ -3708,7 +3731,7 @@
       "description": "Stretches the input to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 29
+        "line": 37
       }
     },
     {
@@ -3719,7 +3742,7 @@
       "description": "Marks the input as invalid and exposes that state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 31
+        "line": 39
       }
     },
     {
@@ -3730,7 +3753,7 @@
       "description": "Disables editing and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 33
+        "line": 41
       }
     },
     {
@@ -3741,7 +3764,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 43
       }
     },
     {
@@ -3751,7 +3774,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 37
+        "line": 45
       }
     },
     {
@@ -3761,7 +3784,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 39
+        "line": 47
       }
     },
     {
@@ -3771,7 +3794,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 41
+        "line": 49
       }
     },
     {
@@ -3781,7 +3804,7 @@
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 43
+        "line": 51
       }
     }
   ],
@@ -4423,16 +4446,6 @@
       }
     },
     {
-      "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
-      "required": false,
-      "description": "Controls the input height.",
-      "source": {
-        "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 25
-      }
-    },
-    {
       "name": "validationMode",
       "type": "\"onBlur\" | \"onChange\" | \"onSubmit\"",
       "required": false,
@@ -4440,16 +4453,6 @@
       "description": "Selects when field validation runs.",
       "source": {
         "path": "packages/design-system/src/components/textField/textField.tsx",
-        "line": 27
-      }
-    },
-    {
-      "name": "variant",
-      "type": "\"default\" | \"subtle\"",
-      "required": false,
-      "description": "Controls the input's visual prominence.",
-      "source": {
-        "path": "packages/design-system/src/components/input/input.tsx",
         "line": 27
       }
     },
@@ -4475,13 +4478,43 @@
       }
     },
     {
+      "name": "size",
+      "type": "\"s\" | \"m\" | \"l\"",
+      "required": false,
+      "description": "Controls the input height.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 31
+      }
+    },
+    {
+      "name": "variant",
+      "type": "\"default\" | \"subtle\"",
+      "required": false,
+      "description": "Controls the input's visual prominence.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 33
+      }
+    },
+    {
+      "name": "font",
+      "type": "\"sans\" | \"mono\"",
+      "required": false,
+      "description": "Selects proportional or data-oriented typography.",
+      "source": {
+        "path": "packages/design-system/src/components/input/input.tsx",
+        "line": 35
+      }
+    },
+    {
       "name": "readOnly",
       "type": "false | true",
       "required": false,
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 43
       }
     },
     {
@@ -4491,7 +4524,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 37
+        "line": 45
       }
     },
     {
@@ -4501,7 +4534,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 39
+        "line": 47
       }
     },
     {
@@ -4511,7 +4544,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 41
+        "line": 49
       }
     }
   ],

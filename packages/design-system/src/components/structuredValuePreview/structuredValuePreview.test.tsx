@@ -18,9 +18,10 @@ describe("StructuredValuePreview", () => {
       />,
     );
 
-    expect(screen.getByText('[6] "Ada", 3, true, …').getAttribute("data-typography")).toBe(
-      "sans",
-    );
+    const marker = screen.getByText("[6]");
+    screen.getByText('"Ada", 3, true, …');
+
+    expect(marker.parentElement?.getAttribute("aria-label")).toBe('[6] "Ada", 3, true, …');
   });
 
   it("renders normalized object entries without reading source objects", () => {
@@ -39,7 +40,8 @@ describe("StructuredValuePreview", () => {
       />,
     );
 
-    expect(screen.getByText('{3} name: "Ada", profile: {…}, roles: […]')).toBeTruthy();
+    expect(screen.getByText("{3}")).toBeTruthy();
+    expect(screen.getByText('name: "Ada", profile: {…}, roles: […]')).toBeTruthy();
   });
 
   it("supports normalized scalar previews", () => {
@@ -68,7 +70,8 @@ describe("StructuredValuePreview", () => {
       />,
     );
 
-    expect(screen.getByText("{3+} first: 1, second: 2, third: 3, …")).toBeTruthy();
+    expect(screen.getByText("{3+}")).toBeTruthy();
+    expect(screen.getByText("first: 1, second: 2, third: 3, …")).toBeTruthy();
   });
 
   it("gives the typed JSON marker a meaningful accessible name without punctuation", () => {

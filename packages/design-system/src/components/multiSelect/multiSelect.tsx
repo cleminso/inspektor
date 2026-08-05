@@ -17,9 +17,9 @@ import {
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
-import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { Button } from "../button/button";
 import { Checkbox } from "../checkbox/checkbox";
+import { ScrollAreaPrivate } from "../scrollArea/scrollArea";
 import { multiSelectStyles } from "./multiSelect.styles";
 
 export interface MultiSelectItem {
@@ -209,12 +209,6 @@ const popupWidthStyles = {
   l: multiSelectStyles.popupWidthL,
 } satisfies Record<MultiSelectContentWidth, unknown>;
 
-const optionsHeightStyles = {
-  s: multiSelectStyles.optionsHeightS,
-  m: multiSelectStyles.optionsHeightM,
-  l: multiSelectStyles.optionsHeightL,
-} satisfies Record<MultiSelectContentHeight, unknown>;
-
 function getMutableItems(items: readonly MultiSelectItem[]): readonly MultiSelectItem[] {
   return items.filter((item) => item.disabled !== true);
 }
@@ -302,27 +296,25 @@ function MultiSelectContent({
           }}
           {...popupStyles}
         >
-          <div
-            aria-label={label}
-            data-scrollbar="standard"
-            role="group"
-            {...stylex.props(
-              multiSelectStyles.options,
-              optionsHeightStyles[maxHeight],
-              scrollbarStyles.standard,
-            )}
+          <ScrollAreaPrivate
+            layout="content"
+            maxHeight={maxHeight}
+            rootSlot="multi-select-scroll-area"
+            viewportSlot="multi-select-viewport"
           >
-            {context.items.map((item) => (
-              <MultiSelectOption
-                key={item.value}
-                allMutableSelected={allMutableSelected}
-                item={item}
-                itemIndex={mutableItemIndices.get(item.value) ?? -1}
-                mutableItems={mutableItems}
-                selectedSet={selectedSet}
-              />
-            ))}
-          </div>
+            <div aria-label={label} role="group" {...stylex.props(multiSelectStyles.options)}>
+              {context.items.map((item) => (
+                <MultiSelectOption
+                  key={item.value}
+                  allMutableSelected={allMutableSelected}
+                  item={item}
+                  itemIndex={mutableItemIndices.get(item.value) ?? -1}
+                  mutableItems={mutableItems}
+                  selectedSet={selectedSet}
+                />
+              ))}
+            </div>
+          </ScrollAreaPrivate>
         </BasePopover.Popup>
       </BasePopover.Positioner>
     </BasePopover.Portal>

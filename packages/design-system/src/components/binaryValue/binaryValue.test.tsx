@@ -14,7 +14,7 @@ describe("BinaryValue", () => {
   it("renders a compact byte count from byteLength", () => {
     render(<BinaryValue byteLength={2_048} />);
 
-    expect(screen.getByText("2 KB")).toBeTruthy();
+    expect(screen.getByText("2KB").getAttribute("data-typography")).toBe("mono");
     expect(screen.queryByRole("button")).toBeNull();
   });
 
@@ -42,7 +42,9 @@ describe("BinaryDetails", () => {
   it("renders a byte count and one action menu", () => {
     render(<BinaryDetails byteLength={3} onCopy={() => undefined} onDownload={() => undefined} />);
 
-    expect(screen.getByRole("textbox", { name: "Binary value" }).getAttribute("value")).toBe("3 B");
+    const input = screen.getByRole("textbox", { name: "Binary value" });
+    expect(input.getAttribute("value")).toBe("3B");
+    expect(input.getAttribute("data-font")).toBe("mono");
     expect(screen.getAllByRole("button")).toHaveLength(1);
     const trigger = screen.getByRole("button", { name: "Copy as" });
     expect(trigger.getAttribute("data-grouped")).toBe("");

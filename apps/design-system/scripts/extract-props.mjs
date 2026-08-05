@@ -193,6 +193,11 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "middleTruncate",
+    exportName: "MiddleTruncate",
+    inheritedProps: [],
+  },
+  {
     componentId: "relationValue",
     exportName: "RelationValue",
     inheritedProps: [],

@@ -17,6 +17,9 @@ export interface ScrollAreaProps
 type VerticalTrackOffset = 'control-height-m' | 'control-height-l'
 
 interface ScrollAreaPrivateProps extends ScrollAreaProps {
+  layout?: 'fill' | 'content'
+  maxHeight?: 's' | 'm' | 'l'
+  rootSlot?: string
   verticalTrackOffset?: VerticalTrackOffset
   viewportSlot?: string
 }
@@ -25,6 +28,12 @@ const verticalTrackOffsetStyles = {
   'control-height-m': scrollAreaStyles.verticalTrackOffsetM,
   'control-height-l': scrollAreaStyles.verticalTrackOffsetL,
 } satisfies Record<VerticalTrackOffset, stylex.StyleXStyles>
+
+const maxHeightStyles = {
+  s: scrollAreaStyles.maxHeightS,
+  m: scrollAreaStyles.maxHeightM,
+  l: scrollAreaStyles.maxHeightL,
+} satisfies Record<NonNullable<ScrollAreaPrivateProps['maxHeight']>, stylex.StyleXStyles>
 
 function setForwardedRef(ref: ForwardedRef<HTMLDivElement>, node: HTMLDivElement | null): void {
   if (typeof ref === 'function') {
@@ -38,15 +47,23 @@ function renderScrollArea(
   {
     axis = 'vertical',
     children,
+    layout = 'fill',
+    maxHeight,
+    rootSlot = 'scroll-area',
     verticalTrackOffset,
     viewportSlot = 'scroll-area-viewport',
     ...props
   }: ScrollAreaPrivateProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const rootStyleProps = stylex.props(scrollAreaStyles.root)
+  const rootStyleProps = stylex.props(
+    scrollAreaStyles.root,
+    layout === 'content' && scrollAreaStyles.rootContent,
+    maxHeight !== undefined && maxHeightStyles[maxHeight],
+  )
   const viewportStyleProps = stylex.props(
     scrollAreaStyles.viewport,
+    layout === 'content' && scrollAreaStyles.viewportContent,
     scrollbarStyles.hidden,
     axis === 'none' && scrollAreaStyles.viewportNone,
     axis === 'vertical' && scrollAreaStyles.viewportVertical,
@@ -98,7 +115,8 @@ function renderScrollArea(
         {...rootStyleProps}
         data-axis={axis}
         data-scrollbar="overlay"
-        data-slot="scroll-area"
+        data-layout={layout}
+        data-slot={rootSlot}
       >
         <BaseScrollArea.Viewport
           {...props}

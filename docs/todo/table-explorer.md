@@ -21,6 +21,16 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [05/08/26]
 
+- [x] Keep the selection column strictly `36px` and render data columns at their TanStack constrained sizes without proportional viewport redistribution.
+- [x] Align schema markers and structured preview counts through a shared leading rail.
+- [x] Supersede viewport-stretched semantic-table columns with an intrinsic-width table over a viewport-filling background surface.
+
+[05/08/26]
+
+- [x] Use monospace typography for raw values in insert and edit form inputs while keeping labels, type captions, helper text, and actions proportional.
+
+[05/08/26]
+
 - [x] Keep Data Grid content in its committed TanStack order while a header drag is in progress and apply one persisted order on drop.
 - [x] Preserve the fixed selection-column slot while the reorderable data-column subset changes order.
 - [x] Use collision-safe drag identities and an internal selection-column namespace that does not consume `_select` from inspected schemas.
@@ -213,6 +223,16 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Give the selection header and row cells the same full-width centered layout inside their fixed column.
 
 ### Compact grid value presentation
+
+[05/08/26]
+
+- [x] Delegate text overflow to value renderers instead of imposing end truncation from the generic cell.
+- [x] Middle-truncate row and relation identifiers while keeping relation navigation indicators visible.
+
+[05/08/26]
+
+- [x] Replace proportional compact-grid value typography with monospace typography for raw database values.
+- [x] Keep headers, controls, and descriptive UI proportional while retaining tabular numerals and right alignment for quantities.
 
 [29/07/26]
 
@@ -569,6 +589,26 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Verify the selection column keeps its configured width through intrinsic Data Grid geometry tests.
+- [x] Verify compact column-marker spacing and structured-preview rendering in focused application tests and browser rendering.
+
+[05/08/26]
+
+- [x] Verify focused row-ID and relation-cell tests, application typecheck, and production build.
+
+[05/08/26]
+
+- [x] Verify insert and edit form inputs expose monospace typography while labels and actions retain proportional typography.
+- [x] Verify binary grid and form values use compact units without spaces.
+
+[05/08/26]
+
+- [x] Verify generic Data Grid cells and application-owned primitive, relation, binary, timestamp, and structured previews use the mono font token.
+- [x] Verify quantities remain tabular and right-aligned while headers and surrounding documentation remain proportional.
+- [x] Verify focused value-renderer and grid tests, package and application typechecks, changed-file lint, production builds, and browser rendering.
 
 [05/08/26]
 

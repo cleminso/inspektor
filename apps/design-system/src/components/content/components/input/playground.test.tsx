@@ -13,6 +13,7 @@ describe("Input playground", () => {
       serializeInputPlayground({
         size: "m",
         variant: "default",
+        font: "sans",
         fullWidth: false,
         invalid: false,
         disabled: false,

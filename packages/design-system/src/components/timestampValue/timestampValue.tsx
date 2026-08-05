@@ -29,12 +29,17 @@ function getEpochMilliseconds(value: number | Date): number | undefined {
 export function TimestampValue({ value }: TimestampValueProps) {
   const epochMilliseconds = getEpochMilliseconds(value);
   if (epochMilliseconds === undefined) {
-    return <span {...stylex.props(timestampValueStyles.preview)}>Invalid timestamp</span>;
+    return (
+      <span data-typography="mono" {...stylex.props(timestampValueStyles.preview)}>
+        Invalid timestamp
+      </span>
+    );
   }
 
   return (
     <time
       data-numeric-variant="tabular"
+      data-typography="mono"
       dateTime={formatUtc(epochMilliseconds)}
       {...stylex.props(timestampValueStyles.preview)}
     >

@@ -51,41 +51,74 @@ export interface StructuredValuePreviewProps {
   variant?: StructuredValuePreviewVariant;
 }
 
-function createPreview(model: StructuredValuePreviewModel): string {
+interface StructuredValuePreviewParts {
+  content: string | null;
+  marker: string | null;
+}
+
+function createPreviewParts(model: StructuredValuePreviewModel): StructuredValuePreviewParts {
   if (model.kind === "scalar") {
-    return `${model.label}${model.continuation === "truncated" ? "…" : ""}`;
+    return {
+      content: `${model.label}${model.continuation === "truncated" ? "…" : ""}`,
+      marker: null,
+    };
   }
 
   if (model.kind === "array") {
     if (model.totalCount === 0) {
-      return "[]";
+      return { content: null, marker: "[]" };
     }
-    return `[${model.totalCount}] ${[
-      ...model.entries,
-      ...(model.continuation === "truncated" ? ["…"] : []),
-    ].join(", ")}`;
+    return {
+      content: [
+        ...model.entries,
+        ...(model.continuation === "truncated" ? ["…"] : []),
+      ].join(", "),
+      marker: `[${model.totalCount}]`,
+    };
   }
 
   if (model.totalCount === 0) {
-    return "{}";
+    return { content: null, marker: "{}" };
   }
   const count = model.totalCount === null ? `${model.entries.length}+` : model.totalCount;
-  return `{${count}} ${[
-    ...model.entries.map(({ label, value }) => `${label}: ${value}`),
-    ...(model.continuation === "truncated" ? ["…"] : []),
-  ].join(", ")}`;
+  return {
+    content: [
+      ...model.entries.map(({ label, value }) => `${label}: ${value}`),
+      ...(model.continuation === "truncated" ? ["…"] : []),
+    ].join(", "),
+    marker: `{${count}}`,
+  };
 }
 
 export function StructuredValuePreview({ model, variant = "json" }: StructuredValuePreviewProps) {
+  const preview = createPreviewParts(model);
+  const accessibilityLabel = [preview.marker, preview.content].filter(Boolean).join(" ");
+
   return (
     <span {...stylex.props(structuredValuePreviewStyles.root)}>
       {variant === "typedJson" ? (
-        <span aria-label="Typed JSON value" {...stylex.props(structuredValuePreviewStyles.marker)}>
+        <span
+          aria-label="Typed JSON value"
+          {...stylex.props(structuredValuePreviewStyles.typedMarker)}
+        >
           {"{T}"}
         </span>
       ) : null}
-      <code data-typography="sans" {...stylex.props(structuredValuePreviewStyles.preview)}>
-        {createPreview(model)}
+      <code
+        aria-label={accessibilityLabel}
+        data-typography="mono"
+        {...stylex.props(structuredValuePreviewStyles.value)}
+      >
+        {preview.marker === null ? null : (
+          <span {...stylex.props(structuredValuePreviewStyles.markerRail)}>
+            {preview.marker}
+          </span>
+        )}
+        {preview.content === null ? null : (
+          <span {...stylex.props(structuredValuePreviewStyles.preview)}>
+            {preview.content}
+          </span>
+        )}
       </code>
     </span>
   );
