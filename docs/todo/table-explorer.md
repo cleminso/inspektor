@@ -118,6 +118,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Schema-driven row forms and basic cell presentation
 
+[05/08/26]
+
+- [x] Remove sibling fields from layout while a structured editor fills the pane, while keeping them mounted for draft and editor-state restoration.
+- [x] Replace JSON and array editors with a single NULL presentation without an editor toolbar while NULL mode is active, then restore the retained draft when Value mode returns.
+
 [29/07/26]
 
 - [x] Build row fields from stored schema metadata rather than returned object keys.

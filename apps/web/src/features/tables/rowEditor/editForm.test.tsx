@@ -626,19 +626,19 @@ describe("EditRowForm Details and JSON views", () => {
 
     fireEvent.click(nullToggle);
 
-    expect(container.querySelector("#row-editor-settings")).toBe(editor);
-    expect(editor.closest("[hidden]")).not.toBeNull();
+    expect(container.querySelector("#row-editor-settings")).toBeNull();
     expect(screen.queryByRole("button", { name: "Format JSON" })).toBeNull();
     const nullPresentation = screen.getByLabelText("Settings value: NULL");
-    expect(within(nullPresentation).getByText("JSON")).toBeTruthy();
+    expect(within(nullPresentation).queryByText("JSON")).toBeNull();
     expect(container.querySelector("input[data-null-value]")).toBeNull();
     expect(focusRowEditorField("settings")).toBe(true);
     expect(document.activeElement).toBe(nullToggle);
 
     fireEvent.click(screen.getByRole("button", { name: "Value" }));
 
-    expect(await screen.findByRole("textbox", { name: "Settings" })).toBe(editor);
-    expect(editor.textContent).toContain('"enabled"');
+    const restoredEditor = await screen.findByRole("textbox", { name: "Settings" });
+    expect(restoredEditor).not.toBe(editor);
+    expect(restoredEditor.textContent).toContain('"enabled"');
   });
 
   it("associates a structured field error and focuses the first invalid editor", async () => {

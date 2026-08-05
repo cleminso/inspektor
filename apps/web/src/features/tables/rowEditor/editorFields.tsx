@@ -274,7 +274,7 @@ export function RowEditorFields({
   onFieldTextChange,
 }: RowEditorFieldsProps): React.ReactElement {
   return (
-    <Box flexDirection="column" flexGrow={1} gap="2xl" minHeight={0} pr="xs">
+    <Box flexDirection="column" flexGrow={1} gap="l" minHeight={0} pr="xs">
       <Field.Root hidden={expandedColumnName !== null} id="row-editor-field-id">
         <Box
           alignItems="end"

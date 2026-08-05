@@ -169,7 +169,7 @@ describe("MutationField", () => {
   it("presents nullable structured fields as exclusive Value and NULL modes", () => {
     const onNullChange = vi.fn();
 
-    render(
+    const { container } = render(
       <MutationField
         canOmit={false}
         column={column("settings", { type: "Json" }, { nullable: true })}
@@ -192,10 +192,34 @@ describe("MutationField", () => {
     );
     expect(screen.queryByRole("checkbox", { name: /settings/i })).toBeNull();
     expect(screen.getByLabelText("Settings value: NULL")).toBeTruthy();
-    expect(screen.getByText("JSON")).toBeTruthy();
+    expect(screen.queryByText("JSON")).toBeNull();
+    expect(container.querySelector("#row-editor-settings")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Value" }));
     expect(onNullChange).toHaveBeenCalledWith(false);
+  });
+
+  it("replaces a nullable array editor with its NULL presentation", () => {
+    const { container } = render(
+      <MutationField
+        canOmit={false}
+        column={column("items", { type: "Array", element: { type: "Text" } }, { nullable: true })}
+        error={undefined}
+        expanded={false}
+        fieldState={{ isNull: true, isOmitted: false, text: '["first"]' }}
+        hidden={false}
+        initialValue={null}
+        onExpandedChange={vi.fn()}
+        onNullChange={vi.fn()}
+        onOmittedChange={vi.fn()}
+        onTextChange={vi.fn()}
+        readOnlyReason={null}
+      />,
+    );
+
+    expect(container.querySelector("#row-editor-items")).toBeNull();
+    expect(screen.getByLabelText("Items value: NULL")).toBeTruthy();
+    expect(screen.queryByText("ARRAY(TEXT)")).toBeNull();
   });
 
   it("adds Default to the structured value-mode selector when an insert can omit the field", () => {

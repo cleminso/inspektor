@@ -19,6 +19,9 @@ export const fieldStyles = stylex.create({
     minWidth: 0,
     width: "100%",
   },
+  hidden: {
+    display: "none",
+  },
   label: {
     gap: spacing.s,
     alignItems: "center",

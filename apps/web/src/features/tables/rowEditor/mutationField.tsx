@@ -103,13 +103,11 @@ function StructuredValueModeControl({
 
 interface StructuredValuePresentationProps {
   accessibilityLabel: string;
-  toolbarLabel: string;
   value: string;
 }
 
 function StructuredValuePresentation({
   accessibilityLabel,
-  toolbarLabel,
   value,
 }: StructuredValuePresentationProps): React.ReactElement {
   return (
@@ -129,18 +127,6 @@ function StructuredValuePresentation({
       <Box padding="m">
         <Text as="span" monospace>
           {value}
-        </Text>
-      </Box>
-      <Box
-        alignItems="center"
-        backgroundColor="bg-secondary"
-        borderColor="border"
-        borderStyle="solid"
-        borderTopWidth={1}
-        padding="xxs"
-      >
-        <Text as="span" color="muted" variant="caption">
-          {toolbarLabel}
         </Text>
       </Box>
     </Box>
@@ -235,7 +221,6 @@ export function MutationField({
     ...(canOmit === true ? (["default"] as const) : []),
     ...(column.nullable === true ? (["null"] as const) : []),
   ];
-  const structuredToolbarLabel = formatColumnTypeLabel(column)?.toUpperCase() ?? "JSON";
   const defaultCheckbox =
     canOmit === true && isStructuredColumnType === false ? (
       <InputGroup.Checkbox
@@ -352,7 +337,6 @@ export function MutationField({
         isStructuredColumnType === true ? (
           <StructuredValuePresentation
             accessibilityLabel={`${label} value: default`}
-            toolbarLabel={structuredToolbarLabel}
             value={defaultValue}
           />
         ) : (
@@ -425,34 +409,32 @@ export function MutationField({
         <JsonView accessibilityLabel={`${label} value`} data={structuredPresentation.fallback} />
       ) : isStructuredColumnType === true ? (
         <>
-          <Box
-            flexDirection="column"
-            flexGrow={expanded === true ? 1 : 0}
-            hidden={fieldState.isNull === true}
-            minHeight={expanded === true ? 0 : undefined}
-            overflow={expanded === true ? "hidden" : undefined}
-          >
-            <CodeEditor
-              id={fieldId}
-              labelledBy={fieldLabelId}
-              describedBy={hasFieldError === true ? `${fieldId}-error` : undefined}
-              disabled={fieldState.isNull === true}
-              expanded={expanded}
-              invalid={hasFieldError}
-              layout={expanded === true ? "fill" : "intrinsic"}
-              readOnly={isReadOnly}
-              onExpandedChange={onExpandedChange}
-              value={structuredPresentation?.source ?? fieldState.text}
-              onValueChange={onTextChange}
-            />
-          </Box>
           {fieldState.isNull === true ? (
             <StructuredValuePresentation
               accessibilityLabel={`${label} value: NULL`}
-              toolbarLabel={structuredToolbarLabel}
               value="NULL"
             />
-          ) : null}
+          ) : (
+            <Box
+              flexDirection="column"
+              flexGrow={expanded === true ? 1 : 0}
+              minHeight={expanded === true ? 0 : undefined}
+              overflow={expanded === true ? "hidden" : undefined}
+            >
+              <CodeEditor
+                id={fieldId}
+                labelledBy={fieldLabelId}
+                describedBy={hasFieldError === true ? `${fieldId}-error` : undefined}
+                expanded={expanded}
+                invalid={hasFieldError}
+                layout={expanded === true ? "fill" : "intrinsic"}
+                readOnly={isReadOnly}
+                onExpandedChange={onExpandedChange}
+                value={structuredPresentation?.source ?? fieldState.text}
+                onValueChange={onTextChange}
+              />
+            </Box>
+          )}
           {defaultRestoreControl}
         </>
       ) : isBinaryColumn === true && initialValue instanceof Uint8Array ? (

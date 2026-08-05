@@ -54,7 +54,7 @@ export interface FieldErrorProps extends Omit<BaseField.Error.Props, "className"
 }
 
 const FieldRoot = forwardRef<ComponentRef<typeof BaseField.Root>, FieldRootProps>(
-  function FieldRoot({ disabled = false, ...props }, forwardedRef) {
+  function FieldRoot({ disabled = false, hidden = false, ...props }, forwardedRef) {
     const stateStyleProps = createStateStyleProps<BaseField.Root.State>((state) => [
       fieldStyles.root,
       state.valid === false && fieldStyles.inputGroupInvalid,
@@ -66,6 +66,7 @@ const FieldRoot = forwardRef<ComponentRef<typeof BaseField.Root>, FieldRootProps
       state.dirty === true && fieldStyles.rootDirty,
       state.filled === true && fieldStyles.rootFilled,
       state.focused === true && fieldStyles.rootFocused,
+      hidden === true && fieldStyles.hidden,
     ]);
 
     return (
@@ -74,6 +75,7 @@ const FieldRoot = forwardRef<ComponentRef<typeof BaseField.Root>, FieldRootProps
           {...props}
           ref={forwardedRef}
           disabled={disabled}
+          hidden={hidden}
           className={stateStyleProps.className}
           style={stateStyleProps.style}
           data-slot="field"
