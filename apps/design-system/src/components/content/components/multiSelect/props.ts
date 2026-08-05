@@ -13,9 +13,6 @@ export const multiSelectTriggerPropNames = ["label", "render", "disabled"] as co
 
 export const multiSelectContentPropNames = [
   "label",
-  "searchLabel",
-  "searchPlaceholder",
-  "emptyLabel",
   "width",
   "maxHeight",
   "keepMounted",

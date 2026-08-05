@@ -506,7 +506,7 @@ export const multiSelectItem = {
   slug: "multi-select",
   href: "/components/multi-select",
   description:
-    "Searchable multiple selection with checkbox rows and contextual Check all and Only actions.",
+    "Multiple selection with checkbox rows and contextual Check all and Only actions.",
   importPath: "@inspector/ds",
   source: {
     label: "multiSelect.tsx",

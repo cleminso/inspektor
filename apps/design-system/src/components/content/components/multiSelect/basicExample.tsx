@@ -19,12 +19,7 @@ export default function BasicExample(): ReactElement {
   return (
     <MultiSelect.Root items={options} value={value} onValueChange={setValue}>
       <MultiSelect.Trigger label="Choose options">{triggerLabel}</MultiSelect.Trigger>
-      <MultiSelect.Content
-        emptyLabel="options"
-        label="Options"
-        searchLabel="Search options"
-        searchPlaceholder="Search options..."
-      />
+      <MultiSelect.Content label="Options" />
     </MultiSelect.Root>
   );
 }

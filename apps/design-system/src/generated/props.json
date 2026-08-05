@@ -6181,7 +6181,7 @@
       "description": "Known options displayed by the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 38
+        "line": 36
       }
     },
     {
@@ -6191,7 +6191,7 @@
       "description": "Controlled selected values.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 40
+        "line": 38
       }
     },
     {
@@ -6202,7 +6202,7 @@
       "description": "Initially selected values when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 42
+        "line": 40
       }
     },
     {
@@ -6212,7 +6212,7 @@
       "description": "Runs when the selected values change.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 44
+        "line": 42
       }
     },
     {
@@ -6223,7 +6223,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 46
+        "line": 44
       }
     },
     {
@@ -6233,7 +6233,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 48
+        "line": 46
       }
     },
     {
@@ -6243,7 +6243,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 50
+        "line": 48
       }
     },
     {
@@ -6254,7 +6254,7 @@
       "description": "Disables the trigger and every mutable option.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 52
+        "line": 50
       }
     }
   ],
@@ -6266,7 +6266,7 @@
       "description": "Stable accessible name for the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 58
+        "line": 56
       }
     },
     {
@@ -6276,7 +6276,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 60
+        "line": 58
       }
     },
     {
@@ -6287,7 +6287,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 62
+        "line": 60
       }
     }
   ],
@@ -6299,37 +6299,7 @@
       "description": "Accessible name for the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 71
-      }
-    },
-    {
-      "name": "searchLabel",
-      "type": "string",
-      "required": true,
-      "description": "Accessible name for the search input.",
-      "source": {
-        "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 73
-      }
-    },
-    {
-      "name": "searchPlaceholder",
-      "type": "string",
-      "required": false,
-      "description": "Placeholder displayed while the query is empty.",
-      "source": {
-        "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 75
-      }
-    },
-    {
-      "name": "emptyLabel",
-      "type": "string",
-      "required": true,
-      "description": "Plural noun used in the empty-query message.",
-      "source": {
-        "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 77
+        "line": 69
       }
     },
     {
@@ -6340,7 +6310,7 @@
       "description": "Controls the popup width.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 79
+        "line": 71
       }
     },
     {
@@ -6351,7 +6321,7 @@
       "description": "Controls the scrolling option-list height.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 81
+        "line": 73
       }
     },
     {
@@ -6362,7 +6332,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 83
+        "line": 75
       }
     },
     {
@@ -6373,7 +6343,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 85
+        "line": 77
       }
     }
   ],

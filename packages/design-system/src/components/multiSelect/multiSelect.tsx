@@ -20,14 +20,12 @@ import { popupPositioning } from "../../primitives/popupPositioning";
 import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { Button } from "../button/button";
 import { Checkbox } from "../checkbox/checkbox";
-import { Input } from "../input/input";
-import { InputGroup } from "../inputGroup/inputGroup";
 import { multiSelectStyles } from "./multiSelect.styles";
 
 export interface MultiSelectItem {
   /** Stable value represented by the option. */
   value: string;
-  /** Visible option label and searchable text. */
+  /** Visible option label. */
   label: string;
   /** Prevents the option from changing while keeping it visible. */
   disabled?: boolean;
@@ -69,12 +67,6 @@ export type MultiSelectContentHeight = "s" | "m" | "l";
 export interface MultiSelectContentProps {
   /** Accessible name for the popup. */
   label: string;
-  /** Accessible name for the search input. */
-  searchLabel: string;
-  /** Placeholder displayed while the query is empty. */
-  searchPlaceholder?: string;
-  /** Plural noun used in the empty-query message. */
-  emptyLabel: string;
   /** Controls the popup width. */
   width?: MultiSelectContentWidth;
   /** Controls the scrolling option-list height. */
@@ -92,13 +84,9 @@ interface ItemControls {
 
 interface MultiSelectContextValue {
   disabled: boolean;
-  filteredItems: readonly MultiSelectItem[];
   items: readonly MultiSelectItem[];
-  query: string;
-  searchRef: RefObject<HTMLInputElement | null>;
   triggerRef: RefObject<ComponentRef<typeof BasePopover.Trigger> | null>;
   selectedValues: readonly string[];
-  setQuery: (query: string) => void;
   setSelectedValues: (values: string[]) => void;
   controls: Map<string, ItemControls>;
 }
@@ -125,19 +113,9 @@ function MultiSelectRoot({
   disabled = false,
 }: MultiSelectRootProps): React.ReactElement {
   const [uncontrolledValue, setUncontrolledValue] = useState<readonly string[]>(defaultValue);
-  const [query, setQuery] = useState("");
   const controlsRef = useRef(new Map<string, ItemControls>());
-  const searchRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<ComponentRef<typeof BasePopover.Trigger>>(null);
   const selectedValues = value ?? uncontrolledValue;
-  const normalizedQuery = query.trim().toLocaleLowerCase();
-  const filteredItems = useMemo(
-    () =>
-      normalizedQuery.length === 0
-        ? items
-        : items.filter((item) => item.label.toLocaleLowerCase().includes(normalizedQuery)),
-    [items, normalizedQuery],
-  );
   const setSelectedValues = useCallback(
     (nextValue: string[]) => {
       if (value === undefined) {
@@ -151,16 +129,12 @@ function MultiSelectRoot({
     () => ({
       controls: controlsRef.current,
       disabled,
-      filteredItems,
       items,
-      query,
-      searchRef,
       triggerRef,
       selectedValues,
-      setQuery,
       setSelectedValues,
     }),
-    [disabled, filteredItems, items, query, selectedValues, setSelectedValues],
+    [disabled, items, selectedValues, setSelectedValues],
   );
 
   return (
@@ -169,11 +143,6 @@ function MultiSelectRoot({
         defaultOpen={defaultOpen}
         open={open}
         onOpenChange={onOpenChange}
-        onOpenChangeComplete={(nextOpen) => {
-          if (nextOpen === false) {
-            setQuery("");
-          }
-        }}
       >
         {children}
       </BasePopover.Root>
@@ -252,15 +221,13 @@ function getMutableItems(items: readonly MultiSelectItem[]): readonly MultiSelec
 
 function MultiSelectContent({
   label,
-  searchLabel,
-  searchPlaceholder,
-  emptyLabel,
   width = "m",
   maxHeight = "m",
   keepMounted = false,
   align = "start",
 }: MultiSelectContentProps): React.ReactElement {
   const context = useMultiSelectContext();
+  const popupRef = useRef<ComponentRef<typeof BasePopover.Popup>>(null);
   const positionerStyles = createStateStyleProps<BasePopover.Positioner.State>((state) => [
     multiSelectStyles.positioner,
     state.open === true && multiSelectStyles.positionerOpen,
@@ -297,18 +264,14 @@ function MultiSelectContent({
   ]);
   const selectedSet = useMemo(() => new Set(context.selectedValues), [context.selectedValues]);
   const mutableItems = useMemo(() => getMutableItems(context.items), [context.items]);
-  const mutableFilteredItems = useMemo(
-    () => getMutableItems(context.filteredItems),
-    [context.filteredItems],
-  );
-  const mutableFilteredItemIndices = useMemo(
-    () => new Map(mutableFilteredItems.map((item, index) => [item.value, index])),
-    [mutableFilteredItems],
+  const mutableItemIndices = useMemo(
+    () => new Map(mutableItems.map((item, index) => [item.value, index])),
+    [mutableItems],
   );
   const allMutableSelected = mutableItems.every((item) => selectedSet.has(item.value));
 
   const focusControl = (itemIndex: number, control: keyof ItemControls) => {
-    const item = mutableFilteredItems[itemIndex];
+    const item = mutableItems[itemIndex];
     if (item === undefined) {
       return;
     }
@@ -323,59 +286,43 @@ function MultiSelectContent({
         {...positionerStyles}
       >
         <BasePopover.Popup
+          ref={popupRef}
           aria-label={label}
           finalFocus={context.triggerRef}
-          initialFocus={context.searchRef}
+          initialFocus={popupRef}
           role="dialog"
+          onKeyDown={(event) => {
+            if (event.defaultPrevented === true || event.target !== event.currentTarget) {
+              return;
+            }
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              event.preventDefault();
+              focusControl(event.key === "ArrowDown" ? 0 : mutableItems.length - 1, "checkbox");
+            }
+          }}
           {...popupStyles}
         >
-          <div {...stylex.props(multiSelectStyles.section)}>
-            <InputGroup size="s" fullWidth>
-              <Input
-                ref={context.searchRef}
-                aria-label={searchLabel}
-                autoFocus
-                type="search"
-                placeholder={searchPlaceholder}
-                value={context.query}
-                onValueChange={context.setQuery}
-                onKeyDown={(event) => {
-                  if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    focusControl(0, "checkbox");
-                  }
-                }}
+          <div
+            aria-label={label}
+            data-scrollbar="standard"
+            role="group"
+            {...stylex.props(
+              multiSelectStyles.options,
+              optionsHeightStyles[maxHeight],
+              scrollbarStyles.standard,
+            )}
+          >
+            {context.items.map((item) => (
+              <MultiSelectOption
+                key={item.value}
+                allMutableSelected={allMutableSelected}
+                item={item}
+                itemIndex={mutableItemIndices.get(item.value) ?? -1}
+                mutableItems={mutableItems}
+                selectedSet={selectedSet}
               />
-            </InputGroup>
+            ))}
           </div>
-          <div {...stylex.props(multiSelectStyles.separator)} />
-          {context.filteredItems.length === 0 ? (
-            <span {...stylex.props(multiSelectStyles.empty)}>
-              {`No ${emptyLabel} match "${context.query}"`}
-            </span>
-          ) : (
-            <div
-              aria-label={label}
-              data-scrollbar="standard"
-              role="group"
-              {...stylex.props(
-                multiSelectStyles.options,
-                optionsHeightStyles[maxHeight],
-                scrollbarStyles.standard,
-              )}
-            >
-              {context.filteredItems.map((item) => (
-                <MultiSelectOption
-                  key={item.value}
-                  allMutableSelected={allMutableSelected}
-                  item={item}
-                  itemIndex={mutableFilteredItemIndices.get(item.value) ?? -1}
-                  mutableFilteredItems={mutableFilteredItems}
-                  selectedSet={selectedSet}
-                />
-              ))}
-            </div>
-          )}
         </BasePopover.Popup>
       </BasePopover.Positioner>
     </BasePopover.Portal>
@@ -386,13 +333,13 @@ function MultiSelectOption({
   allMutableSelected,
   item,
   itemIndex,
-  mutableFilteredItems,
+  mutableItems,
   selectedSet,
 }: {
   allMutableSelected: boolean;
   item: MultiSelectItem;
   itemIndex: number;
-  mutableFilteredItems: readonly MultiSelectItem[];
+  mutableItems: readonly MultiSelectItem[];
   selectedSet: ReadonlySet<string>;
 }): React.ReactElement {
   const context = useMultiSelectContext();
@@ -414,11 +361,11 @@ function MultiSelectOption({
   };
 
   const focusRelative = (offset: number, control: keyof ItemControls) => {
-    if (mutableFilteredItems.length === 0 || itemIndex < 0) {
+    if (mutableItems.length === 0 || itemIndex < 0) {
       return;
     }
-    const nextIndex = (itemIndex + offset + mutableFilteredItems.length) % mutableFilteredItems.length;
-    const nextItem = mutableFilteredItems[nextIndex];
+    const nextIndex = (itemIndex + offset + mutableItems.length) % mutableItems.length;
+    const nextItem = mutableItems[nextIndex];
     if (nextItem !== undefined) {
       context.controls.get(nextItem.value)?.[control]?.focus();
     }
@@ -436,7 +383,7 @@ function MultiSelectOption({
     if (event.key === "Home" || event.key === "End") {
       event.preventDefault();
       const nextItem =
-        event.key === "Home" ? mutableFilteredItems[0] : mutableFilteredItems.at(-1);
+        event.key === "Home" ? mutableItems[0] : mutableItems.at(-1);
       if (nextItem !== undefined) {
         context.controls.get(nextItem.value)?.[control]?.focus();
       }

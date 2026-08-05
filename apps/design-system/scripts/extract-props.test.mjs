@@ -1073,6 +1073,10 @@ test("extracts the constrained MultiSelect compound API", () => {
     metadata["multiSelect.trigger"]?.map(({ name }) => name),
     ["label", "render", "disabled"],
   );
+  assert.deepEqual(
+    metadata["multiSelect.content"]?.map(({ name }) => name),
+    ["label", "width", "maxHeight", "keepMounted", "align"],
+  );
   assert.equal(
     metadata["multiSelect.content"]?.find(({ name }) => name === "width")?.defaultValue,
     '"m"',

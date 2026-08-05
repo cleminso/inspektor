@@ -16,12 +16,7 @@ function TestMultiSelect({ initialValue = ["design", "components"] }: { initialV
   return (
     <MultiSelect.Root items={items} value={value} onValueChange={setValue}>
       <MultiSelect.Trigger label="Choose options">Options</MultiSelect.Trigger>
-      <MultiSelect.Content
-        label="Options"
-        searchLabel="Search options"
-        searchPlaceholder="Search options..."
-        emptyLabel="options"
-      />
+      <MultiSelect.Content label="Options" />
       <output aria-label="Selected values">{value.join(",")}</output>
     </MultiSelect.Root>
   );
@@ -39,14 +34,36 @@ describe("MultiSelect", () => {
     );
   });
 
-  it("opens with a focused search and exposes named checkbox rows", () => {
+  it("opens with dialog focus and exposes named checkbox rows", async () => {
     render(<TestMultiSelect />);
 
     fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
 
-    expect(document.activeElement).toBe(screen.getByRole("searchbox", { name: "Search options" }));
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole("dialog", { name: "Options" }));
+    });
     expect(screen.getByRole("checkbox", { name: "Select Design System" }).getAttribute("aria-disabled")).toBe("true");
     expect(screen.getByRole("checkbox", { name: "Select Components" })).toBeTruthy();
+  });
+
+  it("enters the first or last mutable row from dialog focus", () => {
+    render(<TestMultiSelect />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
+    const dialog = screen.getByRole("dialog", { name: "Options" });
+
+    fireEvent.keyDown(dialog, { key: "ArrowDown" });
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("checkbox", { name: "Select Components" }),
+    );
+
+    dialog.focus();
+    fireEvent.keyDown(dialog, { key: "ArrowUp" });
+
+    expect(document.activeElement).toBe(
+      screen.getByRole("checkbox", { name: "Select Design Tokens" }),
+    );
   });
 
   it("toggles several values without closing", () => {
@@ -75,8 +92,7 @@ describe("MultiSelect", () => {
     render(<TestMultiSelect />);
     fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
 
-    const search = screen.getByRole("searchbox", { name: "Search options" });
-    fireEvent.keyDown(search, { key: "ArrowDown" });
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Options" }), { key: "ArrowDown" });
     const components = screen.getByRole("checkbox", { name: "Select Components" });
     expect(document.activeElement).toBe(components);
 
@@ -120,7 +136,7 @@ describe("MultiSelect", () => {
         <MultiSelect.Trigger ref={ref} label="Choose options">
           Options
         </MultiSelect.Trigger>
-        <MultiSelect.Content label="Options" searchLabel="Search options" emptyLabel="options" />
+        <MultiSelect.Content label="Options" />
       </MultiSelect.Root>,
     );
 
@@ -128,22 +144,11 @@ describe("MultiSelect", () => {
     expect(ref.current).toBe(trigger);
 
     fireEvent.click(trigger);
-    fireEvent.keyDown(screen.getByRole("searchbox", { name: "Search options" }), {
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Options" }), {
       key: "Escape",
     });
 
     await waitFor(() => expect(document.activeElement).toBe(trigger));
-  });
-
-  it("filters options and names the empty query", () => {
-    render(<TestMultiSelect />);
-    fireEvent.click(screen.getByRole("button", { name: "Choose options" }));
-    const search = screen.getByRole("searchbox", { name: "Search options" });
-
-    fireEvent.change(search, { target: { value: "missing" } });
-
-    expect(screen.getByText('No options match "missing"')).toBeTruthy();
-    expect(screen.queryByRole("checkbox", { name: "Select Components" })).toBeNull();
   });
 
   it("closes with Escape and restores trigger focus", async () => {
@@ -151,7 +156,7 @@ describe("MultiSelect", () => {
     const trigger = screen.getByRole("button", { name: "Choose options" });
     fireEvent.click(trigger);
 
-    fireEvent.keyDown(screen.getByRole("searchbox", { name: "Search options" }), {
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Options" }), {
       key: "Escape",
     });
 

@@ -68,18 +68,10 @@ export const multiSelectStyles = stylex.create({
   popupWidthS: { width: spatial["multi-select-width-s"] },
   popupWidthM: { width: spatial["multi-select-width-m"] },
   popupWidthL: { width: spatial["multi-select-width-l"] },
-  section: {
-    padding: spatial["popup-collection-padding"],
-  },
-  separator: {
-    marginBlock: spatial["popup-collection-padding"],
-    backgroundColor: borderColors["border-secondary"],
-    height: 1,
-  },
   options: {
     padding: spatial["popup-collection-padding"],
-    display: "flex",
     overscrollBehavior: "contain",
+    display: "flex",
     flexDirection: "column",
     flexShrink: 1,
     minHeight: 0,
@@ -148,13 +140,5 @@ export const multiSelectStyles = stylex.create({
     marginInlineStart: "auto",
     opacity: multiSelectVars.actionOpacity,
     visibility: multiSelectVars.actionVisibility,
-  },
-  empty: {
-    padding: spacing.l,
-    color: textColors["text-muted"],
-    display: "block",
-    fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[2],
-    lineHeight: lineHeights.ui,
   },
 });

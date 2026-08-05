@@ -16,12 +16,7 @@ const sourceCode = `const [value, setValue] = useState(["design-system", "compon
   <MultiSelect.Trigger label="Choose options">
     {value.length === options.length ? "All options selected" : \`${"${value.length}"} options selected\`}
   </MultiSelect.Trigger>
-  <MultiSelect.Content
-    label="Options"
-    searchLabel="Search options"
-    searchPlaceholder="Search options..."
-    emptyLabel="options"
-  />
+  <MultiSelect.Content label="Options" />
 </MultiSelect.Root>`;
 
 export function MultiSelectPlayground({ children }: { children?: ReactNode }): ReactElement {
@@ -31,12 +26,7 @@ export function MultiSelectPlayground({ children }: { children?: ReactNode }): R
   const preview = (
     <MultiSelect.Root items={options} value={value} onValueChange={setValue}>
       <MultiSelect.Trigger label="Choose options">{triggerLabel}</MultiSelect.Trigger>
-      <MultiSelect.Content
-        emptyLabel="options"
-        label="Options"
-        searchLabel="Search options"
-        searchPlaceholder="Search options..."
-      />
+      <MultiSelect.Content label="Options" />
     </MultiSelect.Root>
   );
 

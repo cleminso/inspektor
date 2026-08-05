@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Present the complete known item collection without query state, filtering, or search-specific content props.
+- [x] Focus the dialog surface on open and enter the first or last mutable row with Down or Up.
+
 [29/07/26]
 
 - [x] Provide controlled and uncontrolled string-value selection.
@@ -29,12 +34,20 @@
 
 ## Open product work
 
+[05/08/26]
+
+- [x] Keep asynchronous and externally filtered collection support in Combobox rather than Multi Select.
+
 [28/07/26]
 
 - [ ] Add asynchronous and externally filtered item support when a consumer requires it.
 - [ ] Add virtualization when a represented collection exceeds bounded popup rendering.
 
 ## Work outside the foundation scope
+
+[05/08/26]
+
+- Search and filtered collection selection; use Combobox when query-driven filtering is required.
 
 [28/07/26]
 
@@ -43,6 +56,11 @@
 - Free-form values outside the known item collection.
 
 ## Settled interaction decisions
+
+[05/08/26]
+
+- [x] Multi Select presents a known collection directly rather than combining selection with search.
+- [x] Initial dialog focus keeps checkbox and contextual-action focus as separate row columns.
 
 [29/07/26]
 
@@ -62,6 +80,13 @@
 - [ ] Decide whether large item collections require persistent action labels on touch interfaces.
 
 ## Validation checklist
+
+[05/08/26]
+
+- [x] Package tests, typecheck, build, and changed-file lint pass.
+- [x] Documentation prop generation and check, typecheck, build, focused extractor test, and changed-file lint pass.
+- [x] Product application typecheck and changed-file lint pass.
+- [ ] Full documentation tests remain blocked by the unrelated Code Editor extractor expectation for the removed `toolbarLabel` prop.
 
 [29/07/26]
 

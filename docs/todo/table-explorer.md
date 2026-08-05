@@ -122,6 +122,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Column and table behavior
 
+[05/08/26]
+
+- [x] Present every fixed and hideable data column directly in the action-bar Multi Select without query filtering.
+
 [29/07/26]
 
 - [x] Render accessible muted base-type column markers before names, with compact spacing and dedicated key and relation icons.

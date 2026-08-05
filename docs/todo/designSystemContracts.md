@@ -24,6 +24,10 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Remove Multi Select query ownership so its high-level Popover composition owns selection and two-column option keyboard behavior only.
+
 [03/08/26]
 
 - [x] Preserve refs through React 18-compatible `forwardRef` boundaries for rendered wrapper parts.

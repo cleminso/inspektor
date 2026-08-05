@@ -56,10 +56,7 @@ export function DataGridColumnVisibility({
       </MultiSelect.Trigger>
       <MultiSelect.Content
         align="end"
-        emptyLabel="columns"
         label="Visible columns"
-        searchLabel="Search columns"
-        searchPlaceholder="Search columns..."
       />
     </MultiSelect.Root>
   );
