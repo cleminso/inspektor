@@ -29,6 +29,7 @@ export type {
   DataGridCellTarget,
   DataGridContentProps,
   DataGridDensity,
+  DataGridRowRendering,
   DataGridExpandedRowProps,
   DataGridFooterProps,
   DataGridHeaderCellProps,

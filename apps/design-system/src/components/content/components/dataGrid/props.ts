@@ -18,9 +18,12 @@ export const dataGridTablePropNames = ['aria-label', 'children'] as const
 export const dataGridContentPropNames = [
   'loading',
   'loadingContent',
+  'rowRendering',
   'emptyContent',
 ] as const
 export const dataGridPartPropNames = ['children'] as const
+export const dataGridViewportPropNames = ['scrollResetKey', 'children'] as const
+export const dataGridBodyPropNames = ['children'] as const
 export const dataGridHeaderRowPropNames = ['headerGroup', 'children'] as const
 export const dataGridHeaderCellPropNames = ['header', 'children'] as const
 export const dataGridRowPropNames = ['row', 'children'] as const

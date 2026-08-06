@@ -57,6 +57,10 @@ export const scrollAreaStyles = stylex.create({
     flexShrink: 1,
     height: 'auto',
   },
+  viewportFrequentScroll: {
+    overflowAnchor: 'none',
+    willChange: 'scroll-position',
+  },
   viewportVertical: {
     overflowX: 'hidden',
     overflowY: 'scroll',
@@ -113,6 +117,9 @@ export const scrollAreaStyles = stylex.create({
   },
   verticalTrackOffsetL: {
     marginTop: spatial['control-height-l'],
+  },
+  verticalTrackFlushEnd: {
+    paddingBottom: 0,
   },
   thumb: {
     backgroundColor: {

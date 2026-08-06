@@ -334,7 +334,7 @@ test("extracts the constrained Tooltip compound API", () => {
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "delay")?.defaultValue,
-    "600",
+    "500",
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
@@ -531,7 +531,20 @@ test("extracts the constrained TabView compound API", () => {
   );
   assert.deepEqual(
     metadata["tabView.item"]?.map(({ name }) => name),
-    ["value", "children", "details", "prefix", "disabled", "onClose", "closeLabel"],
+    [
+      "value",
+      "children",
+      "details",
+      "prefix",
+      "disabled",
+      "onBlur",
+      "onClose",
+      "onFocus",
+      "onPointerDown",
+      "onPointerEnter",
+      "onPointerLeave",
+      "closeLabel",
+    ],
   );
   assert.deepEqual(
     metadata["tabView.panel"]?.map(({ name }) => name),

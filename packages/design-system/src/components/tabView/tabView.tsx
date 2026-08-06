@@ -113,8 +113,18 @@ export interface TabViewItemProps {
   prefix?: ReactNode
   /** Disables selection and closing for this view. */
   disabled?: boolean
+  /** Runs when focus leaves the tab button. */
+  onBlur?: BaseTabs.Tab.Props['onBlur']
   /** Adds a close action to the view. */
   onClose?: (value: TabViewValue) => void
+  /** Runs when the tab button receives focus. */
+  onFocus?: BaseTabs.Tab.Props['onFocus']
+  /** Runs when a pointer press starts on the tab button. */
+  onPointerDown?: BaseTabs.Tab.Props['onPointerDown']
+  /** Runs when the pointer enters the tab button. */
+  onPointerEnter?: BaseTabs.Tab.Props['onPointerEnter']
+  /** Runs when the pointer leaves the tab button. */
+  onPointerLeave?: BaseTabs.Tab.Props['onPointerLeave']
   /** Provides the accessible name for the close action. */
   closeLabel?: string
 }
@@ -263,7 +273,11 @@ function TabViewList({
   }
 
   return (
-    <ReorderComponent listRef={listRef} values={values} onReorder={onReorder}>
+    <ReorderComponent
+      listRef={listRef}
+      values={values}
+      onReorder={onReorder}
+    >
       {tooltipList}
     </ReorderComponent>
   )
@@ -276,7 +290,11 @@ function TabViewItem({ closeLabel = 'Close tab', ...props }: TabViewItemProps) {
 
   if (SortableItem !== null && index >= 0) {
     return (
-      <SortableItem value={props.value} disabled={props.disabled} index={index}>
+      <SortableItem
+        value={props.value}
+        disabled={props.disabled}
+        index={index}
+      >
         {(sortable) => (
           <TabViewItemContent
             {...props}
@@ -289,7 +307,12 @@ function TabViewItem({ closeLabel = 'Close tab', ...props }: TabViewItemProps) {
     )
   }
 
-  return <TabViewItemContent {...props} closeLabel={closeLabel} />
+  return (
+    <TabViewItemContent
+      {...props}
+      closeLabel={closeLabel}
+    />
+  )
 }
 
 interface TabViewItemContentProps extends TabViewItemProps {
@@ -303,7 +326,12 @@ function TabViewItemContent({
   details,
   prefix,
   disabled = false,
+  onBlur,
   onClose,
+  onFocus,
+  onPointerDown,
+  onPointerEnter,
+  onPointerLeave,
   closeLabel = 'Close tab',
   isDragSource = false,
   setReorderRef,
@@ -413,12 +441,20 @@ function TabViewItemContent({
             <BaseTabs.Tab
               value={value}
               disabled={disabled}
+              onBlur={onBlur}
+              onFocus={onFocus}
               onKeyDown={handleTabKeyDown}
+              onPointerDown={onPointerDown}
+              onPointerEnter={onPointerEnter}
+              onPointerLeave={onPointerLeave}
               {...tabStyles}
               data-slot="tab-view-tab"
             >
               {prefix !== undefined ? (
-                <span aria-hidden="true" {...stylex.props(tabViewStyles.prefix)}>
+                <span
+                  aria-hidden="true"
+                  {...stylex.props(tabViewStyles.prefix)}
+                >
                   {prefix}
                 </span>
               ) : null}
@@ -453,7 +489,12 @@ function TabViewItemContent({
                   iconOnly
                   onClick={handleCloseClick}
                   radius="xs"
-                  render={<button type="button" {...stylex.props(tabViewStyles.closeAction)} />}
+                  render={
+                    <button
+                      type="button"
+                      {...stylex.props(tabViewStyles.closeAction)}
+                    />
+                  }
                   size="xs"
                   variant="ghost"
                 >

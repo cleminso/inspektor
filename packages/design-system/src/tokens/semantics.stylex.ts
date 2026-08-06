@@ -151,6 +151,7 @@ export const spatial = stylex.defineVars({
   'panel-gutter-size': spacing.xs,
   'scrollbar-track-size': dimensions[12],
   'scrollbar-thumb-size': spacing.s,
+  'select-compact-width': dimensions[72],
   'select-min-width': dimensions[160],
   'switch-height-s': dimensions[16],
   'switch-height-m': dimensions[20],

@@ -14,7 +14,12 @@ export const tabViewItemPropNames = [
   'details',
   'prefix',
   'disabled',
+  'onBlur',
   'onClose',
+  'onFocus',
+  'onPointerDown',
+  'onPointerEnter',
+  'onPointerLeave',
   'closeLabel',
 ] as const
 

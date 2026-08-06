@@ -49,7 +49,7 @@ const controls = [
     kind: "select",
     key: "width",
     label: "Width",
-    options: ["content", "full"].map((value) => ({ label: value, value })),
+    options: ["compact", "content", "full"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",

@@ -1,70 +1,70 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import * as stylex from '@stylexjs/stylex'
 import {
   createColumnHelper,
   type CellSelectionState,
   type RowSelectionState,
   type SortingState,
   useTable,
-} from "@tanstack/react-table";
-import { useState, type ReactNode } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+} from '@tanstack/react-table'
+import { useState, type ReactNode } from 'react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { DataGrid } from "./dataGrid";
-import { dataGridFeatures, type DataGridFeatures } from "./dataGridFeatures";
-import { getDataGridCellSortableId, getDataGridHeaderSortableId } from "./dataGridReorder";
+import { DataGrid } from './dataGrid'
+import { dataGridStyles } from './dataGrid.styles'
+import { dataGridFeatures, type DataGridFeatures } from './dataGridFeatures'
+import { getDataGridHeaderSortableId } from './dataGridReorder'
+import { scrollAreaStyles } from '../scrollArea/scrollArea.styles'
 
-let onDataGridDragEnd: ((event: unknown) => void) | undefined;
-let dragOverlayDropAnimation: unknown;
+let onDataGridDragEnd: ((event: unknown) => void) | undefined
+let dragOverlayDropAnimation: unknown
 let dragOverlaySource: { element?: Element | null; id: string } = {
-  id: getDataGridHeaderSortableId("name"),
-};
-const sortableInputs: unknown[] = [];
-const sortableTargetRefs = new Map<string, ReturnType<typeof vi.fn>>();
-let droppingSortableId: string | null = null;
-
-vi.mock("@dnd-kit/react", () => ({
+  id: getDataGridHeaderSortableId('name'),
+}
+const sortableInputs: unknown[] = []
+let droppingSortableId: string | null = null
+vi.mock('@dnd-kit/react', () => ({
   DragOverlay: ({
     children,
     dropAnimation,
   }: {
-    children?: (source: { element?: Element | null; id: string }) => ReactNode;
-    dropAnimation?: unknown;
+    children?: (source: { element?: Element | null; id: string }) => ReactNode
+    dropAnimation?: unknown
   }) => {
-    dragOverlayDropAnimation = dropAnimation;
-    return <div data-testid="column-drag-overlay">{children?.(dragOverlaySource)}</div>;
+    dragOverlayDropAnimation = dropAnimation
+    return <div data-testid="column-drag-overlay">{children?.(dragOverlaySource)}</div>
   },
   DragDropProvider: ({
     children,
     onDragEnd,
   }: {
-    children: ReactNode;
-    onDragEnd?: (event: unknown) => void;
+    children: ReactNode
+    onDragEnd?: (event: unknown) => void
   }) => {
-    onDataGridDragEnd = onDragEnd;
-    return children;
+    onDataGridDragEnd = onDragEnd
+    return children
   },
-}));
+}))
 
-vi.mock("@dnd-kit/react/sortable", () => ({
+vi.mock('@dnd-kit/react/sortable', () => ({
   isSortable: (source: { sortable?: boolean } | null | undefined) => source?.sortable === true,
   useSortable: (input: { id: string }) => {
-    const targetRef = vi.fn();
-    sortableInputs.push(input);
-    sortableTargetRefs.set(input.id, targetRef);
+    const targetRef = vi.fn()
+    sortableInputs.push(input)
     return {
       isDropping: input.id === droppingSortableId,
       isDragSource: false,
       ref: () => undefined,
       targetRef,
-    };
+    }
   },
-}));
+}))
 
-vi.mock("@dnd-kit/abstract/modifiers", () => ({
+vi.mock('@dnd-kit/abstract/modifiers', () => ({
   RestrictToHorizontalAxis: class RestrictToHorizontalAxis {},
-}));
+}))
 
-vi.mock("@dnd-kit/dom", () => ({
+vi.mock('@dnd-kit/dom', () => ({
   AutoScroller: { configure: () => ({}) },
   Feedback: { configure: () => ({}) },
   PointerActivationConstraints: {
@@ -73,51 +73,53 @@ vi.mock("@dnd-kit/dom", () => ({
     },
   },
   PointerSensor: { configure: () => ({}) },
-}));
+}))
 
-vi.mock("@dnd-kit/dom/modifiers", () => ({
+vi.mock('@dnd-kit/dom/modifiers', () => ({
   RestrictToElement: { configure: () => ({}) },
-}));
+}))
 
 interface Person {
-  id: string;
-  name: string;
-  role: string;
+  id: string
+  name: string
+  role: string
 }
 
-const columnHelper = createColumnHelper<DataGridFeatures, Person>();
+const columnHelper = createColumnHelper<DataGridFeatures, Person>()
 const columns = columnHelper.columns([
-  columnHelper.accessor("name", { header: "Name" }),
-  columnHelper.accessor("role", { header: "Role" }),
-]);
+  columnHelper.accessor('name', { header: 'Name' }),
+  columnHelper.accessor('role', { header: 'Role' }),
+])
 const columnsWithFixedId = columnHelper.columns([
-  columnHelper.accessor("id", { header: "ID" }),
-  columnHelper.accessor("name", { header: "Name" }),
-  columnHelper.accessor("role", { header: "Role" }),
-]);
+  columnHelper.accessor('id', { header: 'ID' }),
+  columnHelper.accessor('name', { header: 'Name' }),
+  columnHelper.accessor('role', { header: 'Role' }),
+])
 const interactiveCellColumns = columnHelper.columns([
-  columnHelper.accessor("name", {
-    header: "Name",
+  columnHelper.accessor('name', {
+    header: 'Name',
     cell: ({ getValue }) => <a href="#person">{getValue()}</a>,
   }),
-]);
+])
 const rows: Person[] = [
-  { id: "person-1", name: "Ada", role: "Engineer" },
-  { id: "person-2", name: "Grace", role: "Admiral" },
-];
+  { id: 'person-1', name: 'Ada', role: 'Engineer' },
+  { id: 'person-2', name: 'Grace', role: 'Admiral' },
+]
 
 interface TestDataGridProps {
-  activeColumnId?: string | null;
-  activeRowId?: string | null;
-  data?: Person[];
-  initialCellSelection?: CellSelectionState;
-  loading?: boolean;
-  onCellActivate?: (target: { columnId: string; rowId: string }) => void;
-  onCellContextMenu?: (target: { columnId: string; rowId: string }) => void;
-  onColumnActivate?: (columnId: string | null) => void;
-  onRowActivate?: (rowId: string) => void;
-  resizingColumnId?: string | null;
-  selectedRowIds?: string[];
+  activeColumnId?: string | null
+  activeRowId?: string | null
+  data?: Person[]
+  initialCellSelection?: CellSelectionState
+  loading?: boolean
+  onCellActivate?: (target: { columnId: string; rowId: string }) => void
+  onCellContextMenu?: (target: { columnId: string; rowId: string }) => void
+  onColumnActivate?: (columnId: string | null) => void
+  onRowActivate?: (rowId: string) => void
+  resizingColumnId?: string | null
+  rowRendering?: 'all' | 'virtual'
+  scrollResetKey?: string
+  selectedRowIds?: string[]
 }
 
 function TestDataGrid({
@@ -131,12 +133,14 @@ function TestDataGrid({
   onColumnActivate,
   onRowActivate,
   resizingColumnId = null,
+  rowRendering,
+  scrollResetKey,
   selectedRowIds = [],
 }: TestDataGridProps) {
-  const [cellSelection, setCellSelection] = useState(initialCellSelection);
+  const [cellSelection, setCellSelection] = useState(initialCellSelection)
   const rowSelection = Object.fromEntries(
     selectedRowIds.map((rowId) => [rowId, true as const]),
-  ) satisfies RowSelectionState;
+  ) satisfies RowSelectionState
   const table = useTable({
     features: dataGridFeatures,
     columns,
@@ -155,7 +159,7 @@ function TestDataGrid({
       rowSelection,
     },
     onCellSelectionChange: setCellSelection,
-  });
+  })
 
   return (
     <DataGrid.Root
@@ -167,63 +171,118 @@ function TestDataGrid({
       onColumnActivate={onColumnActivate}
       onRowActivate={onRowActivate}
     >
-      <DataGrid.Viewport>
+      <DataGrid.Viewport scrollResetKey={scrollResetKey}>
         <DataGrid.Table aria-label="People">
           <DataGrid.Content
             loading={loading}
             emptyContent="No people"
             loadingContent="Loading people"
+            rowRendering={rowRendering}
           />
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
-describe("DataGrid scrollbar", () => {
-  it("uses overlay tracks outside its two-axis viewport", () => {
-    const { container } = render(<TestDataGrid />);
+describe('DataGrid scrollbar', () => {
+  it('uses overlay tracks outside its two-axis viewport', () => {
+    const { container } = render(<TestDataGrid />)
 
-    const viewport = container.querySelector('[data-slot="data-grid-viewport"]');
-    const scrollbars = Array.from(
-      container.querySelectorAll('[data-slot="scroll-area-scrollbar"]'),
-    );
+    const viewport = container.querySelector('[data-slot="data-grid-viewport"]')
+    const scrollbars = Array.from(container.querySelectorAll('[data-slot="scroll-area-scrollbar"]'))
 
-    expect(viewport?.getAttribute("data-scrollbar")).toBe("hidden");
-    expect(scrollbars.map((scrollbar) => scrollbar.getAttribute("data-orientation"))).toEqual([
-      "vertical",
-      "horizontal",
-    ]);
-    expect(scrollbars.every((scrollbar) => viewport?.contains(scrollbar) === false)).toBe(true);
-  });
+    expect(viewport?.getAttribute('data-scrollbar')).toBe('hidden')
+    expect(scrollbars.map((scrollbar) => scrollbar.getAttribute('data-orientation'))).toEqual([
+      'vertical',
+      'horizontal',
+    ])
+    expect(scrollbars.every((scrollbar) => viewport?.contains(scrollbar) === false)).toBe(true)
+  })
 
-  it("starts its vertical scrollbar below the sticky header", () => {
-    const { container } = render(<TestDataGrid />);
+  it('starts its vertical scrollbar below the sticky header', () => {
+    const { container } = render(<TestDataGrid />)
 
     expect(
       container
         .querySelector('[data-slot="scroll-area-scrollbar"][data-orientation="vertical"]')
-        ?.getAttribute("data-placement"),
-    ).toBe("body");
-  });
+        ?.getAttribute('data-placement'),
+    ).toBe('body')
+  })
 
-  it("uses intrinsic TanStack column widths instead of redistributing viewport space", () => {
-    const { container } = render(<TestDataGrid />);
-    const table = container.querySelector<HTMLElement>('[data-slot="data-grid-table"]');
+  it('resets viewport scroll without remounting table content', () => {
+    const { container, rerender } = render(<TestDataGrid scrollResetKey="page-1" />)
+    const viewport = container.querySelector<HTMLElement>('[data-slot="data-grid-viewport"]')
 
-    expect(table?.getAttribute("data-layout")).toBe("intrinsic");
-    expect(table?.style.width).toBe("300px");
-    expect(table === null ? null : getComputedStyle(table).minWidth).not.toBe("100%");
-  });
+    expect(viewport).not.toBeNull()
+    if (viewport === null) {
+      return
+    }
+    viewport.scrollLeft = 120
+    viewport.scrollTop = 240
 
-  it("keeps the header group above scrolling body rows", () => {
-    const { container } = render(<TestDataGrid />);
+    rerender(<TestDataGrid scrollResetKey="page-2" />)
+
+    expect(container.querySelector('[data-slot="data-grid-viewport"]')).toBe(viewport)
+    expect(viewport.scrollLeft).toBe(0)
+    expect(viewport.scrollTop).toBe(0)
+  })
+
+  it('prepares the viewport for frequent scrolling without browser scroll anchoring', () => {
+    const { container } = render(<TestDataGrid />)
+    const viewport = container.querySelector<HTMLElement>('[data-slot="data-grid-viewport"]')
+
+    expect(viewport).not.toBeNull()
+    if (viewport === null) {
+      return
+    }
+
+    expect(viewport.className).toContain(
+      stylex.props(scrollAreaStyles.viewportFrequentScroll).className,
+    )
+  })
+
+  it('isolates the scrolling table from surrounding paint work', () => {
+    const { container } = render(<TestDataGrid />)
+    const scrollSurface = container.querySelector<HTMLElement>(
+      '[data-slot="data-grid-scroll-surface"]',
+    )
+
+    expect(scrollSurface).not.toBeNull()
+    expect(scrollSurface?.className).toContain(
+      stylex.props(dataGridStyles.scrollSurfacePaintBoundary).className,
+    )
+  })
+
+  it('lets the vertical thumb reach the grid end inset', () => {
+    const { container } = render(<TestDataGrid />)
+    const verticalTrack = container.querySelector<HTMLElement>(
+      '[data-slot="scroll-area-scrollbar"][data-orientation="vertical"]',
+    )
+
+    expect(verticalTrack).not.toBeNull()
+    expect(verticalTrack?.className).toContain(
+      stylex.props(scrollAreaStyles.verticalTrackFlushEnd).className,
+    )
+  })
+
+  it('uses intrinsic TanStack column widths instead of redistributing viewport space', () => {
+    const { container } = render(<TestDataGrid />)
+    const table = container.querySelector<HTMLElement>('[data-slot="data-grid-table"]')
+
+    expect(table?.getAttribute('data-layout')).toBe('intrinsic')
+    expect(table?.style.width).toBe('300px')
+    expect(table === null ? null : getComputedStyle(table).minWidth).not.toBe('100%')
+  })
+
+  it('keeps the header group above scrolling body rows', () => {
+    const { container } = render(<TestDataGrid />)
 
     expect(
-      container.querySelector('[data-slot="data-grid-header"]')?.getAttribute("data-sticky"),
-    ).toBe("true");
-  });
-});
+      container.querySelector('[data-slot="data-grid-header"]')?.getAttribute('data-sticky'),
+    ).toBe('true')
+  })
+})
 
 function ExpandedTestDataGrid() {
   const table = useTable({
@@ -231,8 +290,8 @@ function ExpandedTestDataGrid() {
     columns,
     data: rows,
     getRowId: (row) => row.id,
-  });
-  const firstRow = table.getRowModel().rows[0];
+  })
+  const firstRow = table.getRowModel().rows[0]
 
   return (
     <DataGrid.Root table={table}>
@@ -250,25 +309,25 @@ function ExpandedTestDataGrid() {
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
 function InteractiveHeaderDataGrid({
   onColumnActivate,
 }: {
-  onColumnActivate: (columnId: string | null) => void;
+  onColumnActivate: (columnId: string | null) => void
 }) {
   const interactiveColumns = columnHelper.columns([
-    columnHelper.accessor("name", {
+    columnHelper.accessor('name', {
       header: () => <button type="button">Sort name</button>,
     }),
-  ]);
+  ])
   const table = useTable({
     features: dataGridFeatures,
     columns: interactiveColumns,
     data: rows,
     getRowId: (row) => row.id,
-  });
+  })
 
   return (
     <DataGrid.Root table={table} onColumnActivate={onColumnActivate}>
@@ -278,11 +337,11 @@ function InteractiveHeaderDataGrid({
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
 function InteractiveCellDataGrid() {
-  const [cellSelection, setCellSelection] = useState<CellSelectionState>([]);
+  const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
   const table = useTable({
     features: dataGridFeatures,
     columns: interactiveCellColumns,
@@ -290,7 +349,7 @@ function InteractiveCellDataGrid() {
     getRowId: (row) => row.id,
     state: { cellSelection },
     onCellSelectionChange: setCellSelection,
-  });
+  })
 
   return (
     <DataGrid.Root table={table}>
@@ -300,11 +359,11 @@ function InteractiveCellDataGrid() {
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
 function KeyboardSortableDataGrid({ onSortingChange }: { onSortingChange: () => void }) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([])
   const table = useTable({
     features: dataGridFeatures,
     columns,
@@ -312,10 +371,10 @@ function KeyboardSortableDataGrid({ onSortingChange }: { onSortingChange: () => 
     getRowId: (row) => row.id,
     state: { sorting },
     onSortingChange: (updater) => {
-      setSorting(updater);
-      onSortingChange();
+      setSorting(updater)
+      onSortingChange()
     },
-  });
+  })
 
   return (
     <DataGrid.Root table={table}>
@@ -325,17 +384,17 @@ function KeyboardSortableDataGrid({ onSortingChange }: { onSortingChange: () => 
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
 function DismissibleColumnDataGrid() {
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
   const table = useTable({
     features: dataGridFeatures,
     columns,
     data: rows,
     getRowId: (row) => row.id,
-  });
+  })
 
   return (
     <DataGrid.Root
@@ -349,25 +408,25 @@ function DismissibleColumnDataGrid() {
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
 function SelectionHitAreaDataGrid({
   onCellActivate,
 }: {
-  onCellActivate: (target: { columnId: string; rowId: string }) => void;
+  onCellActivate: (target: { columnId: string; rowId: string }) => void
 }) {
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const selectionColumns = columnHelper.columns([
     columnHelper.display({
-      id: "select",
+      id: 'select',
       enableCellSelection: false,
       header: ({ table }) => (
         <input
           aria-label="Select all rows"
           checked={table.getIsAllRowsSelected()}
           onChange={(event) => {
-            table.toggleAllRowsSelected(event.currentTarget.checked);
+            table.toggleAllRowsSelected(event.currentTarget.checked)
           }}
           type="checkbox"
         />
@@ -377,14 +436,14 @@ function SelectionHitAreaDataGrid({
           aria-label={`Select ${row.original.name}`}
           checked={row.getIsSelected()}
           onChange={(event) => {
-            row.toggleSelected(event.currentTarget.checked);
+            row.toggleSelected(event.currentTarget.checked)
           }}
           type="checkbox"
         />
       ),
     }),
     ...columns,
-  ]);
+  ])
   const table = useTable({
     features: dataGridFeatures,
     columns: selectionColumns,
@@ -393,7 +452,7 @@ function SelectionHitAreaDataGrid({
     getRowId: (row) => row.id,
     onRowSelectionChange: setRowSelection,
     state: { rowSelection },
-  });
+  })
 
   return (
     <DataGrid.Root table={table} onCellActivate={onCellActivate}>
@@ -403,27 +462,30 @@ function SelectionHitAreaDataGrid({
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
 function FixedGeometryDataGrid() {
   const fixedColumns = columnHelper.columns([
-    columnHelper.accessor("name", { header: "Name", size: 120 }),
-    columnHelper.accessor("role", { header: "Role", size: 180 }),
-  ]);
-  const table = useTable({
-    features: dataGridFeatures,
-    columns: fixedColumns,
-    data: rows,
-    getRowId: (row) => row.id,
-  });
+    columnHelper.accessor('name', { header: 'Name', size: 120 }),
+    columnHelper.accessor('role', { header: 'Role', size: 180 }),
+  ])
+  const table = useTable(
+    {
+      features: dataGridFeatures,
+      columns: fixedColumns,
+      data: rows,
+      getRowId: (row) => row.id,
+    },
+    () => null,
+  )
 
   return (
     <>
       <button
         type="button"
         onClick={() => {
-          table.setColumnSizing({ name: 220 });
+          table.setColumnSizing({ name: 220 })
         }}
       >
         Resize name
@@ -431,7 +493,7 @@ function FixedGeometryDataGrid() {
       <button
         type="button"
         onClick={() => {
-          table.setColumnOrder(["role", "name"]);
+          table.setColumnOrder(['role', 'name'])
         }}
       >
         Move role first
@@ -439,7 +501,7 @@ function FixedGeometryDataGrid() {
       <button
         type="button"
         onClick={() => {
-          table.setColumnVisibility({ role: false });
+          table.setColumnVisibility({ role: false })
         }}
       >
         Hide role
@@ -452,23 +514,23 @@ function FixedGeometryDataGrid() {
         </DataGrid.Viewport>
       </DataGrid.Root>
     </>
-  );
+  )
 }
 
 function ReorderableDataGrid({
   columnDragPreview,
-  initialColumnOrder = ["name", "role"],
+  initialColumnOrder = ['name', 'role'],
   includeFixedId = false,
   onColumnOrderChange,
-  reorderableColumnIds = ["name", "role"],
+  reorderableColumnIds = ['name', 'role'],
 }: {
-  columnDragPreview?: (columnId: string) => ReactNode;
-  initialColumnOrder?: string[];
-  includeFixedId?: boolean;
-  onColumnOrderChange: (columnIds: string[]) => void;
-  reorderableColumnIds?: string[];
+  columnDragPreview?: (columnId: string) => ReactNode
+  initialColumnOrder?: string[]
+  includeFixedId?: boolean
+  onColumnOrderChange: (columnIds: string[]) => void
+  reorderableColumnIds?: string[]
 }) {
-  const [columnOrder, setColumnOrder] = useState(initialColumnOrder);
+  const [columnOrder, setColumnOrder] = useState(initialColumnOrder)
   const table = useTable({
     features: dataGridFeatures,
     columns: includeFixedId === true ? columnsWithFixedId : columns,
@@ -478,12 +540,12 @@ function ReorderableDataGrid({
     onColumnOrderChange: (updater) => {
       setColumnOrder((currentColumnOrder) => {
         const nextColumnOrder =
-          typeof updater === "function" ? updater(currentColumnOrder) : updater;
-        onColumnOrderChange(nextColumnOrder);
-        return nextColumnOrder;
-      });
+          typeof updater === 'function' ? updater(currentColumnOrder) : updater
+        onColumnOrderChange(nextColumnOrder)
+        return nextColumnOrder
+      })
     },
-  });
+  })
 
   return (
     <DataGrid.Root
@@ -497,170 +559,190 @@ function ReorderableDataGrid({
         </DataGrid.Table>
       </DataGrid.Viewport>
     </DataGrid.Root>
-  );
+  )
 }
 
 afterEach(() => {
-  cleanup();
-  dragOverlayDropAnimation = undefined;
-  dragOverlaySource = { id: getDataGridHeaderSortableId("name") };
-  droppingSortableId = null;
-  onDataGridDragEnd = undefined;
-  sortableInputs.length = 0;
-  sortableTargetRefs.clear();
-});
+  cleanup()
+  dragOverlayDropAnimation = undefined
+  dragOverlaySource = { id: getDataGridHeaderSortableId('name') }
+  droppingSortableId = null
+  onDataGridDragEnd = undefined
+  sortableInputs.length = 0
+})
 
-describe("DataGrid", () => {
-  it("rejects duplicate reorder column ids", () => {
+describe('DataGrid', () => {
+  it('rejects duplicate reorder column ids', () => {
     expect(() =>
       render(
         <ReorderableDataGrid
-          reorderableColumnIds={["name", "name"]}
+          reorderableColumnIds={['name', 'name']}
           onColumnOrderChange={() => undefined}
         />,
       ),
-    ).toThrow("DataGrid reorderableColumnIds values must be unique");
-  });
+    ).toThrow('DataGrid reorderableColumnIds values must be unique')
+  })
 
-  it("preserves the focused header when reorder behavior loads", async () => {
-    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />);
-    const header = screen.getByRole("columnheader", { name: "Name" });
-    header.focus();
-    expect(header.hasAttribute("data-reorderable")).toBe(false);
+  it('preserves the focused header when reorder behavior loads', async () => {
+    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />)
+    const header = screen.getByRole('columnheader', { name: 'Name' })
+    header.focus()
+    expect(header.hasAttribute('data-reorderable')).toBe(false)
 
     await waitFor(() => {
-      expect(onDataGridDragEnd).toBeTypeOf("function");
-    });
+      expect(onDataGridDragEnd).toBeTypeOf('function')
+    })
 
-    const reorderedHeader = screen.getByRole("columnheader", { name: "Name" });
-    expect(document.activeElement).toBe(reorderedHeader);
-    expect(reorderedHeader.hasAttribute("data-reorderable")).toBe(true);
-  });
+    const reorderedHeader = screen.getByRole('columnheader', { name: 'Name' })
+    expect(document.activeElement).toBe(reorderedHeader)
+    expect(reorderedHeader.hasAttribute('data-reorderable')).toBe(true)
+  })
 
-  it("renders semantic headers, rows, and visible cells from TanStack state", () => {
-    render(<TestDataGrid />);
+  it('renders semantic headers, rows, and visible cells from TanStack state', () => {
+    render(<TestDataGrid />)
 
-    expect(screen.getByRole("table", { name: "People" })).toBeTruthy();
-    expect(screen.getAllByRole("columnheader")).toHaveLength(2);
-    expect(screen.getAllByRole("row")).toHaveLength(3);
-    expect(screen.getByRole("cell", { name: "Ada" }).getAttribute("data-typography")).toBe(
-      "mono",
-    );
-  });
+    expect(screen.getByRole('table', { name: 'People' })).toBeTruthy()
+    expect(screen.getAllByRole('columnheader')).toHaveLength(2)
+    expect(screen.getAllByRole('row')).toHaveLength(3)
+    expect(screen.getByRole('cell', { name: 'Ada' }).getAttribute('data-typography')).toBe('mono')
+  })
 
-  it("uses one explicit column geometry without redistributing unaffected columns", () => {
-    render(<FixedGeometryDataGrid />);
+  it('uses one explicit column geometry without redistributing unaffected columns', () => {
+    render(<FixedGeometryDataGrid />)
 
-    const table = screen.getByRole("table", { name: "Fixed geometry people" });
-    const scrollSurface = table.closest('[data-slot="data-grid-scroll-surface"]');
-    const columns = table.querySelectorAll("col");
+    const table = screen.getByRole('table', { name: 'Fixed geometry people' })
+    const scrollSurface = table.closest('[data-slot="data-grid-scroll-surface"]')
+    const columns = table.querySelectorAll('col')
 
-    expect(scrollSurface).not.toBeNull();
-    expect((scrollSurface as HTMLElement).style.width).toBe("300px");
-    expect(table.style.width).toBe("300px");
-    expect(Array.from(columns, (column) => column.style.width)).toEqual(["120px", "180px"]);
-    expect(table.querySelectorAll('[data-slot="data-grid-filler-cell"]')).toHaveLength(0);
+    expect(scrollSurface).not.toBeNull()
+    expect((scrollSurface as HTMLElement).style.width).toBe('300px')
+    expect(table.style.width).toBe('300px')
+    expect(Array.from(columns, (column) => column.style.width)).toEqual(['120px', '180px'])
+    expect(table.querySelectorAll('[data-slot="data-grid-filler-cell"]')).toHaveLength(0)
 
-    fireEvent.click(screen.getByRole("button", { name: "Resize name" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Resize name' }))
 
-    expect((scrollSurface as HTMLElement).style.width).toBe("400px");
-    expect(table.style.width).toBe("400px");
-    expect(Array.from(columns, (column) => column.style.width)).toEqual(["220px", "180px"]);
-  });
+    expect((scrollSurface as HTMLElement).style.width).toBe('400px')
+    expect(table.style.width).toBe('400px')
+    expect(Array.from(columns, (column) => column.style.width)).toEqual(['220px', '180px'])
+  })
 
-  it("updates shared column geometry for reordered and hidden columns", () => {
-    render(<FixedGeometryDataGrid />);
+  it('updates shared column geometry for reordered and hidden columns', () => {
+    render(<FixedGeometryDataGrid />)
 
-    const table = screen.getByRole("table", { name: "Fixed geometry people" });
+    const table = screen.getByRole('table', { name: 'Fixed geometry people' })
 
-    fireEvent.click(screen.getByRole("button", { name: "Move role first" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Move role first' }))
 
-    expect(Array.from(table.querySelectorAll("col"), (column) => column.style.width)).toEqual([
-      "180px",
-      "120px",
-    ]);
-    expect(table.style.width).toBe("300px");
+    expect(Array.from(table.querySelectorAll('col'), (column) => column.style.width)).toEqual([
+      '180px',
+      '120px',
+    ])
+    expect(table.style.width).toBe('300px')
 
-    fireEvent.click(screen.getByRole("button", { name: "Hide role" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hide role' }))
 
-    expect(Array.from(table.querySelectorAll("col"), (column) => column.style.width)).toEqual([
-      "120px",
-    ]);
-    expect(table.style.width).toBe("120px");
-  });
+    expect(Array.from(table.querySelectorAll('col'), (column) => column.style.width)).toEqual([
+      '120px',
+    ])
+    expect(table.style.width).toBe('120px')
+  })
 
-  it("renders explicit loading and empty content", () => {
-    const { rerender } = render(<TestDataGrid loading />);
+  it('renders explicit loading and empty content', () => {
+    const { rerender } = render(<TestDataGrid loading />)
 
-    expect(screen.getByText("Loading people")).toBeTruthy();
+    expect(screen.getByText('Loading people')).toBeTruthy()
 
-    rerender(<TestDataGrid data={[]} />);
+    rerender(<TestDataGrid data={[]} />)
 
-    expect(screen.getByText("No people")).toBeTruthy();
-  });
+    expect(screen.getByText('No people')).toBeTruthy()
+  })
 
-  it("gives TanStack focused-cell state precedence over column highlighting", () => {
+  it('renders a spinner with explicit loading text without placeholder rows', () => {
+    const { container } = render(<TestDataGrid loading />)
+
+    expect(container.querySelector('[data-slot="spinner"]')).not.toBeNull()
+    expect(container.querySelectorAll('[data-slot="data-grid-loading-row"]')).toHaveLength(0)
+    expect(
+      container.querySelector('[data-slot="data-grid-loading"]')?.getAttribute('aria-busy'),
+    ).toBe('true')
+    expect(screen.getByText('Loading people')).toBeTruthy()
+  })
+
+  it('renders the default 100-row page without scroll-synchronized virtualization', () => {
+    const data = Array.from({ length: 100 }, (_, index) => ({
+      id: `person-${index + 1}`,
+      name: `Person ${index + 1}`,
+      role: 'Member',
+    }))
+    const { container } = render(<TestDataGrid data={data} rowRendering="virtual" />)
+
+    expect(container.querySelectorAll('[data-slot="data-grid-row"]')).toHaveLength(100)
+    expect(container.querySelector('[data-row-rendering="virtual"]')).toBeNull()
+  })
+
+  it('gives TanStack focused-cell state precedence over column highlighting', () => {
     render(
       <TestDataGrid
         activeRowId="person-1"
         activeColumnId="role"
         initialCellSelection={[
           {
-            anchorRowId: "person-1",
-            anchorColumnId: "role",
-            focusRowId: "person-1",
-            focusColumnId: "role",
+            anchorRowId: 'person-1',
+            anchorColumnId: 'role',
+            focusRowId: 'person-1',
+            focusColumnId: 'role',
           },
         ]}
-        selectedRowIds={["person-2"]}
+        selectedRowIds={['person-2']}
       />,
-    );
+    )
 
-    const adaRow = screen.getByRole("row", { name: /Ada Engineer/ });
-    const graceRow = screen.getByRole("row", { name: /Grace Admiral/ });
-    const activeCell = screen.getByRole("cell", { name: "Engineer" });
-    const activeHeader = screen.getByRole("columnheader", { name: "Role" });
+    const adaRow = screen.getByRole('row', { name: /Ada Engineer/ })
+    const graceRow = screen.getByRole('row', { name: /Grace Admiral/ })
+    const activeCell = screen.getByRole('cell', { name: 'Engineer' })
+    const activeHeader = screen.getByRole('columnheader', { name: 'Role' })
 
-    expect(adaRow.hasAttribute("data-active")).toBe(true);
-    expect(graceRow.hasAttribute("data-selected")).toBe(true);
-    expect(activeHeader.hasAttribute("data-active")).toBe(false);
-    expect(activeCell.hasAttribute("data-active")).toBe(true);
-    expect(activeCell.hasAttribute("data-cell-selected")).toBe(true);
-    expect(activeCell.hasAttribute("data-column-active")).toBe(false);
-    expect(activeCell.hasAttribute("data-row-active")).toBe(true);
-    expect(graceRow.querySelectorAll("[data-selected]")).toHaveLength(2);
-  });
+    expect(adaRow.hasAttribute('data-active')).toBe(true)
+    expect(graceRow.hasAttribute('data-selected')).toBe(true)
+    expect(activeHeader.hasAttribute('data-active')).toBe(false)
+    expect(activeCell.hasAttribute('data-active')).toBe(true)
+    expect(activeCell.hasAttribute('data-cell-selected')).toBe(true)
+    expect(activeCell.hasAttribute('data-column-active')).toBe(false)
+    expect(activeCell.hasAttribute('data-row-active')).toBe(true)
+    expect(graceRow.querySelectorAll('[data-selected]')).toHaveLength(2)
+  })
 
-  it("highlights a column when no cell is active", () => {
-    render(<TestDataGrid activeColumnId="role" />);
+  it('highlights a column when no cell is active', () => {
+    render(<TestDataGrid activeColumnId="role" />)
 
-    const activeHeader = screen.getByRole("columnheader", { name: "Role" });
-    const activeColumnCell = screen.getByRole("cell", { name: "Engineer" });
+    const activeHeader = screen.getByRole('columnheader', { name: 'Role' })
+    const activeColumnCell = screen.getByRole('cell', { name: 'Engineer' })
 
-    expect(activeHeader.hasAttribute("data-active")).toBe(true);
-    expect(activeColumnCell.hasAttribute("data-column-active")).toBe(true);
-  });
+    expect(activeHeader.hasAttribute('data-active')).toBe(true)
+    expect(activeColumnCell.hasAttribute('data-column-active')).toBe(true)
+  })
 
-  it("keeps resize emphasis on the header-owned border", () => {
-    const { rerender } = render(<TestDataGrid activeColumnId="role" />);
+  it('keeps resize emphasis on the header-owned border', () => {
+    const { rerender } = render(<TestDataGrid activeColumnId="role" />)
 
-    const restingHandleClassName = screen.getByRole("button", {
-      name: "Resize role column",
-    }).className;
+    const restingHandleClassName = screen.getByRole('button', {
+      name: 'Resize role column',
+    }).className
 
-    rerender(<TestDataGrid activeColumnId="role" resizingColumnId="role" />);
+    rerender(<TestDataGrid activeColumnId="role" resizingColumnId="role" />)
 
-    const resizeHandle = screen.getByRole("button", { name: "Resize role column" });
+    const resizeHandle = screen.getByRole('button', { name: 'Resize role column' })
 
-    expect(resizeHandle.hasAttribute("data-resizing")).toBe(true);
-    expect(resizeHandle.className).toBe(restingHandleClassName);
-  });
+    expect(resizeHandle.hasAttribute('data-resizing')).toBe(true)
+    expect(resizeHandle.className).toBe(restingHandleClassName)
+  })
 
-  it("reports header, row, cell, and cell context-menu activation targets", () => {
-    const onColumnActivate = vi.fn();
-    const onRowActivate = vi.fn();
-    const onCellActivate = vi.fn();
-    const onCellContextMenu = vi.fn();
+  it('reports header, row, cell, and cell context-menu activation targets', () => {
+    const onColumnActivate = vi.fn()
+    const onRowActivate = vi.fn()
+    const onCellActivate = vi.fn()
+    const onCellContextMenu = vi.fn()
 
     render(
       <TestDataGrid
@@ -669,366 +751,345 @@ describe("DataGrid", () => {
         onCellActivate={onCellActivate}
         onCellContextMenu={onCellContextMenu}
       />,
-    );
+    )
 
-    fireEvent.click(screen.getByRole("columnheader", { name: "Role" }));
-    fireEvent.click(screen.getByRole("row", { name: /Ada Engineer/ }));
-    const admiralCell = screen.getByRole("cell", { name: "Admiral" });
-    fireEvent.mouseDown(admiralCell);
-    fireEvent.mouseUp(document);
-    fireEvent.click(admiralCell);
-    fireEvent.contextMenu(screen.getByRole("cell", { name: "Engineer" }));
+    fireEvent.click(screen.getByRole('columnheader', { name: 'Role' }))
+    fireEvent.click(screen.getByRole('row', { name: /Ada Engineer/ }))
+    const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
+    fireEvent.mouseDown(admiralCell)
+    fireEvent.mouseUp(document)
+    fireEvent.click(admiralCell)
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Engineer' }))
 
-    expect(onColumnActivate).toHaveBeenCalledWith("role");
-    expect(onRowActivate).toHaveBeenCalledWith("person-1");
-    expect(onCellActivate).toHaveBeenCalledWith({ rowId: "person-2", columnId: "role" });
-    expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: "person-1", columnId: "role" });
-  });
+    expect(onColumnActivate).toHaveBeenCalledWith('role')
+    expect(onRowActivate).toHaveBeenCalledWith('person-1')
+    expect(onCellActivate).toHaveBeenCalledWith({ rowId: 'person-2', columnId: 'role' })
+    expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: 'person-1', columnId: 'role' })
+  })
 
-  it("activates a cell once across the click sequence of a double click", () => {
-    const onCellActivate = vi.fn();
-    render(<TestDataGrid onCellActivate={onCellActivate} />);
-    const cell = screen.getByRole("cell", { name: "Engineer" });
+  it('activates a cell once across the click sequence of a double click', () => {
+    const onCellActivate = vi.fn()
+    render(<TestDataGrid onCellActivate={onCellActivate} />)
+    const cell = screen.getByRole('cell', { name: 'Engineer' })
 
-    fireEvent.click(cell, { detail: 1 });
-    fireEvent.click(cell, { detail: 2 });
-    fireEvent.doubleClick(cell);
+    fireEvent.click(cell, { detail: 1 })
+    fireEvent.click(cell, { detail: 2 })
+    fireEvent.doubleClick(cell)
 
-    expect(onCellActivate).toHaveBeenCalledOnce();
-  });
+    expect(onCellActivate).toHaveBeenCalledOnce()
+  })
 
-  it("renders TanStack replacement and Shift-range selection", () => {
-    render(<TestDataGrid />);
-    const adaCell = screen.getByRole("cell", { name: "Ada" });
-    const admiralCell = screen.getByRole("cell", { name: "Admiral" });
+  it('renders TanStack replacement and Shift-range selection', () => {
+    render(<TestDataGrid />)
+    const adaCell = screen.getByRole('cell', { name: 'Ada' })
+    const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
 
-    fireEvent.mouseDown(adaCell);
-    fireEvent.mouseUp(document);
-    expect(adaCell.hasAttribute("data-cell-selected")).toBe(true);
-    expect(adaCell.hasAttribute("data-active")).toBe(true);
+    fireEvent.mouseDown(adaCell)
+    fireEvent.mouseUp(document)
+    expect(adaCell.hasAttribute('data-cell-selected')).toBe(true)
+    expect(adaCell.hasAttribute('data-active')).toBe(true)
 
-    fireEvent.mouseDown(admiralCell, { shiftKey: true });
-    fireEvent.mouseUp(document);
+    fireEvent.mouseDown(admiralCell, { shiftKey: true })
+    fireEvent.mouseUp(document)
 
-    for (const cell of screen.getAllByRole("cell")) {
-      expect(cell.hasAttribute("data-cell-selected")).toBe(true);
+    for (const cell of screen.getAllByRole('cell')) {
+      expect(cell.hasAttribute('data-cell-selected')).toBe(true)
     }
-    expect(adaCell.hasAttribute("data-active")).toBe(true);
-  });
+    expect(adaCell.hasAttribute('data-active')).toBe(true)
+  })
 
-  it("extends TanStack selection while a primary-button drag enters cells", () => {
-    render(<TestDataGrid />);
-    const adaCell = screen.getByRole("cell", { name: "Ada" });
-    const admiralCell = screen.getByRole("cell", { name: "Admiral" });
+  it('extends TanStack selection while a primary-button drag enters cells', () => {
+    render(<TestDataGrid />)
+    const adaCell = screen.getByRole('cell', { name: 'Ada' })
+    const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
 
-    fireEvent.mouseDown(adaCell);
-    fireEvent.mouseEnter(admiralCell);
-    fireEvent.mouseUp(document);
+    fireEvent.mouseDown(adaCell)
+    fireEvent.mouseEnter(admiralCell)
+    fireEvent.mouseUp(document)
 
-    for (const cell of screen.getAllByRole("cell")) {
-      expect(cell.hasAttribute("data-cell-selected")).toBe(true);
+    for (const cell of screen.getAllByRole('cell')) {
+      expect(cell.hasAttribute('data-cell-selected')).toBe(true)
     }
-  });
+  })
 
-  it("does not start parent cell selection from an interactive descendant", () => {
-    render(<InteractiveCellDataGrid />);
-    const link = screen.getByRole("link", { name: "Ada" });
-    const cell = link.closest("td");
+  it('does not start parent cell selection from an interactive descendant', () => {
+    render(<InteractiveCellDataGrid />)
+    const link = screen.getByRole('link', { name: 'Ada' })
+    const cell = link.closest('td')
 
-    expect(cell).not.toBeNull();
-    fireEvent.mouseDown(link);
-    fireEvent.mouseUp(document);
+    expect(cell).not.toBeNull()
+    fireEvent.mouseDown(link)
+    fireEvent.mouseUp(document)
 
-    expect(cell?.hasAttribute("data-cell-selected")).toBe(false);
-  });
+    expect(cell?.hasAttribute('data-cell-selected')).toBe(false)
+  })
 
-  it("registers body cells only as column drop targets", async () => {
-    render(<ReorderableDataGrid onColumnOrderChange={vi.fn()} />);
-    const cell = screen.getByRole("cell", { name: "Engineer" });
+  it('keeps body cells outside drag-and-drop registration', async () => {
+    render(<ReorderableDataGrid onColumnOrderChange={vi.fn()} />)
 
     await waitFor(() => {
-      expect(
-        sortableTargetRefs.get(getDataGridCellSortableId("person-1", "role")),
-      ).toHaveBeenCalledWith(cell);
-    });
-  });
+      expect(sortableInputs.length).toBeGreaterThan(0)
+    })
 
-  it("supports expanded content through manual compound composition", () => {
-    render(<ExpandedTestDataGrid />);
+    expect(sortableInputs).not.toContainEqual(expect.objectContaining({ type: 'column-cell' }))
+    const headerSortable = sortableInputs.find(
+      (input) => (input as { type?: string }).type === 'column',
+    )
+    expect(headerSortable).toMatchObject({
+      plugins: [expect.any(Function)],
+      transition: { duration: 0 },
+    })
+  })
 
-    const details = screen.getByRole("cell", { name: "Ada details" });
-    expect(details.getAttribute("colspan")).toBe("2");
-  });
+  it('supports expanded content through manual compound composition', () => {
+    render(<ExpandedTestDataGrid />)
 
-  it("activates a column when its interactive header content is used", () => {
-    const onColumnActivate = vi.fn();
-    render(<InteractiveHeaderDataGrid onColumnActivate={onColumnActivate} />);
+    const details = screen.getByRole('cell', { name: 'Ada details' })
+    expect(details.getAttribute('colspan')).toBe('2')
+  })
 
-    fireEvent.click(screen.getByRole("button", { name: "Sort name" }));
+  it('activates a column when its interactive header content is used', () => {
+    const onColumnActivate = vi.fn()
+    render(<InteractiveHeaderDataGrid onColumnActivate={onColumnActivate} />)
 
-    expect(onColumnActivate).toHaveBeenCalledWith("name");
-  });
+    fireEvent.click(screen.getByRole('button', { name: 'Sort name' }))
 
-  it("deactivates a column when its active header is clicked again", () => {
-    render(<DismissibleColumnDataGrid />);
-    const header = screen.getByRole("columnheader", { name: "Role" });
+    expect(onColumnActivate).toHaveBeenCalledWith('name')
+  })
 
-    fireEvent.click(header);
-    expect(header.hasAttribute("data-active")).toBe(true);
+  it('deactivates a column when its active header is clicked again', () => {
+    render(<DismissibleColumnDataGrid />)
+    const header = screen.getByRole('columnheader', { name: 'Role' })
 
-    fireEvent.click(header);
-    expect(header.hasAttribute("data-active")).toBe(false);
-  });
+    fireEvent.click(header)
+    expect(header.hasAttribute('data-active')).toBe(true)
 
-  it("deactivates a column when a pointer press occurs outside the table", () => {
-    render(<DismissibleColumnDataGrid />);
-    const header = screen.getByRole("columnheader", { name: "Role" });
+    fireEvent.click(header)
+    expect(header.hasAttribute('data-active')).toBe(false)
+  })
 
-    fireEvent.click(header);
-    fireEvent.pointerDown(document.body);
+  it('deactivates a column when a pointer press occurs outside the table', () => {
+    render(<DismissibleColumnDataGrid />)
+    const header = screen.getByRole('columnheader', { name: 'Role' })
 
-    expect(header.hasAttribute("data-active")).toBe(false);
-  });
+    fireEvent.click(header)
+    fireEvent.pointerDown(document.body)
 
-  it("uses the complete checkbox cell as the selection hit area", () => {
-    const onCellActivate = vi.fn();
-    render(<SelectionHitAreaDataGrid onCellActivate={onCellActivate} />);
-    const checkbox = screen.getByRole("checkbox", { name: "Select Ada" });
-    const checkboxCell = checkbox.closest("td");
+    expect(header.hasAttribute('data-active')).toBe(false)
+  })
 
-    expect(checkboxCell).not.toBeNull();
-    fireEvent.mouseDown(checkboxCell as HTMLTableCellElement);
-    fireEvent.mouseUp(document);
-    fireEvent.click(checkboxCell as HTMLTableCellElement);
+  it('uses the complete checkbox cell as the selection hit area', () => {
+    const onCellActivate = vi.fn()
+    render(<SelectionHitAreaDataGrid onCellActivate={onCellActivate} />)
+    const checkbox = screen.getByRole('checkbox', { name: 'Select Ada' })
+    const checkboxCell = checkbox.closest('td')
 
-    expect((checkbox as HTMLInputElement).checked).toBe(true);
-    expect(document.activeElement).not.toBe(checkboxCell);
-    expect(onCellActivate).not.toHaveBeenCalled();
-    expect(checkboxCell?.hasAttribute("data-cell-selected")).toBe(false);
-  });
+    expect(checkboxCell).not.toBeNull()
+    fireEvent.mouseDown(checkboxCell as HTMLTableCellElement)
+    fireEvent.mouseUp(document)
+    fireEvent.click(checkboxCell as HTMLTableCellElement)
 
-  it("keeps table content stable until a column drag is dropped", async () => {
-    const onColumnOrderChange = vi.fn();
-    render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />);
+    expect((checkbox as HTMLInputElement).checked).toBe(true)
+    expect(document.activeElement).not.toBe(checkboxCell)
+    expect(onCellActivate).not.toHaveBeenCalled()
+    expect(checkboxCell?.hasAttribute('data-cell-selected')).toBe(false)
+  })
+
+  it('keeps table content stable until a column drag is dropped', async () => {
+    const onColumnOrderChange = vi.fn()
+    render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />)
 
     await waitFor(() => {
-      expect(onDataGridDragEnd).toBeTypeOf("function");
-    });
+      expect(onDataGridDragEnd).toBeTypeOf('function')
+    })
 
     const operation = {
       source: {
-        id: getDataGridHeaderSortableId("role"),
+        id: getDataGridHeaderSortableId('role'),
         initialIndex: 1,
         index: 1,
         sortable: true,
-        type: "column",
+        type: 'column',
       },
       target: {
-        id: getDataGridHeaderSortableId("name"),
+        id: getDataGridHeaderSortableId('name'),
         index: 0,
         sortable: true,
-        type: "column",
+        type: 'column',
       },
-    };
+    }
 
-    expect(onColumnOrderChange).not.toHaveBeenCalled();
-    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
-      "Name",
-      "Role",
-    ]);
+    expect(onColumnOrderChange).not.toHaveBeenCalled()
+    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      'Name',
+      'Role',
+    ])
     expect(
       screen
-        .getAllByRole("cell")
+        .getAllByRole('cell')
         .slice(0, 2)
         .map((cell) => cell.textContent),
-    ).toEqual(["Ada", "Engineer"]);
+    ).toEqual(['Ada', 'Engineer'])
 
     act(() => {
-      onDataGridDragEnd?.({ canceled: false, operation });
-    });
+      onDataGridDragEnd?.({ canceled: false, operation })
+    })
 
-    expect(onColumnOrderChange).toHaveBeenCalledWith(["role", "name"]);
-    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
-      "Role",
-      "Name",
-    ]);
-  });
+    expect(onColumnOrderChange).toHaveBeenCalledWith(['role', 'name'])
+    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      'Role',
+      'Name',
+    ])
+  })
 
-  it("preserves fixed columns when TanStack commits a reordered subset", async () => {
-    const onColumnOrderChange = vi.fn();
+  it('preserves fixed columns when TanStack commits a reordered subset', async () => {
+    const onColumnOrderChange = vi.fn()
     render(
       <ReorderableDataGrid
         includeFixedId
-        initialColumnOrder={["id", "name", "role"]}
+        initialColumnOrder={['id', 'name', 'role']}
         onColumnOrderChange={onColumnOrderChange}
       />,
-    );
+    )
 
     await waitFor(() => {
-      expect(onDataGridDragEnd).toBeTypeOf("function");
-    });
+      expect(onDataGridDragEnd).toBeTypeOf('function')
+    })
 
     act(() => {
       onDataGridDragEnd?.({
         canceled: false,
         operation: {
           source: {
-            id: getDataGridHeaderSortableId("role"),
+            id: getDataGridHeaderSortableId('role'),
             initialIndex: 1,
             index: 1,
             sortable: true,
-            type: "column",
+            type: 'column',
           },
           target: {
-            id: getDataGridHeaderSortableId("name"),
+            id: getDataGridHeaderSortableId('name'),
             index: 0,
             sortable: true,
-            type: "column",
+            type: 'column',
           },
         },
-      });
-    });
+      })
+    })
 
-    expect(onColumnOrderChange).toHaveBeenCalledWith(["id", "role", "name"]);
-    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
-      "ID",
-      "Role",
-      "Name",
-    ]);
-  });
+    expect(onColumnOrderChange).toHaveBeenCalledWith(['id', 'role', 'name'])
+    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      'ID',
+      'Role',
+      'Name',
+    ])
+  })
 
-  it("namespaces sortable ids without delimiter collisions", () => {
-    expect(getDataGridCellSortableId("row:one", "role")).not.toBe(
-      getDataGridCellSortableId("row", "one:role"),
-    );
-    expect(getDataGridHeaderSortableId('["data-grid","cell"]')).not.toBe(
-      getDataGridCellSortableId("data-grid", "cell"),
-    );
-  });
-
-  it("moves a focused header with Shift and horizontal arrow keys", async () => {
-    const onColumnOrderChange = vi.fn();
-    render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />);
+  it('moves a focused header with Shift and horizontal arrow keys', async () => {
+    const onColumnOrderChange = vi.fn()
+    render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />)
 
     await waitFor(() => {
       expect(
-        screen.getByRole("columnheader", { name: "Name" }).hasAttribute("data-reorderable"),
-      ).toBe(true);
-    });
+        screen.getByRole('columnheader', { name: 'Name' }).hasAttribute('data-reorderable'),
+      ).toBe(true)
+    })
 
-    const header = screen.getByRole("columnheader", { name: "Name" });
-    header.focus();
-    fireEvent.keyDown(header, { key: "ArrowRight", shiftKey: true });
+    const header = screen.getByRole('columnheader', { name: 'Name' })
+    header.focus()
+    fireEvent.keyDown(header, { key: 'ArrowRight', shiftKey: true })
 
-    expect(onColumnOrderChange).toHaveBeenCalledWith(["role", "name"]);
-    expect(document.activeElement).toBe(screen.getByRole("columnheader", { name: "Name" }));
-  });
+    expect(onColumnOrderChange).toHaveBeenCalledWith(['role', 'name'])
+    expect(document.activeElement).toBe(screen.getByRole('columnheader', { name: 'Name' }))
+  })
 
-  it("renders an application-provided drag preview", async () => {
+  it('renders an application-provided drag preview', async () => {
     render(
       <ReorderableDataGrid
         columnDragPreview={(columnId) => <span>{`Marker ${columnId}`}</span>}
         onColumnOrderChange={() => undefined}
       />,
-    );
+    )
 
     await waitFor(() => {
-      expect(screen.getByTestId("column-drag-overlay").textContent).toBe("Marker name");
-    });
-  });
+      expect(screen.getByTestId('column-drag-overlay').textContent).toBe('Marker name')
+    })
+  })
 
-  it("gives reorderable body cells row-scoped sortable transitions without making them draggable", async () => {
-    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />);
-
-    await waitFor(() => {
-      expect(sortableInputs).toContainEqual({
-        accept: "column-cell",
-        id: getDataGridCellSortableId("person-1", "role"),
-        index: 1,
-        group: JSON.stringify(["data-grid", "row", "person-1"]),
-        disabled: {
-          draggable: true,
-          droppable: false,
-        },
-        type: "column-cell",
-      });
-    });
-  });
-
-  it("keeps the source header slot reserved without duplicating the overlay content", async () => {
-    droppingSortableId = getDataGridHeaderSortableId("name");
-    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />);
+  it('keeps the source header slot reserved while a drop settles', async () => {
+    droppingSortableId = getDataGridHeaderSortableId('name')
+    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />)
 
     await waitFor(() => {
-      const header = document.querySelector<HTMLElement>('[data-column-id="name"]');
-      expect(header).not.toBeNull();
+      const header = document.querySelector<HTMLElement>('[data-column-id="name"]')
+      expect(header).not.toBeNull()
       const source = header?.querySelector<HTMLElement>(
         '[data-slot="data-grid-header-drag-source"]',
-      );
-      expect(header?.hasAttribute("data-dragging")).toBe(true);
-      expect(source).not.toBeNull();
-      expect(source?.getAttribute("aria-hidden")).toBe("true");
-    });
-  });
+      )
+      expect(header?.hasAttribute('data-dragging')).toBe(true)
+      expect(source).not.toBeNull()
+      expect(source?.getAttribute('aria-hidden')).toBe('true')
+    })
+  })
 
-  it("reports sort state and toggles sorting from a focused header with Enter", () => {
-    const onSortingChange = vi.fn();
-    render(<KeyboardSortableDataGrid onSortingChange={onSortingChange} />);
+  it('reports sort state and toggles sorting from a focused header with Enter', () => {
+    const onSortingChange = vi.fn()
+    render(<KeyboardSortableDataGrid onSortingChange={onSortingChange} />)
 
-    const header = screen.getByRole("columnheader", { name: "Name" });
-    expect(header.getAttribute("aria-sort")).toBe("none");
-    header.focus();
-    fireEvent.keyDown(header, { key: "Enter" });
+    const header = screen.getByRole('columnheader', { name: 'Name' })
+    expect(header.getAttribute('aria-sort')).toBe('none')
+    header.focus()
+    fireEvent.keyDown(header, { key: 'Enter' })
 
-    expect(onSortingChange).toHaveBeenCalledOnce();
-  });
+    expect(onSortingChange).toHaveBeenCalledOnce()
+  })
 
-  it("does not animate the drag overlay after the pointer is released", async () => {
-    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />);
-
-    await waitFor(() => {
-      expect(dragOverlayDropAnimation).toBeNull();
-    });
-  });
-
-  it("does not publish a transient column order when a drag is canceled", async () => {
-    const onColumnOrderChange = vi.fn();
-    render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />);
+  it('does not animate the drag overlay after the pointer is released', async () => {
+    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />)
 
     await waitFor(() => {
-      expect(onDataGridDragEnd).toBeTypeOf("function");
-    });
+      expect(dragOverlayDropAnimation).toBeNull()
+    })
+  })
+
+  it('does not publish a transient column order when a drag is canceled', async () => {
+    const onColumnOrderChange = vi.fn()
+    render(<ReorderableDataGrid onColumnOrderChange={onColumnOrderChange} />)
+
+    await waitFor(() => {
+      expect(onDataGridDragEnd).toBeTypeOf('function')
+    })
 
     const operation = {
       source: {
-        id: getDataGridHeaderSortableId("role"),
+        id: getDataGridHeaderSortableId('role'),
         initialIndex: 1,
         index: 1,
         sortable: true,
-        type: "column",
+        type: 'column',
       },
       target: {
-        id: getDataGridHeaderSortableId("name"),
+        id: getDataGridHeaderSortableId('name'),
         index: 0,
         sortable: true,
-        type: "column",
+        type: 'column',
       },
-    };
+    }
 
     act(() => {
-      onDataGridDragEnd?.({ canceled: true, operation });
-    });
+      onDataGridDragEnd?.({ canceled: true, operation })
+    })
 
-    expect(onColumnOrderChange).not.toHaveBeenCalled();
-    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual([
-      "Name",
-      "Role",
-    ]);
+    expect(onColumnOrderChange).not.toHaveBeenCalled()
+    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+      'Name',
+      'Role',
+    ])
     expect(
       screen
-        .getAllByRole("cell")
+        .getAllByRole('cell')
         .slice(0, 2)
         .map((cell) => cell.textContent),
-    ).toEqual(["Ada", "Engineer"]);
-  });
-});
+    ).toEqual(['Ada', 'Engineer'])
+  })
+})

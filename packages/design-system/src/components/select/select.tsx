@@ -12,7 +12,7 @@ type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
 
 export type SelectTriggerSize = FormControlSize
 export type SelectItemSize = 's' | 'm' | 'l'
-export type SelectWidth = 'content' | 'full'
+export type SelectWidth = 'compact' | 'content' | 'full'
 
 const sizeStyles = {
   s: selectStyles.sizeS,
@@ -44,7 +44,7 @@ export interface SelectTriggerProps extends Omit<
 > {
   /** Controls the trigger height and padding. */
   size?: SelectTriggerSize
-  /** Controls whether the trigger follows its content or fills its container. */
+  /** Controls whether the trigger uses an intrinsic, compact fixed, or container-filling width. */
   width?: SelectWidth
   /** Content displayed before the selected value. */
   prefix?: React.ReactNode
@@ -133,6 +133,7 @@ const SelectLabel = React.forwardRef<HTMLDivElement, SelectLabelProps>(
 )
 
 const widthStyles = {
+  compact: selectStyles.triggerWidthCompact,
   content: selectStyles.triggerWidthContent,
   full: selectStyles.triggerWidthFull,
 } satisfies Record<SelectWidth, unknown>
@@ -373,8 +374,8 @@ function SelectItemInner<Value>(
       {...stateStyles}
       data-size={size}
     >
-      {hasText === true ? children : <SelectItemText>{children}</SelectItemText>}
       {hasIndicator === false && <SelectItemIndicator />}
+      {hasText === true ? children : <SelectItemText>{children}</SelectItemText>}
     </BaseSelect.Item>
   )
 }
@@ -387,7 +388,7 @@ const SelectItem = React.forwardRef(SelectItemInner) as <Value>(
 const SelectItemText = React.forwardRef<HTMLDivElement, SelectItemTextProps>(
   function SelectItemText(props, ref) {
     const styles = stylex.props(selectStyles.itemText)
-    return <BaseSelect.ItemText {...props} ref={ref} {...styles} />
+    return <BaseSelect.ItemText {...props} ref={ref} {...styles} data-slot="select-item-text" />
   },
 )
 

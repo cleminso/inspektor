@@ -25,6 +25,8 @@ export interface DataGridContextValue<TData extends RowData> {
   getColumnReorderIndex: (columnId: string) => number;
   moveColumn: (columnId: string, offset: -1 | 1) => void;
   table: DataGridTable<TData>;
+  setViewportElement: (element: HTMLDivElement | null) => void;
+  viewportElement: HTMLDivElement | null;
 }
 
 export const DataGridContext = createContext<DataGridContextValue<RowData> | null>(null);

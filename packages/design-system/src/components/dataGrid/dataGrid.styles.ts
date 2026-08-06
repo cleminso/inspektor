@@ -1,11 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import {
-  backgroundColors,
-  borderColors,
-  spatial,
-  textColors,
-} from '../../tokens/semantics.stylex'
+import { backgroundColors, borderColors, spatial, textColors } from '../../tokens/semantics.stylex'
 import {
   fontFamilies,
   fontSizes,
@@ -38,6 +33,9 @@ export const dataGridStyles = stylex.create({
     backgroundColor: backgroundColors['bg-page'],
     position: 'relative',
     minWidth: '100%',
+  },
+  scrollSurfacePaintBoundary: {
+    contain: 'paint',
   },
   table: {
     borderCollapse: 'separate',
@@ -280,11 +278,21 @@ export const dataGridStyles = stylex.create({
   compactCell: {
     height: spatial['control-height-m'],
   },
+  loadingIndicator: {
+    gap: spacing.s,
+    alignItems: 'center',
+    display: 'inline-flex',
+  },
   messageCell: {
     padding: spacing.xl,
     color: textColors['text-muted'],
     textAlign: 'center',
     height: spatial['viewport-height-s'],
+  },
+  virtualSpacerCell: {
+    padding: 0,
+    borderWidth: 0,
+    height: 'inherit',
   },
   expandedCell: {
     padding: spacing.l,
@@ -298,7 +306,7 @@ export const dataGridStyles = stylex.create({
     backgroundColor: backgroundColors['bg-page'],
     color: textColors['text-muted'],
     display: 'flex',
-  flexShrink: 0,
+    flexShrink: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,

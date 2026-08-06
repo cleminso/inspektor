@@ -9,11 +9,16 @@ interface Account {
   role: string;
 }
 
-const data: Account[] = [
-  { id: "account_01", email: "ada@example.com", role: "admin" },
-  { id: "account_02", email: "grace@example.com", role: "member" },
-  { id: "account_03", email: "linus@example.com", role: "member" },
-];
+const names = ["ada", "grace", "linus", "margaret", "donald"];
+const data: Account[] = Array.from({ length: 1000 }, (_, index) => {
+  const name = names[index % names.length] ?? "member";
+  const number = String(index + 1).padStart(4, "0");
+  return {
+    id: `account_${number}`,
+    email: `${name}.${number}@example.com`,
+    role: index % 10 === 0 ? "admin" : "member",
+  };
+});
 const columnHelper = createColumnHelper<DataGridFeatures, Account>();
 const columns = columnHelper.columns([
   columnHelper.accessor("id", { header: "ID", size: 160 }),
@@ -62,12 +67,12 @@ export default function BasicExample() {
     >
       <DataGrid.Viewport>
         <DataGrid.Table aria-label="Accounts">
-          <DataGrid.Content />
+          <DataGrid.Content rowRendering="virtual" />
         </DataGrid.Table>
       </DataGrid.Viewport>
       <DataGrid.Footer>
         <Text color="muted" variant="caption">
-          3 rows
+          1,000 rows
         </Text>
         <Text color="muted" variant="caption">
           Select a row, column, or cell

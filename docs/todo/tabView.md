@@ -13,6 +13,10 @@
 
 [06/08/26]
 
+- [x] Forward focus and pointer intent events through `TabView.Item`'s owned tab button without including its sibling close action.
+
+[06/08/26]
+
 - [x] Replace an open Tab View tooltip instantly and without entrance motion when the pointer targets another tab label or close action.
 
 [06/08/26]
@@ -93,6 +97,13 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Cover focus, blur, pointer-enter, pointer-leave, and pointer-down event forwarding from the tab button.
+- [x] Confirm close-button pointer and focus interaction does not emit tab intent.
+- [x] Verify generated Tab View item metadata includes the forwarded event contract.
+- [x] Verify Tab View tests, design-system typecheck, lint, and production builds.
 
 [06/08/26]
 

@@ -1,7 +1,9 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import { Select, type SelectRootProps } from './select'
+import { selectStyles } from './select.styles'
 
 afterEach(cleanup)
 
@@ -165,6 +167,20 @@ describe('Select', () => {
     expect(trigger.getAttribute('data-width')).toBe('full')
   })
 
+  it('applies a fixed compact width for short option sets', () => {
+    render(
+      <Select.Root>
+        <Select.Trigger width="compact">
+          <Select.Value placeholder="1000" />
+        </Select.Trigger>
+      </Select.Root>,
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger.getAttribute('data-width')).toBe('compact')
+    expect(trigger.className).toContain(stylex.props(selectStyles.triggerWidthCompact).className)
+  })
+
   it('applies a constrained size to popup items', () => {
     render(
       <Select.Root defaultOpen>
@@ -180,6 +196,30 @@ describe('Select', () => {
     )
 
     expect(screen.getByRole('option', { name: 'Main' }).getAttribute('data-size')).toBe('l')
+  })
+
+  it('reserves a leading indicator slot before option text', () => {
+    render(
+      <Select.Root defaultValue="main" defaultOpen>
+        <Select.Trigger aria-label="Branch">
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="main">Main</Select.Item>
+          <Select.Item value="preview">Preview</Select.Item>
+        </Select.Content>
+      </Select.Root>,
+    )
+
+    const option = screen.getByRole('option', { name: 'Main' })
+    const indicator = option.querySelector('[data-slot="select-item-indicator"]')
+    const text = option.querySelector('[data-slot="select-item-text"]')
+
+    expect(indicator).not.toBeNull()
+    expect(text).not.toBeNull()
+    expect(
+      indicator!.compareDocumentPosition(text!) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('composes trigger adornments and owned icons without duplicating legacy parts', () => {

@@ -1217,7 +1217,7 @@
     },
     {
       "name": "width",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1227,7 +1227,7 @@
     },
     {
       "name": "height",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1237,7 +1237,7 @@
     },
     {
       "name": "minWidth",
-      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1247,7 +1247,7 @@
     },
     {
       "name": "maxWidth",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1257,7 +1257,7 @@
     },
     {
       "name": "minHeight",
-      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1267,7 +1267,7 @@
     },
     {
       "name": "maxHeight",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1575,7 +1575,7 @@
       "description": "Controls which native scroll axes and overlay tracks are available.",
       "source": {
         "path": "packages/design-system/src/components/scrollArea/scrollArea.tsx",
-        "line": 14
+        "line": 16
       }
     },
     {
@@ -2233,13 +2233,63 @@
       }
     },
     {
+      "name": "onBlur",
+      "type": "(event: BaseUIEvent<FocusEvent<HTMLButtonElement, Element>>) => void",
+      "required": false,
+      "description": "Runs when focus leaves the tab button.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 117
+      }
+    },
+    {
       "name": "onClose",
       "type": "(value: TabViewValue) => void",
       "required": false,
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 117
+        "line": 119
+      }
+    },
+    {
+      "name": "onFocus",
+      "type": "(event: BaseUIEvent<FocusEvent<HTMLButtonElement, Element>>) => void",
+      "required": false,
+      "description": "Runs when the tab button receives focus.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 121
+      }
+    },
+    {
+      "name": "onPointerDown",
+      "type": "(event: BaseUIEvent<PointerEvent<HTMLButtonElement>>) => void",
+      "required": false,
+      "description": "Runs when a pointer press starts on the tab button.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 123
+      }
+    },
+    {
+      "name": "onPointerEnter",
+      "type": "(event: BaseUIEvent<PointerEvent<HTMLButtonElement>>) => void",
+      "required": false,
+      "description": "Runs when the pointer enters the tab button.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 125
+      }
+    },
+    {
+      "name": "onPointerLeave",
+      "type": "(event: BaseUIEvent<PointerEvent<HTMLButtonElement>>) => void",
+      "required": false,
+      "description": "Runs when the pointer leaves the tab button.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 127
       }
     },
     {
@@ -2250,7 +2300,7 @@
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 119
+        "line": 129
       }
     }
   ],
@@ -2262,7 +2312,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 124
+        "line": 134
       }
     },
     {
@@ -2272,7 +2322,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 126
+        "line": 136
       }
     },
     {
@@ -2283,7 +2333,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 128
+        "line": 138
       }
     }
   ],
@@ -2734,7 +2784,7 @@
       "description": "Column highlighted across the header and visible rows.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 72
+        "line": 77
       }
     },
     {
@@ -2745,7 +2795,7 @@
       "description": "Row currently targeted for inspection.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 74
+        "line": 79
       }
     },
     {
@@ -2755,7 +2805,7 @@
       "description": "Data-table regions and companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 76
+        "line": 81
       }
     },
     {
@@ -2766,7 +2816,7 @@
       "description": "Controls table row and cell spacing.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 78
+        "line": 83
       }
     },
     {
@@ -2776,7 +2826,7 @@
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 80
+        "line": 85
       }
     },
     {
@@ -2786,7 +2836,7 @@
       "description": "Runs when a cell context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 82
+        "line": 87
       }
     },
     {
@@ -2796,7 +2846,7 @@
       "description": "Runs when a column header is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 84
+        "line": 89
       }
     },
     {
@@ -2806,7 +2856,7 @@
       "description": "Runs when a column-header context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 86
+        "line": 91
       }
     },
     {
@@ -2816,7 +2866,7 @@
       "description": "Runs when a non-interactive row is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 88
+        "line": 93
       }
     },
     {
@@ -2826,7 +2876,7 @@
       "description": "Runs when a row context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 90
+        "line": 95
       }
     },
     {
@@ -2836,7 +2886,7 @@
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 92
+        "line": 97
       }
     },
     {
@@ -2846,7 +2896,7 @@
       "description": "Renders the inert visual shown while a column header is dragged.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 97
+        "line": 102
       }
     },
     {
@@ -2856,7 +2906,7 @@
       "description": "Leaf column ids that can be reordered. TanStack table state owns their current order.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 99
+        "line": 104
       }
     }
   ],
@@ -2868,7 +2918,17 @@
       "description": "Table or custom viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 112
+        "line": 117
+      }
+    },
+    {
+      "name": "scrollResetKey",
+      "type": "string | number",
+      "required": false,
+      "description": "Changing this value resets both scroll axes without remounting the viewport content.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
+        "line": 119
       }
     }
   ],
@@ -2880,7 +2940,7 @@
       "description": "Accessible name for the table.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 117
+        "line": 124
       }
     },
     {
@@ -2890,7 +2950,7 @@
       "description": "Header and body composition.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 119
+        "line": 126
       }
     }
   ],
@@ -2903,7 +2963,7 @@
       "description": "Content shown when the table has no rows.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 124
+        "line": 131
       }
     },
     {
@@ -2914,7 +2974,7 @@
       "description": "Whether loading content replaces the current row model.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 126
+        "line": 133
       }
     },
     {
@@ -2925,7 +2985,18 @@
       "description": "Content shown while rows are loading.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 128
+        "line": 135
+      }
+    },
+    {
+      "name": "rowRendering",
+      "type": "\"all\" | \"virtual\"",
+      "required": false,
+      "defaultValue": "\"all\"",
+      "description": "Controls whether all rows render directly or larger row models use a virtual window.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
+        "line": 137
       }
     }
   ],
@@ -2937,7 +3008,7 @@
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 133
+        "line": 142
       }
     }
   ],
@@ -2949,7 +3020,7 @@
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 138
+        "line": 147
       }
     },
     {
@@ -2959,7 +3030,7 @@
       "description": "TanStack header group represented by this row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 140
+        "line": 149
       }
     }
   ],
@@ -2971,7 +3042,7 @@
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 145
+        "line": 154
       }
     },
     {
@@ -2981,7 +3052,7 @@
       "description": "TanStack header represented by this cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 147
+        "line": 156
       }
     }
   ],
@@ -2993,7 +3064,7 @@
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 152
+        "line": 161
       }
     }
   ],
@@ -3005,7 +3076,7 @@
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 157
+        "line": 166
       }
     },
     {
@@ -3015,7 +3086,7 @@
       "description": "TanStack row represented by this table row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 159
+        "line": 168
       }
     }
   ],
@@ -3027,7 +3098,7 @@
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 164
+        "line": 173
       }
     },
     {
@@ -3037,7 +3108,7 @@
       "description": "TanStack cell represented by this table cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 166
+        "line": 175
       }
     }
   ],
@@ -3049,7 +3120,7 @@
       "description": "Expanded content associated with the row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 171
+        "line": 180
       }
     },
     {
@@ -3059,7 +3130,7 @@
       "description": "TanStack row represented by this expanded region.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 173
+        "line": 182
       }
     }
   ],
@@ -3071,7 +3142,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 178
+        "line": 187
       }
     }
   ],
@@ -3083,7 +3154,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 178
+        "line": 187
       }
     }
   ],
@@ -3095,7 +3166,7 @@
       "description": "Status and table companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 183
+        "line": 192
       }
     }
   ],
@@ -3223,7 +3294,7 @@
       "name": "delay",
       "type": "number",
       "required": false,
-      "defaultValue": "600",
+      "defaultValue": "500",
       "description": "Overrides the delay before this tooltip opens.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
@@ -3611,7 +3682,7 @@
       "description": "Complete string whose start and end remain visible when space is constrained.",
       "source": {
         "path": "packages/design-system/src/components/middleTruncate/middleTruncate.tsx",
-        "line": 9
+        "line": 8
       }
     }
   ],
@@ -6428,10 +6499,10 @@
     },
     {
       "name": "width",
-      "type": "\"content\" | \"full\"",
+      "type": "\"content\" | \"full\" | \"compact\"",
       "required": false,
       "defaultValue": "\"content\"",
-      "description": "Controls whether the trigger follows its content or fills its container.",
+      "description": "Controls whether the trigger uses an intrinsic, compact fixed, or container-filling width.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
         "line": 48

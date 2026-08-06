@@ -25,6 +25,7 @@ export function Spinner({ label, size = 'm' }: SpinnerProps) {
       aria-hidden={label === undefined ? true : undefined}
       aria-label={label}
       className={styleProps.className}
+      data-slot="spinner"
       fill="none"
       role={label === undefined ? undefined : 'status'}
       style={styleProps.style}

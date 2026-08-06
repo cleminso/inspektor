@@ -92,6 +92,10 @@
 
 [06/08/26]
 
+- [x] Align the extractor assertion with Tooltip Trigger's 500ms runtime delay default.
+
+[06/08/26]
+
 - [x] Browser verification confirms adjacent replacement renders one popup without starting or ending transition state.
 
 [06/08/26]

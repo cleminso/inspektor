@@ -11,6 +11,7 @@ import { dataGridItem } from "@/lib/registry";
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
 import {
+  dataGridBodyPropNames,
   dataGridCellPropNames,
   dataGridContentPropNames,
   dataGridExpandedRowPropNames,
@@ -20,16 +21,17 @@ import {
   dataGridRootPropNames,
   dataGridRowPropNames,
   dataGridTablePropNames,
+  dataGridViewportPropNames,
 } from "./props";
 
 const rootProps = getGeneratedProps("dataGrid.root", dataGridRootPropNames);
-const viewportProps = getGeneratedProps("dataGrid.viewport", dataGridPartPropNames);
+const viewportProps = getGeneratedProps("dataGrid.viewport", dataGridViewportPropNames);
 const tableProps = getGeneratedProps("dataGrid.table", dataGridTablePropNames);
 const contentProps = getGeneratedProps("dataGrid.content", dataGridContentPropNames);
 const headerProps = getGeneratedProps("dataGrid.header", dataGridPartPropNames);
 const headerRowProps = getGeneratedProps("dataGrid.headerRow", dataGridHeaderRowPropNames);
 const headerCellProps = getGeneratedProps("dataGrid.headerCell", dataGridHeaderCellPropNames);
-const bodyProps = getGeneratedProps("dataGrid.body", dataGridPartPropNames);
+const bodyProps = getGeneratedProps("dataGrid.body", dataGridBodyPropNames);
 const rowProps = getGeneratedProps("dataGrid.row", dataGridRowPropNames);
 const cellProps = getGeneratedProps("dataGrid.cell", dataGridCellPropNames);
 const expandedRowProps = getGeneratedProps("dataGrid.expandedRow", dataGridExpandedRowPropNames);
@@ -51,7 +53,7 @@ export function DataGridPage(): ReactElement {
     >
       <Section
         title="Composition"
-        description="Configure TanStack Table with the exported dataGridFeatures registry, pass the controlled table to Root, and use Content for standard rendering or compose structural parts for specialized rows. TanStack owns cell selection, rendered column order, and intrinsic min, preferred, and maximum column sizes. DataGrid binds mouse behavior, identifies reorderable columns, and commits one column order after a successful drop."
+        description="Configure TanStack Table with the exported dataGridFeatures registry, pass the controlled table to Root, and use Content for standard or virtual row rendering. TanStack owns cell selection, rendered column order, and intrinsic column sizes. DataGrid owns the scroll viewport, virtual row window, interaction behavior, and column-reorder composition."
       />
       <Section title="Root props">
         <PropsTable rows={rootProps} />

@@ -66,6 +66,53 @@ afterEach(() => {
 })
 
 describe('TabView', () => {
+  it('forwards navigation-intent events from the tab without including its close action', () => {
+    const onBlur = vi.fn()
+    const onFocus = vi.fn()
+    const onPointerDown = vi.fn()
+    const onPointerEnter = vi.fn()
+    const onPointerLeave = vi.fn()
+
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List aria-label="Table views">
+          <TabView.Item
+            value="all"
+            closeLabel="Close All accounts"
+            onBlur={onBlur}
+            onClose={() => undefined}
+            onFocus={onFocus}
+            onPointerDown={onPointerDown}
+            onPointerEnter={onPointerEnter}
+            onPointerLeave={onPointerLeave}
+          >
+            All accounts
+          </TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    const tab = screen.getByRole('tab', { name: 'All accounts' })
+    fireEvent.pointerEnter(tab)
+    fireEvent.focus(tab)
+    fireEvent.pointerDown(tab)
+    fireEvent.pointerLeave(tab)
+    fireEvent.blur(tab)
+
+    expect(onPointerEnter).toHaveBeenCalledOnce()
+    expect(onFocus).toHaveBeenCalledOnce()
+    expect(onPointerDown).toHaveBeenCalledOnce()
+    expect(onPointerLeave).toHaveBeenCalledOnce()
+    expect(onBlur).toHaveBeenCalledOnce()
+
+    const closeButton = screen.getByRole('button', { name: 'Close All accounts' })
+    fireEvent.pointerEnter(closeButton)
+    fireEvent.focus(closeButton)
+
+    expect(onPointerEnter).toHaveBeenCalledOnce()
+    expect(onFocus).toHaveBeenCalledOnce()
+  })
+
   it('keeps horizontal scrolling without visible scrollbar chrome', () => {
     render(
       <TabView.Root defaultValue="all">
@@ -340,11 +387,7 @@ describe('TabView', () => {
       <Tooltip.Provider delay={0}>
         <TabView.Root defaultValue="accounts">
           <TabView.List aria-label="Table views">
-            <TabView.Item
-              value="accounts"
-              closeLabel="Close Accounts"
-              onClose={() => undefined}
-            >
+            <TabView.Item value="accounts" closeLabel="Close Accounts" onClose={() => undefined}>
               Accounts
             </TabView.Item>
           </TabView.List>

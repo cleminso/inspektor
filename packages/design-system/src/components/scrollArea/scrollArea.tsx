@@ -8,8 +8,10 @@ import { scrollAreaStyles } from './scrollArea.styles'
 
 export type ScrollAreaAxis = 'none' | 'vertical' | 'both'
 
-export interface ScrollAreaProps
-  extends Omit<BaseScrollArea.Viewport.Props, 'className' | 'render' | 'style'> {
+export interface ScrollAreaProps extends Omit<
+  BaseScrollArea.Viewport.Props,
+  'className' | 'render' | 'style'
+> {
   /** Controls which native scroll axes and overlay tracks are available. */
   axis?: ScrollAreaAxis
 }
@@ -20,6 +22,7 @@ interface ScrollAreaPrivateProps extends ScrollAreaProps {
   layout?: 'fill' | 'content'
   maxHeight?: 's' | 'm' | 'l'
   rootSlot?: string
+  scrollRendering?: 'default' | 'frequent'
   verticalTrackOffset?: VerticalTrackOffset
   viewportSlot?: string
 }
@@ -50,6 +53,7 @@ function renderScrollArea(
     layout = 'fill',
     maxHeight,
     rootSlot = 'scroll-area',
+    scrollRendering = 'default',
     verticalTrackOffset,
     viewportSlot = 'scroll-area-viewport',
     ...props
@@ -65,6 +69,7 @@ function renderScrollArea(
     scrollAreaStyles.viewport,
     layout === 'content' && scrollAreaStyles.viewportContent,
     scrollbarStyles.hidden,
+    scrollRendering === 'frequent' && scrollAreaStyles.viewportFrequentScroll,
     axis === 'none' && scrollAreaStyles.viewportNone,
     axis === 'vertical' && scrollAreaStyles.viewportVertical,
     axis === 'both' && scrollAreaStyles.viewportBoth,
@@ -81,8 +86,7 @@ function renderScrollArea(
         : undefined
   const scrollbarStateStyleProps = createStateStyleProps<BaseScrollArea.Scrollbar.State>(
     (state) => {
-      const hasOverflow =
-        state.orientation === 'vertical' ? state.hasOverflowY : state.hasOverflowX
+      const hasOverflow = state.orientation === 'vertical' ? state.hasOverflowY : state.hasOverflowX
 
       return [
         scrollAreaStyles.scrollbar,
@@ -92,6 +96,9 @@ function renderScrollArea(
         state.orientation === 'vertical' &&
           verticalTrackOffset !== undefined &&
           verticalTrackOffsetStyles[verticalTrackOffset],
+        state.orientation === 'vertical' &&
+          verticalTrackOffset !== undefined &&
+          scrollAreaStyles.verticalTrackFlushEnd,
         hasOverflow === true && scrollAreaStyles.scrollbarWithOverflow,
         hasOverflow === true &&
           (state.hovering === true || state.scrolling === true) &&
@@ -112,68 +119,68 @@ function renderScrollArea(
 
   return (
     <BaseScrollArea.Root
-        {...rootStyleProps}
+      {...rootStyleProps}
+      data-axis={axis}
+      data-scrollbar="overlay"
+      data-layout={layout}
+      data-slot={rootSlot}
+    >
+      <BaseScrollArea.Viewport
+        {...props}
+        ref={setViewportRef}
+        {...viewportStyleProps}
+        style={{ ...viewportStyleProps.style, ...viewportBehaviorStyle }}
         data-axis={axis}
-        data-scrollbar="overlay"
-        data-layout={layout}
-        data-slot={rootSlot}
+        data-scrollbar="hidden"
+        data-slot={viewportSlot}
       >
-        <BaseScrollArea.Viewport
-          {...props}
-          ref={setViewportRef}
-          {...viewportStyleProps}
-          style={{ ...viewportStyleProps.style, ...viewportBehaviorStyle }}
-          data-axis={axis}
-          data-scrollbar="hidden"
-          data-slot={viewportSlot}
+        <BaseScrollArea.Content
+          {...contentStyleProps}
+          style={{
+            ...contentStyleProps.style,
+            minWidth: axis === 'both' ? 'fit-content' : 0,
+          }}
+          data-slot="scroll-area-content"
         >
-          <BaseScrollArea.Content
-            {...contentStyleProps}
-            style={{
-              ...contentStyleProps.style,
-              minWidth: axis === 'both' ? 'fit-content' : 0,
-            }}
-            data-slot="scroll-area-content"
-          >
-            {children}
-          </BaseScrollArea.Content>
-        </BaseScrollArea.Viewport>
+          {children}
+        </BaseScrollArea.Content>
+      </BaseScrollArea.Viewport>
 
-        {axis === 'none' ? null : (
+      {axis === 'none' ? null : (
+        <BaseScrollArea.Scrollbar
+          keepMounted
+          orientation="vertical"
+          {...scrollbarStateStyleProps}
+          data-placement={verticalTrackOffset === undefined ? 'viewport' : 'body'}
+          data-slot="scroll-area-scrollbar"
+        >
+          <BaseScrollArea.Thumb
+            {...stylex.props(scrollAreaStyles.thumb, scrollAreaStyles.thumbVertical)}
+            data-slot="scroll-area-thumb"
+          />
+        </BaseScrollArea.Scrollbar>
+      )}
+
+      {axis === 'both' ? (
+        <>
           <BaseScrollArea.Scrollbar
             keepMounted
-            orientation="vertical"
+            orientation="horizontal"
             {...scrollbarStateStyleProps}
-            data-placement={verticalTrackOffset === undefined ? 'viewport' : 'body'}
+            data-placement="viewport"
             data-slot="scroll-area-scrollbar"
           >
             <BaseScrollArea.Thumb
-              {...stylex.props(scrollAreaStyles.thumb, scrollAreaStyles.thumbVertical)}
+              {...stylex.props(scrollAreaStyles.thumb, scrollAreaStyles.thumbHorizontal)}
               data-slot="scroll-area-thumb"
             />
           </BaseScrollArea.Scrollbar>
-        )}
-
-        {axis === 'both' ? (
-          <>
-            <BaseScrollArea.Scrollbar
-              keepMounted
-              orientation="horizontal"
-              {...scrollbarStateStyleProps}
-              data-placement="viewport"
-              data-slot="scroll-area-scrollbar"
-            >
-              <BaseScrollArea.Thumb
-                {...stylex.props(scrollAreaStyles.thumb, scrollAreaStyles.thumbHorizontal)}
-                data-slot="scroll-area-thumb"
-              />
-            </BaseScrollArea.Scrollbar>
-            <BaseScrollArea.Corner
-              {...stylex.props(scrollAreaStyles.corner)}
-              data-slot="scroll-area-corner"
-            />
-          </>
-        ) : null}
+          <BaseScrollArea.Corner
+            {...stylex.props(scrollAreaStyles.corner)}
+            data-slot="scroll-area-corner"
+          />
+        </>
+      ) : null}
     </BaseScrollArea.Root>
   )
 }
