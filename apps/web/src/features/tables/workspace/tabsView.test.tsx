@@ -1,33 +1,52 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TableTabsView } from "@tables/workspace/tabsView";
+import { TableTabsView } from '@tables/workspace/tabsView'
 
 const mocks = vi.hoisted(() => ({
   activateTab: vi.fn(),
   closeTab: vi.fn(),
   openNewView: vi.fn(),
   reorderTabs: vi.fn(),
+  releasePrefetch: vi.fn(),
+  startTableRowsPrefetch: vi.fn(),
   state: {
     activeTabId: null as string | null,
     tabs: [] as Array<
-      | { kind: "newView"; id: "new-view" }
-      | { kind: "table"; id: string; tableName: string; search: Record<string, string> }
+      | { kind: 'newView'; id: 'new-view' }
+      | { kind: 'table'; id: string; tableName: string; search: Record<string, number | string> }
     >,
   },
-}));
+}))
 
-vi.mock("@tables/workspace/newView", () => ({
+vi.mock('@app/providers/inspectorProvider', () => ({
+  useInspector: () => ({
+    runtime: {
+      client: { manager: {} },
+      wasmSchema: {
+        accounts: { columns: [] },
+        profiles: { columns: [] },
+      },
+    },
+  }),
+}))
+
+vi.mock('@tables/query/tableRowsPrefetch', () => ({
+  TABLE_ROWS_PREFETCH_INTENT_DELAY_MS: 75,
+  startTableRowsPrefetch: mocks.startTableRowsPrefetch,
+}))
+
+vi.mock('@tables/workspace/newView', () => ({
   NewTableView: () => <div>New table view content</div>,
-}));
+}))
 
-vi.mock("@tables/workspace/selectedView", () => ({
+vi.mock('@tables/workspace/selectedView', () => ({
   SelectedTableView: ({ tableName }: { tableName: string }) => (
     <div>Selected table: {tableName}</div>
   ),
-}));
+}))
 
-vi.mock("@tables/workspace/tabsProvider", () => ({
+vi.mock('@tables/workspace/tabsProvider', () => ({
   useTableTabs: () => ({
     activeTabId: mocks.state.activeTabId,
     activateTab: mocks.activateTab,
@@ -36,63 +55,189 @@ vi.mock("@tables/workspace/tabsProvider", () => ({
     reorderTabs: mocks.reorderTabs,
     tabs: mocks.state.tabs,
   }),
-}));
+}))
 
-afterEach(cleanup);
+afterEach(cleanup)
 
 beforeEach(() => {
-  mocks.activateTab.mockReset();
-  mocks.closeTab.mockReset();
-  mocks.openNewView.mockReset();
-  mocks.reorderTabs.mockReset();
-  mocks.state.activeTabId = null;
-  mocks.state.tabs = [];
-});
+  mocks.activateTab.mockReset()
+  mocks.closeTab.mockReset()
+  mocks.openNewView.mockReset()
+  mocks.reorderTabs.mockReset()
+  mocks.releasePrefetch.mockReset()
+  mocks.startTableRowsPrefetch.mockReset()
+  mocks.startTableRowsPrefetch.mockReturnValue(mocks.releasePrefetch)
+  mocks.state.activeTabId = null
+  mocks.state.tabs = []
+})
 
-describe("TableTabsView", () => {
-  it("keeps the tab bar visible with an authored new-view tooltip", async () => {
-    render(<TableTabsView tableName={null} />);
+describe('TableTabsView', () => {
+  it('keeps the tab bar visible with an authored new-view tooltip', async () => {
+    render(<TableTabsView tableName={null} />)
 
-    const addButton = screen.getByRole("button", { name: "Open new table view" });
-    expect(addButton.getAttribute("title")).toBeNull();
-    expect(screen.getByRole("tablist", { name: "Open table views" }).parentElement).toBe(
+    const addButton = screen.getByRole('button', { name: 'Open new table view' })
+    expect(addButton.getAttribute('title')).toBeNull()
+    expect(screen.getByRole('tablist', { name: 'Open table views' }).parentElement).toBe(
       addButton.parentElement,
-    );
-    expect(screen.getByText("New table view content")).toBeTruthy();
+    )
+    expect(screen.getByText('New table view content')).toBeTruthy()
 
-    fireEvent.mouseEnter(addButton);
-    fireEvent.mouseMove(addButton);
-    expect(await screen.findByText("Open new table view")).toBeTruthy();
+    fireEvent.mouseEnter(addButton)
+    fireEvent.mouseMove(addButton)
+    expect(await screen.findByText('Open new table view')).toBeTruthy()
 
-    fireEvent.click(addButton);
-    expect(mocks.openNewView).toHaveBeenCalledOnce();
-  });
+    fireEvent.click(addButton)
+    expect(mocks.openNewView).toHaveBeenCalledOnce()
+  })
 
-  it("renders table content only for an active table tab", () => {
-    mocks.state.activeTabId = "table:accounts";
+  it('renders table content only for an active table tab', () => {
+    mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [
       {
-        kind: "table",
-        id: "table:accounts",
-        tableName: "accounts",
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
         search: {},
       },
-    ];
+    ]
 
-    render(<TableTabsView tableName="accounts" />);
+    render(<TableTabsView tableName="accounts" />)
 
-    expect(screen.getByRole("tabpanel").tabIndex).toBe(-1);
-    expect(screen.getByText("Selected table: accounts")).toBeTruthy();
-    expect(screen.queryByText("New table view content")).toBeNull();
-  });
+    expect(screen.getByRole('tabpanel').tabIndex).toBe(-1)
+    expect(screen.getByText('Selected table: accounts')).toBeTruthy()
+    expect(screen.queryByText('New table view content')).toBeNull()
+  })
 
-  it("does not offer to close the sole new-view tab", () => {
-    mocks.state.activeTabId = "new-view";
-    mocks.state.tabs = [{ kind: "newView", id: "new-view" }];
+  it('does not offer to close the sole new-view tab', () => {
+    mocks.state.activeTabId = 'new-view'
+    mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]
 
-    render(<TableTabsView tableName={null} />);
+    render(<TableTabsView tableName={null} />)
 
-    expect(screen.getByRole("tab", { name: "New view" })).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Close New view" })).toBeNull();
-  });
-});
+    expect(screen.getByRole('tab', { name: 'New view' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Close New view' })).toBeNull()
+  })
+
+  it("prefetches an inactive tab's exact row query from keyboard intent", () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+      {
+        kind: 'table',
+        id: 'view:profiles',
+        tableName: 'profiles',
+        search: {
+          dir: 'desc',
+          filters: JSON.stringify([
+            {
+              id: 'filter-1',
+              column: 'name',
+              operator: 'contains',
+              value: 'Ada',
+            },
+          ]),
+          page: 2,
+          pageSize: 500,
+          sort: 'name',
+        },
+      },
+    ]
+
+    render(<TableTabsView tableName="accounts" />)
+
+    const profilesTab = screen.getByRole('tab', { name: 'profiles' })
+    fireEvent.focus(profilesTab)
+
+    expect(mocks.startTableRowsPrefetch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filters: [
+          {
+            id: 'filter-1',
+            column: 'name',
+            operator: 'contains',
+            value: 'Ada',
+          },
+        ],
+        page: 2,
+        pageSize: 500,
+        sortColumn: 'name',
+        sortDirection: 'desc',
+        tableName: 'profiles',
+      }),
+    )
+
+    fireEvent.blur(profilesTab)
+    expect(mocks.releasePrefetch).toHaveBeenCalledOnce()
+  })
+
+  it('ignores transient pointer passes over inactive tabs', () => {
+    vi.useFakeTimers()
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+      {
+        kind: 'table',
+        id: 'table:profiles',
+        tableName: 'profiles',
+        search: {},
+      },
+    ]
+
+    try {
+      render(<TableTabsView tableName="accounts" />)
+      const profilesTab = screen.getByRole('tab', { name: 'profiles' })
+
+      fireEvent.pointerEnter(profilesTab)
+      fireEvent.pointerLeave(profilesTab)
+      vi.runAllTimers()
+
+      expect(mocks.startTableRowsPrefetch).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('prefetches after pointer intent settles and releases when intent ends', () => {
+    vi.useFakeTimers()
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+      {
+        kind: 'table',
+        id: 'table:profiles',
+        tableName: 'profiles',
+        search: {},
+      },
+    ]
+
+    try {
+      render(<TableTabsView tableName="accounts" />)
+      const profilesTab = screen.getByRole('tab', { name: 'profiles' })
+
+      fireEvent.pointerEnter(profilesTab)
+      vi.advanceTimersByTime(75)
+
+      expect(mocks.startTableRowsPrefetch).toHaveBeenCalledOnce()
+
+      fireEvent.pointerLeave(profilesTab)
+      expect(mocks.releasePrefetch).toHaveBeenCalledOnce()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})

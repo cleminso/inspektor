@@ -130,7 +130,7 @@ describe("buildDataGridColumns", () => {
     fireEvent.contextMenu(screen.getByText("Name"));
     fireEvent.click(screen.getByRole("menuitem", { name: "Reset column width" }));
 
-    expect(nameColumn?.style.width).toBe("280px");
+    expect(nameColumn?.style.width).toBe("294px");
     expect(emailColumn?.style.width).toBe("360px");
   });
 
@@ -228,7 +228,7 @@ describe("buildDataGridColumns", () => {
       ],
     });
 
-    expect(columns.find((column) => column.id === "id")?.size).toBe(280);
+    expect(columns.find((column) => column.id === "id")?.size).toBe(294);
     expect(columns.find((column) => column.id === "enabled")?.size).toBe(220);
     expect(columns.find((column) => column.id === "metadata")?.size).toBe(220);
   });

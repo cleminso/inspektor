@@ -56,6 +56,8 @@ function searchesMatch(left: TableTabSearch, right: TableTabSearch): boolean {
   return (
     left.dir === right.dir &&
     left.filters === right.filters &&
+    left.page === right.page &&
+    left.pageSize === right.pageSize &&
     left.sort === right.sort &&
     left.view === right.view
   );
@@ -101,10 +103,19 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     () => ({
       dir: routeSearch.dir,
       filters: routeSearch.filters,
+      page: routeSearch.page,
+      pageSize: routeSearch.pageSize,
       sort: routeSearch.sort,
       view: routeSearch.view,
     }),
-    [routeSearch.dir, routeSearch.filters, routeSearch.sort, routeSearch.view],
+    [
+      routeSearch.dir,
+      routeSearch.filters,
+      routeSearch.page,
+      routeSearch.pageSize,
+      routeSearch.sort,
+      routeSearch.view,
+    ],
   );
   useEffect(() => {
     saveTableTabsState(scope, { tabs: state.tabs, recentViews: state.recentViews });
