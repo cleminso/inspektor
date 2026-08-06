@@ -1,8 +1,10 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import * as stylex from '@stylexjs/stylex'
 import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Tooltip } from '../tooltip/tooltip'
+import { tooltipStyles } from '../tooltip/tooltip.styles'
 import { TabView } from './tabView'
 
 let onDragEnd: ((event: unknown) => void) | undefined
@@ -333,6 +335,60 @@ describe('TabView', () => {
     ).toBeNull()
   })
 
+  it('describes the close action with a tooltip', async () => {
+    render(
+      <Tooltip.Provider delay={0}>
+        <TabView.Root defaultValue="accounts">
+          <TabView.List aria-label="Table views">
+            <TabView.Item
+              value="accounts"
+              closeLabel="Close Accounts"
+              onClose={() => undefined}
+            >
+              Accounts
+            </TabView.Item>
+          </TabView.List>
+        </TabView.Root>
+      </Tooltip.Provider>,
+    )
+
+    const closeButton = screen.getByRole('button', { name: 'Close Accounts' })
+    fireEvent.mouseEnter(closeButton)
+    fireEvent.mouseMove(closeButton)
+
+    expect(await screen.findByText('Close view')).toBeTruthy()
+  })
+
+  it('opens the next tooltip instantly without entrance motion', async () => {
+    render(
+      <Tooltip.Provider delay={0}>
+        <TabView.Root defaultValue="accounts">
+          <TabView.List aria-label="Table views">
+            <TabView.Item value="accounts" details="Accounts details">
+              Accounts
+            </TabView.Item>
+            <TabView.Item value="profiles" details="Profiles details">
+              Profiles
+            </TabView.Item>
+          </TabView.List>
+        </TabView.Root>
+      </Tooltip.Provider>,
+    )
+
+    const accountsTab = screen.getByRole('tab', { name: 'Accounts' })
+    const profilesTab = screen.getByRole('tab', { name: 'Profiles' })
+    fireEvent.mouseEnter(accountsTab)
+    fireEvent.mouseMove(accountsTab)
+    expect(await screen.findByText('Accounts details')).toBeTruthy()
+
+    fireEvent.mouseLeave(accountsTab)
+    fireEvent.mouseEnter(profilesTab)
+    fireEvent.mouseMove(profilesTab)
+
+    const popup = screen.getByText('Profiles details').closest('[data-slot="tooltip-content"]')
+    expect(popup?.className).not.toContain(stylex.props(tooltipStyles.popupTransition).className)
+  })
+
   it('closes the focused view with the Delete key', () => {
     let closeCount = 0
 
@@ -465,10 +521,32 @@ describe('TabView', () => {
       </Tooltip.Provider>,
     )
 
-    fireEvent.mouseEnter(screen.getByRole('tab', { name: 'Accounts' }))
+    const accountsTab = screen.getByRole('tab', { name: 'Accounts' })
+    fireEvent.mouseEnter(accountsTab)
+    fireEvent.mouseMove(accountsTab)
 
     await waitFor(() => {
       expect(screen.getByText('Table view details')).toBeTruthy()
+    })
+  })
+
+  it('shows the title tooltip when the title fits', async () => {
+    render(
+      <Tooltip.Provider delay={0}>
+        <TabView.Root defaultValue="accounts">
+          <TabView.List aria-label="Table views">
+            <TabView.Item value="accounts">Accounts</TabView.Item>
+          </TabView.List>
+        </TabView.Root>
+      </Tooltip.Provider>,
+    )
+
+    const accountsTab = screen.getByRole('tab', { name: 'Accounts' })
+    fireEvent.mouseEnter(accountsTab)
+    fireEvent.mouseMove(accountsTab)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Accounts')).toHaveLength(2)
     })
   })
 

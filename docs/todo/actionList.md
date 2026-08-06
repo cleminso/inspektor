@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[05/08/26]
+
+- [x] Restore the leading icon when a pointer-focused selection checkbox is unchecked while preserving the checkbox for keyboard focus-visible input.
+
 [03/08/26]
 
 - [x] Preserve Base UI's `nativeButton` contract when a primary trigger renders a navigation link.

@@ -50,14 +50,19 @@ beforeEach(() => {
 });
 
 describe("TableTabsView", () => {
-  it("keeps the tab bar visible for the fallback new-view surface", () => {
+  it("keeps the tab bar visible with an authored new-view tooltip", async () => {
     render(<TableTabsView tableName={null} />);
 
     const addButton = screen.getByRole("button", { name: "Open new table view" });
+    expect(addButton.getAttribute("title")).toBeNull();
     expect(screen.getByRole("tablist", { name: "Open table views" }).parentElement).toBe(
       addButton.parentElement,
     );
     expect(screen.getByText("New table view content")).toBeTruthy();
+
+    fireEvent.mouseEnter(addButton);
+    fireEvent.mouseMove(addButton);
+    expect(await screen.findByText("Open new table view")).toBeTruthy();
 
     fireEvent.click(addButton);
     expect(mocks.openNewView).toHaveBeenCalledOnce();

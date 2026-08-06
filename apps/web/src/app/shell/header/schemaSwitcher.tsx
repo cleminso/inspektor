@@ -54,7 +54,7 @@ export function SchemaSwitcher({
         label="Switch schema"
         size={size}
         width={width}
-        title={triggerTitle}
+        tooltip={triggerTitle}
       >
         <Text as="span" color="inherit" truncate>
           {displayTriggerText}

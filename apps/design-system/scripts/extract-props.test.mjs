@@ -332,6 +332,18 @@ test("extracts the constrained Tooltip compound API", () => {
     metadata["tooltip.trigger"]?.map(({ name }) => name),
     ["delay", "closeOnClick", "closeDelay", "disabled", "render"],
   );
+  assert.equal(
+    metadata["tooltip.trigger"]?.find(({ name }) => name === "delay")?.defaultValue,
+    "600",
+  );
+  assert.equal(
+    metadata["tooltip.trigger"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
+    "true",
+  );
+  assert.equal(
+    metadata["tooltip.trigger"]?.find(({ name }) => name === "closeDelay")?.defaultValue,
+    "0",
+  );
   assert.deepEqual(
     metadata["tooltip.content"]?.map(({ name }) => name),
     ["side", "align"],
@@ -1021,7 +1033,7 @@ test("extracts the constrained ContextSwitcher compound API", () => {
   );
   assert.deepEqual(
     metadata["contextSwitcher.trigger"]?.map(({ name }) => name),
-    ["label", "size", "width", "disabled", "title"],
+    ["label", "size", "width", "disabled", "tooltip"],
   );
   assert.equal(
     metadata["contextSwitcher.trigger"]?.find(({ name }) => name === "size")?.defaultValue,

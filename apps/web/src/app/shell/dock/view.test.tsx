@@ -15,12 +15,13 @@ describe("InspectorDock", () => {
     expect(dock.getAttribute("data-height")).toBe("fixed");
   });
 
-  it("uses semantic extra-small icons", () => {
+  it("uses semantic extra-small icons without native tooltips", () => {
     render(<InspectorDock leftDock={{ isOpen: false, onToggle: () => undefined }} />);
 
     for (const name of ["Open left dock", "Open subscriptions dock"]) {
       const icon = screen.getByRole("button", { name }).querySelector('[data-slot="icon"]');
       expect(icon?.getAttribute("data-size")).toBe("xs");
+      expect(screen.getByRole("button", { name }).getAttribute("title")).toBeNull();
     }
   });
 

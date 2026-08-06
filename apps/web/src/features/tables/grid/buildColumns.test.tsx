@@ -160,7 +160,7 @@ describe("buildDataGridColumns", () => {
     expect(screen.queryByRole("button", { name: "Open Name column menu" })).toBeNull();
   });
 
-  it("renders composed type markers before column names", () => {
+  it("renders composed type markers with authored tooltips before column names", async () => {
     render(
       <TestTable
         columns={[
@@ -182,11 +182,17 @@ describe("buildDataGridColumns", () => {
       />,
     );
 
+    const rowIdMarker = screen.getByLabelText("Row ID");
+    expect(rowIdMarker.getAttribute("title")).toBeNull();
     expect(
-      screen.getByLabelText("Row ID").compareDocumentPosition(screen.getByText("id")) &
+      rowIdMarker.compareDocumentPosition(screen.getByText("id")) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).not.toBe(0);
     expect(screen.getByLabelText("Reference").textContent).toBe("");
+
+    fireEvent.mouseEnter(rowIdMarker);
+    fireEvent.mouseMove(rowIdMarker);
+    expect(await screen.findByText("Row ID")).toBeTruthy();
   });
 
   it("uses schema-aware initial column widths", () => {

@@ -4,6 +4,7 @@ import "@fontsource-variable/geist/wght.css";
 import "./index.css";
 
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { Tooltip } from "@inspector/ds";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
@@ -34,7 +35,9 @@ if (rootElement !== null) {
   ReactDOM.createRoot(rootElement).render(
     <StrictMode>
       <ThemeProvider>
-        <RouterProvider router={router} />
+        <Tooltip.Provider>
+          <RouterProvider router={router} />
+        </Tooltip.Provider>
       </ThemeProvider>
     </StrictMode>,
   );

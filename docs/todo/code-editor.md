@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Replace native browser titles on editor toolbar actions with shared Tooltip composition.
+- [x] Remove native browser titles from imperative CodeMirror fold markers while retaining their accessible labels.
+
 [05/08/26]
 
 - [x] Remove source-type text from the editor toolbar and its public component API.
@@ -120,6 +125,10 @@
 - [x] Keep capped content internal to `CodeEditor` until another product surface establishes a reusable contract.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Cover authored toolbar tooltips and accessible fold-marker labels without native titles.
 
 [26/07/26]
 

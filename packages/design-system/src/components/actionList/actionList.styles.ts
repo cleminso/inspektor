@@ -109,7 +109,7 @@ export const actionListStyles = stylex.create({
     [actionListVars.selectionChecked]: '0',
     [actionListVars.selectionFocusVisible]: {
       default: '0',
-      ':focus-within': '1',
+      ':has([data-slot="checkbox"]:focus-visible)': '1',
     },
     flexShrink: 0,
     position: 'relative',

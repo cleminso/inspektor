@@ -1,4 +1,4 @@
-import { Box, Button, ButtonLink, Icon, Text } from "@inspector/ds";
+import { Box, Button, ButtonLink, Icon, Text, Tooltip } from "@inspector/ds";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { HeadContent, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Moon, Sun } from "lucide-react";
@@ -32,21 +32,23 @@ export function getAdjacentNavigationItems(pathname: string): {
 
 function ThemeSwitch(): ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
+  const label = resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme";
 
   const handleToggleTheme = (): void => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="s"
-      onClick={handleToggleTheme}
-      aria-label={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      title={resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-    >
-      <Icon render={resolvedTheme === "dark" ? <Sun /> : <Moon />} size="s" />
-    </Button>
+    <Tooltip.Root>
+      <Tooltip.Trigger
+        render={
+          <Button variant="ghost" size="s" onClick={handleToggleTheme} aria-label={label}>
+            <Icon render={resolvedTheme === "dark" ? <Sun /> : <Moon />} size="s" />
+          </Button>
+        }
+      />
+      <Tooltip.Content>{label}</Tooltip.Content>
+    </Tooltip.Root>
   );
 }
 

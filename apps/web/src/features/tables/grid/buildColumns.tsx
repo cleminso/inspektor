@@ -16,6 +16,7 @@ import {
   StructuredValuePreview,
   Text,
   TimestampValue,
+  Tooltip,
   Icon,
   type DataGridFeatures,
 } from "@inspector/ds";
@@ -211,13 +212,20 @@ function SelectionCheckbox({
 
 function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.ReactElement {
   return (
-    <Text as="span" aria-label={marker.label} color="muted" title={marker.label} variant="caption">
-      <Box as="span" alignItems="center" display="flex">
-        {marker.icon === "key" ? <Icon render={<KeyRound />} size="xs" /> : null}
-        {marker.icon === "relation" ? <Icon render={<ArrowUpRight />} size="xs" /> : null}
-        {marker.suffix}
-      </Box>
-    </Text>
+    <Tooltip.Root>
+      <Tooltip.Trigger
+        render={
+          <Text as="span" aria-label={marker.label} color="muted" variant="caption">
+            <Box as="span" alignItems="center" display="flex">
+              {marker.icon === "key" ? <Icon render={<KeyRound />} size="xs" /> : null}
+              {marker.icon === "relation" ? <Icon render={<ArrowUpRight />} size="xs" /> : null}
+              {marker.suffix}
+            </Box>
+          </Text>
+        }
+      />
+      <Tooltip.Content>{marker.label}</Tooltip.Content>
+    </Tooltip.Root>
   );
 }
 
@@ -414,7 +422,7 @@ function ColumnHeader({
           />
         }
       >
-        <Box as="span" alignItems="center" display="flex" flex={1} gap="xxs" minWidth={0}>
+        <Box as="span" alignItems="center" display="flex" flex={1} gap="xs" minWidth={0}>
           <ColumnTypeMarker marker={marker} />
           <Text as="span" truncate variant="caption">
             {label}

@@ -26,6 +26,10 @@ export function TooltipPage(): ReactElement {
   return (
     <TooltipPlayground>
       <Section
+        title="Behavior"
+        description="The first pointer tooltip observes its hover delay and enters with subtle anchored motion. Tooltip exits are immediate. Moving to another tooltip within the provider's instant-open phase therefore replaces it without overlapping motion."
+      />
+      <Section
         title="Cell value"
         description="Use a tooltip to reveal supplementary, non-interactive content such as a truncated identifier."
       >
@@ -35,7 +39,7 @@ export function TooltipPage(): ReactElement {
       </Section>
       <Section
         title="Position"
-        description="Content owns its portal, positioning, popup, and arrow."
+        description="Content owns its portal and positioning without extending the trigger's hover area."
       >
         <Example source={positionSource}>
           <PositionExample />

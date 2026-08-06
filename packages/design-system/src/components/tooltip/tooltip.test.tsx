@@ -1,4 +1,3 @@
-import { DirectionProvider } from '@base-ui/react/direction-provider'
 import { Tabs as BaseTabs } from '@base-ui/react/tabs'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import * as stylex from '@stylexjs/stylex'
@@ -69,24 +68,37 @@ describe('Tooltip', () => {
     )
   })
 
-  it('maps logical inline-start arrow placement to the physical RTL side', async () => {
+  it('renders without an arrow indicator', async () => {
     render(
-      <DirectionProvider direction="rtl">
-        <Tooltip.Provider delay={0}>
-          <Tooltip.Root defaultOpen>
-            <Tooltip.Trigger id="trigger">Trigger</Tooltip.Trigger>
-            <Tooltip.Content side="inline-start">Tooltip content</Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      </DirectionProvider>,
+      <Tooltip.Provider delay={0}>
+        <Tooltip.Root defaultOpen>
+          <Tooltip.Trigger id="trigger">Trigger</Tooltip.Trigger>
+          <Tooltip.Content>Tooltip content</Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>,
     )
 
     const popup = (await screen.findByText('Tooltip content')).closest(
       '[data-slot="tooltip-content"]',
     )
-    const arrow = popup?.querySelector('div[aria-hidden="true"]')
 
-    expect(arrow?.className).toContain(stylex.props(tooltipStyles.arrowRight).className)
-    expect(arrow?.className).not.toContain(stylex.props(tooltipStyles.arrowLeft).className)
+    expect(popup?.querySelector('svg[aria-hidden="true"]')).toBeNull()
+  })
+
+  it('makes its visual-label popup non-hoverable by default', async () => {
+    render(
+      <Tooltip.Provider delay={0}>
+        <Tooltip.Root defaultOpen>
+          <Tooltip.Trigger>Trigger</Tooltip.Trigger>
+          <Tooltip.Content>Tooltip content</Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>,
+    )
+
+    const popup = (await screen.findByText('Tooltip content')).closest(
+      '[data-slot="tooltip-content"]',
+    )
+
+    expect(popup?.parentElement?.style.pointerEvents).toBe('none')
   })
 })

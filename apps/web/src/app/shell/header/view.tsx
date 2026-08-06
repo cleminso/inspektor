@@ -1,4 +1,4 @@
-import { Box, Button, Icon, Text } from "@inspector/ds";
+import { Box, Button, Icon, Text, Tooltip } from "@inspector/ds";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -9,6 +9,7 @@ import { ConnectionSwitcher } from "@shared/connections/connectionSwitcher";
 export function InspectorHeader(): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
   const isDarkTheme = resolvedTheme === "dark";
+  const themeLabel = isDarkTheme === true ? "Switch to light theme" : "Switch to dark theme";
 
   return (
     <Box
@@ -33,23 +34,29 @@ export function InspectorHeader(): React.ReactElement {
       </Box>
 
       <Box flex={1} justifyContent="end">
-        <Button
-          type="button"
-          variant="ghost"
-          size="s"
-          aria-label="Toggle theme"
-          iconOnly
-          title={isDarkTheme === true ? "Switch to light theme" : "Switch to dark theme"}
-          onClick={() => {
-            setTheme(isDarkTheme === true ? "light" : "dark");
-          }}
-        >
-          {isDarkTheme === true ? (
-            <Icon render={<Sun />} size="s" />
-          ) : (
-            <Icon render={<Moon />} size="s" />
-          )}
-        </Button>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="s"
+                aria-label="Toggle theme"
+                iconOnly
+                onClick={() => {
+                  setTheme(isDarkTheme === true ? "light" : "dark");
+                }}
+              >
+                {isDarkTheme === true ? (
+                  <Icon render={<Sun />} size="s" />
+                ) : (
+                  <Icon render={<Moon />} size="s" />
+                )}
+              </Button>
+            }
+          />
+          <Tooltip.Content>{themeLabel}</Tooltip.Content>
+        </Tooltip.Root>
       </Box>
     </Box>
   );

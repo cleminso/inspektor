@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, type ReactNode, useState } from "react";
 
 import {
   Combobox,
@@ -16,6 +16,7 @@ import {
   type ComboboxValueProps,
   type ComboboxViewportHeight,
 } from "../combobox/combobox";
+import { Tooltip } from "../tooltip/tooltip";
 import { contextSwitcherStyles } from "./contextSwitcher.styles";
 
 export type ContextSwitcherTriggerSize = ComboboxTriggerSize;
@@ -59,8 +60,8 @@ export type ContextSwitcherTriggerProps = PropsWithChildren<{
   width?: ContextSwitcherTriggerWidth;
   /** Disables the trigger. */
   disabled?: boolean;
-  /** Provides supplemental text for truncated trigger content. */
-  title?: string;
+  /** Provides supplemental content for the trigger tooltip. */
+  tooltip?: ReactNode;
 }>;
 
 export interface ContextSwitcherSearchProps {
@@ -131,15 +132,14 @@ function ContextSwitcherTrigger({
   size = "m",
   width = "content",
   disabled = false,
-  title,
+  tooltip,
   children,
 }: ContextSwitcherTriggerProps) {
   const contentStyleProps = stylex.props(contextSwitcherStyles.triggerContent);
 
-  return (
+  const trigger = (
     <Combobox.Trigger
       aria-label={label}
-      title={title}
       data-width={width}
       size={size}
       width={width}
@@ -149,6 +149,17 @@ function ContextSwitcherTrigger({
         {children}
       </span>
     </Combobox.Trigger>
+  );
+
+  if (tooltip === undefined) {
+    return trigger;
+  }
+
+  return (
+    <Tooltip.Root disabled={disabled}>
+      <Tooltip.Trigger render={trigger} />
+      <Tooltip.Content>{tooltip}</Tooltip.Content>
+    </Tooltip.Root>
   );
 }
 

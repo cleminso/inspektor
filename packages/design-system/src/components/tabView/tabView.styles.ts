@@ -36,7 +36,7 @@ export const tabViewStyles = stylex.create({
   rootActivationDown: {},
   rootActivationNone: {},
   list: {
-    gap: spacing.s,
+    gap: spacing.xs,
     alignItems: 'center',
     display: 'flex',
     flexShrink: 1,
@@ -194,7 +194,7 @@ export const tabViewStyles = stylex.create({
     alignItems: 'center',
     backgroundColor: tabViewVars.closeBackground,
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     pointerEvents: tabViewVars.closePointerEvents,
     position: 'absolute',
     transform: {
@@ -208,11 +208,11 @@ export const tabViewStyles = stylex.create({
       [compactTab]: '50%',
     },
     right: {
-      default: spacing.xs,
+      default: 0,
       [compactTab]: 'auto',
     },
     top: '50%',
-    width: spatial['button-height-xs'],
+    width: spatial['control-height-s'],
   },
   closeContainerOverflowing: {
     '::before': {

@@ -11,6 +11,23 @@
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Replace an open Tab View tooltip instantly and without entrance motion when the pointer targets another tab label or close action.
+
+[06/08/26]
+
+- [x] Reapply the tooltip hover delay when the pointer targets another tab label or close action.
+- [x] Extend the close-action container to the trailing tab edge so pointer traversal does not expose the label trigger behind it.
+
+[06/08/26]
+
+- [x] Describe each tab close action with a `Close view` tooltip.
+
+[05/08/26]
+
+- [x] Keep every tab label in the shared tooltip group so moving across fitting and truncated siblings preserves fast tooltip opening.
+
 [05/08/26]
 
 - [x] Preserve Tab View state-driven presentation while its composed tooltip trigger opens.
@@ -47,6 +64,18 @@
 
 ## Settled interaction decisions
 
+[06/08/26]
+
+- [x] Apply hover delay and subtle motion to the initial tooltip, then replace adjacent tooltips instantly without entrance motion.
+
+[06/08/26]
+
+- [x] Prefer delayed tooltip replacement over instant spatial jumps between Tab View targets.
+
+[05/08/26]
+
+- [x] Show the complete tab label in a tooltip whether the rendered label fits or truncates.
+
 [01/08/26]
 
 - [x] Selection does not use the focus-ring color.
@@ -64,6 +93,24 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Cover instant, motion-free pointer retargeting between tab-label tooltips.
+- [x] Browser verification confirms an adjacent tooltip is marked instant and renders without starting or ending transition state.
+
+[06/08/26]
+
+- [x] Cover delayed pointer retargeting between tab-label tooltips.
+- [x] Browser verification confirms the close-action container reaches the trailing tab edge while the button keeps its inset position.
+
+[06/08/26]
+
+- [x] Cover the close-action tooltip through pointer interaction.
+
+[05/08/26]
+
+- [x] Cover tooltip availability for a fitting tab label.
 
 [05/08/26]
 

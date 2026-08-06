@@ -1,4 +1,4 @@
-import { Box, Button, Icon } from "@inspector/ds";
+import { Box, Button, Icon, Tooltip } from "@inspector/ds";
 import { Activity, Table } from "lucide-react";
 
 export interface InspectorLeftDockControl {
@@ -28,29 +28,41 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
     >
       <Box minWidth={0} flex={1} alignItems="center" gap="xs">
         {leftDock !== undefined ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            aria-label={leftDockLabel}
-            aria-pressed={leftDock.isOpen}
-            iconOnly
-            title={leftDockLabel}
-            onClick={leftDock.onToggle}
-          >
-            <Icon render={<Table />} size="xs" />
-          </Button>
+          <Tooltip.Root>
+            <Tooltip.Trigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  aria-label={leftDockLabel}
+                  aria-pressed={leftDock.isOpen}
+                  iconOnly
+                  onClick={leftDock.onToggle}
+                >
+                  <Icon render={<Table />} size="xs" />
+                </Button>
+              }
+            />
+            <Tooltip.Content>{leftDockLabel}</Tooltip.Content>
+          </Tooltip.Root>
         ) : null}
-        <Button
-          type="button"
-          variant="ghost"
-          size="xs"
-          aria-label="Open subscriptions dock"
-          iconOnly
-          title="Open subscriptions dock"
-        >
-          <Icon render={<Activity />} size="xs" />
-        </Button>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                aria-label="Open subscriptions dock"
+                iconOnly
+              >
+                <Icon render={<Activity />} size="xs" />
+              </Button>
+            }
+          />
+          <Tooltip.Content>Open subscriptions dock</Tooltip.Content>
+        </Tooltip.Root>
       </Box>
     </Box>
   );

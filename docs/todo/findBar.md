@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Replace native browser titles on search-option and match-navigation actions with shared Tooltip composition.
+
 [04/08/26]
 
 - [x] Add a controlled find query field with match position and previous and next actions.
@@ -61,6 +65,10 @@
 - None.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Cover authored Find Bar tooltips and absence of native `title` attributes.
 
 [04/08/26]
 

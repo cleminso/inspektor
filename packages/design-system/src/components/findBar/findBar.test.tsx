@@ -169,6 +169,10 @@ describe('FindBar', () => {
     expect(matchCase.getAttribute('aria-pressed')).toBe('false')
     expect(wholeWord.getAttribute('aria-pressed')).toBe('false')
     expect(regularExpression.getAttribute('aria-pressed')).toBe('false')
+    expect(matchCase.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
+    expect(wholeWord.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
+    expect(regularExpression.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
+    expect(matchCase.getAttribute('title')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Close' })).toBeNull()
 
     fireEvent.click(matchCase)
@@ -187,5 +191,28 @@ describe('FindBar', () => {
       ...searchOptions,
       regularExpression: true,
     })
+  })
+
+  it('uses Tooltip triggers for match navigation', () => {
+    render(
+      <FindBar
+        label="Find in row JSON"
+        value="account"
+        onValueChange={() => undefined}
+        state={{ status: 'matched', activeIndex: 0, count: 1 }}
+        searchOptions={searchOptions}
+        onSearchOptionsChange={() => undefined}
+        onPreviousMatch={() => undefined}
+        onNextMatch={() => undefined}
+      />,
+    )
+
+    const previous = screen.getByRole('button', { name: 'Previous match' })
+    const next = screen.getByRole('button', { name: 'Next match' })
+
+    expect(previous.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
+    expect(next.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
+    expect(previous.getAttribute('title')).toBeNull()
+    expect(next.getAttribute('title')).toBeNull()
   })
 })

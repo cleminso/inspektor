@@ -38,6 +38,7 @@ import {
 } from "../../tokens/value.stylex";
 import { CopyButton } from "../copyButton/copyButton";
 import { Button } from "../button/button";
+import { Tooltip } from "../tooltip/tooltip";
 import type { CodeEditorProps } from "./codeEditor";
 import { codeEditorStyles } from "./codeEditor.styles";
 import { codeEditorVars } from "./codeEditorVars.stylex";
@@ -56,7 +57,7 @@ function createFoldMarker(open: boolean): HTMLElement {
 
   marker.dataset.slot = "code-editor-fold-marker";
   marker.dataset.state = open === true ? "expanded" : "collapsed";
-  marker.title = open === true ? "Fold line" : "Unfold line";
+  marker.setAttribute("aria-label", open === true ? "Fold line" : "Unfold line");
 
   icon.setAttribute("aria-hidden", "true");
   icon.setAttribute("viewBox", "0 0 12 12");
@@ -700,34 +701,48 @@ export function CodeMirrorEditor({
       />
 
       <div {...stylex.props(codeEditorStyles.toolbar)}>
-        <Button
-          aria-label="Format JSON"
-          iconOnly
-          disabled={readOnly === true || disabled === true}
-          onClick={format}
-          size="s"
-          title="Format JSON"
-          variant="ghost"
-        >
-          <FormatIcon />
-        </Button>
-        <Button
-          aria-label={lineWrapping === true ? "Disable line wrapping" : "Enable line wrapping"}
-          aria-pressed={lineWrapping}
-          iconOnly
-          disabled={disabled}
-          onClick={() => {
-            setLineWrapping((enabled) => enabled === false);
-            if (disabled === false) {
-              editorViewRef.current?.focus();
+        <Tooltip.Root disabled={readOnly === true || disabled === true}>
+          <Tooltip.Trigger
+            render={
+              <Button
+                aria-label="Format JSON"
+                iconOnly
+                disabled={readOnly === true || disabled === true}
+                onClick={format}
+                size="s"
+                variant="ghost"
+              >
+                <FormatIcon />
+              </Button>
             }
-          }}
-          size="s"
-          title={lineWrapping === true ? "Disable line wrapping" : "Enable line wrapping"}
-          variant="ghost"
-        >
-          <WrapIcon />
-        </Button>
+          />
+          <Tooltip.Content side="bottom">Format JSON</Tooltip.Content>
+        </Tooltip.Root>
+        <Tooltip.Root disabled={disabled}>
+          <Tooltip.Trigger
+            render={
+              <Button
+                aria-label={lineWrapping === true ? "Disable line wrapping" : "Enable line wrapping"}
+                aria-pressed={lineWrapping}
+                iconOnly
+                disabled={disabled}
+                onClick={() => {
+                  setLineWrapping((enabled) => enabled === false);
+                  if (disabled === false) {
+                    editorViewRef.current?.focus();
+                  }
+                }}
+                size="s"
+                variant="ghost"
+              >
+                <WrapIcon />
+              </Button>
+            }
+          />
+          <Tooltip.Content side="bottom">
+            {lineWrapping === true ? "Disable line wrapping" : "Enable line wrapping"}
+          </Tooltip.Content>
+        </Tooltip.Root>
         <CopyButton
           disabled={disabled}
           label="Copy JSON"
@@ -737,20 +752,28 @@ export function CodeMirrorEditor({
           variant="ghost"
         />
         {hasDisclosure === true ? (
-          <Button
-            aria-controls={viewportId}
-            aria-expanded={isExpanded}
-            aria-label={isExpanded === true ? "Collapse code editor" : "Expand code editor"}
-            iconOnly
-            onClick={() => {
-              setExpanded(isExpanded === false);
-            }}
-            size="s"
-            title={isExpanded === true ? "Collapse" : "Expand"}
-            variant="ghost"
-          >
-            <PresentationIcon expanded={isExpanded} />
-          </Button>
+          <Tooltip.Root>
+            <Tooltip.Trigger
+              render={
+                <Button
+                  aria-controls={viewportId}
+                  aria-expanded={isExpanded}
+                  aria-label={isExpanded === true ? "Collapse code editor" : "Expand code editor"}
+                  iconOnly
+                  onClick={() => {
+                    setExpanded(isExpanded === false);
+                  }}
+                  size="s"
+                  variant="ghost"
+                >
+                  <PresentationIcon expanded={isExpanded} />
+                </Button>
+              }
+            />
+            <Tooltip.Content side="bottom">
+              {isExpanded === true ? "Collapse" : "Expand"}
+            </Tooltip.Content>
+          </Tooltip.Root>
         ) : null}
       </div>
     </div>

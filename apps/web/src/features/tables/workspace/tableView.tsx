@@ -9,6 +9,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
   Text,
+  Tooltip,
 } from "@inspector/ds";
 import { Layers } from "lucide-react";
 
@@ -74,19 +75,25 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
           <Toolbar
             actions={
               <>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  aria-label="Open schema"
-                  iconOnly
-                  title="Open schema"
-                  onClick={() => {
-                    void openSchema();
-                  }}
-                >
-                  <Icon render={<Layers />} size="s" />
-                </Button>
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    render={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="s"
+                        aria-label="Open schema"
+                        iconOnly
+                        onClick={() => {
+                          void openSchema();
+                        }}
+                      >
+                        <Icon render={<Layers />} size="s" />
+                      </Button>
+                    }
+                  />
+                  <Tooltip.Content>Open schema</Tooltip.Content>
+                </Tooltip.Root>
                 <DataGridColumnVisibility table={state.table} />
                 <Button
                   type="button"

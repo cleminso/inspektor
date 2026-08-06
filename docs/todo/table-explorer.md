@@ -19,6 +19,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Replace native browser titles on column-type markers, schema navigation, tab creation, dock controls, and theme controls with shared Tooltip composition.
+
 [05/08/26]
 
 - [x] Reset an individually resized data column to its schema-aware initial width from both header action menus.
@@ -602,6 +606,10 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Cover authored column-type, tab-creation, and dock-control tooltips without native titles.
 
 [05/08/26]
 

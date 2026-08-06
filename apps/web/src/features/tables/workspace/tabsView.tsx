@@ -1,4 +1,4 @@
-import { Box, Button, Icon, TabView } from "@inspector/ds";
+import { Box, Button, Icon, TabView, Tooltip } from "@inspector/ds";
 import { Layers3, Plus, Table2 } from "lucide-react";
 
 import { useTableTabs } from "@tables/workspace/tabsProvider";
@@ -89,17 +89,23 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
               );
             })}
           </TabView.List>
-          <Button
-            type="button"
-            variant="ghost"
-            size="s"
-            aria-label="Open new table view"
-            iconOnly
-            title="Open new table view"
-            onClick={openNewView}
-          >
-            <Icon render={<Plus />} size="s" />
-          </Button>
+          <Tooltip.Root>
+            <Tooltip.Trigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="s"
+                  aria-label="Open new table view"
+                  iconOnly
+                  onClick={openNewView}
+                >
+                  <Icon render={<Plus />} size="s" />
+                </Button>
+              }
+            />
+            <Tooltip.Content>Open new table view</Tooltip.Content>
+          </Tooltip.Root>
         </Box>
       </Box>
       {activeTab?.kind === "table" && tableName !== null ? (

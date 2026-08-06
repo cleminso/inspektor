@@ -4,6 +4,7 @@ import { Box } from '../box/box'
 import { Button } from '../button/button'
 import { Input } from '../input/input'
 import { InputGroup } from '../inputGroup/inputGroup'
+import { Tooltip } from '../tooltip/tooltip'
 import { findBarStyles } from './findBar.styles'
 
 export type FindBarState =
@@ -163,57 +164,75 @@ export function FindBar({
             gap="xxs"
             paddingRight="xxs"
           >
-            <Button
-              aria-label="Match case"
-              aria-pressed={searchOptions.caseSensitive}
-              iconOnly
-              onClick={() => {
-                onSearchOptionsChange({
-                  ...searchOptions,
-                  caseSensitive: searchOptions.caseSensitive === false,
-                })
-              }}
-              radius="xs"
-              size="xs"
-              title="Match case"
-              variant="ghost"
-            >
-              <MatchCaseIcon />
-            </Button>
-            <Button
-              aria-label="Match whole word"
-              aria-pressed={searchOptions.wholeWord}
-              iconOnly
-              onClick={() => {
-                onSearchOptionsChange({
-                  ...searchOptions,
-                  wholeWord: searchOptions.wholeWord === false,
-                })
-              }}
-              radius="xs"
-              size="xs"
-              title="Match whole word"
-              variant="ghost"
-            >
-              <WholeWordIcon />
-            </Button>
-            <Button
-              aria-label="Use regular expression"
-              aria-pressed={searchOptions.regularExpression}
-              iconOnly
-              onClick={() => {
-                onSearchOptionsChange({
-                  ...searchOptions,
-                  regularExpression: searchOptions.regularExpression === false,
-                })
-              }}
-              radius="xs"
-              size="xs"
-              title="Use regular expression"
-              variant="ghost"
-            >
-              <RegularExpressionIcon />
-            </Button>
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    aria-label="Match case"
+                    aria-pressed={searchOptions.caseSensitive}
+                    iconOnly
+                    onClick={() => {
+                      onSearchOptionsChange({
+                        ...searchOptions,
+                        caseSensitive: searchOptions.caseSensitive === false,
+                      })
+                    }}
+                    radius="xs"
+                    size="xs"
+                    variant="ghost"
+                  >
+                    <MatchCaseIcon />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>Match case</Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    aria-label="Match whole word"
+                    aria-pressed={searchOptions.wholeWord}
+                    iconOnly
+                    onClick={() => {
+                      onSearchOptionsChange({
+                        ...searchOptions,
+                        wholeWord: searchOptions.wholeWord === false,
+                      })
+                    }}
+                    radius="xs"
+                    size="xs"
+                    variant="ghost"
+                  >
+                    <WholeWordIcon />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>Match whole word</Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    aria-label="Use regular expression"
+                    aria-pressed={searchOptions.regularExpression}
+                    iconOnly
+                    onClick={() => {
+                      onSearchOptionsChange({
+                        ...searchOptions,
+                        regularExpression: searchOptions.regularExpression === false,
+                      })
+                    }}
+                    radius="xs"
+                    size="xs"
+                    variant="ghost"
+                  >
+                    <RegularExpressionIcon />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>Use regular expression</Tooltip.Content>
+            </Tooltip.Root>
           </Box>
         </InputGroup>
       </Box>
@@ -234,30 +253,42 @@ export function FindBar({
         alignItems="center"
         flexShrink={0}
       >
-        <Button
-          aria-label="Previous match"
-          disabled={hasMatches === false}
-          iconOnly
-          onClick={onPreviousMatch}
-          radius="xs"
-          size="xs"
-          title="Previous match"
-          variant="ghost"
-        >
-          <PreviousIcon />
-        </Button>
-        <Button
-          aria-label="Next match"
-          disabled={hasMatches === false}
-          iconOnly
-          onClick={onNextMatch}
-          radius="xs"
-          size="xs"
-          title="Next match"
-          variant="ghost"
-        >
-          <NextIcon />
-        </Button>
+        <Tooltip.Root disabled={hasMatches === false}>
+          <Tooltip.Trigger
+            render={
+              <Button
+                aria-label="Previous match"
+                disabled={hasMatches === false}
+                iconOnly
+                onClick={onPreviousMatch}
+                radius="xs"
+                size="xs"
+                variant="ghost"
+              >
+                <PreviousIcon />
+              </Button>
+            }
+          />
+          <Tooltip.Content>Previous match</Tooltip.Content>
+        </Tooltip.Root>
+        <Tooltip.Root disabled={hasMatches === false}>
+          <Tooltip.Trigger
+            render={
+              <Button
+                aria-label="Next match"
+                disabled={hasMatches === false}
+                iconOnly
+                onClick={onNextMatch}
+                radius="xs"
+                size="xs"
+                variant="ghost"
+              >
+                <NextIcon />
+              </Button>
+            }
+          />
+          <Tooltip.Content>Next match</Tooltip.Content>
+        </Tooltip.Root>
       </Box>
     </Box>
   )

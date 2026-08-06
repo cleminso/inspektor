@@ -1,6 +1,4 @@
-import { useDirection } from '@base-ui/react/direction-provider'
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip'
-import * as stylex from '@stylexjs/stylex'
 import React, { type PropsWithChildren } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
@@ -25,7 +23,7 @@ export type TooltipRootProps = PropsWithChildren<{
   onOpenChange?: BaseTooltip.Root.Props['onOpenChange']
   /** Runs after opening or closing animations complete. */
   onOpenChangeComplete?: BaseTooltip.Root.Props['onOpenChangeComplete']
-  /** Allows the tooltip to close while the pointer moves over its popup. */
+  /** Prevents the pointer from keeping the tooltip open through its popup. */
   disableHoverablePopup?: BaseTooltip.Root.Props['disableHoverablePopup']
   /** Selects which cursor axis the popup follows. */
   trackCursorAxis?: BaseTooltip.Root.Props['trackCursorAxis']
@@ -64,7 +62,7 @@ function TooltipProvider({ timeout = 400, ...props }: TooltipProviderProps) {
 
 function TooltipRoot({
   defaultOpen = false,
-  disableHoverablePopup = false,
+  disableHoverablePopup = true,
   trackCursorAxis = 'none',
   disabled = false,
   ...props
@@ -81,7 +79,10 @@ function TooltipRoot({
 }
 
 const TooltipTrigger = React.forwardRef<React.ComponentRef<typeof BaseTooltip.Trigger>, TooltipTriggerProps>(
-  function TooltipTrigger({ closeOnClick = true, disabled, render, ...props }, ref) {
+  function TooltipTrigger(
+    { delay = 600, closeOnClick = true, closeDelay = 0, disabled, render, ...props },
+    ref,
+  ) {
     const stateStyleProps =
       render === undefined
         ? createStateStyleProps<BaseTooltip.Trigger.State>((state) => [
@@ -93,7 +94,9 @@ const TooltipTrigger = React.forwardRef<React.ComponentRef<typeof BaseTooltip.Tr
       <BaseTooltip.Trigger
         {...props}
         ref={ref as BaseTooltip.Trigger.Props['ref']}
+        delay={delay}
         closeOnClick={closeOnClick}
+        closeDelay={closeDelay}
         disabled={disabled}
         render={render}
         {...stateStyleProps}
@@ -103,28 +106,7 @@ const TooltipTrigger = React.forwardRef<React.ComponentRef<typeof BaseTooltip.Tr
   },
 )
 
-const arrowSideStyles = {
-  top: tooltipStyles.arrowTop,
-  bottom: tooltipStyles.arrowBottom,
-  left: tooltipStyles.arrowLeft,
-  right: tooltipStyles.arrowRight,
-} satisfies Record<'top' | 'bottom' | 'left' | 'right', unknown>
-
-function getArrowSideStyle(
-  side: NonNullable<BaseTooltip.Positioner.Props['side']>,
-  direction: 'ltr' | 'rtl',
-) {
-  if (side === 'inline-start') {
-    return direction === 'rtl' ? tooltipStyles.arrowRight : tooltipStyles.arrowLeft
-  }
-  if (side === 'inline-end') {
-    return direction === 'rtl' ? tooltipStyles.arrowLeft : tooltipStyles.arrowRight
-  }
-  return arrowSideStyles[side]
-}
-
 function TooltipContent({ side = 'top', align = 'center', children }: TooltipContentProps) {
-  const direction = useDirection()
   const positionerStyleProps = createStateStyleProps<BaseTooltip.Positioner.State>((state) => [
     tooltipStyles.positioner,
     state.open === true && tooltipStyles.positionerOpen,
@@ -144,7 +126,7 @@ function TooltipContent({ side = 'top', align = 'center', children }: TooltipCon
   const popupStyleProps = createStateStyleProps<BaseTooltip.Popup.State>((state) => [
     tooltipStyles.popup,
     state.instant === undefined &&
-      (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
+      state.transitionStatus === 'starting' &&
       tooltipStyles.popupTransition,
     state.open === true && tooltipStyles.popupOpen,
     state.open === false && tooltipStyles.popupClosed,
@@ -161,21 +143,6 @@ function TooltipContent({ side = 'top', align = 'center', children }: TooltipCon
     state.align === 'center' && tooltipStyles.popupAlignCenter,
     state.align === 'end' && tooltipStyles.popupAlignEnd,
   ])
-  const arrowStyleProps = createStateStyleProps<BaseTooltip.Arrow.State>((state) => [
-    tooltipStyles.arrow,
-    getArrowSideStyle(state.side, direction),
-    state.open === true && tooltipStyles.arrowOpen,
-    state.open === false && tooltipStyles.arrowClosed,
-    state.side === 'inline-start' && tooltipStyles.arrowSideInlineStart,
-    state.side === 'inline-end' && tooltipStyles.arrowSideInlineEnd,
-    state.align === 'start' && tooltipStyles.arrowAlignStart,
-    state.align === 'center' && tooltipStyles.arrowAlignCenter,
-    state.align === 'end' && tooltipStyles.arrowAlignEnd,
-    state.uncentered === true && tooltipStyles.arrowUncentered,
-    state.instant !== undefined && tooltipStyles.arrowInstant,
-  ])
-  const arrowIconStyleProps = stylex.props(tooltipStyles.arrowIcon)
-
   return (
     <BaseTooltip.Portal>
       <BaseTooltip.Positioner
@@ -186,11 +153,6 @@ function TooltipContent({ side = 'top', align = 'center', children }: TooltipCon
       >
         <BaseTooltip.Popup {...popupStyleProps} data-slot="tooltip-content">
           {children}
-          <BaseTooltip.Arrow {...arrowStyleProps}>
-            <svg aria-hidden="true" viewBox="0 0 8 4" {...arrowIconStyleProps}>
-              <path d="M0 0h8L4 4z" />
-            </svg>
-          </BaseTooltip.Arrow>
         </BaseTooltip.Popup>
       </BaseTooltip.Positioner>
     </BaseTooltip.Portal>

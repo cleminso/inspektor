@@ -1037,7 +1037,7 @@
     },
     {
       "name": "color",
-      "type": "\"text-default\" | \"text-secondary\" | \"text-muted\" | \"text-disabled\" | \"text-link\" | \"text-selected\" | \"text-danger\" | \"text-on-inverse\" | \"text-on-primary\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, TextColorToken>>",
+      "type": "\"text-default\" | \"text-secondary\" | \"text-muted\" | \"text-disabled\" | \"text-link\" | \"text-selected\" | \"text-success\" | \"text-warning\" | \"text-danger\" | \"text-on-inverse\" | \"text-on-primary\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, TextColorToken>>",
       "required": false,
       "description": "",
       "source": {
@@ -1047,7 +1047,7 @@
     },
     {
       "name": "borderColor",
-      "type": "\"border\" | \"border-secondary\" | \"border-focused\" | \"border-table-header-cell\" | \"border-table-cell\" | \"border-table-column-active\" | \"outline\" | \"border-table-cell-active\" | \"border-warning\" | \"border-danger\" | \"border-danger-subtle\" | \"border-success\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BorderColorToken>>",
+      "type": "\"border\" | \"border-secondary\" | \"border-focused\" | \"border-table-header-cell\" | \"border-table-cell\" | \"border-table-column-active\" | \"border-table-cell-active\" | \"border-warning\" | \"border-danger\" | \"border-danger-subtle\" | \"border-success\" | \"outline\" | \"border-input-ring\" | \"border-input\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BorderColorToken>>",
       "required": false,
       "description": "",
       "source": {
@@ -3107,7 +3107,7 @@
       "description": "Sets the shared delay before tooltips open.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 12
+        "line": 10
       }
     },
     {
@@ -3117,7 +3117,7 @@
       "description": "Sets the shared delay before tooltips close.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 14
+        "line": 12
       }
     },
     {
@@ -3128,7 +3128,7 @@
       "description": "Keeps adjacent tooltips in the instant-open phase after one closes.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 16
+        "line": 14
       }
     }
   ],
@@ -3141,7 +3141,7 @@
       "description": "Whether the tooltip is initially open.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 21
+        "line": 19
       }
     },
     {
@@ -3151,7 +3151,7 @@
       "description": "Whether the tooltip is currently open.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 23
+        "line": 21
       }
     },
     {
@@ -3161,7 +3161,7 @@
       "description": "Runs when the tooltip opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 25
+        "line": 23
       }
     },
     {
@@ -3171,18 +3171,18 @@
       "description": "Runs after opening or closing animations complete.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 27
+        "line": 25
       }
     },
     {
       "name": "disableHoverablePopup",
       "type": "false | true",
       "required": false,
-      "defaultValue": "false",
-      "description": "Allows the tooltip to close while the pointer moves over its popup.",
+      "defaultValue": "true",
+      "description": "Prevents the pointer from keeping the tooltip open through its popup.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 29
+        "line": 27
       }
     },
     {
@@ -3193,7 +3193,7 @@
       "description": "Selects which cursor axis the popup follows.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 31
+        "line": 29
       }
     },
     {
@@ -3203,7 +3203,7 @@
       "description": "Provides imperative tooltip actions.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 33
+        "line": 31
       }
     },
     {
@@ -3214,7 +3214,7 @@
       "description": "Prevents the tooltip from opening.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 35
+        "line": 33
       }
     }
   ],
@@ -3223,10 +3223,11 @@
       "name": "delay",
       "type": "number",
       "required": false,
+      "defaultValue": "600",
       "description": "Overrides the delay before this tooltip opens.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 43
+        "line": 41
       }
     },
     {
@@ -3237,17 +3238,18 @@
       "description": "Closes the tooltip when its trigger is clicked.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 45
+        "line": 43
       }
     },
     {
       "name": "closeDelay",
       "type": "number",
       "required": false,
+      "defaultValue": "0",
       "description": "Overrides the delay before this tooltip closes.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 47
+        "line": 45
       }
     },
     {
@@ -3257,7 +3259,7 @@
       "description": "Prevents this trigger from opening the tooltip.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 49
+        "line": 47
       }
     },
     {
@@ -3267,7 +3269,7 @@
       "description": "Composes tooltip trigger behavior onto another element.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 51
+        "line": 49
       }
     }
   ],
@@ -3280,7 +3282,7 @@
       "description": "Places the tooltip on this side of its trigger.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 56
+        "line": 54
       }
     },
     {
@@ -3291,7 +3293,7 @@
       "description": "Aligns the tooltip along its trigger.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
-        "line": 58
+        "line": 56
       }
     }
   ],
@@ -4534,7 +4536,7 @@
       "description": "Accessible name for the find query field.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -4544,7 +4546,7 @@
       "description": "Query used to find document occurrences.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -4554,7 +4556,7 @@
       "description": "Runs when the find query changes.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -4564,7 +4566,7 @@
       "description": "Describes the result state displayed beside the query.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -4574,7 +4576,7 @@
       "description": "Controls how the document interprets the find query.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -4584,7 +4586,7 @@
       "description": "Runs when a query interpretation option changes.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -4594,7 +4596,7 @@
       "description": "Requests the preceding match, wrapping from the first match to the last.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -4604,7 +4606,7 @@
       "description": "Requests the following match, wrapping from the last match to the first.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 39
+        "line": 40
       }
     }
   ],
@@ -5873,7 +5875,7 @@
       "description": "Items available for filtering and context selection.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -5883,7 +5885,7 @@
       "description": "The active context item.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -5893,7 +5895,7 @@
       "description": "The initially active context item.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
@@ -5903,7 +5905,7 @@
       "description": "Runs when the active context item changes.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -5914,7 +5916,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -5924,7 +5926,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -5934,7 +5936,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 38
+        "line": 39
       }
     },
     {
@@ -5944,7 +5946,7 @@
       "description": "Converts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 40
+        "line": 41
       }
     },
     {
@@ -5954,7 +5956,7 @@
       "description": "Converts an item into a stable string value.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 42
+        "line": 43
       }
     },
     {
@@ -5964,7 +5966,7 @@
       "description": "Compares an item with the active context value.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -5974,7 +5976,7 @@
       "description": "Filters an item against the switcher query.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 46
+        "line": 47
       }
     },
     {
@@ -5985,7 +5987,7 @@
       "description": "Disables the switcher.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 48
+        "line": 49
       }
     }
   ],
@@ -5997,7 +5999,7 @@
       "description": "Accessible label that identifies the context being switched.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 55
+        "line": 56
       }
     },
     {
@@ -6008,7 +6010,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 57
+        "line": 58
       }
     },
     {
@@ -6019,7 +6021,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 59
+        "line": 60
       }
     },
     {
@@ -6030,17 +6032,17 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 61
+        "line": 62
       }
     },
     {
-      "name": "title",
-      "type": "string",
+      "name": "tooltip",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
-      "description": "Provides supplemental text for truncated trigger content.",
+      "description": "Provides supplemental content for the trigger tooltip.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 63
+        "line": 64
       }
     }
   ],
@@ -6064,7 +6066,7 @@
       "description": "Accessible label for the search input.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 68
+        "line": 69
       }
     },
     {
@@ -6074,7 +6076,7 @@
       "description": "Placeholder displayed while the search input is empty.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 70
+        "line": 71
       }
     }
   ],
@@ -6087,7 +6089,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 75
+        "line": 76
       }
     },
     {
@@ -6098,7 +6100,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 77
+        "line": 78
       }
     },
     {
@@ -6108,7 +6110,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 79
+        "line": 80
       }
     }
   ],
@@ -6121,7 +6123,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 84
+        "line": 85
       }
     }
   ],

@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Replace the trigger's native `title` API with constrained `tooltip` content rendered through the shared Tooltip component.
+
 [05/08/26]
 
 - [x] Derive Context Switcher trigger size and width from the constrained Combobox Trigger contract instead of redeclaring forwarded unions.
@@ -59,6 +63,10 @@
 - None.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Cover trigger tooltip composition and generated `tooltip` prop metadata.
 
 [05/08/26]
 

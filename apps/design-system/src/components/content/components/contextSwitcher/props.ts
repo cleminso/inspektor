@@ -18,7 +18,7 @@ export const contextSwitcherTriggerPropNames = [
   "size",
   "width",
   "disabled",
-  "title",
+  "tooltip",
 ] as const;
 
 export const contextSwitcherSearchPropNames = ["label", "placeholder"] as const;

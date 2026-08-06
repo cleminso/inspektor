@@ -11,6 +11,33 @@
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Remove tooltip exit motion so adjacent replacements cannot overlap while the next label opens.
+
+[06/08/26]
+
+- [x] Use authored Tooltip composition instead of native browser titles across design-system and Inspector React controls.
+
+[06/08/26]
+
+- [x] Skip entrance motion when a tooltip opens during its provider's instant-open phase.
+
+[06/08/26]
+
+- [x] Keep tooltip entrance scaling near its resting size so frequent pointer labels do not appear to jump.
+
+[06/08/26]
+
+- [x] Keep visual-label tooltips non-hoverable so pointer movement through trigger gaps closes the previous tooltip.
+- [x] Declare the Base UI trigger delay defaults in the wrapper and generated API metadata.
+- [x] Preserve an undefined trigger `disabled` value so Root-derived disabled state continues to apply.
+- [x] Retain named StyleX rules for every Base UI Tooltip callback state and data attribute.
+
+[05/08/26]
+
+- [x] Present tooltip content without an arrow indicator.
+
 [05/08/26]
 
 - [x] Keep Tooltip-owned trigger presentation on the default trigger.
@@ -31,6 +58,26 @@
 
 ## Settled interaction decisions
 
+[06/08/26]
+
+- [x] Keep subtle motion for the initial entrance only; exits and adjacent replacements are immediate.
+
+[06/08/26]
+
+- [x] Animate the initial pointer tooltip subtly, then replace adjacent tooltips without entrance motion.
+
+[06/08/26]
+
+- [x] Use a subtle anchored scale and opacity transition instead of scaling tooltips from half size.
+
+[06/08/26]
+
+- [x] Tooltip popups do not extend their trigger's hover area because tooltip content is supplementary and non-interactive.
+
+[05/08/26]
+
+- [x] Keep the tooltip as an unpointed floating label instead of visually connecting it with an arrow.
+
 [05/08/26]
 
 - [x] A composed trigger owns its presentation; Tooltip contributes behavior and state attributes.
@@ -42,6 +89,25 @@
 - None.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Browser verification confirms adjacent replacement renders one popup without starting or ending transition state.
+
+[06/08/26]
+
+- [x] Confirm active workspace source contains no native browser tooltip attributes on Inspector-owned controls.
+
+[06/08/26]
+
+- [x] Cover the non-hoverable popup default and its inert positioner contract.
+- [x] Tooltip and design-system package tests pass.
+- [x] Design-system package typecheck, focused lint, and build pass.
+- [x] Documentation tests, generated-prop check, typecheck, lint, and build pass.
+
+[05/08/26]
+
+- [x] Cover the absence of tooltip arrow markup.
 
 [05/08/26]
 

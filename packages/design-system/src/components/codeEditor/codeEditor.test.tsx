@@ -141,10 +141,27 @@ describe("CodeEditor", () => {
 
     expect(editorRoot?.querySelector(".cm-lineNumbers")).not.toBeNull();
     expect(editorRoot?.querySelector(".cm-foldGutter")).not.toBeNull();
-    expect(foldMarker?.getAttribute("title")).toBe("Fold line");
+    expect(foldMarker?.getAttribute("title")).toBeNull();
+    expect(foldMarker?.getAttribute("aria-label")).toBe("Fold line");
     expect(foldMarker?.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 12 12");
     expect(foldMarker?.querySelector("path")?.getAttribute("d")).toBe("m2.5 4 3.5 3.5L9.5 4");
     expect(foldMarker?.querySelector("path")?.getAttribute("stroke-width")).toBe("1.5");
+  });
+
+  it("uses Tooltip triggers for toolbar actions", async () => {
+    renderOverflowingEditor();
+
+    await findCodeMirrorTextbox();
+    const format = screen.getByRole("button", { name: "Format JSON" });
+    const wrapping = screen.getByRole("button", { name: /line wrapping/ });
+    const disclosure = await screen.findByRole("button", { name: "Expand code editor" });
+
+    expect(format.hasAttribute("data-base-ui-tooltip-trigger")).toBe(true);
+    expect(wrapping.hasAttribute("data-base-ui-tooltip-trigger")).toBe(true);
+    expect(disclosure.hasAttribute("data-base-ui-tooltip-trigger")).toBe(true);
+    expect(format.getAttribute("title")).toBeNull();
+    expect(wrapping.getAttribute("title")).toBeNull();
+    expect(disclosure.getAttribute("title")).toBeNull();
   });
 
   it("hides scrollbars until the editor is hovered or focused", async () => {

@@ -256,14 +256,15 @@ function TabViewList({
       data-slot="tab-view-list"
     />
   )
+  const tooltipList = <Tooltip.Provider>{list}</Tooltip.Provider>
 
   if (reorderEnabled === false) {
-    return list
+    return tooltipList
   }
 
   return (
     <ReorderComponent listRef={listRef} values={values} onReorder={onReorder}>
-      {list}
+      {tooltipList}
     </ReorderComponent>
   )
 }
@@ -406,7 +407,7 @@ function TabViewItemContent({
       data-slot="tab-view-item"
       data-title-overflow={titleOverflowing}
     >
-      <Tooltip.Root disabled={details === undefined && titleOverflowing === false}>
+      <Tooltip.Root>
         <Tooltip.Trigger
           render={
             <BaseTabs.Tab
@@ -443,29 +444,36 @@ function TabViewItemContent({
           )}
           data-slot="tab-view-close"
         >
-          <Button
-            aria-label={closeLabel}
-            disabled={disabled}
-            iconOnly
-            onClick={handleCloseClick}
-            radius="xs"
-            render={<button type="button" {...stylex.props(tabViewStyles.closeAction)} />}
-            size="xs"
-            variant="ghost"
-          >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 16 16"
-              fill="none"
-              {...stylex.props(tabViewStyles.closeIcon)}
-            >
-              <path
-                d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-            </svg>
-          </Button>
+          <Tooltip.Root>
+            <Tooltip.Trigger
+              render={
+                <Button
+                  aria-label={closeLabel}
+                  disabled={disabled}
+                  iconOnly
+                  onClick={handleCloseClick}
+                  radius="xs"
+                  render={<button type="button" {...stylex.props(tabViewStyles.closeAction)} />}
+                  size="xs"
+                  variant="ghost"
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    {...stylex.props(tabViewStyles.closeIcon)}
+                  >
+                    <path
+                      d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </Button>
+              }
+            />
+            <Tooltip.Content>Close view</Tooltip.Content>
+          </Tooltip.Root>
         </div>
       ) : null}
     </div>

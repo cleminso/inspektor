@@ -180,6 +180,21 @@ describe("ContextSwitcher", () => {
     expect(content?.textContent).toBe("Main");
   });
 
+  it("composes a semantic tooltip onto the Combobox trigger", () => {
+    render(
+      <ContextSwitcher.Root items={["main"]} defaultValue="main">
+        <ContextSwitcher.Trigger label="Switch context" tooltip={<strong>Current context</strong>}>
+          Main
+        </ContextSwitcher.Trigger>
+      </ContextSwitcher.Root>,
+    );
+
+    const trigger = screen.getByRole("combobox", { name: "Switch context" });
+
+    expect(trigger.hasAttribute("data-base-ui-tooltip-trigger")).toBe(true);
+    expect(trigger.getAttribute("title")).toBeNull();
+  });
+
   it("composes Content as the popup and Viewport as the scrolling results", () => {
     render(<Switcher />);
     openSwitcher();
