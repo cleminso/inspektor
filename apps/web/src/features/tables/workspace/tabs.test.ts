@@ -98,6 +98,33 @@ describe("table tabs", () => {
     });
   });
 
+  it("stores pagination on the existing table view instead of creating another tab", () => {
+    const baseTab: TableDataTab = {
+      kind: "table",
+      id: "table:accounts",
+      tableName: "accounts",
+      search: {},
+    };
+
+    const result = reconcileTableTab({
+      activeTabId: baseTab.id,
+      createId: () => "unused-view",
+      search: { page: 2, pageSize: 500 },
+      tableName: "accounts",
+      tabs: [baseTab],
+    });
+
+    expect(result).toEqual({
+      activeTabId: "table:accounts",
+      tabs: [
+        {
+          ...baseTab,
+          search: { page: 2, pageSize: 500 },
+        },
+      ],
+    });
+  });
+
   it("opens schema in a separate tab while preserving the base data tab", () => {
     const baseTab: TableDataTab = {
       kind: "table",

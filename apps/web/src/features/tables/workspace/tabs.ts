@@ -1,6 +1,10 @@
+import type { TablePageSize } from "@tables/tableTypes";
+
 export interface TableTabSearch {
   dir?: string;
   filters?: string;
+  page?: number;
+  pageSize?: TablePageSize;
   sort?: string;
   view?: string;
 }
@@ -255,7 +259,18 @@ function isTableTabSearch(value: unknown): value is TableTabSearch {
     return false;
   }
 
-  return Object.values(value).every((entry) => entry === undefined || typeof entry === "string");
+  const search = value as TableTabSearch;
+  return (
+    (search.dir === undefined || typeof search.dir === "string") &&
+    (search.filters === undefined || typeof search.filters === "string") &&
+    (search.page === undefined || (Number.isInteger(search.page) && search.page > 0)) &&
+    (search.pageSize === undefined ||
+      search.pageSize === 100 ||
+      search.pageSize === 500 ||
+      search.pageSize === 1000) &&
+    (search.sort === undefined || typeof search.sort === "string") &&
+    (search.view === undefined || typeof search.view === "string")
+  );
 }
 
 function parseTableDataTab(value: unknown): TableDataTab | null {

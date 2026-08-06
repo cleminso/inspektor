@@ -4,72 +4,71 @@
  * Filters, sorting, selected row editor mode, and schema/data view are encoded in the URL
  * so Inspector links can restore a specific view into a Jazz table.
  */
-import { useMemo } from "react";
+import { useMemo } from 'react'
 
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useNavigate, useSearch } from '@tanstack/react-router'
 
-import {
-  parseFiltersFromSearchParam,
-  serializeFiltersToSearchParam,
-} from "@tables/filters/filterParsing";
-import type { TableFilterClause } from "@tables/filters/tableFilters";
+import { serializeFiltersToSearchParam } from '@tables/filters/filterParsing'
+import type { TableFilterClause } from '@tables/filters/tableFilters'
+import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
 import type {
   DetailPaneMode,
   TableExplorerSearchState,
   TableExplorerView,
+  TablePageSize,
   TableRowId,
   TableSortDirection,
-} from "@tables/tableTypes";
+} from '@tables/tableTypes'
 
 interface SearchValues {
-  dir?: string;
-  filters?: string;
-  mode?: string | null;
-  rowId?: string | null;
-  sort?: string;
-  tab?: string;
-  view?: string;
+  dir?: string
+  filters?: string
+  mode?: string | null
+  page?: number
+  pageSize?: TablePageSize
+  rowId?: string | null
+  sort?: string
+  tab?: string
+  view?: string
 }
 
 interface UpdateSearchOptions {
-  replace?: boolean;
+  replace?: boolean
 }
 
 /** Parsed table explorer URL state plus setters that write back to route search params. */
 export interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
-  openSchema: () => Promise<void>;
-  setFilters: (filters: TableFilterClause[]) => Promise<void>;
+  openSchema: () => Promise<void>
+  setFilters: (filters: TableFilterClause[]) => Promise<void>
+  setPage: (page: number) => Promise<void>
+  setPageSize: (pageSize: TablePageSize) => Promise<void>
   setRowEditor: (
     mode: DetailPaneMode | null,
     rowId?: TableRowId | null,
     options?: UpdateSearchOptions,
-  ) => Promise<void>;
-  setSorting: (sortColumn: string, sortDirection: TableSortDirection) => Promise<void>;
+  ) => Promise<void>
+  setSorting: (sortColumn: string, sortDirection: TableSortDirection) => Promise<void>
 }
 
 function parseView(value: string | undefined): TableExplorerView {
-  return value === "schema" ? "schema" : "data";
-}
-
-function parseSortDirection(value: string | undefined): TableSortDirection {
-  return value === "desc" ? "desc" : "asc";
+  return value === 'schema' ? 'schema' : 'data'
 }
 
 function parseEditorMode(value: string | null | undefined): DetailPaneMode | null {
-  if (value === "edit" || value === "insert") {
-    return value;
+  if (value === 'edit' || value === 'insert') {
+    return value
   }
 
-  return null;
+  return null
 }
 
 function parseRowId(value: string | null | undefined): TableRowId | null {
   if (value === null || value === undefined) {
-    return null;
+    return null
   }
 
-  const trimmedValue = value.trim();
-  return trimmedValue.length > 0 ? trimmedValue : null;
+  const trimmedValue = value.trim()
+  return trimmedValue.length > 0 ? trimmedValue : null
 }
 
 /**
@@ -79,8 +78,11 @@ function parseRowId(value: string | null | undefined): TableRowId | null {
  * links reopen the same table context without storing this transient state in Jazz.
  */
 export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResult {
-  const navigate = useNavigate({ from: "/conn/$connectionId/tables/$tableName/" });
-  const search = useSearch({ strict: false }) as SearchValues;
+  const navigate = useNavigate({ from: '/conn/$connectionId/tables/$tableName/' })
+  const search = useSearch({ strict: false }) as SearchValues
+  const searchDirection = search.dir
+  const serializedFilters = search.filters
+  const sortColumn = search.sort
 
   /**
    * Why: the parsed filters array flows into useTableRows's query-builder memo and
@@ -100,26 +102,41 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
    * against at this boundary.
    */
   const filters = useMemo(
-    () => parseFiltersFromSearchParam(search.filters ?? null),
-    [search.filters],
-  );
+    () => resolveTableRowsSearch({ filters: serializedFilters }).filters,
+    [serializedFilters],
+  )
+  const tableRowsSearch = useMemo(
+    () =>
+      resolveTableRowsSearch(
+        {
+          dir: searchDirection,
+          page: search.page,
+          pageSize: search.pageSize,
+          sort: sortColumn,
+        },
+        filters,
+      ),
+    [filters, search.page, search.pageSize, searchDirection, sortColumn],
+  )
 
   const state = useMemo<TableExplorerSearchState>(() => {
-    const editorMode = parseEditorMode(search.mode);
-    const rowId = parseRowId(search.rowId);
+    const editorMode = parseEditorMode(search.mode)
+    const rowId = parseRowId(search.rowId)
     // Edit mode requires a stable Jazz row ID; invalid URLs fall back to the data table.
-    const resolvedEditorMode = editorMode === "edit" && rowId === null ? null : editorMode;
+    const resolvedEditorMode = editorMode === 'edit' && rowId === null ? null : editorMode
 
     return {
       editorMode: resolvedEditorMode,
       // Opening the row editor always returns the user to data rows, even from schema view.
-      view: resolvedEditorMode !== null ? "data" : parseView(search.view),
+      view: resolvedEditorMode !== null ? 'data' : parseView(search.view),
       filters,
-      rowId: resolvedEditorMode === "edit" ? rowId : null,
-      sortColumn: search.sort ?? "id",
-      sortDirection: parseSortDirection(search.dir),
-    };
-  }, [filters, search.dir, search.mode, search.rowId, search.sort, search.view]);
+      page: tableRowsSearch.page,
+      pageSize: tableRowsSearch.pageSize,
+      rowId: resolvedEditorMode === 'edit' ? rowId : null,
+      sortColumn: tableRowsSearch.sortColumn,
+      sortDirection: tableRowsSearch.sortDirection,
+    }
+  }, [filters, search.mode, search.rowId, search.view, tableRowsSearch])
 
   const createNextSearch = (
     baseSearch: SearchValues,
@@ -128,41 +145,47 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     const nextSearch: SearchValues = {
       ...baseSearch,
       ...updates,
-    };
+    }
 
     // Remove default values so generated URLs stay readable and shareable.
-    delete nextSearch.tab;
-    if (nextSearch.view === "data" || nextSearch.view === undefined) {
-      delete nextSearch.view;
+    delete nextSearch.tab
+    if (nextSearch.view === 'data' || nextSearch.view === undefined) {
+      delete nextSearch.view
     }
-    if (nextSearch.sort === "id" || nextSearch.sort === undefined) {
-      delete nextSearch.sort;
+    if (nextSearch.sort === 'id' || nextSearch.sort === undefined) {
+      delete nextSearch.sort
     }
-    if (nextSearch.dir === "asc" || nextSearch.dir === undefined) {
-      delete nextSearch.dir;
+    if (nextSearch.dir === 'asc' || nextSearch.dir === undefined) {
+      delete nextSearch.dir
     }
     if (nextSearch.filters === null || nextSearch.filters === undefined) {
-      delete nextSearch.filters;
+      delete nextSearch.filters
     }
-    if (nextSearch.mode !== "edit" && nextSearch.mode !== "insert") {
-      delete nextSearch.mode;
-      delete nextSearch.rowId;
+    if (nextSearch.page === 1 || nextSearch.page === undefined) {
+      delete nextSearch.page
     }
-    if (nextSearch.mode === "insert") {
-      delete nextSearch.rowId;
+    if (nextSearch.pageSize === 100 || nextSearch.pageSize === undefined) {
+      delete nextSearch.pageSize
     }
-    if (nextSearch.mode === "edit") {
-      const rowId = parseRowId(nextSearch.rowId);
+    if (nextSearch.mode !== 'edit' && nextSearch.mode !== 'insert') {
+      delete nextSearch.mode
+      delete nextSearch.rowId
+    }
+    if (nextSearch.mode === 'insert') {
+      delete nextSearch.rowId
+    }
+    if (nextSearch.mode === 'edit') {
+      const rowId = parseRowId(nextSearch.rowId)
       if (rowId === null) {
-        delete nextSearch.mode;
-        delete nextSearch.rowId;
+        delete nextSearch.mode
+        delete nextSearch.rowId
       } else {
-        nextSearch.rowId = rowId;
+        nextSearch.rowId = rowId
       }
     }
 
-    return nextSearch;
-  };
+    return nextSearch
+  }
 
   const updateSearch = async (
     updates: Partial<SearchValues>,
@@ -171,36 +194,43 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     await navigate({
       replace: options?.replace ?? true,
       search: (currentSearch) => createNextSearch(currentSearch as SearchValues, updates),
-    });
-  };
+    })
+  }
 
   return {
     ...state,
     openSchema: async () => {
-      await updateSearch({ mode: null, rowId: null, view: "schema" });
+      await updateSearch({ mode: null, rowId: null, view: 'schema' })
     },
     setFilters: async (filters) => {
       await updateSearch({
         filters: serializeFiltersToSearchParam(filters) ?? undefined,
         mode: null,
+        page: undefined,
         rowId: null,
-      });
+      })
+    },
+    setPage: async (page) => {
+      await updateSearch({ mode: null, page, rowId: null })
+    },
+    setPageSize: async (pageSize) => {
+      await updateSearch({ mode: null, page: undefined, pageSize, rowId: null })
     },
     setRowEditor: async (mode, rowId = null, options) => {
-      if (mode === "edit") {
-        await updateSearch({ mode, rowId }, options);
-        return;
+      if (mode === 'edit') {
+        await updateSearch({ mode, rowId }, options)
+        return
       }
 
-      if (mode === "insert") {
-        await updateSearch({ mode, rowId: null, view: "data" }, options);
-        return;
+      if (mode === 'insert') {
+        await updateSearch({ mode, rowId: null, view: 'data' }, options)
+        return
       }
 
-      await updateSearch({ mode: null, rowId: null }, options);
+      await updateSearch({ mode: null, rowId: null }, options)
     },
     setSorting: async (sortColumn, sortDirection) => {
-      await updateSearch({ sort: sortColumn, dir: sortDirection, mode: null, rowId: null });
+      await updateSearch({ sort: sortColumn, dir: sortDirection, mode: null, page: undefined, rowId: null })
     },
-  };
+  }
 }

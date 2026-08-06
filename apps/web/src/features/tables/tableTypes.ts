@@ -7,6 +7,8 @@ export interface TableRouteSearch {
   empty?: "true";
   filters?: string;
   mode?: string | null;
+  page?: number;
+  pageSize?: TablePageSize;
   rowId?: string | null;
   sort?: string;
   tab?: string;
@@ -28,6 +30,7 @@ export type TableExplorerView = "data" | "schema";
 export type DetailPaneMode = "edit" | "insert";
 
 export type TableSortDirection = "asc" | "desc";
+export type TablePageSize = 100 | 500 | 1000;
 
 /** Runtime row IDs are normalized as strings for table state and URLs. */
 export type TableRowId = string;
@@ -37,6 +40,8 @@ export interface TableExplorerSearchState {
   editorMode: DetailPaneMode | null;
   view: TableExplorerView;
   filters: TableFilterClause[];
+  page: number;
+  pageSize: TablePageSize;
   rowId: TableRowId | null;
   sortColumn: string;
   sortDirection: TableSortDirection;

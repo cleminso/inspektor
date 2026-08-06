@@ -17,7 +17,7 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 const searchState = {
-  value: {} as Record<string, string | null | undefined>,
+  value: {} as Record<string, number | string | null | undefined>,
 };
 
 function captureSearchUpdater(): (current: unknown) => Record<string, unknown> {
@@ -41,6 +41,21 @@ afterEach(() => {
 });
 
 describe("useTableExplorerSearchParams", () => {
+  it("normalizes pagination search values", () => {
+    searchState.value = { page: 3, pageSize: 500 };
+
+    const { result, rerender } = renderHook(() => useTableExplorerSearchParams());
+
+    expect(result.current.page).toBe(3);
+    expect(result.current.pageSize).toBe(500);
+
+    searchState.value = { page: -2, pageSize: 250 };
+    rerender();
+
+    expect(result.current.page).toBe(1);
+    expect(result.current.pageSize).toBe(100);
+  });
+
   it("updates search params relative to the active route", () => {
     renderHook(() => useTableExplorerSearchParams());
 
@@ -97,5 +112,39 @@ describe("useTableExplorerSearchParams", () => {
     expect(nextSearch.tab).toBeUndefined();
     expect(nextSearch.mode).toBeUndefined();
     expect(nextSearch.rowId).toBeUndefined();
+  });
+
+  it("writes non-default pages and removes the first page from the URL", async () => {
+    const { result } = renderHook(() => useTableExplorerSearchParams());
+
+    await act(async () => {
+      await result.current.setPage(3);
+    });
+
+    expect(captureSearchUpdater()({ custom: "kept" })).toEqual({ custom: "kept", page: 3 });
+
+    navigateMock.mockReset();
+    await act(async () => {
+      await result.current.setPage(1);
+    });
+
+    expect(captureSearchUpdater()({ custom: "kept", page: 3 })).toEqual({ custom: "kept" });
+  });
+
+  it("resets the page and stores only non-default page sizes", async () => {
+    const { result } = renderHook(() => useTableExplorerSearchParams());
+
+    await act(async () => {
+      await result.current.setPageSize(500);
+    });
+
+    expect(captureSearchUpdater()({ page: 4 })).toEqual({ pageSize: 500 });
+
+    navigateMock.mockReset();
+    await act(async () => {
+      await result.current.setPageSize(100);
+    });
+
+    expect(captureSearchUpdater()({ page: 4, pageSize: 500 })).toEqual({});
   });
 });
