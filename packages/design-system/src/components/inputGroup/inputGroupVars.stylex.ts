@@ -11,8 +11,8 @@ import { backgroundColors, borderColors, textColors } from "../../tokens/semanti
 export const inputGroupVars = stylex.defineVars({
   backgroundColor: backgroundColors["bg-card"],
   borderColor: borderColors.border,
-  focusedBorderColor: borderColors["border-focused"],
-  outlineColor: borderColors["outline"],
+  focusedBorderColor: borderColors["border-input"],
+  outlineColor: borderColors["border-input-ring"],
   outlineWidth: "0px",
   textColor: textColors["text-default"],
 });

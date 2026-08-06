@@ -197,31 +197,75 @@ describe('Toaster', () => {
     expect(onUndo).toHaveBeenCalledOnce()
   })
 
-  it('deduplicates matching notifications and replays the pulse', async () => {
-    expect(stylex.props(toasterStyles.pulseOdd).className).not.toBe(
-      stylex.props(toasterStyles.pulseEven).className,
-    )
+  it('deduplicates matching notifications and pulses the mounted toast', async () => {
+    const animatePulse = vi.fn(() => ({ cancel: vi.fn() }) as unknown as Animation)
+    const originalAnimate = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'animate')
+    Object.defineProperty(HTMLElement.prototype, 'animate', {
+      configurable: true,
+      value: animatePulse,
+    })
 
-    render(<Toaster />)
+    try {
+      render(<Toaster />)
 
-    toasts.success('Draft saved', { preserve: true })
+      toasts.success('Draft saved', { preserve: true })
 
-    const toast = (await screen.findByText('Draft saved')).closest('[data-slot="toast"]')
-    expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(1)
-    expect(toast?.className).not.toContain(stylex.props(toasterStyles.pulseOdd).className)
-
-    toasts.success('Draft saved', { preserve: true })
-
-    await waitFor(() => {
+      const toast = (await screen.findByText('Draft saved')).closest('[data-slot="toast"]')
       expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(1)
-      expect(toast?.className).toContain(stylex.props(toasterStyles.pulseOdd).className)
+      expect(animatePulse).not.toHaveBeenCalled()
+
+      toasts.success('Draft saved', { preserve: true })
+
+      await waitFor(() => {
+        expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(1)
+        expect(animatePulse).toHaveBeenCalledOnce()
+      })
+      expect(toast).toBe(screen.getByText('Draft saved').closest('[data-slot="toast"]'))
+    } finally {
+      if (originalAnimate === undefined) {
+        delete (HTMLElement.prototype as Partial<HTMLElement>).animate
+      } else {
+        Object.defineProperty(HTMLElement.prototype, 'animate', originalAnimate)
+      }
+    }
+  })
+
+  it('does not pulse matching notifications when reduced motion is requested', async () => {
+    const animatePulse = vi.fn(() => ({ cancel: vi.fn() }) as unknown as Animation)
+    const originalAnimate = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'animate')
+    const originalMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia')
+    Object.defineProperty(HTMLElement.prototype, 'animate', {
+      configurable: true,
+      value: animatePulse,
+    })
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn(() => ({ matches: true }) as MediaQueryList),
     })
 
-    toasts.success('Draft saved', { preserve: true })
+    try {
+      render(<Toaster />)
 
-    await waitFor(() => {
-      expect(toast?.className).toContain(stylex.props(toasterStyles.pulseEven).className)
-    })
+      toasts.success('Draft saved', { preserve: true })
+      await screen.findByText('Draft saved')
+      toasts.success('Draft saved', { preserve: true })
+
+      await waitFor(() => {
+        expect(document.querySelectorAll('[data-slot="toast"]')).toHaveLength(1)
+      })
+      expect(animatePulse).not.toHaveBeenCalled()
+    } finally {
+      if (originalAnimate === undefined) {
+        delete (HTMLElement.prototype as Partial<HTMLElement>).animate
+      } else {
+        Object.defineProperty(HTMLElement.prototype, 'animate', originalAnimate)
+      }
+      if (originalMatchMedia === undefined) {
+        delete (window as Partial<Window>).matchMedia
+      } else {
+        Object.defineProperty(window, 'matchMedia', originalMatchMedia)
+      }
+    }
   })
 
   it('keeps matching notifications separate when they have distinct ids', async () => {

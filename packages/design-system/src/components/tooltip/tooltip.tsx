@@ -80,7 +80,7 @@ function TooltipRoot({
 
 const TooltipTrigger = React.forwardRef<React.ComponentRef<typeof BaseTooltip.Trigger>, TooltipTriggerProps>(
   function TooltipTrigger(
-    { delay = 600, closeOnClick = true, closeDelay = 0, disabled, render, ...props },
+    { delay = 500, closeOnClick = true, closeDelay = 0, disabled, render, ...props },
     ref,
   ) {
     const stateStyleProps =

@@ -2,6 +2,7 @@
 
 import { Toast as BaseToast } from '@base-ui/react/toast'
 import * as stylex from '@stylexjs/stylex'
+import { useEffect, useRef } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { Button } from '../button/button'
@@ -111,6 +112,56 @@ const stackOrderStyles = [
   toasterStyles.toastBack,
 ] as const
 
+const pulseKeyframes: Keyframe[] = [
+  { easing: 'cubic-bezier(0.23, 1, 0.32, 1)', offset: 0, scale: '1' },
+  { easing: 'cubic-bezier(0.77, 0, 0.175, 1)', offset: 0.4, scale: '1.02' },
+  { offset: 1, scale: '1' },
+]
+
+function getRenderedScale(element: HTMLElement): string {
+  const scale = window.getComputedStyle(element).scale
+  return scale === '' || scale === 'none' ? '1' : scale
+}
+
+function useToastPulse(updateKey: number | undefined) {
+  const elementRef = useRef<HTMLDivElement>(null)
+  const animationRef = useRef<Animation>(null)
+
+  useEffect(() => {
+    if (updateKey === undefined || updateKey <= 0) {
+      return
+    }
+
+    const element = elementRef.current
+    if (element === null || element.animate === undefined) {
+      return
+    }
+
+    const shouldReduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (shouldReduceMotion === true) {
+      animationRef.current?.cancel()
+      animationRef.current = null
+      return
+    }
+
+    const renderedScale = getRenderedScale(element)
+    animationRef.current?.cancel()
+    animationRef.current = element.animate(
+      [{ ...pulseKeyframes[0], scale: renderedScale }, ...pulseKeyframes.slice(1)],
+      { duration: 180 },
+    )
+  }, [updateKey])
+
+  useEffect(
+    () => () => {
+      animationRef.current?.cancel()
+    },
+    [],
+  )
+
+  return elementRef
+}
+
 function getToastStatus(type: string | undefined): ToastStatus {
   if (type === 'success' || type === 'warning' || type === 'error' || type === 'loading') {
     return type
@@ -118,98 +169,106 @@ function getToastStatus(type: string | undefined): ToastStatus {
   return 'message'
 }
 
+interface ToastItemProps {
+  index: number
+  toast: BaseToast.Root.ToastObject
+}
+
+function ToastItem({ index, toast }: ToastItemProps) {
+  const elementRef = useToastPulse(toast.updateKey)
+  const status = getToastStatus(toast.type)
+  const rootStyleProps = createStateStyleProps<BaseToast.Root.State>((state) => [
+    toasterStyles.toast,
+    stackOrderStyles[Math.min(index, stackOrderStyles.length - 1)],
+    state.expanded === true && toasterStyles.toastExpanded,
+    state.limited === true && toasterStyles.toastLimited,
+    state.transitionStatus === 'starting' && toasterStyles.toastStarting,
+    state.transitionStatus === 'ending' && toasterStyles.toastEnding,
+    state.transitionStatus === 'ending' &&
+      state.swipeDirection === 'left' &&
+      toasterStyles.toastEndingLeft,
+    state.transitionStatus === 'ending' &&
+      state.swipeDirection === 'right' &&
+      toasterStyles.toastEndingRight,
+    state.transitionStatus === 'ending' &&
+      state.swipeDirection === 'up' &&
+      toasterStyles.toastEndingUp,
+    state.transitionStatus === 'ending' &&
+      state.swipeDirection === 'down' &&
+      toasterStyles.toastEndingDown,
+    state.swiping === true && toasterStyles.toastSwiping,
+    state.swipeDirection === 'left' && toasterStyles.toastSwipeLeft,
+    state.swipeDirection === 'right' && toasterStyles.toastSwipeRight,
+    state.swipeDirection === 'up' && toasterStyles.toastSwipeUp,
+    state.swipeDirection === 'down' && toasterStyles.toastSwipeDown,
+  ])
+  const contentStyleProps = createStateStyleProps<BaseToast.Content.State>((state) => [
+    toasterStyles.content,
+    state.behind === true && toasterStyles.contentBehind,
+    state.expanded === true && toasterStyles.contentExpanded,
+  ])
+  const titleStyleProps = createStateStyleProps<BaseToast.Title.State>((state) => [
+    toasterStyles.title,
+    state.type !== undefined && titleStatusStyles[getToastStatus(state.type)],
+  ])
+
+  return (
+    <BaseToast.Root
+      ref={elementRef}
+      toast={toast}
+      swipeDirection={['down', 'right']}
+      {...rootStyleProps}
+      data-slot="toast"
+      data-status={status}
+    >
+      <BaseToast.Content {...contentStyleProps}>
+        <div {...stylex.props(toasterStyles.header)}>
+          <BaseToast.Title {...titleStyleProps} />
+          <div {...stylex.props(toasterStyles.controls)}>
+            <BaseToast.Action {...stylex.props(toasterStyles.action)} />
+            <BaseToast.Close
+              render={
+                <Button
+                  iconOnly
+                  aria-label="Dismiss notification"
+                  size="s"
+                  variant="ghost"
+                />
+              }
+            >
+              <svg
+                aria-hidden="true"
+                fill="none"
+                viewBox="0 0 16 16"
+                {...stylex.props(toasterStyles.closeIcon)}
+              >
+                <path
+                  d="M4.5 4.5l7 7m0-7-7 7"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="1.5"
+                />
+              </svg>
+            </BaseToast.Close>
+          </div>
+        </div>
+        {toast.description !== undefined && toast.description !== null ? (
+          <BaseToast.Description
+            {...stylex.props(toasterStyles.description)}
+            data-slot="toast-description"
+          />
+        ) : null}
+      </BaseToast.Content>
+    </BaseToast.Root>
+  )
+}
+
 function ToastList() {
   const { toasts: activeToasts } = BaseToast.useToastManager()
 
-  return activeToasts.map((toast, index) => {
-    const status = getToastStatus(toast.type)
-    const rootStyleProps = createStateStyleProps<BaseToast.Root.State>((state) => [
-      toasterStyles.toast,
-      stackOrderStyles[Math.min(index, stackOrderStyles.length - 1)],
-      toast.updateKey !== undefined &&
-        toast.updateKey > 0 &&
-        (toast.updateKey % 2 === 0 ? toasterStyles.pulseEven : toasterStyles.pulseOdd),
-      state.expanded === true && toasterStyles.toastExpanded,
-      state.limited === true && toasterStyles.toastLimited,
-      state.transitionStatus === 'starting' && toasterStyles.toastStarting,
-      state.transitionStatus === 'ending' && toasterStyles.toastEnding,
-      state.transitionStatus === 'ending' &&
-        state.swipeDirection === 'left' &&
-        toasterStyles.toastEndingLeft,
-      state.transitionStatus === 'ending' &&
-        state.swipeDirection === 'right' &&
-        toasterStyles.toastEndingRight,
-      state.transitionStatus === 'ending' &&
-        state.swipeDirection === 'up' &&
-        toasterStyles.toastEndingUp,
-      state.transitionStatus === 'ending' &&
-        state.swipeDirection === 'down' &&
-        toasterStyles.toastEndingDown,
-      state.swiping === true && toasterStyles.toastSwiping,
-      state.swipeDirection === 'left' && toasterStyles.toastSwipeLeft,
-      state.swipeDirection === 'right' && toasterStyles.toastSwipeRight,
-      state.swipeDirection === 'up' && toasterStyles.toastSwipeUp,
-      state.swipeDirection === 'down' && toasterStyles.toastSwipeDown,
-    ])
-    const contentStyleProps = createStateStyleProps<BaseToast.Content.State>((state) => [
-      toasterStyles.content,
-      state.behind === true && toasterStyles.contentBehind,
-      state.expanded === true && toasterStyles.contentExpanded,
-    ])
-    const titleStyleProps = createStateStyleProps<BaseToast.Title.State>((state) => [
-      toasterStyles.title,
-      state.type !== undefined && titleStatusStyles[getToastStatus(state.type)],
-    ])
-    return (
-      <BaseToast.Root
-        key={toast.id}
-        toast={toast}
-        swipeDirection={['down', 'right']}
-        {...rootStyleProps}
-        data-slot="toast"
-        data-status={status}
-      >
-        <BaseToast.Content {...contentStyleProps}>
-          <div {...stylex.props(toasterStyles.header)}>
-            <BaseToast.Title {...titleStyleProps} />
-            <div {...stylex.props(toasterStyles.controls)}>
-              <BaseToast.Action {...stylex.props(toasterStyles.action)} />
-              <BaseToast.Close
-                render={
-                  <Button
-                    iconOnly
-                    aria-label="Dismiss notification"
-                    size="s"
-                    variant="ghost"
-                  />
-                }
-              >
-                <svg
-                  aria-hidden="true"
-                  fill="none"
-                  viewBox="0 0 16 16"
-                  {...stylex.props(toasterStyles.closeIcon)}
-                >
-                  <path
-                    d="M4.5 4.5l7 7m0-7-7 7"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              </BaseToast.Close>
-            </div>
-          </div>
-          {toast.description !== undefined && toast.description !== null ? (
-            <BaseToast.Description
-              {...stylex.props(toasterStyles.description)}
-              data-slot="toast-description"
-            />
-          ) : null}
-        </BaseToast.Content>
-      </BaseToast.Root>
-    )
-  })
+  return activeToasts.map((toast, index) => (
+    <ToastItem key={toast.id} index={index} toast={toast} />
+  ))
 }
 
 export function Toaster(_props: ToasterProps) {

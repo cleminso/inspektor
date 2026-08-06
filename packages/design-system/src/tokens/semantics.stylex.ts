@@ -73,13 +73,17 @@ export const borderColors = stylex.defineVars({
   'border-table-header-cell': `light-dark(${palette.gray300}, ${palette.neutral700})`,
   'border-table-cell': `light-dark(${palette.gray200}, ${palette.neutral800})`,
   'border-table-column-active': `light-dark(${palette.blue500}, ${palette.blue500})`,
-  'outline': `light-dark(${palette.blue500}, ${palette.blue500})`,
+
   'border-table-cell-active': `light-dark(${palette.blue500}, ${palette.blue500})`,
 
   'border-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
   'border-danger': `light-dark(${palette.red500}, ${palette.red400})`,
   'border-danger-subtle': `light-dark(${palette.red200}, ${palette.red900})`,
   'border-success': `light-dark(${palette.green600}, ${palette.green300})`,
+
+  'outline': `light-dark(${palette.blue500}, ${palette.blue500})`,
+  'border-input-ring': `light-dark(${palette.blue200}, ${palette.blue900})`,
+  'border-input': `light-dark(${palette.blue500}, ${palette.blue500})`,
 } as const)
 
 export const syntaxColors = stylex.defineVars({

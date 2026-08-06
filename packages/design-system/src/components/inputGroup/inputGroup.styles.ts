@@ -28,8 +28,9 @@ export const inputGroupStyles = stylex.create({
     outlineWidth: inputGroupVars.outlineWidth,
     minWidth: 0,
   },
-  focusVisible: {
+  focused: {
     borderColor: inputGroupVars.focusedBorderColor,
+    outlineWidth: spatial["focus-ring-width"],
   },
   sizeS: {
     height: spatial["control-height-s"],

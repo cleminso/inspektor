@@ -16,6 +16,11 @@ This checklist tracks the reusable Input component.
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Show a solid blue border and subtle blue outer ring while standalone and grouped inputs are focused.
+- [x] Keep the neutral border and remove the outer ring while inputs are unfocused.
+
 [05/08/26]
 
 - [x] Provide constrained proportional and monospace font variants.
@@ -36,6 +41,11 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[06/08/26]
+
+- [x] Apply the focused treatment for pointer focus and focus-visible interaction.
+- [x] Let `InputGroup` own the focused border and ring for grouped inputs.
+
 [05/08/26]
 
 - [x] Expose font choice as a constrained `sans` or `mono` component prop rather than a styling escape hatch.
@@ -47,6 +57,11 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Run focused tests, typecheck, lint, and package build.
+- [ ] Verify standalone and grouped focus treatments in the browser.
 
 [05/08/26]
 

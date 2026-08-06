@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Retarget repeated-notification feedback from the toast's rendered scale with the Web Animations API.
+- [x] Use a restrained two-percent pulse with responsive easing for the professional dashboard context.
+- [x] Skip transform-based pulse feedback when reduced motion is requested or Web Animations are unavailable.
+
 [05/08/26]
 
 - [x] Let content determine toast height instead of reserving unused minimum-height space.
@@ -51,6 +57,11 @@
 
 ## Settled interaction decisions
 
+[06/08/26]
+
+- Repeated notifications pulse the existing mounted toast without replaying its entrance transition.
+- Rapid updates retarget the active pulse instead of stacking or restarting independent keyframe animations.
+
 [05/08/26]
 
 - Toast status changes only the title text color; the surface, border, description, and controls remain neutral.
@@ -69,6 +80,13 @@
 - None.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Run the focused toaster tests.
+- [x] Run focused lint for the toaster files.
+- [x] Verify repeated pulses retarget from the rendered scale on the same toast element.
+- [ ] Run the design-system typecheck and declaration build after the unrelated `border-input-subtle` token mismatch is resolved.
 
 [05/08/26]
 

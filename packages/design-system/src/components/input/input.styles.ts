@@ -12,10 +12,9 @@ import {
 export const inputStyles = stylex.create({
   base: {
     margin: 0,
-    // Editable controls match :focus-visible after pointer focus, so use :focus without a halo.
     borderColor: {
       default: borderColors.border,
-      ":focus": borderColors["border-focused"],
+      ":focus": borderColors["border-input"],
     },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
@@ -28,9 +27,13 @@ export const inputStyles = stylex.create({
     color: textColors["text-default"],
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    outlineColor: borderColors["outline"],
+    outlineColor: borderColors["border-input-ring"],
+    outlineOffset: 0,
     outlineStyle: "solid",
-    outlineWidth: 0,
+    outlineWidth: {
+      default: 0,
+      ":focus": spatial["focus-ring-width"],
+    },
     minWidth: 0,
     "::placeholder": {
       color: textColors["text-muted"],

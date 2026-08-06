@@ -101,10 +101,11 @@ function InputGroupRoot({
 }: InputGroupRootProps) {
   const field = useContext(FieldContext);
   const effectiveDisabled = disabled === true || field?.disabled === true;
+  const [focused, setFocused] = useState(false);
   const [focusVisible, setFocusVisible] = useState(false);
   const rootStyleProps = stylex.props(
     inputGroupStyles.root,
-    focusVisible === true && inputGroupStyles.focusVisible,
+    focused === true && inputGroupStyles.focused,
     sizeStyles[size],
     fullWidth === true && inputGroupStyles.fullWidth,
     invalid === true && inputGroupStyles.invalid,
@@ -118,8 +119,10 @@ function InputGroupRoot({
         data-slot="input-group"
         data-invalid={invalid === true ? "" : undefined}
         data-disabled={effectiveDisabled === true ? "" : undefined}
+        data-focused={focused === true ? "" : undefined}
         data-focus-visible={focusVisible === true ? "" : undefined}
         onFocusCapture={(event) => {
+          setFocused(true);
           setFocusVisible(event.target instanceof HTMLElement && event.target.matches(":focus-visible"));
         }}
         onBlurCapture={(event) => {
@@ -127,6 +130,7 @@ function InputGroupRoot({
             return;
           }
 
+          setFocused(false);
           setFocusVisible(false);
         }}
       >
