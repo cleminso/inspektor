@@ -21,6 +21,89 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [06/08/26]
 
+- [x] Use tabular numerals for the page label so equal-length page numbers retain one width.
+- [x] Remove row-ID resize lag and incomplete initial rendering by replacing measured middle truncation with CSS clipping.
+
+[06/08/26]
+
+- [x] Keep toolbar DOM order as content, pagination, then actions.
+- [x] Keep a 48-row virtual overscan and remove mocked virtualizer tests that only verified the mock implementation.
+- [x] Restrict virtual rendering to `DataGrid.Content`; custom `DataGrid.Body` children always render directly.
+- [x] Share speculative table-row subscription ownership between table-list and tab intent surfaces.
+- [x] Add deterministic ID tie-breaking, reject unsafe page values, and return empty out-of-range pages to page one.
+- [x] Stop preserving preceding rows when a replacement query rejects.
+- [x] Preserve guarded insert-save destinations instead of resetting their page.
+
+[06/08/26]
+
+- [x] Isolate the scrolling table behind a paint containment boundary so Chromium and WebKit can repaint it independently from the surrounding workspace.
+- [x] Remove the Data Grid vertical track's trailing inset so its thumb reaches the bottom edge at maximum vertical scroll.
+
+[06/08/26]
+
+- [x] Increase the virtual row buffer to 48 rows after removing body-cell drag registration so rapid scrolling keeps more painted content around the viewport.
+- [x] Mark the Data Grid viewport as a frequent scroll surface and disable supported-browser scroll anchoring that can override explicit page resets.
+- [x] Reset the viewport again when a page or page-size query moves from initial loading to ready so replacement rows cannot retain the previous offset.
+
+[06/08/26]
+
+- [x] Supersede direct rendering through 500 rows by virtualizing row models above the 100-row default.
+- [x] Reduce virtual overscan to 12 rows and keep the virtual item-key callback stable while the row model is unchanged.
+- [x] Disable dnd-kit's optimistic DOM reordering while preserving its keyboard plugin, then commit one TanStack column order on drop.
+- [x] Reset page scroll without key-remounting the Data Grid viewport.
+- [x] Keep schema-derived column definitions stable when only column order changes.
+- [x] Move live column-width propagation outside React and subscribe resize indicators to their own TanStack state.
+
+[06/08/26]
+
+- [x] Render row models through 500 records directly instead of trying to mask delayed browser painting with larger virtual overscan.
+- [x] Keep virtualization for larger row models with a bounded 60-row overscan.
+- [x] Move pagination after the table actions at the right edge of the toolbar.
+- [x] Align the reset-width tests with the schema-aware 294px identifier column width.
+
+[06/08/26]
+
+- [x] Restore the reserved source-header state and default sortable transition while a column drop settles.
+- [x] Preserve the last settled row range and page label while a page-size query loads, and disable page navigation until it resolves.
+- [x] Show `0–0 of 0` for empty results so row status retains the same information structure.
+- [x] Keep the page-size trigger at one compact width for 100, 500, and 1000 rows.
+- [x] Wrap previous-page and next-page icon actions with shared tooltips.
+- [x] Scale virtual overscan from 60 rows for small row models to 90 and 120 rows for larger models.
+
+[06/08/26]
+
+- [x] Keep body cells outside dnd-kit registration so header-drop work does not scale with every visible row cell, then apply the TanStack column order atomically on drop.
+- [x] Use a 24-row virtual overscan to keep mounted content ahead of rapid scrolling without making drag layout work measure an unnecessarily large table.
+- [x] Move the row status, compact page-size selector, previous, `Page x`, and next controls to the left side of the table toolbar and remove the product Data Grid footer.
+- [x] Show a truthful total lower bound while another page exists and an exact total when the final page proves it.
+- [x] Disable dnd-kit sortable transitions and post-drop header visuals so column order applies without a synthetic settling delay.
+
+[06/08/26]
+
+- [x] Replace cumulative 50-row loading with URL-backed pages using a 100-row default and constrained 100, 500, and 1000 row sizes.
+- [x] Query one page plus a sentinel row from its page-derived offset and expose previous and next navigation without claiming an unavailable total count.
+- [x] Virtualize the current page inside the existing semantic Data Grid table so scrolling and live column resizing only mount the visible row window plus overscan.
+- [x] Replace literal skeleton records with the shared spinner and visible `Loading rows` status.
+- [x] Prefetch inactive tabs using their stored page and page size as part of exact Jazz query identity.
+
+[06/08/26]
+
+- [x] Prefetch an inactive data tab's exact stored filter and sort query from settled pointer intent, keyboard focus, and pointer-down navigation intent.
+- [x] Keep tab prefetch bounded to one speculative subscription and release it after intent, closure, runtime replacement, or destination handoff.
+
+[06/08/26]
+
+- [x] Document the table-row prefetch, Jazz cache-entry reuse, subscription lifecycle, and grid-state projection in [Table row prefetch and query lifecycle](../tableRowsPrefetch.md).
+
+[06/08/26]
+
+- [x] Prefetch the exact default Jazz table-row subscription from settled pointer intent, keyboard focus, and pointer-down navigation intent.
+- [x] Reuse one shared query builder and options object for speculative and rendered table-row subscriptions.
+- [x] Replace the blank initial row-loading message with column-aligned Data Grid skeleton rows while preserving an accessible loading status.
+- [x] Surface failed Jazz row queries as errors instead of leaving the grid in an indefinite loading state.
+
+[06/08/26]
+
 - [x] Replace native browser titles on column-type markers, schema navigation, tab creation, dock controls, and theme controls with shared Tooltip composition.
 
 [05/08/26]
@@ -312,6 +395,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Open product work
 
+### Table query prefetch
+
+[06/08/26]
+
+- [ ] Replace the isolated alpha `SubscriptionsOrchestrator` adapter when Jazz exposes a supported prefetch API with shared pending work, release, and bounded retention.
+- [ ] Measure speculative query hit rate, transferred rows, failed queries, and duplicate server work before broadening prefetch beyond direct table navigation intent.
+- [ ] Decide whether durable inspected-row caching is an explicit opt-in; keep the default admin runtime non-persistent.
+
 ### Shared mutation draft and editing surfaces
 
 [28/07/26]
@@ -506,6 +597,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Query scope and pagination
 
+[06/08/26]
+
+- [x] Supersede cumulative load-more state with explicit page and page-size route identity.
+- [ ] Add count-query support before presenting an exact matching-row total.
+- [ ] Define selection behavior when rows leave the represented page because of live updates.
+
 [23/07/26]
 
 - [ ] Complete page-windowed browsing and explicit page identity in selection lifecycle rules.
@@ -528,6 +625,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Work outside the foundation scope
 
+[06/08/26]
+
+- [x] Supersede the earlier virtualization exclusion with fixed-height virtual rendering for standard Data Grid rows.
+- [ ] Keep dynamic-height expanded rows outside the virtual body until their measurement and focus behavior is specified.
+
 [05/08/26]
 
 These items were identified in the behavior design but intentionally excluded from the implemented foundation:
@@ -543,6 +645,13 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[06/08/26]
+
+- [x] Use 100 rows as the default page size and constrain alternatives to 500 and 1000 rows.
+- [x] Keep page controls honest without an exact total: show the represented row range, current page, and available previous or next navigation.
+- [x] Reset pagination to page one when filters, sorting, or page size change.
+- [x] Use a spinner with visible `Loading rows` copy instead of record-shaped skeleton placeholders.
 
 [05/08/26]
 
@@ -606,6 +715,54 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Cover the frequent-scroll viewport treatment, expanded virtual buffer, and query-completion scroll key with focused tests.
+- [x] Verify immediate 1000-row jumps keep rendered rows intersecting the viewport in the browser fixture.
+- [ ] Verify rapid scrolling and page-size reset behavior in a connected Orion session.
+
+[06/08/26]
+
+- [x] Verify focused Data Grid and Table Explorer regression tests.
+- [x] Verify design-system and Inspector typechecks and lints.
+- [x] Profile a large-grid header drag after removing optimistic DOM reordering.
+- [ ] Verify page-size round trips and virtual scrolling in a connected Safari or Orion session.
+
+[06/08/26]
+
+- [x] Cover the 309-row non-virtual boundary and the larger-model virtual window with focused Data Grid tests.
+- [x] Cover right-edge pagination order and the corrected schema-aware reset width with focused Inspector tests.
+- [ ] Verify the 309-row connected table in Orion or Safari; the automated browser does not provide those engines.
+
+[06/08/26]
+
+- [x] Cover settled pagination status during page-size loading, empty ranges, compact page-size width, page-navigation tooltips, dynamic overscan, and restored drop settling with focused tests.
+- [x] Verify the Select documentation fixture renders `width="compact"` at a fixed 72px.
+- [x] Verify a 1000-row Data Grid fixture mounts rows across immediate quarter-page jumps without an empty virtual window.
+- [x] Verify affected typechecks, lints, generated metadata checks, and production builds.
+
+[06/08/26]
+
+- [x] Cover page offsets, sentinel rows, route normalization, page-size reset, pagination controls, and exact paginated prefetch identity.
+- [x] Cover virtual row-window rendering, full scroll geometry, semantic row counts, and spinner loading presentation.
+- [x] Verify Inspector and design-system tests, typechecks, lints, generated metadata, and production builds.
+- [x] Verify a 1000-row Data Grid fixture keeps mounted rows bounded while scrolling across the complete page and preserves live column resizing.
+- [ ] Verify scrolling and live column resizing with 100, 500, and 1000 rows in a browser-held Inspector connection.
+
+[06/08/26]
+
+- [x] Cover inactive-tab focus, settled pointer intent, transient pointer cancellation, exact stored filter and sort resolution, and speculative release.
+- [x] Verify Inspector tests, typecheck, lint, and production build after adding tab prefetch.
+- [x] Verify design-system tests, typecheck, lint, generated metadata, and production builds after extending Tab View events.
+- [ ] Verify tab-to-table handoff with a browser-held Inspector connection; the automated browser profile has no saved connection.
+
+[06/08/26]
+
+- [x] Cover exact query identity, orchestrator ownership, pointer and keyboard intent, transient pointer cancellation, rejected query state, and skeleton row geometry with focused tests.
+- [x] Verify Inspector and design-system tests, typechecks, lints, and production builds.
+- [x] Verify generated Data Grid prop metadata, design-system documentation typecheck, and production build.
+- [ ] Repeat the recorded connected-table interaction with browser-held connection credentials; the automated browser profile has no saved Inspector connection.
 
 [06/08/26]
 
