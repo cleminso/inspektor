@@ -17,7 +17,6 @@ vi.mock("jazz-tools/react", () => {
 
   return {
     createJazzClient: vi.fn(),
-    JazzClientProvider: vi.fn(),
   };
 });
 

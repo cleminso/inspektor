@@ -21,6 +21,46 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [07/08/26]
 
+- [x] Persist stored schemas in Jazz's JSON wire representation without a cache reviver that can reinterpret unknown fields.
+
+[07/08/26]
+
+- [x] Scope preserved query rows to the Jazz manager that produced them so runtime replacement restores an explicit row-loading state.
+- [x] Read runtime client and schema once in the table-view state boundary and pass them to internal query and mutation hooks.
+- [x] Keep speculative row-editor module failures retryable before first lazy rendering without claiming in-place recovery for a rejected mounted lazy component.
+- [x] Cache decoded stored-schema metadata in memory after its first validated browser-storage read.
+- [x] Keep schema and permissions serialization behind independent memoization boundaries.
+- [x] Inline single-use table empty-content and insert-form preload lifecycle decisions at their owning render boundary.
+
+[07/08/26]
+
+- [x] Keep the row-editor pane visible while its deferred form module or requested live row resolves, with explicit `Loading editor` and `Loading row` status content.
+- [x] Render non-native row-editor field labels and the Insert more switch with elements that match their Base UI native contracts.
+- [x] Run the Inspector client through Jazz's registry-backed React lifecycle so rapid table navigation and development remounts cannot create overlapping WASM runtimes.
+
+[07/08/26]
+
+- [x] Restore the stored WASM schema from a versioned connection-and-schema cache so table navigation and grid columns remain stable across a document reload.
+- [x] Preserve Jazz `Uint8Array` schema values through an explicit cache codec and treat unavailable browser storage as an optional optimization.
+- [x] Subscribe table navigation, columns, queries, mutations, schema views, and prefetch to granular read-only runtime projections.
+- [x] Keep live rows uncached so reconnecting a table remains an explicit row-body loading state.
+
+[07/08/26]
+
+- [x] Keep the selected table toolbar and Data Grid mounted while the Jazz client and stored schema resolve, with loading limited to the row body.
+- [x] Keep unresolved schema navigation distinct from a resolved schema containing no tables so the dock never flashes a false empty state.
+- [x] Read table queries and mutations from the app-owned runtime client instead of inserting a Jazz React provider that remounts the workspace.
+- [x] Warm the insert-form chunk when the table workspace mounts while retaining the separate CodeMirror loading boundary.
+- [x] Disable schema and insert actions until both the runtime client and stored schema are available.
+
+[07/08/26]
+
+- [x] Remove the pristine empty-table sentence while retaining the viewport-independent toolbar Insert row action.
+- [x] Keep filtered-empty and row-query failure content distinct from pristine empty data.
+- [x] Present schema loading and runtime failure inside the selected-table workspace instead of returning a blank panel.
+
+[07/08/26]
+
 - [x] Keep schema-tab creation route-owned instead of reconciling tab state before navigation and again after navigation.
 - [x] Preserve tab-state identity when schema sanitization makes no semantic change so context consumers and persistence remain idle.
 - [x] Use the workspace provider's scope key as the single reset boundary for Table Explorer state.
@@ -403,6 +443,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Deferred row editor boundary
 
+[07/08/26]
+
+- [x] Share retryable edit and insert form loaders between direct-intent prefetch and `React.lazy` rendering.
+- [x] Prefetch the insert form from toolbar intent and the edit form from row-selection intent without importing either form into the base table graph.
+- [x] Keep the detail-pane structure stable and remove the visible row-editor loading sentence while the selected form resolves.
+- [x] Keep CodeMirror behind its independent deferred boundary.
+
 [30/07/26]
 
 - [x] Keep the active edited row available through a dedicated `useTableRowById` query when filters or pagination remove it from the visible grid query.
@@ -668,6 +715,17 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[07/08/26]
+
+- Live rows may remain visible only while a query refreshes through the same Jazz manager.
+- A replacement Jazz manager starts with row-body loading even when route and query identity are unchanged.
+- Failed speculative row-editor preloads may retry before lazy rendering; mounted lazy failures remain error-boundary failures.
+
+[07/08/26]
+
+- [x] Keep Insert row in the table toolbar as the sole pristine-empty insertion action instead of adding a synthetic data row.
+- [x] Do not introduce selected-row resolving or missing-row product states without evidence that the normal row-selection path requires them.
+
 [06/08/26]
 
 - [x] Use 100 rows as the default page size and constrain alternatives to 500 and 1000 rows.
@@ -737,6 +795,30 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[07/08/26]
+
+- [x] Cover plain-JSON schema-cache round trips for unknown fields that resemble the removed serialization tag.
+- [x] Verify focused runtime tests, Inspector typecheck and lint, and the production build.
+
+[07/08/26]
+
+- [x] Cover same-manager row preservation and replacement-manager loading behavior.
+- [x] Cover shared runtime inputs for table queries and mutations without duplicate projection subscriptions.
+- [x] Cover failed speculative editor preload retry and retained deferred bundle boundaries.
+- [x] Cover decoded schema-cache reuse without repeated browser-storage parsing.
+
+[07/08/26]
+
+- [x] Cover schema cache identity, malformed data, unavailable storage, and Jazz binary default round trips.
+- [x] Cover synchronous cached-schema hydration, independent schema publication, and projection-level render isolation.
+
+[07/08/26]
+
+- [x] Cover pristine, filtered, and failed row-query empty content with focused tests.
+- [x] Cover schema loading and runtime failure workspace states without exposing raw runtime errors.
+- [x] Cover retryable row-editor module loading, direct edit intent, direct insert intent, and static import boundaries.
+- [x] Verify the product build retains separate edit-form, insert-form, shared editor-fields, and CodeMirror chunks.
 
 [07/08/26]
 

@@ -1,16 +1,24 @@
 import { Box, CopyButton, Text } from "@inspector/ds";
+import { useMemo } from "react";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useRuntimePermissions, useRuntimeSchema } from "@app/providers/inspectorProvider";
 interface SchemaViewProps {
   tableName: string;
 }
 
 export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
-  const { runtime } = useInspector();
-  const tableSchema = runtime.wasmSchema?.[tableName] ?? null;
-  const tablePermissions = runtime.storedPermissions?.permissions?.[tableName] ?? null;
-  const schemaJson = JSON.stringify({ [tableName]: tableSchema }, null, 2);
-  const permissionsJson = JSON.stringify({ [tableName]: tablePermissions }, null, 2);
+  const wasmSchema = useRuntimeSchema();
+  const storedPermissions = useRuntimePermissions();
+  const tableSchema = wasmSchema?.[tableName] ?? null;
+  const tablePermissions = storedPermissions?.permissions?.[tableName] ?? null;
+  const schemaJson = useMemo(
+    () => JSON.stringify({ [tableName]: tableSchema }, null, 2),
+    [tableName, tableSchema],
+  );
+  const permissionsJson = useMemo(
+    () => JSON.stringify({ [tableName]: tablePermissions }, null, 2),
+    [tableName, tablePermissions],
+  );
 
   return (
     <Box minHeight={0} flex={1} flexDirection="column" overflow="hidden" backgroundColor="bg-page">

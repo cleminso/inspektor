@@ -2,7 +2,7 @@ import { Box, Button, Icon, TabView, Tooltip } from '@inspector/ds'
 import { Layers3, Plus, Table2 } from 'lucide-react'
 import { useRef } from 'react'
 
-import { useInspector } from '@app/providers/inspectorProvider'
+import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
 import {
   type TableRowsPrefetchTarget,
   useTableRowsPrefetchIntent,
@@ -19,15 +19,16 @@ interface TableTabsViewProps {
 
 export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactElement {
   const { activeTabId, activateTab, closeTab, openNewView, reorderTabs, tabs } = useTableTabs()
-  const { runtime } = useInspector()
+  const client = useRuntimeClient()
+  const wasmSchema = useRuntimeSchema()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
   const pointerIntentTabIdRef = useRef<string | null>(null)
   const focusedIntentTabIdRef = useRef<string | null>(null)
   const prefetchIntent = useTableRowsPrefetchIntent({
     activeKey: activeTabId,
     availableKeys: tabs.flatMap((tab) => (tab.kind === 'table' ? [tab.id] : [])),
-    client: runtime.client,
-    schema: runtime.wasmSchema,
+    client,
+    schema: wasmSchema,
   })
 
   const getPrefetchTarget = (tabId: string): TableRowsPrefetchTarget | null => {
@@ -39,8 +40,8 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
       tab === undefined ||
       tab.id === activeTabId ||
       tab.search.view === 'schema' ||
-      runtime.wasmSchema === null ||
-      Object.hasOwn(runtime.wasmSchema, tab.tableName) === false
+      wasmSchema === null ||
+      Object.hasOwn(wasmSchema, tab.tableName) === false
     ) {
       return null
     }

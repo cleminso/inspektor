@@ -6,9 +6,9 @@
  */
 import { useEffect, useMemo, useRef } from 'react'
 
-import { type DynamicTableRow } from 'jazz-tools'
+import { type DynamicTableRow, type WasmSchema } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/react'
 
-import { useInspector } from '@app/providers/inspectorProvider'
 import { buildTableRowsQuery, TABLE_ROWS_QUERY_OPTIONS } from '@tables/query/tableRowsQuery'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
@@ -36,11 +36,14 @@ function isColumnSortable(
   }
 }
 
-export interface UseTableRowsOptions {
+interface UseTableRowsOptions {
+  client: JazzClient | null
+  currentSchemaHash: string | null
   tableName: string | null
+  wasmSchema: WasmSchema | null
 }
 
-export interface UseTableRowsResult {
+interface UseTableRowsResult {
   columns: TableColumnMeta[]
   error: string | null
   goToNextPage: () => Promise<void>
@@ -60,6 +63,7 @@ export interface UseTableRowsResult {
 
 interface ResolvedRowsState {
   dataScopeKey: string
+  manager: JazzClient['manager'] | null
   queryKey: string
   rows: DynamicTableRow[]
 }
@@ -70,8 +74,12 @@ interface ResolvedRowsState {
  * The hook derives columns from stored Jazz runtime schema metadata and builds a generic
  * query from URL-backed filters and sorting, avoiding inspected-app generated code.
  */
-export function useTableRows({ tableName }: UseTableRowsOptions): UseTableRowsResult {
-  const { currentSchemaHash, runtime } = useInspector()
+export function useTableRows({
+  client,
+  currentSchemaHash,
+  tableName,
+  wasmSchema,
+}: UseTableRowsOptions): UseTableRowsResult {
   const { filters, page, pageSize, setPage, setPageSize, sortColumn, sortDirection } =
     useTableExplorerSearchParams()
   const queryKey = JSON.stringify({
@@ -86,8 +94,8 @@ export function useTableRows({ tableName }: UseTableRowsOptions): UseTableRowsRe
   const dataScopeKey = JSON.stringify({ currentSchemaHash, filters, page, pageSize, tableName })
 
   const schemaColumns = useMemo(
-    () => getTableColumns(runtime.wasmSchema, tableName),
-    [runtime.wasmSchema, tableName],
+    () => getTableColumns(wasmSchema, tableName),
+    [tableName, wasmSchema],
   )
 
   const columns = useMemo<TableColumnMeta[]>(() => {
@@ -112,7 +120,7 @@ export function useTableRows({ tableName }: UseTableRowsOptions): UseTableRowsRe
   }, [schemaColumns])
 
   const queryBuilder = useMemo(() => {
-    if (runtime.wasmSchema === null || tableName === null) {
+    if (wasmSchema === null || tableName === null) {
       return null
     }
 
@@ -120,31 +128,35 @@ export function useTableRows({ tableName }: UseTableRowsOptions): UseTableRowsRe
       filters,
       page,
       pageSize,
-      schema: runtime.wasmSchema,
+      schema: wasmSchema,
       sortColumn,
       sortDirection,
       tableName,
     })
-  }, [filters, page, pageSize, runtime.wasmSchema, sortColumn, sortDirection, tableName])
+  }, [filters, page, pageSize, sortColumn, sortDirection, tableName, wasmSchema])
 
   const queryState = useJazzQueryState<DynamicTableRow>(
+    client?.manager ?? null,
     queryBuilder ?? undefined,
     TABLE_ROWS_QUERY_OPTIONS,
   )
   const rows = queryState.data
   // Keep compatible rows during sort refreshes and pagination, but never carry them into another
-  // table, schema, filter set, page, or page-size scope.
+  // table, schema, filter set, page, page-size scope, or replacement Jazz manager.
   const resolvedRowsRef = useRef<ResolvedRowsState | null>(null)
   if (rows !== undefined) {
     resolvedRowsRef.current = {
       dataScopeKey,
+      manager: client?.manager ?? null,
       queryKey,
       rows,
     }
   }
   const previousRowsState = resolvedRowsRef.current
   const canPreserveRows =
-    queryState.status === 'pending' && previousRowsState?.dataScopeKey === dataScopeKey
+    queryState.status === 'pending' &&
+    previousRowsState?.dataScopeKey === dataScopeKey &&
+    previousRowsState.manager === client?.manager
   const resolvedRows = rows ?? (canPreserveRows === true ? previousRowsState.rows : EMPTY_ROWS)
   const hasNextPage = resolvedRows.length > pageSize
   const visibleRows = useMemo(
@@ -152,7 +164,9 @@ export function useTableRows({ tableName }: UseTableRowsOptions): UseTableRowsRe
     [hasNextPage, pageSize, resolvedRows],
   )
   const isPending = queryState.status === 'pending'
-  const isInitialLoading = isPending === true && canPreserveRows === false
+  const isRuntimeReady = client !== null && wasmSchema !== null
+  const isInitialLoading =
+    isRuntimeReady === false || (isPending === true && canPreserveRows === false)
   const isRefreshing =
     isPending === true && canPreserveRows === true && previousRowsState.queryKey !== queryKey
   const outOfRangePageKey =

@@ -5,7 +5,11 @@ import {
   type ContextSwitcherTriggerWidth,
 } from "@inspector/ds";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import {
+  useInspectorSessionState,
+  useRuntimeSchemaHashes,
+  useRuntimeSchemaHashesLoading,
+} from "@app/providers/inspectorProvider";
 
 interface SchemaSwitcherProps {
   size?: ContextSwitcherTriggerSize;
@@ -31,7 +35,9 @@ export function SchemaSwitcher({
   triggerLabel,
   width = "content",
 }: SchemaSwitcherProps = {}): React.ReactElement {
-  const { currentSchemaHash, runtime, switchSchema } = useInspector();
+  const { currentSchemaHash, switchSchema } = useInspectorSessionState();
+  const availableSchemaHashes = useRuntimeSchemaHashes();
+  const isSchemaHashesLoading = useRuntimeSchemaHashesLoading();
   const triggerText = triggerLabel ?? currentSchemaHash ?? "Select schema";
   const triggerTitle = triggerLabel ?? currentSchemaHash ?? undefined;
   const shouldTruncateCurrentSchema =
@@ -42,7 +48,7 @@ export function SchemaSwitcher({
       : triggerText;
   return (
     <ContextSwitcher.Root<string>
-      items={runtime.availableSchemaHashes}
+      items={availableSchemaHashes}
       value={currentSchemaHash}
       onValueChange={(schemaHash) => {
         if (schemaHash !== null) {
@@ -63,7 +69,7 @@ export function SchemaSwitcher({
       <ContextSwitcher.Content width="content">
         <ContextSwitcher.Search label="Search schemas" placeholder="Search schemas" />
         <ContextSwitcher.Viewport maxHeight="l">
-          {runtime.isLoading === true ? (
+          {isSchemaHashesLoading === true ? (
             <ContextSwitcher.Status>Loading schemas...</ContextSwitcher.Status>
           ) : (
             <>

@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { RelationValue } from "@inspector/ds";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import { buildRelationTableLink } from "@tables/routing/buildRelationTableLink";
 
 interface RelationCellLinkProps {
@@ -11,7 +11,7 @@ interface RelationCellLinkProps {
 }
 
 export function RelationCellLink({ relationId, relationTable }: RelationCellLinkProps): React.ReactElement {
-  const { currentConnectionId } = useInspector();
+  const { currentConnectionId } = useInspectorSessionState();
 
   if (currentConnectionId === null) {
     return <RelationValue id={relationId} />;

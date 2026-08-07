@@ -11,6 +11,30 @@
 
 ## Implemented foundation
 
+[07/08/26]
+
+- [x] Include branch identity in the projected runtime store so branch changes synchronously stop exposing the previous client.
+- [x] Derive workspace readiness from runtime resources and track schema-hash discovery independently.
+
+[07/08/26]
+
+- [x] Delegate Jazz client acquisition and shutdown to the SDK's registry-backed React provider instead of calling `createJazzClient` directly from an effect.
+- [x] Mount the Jazz client controller beside the structural workspace so its Suspense fallback never replaces or remounts route content.
+- [x] Project the registry-owned client into the app runtime store while keeping route and session state as the client configuration owner.
+
+[07/08/26]
+
+- [x] Keep one explicit route-owned Jazz runtime while exposing client, schema, schema hashes, permissions, errors, and loading through independent Nano Store projections.
+- [x] Publish client and stored schema independently so schema hashes and permissions cannot delay structural workspace restoration.
+- [x] Keep runtime identity in TanStack Router and the session store instead of duplicating it into Nano Stores.
+
+[07/08/26]
+
+- [x] Enter a saved runtime from its persisted branch and schema preference without blocking route rendering on schema-hash discovery.
+- [x] Fetch the Jazz client, stored schema, and schema hashes in parallel inside the runtime boundary.
+- [x] Keep optional stored permissions outside the critical runtime readiness path.
+- [x] Keep the connected workspace mounted while the runtime client becomes available instead of inserting a remounting Jazz provider wrapper.
+
 [31/07/26]
 
 - [x] Enter connected workspaces through the Tables route.
@@ -60,6 +84,21 @@
 
 ## Settled interaction decisions
 
+[07/08/26]
+
+- Branch changes create a fresh runtime projection before descendants render against the new route identity.
+- Schema-hash discovery does not block client and stored-schema workspace readiness.
+
+[07/08/26]
+
+- The runtime provider owns client creation and shutdown; Nano Store listener lifecycles do not own Jazz resources.
+- Runtime projection consumers are read-only, while navigation and refresh behavior remain explicit provider commands.
+
+[07/08/26]
+
+- Persisted runtime identity provides the optimistic route target; runtime loading validates and refreshes remote schema metadata.
+- Jazz query and mutation consumers receive the app-owned runtime client directly, so client readiness does not change the connected React tree shape.
+
 [31/07/26]
 
 - Connected entry flows open Tables without a header-level view switcher.
@@ -79,6 +118,16 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[07/08/26]
+
+- [x] Cover branch-keyed runtime replacement and branch-independent cached-schema hydration.
+- [x] Cover schema-hash pending presentation without a false empty switcher state.
+
+[07/08/26]
+
+- [x] Cover that permission publication does not rerender schema-only consumers.
+- [x] Cover that a cached schema is available before the fresh client and schema requests resolve.
 
 [30/07/26]
 

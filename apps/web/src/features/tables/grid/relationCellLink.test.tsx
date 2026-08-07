@@ -10,7 +10,7 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 vi.mock("@app/providers/inspectorProvider", () => ({
-  useInspector: () => ({
+  useInspectorSessionState: () => ({
     currentBranch: "main",
     currentConnectionId: "connection-1",
     currentSchemaHash: "schema-1",

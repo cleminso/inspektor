@@ -3,7 +3,11 @@ import { Link } from '@tanstack/react-router'
 import { Table2 } from 'lucide-react'
 import { useEffect, useEffectEvent } from 'react'
 
-import { useInspector } from '@app/providers/inspectorProvider'
+import {
+  useInspectorSessionState,
+  useRuntimeClient,
+  useRuntimeSchema,
+} from '@app/providers/inspectorProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 import { useTableRowsPrefetchIntent } from '@tables/query/useTableRowsPrefetchIntent'
 
@@ -17,6 +21,7 @@ export interface TableCheckedChangeOptions {
 
 interface TableListPaneProps {
   checkedTableNames: ReadonlySet<string>
+  isSchemaReady?: boolean
   pinnedTableNames: ReadonlySet<string>
   selectedTableName: string | null
   tables: string[]
@@ -56,6 +61,7 @@ function isTableSelectionInteraction(target: EventTarget | null): boolean {
 
 export function TableListPane({
   checkedTableNames,
+  isSchemaReady = true,
   pinnedTableNames,
   selectedTableName,
   tables,
@@ -66,7 +72,9 @@ export function TableListPane({
   onTableCheckedChange,
   onUnpinTables,
 }: TableListPaneProps): React.ReactElement {
-  const { currentConnectionId, runtime } = useInspector()
+  const { currentConnectionId } = useInspectorSessionState()
+  const client = useRuntimeClient()
+  const wasmSchema = useRuntimeSchema()
   const canBuildHref = currentConnectionId !== null
   const pinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName))
   const unpinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName) === false)
@@ -75,8 +83,8 @@ export function TableListPane({
   const prefetchIntent = useTableRowsPrefetchIntent({
     activeKey: selectedTableName,
     availableKeys: tables,
-    client: runtime.client,
-    schema: runtime.wasmSchema,
+    client,
+    schema: wasmSchema,
   })
 
   useEffect(() => {
@@ -294,7 +302,7 @@ export function TableListPane({
                 paddingTop="xxs"
                 flexDirection="column"
               >
-                {tables.length === 0 ? (
+                {isSchemaReady === false ? null : tables.length === 0 ? (
                   <Box
                     padding="m"
                     flexDirection="column"

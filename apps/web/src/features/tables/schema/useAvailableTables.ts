@@ -6,10 +6,10 @@
  */
 import { useMemo } from "react";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useRuntimeSchema } from "@app/providers/inspectorProvider";
 import { getTableNames } from "@tables/schema/tableSchema";
 
-export interface UseAvailableTablesResult {
+interface UseAvailableTablesResult {
   tables: string[];
   hasTables: boolean;
   isSchemaReady: boolean;
@@ -19,20 +19,20 @@ export interface UseAvailableTablesResult {
  * Reads table navigation data from the active Inspector runtime.
  *
  * The Inspector does not import generated app schema code. Instead, it gets table names
- * from `runtime.wasmSchema`, which is the Jazz stored schema metadata loaded for the
+ * from the runtime schema projection, which is the Jazz stored schema metadata loaded for the
  * active connection and schema hash.
  */
 export function useAvailableTables(): UseAvailableTablesResult {
-  const { runtime } = useInspector();
+  const wasmSchema = useRuntimeSchema();
 
   return useMemo(() => {
-    const tables = getTableNames(runtime.wasmSchema);
+    const tables = getTableNames(wasmSchema);
 
     return {
       tables,
       hasTables: tables.length > 0,
       // Distinguishes "schema still loading" from "schema loaded but contains no tables".
-      isSchemaReady: runtime.wasmSchema !== null,
+      isSchemaReady: wasmSchema !== null,
     };
-  }, [runtime.wasmSchema]);
+  }, [wasmSchema]);
 }

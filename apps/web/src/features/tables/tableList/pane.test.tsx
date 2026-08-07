@@ -13,15 +13,9 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspector: () => ({
-    currentBranch: 'main',
-    currentConnectionId: 'connection',
-    currentSchemaHash: 'schema',
-    runtime: {
-      client: { manager: {} },
-      wasmSchema: { users: { columns: [] } },
-    },
-  }),
+  useInspectorSessionState: () => ({ currentConnectionId: 'connection' }),
+  useRuntimeClient: () => ({ manager: {} }),
+  useRuntimeSchema: () => ({ users: { columns: [] } }),
 }))
 
 vi.mock('@tables/query/tableRowsPrefetch', () => ({
@@ -48,6 +42,24 @@ describe('TableListPane', () => {
     onReplaceSelection: vi.fn(),
     onUnpinTables: vi.fn(),
   }
+
+  it('does not present schema loading as an empty table list', () => {
+    render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        isSchemaReady={false}
+        selectedTableName={null}
+        tables={[]}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('TABLES')).toBeTruthy()
+    expect(screen.queryByText('No tables')).toBeNull()
+    expect(screen.queryByText('No published tables found in this schema.')).toBeNull()
+  })
 
   it('keeps table overflow inside the expanded accordion panel', () => {
     const { container } = render(

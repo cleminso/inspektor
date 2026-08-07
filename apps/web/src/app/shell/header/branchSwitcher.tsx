@@ -5,7 +5,7 @@ import {
   type ContextSwitcherTriggerWidth,
 } from "@inspector/ds";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 
 interface BranchSwitcherProps {
   size?: ContextSwitcherTriggerSize;
@@ -18,7 +18,7 @@ export function BranchSwitcher({
   triggerLabel,
   width = "content",
 }: BranchSwitcherProps = {}): React.ReactElement {
-  const { currentBranch, rememberedBranches, switchBranch } = useInspector();
+  const { currentBranch, rememberedBranches, switchBranch } = useInspectorSessionState();
   return (
     <ContextSwitcher.Root<string>
       items={rememberedBranches}

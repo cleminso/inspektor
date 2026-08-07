@@ -65,7 +65,7 @@ vi.mock("@inspector/ds", async (importOriginal) => {
 });
 
 vi.mock("@app/providers/inspectorProvider", () => ({
-  useInspector: () => ({
+  useInspectorSessionState: () => ({
     currentBranch: "main",
     currentConnectionId: "connection-1",
     currentSchemaHash: "schema-1",
@@ -77,6 +77,22 @@ const schemaColumns = [
   { name: "age", column_type: { type: "Integer" }, nullable: false },
   { name: "active", column_type: { type: "Boolean" }, nullable: false },
 ] satisfies ColumnDescriptor[];
+
+describe("EditRowForm loading state", () => {
+  it("identifies a requested row as loading while its live query reconnects", () => {
+    render(
+      <EditRowForm
+        onSave={vi.fn()}
+        rowValues={null}
+        schemaColumns={schemaColumns}
+        targetRowId="row-1"
+      />,
+    );
+
+    expect(screen.getByRole("status").textContent).toContain("Loading row");
+    expect(screen.queryByText("Select a row from the data table to edit it.")).toBeNull();
+  });
+});
 
 const rowValues = {
   active: true,

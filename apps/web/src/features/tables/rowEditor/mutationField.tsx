@@ -18,7 +18,7 @@ import {
   ToggleGroup,
 } from "@inspector/ds";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import {
   formatColumnNameLabel,
   formatColumnTypeLabel,
@@ -164,7 +164,7 @@ export function MutationField({
   onTextChange,
   readOnlyReason,
 }: MutationFieldProps): React.ReactElement {
-  const { currentConnectionId } = useInspector();
+  const { currentConnectionId } = useInspectorSessionState();
   const label = formatColumnNameLabel(column.name);
   const fieldId = `row-editor-${column.name}`;
   const fieldLabelId = `${fieldId}-label`;
@@ -279,6 +279,7 @@ export function MutationField({
             id={fieldLabelId}
             htmlFor={usesNonNativeControl === true ? undefined : fieldId}
             nativeLabel={usesNonNativeControl === false}
+            render={usesNonNativeControl === true ? <Text as="span" /> : undefined}
             onClickCapture={
               isEditableStructuredColumn === true
                 ? (event) => {
@@ -289,7 +290,7 @@ export function MutationField({
                 : undefined
             }
           >
-            <Text as="span">{label}</Text>
+            {usesNonNativeControl === true ? label : <Text as="span">{label}</Text>}
           </Field.Label>
         </Box>
         {isEditableStructuredColumn === true &&
@@ -462,7 +463,7 @@ export function MutationField({
               font="mono"
               value={fieldState.text}
               disabled={fieldState.isNull === true}
-              readOnly={isReadOnly || isBinaryColumn === true}
+              readOnly={isReadOnly === true || isBinaryColumn === true}
               onValueChange={onTextChange}
             />
             {column.nullable === true && readOnlyReason === null ? (

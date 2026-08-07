@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchServerSubscriptions } from "jazz-tools";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import type { QuerySubscriptionRow } from "@queries/telemetry/types";
 
 const LIVE_QUERY_POLL_MS = 20_000;
@@ -52,7 +52,7 @@ interface QuerySubscriptionTelemetryState {
  * instead of the Inspector's own background reads.
  */
 export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
-  const { activeConnection } = useInspector();
+  const { activeConnection } = useInspectorSessionState();
   const connectionConfig = useMemo<QuerySubscriptionConnectionConfig | null>(() => {
     if (
       activeConnection === null ||

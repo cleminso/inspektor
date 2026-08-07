@@ -11,7 +11,7 @@ export type GenericWhereValue = unknown | { [op: string]: unknown };
 
 export type GenericWhereInput = Record<string, GenericWhereValue>;
 
-/** QueryBuilder implementation that lets `useAll(...)` query runtime-selected tables. */
+/** QueryBuilder implementation for subscriptions against runtime-selected tables. */
 export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
   readonly _table: string;
   readonly _schema: WasmSchema;

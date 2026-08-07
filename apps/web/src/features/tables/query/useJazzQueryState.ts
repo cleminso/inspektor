@@ -1,5 +1,5 @@
 import type { QueryBuilder, QueryOptions } from 'jazz-tools'
-import { useJazzClient } from 'jazz-tools/react'
+import type { JazzClient } from 'jazz-tools/react'
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 
 /** Stable state projection exposed by one Jazz orchestrator cache entry. */
@@ -15,6 +15,8 @@ const IDLE_QUERY_STATE = {
   error: null,
 } as const satisfies JazzQueryState<never>
 
+type JazzQueryManager = Pick<JazzClient['manager'], 'getCacheEntry' | 'makeQueryKey'>
+
 /**
  * Subscribes React to the canonical Jazz cache entry for a query.
  *
@@ -23,12 +25,12 @@ const IDLE_QUERY_STATE = {
  * same builder serialization and options therefore share pending and fulfilled work.
  */
 export function useJazzQueryState<T extends { id: string }>(
+  manager: JazzQueryManager | null,
   query: QueryBuilder<T> | undefined,
   options?: QueryOptions,
 ): JazzQueryState<T> {
-  const { manager } = useJazzClient()
   const entry = useMemo(() => {
-    if (query === undefined) {
+    if (manager === null || query === undefined) {
       return null
     }
 

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { MutationField } from "@tables/rowEditor/mutationField";
 
 vi.mock("@app/providers/inspectorProvider", () => ({
-  useInspector: () => ({
+  useInspectorSessionState: () => ({
     currentBranch: "main",
     currentConnectionId: "connection-1",
     currentSchemaHash: "schema-1",

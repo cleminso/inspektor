@@ -4,18 +4,26 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useTableRowById } from "@tables/query/useTableRowById";
 
-const { builderCalls, queryRows, useAllMock } = vi.hoisted(() => ({
+const { builderCalls, manager, queryRows, useJazzQueryStateMock } = vi.hoisted(() => ({
   builderCalls: {
     limit: vi.fn(),
     offset: vi.fn(),
     where: vi.fn(),
   },
+  manager: {},
   queryRows: { value: undefined as DynamicTableRow[] | undefined },
-  useAllMock: vi.fn(() => queryRows.value),
+  useJazzQueryStateMock: vi.fn(() => ({
+    status: queryRows.value === undefined ? "pending" : "fulfilled",
+    data: queryRows.value,
+    error: null,
+  })),
 }));
 
+let runtimeClient: { manager: Record<string, never> } | null;
+
 vi.mock("@app/providers/inspectorProvider", () => ({
-  useInspector: () => ({ runtime: { wasmSchema: {} } }),
+  useRuntimeClient: () => runtimeClient,
+  useRuntimeSchema: () => ({}),
 }));
 
 vi.mock("@tables/query/genericQueryBuilder", () => ({
@@ -35,14 +43,17 @@ vi.mock("@tables/query/genericQueryBuilder", () => ({
   },
 }));
 
-vi.mock("jazz-tools/react", () => ({ useAll: useAllMock }));
+vi.mock("@tables/query/useJazzQueryState", () => ({
+  useJazzQueryState: useJazzQueryStateMock,
+}));
 
 beforeEach(() => {
   queryRows.value = undefined;
+  runtimeClient = { manager };
   builderCalls.limit.mockClear();
   builderCalls.offset.mockClear();
   builderCalls.where.mockClear();
-  useAllMock.mockClear();
+  useJazzQueryStateMock.mockClear();
 });
 
 describe("useTableRowById", () => {
@@ -55,7 +66,7 @@ describe("useTableRowById", () => {
     expect(builderCalls.where).toHaveBeenCalledWith({ id: "row-1" });
     expect(builderCalls.limit).toHaveBeenCalledWith(1);
     expect(builderCalls.offset).toHaveBeenCalledWith(0);
-    expect(useAllMock).toHaveBeenCalledWith(expect.anything(), {
+    expect(useJazzQueryStateMock).toHaveBeenCalledWith(manager, expect.anything(), {
       propagation: "full",
       visibility: "hidden_from_live_query_list",
     });
@@ -68,7 +79,19 @@ describe("useTableRowById", () => {
 
     expect(result.current).toBeNull();
     expect(builderCalls.where).not.toHaveBeenCalled();
-    expect(useAllMock).toHaveBeenCalledWith(undefined, {
+    expect(useJazzQueryStateMock).toHaveBeenCalledWith(manager, undefined, {
+      propagation: "full",
+      visibility: "hidden_from_live_query_list",
+    });
+  });
+
+  it("stays idle without a runtime client provider", () => {
+    runtimeClient = null;
+
+    const { result } = renderHook(() => useTableRowById({ rowId: "row-1", tableName: "users" }));
+
+    expect(result.current).toBeNull();
+    expect(useJazzQueryStateMock).toHaveBeenCalledWith(null, expect.anything(), {
       propagation: "full",
       visibility: "hidden_from_live_query_list",
     });

@@ -47,7 +47,17 @@ export function EditRowForm({
   targetRowId,
 }: EditRowFormProps): React.ReactElement {
   if (rowValues === null) {
-    return <Text color="muted">Select a row from the data table to edit it.</Text>;
+    return (
+      <Box
+        height="full"
+        alignItems="center"
+        justifyContent="center"
+        role="status"
+        aria-live="polite"
+      >
+        <Text color="muted">Loading row</Text>
+      </Box>
+    );
   }
 
   return (

@@ -1,17 +1,38 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchSchemaHashes, fetchStoredPermissions, fetchStoredWasmSchema, type StoredPermissionsResponse, type WasmSchema } from "jazz-tools";
-import { createJazzClient, type JazzClient } from "jazz-tools/react";
+import { useEffect, useMemo } from "react";
+import { atom, type ReadableAtom, type WritableAtom } from "nanostores";
+
+import {
+  fetchSchemaHashes,
+  fetchStoredPermissions,
+  fetchStoredWasmSchema,
+  type StoredPermissionsResponse,
+  type WasmSchema,
+} from "jazz-tools";
+import type { JazzClient } from "jazz-tools/react";
 
 import type { StoredConnection } from "@app/connections/connections";
+import { readCachedWasmSchema, writeCachedWasmSchema } from "@app/runtime/wasmSchemaCache";
 
-export interface InspectorRuntimeState {
-  client: JazzClient | null;
-  wasmSchema: WasmSchema | null;
-  storedPermissions: StoredPermissionsResponse | null;
-  availableSchemaHashes: string[];
-  error: string | null;
-  isLoading: boolean;
+export interface InspectorRuntimeStore {
+  $availableSchemaHashes: ReadableAtom<readonly string[]>;
+  $client: ReadableAtom<JazzClient | null>;
+  $error: ReadableAtom<string | null>;
+  $isSchemaHashesLoading: ReadableAtom<boolean>;
+  $storedPermissions: ReadableAtom<StoredPermissionsResponse | null>;
+  $wasmSchema: ReadableAtom<WasmSchema | null>;
+  clearClient: (client: JazzClient) => void;
   clearRuntime: () => void;
+  publishClient: (client: JazzClient) => void;
+  publishClientError: (error: unknown) => void;
+}
+
+interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
+  $availableSchemaHashes: WritableAtom<readonly string[]>;
+  $client: WritableAtom<JazzClient | null>;
+  $error: WritableAtom<string | null>;
+  $isSchemaHashesLoading: WritableAtom<boolean>;
+  $storedPermissions: WritableAtom<StoredPermissionsResponse | null>;
+  $wasmSchema: WritableAtom<WasmSchema | null>;
 }
 
 interface UseInspectorRuntimeOptions {
@@ -21,158 +42,155 @@ interface UseInspectorRuntimeOptions {
   initialSchemaHashes?: readonly string[];
 }
 
-/**
- * Owns the Inspector's Jazz runtime for the selected connection, branch, and schema hash.
- *
- * It creates an in-memory Jazz admin client, loads the stored WASM schema metadata used
- * by the generic data explorer, fetches available schema hashes, and exposes stored
- * permissions when the server can provide them.
- *
- * It starts async work in an effect, then stores resolved data in React state.
- * Consumers read `runtime.wasmSchema`, `runtime.client`, etc.
- */
+function createInspectorRuntimeStore(
+  initialSchema: WasmSchema | null,
+  isSchemaHashesLoading: boolean,
+): MutableInspectorRuntimeStore {
+  const $client = atom<JazzClient | null>(null);
+  const $wasmSchema = atom<WasmSchema | null>(initialSchema);
+  const $storedPermissions = atom<StoredPermissionsResponse | null>(null);
+  const $availableSchemaHashes = atom<readonly string[]>([]);
+  const $error = atom<string | null>(null);
+  const $isSchemaHashesLoading = atom(isSchemaHashesLoading);
+
+  const publishClient = (client: JazzClient) => {
+    $client.set(client);
+  };
+
+  const clearClient = (client: JazzClient) => {
+    // Cleanup from an old provider must not clear a replacement client published into this store.
+    if ($client.get() === client) {
+      $client.set(null);
+    }
+  };
+
+  const publishClientError = (error: unknown) => {
+    $client.set(null);
+    $error.set(error instanceof Error ? error.message : String(error));
+  };
+
+  const clearRuntime = () => {
+    $client.set(null);
+    $wasmSchema.set(null);
+    $storedPermissions.set(null);
+    $availableSchemaHashes.set([]);
+    $isSchemaHashesLoading.set(false);
+    $error.set(null);
+  };
+
+  return {
+    $availableSchemaHashes,
+    $client,
+    $error,
+    $isSchemaHashesLoading,
+    $storedPermissions,
+    $wasmSchema,
+    clearClient,
+    clearRuntime,
+    publishClient,
+    publishClientError,
+  };
+}
+
+/** Synchronizes Jazz metadata into independently subscribable runtime projection stores. */
 export function useInspectorRuntime({
   connection,
   branch,
   schemaHash,
   initialSchemaHashes,
-}: UseInspectorRuntimeOptions): InspectorRuntimeState {
-  const [client, setClient] = useState<JazzClient | null>(null);
-  const [wasmSchema, setWasmSchema] = useState<WasmSchema | null>(null);
-  const [storedPermissions, setStoredPermissions] = useState<StoredPermissionsResponse | null>(null);
-  const [availableSchemaHashes, setAvailableSchemaHashes] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Shut down the active client before dropping schema-dependent runtime state.
-  const clearRuntime = useCallback(() => {
-    setClient((currentClient) => {
-      if (currentClient !== null) {
-        void currentClient.shutdown();
-      }
-      return null;
-    });
-    setWasmSchema(null);
-    setStoredPermissions(null);
-  }, []);
+}: UseInspectorRuntimeOptions): InspectorRuntimeStore {
+  const shouldDiscoverSchemaHashes =
+    initialSchemaHashes === undefined || initialSchemaHashes.length === 0;
+  const runtime = useMemo(
+    () =>
+      createInspectorRuntimeStore(
+        connection !== null && schemaHash !== null
+          ? readCachedWasmSchema(connection, schemaHash)
+          : null,
+        connection !== null &&
+          branch !== null &&
+          schemaHash !== null &&
+          shouldDiscoverSchemaHashes,
+      ),
+    [branch, connection, schemaHash, shouldDiscoverSchemaHashes],
+  );
 
   useEffect(() => {
     if (connection === null || branch === null || schemaHash === null) {
-      clearRuntime();
-      setAvailableSchemaHashes([]);
-      setError(null);
-      setIsLoading(false);
+      runtime.clearRuntime();
       return;
     }
 
-    // Guards against stale async work updating state after the selected runtime changes.
     let active = true;
-    const isActive = () => active;
-    let runtimeClient: JazzClient | null = null;
-
-    setError(null);
-    setIsLoading(true);
-
-    const run = async () => {
-      try {
-        runtimeClient = await createJazzClient({
-          appId: connection.appId,
-          serverUrl: connection.serverUrl,
-          env: connection.env,
-          userBranch: branch,
-          adminSecret: connection.adminSecret,
-          driver: { type: "memory" },
-        });
-
-        if (isActive() === false) {
-          // The user selected a different runtime while client creation was in flight.
-          void runtimeClient.shutdown();
-          runtimeClient = null;
-          return;
-        }
-
-        const schemaHashesRequest =
-          initialSchemaHashes !== undefined && initialSchemaHashes.length > 0
-            ? Promise.resolve({ hashes: [...initialSchemaHashes] })
-            : fetchSchemaHashes(connection.serverUrl, {
-                appId: connection.appId,
-                adminSecret: connection.adminSecret,
-              });
-        const [{ schema }, { hashes }, permissions] = await Promise.all([
-          fetchStoredWasmSchema(connection.serverUrl, {
-            appId: connection.appId,
-            adminSecret: connection.adminSecret,
-            schemaHash,
-          }),
-          schemaHashesRequest,
-          // Permissions enrich the UI but should not block the runtime if unavailable.
-          fetchStoredPermissions(connection.serverUrl, {
-            appId: connection.appId,
-            adminSecret: connection.adminSecret,
-          }).catch(() => null),
-        ]);
-
-        if (isActive() === false) {
-          // Schema/hash requests can finish after navigation; discard their client and data.
-          if (runtimeClient !== null) {
-            void runtimeClient.shutdown();
-            runtimeClient = null;
-          }
-          return;
-        }
-
-        const nextClient = runtimeClient;
-
-        setClient((currentClient) => {
-          if (currentClient !== null) {
-            void currentClient.shutdown();
-          }
-          return nextClient;
-        });
-        setWasmSchema(schema);
-        setStoredPermissions(permissions);
-        setAvailableSchemaHashes(hashes);
-        setIsLoading(false);
-      } catch (runtimeError) {
-        if (runtimeClient !== null) {
-          void runtimeClient.shutdown();
-          runtimeClient = null;
-        }
-
-        if (isActive() === false) {
-          return;
-        }
-
-        setError(runtimeError instanceof Error ? runtimeError.message : String(runtimeError));
-        setIsLoading(false);
+    const failRuntime = (error: unknown) => {
+      if (active === false) {
+        return;
       }
+      runtime.$error.set(error instanceof Error ? error.message : String(error));
     };
 
-    clearRuntime();
-    void run();
+    runtime.$error.set(null);
+    runtime.$storedPermissions.set(null);
+    runtime.$availableSchemaHashes.set(
+      initialSchemaHashes !== undefined ? [...initialSchemaHashes] : [],
+    );
+
+    const schemaRequest = fetchStoredWasmSchema(connection.serverUrl, {
+      appId: connection.appId,
+      adminSecret: connection.adminSecret,
+      schemaHash,
+    }).then(({ schema }) => {
+      if (active === false) {
+        return;
+      }
+      runtime.$wasmSchema.set(schema);
+      writeCachedWasmSchema(connection, schemaHash, schema);
+    });
+
+    if (shouldDiscoverSchemaHashes === true) {
+      void fetchSchemaHashes(connection.serverUrl, {
+        appId: connection.appId,
+        adminSecret: connection.adminSecret,
+      }).then(
+        ({ hashes }) => {
+          if (active === true) {
+            runtime.$availableSchemaHashes.set(hashes);
+            runtime.$isSchemaHashesLoading.set(false);
+          }
+        },
+        () => {
+          if (active === true) {
+            runtime.$isSchemaHashesLoading.set(false);
+          }
+        },
+      );
+    }
+
+    void fetchStoredPermissions(connection.serverUrl, {
+      appId: connection.appId,
+      adminSecret: connection.adminSecret,
+    }).then(
+      (permissions) => {
+        if (active === true) {
+          runtime.$storedPermissions.set(permissions);
+        }
+      },
+      () => undefined,
+    );
+
+    void schemaRequest.catch(failRuntime);
 
     return () => {
       active = false;
-      if (runtimeClient !== null) {
-        const clientToShutdown = runtimeClient;
-        runtimeClient = null;
-        void clientToShutdown.shutdown();
-        setClient((currentClient) => (currentClient === clientToShutdown ? null : currentClient));
-      }
     };
-  }, [branch, clearRuntime, connection, initialSchemaHashes, schemaHash]);
+  }, [
+    branch,
+    connection,
+    initialSchemaHashes,
+    runtime,
+    schemaHash,
+    shouldDiscoverSchemaHashes,
+  ]);
 
-  // Keep the returned object stable for consumers that use it in dependency arrays.
-  return useMemo(
-    () => ({
-      client,
-      wasmSchema,
-      storedPermissions,
-      availableSchemaHashes,
-      error,
-      isLoading,
-      clearRuntime,
-    }),
-    [availableSchemaHashes, clearRuntime, client, error, isLoading, storedPermissions, wasmSchema],
-  );
+  return runtime;
 }

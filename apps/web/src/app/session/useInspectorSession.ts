@@ -39,7 +39,7 @@ export interface UseInspectorSessionResult {
   resolveBranch: (connectionId: string, branch?: string | null) => string;
   resolveSchemaHash: (
     connectionId: string,
-    availableSchemaHashes: string[],
+    availableSchemaHashes: readonly string[],
     schemaHash?: string | null,
   ) => string | null;
   saveConnection: (draft: ConnectionDraft, connectionId?: string) => StoredConnection;
@@ -122,7 +122,7 @@ export function useInspectorSession(): UseInspectorSessionResult {
         getStoredConnectionPreferences(state.store, connectionId).rememberedBranches,
       resolveBranch: (connectionId: string, branch?: string | null) =>
         resolveDefaultBranch(state.store, connectionId, branch),
-      resolveSchemaHash: (connectionId: string, availableSchemaHashes: string[], schemaHash?: string | null) =>
+      resolveSchemaHash: (connectionId: string, availableSchemaHashes: readonly string[], schemaHash?: string | null) =>
         resolveDefaultSchemaHash(state.store, connectionId, availableSchemaHashes, schemaHash),
       saveConnection,
       deleteConnection,

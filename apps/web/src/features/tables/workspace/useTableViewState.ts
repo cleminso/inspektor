@@ -11,7 +11,11 @@ import type { DataGridCellTarget, DataGridTable } from '@inspector/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
 import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
 
-import { useInspector } from '@app/providers/inspectorProvider'
+import {
+  useInspectorSessionState,
+  useRuntimeClient,
+  useRuntimeSchema,
+} from '@app/providers/inspectorProvider'
 import { useColumnVisibility } from '@tables/grid/useColumnVisibility'
 import type { RowSelectionRequest } from '@tables/grid/buildColumns'
 import {
@@ -20,6 +24,7 @@ import {
   type ColumnMoveDirection,
 } from '@tables/grid/useColumnOrder'
 import { useTableGrid } from '@tables/grid/useTableGrid'
+import { prefetchEditRowForm } from '@tables/rowEditor/rowEditorModules'
 import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
@@ -59,6 +64,7 @@ interface TableViewDraftTransitionState {
 
 interface UseTableViewStateResult {
   activeColumnId: string | null
+  canEditRows: boolean
   reorderableColumnIds: readonly string[]
   detailPaneMode: TableViewDetailPaneMode
   draftTransition: TableViewDraftTransitionState
@@ -115,12 +121,14 @@ export function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record
 export function useTableViewState({
   tableName,
 }: UseTableViewStateOptions): UseTableViewStateResult {
-  const { currentBranch, currentConnectionId, currentSchemaHash, runtime } = useInspector()
+  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
+  const client = useRuntimeClient()
+  const wasmSchema = useRuntimeSchema()
   const searchState = useTableExplorerSearchParams()
-  const query = useTableRows({ tableName })
+  const query = useTableRows({ client, currentSchemaHash, tableName, wasmSchema })
   const schemaColumns = useMemo(
-    () => getTableColumns(runtime.wasmSchema, tableName),
-    [runtime.wasmSchema, tableName],
+    () => getTableColumns(wasmSchema, tableName),
+    [tableName, wasmSchema],
   )
   const editorMode = searchState.editorMode ?? 'closed'
   const activeRowId = searchState.editorMode === 'edit' ? searchState.rowId : null
@@ -130,7 +138,7 @@ export function useTableViewState({
     activeRowId === null ? [] : [activeRowId],
   )
   const deletedRowIdsRef = useRef<Set<TableRowId>>(new Set())
-  const mutations = useTableMutations(tableName)
+  const mutations = useTableMutations({ client, tableName, wasmSchema })
   const draftTransition = useDraftTransitionGuard()
   const tableKey = `${currentConnectionId ?? 'unknown'}:${currentBranch ?? 'unknown'}:${currentSchemaHash ?? 'unknown'}:${tableName}`
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
@@ -355,6 +363,7 @@ export function useTableViewState({
     onCellSelectionChange: setCellSelection,
     onColumnMenuOpen: handleColumnActivate,
     onColumnMove: handleColumnMove,
+    onEditIntent: prefetchEditRowForm,
     onColumnOrderChange: setColumnOrder,
   })
   const selectedRow = useMemo(() => {
@@ -480,6 +489,7 @@ export function useTableViewState({
 
   return {
     activeColumnId,
+    canEditRows: client !== null && wasmSchema !== null,
     reorderableColumnIds: columnIds,
     detailPaneMode,
     draftTransition,

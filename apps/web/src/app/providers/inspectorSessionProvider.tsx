@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, type PropsWithChildren
 import { useNavigate, useParams } from "@tanstack/react-router";
 
 import { getConnectionDisplayName, type StoredConnection } from "@app/connections/connections";
+import { NoStoredSchemasError } from "@app/connections/connectionValidation";
 import { appRoutes } from "@app/routing/appRoutes";
 import { resolveTablesNavigationTarget } from "@app/routing/inspectorNavigation";
 import { useInspectorSession } from "@app/session/useInspectorSession";
@@ -9,8 +10,8 @@ import { useInspectorSession } from "@app/session/useInspectorSession";
 /**
  * Connection and route state that is safe to use before a Jazz client exists.
  *
- * Root-level screens use this context for onboarding and navigation. Runtime-only consumers use
- * `useInspector`, which extends this context after the connection route mounts `InspectorProvider`.
+ * Root-level screens use this context for onboarding and navigation. Connection-scoped consumers
+ * use the session and runtime projections exposed by `InspectorProvider`.
  */
 export interface InspectorSessionContextValue {
   connections: StoredConnection[];
@@ -21,8 +22,8 @@ export interface InspectorSessionContextValue {
   currentTableName: string | null;
   connectionLabel: string | null;
   rememberedBranches: string[];
-  openConnection: (connectionId: string, knownSchemaHashes?: string[]) => Promise<void>;
-  switchBranch: (branch: string, knownSchemaHashes?: string[]) => Promise<void>;
+  openConnection: (connectionId: string, knownSchemaHashes?: readonly string[]) => Promise<void>;
+  switchBranch: (branch: string, knownSchemaHashes?: readonly string[]) => Promise<void>;
   switchSchema: (schemaHash: string) => Promise<void>;
   saveConnection: ReturnType<typeof useInspectorSession>["saveConnection"];
   deleteConnection: ReturnType<typeof useInspectorSession>["deleteConnection"];
@@ -52,7 +53,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
   const currentBranch = connectionPreferences?.lastBranch ?? null;
   const currentSchemaHash = connectionPreferences?.lastSchemaHash ?? null;
 
-  const openConnection = useCallback(async (connectionId: string, knownSchemaHashes?: string[]) => {
+  const openConnection = useCallback(async (connectionId: string, knownSchemaHashes?: readonly string[]) => {
     const nextTarget = await resolveTablesNavigationTarget({
       connectionId,
       getConnection: (nextConnectionId) => session.getConnection(nextConnectionId),
@@ -60,9 +61,10 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       resolveSchemaHash: (nextConnectionId, availableSchemaHashes, schemaHashOverride) =>
         session.resolveSchemaHash(nextConnectionId, availableSchemaHashes, schemaHashOverride),
       knownSchemaHashes,
+      schemaFetchError: "throw",
     });
     if (nextTarget === null) {
-      return;
+      throw new NoStoredSchemasError();
     }
 
     session.setConnectionContext(connectionId, nextTarget.branch, nextTarget.schemaHash);
@@ -73,7 +75,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
     });
   }, [navigate, session]);
 
-  const switchBranch = useCallback(async (branch: string, knownSchemaHashes?: string[]) => {
+  const switchBranch = useCallback(async (branch: string, knownSchemaHashes?: readonly string[]) => {
     if (activeConnection === null) {
       return;
     }

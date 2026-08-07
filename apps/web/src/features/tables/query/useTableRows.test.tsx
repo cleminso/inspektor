@@ -10,14 +10,15 @@ let page = 1;
 let pageSize: 100 | 500 | 1000 = 100;
 let sortColumn = "id";
 let sortDirection: "asc" | "desc" = "asc";
+let runtimeClient: { manager: Record<string, never> } | null;
+let runtimeSchema: Record<string, unknown> | null;
 const setPage = vi.fn();
 const setPageSize = vi.fn();
 
 vi.mock("@app/providers/inspectorProvider", () => ({
-  useInspector: () => ({
-    currentSchemaHash: "schema-1",
-    runtime: { wasmSchema: {} },
-  }),
+  useInspectorSessionState: () => ({ currentSchemaHash: "schema-1" }),
+  useRuntimeClient: () => runtimeClient,
+  useRuntimeSchema: () => runtimeSchema,
 }));
 
 vi.mock("@tables/routing/useTableSearchParams", () => ({
@@ -69,9 +70,28 @@ beforeEach(() => {
   setPageSize.mockReset();
   sortColumn = "id";
   sortDirection = "asc";
+  runtimeClient = { manager: {} };
+  runtimeSchema = {};
 });
 
 describe("useTableRows", () => {
+  it("keeps row loading active until the runtime can execute the query", () => {
+    runtimeClient = null;
+    runtimeSchema = null;
+
+    const { result } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+
+    expect(result.current.isInitialLoading).toBe(true);
+    expect(result.current.rows).toEqual([]);
+  });
+
   it("keeps the capped row array stable across unrelated renders", () => {
     queryRows = [
       { id: "row-1", name: "Ada" } as DynamicTableRow,
@@ -79,7 +99,12 @@ describe("useTableRows", () => {
       { id: "row-3", name: "Linus" } as DynamicTableRow,
     ];
     const { result, rerender } = renderHook(() =>
-      useTableRows({ tableName: "users" }),
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
     );
     const initialRows = result.current.rows;
 
@@ -93,7 +118,14 @@ describe("useTableRows", () => {
       { id: "row-1", name: "Ada" } as DynamicTableRow,
       { id: "row-2", name: "Grace" } as DynamicTableRow,
     ];
-    const { result, rerender } = renderHook(() => useTableRows({ tableName: "users" }));
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
 
     expect(result.current.rows.map((row) => row.id)).toEqual(["row-1", "row-2"]);
 
@@ -108,10 +140,40 @@ describe("useTableRows", () => {
     expect(result.current.page).toBe(1);
   });
 
+  it("does not preserve resolved rows when the Jazz manager is replaced", () => {
+    queryRows = [
+      { id: "row-1", name: "Ada" } as DynamicTableRow,
+      { id: "row-2", name: "Grace" } as DynamicTableRow,
+    ];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+
+    runtimeClient = { manager: {} };
+    queryRows = undefined;
+    rerender();
+
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.isInitialLoading).toBe(true);
+    expect(result.current.isRefreshing).toBe(false);
+  });
+
   it("exposes a failed fresh query without leaving the grid in its loading state", () => {
     queryError = new Error("Unable to load rows");
 
-    const { result } = renderHook(() => useTableRows({ tableName: "users" }));
+    const { result } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
 
     expect(result.current.error).toBe("Unable to load rows");
     expect(result.current.isInitialLoading).toBe(false);
@@ -123,7 +185,14 @@ describe("useTableRows", () => {
       { id: "row-1", name: "Ada" } as DynamicTableRow,
       { id: "row-2", name: "Grace" } as DynamicTableRow,
     ];
-    const { result, rerender } = renderHook(() => useTableRows({ tableName: "users" }));
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
 
     sortColumn = "name";
     sortDirection = "desc";
@@ -142,7 +211,14 @@ describe("useTableRows", () => {
       id: `row-${index + 1}`,
     })) as DynamicTableRow[];
 
-    const { result } = renderHook(() => useTableRows({ tableName: "users" }));
+    const { result } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
 
     expect(result.current.rows).toHaveLength(100);
     expect(result.current.hasNextPage).toBe(true);
@@ -154,7 +230,14 @@ describe("useTableRows", () => {
   it("navigates between pages and resets the page when page size changes", async () => {
     page = 2;
     queryRows = [{ id: "row-101" } as DynamicTableRow];
-    const { result } = renderHook(() => useTableRows({ tableName: "users" }));
+    const { result } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
 
     await result.current.goToPreviousPage();
     await result.current.setPageSize(500);
@@ -169,7 +252,14 @@ describe("useTableRows", () => {
     page = 2;
     queryRows = [];
 
-    renderHook(() => useTableRows({ tableName: "users" }));
+    renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
 
     await waitFor(() => {
       expect(setPage).toHaveBeenCalledWith(1);

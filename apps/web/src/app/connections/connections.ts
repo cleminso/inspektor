@@ -315,7 +315,7 @@ export function resolveDefaultBranch(
 export function resolveDefaultSchemaHash(
   store: StoredConnectionsStore,
   connectionId: string,
-  availableSchemaHashes: string[],
+  availableSchemaHashes: readonly string[],
   schemaHash?: string | null,
 ): string | null {
   const nextSchemaHash = schemaHash ?? getConnectionPreferences(store, connectionId).lastSchemaHash;

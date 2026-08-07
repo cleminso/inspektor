@@ -5,13 +5,18 @@
  * mutation runtime to insert, update, and delete rows without app-generated table code.
  */
 import { useMemo, useState } from "react";
+import type { WasmSchema } from "jazz-tools";
+import type { JazzClient } from "jazz-tools/react";
 
-import { useDb } from "jazz-tools/react";
-
-import { useInspector } from "@app/providers/inspectorProvider";
 import { createTableProxy } from "@tables/rowEditor/mutation/tableProxy";
 
-export interface UseTableMutationsResult {
+interface UseTableMutationsOptions {
+  client: JazzClient | null;
+  tableName: string;
+  wasmSchema: WasmSchema | null;
+}
+
+interface UseTableMutationsResult {
   error: string | null;
   isPending: boolean;
   deleteRow: (rowId: string) => Promise<void>;
@@ -37,19 +42,21 @@ function omitUndefinedValues(values: Record<string, unknown>): Record<string, un
  * an update `{ name: "Grace" }` reaches Jazz as a one-column patch; this hook never reconstructs
  * the rest of the row.
  */
-export function useTableMutations(tableName: string): UseTableMutationsResult {
-  const db = useDb();
-  const { runtime } = useInspector();
+export function useTableMutations({
+  client,
+  tableName,
+  wasmSchema,
+}: UseTableMutationsOptions): UseTableMutationsResult {
   const [pendingCount, setPendingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const tableProxy = useMemo(() => {
-    if (runtime.wasmSchema === null) {
+    if (wasmSchema === null) {
       return null;
     }
 
-    return createTableProxy(tableName, runtime.wasmSchema);
-  }, [runtime.wasmSchema, tableName]);
+    return createTableProxy(tableName, wasmSchema);
+  }, [tableName, wasmSchema]);
 
   /**
    * Waits for edge acknowledgement before treating a mutation as successful.
@@ -75,30 +82,30 @@ export function useTableMutations(tableName: string): UseTableMutationsResult {
     error,
     isPending: pendingCount > 0,
     insertRow: async (values) => {
-      if (tableProxy === null) {
-        throw new Error("Schema is not loaded.");
+      if (tableProxy === null || client === null) {
+        throw new Error("Table runtime is not loaded.");
       }
 
       await runMutation(async () => {
-        await db.insert(tableProxy, omitUndefinedValues(values)).wait({ tier: "edge" });
+        await client.db.insert(tableProxy, omitUndefinedValues(values)).wait({ tier: "edge" });
       });
     },
     updateRow: async (rowId, values) => {
-      if (tableProxy === null) {
-        throw new Error("Schema is not loaded.");
+      if (tableProxy === null || client === null) {
+        throw new Error("Table runtime is not loaded.");
       }
 
       await runMutation(async () => {
-        await db.update(tableProxy, rowId, omitUndefinedValues(values)).wait({ tier: "edge" });
+        await client.db.update(tableProxy, rowId, omitUndefinedValues(values)).wait({ tier: "edge" });
       });
     },
     deleteRow: async (rowId) => {
-      if (tableProxy === null) {
-        throw new Error("Schema is not loaded.");
+      if (tableProxy === null || client === null) {
+        throw new Error("Table runtime is not loaded.");
       }
 
       await runMutation(async () => {
-        await db.delete(tableProxy, rowId).wait({ tier: "edge" });
+        await client.db.delete(tableProxy, rowId).wait({ tier: "edge" });
       });
     },
   };

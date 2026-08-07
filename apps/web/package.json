@@ -18,6 +18,7 @@
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@inspector/ds": "workspace:*",
+    "@nanostores/react": "^1.1.0",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-table": "catalog:",
@@ -25,6 +26,7 @@
     "agentation-mcp": "^1.2.0",
     "jazz-tools": "catalog:",
     "lucide-react": "catalog:",
+    "nanostores": "^1.4.2",
     "next-themes": "0.4.6",
     "react": "catalog:",
     "react-dom": "catalog:"

@@ -73,12 +73,13 @@ vi.mock('jazz-tools/react', () => ({
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspector: () => ({
+  useInspectorSessionState: () => ({
     currentBranch: 'main',
     currentConnectionId: 'connection-1',
     currentSchemaHash: 'schema-1',
-    runtime: { wasmSchema: null },
   }),
+  useRuntimeClient: () => null,
+  useRuntimeSchema: () => null,
 }))
 
 vi.mock('@tables/grid/useColumnVisibility', () => ({

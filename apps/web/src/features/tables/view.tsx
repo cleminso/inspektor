@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import {
   TableListPane,
   type TableCheckedChangeOptions,
@@ -19,7 +19,7 @@ import { TableTabsView } from "@tables/workspace/tabsView";
 
 export function TableExplorerScreen(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
-    useInspector();
+    useInspectorSessionState();
   const scope = `${currentConnectionId ?? "none"}:${currentBranch ?? "none"}:${currentSchemaHash ?? "none"}`;
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set());
   const [pinnedTableNames, setPinnedTableNames] = useState<ReadonlySet<string>>(() =>
@@ -27,7 +27,7 @@ export function TableExplorerScreen(): React.ReactElement {
   );
   const tableSelectionAnchorRef = useRef<string | null>(null);
   const tableSelectionSectionRef = useRef<TableListSection | null>(null);
-  const { tables } = useAvailableTables();
+  const { isSchemaReady, tables } = useAvailableTables();
   const { openBaseTabs } = useTableTabs();
 
   const handleTableCheckedChange = (
@@ -89,6 +89,7 @@ export function TableExplorerScreen(): React.ReactElement {
       <SidePanelLayout.Panel>
         <TableListPane
           checkedTableNames={checkedTableNames}
+          isSchemaReady={isSchemaReady}
           pinnedTableNames={pinnedTableNames}
           selectedTableName={currentTableName}
           tables={tables}

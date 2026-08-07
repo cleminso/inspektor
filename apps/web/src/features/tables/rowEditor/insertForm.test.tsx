@@ -53,7 +53,7 @@ vi.mock("@inspector/ds", async (importOriginal) => {
 });
 
 vi.mock("@app/providers/inspectorProvider", () => ({
-  useInspector: () => ({
+  useInspectorSessionState: () => ({
     currentBranch: "main",
     currentConnectionId: "connection-1",
     currentSchemaHash: "schema-1",

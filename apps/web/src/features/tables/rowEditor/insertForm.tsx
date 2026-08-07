@@ -107,7 +107,6 @@ function InsertRowFormFields({
             id={insertMoreFieldId}
             aria-labelledby={`${insertMoreFieldId}-label`}
             checked={insertMoreEnabled}
-            nativeButton={true}
             onCheckedChange={(nextChecked) => {
               onInsertMoreEnabledChange(nextChecked === true)
             }}

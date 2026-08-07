@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import type { DynamicTableRow, QueryBuilder } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
@@ -29,16 +30,13 @@ const { entry, listeners, manager } = vi.hoisted(() => {
   return { entry, listeners, manager }
 })
 
-vi.mock('jazz-tools/react', () => ({
-  useJazzClient: () => ({ manager }),
-}))
-
 const query = {
   _build: () => 'users-query',
   _rowType: undefined as unknown as DynamicTableRow,
   _schema: {},
   _table: 'users',
 } satisfies QueryBuilder<DynamicTableRow>
+const queryManager = manager as unknown as JazzClient['manager']
 
 beforeEach(() => {
   listeners.clear()
@@ -54,7 +52,9 @@ beforeEach(() => {
 
 describe('useJazzQueryState', () => {
   it('exposes fulfilled rows from the shared Jazz cache entry', () => {
-    const { result } = renderHook(() => useJazzQueryState(query, { propagation: 'full' }))
+    const { result } = renderHook(() =>
+      useJazzQueryState(queryManager, query, { propagation: 'full' }),
+    )
 
     expect(result.current.status).toBe('pending')
 
@@ -77,7 +77,7 @@ describe('useJazzQueryState', () => {
   })
 
   it('exposes rejected query state instead of leaving the consumer loading', () => {
-    const { result } = renderHook(() => useJazzQueryState(query))
+    const { result } = renderHook(() => useJazzQueryState(queryManager, query))
     const error = new Error('Query unavailable')
 
     act(() => {
@@ -96,5 +96,16 @@ describe('useJazzQueryState', () => {
       data: undefined,
       error,
     })
+  })
+
+  it('stays idle without a runtime query manager', () => {
+    const { result } = renderHook(() => useJazzQueryState(null, query))
+
+    expect(result.current).toEqual({
+      status: 'idle',
+      data: undefined,
+      error: null,
+    })
+    expect(manager.makeQueryKey).not.toHaveBeenCalled()
   })
 })

@@ -8,8 +8,8 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Text,
   Tooltip,
+  Text,
 } from '@inspector/ds'
 import { Layers } from 'lucide-react'
 
@@ -17,6 +17,11 @@ import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
+import {
+  loadEditRowForm,
+  loadInsertRowForm,
+  prefetchInsertRowForm,
+} from '@tables/rowEditor/rowEditorModules'
 import { getTableViewportScrollResetKey } from '@tables/workspace/tableViewport'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
@@ -26,20 +31,22 @@ interface TableViewProps {
 }
 
 /**
- * Row forms and their editor integrations are optional until the detail pane opens. Keeping them
- * behind this boundary preserves a usable base table without making editor code static work.
+ * Row forms stay outside the base table graph. Direct interaction intent warms the selected form
+ * through the same loader that React.lazy consumes, while CodeMirror remains deferred. A failed
+ * speculative preload is cleared before React's first lazy load; mounted lazy failures remain
+ * React error-boundary concerns.
  */
-const EditRowForm = lazy(async () => {
-  const module = await import('@tables/rowEditor/editForm')
+const EditRowForm = lazy(loadEditRowForm)
 
-  return { default: module.EditRowForm }
-})
+const InsertRowForm = lazy(loadInsertRowForm)
 
-const InsertRowForm = lazy(async () => {
-  const module = await import('@tables/rowEditor/insertForm')
-
-  return { default: module.InsertRowForm }
-})
+function RowEditorFormFallback(): React.ReactElement {
+  return (
+    <Box height="full" alignItems="center" justifyContent="center" role="status" aria-live="polite">
+      <Text color="muted">Loading editor</Text>
+    </Box>
+  )
+}
 
 export function TableView({ tableName }: TableViewProps): React.ReactElement {
   const { openSchemaView } = useTableTabs()
@@ -90,6 +97,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                         size="s"
                         aria-label="Open schema"
                         iconOnly
+                        disabled={state.canEditRows === false}
                         onClick={() => {
                           openSchemaView(tableName)
                         }}
@@ -108,6 +116,10 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                   type="button"
                   variant="primary"
                   size="s"
+                  disabled={state.canEditRows === false}
+                  onFocus={prefetchInsertRowForm}
+                  onPointerDown={prefetchInsertRowForm}
+                  onPointerEnter={prefetchInsertRowForm}
                   onClick={() => {
                     if (state.detailPaneMode === 'insert') {
                       state.handleRowEditorOpenChange(false)
@@ -159,9 +171,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                     rowRendering="virtual"
                     emptyContent={
                       state.error ??
-                      (state.filters.length > 0
-                        ? 'No rows match these filters'
-                        : 'This table has no rows')
+                      (state.filters.length > 0 ? 'No rows match these filters' : null)
                     }
                   />
                 </DataGrid.Table>
@@ -189,21 +199,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               onNavigatePrevious={state.rowEditor.goToPreviousRow}
               onNavigateNext={state.rowEditor.goToNextRow}
             >
-              <Suspense
-                fallback={
-                  <Box
-                    width="full"
-                    padding="l"
-                  >
-                    <Text
-                      color="muted"
-                      variant="caption"
-                    >
-                      Loading row editor
-                    </Text>
-                  </Box>
-                }
-              >
+              <Suspense fallback={<RowEditorFormFallback />}>
                 {state.detailPaneMode === 'insert' ? (
                   <InsertRowForm
                     key={`${tableName}:insert`}

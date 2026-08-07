@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
@@ -96,7 +96,7 @@ interface TableTabsProviderState extends TableTabsState {
 }
 
 export function TableTabsProvider({ children, scope }: TableTabsProviderProps): React.ReactElement {
-  const { currentConnectionId, currentTableName } = useInspector();
+  const { currentConnectionId, currentTableName } = useInspectorSessionState();
   const navigate = useNavigate({ from: appRoutes.tables });
   const routeSearch = useSearch({ strict: false }) as RouteSearch;
   const { isSchemaReady, tables: availableTables } = useAvailableTables();

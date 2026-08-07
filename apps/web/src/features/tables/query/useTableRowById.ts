@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 
 import type { DynamicTableRow } from "jazz-tools";
-import { useAll } from "jazz-tools/react";
 
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useRuntimeClient, useRuntimeSchema } from "@app/providers/inspectorProvider";
+import { useJazzQueryState } from "@tables/query/useJazzQueryState";
 import type { TableRowId } from "@tables/tableTypes";
 
 import { GenericQueryBuilder } from "./genericQueryBuilder";
@@ -17,17 +17,18 @@ export function useTableRowById({
   rowId,
   tableName,
 }: UseTableRowByIdOptions): DynamicTableRow | null {
-  const { runtime } = useInspector();
+  const client = useRuntimeClient();
+  const wasmSchema = useRuntimeSchema();
   const queryBuilder = useMemo(() => {
-    if (runtime.wasmSchema === null || rowId === null) {
+    if (wasmSchema === null || rowId === null) {
       return null;
     }
 
-    return new GenericQueryBuilder(tableName, runtime.wasmSchema)
+    return new GenericQueryBuilder(tableName, wasmSchema)
       .where({ id: rowId })
       .limit(1)
       .offset(0);
-  }, [rowId, runtime.wasmSchema, tableName]);
+  }, [rowId, tableName, wasmSchema]);
   const queryOptions = useMemo(
     () => ({
       propagation: "full" as const,
@@ -35,11 +36,15 @@ export function useTableRowById({
     }),
     [],
   );
-  const rows = useAll<DynamicTableRow>(queryBuilder ?? undefined, queryOptions);
+  const queryState = useJazzQueryState<DynamicTableRow>(
+    client?.manager ?? null,
+    queryBuilder ?? undefined,
+    queryOptions,
+  );
 
   if (rowId === null) {
     return null;
   }
 
-  return rows?.find((row) => String(row.id) === rowId) ?? null;
+  return queryState.data?.find((row) => String(row.id) === rowId) ?? null;
 }

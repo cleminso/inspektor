@@ -9,6 +9,7 @@ import { redirect } from "@tanstack/react-router";
 
 import {
   getConnectionById,
+  getConnectionPreferences,
   readStoredConnections,
   resolveDefaultBranch,
   resolveDefaultSchemaHash,
@@ -23,7 +24,7 @@ export interface ResolvedTablesNavigationTarget {
   connectionId: string;
   branch: string;
   schemaHash: string;
-  availableSchemaHashes: string[];
+  availableSchemaHashes: readonly string[];
 }
 
 interface ResolveTablesNavigationTargetOptions {
@@ -34,10 +35,10 @@ interface ResolveTablesNavigationTargetOptions {
   resolveBranch: (connectionId: string, branchOverride?: string | null) => string;
   resolveSchemaHash: (
     connectionId: string,
-    availableSchemaHashes: string[],
+    availableSchemaHashes: readonly string[],
     schemaHashOverride?: string | null,
   ) => string | null;
-  knownSchemaHashes?: string[];
+  knownSchemaHashes?: readonly string[];
   schemaFetchError?: "ignore" | "throw";
 }
 
@@ -80,7 +81,7 @@ export async function resolveTablesNavigationTarget({
       adminSecret: connection.adminSecret,
     });
   };
-  let availableSchemaHashes: string[];
+  let availableSchemaHashes: readonly string[];
   if (knownSchemaHashes !== undefined && knownSchemaHashes.length > 0) {
     availableSchemaHashes = knownSchemaHashes;
   } else {
@@ -115,6 +116,23 @@ export async function resolveStoredTablesNavigationTarget({
   store,
 }: ResolveStoredTablesNavigationTargetOptions): Promise<ResolvedTablesNavigationTarget | null> {
   const resolvedStore = store ?? readStoredConnections();
+  const connection = getConnectionById(resolvedStore, connectionId);
+  if (connection === null) {
+    return null;
+  }
+  const branch = resolveDefaultBranch(resolvedStore, connectionId, branchOverride);
+  const preferredSchemaHash =
+    schemaHashOverride ?? getConnectionPreferences(resolvedStore, connectionId).lastSchemaHash;
+  if (preferredSchemaHash !== null) {
+    // Persisted hashes allow immediate navigation; the mounted runtime fetches the selected schema
+    // and discovers the complete hash list without adding Jazz metadata to the root import graph.
+    return {
+      connectionId,
+      branch,
+      schemaHash: preferredSchemaHash,
+      availableSchemaHashes: [],
+    };
+  }
 
   return resolveTablesNavigationTarget({
     connectionId,

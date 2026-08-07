@@ -7,7 +7,7 @@ const fetchSchemaHashes = vi.fn();
 
 vi.mock("jazz-tools", () => ({ fetchSchemaHashes }));
 
-function createStore(): StoredConnectionsStore {
+function createStore(lastSchemaHash: string | null = "schema-1"): StoredConnectionsStore {
   const store = createEmptyConnectionStore();
 
   return {
@@ -26,7 +26,7 @@ function createStore(): StoredConnectionsStore {
     preferencesByConnectionId: {
       "connection-1": {
         lastBranch: "main",
-        lastSchemaHash: "schema-1",
+        lastSchemaHash,
         rememberedBranches: ["main"],
       },
     },
@@ -34,24 +34,28 @@ function createStore(): StoredConnectionsStore {
 }
 
 describe("resolveStoredTablesNavigationTarget", () => {
-  it("preserves schema discovery failures for the connection route", async () => {
-    fetchSchemaHashes.mockRejectedValueOnce(new Error("Schema service unavailable"));
-
+  it("uses the persisted runtime target without blocking route entry on schema discovery", async () => {
     await expect(
       resolveStoredTablesNavigationTarget({
         connectionId: "connection-1",
         store: createStore(),
       }),
-    ).rejects.toThrow("Schema service unavailable");
+    ).resolves.toEqual({
+      connectionId: "connection-1",
+      branch: "main",
+      schemaHash: "schema-1",
+      availableSchemaHashes: [],
+    });
+    expect(fetchSchemaHashes).not.toHaveBeenCalled();
   });
 
-  it("returns fetched schema hashes for runtime reuse", async () => {
+  it("discovers schema hashes when no schema preference exists", async () => {
     fetchSchemaHashes.mockResolvedValueOnce({ hashes: ["schema-1", "schema-2"] });
 
     await expect(
       resolveStoredTablesNavigationTarget({
         connectionId: "connection-1",
-        store: createStore(),
+        store: createStore(null),
       }),
     ).resolves.toEqual({
       connectionId: "connection-1",

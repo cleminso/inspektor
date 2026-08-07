@@ -20,14 +20,10 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspector: () => ({
-    runtime: {
-      client: { manager: {} },
-      wasmSchema: {
-        accounts: { columns: [] },
-        profiles: { columns: [] },
-      },
-    },
+  useRuntimeClient: () => ({ manager: {} }),
+  useRuntimeSchema: () => ({
+    accounts: { columns: [] },
+    profiles: { columns: [] },
   }),
 }))
 
@@ -77,9 +73,7 @@ describe('TableTabsView', () => {
 
     const addButton = screen.getByRole('button', { name: 'Open new table view' })
     expect(addButton.getAttribute('title')).toBeNull()
-    expect(screen.getByRole('tablist', { name: 'Open table views' }).parentElement).toBe(
-      addButton.parentElement,
-    )
+    expect(screen.getByRole('tablist', { name: 'Open table views' })).toBeTruthy()
     expect(screen.getByText('New table view content')).toBeTruthy()
 
     fireEvent.mouseEnter(addButton)

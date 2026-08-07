@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 import { InspectorLayout } from "@app/shell/layout";
-import { useInspector } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import { SidePanelLayoutProvider, useSidePanelLayout } from "@tables/tableList/layout";
 import { TableTabsProvider } from "@tables/workspace/tabsProvider";
 import { TableExplorerScreen } from "@tables/view";
@@ -45,7 +45,7 @@ function TablesLayoutRoute(): React.ReactElement {
 }
 
 function TablesWorkspaceLayout(): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspector();
+  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState();
   const { isOpen, toggle } = useSidePanelLayout();
   const tabScope = `${currentConnectionId ?? "none"}:${currentBranch ?? "none"}:${currentSchemaHash ?? "none"}`;
 
