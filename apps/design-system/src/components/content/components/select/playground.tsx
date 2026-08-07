@@ -1,7 +1,6 @@
 import {
   Box,
   Select,
-  type SelectItemSize,
   type SelectTriggerSize,
   type SelectWidth,
 } from "@inspector/ds";
@@ -15,21 +14,15 @@ import { selectItem } from "@/lib/registry";
 
 export interface SelectPlaygroundState {
   size: SelectTriggerSize;
-  itemSize: SelectItemSize;
   width: SelectWidth;
   disabled: boolean;
-  prefix: boolean;
-  suffix: boolean;
   [key: string]: boolean | string;
 }
 
 const initialState: SelectPlaygroundState = {
   size: "m",
-  itemSize: "s",
   width: "content",
   disabled: false,
-  prefix: false,
-  suffix: false,
 };
 
 const options = [
@@ -51,27 +44,16 @@ const controls = [
     label: "Width",
     options: ["compact", "content", "full"].map((value) => ({ label: value, value })),
   },
-  {
-    kind: "select",
-    key: "itemSize",
-    label: "Item size",
-    options: ["s", "m", "l"].map((value) => ({ label: value, value })),
-  },
   { kind: "boolean", key: "disabled", label: "Disabled" },
-  { kind: "boolean", key: "prefix", label: "Prefix" },
-  { kind: "boolean", key: "suffix", label: "Suffix" },
 ] as const satisfies readonly PlaygroundControl<SelectPlaygroundState>[];
 
 export function serializeSelectPlayground(state: SelectPlaygroundState): string {
   const rootProps = ["items={options}", 'defaultValue="main"'];
-  const triggerProps = ['aria-label="Branch"'];
+  const triggerProps = ['aria-label="Branch"', 'placeholder="Select a branch"'];
   const itemProps = ['key={option.value}', 'value={option.value}'];
   if (state.disabled === true) rootProps.push("disabled");
   if (state.size !== "m") triggerProps.push(`size="${state.size}"`);
   if (state.width !== "content") triggerProps.push(`width="${state.width}"`);
-  if (state.prefix === true) triggerProps.push('prefix="Branch"');
-  if (state.suffix === true) triggerProps.push('suffix="Active"');
-  if (state.itemSize !== "s") itemProps.push(`size="${state.itemSize}"`);
 
   return createPlaygroundSource({
     imports: { Select: true },
@@ -82,9 +64,7 @@ export function serializeSelectPlayground(state: SelectPlaygroundState): string 
 ];`,
     example: `(
     <Select.Root ${rootProps.join(" ")}>
-      <Select.Trigger ${triggerProps.join(" ")}>
-        <Select.Value placeholder="Select a branch" />
-      </Select.Trigger>
+      <Select.Trigger ${triggerProps.join(" ")} />
       <Select.Content>
         {options.map((option) => (
           <Select.Item ${itemProps.join(" ")}>
@@ -104,16 +84,13 @@ export function SelectPlayground({ children }: { children?: ReactNode }): ReactE
       <Select.Root items={options} defaultValue="main" disabled={state.disabled}>
         <Select.Trigger
           aria-label="Branch"
+          placeholder="Select a branch"
           size={state.size}
           width={state.width}
-          prefix={state.prefix === true ? "Branch" : undefined}
-          suffix={state.suffix === true ? "Active" : undefined}
-        >
-          <Select.Value placeholder="Select a branch" />
-        </Select.Trigger>
+        />
         <Select.Content>
           {options.map((option) => (
-            <Select.Item key={option.value} value={option.value} size={state.itemSize}>
+            <Select.Item key={option.value} value={option.value}>
               {option.label}
             </Select.Item>
           ))}

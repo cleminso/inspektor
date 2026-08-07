@@ -293,23 +293,11 @@ export type {
 export { Select } from './components/select/select'
 export type {
   SelectContentProps,
-  SelectGroupLabelProps,
-  SelectGroupProps,
-  SelectIconProps,
-  SelectItemIndicatorProps,
   SelectItemProps,
-  SelectItemTextProps,
   SelectLabelProps,
-  SelectListProps,
-  SelectPopupProps,
-  SelectPortalProps,
-  SelectPositionerProps,
   SelectRootProps,
-  SelectSeparatorProps,
-  SelectItemSize,
   SelectTriggerSize,
   SelectTriggerProps,
-  SelectValueProps,
   SelectWidth,
 } from './components/select/select'
 export { Text } from './components/text/text'

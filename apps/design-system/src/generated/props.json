@@ -6436,40 +6436,40 @@
       "name": "items",
       "type": "readonly Group<any>[] | Record<string, React.ReactNode> | readonly { label: React.ReactNode; value: any; }[]",
       "required": false,
-      "description": "Data structure of the items rendered in the select popup.\nWhen specified, `<Select.Value>` renders the label of the selected item instead of the raw value.\nItems used to resolve selected value labels.",
+      "description": "Items used to resolve selected value labels.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 28
+        "line": 21
       }
     },
     {
       "name": "value",
       "type": "null | Value",
       "required": false,
-      "description": "The value of the select. Use when controlled.\nThe selected value.",
+      "description": "The selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 30
+        "line": 23
       }
     },
     {
       "name": "defaultValue",
       "type": "null | Value",
       "required": false,
-      "description": "The uncontrolled value of the select when it's initially rendered.\n\nTo render a controlled select, use the `value` prop instead.\nThe initially selected value.",
+      "description": "The initially selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 32
+        "line": 25
       }
     },
     {
       "name": "onValueChange",
       "type": "(value: Value | null, eventDetails: SelectRootChangeEventDetails) => void",
       "required": false,
-      "description": "Event handler called when the value of the select changes.\nRuns when the selected value changes.",
+      "description": "Runs when the selected value changes.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 34
+        "line": 27
       }
     },
     {
@@ -6477,15 +6477,25 @@
       "type": "false | true",
       "required": false,
       "defaultValue": "false",
-      "description": "Whether the component should ignore user interaction.\nDisables the select.",
+      "description": "Disables the Select.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 36
+        "line": 29
       }
     }
   ],
   "select.label": [],
   "select.trigger": [
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Text displayed when the Select has no value.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 39
+      }
+    },
     {
       "name": "size",
       "type": "\"s\" | \"m\" | \"l\"",
@@ -6494,7 +6504,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 46
+        "line": 41
       }
     },
     {
@@ -6502,166 +6512,36 @@
       "type": "\"content\" | \"full\" | \"compact\"",
       "required": false,
       "defaultValue": "\"content\"",
-      "description": "Controls whether the trigger uses an intrinsic, compact fixed, or container-filling width.",
+      "description": "Controls whether the trigger follows the selected value, reserves a stable compact width, or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 48
-      }
-    },
-    {
-      "name": "prefix",
-      "type": "null | string | number | bigint | false | true | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
-      "required": false,
-      "description": "Content displayed before the selected value.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 50
-      }
-    },
-    {
-      "name": "suffix",
-      "type": "null | string | number | bigint | false | true | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
-      "required": false,
-      "description": "Content displayed after the selected value and before the chevron.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 52
-      }
-    },
-    {
-      "name": "fullWidth",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Stretches the trigger to the width of its container.",
-      "deprecated": "Use `width=\"full\"`.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 54
-      }
-    },
-    {
-      "name": "disabled",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Disables the trigger.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 56
-      }
-    },
-    {
-      "name": "nativeButton",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "true",
-      "description": "Indicates whether the rendered trigger is a native button.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 58
-      }
-    },
-    {
-      "name": "render",
-      "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, SelectTriggerState>",
-      "required": false,
-      "description": "Composes trigger behavior onto a compatible element.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 60
+        "line": 43
       }
     }
   ],
-  "select.value": [],
-  "select.icon": [],
-  "select.portal": [],
-  "select.positioner": [
-    {
-      "name": "side",
-      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
-      "required": false,
-      "defaultValue": "\"bottom\"",
-      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
-      "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 86
-      }
-    },
-    {
-      "name": "align",
-      "type": "\"center\" | \"start\" | \"end\"",
-      "required": false,
-      "defaultValue": "\"start\"",
-      "description": "How to align the popup relative to the specified side.",
-      "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 116
-      }
-    },
-    {
-      "name": "alignItemWithTrigger",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Whether the positioner overlaps the trigger so the selected item's text is aligned with the trigger's value text. This only applies to mouse input and is automatically disabled if there is not enough space.",
-      "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/select/positioner/SelectPositioner.d.mts",
-        "line": 34
-      }
-    }
-  ],
-  "select.popup": [],
-  "select.list": [],
   "select.content": [
     {
       "name": "children",
       "type": "null | string | number | bigint | false | true | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
-      "description": "Select options, groups, and separators rendered in the popup.",
+      "description": "Select items rendered in the popup.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 77
-      }
-    },
-    {
-      "name": "side",
-      "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
-      "required": false,
-      "defaultValue": "\"bottom\"",
-      "description": "Places the popup on this side of the trigger.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 79
-      }
-    },
-    {
-      "name": "align",
-      "type": "\"center\" | \"start\" | \"end\"",
-      "required": false,
-      "defaultValue": "\"start\"",
-      "description": "Aligns the popup along the trigger.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 81
-      }
-    },
-    {
-      "name": "alignItemWithTrigger",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Aligns the selected item text with the trigger value.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 83
+        "line": 48
       }
     }
   ],
-  "select.group": [],
-  "select.groupLabel": [],
-  "select.separator": [],
   "select.item": [
+    {
+      "name": "children",
+      "type": "string",
+      "required": true,
+      "description": "Text displayed for this option.",
+      "source": {
+        "path": "packages/design-system/src/components/select/select.tsx",
+        "line": 53
+      }
+    },
     {
       "name": "value",
       "type": "Value",
@@ -6669,18 +6549,7 @@
       "description": "The value represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 91
-      }
-    },
-    {
-      "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
-      "required": false,
-      "defaultValue": "\"s\"",
-      "description": "Controls the option minimum height.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 93
+        "line": 55
       }
     },
     {
@@ -6688,45 +6557,20 @@
       "type": "false | true",
       "required": false,
       "defaultValue": "false",
-      "description": "Whether the component should ignore user interaction.\nDisables the option.",
+      "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 95
+        "line": 57
       }
     },
     {
-      "name": "nativeButton",
-      "type": "false | true",
+      "name": "label",
+      "type": "string",
       "required": false,
-      "defaultValue": "false",
-      "description": "Indicates whether the rendered option is a native button.",
+      "description": "Text used to match the option during keyboard navigation.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 97
-      }
-    },
-    {
-      "name": "render",
-      "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, SelectItemState>",
-      "required": false,
-      "description": "Composes option behavior onto a compatible element.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 99
-      }
-    }
-  ],
-  "select.itemText": [],
-  "select.itemIndicator": [
-    {
-      "name": "keepMounted",
-      "type": "false | true",
-      "required": false,
-      "defaultValue": "false",
-      "description": "Keeps the indicator mounted while the item is not selected.",
-      "source": {
-        "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 112
+        "line": 59
       }
     }
   ]

@@ -5,6 +5,5 @@ export const selectRootPropNames = [
   "onValueChange",
   "disabled",
 ] as const;
-export const selectTriggerPropNames = ["size", "width", "prefix", "suffix", "disabled", "render"] as const;
-export const selectPositionerPropNames = ["side", "align", "alignItemWithTrigger"] as const;
-export const selectItemPropNames = ["value", "size", "disabled", "render"] as const;
+export const selectTriggerPropNames = ["placeholder", "size", "width"] as const;
+export const selectItemPropNames = ["value", "disabled", "label"] as const;

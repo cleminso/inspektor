@@ -11,9 +11,7 @@ export default function DisabledExample(): ReactElement {
   return (
     <Box gap="m" flexWrap="wrap">
       <Select.Root items={roles} defaultValue="viewer" disabled>
-        <Select.Trigger aria-label="Disabled role">
-          <Select.Value />
-        </Select.Trigger>
+        <Select.Trigger aria-label="Disabled role" />
         <Select.Content>
           {roles.map((role) => (
             <Select.Item key={role.value} value={role.value}>
@@ -24,9 +22,7 @@ export default function DisabledExample(): ReactElement {
       </Select.Root>
 
       <Select.Root items={roles} defaultValue="editor">
-        <Select.Trigger aria-label="Role with unavailable option">
-          <Select.Value />
-        </Select.Trigger>
+        <Select.Trigger aria-label="Role with unavailable option" />
         <Select.Content>
           <Select.Item value="viewer">Viewer</Select.Item>
           <Select.Item value="editor">Editor</Select.Item>

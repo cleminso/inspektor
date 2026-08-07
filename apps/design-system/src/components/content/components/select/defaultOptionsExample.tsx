@@ -10,9 +10,7 @@ const options = [
 export default function DefaultOptionsExample(): ReactElement {
   return (
     <Select.Root items={options} defaultValue="main">
-      <Select.Trigger aria-label="Branch">
-        <Select.Value placeholder="Select a branch" />
-      </Select.Trigger>
+      <Select.Trigger aria-label="Branch" placeholder="Select a branch" />
       <Select.Content>
         {options.map((option) => (
           <Select.Item key={option.value} value={option.value}>

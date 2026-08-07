@@ -12,9 +12,7 @@ export default function LabelExample(): ReactElement {
     <Select.Root items={regions} defaultValue="iad">
       <Box flexDirection="column" gap="xs" alignItems="start">
         <Select.Label>Region</Select.Label>
-        <Select.Trigger width="full">
-          <Select.Value />
-        </Select.Trigger>
+        <Select.Trigger width="full" />
       </Box>
       <Select.Content>
         {regions.map((region) => (

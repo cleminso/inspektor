@@ -16,6 +16,11 @@ This checklist tracks responsive middle truncation for identity-bearing strings.
 
 ## Implemented foundation
 
+[06/08/26]
+
+- [x] Replace per-instance resize observation and synchronous text measurement with balanced CSS clipping.
+- [x] Render the complete accessible value on the first paint without waiting for width or font measurements.
+
 [05/08/26]
 
 - [x] Preserve balanced leading and trailing grapheme clusters around one ellipsis.
@@ -56,6 +61,11 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[06/08/26]
+
+- [x] Verify balanced clipping at a constrained width without creating a `ResizeObserver`.
+- [x] Verify relation-value composition and table row-ID rendering retain the complete accessible value.
 
 [05/08/26]
 

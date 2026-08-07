@@ -12,12 +12,10 @@ export default function SizesExample(): ReactElement {
     <Box gap="m" alignItems="center" flexWrap="wrap">
       {sizes.map((size) => (
         <Select.Root key={size} items={items} defaultValue="local">
-          <Select.Trigger size={size} aria-label={`${size.toUpperCase()} environment`}>
-            <Select.Value />
-          </Select.Trigger>
+          <Select.Trigger size={size} aria-label={`${size.toUpperCase()} environment`} />
           <Select.Content>
             {items.map((item) => (
-              <Select.Item key={item.value} value={item.value} size={size}>
+              <Select.Item key={item.value} value={item.value}>
                 {item.label}
               </Select.Item>
             ))}

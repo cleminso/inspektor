@@ -26,18 +26,16 @@ function SelectControl<TState extends PlaygroundState>({
   onChange: (value: string) => void;
 }): ReactElement {
   return (
-    <Select value={value} onValueChange={(nextValue) => onChange(nextValue ?? value)}>
-      <Select.Trigger id={id} size="s" width="full" aria-label={control.label}>
-        <Select.Value />
-      </Select.Trigger>
-      <Select.Content align="end">
+    <Select.Root value={value} onValueChange={(nextValue) => onChange(nextValue ?? value)}>
+      <Select.Trigger id={id} size="s" width="full" aria-label={control.label} />
+      <Select.Content>
         {control.options.map((option) => (
-          <Select.Item key={option.value} value={option.value} size="s">
+          <Select.Item key={option.value} value={option.value}>
             {option.label}
           </Select.Item>
         ))}
       </Select.Content>
-    </Select>
+    </Select.Root>
   );
 }
 

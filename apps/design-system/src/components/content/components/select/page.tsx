@@ -11,21 +11,19 @@ import DisabledExample from "./disabledExample";
 import disabledSource from "./disabledExample.tsx?raw";
 import LabelExample from "./labelExample";
 import labelSource from "./labelExample.tsx?raw";
-import PrefixAndSuffixExample from "./prefixAndSuffixExample";
-import prefixAndSuffixSource from "./prefixAndSuffixExample.tsx?raw";
 import { SelectPlayground } from "./playground";
 import {
   selectItemPropNames,
-  selectPositionerPropNames,
   selectRootPropNames,
   selectTriggerPropNames,
 } from "./props";
 import SizesExample from "./sizesExample";
 import sizesSource from "./sizesExample.tsx?raw";
+import WidthsExample from "./widthsExample";
+import widthsSource from "./widthsExample.tsx?raw";
 
 const rootProps = getGeneratedProps("select.root", selectRootPropNames);
 const triggerProps = getGeneratedProps("select.trigger", selectTriggerPropNames);
-const positionerProps = getGeneratedProps("select.positioner", selectPositionerPropNames);
 const itemProps = getGeneratedProps("select.item", selectItemPropNames);
 
 export function SelectPage(): ReactElement {
@@ -39,17 +37,17 @@ export function SelectPage(): ReactElement {
           <DefaultOptionsExample />
         </Example>
       </Section>
-      <Section title="Sizes" description="Match the trigger and option size to adjacent controls.">
+      <Section title="Sizes" description="Match the trigger size to adjacent controls.">
         <Example source={sizesSource}>
           <SizesExample />
         </Example>
       </Section>
       <Section
-        title="Prefix and suffix"
-        description="Add concise context without changing the selected value."
+        title="Widths"
+        description="Use content width for intrinsic labels, compact width to reserve a stable short-control footprint, and full width in form layouts."
       >
-        <Example source={prefixAndSuffixSource}>
-          <PrefixAndSuffixExample />
+        <Example source={widthsSource}>
+          <WidthsExample />
         </Example>
       </Section>
       <Section
@@ -73,12 +71,6 @@ export function SelectPage(): ReactElement {
       </Section>
       <Section title="Trigger props">
         <PropsTable rows={triggerProps} />
-      </Section>
-      <Section
-        title="Positioner props"
-        description="Use Positioner when composing the popup layers directly instead of using Content."
-      >
-        <PropsTable rows={positionerProps} />
       </Section>
       <Section title="Item props">
         <PropsTable rows={itemProps} />

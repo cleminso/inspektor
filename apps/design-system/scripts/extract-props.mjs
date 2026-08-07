@@ -390,25 +390,13 @@ const componentEntries = [
     "Root",
     "Label",
     "Trigger",
-    "Value",
-    "Icon",
-    "Portal",
-    "Positioner",
-    "Popup",
-    "List",
     "Content",
-    "Group",
-    "GroupLabel",
-    "Separator",
     "Item",
-    "ItemText",
-    "ItemIndicator",
   ].map((part) => ({
     componentId: `select.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "Select",
     part,
-    inheritedProps:
-      part === "Positioner" ? ["side", "align", "alignItemWithTrigger"] : [],
+    inheritedProps: [],
   })),
 ];
 

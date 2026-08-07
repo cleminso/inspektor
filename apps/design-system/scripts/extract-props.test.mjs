@@ -28,7 +28,7 @@ test("extracts direct and compound forwardRef component props", () => {
   const metadata = extractPropsMetadata();
 
   assert.ok(metadata.input?.some(({ name }) => name === "size"));
-  assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "render"));
+  assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "placeholder"));
   assert.ok(metadata.box?.some(({ name }) => name === "overflow"));
   assert.equal(metadata.box?.some(({ name }) => name === "scrollbar"), false);
   assert.doesNotMatch(
@@ -1139,35 +1139,10 @@ test("extracts the constrained Select compound API", () => {
     metadata["select.trigger"]?.find(({ name }) => name === "size")?.defaultValue,
     '"m"',
   );
-  assert.equal(
-    metadata["select.trigger"]?.find(({ name }) => name === "fullWidth")?.defaultValue,
-    "false",
-  );
-  assert.equal(
-    metadata["select.positioner"]?.find(({ name }) => name === "sideOffset"),
-    undefined,
-  );
-  assert.deepEqual(
-    metadata["select.positioner"]?.map(({ name }) => name),
-    ["side", "align", "alignItemWithTrigger"],
-  );
-  assert.equal(
-    metadata["select.positioner"]?.find(({ name }) => name === "side")?.defaultValue,
-    '"bottom"',
-  );
-  assert.equal(
-    metadata["select.positioner"]?.find(({ name }) => name === "align")?.defaultValue,
-    '"start"',
-  );
-  assert.equal(
-    metadata["select.positioner"]?.find(({ name }) => name === "alignItemWithTrigger")?.defaultValue,
-    "false",
-  );
-  assert.equal(
-    metadata["select.itemIndicator"]?.find(({ name }) => name === "keepMounted")?.defaultValue,
-    "false",
-  );
-  assert.equal(metadata["select.item"]?.find(({ name }) => name === "size")?.defaultValue, '"s"');
+  assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "placeholder"));
+  assert.equal(metadata["select.positioner"], undefined);
+  assert.equal(metadata["select.itemIndicator"], undefined);
+  assert.equal(metadata["select.item"]?.find(({ name }) => name === "size"), undefined);
   assert.equal(
     metadata["select.trigger"]?.find(({ name }) => name === "className"),
     undefined,

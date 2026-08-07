@@ -11,17 +11,15 @@ describe("Select playground", () => {
   it("serializes a constrained Select composition without default props", () => {
     const source = serializeSelectPlayground({
       size: "m",
-      itemSize: "s",
       width: "content",
       disabled: false,
-      prefix: false,
-      suffix: false,
     });
 
     expect(source).toContain('<Select.Root items={options} defaultValue="main">');
-    expect(source).toContain('<Select.Trigger aria-label="Branch">');
+    expect(source).toContain(
+      '<Select.Trigger aria-label="Branch" placeholder="Select a branch" />',
+    );
     expect(source).not.toContain('size="m"');
-    expect(source).not.toContain('<Select.Item key={option.value} value={option.value} size="s">');
     expect(source).not.toContain('width="content"');
   });
 
@@ -42,18 +40,5 @@ describe("Select playground", () => {
       (container.querySelector('[data-slot="select-trigger"]') as HTMLButtonElement).disabled,
     ).toBe(false);
     expect(container.querySelector("pre")?.textContent).not.toContain("disabled");
-  });
-
-  it("serializes a non-default option size", () => {
-    const source = serializeSelectPlayground({
-      size: "m",
-      itemSize: "l",
-      width: "content",
-      disabled: false,
-      prefix: false,
-      suffix: false,
-    });
-
-    expect(source).toContain('value={option.value} size="l"');
   });
 });

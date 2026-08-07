@@ -384,24 +384,14 @@ export function MutationField({
               }
             }}
           >
-            <Select.Trigger id={fieldId} fullWidth>
-              <Select.Value placeholder="Select value" />
-              <Select.Icon />
-            </Select.Trigger>
-            <Select.Portal>
-              <Select.Positioner>
-                <Select.Popup>
-                  <Select.List>
-                    {column.column_type.variants.map((variant) => (
-                      <Select.Item key={variant} value={variant}>
-                        <Select.ItemIndicator />
-                        <Select.ItemText>{variant}</Select.ItemText>
-                      </Select.Item>
-                    ))}
-                  </Select.List>
-                </Select.Popup>
-              </Select.Positioner>
-            </Select.Portal>
+            <Select.Trigger id={fieldId} placeholder="Select value" width="full" />
+            <Select.Content>
+              {column.column_type.variants.map((variant) => (
+                <Select.Item key={variant} value={variant}>
+                  {variant}
+                </Select.Item>
+              ))}
+            </Select.Content>
           </Select.Root>
           {defaultRestoreControl}
         </Box>

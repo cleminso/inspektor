@@ -8,6 +8,21 @@
 
 ## Implemented foundation
 
+[07/08/26]
+
+- [x] Place the selected check indicator after the option label as a trailing indicator.
+- [x] Replace the trigger triangle glyph with a chevron-down icon.
+- [x] Keep compact triggers stable while placing the chevron directly after short selected values.
+- [x] Document content, compact, and full trigger-width behavior.
+
+[07/08/26]
+
+- [x] Keep Base UI state styling while reducing the public Select anatomy to Root, Label, Trigger, Content, and Item.
+- [x] Make Trigger own selected-value and chevron rendering.
+- [x] Make Content own portal, positioning, popup, list, and scrollbar composition.
+- [x] Make Item own selected indicator, text presentation, and standard row sizing.
+- [x] Remove unused adornment, low-level composition, item-size, and deprecated width APIs.
+
 [06/08/26]
 
 - [x] Use the `xs` gap between the selected value and trigger indicator.

@@ -17,6 +17,8 @@ Before editing files for a substantial task involving a TanStack package:
 - [Active workspace](#active-workspace)
 - [Implementation checklists](#implementation-checklists)
 - [Commands](#commands)
+- [Debugging workflow](#debugging-workflow)
+- [Editing and validation](#editing-and-validation)
 - [Architecture](#architecture)
 - [Import boundaries](#import-boundaries)
 - [Design-system constraints](#design-system-constraints)
@@ -85,6 +87,23 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
   - `pnpm --filter inspector.design-system build`
   - `pnpm --filter inspector.design-system typecheck`
   - `pnpm --filter inspector.design-system lint`
+
+## Debugging workflow
+
+- Treat a reported cause as a hypothesis. Compare broken and working paths and isolate their smallest implementation difference before editing.
+- For rendering or performance defects, inspect runtime structure, computed styles, render fan-out, observers, layout reads, and DOM writes before changing global infrastructure.
+- Do not change font loading, network hints, compositor hints, virtualization settings, or application bootstrap behavior without evidence that subsystem causes the defect.
+- Confirm a regression test fails for the reported behavior, not because its fixture or test harness is incorrect.
+
+## Editing and validation
+
+- Preserve existing file formatting and exclude unrelated formatting churn from behavioral changes.
+- After a multi-hunk or replacement patch, inspect the resulting file or semantic diff before running tests.
+- Validate in order: focused test, changed-file lint, browser behavior when applicable, affected-package typecheck and build, then one package-wide test pass.
+- Run StyleX lint immediately after editing styles; follow a nearby passing property order instead of guessing or alphabetizing it.
+- Prefer contract invariants over manually calculated expectations for long identifiers, Unicode strings, ranges, and offsets.
+- Stabilize source APIs before regenerating metadata, and commit generated output with its source change.
+- Do not modify the Git index unless the user requests it; inspect cached and working-tree diffs separately when changes are already staged.
 
 ## Architecture
 

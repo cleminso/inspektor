@@ -22,34 +22,67 @@ function Options() {
 }
 
 describe('Select', () => {
-  it('uses the standard treatment on its scrolling list', () => {
+  it('owns the trigger value, icon, popup structure, and item presentation', () => {
     render(
-      <Select.Root items={items} defaultOpen>
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
+      <Select.Root items={items} defaultValue="main" defaultOpen>
+        <Select.Trigger aria-label="Branch" />
         <Options />
       </Select.Root>,
     )
 
+    const trigger = screen.getByRole('combobox')
+    const option = screen.getByRole('option', { name: 'Main' })
+
+    expect(trigger.textContent).toContain('Main')
+    expect(trigger.querySelectorAll('[data-slot="select-icon"]')).toHaveLength(1)
+    expect(option.querySelectorAll('[data-slot="select-item-indicator"]')).toHaveLength(1)
+    expect(option.querySelectorAll('[data-slot="select-item-text"]')).toHaveLength(1)
     expect(screen.getByRole('listbox').getAttribute('data-scrollbar')).toBe('standard')
   })
 
-  it('preserves single-select value types', () => {
+  it('uses a chevron trigger icon and places the selected check after the item text', () => {
+    render(
+      <Select.Root items={items} defaultValue="main" defaultOpen>
+        <Select.Trigger aria-label="Branch" />
+        <Options />
+      </Select.Root>,
+    )
+
+    const triggerIcon = screen.getByRole('combobox').querySelector('[data-slot="select-icon"]')
+    const option = screen.getByRole('option', { name: 'Main' })
+    const itemText = option.querySelector('[data-slot="select-item-text"]')
+    const itemIndicator = option.querySelector('[data-slot="select-item-indicator"]')
+
+    expect(triggerIcon?.querySelector('[data-slot="select-chevron"]')).toBeTruthy()
+    expect(itemText?.nextElementSibling).toBe(itemIndicator)
+  })
+
+  it('renders a trigger placeholder through its constrained API', () => {
+    render(
+      <Select.Root items={items}>
+        <Select.Trigger aria-label="Branch" placeholder="Select a branch" />
+      </Select.Root>,
+    )
+
+    expect(screen.getByRole('combobox').textContent).toContain('Select a branch')
+  })
+
+  it('preserves single-select value and form types', () => {
     expectTypeOf<SelectRootProps<'main' | 'preview'>['value']>().toEqualTypeOf<
       'main' | 'preview' | null | undefined
     >()
     expectTypeOf<SelectRootProps<'main' | 'preview'>['defaultValue']>().toEqualTypeOf<
       'main' | 'preview' | null | undefined
     >()
+    expectTypeOf<SelectRootProps<'main' | 'preview'>['name']>().toEqualTypeOf<
+      string | undefined
+    >()
   })
 
-  it('updates an uncontrolled value through a composed item', () => {
+  it('updates an uncontrolled value through an item', () => {
     render(
       <Select.Root items={items} defaultValue="main" defaultOpen>
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
+        <Select.Trigger aria-label="Branch" />
         <Options />
       </Select.Root>,
     )
@@ -65,9 +98,7 @@ describe('Select', () => {
     const onValueChange = vi.fn()
     render(
       <Select.Root items={items} value="main" onValueChange={onValueChange} defaultOpen>
-        <Select.Trigger>
-          <Select.Value />
-        </Select.Trigger>
+        <Select.Trigger aria-label="Branch" />
         <Options />
       </Select.Root>,
     )
@@ -80,29 +111,23 @@ describe('Select', () => {
     expect(screen.getByRole('combobox').textContent).toContain('Main')
   })
 
-  it('disables the control and individual options', () => {
+  it('disables the complete control and individual items', () => {
     const onDisabledControlChange = vi.fn()
     const { rerender } = render(
       <Select.Root items={items} disabled onValueChange={onDisabledControlChange} defaultOpen>
-        <Select.Trigger>
-          <Select.Value placeholder="Branch" />
-        </Select.Trigger>
+        <Select.Trigger aria-label="Branch" placeholder="Select a branch" />
         <Options />
       </Select.Root>,
     )
 
     expect(screen.getByRole('combobox').hasAttribute('disabled')).toBe(true)
-    const disabledRootOption = screen.getByRole('option', { name: 'Preview' })
-    fireEvent.pointerDown(disabledRootOption, { pointerType: 'mouse' })
-    fireEvent.click(disabledRootOption)
+    fireEvent.click(screen.getByRole('option', { name: 'Preview' }))
     expect(onDisabledControlChange).not.toHaveBeenCalled()
 
-    const onDisabledOptionChange = vi.fn()
+    const onDisabledItemChange = vi.fn()
     rerender(
-      <Select.Root items={items} onValueChange={onDisabledOptionChange} defaultOpen>
-        <Select.Trigger>
-          <Select.Value placeholder="Branch" />
-        </Select.Trigger>
+      <Select.Root items={items} onValueChange={onDisabledItemChange} defaultOpen>
+        <Select.Trigger aria-label="Branch" />
         <Select.Content>
           <Select.Item value="main">Main</Select.Item>
           <Select.Item value="preview" disabled>
@@ -112,53 +137,27 @@ describe('Select', () => {
       </Select.Root>,
     )
 
-    const disabledOption = screen.getByRole('option', { name: 'Preview' })
-    fireEvent.pointerDown(disabledOption, { pointerType: 'mouse' })
-    fireEvent.click(disabledOption)
-    expect(disabledOption.getAttribute('aria-disabled')).toBe('true')
-    expect(onDisabledOptionChange).not.toHaveBeenCalled()
+    const disabledItem = screen.getByRole('option', { name: 'Preview' })
+    fireEvent.click(disabledItem)
+    expect(disabledItem.getAttribute('aria-disabled')).toBe('true')
+    expect(onDisabledItemChange).not.toHaveBeenCalled()
   })
 
   it('associates its label with the trigger', () => {
     render(
       <Select.Root>
         <Select.Label>Branch</Select.Label>
-        <Select.Trigger>
-          <Select.Value placeholder="Choose" />
-        </Select.Trigger>
+        <Select.Trigger placeholder="Select a branch" />
       </Select.Root>,
     )
 
     expect(screen.getByRole('combobox', { name: 'Branch' })).toBeTruthy()
   })
 
-  it('associates grouped options with their group label', () => {
-    render(
-      <Select.Root defaultOpen>
-        <Select.Trigger aria-label="Branch">
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Group>
-            <Select.GroupLabel>Active branches</Select.GroupLabel>
-            <Select.Item value="main">Main</Select.Item>
-          </Select.Group>
-          <Select.Separator />
-          <Select.Item value="archived">Archived</Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    )
-
-    expect(screen.getByRole('group', { name: 'Active branches' })).toBeTruthy()
-    expect(screen.getByRole('separator')).toBeTruthy()
-  })
-
-  it('applies constrained size and width options', () => {
+  it('applies constrained trigger size and width options', () => {
     render(
       <Select.Root>
-        <Select.Trigger size="l" width="full">
-          <Select.Value placeholder="Branch" />
-        </Select.Trigger>
+        <Select.Trigger aria-label="Branch" size="l" width="full" />
       </Select.Root>,
     )
 
@@ -167,129 +166,16 @@ describe('Select', () => {
     expect(trigger.getAttribute('data-width')).toBe('full')
   })
 
-  it('applies a fixed compact width for short option sets', () => {
+  it('applies the compact fixed width', () => {
     render(
       <Select.Root>
-        <Select.Trigger width="compact">
-          <Select.Value placeholder="1000" />
-        </Select.Trigger>
+        <Select.Trigger aria-label="Page size" width="compact" />
       </Select.Root>,
     )
 
-    const trigger = screen.getByRole('combobox')
-    expect(trigger.getAttribute('data-width')).toBe('compact')
-    expect(trigger.className).toContain(stylex.props(selectStyles.triggerWidthCompact).className)
-  })
-
-  it('applies a constrained size to popup items', () => {
-    render(
-      <Select.Root defaultOpen>
-        <Select.Trigger aria-label="Branch">
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="main" size="l">
-            Main
-          </Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    )
-
-    expect(screen.getByRole('option', { name: 'Main' }).getAttribute('data-size')).toBe('l')
-  })
-
-  it('reserves a leading indicator slot before option text', () => {
-    render(
-      <Select.Root defaultValue="main" defaultOpen>
-        <Select.Trigger aria-label="Branch">
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="main">Main</Select.Item>
-          <Select.Item value="preview">Preview</Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    )
-
-    const option = screen.getByRole('option', { name: 'Main' })
-    const indicator = option.querySelector('[data-slot="select-item-indicator"]')
-    const text = option.querySelector('[data-slot="select-item-text"]')
-
-    expect(indicator).not.toBeNull()
-    expect(text).not.toBeNull()
-    expect(
-      indicator!.compareDocumentPosition(text!) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy()
-  })
-
-  it('composes trigger adornments and owned icons without duplicating legacy parts', () => {
-    const { rerender } = render(
-      <Select.Root>
-        <Select.Trigger prefix={<span>Repository</span>} suffix={<span>Required</span>}>
-          <Select.Value placeholder="Branch" />
-        </Select.Trigger>
-      </Select.Root>,
-    )
-
-    const trigger = screen.getByRole('combobox')
-    expect(trigger.querySelectorAll('[data-slot="select-icon"]')).toHaveLength(1)
-    expect(trigger.textContent).toContain('Repository')
-    expect(trigger.textContent).toContain('Required')
-
-    rerender(
-      <Select.Root>
-        <Select.Trigger>
-          <Select.Value placeholder="Branch" />
-          <>
-            <Select.Icon />
-          </>
-        </Select.Trigger>
-      </Select.Root>,
-    )
-
-    expect(screen.getByRole('combobox').querySelectorAll('[data-slot="select-icon"]')).toHaveLength(
-      1,
+    expect(screen.getByRole('combobox').className).toContain(
+      stylex.props(selectStyles.triggerWidthCompact).className,
     )
   })
 
-  it('owns one selected-item indicator while accepting legacy item composition', () => {
-    const { rerender } = render(
-      <Select.Root defaultValue="main" defaultOpen>
-        <Select.Trigger aria-label="Branch">
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="main">Main</Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    )
-
-    expect(
-      screen
-        .getByRole('option', { name: 'Main' })
-        .querySelectorAll('[data-slot="select-item-indicator"]'),
-    ).toHaveLength(1)
-
-    rerender(
-      <Select.Root defaultValue="main" defaultOpen>
-        <Select.Trigger aria-label="Branch">
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="main">
-            <>
-              <Select.ItemText>Main</Select.ItemText>
-              <Select.ItemIndicator />
-            </>
-          </Select.Item>
-        </Select.Content>
-      </Select.Root>,
-    )
-
-    expect(
-      screen
-        .getByRole('option', { name: 'Main' })
-        .querySelectorAll('[data-slot="select-item-indicator"]'),
-    ).toHaveLength(1)
-  })
 })

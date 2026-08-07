@@ -71,14 +71,11 @@ export function TablePagination({
           }
         }}
       >
-        <Select.Trigger aria-label="Rows per page" size="s" width="compact">
-          <Select.Value />
-        </Select.Trigger>
-        <Select.Content align="start" side="bottom">
+        <Select.Trigger aria-label="Rows per page" size="s" width="content" />
+        <Select.Content>
           {pageSizeItems.map((item) => (
-            <Select.Item key={item.value} value={item.value} size="s">
-              <Select.ItemIndicator />
-              <Select.ItemText>{item.label}</Select.ItemText>
+            <Select.Item key={item.value} value={item.value}>
+              {item.label}
             </Select.Item>
           ))}
         </Select.Content>

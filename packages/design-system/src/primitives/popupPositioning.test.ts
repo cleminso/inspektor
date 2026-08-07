@@ -5,7 +5,7 @@ import type { ContextMenuContentProps, ContextMenuPositionerProps } from '../com
 import type { ContextSwitcherContentProps } from '../components/contextSwitcher/contextSwitcher'
 import type { MenuContentProps, MenuPositionerProps } from '../components/menu/menu'
 import type { MultiSelectContentProps } from '../components/multiSelect/multiSelect'
-import type { SelectContentProps, SelectPositionerProps } from '../components/select/select'
+import type { SelectContentProps } from '../components/select/select'
 import type { TooltipContentProps } from '../components/tooltip/tooltip'
 
 type ExposesArbitraryOffsets<Props> =
@@ -26,7 +26,6 @@ describe('popup positioning contract', () => {
     expectTypeOf<ExposesArbitraryOffsets<ComboboxPositionerProps>>().toEqualTypeOf<false>()
     expectTypeOf<ExposesArbitraryOffsets<ComboboxContentProps>>().toEqualTypeOf<false>()
     expectTypeOf<ExposesArbitraryOffsets<ContextSwitcherContentProps>>().toEqualTypeOf<false>()
-    expectTypeOf<ExposesArbitraryOffsets<SelectPositionerProps>>().toEqualTypeOf<false>()
     expectTypeOf<ExposesArbitraryOffsets<SelectContentProps>>().toEqualTypeOf<false>()
     expectTypeOf<ExposesArbitraryOffsets<MultiSelectContentProps>>().toEqualTypeOf<false>()
     expectTypeOf<ExposesArbitraryOffsets<TooltipContentProps>>().toEqualTypeOf<false>()
@@ -39,9 +38,12 @@ describe('popup positioning contract', () => {
     expectTypeOf<ExposesSemanticAlign<ContextMenuPositionerProps>>().toEqualTypeOf<true>()
     expectTypeOf<ExposesSemanticSide<ComboboxPositionerProps>>().toEqualTypeOf<true>()
     expectTypeOf<ExposesSemanticAlign<ComboboxPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSemanticSide<SelectPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSemanticAlign<SelectPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSelectedItemAlignment<SelectPositionerProps>>().toEqualTypeOf<true>()
+  })
+
+  it('keeps Select placement internal', () => {
+    expectTypeOf<ExposesSemanticSide<SelectContentProps>>().toEqualTypeOf<false>()
+    expectTypeOf<ExposesSemanticAlign<SelectContentProps>>().toEqualTypeOf<false>()
+    expectTypeOf<ExposesSelectedItemAlignment<SelectContentProps>>().toEqualTypeOf<false>()
   })
 
   it('exposes semantic side placement through Combobox Content', () => {
