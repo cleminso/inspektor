@@ -13,6 +13,7 @@ import {
   reorderTableTabs,
   replaceNewViewTab,
   saveTableTabsState,
+  sanitizeTableTabsState,
   type TableDataTab,
   type TableTab,
 } from "@tables/workspace/tabs";
@@ -142,17 +143,114 @@ describe("table tabs", () => {
     });
 
     expect(result).toEqual({
-      activeTabId: "view:accounts-schema",
+      activeTabId: "schema:accounts",
       tabs: [
         baseTab,
         {
           kind: "table",
-          id: "view:accounts-schema",
+          id: "schema:accounts",
           tableName: "accounts",
           search: { view: "schema" },
         },
       ],
     });
+  });
+
+  it("opens schema separately from an active filtered data view", () => {
+    const filteredTab: TableDataTab = {
+      kind: "table",
+      id: "view:accounts-filtered",
+      tableName: "accounts",
+      search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
+    };
+
+    const result = reconcileTableTab({
+      activeTabId: filteredTab.id,
+      createId: () => "unused",
+      search: { filters: "active-filter", sort: "createdAt", dir: "desc", view: "schema" },
+      tableName: "accounts",
+      tabs: [filteredTab],
+    });
+
+    expect(result).toEqual({
+      activeTabId: "schema:accounts",
+      tabs: [
+        filteredTab,
+        {
+          kind: "table",
+          id: "schema:accounts",
+          tableName: "accounts",
+          search: { view: "schema" },
+        },
+      ],
+    });
+  });
+
+  it("activates the existing canonical schema view", () => {
+    const schemaTab: TableDataTab = {
+      kind: "table",
+      id: "schema:accounts",
+      tableName: "accounts",
+      search: { view: "schema" },
+    };
+
+    const result = reconcileTableTab({
+      activeTabId: "table:accounts",
+      createId: () => "unused",
+      search: { filters: "ignored-filter", sort: "ignored-sort", view: "schema" },
+      tableName: "accounts",
+      tabs: [
+        { kind: "table", id: "table:accounts", tableName: "accounts", search: {} },
+        schemaTab,
+      ],
+    });
+
+    expect(result.activeTabId).toBe(schemaTab.id);
+    expect(result.tabs).toHaveLength(2);
+    expect(result.tabs[1]).toEqual(schemaTab);
+  });
+
+  it("replaces an active New view when opening a table beside existing tabs", () => {
+    const newViewTab = { kind: "newView", id: NEW_VIEW_TAB_ID } as const;
+    const existingTab = {
+      kind: "table" as const,
+      id: "table:users",
+      tableName: "users",
+      search: {},
+    };
+
+    const result = reconcileTableTab({
+      activeTabId: NEW_VIEW_TAB_ID,
+      createId: () => "unused",
+      search: {},
+      tableName: "accounts",
+      tabs: [existingTab, newViewTab],
+    });
+
+    expect(result.tabs).toEqual([
+      existingTab,
+      { kind: "table", id: "table:accounts", tableName: "accounts", search: {} },
+    ]);
+  });
+
+  it("keeps New view when activating an existing table tab", () => {
+    const newViewTab = { kind: "newView", id: NEW_VIEW_TAB_ID } as const;
+    const existingTab = {
+      kind: "table" as const,
+      id: "table:accounts",
+      tableName: "accounts",
+      search: {},
+    };
+
+    const result = reconcileTableTab({
+      activeTabId: NEW_VIEW_TAB_ID,
+      createId: () => "unused",
+      search: {},
+      tableName: "accounts",
+      tabs: [existingTab, newViewTab],
+    });
+
+    expect(result.tabs).toEqual([existingTab, newViewTab]);
   });
 
   it("updates the active filtered tab when its route search changes", () => {
@@ -226,6 +324,79 @@ describe("table tabs", () => {
 
     expect(firstResult.activeTabId).toBe(NEW_VIEW_TAB_ID);
     expect(secondResult.tabs).toEqual(firstResult.tabs);
+  });
+
+  it("replaces a sole New view when base tabs open", () => {
+    const newViewTab = { kind: "newView", id: NEW_VIEW_TAB_ID } as const;
+
+    expect(openBaseTableTabs([newViewTab], ["accounts"])).toEqual({
+      activeTabId: "table:accounts",
+      tabs: [{ kind: "table", id: "table:accounts", tableName: "accounts", search: {} }],
+    });
+  });
+
+  it("repairs persisted schema identities and removes unavailable tables", () => {
+    const state = sanitizeTableTabsState(
+      {
+        tabs: [
+          { kind: "newView", id: NEW_VIEW_TAB_ID },
+          {
+            kind: "table",
+            id: "view:legacy-schema",
+            tableName: "accounts",
+            search: { filters: "ignored", view: "schema" },
+          },
+          {
+            kind: "table",
+            id: "schema:accounts-copy",
+            tableName: "accounts",
+            search: { view: "schema" },
+          },
+          {
+            kind: "table",
+            id: "view:malformed",
+            tableName: "view:malformed",
+            search: { view: "schema" },
+          },
+        ],
+        recentViews: [],
+      },
+      ["accounts"],
+    );
+
+    expect(state.tabs).toEqual([
+      { kind: "newView", id: NEW_VIEW_TAB_ID },
+      {
+        kind: "table",
+        id: "schema:accounts",
+        tableName: "accounts",
+        search: { view: "schema" },
+      },
+    ]);
+  });
+
+  it("preserves state identity when persisted tabs already match the available schema", () => {
+    const state = {
+      tabs: [
+        { kind: "newView" as const, id: NEW_VIEW_TAB_ID },
+        {
+          kind: "table" as const,
+          id: "schema:accounts",
+          tableName: "accounts",
+          search: { view: "schema" },
+        },
+      ],
+      recentViews: [
+        {
+          kind: "table" as const,
+          id: "table:accounts",
+          tableName: "accounts",
+          search: {},
+        },
+      ],
+    };
+
+    expect(sanitizeTableTabsState(state, ["accounts"])).toBe(state);
   });
 
   it("replaces the new-view placeholder with a selected table view", () => {

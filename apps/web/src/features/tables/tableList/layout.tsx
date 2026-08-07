@@ -29,13 +29,8 @@ export function useSidePanelLayout(): SidePanelLayoutContextValue {
   return value;
 }
 
-interface SidePanelLayoutControl {
-  isOpen: boolean;
-  toggle: () => void;
-}
-
 interface SidePanelLayoutProviderProps {
-  children: React.ReactNode | ((control: SidePanelLayoutControl) => React.ReactNode);
+  children: React.ReactNode;
 }
 
 interface SidePanelLayoutRootProps {
@@ -71,11 +66,9 @@ export function SidePanelLayoutProvider({
     () => ({ isOpen, panelRef, setIsOpenFromSize, toggle }),
     [isOpen, panelRef, setIsOpenFromSize, toggle],
   );
-  const content = typeof children === "function" ? children({ isOpen, toggle }) : children;
-
   return (
     <SidePanelLayoutContext.Provider value={contextValue}>
-      {content}
+      {children}
     </SidePanelLayoutContext.Provider>
   );
 }

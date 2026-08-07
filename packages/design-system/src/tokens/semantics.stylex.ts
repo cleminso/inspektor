@@ -160,6 +160,7 @@ export const spatial = stylex.defineVars({
   'switch-thumb-s': dimensions[12],
   'switch-thumb-m': dimensions[14],
   'tab-height': dimensions[26],
+  'tab-view-min-width': dimensions[64],
   'textarea-height-s': dimensions[72],
   'textarea-height-m': dimensions[112],
   'textarea-height-l': dimensions[160],

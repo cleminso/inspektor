@@ -14,6 +14,7 @@ import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
   createTableTabRouteSearch,
+  createSchemaTableTabId,
   loadTableTabsState,
   openBaseTableTabs,
   openNewViewTab,
@@ -22,6 +23,7 @@ import {
   reorderTableTabs,
   replaceNewViewTab,
   saveTableTabsState,
+  sanitizeTableTabsState,
   type TableDataTab,
   type TableTab,
   type TableTabSearch,
@@ -29,6 +31,7 @@ import {
   type TableTabsRouteSearch,
 } from "@tables/workspace/tabs";
 import { appRoutes } from "@app/routing/appRoutes";
+import { useAvailableTables } from "@tables/schema/useAvailableTables";
 
 interface RouteSearch extends TableTabsRouteSearch {
   tab?: string;
@@ -43,6 +46,7 @@ interface TableTabsContextValue {
   openBaseTabs: (orderedTableNames: readonly string[]) => void;
   openNewView: () => void;
   openRecentView: (view: TableDataTab) => void;
+  openSchemaView: (tableName: string) => void;
   reorderTabs: (orderedTabIds: readonly string[]) => void;
 }
 
@@ -95,6 +99,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const { currentConnectionId, currentTableName } = useInspector();
   const navigate = useNavigate({ from: appRoutes.tables });
   const routeSearch = useSearch({ strict: false }) as RouteSearch;
+  const { isSchemaReady, tables: availableTables } = useAvailableTables();
   const [state, setState] = useState<TableTabsProviderState>(() => ({
     ...loadTableTabsState(scope),
     activeTabId: null,
@@ -138,50 +143,83 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
 
   useEffect(() => {
     setState((currentState) => {
+      const sanitizedTabsState =
+        isSchemaReady === true
+          ? sanitizeTableTabsState(currentState, availableTables)
+          : currentState;
+      const sanitizedState =
+        sanitizedTabsState === currentState
+          ? currentState
+          : { ...sanitizedTabsState, activeTabId: currentState.activeTabId };
       if (currentTableName === null) {
         if (routeSearch.empty === "true") {
-          const result = openNewViewTab(currentState.tabs);
+          const result = openNewViewTab(sanitizedState.tabs);
           if (
-            tabsMatch(result.tabs, currentState.tabs) === true &&
-            currentState.activeTabId === NEW_VIEW_TAB_ID
+            tabsMatch(result.tabs, sanitizedState.tabs) === true &&
+            sanitizedState.activeTabId === NEW_VIEW_TAB_ID
           ) {
-            return currentState;
+            return sanitizedState;
           }
 
-          return { ...currentState, tabs: result.tabs, activeTabId: NEW_VIEW_TAB_ID };
+          return { ...sanitizedState, tabs: result.tabs, activeTabId: NEW_VIEW_TAB_ID };
         }
 
-        return currentState.activeTabId === null
-          ? currentState
-          : { ...currentState, activeTabId: null };
+        return sanitizedState.activeTabId === null
+          ? sanitizedState
+          : { ...sanitizedState, activeTabId: null };
       }
 
-      const tabsWithoutNewView = currentState.tabs.filter((tab) => tab.kind !== "newView");
+      if (
+        isSchemaReady === true &&
+        availableTables.includes(currentTableName) === false
+      ) {
+        const result = openNewViewTab(sanitizedState.tabs);
+        return { ...sanitizedState, tabs: result.tabs, activeTabId: NEW_VIEW_TAB_ID };
+      }
+
       const result = reconcileTableTab({
-        activeTabId: currentState.activeTabId,
+        activeTabId: sanitizedState.activeTabId,
         createId: createViewId,
         search: currentSearch,
         tableName: currentTableName,
-        tabs: tabsWithoutNewView,
+        tabs: sanitizedState.tabs,
       });
       const activeTableTab = result.tabs.find(
         (tab): tab is TableDataTab => tab.kind === "table" && tab.id === result.activeTabId,
       );
       const recentViews =
         activeTableTab === undefined
-          ? currentState.recentViews
-          : recordRecentTableView(currentState.recentViews, activeTableTab);
+          ? sanitizedState.recentViews
+          : recordRecentTableView(sanitizedState.recentViews, activeTableTab);
       if (
-        tabsMatch(result.tabs, currentState.tabs) === true &&
-        tabsMatch(recentViews, currentState.recentViews) === true &&
-        currentState.activeTabId === result.activeTabId
+        tabsMatch(result.tabs, sanitizedState.tabs) === true &&
+        tabsMatch(recentViews, sanitizedState.recentViews) === true &&
+        sanitizedState.activeTabId === result.activeTabId
       ) {
-        return currentState;
+        return sanitizedState;
       }
 
       return { tabs: result.tabs, recentViews, activeTabId: result.activeTabId };
     });
-  }, [currentSearch, currentTableName, routeSearch.empty]);
+  }, [availableTables, currentSearch, currentTableName, isSchemaReady, routeSearch.empty]);
+
+  useEffect(() => {
+    if (
+      currentConnectionId === null ||
+      currentTableName === null ||
+      isSchemaReady === false ||
+      availableTables.includes(currentTableName) === true
+    ) {
+      return;
+    }
+
+    void navigate({
+      to: appRoutes.tables,
+      params: { connectionId: currentConnectionId },
+      replace: true,
+      search: { empty: "true" },
+    });
+  }, [availableTables, currentConnectionId, currentTableName, isSchemaReady, navigate]);
 
   const navigateToTab = useCallback(
     (tab: TableTab) => {
@@ -273,7 +311,11 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
 
   const openBaseTabs = useCallback(
     (orderedTableNames: readonly string[]) => {
-      const result = openBaseTableTabs(state.tabs, orderedTableNames);
+      const sourceTabs =
+        state.activeTabId === NEW_VIEW_TAB_ID
+          ? state.tabs.filter((tab) => tab.kind !== "newView")
+          : state.tabs;
+      const result = openBaseTableTabs(sourceTabs, orderedTableNames);
       if (result.activeTabId === null) {
         return;
       }
@@ -290,18 +332,12 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       }));
       navigateToTab(activeTab);
     },
-    [navigateToTab, state.tabs],
+    [navigateToTab, state.activeTabId, state.tabs],
   );
 
   const openRecentView = useCallback(
     (view: TableDataTab) => {
-      const tabs =
-        state.activeTabId === NEW_VIEW_TAB_ID
-          ? replaceNewViewTab(state.tabs, view)
-          : replaceNewViewTab(
-              state.tabs.filter((tab) => tab.kind !== "newView"),
-              view,
-            );
+      const tabs = replaceNewViewTab(state.tabs, view);
       setState({
         tabs,
         recentViews: recordRecentTableView(state.recentViews, view),
@@ -309,7 +345,20 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       });
       navigateToTab(view);
     },
-    [navigateToTab, state.activeTabId, state.recentViews, state.tabs],
+    [navigateToTab, state.recentViews, state.tabs],
+  );
+
+  const openSchemaView = useCallback(
+    (tableName: string) => {
+      const schemaTab: TableDataTab = {
+        kind: "table",
+        id: createSchemaTableTabId(tableName),
+        tableName,
+        search: { view: "schema" },
+      };
+      navigateToTab(schemaTab);
+    },
+    [navigateToTab],
   );
 
   const reorderTabs = useCallback((orderedTabIds: readonly string[]) => {
@@ -329,6 +378,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       openBaseTabs,
       openNewView,
       openRecentView,
+      openSchemaView,
       reorderTabs,
     }),
     [
@@ -337,6 +387,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       openBaseTabs,
       openNewView,
       openRecentView,
+      openSchemaView,
       reorderTabs,
       state,
     ],

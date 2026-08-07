@@ -11,6 +11,21 @@
 
 ## Implemented foundation
 
+[07/08/26]
+
+- [x] Keep title overflow observation stable when callers recreate an equivalent prefix element.
+- [x] Verify reserved close spacing through the applied style instead of exposing test-only closable state in the DOM.
+- [x] Document why title observation depends on content rather than prefix ReactNode identity.
+
+[07/08/26]
+
+- [x] Supersede end ellipsis with clipped title text and show the trailing fade only when that title overflows.
+- [x] Keep an extra-extra-small gap between the title region and the reserved close action.
+- [x] Size short tabs from their content and cap long tabs at the existing `180px` semantic maximum.
+- [x] Compress tabs to a semantic `64px` minimum before horizontal overflow takes over.
+- [x] Keep prefixes leading, titles visible, and close actions in a reserved trailing region.
+- [x] Remove the compact title-hidden and centered-close substitution so compression preserves tab structure and geometry.
+
 [06/08/26]
 
 - [x] Forward focus and pointer intent events through `TabView.Item`'s owned tab button without including its sibling close action.
@@ -54,6 +69,10 @@
 
 ## Open product work
 
+[07/08/26]
+
+- [ ] Add programmatic selected-item nearest-edge reveal after drag state can be observed without competing with DND auto-scroll or transformed sortable geometry.
+
 [01/08/26]
 
 - None.
@@ -67,6 +86,13 @@
 - Tab overflow and close-action behavior.
 
 ## Settled interaction decisions
+
+[07/08/26]
+
+- [x] Use the trailing fade rather than an ellipsis only for tab names that actually clip.
+- [x] Separate the title and close regions with the extra-extra-small spacing token.
+- [x] Preserve the same leading prefix, visible title, and trailing close structure at every compressed width.
+- [x] Reserve close-action width whether the action is visible or hidden so hover, focus, and selection do not shift title geometry.
 
 [06/08/26]
 
@@ -97,6 +123,12 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[07/08/26]
+
+- [x] Cover stable title observation across equivalent prefix element identities.
+- [x] Cover the reserved close region through its applied Tab View style.
+- [x] Verify Tab View changed-file lint and the design-system typecheck, build, and package-wide tests.
 
 [06/08/26]
 

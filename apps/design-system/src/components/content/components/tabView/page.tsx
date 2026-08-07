@@ -22,7 +22,7 @@ export function TabViewPage(): ReactElement {
     <TabViewPlayground>
       <Section
         title="Behavior"
-        description="Views select on pointer interaction or arrow-key focus. A controlled value list and reorder callback enable horizontal pointer dragging while preserving touch scrolling. Every view name exposes supplementary tooltip context. The first tooltip observes the hover delay, while adjacent tooltip replacements open instantly without entrance motion. The close action appears for the active, hovered, or focused view and exposes a Close view tooltip. Press Delete while a tab is focused to close it. Sequential focus moves from the active tab into the panel content."
+        description="Views size to their content up to a 180px maximum, then compress to a readable minimum before the list scrolls. Long names clip beneath a trailing fade only when they overflow, while prefixes stay leading and closable views reserve a stable trailing close region with an extra-extra-small title gap. Views select on pointer interaction or arrow-key focus. A controlled value list and reorder callback enable horizontal pointer dragging while preserving touch scrolling. Every view name exposes supplementary tooltip context. The first tooltip observes the hover delay, while adjacent tooltip replacements open instantly without entrance motion. The close action appears for the active, hovered, or focused view and exposes a Close view tooltip. Press Delete while a tab is focused to close it. Sequential focus moves from the active tab into the panel content."
       />
       <Section title="Root props">
         <PropsTable rows={rootProps} />

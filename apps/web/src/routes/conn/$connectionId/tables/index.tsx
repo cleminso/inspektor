@@ -3,13 +3,12 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 
 import { appRoutes } from "@app/routing/appRoutes";
 import { useAvailableTables } from "@tables/schema/useAvailableTables";
-import { TableExplorerScreen } from "@tables/view";
 
 export const Route = createFileRoute("/conn/$connectionId/tables/")({
   component: TablesRoute,
 });
 
-function TablesRoute(): React.ReactElement {
+function TablesRoute(): null {
   const navigate = useNavigate();
   const params = Route.useParams();
   const search = useSearch({ strict: false }) as { empty?: string };
@@ -34,5 +33,5 @@ function TablesRoute(): React.ReactElement {
     });
   }, [isSchemaReady, navigate, params, search.empty, tables]);
 
-  return <TableExplorerScreen />;
+  return null;
 }

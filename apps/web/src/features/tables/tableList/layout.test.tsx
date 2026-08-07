@@ -45,14 +45,20 @@ afterEach(() => {
 });
 
 describe("SidePanelLayout", () => {
-  it("provides shell controls through its render boundary", () => {
+  it("provides shell controls to a descendant", () => {
+    function ShellControl(): React.ReactElement {
+      const { isOpen, toggle } = useSidePanelLayout();
+
+      return (
+        <button type="button" aria-pressed={isOpen} onClick={toggle}>
+          Toggle shell dock
+        </button>
+      );
+    }
+
     render(
       <SidePanelLayoutProvider>
-        {({ isOpen, toggle }) => (
-          <button type="button" aria-pressed={isOpen} onClick={toggle}>
-            Toggle shell dock
-          </button>
-        )}
+        <ShellControl />
       </SidePanelLayoutProvider>,
     );
 

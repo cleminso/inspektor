@@ -5,5 +5,4 @@ export const tabViewVars = stylex.defineVars({
   closeBackground: 'transparent',
   closeOpacity: 0,
   closePointerEvents: 'none',
-  fadeRight: '0',
 })

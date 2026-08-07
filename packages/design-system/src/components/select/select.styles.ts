@@ -63,7 +63,7 @@ export const selectStyles = stylex.create({
     whiteSpace: "nowrap",
     minWidth: spatial["select-min-width"],
   },
-  sizeS: { height: spatial["button-height-s"], paddingInline: spacing.s },
+  sizeS: { height: spatial["button-height-s"], paddingInline: spacing.xs },
   sizeM: { height: spatial["control-height-m"], paddingInline: spacing.m },
   sizeL: { height: spatial["control-height-l"], paddingInline: spacing.l },
   triggerWidthCompact: {

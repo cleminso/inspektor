@@ -19,6 +19,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[07/08/26]
+
+- [x] Keep schema-tab creation route-owned instead of reconciling tab state before navigation and again after navigation.
+- [x] Preserve tab-state identity when schema sanitization makes no semantic change so context consumers and persistence remain idle.
+- [x] Use the workspace provider's scope key as the single reset boundary for Table Explorer state.
+- [x] Document the schema sanitizer's reference-preserving no-op contract at its public function boundary.
+
 [06/08/26]
 
 - [x] Use tabular numerals for the page label so equal-length page numbers retain one width.
@@ -260,6 +267,15 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Workspace tabs
 
+[07/08/26]
+
+- [x] Replace the active New View when a new table, schema, or recent view opens, including when other tabs already exist.
+- [x] Preserve New View when an existing workspace tab is activated rather than newly opened.
+- [x] Give each table schema one canonical workspace identity and activate the existing schema tab instead of creating a duplicate.
+- [x] Open schema beside every data view, including filtered and sorted views, without replacing the source tab.
+- [x] Remove data-only route search from schema tab identity and persisted schema state.
+- [x] Repair persisted schema identities, duplicate tab IDs, and tabs that reference unavailable tables.
+
 [31/07/26]
 
 - [x] Keep data grid as the default table content and remove the table-list Data/Schema toggle.
@@ -274,6 +290,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Keep loaded-row extension from expanding an existing row or cell selection implicitly.
 
 ### Table-list dock
+
+[07/08/26]
+
+- [x] Keep the table workspace, tab strip, and resizable dock mounted across table and New View child-route changes.
+- [x] Preserve a collapsed table-list dock while New View opens or the final table tab closes.
+- [x] Consume side-panel controls from an explicit provider descendant instead of a provider render callback.
 
 [04/08/26]
 
@@ -715,6 +737,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[07/08/26]
+
+- [x] Cover reference-preserving no-op tab sanitization with a focused regression test.
+- [x] Verify focused workspace tab tests after simplifying route-owned schema reconciliation.
+- [x] Verify Inspector changed-file lint, typecheck, production build, and package-wide tests.
 
 [06/08/26]
 

@@ -2,8 +2,9 @@ import { Box, Button, TabView, Text } from '@inspector/ds'
 import { type ReactElement, useState } from 'react'
 
 const initialViews = [
-  { value: 'all', label: 'All accounts' },
+  { value: 'all', label: 'All' },
   { value: 'active', label: 'Active accounts sorted by creation date' },
+  { value: 'archived', label: 'Archived accounts' },
 ]
 
 function TableIcon(): ReactElement {

@@ -16,8 +16,6 @@ import {
 } from '../../tokens/value.stylex'
 import { tabViewVars } from './tabViewVars.stylex'
 
-const compactTab = '@container (max-width: 4rem)'
-
 export const tabViewStyles = stylex.create({
   root: {
     display: 'flex',
@@ -73,18 +71,12 @@ export const tabViewStyles = stylex.create({
       ':focus-within': 'auto',
       ':hover': 'auto',
     },
-    [tabViewVars.fadeRight]: {
-      default: '0',
-      ':focus-within': '100%',
-      ':hover': '100%',
-    },
     borderRadius: borderRadii.xs,
     overflow: 'hidden',
     alignItems: 'center',
     backgroundColor: tabViewVars.background,
-    containerType: 'inline-size',
     display: 'flex',
-    flexBasis: spatial['tab-view-width'],
+    flexBasis: 'auto',
     flexGrow: 0,
     flexShrink: 1,
     outlineColor: borderColors['outline'],
@@ -97,41 +89,32 @@ export const tabViewStyles = stylex.create({
     position: 'relative',
     height: spatial['tab-height'],
     maxWidth: spatial['tab-view-width'],
-    minWidth: spatial['tab-height'],
-    width: spatial['tab-view-width'],
+    minWidth: spatial['tab-view-min-width'],
+    width: 'fit-content',
   },
   itemActive: {
     [tabViewVars.background]: backgroundColors['bg-tab-selected'],
     [tabViewVars.closeBackground]: tabViewVars.background,
     [tabViewVars.closeOpacity]: 1,
     [tabViewVars.closePointerEvents]: 'auto',
-    [tabViewVars.fadeRight]: '100%',
   },
   itemDragging: {
     [tabViewVars.background]: backgroundColors['bg-tab-hover'],
     [tabViewVars.closeBackground]: tabViewVars.background,
     [tabViewVars.closeOpacity]: 1,
     [tabViewVars.closePointerEvents]: 'auto',
-    [tabViewVars.fadeRight]: '100%',
   },
   itemDisabled: {
     [tabViewVars.background]: 'transparent',
     [tabViewVars.closeOpacity]: 0,
     [tabViewVars.closePointerEvents]: 'none',
-    [tabViewVars.fadeRight]: '0',
     opacity: 0.6,
   },
   tab: {
     borderRadius: borderRadii.xs,
     borderStyle: 'none',
-    gap: {
-      default: spacing.xs,
-      [compactTab]: 0,
-    },
-    paddingInline: {
-      default: spacing.xs,
-      [compactTab]: 0,
-    },
+    gap: spacing.xs,
+    paddingInline: spacing.xs,
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: 'transparent',
@@ -144,10 +127,7 @@ export const tabViewStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
-    justifyContent: {
-      default: 'flex-start',
-      [compactTab]: 'center',
-    },
+    justifyContent: 'flex-start',
     lineHeight: lineHeights.ui,
     outlineStyle: 'none',
     textAlign: 'start',
@@ -155,6 +135,9 @@ export const tabViewStyles = stylex.create({
     height: '100%',
     minWidth: 0,
     width: '100%',
+  },
+  tabClosable: {
+    paddingRight: `calc(${spatial['control-height-s']} + ${spacing.xxs})`,
   },
   tabActive: {
     color: textColors['text-default'],
@@ -180,10 +163,7 @@ export const tabViewStyles = stylex.create({
   },
   title: {
     overflow: 'hidden',
-    display: {
-      default: 'block',
-      [compactTab]: 'none',
-    },
+    display: 'block',
     flexGrow: 1,
     flexShrink: 1,
     textOverflow: 'clip',
@@ -197,20 +177,10 @@ export const tabViewStyles = stylex.create({
     justifyContent: 'flex-start',
     pointerEvents: tabViewVars.closePointerEvents,
     position: 'absolute',
-    transform: {
-      default: 'translateY(-50%)',
-      [compactTab]: 'translate(-50%, -50%)',
-    },
+    transform: 'translateY(-50%)',
     zIndex: 1,
     height: spatial['button-height-xs'],
-    left: {
-      default: 'auto',
-      [compactTab]: '50%',
-    },
-    right: {
-      default: 0,
-      [compactTab]: 'auto',
-    },
+    right: 0,
     top: '50%',
     width: spatial['control-height-s'],
   },
@@ -218,15 +188,11 @@ export const tabViewStyles = stylex.create({
     '::before': {
       backgroundImage: `linear-gradient(to right, transparent, ${tabViewVars.background})`,
       content: '',
-      display: {
-        default: 'block',
-        [compactTab]: 'none',
-      },
       pointerEvents: 'none',
       position: 'absolute',
       zIndex: 0,
       height: '100%',
-      right: tabViewVars.fadeRight,
+      right: '100%',
       top: 0,
       width: spacing.xl,
     },

@@ -21,21 +21,6 @@ export function TableExplorerScreen(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
     useInspector();
   const scope = `${currentConnectionId ?? "none"}:${currentBranch ?? "none"}:${currentSchemaHash ?? "none"}`;
-
-  return (
-    <ScopedTableExplorerScreen key={scope} currentTableName={currentTableName} scope={scope} />
-  );
-}
-
-interface ScopedTableExplorerScreenProps {
-  currentTableName: string | null;
-  scope: string;
-}
-
-function ScopedTableExplorerScreen({
-  currentTableName,
-  scope,
-}: ScopedTableExplorerScreenProps): React.ReactElement {
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set());
   const [pinnedTableNames, setPinnedTableNames] = useState<ReadonlySet<string>>(() =>
     loadPinnedTableNames(scope),

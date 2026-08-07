@@ -209,6 +209,7 @@ export const dimensionValues = stylex.defineConsts({
   36: '2.25rem',
   40: '2.5rem',
   56: '3.5rem',
+  64: '4rem',
   72: '4.5rem',
   100: '6.25rem',
   112: '7rem',

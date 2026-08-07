@@ -64,19 +64,6 @@ describe("useTableExplorerSearchParams", () => {
     });
   });
 
-  it("opens schema and removes legacy tab identity", async () => {
-    searchState.value = { tab: "new-view" };
-    const { result } = renderHook(() => useTableExplorerSearchParams());
-
-    await act(async () => {
-      await result.current.openSchema();
-    });
-
-    const nextSearch = captureSearchUpdater()({ tab: "new-view" });
-
-    expect(nextSearch).toEqual({ view: "schema" });
-  });
-
   it("returns to the default data view when opening the row editor", async () => {
     searchState.value = { tab: "table:accounts", view: "schema" };
     const { result } = renderHook(() => useTableExplorerSearchParams());

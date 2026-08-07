@@ -38,7 +38,6 @@ interface UpdateSearchOptions {
 
 /** Parsed table explorer URL state plus setters that write back to route search params. */
 export interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
-  openSchema: () => Promise<void>
   setFilters: (filters: TableFilterClause[]) => Promise<void>
   setPage: (page: number) => Promise<void>
   setPageSize: (pageSize: TablePageSize) => Promise<void>
@@ -199,9 +198,6 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
 
   return {
     ...state,
-    openSchema: async () => {
-      await updateSearch({ mode: null, rowId: null, view: 'schema' })
-    },
     setFilters: async (filters) => {
       await updateSearch({
         filters: serializeFiltersToSearchParam(filters) ?? undefined,

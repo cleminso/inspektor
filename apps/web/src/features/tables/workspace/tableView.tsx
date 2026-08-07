@@ -16,9 +16,9 @@ import { Layers } from 'lucide-react'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
-import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import { getTableViewportScrollResetKey } from '@tables/workspace/tableViewport'
+import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
 
 interface TableViewProps {
@@ -42,7 +42,7 @@ const InsertRowForm = lazy(async () => {
 })
 
 export function TableView({ tableName }: TableViewProps): React.ReactElement {
-  const { openSchema } = useTableExplorerSearchParams()
+  const { openSchemaView } = useTableTabs()
   const state = useTableViewState({
     tableName,
   })
@@ -91,7 +91,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                         aria-label="Open schema"
                         iconOnly
                         onClick={() => {
-                          void openSchema()
+                          openSchemaView(tableName)
                         }}
                       >
                         <Icon

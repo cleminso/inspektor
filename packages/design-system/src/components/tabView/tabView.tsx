@@ -338,12 +338,12 @@ function TabViewItemContent({
 }: TabViewItemContentProps) {
   const context = useContext(TabViewContext)
   const active = context.value === value
-  const hasPrefix = prefix !== undefined
   const itemRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLSpanElement>(null)
   const [titleOverflowing, setTitleOverflowing] = useState(false)
   const tabStyles = createStateStyleProps<BaseTabs.Tab.State>((state) => [
     tabViewStyles.tab,
+    onClose !== undefined && tabViewStyles.tabClosable,
     state.active === true && tabViewStyles.tabActive,
     state.disabled === true && tabViewStyles.tabDisabled,
     state.orientation === 'horizontal' && tabViewStyles.tabHorizontal,
@@ -383,41 +383,26 @@ function TabViewItemContent({
     [setReorderRef],
   )
 
-  useEffect(() => {
-    const item = itemRef.current
+  // Content changes require an explicit measurement. Prefix and container geometry
+  // changes are reported by the title observer without depending on ReactNode identity.
+  useLayoutEffect(() => {
     const title = titleRef.current
-    if (item === null || title === null) {
+    if (title === null) {
       return
     }
 
-    let animationFrame: number | undefined
-    const measure = () => {
+    const updateTitleOverflow = () => {
       setTitleOverflowing(title.scrollWidth > title.clientWidth)
     }
-    const scheduleMeasure = () => {
-      if (animationFrame !== undefined) {
-        return
-      }
-      animationFrame = requestAnimationFrame(() => {
-        animationFrame = undefined
-        measure()
-      })
-    }
+    updateTitleOverflow()
 
-    measure()
     if (typeof ResizeObserver === 'undefined') {
       return
     }
-    const resizeObserver = new ResizeObserver(scheduleMeasure)
-    resizeObserver.observe(item)
-
-    return () => {
-      resizeObserver.disconnect()
-      if (animationFrame !== undefined) {
-        cancelAnimationFrame(animationFrame)
-      }
-    }
-  }, [children, hasPrefix])
+    const resizeObserver = new ResizeObserver(updateTitleOverflow)
+    resizeObserver.observe(title)
+    return () => resizeObserver.disconnect()
+  }, [children])
 
   return (
     <div
@@ -474,9 +459,7 @@ function TabViewItemContent({
         <div
           {...stylex.props(
             tabViewStyles.closeContainer,
-            titleOverflowing === true &&
-              disabled === false &&
-              tabViewStyles.closeContainerOverflowing,
+            titleOverflowing === true && tabViewStyles.closeContainerOverflowing,
           )}
           data-slot="tab-view-close"
         >

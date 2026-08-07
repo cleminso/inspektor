@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Tooltip } from '../tooltip/tooltip'
 import { tooltipStyles } from '../tooltip/tooltip.styles'
 import { TabView } from './tabView'
+import { tabViewStyles } from './tabView.styles'
 
 let onDragEnd: ((event: unknown) => void) | undefined
 let onDragStart: ((event: unknown) => void) | undefined
@@ -486,69 +487,39 @@ describe('TabView', () => {
     expect(closeCount).toBe(0)
   })
 
-  it('marks only titles whose rendered content overflows', async () => {
-    const scrollWidthDescriptor = Object.getOwnPropertyDescriptor(
-      HTMLElement.prototype,
-      'scrollWidth',
+  it('applies a stable trailing close region without replacing the leading prefix or title', () => {
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List aria-label="Table views">
+          <TabView.Item value="all" prefix={<span>Table</span>}>
+            All
+          </TabView.Item>
+          <TabView.Item
+            value="active"
+            prefix={<span>Table</span>}
+            closeLabel="Close Active accounts"
+            onClose={() => undefined}
+          >
+            Active accounts sorted by creation date
+          </TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
     )
-    const clientWidthDescriptor = Object.getOwnPropertyDescriptor(
-      HTMLElement.prototype,
-      'clientWidth',
+
+    const closableTab = screen.getByRole('tab', {
+      name: 'Active accounts sorted by creation date',
+    })
+    const closableItem = closableTab.closest('[data-slot="tab-view-item"]')
+
+    expect(closableItem?.hasAttribute('data-closable')).toBe(false)
+    expect(closableTab.className).toContain(
+      stylex.props(tabViewStyles.tabClosable).className,
     )
-
-    Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
-      configurable: true,
-      get() {
-        return this.textContent?.startsWith('Active') === true ? 240 : 80
-      },
-    })
-    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
-      configurable: true,
-      get() {
-        return 100
-      },
-    })
-
-    try {
-      render(
-        <TabView.Root defaultValue="all">
-          <TabView.List aria-label="Table views">
-            <TabView.Item value="all" onClose={() => undefined}>
-              All accounts
-            </TabView.Item>
-            <TabView.Item value="active" onClose={() => undefined}>
-              Active accounts sorted by creation date
-            </TabView.Item>
-          </TabView.List>
-        </TabView.Root>,
-      )
-
-      await waitFor(() => {
-        expect(
-          screen
-            .getByRole('tab', { name: 'Active accounts sorted by creation date' })
-            .closest('[data-slot="tab-view-item"]')
-            ?.getAttribute('data-title-overflow'),
-        ).toBe('true')
-      })
-      expect(
-        screen
-          .getByRole('tab', { name: 'All accounts' })
-          .closest('[data-slot="tab-view-item"]')
-          ?.getAttribute('data-title-overflow'),
-      ).toBe('false')
-    } finally {
-      if (scrollWidthDescriptor === undefined) {
-        delete (HTMLElement.prototype as { scrollWidth?: number }).scrollWidth
-      } else {
-        Object.defineProperty(HTMLElement.prototype, 'scrollWidth', scrollWidthDescriptor)
-      }
-      if (clientWidthDescriptor === undefined) {
-        delete (HTMLElement.prototype as { clientWidth?: number }).clientWidth
-      } else {
-        Object.defineProperty(HTMLElement.prototype, 'clientWidth', clientWidthDescriptor)
-      }
-    }
+    expect(closableTab.querySelector('[data-slot="tab-view-title"]')?.textContent).toBe(
+      'Active accounts sorted by creation date',
+    )
+    expect(closableItem?.querySelector('[aria-hidden="true"] span')?.textContent).toBe('Table')
+    expect(closableItem?.lastElementChild?.getAttribute('data-slot')).toBe('tab-view-close')
   })
 
   it('shows supplied details even when the title does not overflow', async () => {
@@ -593,12 +564,62 @@ describe('TabView', () => {
     })
   })
 
+  it('adds the trailing fade only when the title overflows', () => {
+    let resizeCallback: ResizeObserverCallback | undefined
+    class ResizeObserverMock {
+      private readonly callback: ResizeObserverCallback
+      constructor(callback: ResizeObserverCallback) {
+        this.callback = callback
+      }
+      observe(target: Element) {
+        if (target.getAttribute('data-slot') === 'tab-view-title') {
+          resizeCallback = this.callback
+        }
+      }
+      disconnect() {}
+    }
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+
+    try {
+      render(
+        <TabView.Root defaultValue="accounts">
+          <TabView.List aria-label="Table views">
+            <TabView.Item value="accounts" onClose={() => undefined}>
+              Account names sorted by creation date
+            </TabView.Item>
+          </TabView.List>
+        </TabView.Root>,
+      )
+
+      const item = screen
+        .getByRole('tab', { name: 'Account names sorted by creation date' })
+        .closest('[data-slot="tab-view-item"]')
+      const title = item?.querySelector('[data-slot="tab-view-title"]')
+      expect(item?.getAttribute('data-title-overflow')).toBe('false')
+
+      Object.defineProperties(title, {
+        clientWidth: { configurable: true, value: 100 },
+        scrollWidth: { configurable: true, value: 180 },
+      })
+      act(() => {
+        resizeCallback?.([], {} as ResizeObserver)
+      })
+
+      expect(item?.getAttribute('data-title-overflow')).toBe('true')
+      expect(item?.querySelector('[data-slot="tab-view-close"]')?.className).not.toBe(
+        stylex.props(tabViewStyles.closeContainer).className,
+      )
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('keeps its resize observer when the prefix element identity changes', () => {
-    let observedItemCount = 0
+    let observedTitleCount = 0
     class ResizeObserverMock {
       observe(target: Element) {
-        if (target.getAttribute('data-slot') === 'tab-view-item') {
-          observedItemCount += 1
+        if (target.getAttribute('data-slot') === 'tab-view-title') {
+          observedTitleCount += 1
         }
       }
       disconnect() {}
@@ -626,7 +647,7 @@ describe('TabView', () => {
         </TabView.Root>,
       )
 
-      expect(observedItemCount).toBe(1)
+      expect(observedTitleCount).toBe(1)
     } finally {
       vi.unstubAllGlobals()
     }
