@@ -6,6 +6,8 @@ import { useTableRows } from "@tables/query/useTableRows";
 
 let queryRows: DynamicTableRow[] | undefined;
 let queryError: unknown;
+let currentSchemaHash = "schema-1";
+let filters: unknown[] = [];
 let page = 1;
 let pageSize: 100 | 500 | 1000 = 100;
 let sortColumn = "id";
@@ -23,7 +25,7 @@ vi.mock("@app/providers/inspectorProvider", () => ({
 
 vi.mock("@tables/routing/useTableSearchParams", () => ({
   useTableExplorerSearchParams: () => ({
-    filters: [],
+    filters,
     page,
     pageSize,
     setPage,
@@ -64,6 +66,8 @@ vi.mock("@tables/query/useJazzQueryState", () => ({
 beforeEach(() => {
   queryRows = undefined;
   queryError = null;
+  currentSchemaHash = "schema-1";
+  filters = [];
   page = 1;
   pageSize = 100;
   setPage.mockReset();
@@ -155,6 +159,72 @@ describe("useTableRows", () => {
     );
 
     runtimeClient = { manager: {} };
+    queryRows = undefined;
+    rerender();
+
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.isInitialLoading).toBe(true);
+    expect(result.current.isRefreshing).toBe(false);
+  });
+
+  it.each([
+    {
+      name: "schema",
+      replaceScope: () => {
+        currentSchemaHash = "schema-2";
+      },
+    },
+    {
+      name: "filters",
+      replaceScope: () => {
+        filters = [{ column: "name", operator: "equals", value: "Grace" }];
+      },
+    },
+    {
+      name: "page",
+      replaceScope: () => {
+        page = 2;
+      },
+    },
+    {
+      name: "page size",
+      replaceScope: () => {
+        pageSize = 500;
+      },
+    },
+  ])("does not preserve resolved rows when the $name scope changes", ({ replaceScope }) => {
+    queryRows = [{ id: "row-1", name: "Ada" } as DynamicTableRow];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash,
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+
+    replaceScope();
+    queryRows = undefined;
+    rerender();
+
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.isInitialLoading).toBe(true);
+    expect(result.current.isRefreshing).toBe(false);
+  });
+
+  it("does not preserve resolved rows when the table scope changes", () => {
+    let tableName = "users";
+    queryRows = [{ id: "row-1", name: "Ada" } as DynamicTableRow];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash,
+        tableName,
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+
+    tableName = "accounts";
     queryRows = undefined;
     rerender();
 

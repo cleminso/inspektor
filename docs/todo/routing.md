@@ -13,6 +13,10 @@
 
 [08/08/26]
 
+- [x] Remount the Jazz provider when a saved profile object changes under the same persisted id, using an opaque reference token instead of credential material.
+
+[08/08/26]
+
 - [x] Remount the narrow registry-backed Jazz provider boundary by non-sensitive connection and branch identity so replacement runtimes cannot receive a retained previous client.
 - [x] Disable Jazz DevTools auto-attachment for the Inspector-owned runtime provider.
 
@@ -128,6 +132,11 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[08/08/26]
+
+- [x] Cover a replacement runtime remaining clientless until its matching client resolves.
+- [x] Cover credential replacement under one saved connection id without publishing the retained client.
 
 [08/08/26]
 

@@ -27,6 +27,19 @@ type InspectorContextValue = InspectorSessionContextValue;
 
 const InspectorContext = createContext<InspectorContextValue | null>(null);
 const InspectorRuntimeContext = createContext<InspectorRuntimeStore | null>(null);
+const connectionProfileTokens = new WeakMap<object, number>();
+let nextConnectionProfileToken = 0;
+
+function getConnectionProfileToken(connection: object): number {
+  const existingToken = connectionProfileTokens.get(connection);
+  if (existingToken !== undefined) {
+    return existingToken;
+  }
+
+  nextConnectionProfileToken += 1;
+  connectionProfileTokens.set(connection, nextConnectionProfileToken);
+  return nextConnectionProfileToken;
+}
 
 interface InspectorProviderProps extends PropsWithChildren {
   initialRuntimeTarget?: ResolvedTablesNavigationTarget;
@@ -126,7 +139,11 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
   );
   const clientIdentity =
     session.activeConnection !== null && session.currentBranch !== null
-      ? JSON.stringify([session.activeConnection.id, session.currentBranch])
+      ? JSON.stringify([
+          session.activeConnection.id,
+          getConnectionProfileToken(session.activeConnection),
+          session.currentBranch,
+        ])
       : null;
   const openConnection = useCallback(
     (connectionId: string) =>
