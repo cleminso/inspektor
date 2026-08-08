@@ -4,7 +4,7 @@
  * The hook turns route search state into a generic Jazz query, derives render columns from
  * stored schema metadata, and loads one URL-backed page without app-generated table types.
  */
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 
 import { type DynamicTableRow, type WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
@@ -144,19 +144,17 @@ export function useTableRows({
   // Keep compatible rows during sort refreshes and pagination, but never carry them into another
   // table, schema, filter set, page, page-size scope, or replacement Jazz manager.
   const resolvedRowsRef = useRef<ResolvedRowsState | null>(null)
-  if (rows !== undefined) {
-    resolvedRowsRef.current = {
-      dataScopeKey,
-      manager: client?.manager ?? null,
-      queryKey,
-      rows,
-    }
-  }
+  const manager = client?.manager ?? null
+  useLayoutEffect(() => {
+    if (rows === undefined) return
+
+    resolvedRowsRef.current = { dataScopeKey, manager, queryKey, rows }
+  }, [dataScopeKey, manager, queryKey, rows])
   const previousRowsState = resolvedRowsRef.current
   const canPreserveRows =
     queryState.status === 'pending' &&
     previousRowsState?.dataScopeKey === dataScopeKey &&
-    previousRowsState.manager === client?.manager
+    previousRowsState.manager === manager
   const resolvedRows = rows ?? (canPreserveRows === true ? previousRowsState.rows : EMPTY_ROWS)
   const hasNextPage = resolvedRows.length > pageSize
   const visibleRows = useMemo(

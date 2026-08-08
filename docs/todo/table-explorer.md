@@ -19,6 +19,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[08/08/26]
+
+- [x] Keep non-suspense Jazz query renders side-effect free by computing and peeking keys during render while registering cache entries only from React's subscription lifecycle.
+- [x] Observe Jazz query resets so stale fulfilled snapshots return to pending.
+- [x] Preserve only committed fulfilled row results during compatible same-manager refreshes.
+
 [07/08/26]
 
 - [x] Persist stored schemas in Jazz's JSON wire representation without a cache reviver that can reinterpret unknown fields.
@@ -715,6 +721,11 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[08/08/26]
+
+- Equivalent serialized query keys retain one subscription even when inline query-builder identity changes.
+- Abandoned fulfilled renders cannot become the source of preserved rows.
+
 [07/08/26]
 
 - Live rows may remain visible only while a query refreshes through the same Jazz manager.
@@ -795,6 +806,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[08/08/26]
+
+- [x] Cover render-safe query snapshots, commit-phase subscription acquisition, query reset, and equivalent-key subscription stability.
+- [x] Cover that an abandoned fulfilled render cannot replace the last committed preserved rows.
+- [x] Verify focused query tests, Inspector lint and typecheck, the production build, and package-wide tests.
 
 [07/08/26]
 

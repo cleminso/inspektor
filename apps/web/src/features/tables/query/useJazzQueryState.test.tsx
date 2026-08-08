@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import type { DynamicTableRow, QueryBuilder } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
+import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
@@ -10,6 +11,7 @@ const { entry, listeners, manager } = vi.hoisted(() => {
     onDelta?: () => void
     onError?: () => void
     onfulfilled?: () => void
+    onReset?: () => void
   }>()
   const entry = {
     state: {
@@ -23,8 +25,10 @@ const { entry, listeners, manager } = vi.hoisted(() => {
     }),
   }
   const manager = {
+    computeKey: vi.fn(() => 'query-key'),
     makeQueryKey: vi.fn(() => 'query-key'),
     getCacheEntry: vi.fn(() => entry),
+    peekState: vi.fn(() => entry.state),
   }
 
   return { entry, listeners, manager }
@@ -47,10 +51,26 @@ beforeEach(() => {
   }
   entry.subscribe.mockClear()
   manager.getCacheEntry.mockClear()
+  manager.computeKey.mockClear()
   manager.makeQueryKey.mockClear()
+  manager.peekState.mockClear()
 })
 
 describe('useJazzQueryState', () => {
+  it('does not register or create a cache entry during a render without a subscription commit', () => {
+    function QueryConsumer() {
+      useJazzQueryState(queryManager, query)
+      return null
+    }
+
+    renderToString(<QueryConsumer />)
+
+    expect(manager.computeKey).toHaveBeenCalledWith(query, undefined)
+    expect(manager.peekState).toHaveBeenCalledWith('query-key')
+    expect(manager.makeQueryKey).not.toHaveBeenCalled()
+    expect(manager.getCacheEntry).not.toHaveBeenCalled()
+  })
+
   it('exposes fulfilled rows from the shared Jazz cache entry', () => {
     const { result } = renderHook(() =>
       useJazzQueryState(queryManager, query, { propagation: 'full' }),
@@ -107,5 +127,66 @@ describe('useJazzQueryState', () => {
       error: null,
     })
     expect(manager.makeQueryKey).not.toHaveBeenCalled()
+  })
+
+  it('returns to pending when Jazz resets an active query', () => {
+    const { result } = renderHook(() => useJazzQueryState(queryManager, query))
+
+    act(() => {
+      entry.state = {
+        status: 'fulfilled',
+        data: [{ id: 'user-1' } as DynamicTableRow],
+        error: null,
+      }
+      for (const listener of listeners) listener.onfulfilled?.()
+    })
+
+    act(() => {
+      entry.state = { status: 'pending', data: undefined, error: null }
+      for (const listener of listeners) listener.onReset?.()
+    })
+
+    expect(result.current.status).toBe('pending')
+  })
+
+  it('does not resubscribe when an equivalent query builder replaces the previous object', () => {
+    const { rerender } = renderHook(
+      ({ currentQuery }) => useJazzQueryState(queryManager, currentQuery),
+      { initialProps: { currentQuery: query } },
+    )
+    const equivalentQuery = { ...query }
+
+    rerender({ currentQuery: equivalentQuery })
+
+    expect(entry.subscribe).toHaveBeenCalledOnce()
+    expect(manager.computeKey).toHaveBeenLastCalledWith(equivalentQuery, undefined)
+  })
+
+  it('unsubscribes from a replaced manager and reads the replacement snapshot', () => {
+    const replacementState = {
+      status: 'fulfilled' as const,
+      data: [{ id: 'replacement-row' } as DynamicTableRow],
+      error: null,
+    }
+    const replacementEntry = {
+      state: replacementState,
+      subscribe: vi.fn(() => () => undefined),
+    }
+    const replacementManager = {
+      computeKey: vi.fn(() => 'query-key'),
+      makeQueryKey: vi.fn(() => 'query-key'),
+      getCacheEntry: vi.fn(() => replacementEntry),
+      peekState: vi.fn(() => replacementState),
+    } as unknown as JazzClient['manager']
+    const { result, rerender } = renderHook(
+      ({ currentManager }) => useJazzQueryState(currentManager, query),
+      { initialProps: { currentManager: queryManager } },
+    )
+
+    rerender({ currentManager: replacementManager })
+
+    expect(listeners).toHaveLength(0)
+    expect(replacementEntry.subscribe).toHaveBeenCalledOnce()
+    expect(result.current).toBe(replacementState)
   })
 })

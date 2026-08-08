@@ -1,6 +1,6 @@
 import type { QueryBuilder, QueryOptions } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
-import { useCallback, useMemo, useSyncExternalStore } from 'react'
+import { useCallback, useRef, useSyncExternalStore } from 'react'
 
 /** Stable state projection exposed by one Jazz orchestrator cache entry. */
 export type JazzQueryState<T> =
@@ -15,7 +15,10 @@ const IDLE_QUERY_STATE = {
   error: null,
 } as const satisfies JazzQueryState<never>
 
-type JazzQueryManager = Pick<JazzClient['manager'], 'getCacheEntry' | 'makeQueryKey'>
+type JazzQueryManager = Pick<
+  JazzClient['manager'],
+  'computeKey' | 'getCacheEntry' | 'makeQueryKey' | 'peekState'
+>
 
 /**
  * Subscribes React to the canonical Jazz cache entry for a query.
@@ -29,33 +32,36 @@ export function useJazzQueryState<T extends { id: string }>(
   query: QueryBuilder<T> | undefined,
   options?: QueryOptions,
 ): JazzQueryState<T> {
-  const entry = useMemo(() => {
-    if (manager === null || query === undefined) {
-      return null
-    }
-
-    const key = manager.makeQueryKey(query, options)
-    return manager.getCacheEntry<T>(key)
-  }, [manager, options, query])
+  const key = manager !== null && query !== undefined ? manager.computeKey(query, options) : null
+  const queryRef = useRef(query)
+  queryRef.current = query
+  const optionsRef = useRef(options)
+  optionsRef.current = options
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
-      if (entry === null) {
+      const currentQuery = queryRef.current
+      if (manager === null || currentQuery === undefined || key === null) {
         return () => undefined
       }
 
+      manager.makeQueryKey(currentQuery, optionsRef.current)
+      const entry = manager.getCacheEntry<T>(key)
       return entry.subscribe({
         onDelta: onStoreChange,
         onError: onStoreChange,
         onfulfilled: onStoreChange,
+        onReset: onStoreChange,
       })
     },
-    [entry],
+    [key, manager],
   )
   // Return Jazz's state object directly: cloning it here would make every snapshot appear changed.
   const getSnapshot = useCallback(
     () =>
-      entry === null ? (IDLE_QUERY_STATE as JazzQueryState<T>) : (entry.state as JazzQueryState<T>),
-    [entry],
+      manager === null || key === null
+        ? (IDLE_QUERY_STATE as JazzQueryState<T>)
+        : (manager.peekState<T>(key) as JazzQueryState<T>),
+    [key, manager],
   )
 
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)

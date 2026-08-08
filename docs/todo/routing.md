@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[08/08/26]
+
+- [x] Remount the narrow registry-backed Jazz provider boundary by non-sensitive connection and branch identity so replacement runtimes cannot receive a retained previous client.
+- [x] Disable Jazz DevTools auto-attachment for the Inspector-owned runtime provider.
+
 [07/08/26]
 
 - [x] Include branch identity in the projected runtime store so branch changes synchronously stop exposing the previous client.
@@ -84,6 +89,11 @@
 
 ## Settled interaction decisions
 
+[08/08/26]
+
+- A connection or branch replacement remains clientless until the matching registry-backed Jazz provider resolves.
+- Provider identity may include persisted connection identity and branch, but never credential material.
+
 [07/08/26]
 
 - Branch changes create a fresh runtime projection before descendants render against the new route identity.
@@ -118,6 +128,13 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[08/08/26]
+
+- [x] Cover retained-client replacement across the runtime provider boundary.
+- [x] Cover disabled Jazz DevTools auto-attachment.
+- [x] Verify focused provider tests, Inspector lint and typecheck, the production build, and package-wide tests.
+- [ ] Browser verification covers resolved connection and branch replacement without previous-client queries or a nested Inspector overlay.
 
 [07/08/26]
 

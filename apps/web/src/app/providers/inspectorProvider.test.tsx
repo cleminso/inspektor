@@ -8,7 +8,7 @@ import type { StoredConnection } from "@app/connections/connections";
 const runtimeHolder = vi.hoisted(() => ({ current: null as unknown }));
 const sessionHolder = vi.hoisted(() => ({ current: null as unknown }));
 const jazzReactMocks = vi.hoisted(() => ({
-  client: { manager: {} },
+  clients: new Map<string, { manager: object }>(),
   provider: vi.fn(),
 }));
 
@@ -53,13 +53,32 @@ vi.mock("@app/providers/inspectorSessionProvider", () => ({
   useInspectorSessionContext: () => sessionHolder.current,
 }));
 
-vi.mock("jazz-tools/react", () => ({
-  JazzProvider: ({ children, config }: { children: React.ReactNode; config: unknown }) => {
-    jazzReactMocks.provider(config);
-    return children;
-  },
-  useJazzClient: () => jazzReactMocks.client,
-}));
+vi.mock("jazz-tools/react", async () => {
+  const React = await import("react");
+  const ClientContext = React.createContext<{ manager: object } | null>(null);
+  function JazzProvider({
+    autoAttachDevTools,
+    children,
+    config,
+  }: {
+    autoAttachDevTools?: boolean;
+    children: React.ReactNode;
+    config: { appId: string; userBranch: string };
+  }) {
+    jazzReactMocks.provider({ autoAttachDevTools, config });
+    const clientKey = `${config.appId}:${config.userBranch}`;
+    const [client, setClient] = React.useState(() => jazzReactMocks.clients.get(clientKey)!);
+    React.useEffect(() => {
+      setClient(jazzReactMocks.clients.get(clientKey)!);
+    }, [clientKey]);
+    return <ClientContext.Provider value={client}>{children}</ClientContext.Provider>;
+  }
+
+  return {
+    JazzProvider,
+    useJazzClient: () => React.useContext(ClientContext)!,
+  };
+});
 
 afterEach(() => {
   cleanup();
@@ -69,7 +88,11 @@ afterEach(() => {
   runtime.publishClient.mockClear();
   runtime.publishClientError.mockClear();
   jazzReactMocks.provider.mockClear();
+  jazzReactMocks.clients.clear();
   session.activeConnection = null;
+  session.currentConnectionId = "connection-1";
+  session.currentBranch = "main";
+  runtimeHolder.current = runtime;
 });
 
 describe("InspectorProvider runtime projections", () => {
@@ -107,6 +130,8 @@ describe("InspectorProvider runtime projections", () => {
       adminSecret: "secret",
       env: "dev",
     };
+    const client = { manager: {} };
+    jazzReactMocks.clients.set("app-1:main", client);
 
     render(
       <InspectorProvider>
@@ -116,13 +141,74 @@ describe("InspectorProvider runtime projections", () => {
 
     expect(jazzReactMocks.provider).toHaveBeenCalledOnce();
     expect(jazzReactMocks.provider).toHaveBeenCalledWith({
-      appId: "app-1",
-      serverUrl: "https://example.com",
-      env: "dev",
-      userBranch: "main",
-      adminSecret: "secret",
-      driver: { type: "memory" },
+      autoAttachDevTools: false,
+      config: {
+        appId: "app-1",
+        serverUrl: "https://example.com",
+        env: "dev",
+        userBranch: "main",
+        adminSecret: "secret",
+        driver: { type: "memory" },
+      },
     });
-    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(jazzReactMocks.client));
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(client));
+  });
+
+  it("never publishes a retained client into a replacement runtime", async () => {
+    const clientA = { manager: { connection: "a" } };
+    const clientB = { manager: { connection: "b" } };
+    jazzReactMocks.clients.set("app-a:main", clientA);
+    jazzReactMocks.clients.set("app-b:main", clientB);
+    session.activeConnection = {
+      id: "connection-a",
+      name: "App A",
+      serverUrl: "https://a.example.com",
+      appId: "app-a",
+      adminSecret: "secret-a",
+      env: "dev",
+    };
+    const runtimeB = { ...runtime, clearClient: vi.fn(), publishClient: vi.fn() };
+    const { rerender } = render(<InspectorProvider>Workspace</InspectorProvider>);
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(clientA));
+
+    session.activeConnection = {
+      id: "connection-b",
+      name: "App B",
+      serverUrl: "https://b.example.com",
+      appId: "app-b",
+      adminSecret: "secret-b",
+      env: "dev",
+    };
+    session.currentConnectionId = "connection-b";
+    runtimeHolder.current = runtimeB;
+    rerender(<InspectorProvider>Workspace</InspectorProvider>);
+
+    await waitFor(() => expect(runtimeB.publishClient).toHaveBeenCalledWith(clientB));
+    expect(runtimeB.publishClient).not.toHaveBeenCalledWith(clientA);
+  });
+
+  it("never publishes a retained branch client into a replacement runtime", async () => {
+    const mainClient = { manager: { branch: "main" } };
+    const featureClient = { manager: { branch: "feature" } };
+    jazzReactMocks.clients.set("app-1:main", mainClient);
+    jazzReactMocks.clients.set("app-1:feature", featureClient);
+    session.activeConnection = {
+      id: "connection-1",
+      name: "Local app",
+      serverUrl: "https://example.com",
+      appId: "app-1",
+      adminSecret: "secret",
+      env: "dev",
+    };
+    const featureRuntime = { ...runtime, clearClient: vi.fn(), publishClient: vi.fn() };
+    const { rerender } = render(<InspectorProvider>Workspace</InspectorProvider>);
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(mainClient));
+
+    session.currentBranch = "feature";
+    runtimeHolder.current = featureRuntime;
+    rerender(<InspectorProvider>Workspace</InspectorProvider>);
+
+    await waitFor(() => expect(featureRuntime.publishClient).toHaveBeenCalledWith(featureClient));
+    expect(featureRuntime.publishClient).not.toHaveBeenCalledWith(mainClient);
   });
 });

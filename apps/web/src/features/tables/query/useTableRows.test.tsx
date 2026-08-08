@@ -163,6 +163,34 @@ describe("useTableRows", () => {
     expect(result.current.isRefreshing).toBe(false);
   });
 
+  it("does not preserve rows from a render that never commits", () => {
+    const neverResolves = new Promise<never>(() => undefined);
+    let suspend = false;
+    queryRows = undefined;
+    const { result, rerender } = renderHook(() => {
+      const tableRows = useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      });
+      if (suspend === true) throw neverResolves;
+      return tableRows;
+    });
+
+    queryRows = [{ id: "uncommitted-row" } as DynamicTableRow];
+    suspend = true;
+    rerender();
+
+    queryRows = undefined;
+    suspend = false;
+    sortColumn = "name";
+    rerender();
+
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.isInitialLoading).toBe(true);
+  });
+
   it("exposes a failed fresh query without leaving the grid in its loading state", () => {
     queryError = new Error("Unable to load rows");
 

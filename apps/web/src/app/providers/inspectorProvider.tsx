@@ -124,6 +124,10 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
         : null,
     [session.activeConnection, session.currentBranch],
   );
+  const clientIdentity =
+    session.activeConnection !== null && session.currentBranch !== null
+      ? JSON.stringify([session.activeConnection.id, session.currentBranch])
+      : null;
   const openConnection = useCallback(
     (connectionId: string) =>
       session.openConnection(
@@ -155,7 +159,12 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
           onError={runtime.publishClientError}
           resetToken={clientConfig}
         >
-          <JazzProvider config={clientConfig} fallback={null}>
+          <JazzProvider
+            key={clientIdentity}
+            autoAttachDevTools={false}
+            config={clientConfig}
+            fallback={null}
+          >
             <RuntimeClientProjection runtime={runtime} />
           </JazzProvider>
         </RuntimeClientErrorBoundary>
