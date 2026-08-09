@@ -41,7 +41,7 @@ if (rootElement !== null) {
       <Tooltip.Provider>
         <StrictMode>
           <RouterProvider router={router} />
-          {import.meta.env.DEV === true ? <Agentation endpoint="http://localhost:4747" /> : null}
+          {import.meta.env.DEV === true ? <Agentation endpoint="/agentation" /> : null}
         </StrictMode>
       </Tooltip.Provider>
     </ThemeProvider>

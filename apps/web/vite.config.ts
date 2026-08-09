@@ -49,7 +49,17 @@ export default defineConfig(({ mode }) => ({
     createStylexPlugin(),
     viteReact(),
   ],
-  server: { port: PORT, host: true },
+  server: {
+    port: PORT,
+    host: true,
+    proxy: {
+     "/agentation": {
+       target: "http://localhost:4747",
+       changeOrigin: true,
+       rewrite: (path) => path.replace(/^\/agentation/, ""),
+     },
+    },
+  },
   build: {
     outDir: "dist",
     sourcemap: true,
