@@ -407,8 +407,10 @@ function parseTableTab(value: unknown): TableTab | null {
   if (
     typeof value === "object" &&
     value !== null &&
-    (value as Partial<NewViewTab>).kind === "newView" &&
-    (value as Partial<NewViewTab>).id === NEW_VIEW_TAB_ID
+    "kind" in value &&
+    value.kind === "newView" &&
+    "id" in value &&
+    value.id === NEW_VIEW_TAB_ID
   ) {
     return { kind: "newView", id: NEW_VIEW_TAB_ID };
   }

@@ -454,8 +454,10 @@ function isStoredConnection(value: unknown): value is StoredConnection {
 function isLegacyStoredConnection(value: unknown): value is LegacyStoredConnection {
   return (
     isStoredConnection(value) === true &&
-    typeof (value as LegacyStoredConnection).branch === "string" &&
-    typeof (value as LegacyStoredConnection).schemaHash === "string"
+    "branch" in value &&
+    typeof value.branch === "string" &&
+    "schemaHash" in value &&
+    typeof value.schemaHash === "string"
   );
 }
 
