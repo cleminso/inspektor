@@ -51,7 +51,7 @@ function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): R
       {isFormStep === true ? (
         // TODO: update error message UI and copywriting
         <AddConnectionForm
-          errorMessage={flow.errorMessage}
+          error={flow.error}
           formValues={flow.formValues}
           isSubmitting={flow.isSubmitting}
           onCancel={onClose}
@@ -61,7 +61,7 @@ function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): R
       ) : (
         <SchemaSwitcher
           appId={flow.formValues.appId}
-          errorMessage={flow.errorMessage}
+          error={flow.error}
           isSubmitting={flow.isSubmitting}
           onCancel={onClose}
           onSelectSchema={flow.selectSchema}

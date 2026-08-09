@@ -1,8 +1,10 @@
 import { Box, Button, CopyButton, Text } from "@inspector/ds";
 
+import type { ConnectionError } from "@app/connections/connectionValidation";
+
 interface SchemaSwitcherProps {
   appId: string;
-  errorMessage: string | null;
+  error: ConnectionError | null;
   isSubmitting: boolean;
   onCancel: () => void;
   onSelectSchema: (schemaHash: string) => Promise<void>;
@@ -11,13 +13,13 @@ interface SchemaSwitcherProps {
 
 export function SchemaSwitcher({
   appId,
-  errorMessage,
+  error,
   isSubmitting,
   onCancel,
   onSelectSchema,
   schemaHashes,
 }: SchemaSwitcherProps): React.ReactElement {
-  const hasError = errorMessage !== null;
+  const hasError = error !== null;
   const hasSchemas = schemaHashes.length > 0;
   const appLabel = appId.trim().length > 0 ? appId.trim() : "this connection";
 
@@ -73,9 +75,12 @@ export function SchemaSwitcher({
         )}
       </Box>
       {hasError === true ? (
-        <Text color="error" role="status" aria-live="polite">
-          {errorMessage}
-        </Text>
+        <Box flexDirection="column" gap="xs" role="status" aria-live="polite">
+          <Text color="error" variant="label">
+            {error.title}
+          </Text>
+          <Text color="error">{error.description}</Text>
+        </Box>
       ) : null}
       <Box alignItems="center" justifyContent="end" paddingTop="xl">
         <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting === true}>

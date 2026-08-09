@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { fetchSchemaHashes } from "jazz-tools";
@@ -6,6 +6,14 @@ import { fetchSchemaHashes } from "jazz-tools";
 import { useInspectorSessionContext } from "@app/providers/inspectorSessionProvider";
 import { findConnectionByCredentials } from "@app/connections/connectionIdentity";
 import { normalizeBranchName, normalizeEnvName } from "@app/connections/connections";
+import {
+  ConnectionNavigationError,
+  EMPTY_SCHEMA_ERROR,
+  normalizeConnectionOpenError,
+  normalizeSchemaFetchError,
+  validateConnectionInput,
+  type ConnectionError,
+} from "@app/connections/connectionValidation";
 import { appRoutes } from "@app/routing/appRoutes";
 
 import {
@@ -16,8 +24,8 @@ import {
 
 type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
 
-export interface UseAddConnectionFlowResult {
-  errorMessage: string | null;
+interface UseAddConnectionFlowResult {
+  error: ConnectionError | null;
   formValues: AddConnectionFormValues;
   isSubmitting: boolean;
   schemaHashes: string[];
@@ -36,7 +44,8 @@ export function useAddConnectionFlow(): UseAddConnectionFlowResult {
   const [formValues, setFormValues] = useState<AddConnectionFormValues>(() => createInitialFormValues(prefill));
   const [schemaHashes, setSchemaHashes] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<ConnectionError | null>(null);
+  const isSubmittingRef = useRef(false);
 
   const canSubmit =
     formValues.serverUrl.trim().length > 0 &&
@@ -48,6 +57,7 @@ export function useAddConnectionFlow(): UseAddConnectionFlowResult {
       ...currentValues,
       [field]: value,
     }));
+    setError((currentError) => (currentError?.field === field ? null : currentError));
   };
 
   const openResolvedConnection = async (schemaHash: string) => {
@@ -64,32 +74,49 @@ export function useAddConnectionFlow(): UseAddConnectionFlowResult {
 
     setConnectionContext(connection.id, branch, schemaHash);
 
-    await navigate({
-      to: appRoutes.tables,
-      params: {
-        connectionId: connection.id,
-      },
-    });
+    try {
+      await navigate({
+        to: appRoutes.tables,
+        params: {
+          connectionId: connection.id,
+        },
+      });
+    } catch {
+      throw new ConnectionNavigationError();
+    }
   };
 
   const fetchSchemas: FormSubmitHandler = async (event) => {
     event.preventDefault();
 
-    if (canSubmit === false || isSubmitting === true) {
+    if (canSubmit === false || isSubmittingRef.current === true) {
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
-    setErrorMessage(null);
 
     try {
-      const response = await fetchSchemaHashes(formValues.serverUrl.trim(), {
-        appId: formValues.appId.trim(),
-        adminSecret: formValues.adminSecret.trim(),
-      });
+      const validation = validateConnectionInput(formValues);
+      if (validation.valid === false) {
+        setError(validation.error);
+        return;
+      }
+
+      setError(null);
+      let response: Awaited<ReturnType<typeof fetchSchemaHashes>>;
+      try {
+        response = await fetchSchemaHashes(validation.value.serverUrl, {
+          appId: validation.value.appId,
+          adminSecret: validation.value.adminSecret,
+        });
+      } catch (fetchError) {
+        setError(normalizeSchemaFetchError(fetchError));
+        return;
+      }
 
       if (response.hashes.length === 0) {
-        setErrorMessage("No stored schemas were found for this server.");
+        setError(EMPTY_SCHEMA_ERROR);
         setSchemaHashes([]);
         setStep("form");
         return;
@@ -103,35 +130,39 @@ export function useAddConnectionFlow(): UseAddConnectionFlowResult {
       setSchemaHashes(response.hashes);
       setStep("schema");
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : String(error));
+      setError(normalizeConnectionOpenError(error));
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   };
 
   const selectSchema = async (schemaHash: string) => {
-    if (isSubmitting === true) {
+    if (isSubmittingRef.current === true) {
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
-    setErrorMessage(null);
+    setError(null);
 
     try {
       await openResolvedConnection(schemaHash);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : String(error));
+      setError(normalizeConnectionOpenError(error));
+    } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   };
 
   const goBackToForm = () => {
-    setErrorMessage(null);
+    setError(null);
     setStep("form");
   };
 
   return {
-    errorMessage,
+    error,
     fetchSchemas,
     formValues,
     goBackToForm,

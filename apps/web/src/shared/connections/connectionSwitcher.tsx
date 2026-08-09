@@ -6,6 +6,7 @@ import {
   Button,
   ContextSwitcher,
   Text,
+  toasts,
   type ContextSwitcherTriggerSize,
   type ContextSwitcherTriggerWidth,
 } from "@inspector/ds";
@@ -17,6 +18,7 @@ import {
   type StoredConnection,
 } from "@app/connections/connections";
 import { appRoutes } from "@app/routing/appRoutes";
+import { normalizeConnectionOpenError } from "@app/connections/connectionValidation";
 
 interface ConnectionSwitcherProps {
   size?: ContextSwitcherTriggerSize;
@@ -39,7 +41,8 @@ export function ConnectionSwitcher({
   triggerLabel,
   width = "content",
 }: ConnectionSwitcherProps = {}): React.ReactElement {
-  const { connections, currentConnectionId, openConnection } = useInspectorSessionContext();
+  const { connections, currentConnectionId, openingConnectionId, openConnection } =
+    useInspectorSessionContext();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -68,10 +71,25 @@ export function ConnectionSwitcher({
           .includes(query.trim().toLowerCase())
       }
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(nextOpen, details) => {
+        if (nextOpen === false && details.reason === "item-press") {
+          return;
+        }
+
+        setOpen(nextOpen);
+      }}
       onValueChange={(connection) => {
         if (connection !== null) {
-          void openConnection(connection.id);
+          void openConnection(connection.id)
+            .then((result) => {
+              if (result === "opened") {
+                setOpen(false);
+              }
+            })
+            .catch((error: unknown) => {
+              const normalizedError = normalizeConnectionOpenError(error);
+              toasts.error(normalizedError.title, { description: normalizedError.description });
+            });
         }
       }}
     >
@@ -85,23 +103,36 @@ export function ConnectionSwitcher({
         </Text>
       </ContextSwitcher.Trigger>
       <ContextSwitcher.Content>
-        <ContextSwitcher.Search
-          label="Search connections"
-          placeholder="Search connections"
-        />
-        <ContextSwitcher.Viewport maxHeight="l">
-          <ContextSwitcher.Empty>No saved connections.</ContextSwitcher.Empty>
-          <ContextSwitcher.List>
-            {(connection: StoredConnection) => (
-              <ContextSwitcher.Item key={connection.id} value={connection}>
-                <ContextSwitcher.ItemText
-                  label={getConnectionDisplayName(connection)}
-                  description={getConnectionSecondaryLabel(connection)}
-                />
-              </ContextSwitcher.Item>
-            )}
-          </ContextSwitcher.List>
-        </ContextSwitcher.Viewport>
+        {orderedConnections.length > 1 ? (
+          <ContextSwitcher.Search
+            label="Search connections"
+            placeholder="Search connections"
+          />
+        ) : null}
+        {orderedConnections.length > 0 ? (
+          <ContextSwitcher.Viewport maxHeight="l">
+            {openingConnectionId !== null ? (
+              <ContextSwitcher.Status>Opening connection…</ContextSwitcher.Status>
+            ) : null}
+            {orderedConnections.length > 1 ? (
+              <ContextSwitcher.Empty>No matching connections.</ContextSwitcher.Empty>
+            ) : null}
+            <ContextSwitcher.List>
+              {(connection: StoredConnection) => (
+                <ContextSwitcher.Item
+                  key={connection.id}
+                  value={connection}
+                  disabled={openingConnectionId !== null}
+                >
+                  <ContextSwitcher.ItemText
+                    label={getConnectionDisplayName(connection)}
+                    description={getConnectionSecondaryLabel(connection)}
+                  />
+                </ContextSwitcher.Item>
+              )}
+            </ContextSwitcher.List>
+          </ContextSwitcher.Viewport>
+        ) : null}
         <ContextSwitcher.Footer>
           <Button
             variant="ghost"

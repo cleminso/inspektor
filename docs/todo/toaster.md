@@ -11,6 +11,20 @@
 
 ## Implemented foundation
 
+[09/08/26]
+
+- [x] Coordinate connection opening before entry-surface error handling so overlapping consumers cannot duplicate failure notifications.
+- [x] Distinguish route-navigation failures from schema-fetch failures in saved-connection notifications.
+
+[07/08/26]
+
+- [x] Prevent overlapping saved-connection requests from producing competing failure notifications.
+
+[07/08/26]
+
+- [x] Report saved-connection opening failures through a normalized error toast because the originating switcher popup is transient.
+- [x] Keep add-connection form failures persistent and inline instead of duplicating them as toast notifications.
+
 [06/08/26]
 
 - [x] Retarget repeated-notification feedback from the toast's rendered scale with the Web Animations API.
@@ -57,6 +71,14 @@
 
 ## Settled interaction decisions
 
+[09/08/26]
+
+- A connection-opening failure does not reopen a switcher that the user explicitly dismissed.
+
+[07/08/26]
+
+- Transient connection-switcher failures use a toast title and supporting recovery guidance without exposing raw browser errors.
+
 [06/08/26]
 
 - Repeated notifications pulse the existing mounted toast without replaying its entrance transition.
@@ -80,6 +102,19 @@
 - None.
 
 ## Validation checklist
+
+[09/08/26]
+
+- [x] Verify shared connection coordination admits one failure notification source per opening request.
+- [x] Verify navigation failures use opening guidance rather than credential guidance.
+
+[07/08/26]
+
+- [x] Verify repeated saved-connection activation starts one request and cannot duplicate its error toast.
+
+[07/08/26]
+
+- [x] Cover normalized saved-connection failure notifications from the switcher and recent-connections list.
 
 [06/08/26]
 

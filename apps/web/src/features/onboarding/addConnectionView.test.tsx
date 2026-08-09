@@ -16,7 +16,7 @@ vi.mock("@app/providers/inspectorSessionProvider", () => ({
 
 vi.mock("./useAddConnectionFlow", () => ({
   useAddConnectionFlow: () => ({
-    errorMessage: null,
+    error: null,
     fetchSchemas: vi.fn(),
     formValues: {
       name: "",

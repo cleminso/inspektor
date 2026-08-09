@@ -2,12 +2,14 @@ import { useState } from "react";
 
 import { Box, Button, Text, TextField } from "@inspector/ds";
 
+import type { ConnectionError } from "@app/connections/connectionValidation";
+
 import type { AddConnectionFormValues } from "./connectionFormTypes";
 
 type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
 
 interface AddConnectionFormProps {
-  errorMessage: string | null;
+  error: ConnectionError | null;
   formValues: AddConnectionFormValues;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -16,14 +18,14 @@ interface AddConnectionFormProps {
 }
 
 export function AddConnectionForm({
-  errorMessage,
+  error,
   formValues,
   isSubmitting,
   onCancel,
   onSubmit,
   onUpdateField,
 }: AddConnectionFormProps): React.ReactElement {
-  const hasError = errorMessage !== null;
+  const hasError = error !== null;
   const canSubmit =
     formValues.serverUrl.trim().length > 0 &&
     formValues.appId.trim().length > 0 &&
@@ -72,7 +74,11 @@ export function AddConnectionForm({
         <TextField
           id="connection-server-url"
           label="Server URL"
-          description="Sync server that stores your app data."
+          description={
+            error?.field === "serverUrl"
+              ? error.description
+              : "Sync server that stores your app data."
+          }
           value={formValues.serverUrl}
           onBlur={() => {
             markFieldTouched("serverUrl");
@@ -85,11 +91,12 @@ export function AddConnectionForm({
           }}
           placeholder="https://v2.sync.jazz.tools/"
           required={true}
-          invalid={isFieldInvalid("serverUrl") === true}
+          invalid={isFieldInvalid("serverUrl") === true || error?.field === "serverUrl"}
         />
         <TextField
           id="connection-app-id"
           label="App ID"
+          description={error?.field === "appId" ? error.description : undefined}
           value={formValues.appId}
           onBlur={() => {
             markFieldTouched("appId");
@@ -101,11 +108,12 @@ export function AddConnectionForm({
             onUpdateField("appId", value);
           }}
           required={true}
-          invalid={isFieldInvalid("appId") === true}
+          invalid={isFieldInvalid("appId") === true || error?.field === "appId"}
         />
         <TextField
           id="connection-admin-secret"
           label="Admin secret"
+          description={error?.field === "adminSecret" ? error.description : undefined}
           type="password"
           value={formValues.adminSecret}
           onBlur={() => {
@@ -118,7 +126,7 @@ export function AddConnectionForm({
             onUpdateField("adminSecret", value);
           }}
           required={true}
-          invalid={isFieldInvalid("adminSecret") === true}
+          invalid={isFieldInvalid("adminSecret") === true || error?.field === "adminSecret"}
         />
         <Box display="grid" gridTemplateColumns={{ base: "one", sm: "two" }} gap="m">
           <TextField
@@ -140,9 +148,12 @@ export function AddConnectionForm({
         </Box>
       </Box>
       {hasError === true ? (
-        <Text color="error" role="status" aria-live="polite">
-          {errorMessage}
-        </Text>
+        <Box flexDirection="column" gap="xs" role="status" aria-live="polite">
+          <Text color="error" variant="label">
+            {error.title}
+          </Text>
+          {error.field === undefined ? <Text color="error">{error.description}</Text> : null}
+        </Box>
       ) : null}
       <Box alignItems="center" justifyContent="end" gap="m">
         <Button type="button" variant="ghost" size="s" onClick={onCancel} disabled={isSubmitting === true}>
