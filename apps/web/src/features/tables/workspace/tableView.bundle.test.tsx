@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-const rowEditorModuleLoaded = vi.hoisted(() => vi.fn());
 const codeMirrorModuleLoaded = vi.hoisted(() => vi.fn());
+const rowEditorModuleLoaded = vi.hoisted(() => vi.fn());
 
 vi.mock("@codemirror/view", () => {
   codeMirrorModuleLoaded();

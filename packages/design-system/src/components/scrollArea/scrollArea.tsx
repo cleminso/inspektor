@@ -24,6 +24,7 @@ interface ScrollAreaPrivateProps extends ScrollAreaProps {
   rootSlot?: string
   scrollRendering?: 'default' | 'frequent'
   verticalTrackOffset?: VerticalTrackOffset
+  viewportContainerType?: 'size'
   viewportSlot?: string
 }
 
@@ -55,6 +56,7 @@ function renderScrollArea(
     rootSlot = 'scroll-area',
     scrollRendering = 'default',
     verticalTrackOffset,
+    viewportContainerType,
     viewportSlot = 'scroll-area-viewport',
     ...props
   }: ScrollAreaPrivateProps,
@@ -70,6 +72,7 @@ function renderScrollArea(
     layout === 'content' && scrollAreaStyles.viewportContent,
     scrollbarStyles.hidden,
     scrollRendering === 'frequent' && scrollAreaStyles.viewportFrequentScroll,
+    viewportContainerType === 'size' && scrollAreaStyles.viewportSizeContainer,
     axis === 'none' && scrollAreaStyles.viewportNone,
     axis === 'vertical' && scrollAreaStyles.viewportVertical,
     axis === 'both' && scrollAreaStyles.viewportBoth,
@@ -131,6 +134,7 @@ function renderScrollArea(
         {...viewportStyleProps}
         style={{ ...viewportStyleProps.style, ...viewportBehaviorStyle }}
         data-axis={axis}
+        data-container-type={viewportContainerType}
         data-scrollbar="hidden"
         data-slot={viewportSlot}
       >

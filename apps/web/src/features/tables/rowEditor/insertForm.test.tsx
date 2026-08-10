@@ -66,6 +66,31 @@ afterEach(() => {
 });
 
 describe("InsertRowForm structured values", () => {
+  it("allows drafting while mutation submission is unavailable", () => {
+    const onSave = vi.fn();
+    const columns = [
+      { name: "name", column_type: { type: "Text" }, nullable: false },
+    ] satisfies ColumnDescriptor[];
+
+    render(
+      <InsertRowForm
+        saveDisabled
+        onSave={onSave}
+        rowValues={{ name: "Ada" }}
+        schemaColumns={columns}
+      />,
+    );
+
+    expect((screen.getByRole("textbox", { name: "Name" }) as HTMLInputElement).disabled).toBe(
+      false,
+    );
+    expect((screen.getByRole("button", { name: "Insert" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
+    fireEvent.submit(screen.getByRole("button", { name: "Insert" }).closest("form")!);
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
   it("omits an untouched default-backed field from the insert payload", async () => {
     const onSave = vi.fn();
     const columns = [

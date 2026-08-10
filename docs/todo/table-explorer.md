@@ -19,6 +19,15 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[10/08/26]
+
+- [x] Keep schema navigation and insert drafting available from cached schema metadata while verified runtime mutations remain unavailable.
+- [x] Limit runtime-readiness disabling to the insert form submission control and begin form preloading from schema readiness.
+- [x] Restore one shared preload and render request per deferred row form so a completed preload renders synchronously.
+- [x] Keep speculative import failures retryable and render-consumed failures available to an error boundary with a component-level loader API.
+- [x] Keep cached schema metadata available for structural rendering while withholding the Jazz client from queries until the selected stored schema is verified.
+- [x] Prevent a cached schema from initializing one Jazz `Db` before a different network schema reaches the same client.
+
 [08/08/26]
 
 - [x] Keep non-suspense Jazz query renders side-effect free by computing and peeking keys during render while registering cache entries only from React's subscription lifecycle.
@@ -33,10 +42,8 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 - [x] Scope preserved query rows to the Jazz manager that produced them so runtime replacement restores an explicit row-loading state.
 - [x] Read runtime client and schema once in the table-view state boundary and pass them to internal query and mutation hooks.
-- [x] Keep speculative row-editor module failures retryable before first lazy rendering without claiming in-place recovery for a rejected mounted lazy component.
 - [x] Cache decoded stored-schema metadata in memory after its first validated browser-storage read.
 - [x] Keep schema and permissions serialization behind independent memoization boundaries.
-- [x] Inline single-use table empty-content and insert-form preload lifecycle decisions at their owning render boundary.
 
 [07/08/26]
 
@@ -56,8 +63,6 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Keep the selected table toolbar and Data Grid mounted while the Jazz client and stored schema resolve, with loading limited to the row body.
 - [x] Keep unresolved schema navigation distinct from a resolved schema containing no tables so the dock never flashes a false empty state.
 - [x] Read table queries and mutations from the app-owned runtime client instead of inserting a Jazz React provider that remounts the workspace.
-- [x] Warm the insert-form chunk when the table workspace mounts while retaining the separate CodeMirror loading boundary.
-- [x] Disable schema and insert actions until both the runtime client and stored schema are available.
 
 [07/08/26]
 
@@ -721,6 +726,11 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[10/08/26]
+
+- Cached schema metadata may stabilize table structure, but only the selected schema fetched from Jazz may initialize the query client.
+- Row-editor forms remain deferred from the base table bundle and are warmed once cached schema metadata is available.
+
 [08/08/26]
 
 - Equivalent serialized query keys retain one subscription even when inline query-builder identity changes.
@@ -730,7 +740,7 @@ These items were identified in the behavior design but intentionally excluded fr
 
 - Live rows may remain visible only while a query refreshes through the same Jazz manager.
 - A replacement Jazz manager starts with row-body loading even when route and query identity are unchanged.
-- Failed speculative row-editor preloads may retry before lazy rendering; mounted lazy failures remain error-boundary failures.
+- Failed speculative row-editor preloads may retry; render-consumed failures remain error-boundary failures.
 
 [07/08/26]
 
@@ -806,6 +816,20 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[10/08/26]
+
+- [x] Reproduce the resolved-preload suspense gap with a failing loader regression test.
+- [x] Verify a prefetched editor module renders without committing its Suspense fallback.
+- [x] Reproduce cached-schema query readiness through focused runtime and provider tests.
+- [x] Verify the client remains unpublished until the selected stored schema replaces cached metadata.
+- [x] Verify focused loader, runtime, provider, and bundle-boundary tests, full Inspector tests, typecheck, and build.
+- [ ] Verify the connected first table load no longer reports Jazz's different-schema error.
+- [ ] Verify first insert and edit pane openings do not expose `Loading editor` in a connected browser.
+
+[08/08/26]
+
+- [x] Cover preserved-row reset when table, schema, filters, page, or page-size scope changes.
 
 [08/08/26]
 

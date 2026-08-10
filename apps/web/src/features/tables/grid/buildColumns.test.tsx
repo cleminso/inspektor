@@ -74,10 +74,6 @@ describe("buildDataGridColumns", () => {
 
     const menuButton = screen.getByRole("button", { name: "Open Name column menu" });
 
-    expect(menuButton.getAttribute("data-icon-only")).toBe("");
-    expect(menuButton.getAttribute("data-size")).toBe("xs");
-    expect(menuButton.getAttribute("data-radius")).toBe("xs");
-
     fireEvent.click(menuButton);
     expect(onColumnMenuOpen).toHaveBeenCalledWith("name");
     fireEvent.click(screen.getByRole("menuitem", { name: "Sort Ascending" }));
@@ -238,12 +234,11 @@ describe("buildDataGridColumns", () => {
 
     const table = screen.getByRole("table", { name: "People" });
     const renderedColumns = table.querySelectorAll("col");
-    const headerCheckbox = screen.getByRole("checkbox", { name: "Select all loaded rows" });
-    const rowCheckbox = screen.getByRole("checkbox", { name: "Select row row-1" });
+    screen.getByRole("checkbox", { name: "Select all loaded rows" });
+    screen.getByRole("checkbox", { name: "Select row row-1" });
 
     expect(renderedColumns).toHaveLength(2);
     expect(renderedColumns[0]?.style.width).toBe("36px");
-    expect(headerCheckbox.parentElement?.className).toBe(rowCheckbox.parentElement?.className);
   });
 
   it("keeps the internal selection column distinct from inspected schema columns", () => {

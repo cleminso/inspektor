@@ -24,7 +24,6 @@ import {
   type ColumnMoveDirection,
 } from '@tables/grid/useColumnOrder'
 import { useTableGrid } from '@tables/grid/useTableGrid'
-import { prefetchEditRowForm } from '@tables/rowEditor/rowEditorModules'
 import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
@@ -64,7 +63,9 @@ interface TableViewDraftTransitionState {
 
 interface UseTableViewStateResult {
   activeColumnId: string | null
-  canEditRows: boolean
+  canInspectSchema: boolean
+  canMutateRows: boolean
+  canOpenRowEditor: boolean
   reorderableColumnIds: readonly string[]
   detailPaneMode: TableViewDetailPaneMode
   draftTransition: TableViewDraftTransitionState
@@ -363,7 +364,6 @@ export function useTableViewState({
     onCellSelectionChange: setCellSelection,
     onColumnMenuOpen: handleColumnActivate,
     onColumnMove: handleColumnMove,
-    onEditIntent: prefetchEditRowForm,
     onColumnOrderChange: setColumnOrder,
   })
   const selectedRow = useMemo(() => {
@@ -489,7 +489,9 @@ export function useTableViewState({
 
   return {
     activeColumnId,
-    canEditRows: client !== null && wasmSchema !== null,
+    canInspectSchema: wasmSchema !== null,
+    canMutateRows: client !== null && wasmSchema !== null,
+    canOpenRowEditor: wasmSchema !== null,
     reorderableColumnIds: columnIds,
     detailPaneMode,
     draftTransition,

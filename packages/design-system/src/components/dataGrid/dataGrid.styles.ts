@@ -20,15 +20,6 @@ export const dataGridStyles = stylex.create({
     minWidth: 0,
     width: '100%',
   },
-  viewport: {
-    overflow: 'auto',
-    flexBasis: 0,
-    flexGrow: 1,
-    flexShrink: 1,
-    minHeight: 0,
-    minWidth: 0,
-    width: '100%',
-  },
   scrollSurface: {
     backgroundColor: backgroundColors['bg-page'],
     position: 'relative',
@@ -280,14 +271,25 @@ export const dataGridStyles = stylex.create({
   },
   loadingIndicator: {
     gap: spacing.s,
-    alignItems: 'center',
-    display: 'inline-flex',
   },
   messageCell: {
-    padding: spacing.xl,
     color: textColors['text-muted'],
+    padding: 0,
+  },
+  messageContent: {
+    alignItems: 'center',
+    boxSizing: 'border-box',
+    display: 'flex',
+    padding: spacing.xl,
+    justifyContent: 'center',
+    position: 'sticky',
+    height: `calc(100cqh - ${spatial['control-height-l']})`,
     textAlign: 'center',
-    height: spatial['viewport-height-s'],
+    left: 0,
+    width: '100cqw',
+  },
+  compactMessageContent: {
+    height: `calc(100cqh - ${spatial['control-height-m']})`,
   },
   virtualSpacerCell: {
     padding: 0,

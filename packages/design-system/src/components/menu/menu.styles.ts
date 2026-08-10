@@ -140,7 +140,7 @@ export const menuStyles = stylex.create({
     fontWeight: fontWeights.regular,
     lineHeight: lineHeights.ui,
     userSelect: "none",
-    minHeight: spatial["popup-row-min-height"],
+    minHeight: spatial["popup-row-min-height-s"],
     width: "auto",
   },
   itemHighlighted: {

@@ -87,7 +87,7 @@ export function TablePagination({
               aria-label="Previous page"
               disabled={loading === true || hasPreviousPage === false}
               iconOnly
-              size="s"
+              size="xs"
               variant="ghost"
               onClick={() => onPageChange(page - 1)}
             >
@@ -107,7 +107,7 @@ export function TablePagination({
               aria-label="Next page"
               disabled={loading === true || hasNextPage === false}
               iconOnly
-              size="s"
+              size="xs"
               variant="ghost"
               onClick={() => onPageChange(page + 1)}
             >

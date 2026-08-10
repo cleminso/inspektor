@@ -60,6 +60,10 @@ const routeBlocker = {
   status: 'idle' as const,
 }
 let shouldBlockNavigation = () => false
+const runtimeState = vi.hoisted(() => ({
+  client: null as object | null,
+  schema: null as Record<string, unknown> | null,
+}))
 
 vi.mock('@tanstack/react-router', () => ({
   useBlocker: (options: { shouldBlockFn: () => boolean }) => {
@@ -78,8 +82,8 @@ vi.mock('@app/providers/inspectorProvider', () => ({
     currentConnectionId: 'connection-1',
     currentSchemaHash: 'schema-1',
   }),
-  useRuntimeClient: () => null,
-  useRuntimeSchema: () => null,
+  useRuntimeClient: () => runtimeState.client,
+  useRuntimeSchema: () => runtimeState.schema,
 }))
 
 vi.mock('@tables/grid/useColumnVisibility', () => ({
@@ -164,6 +168,8 @@ beforeEach(() => {
   searchState.sortColumn = 'id'
   columnOrderState.columnOrder = ['id', 'name']
   activeRows = []
+  runtimeState.client = null
+  runtimeState.schema = null
   Object.assign(routeBlocker, {
     action: undefined,
     current: undefined,
@@ -214,6 +220,16 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
+  it('keeps schema and insert UI available while mutations wait for the runtime client', () => {
+    runtimeState.schema = { accounts: { columns: [] } }
+
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(result.current.canInspectSchema).toBe(true)
+    expect(result.current.canOpenRowEditor).toBe(true)
+    expect(result.current.canMutateRows).toBe(false)
+  })
+
   it('keeps column definitions stable when only the rendered order changes', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     const initialColumnDefinitions = result.current.table.options.columns

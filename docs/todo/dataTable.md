@@ -4,6 +4,7 @@
 
 - [Implemented foundation](#implemented-foundation)
 - [TanStack Table v9 selection](#tanstack-table-v9-selection)
+- [Message and empty states](#message-and-empty-states)
 - [Stable column geometry](#stable-column-geometry)
 - [Open product work](#open-product-work)
 - [Work outside the foundation scope](#work-outside-the-foundation-scope)
@@ -12,6 +13,23 @@
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+### Message and empty states
+
+[10/08/26]
+
+- [x] Establish size containment on the actual scrolling viewport so message container-query units do not resolve against a taller ancestor.
+- [x] Keep loading and empty message centers aligned to the visible body region below the active-density header.
+
+[07/08/26]
+
+- [x] Render loading and empty message content in a flow-content wrapper so composed React children retain valid HTML structure.
+
+[07/08/26]
+
+- [x] Let `DataGrid.Content` render only its header when `emptyContent` is `null` instead of reserving a message row.
+- [x] Keep non-empty loading and empty messages attached to the visible leading edge while the intrinsic-width table scrolls horizontally.
+- [x] Preserve native table structure, loading status semantics, and shared column geometry for message rows.
 
 ### TanStack Table v9 selection
 
@@ -121,6 +139,15 @@
 
 ## Settled implementation decisions
 
+[10/08/26]
+
+- [x] Use the Data Grid viewport as the CSS size-query container for message placement instead of synchronizing viewport dimensions into React state.
+
+[07/08/26]
+
+- [x] Treat `emptyContent={null}` as an intentional header-only empty presentation rather than defaulting it to generic copy.
+- [x] Keep message placement inside design-system-owned semantic table markup instead of positioning application overlays over the viewport.
+
 [26/07/26]
 
 - [x] Keep every `@dnd-kit` import in `dataGridReorder.tsx`; a static import originally placed the shared sortable code in the initial application load.
@@ -155,6 +182,21 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[10/08/26]
+
+- [x] Reproduce the vertical offset from the supplied recording and cover scrolling-viewport containment with a focused regression test.
+- [x] Verify focused Data Grid and Scroll Area tests, full design-system tests, typecheck, and build.
+- [ ] Verify regular and compact message centers against the visible scrolling viewport in a browser.
+
+[07/08/26]
+
+- [x] Verify loading and empty message wrappers accept flow content while preserving loading status semantics.
+
+[07/08/26]
+
+- [x] Verify header-only empty content, sticky message structure, loading semantics, and unchanged column geometry through focused Data Grid tests.
+- [x] Run design-system tests, typecheck, lint, declaration build, generated-props checks, documentation tests, and documentation build.
 
 [05/08/26]
 

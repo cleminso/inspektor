@@ -21,6 +21,7 @@ const runtime = {
   $client: atom(null),
   $error: atom<string | null>(null),
   $isSchemaHashesLoading: atom(false),
+  $isWasmSchemaLoading: atom(false),
   $storedPermissions: atom<unknown>(null),
   $wasmSchema: atom<Record<string, { columns: [] }> | null>({ accounts: { columns: [] } }),
   clearClient: vi.fn(),
@@ -95,6 +96,7 @@ afterEach(() => {
   cleanup();
   runtime.$storedPermissions.set(null);
   runtime.$wasmSchema.set({ accounts: { columns: [] } });
+  runtime.$isWasmSchemaLoading.set(false);
   runtime.clearClient.mockClear();
   runtime.publishClient.mockClear();
   runtime.publishClientError.mockClear();
@@ -163,6 +165,30 @@ describe("InspectorProvider runtime projections", () => {
         driver: { type: "memory" },
       },
     });
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(client));
+  });
+
+  it("does not publish a client until the selected stored schema is verified", async () => {
+    session.activeConnection = {
+      id: "connection-1",
+      name: "Local app",
+      serverUrl: "https://example.com",
+      appId: "app-1",
+      adminSecret: "secret",
+      env: "dev",
+    };
+    const client = { manager: {} };
+    jazzReactMocks.clients.set("app-1:main:secret", client);
+    runtime.$isWasmSchemaLoading.set(true);
+
+    render(<InspectorProvider>Workspace</InspectorProvider>);
+
+    expect(runtime.publishClient).not.toHaveBeenCalled();
+
+    act(() => {
+      runtime.$isWasmSchemaLoading.set(false);
+    });
+
     await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(client));
   });
 

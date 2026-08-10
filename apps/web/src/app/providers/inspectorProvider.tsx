@@ -47,13 +47,22 @@ interface InspectorProviderProps extends PropsWithChildren {
 
 function RuntimeClientProjection({ runtime }: { runtime: InspectorRuntimeStore }) {
   const client = useJazzClient();
+  const isWasmSchemaLoading = useStore(runtime.$isWasmSchemaLoading);
 
   useEffect(() => {
+    if (
+      isWasmSchemaLoading === true ||
+      runtime.$wasmSchema.get() === null ||
+      runtime.$error.get() !== null
+    ) {
+      return;
+    }
+
     runtime.publishClient(client);
     return () => {
       runtime.clearClient(client);
     };
-  }, [client, runtime]);
+  }, [client, isWasmSchemaLoading, runtime]);
 
   return null;
 }

@@ -18,6 +18,7 @@ export interface InspectorRuntimeStore {
   $client: ReadableAtom<JazzClient | null>;
   $error: ReadableAtom<string | null>;
   $isSchemaHashesLoading: ReadableAtom<boolean>;
+  $isWasmSchemaLoading: ReadableAtom<boolean>;
   $storedPermissions: ReadableAtom<StoredPermissionsResponse | null>;
   $wasmSchema: ReadableAtom<WasmSchema | null>;
   clearClient: (client: JazzClient) => void;
@@ -31,6 +32,7 @@ interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
   $client: WritableAtom<JazzClient | null>;
   $error: WritableAtom<string | null>;
   $isSchemaHashesLoading: WritableAtom<boolean>;
+  $isWasmSchemaLoading: WritableAtom<boolean>;
   $storedPermissions: WritableAtom<StoredPermissionsResponse | null>;
   $wasmSchema: WritableAtom<WasmSchema | null>;
 }
@@ -45,6 +47,7 @@ interface UseInspectorRuntimeOptions {
 function createInspectorRuntimeStore(
   initialSchema: WasmSchema | null,
   isSchemaHashesLoading: boolean,
+  isWasmSchemaLoading: boolean,
 ): MutableInspectorRuntimeStore {
   const $client = atom<JazzClient | null>(null);
   const $wasmSchema = atom<WasmSchema | null>(initialSchema);
@@ -52,6 +55,7 @@ function createInspectorRuntimeStore(
   const $availableSchemaHashes = atom<readonly string[]>([]);
   const $error = atom<string | null>(null);
   const $isSchemaHashesLoading = atom(isSchemaHashesLoading);
+  const $isWasmSchemaLoading = atom(isWasmSchemaLoading);
 
   const publishClient = (client: JazzClient) => {
     $client.set(client);
@@ -75,6 +79,7 @@ function createInspectorRuntimeStore(
     $storedPermissions.set(null);
     $availableSchemaHashes.set([]);
     $isSchemaHashesLoading.set(false);
+    $isWasmSchemaLoading.set(false);
     $error.set(null);
   };
 
@@ -83,6 +88,7 @@ function createInspectorRuntimeStore(
     $client,
     $error,
     $isSchemaHashesLoading,
+    $isWasmSchemaLoading,
     $storedPermissions,
     $wasmSchema,
     clearClient,
@@ -111,6 +117,7 @@ export function useInspectorRuntime({
           branch !== null &&
           schemaHash !== null &&
           shouldDiscoverSchemaHashes,
+        connection !== null && branch !== null && schemaHash !== null,
       ),
     [branch, connection, schemaHash, shouldDiscoverSchemaHashes],
   );
@@ -127,9 +134,11 @@ export function useInspectorRuntime({
         return;
       }
       runtime.$error.set(error instanceof Error ? error.message : String(error));
+      runtime.$isWasmSchemaLoading.set(false);
     };
 
     runtime.$error.set(null);
+    runtime.$isWasmSchemaLoading.set(true);
     runtime.$storedPermissions.set(null);
     runtime.$availableSchemaHashes.set(
       initialSchemaHashes !== undefined ? [...initialSchemaHashes] : [],
@@ -145,6 +154,7 @@ export function useInspectorRuntime({
       }
       runtime.$wasmSchema.set(schema);
       writeCachedWasmSchema(connection, schemaHash, schema);
+      runtime.$isWasmSchemaLoading.set(false);
     });
 
     if (shouldDiscoverSchemaHashes === true) {

@@ -98,7 +98,7 @@ export const multiSelectStyles = stylex.create({
     gridTemplateColumns: `${spatial["icon-size-s"]} minmax(0, 1fr)`,
     lineHeight: lineHeights.ui,
     userSelect: "none",
-    minHeight: spatial["popup-row-min-height"],
+    minHeight: spatial["popup-row-min-height-s"],
   },
   rowDisabled: { color: textColors["text-disabled"] },
   optionButton: {

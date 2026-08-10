@@ -61,6 +61,9 @@ export const scrollAreaStyles = stylex.create({
     overflowAnchor: 'none',
     willChange: 'scroll-position',
   },
+  viewportSizeContainer: {
+    containerType: 'size',
+  },
   viewportVertical: {
     overflowX: 'hidden',
     overflowY: 'scroll',

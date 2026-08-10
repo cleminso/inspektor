@@ -139,7 +139,7 @@ export const spatial = stylex.defineVars({
   'multi-select-width-l': dimensions[360],
   'popup-collection-padding': spacing.xxs,
   'popup-item-inline-padding': spacing.s,
-  'popup-row-min-height': dimensions[22],
+  'popup-row-min-height-s': dimensions[22],
   'popup-row-min-height-m': dimensions[24],
   'popup-row-min-height-l': dimensions[28],
   'popup-width-s': dimensions[240],

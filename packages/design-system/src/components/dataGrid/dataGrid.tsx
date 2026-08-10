@@ -127,7 +127,7 @@ export interface DataGridTableProps {
 }
 
 export interface DataGridContentProps {
-  /** Content shown when the table has no rows. */
+  /** Content shown when the table has no rows. Pass `null` to render only the header. */
   emptyContent?: ReactNode
   /** Whether loading content replaces the current row model. */
   loading?: boolean
@@ -544,6 +544,7 @@ function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
       ref={registerViewport}
       scrollRendering="frequent"
       verticalTrackOffset={density === 'compact' ? 'control-height-m' : 'control-height-l'}
+      viewportContainerType="size"
       viewportSlot="data-grid-viewport"
     >
       {children}
@@ -661,7 +662,9 @@ function DataGridContent({
       {loading === true ? (
         <DataGridLoading>{loadingContent}</DataGridLoading>
       ) : table.getRowModel().rows.length === 0 ? (
-        <DataGridEmpty>{emptyContent}</DataGridEmpty>
+        emptyContent === null ? null : (
+          <DataGridEmpty>{emptyContent}</DataGridEmpty>
+        )
       ) : (
         <DataGridDefaultBody rowRendering={rowRendering} />
       )}
@@ -1154,7 +1157,7 @@ function DataGridExpandedRow<TData extends RowData>({
 }
 
 function DataGridEmpty({ children }: DataGridMessageProps) {
-  const { table } = useDataGridContext()
+  const { density, table } = useDataGridContext()
 
   return (
     <tbody data-slot="data-grid-empty">
@@ -1163,7 +1166,15 @@ function DataGridEmpty({ children }: DataGridMessageProps) {
           {...stylex.props(dataGridStyles.messageCell)}
           colSpan={getVisibleColumnCount(table)}
         >
-          {children}
+          <div
+            {...stylex.props(
+              dataGridStyles.messageContent,
+              density === 'compact' && dataGridStyles.compactMessageContent,
+            )}
+            data-slot="data-grid-message-content"
+          >
+            {children}
+          </div>
         </td>
       </tr>
     </tbody>
@@ -1171,7 +1182,7 @@ function DataGridEmpty({ children }: DataGridMessageProps) {
 }
 
 function DataGridLoading({ children }: DataGridMessageProps) {
-  const { table } = useDataGridContext()
+  const { density, table } = useDataGridContext()
 
   return (
     <tbody
@@ -1183,13 +1194,18 @@ function DataGridLoading({ children }: DataGridMessageProps) {
           {...stylex.props(dataGridStyles.messageCell)}
           colSpan={getVisibleColumnCount(table)}
         >
-          <span
-            {...stylex.props(dataGridStyles.loadingIndicator)}
+          <div
+            {...stylex.props(
+              dataGridStyles.messageContent,
+              density === 'compact' && dataGridStyles.compactMessageContent,
+              dataGridStyles.loadingIndicator,
+            )}
+            data-slot="data-grid-message-content"
             role="status"
           >
             <Spinner size="s" />
             {children}
-          </span>
+          </div>
         </td>
       </tr>
     </tbody>

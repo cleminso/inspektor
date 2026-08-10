@@ -66,6 +66,38 @@ describe("useInspectorRuntime", () => {
     expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } });
   });
 
+  it("keeps a cached schema unverified until the stored schema resolves", async () => {
+    const connection = {
+      id: "connection-1",
+      name: "Local app",
+      serverUrl: "https://example.com",
+      appId: "app-1",
+      adminSecret: "secret",
+      env: "dev",
+    } as const;
+    writeCachedWasmSchema(connection, "schema-1", { stale: { columns: [] } });
+    let resolveStoredSchema!: (value: { schema: { accounts: { columns: [] } } }) => void;
+    jazzMocks.fetchStoredWasmSchema.mockReturnValue(
+      new Promise((resolve) => {
+        resolveStoredSchema = resolve;
+      }),
+    );
+    jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined));
+    jazzMocks.fetchSchemaHashes.mockReturnValue(new Promise(() => undefined));
+
+    const { result } = renderHook(() =>
+      useInspectorRuntime({ connection, branch: "main", schemaHash: "schema-1" }),
+    );
+
+    expect(result.current.$wasmSchema.get()).toEqual({ stale: { columns: [] } });
+    expect(result.current.$isWasmSchemaLoading.get()).toBe(true);
+
+    resolveStoredSchema({ schema: { accounts: { columns: [] } } });
+
+    await waitFor(() => expect(result.current.$isWasmSchemaLoading.get()).toBe(false));
+    expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } });
+  });
+
   it("exposes a fresh client projection when the branch changes while preserving cached schema", () => {
     const connection = {
       id: "connection-1",
@@ -93,6 +125,31 @@ describe("useInspectorRuntime", () => {
     expect(result.current).not.toBe(mainRuntime);
     expect(result.current.$client.get()).toBeNull();
     expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } });
+  });
+
+  it("does not let stale provider cleanup clear a replacement client", () => {
+    const connection = {
+      id: "connection-1",
+      name: "Local app",
+      serverUrl: "https://example.com",
+      appId: "app-1",
+      adminSecret: "secret",
+      env: "dev",
+    } as const;
+    jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined));
+    jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined));
+    jazzMocks.fetchSchemaHashes.mockReturnValue(new Promise(() => undefined));
+    const { result } = renderHook(() =>
+      useInspectorRuntime({ connection, branch: "main", schemaHash: "schema-1" }),
+    );
+    const previousClient = { manager: { client: "previous" } } as unknown as JazzClient;
+    const replacementClient = { manager: { client: "replacement" } } as unknown as JazzClient;
+
+    result.current.publishClient(previousClient);
+    result.current.publishClient(replacementClient);
+    result.current.clearClient(previousClient);
+
+    expect(result.current.$client.get()).toBe(replacementClient);
   });
 
   it("publishes schema metadata without waiting for client or hash discovery", async () => {

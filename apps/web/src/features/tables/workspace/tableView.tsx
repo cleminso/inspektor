@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useEffectEvent } from 'react'
+import { Suspense, useEffect, useEffectEvent } from 'react'
 
 import {
   Box,
@@ -8,20 +8,20 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Tooltip,
   Text,
+  Tooltip,
 } from '@inspector/ds'
 import { Layers } from 'lucide-react'
 
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
-import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import {
-  loadEditRowForm,
-  loadInsertRowForm,
-  prefetchInsertRowForm,
+  EditRowForm,
+  InsertRowForm,
+  preloadRowEditorForms,
 } from '@tables/rowEditor/rowEditorModules'
+import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import { getTableViewportScrollResetKey } from '@tables/workspace/tableViewport'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
@@ -29,16 +29,6 @@ import { useTableViewState } from '@tables/workspace/useTableViewState'
 interface TableViewProps {
   tableName: string
 }
-
-/**
- * Row forms stay outside the base table graph. Direct interaction intent warms the selected form
- * through the same loader that React.lazy consumes, while CodeMirror remains deferred. A failed
- * speculative preload is cleared before React's first lazy load; mounted lazy failures remain
- * React error-boundary concerns.
- */
-const EditRowForm = lazy(loadEditRowForm)
-
-const InsertRowForm = lazy(loadInsertRowForm)
 
 function RowEditorFormFallback(): React.ReactElement {
   return (
@@ -55,6 +45,12 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
   })
   const scrollResetKey = getTableViewportScrollResetKey(state)
   const handleEscape = useEffectEvent(state.handleEscape)
+
+  useEffect(() => {
+    if (state.canOpenRowEditor === true) {
+      preloadRowEditorForms()
+    }
+  }, [state.canOpenRowEditor])
 
   useEffect(() => {
     if (
@@ -97,7 +93,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                         size="s"
                         aria-label="Open schema"
                         iconOnly
-                        disabled={state.canEditRows === false}
+                        disabled={state.canInspectSchema === false}
                         onClick={() => {
                           openSchemaView(tableName)
                         }}
@@ -116,10 +112,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                   type="button"
                   variant="primary"
                   size="s"
-                  disabled={state.canEditRows === false}
-                  onFocus={prefetchInsertRowForm}
-                  onPointerDown={prefetchInsertRowForm}
-                  onPointerEnter={prefetchInsertRowForm}
+                  disabled={state.canOpenRowEditor === false}
                   onClick={() => {
                     if (state.detailPaneMode === 'insert') {
                       state.handleRowEditorOpenChange(false)
@@ -203,6 +196,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                 {state.detailPaneMode === 'insert' ? (
                   <InsertRowForm
                     key={`${tableName}:insert`}
+                    saveDisabled={state.canMutateRows === false}
                     rowValues={state.rowValues ?? {}}
                     schemaColumns={state.schemaColumns}
                     onCancel={() => {

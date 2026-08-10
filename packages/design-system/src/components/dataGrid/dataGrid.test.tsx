@@ -110,6 +110,7 @@ interface TestDataGridProps {
   activeColumnId?: string | null
   activeRowId?: string | null
   data?: Person[]
+  emptyContent?: ReactNode
   initialCellSelection?: CellSelectionState
   loading?: boolean
   onCellActivate?: (target: { columnId: string; rowId: string }) => void
@@ -126,6 +127,7 @@ function TestDataGrid({
   activeColumnId = null,
   activeRowId = null,
   data = rows,
+  emptyContent = 'No people',
   initialCellSelection = [],
   loading = false,
   onCellActivate,
@@ -175,7 +177,7 @@ function TestDataGrid({
         <DataGrid.Table aria-label="People">
           <DataGrid.Content
             loading={loading}
-            emptyContent="No people"
+            emptyContent={emptyContent}
             loadingContent="Loading people"
             rowRendering={rowRendering}
           />
@@ -658,6 +660,25 @@ describe('DataGrid', () => {
     expect(screen.getByText('No people')).toBeTruthy()
   })
 
+  it('renders only the header when empty content is null', () => {
+    const { container } = render(<TestDataGrid data={[]} emptyContent={null} />)
+
+    expect(screen.getAllByRole('columnheader')).toHaveLength(2)
+    expect(container.querySelector('tbody')).toBeNull()
+  })
+
+  it('spans empty content across every visible column', () => {
+    const { container } = render(<TestDataGrid data={[]} />)
+    const messageBody = container.querySelector('[data-slot="data-grid-empty"]')
+    const messageCell = messageBody?.querySelector(':scope > tr > td')
+    const messageContent = messageCell?.querySelector(
+      ':scope > [data-slot="data-grid-message-content"]',
+    )
+
+    expect(messageCell?.getAttribute('colspan')).toBe('2')
+    expect(messageContent?.textContent).toBe('No people')
+  })
+
   it('renders a spinner with explicit loading text without placeholder rows', () => {
     const { container } = render(<TestDataGrid loading />)
 
@@ -666,6 +687,11 @@ describe('DataGrid', () => {
     expect(
       container.querySelector('[data-slot="data-grid-loading"]')?.getAttribute('aria-busy'),
     ).toBe('true')
+    expect(
+      container
+        .querySelector('[data-slot="data-grid-message-content"]')
+        ?.getAttribute('role'),
+    ).toBe('status')
     expect(screen.getByText('Loading people')).toBeTruthy()
   })
 

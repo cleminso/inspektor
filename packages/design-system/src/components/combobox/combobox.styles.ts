@@ -281,7 +281,7 @@ export const comboboxStyles = stylex.create({
     gridTemplateColumns: `minmax(0, 1fr) ${spatial["icon-size-m"]}`,
     lineHeight: lineHeights.ui,
     userSelect: "none",
-    minHeight: spatial["popup-row-min-height"],
+    minHeight: spatial["popup-row-min-height-s"],
     width: "auto",
   },
   itemInteractive: {

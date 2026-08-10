@@ -12,6 +12,7 @@ interface InsertRowFormProps {
   onDirtyChange?: (isDirty: boolean) => void
   onSave: (values: Record<string, unknown>, options?: { keepOpen: boolean }) => Promise<void> | void
   rowValues: Record<string, unknown>
+  saveDisabled?: boolean
   schemaColumns: ColumnDescriptor[]
 }
 
@@ -29,6 +30,7 @@ function InsertRowFormFields({
   onDirtyChange,
   onSave,
   rowValues,
+  saveDisabled,
   schemaColumns,
 }: InsertRowFormFieldsProps): React.ReactElement {
   const insertMoreFieldId = 'insert-more'
@@ -55,7 +57,13 @@ function InsertRowFormFields({
       minHeight={0}
       flexDirection="column"
       overflow="hidden"
-      onSubmit={rowEditor.submit}
+      onSubmit={(event) => {
+        if (saveDisabled === true) {
+          event.preventDefault()
+          return
+        }
+        rowEditor.submit(event)
+      }}
     >
       <Box flexGrow={1} mb="m" minHeight={0} overflow="hidden">
         <ScrollArea
@@ -140,6 +148,7 @@ function InsertRowFormFields({
             variant="primary"
             size="s"
             loading={rowEditor.isSaving === true}
+            disabled={saveDisabled === true}
           >
             Insert
           </Button>
@@ -154,6 +163,7 @@ export function InsertRowForm({
   onDirtyChange,
   onSave,
   rowValues,
+  saveDisabled = false,
   schemaColumns,
 }: InsertRowFormProps): React.ReactElement {
   const [insertMoreEnabled, setInsertMoreEnabled] = useState(false)
@@ -171,6 +181,7 @@ export function InsertRowForm({
       onDirtyChange={onDirtyChange}
       onSave={onSave}
       rowValues={rowValues}
+      saveDisabled={saveDisabled}
       schemaColumns={schemaColumns}
     />
   )
