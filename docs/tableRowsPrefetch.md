@@ -27,7 +27,8 @@ admin data is not persisted to browser storage.
 - The shared query module owns the exact query shape and query options used by both prefetch and rendered rows.
 - Jazz's `SubscriptionsOrchestrator` owns query-key generation, cache-entry reuse, subscription delivery, and reference counting.
 - `useJazzQueryState` adapts one orchestrator cache entry to React through `useSyncExternalStore`.
-- `useTableRows` owns table-query derivation, page boundaries, compatible-row preservation, and view-facing status flags.
+- `useTableRows` owns table-query derivation, active loaded-window reuse, page projection, compatible-row preservation, and
+  view-facing status flags.
 - `DataGrid` owns reusable loading, empty, complete-row, and virtual-row presentation without knowing about Jazz.
 
 The adapter around `SubscriptionsOrchestrator` is intentionally isolated because that Jazz API is from an alpha package surface. A
@@ -78,8 +79,8 @@ and options match the prefetch query exactly. `useJazzQueryState` therefore obta
 to its state.
 
 If the prefetch has fulfilled, rows are available in the first destination snapshot. If it is pending, the destination joins that
-pending entry. If route state differs from the default query, the rendered table intentionally creates the query matching that route
-instead of showing speculative rows from a different scope.
+pending entry. If route state differs from the default query, the rendered table creates the query matching that route unless the
+active fulfilled query already contains the complete requested page and its pagination probe.
 
 ### 5. Project cache state into UI state
 
@@ -89,8 +90,9 @@ instead of showing speculative rows from a different scope.
 - refreshing when sorting changes within the same table-page data scope
 - rejected query error text
 
-Resolved rows remain visible while compatible sorting work is pending. Rows are not preserved across a table, schema, filter, page,
-or page-size scope change.
+Resolved rows remain visible while compatible sorting work is pending. A fulfilled wider window remains the active Jazz subscription
+while smaller pages can be projected from it. Rows are not reused across a table, schema, filter, sort, or Jazz-manager change, and an
+uncovered page or page-size request starts its own bounded query.
 
 ## Query identity contract
 
@@ -108,6 +110,10 @@ rendered-query identity in tests.
 
 `TABLE_ROWS_QUERY_OPTIONS` is a module-scope constant. Its stable reference also prevents subscription churn in React dependencies.
 
+Loaded-window reuse is separate from exact prefetch identity. `useTableRows` can keep an already fulfilled broader query active while
+the route represents a contained page. The broader query remains authoritative; the Inspector does not seed or open redundant exact
+page subscriptions for contained rows.
+
 ## Subscription lifecycle
 
 `useTableRowsPrefetchIntent` stores timeout and release handles in refs because they are transient resources and do not affect rendered
@@ -116,8 +122,9 @@ the target closes, the runtime changes, or the owning surface unmounts. Prefetch
 effects run after the destination render, allowing its subscription to join the cache entry first.
 
 The destination table owns an independent subscription through `useSyncExternalStore`. React calls the returned cleanup when the
-query entry changes or the component unmounts. The Jazz manager decides how long an unreferenced cache entry remains available; the
-Inspector does not add a second cache or retention policy.
+active query entry changes or the component unmounts. A contained pagination change keeps the broader entry active. `useTableRows`
+retains one committed fulfilled window for this decision; it does not persist rows or retain multiple independent subscriptions. The
+Jazz manager decides how long an entry remains available after it is no longer active.
 
 ## Grid presentation states
 
@@ -144,6 +151,11 @@ array length would defeat bounded pagination, so the Inspector represents only t
 replaces the cumulative load-more query, which repeatedly requested every row from offset zero. Non-ID sorts add ascending ID order as
 a deterministic tie-breaker so equal values cannot move unpredictably across offsets.
 
+A fulfilled query window can represent smaller pages whose visible rows and extra probe are fully contained by that window. For
+example, an offset-zero 501-row result can represent size-100 pages one through five without changing the active Jazz subscription.
+Page six starts an offset-500, limit-101 query because only its first row was the preceding window's probe. A result shorter than its
+requested page size proves the end of the result set and can also satisfy a larger page that cannot contain additional rows.
+
 Pagination renders between the toolbar content and actions as a lower-bound row status, compact page-size selector, previous and next
 icon actions, and a `Page x` label. While another page exists, the row status communicates a truthful lower bound such as
 `1–100 of 101+`. The final page proves the exact result count and can show a status such as `10,001–10,004 of 10,004`. The product
@@ -165,7 +177,8 @@ scroll axes without remounting the viewport or its retained table content.
 - `apps/web/src/features/tables/query/tableRowsPrefetch.ts`: isolated Jazz orchestrator prefetch adapter.
 - `apps/web/src/features/tables/query/useTableRowsPrefetchIntent.ts`: shared intent timer, ownership, handoff, and runtime cleanup.
 - `apps/web/src/features/tables/query/useJazzQueryState.ts`: React external-store adapter for Jazz cache entries.
-- `apps/web/src/features/tables/query/useTableRows.ts`: query derivation, row preservation, pagination, and status projection.
+- `apps/web/src/features/tables/query/useTableRows.ts`: query derivation, active loaded-window reuse, page projection, row
+  preservation, pagination, and status projection.
 - `apps/web/src/features/tables/grid/toolbar.tsx`: row status, compact page-size, `Page x`, and previous/next toolbar controls.
 - `apps/web/src/features/tables/workspace/tableView.tsx`: product loading copy and virtual rendering selection.
 - `packages/design-system/src/components/dataGrid/dataGrid.tsx`: reusable loading and virtual table-body presentation.
@@ -178,5 +191,7 @@ scroll axes without remounting the viewport or its retained table content.
 - Release every speculative and rendered subscription through the cleanup function returned by Jazz.
 - Preserve one semantic table, one `colgroup`, one header, and one body for loading and resolved rows.
 - Do not show prefetched default rows for a filtered or differently sorted route.
+- Reuse a loaded window only when it contains the complete visible page plus its probe, or when it proves the result-set end.
+- Invalidate loaded-window reuse when the manager, schema, table, filters, or sorting changes.
 - Keep virtual row estimates aligned with the fixed Data Grid density heights.
 - Replace only `tableRowsPrefetch.ts` if Jazz adds a supported prefetch API with shared pending work and bounded retention.

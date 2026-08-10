@@ -21,6 +21,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [10/08/26]
 
+- [x] Keep a broader fulfilled Jazz row query active while route pagination projects a fully covered smaller page from its rows.
+- [x] Start a bounded page query when the active loaded window does not contain the complete page and pagination probe.
+- [x] Reuse a final loaded window for larger pages only when its short result proves that no additional rows exist.
+
+[10/08/26]
+
 - [x] Keep schema navigation and insert drafting available from cached schema metadata while verified runtime mutations remain unavailable.
 - [x] Limit runtime-readiness disabling to the insert form submission control and begin form preloading from schema readiness.
 - [x] Restore one shared preload and render request per deferred row form so a completed preload renders synchronously.
@@ -728,6 +734,12 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [10/08/26]
 
+- A loaded row window may serve contained page and page-size routes without opening redundant exact-page subscriptions.
+- An uncovered page starts a bounded query; prior page-size selection does not imply proactive block prefetching.
+- Loaded-window reuse is invalid across Jazz manager, schema, table, filter, or sort changes.
+
+[10/08/26]
+
 - Cached schema metadata may stabilize table structure, but only the selected schema fetched from Jazz may initialize the query client.
 - Row-editor forms remain deferred from the base table bundle and are warmed once cached schema metadata is available.
 
@@ -816,6 +828,13 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[10/08/26]
+
+- [x] Reproduce contained-page refetching with a failing loaded-window regression test.
+- [x] Cover contained smaller pages, the first uncovered page, known result-set ends, larger uncovered pages, live end-boundary changes, and repeated out-of-range navigation.
+- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
+- [ ] Verify the 500-to-100 page-size sequence against a connected table containing more than 500 rows.
 
 [10/08/26]
 

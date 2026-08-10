@@ -4,6 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useTableRows } from "@tables/query/useTableRows";
 
+const { useJazzQueryStateMock } = vi.hoisted(() => ({
+  useJazzQueryStateMock: vi.fn(),
+}));
+
 let queryRows: DynamicTableRow[] | undefined;
 let queryError: unknown;
 let currentSchemaHash = "schema-1";
@@ -39,10 +43,15 @@ vi.mock("@tables/schema/tableSchema", () => ({ getTableColumns: () => [] }));
 
 vi.mock("@tables/query/genericQueryBuilder", () => ({
   GenericQueryBuilder: class GenericQueryBuilder {
-    limit() {
+    limitValue: number | undefined;
+    offsetValue: number | undefined;
+
+    limit(value: number) {
+      this.limitValue = value;
       return this;
     }
-    offset() {
+    offset(value: number) {
+      this.offsetValue = value;
       return this;
     }
     orderBy() {
@@ -55,12 +64,7 @@ vi.mock("@tables/query/genericQueryBuilder", () => ({
 }));
 
 vi.mock("@tables/query/useJazzQueryState", () => ({
-  useJazzQueryState: () =>
-    queryError === null
-      ? queryRows === undefined
-        ? { status: "pending", data: undefined, error: null }
-        : { status: "fulfilled", data: queryRows, error: null }
-      : { status: "rejected", data: undefined, error: queryError },
+  useJazzQueryState: useJazzQueryStateMock,
 }));
 
 beforeEach(() => {
@@ -76,6 +80,14 @@ beforeEach(() => {
   sortDirection = "asc";
   runtimeClient = { manager: {} };
   runtimeSchema = {};
+  useJazzQueryStateMock.mockReset();
+  useJazzQueryStateMock.mockImplementation(() =>
+    queryError === null
+      ? queryRows === undefined
+        ? { status: "pending", data: undefined, error: null }
+        : { status: "fulfilled", data: queryRows, error: null }
+      : { status: "rejected", data: undefined, error: queryError },
+  );
 });
 
 describe("useTableRows", () => {
@@ -178,18 +190,6 @@ describe("useTableRows", () => {
       name: "filters",
       replaceScope: () => {
         filters = [{ column: "name", operator: "equals", value: "Grace" }];
-      },
-    },
-    {
-      name: "page",
-      replaceScope: () => {
-        page = 2;
-      },
-    },
-    {
-      name: "page size",
-      replaceScope: () => {
-        pageSize = 500;
       },
     },
   ])("does not preserve resolved rows when the $name scope changes", ({ replaceScope }) => {
@@ -325,6 +325,186 @@ describe("useTableRows", () => {
     expect(result.current.pageSize).toBe(100);
   });
 
+  it("reuses a fulfilled broad query for covered smaller pages", () => {
+    pageSize = 500;
+    queryRows = Array.from({ length: 501 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+    const broadQuery = useJazzQueryStateMock.mock.lastCall?.[1];
+
+    pageSize = 100;
+    page = 2;
+    rerender();
+
+    expect(result.current.rows[0]?.id).toBe("row-101");
+    expect(result.current.rows.at(-1)?.id).toBe("row-200");
+    expect(result.current.isInitialLoading).toBe(false);
+    expect(useJazzQueryStateMock.mock.lastCall?.[1]).toBe(broadQuery);
+
+    page = 5;
+    rerender();
+
+    expect(result.current.rows[0]?.id).toBe("row-401");
+    expect(result.current.rows.at(-1)?.id).toBe("row-500");
+    expect(result.current.hasNextPage).toBe(true);
+    expect(useJazzQueryStateMock.mock.lastCall?.[1]).toBe(broadQuery);
+  });
+
+  it("starts a bounded query for the first page outside a loaded window", () => {
+    pageSize = 500;
+    queryRows = Array.from({ length: 501 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+    const broadQuery = useJazzQueryStateMock.mock.lastCall?.[1];
+
+    pageSize = 100;
+    page = 6;
+    queryRows = undefined;
+    rerender();
+
+    const uncoveredQuery = useJazzQueryStateMock.mock.lastCall?.[1] as {
+      limitValue: number;
+      offsetValue: number;
+    };
+    expect(uncoveredQuery).not.toBe(broadQuery);
+    expect(uncoveredQuery.limitValue).toBe(101);
+    expect(uncoveredQuery.offsetValue).toBe(500);
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.isInitialLoading).toBe(true);
+  });
+
+  it("reuses a loaded final window when a larger page cannot contain more rows", () => {
+    pageSize = 100;
+    queryRows = Array.from({ length: 75 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+    const finalQuery = useJazzQueryStateMock.mock.lastCall?.[1];
+
+    pageSize = 500;
+    rerender();
+
+    expect(result.current.rows).toHaveLength(75);
+    expect(result.current.hasNextPage).toBe(false);
+    expect(result.current.isInitialLoading).toBe(false);
+    expect(useJazzQueryStateMock.mock.lastCall?.[1]).toBe(finalQuery);
+  });
+
+  it("stops reusing a final window when a live update fills its pagination probe", () => {
+    pageSize = 100;
+    queryRows = Array.from({ length: 75 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+    const initialQuery = useJazzQueryStateMock.mock.lastCall?.[1];
+    const expandedRows = Array.from({ length: 101 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    useJazzQueryStateMock.mockImplementation((_manager, currentQuery) =>
+      currentQuery === initialQuery
+        ? { status: "fulfilled", data: expandedRows, error: null }
+        : { status: "pending", data: undefined, error: null },
+    );
+
+    pageSize = 500;
+    rerender();
+
+    expect(useJazzQueryStateMock.mock.lastCall?.[1]).not.toBe(initialQuery);
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.isInitialLoading).toBe(true);
+  });
+
+  it("does not reset a newly uncovered page while its bounded query starts", () => {
+    pageSize = 100;
+    queryRows = Array.from({ length: 75 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+    const initialQuery = useJazzQueryStateMock.mock.lastCall?.[1];
+    const expandedRows = Array.from({ length: 101 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    useJazzQueryStateMock.mockImplementation((_manager, currentQuery) =>
+      currentQuery === initialQuery
+        ? { status: "fulfilled", data: expandedRows, error: null }
+        : { status: "pending", data: undefined, error: null },
+    );
+
+    page = 2;
+    rerender();
+
+    expect(useJazzQueryStateMock.mock.lastCall?.[1]).not.toBe(initialQuery);
+    expect(result.current.rows).toEqual([]);
+    expect(result.current.isInitialLoading).toBe(true);
+    expect(setPage).not.toHaveBeenCalled();
+  });
+
+  it("does not reuse a loaded window when a larger page needs rows beyond it", () => {
+    pageSize = 100;
+    queryRows = Array.from({ length: 101 }, (_, index) => ({
+      id: `row-${index + 1}`,
+    })) as DynamicTableRow[];
+    const { result, rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+    const initialQuery = useJazzQueryStateMock.mock.lastCall?.[1];
+
+    pageSize = 500;
+    queryRows = undefined;
+    rerender();
+
+    const largerQuery = useJazzQueryStateMock.mock.lastCall?.[1] as {
+      limitValue: number;
+      offsetValue: number;
+    };
+    expect(largerQuery).not.toBe(initialQuery);
+    expect(largerQuery.limitValue).toBe(501);
+    expect(largerQuery.offsetValue).toBe(0);
+    expect(result.current.isInitialLoading).toBe(true);
+  });
+
   it("navigates between pages and resets the page when page size changes", async () => {
     page = 2;
     queryRows = [{ id: "row-101" } as DynamicTableRow];
@@ -358,6 +538,35 @@ describe("useTableRows", () => {
         wasmSchema: runtimeSchema as never,
       }),
     );
+
+    await waitFor(() => {
+      expect(setPage).toHaveBeenCalledWith(1);
+    });
+  });
+
+  it("returns to the first page whenever the same out-of-range page is revisited", async () => {
+    page = 2;
+    queryRows = [];
+    const { rerender } = renderHook(() =>
+      useTableRows({
+        client: runtimeClient as never,
+        currentSchemaHash: "schema-1",
+        tableName: "users",
+        wasmSchema: runtimeSchema as never,
+      }),
+    );
+    await waitFor(() => {
+      expect(setPage).toHaveBeenCalledWith(1);
+    });
+
+    page = 1;
+    queryRows = undefined;
+    rerender();
+    setPage.mockClear();
+
+    page = 2;
+    queryRows = [];
+    rerender();
 
     await waitFor(() => {
       expect(setPage).toHaveBeenCalledWith(1);
