@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-
-import { Box, Button, Icon, Select, Text, Tooltip } from "@inspector/ds";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { Box, Button, Select, Text, Tooltip } from "@inspector/ds";
 
 import { TABLE_PAGE_SIZE_OPTIONS } from "@tables/query/tableRowsQuery";
 import type { TablePageSize } from "@tables/tableTypes";
@@ -91,7 +91,7 @@ export function TablePagination({
               variant="ghost"
               onClick={() => onPageChange(page - 1)}
             >
-              <Icon render={<ChevronLeft />} size="s" />
+              <Button.Glyph artwork={ChevronLeft} />
             </Button>
           }
         />
@@ -111,7 +111,7 @@ export function TablePagination({
               variant="ghost"
               onClick={() => onPageChange(page + 1)}
             >
-              <Icon render={<ChevronRight />} size="s" />
+              <Button.Glyph artwork={ChevronRight} />
             </Button>
           }
         />

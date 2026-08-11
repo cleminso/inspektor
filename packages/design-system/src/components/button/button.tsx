@@ -1,4 +1,5 @@
 import { Button as BaseButton } from '@base-ui/react/button'
+import { mergeProps } from '@base-ui/react/merge-props'
 import { forwardRef, useContext } from 'react'
 import type React from 'react'
 
@@ -6,15 +7,24 @@ import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import {
   ButtonContent,
+  ButtonGlyph,
   buttonLayoutOptions,
   getButtonVisualStyles,
+  type ButtonGlyphSize,
   type ButtonLayout,
   type ButtonRadius,
   type ButtonSize,
   type ButtonVariant,
 } from './buttonVisuals'
 
-export type { ButtonLayout, ButtonRadius, ButtonSize, ButtonVariant } from './buttonVisuals'
+export type {
+  ButtonGlyphProps,
+  ButtonGlyphSize,
+  ButtonLayout,
+  ButtonRadius,
+  ButtonSize,
+  ButtonVariant,
+} from './buttonVisuals'
 
 type BaseButtonProps = Omit<
   BaseButton.Props,
@@ -30,6 +40,8 @@ interface ButtonSharedProps {
   loading?: boolean
   /** Selects a design-system corner radius. */
   radius?: ButtonRadius
+  /** Selects the standard glyph treatment or the explicit compact-control exception. */
+  glyphSize?: ButtonGlyphSize
   /** Disables interaction and exposes the disabled state to assistive technology. */
   disabled?: BaseButton.Props['disabled']
   /** Composes Button behavior and styles onto another native button component. */
@@ -61,7 +73,7 @@ export type ButtonProps = BaseButtonProps &
   ButtonSharedProps &
   (LabelButtonProps | IconOnlyButtonProps)
 
-export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
+const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
   {
     variant = 'primary',
     size = 'm',
@@ -69,12 +81,14 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
     iconOnly = false,
     layout = 'inline',
     radius = 'xs',
+    glyphSize = 'standard',
     prefix,
     suffix,
     disabled = false,
     render,
     children,
     'aria-pressed': ariaPressed,
+    'aria-expanded': ariaExpanded,
     type = 'button',
     ...props
   },
@@ -90,6 +104,7 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
       size,
       square: iconOnly,
       pressed: ariaPressed === true,
+      expanded: ariaExpanded === true,
       radius,
       fill: layoutOptions.fill,
       alignment: layoutOptions.alignment,
@@ -99,19 +114,46 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
       hasSuffix: suffix !== undefined,
     }),
   )
+  const compositionProps = props as typeof props &
+    Pick<BaseButton.Props, 'className' | 'style'>
+  const {
+    className: compositionClassName,
+    style: compositionStyle,
+    ...buttonProps
+  } = compositionProps
+  function resolveStateStyleProps(state: BaseButton.State) {
+    return mergeProps<'button'>(
+      {
+        className: stateStyleProps.className(state),
+        style: stateStyleProps.style(state),
+      },
+      {
+        className:
+          typeof compositionClassName === 'function'
+            ? compositionClassName(state)
+            : compositionClassName,
+        style:
+          typeof compositionStyle === 'function' ? compositionStyle(state) : compositionStyle,
+      },
+    )
+  }
 
   return (
     <BaseButton
-      {...props}
+      {...buttonProps}
       ref={forwardedRef}
       aria-pressed={ariaPressed}
+      aria-expanded={ariaExpanded}
       disabled={isInteractionBlocked}
       focusableWhenDisabled={loading === true}
       render={render}
       type={type}
-      {...stateStyleProps}
+      className={(state) => resolveStateStyleProps(state).className}
+      style={(state) => resolveStateStyleProps(state).style}
       aria-busy={loading === true ? true : undefined}
       data-full-width={layoutOptions.fill === true ? '' : undefined}
+      data-glyph-size={glyphSize}
+      data-expanded={ariaExpanded === true ? '' : undefined}
       data-icon-only={iconOnly === true ? '' : undefined}
       data-loading={loading === true ? '' : undefined}
       data-pressed={ariaPressed === true ? '' : undefined}
@@ -127,9 +169,12 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(function Button(
         loading={loading}
         iconOnly={iconOnly}
         size={size}
+        glyphSize={glyphSize}
       >
         {children}
       </ButtonContent>
     </BaseButton>
   )
 })
+
+export const Button = Object.assign(ButtonRoot, { Glyph: ButtonGlyph })

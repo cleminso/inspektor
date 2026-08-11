@@ -109,9 +109,7 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(functio
     'data-slot': 'button-link',
     'data-variant': variant,
   } as useRender.ElementProps<'a'>
-  const domProps = Object.fromEntries(
-    Object.entries(props).filter(([key]) => key !== 'className' && key !== 'style'),
-  ) as useRender.ComponentProps<'a'>
+  const domProps = props as useRender.ComponentProps<'a'>
 
   return useRender({
     defaultTagName: 'a',

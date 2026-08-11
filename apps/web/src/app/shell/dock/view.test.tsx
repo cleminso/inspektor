@@ -19,9 +19,11 @@ describe("InspectorDock", () => {
     render(<InspectorDock leftDock={{ isOpen: false, onToggle: () => undefined }} />);
 
     for (const name of ["Open left dock", "Open subscriptions dock"]) {
-      const icon = screen.getByRole("button", { name }).querySelector('[data-slot="icon"]');
+      const button = screen.getByRole("button", { name });
+      const icon = button.querySelector('[data-slot="icon"]');
+      expect(button.getAttribute("data-glyph-size")).toBe("compact");
       expect(icon?.getAttribute("data-size")).toBe("xs");
-      expect(screen.getByRole("button", { name }).getAttribute("title")).toBeNull();
+      expect(button.getAttribute("title")).toBeNull();
     }
   });
 

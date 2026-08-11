@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex'
+import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 
 import { useClipboard } from '../../hooks/useClipboard'
 import {
@@ -24,7 +25,7 @@ export interface CopyButtonProps {
   copiedLabel?: string
   /** Feedback shown when the clipboard operation fails. */
   errorLabel?: string
-  /** Controls the square button and icon size. */
+  /** Controls the square button size. */
   size?: CopyButtonSize
   /** Controls the visual treatment and emphasis of the copy action. */
   variant?: CopyButtonVariant
@@ -38,32 +39,44 @@ export interface CopyButtonProps {
   onCopyError?: (error: Error) => void
 }
 
-const iconSizeStyles = {
-  xs: copyButtonStyles.iconXS,
-  s: copyButtonStyles.iconS,
-  m: copyButtonStyles.iconM,
-} satisfies Record<CopyButtonSize, unknown>
+const CopyArtwork = forwardRef<SVGSVGElement, ComponentPropsWithoutRef<'svg'>>(
+  function CopyArtwork(props, ref) {
+    return (
+      <svg
+        {...props}
+        ref={ref}
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+      >
+        <rect height="12" rx="1" width="12" x="8" y="8" />
+        <path d="M16 6V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h1" />
+      </svg>
+    )
+  },
+)
 
-function CopyIcon({ size }: { size: CopyButtonSize }) {
-  const iconStyleProps = stylex.props(copyButtonStyles.icon, iconSizeStyles[size])
-
-  return (
-    <svg aria-hidden="true" strokeWidth={1.5} viewBox="0 0 24 24" {...iconStyleProps}>
-      <rect height="12" rx="1" width="12" x="8" y="8" />
-      <path d="M16 6V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h1" />
-    </svg>
-  )
-}
-
-function CheckIcon({ size }: { size: CopyButtonSize }) {
-  const iconStyleProps = stylex.props(copyButtonStyles.icon, iconSizeStyles[size])
-
-  return (
-    <svg aria-hidden="true" strokeWidth={1.5} viewBox="0 0 24 24" {...iconStyleProps}>
-      <path d="m5 12 4 4L19 6" />
-    </svg>
-  )
-}
+const CheckArtwork = forwardRef<SVGSVGElement, ComponentPropsWithoutRef<'svg'>>(
+  function CheckArtwork(props, ref) {
+    return (
+      <svg
+        {...props}
+        ref={ref}
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+      >
+        <path d="m5 12 4 4L19 6" />
+      </svg>
+    )
+  },
+)
 
 export function CopyButton({
   textToCopy,
@@ -104,7 +117,7 @@ export function CopyButton({
             size={size}
             variant={variant}
           >
-            {copied === true ? <CheckIcon size={size} /> : <CopyIcon size={size} />}
+            <Button.Glyph artwork={copied === true ? CheckArtwork : CopyArtwork} />
           </Button>
         }
       />

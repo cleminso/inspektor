@@ -84,6 +84,22 @@
       }
     },
     {
+      "files": ["apps/web/src/**/*.tsx"],
+      "rules": {
+        "react/forbid-elements": [
+          "error",
+          {
+            "forbid": [
+              {
+                "element": "svg",
+                "message": "Use @inspector/ds Icon with imported SVG artwork."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["**/*.test.ts", "**/*.test.tsx"],
       "rules": {
         "jsx-a11y/anchor-has-content": "off",

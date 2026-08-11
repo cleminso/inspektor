@@ -9,7 +9,7 @@ export default function PrefixSuffixExample(): ReactElement {
       <ContextMenu.Content>
         <ContextMenu.Item onClick={() => undefined}>
           <ContextMenu.Prefix>
-            <Icon render={<Pencil />} size="s" />
+            <Icon artwork={Pencil} size="s" />
           </ContextMenu.Prefix>
           Rename tab
           <ContextMenu.Suffix>
@@ -18,7 +18,7 @@ export default function PrefixSuffixExample(): ReactElement {
         </ContextMenu.Item>
         <ContextMenu.Item onClick={() => undefined}>
           <ContextMenu.Prefix>
-            <Icon render={<Copy />} size="s" />
+            <Icon artwork={Copy} size="s" />
           </ContextMenu.Prefix>
           Duplicate tab
           <ContextMenu.Suffix>
@@ -29,7 +29,7 @@ export default function PrefixSuffixExample(): ReactElement {
         </ContextMenu.Item>
         <ContextMenu.Item variant="danger" onClick={() => undefined}>
           <ContextMenu.Prefix>
-            <Icon render={<X />} size="s" />
+            <Icon artwork={X} size="s" />
           </ContextMenu.Prefix>
           Close tab
           <ContextMenu.Suffix>

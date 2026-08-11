@@ -2,6 +2,7 @@ import type { Menu as BaseMenu } from '@base-ui/react/menu'
 import * as stylex from '@stylexjs/stylex'
 
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
+import { CheckGlyph, ChevronRightGlyph } from '../icon/iconArtwork'
 import { menuStyles } from './menu.styles'
 
 type MenuPresentationItemVariant = 'default' | 'danger'
@@ -137,16 +138,12 @@ export function getMenuSubmenuTriggerStyles(state: BaseMenu.SubmenuTrigger.State
 
 export function MenuCheckIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 16 16"
+    <CheckGlyph
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
       {...stylex.props(menuStyles.icon)}
-    >
-      <path d="m3 8 3 3 7-7" />
-    </svg>
+    />
   )
 }
 
@@ -169,13 +166,9 @@ export function MenuRadioIcon() {
 
 export function MenuSubmenuIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 16 16"
+    <ChevronRightGlyph
       fill="currentColor"
       {...stylex.props(menuStyles.submenuIcon)}
-    >
-      <path d="m6 3 5 5-5 5z" />
-    </svg>
+    />
   )
 }

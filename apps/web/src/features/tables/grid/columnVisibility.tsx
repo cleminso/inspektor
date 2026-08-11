@@ -1,7 +1,7 @@
 import type { DynamicTableRow } from "jazz-tools";
 import { Settings2 } from "lucide-react";
 
-import { Button, Icon, MultiSelect, type DataGridTable, type MultiSelectItem } from "@inspector/ds";
+import { Button, MultiSelect, type DataGridTable, type MultiSelectItem } from "@inspector/ds";
 
 import { tableGridSelectionColumnId } from "@tables/grid/tableGridColumnIds";
 
@@ -52,7 +52,7 @@ export function DataGridColumnVisibility({
           />
         }
       >
-        <Icon render={<Settings2 />} size="s" />
+        <Button.Glyph artwork={Settings2} />
       </MultiSelect.Trigger>
       <MultiSelect.Content
         align="end"

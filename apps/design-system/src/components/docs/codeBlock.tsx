@@ -48,7 +48,7 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
               isExpanded === false && styles.triggerIconCollapsed,
             )}
           >
-            <Icon render={<ChevronDown />} size="s" />
+            <Icon artwork={ChevronDown} size="s" />
           </span>
           {isExpanded === true ? "Hide code" : "Show code"}
         </button>

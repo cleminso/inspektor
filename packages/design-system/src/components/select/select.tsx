@@ -6,6 +6,7 @@ import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { popupPositioning } from '../../primitives/popupPositioning'
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import type { FormControlSize } from '../../utils/formControlSize'
+import { CheckGlyph, ChevronDownGlyph } from '../icon/iconArtwork'
 import { selectStyles } from './select.styles'
 
 type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
@@ -155,19 +156,15 @@ const SelectIcon = React.forwardRef<HTMLSpanElement, BaseSelect.Icon.Props>(
     const iconStyles = stylex.props(selectStyles.icon)
     return (
       <BaseSelect.Icon {...props} ref={ref} {...stateStyles} data-slot="select-icon">
-        <svg
-          aria-hidden="true"
+        <ChevronDownGlyph
           data-slot="select-chevron"
-          viewBox="0 0 16 16"
           fill="none"
           stroke="currentColor"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="1.5"
           {...iconStyles}
-        >
-          <path d="m4 6 4 4 4-4" />
-        </svg>
+        />
       </BaseSelect.Icon>
     )
   },
@@ -307,16 +304,12 @@ const SelectItemIndicator = React.forwardRef<HTMLSpanElement, BaseSelect.ItemInd
         {...stateStyles}
         data-slot="select-item-indicator"
       >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 16 16"
+        <CheckGlyph
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
           {...iconStyles}
-        >
-          <path d="m3 8 3 3 7-7" />
-        </svg>
+        />
       </BaseSelect.ItemIndicator>
     )
   },

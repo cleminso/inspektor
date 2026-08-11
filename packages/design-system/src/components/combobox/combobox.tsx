@@ -15,6 +15,7 @@ import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
 import { scrollbarStyles } from "../../styles/scrollbar.styles";
 import { ButtonContent, getButtonVisualStyles } from "../button/buttonVisuals";
+import { CheckGlyph, ChevronDownGlyph, CloseGlyph } from "../icon/iconArtwork";
 import { comboboxStyles } from "./combobox.styles";
 
 type WithoutStyles<Props> = Omit<Props, "className" | "style" | "render">;
@@ -437,15 +438,12 @@ function ComboboxChevron({ open }: { open: boolean }) {
   const iconStyles = stylex.props(comboboxStyles.icon, open === true && comboboxStyles.iconOpen);
 
   return (
-    <svg
-      aria-hidden="true"
+    <ChevronDownGlyph
       data-slot="combobox-chevron"
       fill="currentColor"
-      viewBox="0 0 16 16"
+      variant="solid"
       {...iconStyles}
-    >
-      <path d="m14.06 5.5-.53.53-4.82 4.82a1 1 0 0 1-1.42 0L2.47 6.03l-.53-.53L3 4.44l.53.53L8 9.44l4.47-4.47.53-.53z" />
-    </svg>
+    />
   );
 }
 
@@ -653,16 +651,13 @@ const ComboboxClear = forwardRef<ComponentRef<typeof BaseCombobox.Clear>, Combob
         disabled={disabled}
         {...stateStyles}
       >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 16 16"
+        <CloseGlyph
           fill="none"
+          geometry="edge"
           stroke="currentColor"
           strokeWidth="1.5"
           {...iconStyles}
-        >
-          <path d="m4 4 8 8M12 4l-8 8" />
-        </svg>
+        />
       </BaseCombobox.Clear>
     );
   },
@@ -768,16 +763,12 @@ const ComboboxItemIndicator = forwardRef<
       keepMounted={keepMounted}
       {...stateStyles}
     >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 16 16"
+      <CheckGlyph
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
         {...iconStyles}
-      >
-        <path d="m3 8 3 3 7-7" />
-      </svg>
+      />
     </BaseCombobox.ItemIndicator>
   );
 });

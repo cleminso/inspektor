@@ -7,11 +7,14 @@ import { getGeneratedProps } from "@/lib/propsData";
 import { buttonItem } from "@/lib/registry";
 
 import { ButtonPlayground } from "./playground";
-import { buttonPropNames } from "./props";
+import GlyphCompositionExample from "./glyphCompositionExample";
+import glyphCompositionSource from "./glyphCompositionExample.tsx?raw";
+import { buttonGlyphPropNames, buttonPropNames } from "./props";
 import VariantsExample from "./variantsExample";
 import variantsSource from "./variantsExample.tsx?raw";
 
 const buttonProps = getGeneratedProps(buttonItem.componentId, buttonPropNames);
+const buttonGlyphProps = getGeneratedProps("button.glyph", buttonGlyphPropNames);
 
 export function ButtonPage(): ReactElement {
   return (
@@ -23,10 +26,23 @@ export function ButtonPage(): ReactElement {
       </Section>
 
       <Section
+        title="Glyph composition"
+        description={'Use Button.Glyph for ordinary icon-only, prefix, and suffix artwork. Button selects the standard glyph size; glyphSize="compact" records the explicit compact-control exception.'}
+      >
+        <Example source={glyphCompositionSource}>
+          <GlyphCompositionExample />
+        </Example>
+      </Section>
+
+      <Section
         title="Props"
         description="Button combines constrained visual props with native button behavior and render composition."
       >
         <PropsTable rows={buttonProps} />
+      </Section>
+
+      <Section title="Glyph props">
+        <PropsTable rows={buttonGlyphProps} />
       </Section>
     </ButtonPlayground>
   );

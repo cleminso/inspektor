@@ -61,7 +61,7 @@ export default function StatusExample(): ReactElement {
         isItemEqualToValue={(item, selected) => item.hash === selected.hash}
       >
         <ContextSwitcher.Trigger label="Switch schema" tooltip={schema?.hash} width="m">
-          <Icon render={<HashIcon />} size="s" />
+          <Icon artwork={HashIcon} size="s" />
           <Text as="span" color="inherit" monospace truncate>
             {schema === null ? "Select schema" : truncateMiddle(schema.hash)}
           </Text>

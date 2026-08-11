@@ -1,4 +1,4 @@
-import { Box, Button, Icon } from "@inspector/ds";
+import { Box, Button } from "@inspector/ds";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, PanelLeft, PanelRight } from "lucide-react";
 import { type ReactElement } from "react";
@@ -54,7 +54,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
           aria-pressed={isNavigationOpen}
           onClick={toggleNavigation}
         >
-          <Icon render={<PanelLeft />} size="s" />
+          <Button.Glyph artwork={PanelLeft} />
         </Button>
         <SourceLink source={item.source} title={item.title} />
       </Box>
@@ -70,7 +70,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
           disabled={previousItem === undefined}
           onClick={navigatePrevious}
         >
-          <Icon render={<ArrowLeft />} size="s" />
+          <Button.Glyph artwork={ArrowLeft} />
         </Button>
         <Button
           variant="ghost"
@@ -81,7 +81,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
           disabled={nextItem === undefined}
           onClick={navigateNext}
         >
-          <Icon render={<ArrowRight />} size="s" />
+          <Button.Glyph artwork={ArrowRight} />
         </Button>
         {item.componentId !== undefined ? (
           <Button
@@ -93,7 +93,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
             aria-pressed={isControlsOpen}
             onClick={toggleControls}
           >
-            <Icon render={<PanelRight />} size="s" />
+            <Button.Glyph artwork={PanelRight} />
           </Button>
         ) : null}
       </Box>

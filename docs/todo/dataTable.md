@@ -14,6 +14,11 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Keep column-header menu actions borderless by preserving ghost Button presentation across Menu Trigger composition.
+- [x] Preserve the 20px `xs` header-menu target and compact 12px glyph inside the 32px header row.
+
 ### Message and empty states
 
 [10/08/26]
@@ -122,6 +127,19 @@
 
 ## Open product work
 
+[11/08/26]
+
+- [x] Stop `Menu.Trigger` presentation styles from overriding the Button-owned border, surface, radius, and height on column-header menu actions.
+- [x] Keep the `xs` column-header chevron target while removing the accidental 28px composed Menu treatment.
+
+[11/0826]
+
+- [ ] List all wrong interactions with the grid, row select when opening rowEditor
+- [ ] Think about cell reactivity UI feedback when value changes.
+- [ ] Investigate how to improve grid cell selection border.
+- [ ] During Column resizing, should the column cell moves as well, or simply keep header? Change the current behavior to adopt spreadheet like column border moves?
+- [ ] Add actions "Hide other columns" and "Show all columns" from context menu.
+
 [29/07/26]
 
 - [ ] Add visual regression coverage for header corners, active cells, active columns, resizing, and drag states.
@@ -175,6 +193,10 @@
 
 ## Open design decisions
 
+[11/08/26]
+
+- [x] The composed control owns persistent open-state presentation when Menu behavior is rendered through another design-system control.
+
 [29/07/26]
 
 - [ ] Decide whether active-row presentation should use fill, a leading edge, or cell-owned horizontal edges.
@@ -182,6 +204,13 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[11/08/26]
+
+- [x] Focused column tests preserve the `xs` header action and compact `xs` glyph while retaining sorting, context-menu, move, reset, and hide behavior.
+- [x] Application type checking and production build pass.
+- [x] The application suite passes 428 of 429 tests; the remaining dock fixed-height assertion is unrelated to header actions.
+- [ ] Verify the borderless header action in a connected table route.
 
 [10/08/26]
 

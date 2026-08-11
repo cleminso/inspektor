@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Icon,
   type ButtonLayout,
   type ButtonRadius,
   type ButtonSize,
@@ -125,7 +124,7 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
   const preview = state.iconOnly === true ? (
     <Box>
       <Button {...sharedPreviewProps} iconOnly aria-label="Primary action">
-        <Icon render={<ArrowRight />} size="s" />
+        <Button.Glyph artwork={ArrowRight} />
       </Button>
     </Box>
   ) : (
@@ -133,8 +132,8 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
       <Button
         {...sharedPreviewProps}
         layout={state.layout}
-        prefix={state.prefix === true ? <Icon render={<ArrowLeft />} size="s" /> : undefined}
-        suffix={state.suffix === true ? <Icon render={<ArrowRight />} size="s" /> : undefined}
+        prefix={state.prefix === true ? <Button.Glyph artwork={ArrowLeft} /> : undefined}
+        suffix={state.suffix === true ? <Button.Glyph artwork={ArrowRight} /> : undefined}
       >
         Primary
       </Button>

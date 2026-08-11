@@ -1,6 +1,6 @@
 import { ActionList, Box, Icon, Text } from "@inspector/ds";
-import { Layers3, Table2 } from "lucide-react";
 
+import { productGlyphs } from "@app/icons/productGlyphs";
 import { useTableTabs } from "@tables/workspace/tabsProvider";
 import { createBaseTableTabId } from "@tables/workspace/tabs";
 
@@ -38,9 +38,9 @@ export function NewTableView(): React.ReactElement {
                   <ActionList.Trigger
                     prefix={
                       isBaseView === true ? (
-                        <Icon render={<Table2 />} size="s" />
+                        <Icon artwork={productGlyphs.table} size="s" />
                       ) : (
-                        <Icon render={<Layers3 />} size="s" />
+                        <Icon artwork={productGlyphs.derivedView} size="s" />
                       )
                     }
                     onClick={() => {

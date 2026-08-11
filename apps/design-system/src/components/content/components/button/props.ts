@@ -1,6 +1,7 @@
 export const buttonPropNames = [
   "variant",
   "size",
+  "glyphSize",
   "iconOnly",
   "aria-label",
   "loading",
@@ -11,3 +12,5 @@ export const buttonPropNames = [
   "disabled",
   "render",
 ] as const;
+
+export const buttonGlyphPropNames = ["artwork"] as const;

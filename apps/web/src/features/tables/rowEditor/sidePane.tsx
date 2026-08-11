@@ -1,6 +1,6 @@
-import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
-import { Box, Button, Icon, Text } from "@inspector/ds";
+import { Box, Button, Text } from "@inspector/ds";
 
 import { DetailPane } from "@tables/rowEditor/detailPane";
 import { ROW_EDITOR_FORM_ID } from "@tables/rowEditor/editorForm";
@@ -64,7 +64,7 @@ export function RowEditorSidePanel({
                   aria-label="Previous selected row"
                   iconOnly
                 >
-                  <Icon render={<ArrowUpIcon />} size="s" />
+                  <Button.Glyph artwork={ArrowUp} />
                 </Button>
                 <Button
                   type="button"
@@ -75,7 +75,7 @@ export function RowEditorSidePanel({
                   aria-label="Next selected row"
                   iconOnly
                 >
-                  <Icon render={<ArrowDownIcon />} size="s" />
+                  <Button.Glyph artwork={ArrowDown} />
                 </Button>
               </Box>
             </Box>

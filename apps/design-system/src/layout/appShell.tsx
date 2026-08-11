@@ -1,4 +1,4 @@
-import { Box, Button, ButtonLink, Icon, Text, Tooltip } from "@inspector/ds";
+import { Box, Button, ButtonLink, Text, Tooltip } from "@inspector/ds";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { HeadContent, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Moon, Sun } from "lucide-react";
@@ -42,8 +42,8 @@ function ThemeSwitch(): ReactElement {
     <Tooltip.Root>
       <Tooltip.Trigger
         render={
-          <Button variant="ghost" size="s" onClick={handleToggleTheme} aria-label={label}>
-            <Icon render={resolvedTheme === "dark" ? <Sun /> : <Moon />} size="s" />
+          <Button iconOnly variant="ghost" size="s" onClick={handleToggleTheme} aria-label={label}>
+            <Button.Glyph artwork={resolvedTheme === "dark" ? Sun : Moon} />
           </Button>
         }
       />

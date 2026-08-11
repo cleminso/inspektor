@@ -25,7 +25,9 @@ describe("RowEditorSidePanel dirty transitions", () => {
     );
 
     for (const name of ["Previous selected row", "Next selected row"]) {
-      const icon = screen.getByRole("button", { name }).querySelector('[data-slot="icon"]');
+      const button = screen.getByRole("button", { name });
+      const icon = button.querySelector('[data-slot="icon"]');
+      expect(button.getAttribute("data-glyph-size")).toBe("standard");
       expect(icon?.getAttribute("data-size")).toBe("s");
     }
   });

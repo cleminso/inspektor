@@ -9,7 +9,7 @@ export default function PrefixSuffixExample(): ReactElement {
       <Menu.Content>
         <Menu.Item onClick={() => undefined}>
           <Menu.Prefix>
-            <Icon render={<Pencil />} size="s" />
+            <Icon artwork={Pencil} size="s" />
           </Menu.Prefix>
           Rename
           <Menu.Suffix>
@@ -18,7 +18,7 @@ export default function PrefixSuffixExample(): ReactElement {
         </Menu.Item>
         <Menu.Item onClick={() => undefined}>
           <Menu.Prefix>
-            <Icon render={<Copy />} size="s" />
+            <Icon artwork={Copy} size="s" />
           </Menu.Prefix>
           Duplicate
           <Menu.Suffix>
@@ -29,7 +29,7 @@ export default function PrefixSuffixExample(): ReactElement {
         </Menu.Item>
         <Menu.Item variant="danger" onClick={() => undefined}>
           <Menu.Prefix>
-            <Icon render={<Trash2 />} size="s" />
+            <Icon artwork={Trash2} size="s" />
           </Menu.Prefix>
           Delete
           <Menu.Suffix>

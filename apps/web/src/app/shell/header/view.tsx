@@ -1,4 +1,4 @@
-import { Box, Button, Icon, Text, Tooltip } from "@inspector/ds";
+import { Box, Button, Text, Tooltip } from "@inspector/ds";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -47,11 +47,7 @@ export function InspectorHeader(): React.ReactElement {
                   setTheme(isDarkTheme === true ? "light" : "dark");
                 }}
               >
-                {isDarkTheme === true ? (
-                  <Icon render={<Sun />} size="s" />
-                ) : (
-                  <Icon render={<Moon />} size="s" />
-                )}
+                <Button.Glyph artwork={isDarkTheme === true ? Sun : Moon} />
               </Button>
             }
           />

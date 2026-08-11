@@ -1,8 +1,9 @@
 import { Box, Button, Icon, TabView, Tooltip } from '@inspector/ds'
-import { Layers3, Plus, Table2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useRef } from 'react'
 
 import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import { productGlyphs } from '@app/icons/productGlyphs'
 import {
   type TableRowsPrefetchTarget,
   useTableRowsPrefetchIntent,
@@ -139,15 +140,9 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   value={tab.id}
                   prefix={
                     isBaseTab === true ? (
-                      <Icon
-                        render={<Table2 />}
-                        size="s"
-                      />
+                      <Icon artwork={productGlyphs.table} size="s" />
                     ) : (
-                      <Icon
-                        render={<Layers3 />}
-                        size="s"
-                      />
+                      <Icon artwork={productGlyphs.derivedView} size="s" />
                     )
                   }
                   details={isBaseTab === false ? `Filtered view of ${tab.tableName}` : undefined}
@@ -203,10 +198,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   iconOnly
                   onClick={openNewView}
                 >
-                  <Icon
-                    render={<Plus />}
-                    size="s"
-                  />
+                  <Button.Glyph artwork={Plus} />
                 </Button>
               }
             />

@@ -3,8 +3,9 @@ import test from "node:test";
 
 import { extractPropsMetadata } from "./extract-props.mjs";
 
+const metadata = extractPropsMetadata();
+
 test("extracts documented Accordion and ActionList props", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["accordion.panel"]?.map(({ name }) => name),
@@ -25,7 +26,6 @@ test("extracts documented Accordion and ActionList props", () => {
 });
 
 test("extracts direct and compound forwardRef component props", () => {
-  const metadata = extractPropsMetadata();
 
   assert.ok(metadata.input?.some(({ name }) => name === "size"));
   assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "placeholder"));
@@ -39,7 +39,6 @@ test("extracts direct and compound forwardRef component props", () => {
 });
 
 test("preserves explicit null in public prop types", () => {
-  const metadata = extractPropsMetadata();
 
   assert.match(
     metadata["select.root"]?.find(({ name }) => name === "value")?.type ?? "",
@@ -52,7 +51,6 @@ test("preserves explicit null in public prop types", () => {
 });
 
 test("extracts Button API facts from the public package export", () => {
-  const metadata = extractPropsMetadata();
   const buttonProps = metadata.button;
 
   assert.ok(buttonProps);
@@ -63,6 +61,7 @@ test("extracts Button API facts from the public package export", () => {
       "size",
       "loading",
       "radius",
+      "glyphSize",
       "disabled",
       "render",
       "iconOnly",
@@ -81,6 +80,11 @@ test("extracts Button API facts from the public package export", () => {
   assert.doesNotMatch(radius?.type ?? "", /"l"|"xl"/);
   assert.equal(radius?.required, false);
   assert.equal(radius?.description, "Selects a design-system corner radius.");
+
+  const glyphSize = buttonProps.find(({ name }) => name === "glyphSize");
+  assert.equal(glyphSize?.defaultValue, '"standard"');
+  assert.match(glyphSize?.type ?? "", /"standard"/);
+  assert.match(glyphSize?.type ?? "", /"compact"/);
 
   const layout = buttonProps.find(({ name }) => name === "layout");
   assert.equal(layout?.defaultValue, '"inline"');
@@ -101,8 +105,34 @@ test("extracts Button API facts from the public package export", () => {
   assert.doesNotMatch(size?.type ?? "", /"l"/);
 });
 
+test("extracts Button Glyph API facts from the public compound export", () => {
+  const glyphProps = metadata["button.glyph"];
+
+  assert.ok(glyphProps);
+  assert.deepEqual(
+    glyphProps.map(({ name }) => name),
+    ["artwork"],
+  );
+  assert.equal(glyphProps[0]?.required, true);
+  assert.equal(
+    glyphProps[0]?.description,
+    "SVG artwork rendered at the size selected by the surrounding button.",
+  );
+});
+
+test("extracts the constrained Icon artwork API", () => {
+  const iconProps = metadata.icon;
+
+  assert.ok(iconProps);
+  assert.deepEqual(
+    iconProps.map(({ name }) => name),
+    ["artwork", "size"],
+  );
+  assert.equal(iconProps.find(({ name }) => name === "artwork")?.required, true);
+  assert.equal(iconProps.find(({ name }) => name === "size")?.defaultValue, '"s"');
+});
+
 test("extracts the semantic TextLink API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata.textLink?.map(({ name }) => name),
@@ -123,7 +153,6 @@ test("extracts the semantic TextLink API", () => {
 });
 
 test("extracts ButtonLink navigation and presentation props", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata.buttonLink?.map(({ name }) => name),
@@ -159,7 +188,6 @@ test("extracts ButtonLink navigation and presentation props", () => {
 });
 
 test("extracts runtime defaults instead of JSDoc default tags", () => {
-  const metadata = extractPropsMetadata();
   const buttonProps = metadata.button ?? [];
 
   assert.equal(buttonProps.find(({ name }) => name === "variant")?.defaultValue, '"primary"');
@@ -172,7 +200,6 @@ test("extracts runtime defaults instead of JSDoc default tags", () => {
 });
 
 test("extracts the constrained CopyButton API", () => {
-  const metadata = extractPropsMetadata();
   const copyButtonProps = metadata.copyButton;
 
   assert.deepEqual(
@@ -207,7 +234,6 @@ test("extracts the constrained CopyButton API", () => {
 });
 
 test("extracts the constrained resizable panel APIs", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata.resizablePanelGroup?.map(({ name }) => name),
@@ -270,7 +296,6 @@ test("extracts the constrained resizable panel APIs", () => {
 });
 
 test("extracts the constrained Switch API", () => {
-  const metadata = extractPropsMetadata();
   const switchProps = metadata.switch;
 
   assert.deepEqual(
@@ -301,7 +326,6 @@ test("extracts the constrained Switch API", () => {
 });
 
 test("extracts the constrained Tooltip compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["tooltip.provider"]?.map(({ name }) => name),
@@ -359,7 +383,6 @@ test("extracts the constrained Tooltip compound API", () => {
 });
 
 test("extracts the constrained Toaster API", () => {
-  const metadata = extractPropsMetadata();
   const toasterProps = metadata.toaster;
 
   assert.deepEqual(
@@ -373,7 +396,6 @@ test("extracts the constrained Toaster API", () => {
 });
 
 test("extracts the Spinner API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata.spinner?.map(({ name }) => name),
@@ -387,7 +409,6 @@ test("extracts the Spinner API", () => {
 });
 
 test("extracts the constrained JsonView API", () => {
-  const metadata = extractPropsMetadata();
   const jsonViewProps = metadata.jsonView;
 
   assert.deepEqual(
@@ -406,7 +427,6 @@ test("extracts the constrained JsonView API", () => {
 });
 
 test("extracts the constrained CodeEditor API", () => {
-  const metadata = extractPropsMetadata();
   const codeEditorProps = metadata.codeEditor;
 
   assert.deepEqual(
@@ -443,7 +463,6 @@ test("extracts the constrained CodeEditor API", () => {
 });
 
 test("extracts the constrained ButtonGroup named API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["buttonGroup.root"]?.map(({ name }) => name),
@@ -472,7 +491,6 @@ test("extracts the constrained ButtonGroup named API", () => {
 });
 
 test("extracts the constrained ToggleGroup compound API", () => {
-  const metadata = extractPropsMetadata();
   const rootProps = metadata["toggleGroup.root"];
   const itemProps = metadata["toggleGroup.item"];
 
@@ -511,7 +529,6 @@ test("extracts the constrained ToggleGroup compound API", () => {
 });
 
 test("extracts the constrained TabView compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["tabView.root"]?.map(({ name }) => name),
@@ -561,7 +578,6 @@ test("extracts the constrained TabView compound API", () => {
 });
 
 test("extracts Input API facts from the public package export", () => {
-  const metadata = extractPropsMetadata();
   const inputProps = metadata.input;
 
   assert.ok(inputProps);
@@ -596,7 +612,6 @@ test("extracts Input API facts from the public package export", () => {
 });
 
 test("extracts the constrained Textarea API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata.textarea?.map(({ name }) => name),
@@ -615,7 +630,6 @@ test("extracts the constrained Textarea API", () => {
 });
 
 test("extracts the constrained InputGroup compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["inputGroup.root"]?.map(({ name }) => name),
@@ -649,7 +663,6 @@ test("extracts the constrained InputGroup compound API", () => {
 });
 
 test("extracts compound Field part API facts from the public package export", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["field.root"]?.map(({ name }) => name),
@@ -693,7 +706,6 @@ test("extracts compound Field part API facts from the public package export", ()
 });
 
 test("extracts compound Fieldset part API facts from the public package export", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["fieldset.root"]?.map(({ name }) => name),
@@ -710,13 +722,11 @@ test("extracts compound Fieldset part API facts from the public package export",
 });
 
 test("does not expose an unused Form abstraction", () => {
-  const metadata = extractPropsMetadata();
 
   assert.equal(metadata.form, undefined);
 });
 
 test("extracts Checkbox API facts from the public package export", () => {
-  const metadata = extractPropsMetadata();
   const checkboxProps = metadata.checkbox;
 
   assert.ok(checkboxProps);
@@ -760,7 +770,6 @@ test("extracts Checkbox API facts from the public package export", () => {
 });
 
 test("extracts TextField composition props from the public package export", () => {
-  const metadata = extractPropsMetadata();
   const textFieldProps = metadata.textField;
 
   assert.ok(textFieldProps);
@@ -781,7 +790,6 @@ test("extracts TextField composition props from the public package export", () =
 });
 
 test("extracts the constrained FindBar API", () => {
-  const metadata = extractPropsMetadata();
   const findBarProps = metadata.findBar;
 
   assert.deepEqual(
@@ -808,7 +816,6 @@ test("extracts the constrained FindBar API", () => {
 });
 
 test("extracts the constrained Menu compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.equal(
     metadata["menu.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
@@ -888,7 +895,6 @@ test("extracts the constrained Menu compound API", () => {
 });
 
 test("extracts the constrained ContextMenu compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.equal(
     metadata["contextMenu.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
@@ -937,7 +943,6 @@ test("extracts the constrained ContextMenu compound API", () => {
 });
 
 test("extracts the constrained Combobox compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.equal(
     metadata["combobox.root"]?.find(({ name }) => name === "disabled")?.defaultValue,
@@ -1021,7 +1026,6 @@ test("extracts the constrained Combobox compound API", () => {
 });
 
 test("extracts the constrained ContextSwitcher compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["contextSwitcher.root"]?.map(({ name }) => name),
@@ -1083,7 +1087,6 @@ test("extracts the constrained ContextSwitcher compound API", () => {
 });
 
 test("extracts the constrained MultiSelect compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata["multiSelect.root"]?.map(({ name }) => name),
@@ -1129,7 +1132,6 @@ test("extracts the constrained MultiSelect compound API", () => {
 });
 
 test("extracts the constrained Select compound API", () => {
-  const metadata = extractPropsMetadata();
 
   assert.equal(
     metadata["select.root"]?.find(({ name }) => name === "disabled")?.defaultValue,
@@ -1150,7 +1152,6 @@ test("extracts the constrained Select compound API", () => {
 });
 
 test("extracts the value presentation component APIs", () => {
-  const metadata = extractPropsMetadata();
 
   assert.deepEqual(
     metadata.binaryValue?.map(({ name }) => name),

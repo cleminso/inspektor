@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import * as stylex from '@stylexjs/stylex'
 
 import { buttonGroupStyles } from '../buttonGroup/buttonGroup.styles'
 import type { ButtonGroupOrientation } from '../buttonGroup/buttonGroupContext'
+import { Icon, type IconArtwork, type IconSize } from '../icon/icon'
 import { Spinner, type SpinnerSize } from '../spinner/spinner'
 import { buttonStyles } from './button.styles'
 
@@ -16,6 +17,7 @@ export type ButtonVariant =
 export type ButtonSize = 'xs' | 's' | 'm'
 export type ButtonLayout = 'inline' | 'row'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm'
+export type ButtonGlyphSize = 'standard' | 'compact'
 
 interface ButtonLayoutOptions {
   alignment: 'center' | 'start'
@@ -28,6 +30,14 @@ const variantStyles = {
   danger: buttonStyles.danger,
   ghost: buttonStyles.ghost,
   link: buttonStyles.link,
+} satisfies Record<ButtonVariant, unknown>
+
+const expandedStyles = {
+  primary: buttonStyles.expandedPrimary,
+  secondary: buttonStyles.expandedSecondary,
+  danger: buttonStyles.expandedDanger,
+  ghost: buttonStyles.expandedGhost,
+  link: buttonStyles.expandedLink,
 } satisfies Record<ButtonVariant, unknown>
 
 const sizeStyles = {
@@ -54,11 +64,29 @@ const spinnerSizes = {
   m: 'l',
 } satisfies Record<ButtonSize, SpinnerSize>
 
+const glyphSizes = {
+  standard: 's',
+  compact: 'xs',
+} satisfies Record<ButtonGlyphSize, IconSize>
+
+const ButtonGlyphSizeContext = createContext<IconSize>(glyphSizes.standard)
+
+export interface ButtonGlyphProps {
+  /** SVG artwork rendered at the size selected by the surrounding button. */
+  artwork: IconArtwork
+}
+
+export function ButtonGlyph({ artwork }: ButtonGlyphProps) {
+  const size = useContext(ButtonGlyphSizeContext)
+  return <Icon artwork={artwork} size={size} />
+}
+
 interface ButtonVisualStylesOptions {
   variant: ButtonVariant
   size: ButtonSize
   square: boolean
   pressed: boolean
+  expanded?: boolean
   fill: boolean
   alignment: ButtonLayoutOptions['alignment']
   radius: ButtonRadius
@@ -73,6 +101,7 @@ export function getButtonVisualStyles({
   size,
   square,
   pressed,
+  expanded = false,
   fill,
   alignment,
   radius,
@@ -89,6 +118,7 @@ export function getButtonVisualStyles({
     variantStyles[variant],
     square === true && buttonStyles.square,
     pressed === true && buttonStyles.pressed,
+    expanded === true && expandedStyles[variant],
     radiusStyles[radius],
     orientation !== null && buttonGroupStyles.member,
     orientation === 'horizontal' && buttonGroupStyles.memberHorizontal,
@@ -109,6 +139,7 @@ interface ButtonContentProps {
   suffix?: ReactNode
   loading?: boolean
   size: ButtonSize
+  glyphSize?: ButtonGlyphSize
 }
 
 export function ButtonContent({
@@ -118,14 +149,18 @@ export function ButtonContent({
   suffix,
   loading = false,
   size,
+  glyphSize = 'standard',
 }: ButtonContentProps) {
   const spinnerSize = spinnerSizes[size]
+  const iconSize = glyphSizes[glyphSize]
 
   if (iconOnly === true) {
     return (
-      <span aria-hidden="true" data-slot="button-icon" {...stylex.props(buttonStyles.iconSlot)}>
-        {loading === true ? <Spinner size={spinnerSize} /> : children}
-      </span>
+      <ButtonGlyphSizeContext.Provider value={iconSize}>
+        <span aria-hidden="true" data-slot="button-icon" {...stylex.props(buttonStyles.iconSlot)}>
+          {loading === true ? <Spinner size={spinnerSize} /> : children}
+        </span>
+      </ButtonGlyphSizeContext.Provider>
     )
   }
 
@@ -136,17 +171,19 @@ export function ButtonContent({
   ) : null
 
   return (
-    <span
-      data-slot="button-content"
-      {...stylex.props(buttonStyles.content)}
-    >
-      {prefixContent}
-      {children}
-      {suffix !== undefined ? (
-        <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
-          {suffix}
-        </span>
-      ) : null}
-    </span>
+    <ButtonGlyphSizeContext.Provider value={iconSize}>
+      <span
+        data-slot="button-content"
+        {...stylex.props(buttonStyles.content)}
+      >
+        {prefixContent}
+        {children}
+        {suffix !== undefined ? (
+          <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
+            {suffix}
+          </span>
+        ) : null}
+      </span>
+    </ButtonGlyphSizeContext.Provider>
   )
 }

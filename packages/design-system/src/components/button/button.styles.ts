@@ -39,7 +39,7 @@ export const buttonStyles = stylex.create({
     justifyContent: 'center',
     lineHeight: lineHeights.ui,
     outlineColor: focusColors.ring,
-    outlineOffset: 2,
+    outlineOffset: 1.5,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
     position: 'relative',
@@ -117,6 +117,19 @@ export const buttonStyles = stylex.create({
   pressed: {
     color: textColors.accent,
   },
+  expandedPrimary: {
+    backgroundColor: accentElementColors.pressed,
+  },
+  expandedSecondary: {
+    backgroundColor: ghostElementColors.selected,
+  },
+  expandedDanger: {
+    backgroundColor: dangerElementColors.pressed,
+  },
+  expandedGhost: {
+    backgroundColor: ghostElementColors.selected,
+  },
+  expandedLink: {},
   radiusNone: {
     borderRadius: borderRadii.none,
   },

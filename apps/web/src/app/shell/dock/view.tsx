@@ -1,5 +1,7 @@
-import { Box, Button, Icon, Tooltip } from "@inspector/ds";
-import { Activity, Table } from "lucide-react";
+import { Box, Button, Tooltip } from "@inspector/ds";
+import { Rss } from "lucide-react";
+
+import { productGlyphs } from "@app/icons/productGlyphs";
 
 export interface InspectorLeftDockControl {
   isOpen: boolean;
@@ -35,10 +37,11 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
                   size="xs"
                   aria-label={leftDockLabel}
                   aria-pressed={leftDock.isOpen}
+                  glyphSize="compact"
                   iconOnly
                   onClick={leftDock.onToggle}
                 >
-                  <Icon render={<Table />} size="xs" />
+                  <Button.Glyph artwork={productGlyphs.table} />
                 </Button>
               }
             />
@@ -53,9 +56,10 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
                 variant="ghost"
                 size="xs"
                 aria-label="Open subscriptions dock"
+                glyphSize="compact"
                 iconOnly
               >
-                <Icon render={<Activity />} size="xs" />
+                <Button.Glyph artwork={Rss} />
               </Button>
             }
           />

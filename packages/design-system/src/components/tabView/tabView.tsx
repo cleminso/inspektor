@@ -21,6 +21,7 @@ import {
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { Button } from '../button/button'
+import { CloseGlyph } from '../icon/iconArtwork'
 import { Tooltip } from '../tooltip/tooltip'
 import { tabViewStyles } from './tabView.styles'
 import { TabViewReorderContext, type TabViewValue } from './tabViewReorderContext'
@@ -481,18 +482,12 @@ function TabViewItemContent({
                   size="xs"
                   variant="ghost"
                 >
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 16 16"
+                  <CloseGlyph
                     fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
                     {...stylex.props(tabViewStyles.closeIcon)}
-                  >
-                    <path
-                      d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
+                  />
                 </Button>
               }
             />

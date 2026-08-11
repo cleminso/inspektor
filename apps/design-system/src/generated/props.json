@@ -8,7 +8,7 @@
       "description": "Controls the checkbox dimensions.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 19
+        "line": 20
       }
     },
     {
@@ -18,7 +18,7 @@
       "description": "Controls whether the checkbox is checked.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 21
+        "line": 22
       }
     },
     {
@@ -28,7 +28,7 @@
       "description": "Sets the initial checked state when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 23
+        "line": 24
       }
     },
     {
@@ -38,7 +38,7 @@
       "description": "Runs when the checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -49,7 +49,7 @@
       "description": "Displays a mixed state.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -59,7 +59,7 @@
       "description": "Identifies the checkbox during form submission.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -69,7 +69,7 @@
       "description": "Sets the submitted value when checked.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -79,7 +79,7 @@
       "description": "Sets the submitted value when unchecked.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -90,7 +90,7 @@
       "description": "Disables interaction.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -101,7 +101,7 @@
       "description": "Prevents changes while preserving interaction semantics.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -112,7 +112,7 @@
       "description": "Requires the checkbox to be checked for valid form submission.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 39
+        "line": 40
       }
     },
     {
@@ -123,7 +123,7 @@
       "description": "Indicates that a composed root renders a native button.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -133,7 +133,7 @@
       "description": "Provides access to the hidden native input.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -143,7 +143,7 @@
       "description": "Composes Checkbox behavior and styles onto another element.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 45
+        "line": 46
       }
     }
   ],
@@ -156,7 +156,7 @@
       "description": "Controls whether the label sizes to its content or fills a selectable row.",
       "source": {
         "path": "packages/design-system/src/components/checkbox/checkbox.tsx",
-        "line": 51
+        "line": 52
       }
     }
   ],
@@ -316,7 +316,7 @@
       "description": "Controls the visual treatment and emphasis of the action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 26
+        "line": 36
       }
     },
     {
@@ -327,7 +327,7 @@
       "description": "Controls the button height and horizontal padding.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 28
+        "line": 38
       }
     },
     {
@@ -338,7 +338,7 @@
       "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 30
+        "line": 40
       }
     },
     {
@@ -349,7 +349,18 @@
       "description": "Selects a design-system corner radius.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 32
+        "line": 42
+      }
+    },
+    {
+      "name": "glyphSize",
+      "type": "\"standard\" | \"compact\"",
+      "required": false,
+      "defaultValue": "\"standard\"",
+      "description": "Selects the standard glyph treatment or the explicit compact-control exception.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 44
       }
     },
     {
@@ -360,7 +371,7 @@
       "description": "Disables interaction and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 34
+        "line": 46
       }
     },
     {
@@ -370,7 +381,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes Button behavior and styles onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 36
+        "line": 48
       }
     },
     {
@@ -381,7 +392,7 @@
       "description": "Makes the button a square icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 41
+        "line": 53
       }
     },
     {
@@ -392,7 +403,7 @@
       "description": "Selects inline or full-width row action layout.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 43
+        "line": 55
       }
     },
     {
@@ -402,7 +413,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 45
+        "line": 57
       }
     },
     {
@@ -412,7 +423,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 47
+        "line": 59
       }
     },
     {
@@ -422,7 +433,19 @@
       "description": "Defines a string value that labels the current element.\nIdentifies the icon-only action for assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 54
+        "line": 66
+      }
+    }
+  ],
+  "button.glyph": [
+    {
+      "name": "artwork",
+      "type": "IconArtwork",
+      "required": true,
+      "description": "SVG artwork rendered at the size selected by the surrounding button.",
+      "source": {
+        "path": "packages/design-system/src/components/button/buttonVisuals.tsx",
+        "line": 76
       }
     }
   ],
@@ -584,7 +607,7 @@
       "description": "Text written to the clipboard when the button is activated.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 20
+        "line": 21
       }
     },
     {
@@ -594,7 +617,7 @@
       "description": "Accessible action label that identifies what will be copied.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 22
+        "line": 23
       }
     },
     {
@@ -605,7 +628,7 @@
       "description": "Feedback shown after the text is copied.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 24
+        "line": 25
       }
     },
     {
@@ -616,7 +639,7 @@
       "description": "Feedback shown when the clipboard operation fails.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -624,10 +647,10 @@
       "type": "\"s\" | \"m\" | \"xs\"",
       "required": false,
       "defaultValue": "\"s\"",
-      "description": "Controls the square button and icon size.",
+      "description": "Controls the square button size.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -638,7 +661,7 @@
       "description": "Controls the visual treatment and emphasis of the copy action.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
@@ -649,7 +672,7 @@
       "description": "Prevents the copy action and its tooltip from being activated.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -660,7 +683,7 @@
       "description": "Places the feedback tooltip on this side of the button.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -670,7 +693,7 @@
       "description": "Runs after text is successfully written to the clipboard.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -680,7 +703,7 @@
       "description": "Runs when writing text to the clipboard fails.",
       "source": {
         "path": "packages/design-system/src/components/copyButton/copyButton.tsx",
-        "line": 38
+        "line": 39
       }
     }
   ],
@@ -1027,7 +1050,7 @@
     },
     {
       "name": "backgroundColor",
-      "type": "\"surface-default\" | \"surface-background\" | \"surface-raised\" | \"surface-canvas\" | \"surface-subtle\" | \"surface-overlay\" | \"surface-backdrop\" | \"surface-inverse\" | \"element-disabled\" | \"element-default\" | \"element-hover\" | \"element-pressed\" | \"element-selected\" | \"ghost-element-disabled\" | \"ghost-element-default\" | \"ghost-element-hover\" | \"ghost-element-pressed\" | \"ghost-element-selected\" | \"accent-element-disabled\" | \"accent-element-default\" | \"accent-element-hover\" | \"accent-element-pressed\" | \"danger-element-disabled\" | \"danger-element-default\" | \"danger-element-hover\" | \"danger-element-pressed\" | \"selection-background\" | \"selection-strong-background\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BackgroundColorToken>>",
+      "type": "\"surface-canvas\" | \"surface-default\" | \"surface-background\" | \"surface-raised\" | \"surface-subtle\" | \"surface-overlay\" | \"surface-backdrop\" | \"surface-inverse\" | \"element-disabled\" | \"element-default\" | \"element-hover\" | \"element-pressed\" | \"element-selected\" | \"ghost-element-disabled\" | \"ghost-element-default\" | \"ghost-element-hover\" | \"ghost-element-pressed\" | \"ghost-element-selected\" | \"accent-element-disabled\" | \"accent-element-default\" | \"accent-element-hover\" | \"accent-element-pressed\" | \"danger-element-disabled\" | \"danger-element-default\" | \"danger-element-hover\" | \"danger-element-pressed\" | \"selection-background\" | \"selection-strong-background\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BackgroundColorToken>>",
       "required": false,
       "description": "",
       "source": {
@@ -2073,7 +2096,7 @@
       "description": "The tab views and their associated panels.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 65
+        "line": 66
       }
     },
     {
@@ -2083,7 +2106,7 @@
       "description": "The active view value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 67
+        "line": 68
       }
     },
     {
@@ -2093,7 +2116,7 @@
       "description": "The initially active view value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 69
+        "line": 70
       }
     },
     {
@@ -2103,7 +2126,7 @@
       "description": "Called when the active view changes.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 71
+        "line": 72
       }
     }
   ],
@@ -2115,7 +2138,7 @@
       "description": "The tab view items.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 79
+        "line": 80
       }
     },
     {
@@ -2125,7 +2148,7 @@
       "description": "An accessible name for the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 81
+        "line": 82
       }
     },
     {
@@ -2135,7 +2158,7 @@
       "description": "Identifies the element that labels the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 83
+        "line": 84
       }
     },
     {
@@ -2146,7 +2169,7 @@
       "description": "Activates a view as arrow-key navigation moves focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 85
+        "line": 86
       }
     },
     {
@@ -2157,7 +2180,7 @@
       "description": "Loops keyboard focus between the first and last views.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 87
+        "line": 88
       }
     },
     {
@@ -2167,7 +2190,7 @@
       "description": "The tab values in their controlled visual order.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 92
+        "line": 93
       }
     },
     {
@@ -2177,7 +2200,7 @@
       "description": "Called with the complete ordered value list after a tab is dragged.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 94
+        "line": 95
       }
     }
   ],
@@ -2189,7 +2212,7 @@
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 107
+        "line": 108
       }
     },
     {
@@ -2199,7 +2222,7 @@
       "description": "The visible view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 109
+        "line": 110
       }
     },
     {
@@ -2209,7 +2232,7 @@
       "description": "Supplementary context shown in a tooltip even when the view name fits.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 111
+        "line": 112
       }
     },
     {
@@ -2219,7 +2242,7 @@
       "description": "Renders a decorative medium icon before the view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 113
+        "line": 114
       }
     },
     {
@@ -2229,7 +2252,7 @@
       "description": "Disables selection and closing for this view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 115
+        "line": 116
       }
     },
     {
@@ -2239,7 +2262,7 @@
       "description": "Runs when focus leaves the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 117
+        "line": 118
       }
     },
     {
@@ -2249,7 +2272,7 @@
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 119
+        "line": 120
       }
     },
     {
@@ -2259,7 +2282,7 @@
       "description": "Runs when the tab button receives focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 121
+        "line": 122
       }
     },
     {
@@ -2269,7 +2292,7 @@
       "description": "Runs when a pointer press starts on the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 123
+        "line": 124
       }
     },
     {
@@ -2279,7 +2302,7 @@
       "description": "Runs when the pointer enters the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 125
+        "line": 126
       }
     },
     {
@@ -2289,7 +2312,7 @@
       "description": "Runs when the pointer leaves the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 127
+        "line": 128
       }
     },
     {
@@ -2300,7 +2323,7 @@
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 129
+        "line": 130
       }
     }
   ],
@@ -2312,7 +2335,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 134
+        "line": 135
       }
     },
     {
@@ -2322,7 +2345,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 136
+        "line": 137
       }
     },
     {
@@ -2333,7 +2356,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 138
+        "line": 139
       }
     }
   ],
@@ -2810,7 +2833,7 @@
     },
     {
       "name": "density",
-      "type": "\"default\" | \"compact\"",
+      "type": "\"compact\" | \"default\"",
       "required": false,
       "defaultValue": "\"default\"",
       "description": "Controls table row and cell spacing.",
@@ -3394,13 +3417,13 @@
   ],
   "icon": [
     {
-      "name": "render",
-      "type": "NonNullable<ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}> | undefined>",
+      "name": "artwork",
+      "type": "IconArtwork",
       "required": true,
-      "description": "Composes semantic icon presentation onto SVG artwork.",
+      "description": "Ref-forwarding SVG component that follows the documented artwork protocol.",
       "source": {
         "path": "packages/design-system/src/components/icon/icon.tsx",
-        "line": 11
+        "line": 17
       }
     },
     {
@@ -3411,7 +3434,7 @@
       "description": "Controls the rendered icon dimensions.",
       "source": {
         "path": "packages/design-system/src/components/icon/icon.tsx",
-        "line": 13
+        "line": 19
       }
     }
   ],
@@ -4741,7 +4764,7 @@
       "name": "render",
       "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, MenuTriggerState>",
       "required": false,
-      "description": "Composes trigger behavior onto another element.",
+      "description": "Composes trigger behavior onto a design-system control that owns its presentation.",
       "source": {
         "path": "packages/design-system/src/components/menu/menu.tsx",
         "line": 47
@@ -5372,7 +5395,7 @@
       "description": "The items to be displayed in the list.\nCan be either a flat array of items or an array of groups with items.\nItems available for filtering and selection.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -5382,7 +5405,7 @@
       "description": "The selected value of the combobox. Use when controlled.\nThe selected item.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -5392,7 +5415,7 @@
       "description": "The uncontrolled selected value of the combobox when it's initially rendered.\n\nTo render a controlled combobox, use the `value` prop instead.\nThe initially selected item.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -5402,7 +5425,7 @@
       "description": "Event handler called when the selected value of the combobox changes.\nRuns when the selected item changes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -5412,7 +5435,7 @@
       "description": "The input value of the combobox. Use when controlled.\nThe current filter input value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -5422,7 +5445,7 @@
       "description": "The uncontrolled input value when initially rendered.\n\nTo render a controlled input, use the `inputValue` prop instead.\nThe initial filter input value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -5432,7 +5455,7 @@
       "description": "Event handler called when the input value changes.\nRuns when the filter input value changes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 39
+        "line": 40
       }
     },
     {
@@ -5443,7 +5466,7 @@
       "description": "Whether the popup is initially open.\n\nTo render a controlled popup, use the `open` prop instead.\nWhether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -5453,7 +5476,7 @@
       "description": "Whether the popup is currently open. Use when controlled.\nWhether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -5463,7 +5486,7 @@
       "description": "Event handler called when the popup is opened or closed.\nRuns when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -5473,7 +5496,7 @@
       "description": "Event handler called after any animations complete when the popup is opened or closed.\nRuns after an opening or closing transition completes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -5483,7 +5506,7 @@
       "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for display in the input.\nIf the shape of the object is `{ value, label }`, the label will be used automatically without needing to specify this prop.\nConverts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 49
+        "line": 50
       }
     },
     {
@@ -5493,7 +5516,7 @@
       "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for form submission.\nIf the shape of the object is `{ value, label }`, the value will be used automatically without needing to specify this prop.\nConverts an item into the value submitted with a form.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 51
+        "line": 52
       }
     },
     {
@@ -5503,7 +5526,7 @@
       "description": "Custom comparison logic used to determine if a combobox item value matches the current selected value. Useful when item values are objects without matching referentially.\nDefaults to `Object.is` comparison.\nCompares an item with the selected value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 53
+        "line": 54
       }
     },
     {
@@ -5513,7 +5536,7 @@
       "description": "Filter function used to match items vs input query.\nFilters an item against the current query.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 55
+        "line": 56
       }
     },
     {
@@ -5523,7 +5546,7 @@
       "description": "Identifies the field when a form is submitted.\nIdentifies the value when the combobox participates in form submission.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 57
+        "line": 58
       }
     },
     {
@@ -5533,7 +5556,7 @@
       "description": "Identifies the form that owns the internal input.\nUseful when the combobox is rendered outside the form.\nAssociates the combobox with a form element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 59
+        "line": 60
       }
     },
     {
@@ -5544,7 +5567,7 @@
       "description": "Whether the user must choose a value before submitting a form.\nRequires a selection before form submission.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 61
+        "line": 62
       }
     },
     {
@@ -5555,7 +5578,7 @@
       "description": "Whether the user should be unable to choose a different option from the popup.\nPrevents selection changes while preserving focus and form participation.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 63
+        "line": 64
       }
     },
     {
@@ -5566,7 +5589,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the combobox.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 65
+        "line": 66
       }
     }
   ],
@@ -5578,7 +5601,7 @@
       "description": "Composes the label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 113
+        "line": 114
       }
     }
   ],
@@ -5590,7 +5613,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 118
+        "line": 119
       }
     }
   ],
@@ -5603,7 +5626,7 @@
       "description": "Controls the input-group surface treatment.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 73
+        "line": 74
       }
     },
     {
@@ -5614,7 +5637,7 @@
       "description": "Controls whether the input group follows its content or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 75
+        "line": 76
       }
     }
   ],
@@ -5626,7 +5649,7 @@
       "description": "Composes input behavior onto another input component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 82
+        "line": 83
       }
     }
   ],
@@ -5638,7 +5661,7 @@
       "description": "Content displayed by the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 100
+        "line": 101
       }
     },
     {
@@ -5649,7 +5672,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 102
+        "line": 103
       }
     },
     {
@@ -5660,7 +5683,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 104
+        "line": 105
       }
     },
     {
@@ -5671,7 +5694,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 106
+        "line": 107
       }
     },
     {
@@ -5681,7 +5704,7 @@
       "description": "Composes trigger behavior onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 108
+        "line": 109
       }
     }
   ],
@@ -5694,7 +5717,7 @@
       "description": "Disables the input action trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 89
+        "line": 90
       }
     }
   ],
@@ -5707,7 +5730,7 @@
       "description": "Keeps the portal mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 123
+        "line": 124
       }
     }
   ],
@@ -5744,7 +5767,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 135
+        "line": 136
       }
     }
   ],
@@ -5756,7 +5779,7 @@
       "description": "Content rendered inside the positioned popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 140
+        "line": 141
       }
     },
     {
@@ -5767,7 +5790,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 142
+        "line": 143
       }
     },
     {
@@ -5778,7 +5801,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 144
+        "line": 145
       }
     },
     {
@@ -5789,7 +5812,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 146
+        "line": 147
       }
     },
     {
@@ -5800,7 +5823,7 @@
       "description": "Places the popup on this side of the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 148
+        "line": 149
       }
     }
   ],
@@ -5815,7 +5838,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 168
+        "line": 169
       }
     }
   ],
@@ -5828,7 +5851,7 @@
       "description": "Accessible label for the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 183
+        "line": 184
       }
     },
     {
@@ -5839,7 +5862,7 @@
       "description": "Keeps the clear action mounted when no value is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 185
+        "line": 186
       }
     },
     {
@@ -5850,7 +5873,7 @@
       "description": "Disables the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 187
+        "line": 188
       }
     },
     {
@@ -5860,7 +5883,7 @@
       "description": "Composes clear behavior onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 189
+        "line": 190
       }
     }
   ],
@@ -5878,7 +5901,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 194
+        "line": 195
       }
     },
     {
@@ -5889,7 +5912,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 196
+        "line": 197
       }
     },
     {
@@ -5899,7 +5922,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 198
+        "line": 199
       }
     }
   ],
@@ -5911,7 +5934,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 203
+        "line": 204
       }
     },
     {
@@ -5921,7 +5944,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 205
+        "line": 206
       }
     }
   ],
@@ -5934,7 +5957,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 213
+        "line": 214
       }
     }
   ],
@@ -6125,7 +6148,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 118
+        "line": 119
       }
     }
   ],
@@ -6209,7 +6232,7 @@
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 194
+        "line": 195
       }
     },
     {
@@ -6220,7 +6243,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 196
+        "line": 197
       }
     },
     {
@@ -6230,7 +6253,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 198
+        "line": 199
       }
     }
   ],
@@ -6242,7 +6265,7 @@
       "description": "Primary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 203
+        "line": 204
       }
     },
     {
@@ -6252,7 +6275,7 @@
       "description": "Optional secondary item text, constrained to one line.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 205
+        "line": 206
       }
     }
   ],
@@ -6439,7 +6462,7 @@
       "description": "Items used to resolve selected value labels.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 21
+        "line": 22
       }
     },
     {
@@ -6449,7 +6472,7 @@
       "description": "The selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 23
+        "line": 24
       }
     },
     {
@@ -6459,7 +6482,7 @@
       "description": "The initially selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -6469,7 +6492,7 @@
       "description": "Runs when the selected value changes.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -6480,7 +6503,7 @@
       "description": "Disables the Select.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 29
+        "line": 30
       }
     }
   ],
@@ -6493,7 +6516,7 @@
       "description": "Text displayed when the Select has no value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 39
+        "line": 40
       }
     },
     {
@@ -6504,7 +6527,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -6515,7 +6538,7 @@
       "description": "Controls whether the trigger follows the selected value or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 43
+        "line": 44
       }
     }
   ],
@@ -6527,7 +6550,7 @@
       "description": "Select items rendered in the popup.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 48
+        "line": 49
       }
     }
   ],
@@ -6539,7 +6562,7 @@
       "description": "Text displayed for this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 53
+        "line": 54
       }
     },
     {
@@ -6549,7 +6572,7 @@
       "description": "The value represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 55
+        "line": 56
       }
     },
     {
@@ -6560,7 +6583,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 57
+        "line": 58
       }
     },
     {
@@ -6570,7 +6593,7 @@
       "description": "Text used to match the option during keyboard navigation.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 59
+        "line": 60
       }
     }
   ]

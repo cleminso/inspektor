@@ -160,11 +160,11 @@ export const menuStyles = stylex.create({
     color: textColors.disabled,
     cursor: "not-allowed",
   },
-  itemDanger: { color: textColors.danger },
+  itemDanger: { color: textColors.default },
   itemDangerHighlighted: {
     [keyboardInputVars.textColor]: textColors.default,
     backgroundColor: dangerElementColors.default,
-    color: textColors.default,
+    color: textColors.danger,
   },
   choiceItem: {
     display: "grid",

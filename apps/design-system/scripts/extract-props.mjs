@@ -35,6 +35,12 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: "button.glyph",
+    exportName: "Button",
+    part: "Glyph",
+    inheritedProps: [],
+  },
+  {
     componentId: "buttonLink",
     exportName: "ButtonLink",
     inheritedProps: [],
@@ -559,9 +565,27 @@ function resolveNamedComponent(sourceFile, name) {
   }
 
   const variableDeclaration = sourceFile.getVariableDeclaration(name);
-  return variableDeclaration === undefined
-    ? undefined
-    : resolveForwardRefFunction(variableDeclaration);
+  if (variableDeclaration !== undefined) {
+    return resolveForwardRefFunction(variableDeclaration);
+  }
+
+  const importedDeclaration = sourceFile
+    .getImportDeclarations()
+    .flatMap((declaration) => declaration.getNamedImports())
+    .find((specifier) => (specifier.getAliasNode()?.getText() ?? specifier.getName()) === name)
+    ?.getNameNode()
+    .getSymbol()
+    ?.getAliasedSymbol()
+    ?.getDeclarations()
+    .find((declaration) => Node.isFunctionDeclaration(declaration) || Node.isVariableDeclaration(declaration));
+
+  if (importedDeclaration === undefined) {
+    return undefined;
+  }
+
+  return Node.isFunctionDeclaration(importedDeclaration)
+    ? importedDeclaration
+    : resolveForwardRefFunction(importedDeclaration);
 }
 
 function resolveAssignedFunction(variableDeclaration, part) {

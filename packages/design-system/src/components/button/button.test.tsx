@@ -1,10 +1,18 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import * as stylex from "@stylexjs/stylex";
+import { forwardRef, type ComponentPropsWithoutRef } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { Menu } from "../menu/menu";
 import { Button } from "./button";
 import { buttonStyles } from "./button.styles";
 import { getButtonVisualStyles } from "./buttonVisuals";
+
+const TestArtwork = forwardRef<SVGSVGElement, ComponentPropsWithoutRef<"svg">>(
+  function TestArtwork(props, ref) {
+    return <svg {...props} ref={ref} viewBox="0 0 16 16" />;
+  },
+);
 
 afterEach(cleanup);
 
@@ -30,17 +38,91 @@ describe("Button", () => {
   it("renders an accessible square button for icon-only actions", () => {
     render(
       <Button iconOnly aria-label="Toggle panel" aria-pressed>
-        <svg data-testid="panel-icon" />
+        <Button.Glyph artwork={TestArtwork} />
       </Button>,
     );
 
     const button = screen.getByRole("button", { name: "Toggle panel" });
-    const icon = screen.getByTestId("panel-icon");
+    const icon = button.querySelector('[data-slot="icon"]');
 
     expect(button.getAttribute("data-icon-only")).toBe("");
     expect(button.getAttribute("data-pressed")).toBe("");
     expect(button.getAttribute("aria-pressed")).toBe("true");
-    expect(icon.parentElement?.getAttribute("aria-hidden")).toBe("true");
+    expect(icon?.getAttribute("data-size")).toBe("s");
+    expect(icon?.parentElement?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("exposes the compact glyph treatment as a button decision", () => {
+    render(
+      <Button glyphSize="compact" iconOnly aria-label="Toggle dock" size="xs">
+        <Button.Glyph artwork={TestArtwork} />
+      </Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "Toggle dock" });
+    expect(button.getAttribute("data-glyph-size")).toBe("compact");
+    expect(button.querySelector('[data-slot="icon"]')?.getAttribute("data-size")).toBe("xs");
+  });
+
+  it("preserves style props received through render composition", () => {
+    render(
+      <Button
+        {...({
+          className: "composition-marker",
+          style: { "--composition-marker": "preserved" },
+        } as object)}
+      >
+        Actions
+      </Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    expect(button.classList.contains("composition-marker")).toBe(true);
+    expect(button.style.getPropertyValue("--composition-marker")).toBe("preserved");
+  });
+
+  it("preserves behavior and refs when composed as a menu trigger", () => {
+    let clickCount = 0;
+    const ref = { current: null as HTMLElement | null };
+
+    render(
+      <Menu.Root>
+        <Menu.Trigger
+          render={
+            <Button
+              ref={ref}
+              variant="secondary"
+              onClick={() => {
+                clickCount += 1;
+              }}
+            />
+          }
+        >
+          Actions
+        </Menu.Trigger>
+        <Menu.Content>
+          <Menu.Item>Rename</Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Actions" });
+
+    expect(ref.current).toBe(trigger);
+    fireEvent.click(trigger);
+    expect(clickCount).toBe(1);
+    expect(screen.getByRole("menu")).toBeTruthy();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("prevents button glyphs from selecting an independent icon size", () => {
+    const glyph = (
+      // @ts-expect-error Button owns the glyph size relationship.
+      <Button.Glyph artwork={TestArtwork} size="m" />
+    );
+
+    expect(glyph).toBeDefined();
   });
 
   it("requires icon-only actions to use their constrained content API", () => {

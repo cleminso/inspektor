@@ -1,13 +1,77 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import * as stylex from "@stylexjs/stylex";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRef } from "react";
 
+import { Button } from "../button/button";
+import { buttonStyles } from "../button/button.styles";
 import { KeyboardInput } from "../keyboardInput/keyboardInput";
 import { Menu } from "./menu";
+import { menuStyles } from "./menu.styles";
 
 afterEach(cleanup);
 
 describe("Menu", () => {
+  it("keeps trigger presentation on the component that owns the composed control", () => {
+    render(
+      <Menu.Root>
+        <Menu.Trigger render={<Button iconOnly aria-label="Open actions" size="xs" variant="ghost" />}>
+          Actions
+        </Menu.Trigger>
+        <Menu.Content>
+          <Menu.Item>Duplicate</Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Open actions" });
+    const menuTriggerClassName = stylex.props(menuStyles.trigger).className;
+    const buttonClassNames = new Set(
+      stylex
+        .props(
+          buttonStyles.base,
+          buttonStyles.sizeXS,
+          buttonStyles.square,
+          buttonStyles.ghost,
+          buttonStyles.radiusXS,
+        )
+        .className?.split(" ") ?? [],
+    );
+    const menuOnlyClassNames =
+      menuTriggerClassName?.split(" ").filter((className) => buttonClassNames.has(className) === false) ?? [];
+
+    expect(menuTriggerClassName).toBeDefined();
+    expect(menuOnlyClassNames.length).toBeGreaterThan(0);
+    for (const className of menuOnlyClassNames) {
+      expect(trigger.classList.contains(className)).toBe(false);
+    }
+    expect(trigger.getAttribute("data-size")).toBe("xs");
+
+    fireEvent.click(trigger);
+
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(trigger.getAttribute("data-expanded")).toBe("");
+  });
+
+  it("keeps Menu presentation on an uncomposed trigger", () => {
+    render(
+      <Menu.Root>
+        <Menu.Trigger>Actions</Menu.Trigger>
+        <Menu.Content>
+          <Menu.Item>Duplicate</Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Actions" });
+    const menuTriggerClassNames = stylex.props(menuStyles.trigger).className?.split(" ") ?? [];
+
+    expect(menuTriggerClassNames.length).toBeGreaterThan(0);
+    for (const className of menuTriggerClassNames) {
+      expect(trigger.classList.contains(className)).toBe(true);
+    }
+  });
+
   it("uses the standard treatment on its bounded popup", () => {
     render(
       <Menu.Root defaultOpen>

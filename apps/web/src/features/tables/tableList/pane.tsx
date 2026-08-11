@@ -1,8 +1,8 @@
 import { Accordion, ActionList, Box, ContextMenu, Icon, SidePanel, Text } from '@inspector/ds'
 import { Link } from '@tanstack/react-router'
-import { Table2 } from 'lucide-react'
 import { useEffect, useEffectEvent } from 'react'
 
+import { productGlyphs } from '@app/icons/productGlyphs'
 import {
   useInspectorSessionState,
   useRuntimeClient,
@@ -199,10 +199,7 @@ export function TableListPane({
                   aria-label={`Select ${tableName}`}
                   checked={isChecked}
                   icon={
-                    <Icon
-                      render={<Table2 />}
-                      size="s"
-                    />
+                    <Icon artwork={productGlyphs.table} size="s" />
                   }
                   onCheckedChange={(checked, eventDetails) => {
                     changeChecked(checked === true, eventDetails.event)

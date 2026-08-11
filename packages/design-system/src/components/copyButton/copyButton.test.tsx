@@ -9,6 +9,17 @@ afterEach(() => {
 })
 
 describe('CopyButton', () => {
+  it('uses the general 24-unit outline weight', () => {
+    render(<CopyButton label="Copy query" copiedLabel="Query copied" textToCopy="select *" />)
+
+    expect(
+      screen
+        .getByRole('button', { name: 'Copy query' })
+        .querySelector('[data-slot="icon"]')
+        ?.getAttribute('stroke-width'),
+    ).toBe('2')
+  })
+
   it('copies text and reports successful feedback', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     const onCopy = vi.fn()

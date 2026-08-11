@@ -4,15 +4,14 @@ import {
   Box,
   Button,
   DataGrid,
-  Icon,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
   Text,
   Tooltip,
 } from '@inspector/ds'
-import { Layers } from 'lucide-react'
 
+import { productGlyphs } from '@app/icons/productGlyphs'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
@@ -98,10 +97,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                           openSchemaView(tableName)
                         }}
                       >
-                        <Icon
-                          render={<Layers />}
-                          size="s"
-                        />
+                        <Button.Glyph artwork={productGlyphs.schema} />
                       </Button>
                     }
                   />

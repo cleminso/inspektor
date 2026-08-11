@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { forwardRef, type ComponentPropsWithRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { CheckGlyph } from "../icon/iconArtwork";
 import { checkboxStyles } from "./checkbox.styles";
 
 export type CheckboxSize = "s" | "m";
@@ -130,19 +131,16 @@ const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoo
         data-slot="checkbox-indicator"
         render={(indicatorProps, state) => (
           <span {...indicatorProps}>
-            <svg
-              aria-hidden="true"
+            <CheckGlyph
               className={iconStylexProps.className}
               style={iconStylexProps.style}
-              viewBox="0 0 16 16"
               fill="none"
               stroke="currentColor"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-            >
-              <path d={state.indeterminate === true ? "M4 8h8" : "m3 8 3 3 7-7"} />
-            </svg>
+              variant={state.indeterminate === true ? "indeterminate" : "check"}
+            />
           </span>
         )}
       />

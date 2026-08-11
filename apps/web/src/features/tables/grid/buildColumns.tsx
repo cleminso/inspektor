@@ -2,7 +2,7 @@ import { useRef, type MouseEvent } from "react";
 
 import type { Column, ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
-import { ArrowUpRight, ChevronDown, KeyRound } from "lucide-react";
+import { ChevronDown, KeyRound } from "lucide-react";
 
 import {
   BinaryValue,
@@ -21,6 +21,7 @@ import {
   type DataGridFeatures,
 } from "@inspector/ds";
 
+import { productGlyphs } from "@app/icons/productGlyphs";
 import {
   getColumnTypeMarker,
   type ColumnTypeMarker as ColumnTypeMarkerModel,
@@ -217,8 +218,10 @@ function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.
         render={
           <Text as="span" aria-label={marker.label} color="muted" variant="caption">
             <Box as="span" alignItems="center" display="flex">
-              {marker.icon === "key" ? <Icon render={<KeyRound />} size="xs" /> : null}
-              {marker.icon === "relation" ? <Icon render={<ArrowUpRight />} size="xs" /> : null}
+              {marker.icon === "key" ? <Icon artwork={KeyRound} size="xs" /> : null}
+              {marker.icon === "relation" ? (
+                <Icon artwork={productGlyphs.relation} size="xs" />
+              ) : null}
               {marker.suffix}
             </Box>
           </Text>
@@ -434,6 +437,7 @@ function ColumnHeader({
               <Button
                 type="button"
                 aria-label={`Open ${label} column menu`}
+                glyphSize="compact"
                 iconOnly
                 size="xs"
                 variant="ghost"
@@ -442,7 +446,7 @@ function ColumnHeader({
                 }}
               >
                 <Text as="span" color="muted">
-                  <Icon render={<ChevronDown />} size="s" />
+                  <Button.Glyph artwork={ChevronDown} />
                 </Text>
               </Button>
             }

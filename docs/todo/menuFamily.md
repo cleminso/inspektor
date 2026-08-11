@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Document that a composed Menu trigger control owns its visual presentation.
+
 [05/08/26]
 
 - [x] Share Menu and Context Menu state-to-style selectors, indicator artwork, and submenu artwork through one internal menu presentation owner.

@@ -1,14 +1,20 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
 import * as stylex from '@stylexjs/stylex'
+import {
+  forwardRef,
+  type ComponentPropsWithRef,
+  type ForwardRefExoticComponent,
+} from 'react'
 
 import { iconStyles } from './icon.styles'
 
 export type IconSize = 'xs' | 's' | 'm'
+/** Props an SVG artwork component must forward to its root SVG element. */
+export type IconArtworkProps = ComponentPropsWithRef<'svg'>
+export type IconArtwork = ForwardRefExoticComponent<IconArtworkProps>
 
 export interface IconProps {
-  /** Composes semantic icon presentation onto SVG artwork. */
-  render: NonNullable<useRender.ComponentProps<'span'>['render']>
+  /** Ref-forwarding SVG component that follows the documented artwork protocol. */
+  artwork: IconArtwork
   /** Controls the rendered icon dimensions. */
   size?: IconSize
 }
@@ -19,17 +25,18 @@ const sizeStyles = {
   m: iconStyles.m,
 } satisfies Record<IconSize, unknown>
 
-export function Icon({ render, size = 's' }: IconProps) {
-  const defaultProps = {
-    ...stylex.props(iconStyles.base, sizeStyles[size]),
-    'aria-hidden': true,
-    'data-size': size,
-    'data-slot': 'icon',
-  } as useRender.ElementProps<'span'>
-
-  return useRender({
-    defaultTagName: 'span',
-    render,
-    props: mergeProps<'span'>(defaultProps, {}),
-  })
-}
+export const Icon = forwardRef<SVGSVGElement, IconProps>(function Icon(
+  { artwork: Artwork, size = 's' },
+  forwardedRef,
+) {
+  return (
+    <Artwork
+      ref={forwardedRef}
+      aria-hidden="true"
+      data-size={size}
+      data-slot="icon"
+      focusable="false"
+      {...stylex.props(iconStyles.base, sizeStyles[size])}
+    />
+  )
+})

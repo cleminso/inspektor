@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { Button } from '../button/button'
+import { CloseGlyph } from '../icon/iconArtwork'
 import { toasterStyles } from './toaster.styles'
 
 export type ToastId = string | number
@@ -236,19 +237,13 @@ function ToastItem({ index, toast }: ToastItemProps) {
                 />
               }
             >
-              <svg
-                aria-hidden="true"
+              <CloseGlyph
                 fill="none"
-                viewBox="0 0 16 16"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.5"
                 {...stylex.props(toasterStyles.closeIcon)}
-              >
-                <path
-                  d="M4.5 4.5l7 7m0-7-7 7"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeWidth="1.5"
-                />
-              </svg>
+              />
             </BaseToast.Close>
           </div>
         </div>

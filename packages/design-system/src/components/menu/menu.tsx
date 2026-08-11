@@ -43,7 +43,7 @@ export interface MenuRootProps extends WithoutStyles<BaseMenu.Root.Props> {
 export interface MenuTriggerProps extends WithoutStyles<BaseMenu.Trigger.Props> {
   /** Disables the menu trigger. */
   disabled?: boolean;
-  /** Composes trigger behavior onto another element. */
+  /** Composes trigger behavior onto a design-system control that owns its presentation. */
   render?: BaseMenu.Trigger.Props["render"];
 }
 
@@ -163,24 +163,26 @@ function MenuRoot({ defaultOpen = false, disabled = false, ...props }: MenuRootP
 }
 
 const MenuTrigger = forwardRef<ComponentRef<typeof BaseMenu.Trigger>, MenuTriggerProps>(function MenuTrigger(
-  { disabled = false, ...props },
+  { disabled = false, render, ...props },
   ref,
 ) {
   const inputGroup = useContext(InputGroupContext);
   const effectiveDisabled = disabled === true || inputGroup?.disabled === true;
+  const isComposed = render !== undefined;
   const stateStyles = createStateStyleProps<BaseMenu.Trigger.State>((state) => [
-    menuStyles.trigger,
-    inputGroup !== null && menuStyles.triggerGrouped,
-    state.open === true && menuStyles.triggerOpen,
-    state.open === true && menuStyles.triggerPressed,
-    state.disabled === true && menuStyles.disabled,
-    state.disabled === true && menuStyles.triggerDisabled,
+    isComposed === false && menuStyles.trigger,
+    isComposed === false && inputGroup !== null && menuStyles.triggerGrouped,
+    isComposed === false && state.open === true && menuStyles.triggerOpen,
+    isComposed === false && state.open === true && menuStyles.triggerPressed,
+    isComposed === false && state.disabled === true && menuStyles.disabled,
+    isComposed === false && state.disabled === true && menuStyles.triggerDisabled,
   ]);
   return (
     <BaseMenu.Trigger
       {...props}
       ref={ref as BaseMenu.Trigger.Props["ref"]}
       disabled={effectiveDisabled}
+      render={render}
       {...stateStyles}
       data-slot="menu-trigger"
       data-grouped={inputGroup === null ? undefined : ""}

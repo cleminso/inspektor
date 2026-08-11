@@ -74,6 +74,10 @@ describe("buildDataGridColumns", () => {
 
     const menuButton = screen.getByRole("button", { name: "Open Name column menu" });
 
+    expect(menuButton.getAttribute("data-size")).toBe("xs");
+    expect(menuButton.getAttribute("data-glyph-size")).toBe("compact");
+    expect(menuButton.querySelector('[data-slot="icon"]')?.getAttribute("data-size")).toBe("xs");
+
     fireEvent.click(menuButton);
     expect(onColumnMenuOpen).toHaveBeenCalledWith("name");
     fireEvent.click(screen.getByRole("menuitem", { name: "Sort Ascending" }));

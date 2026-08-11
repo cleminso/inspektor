@@ -80,8 +80,10 @@ describe('ButtonLink', () => {
   })
 
   it('composes button presentation onto a router link without button semantics', () => {
+    const ref = createRef<HTMLAnchorElement>()
+
     render(
-      <ButtonLink variant="secondary" render={<RouterLink to="/components" />}>
+      <ButtonLink ref={ref} variant="secondary" render={<RouterLink to="/components" />}>
         Browse components
       </ButtonLink>,
     )
@@ -92,6 +94,7 @@ describe('ButtonLink', () => {
     expect(link.getAttribute('role')).toBeNull()
     expect(link.getAttribute('aria-disabled')).toBeNull()
     expect(link.className).not.toBe('')
+    expect(ref.current).toBe(link)
   })
 
   it('rejects button-only states and styling escape hatches', () => {
@@ -121,14 +124,14 @@ describe('ButtonLink', () => {
     expect(ref).toBeDefined()
   })
 
-  it('strips styling escape hatches passed by untyped consumers', () => {
+  it('preserves style props received through render composition', () => {
     render(
       <ButtonLink
         href="/catalog"
         {...({
           'data-testid': 'button-link',
-          className: 'consumer-style',
-          style: { color: 'red' },
+          className: 'composition-marker',
+          style: { '--composition-marker': 'preserved' },
         } as object)}
       >
         Open catalog
@@ -137,7 +140,7 @@ describe('ButtonLink', () => {
 
     const link = screen.getByTestId('button-link')
 
-    expect(link.className).not.toContain('consumer-style')
-    expect(link.style.color).not.toBe('red')
+    expect(link.className).toContain('composition-marker')
+    expect(link.style.getPropertyValue('--composition-marker')).toBe('preserved')
   })
 })

@@ -204,7 +204,7 @@ export const iconItem = {
   title: "Icon",
   slug: "icon",
   href: "/components/icon",
-  description: "Decorative SVG artwork with constrained semantic sizing.",
+  description: "Decorative imported SVG artwork with constrained semantic sizing.",
   importPath: "@inspector/ds",
   source: {
     label: "icon.tsx",
