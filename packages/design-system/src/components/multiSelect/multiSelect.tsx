@@ -22,6 +22,8 @@ import { Checkbox } from "../checkbox/checkbox";
 import { ScrollAreaPrivate } from "../scrollArea/scrollArea";
 import { multiSelectStyles } from "./multiSelect.styles";
 
+const deferredRenderingThreshold = 50;
+
 export interface MultiSelectItem {
   /** Stable value represented by the option. */
   value: string;
@@ -263,6 +265,7 @@ function MultiSelectContent({
     [mutableItems],
   );
   const allMutableSelected = mutableItems.every((item) => selectedSet.has(item.value));
+  const deferRendering = context.items.length > deferredRenderingThreshold;
 
   const focusControl = (itemIndex: number, control: keyof ItemControls) => {
     const item = mutableItems[itemIndex];
@@ -307,6 +310,7 @@ function MultiSelectContent({
                 <MultiSelectOption
                   key={item.value}
                   allMutableSelected={allMutableSelected}
+                  deferRendering={deferRendering}
                   item={item}
                   itemIndex={mutableItemIndices.get(item.value) ?? -1}
                   mutableItems={mutableItems}
@@ -323,12 +327,14 @@ function MultiSelectContent({
 
 function MultiSelectOption({
   allMutableSelected,
+  deferRendering,
   item,
   itemIndex,
   mutableItems,
   selectedSet,
 }: {
   allMutableSelected: boolean;
+  deferRendering: boolean;
   item: MultiSelectItem;
   itemIndex: number;
   mutableItems: readonly MultiSelectItem[];
@@ -386,9 +392,11 @@ function MultiSelectOption({
     <div
       {...stylex.props(
         multiSelectStyles.row,
+        deferRendering === true && multiSelectStyles.rowDeferred,
         disabled === true && multiSelectStyles.rowDisabled,
       )}
       data-slot="multi-select-row"
+      data-rendering={deferRendering === true ? "deferred" : undefined}
     >
       <Checkbox
         ref={(element) => {

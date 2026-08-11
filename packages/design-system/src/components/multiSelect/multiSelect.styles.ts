@@ -101,6 +101,10 @@ export const multiSelectStyles = stylex.create({
     userSelect: "none",
     minHeight: spatial["collection-row-height-s"],
   },
+  rowDeferred: {
+    containIntrinsicBlockSize: `auto ${spatial["collection-row-height-s"]}`,
+    contentVisibility: "auto",
+  },
   rowDisabled: { color: textColors.disabled },
   optionButton: {
     padding: 0,

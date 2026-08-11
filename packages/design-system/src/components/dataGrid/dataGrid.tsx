@@ -31,6 +31,10 @@ import { useDataGridReorderContext } from './dataGridReorderContext'
 export type DataGridDensity = 'compact' | 'default'
 export type DataGridRowRendering = 'all' | 'virtual'
 
+const defaultColumnMinSize = 20
+const defaultColumnMaxSize = Number.MAX_SAFE_INTEGER
+const keyboardColumnResizeStep = 10
+
 /**
  * Why: importing DND from this static module pulled the shared sortable chunk into the initial
  * application load. A sibling-runtime alternative kept the chunk deferred but depended on DOM
@@ -120,10 +124,14 @@ export interface DataGridViewportProps {
 }
 
 export interface DataGridTableProps {
+  /** Whether the table is updating while its settled rows remain available. */
+  'aria-busy'?: boolean
   /** Accessible name for the table. */
   'aria-label': string
   /** Header and body composition. */
   children: ReactNode
+  /** Polite announcement rendered in a stable, visually hidden status region. */
+  statusContent?: ReactNode
 }
 
 export interface DataGridContentProps {
@@ -240,6 +248,18 @@ function getVisibleColumnCount<TData extends RowData>(table: DataGridTable<TData
   return Math.max(table.getVisibleLeafColumns().length, 1)
 }
 
+function getFirstSelectableCell<TData extends RowData>(
+  table: DataGridTable<TData>,
+): Cell<DataGridFeatures, TData, unknown> | undefined {
+  for (const row of table.getRowModel().rows) {
+    for (const cell of row.getVisibleCells()) {
+      if (cell.getCanSelect() === true) {
+        return cell
+      }
+    }
+  }
+}
+
 function moveColumnByOffset(
   columnOrder: readonly string[],
   visibleColumnOrder: readonly string[],
@@ -304,6 +324,8 @@ function DataGridRoot<TData extends RowData>({
   table,
 }: DataGridRootProps<TData>) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const cellElementsRef = useRef(new Map<string, HTMLTableCellElement>())
+  const shouldFocusFocusedCellRef = useRef(false)
   const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null)
   const focusedColumnIdRef = useRef<string | null>(null)
   const onColumnActivateRef = useRef(onColumnActivate)
@@ -336,11 +358,33 @@ function DataGridRoot<TData extends RowData>({
   const columnReorderConfigured = reorderableColumnIds !== undefined
   const columnReorderReady = ReorderComponent !== null
   const columnReorderEnabled = columnReorderConfigured === true && columnReorderReady === true
+  const bodyCellEntryId = table.getFocusedCell()?.id ?? getFirstSelectableCell(table)?.id ?? null
+  const focusFocusedCell = useCallback(() => {
+    shouldFocusFocusedCellRef.current = true
+  }, [])
+  const registerCellElement = useCallback(
+    (cellId: string, element: HTMLTableCellElement | null) => {
+      if (element === null) {
+        cellElementsRef.current.delete(cellId)
+      } else {
+        cellElementsRef.current.set(cellId, element)
+        if (
+          shouldFocusFocusedCellRef.current === true &&
+          table.getFocusedCell()?.id === cellId
+        ) {
+          element.focus()
+          shouldFocusFocusedCellRef.current = false
+        }
+      }
+    },
+    [table],
+  )
   const value = useMemo(
     () =>
       ({
         activeColumnId,
         activeRowId,
+        bodyCellEntryId,
         density,
         onCellActivate,
         onCellContextMenu,
@@ -349,6 +393,7 @@ function DataGridRoot<TData extends RowData>({
         onRowActivate,
         onRowContextMenu,
         columnReorderEnabled,
+        focusFocusedCell,
         getColumnReorderIndex: (columnId: string) => columnReorderIndices.get(columnId) ?? -1,
         moveColumn: (columnId: string, offset: -1 | 1) => {
           if (reorderableColumnIds === undefined) {
@@ -374,6 +419,7 @@ function DataGridRoot<TData extends RowData>({
             )
           }
         },
+        registerCellElement,
         table,
         setViewportElement,
         viewportElement,
@@ -381,11 +427,13 @@ function DataGridRoot<TData extends RowData>({
     [
       activeColumnId,
       activeRowId,
+      bodyCellEntryId,
       columnReorderEnabled,
       columnReorderIndices,
       columnOrder,
       completeColumnOrder,
       density,
+      focusFocusedCell,
       onCellActivate,
       onCellContextMenu,
       onColumnActivate,
@@ -394,10 +442,28 @@ function DataGridRoot<TData extends RowData>({
       onRowContextMenu,
       reorderableColumnIdSet,
       reorderableColumnIds,
+      registerCellElement,
       table,
       viewportElement,
     ],
   )
+
+  useLayoutEffect(() => {
+    if (shouldFocusFocusedCellRef.current === false) {
+      return
+    }
+
+    const focusedCell = table.getFocusedCell()
+    if (focusedCell === undefined) {
+      shouldFocusFocusedCellRef.current = false
+      return
+    }
+    const focusedCellElement = cellElementsRef.current.get(focusedCell.id)
+    if (focusedCellElement !== undefined) {
+      focusedCellElement.focus()
+      shouldFocusFocusedCellRef.current = false
+    }
+  })
 
   useEffect(() => {
     onColumnActivateRef.current = onColumnActivate
@@ -543,6 +609,7 @@ function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
       axis="both"
       ref={registerViewport}
       scrollRendering="frequent"
+      tabIndex={-1}
       verticalTrackOffset={density === 'compact' ? 'collection-row-l' : 'collection-row-xl'}
       viewportContainerType="size"
       viewportSlot="data-grid-viewport"
@@ -552,7 +619,7 @@ function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
   )
 }
 
-function DataGridTable({ 'aria-label': ariaLabel, children }: DataGridTableProps) {
+function DataGridTable(props: DataGridTableProps) {
   const { table } = useDataGridContext()
 
   return (
@@ -563,14 +630,17 @@ function DataGridTable({ 'aria-label': ariaLabel, children }: DataGridTableProps
         columnVisibility: state.columnVisibility,
       })}
     >
-      {() => (
-        <DataGridTableImplementation aria-label={ariaLabel}>{children}</DataGridTableImplementation>
-      )}
+      {() => <DataGridTableImplementation {...props} />}
     </Subscribe>
   )
 }
 
-function DataGridTableImplementation({ 'aria-label': ariaLabel, children }: DataGridTableProps) {
+function DataGridTableImplementation({
+  'aria-busy': ariaBusy,
+  'aria-label': ariaLabel,
+  children,
+  statusContent,
+}: DataGridTableProps) {
   const { density, table } = useDataGridContext()
   const scrollSurfaceRef = useRef<HTMLDivElement>(null)
   const tableRef = useRef<HTMLTableElement>(null)
@@ -602,7 +672,6 @@ function DataGridTableImplementation({ 'aria-label': ariaLabel, children }: Data
       tableElement.style.width = `${width}px`
     }
 
-    writeColumnGeometry()
     const subscription = table.atoms.columnSizing.subscribe(writeColumnGeometry)
     return () => subscription.unsubscribe()
   }, [table])
@@ -614,6 +683,15 @@ function DataGridTableImplementation({ 'aria-label': ariaLabel, children }: Data
       ref={scrollSurfaceRef}
       style={{ width: tableWidth }}
     >
+      <div
+        {...stylex.props(dataGridStyles.visuallyHidden)}
+        aria-atomic="true"
+        aria-live="polite"
+        data-slot="data-grid-status"
+        role="status"
+      >
+        {statusContent}
+      </div>
       <div
         {...stylex.props(dataGridStyles.headerBackdropAnchor)}
         aria-hidden="true"
@@ -627,6 +705,7 @@ function DataGridTableImplementation({ 'aria-label': ariaLabel, children }: Data
       </div>
       <table
         {...stylex.props(dataGridStyles.table)}
+        aria-busy={ariaBusy === true ? true : undefined}
         aria-label={ariaLabel}
         aria-rowcount={table.getRowModel().rows.length + table.getHeaderGroups().length}
         data-layout="intrinsic"
@@ -725,6 +804,8 @@ function DataGridHeaderCell<TData extends RowData>({
     table,
   } = useDataGridContext<TData>()
   const isActive = table.getFocusedCell() === undefined && activeColumnId === header.column.id
+  const minSize = header.column.columnDef.minSize ?? defaultColumnMinSize
+  const maxSize = header.column.columnDef.maxSize ?? defaultColumnMaxSize
   const columnReorderIndex = getColumnReorderIndex(header.column.id)
   const columnReorderable = columnReorderEnabled === true && columnReorderIndex >= 0
   const sortDirection = header.column.getIsSorted()
@@ -809,6 +890,11 @@ function DataGridHeaderCell<TData extends RowData>({
           isDragVisual === true && dataGridStyles.headerCellDragging,
         )}
         colSpan={header.colSpan}
+        aria-label={
+          typeof header.column.columnDef.header === 'string'
+            ? header.column.columnDef.header
+            : undefined
+        }
         aria-sort={ariaSort}
         data-active={isActive === true ? '' : undefined}
         data-column-id={header.column.id}
@@ -819,7 +905,7 @@ function DataGridHeaderCell<TData extends RowData>({
         onContextMenu={handleContextMenu}
         onKeyDown={handleKeyDown}
         scope="col"
-        tabIndex={-1}
+        tabIndex={header.column.getCanSort() === true || columnReorderable === true ? 0 : -1}
       >
         <div
           {...stylex.props(
@@ -835,16 +921,23 @@ function DataGridHeaderCell<TData extends RowData>({
         </div>
         {header.column.getCanResize() === true ? (
           <Subscribe
-            source={table.atoms.columnResizing}
-            selector={(columnResizing) => columnResizing.isResizingColumn === header.column.id}
+            source={table.store}
+            selector={(state) => ({
+              columnSize: state.columnSizing[header.column.id],
+              isResizing: state.columnResizing.isResizingColumn === header.column.id,
+            })}
           >
-            {(isResizing) => (
+            {({ isResizing }) => (
               <button
                 {...stylex.props(
                   dataGridStyles.resizeHandle,
                   isDragVisual === true && dataGridStyles.resizeHandleDragging,
                 )}
                 aria-label={`Resize ${header.column.id} column`}
+                aria-orientation="vertical"
+                aria-valuemax={maxSize}
+                aria-valuemin={minSize}
+                aria-valuenow={header.column.getSize()}
                 data-resizing={isResizing === true ? '' : undefined}
                 data-slot="data-grid-resize-handle"
                 onClick={(event) => {
@@ -858,10 +951,36 @@ function DataGridHeaderCell<TData extends RowData>({
                   event.stopPropagation()
                   header.getResizeHandler()(event)
                 }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    header.column.resetSize()
+                    return
+                  }
+                  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+                    return
+                  }
+
+                  event.preventDefault()
+                  event.stopPropagation()
+                  const direction = table.options.columnResizeDirection ?? 'ltr'
+                  const logicalOffset = event.key === 'ArrowRight' ? 1 : -1
+                  const offset = direction === 'rtl' ? -logicalOffset : logicalOffset
+                  const size = Math.min(
+                    Math.max(header.column.getSize() + offset * keyboardColumnResizeStep, minSize),
+                    maxSize,
+                  )
+                  table.setColumnSizing((columnSizing) => ({
+                    ...columnSizing,
+                    [header.column.id]: size,
+                  }))
+                }}
                 onTouchStart={(event) => {
                   event.stopPropagation()
                   header.getResizeHandler()(event)
                 }}
+                role="separator"
                 type="button"
               />
             )}
@@ -941,6 +1060,16 @@ function DataGridVirtualSpacer({ height, slot }: { height: number; slot: string 
 
 /** Keeps native table layout while mounting only the rows intersecting the scroll viewport. */
 function DataGridVirtualBody() {
+  const { table } = useDataGridContext()
+
+  return (
+    <Subscribe source={table.atoms.cellSelection}>
+      {() => <DataGridVirtualBodyImplementation />}
+    </Subscribe>
+  )
+}
+
+function DataGridVirtualBodyImplementation() {
   const { density, table, viewportElement } = useDataGridContext()
   const rows = table.getRowModel().rows
   const getItemKey = useCallback((index: number) => rows[index]?.id ?? index, [rows])
@@ -957,6 +1086,15 @@ function DataGridVirtualBody() {
   const paddingStart = firstVirtualRow?.start ?? 0
   const paddingEnd =
     lastVirtualRow === undefined ? 0 : rowVirtualizer.getTotalSize() - lastVirtualRow.end
+  const focusedCell = table.getFocusedCell()
+  const focusedRowIndex =
+    focusedCell === undefined ? -1 : rows.findIndex((row) => row.id === focusedCell.row.id)
+
+  useLayoutEffect(() => {
+    if (focusedRowIndex >= 0) {
+      rowVirtualizer.scrollToIndex(focusedRowIndex, { align: 'auto' })
+    }
+  }, [focusedRowIndex, rowVirtualizer])
 
   return (
     <tbody
@@ -1047,10 +1185,13 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   const {
     activeColumnId,
     activeRowId,
+    bodyCellEntryId,
     density,
+    focusFocusedCell,
     onCellActivate,
     onCellContextMenu,
     onColumnActivate,
+    registerCellElement,
     table,
   } = useDataGridContext<TData>()
   const target = { rowId: cell.row.id, columnId: cell.column.id }
@@ -1059,6 +1200,13 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   const isSelected = cell.row.getIsSelected()
   const isCellSelected = cell.getIsSelected()
   const isActive = cell.getIsFocused()
+  const tabIndex = cell.getTabIndex() === 0 || bodyCellEntryId === cell.id ? 0 : -1
+  const registerCell = useCallback(
+    (element: HTMLTableCellElement | null) => {
+      registerCellElement(cell.id, element)
+    },
+    [cell.id, registerCellElement],
+  )
 
   const handleClick = (event: MouseEvent<HTMLTableCellElement>) => {
     if (event.detail > 1) {
@@ -1103,6 +1251,36 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     onCellContextMenu(target, event)
   }
 
+  const handleKeyDown = (event: ReactKeyboardEvent<HTMLTableCellElement>) => {
+    if (
+      event.target !== event.currentTarget ||
+      event.altKey === true ||
+      event.ctrlKey === true ||
+      event.metaKey === true ||
+      event.shiftKey === true
+    ) {
+      return
+    }
+
+    const directions = {
+      ArrowDown: 'down',
+      ArrowLeft: 'left',
+      ArrowRight: 'right',
+      ArrowUp: 'up',
+    } as const
+    if (event.key in directions) {
+      event.preventDefault()
+      table.moveCellSelection(directions[event.key as keyof typeof directions])
+      focusFocusedCell()
+      return
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onColumnActivate?.(null)
+      onCellActivate?.(target)
+    }
+  }
+
   // Body cells intentionally stay outside drag-and-drop registration. Per-cell position observers
   // make header release work scale with the virtual row window, while the header drop can apply
   // TanStack's column order atomically to every rendered cell.
@@ -1125,11 +1303,18 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       data-selected={isSelected === true ? '' : undefined}
       data-slot="data-grid-cell"
       data-typography="mono"
+      ref={registerCell}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
+      onFocus={() => {
+        if (cell.getCanSelect() === true && cell.getIsFocused() === false) {
+          table.setFocusedCell(target.rowId, target.columnId)
+        }
+      }}
+      onKeyDown={handleKeyDown}
       onMouseDown={handleMouseDown}
       onMouseEnter={cell.getSelectionExtendHandler()}
-      tabIndex={cell.getTabIndex()}
+      tabIndex={tabIndex}
     >
       {children ?? <FlexRender cell={cell} />}
     </td>

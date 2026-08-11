@@ -1,6 +1,6 @@
-import { Accordion, ActionList, Box, ContextMenu, Icon, SidePanel, Text } from '@inspector/ds'
+import { Accordion, ActionList, Box, ContextMenu, Icon, Menu, SidePanel, Text } from '@inspector/ds'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useEffectEvent } from 'react'
+import { useEffect, useEffectEvent, useRef } from 'react'
 
 import { productGlyphs } from '@app/icons/productGlyphs'
 import {
@@ -10,6 +10,8 @@ import {
 } from '@app/providers/inspectorProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 import { useTableRowsPrefetchIntent } from '@tables/query/useTableRowsPrefetchIntent'
+
+const deferredRenderingThreshold = 50
 
 export type TableListSection = 'pinned' | 'tables'
 
@@ -50,7 +52,7 @@ function isTableSelectionInteraction(target: EventTarget | null): boolean {
     return false
   }
 
-  if (target.closest('[data-slot="context-menu-popup"]') !== null) {
+  if (target.closest('[data-slot="context-menu-popup"], [data-slot="menu-popup"]') !== null) {
     return true
   }
 
@@ -78,8 +80,10 @@ export function TableListPane({
   const canBuildHref = currentConnectionId !== null
   const pinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName))
   const unpinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName) === false)
+  const deferTableRendering = tables.length > deferredRenderingThreshold
   const hasCheckedTables = checkedTableNames.size > 0
   const clearSelection = useEffectEvent(onClearSelection)
+  const pendingMenuActionRef = useRef<(() => void) | null>(null)
   const prefetchIntent = useTableRowsPrefetchIntent({
     activeKey: selectedTableName,
     availableKeys: tables,
@@ -111,133 +115,196 @@ export function TableListPane({
     const orderedCheckedTableNames = sectionTables.filter((tableName) =>
       checkedTableNames.has(tableName),
     )
+    const handleActionsOpenChangeComplete = (open: boolean) => {
+      if (open === true) {
+        return
+      }
 
+      const pendingMenuAction = pendingMenuActionRef.current
+      pendingMenuActionRef.current = null
+      pendingMenuAction?.()
+    }
+    const togglePinnedTables = () => {
+      if (section === 'pinned') {
+        onUnpinTables(orderedCheckedTableNames)
+      } else {
+        onPinTables(orderedCheckedTableNames)
+      }
+    }
+    const scheduleClearSelection = () => {
+      pendingMenuActionRef.current = onClearSelection
+    }
     return (
-      <ActionList
-        aria-label={section === 'pinned' ? 'Pinned tables' : 'Tables'}
-        onEscapeKeyDown={(event) => {
-          if (hasCheckedTables === false) {
-            return
-          }
-
-          onClearSelection()
-          event.preventDefault()
-        }}
-      >
-        {sectionTables.map((tableName) => {
-          const isActive = selectedTableName === tableName
-          const isChecked = checkedTableNames.has(tableName)
-          const tableParams =
-            canBuildHref === true
-              ? {
-                  connectionId: currentConnectionId,
-                  tableName,
-                }
-              : null
-          const handleContextMenu = () => {
-            if (isChecked === false) {
+      <ContextMenu.Root onOpenChangeComplete={handleActionsOpenChangeComplete}>
+        <ContextMenu.Trigger
+          onContextMenu={(event) => {
+            if (event.target instanceof Element === false) {
+              return
+            }
+            const tableName =
+              event.target.closest<HTMLElement>('[data-table-name]')?.dataset.tableName
+            if (tableName !== undefined && checkedTableNames.has(tableName) === false) {
               onReplaceSelection(tableName, section)
             }
-          }
-          const changeChecked = (checked: boolean, event: Event) => {
-            onTableCheckedChange(tableName, checked, {
-              extendRange: hasShiftKey(event),
-              orderedTableNames: sectionTables,
-              section,
-            })
-          }
-          const trigger =
-            tableParams === null ? (
-              <ActionList.Trigger disabled>{tableName}</ActionList.Trigger>
-            ) : hasCheckedTables === true ? (
-              <ActionList.Trigger
-                onClick={(event) => {
-                  changeChecked(isChecked === false, event.nativeEvent)
-                }}
-              >
-                {tableName}
-              </ActionList.Trigger>
-            ) : (
-              <ActionList.Trigger
-                nativeButton={false}
-                render={
-                  <Link
-                    to={appRoutes.table}
-                    params={tableParams}
-                    search={{}}
-                    aria-current={isActive === true ? 'page' : undefined}
-                    onBlur={() => {
-                      prefetchIntent.cancelScheduled()
-                      prefetchIntent.release(tableName)
-                    }}
-                    onFocus={() => prefetchIntent.prefetch({ key: tableName, tableName })}
-                    onPointerDown={() => prefetchIntent.prefetch({ key: tableName, tableName })}
-                    onPointerEnter={() => prefetchIntent.schedule({ key: tableName, tableName })}
-                    onPointerLeave={() => {
-                      prefetchIntent.cancelScheduled()
-                      prefetchIntent.release(tableName)
-                    }}
-                  />
+          }}
+          render={
+            <ActionList
+              aria-label={section === 'pinned' ? 'Pinned tables' : 'Tables'}
+              onEscapeKeyDown={(event) => {
+                if (hasCheckedTables === false) {
+                  return
                 }
-              >
-                {tableName}
-              </ActionList.Trigger>
-            )
 
-          return (
-            <ContextMenu.Root key={tableName}>
-              <ContextMenu.Trigger
-                onContextMenu={handleContextMenu}
-                render={
-                  <ActionList.Item
-                    active={isActive}
-                    checked={isChecked}
-                  />
-                }
+                onClearSelection()
+                event.preventDefault()
+              }}
+            />
+          }
+        >
+          {sectionTables.map((tableName) => {
+            const isActive = selectedTableName === tableName
+            const isChecked = checkedTableNames.has(tableName)
+            const tableParams =
+              canBuildHref === true
+                ? {
+                    connectionId: currentConnectionId,
+                    tableName,
+                  }
+                : null
+            const handleActionsOpenChange = (open: boolean) => {
+              if (open === true && isChecked === false) {
+                onReplaceSelection(tableName, section)
+              }
+            }
+            const changeChecked = (checked: boolean, event: Event) => {
+              onTableCheckedChange(tableName, checked, {
+                extendRange: hasShiftKey(event),
+                orderedTableNames: sectionTables,
+                section,
+              })
+            }
+            const trigger =
+              tableParams === null ? (
+                <ActionList.Trigger disabled>{tableName}</ActionList.Trigger>
+              ) : hasCheckedTables === true ? (
+                <ActionList.Trigger
+                  onClick={(event) => {
+                    changeChecked(isChecked === false, event.nativeEvent)
+                  }}
+                >
+                  {tableName}
+                </ActionList.Trigger>
+              ) : (
+                <ActionList.Trigger
+                  nativeButton={false}
+                  render={
+                    <Link
+                      to={appRoutes.table}
+                      params={tableParams}
+                      search={{}}
+                      aria-current={isActive === true ? 'page' : undefined}
+                      onBlur={() => {
+                        prefetchIntent.cancelScheduled()
+                        prefetchIntent.release(tableName)
+                      }}
+                      onFocus={() => prefetchIntent.prefetch({ key: tableName, tableName })}
+                      onPointerDown={() => prefetchIntent.prefetch({ key: tableName, tableName })}
+                      onPointerEnter={() => prefetchIntent.schedule({ key: tableName, tableName })}
+                      onPointerLeave={() => {
+                        prefetchIntent.cancelScheduled()
+                        prefetchIntent.release(tableName)
+                      }}
+                    />
+                  }
+                >
+                  {tableName}
+                </ActionList.Trigger>
+              )
+
+            return (
+              <ActionList.Item
+                key={tableName}
+                active={isActive}
+                checked={isChecked}
+                data-table-name={tableName}
+                deferOffscreenRendering={deferTableRendering}
               >
                 <ActionList.SelectionControl
                   aria-label={`Select ${tableName}`}
                   checked={isChecked}
                   icon={
-                    <Icon artwork={productGlyphs.table} size="s" />
+                    <Icon
+                      artwork={productGlyphs.table}
+                      size="s"
+                    />
                   }
                   onCheckedChange={(checked, eventDetails) => {
                     changeChecked(checked === true, eventDetails.event)
                   }}
                 />
                 {trigger}
-              </ContextMenu.Trigger>
-              <ContextMenu.Content>
-                <ContextMenu.Item onClick={() => onOpenTables(orderedCheckedTableNames)}>
-                  {getActionLabel('Open', orderedCheckedTableNames.length)}
-                </ContextMenu.Item>
-                <ContextMenu.Separator />
-                <ContextMenu.Item
-                  onClick={() => {
-                    if (section === 'pinned') {
-                      onUnpinTables(orderedCheckedTableNames)
-                    } else {
-                      onPinTables(orderedCheckedTableNames)
-                    }
-                  }}
+                <Menu.Root
+                  onOpenChange={handleActionsOpenChange}
+                  onOpenChangeComplete={handleActionsOpenChangeComplete}
                 >
-                  {getActionLabel(
-                    section === 'pinned' ? 'Unpin' : 'Pin',
-                    orderedCheckedTableNames.length,
-                  )}
-                </ContextMenu.Item>
-                <ContextMenu.Separator />
-                <ContextMenu.Item
-                  variant="danger"
-                  onClick={onClearSelection}
-                >
-                  Deselect all
-                </ContextMenu.Item>
-              </ContextMenu.Content>
-            </ContextMenu.Root>
-          )
-        })}
-      </ActionList>
+                  <Menu.Trigger
+                    render={<ActionList.Action aria-label={`Open ${tableName} actions`} />}
+                  >
+                    <Icon
+                      artwork={productGlyphs.ellipsis}
+                      size="s"
+                    />
+                  </Menu.Trigger>
+                  <Menu.Content align="end">
+                    <Menu.Item onClick={() => onOpenTables(orderedCheckedTableNames)}>
+                      {getActionLabel('Open', orderedCheckedTableNames.length)}
+                    </Menu.Item>
+                    <Menu.Separator />
+                    <Menu.Item
+                      onClick={() => {
+                        togglePinnedTables()
+                      }}
+                    >
+                      {getActionLabel(
+                        section === 'pinned' ? 'Unpin' : 'Pin',
+                        orderedCheckedTableNames.length,
+                      )}
+                    </Menu.Item>
+                    <Menu.Separator />
+                    <Menu.Item
+                      variant="danger"
+                      onClick={() => {
+                        scheduleClearSelection()
+                      }}
+                    >
+                      Deselect all
+                    </Menu.Item>
+                  </Menu.Content>
+                </Menu.Root>
+              </ActionList.Item>
+            )
+          })}
+        </ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item onClick={() => onOpenTables(orderedCheckedTableNames)}>
+            {getActionLabel('Open', orderedCheckedTableNames.length)}
+          </ContextMenu.Item>
+          <ContextMenu.Separator />
+          <ContextMenu.Item onClick={togglePinnedTables}>
+            {getActionLabel(
+              section === 'pinned' ? 'Unpin' : 'Pin',
+              orderedCheckedTableNames.length,
+            )}
+          </ContextMenu.Item>
+          <ContextMenu.Separator />
+          <ContextMenu.Item
+            variant="danger"
+            onClick={scheduleClearSelection}
+          >
+            Deselect all
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>
     )
   }
 
@@ -251,7 +318,8 @@ export function TableListPane({
         >
           {pinnedTables.length > 0 ? (
             <Accordion.Item value="pinned">
-              <Accordion.Header>
+              {/* oxlint-disable-next-line jsx-a11y/heading-has-content -- Base UI composes the trigger child into this heading. */}
+              <Accordion.Header render={<h2 />}>
                 <Accordion.Trigger
                   suffix={
                     <Text
@@ -278,7 +346,8 @@ export function TableListPane({
             </Accordion.Item>
           ) : null}
           <Accordion.Item value="tables">
-            <Accordion.Header>
+            {/* oxlint-disable-next-line jsx-a11y/heading-has-content -- Base UI composes the trigger child into this heading. */}
+            <Accordion.Header render={<h2 />}>
               <Accordion.Trigger
                 suffix={
                   <Text

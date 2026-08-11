@@ -19,10 +19,6 @@ import {
 export const textareaStyles = stylex.create({
   base: {
     margin: 0,
-    borderColor: {
-      default: borderColors.default,
-      ":focus": borderColors.focused,
-    },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
@@ -34,9 +30,6 @@ export const textareaStyles = stylex.create({
     color: textColors.default,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    outlineColor: focusColors.ring,
-    outlineStyle: "solid",
-    outlineWidth: 0,
     resize: "vertical",
     minWidth: 0,
     "::placeholder": {
@@ -65,12 +58,14 @@ export const textareaStyles = stylex.create({
     borderColor: {
       default: borderColors.danger,
       ":focus-visible": borderColors.danger,
-      ":focus": borderColors.danger,
     },
     outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
     outlineStyle: "solid",
-    outlineWidth: 0,
+    outlineWidth: {
+      default: 0,
+      ":focus-visible": spatial["focus-ring-width"],
+    },
   },
   disabled: {
     backgroundColor: {

@@ -561,6 +561,7 @@ test("extracts the constrained TabView compound API", () => {
       "onPointerEnter",
       "onPointerLeave",
       "closeLabel",
+      "reorderLabel",
     ],
   );
   assert.deepEqual(

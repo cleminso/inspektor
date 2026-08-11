@@ -120,6 +120,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                     key={tab.id}
                     value={tab.id}
                     closeLabel="Close New view"
+                    reorderLabel="Reorder New view"
                     onClose={
                       canCloseNewView === true
                         ? () => {
@@ -147,6 +148,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   }
                   details={isBaseTab === false ? `Filtered view of ${tab.tableName}` : undefined}
                   closeLabel={`Close ${tab.tableName}`}
+                  reorderLabel={`Reorder ${tab.tableName}`}
                   onBlur={() => {
                     if (focusedIntentTabIdRef.current === tab.id) {
                       focusedIntentTabIdRef.current = null
@@ -193,7 +195,8 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                 <Button
                   type="button"
                   variant="ghost"
-                  size="s"
+                  size="xs"
+                  radius="xs"
                   aria-label="Open new table view"
                   iconOnly
                   onClick={openNewView}

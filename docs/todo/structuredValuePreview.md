@@ -16,6 +16,10 @@ This checklist tracks the reusable compact structured-value preview component.
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Mark structured technical previews as non-translatable content.
+
 [05/08/26]
 
 - [x] Split structural counts from bounded payload text and place counts in a fixed leading rail.

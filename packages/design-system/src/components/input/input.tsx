@@ -3,6 +3,7 @@ import { Input as BaseInput } from "@base-ui/react/input";
 import { forwardRef, useContext, type ComponentRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
+import { editableControlStyles } from "../../primitives/editableControl.styles";
 import type { FormControlSize } from "../../utils/formControlSize";
 import { InputGroupContext } from "../inputGroup/inputGroupContext";
 import { inputStyles } from "./input.styles";
@@ -72,6 +73,7 @@ export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(func
   const effectiveSize = inputGroup?.size ?? size;
   const stateStyleProps = createStateStyleProps<BaseInput.State>((state) => [
     inputStyles.base,
+    editableControlStyles.focusVisible,
     variantStyles[variant],
     sizeStyles[effectiveSize],
     fontStyles[font],

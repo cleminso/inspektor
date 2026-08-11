@@ -3,6 +3,7 @@ import { Select as BaseSelect } from '@base-ui/react/select'
 import * as stylex from '@stylexjs/stylex'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { editableControlStyles } from '../../primitives/editableControl.styles'
 import { popupPositioning } from '../../primitives/popupPositioning'
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import type { FormControlSize } from '../../utils/formControlSize'
@@ -101,6 +102,7 @@ const SelectTrigger = React.forwardRef<
 ) {
   const stateStyles = createStateStyleProps<BaseSelect.Trigger.State>((state) => [
     selectStyles.trigger,
+    editableControlStyles.focusVisible,
     sizeStyles[size],
     widthStyles[width],
     state.open === true && selectStyles.triggerOpen,

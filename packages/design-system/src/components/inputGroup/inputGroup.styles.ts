@@ -35,7 +35,7 @@ export const inputGroupStyles = stylex.create({
     outlineWidth: inputGroupVars.outlineWidth,
     minWidth: 0,
   },
-  focused: {
+  focusVisible: {
     borderColor: inputGroupVars.focusedBorderColor,
     outlineWidth: spatial["focus-ring-width"],
   },
@@ -58,7 +58,6 @@ export const inputGroupStyles = stylex.create({
     [inputGroupVars.borderColor]: borderColors.danger,
     [inputGroupVars.focusedBorderColor]: borderColors.danger,
     [inputGroupVars.outlineColor]: focusColors.ringDanger,
-    [inputGroupVars.outlineWidth]: spatial["focus-ring-width"],
   },
   disabled: {
     [inputGroupVars.backgroundColor]: elementColors.disabled,

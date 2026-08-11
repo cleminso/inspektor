@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Support deferred offscreen rendering for large mounted collections without removing items from keyboard, selection, or accessibility order.
+- [x] Reveal trailing actions on item hover or focus-within and keep them visible while their popup remains open.
+
 [05/08/26]
 
 - [x] Restore the leading icon when a pointer-focused selection checkbox is unchecked while preserving the checkbox for keyboard focus-visible input.

@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { JsonView } from "./jsonView";
@@ -34,6 +35,42 @@ function expectFocused(item: HTMLElement): void {
 }
 
 describe("JsonView", () => {
+  it("updates query text urgently while deferring search traversal", async () => {
+    const onResultsChange = vi.fn();
+
+    function SearchHarness() {
+      const [query, setQuery] = useState("Ada");
+
+      return (
+        <>
+          <input
+            aria-label="Find JSON"
+            value={query}
+            onChange={(event) => setQuery(event.currentTarget.value)}
+          />
+          <JsonView
+            accessibilityLabel="Deferred search"
+            data={{ first: "Ada", second: "Grace" }}
+            search={{ activeMatchIndex: 0, onResultsChange, query }}
+          />
+        </>
+      );
+    }
+
+    const { container } = render(<SearchHarness />);
+    const input = screen.getByRole("textbox", { name: "Find JSON" });
+
+    fireEvent.change(input, { target: { value: "Grace" } });
+
+    expect(onResultsChange).toHaveBeenCalledWith(expect.objectContaining({ pending: true }));
+    await waitFor(() => expect(container.querySelector("mark")?.textContent).toBe("Grace"));
+    await waitFor(() =>
+      expect(onResultsChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({ pending: false }),
+      ),
+    );
+  });
+
   it("renders an expanded object with JSON punctuation and every primitive type", () => {
     render(
       <JsonView
@@ -416,7 +453,7 @@ describe("JsonView", () => {
     expect(getTreeItem(/profile\.name/i).textContent).toContain('"Ada.Lovelace"');
     expect(getTreeItem(/untouched/i).querySelector("mark")).toBeNull();
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2 });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2, pending: false });
     });
   });
 
@@ -441,7 +478,7 @@ describe("JsonView", () => {
       "User",
     ]);
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 0, count: 1 });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 0, count: 1, pending: false });
     });
 
     rerender(
@@ -500,7 +537,7 @@ describe("JsonView", () => {
 
     expect(container.querySelector("mark")).toBeNull();
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0 });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0, pending: false });
     });
   });
 
@@ -519,7 +556,7 @@ describe("JsonView", () => {
     expect(marks[0]?.hasAttribute("data-active")).toBe(false);
     expect(marks[1]?.hasAttribute("data-active")).toBe(true);
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2 });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2, pending: false });
     });
   });
 
@@ -551,7 +588,7 @@ describe("JsonView", () => {
     );
 
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0 });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0, pending: false });
     });
   });
 
@@ -753,7 +790,11 @@ describe("JsonView", () => {
     const marks = Array.from(container.querySelectorAll("mark"));
     expect(marks).toHaveLength(501);
     expect(marks.at(-1)?.hasAttribute("data-active")).toBe(true);
-    expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 599, count: 600 });
+    expect(onResultsChange).toHaveBeenLastCalledWith({
+      activeIndex: 599,
+      count: 600,
+      pending: false,
+    });
   });
 
   it("keeps bounded string content out of the tree item label", () => {

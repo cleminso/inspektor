@@ -16,6 +16,24 @@
 
 [11/08/26]
 
+- [x] Keep the Data Grid's native two-axis viewport available for programmatic scrolling while removing its redundant sequential-focus stop in favor of the grid's interactive controls and roving body-cell entry point.
+
+[11/08/26]
+
+- [x] Keep noninteractive schema type-marker tooltip triggers free of `aria-label`; their visual tooltip remains available without assigning an invalid ARIA attribute to the native span.
+
+[11/08/26]
+
+- [x] Preserve native `columnheader` semantics on reorderable headers by excluding DnD Kit's generic button-role accessibility plugin and retaining the grid's dedicated keyboard reorder commands.
+
+[11/08/26]
+
+- [x] Provide one roving body-cell entry point with arrow navigation and Enter or Space activation, mounting virtual destinations before focus transfer.
+- [x] Keep reorderable headers in sequential keyboard traversal and provide bounded keyboard resizing and reset through accessible separators.
+- [x] Expose busy state and stable polite result announcements without replacing settled rows.
+
+[11/08/26]
+
 - [x] Keep column-header menu actions borderless by preserving ghost Button presentation across Menu Trigger composition.
 - [x] Preserve the 20px `xs` header-menu target and compact 12px glyph inside the 32px header row.
 
@@ -204,6 +222,11 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[11/08/26]
+
+- [x] Cover the overflowing viewport focus contract with a regression test that exercises Base UI's measured-overflow state.
+- [ ] Verify keyboard traversal moves from the table toolbar directly to the first grid control in a connected table route.
 
 [11/08/26]
 

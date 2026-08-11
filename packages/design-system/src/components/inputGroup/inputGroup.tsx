@@ -107,7 +107,7 @@ function InputGroupRoot({
   const [focusVisible, setFocusVisible] = useState(false);
   const rootStyleProps = stylex.props(
     inputGroupStyles.root,
-    focused === true && inputGroupStyles.focused,
+    focusVisible === true && inputGroupStyles.focusVisible,
     sizeStyles[size],
     fullWidth === true && inputGroupStyles.fullWidth,
     invalid === true && inputGroupStyles.invalid,

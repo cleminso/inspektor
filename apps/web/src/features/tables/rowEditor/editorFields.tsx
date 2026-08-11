@@ -5,7 +5,7 @@
  * dirty comparison, live reconciliation, and patch construction remain in the shared mutation
  * modules so an inline editor can reuse them without rendering this pane form.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
@@ -104,10 +104,16 @@ export function useRowEditorFields({
   const [isSaving, setIsSaving] = useState(false);
   const isSavingRef = useRef(false);
   const formFields = useMemo(() => buildMutationFields(schemaColumns), [schemaColumns]);
-  const isDirty = useMemo(
-    () => isRowMutationDraftDirty(draft, schemaColumns),
-    [draft, schemaColumns],
+  const deferredDraft = useDeferredValue(draft);
+  const deferredIsDirty = useMemo(
+    () => isRowMutationDraftDirty(deferredDraft, schemaColumns),
+    [deferredDraft, schemaColumns],
   );
+  const urgentIsDirty =
+    draft.kind === "update"
+      ? Object.keys(draft.fieldInputs).length > 0
+      : isRowMutationDraftDirty(draft, schemaColumns);
+  const isDirty = draft === deferredDraft ? deferredIsDirty : urgentIsDirty;
   const fieldStates = useMemo<Record<string, FieldState>>(
     () =>
       Object.fromEntries(

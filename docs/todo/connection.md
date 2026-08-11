@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Keep submit available for native required validation and disable it only while submission is active.
+- [x] Route custom field failures through the Text Field error channel and focus the first invalid field.
+- [x] Give connection fields stable form metadata and appropriate technical-value input semantics.
+
 [09/08/26]
 
 - [x] Coordinate saved-connection opening at the session boundary so every consumer shares one in-flight request.

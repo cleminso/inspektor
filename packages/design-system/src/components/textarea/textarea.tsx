@@ -2,6 +2,7 @@ import { Field as BaseField } from '@base-ui/react/field'
 import { forwardRef, type ComponentPropsWithRef } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
+import { editableControlStyles } from '../../primitives/editableControl.styles'
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { textareaStyles } from './textarea.styles'
 
@@ -64,6 +65,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   >
   const stateStyleProps = createStateStyleProps<BaseField.Control.State>((state) => [
     textareaStyles.base,
+    editableControlStyles.focusVisible,
     scrollbarStyles.standard,
     heightStyles[height],
     fontStyles[font],

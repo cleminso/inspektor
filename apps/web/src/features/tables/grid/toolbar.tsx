@@ -11,7 +11,7 @@ const pageSizeItems = TABLE_PAGE_SIZE_OPTIONS.map((value) => ({
   value,
 }));
 
-const rowCountFormatter = new Intl.NumberFormat("en-US");
+const rowCountFormatter = new Intl.NumberFormat(undefined);
 
 interface TablePaginationProps {
   hasNextPage: boolean;

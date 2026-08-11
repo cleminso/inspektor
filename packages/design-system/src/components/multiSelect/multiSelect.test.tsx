@@ -25,6 +25,34 @@ function TestMultiSelect({ initialValue = ["design", "components"] }: { initialV
 afterEach(cleanup);
 
 describe("MultiSelect", () => {
+  it("keeps complete large-collection metadata while deferring offscreen rendering", () => {
+    const largeItems = Array.from({ length: 101 }, (_, index) => ({
+      label: `Option ${index + 1}`,
+      value: `option-${index + 1}`,
+    }));
+
+    const { container } = render(
+      <MultiSelect.Root items={largeItems}>
+        <MultiSelect.Trigger label="Choose large collection">Options</MultiSelect.Trigger>
+        <MultiSelect.Content label="Large options" />
+      </MultiSelect.Root>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose large collection" }));
+
+    const rows = container.ownerDocument.querySelectorAll('[data-slot="multi-select-row"]');
+    const firstCheckbox = screen.getByRole("checkbox", { name: "Select Option 1" });
+    const lastCheckbox = screen.getByRole("checkbox", { name: "Select Option 101" });
+
+    expect(rows).toHaveLength(101);
+    expect(rows[0]?.getAttribute("data-rendering")).toBe("deferred");
+
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Large options" }), {
+      key: "ArrowDown",
+    });
+    fireEvent.keyDown(firstCheckbox, { key: "End" });
+    expect(document.activeElement).toBe(lastCheckbox);
+  });
+
   it("uses an overflow-aware overlay scrollbar for its options", () => {
     const { container } = render(<TestMultiSelect />);
     fireEvent.click(screen.getByRole("button", { name: "Choose options" }));

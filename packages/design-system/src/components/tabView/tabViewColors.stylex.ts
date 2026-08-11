@@ -12,7 +12,7 @@ import { palette } from '../../tokens/value.stylex'
 export const tabViewColors = stylex.defineVars({
   background: surfaceColors.background,
   hoverBackground: `light-dark(color-mix(in oklch, ${palette.gray100} 35%, ${palette.gray200}), ${palette.neutral900})`,
-  selectedBackground: elementColors.hover,
+  selectedBackground: elementColors.selected,
   disabledBackground: ghostElementColors.default,
   closeBackground: ghostElementColors.default,
   buttonBackground: ghostElementColors.default,

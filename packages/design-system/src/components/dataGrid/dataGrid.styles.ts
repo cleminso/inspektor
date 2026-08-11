@@ -38,6 +38,16 @@ export const dataGridStyles = stylex.create({
     tableLayout: 'fixed',
     userSelect: 'none',
   },
+  visuallyHidden: {
+    padding: 0,
+    borderWidth: 0,
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    height: 1,
+    width: 1,
+  },
   headerBackdropAnchor: {
     position: 'sticky',
     zIndex: 1,

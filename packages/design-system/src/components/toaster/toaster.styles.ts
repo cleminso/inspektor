@@ -57,7 +57,7 @@ export const toasterStyles = stylex.create({
       `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-swipe-movement-y) - var(--toast-index) * ${spacing.m})) scale(calc(1 - var(--toast-index) * 0.04))`,
     transformOrigin: 'bottom right',
     transitionDuration: { default: '240ms', [reducedMotion]: '0ms' },
-    transitionProperty: 'transform, opacity, height',
+    transitionProperty: 'transform, opacity',
     transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
     userSelect: 'none',
     bottom: 0,

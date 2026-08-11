@@ -132,6 +132,24 @@ describe("update row drafts", () => {
     });
   });
 
+  it("retains structured text urgently and resolves semantic equality at submission", () => {
+    const settingsColumn = columns[2];
+    const draft = setMutationFieldText(
+      createUpdateRowDraft({ settings: { enabled: true } }),
+      settingsColumn,
+      '{"enabled":true}',
+    );
+
+    expect(draft.fieldInputs.settings).toEqual({
+      mode: "value",
+      text: '{"enabled":true}',
+    });
+    expect(buildRowMutationSubmission(draft, [settingsColumn])).toEqual({
+      errors: {},
+      values: {},
+    });
+  });
+
   it("uses canonical BigInt equality when returning a field to its source value", () => {
     const bigintColumn = {
       name: "sequence",

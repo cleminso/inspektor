@@ -43,6 +43,27 @@ describe('TableListPane', () => {
     onUnpinTables: vi.fn(),
   }
 
+  it('keeps every large schema-list item available while deferring offscreen rendering', () => {
+    const tables = Array.from({ length: 101 }, (_, index) => `table_${index + 1}`)
+    const { container } = render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={tables}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    const items = container.querySelectorAll('[data-slot="action-list-item"]')
+
+    expect(items).toHaveLength(101)
+    expect(items[0]?.getAttribute('data-rendering')).toBe('deferred')
+    expect(screen.getByRole('button', { name: 'table_1' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'table_101' })).toBeTruthy()
+  })
+
   it('does not present schema loading as an empty table list', () => {
     render(
       <TableListPane
@@ -454,6 +475,49 @@ describe('TableListPane', () => {
 
     expect(onReplaceSelection).not.toHaveBeenCalled()
     expect(screen.getByRole('menuitem', { name: 'Open 1 table' })).toBeTruthy()
+  })
+
+  it('clears selection only after the visible actions menu closes', () => {
+    const onClearSelection = vi.fn()
+
+    render(
+      <TableListPane
+        {...defaultActionProps}
+        checkedTableNames={new Set(['accounts'])}
+        selectedTableName={null}
+        tables={['accounts']}
+        onClearSelection={onClearSelection}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open accounts actions' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Deselect all' }))
+
+    expect(screen.queryByRole('menuitem', { name: 'Deselect all' })).toBeNull()
+    expect(onClearSelection).toHaveBeenCalledOnce()
+  })
+
+  it('preserves selection while deselect all is pressed without activation', () => {
+    const onClearSelection = vi.fn()
+
+    render(
+      <TableListPane
+        {...defaultActionProps}
+        checkedTableNames={new Set(['accounts'])}
+        selectedTableName={null}
+        tables={['accounts']}
+        onClearSelection={onClearSelection}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open accounts actions' }))
+    const deselectAllItem = screen.getByRole('menuitem', { name: 'Deselect all' })
+    fireEvent.pointerDown(deselectAllItem)
+    fireEvent.pointerUp(deselectAllItem)
+
+    expect(onClearSelection).not.toHaveBeenCalled()
   })
 
   it('clears checked tables when the context menu is dismissed', () => {

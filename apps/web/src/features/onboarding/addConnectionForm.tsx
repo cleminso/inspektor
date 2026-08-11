@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { Box, Button, Text, TextField } from "@inspector/ds";
 
@@ -26,112 +26,89 @@ export function AddConnectionForm({
   onUpdateField,
 }: AddConnectionFormProps): React.ReactElement {
   const hasError = error !== null;
-  const canSubmit =
-    formValues.serverUrl.trim().length > 0 &&
-    formValues.appId.trim().length > 0 &&
-    formValues.adminSecret.trim().length > 0;
-  const [touchedFields, setTouchedFields] = useState<
-    Partial<Record<keyof AddConnectionFormValues, boolean>>
-  >({});
-  const isFieldInvalid = (field: keyof AddConnectionFormValues) =>
-    touchedFields[field] === true && formValues[field].trim().length === 0;
-  const markFieldTouched = (field: keyof AddConnectionFormValues) => {
-    setTouchedFields((currentFields) => ({ ...currentFields, [field]: true }));
-  };
-  const markRequiredFieldsTouched = () => {
-    setTouchedFields((currentFields) => ({
-      ...currentFields,
-      serverUrl: true,
-      appId: true,
-      adminSecret: true,
-    }));
-  };
+  const serverUrlRef = useRef<HTMLInputElement>(null);
+  const appIdRef = useRef<HTMLInputElement>(null);
+  const adminSecretRef = useRef<HTMLInputElement>(null);
+  const errorField = error?.field;
 
-  const handleSubmit: FormSubmitHandler = (event) => {
-    markRequiredFieldsTouched();
-    onSubmit(event);
-  };
+  useEffect(() => {
+    if (errorField === "serverUrl") {
+      serverUrlRef.current?.focus();
+    } else if (errorField === "appId") {
+      appIdRef.current?.focus();
+    } else if (errorField === "adminSecret") {
+      adminSecretRef.current?.focus();
+    }
+  }, [errorField]);
 
   return (
-    <Box
-      as="form"
-      minHeight={0}
-      width="full"
-      flexDirection="column"
-      gap="3xl"
-      onSubmit={handleSubmit}
-    >
+    <Box as="form" minHeight={0} width="full" flexDirection="column" gap="3xl" onSubmit={onSubmit}>
       <Box flexDirection="column" gap="xl">
         <TextField
           id="connection-name"
           label="Connection name"
+          name="name"
+          autoComplete="off"
           value={formValues.name}
           onValueChange={(value) => {
             onUpdateField("name", value);
           }}
-          placeholder="My Jazz app"
+          placeholder="My Jazz app…"
         />
         <TextField
           id="connection-server-url"
           label="Server URL"
-          description={
-            error?.field === "serverUrl"
-              ? error.description
-              : "Sync server that stores your app data."
-          }
+          name="serverUrl"
+          autoComplete="url"
+          description="Sync server that stores your app data."
+          error={error?.field === "serverUrl" ? error.description : undefined}
+          ref={serverUrlRef}
+          type="url"
+          inputMode="url"
+          spellCheck={false}
           value={formValues.serverUrl}
-          onBlur={() => {
-            markFieldTouched("serverUrl");
-          }}
-          onInvalid={() => {
-            markFieldTouched("serverUrl");
-          }}
           onValueChange={(value) => {
             onUpdateField("serverUrl", value);
           }}
           placeholder="https://v2.sync.jazz.tools/"
           required={true}
-          invalid={isFieldInvalid("serverUrl") === true || error?.field === "serverUrl"}
         />
         <TextField
           id="connection-app-id"
           label="App ID"
-          description={error?.field === "appId" ? error.description : undefined}
+          name="appId"
+          autoComplete="off"
+          error={error?.field === "appId" ? error.description : undefined}
+          ref={appIdRef}
+          spellCheck={false}
           value={formValues.appId}
-          onBlur={() => {
-            markFieldTouched("appId");
-          }}
-          onInvalid={() => {
-            markFieldTouched("appId");
-          }}
           onValueChange={(value) => {
             onUpdateField("appId", value);
           }}
           required={true}
-          invalid={isFieldInvalid("appId") === true || error?.field === "appId"}
         />
         <TextField
           id="connection-admin-secret"
           label="Admin secret"
-          description={error?.field === "adminSecret" ? error.description : undefined}
+          name="adminSecret"
+          autoComplete="off"
+          error={error?.field === "adminSecret" ? error.description : undefined}
+          ref={adminSecretRef}
           type="password"
+          spellCheck={false}
           value={formValues.adminSecret}
-          onBlur={() => {
-            markFieldTouched("adminSecret");
-          }}
-          onInvalid={() => {
-            markFieldTouched("adminSecret");
-          }}
           onValueChange={(value) => {
             onUpdateField("adminSecret", value);
           }}
           required={true}
-          invalid={isFieldInvalid("adminSecret") === true || error?.field === "adminSecret"}
         />
         <Box display="grid" gridTemplateColumns={{ base: "one", sm: "two" }} gap="m">
           <TextField
             id="connection-env"
             label="Env"
+            name="env"
+            autoComplete="off"
+            spellCheck={false}
             value={formValues.env}
             onValueChange={(value) => {
               onUpdateField("env", value);
@@ -140,6 +117,9 @@ export function AddConnectionForm({
           <TextField
             id="connection-branch"
             label="Branch"
+            name="branch"
+            autoComplete="off"
+            spellCheck={false}
             value={formValues.branch}
             onValueChange={(value) => {
               onUpdateField("branch", value);
@@ -156,10 +136,21 @@ export function AddConnectionForm({
         </Box>
       ) : null}
       <Box alignItems="center" justifyContent="end" gap="m">
-        <Button type="button" variant="ghost" size="s" onClick={onCancel} disabled={isSubmitting === true}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="s"
+          onClick={onCancel}
+          disabled={isSubmitting === true}
+        >
           Cancel
         </Button>
-        <Button type="submit" size="s" disabled={canSubmit === false} loading={isSubmitting === true}>
+        <Button
+          type="submit"
+          size="s"
+          disabled={isSubmitting === true}
+          loading={isSubmitting === true}
+        >
           Add connection
         </Button>
       </Box>

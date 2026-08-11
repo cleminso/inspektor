@@ -146,6 +146,29 @@ describe('FindBar', () => {
     expect(onValueChange).toHaveBeenCalledWith('profile')
   })
 
+  it('announces deferred search work and disables stale navigation', () => {
+    render(
+      <FindBar
+        label="Find in row JSON"
+        value="profile"
+        onValueChange={() => undefined}
+        state={{ status: 'searching' }}
+        searchOptions={searchOptions}
+        onSearchOptionsChange={() => undefined}
+        onPreviousMatch={() => undefined}
+        onNextMatch={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('status', { name: 'Searching' }).textContent).toBe('Searching…')
+    expect(
+      (screen.getByRole('button', { name: 'Previous match' }) as HTMLButtonElement).disabled,
+    ).toBe(true)
+    expect((screen.getByRole('button', { name: 'Next match' }) as HTMLButtonElement).disabled).toBe(
+      true,
+    )
+  })
+
   it('controls match case, whole word, and regular expression options', () => {
     const onSearchOptionsChange = vi.fn()
 

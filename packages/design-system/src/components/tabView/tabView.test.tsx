@@ -86,6 +86,7 @@ vi.mock('@dnd-kit/abstract/modifiers', () => ({
 }))
 
 vi.mock('@dnd-kit/dom', () => ({
+  Accessibility: class Accessibility {},
   AutoScroller: { configure: () => ({}) },
   Feedback: { configure: () => ({}) },
   PointerActivationConstraints: {
@@ -309,6 +310,146 @@ describe('TabView', () => {
     })
 
     expect(handleReorder).toHaveBeenCalledWith(['active', 'all', 'archived'])
+  })
+
+  it('reorders a tab from its right-click context menu', async () => {
+    const handleReorder = vi.fn()
+
+    render(
+      <TabView.Root defaultValue="active">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'active', 'archived']}
+          onReorder={handleReorder}
+        >
+          <TabView.Item value="all" reorderLabel="Reorder All accounts">
+            All accounts
+          </TabView.Item>
+          <TabView.Item value="active" reorderLabel="Reorder Active accounts">
+            Active accounts
+          </TabView.Item>
+          <TabView.Item value="archived" reorderLabel="Reorder Archived accounts">
+            Archived accounts
+          </TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('tab', { name: 'Active accounts' }).closest('[data-reorder-ready]'),
+      ).toBeTruthy()
+    })
+    const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
+    fireEvent.contextMenu(activeTab, { clientX: 40, clientY: 20 })
+
+    const moveLeft = await screen.findByRole('menuitem', { name: 'Move left' })
+    expect(screen.getByRole('menu', { name: 'Reorder Active accounts' })).toBeTruthy()
+    expect(
+      screen.getByRole('menuitem', { name: 'Move right' }).hasAttribute('aria-disabled'),
+    ).toBe(false)
+    fireEvent.click(moveLeft)
+
+    expect(handleReorder).toHaveBeenCalledWith(['active', 'all', 'archived'])
+  })
+
+  it('supports keyboard reordering before pointer drag behavior loads', () => {
+    const handleReorder = vi.fn()
+
+    render(
+      <TabView.Root defaultValue="active">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'active']}
+          onReorder={handleReorder}
+        >
+          <TabView.Item value="all" reorderLabel="Reorder All accounts">
+            All accounts
+          </TabView.Item>
+          <TabView.Item value="active" reorderLabel="Reorder Active accounts">
+            Active accounts
+          </TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Active accounts' }), {
+      key: 'ArrowLeft',
+      shiftKey: true,
+    })
+
+    expect(handleReorder).toHaveBeenCalledWith(['active', 'all'])
+  })
+
+  it('does not reorder a disabled tab through alternate actions', async () => {
+    const handleReorder = vi.fn()
+
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'archived']}
+          onReorder={handleReorder}
+        >
+          <TabView.Item value="all" reorderLabel="Reorder All accounts">
+            All accounts
+          </TabView.Item>
+          <TabView.Item
+            disabled
+            value="archived"
+            reorderLabel="Reorder Archived accounts"
+          >
+            Archived accounts
+          </TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    const archivedTab = screen.getByRole('tab', { name: 'Archived accounts' })
+    fireEvent.keyDown(archivedTab, { key: 'ArrowLeft', shiftKey: true })
+    await waitFor(() => {
+      expect(
+        screen.getByRole('tab', { name: 'All accounts' }).closest('[data-reorder-ready]'),
+      ).toBeTruthy()
+    })
+    fireEvent.contextMenu(archivedTab)
+
+    expect(handleReorder).not.toHaveBeenCalled()
+    expect(screen.queryByRole('menu', { name: 'Reorder Archived accounts' })).toBeNull()
+  })
+
+  it('disables reorder actions at the list boundaries', async () => {
+    render(
+      <TabView.Root defaultValue="all">
+        <TabView.List
+          aria-label="Table views"
+          values={['all', 'active']}
+          onReorder={() => undefined}
+        >
+          <TabView.Item value="all" reorderLabel="Reorder All accounts">
+            All accounts
+          </TabView.Item>
+          <TabView.Item value="active" reorderLabel="Reorder Active accounts">
+            Active accounts
+          </TabView.Item>
+        </TabView.List>
+      </TabView.Root>,
+    )
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('tab', { name: 'All accounts' }).closest('[data-reorder-ready]'),
+      ).toBeTruthy()
+    })
+    const firstTab = screen.getByRole('tab', { name: 'All accounts' })
+    fireEvent.contextMenu(firstTab, { clientX: 40, clientY: 20 })
+
+    expect(
+      (await screen.findByRole('menuitem', { name: 'Move left' })).getAttribute('aria-disabled'),
+    ).toBe('true')
+    expect(
+      screen.getByRole('menuitem', { name: 'Move right' }).hasAttribute('aria-disabled'),
+    ).toBe(false)
   })
 
   it('switches the active view and its associated panel', () => {

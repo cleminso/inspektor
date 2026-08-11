@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Defer complete-tree search while exposing stale-search status through the external Find Bar without changing occurrence results.
+
 [29/07/26]
 
 - [x] Register the exported `JsonView` with package-authoritative prop extraction.

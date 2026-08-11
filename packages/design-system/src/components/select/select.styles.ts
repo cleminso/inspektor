@@ -35,10 +35,6 @@ export const selectStyles = stylex.create({
   labelFilled: {},
   labelFocused: {},
   trigger: {
-    borderColor: {
-      default: borderColors.default,
-      ":focus-visible": borderColors.focused,
-    },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
@@ -57,10 +53,6 @@ export const selectStyles = stylex.create({
     fontSize: fontSizes[1],
     justifyContent: "flex-start",
     lineHeight: lineHeights.ui,
-    outlineColor: focusColors.ring,
-    outlineOffset: -1,
-    outlineStyle: "solid",
-    outlineWidth: 0,
     userSelect: "none",
     whiteSpace: "nowrap",
   },
@@ -93,7 +85,10 @@ export const selectStyles = stylex.create({
     outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
     outlineStyle: "solid",
-    outlineWidth: spatial["focus-ring-width"],
+    outlineWidth: {
+      default: 0,
+      ":focus-visible": spatial["focus-ring-width"],
+    },
   },
   disabled: {
     borderColor: borderColors.default,

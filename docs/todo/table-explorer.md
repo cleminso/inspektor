@@ -19,6 +19,21 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Render table-list accordion sections as level-two headings beneath the Tables page heading.
+
+[11/08/26]
+
+- [x] Share one table-list context menu per section while retaining visible per-row action menus.
+- [x] Defer offscreen rendering above 50 schema-table rows while preserving complete navigation and selection semantics.
+
+[11/08/26]
+
+- [x] Keep row-editor text updates urgent while deferring semantic dirty-state parsing and preserving immediate navigation protection.
+- [x] Announce row refresh, refresh completion, filtered emptiness, and query failures without replacing settled rows.
+- [x] Mark branch and schema identifiers as non-translatable technical content.
+
 [10/08/26]
 
 - [x] Keep a broader fulfilled Jazz row query active while route pagination projects a fully covered smaller page from its rows.
@@ -731,6 +746,10 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[11/08/26]
+
+- Treat row-action popups as inside the selection boundary and commit selection-changing commands after popup closure.
 
 [10/08/26]
 

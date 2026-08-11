@@ -1,0 +1,31 @@
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import { ConnectionsLayout } from './connectionsLayout'
+
+vi.mock('@shared/connections/connectionSwitcher', () => ({
+  ConnectionSwitcher: () => <button type="button">Open connection</button>,
+}))
+
+afterEach(cleanup)
+
+describe('ConnectionsLayout', () => {
+  it('provides a skip link and a focusable titled main landmark', () => {
+    render(
+      <ConnectionsLayout pageTitle="Connections">
+        <div>Content</div>
+      </ConnectionsLayout>,
+    )
+
+    const skipLink = screen.getByRole('link', { name: 'Skip to content' })
+    const main = screen.getByRole('main')
+
+    expect(skipLink.getAttribute('href')).toBe('#main-content')
+    expect(main.getAttribute('id')).toBe('main-content')
+    expect(main.getAttribute('tabindex')).toBe('-1')
+    expect(screen.getByRole('heading', { level: 1, name: 'Connections' })).toBeTruthy()
+    expect(skipLink.compareDocumentPosition(screen.getByRole('banner'))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+  })
+})

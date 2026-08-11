@@ -16,6 +16,10 @@ This checklist tracks the reusable relation preview and detail component.
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Mark stored relation identifiers as non-translatable technical content.
+
 [05/08/26]
 
 - [x] Middle-truncate compact stored identifiers while reserving a fixed slot for the navigation arrow.

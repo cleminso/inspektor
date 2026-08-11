@@ -22,6 +22,7 @@ describe("StructuredValuePreview", () => {
     screen.getByText('"Ada", 3, true, …');
 
     expect(marker.parentElement?.getAttribute("aria-label")).toBe('[6] "Ada", 3, true, …');
+    expect(marker.closest('[translate="no"]')).toBeTruthy();
   });
 
   it("renders normalized object entries without reading source objects", () => {

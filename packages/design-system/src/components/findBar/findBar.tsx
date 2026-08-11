@@ -9,6 +9,7 @@ import { findBarStyles } from './findBar.styles'
 
 export type FindBarState =
   | { status: 'idle' }
+  | { status: 'searching' }
   | { status: 'empty' }
   | { status: 'matched'; activeIndex: number; count: number }
 
@@ -106,13 +107,17 @@ export function FindBar({
       ? `${state.activeIndex + 1} of ${state.count}`
       : state.status === 'empty'
         ? 'No matches'
-        : ''
+        : state.status === 'searching'
+          ? 'Searching…'
+          : ''
   const statusLabel =
     state.status === 'matched'
       ? `Match ${state.activeIndex + 1} of ${state.count}`
       : state.status === 'empty'
         ? 'No matches'
-        : undefined
+        : state.status === 'searching'
+          ? 'Searching'
+          : undefined
 
   return (
     <Box
@@ -140,7 +145,7 @@ export function FindBar({
             aria-label={label}
             role="searchbox"
             type="text"
-            placeholder="Find"
+            placeholder="Find…"
             value={value}
             onValueChange={(nextValue) => {
               onValueChange(nextValue)

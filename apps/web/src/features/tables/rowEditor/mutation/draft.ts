@@ -356,7 +356,7 @@ export function setMutationFieldText(
       [column.name]: { mode: "value" as const, text },
     },
   };
-  return removeCleanUpdateInput(nextDraft, column, nextDraft.fieldInputs[column.name]);
+  return nextDraft;
 }
 
 export function setMutationFieldMode(
@@ -436,7 +436,20 @@ export function isRowMutationDraftDirty(
   columns: readonly ColumnDescriptor[],
 ): boolean {
   if (draft.kind === "update") {
-    return Object.keys(draft.fieldInputs).length > 0;
+    const columnsByName = new Map(columns.map((column) => [column.name, column]));
+    return Object.entries(draft.fieldInputs).some(([columnName, input]) => {
+      const column = columnsByName.get(columnName);
+      if (column === undefined) {
+        return false;
+      }
+      const resolved = resolveMutationField(draft, column, input);
+      const sourceValue = draft.sourceValues[columnName];
+      return !(
+        (resolved.kind === "null" && (sourceValue === null || sourceValue === undefined)) ||
+        (resolved.kind === "valid" &&
+          areMutationValuesEqual(column.column_type, resolved.value, sourceValue) === true)
+      );
+    });
   }
 
   return columns.some((column) => {
@@ -476,9 +489,24 @@ export function buildRowMutationSubmission(
     if (resolved.kind === "invalid") {
       errors[column.name] = resolved.error;
     } else if (resolved.kind === "null") {
-      values[column.name] = null;
+      if (
+        draft.kind !== "update" ||
+        (draft.sourceValues[column.name] !== null &&
+          draft.sourceValues[column.name] !== undefined)
+      ) {
+        values[column.name] = null;
+      }
     } else if (resolved.kind === "valid") {
-      values[column.name] = prepareMutationValueForJazz(column.column_type, resolved.value);
+      if (
+        draft.kind !== "update" ||
+        areMutationValuesEqual(
+          column.column_type,
+          resolved.value,
+          draft.sourceValues[column.name],
+        ) === false
+      ) {
+        values[column.name] = prepareMutationValueForJazz(column.column_type, resolved.value);
+      }
     }
   }
 

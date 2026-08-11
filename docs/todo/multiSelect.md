@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Do not emit virtual set-position metadata for fully mounted checkbox options.
+- [x] Defer offscreen rendering above 50 options while retaining the complete mounted collection, keyboard order, and stable item identity.
+
 [05/08/26]
 
 - [x] Size the option viewport to its collection until the configured maximum height is reached.

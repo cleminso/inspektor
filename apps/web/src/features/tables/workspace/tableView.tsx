@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useEffectEvent } from 'react'
+import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import {
   Box,
@@ -44,6 +44,38 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
   })
   const scrollResetKey = getTableViewportScrollResetKey(state)
   const handleEscape = useEffectEvent(state.handleEscape)
+  const refreshPendingRef = useRef(false)
+  const [refreshAnnouncement, setRefreshAnnouncement] = useState('')
+  const filteredEmpty =
+    state.error === null &&
+    state.isInitialLoading === false &&
+    state.isRefreshing === false &&
+    state.loadedRowCount === 0 &&
+    state.filters.length > 0
+  const queryStatus =
+    state.error !== null
+      ? ''
+      : state.isRefreshing === true
+        ? 'Refreshing rows'
+        : [refreshAnnouncement, filteredEmpty ? 'No rows match these filters' : '']
+            .filter(Boolean)
+            .join('. ')
+
+  useEffect(() => {
+    if (state.isInitialLoading === true || state.error !== null) {
+      refreshPendingRef.current = false
+      setRefreshAnnouncement('')
+      return
+    }
+    if (state.isRefreshing === true) {
+      refreshPendingRef.current = true
+      return
+    }
+    if (refreshPendingRef.current === true) {
+      refreshPendingRef.current = false
+      setRefreshAnnouncement('Rows refreshed')
+    }
+  }, [state.error, state.isInitialLoading, state.isRefreshing])
 
   useEffect(() => {
     if (state.canOpenRowEditor === true) {
@@ -153,14 +185,38 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               onColumnActivate={state.handleColumnActivate}
             >
               <DataGrid.Viewport scrollResetKey={scrollResetKey}>
-                <DataGrid.Table aria-label={`${tableName} rows`}>
+                <DataGrid.Table
+                  aria-busy={state.isInitialLoading || state.isRefreshing}
+                  aria-label={`${tableName} rows`}
+                  statusContent={queryStatus}
+                >
                   <DataGrid.Content
                     loading={state.isInitialLoading}
                     loadingContent="Loading rows"
                     rowRendering="virtual"
                     emptyContent={
-                      state.error ??
-                      (state.filters.length > 0 ? 'No rows match these filters' : null)
+                      state.error === null ? (
+                        filteredEmpty ? (
+                          'No rows match these filters'
+                        ) : null
+                      ) : (
+                        <Box
+                          flexDirection="column"
+                          gap="xs"
+                          role="alert"
+                        >
+                          <Text
+                            color="error"
+                            variant="label"
+                          >
+                            Couldn't load rows
+                          </Text>
+                          <Text color="muted">{state.error}</Text>
+                          <Text color="muted">
+                            Check the connection, then reload the page to try again.
+                          </Text>
+                        </Box>
+                      )
                     }
                   />
                 </DataGrid.Table>

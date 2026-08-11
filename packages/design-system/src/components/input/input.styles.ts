@@ -19,10 +19,6 @@ import {
 export const inputStyles = stylex.create({
   base: {
     margin: 0,
-    borderColor: {
-      default: borderColors.default,
-      ":focus": borderColors.focused,
-    },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
@@ -34,13 +30,6 @@ export const inputStyles = stylex.create({
     color: textColors.default,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    outlineColor: focusColors.ringSubtle,
-    outlineOffset: 0,
-    outlineStyle: "solid",
-    outlineWidth: {
-      default: 0,
-      ":focus": spatial["focus-ring-width"],
-    },
     minWidth: 0,
     "::placeholder": {
       color: textColors.muted,
@@ -67,8 +56,8 @@ export const inputStyles = stylex.create({
   subtle: {
     borderColor: {
       default: "transparent",
+      ":focus-visible": borderColors.focused,
       ":hover": borderColors.default,
-      ":focus": borderColors.focused,
     },
     backgroundColor: surfaceColors.subtle,
   },
@@ -108,13 +97,12 @@ export const inputStyles = stylex.create({
     borderColor: {
       default: borderColors.danger,
       ":focus-visible": borderColors.danger,
-      ":focus": borderColors.danger,
     },
     outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: {
-      default: spatial["focus-ring-width"],
+      default: 0,
       ":focus-visible": spatial["focus-ring-width"],
     },
   },

@@ -385,7 +385,7 @@ export function MutationField({
               }
             }}
           >
-            <Select.Trigger id={fieldId} placeholder="Select value" width="full" />
+            <Select.Trigger id={fieldId} placeholder="Select value…" width="full" />
             <Select.Content>
               {column.column_type.variants.map((variant) => (
                 <Select.Item key={variant} value={variant}>

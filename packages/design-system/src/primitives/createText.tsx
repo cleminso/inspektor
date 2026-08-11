@@ -64,8 +64,8 @@ const VARIANT_DEFAULT_WRAP: Partial<Record<TextVariant, TextWrap>> = {
   heading: 'balance',
 }
 
-const numberFormatter = new Intl.NumberFormat('en-US')
-const compactFormatter = new Intl.NumberFormat('en-US', {
+const numberFormatter = new Intl.NumberFormat(undefined)
+const compactFormatter = new Intl.NumberFormat(undefined, {
   notation: 'compact',
 })
 
@@ -150,7 +150,7 @@ function TextInner<E extends TextTag = 'p'>(
       ? applyFormatter(formatter, children)
       : children
 
-  const loadingPlaceholder = placeholderText ?? formattedContent ?? 'Loading...'
+  const loadingPlaceholder = placeholderText ?? formattedContent ?? 'Loading…'
   const loadingAccessibleLabel =
     loadingLabel ??
     placeholderText ??

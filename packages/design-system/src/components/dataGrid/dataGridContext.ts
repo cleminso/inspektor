@@ -14,6 +14,7 @@ import type { DataGridTable } from "./dataGridFeatures";
 export interface DataGridContextValue<TData extends RowData> {
   activeColumnId: string | null;
   activeRowId: string | null;
+  bodyCellEntryId: string | null;
   density: DataGridDensity;
   onCellActivate?: (target: DataGridCellTarget) => void;
   onCellContextMenu?: DataGridCellContextMenuHandler;
@@ -24,6 +25,8 @@ export interface DataGridContextValue<TData extends RowData> {
   columnReorderEnabled: boolean;
   getColumnReorderIndex: (columnId: string) => number;
   moveColumn: (columnId: string, offset: -1 | 1) => void;
+  focusFocusedCell: () => void;
+  registerCellElement: (cellId: string, element: HTMLTableCellElement | null) => void;
   table: DataGridTable<TData>;
   setViewportElement: (element: HTMLDivElement | null) => void;
   viewportElement: HTMLDivElement | null;

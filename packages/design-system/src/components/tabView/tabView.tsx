@@ -1,8 +1,3 @@
-// TODO:
-// - add `click-right` -> context menu to perform actions with tabView
-// - handle behavior: select tab + press shit + click another tab = select all tabs range
-//  - right click = open context menu
-//  - direct press `delete` = close all tabView from the selected range
 import { Tabs as BaseTabs } from '@base-ui/react/tabs'
 import * as stylex from '@stylexjs/stylex'
 import {
@@ -21,10 +16,15 @@ import {
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { Button } from '../button/button'
+import { ContextMenu } from '../contextMenu/contextMenu'
 import { CloseGlyph } from '../icon/iconArtwork'
 import { Tooltip } from '../tooltip/tooltip'
 import { tabViewStyles } from './tabView.styles'
-import { TabViewReorderContext, type TabViewValue } from './tabViewReorderContext'
+import {
+  getReorderedTabViewValues,
+  TabViewReorderContext,
+  type TabViewValue,
+} from './tabViewReorderContext'
 
 export type { TabViewValue } from './tabViewReorderContext'
 
@@ -33,6 +33,13 @@ interface TabViewContextValue {
 }
 
 const TabViewContext = createContext<TabViewContextValue>({ value: null })
+
+interface TabViewReorderActionsContextValue {
+  values: readonly TabViewValue[]
+  onReorder: (values: TabViewValue[]) => void
+}
+
+const TabViewReorderActionsContext = createContext<TabViewReorderActionsContextValue | null>(null)
 
 /**
  * Why: importing DND from this static module pulled the shared sortable chunk into the initial
@@ -128,6 +135,8 @@ export interface TabViewItemProps {
   onPointerLeave?: BaseTabs.Tab.Props['onPointerLeave']
   /** Provides the accessible name for the close action. */
   closeLabel?: string
+  /** Enables the reorder context menu and provides its accessible name. */
+  reorderLabel?: string
 }
 
 export interface TabViewPanelProps {
@@ -269,18 +278,27 @@ function TabViewList({
   )
   const tooltipList = <Tooltip.Provider>{list}</Tooltip.Provider>
 
-  if (reorderEnabled === false) {
-    return tooltipList
+  const listContent =
+    reorderEnabled === true ? (
+      <ReorderComponent
+        listRef={listRef}
+        values={values}
+        onReorder={onReorder}
+      >
+        {tooltipList}
+      </ReorderComponent>
+    ) : (
+      tooltipList
+    )
+
+  if (reorderConfigured === false) {
+    return listContent
   }
 
   return (
-    <ReorderComponent
-      listRef={listRef}
-      values={values}
-      onReorder={onReorder}
-    >
-      {tooltipList}
-    </ReorderComponent>
+    <TabViewReorderActionsContext.Provider value={{ values, onReorder }}>
+      {listContent}
+    </TabViewReorderActionsContext.Provider>
   )
 }
 
@@ -301,6 +319,7 @@ function TabViewItem({ closeLabel = 'Close tab', ...props }: TabViewItemProps) {
             {...props}
             closeLabel={closeLabel}
             isDragSource={sortable.isDragSource}
+            reorderReady
             setReorderRef={sortable.setReorderRef}
           />
         )}
@@ -318,6 +337,7 @@ function TabViewItem({ closeLabel = 'Close tab', ...props }: TabViewItemProps) {
 
 interface TabViewItemContentProps extends TabViewItemProps {
   isDragSource?: boolean
+  reorderReady?: boolean
   setReorderRef?: (element: HTMLDivElement | null) => void
 }
 
@@ -333,15 +353,20 @@ function TabViewItemContent({
   onPointerDown,
   onPointerEnter,
   onPointerLeave,
+  reorderLabel,
   closeLabel = 'Close tab',
   isDragSource = false,
+  reorderReady = false,
   setReorderRef,
 }: TabViewItemContentProps) {
   const context = useContext(TabViewContext)
+  const reorderActions = useContext(TabViewReorderActionsContext)
   const active = context.value === value
   const itemRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLSpanElement>(null)
   const [titleOverflowing, setTitleOverflowing] = useState(false)
+  const reorderIndex = reorderActions?.values.indexOf(value) ?? -1
+  const showReorderActions = reorderLabel !== undefined && reorderIndex >= 0 && disabled === false
   const tabStyles = createStateStyleProps<BaseTabs.Tab.State>((state) => [
     tabViewStyles.tab,
     onClose !== undefined && tabViewStyles.tabClosable,
@@ -369,11 +394,38 @@ function TabViewItemContent({
   }
 
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (
+      showReorderActions === true &&
+      event.shiftKey === true &&
+      event.altKey === false &&
+      event.ctrlKey === false &&
+      event.metaKey === false &&
+      (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+    ) {
+      event.preventDefault()
+      moveTab(reorderIndex + (event.key === 'ArrowLeft' ? -1 : 1))
+      return
+    }
+
     if (event.key !== 'Delete' || onClose === undefined || disabled === true) {
       return
     }
     event.preventDefault()
     handleClose()
+  }
+
+  const moveTab = (destinationIndex: number) => {
+    if (reorderActions === null) {
+      return
+    }
+    const reorderedValues = getReorderedTabViewValues(
+      reorderActions.values,
+      value,
+      destinationIndex,
+    )
+    if (reorderedValues !== null) {
+      reorderActions.onReorder(reorderedValues)
+    }
   }
 
   const setItemRef = useCallback(
@@ -405,7 +457,7 @@ function TabViewItemContent({
     return () => resizeObserver.disconnect()
   }, [children])
 
-  return (
+  const item = (
     <div
       ref={setItemRef}
       {...stylex.props(
@@ -418,6 +470,7 @@ function TabViewItemContent({
       data-disabled={disabled === true ? '' : undefined}
       data-dragging={isDragSource === true ? '' : undefined}
       data-reorder-key={getTabViewValueKey(value)}
+      data-reorder-ready={reorderReady === true && showReorderActions === true ? '' : undefined}
       data-slot="tab-view-item"
       data-title-overflow={titleOverflowing}
     >
@@ -496,6 +549,34 @@ function TabViewItemContent({
         </div>
       ) : null}
     </div>
+  )
+
+  if (showReorderActions === false) {
+    return item
+  }
+
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger render={item} />
+      <ContextMenu.Content aria-label={reorderLabel}>
+        <ContextMenu.Item
+          disabled={reorderIndex <= 0}
+          onClick={() => {
+            moveTab(reorderIndex - 1)
+          }}
+        >
+          Move left
+        </ContextMenu.Item>
+        <ContextMenu.Item
+          disabled={reorderIndex >= (reorderActions?.values.length ?? 0) - 1}
+          onClick={() => {
+            moveTab(reorderIndex + 1)
+          }}
+        >
+          Move right
+        </ContextMenu.Item>
+      </ContextMenu.Content>
+    </ContextMenu.Root>
   )
 }
 

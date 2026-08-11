@@ -40,7 +40,7 @@ export interface ContextMenuRootProps extends WithoutStyles<BaseContextMenu.Root
 }
 
 export interface ContextMenuTriggerProps extends WithoutStyles<BaseContextMenu.Trigger.Props> {
-  /** Composes context-menu behavior onto another element. */
+  /** Composes context-menu behavior onto another element. Context menus must supplement visible actions. */
   render?: BaseContextMenu.Trigger.Props["render"];
 }
 export type ContextMenuPortalProps = WithoutStyles<BaseContextMenu.Portal.Props>;

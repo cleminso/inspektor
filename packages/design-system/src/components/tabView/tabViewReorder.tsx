@@ -1,13 +1,19 @@
 import { RestrictToHorizontalAxis } from '@dnd-kit/abstract/modifiers'
-import { AutoScroller, Feedback, PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
+import {
+  Accessibility,
+  AutoScroller,
+  Feedback,
+  PointerActivationConstraints,
+  PointerSensor,
+} from '@dnd-kit/dom'
 import { RestrictToElement } from '@dnd-kit/dom/modifiers'
-import { arrayMove } from '@dnd-kit/helpers'
 import { DragDropProvider } from '@dnd-kit/react'
 import { isSortable, useSortable } from '@dnd-kit/react/sortable'
 import { useMemo, type ReactNode, type RefObject } from 'react'
 
 import {
   TabViewReorderContext,
+  getReorderedTabViewValues,
   type TabViewSortableItemProps,
   type TabViewValue,
 } from './tabViewReorderContext'
@@ -29,28 +35,14 @@ const tabViewPointerSensor = PointerSensor.configure({
       return false
     }
     return (
-      event.target.closest('[data-slot="tab-view-close"]') !== null ||
+      event.target.closest('[data-slot="tab-view-actions"], [data-slot="tab-view-close"]') !==
+        null ||
       event.target.closest('[contenteditable="true"]') !== null
     )
   },
 })
 
 const tabViewSensors = [tabViewPointerSensor]
-
-function getReorderedValues(
-  values: readonly TabViewValue[],
-  sourceValue: TabViewValue,
-  destinationIndex: number,
-): TabViewValue[] | null {
-  const sourceIndex = values.indexOf(sourceValue)
-  if (sourceIndex < 0 || destinationIndex < 0 || destinationIndex >= values.length) {
-    return null
-  }
-  if (sourceIndex === destinationIndex) {
-    return null
-  }
-  return arrayMove([...values], sourceIndex, destinationIndex)
-}
 
 // Keep sortable ownership declarative: the hook's ref belongs to the TabView.Item for this value.
 // Do not replace this with DOM discovery or an external `element`; that caused cross-tab movement.
@@ -96,7 +88,7 @@ export function TabViewReorder({ children, listRef, values, onReorder }: TabView
         sensors={tabViewSensors}
         modifiers={modifiers}
         plugins={(defaults) => [
-          ...defaults,
+          ...defaults.filter((plugin) => plugin !== Accessibility),
           AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
           Feedback.configure({ dropAnimation: null }),
         ]}
@@ -114,7 +106,7 @@ export function TabViewReorder({ children, listRef, values, onReorder }: TabView
           if (isSortable(source) === false) {
             return
           }
-          const reorderedValues = getReorderedValues(values, source.id, source.index)
+          const reorderedValues = getReorderedTabViewValues(values, source.id, source.index)
           if (reorderedValues !== null) {
             onReorder(reorderedValues)
           }

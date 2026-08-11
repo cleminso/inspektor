@@ -31,6 +31,11 @@ export const actionListStyles = stylex.create({
     width: '100%',
   },
   item: {
+    [actionListVars.actionVisible]: {
+      default: '0',
+      ':focus-within': '1',
+      ':hover': '1',
+    },
     [actionListVars.selectionHoverVisible]: {
       default: '0',
       ':hover': '1',
@@ -53,6 +58,10 @@ export const actionListStyles = stylex.create({
     minWidth: 0,
     paddingRight: spacing.s,
     width: '100%',
+  },
+  itemDeferred: {
+    containIntrinsicBlockSize: `auto ${spatial['collection-row-height-l']}`,
+    contentVisibility: 'auto',
   },
   itemActive: {
     backgroundColor: {
@@ -178,6 +187,10 @@ export const actionListStyles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
+    opacity: {
+      default: actionListVars.actionVisible,
+      ':is([data-popup-open])': '1',
+    },
     outlineColor: focusColors.ring,
     outlineOffset: -2,
     outlineStyle: {
@@ -185,6 +198,12 @@ export const actionListStyles = stylex.create({
       ':focus-visible': 'solid',
     },
     outlineWidth: spatial['focus-ring-width'],
+    transitionDuration: {
+      default: '100ms',
+      [reducedMotion]: '0ms',
+    },
+    transitionProperty: 'opacity',
+    transitionTimingFunction: 'ease-out',
     height: spatial['control-height-xs'],
     width: spatial['control-height-xs'],
   },

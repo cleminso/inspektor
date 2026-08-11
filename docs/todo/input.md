@@ -16,6 +16,10 @@ This checklist tracks the reusable Input component.
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Share one token-backed focus-visible outline across Input, Textarea, Select, and Input Group, switching to danger only for focus-visible invalid state.
+
 [06/08/26]
 
 - [x] Show a solid blue border and subtle blue outer ring while standalone and grouped inputs are focused.
@@ -40,6 +44,10 @@ No open product work is recorded.
 - [x] Keep application-specific decisions about which values use monospace in consuming features.
 
 ## Settled interaction decisions
+
+[11/08/26]
+
+- [x] Supersede pointer-focused outlines with focus-visible outlines so pointer interaction does not retain keyboard-focus presentation.
 
 [06/08/26]
 

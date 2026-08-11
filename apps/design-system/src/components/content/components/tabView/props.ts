@@ -21,6 +21,7 @@ export const tabViewItemPropNames = [
   'onPointerEnter',
   'onPointerLeave',
   'closeLabel',
+  'reorderLabel',
 ] as const
 
 export const tabViewPanelPropNames = ['value', 'keepMounted'] as const

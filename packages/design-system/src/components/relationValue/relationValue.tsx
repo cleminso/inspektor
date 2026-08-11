@@ -44,7 +44,7 @@ export function RelationDetails(props: RelationDetailsProps) {
           <dt {...stylex.props(relationValueStyles.label)}>Stored ID</dt>
           <dd {...stylex.props(relationValueStyles.groupValue)}>
             <InputGroup fullWidth>
-              <Input aria-label="Stored relation ID" readOnly value={props.id} />
+              <Input aria-label="Stored relation ID" readOnly translate="no" value={props.id} />
               <InputGroup.Suffix>
                 <span {...stylex.props(relationValueStyles.groupActions)}>
                   {props.navigation === undefined ? null : (
@@ -80,6 +80,7 @@ export function RelationValue(props: RelationValueProps) {
     <span data-slot="relation-value" {...stylex.props(relationValueStyles.compact)}>
       <span
         data-typography="mono"
+        translate="no"
         {...stylex.props(relationValueStyles.compactValue, relationValueStyles.compactId)}
       >
         {props.navigation === undefined ? (

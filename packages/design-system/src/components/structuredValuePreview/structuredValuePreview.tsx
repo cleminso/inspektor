@@ -95,7 +95,7 @@ export function StructuredValuePreview({ model, variant = "json" }: StructuredVa
   const accessibilityLabel = [preview.marker, preview.content].filter(Boolean).join(" ");
 
   return (
-    <span {...stylex.props(structuredValuePreviewStyles.root)}>
+    <span translate="no" {...stylex.props(structuredValuePreviewStyles.root)}>
       {variant === "typedJson" ? (
         <span
           aria-label="Typed JSON value"

@@ -1,15 +1,20 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren } from 'react'
 
-import { Box } from "@inspector/ds";
+import { Box, ButtonLink, Text } from '@inspector/ds'
 
-import { InspectorHeader } from "./header/view";
-import { InspectorDock, type InspectorLeftDockControl } from "./dock/view";
+import { InspectorHeader } from './header/view'
+import { InspectorDock, type InspectorLeftDockControl } from './dock/view'
 
 interface InspectorLayoutProps extends PropsWithChildren {
-  leftDock?: InspectorLeftDockControl;
+  leftDock?: InspectorLeftDockControl
+  pageTitle: string
 }
 
-export function InspectorLayout({ children, leftDock }: InspectorLayoutProps): React.ReactElement {
+export function InspectorLayout({
+  children,
+  leftDock,
+  pageTitle,
+}: InspectorLayoutProps): React.ReactElement {
   return (
     <Box
       minHeight={0}
@@ -25,17 +30,41 @@ export function InspectorLayout({ children, leftDock }: InspectorLayoutProps): R
       data-layout="viewport"
       data-page-scroll="locked"
     >
+      <Box
+        position="fixed"
+        top="xs"
+        left="xs"
+        zIndex="navigation"
+        opacity={{ base: 0, focusWithin: 1 }}
+        pointerEvents={{ base: 'none', focusWithin: 'auto' }}
+      >
+        <ButtonLink
+          href="#main-content"
+          size="s"
+        >
+          Skip to content
+        </ButtonLink>
+      </Box>
       <InspectorHeader />
       <Box
         as="main"
+        id="main-content"
+        tabIndex={-1}
         minHeight={0}
         minWidth={0}
         flex={1}
         overflow="hidden"
       >
+        <Box
+          position="absolute"
+          opacity={0}
+          pointerEvents="none"
+        >
+          <Text as="h1">{pageTitle}</Text>
+        </Box>
         {children}
       </Box>
       <InspectorDock leftDock={leftDock} />
     </Box>
-  );
+  )
 }

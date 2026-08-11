@@ -1,12 +1,16 @@
-import { Box } from "@inspector/ds";
+import { Box, ButtonLink, Text } from '@inspector/ds'
 
-import { ConnectionSwitcher } from "@shared/connections/connectionSwitcher";
+import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 
 interface ConnectionsLayoutProps {
-  children: React.ReactNode;
+  children: React.ReactNode
+  pageTitle: string
 }
 
-export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.ReactElement {
+export function ConnectionsLayout({
+  children,
+  pageTitle,
+}: ConnectionsLayoutProps): React.ReactElement {
   return (
     <Box
       height="screen-height-small"
@@ -16,6 +20,21 @@ export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.R
       overflow="hidden"
       backgroundColor="surface-background"
     >
+      <Box
+        position="fixed"
+        top="xs"
+        left="xs"
+        zIndex="navigation"
+        opacity={{ base: 0, focusWithin: 1 }}
+        pointerEvents={{ base: 'none', focusWithin: 'auto' }}
+      >
+        <ButtonLink
+          href="#main-content"
+          size="s"
+        >
+          Skip to content
+        </ButtonLink>
+      </Box>
       <Box
         as="header"
         width="full"
@@ -32,6 +51,8 @@ export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.R
       </Box>
       <Box
         as="main"
+        id="main-content"
+        tabIndex={-1}
         minHeight={0}
         flex={1}
         alignItems="start"
@@ -42,8 +63,15 @@ export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.R
         paddingBottom="5xl"
         paddingLeft="2xl"
       >
+        <Box
+          position="absolute"
+          opacity={0}
+          pointerEvents="none"
+        >
+          <Text as="h1">{pageTitle}</Text>
+        </Box>
         {children}
       </Box>
     </Box>
-  );
+  )
 }

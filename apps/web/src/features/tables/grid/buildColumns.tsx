@@ -216,7 +216,7 @@ function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.
     <Tooltip.Root>
       <Tooltip.Trigger
         render={
-          <Text as="span" aria-label={marker.label} color="muted" variant="caption">
+          <Text as="span" color="muted" variant="caption">
             <Box as="span" alignItems="center" display="flex">
               {marker.icon === "key" ? <Icon artwork={KeyRound} size="xs" /> : null}
               {marker.icon === "relation" ? (

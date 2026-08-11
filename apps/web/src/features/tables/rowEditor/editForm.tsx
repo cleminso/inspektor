@@ -95,6 +95,7 @@ function RowJsonRepresentation({
   const [searchResults, setSearchResults] = useState<JsonViewSearchResults>({
     activeIndex: null,
     count: 0,
+    pending: false,
   });
   const value = useMemo(
     () => createRowJsonViewValue(rowValues, schemaColumns),
@@ -103,6 +104,8 @@ function RowJsonRepresentation({
   const findState: FindBarState =
     searchQuery.length === 0
       ? { status: "idle" }
+      : searchResults.pending === true
+        ? { status: "searching" }
       : searchResults.activeIndex === null
         ? { status: "empty" }
         : {
@@ -119,14 +122,14 @@ function RowJsonRepresentation({
           onValueChange={(nextValue) => {
             setSearchQuery(nextValue);
             setActiveMatchIndex(0);
-            setSearchResults({ activeIndex: null, count: 0 });
+            setSearchResults({ activeIndex: null, count: 0, pending: true });
           }}
           state={findState}
           searchOptions={searchOptions}
           onSearchOptionsChange={(nextOptions) => {
             setSearchOptions(nextOptions);
             setActiveMatchIndex(0);
-            setSearchResults({ activeIndex: null, count: 0 });
+            setSearchResults({ activeIndex: null, count: 0, pending: true });
           }}
           onPreviousMatch={() => {
             setActiveMatchIndex((searchResults.activeIndex ?? 0) - 1);
@@ -272,7 +275,7 @@ function LoadedEditRowForm({
                 }}
               >
                 {isDeleting === true
-                  ? "Deleting..."
+                  ? "Deleting…"
                   : isDeleteConfirming === true
                     ? "Confirm delete"
                     : "Delete"}

@@ -4,7 +4,6 @@ import {
   borderColors,
   elementColors,
   focusColors,
-  spatial,
   textColors,
 } from "../../tokens/semantics.stylex";
 import {
@@ -58,7 +57,6 @@ export const fieldStyles = stylex.create({
     [inputGroupVars.borderColor]: borderColors.danger,
     [inputGroupVars.focusedBorderColor]: borderColors.danger,
     [inputGroupVars.outlineColor]: focusColors.ringDanger,
-    [inputGroupVars.outlineWidth]: spatial["focus-ring-width"],
   },
   inputGroupDisabled: {
     [inputGroupVars.backgroundColor]: elementColors.disabled,

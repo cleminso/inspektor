@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Provide Shift-plus-Arrow and context-menu reordering independently of deferred pointer dragging, keep the semantic tab as the sole sequential tab stop, and exclude disabled tabs.
+
 [07/08/26]
 
 - [x] Keep title overflow observation stable when callers recreate an equivalent prefix element.
@@ -79,6 +83,10 @@
 
 ## Work outside the foundation scope
 
+[11/08/26]
+
+- The earlier exclusions for selection color and drag interaction changes are superseded by the implemented foundation and settled decisions.
+
 [01/08/26]
 
 - Tab selection colors and typography.
@@ -86,6 +94,11 @@
 - Tab overflow and close-action behavior.
 
 ## Settled interaction decisions
+
+[11/08/26]
+
+- [x] Keep selection and focus visually distinct: neutral selected surface for persistent state and the shared blue ring for keyboard destination.
+- [x] Keep pointer dragging as a supplemental reorder path while Shift and Arrow keys and the context menu own accessible keyboard reordering.
 
 [07/08/26]
 
@@ -123,6 +136,10 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[11/08/26]
+
+- [x] Verify the actual tabs remain the only semantic and sequential-focus targets after deferred reorder behavior loads.
 
 [07/08/26]
 

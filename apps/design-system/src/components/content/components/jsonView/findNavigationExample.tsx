@@ -21,10 +21,16 @@ export default function FindNavigationExample() {
     wholeWord: false,
     regularExpression: false,
   })
-  const [results, setResults] = useState<JsonViewSearchResults>({ activeIndex: null, count: 0 })
+  const [results, setResults] = useState<JsonViewSearchResults>({
+    activeIndex: null,
+    count: 0,
+    pending: false,
+  })
   const state: FindBarState =
     query.length === 0
       ? { status: 'idle' }
+      : results.pending === true
+        ? { status: 'searching' }
       : results.activeIndex === null
         ? { status: 'empty' }
         : { status: 'matched', activeIndex: results.activeIndex, count: results.count }
@@ -41,14 +47,14 @@ export default function FindNavigationExample() {
         onValueChange={(nextQuery) => {
           setQuery(nextQuery)
           setActiveMatchIndex(0)
-          setResults({ activeIndex: null, count: 0 })
+          setResults({ activeIndex: null, count: 0, pending: true })
         }}
         state={state}
         searchOptions={searchOptions}
         onSearchOptionsChange={(nextOptions) => {
           setSearchOptions(nextOptions)
           setActiveMatchIndex(0)
-          setResults({ activeIndex: null, count: 0 })
+          setResults({ activeIndex: null, count: 0, pending: true })
         }}
         onPreviousMatch={() => {
           setActiveMatchIndex((results.activeIndex ?? 0) - 1)

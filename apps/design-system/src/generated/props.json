@@ -2096,7 +2096,7 @@
       "description": "The tab views and their associated panels.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 66
+        "line": 73
       }
     },
     {
@@ -2106,7 +2106,7 @@
       "description": "The active view value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 68
+        "line": 75
       }
     },
     {
@@ -2116,7 +2116,7 @@
       "description": "The initially active view value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 70
+        "line": 77
       }
     },
     {
@@ -2126,7 +2126,7 @@
       "description": "Called when the active view changes.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 72
+        "line": 79
       }
     }
   ],
@@ -2138,7 +2138,7 @@
       "description": "The tab view items.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 80
+        "line": 87
       }
     },
     {
@@ -2148,7 +2148,7 @@
       "description": "An accessible name for the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 82
+        "line": 89
       }
     },
     {
@@ -2158,7 +2158,7 @@
       "description": "Identifies the element that labels the tab list.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 84
+        "line": 91
       }
     },
     {
@@ -2169,7 +2169,7 @@
       "description": "Activates a view as arrow-key navigation moves focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 86
+        "line": 93
       }
     },
     {
@@ -2180,7 +2180,7 @@
       "description": "Loops keyboard focus between the first and last views.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 88
+        "line": 95
       }
     },
     {
@@ -2190,7 +2190,7 @@
       "description": "The tab values in their controlled visual order.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 93
+        "line": 100
       }
     },
     {
@@ -2200,7 +2200,7 @@
       "description": "Called with the complete ordered value list after a tab is dragged.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 95
+        "line": 102
       }
     }
   ],
@@ -2212,7 +2212,7 @@
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 108
+        "line": 115
       }
     },
     {
@@ -2222,7 +2222,7 @@
       "description": "The visible view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 110
+        "line": 117
       }
     },
     {
@@ -2232,7 +2232,7 @@
       "description": "Supplementary context shown in a tooltip even when the view name fits.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 112
+        "line": 119
       }
     },
     {
@@ -2242,7 +2242,7 @@
       "description": "Renders a decorative medium icon before the view name.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 114
+        "line": 121
       }
     },
     {
@@ -2252,7 +2252,7 @@
       "description": "Disables selection and closing for this view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 116
+        "line": 123
       }
     },
     {
@@ -2262,7 +2262,7 @@
       "description": "Runs when focus leaves the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 118
+        "line": 125
       }
     },
     {
@@ -2272,7 +2272,7 @@
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 120
+        "line": 127
       }
     },
     {
@@ -2282,7 +2282,7 @@
       "description": "Runs when the tab button receives focus.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 122
+        "line": 129
       }
     },
     {
@@ -2292,7 +2292,7 @@
       "description": "Runs when a pointer press starts on the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 124
+        "line": 131
       }
     },
     {
@@ -2302,7 +2302,7 @@
       "description": "Runs when the pointer enters the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 126
+        "line": 133
       }
     },
     {
@@ -2312,7 +2312,7 @@
       "description": "Runs when the pointer leaves the tab button.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 128
+        "line": 135
       }
     },
     {
@@ -2323,7 +2323,17 @@
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 130
+        "line": 137
+      }
+    },
+    {
+      "name": "reorderLabel",
+      "type": "string",
+      "required": false,
+      "description": "Enables the reorder context menu and provides its accessible name.",
+      "source": {
+        "path": "packages/design-system/src/components/tabView/tabView.tsx",
+        "line": 139
       }
     }
   ],
@@ -2335,7 +2345,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 135
+        "line": 144
       }
     },
     {
@@ -2345,7 +2355,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 137
+        "line": 146
       }
     },
     {
@@ -2356,7 +2366,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 139
+        "line": 148
       }
     }
   ],
@@ -2600,13 +2610,24 @@
       }
     },
     {
+      "name": "deferOffscreenRendering",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Defers offscreen rendering work while preserving the complete mounted collection.",
+      "source": {
+        "path": "packages/design-system/src/components/actionList/actionList.tsx",
+        "line": 35
+      }
+    },
+    {
       "name": "render",
       "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, {}>",
       "required": false,
       "description": "Composes item behavior and styles onto another list item.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 35
+        "line": 37
       }
     }
   ],
@@ -2618,7 +2639,7 @@
       "description": "Accessible name describing which item the checkbox selects.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 40
+        "line": 42
       }
     },
     {
@@ -2628,7 +2649,7 @@
       "description": "Controls whether this item participates in the bulk selection.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 42
+        "line": 44
       }
     },
     {
@@ -2639,7 +2660,7 @@
       "description": "Disables selection for this item.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 44
+        "line": 46
       }
     },
     {
@@ -2649,7 +2670,7 @@
       "description": "Leading icon shown while the selection control is inactive.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 46
+        "line": 48
       }
     },
     {
@@ -2659,7 +2680,7 @@
       "description": "Runs when the checked state changes.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 48
+        "line": 50
       }
     }
   ],
@@ -2671,7 +2692,7 @@
       "description": "Visible action label.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 56
+        "line": 58
       }
     },
     {
@@ -2681,7 +2702,7 @@
       "description": "Decorative content before the label.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 58
+        "line": 60
       }
     },
     {
@@ -2692,7 +2713,7 @@
       "description": "Disables the primary trigger.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 60
+        "line": 62
       }
     },
     {
@@ -2703,7 +2724,7 @@
       "description": "Whether the composed render target is a native button.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 62
+        "line": 64
       }
     },
     {
@@ -2713,7 +2734,7 @@
       "description": "Composes trigger behavior and styles onto another button or link element.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 64
+        "line": 66
       }
     }
   ],
@@ -2725,7 +2746,7 @@
       "description": "Accessible name for an icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 69
+        "line": 71
       }
     },
     {
@@ -2736,7 +2757,7 @@
       "description": "Disables the trailing action.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 71
+        "line": 73
       }
     },
     {
@@ -2746,7 +2767,7 @@
       "description": "Composes action behavior and styles onto another native button element.",
       "source": {
         "path": "packages/design-system/src/components/actionList/actionList.tsx",
-        "line": 73
+        "line": 75
       }
     }
   ],
@@ -2807,7 +2828,7 @@
       "description": "Column highlighted across the header and visible rows.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 77
+        "line": 81
       }
     },
     {
@@ -2818,7 +2839,7 @@
       "description": "Row currently targeted for inspection.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 79
+        "line": 83
       }
     },
     {
@@ -2828,7 +2849,7 @@
       "description": "Data-table regions and companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 81
+        "line": 85
       }
     },
     {
@@ -2839,7 +2860,7 @@
       "description": "Controls table row and cell spacing.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 83
+        "line": 87
       }
     },
     {
@@ -2849,7 +2870,7 @@
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 85
+        "line": 89
       }
     },
     {
@@ -2859,7 +2880,7 @@
       "description": "Runs when a cell context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 87
+        "line": 91
       }
     },
     {
@@ -2869,7 +2890,7 @@
       "description": "Runs when a column header is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 89
+        "line": 93
       }
     },
     {
@@ -2879,7 +2900,7 @@
       "description": "Runs when a column-header context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 91
+        "line": 95
       }
     },
     {
@@ -2889,7 +2910,7 @@
       "description": "Runs when a non-interactive row is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 93
+        "line": 97
       }
     },
     {
@@ -2899,7 +2920,7 @@
       "description": "Runs when a row context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 95
+        "line": 99
       }
     },
     {
@@ -2909,7 +2930,7 @@
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 97
+        "line": 101
       }
     },
     {
@@ -2919,7 +2940,7 @@
       "description": "Renders the inert visual shown while a column header is dragged.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 102
+        "line": 106
       }
     },
     {
@@ -2929,7 +2950,7 @@
       "description": "Leaf column ids that can be reordered. TanStack table state owns their current order.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 104
+        "line": 108
       }
     }
   ],
@@ -2941,7 +2962,7 @@
       "description": "Table or custom viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 117
+        "line": 121
       }
     },
     {
@@ -2951,11 +2972,21 @@
       "description": "Changing this value resets both scroll axes without remounting the viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 119
+        "line": 123
       }
     }
   ],
   "dataGrid.table": [
+    {
+      "name": "aria-busy",
+      "type": "false | true",
+      "required": false,
+      "description": "Whether the table is updating while its settled rows remain available.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
+        "line": 128
+      }
+    },
     {
       "name": "aria-label",
       "type": "string",
@@ -2963,7 +2994,7 @@
       "description": "Accessible name for the table.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 124
+        "line": 130
       }
     },
     {
@@ -2973,7 +3004,17 @@
       "description": "Header and body composition.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 126
+        "line": 132
+      }
+    },
+    {
+      "name": "statusContent",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Polite announcement rendered in a stable, visually hidden status region.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
+        "line": 134
       }
     }
   ],
@@ -2986,7 +3027,7 @@
       "description": "Content shown when the table has no rows. Pass `null` to render only the header.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 131
+        "line": 139
       }
     },
     {
@@ -2997,7 +3038,7 @@
       "description": "Whether loading content replaces the current row model.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 133
+        "line": 141
       }
     },
     {
@@ -3008,7 +3049,7 @@
       "description": "Content shown while rows are loading.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 135
+        "line": 143
       }
     },
     {
@@ -3019,7 +3060,7 @@
       "description": "Controls whether all rows render directly or larger row models use a virtual window.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 137
+        "line": 145
       }
     }
   ],
@@ -3031,7 +3072,7 @@
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 142
+        "line": 150
       }
     }
   ],
@@ -3043,7 +3084,7 @@
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 147
+        "line": 155
       }
     },
     {
@@ -3053,7 +3094,7 @@
       "description": "TanStack header group represented by this row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 149
+        "line": 157
       }
     }
   ],
@@ -3065,7 +3106,7 @@
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 154
+        "line": 162
       }
     },
     {
@@ -3075,7 +3116,7 @@
       "description": "TanStack header represented by this cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 156
+        "line": 164
       }
     }
   ],
@@ -3087,7 +3128,7 @@
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 161
+        "line": 169
       }
     }
   ],
@@ -3099,7 +3140,7 @@
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 166
+        "line": 174
       }
     },
     {
@@ -3109,7 +3150,7 @@
       "description": "TanStack row represented by this table row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 168
+        "line": 176
       }
     }
   ],
@@ -3121,7 +3162,7 @@
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 173
+        "line": 181
       }
     },
     {
@@ -3131,7 +3172,7 @@
       "description": "TanStack cell represented by this table cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 175
+        "line": 183
       }
     }
   ],
@@ -3143,7 +3184,7 @@
       "description": "Expanded content associated with the row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 180
+        "line": 188
       }
     },
     {
@@ -3153,7 +3194,7 @@
       "description": "TanStack row represented by this expanded region.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 182
+        "line": 190
       }
     }
   ],
@@ -3165,7 +3206,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 187
+        "line": 195
       }
     }
   ],
@@ -3177,7 +3218,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 187
+        "line": 195
       }
     }
   ],
@@ -3189,7 +3230,7 @@
       "description": "Status and table companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 192
+        "line": 200
       }
     }
   ],
@@ -3446,7 +3487,7 @@
       "description": "Contextual label for the JSON tree.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 49
+        "line": 52
       }
     },
     {
@@ -3456,7 +3497,7 @@
       "description": "JSON-compatible object or array to inspect.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 51
+        "line": 54
       }
     },
     {
@@ -3467,7 +3508,7 @@
       "description": "Number of container levels expanded initially.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 53
+        "line": 56
       }
     },
     {
@@ -3477,7 +3518,7 @@
       "description": "Controls occurrence highlighting and active-match navigation.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 55
+        "line": 58
       }
     }
   ],
@@ -3772,7 +3813,7 @@
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -3783,7 +3824,7 @@
       "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -3794,7 +3835,7 @@
       "description": "Selects proportional or data-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -3805,7 +3846,7 @@
       "description": "Stretches the input to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 39
+        "line": 40
       }
     },
     {
@@ -3816,7 +3857,7 @@
       "description": "Marks the input as invalid and exposes that state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 41
+        "line": 42
       }
     },
     {
@@ -3827,7 +3868,7 @@
       "description": "Disables editing and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -3838,7 +3879,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -3848,7 +3889,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -3858,7 +3899,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 49
+        "line": 50
       }
     },
     {
@@ -3868,7 +3909,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 51
+        "line": 52
       }
     },
     {
@@ -3878,7 +3919,7 @@
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 53
+        "line": 54
       }
     }
   ],
@@ -3891,7 +3932,7 @@
       "description": "Controls the minimum editor height.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 16
+        "line": 17
       }
     },
     {
@@ -3902,7 +3943,7 @@
       "description": "Selects proportional or code-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 18
+        "line": 19
       }
     },
     {
@@ -3913,7 +3954,7 @@
       "description": "Stretches the textarea to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 20
+        "line": 21
       }
     },
     {
@@ -3924,7 +3965,7 @@
       "description": "Marks the textarea as invalid and exposes that state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 22
+        "line": 23
       }
     },
     {
@@ -3935,7 +3976,7 @@
       "description": "Disables editing and focus.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 24
+        "line": 25
       }
     },
     {
@@ -3946,7 +3987,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -3956,7 +3997,7 @@
       "description": "Sets the initial value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -3966,7 +4007,7 @@
       "description": "Sets the current value when controlled.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
@@ -3976,7 +4017,7 @@
       "description": "Runs when the textarea value changes.",
       "source": {
         "path": "packages/design-system/src/components/textarea/textarea.tsx",
-        "line": 32
+        "line": 33
       }
     }
   ],
@@ -4558,7 +4599,7 @@
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -4568,7 +4609,7 @@
       "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -4578,7 +4619,7 @@
       "description": "Selects proportional or data-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -4588,7 +4629,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 45
+        "line": 46
       }
     },
     {
@@ -4598,7 +4639,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 47
+        "line": 48
       }
     },
     {
@@ -4608,7 +4649,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 49
+        "line": 50
       }
     },
     {
@@ -4618,7 +4659,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 51
+        "line": 52
       }
     }
   ],
@@ -4630,7 +4671,7 @@
       "description": "Accessible name for the find query field.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -4640,7 +4681,7 @@
       "description": "Query used to find document occurrences.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -4650,17 +4691,17 @@
       "description": "Runs when the find query changes.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
       "name": "state",
-      "type": "{ status: 'idle' } | { status: 'empty' } | { status: 'matched'; activeIndex: number; count: number }",
+      "type": "{ status: 'idle' } | { status: 'searching' } | { status: 'empty' } | { status: 'matched'; activeIndex: number; count: number }",
       "required": true,
       "description": "Describes the result state displayed beside the query.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -4670,7 +4711,7 @@
       "description": "Controls how the document interprets the find query.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -4680,7 +4721,7 @@
       "description": "Runs when a query interpretation option changes.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -4690,7 +4731,7 @@
       "description": "Requests the preceding match, wrapping from the first match to the last.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 38
+        "line": 39
       }
     },
     {
@@ -4700,7 +4741,7 @@
       "description": "Requests the following match, wrapping from the last match to the first.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 40
+        "line": 41
       }
     }
   ],
@@ -5152,7 +5193,7 @@
       "name": "render",
       "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ContextMenuTriggerState>",
       "required": false,
-      "description": "Composes context-menu behavior onto another element.",
+      "description": "Composes context-menu behavior onto another element. Context menus must supplement visible actions.",
       "source": {
         "path": "packages/design-system/src/components/contextMenu/contextMenu.tsx",
         "line": 44
@@ -6288,7 +6329,7 @@
       "description": "Known options displayed by the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 36
+        "line": 38
       }
     },
     {
@@ -6298,7 +6339,7 @@
       "description": "Controlled selected values.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 38
+        "line": 40
       }
     },
     {
@@ -6309,7 +6350,7 @@
       "description": "Initially selected values when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 40
+        "line": 42
       }
     },
     {
@@ -6319,7 +6360,7 @@
       "description": "Runs when the selected values change.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 42
+        "line": 44
       }
     },
     {
@@ -6330,7 +6371,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 44
+        "line": 46
       }
     },
     {
@@ -6340,7 +6381,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 46
+        "line": 48
       }
     },
     {
@@ -6350,7 +6391,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 48
+        "line": 50
       }
     },
     {
@@ -6361,7 +6402,7 @@
       "description": "Disables the trigger and every mutable option.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 50
+        "line": 52
       }
     }
   ],
@@ -6373,7 +6414,7 @@
       "description": "Stable accessible name for the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 56
+        "line": 58
       }
     },
     {
@@ -6383,7 +6424,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 58
+        "line": 60
       }
     },
     {
@@ -6394,7 +6435,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 60
+        "line": 62
       }
     }
   ],
@@ -6406,7 +6447,7 @@
       "description": "Accessible name for the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 69
+        "line": 71
       }
     },
     {
@@ -6417,7 +6458,7 @@
       "description": "Controls the popup width.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 71
+        "line": 73
       }
     },
     {
@@ -6428,7 +6469,7 @@
       "description": "Controls the scrolling option-list height.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 73
+        "line": 75
       }
     },
     {
@@ -6439,7 +6480,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 75
+        "line": 77
       }
     },
     {
@@ -6450,7 +6491,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 77
+        "line": 79
       }
     }
   ],
@@ -6462,7 +6503,7 @@
       "description": "Items used to resolve selected value labels.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 22
+        "line": 23
       }
     },
     {
@@ -6472,7 +6513,7 @@
       "description": "The selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 24
+        "line": 25
       }
     },
     {
@@ -6482,7 +6523,7 @@
       "description": "The initially selected value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -6492,7 +6533,7 @@
       "description": "Runs when the selected value changes.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -6503,7 +6544,7 @@
       "description": "Disables the Select.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 30
+        "line": 31
       }
     }
   ],
@@ -6516,7 +6557,7 @@
       "description": "Text displayed when the Select has no value.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 40
+        "line": 41
       }
     },
     {
@@ -6527,7 +6568,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 42
+        "line": 43
       }
     },
     {
@@ -6538,7 +6579,7 @@
       "description": "Controls whether the trigger follows the selected value or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 44
+        "line": 45
       }
     }
   ],
@@ -6550,7 +6591,7 @@
       "description": "Select items rendered in the popup.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 49
+        "line": 50
       }
     }
   ],
@@ -6562,7 +6603,7 @@
       "description": "Text displayed for this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 54
+        "line": 55
       }
     },
     {
@@ -6572,7 +6613,7 @@
       "description": "The value represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 56
+        "line": 57
       }
     },
     {
@@ -6583,7 +6624,7 @@
       "description": "Disables the option.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 58
+        "line": 59
       }
     },
     {
@@ -6593,7 +6634,7 @@
       "description": "Text used to match the option during keyboard navigation.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
-        "line": 60
+        "line": 61
       }
     }
   ]

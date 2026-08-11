@@ -59,6 +59,10 @@
 
 ## Settled interaction decisions
 
+[11/08/26]
+
+- [x] Treat Context Menu as an enhancement; every command remains available through a visible control.
+
 [05/08/26]
 
 - Menu and Context Menu share internal presentation without hiding their exact Base UI namespaces behind a generic component factory.

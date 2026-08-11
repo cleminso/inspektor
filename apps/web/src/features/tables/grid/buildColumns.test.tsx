@@ -160,7 +160,7 @@ describe("buildDataGridColumns", () => {
     expect(screen.queryByRole("button", { name: "Open Name column menu" })).toBeNull();
   });
 
-  it("renders composed type markers with authored tooltips before column names", async () => {
+  it("renders composed type markers with tooltips without applying ARIA labels to spans", async () => {
     render(
       <TestTable
         columns={[
@@ -182,13 +182,22 @@ describe("buildDataGridColumns", () => {
       />,
     );
 
-    const rowIdMarker = screen.getByLabelText("Row ID");
+    const markers = Array.from(document.querySelectorAll('[data-slot="tooltip-trigger"]'));
+    const rowIdMarker = markers[0];
+    const referenceMarker = markers[1];
+
+    if (rowIdMarker === undefined || referenceMarker === undefined) {
+      throw new Error("Expected column type markers to render tooltip triggers");
+    }
+
+    expect(rowIdMarker.getAttribute("aria-label")).toBeNull();
     expect(rowIdMarker.getAttribute("title")).toBeNull();
     expect(
       rowIdMarker.compareDocumentPosition(screen.getByText("id")) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).not.toBe(0);
-    expect(screen.getByLabelText("Reference").textContent).toBe("");
+    expect(referenceMarker.getAttribute("aria-label")).toBeNull();
+    expect(referenceMarker.textContent).toBe("");
 
     fireEvent.mouseEnter(rowIdMarker);
     fireEvent.mouseMove(rowIdMarker);

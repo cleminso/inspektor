@@ -140,12 +140,6 @@ export const accordionStyles = stylex.create({
     flexShrink: 0,
   },
   panel: {
-    transitionDuration: {
-      default: '150ms',
-      [reducedMotion]: '0ms',
-    },
-    transitionProperty: 'height',
-    transitionTimingFunction: 'ease-out',
     height: 'var(--accordion-panel-height)',
     overflowX: 'hidden',
     overflowY: 'hidden',

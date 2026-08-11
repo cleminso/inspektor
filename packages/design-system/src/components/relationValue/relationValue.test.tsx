@@ -15,6 +15,7 @@ describe("RelationValue", () => {
     expect(screen.getByText("account_0123456789")).toBeTruthy();
     expect(screen.queryByRole("link")).toBeNull();
     expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.getByText("account_0123456789").closest('[translate="no"]')).toBeTruthy();
   });
 
   it("keeps navigation beside the middle-truncated identifier", () => {
@@ -65,6 +66,9 @@ describe("RelationDetails", () => {
     expect(
       screen.getByRole("textbox", { name: "Stored relation ID" }).getAttribute("value"),
     ).toBe("account_0123456789-complete");
+    expect(
+      screen.getByRole("textbox", { name: "Stored relation ID" }).getAttribute("translate"),
+    ).toBe("no");
     expect(screen.getByText("Ada Lovelace")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Copy display value" })).toBeTruthy();
     expect(screen.queryByText("Target")).toBeNull();

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TableTabsView } from '@tables/workspace/tabsView'
@@ -110,6 +110,37 @@ describe('TableTabsView', () => {
 
     expect(screen.getByRole('tab', { name: 'New view' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Close New view' })).toBeNull()
+  })
+
+  it('moves a table tab from its right-click reorder context menu', async () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+      {
+        kind: 'table',
+        id: 'table:profiles',
+        tableName: 'profiles',
+        search: {},
+      },
+    ]
+
+    render(<TableTabsView tableName="accounts" />)
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('tab', { name: 'accounts' }).closest('[data-reorder-ready]'),
+      ).toBeTruthy()
+    })
+    const accountsTab = screen.getByRole('tab', { name: 'accounts' })
+    fireEvent.contextMenu(accountsTab, { clientX: 40, clientY: 20 })
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Move right' }))
+
+    expect(mocks.reorderTabs).toHaveBeenCalledWith(['table:profiles', 'table:accounts'])
   })
 
   it("prefetches an inactive tab's exact row query from keyboard intent", () => {

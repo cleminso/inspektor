@@ -114,6 +114,7 @@ vi.mock('@dnd-kit/abstract/modifiers', () => ({
 }))
 
 vi.mock('@dnd-kit/dom', () => ({
+  Accessibility: class Accessibility {},
   AutoScroller: { configure: () => ({}) },
   Feedback: { configure: () => ({}) },
   PointerActivationConstraints: {
@@ -568,6 +569,34 @@ function FixedGeometryDataGrid() {
   )
 }
 
+function KeyboardResizableDataGrid() {
+  const resizableColumns = columnHelper.columns([
+    columnHelper.accessor('name', {
+      header: 'Name',
+      maxSize: 140,
+      minSize: 100,
+      size: 120,
+    }),
+    columnHelper.accessor('role', { header: 'Role', size: 180 }),
+  ])
+  const table = useTable({
+    features: dataGridFeatures,
+    columns: resizableColumns,
+    data: rows,
+    getRowId: (row) => row.id,
+  })
+
+  return (
+    <DataGrid.Root table={table}>
+      <DataGrid.Viewport>
+        <DataGrid.Table aria-label="Keyboard resizable people">
+          <DataGrid.Content />
+        </DataGrid.Table>
+      </DataGrid.Viewport>
+    </DataGrid.Root>
+  )
+}
+
 function ReorderableDataGrid({
   columnDragPreview,
   initialColumnOrder = ['name', 'role'],
@@ -801,13 +830,13 @@ describe('DataGrid', () => {
   it('keeps resize emphasis on the header-owned border', () => {
     const { rerender } = render(<TestDataGrid activeColumnId="role" />)
 
-    const restingHandleClassName = screen.getByRole('button', {
+    const restingHandleClassName = screen.getByRole('separator', {
       name: 'Resize role column',
     }).className
 
     rerender(<TestDataGrid activeColumnId="role" resizingColumnId="role" />)
 
-    const resizeHandle = screen.getByRole('button', { name: 'Resize role column' })
+    const resizeHandle = screen.getByRole('separator', { name: 'Resize role column' })
 
     expect(resizeHandle.hasAttribute('data-resizing')).toBe(true)
     expect(resizeHandle.className).toBe(restingHandleClassName)
@@ -871,6 +900,94 @@ describe('DataGrid', () => {
       expect(cell.hasAttribute('data-cell-selected')).toBe(true)
     }
     expect(adaCell.hasAttribute('data-active')).toBe(true)
+  })
+
+  it('provides one body-cell entry point and moves its roving focus with arrow keys', async () => {
+    render(<TestDataGrid />)
+    const adaCell = screen.getByRole('cell', { name: 'Ada' })
+    const engineerCell = screen.getByRole('cell', { name: 'Engineer' })
+    const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
+
+    expect(adaCell.tabIndex).toBe(0)
+    expect(engineerCell.tabIndex).toBe(-1)
+
+    act(() => {
+      adaCell.focus()
+    })
+    fireEvent.keyDown(adaCell, { key: 'ArrowRight' })
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(engineerCell)
+    })
+    expect(engineerCell.tabIndex).toBe(0)
+    expect(adaCell.tabIndex).toBe(-1)
+
+    fireEvent.keyDown(engineerCell, { key: 'ArrowDown' })
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(admiralCell)
+    })
+    expect(admiralCell.tabIndex).toBe(0)
+  })
+
+  it('activates a focused body cell with Enter and Space', () => {
+    const onCellActivate = vi.fn()
+    render(<TestDataGrid onCellActivate={onCellActivate} />)
+    const cell = screen.getByRole('cell', { name: 'Engineer' })
+
+    cell.focus()
+    fireEvent.keyDown(cell, { key: 'Enter' })
+    fireEvent.keyDown(cell, { key: ' ' })
+
+    expect(onCellActivate).toHaveBeenNthCalledWith(1, {
+      rowId: 'person-1',
+      columnId: 'role',
+    })
+    expect(onCellActivate).toHaveBeenNthCalledWith(2, {
+      rowId: 'person-1',
+      columnId: 'role',
+    })
+  })
+
+  it('does not handle body-cell navigation from an interactive descendant', () => {
+    render(<InteractiveCellDataGrid />)
+    const link = screen.getByRole('link', { name: 'Ada' })
+    const cell = link.closest('td')
+
+    expect(cell).not.toBeNull()
+    link.focus()
+    fireEvent.keyDown(link, { key: 'ArrowRight' })
+
+    expect(document.activeElement).toBe(link)
+    expect(cell?.hasAttribute('data-active')).toBe(false)
+  })
+
+  it('exposes keyboard-resizable separators with bounded values and reset behavior', () => {
+    render(<KeyboardResizableDataGrid />)
+    const table = screen.getByRole('table', { name: 'Keyboard resizable people' })
+    const handle = screen.getByRole('separator', { name: 'Resize name column' })
+    const nameColumn = table.querySelector('col')
+
+    expect(handle.getAttribute('aria-orientation')).toBe('vertical')
+    expect(handle.getAttribute('aria-valuemin')).toBe('100')
+    expect(handle.getAttribute('aria-valuemax')).toBe('140')
+    expect(handle.getAttribute('aria-valuenow')).toBe('120')
+
+    for (let index = 0; index < 4; index += 1) {
+      fireEvent.keyDown(handle, { key: 'ArrowRight' })
+    }
+    expect(nameColumn?.style.width).toBe('140px')
+    expect(handle.getAttribute('aria-valuenow')).toBe('140')
+
+    for (let index = 0; index < 8; index += 1) {
+      fireEvent.keyDown(handle, { key: 'ArrowLeft' })
+    }
+    expect(nameColumn?.style.width).toBe('100px')
+    expect(handle.getAttribute('aria-valuenow')).toBe('100')
+
+    fireEvent.keyDown(handle, { key: 'Enter' })
+    expect(nameColumn?.style.width).toBe('120px')
+    expect(handle.getAttribute('aria-valuenow')).toBe('120')
   })
 
   it('extends TanStack selection while a primary-button drag enters cells', () => {
@@ -1113,10 +1230,21 @@ describe('DataGrid', () => {
 
     const header = screen.getByRole('columnheader', { name: 'Name' })
     expect(header.getAttribute('aria-sort')).toBe('none')
+    expect(header.tabIndex).toBe(0)
     header.focus()
     fireEvent.keyDown(header, { key: 'Enter' })
 
     expect(onSortingChange).toHaveBeenCalledOnce()
+  })
+
+  it('preserves native columnheader semantics and valid sort state when reordering is attached', async () => {
+    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />)
+
+    await waitFor(() => {
+      const header = screen.getByRole('columnheader', { name: 'Name' })
+      expect(header.getAttribute('role')).toBeNull()
+      expect(header.getAttribute('aria-sort')).toBe('none')
+    })
   })
 
   it('does not animate the drag overlay after the pointer is released', async () => {

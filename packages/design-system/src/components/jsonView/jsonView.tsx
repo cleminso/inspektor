@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import {
+  useDeferredValue,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -27,6 +28,8 @@ export interface JsonViewSearchResults {
   activeIndex: number | null;
   /** Number of textual occurrences found in the complete JSON value. */
   count: number;
+  /** Whether the reported occurrences belong to a query that is being replaced. */
+  pending: boolean;
 }
 
 export interface JsonViewSearch {
@@ -871,15 +874,17 @@ export function JsonView({
   const onSearchResultsChangeRef = useRef(search?.onResultsChange);
   const serializedData = useMemo(() => JSON.stringify(data, null, 2), [data]);
   const searchQuery = search?.query ?? "";
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const searchPending = searchQuery !== deferredSearchQuery;
   const searchPattern = useMemo(
     () =>
       createSearchPattern({
-        query: searchQuery,
+        query: deferredSearchQuery,
         caseSensitive: search?.caseSensitive,
         wholeWord: search?.wholeWord,
         regularExpression: search?.regularExpression,
       }),
-    [search?.caseSensitive, search?.regularExpression, search?.wholeWord, searchQuery],
+    [deferredSearchQuery, search?.caseSensitive, search?.regularExpression, search?.wholeWord],
   );
   const searchModel = useMemo(
     () => createSearchModel(data, searchPattern),
@@ -920,8 +925,9 @@ export function JsonView({
     onSearchResultsChangeRef.current?.({
       activeIndex: activeSearchMatchIndex,
       count: searchModel.matches.length,
+      pending: searchPending,
     });
-  }, [activeSearchMatchIndex, searchModel.matches.length, searchPattern, searchQuery]);
+  }, [activeSearchMatchIndex, deferredSearchQuery, searchModel.matches.length, searchPattern, searchPending]);
 
   useEffect(() => {
     if (activeSearchMatch === undefined || activeSearchMatchVisible === false) {

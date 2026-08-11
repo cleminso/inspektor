@@ -1,62 +1,65 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react'
 
-import { useNavigate } from "@tanstack/react-router";
+import { Link } from '@tanstack/react-router'
 
 import {
-  Button,
+  ButtonLink,
   ContextSwitcher,
   Text,
   toasts,
   type ContextSwitcherTriggerSize,
   type ContextSwitcherTriggerWidth,
-} from "@inspector/ds";
+} from '@inspector/ds'
 
-import { useInspectorSessionContext } from "@app/providers/inspectorSessionProvider";
+import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import {
   getConnectionDisplayName,
   getConnectionSecondaryLabel,
   type StoredConnection,
-} from "@app/connections/connections";
-import { appRoutes } from "@app/routing/appRoutes";
-import { normalizeConnectionOpenError } from "@app/connections/connectionValidation";
+} from '@app/connections/connections'
+import { appRoutes } from '@app/routing/appRoutes'
+import { normalizeConnectionOpenError } from '@app/connections/connectionValidation'
 
 interface ConnectionSwitcherProps {
-  size?: ContextSwitcherTriggerSize;
-  triggerLabel?: string;
-  width?: ContextSwitcherTriggerWidth;
+  size?: ContextSwitcherTriggerSize
+  triggerLabel?: string
+  width?: ContextSwitcherTriggerWidth
 }
 
 function sortConnections(
   connections: StoredConnection[],
   currentConnectionId: string | null,
 ): StoredConnection[] {
-  const activeConnections = connections.filter((connection) => connection.id === currentConnectionId);
-  const inactiveConnections = connections.filter((connection) => connection.id !== currentConnectionId);
+  const activeConnections = connections.filter(
+    (connection) => connection.id === currentConnectionId,
+  )
+  const inactiveConnections = connections.filter(
+    (connection) => connection.id !== currentConnectionId,
+  )
 
-  return [...activeConnections, ...inactiveConnections];
+  return [...activeConnections, ...inactiveConnections]
 }
 
 export function ConnectionSwitcher({
-  size = "s",
+  size = 's',
   triggerLabel,
-  width = "content",
+  width = 'content',
 }: ConnectionSwitcherProps = {}): React.ReactElement {
   const { connections, currentConnectionId, openingConnectionId, openConnection } =
-    useInspectorSessionContext();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+    useInspectorSessionContext()
+  const [open, setOpen] = useState(false)
 
   const orderedConnections = useMemo(
     () => sortConnections(connections, currentConnectionId),
     [connections, currentConnectionId],
-  );
+  )
   const activeConnection =
-    orderedConnections.find((connection) => connection.id === currentConnectionId) ?? null;
+    orderedConnections.find((connection) => connection.id === currentConnectionId) ?? null
   const resolvedTriggerLabel =
     triggerLabel ??
     (activeConnection !== null && activeConnection.id === currentConnectionId
       ? getConnectionDisplayName(activeConnection)
-      : "Open connections");
+      : 'Open connections')
 
   return (
     <ContextSwitcher.Root<StoredConnection>
@@ -66,30 +69,28 @@ export function ConnectionSwitcher({
       itemToStringValue={(connection) => connection.id}
       isItemEqualToValue={(connection, selected) => connection.id === selected.id}
       filter={(connection, query) =>
-        `${connection.name} ${connection.appId}`
-          .toLowerCase()
-          .includes(query.trim().toLowerCase())
+        `${connection.name} ${connection.appId}`.toLowerCase().includes(query.trim().toLowerCase())
       }
       open={open}
       onOpenChange={(nextOpen, details) => {
-        if (nextOpen === false && details.reason === "item-press") {
-          return;
+        if (nextOpen === false && details.reason === 'item-press') {
+          return
         }
 
-        setOpen(nextOpen);
+        setOpen(nextOpen)
       }}
       onValueChange={(connection) => {
         if (connection !== null) {
           void openConnection(connection.id)
             .then((result) => {
-              if (result === "opened") {
-                setOpen(false);
+              if (result === 'opened') {
+                setOpen(false)
               }
             })
             .catch((error: unknown) => {
-              const normalizedError = normalizeConnectionOpenError(error);
-              toasts.error(normalizedError.title, { description: normalizedError.description });
-            });
+              const normalizedError = normalizeConnectionOpenError(error)
+              toasts.error(normalizedError.title, { description: normalizedError.description })
+            })
         }
       }}
     >
@@ -98,7 +99,11 @@ export function ConnectionSwitcher({
         size={size}
         width={width}
       >
-        <Text as="span" color="inherit" truncate>
+        <Text
+          as="span"
+          color="inherit"
+          truncate
+        >
           {resolvedTriggerLabel}
         </Text>
       </ContextSwitcher.Trigger>
@@ -106,7 +111,7 @@ export function ConnectionSwitcher({
         {orderedConnections.length > 1 ? (
           <ContextSwitcher.Search
             label="Search connections"
-            placeholder="Search connections"
+            placeholder="Search connections…"
           />
         ) : null}
         {orderedConnections.length > 0 ? (
@@ -134,19 +139,19 @@ export function ConnectionSwitcher({
           </ContextSwitcher.Viewport>
         ) : null}
         <ContextSwitcher.Footer>
-          <Button
+          <ButtonLink
             variant="ghost"
             size="s"
             layout="row"
+            render={<Link to={appRoutes.newConnection} />}
             onClick={() => {
-              setOpen(false);
-              void navigate({ to: appRoutes.newConnection });
+              setOpen(false)
             }}
           >
             Add new connection
-          </Button>
+          </ButtonLink>
         </ContextSwitcher.Footer>
       </ContextSwitcher.Content>
     </ContextSwitcher.Root>
-  );
+  )
 }

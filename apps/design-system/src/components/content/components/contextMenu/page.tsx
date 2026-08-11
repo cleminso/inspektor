@@ -41,7 +41,7 @@ export function ContextMenuPage(): ReactElement {
     <ContextMenuPlayground>
       <Section
         title="Default"
-        description="Right-click the trigger to open contextual actions. Item callbacks remain responsible for updating application state."
+        description="Right-click the trigger to open contextual actions. Context menus supplement a visible Menu exposing the same actions; they are never the only action path."
       >
         <Example source={defaultSource}>
           <DefaultExample />

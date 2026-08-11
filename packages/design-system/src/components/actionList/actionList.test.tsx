@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ActionList } from './actionList'
 import { actionListStyles } from './actionList.styles'
 import { ContextMenu } from '../contextMenu/contextMenu'
+import { Menu } from '../menu/menu'
 
 const normalizationContractStyles = stylex.create({
   root: {
@@ -88,6 +89,30 @@ describe('ActionList', () => {
     expect(
       screen.getByRole('button', { name: 'accounts' }).closest('[data-slot="action-list-item"]'),
     ).toBeTruthy()
+  })
+
+  it('retains the trailing action open state while its menu is portaled', () => {
+    render(
+      <ActionList>
+        <ActionList.Item>
+          <ActionList.Trigger>accounts</ActionList.Trigger>
+          <Menu.Root>
+            <Menu.Trigger render={<ActionList.Action aria-label="Open account actions" />}>
+              Actions
+            </Menu.Trigger>
+            <Menu.Content>
+              <Menu.Item>Open</Menu.Item>
+            </Menu.Content>
+          </Menu.Root>
+        </ActionList.Item>
+      </ActionList>,
+    )
+
+    const action = screen.getByRole('button', { name: 'Open account actions' })
+    fireEvent.click(action)
+
+    expect(action.hasAttribute('data-popup-open')).toBe(true)
+    expect(screen.getByRole('menuitem', { name: 'Open' })).toBeTruthy()
   })
 
   it('normalizes native list and composed button presentation', () => {

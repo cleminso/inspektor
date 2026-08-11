@@ -31,6 +31,8 @@ export interface ActionListItemProps extends Omit<
   active?: boolean
   /** Applies the bulk-selection treatment. */
   checked?: boolean
+  /** Defers offscreen rendering work while preserving the complete mounted collection. */
+  deferOffscreenRendering?: boolean
   /** Composes item behavior and styles onto another list item. */
   render?: useRender.ComponentProps<'li'>['render']
 }
@@ -112,18 +114,20 @@ const ActionListRoot = forwardRef<HTMLUListElement, ActionListRootProps>(functio
 })
 
 const ActionListItem = forwardRef<HTMLLIElement, ActionListItemProps>(function ActionListItem(
-  { children, active = false, checked = false, render, ...props },
+  { children, active = false, checked = false, deferOffscreenRendering = false, render, ...props },
   forwardedRef,
 ) {
   const defaultProps = {
     ...stylex.props(
       actionListStyles.item,
+      deferOffscreenRendering === true && actionListStyles.itemDeferred,
       checked === true && actionListStyles.itemChecked,
       active === true && actionListStyles.itemActive,
     ),
     children,
     'data-active': active === true ? '' : undefined,
     'data-checked': checked === true ? '' : undefined,
+    'data-rendering': deferOffscreenRendering === true ? 'deferred' : undefined,
     'data-slot': 'action-list-item',
   } as useRender.ComponentProps<'li'>
 

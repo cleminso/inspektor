@@ -1,60 +1,69 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 
-import { InspectorLayout } from "@app/shell/layout";
-import { useInspectorSessionState } from "@app/providers/inspectorProvider";
-import { SidePanelLayoutProvider, useSidePanelLayout } from "@tables/tableList/layout";
-import { TableTabsProvider } from "@tables/workspace/tabsProvider";
-import { TableExplorerScreen } from "@tables/view";
-import type { TablePageSize, TableRouteSearch } from "@tables/tableTypes";
+import { InspectorLayout } from '@app/shell/layout'
+import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { SidePanelLayoutProvider, useSidePanelLayout } from '@tables/tableList/layout'
+import { TableTabsProvider } from '@tables/workspace/tabsProvider'
+import { TableExplorerScreen } from '@tables/view'
+import type { TablePageSize, TableRouteSearch } from '@tables/tableTypes'
 
 export function parsePositiveInteger(value: unknown): number | undefined {
-  const numberValue = typeof value === "string" ? Number(value) : value;
-  return typeof numberValue === "number" && Number.isSafeInteger(numberValue) && numberValue > 0
+  const numberValue = typeof value === 'string' ? Number(value) : value
+  return typeof numberValue === 'number' && Number.isSafeInteger(numberValue) && numberValue > 0
     ? numberValue
-    : undefined;
+    : undefined
 }
 
 function parsePageSize(value: unknown): TablePageSize | undefined {
-  const pageSize = parsePositiveInteger(value);
-  return pageSize === 100 || pageSize === 500 || pageSize === 1000 ? pageSize : undefined;
+  const pageSize = parsePositiveInteger(value)
+  return pageSize === 100 || pageSize === 500 || pageSize === 1000 ? pageSize : undefined
 }
 
-export const Route = createFileRoute("/conn/$connectionId/tables")({
+export const Route = createFileRoute('/conn/$connectionId/tables')({
+  head: () => ({
+    meta: [{ title: 'Tables | Inspector' }],
+  }),
   component: TablesLayoutRoute,
   validateSearch: (search): TableRouteSearch => ({
     ...search,
-    dir: typeof search.dir === "string" ? search.dir : undefined,
-    empty: search.empty === "true" ? "true" : undefined,
-    filters: typeof search.filters === "string" ? search.filters : undefined,
-    mode: typeof search.mode === "string" ? search.mode : undefined,
+    dir: typeof search.dir === 'string' ? search.dir : undefined,
+    empty: search.empty === 'true' ? 'true' : undefined,
+    filters: typeof search.filters === 'string' ? search.filters : undefined,
+    mode: typeof search.mode === 'string' ? search.mode : undefined,
     page: parsePositiveInteger(search.page),
     pageSize: parsePageSize(search.pageSize),
-    rowId: typeof search.rowId === "string" ? search.rowId : undefined,
-    sort: typeof search.sort === "string" ? search.sort : undefined,
-    tab: typeof search.tab === "string" ? search.tab : undefined,
-    view: typeof search.view === "string" ? search.view : undefined,
+    rowId: typeof search.rowId === 'string' ? search.rowId : undefined,
+    sort: typeof search.sort === 'string' ? search.sort : undefined,
+    tab: typeof search.tab === 'string' ? search.tab : undefined,
+    view: typeof search.view === 'string' ? search.view : undefined,
   }),
-});
+})
 
 function TablesLayoutRoute(): React.ReactElement {
   return (
     <SidePanelLayoutProvider>
       <TablesWorkspaceLayout />
     </SidePanelLayoutProvider>
-  );
+  )
 }
 
 function TablesWorkspaceLayout(): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState();
-  const { isOpen, toggle } = useSidePanelLayout();
-  const tabScope = `${currentConnectionId ?? "none"}:${currentBranch ?? "none"}:${currentSchemaHash ?? "none"}`;
+  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
+  const { isOpen, toggle } = useSidePanelLayout()
+  const tabScope = `${currentConnectionId ?? 'none'}:${currentBranch ?? 'none'}:${currentSchemaHash ?? 'none'}`
 
   return (
-    <InspectorLayout leftDock={{ isOpen, onToggle: toggle }}>
-      <TableTabsProvider key={tabScope} scope={tabScope}>
+    <InspectorLayout
+      leftDock={{ isOpen, onToggle: toggle }}
+      pageTitle="Tables"
+    >
+      <TableTabsProvider
+        key={tabScope}
+        scope={tabScope}
+      >
         <TableExplorerScreen />
         <Outlet />
       </TableTabsProvider>
     </InspectorLayout>
-  );
+  )
 }

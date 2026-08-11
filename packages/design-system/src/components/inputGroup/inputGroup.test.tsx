@@ -46,7 +46,7 @@ describe("InputGroup", () => {
     );
     const input = screen.getByRole("textbox", { name: "Domain" });
     const group = input.closest('[data-slot="input-group"]');
-    vi.spyOn(input, "matches").mockReturnValue(true);
+    const matches = vi.spyOn(input, "matches").mockReturnValue(true);
 
     fireEvent.focus(input);
 
@@ -54,6 +54,13 @@ describe("InputGroup", () => {
 
     fireEvent.blur(input);
 
+    expect(group?.getAttribute("data-focus-visible")).toBe(null);
+
+    matches.mockReturnValue(false);
+
+    fireEvent.focus(input);
+
+    expect(group?.getAttribute("data-focused")).toBe("");
     expect(group?.getAttribute("data-focus-visible")).toBe(null);
   });
 

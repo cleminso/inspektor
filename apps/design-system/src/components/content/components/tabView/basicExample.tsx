@@ -75,6 +75,7 @@ export default function BasicExample(): ReactElement {
                 details={view.value === 'active' ? 'Filtered account table view' : undefined}
                 prefix={<TableIcon />}
                 closeLabel={`Close ${view.label}`}
+                reorderLabel={`Reorder ${view.label}`}
                 onClose={closeView}
               >
                 {view.label}

@@ -4,7 +4,7 @@
 :root {
   --lightningcss-light: initial;
   --lightningcss-dark: ;
-  color-scheme: light;
+  color-scheme: light dark;
 }
 
 .dark {

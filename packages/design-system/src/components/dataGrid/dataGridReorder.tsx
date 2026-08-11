@@ -1,5 +1,5 @@
 import { RestrictToHorizontalAxis } from '@dnd-kit/abstract/modifiers'
-import { AutoScroller, PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
+import { Accessibility, AutoScroller, PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
 import { RestrictToElement } from '@dnd-kit/dom/modifiers'
 import { move } from '@dnd-kit/helpers'
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react'
@@ -117,7 +117,7 @@ export function DataGridReorder({
         sensors={dataGridSensors}
         modifiers={modifiers}
         plugins={(defaults) => [
-          ...defaults,
+          ...defaults.filter((plugin) => plugin !== Accessibility),
           AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
         ]}
         onDragEnd={(event) => {

@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[11/08/26]
+
+- [x] Render TanStack Router head content with route-specific titles.
+- [x] Add page headings, focusable main landmarks, and focus-visible skip links before persistent headers.
+- [x] Use TanStack Router links for user-initiated route changes while retaining imperative navigation for successful submissions.
+
 [08/08/26]
 
 - [x] Remount the Jazz provider when a saved profile object changes under the same persisted id, using an opaque reference token instead of credential material.
