@@ -89,9 +89,9 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
         alignItems="center"
         gap="s"
         padding="xs"
-        backgroundColor="bg-page"
+        backgroundColor="surface-background"
         borderBottomWidth={1}
-        borderColor="border-secondary"
+        borderColor="subtle"
         borderStyle="solid"
         overflow="hidden"
       >

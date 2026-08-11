@@ -76,7 +76,7 @@ export function serializeResizablePanelPlayground(state: ResizablePanelPlaygroun
       ResizablePanelGroup: true,
       Text: true,
     },
-    example: `(\n    <Box width="full" height="viewport-height-m" borderWidth={1} borderStyle="solid" borderColor="border">\n      ${groupOpen}\n        <ResizablePanel ${panelProps.join(" ")}>\n          <Box height="full" alignItems="center" justifyContent="center" backgroundColor="bg-secondary">\n            <Text>Navigation</Text>\n          </Box>\n        </ResizablePanel>\n        ${handle}\n        <ResizablePanel>\n          <Box height="full" alignItems="center" justifyContent="center">\n            <Text>Content</Text>\n          </Box>\n        </ResizablePanel>\n      </ResizablePanelGroup>\n    </Box>\n  )`,
+    example: `(\n    <Box width="full" height="viewport-height-m" borderWidth={1} borderStyle="solid" borderColor="default">\n      ${groupOpen}\n        <ResizablePanel ${panelProps.join(" ")}>\n          <Box height="full" alignItems="center" justifyContent="center" backgroundColor="element-default">\n            <Text>Navigation</Text>\n          </Box>\n        </ResizablePanel>\n        ${handle}\n        <ResizablePanel>\n          <Box height="full" alignItems="center" justifyContent="center">\n            <Text>Content</Text>\n          </Box>\n        </ResizablePanel>\n      </ResizablePanelGroup>\n    </Box>\n  )`,
   });
 }
 
@@ -88,7 +88,7 @@ export function ResizablePanelPlayground({ children }: { children?: ReactNode })
       height="viewport-height-m"
       borderWidth={1}
       borderStyle="solid"
-      borderColor="border"
+      borderColor="default"
     >
       <ResizablePanelGroup orientation={state.orientation} disabled={state.disabled}>
         <ResizablePanel defaultSize="40%" minSize="25%" collapsible={state.collapsible}>
@@ -96,7 +96,7 @@ export function ResizablePanelPlayground({ children }: { children?: ReactNode })
             height="full"
             alignItems="center"
             justifyContent="center"
-            backgroundColor="bg-secondary"
+            backgroundColor="element-default"
           >
             <Text>Navigation</Text>
           </Box>

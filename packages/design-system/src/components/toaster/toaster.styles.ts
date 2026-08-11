@@ -2,7 +2,14 @@ import * as stylex from '@stylexjs/stylex'
 
 import { breakpointQueries } from '../../tokens/breakpoints.stylex'
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { backgroundColors, borderColors, spatial, textColors } from '../../tokens/semantics.stylex'
+import {
+  borderColors,
+  focusColors,
+  ghostElementColors,
+  spatial,
+  surfaceColors,
+  textColors,
+} from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -34,14 +41,14 @@ export const toasterStyles = stylex.create({
   },
   viewportExpanded: {},
   toast: {
-    borderColor: borderColors.border,
+    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
     borderStyle: 'solid',
     borderWidth: 1,
     alignItems: 'stretch',
-    backgroundColor: backgroundColors['bg-popover'],
+    backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,
-    color: textColors['text-default'],
+    color: textColors.default,
     cursor: 'default',
     opacity: 1,
     overflowWrap: 'anywhere',
@@ -113,7 +120,7 @@ export const toasterStyles = stylex.create({
   },
   title: {
     margin: 0,
-    color: textColors['text-default'],
+    color: textColors.default,
     flexGrow: 1,
     fontSize: fontSizes[2],
     fontWeight: fontWeights.medium,
@@ -121,13 +128,13 @@ export const toasterStyles = stylex.create({
     minWidth: 0,
   },
   titleMessage: {},
-  titleSuccess: { color: textColors['text-success'] },
-  titleWarning: { color: textColors['text-warning'] },
-  titleError: { color: textColors['text-danger'] },
+  titleSuccess: { color: textColors.success },
+  titleWarning: { color: textColors.warning },
+  titleError: { color: textColors.danger },
   titleLoading: {},
   description: {
     margin: 0,
-    color: textColors['text-muted'],
+    color: textColors.muted,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.regular,
     lineHeight: lineHeights.compact,
@@ -139,11 +146,11 @@ export const toasterStyles = stylex.create({
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: {
-      default: backgroundColors['bg-subtle'],
-      ':hover': backgroundColors['bg-hover'],
-      ':active': backgroundColors['bg-pressed'],
+      default: surfaceColors.subtle,
+      ':hover': ghostElementColors.hover,
+      ':active': ghostElementColors.pressed,
     },
-    color: textColors['text-default'],
+    color: textColors.default,
     cursor: 'pointer',
     display: 'flex',
     flexShrink: 0,
@@ -151,7 +158,7 @@ export const toasterStyles = stylex.create({
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
     lineHeight: lineHeights.compact,
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: 1,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },

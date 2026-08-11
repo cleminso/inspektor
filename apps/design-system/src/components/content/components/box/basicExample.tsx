@@ -10,7 +10,7 @@ export default function BasicExample(): ReactElement {
       padding="l"
       borderWidth={1}
       borderStyle="solid"
-      borderColor="border"
+      borderColor="default"
       borderRadius="s"
     >
       <Text as="h2" variant="label">Layout region</Text>

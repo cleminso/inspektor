@@ -543,7 +543,7 @@ function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
       axis="both"
       ref={registerViewport}
       scrollRendering="frequent"
-      verticalTrackOffset={density === 'compact' ? 'control-height-m' : 'control-height-l'}
+      verticalTrackOffset={density === 'compact' ? 'collection-row-l' : 'collection-row-xl'}
       viewportContainerType="size"
       viewportSlot="data-grid-viewport"
     >

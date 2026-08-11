@@ -19,7 +19,7 @@ export interface InputPlaygroundState {
 }
 
 const initialState: InputPlaygroundState = {
-  size: "m",
+  size: "l",
   variant: "default",
   font: "sans",
   fullWidth: false,
@@ -33,7 +33,7 @@ const controls = [
     kind: "select",
     key: "size",
     label: "Size",
-    options: ["s", "m", "l"].map((value) => ({ label: value, value })),
+    options: ["xs", "s", "m", "l"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",
@@ -55,7 +55,7 @@ const controls = [
 
 export function serializeInputPlayground(state: InputPlaygroundState): string {
   const props = ['aria-label="Email"', 'placeholder="name@example.com"'];
-  if (state.size !== "m") props.push(`size="${state.size}"`);
+  if (state.size !== "l") props.push(`size="${state.size}"`);
   if (state.variant !== "default") props.push(`variant="${state.variant}"`);
   if (state.font !== "sans") props.push(`font="${state.font}"`);
   if (state.fullWidth === true) props.push("fullWidth");

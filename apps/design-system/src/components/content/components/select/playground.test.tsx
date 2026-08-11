@@ -10,7 +10,7 @@ afterEach(cleanup);
 describe("Select playground", () => {
   it("serializes a constrained Select composition without default props", () => {
     const source = serializeSelectPlayground({
-      size: "m",
+      size: "l",
       width: "content",
       disabled: false,
     });
@@ -19,7 +19,7 @@ describe("Select playground", () => {
     expect(source).toContain(
       '<Select.Trigger aria-label="Branch" placeholder="Select a branch" />',
     );
-    expect(source).not.toContain('size="m"');
+    expect(source).not.toContain('size="l"');
     expect(source).not.toContain('width="content"');
   });
 

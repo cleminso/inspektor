@@ -12,7 +12,7 @@ describe("Toggle Group playground", () => {
     expect(
       serializeToggleGroupPlayground({
         orientation: "horizontal",
-        size: "m",
+        size: "l",
         width: "content",
         itemWidth: "content",
         multiple: false,

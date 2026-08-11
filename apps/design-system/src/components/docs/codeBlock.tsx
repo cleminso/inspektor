@@ -16,8 +16,8 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
       alignItems="center"
       flexDirection="column"
       position="relative"
-      backgroundColor="bg-page"
-      borderColor="border"
+      backgroundColor="surface-background"
+      borderColor="default"
       borderBottomLeftRadius="m"
       borderBottomRightRadius="m"
       borderStyle="solid"
@@ -58,8 +58,8 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
           hidden={isExpanded === false}
           display={isExpanded === true ? "block" : "none"}
           position="relative"
-          backgroundColor="bg-page"
-          borderColor="border"
+          backgroundColor="surface-background"
+          borderColor="default"
           borderStyle="solid"
           borderWidth={0}
           borderTopWidth={1}

@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { backgroundColors, borderColors, spatial, textColors } from '../../tokens/semantics.stylex'
+import { spatial } from '../../tokens/semantics.stylex'
 import {
   fontFamilies,
   fontSizes,
@@ -8,11 +8,12 @@ import {
   lineHeights,
   spacing,
 } from '../../tokens/value.stylex'
+import { dataGridColors } from './dataGridColors.stylex'
 
 export const dataGridStyles = stylex.create({
   root: {
-    backgroundColor: backgroundColors['bg-page'],
-    color: textColors['text-default'],
+    backgroundColor: dataGridColors.background,
+    color: dataGridColors.text,
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
@@ -21,7 +22,7 @@ export const dataGridStyles = stylex.create({
     width: '100%',
   },
   scrollSurface: {
-    backgroundColor: backgroundColors['bg-page'],
+    backgroundColor: dataGridColors.background,
     position: 'relative',
     minWidth: '100%',
   },
@@ -45,17 +46,17 @@ export const dataGridStyles = stylex.create({
   },
   headerBackdrop: {
     boxSizing: 'border-box',
-    borderBottomColor: borderColors['border-table-header-cell'],
+    borderBottomColor: dataGridColors.headerBorder,
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
-    borderTopColor: borderColors['border-table-header-cell'],
+    borderTopColor: dataGridColors.headerBorder,
     borderTopStyle: 'solid',
     borderTopWidth: 1,
-    height: spatial['control-height-l'],
+    height: spatial['collection-row-height-xl'],
     width: '100%',
   },
   compactHeaderBackdrop: {
-    height: spatial['control-height-m'],
+    height: spatial['collection-row-height-l'],
   },
   header: {
     position: 'sticky',
@@ -63,27 +64,27 @@ export const dataGridStyles = stylex.create({
     top: 0,
   },
   headerCell: {
-    backgroundColor: backgroundColors['bg-table-header'],
+    backgroundColor: dataGridColors.headerBackground,
     boxSizing: 'border-box',
-    color: textColors['text-secondary'],
-    borderBottomColor: borderColors['border-table-header-cell'],
-    borderTopColor: borderColors['border-table-header-cell'],
+    color: dataGridColors.headerText,
+    borderBottomColor: dataGridColors.headerBorder,
+    borderTopColor: dataGridColors.headerBorder,
     borderBottomStyle: 'solid',
     overflow: 'hidden',
     borderBottomWidth: 1,
     borderTopWidth: 1,
     fontWeight: fontWeights.regular,
     borderRightColor: {
-      default: borderColors['border-table-header-cell'],
-      ':has([data-resizing])': borderColors['border-table-column-active'],
+      default: dataGridColors.headerBorder,
+      ':has([data-resizing])': dataGridColors.emphasizedColumnBorder,
       ':has([data-slot="data-grid-resize-handle"]:focus-visible)':
-        borderColors['border-table-column-active'],
+        dataGridColors.emphasizedColumnBorder,
       ':has([data-slot="data-grid-resize-handle"]:hover)':
-        borderColors['border-table-column-active'],
+        dataGridColors.emphasizedColumnBorder,
     },
     outlineColor: {
-      default: 'transparent',
-      ':focus-visible': borderColors['border-table-column-active'],
+      default: dataGridColors.headerOutlineRest,
+      ':focus-visible': dataGridColors.focusRing,
     },
     outlineOffset: -2,
     borderRightStyle: 'solid',
@@ -93,7 +94,7 @@ export const dataGridStyles = stylex.create({
       default: 0,
       ':focus-visible': spatial['focus-ring-width'],
     },
-    height: spatial['control-height-l'],
+    height: spatial['collection-row-height-xl'],
     position: 'sticky',
     textAlign: 'start',
     // paddingLeft: spacing.m,
@@ -106,19 +107,19 @@ export const dataGridStyles = stylex.create({
     top: 0,
   },
   headerCellActive: {
-    backgroundColor: backgroundColors['bg-table-header-cell-active'],
-    color: textColors['text-default'],
-    borderBottomColor: 'transparent',
+    backgroundColor: dataGridColors.emphasizedHeaderBackground,
+    color: dataGridColors.emphasizedHeaderText,
+    borderBottomColor: dataGridColors.emphasizedHeaderBottomBorder,
     borderRightColor: {
-      default: 'transparent',
-      ':has([data-resizing])': borderColors['border-table-column-active'],
+      default: dataGridColors.emphasizedHeaderSideBorder,
+      ':has([data-resizing])': dataGridColors.emphasizedColumnBorder,
       ':has([data-slot="data-grid-resize-handle"]:focus-visible)':
-        borderColors['border-table-column-active'],
+        dataGridColors.emphasizedColumnBorder,
       ':has([data-slot="data-grid-resize-handle"]:hover)':
-        borderColors['border-table-column-active'],
+        dataGridColors.emphasizedColumnBorder,
     },
-    borderTopColor: borderColors['border-table-column-active'],
-    outlineColor: borderColors['border-table-column-active'],
+    borderTopColor: dataGridColors.emphasizedColumnBorder,
+    outlineColor: dataGridColors.emphasizedColumnBorder,
     outlineOffset: {
       default: 0,
       ':focus-visible': -1,
@@ -138,10 +139,10 @@ export const dataGridStyles = stylex.create({
     touchAction: 'none',
   },
   headerCellDragging: {
-    backgroundColor: 'transparent',
+    backgroundColor: dataGridColors.draggedHeaderBackground,
     cursor: 'grabbing',
     zIndex: 4,
-    borderBottomColor: borderColors['border-table-column-active'],
+    borderBottomColor: dataGridColors.emphasizedColumnBorder,
   },
   headerDragContent: {
     alignItems: 'center',
@@ -160,7 +161,7 @@ export const dataGridStyles = stylex.create({
     width: '100%',
   },
   headerDragSource: {
-    color: 'inherit',
+    color: dataGridColors.draggedHeaderText,
   },
   headerDragSourceDragging: {
     visibility: 'hidden',
@@ -175,39 +176,42 @@ export const dataGridStyles = stylex.create({
     position: 'fixed',
   },
   columnDragOverlayContent: {
-    backgroundColor: backgroundColors['bg-table-header-cell-active'],
-    borderBottomColor: borderColors['border-table-column-active'],
+    backgroundColor: dataGridColors.emphasizedHeaderBackground,
+    borderBottomColor: dataGridColors.emphasizedColumnBorder,
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
-    color: textColors['text-default'],
+    color: dataGridColors.emphasizedHeaderText,
   },
   row: {
-    backgroundColor: backgroundColors['bg-page'],
+    backgroundColor: {
+      default: dataGridColors.background,
+      ':hover': dataGridColors.rowHoverBackground,
+    },
   },
   rowSelected: {
-    backgroundColor: 'transparent',
+    backgroundColor: dataGridColors.selectedRowBackground,
   },
   rowActive: {
-    boxShadow: `inset 0 ${spatial['focus-ring-width']} 0 ${borderColors['border-table-cell-active']}`,
+    boxShadow: `inset 0 ${spatial['focus-ring-width']} 0 ${dataGridColors.currentRowBorder}`,
   },
   cell: {
-    backgroundColor: 'transparent',
+    backgroundColor: dataGridColors.cellBackground,
     boxSizing: 'border-box',
     fontFamily: fontFamilies.mono,
-    borderBottomColor: borderColors['border-table-cell'],
+    borderBottomColor: dataGridColors.cellBorder,
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
     overflow: 'hidden',
-    borderRightColor: borderColors['border-table-cell'],
+    borderRightColor: dataGridColors.cellBorder,
     outlineColor: {
-      default: 'transparent',
-      ':focus-visible': borderColors['border-table-cell-active'],
+      default: dataGridColors.cellOutlineRest,
+      ':focus-visible': dataGridColors.focusRing,
     },
     outlineOffset: -2,
     borderRightStyle: 'solid',
     borderRightWidth: 1,
     outlineStyle: 'solid',
-    height: spatial['control-height-l'],
+    height: spatial['collection-row-height-xl'],
     outlineWidth: {
       default: 0,
       ':focus-visible': spatial['focus-ring-width'],
@@ -219,19 +223,19 @@ export const dataGridStyles = stylex.create({
     paddingTop: 0,
   },
   cellColumnActive: {
-    backgroundColor: backgroundColors['bg-table-column-cell-active'],
+    backgroundColor: dataGridColors.emphasizedColumnBackground,
   },
   cellSelected: {
-    backgroundColor: backgroundColors['bg-table-row-cell-selected'],
+    backgroundColor: dataGridColors.selectedCellBackground,
   },
   cellSelection: {
-    backgroundColor: backgroundColors['bg-table-cell-active'],
+    backgroundColor: dataGridColors.emphasizedCellBackground,
   },
   cellActive: {
-    backgroundColor: backgroundColors['bg-table-cell-active'],
-    borderBottomColor: 'transparent',
-    borderRightColor: 'transparent',
-    outlineColor: borderColors['border-table-cell-active'],
+    backgroundColor: dataGridColors.currentCellBackground,
+    borderBottomColor: dataGridColors.currentCellInnerBorder,
+    borderRightColor: dataGridColors.currentCellInnerBorder,
+    outlineColor: dataGridColors.currentCellBorder,
     outlineOffset: {
       default: 0,
       ':focus-visible': -1,
@@ -244,11 +248,11 @@ export const dataGridStyles = stylex.create({
     zIndex: 1,
   },
   resizeHandle: {
-    backgroundColor: 'transparent',
+    backgroundColor: dataGridColors.resizeHandleBackground,
     borderWidth: 0,
     cursor: 'col-resize',
     height: '100%',
-    outlineColor: borderColors['border-table-column-active'],
+    outlineColor: dataGridColors.emphasizedColumnBorder,
     outlineOffset: -2,
     outlineStyle: 'solid',
     outlineWidth: {
@@ -267,13 +271,13 @@ export const dataGridStyles = stylex.create({
     visibility: 'hidden',
   },
   compactCell: {
-    height: spatial['control-height-m'],
+    height: spatial['collection-row-height-l'],
   },
   loadingIndicator: {
     gap: spacing.s,
   },
   messageCell: {
-    color: textColors['text-muted'],
+    color: dataGridColors.messageText,
     padding: 0,
   },
   messageContent: {
@@ -283,13 +287,13 @@ export const dataGridStyles = stylex.create({
     padding: spacing.xl,
     justifyContent: 'center',
     position: 'sticky',
-    height: `calc(100cqh - ${spatial['control-height-l']})`,
+    height: `calc(100cqh - ${spatial['collection-row-height-xl']})`,
     textAlign: 'center',
     left: 0,
     width: '100cqw',
   },
   compactMessageContent: {
-    height: `calc(100cqh - ${spatial['control-height-m']})`,
+    height: `calc(100cqh - ${spatial['collection-row-height-l']})`,
   },
   virtualSpacerCell: {
     padding: 0,
@@ -298,25 +302,25 @@ export const dataGridStyles = stylex.create({
   },
   expandedCell: {
     padding: spacing.l,
-    backgroundColor: backgroundColors['bg-subtle'],
-    borderBottomColor: borderColors.border,
+    backgroundColor: dataGridColors.expandedRowBackground,
+    borderBottomColor: dataGridColors.expandedRowBorder,
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
   },
   footer: {
     alignItems: 'center',
-    backgroundColor: backgroundColors['bg-page'],
-    color: textColors['text-muted'],
+    backgroundColor: dataGridColors.footerBackground,
+    color: dataGridColors.footerText,
     display: 'flex',
     flexShrink: 0,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,
-    borderTopColor: borderColors['border-secondary'],
+    borderTopColor: dataGridColors.footerBorder,
     borderTopStyle: 'solid',
     borderTopWidth: 1,
     justifyContent: 'space-between',
-    minHeight: spatial['control-height-l'],
+    minHeight: spatial['collection-row-height-xl'],
     paddingLeft: spacing.l,
     paddingRight: spacing.l,
   },

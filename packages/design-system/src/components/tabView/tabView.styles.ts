@@ -1,11 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import {
-  backgroundColors,
-  borderColors,
-  spatial,
-  textColors,
-} from '../../tokens/semantics.stylex'
+import { spatial } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -14,6 +9,7 @@ import {
   lineHeights,
   spacing,
 } from '../../tokens/value.stylex'
+import { tabViewColors } from './tabViewColors.stylex'
 import { tabViewVars } from './tabViewVars.stylex'
 
 export const tabViewStyles = stylex.create({
@@ -52,12 +48,12 @@ export const tabViewStyles = stylex.create({
   listActivationNone: {},
   item: {
     [tabViewVars.background]: {
-      default: backgroundColors['bg-tab'],
-      ':focus-within': backgroundColors['bg-tab-hover'],
-      ':hover': backgroundColors['bg-tab-hover'],
+      default: tabViewColors.background,
+      ':focus-within': tabViewColors.hoverBackground,
+      ':hover': tabViewColors.hoverBackground,
     },
     [tabViewVars.closeBackground]: {
-      default: 'transparent',
+      default: tabViewColors.closeBackground,
       ':focus-within': tabViewVars.background,
       ':hover': tabViewVars.background,
     },
@@ -79,7 +75,7 @@ export const tabViewStyles = stylex.create({
     flexBasis: 'auto',
     flexGrow: 0,
     flexShrink: 1,
-    outlineColor: borderColors['outline'],
+    outlineColor: tabViewColors.focusRing,
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',
@@ -93,19 +89,19 @@ export const tabViewStyles = stylex.create({
     width: 'fit-content',
   },
   itemActive: {
-    [tabViewVars.background]: backgroundColors['bg-tab-selected'],
+    [tabViewVars.background]: tabViewColors.selectedBackground,
     [tabViewVars.closeBackground]: tabViewVars.background,
     [tabViewVars.closeOpacity]: 1,
     [tabViewVars.closePointerEvents]: 'auto',
   },
   itemDragging: {
-    [tabViewVars.background]: backgroundColors['bg-tab-hover'],
+    [tabViewVars.background]: tabViewColors.hoverBackground,
     [tabViewVars.closeBackground]: tabViewVars.background,
     [tabViewVars.closeOpacity]: 1,
     [tabViewVars.closePointerEvents]: 'auto',
   },
   itemDisabled: {
-    [tabViewVars.background]: 'transparent',
+    [tabViewVars.background]: tabViewColors.disabledBackground,
     [tabViewVars.closeOpacity]: 0,
     [tabViewVars.closePointerEvents]: 'none',
     opacity: 0.6,
@@ -117,10 +113,10 @@ export const tabViewStyles = stylex.create({
     paddingInline: spacing.xs,
     alignItems: 'center',
     appearance: 'none',
-    backgroundColor: 'transparent',
+    backgroundColor: tabViewColors.buttonBackground,
     color: {
-      default: textColors['text-muted'],
-      ':hover': textColors['text-secondary'],
+      default: tabViewColors.text,
+      ':hover': tabViewColors.hoverText,
     },
     cursor: 'pointer',
     display: 'flex',
@@ -137,13 +133,13 @@ export const tabViewStyles = stylex.create({
     width: '100%',
   },
   tabClosable: {
-    paddingRight: `calc(${spatial['control-height-s']} + ${spacing.xxs})`,
+    paddingRight: `calc(${spatial['control-height-m']} + ${spacing.xxs})`,
   },
   tabActive: {
-    color: textColors['text-default'],
+    color: tabViewColors.selectedText,
   },
   tabDisabled: {
-    color: textColors['text-disabled'],
+    color: tabViewColors.disabledText,
     cursor: 'not-allowed',
   },
   tabHorizontal: {},
@@ -179,10 +175,10 @@ export const tabViewStyles = stylex.create({
     position: 'absolute',
     transform: 'translateY(-50%)',
     zIndex: 1,
-    height: spatial['button-height-xs'],
+    height: spatial['control-height-xs'],
     right: 0,
     top: '50%',
-    width: spatial['control-height-s'],
+    width: spatial['control-height-m'],
   },
   closeContainerOverflowing: {
     '::before': {
@@ -206,7 +202,7 @@ export const tabViewStyles = stylex.create({
     zIndex: 1,
   },
   closeIcon: {
-    color: textColors['text-muted'],
+    color: tabViewColors.closeIcon,
     display: 'block',
     position: 'relative',
     zIndex: 1,
@@ -216,7 +212,7 @@ export const tabViewStyles = stylex.create({
   panel: {
     overflow: 'hidden',
     flexGrow: 1,
-    outlineColor: borderColors['outline'],
+    outlineColor: tabViewColors.focusRing,
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',

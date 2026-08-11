@@ -41,7 +41,7 @@ export function SchemaSwitcher({
               paddingHorizontal="m"
               paddingVertical="xs"
               borderWidth={1}
-              borderColor="border"
+              borderColor="default"
               borderStyle="solid"
               borderRadius="xs"
             >

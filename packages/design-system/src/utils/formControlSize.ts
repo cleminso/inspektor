@@ -1,1 +1,1 @@
-export type FormControlSize = 's' | 'm' | 'l'
+export type FormControlSize = 'xs' | 's' | 'm' | 'l'

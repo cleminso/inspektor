@@ -20,7 +20,7 @@ export function InspectorHeader(): React.ReactElement {
       gap="s"
       paddingVertical="s"
       paddingHorizontal="xs"
-      backgroundColor="bg-page"
+      backgroundColor="surface-background"
     >
       <Box minWidth={0} flex={1} alignItems="center" gap="xxs">
         <ConnectionSwitcher width="m" />

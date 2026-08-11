@@ -99,9 +99,9 @@ function InsertRowFormFields({
         justifyContent="between"
         gap="m"
         borderTopWidth={1}
-        borderColor="border"
+        borderColor="default"
         borderStyle="solid"
-        backgroundColor="bg-page"
+        backgroundColor="surface-background"
         px="l"
       >
         <Box

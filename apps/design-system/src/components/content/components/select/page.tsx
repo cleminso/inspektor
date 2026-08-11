@@ -44,7 +44,7 @@ export function SelectPage(): ReactElement {
       </Section>
       <Section
         title="Widths"
-        description="Use content width for intrinsic labels, compact width to reserve a stable short-control footprint, and full width in form layouts."
+        description="Use content width for intrinsic labels and full width in form layouts."
       >
         <Example source={widthsSource}>
           <WidthsExample />

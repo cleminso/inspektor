@@ -1,8 +1,12 @@
 import * as stylex from '@stylexjs/stylex'
 
 import {
-  backgroundColors,
+  accentElementColors,
   borderColors,
+  dangerElementColors,
+  elementColors,
+  focusColors,
+  ghostElementColors,
   spatial,
   textColors,
 } from '../../tokens/semantics.stylex'
@@ -34,7 +38,7 @@ export const buttonStyles = stylex.create({
     fontWeight: fontWeights.regular,
     justifyContent: 'center',
     lineHeight: lineHeights.ui,
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: 2,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
@@ -44,41 +48,41 @@ export const buttonStyles = stylex.create({
   },
   primary: {
     backgroundColor: {
-      default: backgroundColors['bg-primary'],
-      ':hover': backgroundColors['bg-primary-hover'],
-      ':active': backgroundColors['bg-primary-hover'],
+      default: accentElementColors.default,
+      ':hover': accentElementColors.hover,
+      ':active': accentElementColors.pressed,
     },
-    color: textColors['text-on-primary'],
+    color: textColors.onAccent,
   },
   secondary: {
-    borderColor: borderColors['border'],
+    borderColor: borderColors.default,
     backgroundColor: {
       default: null,
-      ':hover': backgroundColors['bg-secondary-hover'],
-      ':active': backgroundColors['bg-pressed'],
+      ':hover': elementColors.hover,
+      ':active': ghostElementColors.pressed,
     },
-    color: textColors['text-default'],
+    color: textColors.default,
   },
   danger: {
     backgroundColor: {
-      default: backgroundColors['bg-danger'],
-      ':hover': backgroundColors['bg-danger-hover'],
-      ':active': backgroundColors['bg-danger-hover'],
+      default: dangerElementColors.default,
+      ':hover': dangerElementColors.hover,
+      ':active': dangerElementColors.pressed,
     },
-    color: textColors['text-default'],
+    color: textColors.default,
   },
   ghost: {
     backgroundColor: {
       default: 'transparent',
-      ':hover': backgroundColors['bg-hover'],
-      ':active': backgroundColors['bg-pressed'],
+      ':hover': ghostElementColors.hover,
+      ':active': ghostElementColors.pressed,
     },
-    color: textColors['text-default'],
+    color: textColors.default,
   },
   link: {
     paddingInline: 0,
     backgroundColor: 'transparent',
-    color: textColors['text-link'],
+    color: textColors.link,
     textDecorationLine: {
       default: 'none',
       ':hover': 'underline',
@@ -88,17 +92,17 @@ export const buttonStyles = stylex.create({
   sizeXS: {
     paddingInline: spacing.s,
     fontSize: fontSizes[2],
-    height: spatial['button-height-xs'],
+    height: spatial['control-height-xs'],
   },
   sizeS: {
     paddingInline: spacing.s,
     fontSize: fontSizes[2],
-    height: spatial['button-height-s'],
+    height: spatial['control-height-s'],
   },
   sizeM: {
     paddingInline: spacing.s,
     fontSize: fontSizes[2],
-    height: spatial['button-height-m'],
+    height: spatial['control-height-m'],
   },
   withPrefix: {
     paddingInlineStart: `calc(${spacing.s} - ${spacing.xxs})`,
@@ -111,7 +115,7 @@ export const buttonStyles = stylex.create({
     paddingInline: 0,
   },
   pressed: {
-    color: textColors['text-selected'],
+    color: textColors.accent,
   },
   radiusNone: {
     borderRadius: borderRadii.none,
@@ -134,11 +138,11 @@ export const buttonStyles = stylex.create({
   disabled: {
     borderColor: 'transparent',
     backgroundColor: {
-      default: backgroundColors['bg-disabled'],
-      ':hover': backgroundColors['bg-disabled'],
-      ':active': backgroundColors['bg-disabled'],
+      default: elementColors.disabled,
+      ':hover': elementColors.disabled,
+      ':active': elementColors.disabled,
     },
-    color: textColors['text-disabled'],
+    color: textColors.disabled,
     cursor: 'not-allowed',
   },
   disabledBare: {
@@ -148,7 +152,7 @@ export const buttonStyles = stylex.create({
       ':hover': 'transparent',
       ':active': 'transparent',
     },
-    color: textColors['text-disabled'],
+    color: textColors.disabled,
     cursor: 'not-allowed',
   },
   content: {

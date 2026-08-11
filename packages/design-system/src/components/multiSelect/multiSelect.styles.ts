@@ -2,9 +2,10 @@ import * as stylex from "@stylexjs/stylex";
 
 import { layerIndexes } from "../../tokens/layers.stylex";
 import {
-  backgroundColors,
   borderColors,
+  focusColors,
   spatial,
+  surfaceColors,
   textColors,
 } from "../../tokens/semantics.stylex";
 import {
@@ -37,14 +38,14 @@ export const multiSelectStyles = stylex.create({
   positionerAlignCenter: {},
   positionerAlignEnd: {},
   popup: {
-    borderColor: borderColors.border,
+    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
     outline: "none",
-    backgroundColor: backgroundColors["bg-popover"],
+    backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,
-    color: textColors["text-default"],
+    color: textColors.default,
     display: "flex",
     flexDirection: "column",
     transformOrigin: "var(--transform-origin)",
@@ -98,9 +99,9 @@ export const multiSelectStyles = stylex.create({
     gridTemplateColumns: `${spatial["icon-size-s"]} minmax(0, 1fr)`,
     lineHeight: lineHeights.ui,
     userSelect: "none",
-    minHeight: spatial["popup-row-min-height-s"],
+    minHeight: spatial["collection-row-height-s"],
   },
-  rowDisabled: { color: textColors["text-disabled"] },
+  rowDisabled: { color: textColors.disabled },
   optionButton: {
     padding: 0,
     borderWidth: 0,
@@ -115,7 +116,7 @@ export const multiSelectStyles = stylex.create({
     fontSize: fontSizes[2],
     fontWeight: fontWeights.regular,
     lineHeight: lineHeights.ui,
-    outlineColor: borderColors["outline"],
+    outlineColor: focusColors.ring,
     outlineOffset: -1,
     outlineStyle: "solid",
     outlineWidth: { default: 0, ":focus-visible": spatial["focus-ring-width"] },
@@ -130,7 +131,7 @@ export const multiSelectStyles = stylex.create({
     whiteSpace: "nowrap",
   },
   action: {
-    color: textColors["text-muted"],
+    color: textColors.muted,
     flexShrink: 0,
     marginInlineStart: "auto",
     opacity: multiSelectVars.actionOpacity,

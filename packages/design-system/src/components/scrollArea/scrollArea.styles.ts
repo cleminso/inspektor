@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { borderColors, spatial } from '../../tokens/semantics.stylex'
+import { borderColors, focusColors, spatial } from '../../tokens/semantics.stylex'
 import { layerIndexes } from '../../tokens/layers.stylex'
 import { borderRadii, spacing } from '../../tokens/value.stylex'
 import { scrollAreaVars } from './scrollAreaVars.stylex'
@@ -40,7 +40,7 @@ export const scrollAreaStyles = stylex.create({
     maxHeight: spatial['viewport-height-l'],
   },
   viewport: {
-    outlineColor: borderColors.outline,
+    outlineColor: focusColors.ring,
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',
@@ -116,18 +116,18 @@ export const scrollAreaStyles = stylex.create({
     height: spatial['scrollbar-track-size'],
   },
   verticalTrackOffsetM: {
-    marginTop: spatial['control-height-m'],
+    marginTop: spatial['collection-row-height-l'],
   },
   verticalTrackOffsetL: {
-    marginTop: spatial['control-height-l'],
+    marginTop: spatial['collection-row-height-xl'],
   },
   verticalTrackFlushEnd: {
     paddingBottom: 0,
   },
   thumb: {
     backgroundColor: {
-      default: borderColors['border-secondary'],
-      ':hover': borderColors['border-focused'],
+      default: borderColors.subtle,
+      ':hover': borderColors.strong,
     },
     borderRadius: borderRadii.m,
   },

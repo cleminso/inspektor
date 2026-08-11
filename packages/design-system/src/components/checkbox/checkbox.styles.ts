@@ -2,8 +2,10 @@ import * as stylex from "@stylexjs/stylex";
 
 import { interactiveControlVars } from "../../primitives/interactiveControlVars.stylex";
 import {
-  backgroundColors,
   borderColors,
+  elementColors,
+  focusColors,
+  surfaceColors,
   textColors,
   spatial,
 } from "../../tokens/semantics.stylex";
@@ -19,12 +21,12 @@ import {
 export const checkboxStyles = stylex.create({
   label: {
     [interactiveControlVars.hoverBorderColor]: {
-      default: borderColors.border,
-      ":hover": borderColors["border-focused"],
+      default: borderColors.default,
+      ":hover": borderColors.strong,
     },
     gap: spacing.s,
     alignItems: "center",
-    color: textColors["text-default"],
+    color: textColors.default,
     cursor: "pointer",
     display: "inline-flex",
     fontFamily: fontFamilies.sans,
@@ -43,21 +45,21 @@ export const checkboxStyles = stylex.create({
     margin: 0,
     padding: 0,
     borderColor: {
-      default: borderColors.border,
-      ":focus-visible": borderColors["border-focused"],
+      default: borderColors.default,
+      ":focus-visible": borderColors.focused,
     },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
     alignItems: "center",
     appearance: "none",
-    backgroundColor: backgroundColors["bg-card"],
+    backgroundColor: surfaceColors.default,
     color: "transparent",
     cursor: "pointer",
     display: "inline-flex",
     flexShrink: 0,
     justifyContent: "center",
-    outlineColor: borderColors["outline"],
+    outlineColor: focusColors.ring,
     outlineOffset: 2,
     outlineStyle: "solid",
     outlineWidth: {
@@ -69,16 +71,16 @@ export const checkboxStyles = stylex.create({
       content: "",
       position: "absolute",
       transform: "translate(-50%, -50%)",
-      height: spatial["control-height-m"],
+      height: spatial["interaction-target-min"],
       left: "50%",
       top: "50%",
-      width: spatial["control-height-m"],
+      width: spatial["interaction-target-min"],
     },
   },
   hoverable: {
     borderColor: {
       default: interactiveControlVars.hoverBorderColor,
-      ":hover": borderColors["border-focused"],
+      ":hover": borderColors.strong,
     },
   },
   sizeS: {
@@ -90,21 +92,21 @@ export const checkboxStyles = stylex.create({
     width: spatial["icon-size-m"],
   },
   selected: {
-    borderColor: backgroundColors["bg-inverse"],
-    backgroundColor: backgroundColors["bg-inverse"],
-    color: textColors["text-on-inverse"],
+    borderColor: surfaceColors.inverse,
+    backgroundColor: surfaceColors.inverse,
+    color: textColors.onInverse,
   },
   invalid: {
-    borderColor: borderColors["border-danger"],
+    borderColor: borderColors.danger,
   },
   disabled: {
-    borderColor: borderColors["border-secondary"],
-    backgroundColor: backgroundColors["bg-disabled"],
-    color: textColors["text-disabled"],
+    borderColor: borderColors.subtle,
+    backgroundColor: elementColors.disabled,
+    color: textColors.disabled,
     cursor: "not-allowed",
   },
   selectedDisabled: {
-    borderColor: borderColors["border-secondary"],
+    borderColor: borderColors.subtle,
   },
   readOnly: {
     cursor: "default",

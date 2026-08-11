@@ -1,14 +1,14 @@
 import * as stylex from "@stylexjs/stylex";
 
 import {
-  backgroundColors,
   borderColors,
+  surfaceColors,
   syntaxColors,
-  spatial,
   textColors,
 } from "../../tokens/semantics.stylex";
 import {
   borderRadii,
+  dimensions,
   fontFamilies,
   fontSizes,
   fontWeights,
@@ -25,14 +25,14 @@ export const structuredValuePreviewStyles = stylex.create({
     minWidth: 0,
   },
   typedMarker: {
-    borderColor: borderColors["border-secondary"],
+    borderColor: borderColors.subtle,
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
     borderWidth: 1,
     paddingBlock: spacing.xxs,
     paddingInline: spacing.xs,
-    backgroundColor: backgroundColors["bg-subtle"],
-    color: textColors["text-secondary"],
+    backgroundColor: surfaceColors.subtle,
+    color: textColors.secondary,
     flexShrink: 0,
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
@@ -54,7 +54,7 @@ export const structuredValuePreviewStyles = stylex.create({
     overflow: "hidden",
     flexShrink: 0,
     textOverflow: "ellipsis",
-    width: spatial["control-height-l"],
+    width: dimensions[32],
   },
   preview: {
     overflow: "hidden",

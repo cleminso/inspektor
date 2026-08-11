@@ -10,10 +10,9 @@ import { textColors } from "../../tokens/semantics.stylex";
 import { shadows } from "../../tokens/value.stylex";
 
 export const keyboardInputVars = stylex.defineVars({
-  // backgroundColor: backgroundColors["bg-card"],
   boxShadow: shadows.border,
   textColor: {
-    default: textColors['text-muted'],
-    ':hover': textColors['text-default'],
+    default: textColors.muted,
+    ':hover': textColors.default,
   },
 });

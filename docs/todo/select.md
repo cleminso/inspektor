@@ -10,6 +10,12 @@
 
 [07/08/26]
 
+- [x] Map trigger sizes to the shared control-height scale.
+- [x] Remove the unused fixed compact-width mode and component-owned global width tokens.
+- [x] Let Base UI's anchor-width variable establish the popup minimum width.
+
+[07/08/26]
+
 - [x] Place the selected check indicator after the option label as a trailing indicator.
 - [x] Replace the trigger triangle glyph with a chevron-down icon.
 - [x] Keep compact triggers stable while placing the chevron directly after short selected values.

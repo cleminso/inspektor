@@ -1,14 +1,15 @@
 import * as stylex from '@stylexjs/stylex'
 
 import {
-  backgroundColors,
   borderColors,
+  elementColors,
+  focusColors,
   spatial,
+  surfaceColors,
   textColors,
 } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
-  dimensions,
   fontFamilies,
   fontSizes,
   fontWeights,
@@ -23,7 +24,7 @@ export const toggleGroupStyles = stylex.create({
     gap: spacing.xxs,
     overflow: 'clip',
     alignItems: 'stretch',
-    backgroundColor: backgroundColors['bg-subtle'],
+    backgroundColor: surfaceColors.subtle,
     boxSizing: 'border-box',
     display: 'inline-flex',
     width: 'fit-content',
@@ -47,6 +48,9 @@ export const toggleGroupStyles = stylex.create({
   rootSizeM: {
     height: spatial['control-height-m'],
   },
+  rootSizeL: {
+    height: spatial['control-height-l'],
+  },
   item: {
     borderColor: 'transparent',
     borderRadius: borderRadii.xs,
@@ -58,8 +62,8 @@ export const toggleGroupStyles = stylex.create({
     appearance: 'none',
     backgroundColor: 'transparent',
     color: {
-      default: textColors['text-muted'],
-      ':hover': textColors['text-secondary'],
+      default: textColors.muted,
+      ':hover': textColors.secondary,
     },
     cursor: 'pointer',
     display: 'inline-flex',
@@ -69,7 +73,7 @@ export const toggleGroupStyles = stylex.create({
     fontWeight: fontWeights.regular,
     justifyContent: 'center',
     lineHeight: lineHeights.ui,
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: 1,
     outlineStyle: {
       default: 'none',
@@ -80,19 +84,22 @@ export const toggleGroupStyles = stylex.create({
     whiteSpace: 'nowrap',
   },
   itemSizeS: {
-    height: dimensions[20],
+    height: `calc(${spatial['control-height-s']} - ${spacing.xs})`,
   },
   itemSizeM: {
-    height: dimensions[24],
+    height: `calc(${spatial['control-height-m']} - ${spacing.xs})`,
+  },
+  itemSizeL: {
+    height: `calc(${spatial['control-height-l']} - ${spacing.xs})`,
   },
   itemPressed: {
-    borderColor: borderColors['border'],
+    borderColor: borderColors.default,
     backgroundColor: {
-      default: backgroundColors['bg-popover'],
-      ':hover': backgroundColors['bg-popover'],
-      ':active': backgroundColors['bg-popover'],
+      default: surfaceColors.raised,
+      ':hover': surfaceColors.raised,
+      ':active': surfaceColors.raised,
     },
-    color: textColors['text-default'],
+    color: textColors.default,
   },
   itemEqualWidth: {
     flexBasis: '0%',
@@ -106,18 +113,18 @@ export const toggleGroupStyles = stylex.create({
       ':active': 'transparent',
     },
     backgroundColor: {
-      default: backgroundColors['bg-disabled'],
-      ':hover': backgroundColors['bg-disabled'],
-      ':active': backgroundColors['bg-disabled'],
+      default: elementColors.disabled,
+      ':hover': elementColors.disabled,
+      ':active': elementColors.disabled,
     },
-    color: textColors['text-disabled'],
+    color: textColors.disabled,
     cursor: 'not-allowed',
   },
   itemPressedDisabled: {
     borderColor: {
-      default: borderColors['border-secondary'],
-      ':hover': borderColors['border-secondary'],
-      ':active': borderColors['border-secondary'],
+      default: borderColors.subtle,
+      ':hover': borderColors.subtle,
+      ':active': borderColors.subtle,
     },
   },
 })

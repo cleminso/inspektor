@@ -27,7 +27,7 @@ function TableWorkspaceStatus({
       flex={1}
       alignItems="center"
       justifyContent="center"
-      backgroundColor="bg-page"
+      backgroundColor="surface-background"
       role={kind === "error" ? "alert" : "status"}
       aria-live={kind === "loading" ? "polite" : undefined}
     >

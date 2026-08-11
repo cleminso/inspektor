@@ -23,10 +23,10 @@ export function Example({ children, source, align = "center" }: ExampleProps): R
       flexDirection="column"
       borderWidth={1}
       borderStyle="solid"
-      borderColor="border"
+      borderColor="default"
       borderRadius="s"
       overflow="hidden"
-      backgroundColor="bg-page"
+      backgroundColor="surface-background"
     >
       <Box
         minHeight="example-height"

@@ -109,7 +109,7 @@ function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.Rea
           height="full"
           minHeight={0}
           overflow="hidden"
-          backgroundColor="bg-page"
+          backgroundColor="surface-background"
           borderBottomRightRadius="xs"
           borderTopRightRadius="xs"
         >
@@ -129,7 +129,7 @@ function SidePanelLayoutContent({ children }: SidePanelLayoutPartProps): React.R
         height="full"
         minHeight={0}
         overflow="hidden"
-        backgroundColor="bg-page"
+        backgroundColor="surface-background"
         borderBottomLeftRadius="xs"
         borderTopLeftRadius="xs"
       >

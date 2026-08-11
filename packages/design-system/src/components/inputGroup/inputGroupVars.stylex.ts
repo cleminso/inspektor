@@ -6,13 +6,13 @@
  */
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, textColors } from "../../tokens/semantics.stylex";
+import { borderColors, focusColors, surfaceColors, textColors } from "../../tokens/semantics.stylex";
 
 export const inputGroupVars = stylex.defineVars({
-  backgroundColor: backgroundColors["bg-card"],
-  borderColor: borderColors.border,
-  focusedBorderColor: borderColors["border-input"],
-  outlineColor: borderColors["border-input-ring"],
+  backgroundColor: surfaceColors.default,
+  borderColor: borderColors.default,
+  focusedBorderColor: borderColors.focused,
+  outlineColor: focusColors.ringSubtle,
   outlineWidth: "0px",
-  textColor: textColors["text-default"],
+  textColor: textColors.default,
 });

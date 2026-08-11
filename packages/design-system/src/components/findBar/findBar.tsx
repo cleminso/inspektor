@@ -117,8 +117,8 @@ export function FindBar({
   return (
     <Box
       alignItems="center"
-      backgroundColor="bg-subtle"
-      borderColor="border"
+      backgroundColor="surface-subtle"
+      borderColor="default"
       borderRadius="xs"
       borderStyle="solid"
       borderWidth={1}
@@ -240,7 +240,7 @@ export function FindBar({
         alignItems="center"
         aria-label={statusLabel}
         as="span"
-        color="text-muted"
+        color="muted"
         display="inline-flex"
         flexShrink={0}
         justifyContent="end"

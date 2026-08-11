@@ -1,6 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
+import {
+  borderColors,
+  elementColors,
+  focusColors,
+  spatial,
+  surfaceColors,
+  textColors,
+} from "../../tokens/semantics.stylex";
 import {
   borderRadii,
   fontFamilies,
@@ -13,8 +20,8 @@ export const inputStyles = stylex.create({
   base: {
     margin: 0,
     borderColor: {
-      default: borderColors.border,
-      ":focus": borderColors["border-input"],
+      default: borderColors.default,
+      ":focus": borderColors.focused,
     },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
@@ -22,12 +29,12 @@ export const inputStyles = stylex.create({
     paddingBlock: 0,
     paddingInline: spacing.xs,
     appearance: "none",
-    backgroundColor: backgroundColors["bg-card"],
+    backgroundColor: surfaceColors.default,
     boxSizing: "border-box",
-    color: textColors["text-default"],
+    color: textColors.default,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    outlineColor: borderColors["border-input-ring"],
+    outlineColor: focusColors.ringSubtle,
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: {
@@ -36,8 +43,11 @@ export const inputStyles = stylex.create({
     },
     minWidth: 0,
     "::placeholder": {
-      color: textColors["text-muted"],
+      color: textColors.muted,
     },
+  },
+  sizeXS: {
+    height: spatial["control-height-xs"],
   },
   sizeS: {
     height: spatial["control-height-s"],
@@ -57,10 +67,10 @@ export const inputStyles = stylex.create({
   subtle: {
     borderColor: {
       default: "transparent",
-      ":hover": borderColors.border,
-      ":focus": borderColors["border-focused"],
+      ":hover": borderColors.default,
+      ":focus": borderColors.focused,
     },
-    backgroundColor: backgroundColors["bg-subtle"],
+    backgroundColor: surfaceColors.subtle,
   },
   fullWidth: {
     width: "100%",
@@ -78,29 +88,29 @@ export const inputStyles = stylex.create({
   },
   disabled: {
     backgroundColor: {
-      default: backgroundColors["bg-disabled"],
-      ":hover": backgroundColors["bg-disabled"],
+      default: elementColors.disabled,
+      ":hover": elementColors.disabled,
     },
-    color: textColors["text-disabled"],
+    color: textColors.disabled,
     cursor: "not-allowed",
     "::placeholder": {
-      color: textColors["text-disabled"],
+      color: textColors.disabled,
     },
   },
   readOnly: {
     backgroundColor: {
-      default: backgroundColors["bg-secondary"],
-      ":hover": backgroundColors["bg-secondary"],
+      default: elementColors.default,
+      ":hover": elementColors.default,
     },
     cursor: "default",
   },
   invalid: {
     borderColor: {
-      default: borderColors["border-danger"],
-      ":focus-visible": borderColors["border-danger"],
-      ":focus": borderColors["border-danger"],
+      default: borderColors.danger,
+      ":focus-visible": borderColors.danger,
+      ":focus": borderColors.danger,
     },
-    outlineColor: borderColors["border-danger-subtle"],
+    outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: {

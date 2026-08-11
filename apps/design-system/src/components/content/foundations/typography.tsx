@@ -35,7 +35,7 @@ export function TypographyFoundationPage(): ReactElement {
           flexDirection="column"
           borderWidth={1}
           borderStyle="solid"
-          borderColor="border"
+          borderColor="default"
           borderRadius="m"
           overflow="hidden"
         >
@@ -47,7 +47,7 @@ export function TypographyFoundationPage(): ReactElement {
               padding="xl"
               borderBottomWidth={1}
               borderStyle="solid"
-              borderColor="border"
+              borderColor="default"
             >
               <Text as="code" variant="caption" color="muted">
                 {variant}
@@ -68,7 +68,7 @@ export function TypographyFoundationPage(): ReactElement {
           padding="xl"
           borderWidth={1}
           borderStyle="solid"
-          borderColor="border"
+          borderColor="default"
           borderRadius="m"
         >
           {textColors.map((color) => (

@@ -23,9 +23,10 @@ import * as stylex from "@stylexjs/stylex";
 import { useEffect, useId, useRef, useState } from "react";
 
 import {
-  backgroundColors,
   borderColors,
+  ghostElementColors,
   spatial,
+  surfaceColors,
   syntaxColors,
   textColors,
 } from "../../tokens/semantics.stylex";
@@ -123,7 +124,7 @@ const highlightStyle = HighlightStyle.define([
 const editorTheme = EditorView.theme({
   "&": {
     backgroundColor: "transparent",
-    color: textColors["text-default"],
+    color: textColors.default,
     fontSize: fontSizes[1],
     height: "100%",
   },
@@ -145,13 +146,13 @@ const editorTheme = EditorView.theme({
     borderRadius: borderRadii.m,
   },
   "&:hover .cm-scroller, &.cm-focused .cm-scroller": {
-    scrollbarColor: `${borderColors["border-secondary"]} transparent`,
+    scrollbarColor: `${borderColors.subtle} transparent`,
   },
   "&:hover .cm-scroller::-webkit-scrollbar-thumb, &.cm-focused .cm-scroller::-webkit-scrollbar-thumb": {
-    backgroundColor: borderColors["border-secondary"],
+    backgroundColor: borderColors.subtle,
   },
   ".cm-content": {
-    caretColor: textColors["text-default"],
+    caretColor: textColors.default,
     minHeight: "100%",
     paddingBlock: spacing.l,
     paddingInline: spacing.m,
@@ -162,7 +163,7 @@ const editorTheme = EditorView.theme({
   ".cm-gutters": {
     backgroundColor: codeEditorVars.backgroundColor,
     borderRightWidth: 0,
-    color: textColors["text-muted"],
+    color: textColors.muted,
   },
   ".cm-lineNumbers .cm-gutterElement": {
     minWidth: spatial["control-height-xs"],
@@ -175,7 +176,7 @@ const editorTheme = EditorView.theme({
   ".cm-foldGutter .cm-gutterElement": {
     alignItems: "center",
     borderRadius: borderRadii.xs,
-    color: textColors["text-muted"],
+    color: textColors.muted,
     cursor: "pointer",
     display: "flex",
     justifyContent: "center",
@@ -183,8 +184,8 @@ const editorTheme = EditorView.theme({
     width: spatial["icon-size-m"],
   },
   ".cm-foldGutter .cm-gutterElement:hover": {
-    backgroundColor: backgroundColors["bg-hover"],
-    color: textColors["text-default"],
+    backgroundColor: ghostElementColors.hover,
+    color: textColors.default,
   },
   '[data-slot="code-editor-fold-marker"]': {
     alignItems: "center",
@@ -200,18 +201,18 @@ const editorTheme = EditorView.theme({
     width: spatial["icon-size-xs"],
   },
   ".cm-cursor, .cm-dropCursor": {
-    borderLeftColor: textColors["text-default"],
+    borderLeftColor: textColors.default,
   },
   ".cm-selectionBackground, &.cm-focused .cm-selectionBackground, ::selection": {
-    backgroundColor: backgroundColors["bg-selected"],
+    backgroundColor: ghostElementColors.selected,
   },
   ".cm-activeLine": {
     backgroundColor: "transparent",
   },
   ".cm-tooltip": {
-    backgroundColor: backgroundColors["bg-popover"],
+    backgroundColor: surfaceColors.raised,
     borderColor: syntaxColors["syntax-punctuation"],
-    color: textColors["text-default"],
+    color: textColors.default,
   },
   ".cm-diagnostic-error": {
     borderLeftColor: syntaxColors["syntax-string-special"],

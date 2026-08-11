@@ -135,7 +135,7 @@ export function Toolbar({ actions, children, pagination }: ToolbarProps): React.
       alignItems="center"
       gap="s"
       padding="s"
-      backgroundColor="bg-page"
+      backgroundColor="surface-background"
     >
       <Box minWidth={0} flex={1}>
         {children}

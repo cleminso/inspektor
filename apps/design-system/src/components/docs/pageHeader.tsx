@@ -19,7 +19,7 @@ export function PageHeader({ title, description, source }: PageHeaderProps): Rea
       paddingBottom="2xl"
       borderBottomWidth={1}
       borderStyle="solid"
-      borderColor="border"
+      borderColor="default"
     >
       <Box flexDirection="row" alignItems="center" justifyContent="between" gap="xl">
         <Text as="h1" variant="heading">

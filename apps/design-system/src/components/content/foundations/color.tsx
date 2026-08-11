@@ -1,5 +1,11 @@
 import { Box, Text, Toaster, toasts } from "@inspector/ds";
-import { paletteValues, type PaletteToken } from "@inspector/ds/theme";
+import {
+  paletteValues,
+  type BackgroundColorToken,
+  type BorderColorToken,
+  type PaletteToken,
+  type TextColorToken,
+} from "@inspector/ds/theme";
 import * as stylex from "@stylexjs/stylex";
 import { type ReactElement } from "react";
 import { useTheme } from "next-themes";
@@ -33,6 +39,149 @@ interface ColorScale {
   label: string;
   swatches: ColorSwatch[];
 }
+
+interface SemanticColorRole {
+  label: string;
+  token: string;
+  style: keyof typeof semanticColorAppearances;
+}
+
+interface SemanticColorGroup {
+  label: string;
+  description: string;
+  roles: SemanticColorRole[];
+}
+
+interface SemanticColorAppearance {
+  backgroundColor: BackgroundColorToken;
+  borderColor?: BorderColorToken;
+  color?: TextColorToken;
+  sample?: string;
+}
+
+const semanticColorAppearances = {
+  surfaceBackground: { backgroundColor: "surface-background" },
+  surfaceDefault: { backgroundColor: "surface-default" },
+  surfaceRaised: { backgroundColor: "surface-raised" },
+  surfaceSunken: { backgroundColor: "surface-canvas" },
+  surfaceSubtle: { backgroundColor: "surface-subtle" },
+  surfaceInverse: { backgroundColor: "surface-inverse" },
+  elementDefault: { backgroundColor: "element-default" },
+  elementHover: { backgroundColor: "element-hover" },
+  elementPressed: { backgroundColor: "element-pressed" },
+  elementSelected: { backgroundColor: "element-selected" },
+  elementDisabled: { backgroundColor: "element-disabled" },
+  ghostDefault: { backgroundColor: "ghost-element-default" },
+  ghostHover: { backgroundColor: "ghost-element-hover" },
+  ghostPressed: { backgroundColor: "ghost-element-pressed" },
+  ghostSelected: { backgroundColor: "ghost-element-selected" },
+  ghostDisabled: { backgroundColor: "ghost-element-disabled" },
+  accentDefault: { backgroundColor: "accent-element-default" },
+  accentHover: { backgroundColor: "accent-element-hover" },
+  accentPressed: { backgroundColor: "accent-element-pressed" },
+  dangerDefault: { backgroundColor: "danger-element-default" },
+  dangerHover: { backgroundColor: "danger-element-hover" },
+  dangerPressed: { backgroundColor: "danger-element-pressed" },
+  textDefault: { backgroundColor: "surface-default", color: "default", sample: "Aa" },
+  textSecondary: { backgroundColor: "surface-default", color: "secondary", sample: "Aa" },
+  textMuted: { backgroundColor: "surface-default", color: "muted", sample: "Aa" },
+  textPlaceholder: { backgroundColor: "surface-default", color: "placeholder", sample: "Aa" },
+  textDisabled: { backgroundColor: "surface-default", color: "disabled", sample: "Aa" },
+  textAccent: { backgroundColor: "surface-default", color: "accent", sample: "Aa" },
+  textDanger: { backgroundColor: "surface-default", color: "danger", sample: "Aa" },
+  borderDefault: { backgroundColor: "surface-default", borderColor: "default" },
+  borderSubtle: { backgroundColor: "surface-default", borderColor: "subtle" },
+  borderStrong: { backgroundColor: "surface-default", borderColor: "strong" },
+  borderFocused: { backgroundColor: "surface-default", borderColor: "focused" },
+  focusRing: { backgroundColor: "surface-default", borderColor: "focused" },
+  selectionBackground: { backgroundColor: "selection-background" },
+  selectionStrongBackground: { backgroundColor: "selection-strong-background" },
+} as const satisfies Record<string, SemanticColorAppearance>;
+
+function getSemanticColorAppearance(
+  style: keyof typeof semanticColorAppearances,
+): SemanticColorAppearance {
+  return semanticColorAppearances[style];
+}
+
+const semanticColorGroups: SemanticColorGroup[] = [
+  {
+    label: "Surface",
+    description: "Structural backgrounds shared by pages, containers, and floating content.",
+    roles: [
+      { label: "Background", token: "surface.background", style: "surfaceBackground" },
+      { label: "Surface", token: "surface.default", style: "surfaceDefault" },
+      { label: "Raised", token: "surface.raised", style: "surfaceRaised" },
+      { label: "Sunken", token: "surface.canvas", style: "surfaceSunken" },
+      { label: "Subtle", token: "surface.subtle", style: "surfaceSubtle" },
+      { label: "Inverse", token: "surface.inverse", style: "surfaceInverse" },
+    ],
+  },
+  {
+    label: "Element",
+    description: "Filled interactive elements and their mutually exclusive interaction states.",
+    roles: [
+      { label: "Default", token: "element.default", style: "elementDefault" },
+      { label: "Hover", token: "element.hover", style: "elementHover" },
+      { label: "Pressed", token: "element.pressed", style: "elementPressed" },
+      { label: "Selected", token: "element.selected", style: "elementSelected" },
+      { label: "Disabled", token: "element.disabled", style: "elementDisabled" },
+    ],
+  },
+  {
+    label: "Ghost element",
+    description: "Transparent interactive elements that reveal state without introducing a resting surface.",
+    roles: [
+      { label: "Default", token: "ghostElement.default", style: "ghostDefault" },
+      { label: "Hover", token: "ghostElement.hover", style: "ghostHover" },
+      { label: "Pressed", token: "ghostElement.pressed", style: "ghostPressed" },
+      { label: "Selected", token: "ghostElement.selected", style: "ghostSelected" },
+      { label: "Disabled", token: "ghostElement.disabled", style: "ghostDisabled" },
+    ],
+  },
+  {
+    label: "Accent and danger",
+    description: "Intent-bearing interactive surfaces with their own hover and pressed progressions.",
+    roles: [
+      { label: "Accent", token: "accentElement.default", style: "accentDefault" },
+      { label: "Accent hover", token: "accentElement.hover", style: "accentHover" },
+      { label: "Accent pressed", token: "accentElement.pressed", style: "accentPressed" },
+      { label: "Danger", token: "dangerElement.default", style: "dangerDefault" },
+      { label: "Danger hover", token: "dangerElement.hover", style: "dangerHover" },
+      { label: "Danger pressed", token: "dangerElement.pressed", style: "dangerPressed" },
+    ],
+  },
+  {
+    label: "Text",
+    description: "Content hierarchy, interaction emphasis, status, and on-color foregrounds.",
+    roles: [
+      { label: "Default", token: "text.default", style: "textDefault" },
+      { label: "Secondary", token: "text.secondary", style: "textSecondary" },
+      { label: "Muted", token: "text.muted", style: "textMuted" },
+      { label: "Placeholder", token: "text.placeholder", style: "textPlaceholder" },
+      { label: "Disabled", token: "text.disabled", style: "textDisabled" },
+      { label: "Accent", token: "text.accent", style: "textAccent" },
+      { label: "Danger", token: "text.danger", style: "textDanger" },
+    ],
+  },
+  {
+    label: "Border, focus, and selection",
+    description: "Boundaries and orthogonal indicators that can coexist with element state.",
+    roles: [
+      { label: "Default", token: "border.default", style: "borderDefault" },
+      { label: "Subtle", token: "border.subtle", style: "borderSubtle" },
+      { label: "Strong", token: "border.strong", style: "borderStrong" },
+      { label: "Focused", token: "border.focused", style: "borderFocused" },
+      { label: "Focus ring", token: "focus.ring", style: "focusRing" },
+      { label: "Selection", token: "selection.background", style: "selectionBackground" },
+      {
+        label: "Strong selection",
+        token: "selection.strongBackground",
+        style: "selectionStrongBackground",
+      },
+    ],
+  },
+];
 
 function getScaleToken(scaleName: ScaleName, step: ScaleStep): PaletteToken {
   return `${scaleName}${step}` as PaletteToken;
@@ -161,6 +310,43 @@ function ColorScaleRow({ scale }: { scale: ColorScale }): ReactElement {
   );
 }
 
+function SemanticColorGroup({ group }: { group: SemanticColorGroup }): ReactElement {
+  return (
+    <Box flexDirection="column" gap="m">
+      <Box flexDirection="column" gap="xs">
+        <Text as="h3" variant="title">
+          {group.label}
+        </Text>
+        <Text color="muted">{group.description}</Text>
+      </Box>
+      <ul {...stylex.props(styles.semanticList)}>
+        {group.roles.map((role) => (
+          <li key={role.token} {...stylex.props(styles.semanticItem)}>
+            <Box
+              as="span"
+              aria-hidden="true"
+              alignItems="center"
+              backgroundColor={getSemanticColorAppearance(role.style).backgroundColor}
+              borderColor={getSemanticColorAppearance(role.style).borderColor ?? "default"}
+              borderRadius="s"
+              borderStyle="solid"
+              borderWidth={1}
+              color={getSemanticColorAppearance(role.style).color}
+              height="control-height-m"
+              justifyContent="center"
+              width="control-height-m"
+            >
+              {getSemanticColorAppearance(role.style).sample}
+            </Box>
+            <span {...stylex.props(styles.semanticLabel)}>{role.label}</span>
+            <code {...stylex.props(styles.semanticToken)}>{role.token}</code>
+          </li>
+        ))}
+      </ul>
+    </Box>
+  );
+}
+
 export function ColorFoundationPage(): ReactElement {
   const { resolvedTheme } = useTheme();
   const mode: ThemeMode = resolvedTheme === "dark" ? "dark" : "light";
@@ -181,12 +367,26 @@ export function ColorFoundationPage(): ReactElement {
           </Box>
         </Section>
 
-        {/*<Section
-          title="Backgrounds"
-          description="There are two background colors for pages and UI components. In most cases, use "
+        <Section
+          title="Interface semantics"
+          description="Reusable color roles are grouped by visual responsibility. Component colors link to these roles instead of adding component names to the interface namespace."
         >
+          <Box flexDirection="column" gap="3xl">
+            {semanticColorGroups.map((group) => (
+              <SemanticColorGroup key={group.label} group={group} />
+            ))}
+          </Box>
+        </Section>
 
-        </Section>*/}
+        <Section
+          title="Component semantics"
+          description="Components with distinct visual state models own private linked tokens. DataGrid defines header, row, column, cell, and focus roles; TabView defines resting, hover, selected, disabled, text, and focus roles."
+        >
+          <Text color="muted">
+            Component tokens remain beside their implementation and link to interface semantics by default.
+            They are promoted to the public theme contract only when consumers need to tune them independently.
+          </Text>
+        </Section>
       </FoundationDocsPage>
       <Toaster />
     </>
@@ -245,5 +445,34 @@ const styles = stylex.create({
     minWidth: 0,
     padding: 0,
     width: "100%",
+  },
+  semanticList: {
+    display: "grid",
+    gap: 8,
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+  semanticItem: {
+    alignItems: "center",
+    display: "grid",
+    gap: 8,
+    gridTemplateColumns: "24px minmax(0, 1fr)",
+    paddingBlock: 4,
+  },
+  semanticLabel: {
+    color: "inherit",
+    fontFamily: "'Geist Variable', 'Inter', sans-serif",
+    fontSize: 13,
+    lineHeight: "18px",
+    minWidth: 0,
+  },
+  semanticToken: {
+    color: "inherit",
+    fontFamily: "'Geist Mono Variable', ui-monospace, SFMono-Regular, Consolas, monospace",
+    fontSize: 12,
+    lineHeight: "16px",
+    minWidth: 0,
   },
 });

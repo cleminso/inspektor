@@ -1,15 +1,22 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
+import {
+  borderColors,
+  elementColors,
+  focusColors,
+  spatial,
+  surfaceColors,
+  textColors,
+} from "../../tokens/semantics.stylex";
 import { borderRadii, fontFamilies, fontSizes, lineHeights, spacing } from "../../tokens/value.stylex";
 import { codeEditorVars } from "./codeEditorVars.stylex";
 
 export const codeEditorStyles = stylex.create({
   root: {
-    [codeEditorVars.backgroundColor]: backgroundColors["bg-card"],
+    [codeEditorVars.backgroundColor]: surfaceColors.default,
     borderColor: {
-      default: borderColors.border,
-      ":focus-within": borderColors["border-focused"],
+      default: borderColors.default,
+      ":focus-within": borderColors.focused,
     },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
@@ -31,21 +38,21 @@ export const codeEditorStyles = stylex.create({
   },
   invalid: {
     borderColor: {
-      default: borderColors["border-danger"],
-      ":focus-within": borderColors["border-danger"],
+      default: borderColors.danger,
+      ":focus-within": borderColors.danger,
     },
-    outlineColor: borderColors["border-danger-subtle"],
+    outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: 0,
   },
   disabled: {
-    [codeEditorVars.backgroundColor]: backgroundColors["bg-disabled"],
-    color: textColors["text-disabled"],
+    [codeEditorVars.backgroundColor]: elementColors.disabled,
+    color: textColors.disabled,
     cursor: "not-allowed",
   },
   readOnly: {
-    [codeEditorVars.backgroundColor]: backgroundColors["bg-secondary"],
+    [codeEditorVars.backgroundColor]: elementColors.default,
   },
   viewport: {
     minHeight: 0,
@@ -73,21 +80,21 @@ export const codeEditorStyles = stylex.create({
   },
   loadError: {
     padding: spacing.xs,
-    borderColor: borderColors.border,
+    borderColor: borderColors.default,
     borderStyle: "solid",
-    color: textColors["text-danger"],
+    color: textColors.danger,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,
     borderTopWidth: 1,
   },
   toolbar: {
     padding: spacing.xs,
-    borderColor: borderColors.border,
+    borderColor: borderColors.default,
     borderStyle: "solid",
     borderWidth: 0,
     gap: spacing.xxs,
     alignItems: "center",
-    backgroundColor: backgroundColors["bg-secondary"],
+    backgroundColor: elementColors.default,
     display: "flex",
     justifyContent: "flex-end",
     borderTopWidth: 1,

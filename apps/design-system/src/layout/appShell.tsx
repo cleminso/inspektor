@@ -84,8 +84,8 @@ function AppShellContent(): ReactElement {
         height="full"
         flexDirection="column"
         overflow="hidden"
-        backgroundColor="bg-page"
-        color="text-default"
+        backgroundColor="surface-background"
+        color="default"
       >
         <Box
           as="header"
@@ -96,7 +96,7 @@ function AppShellContent(): ReactElement {
           paddingVertical="m"
           borderBottomWidth={1}
           borderStyle="solid"
-          borderColor="border"
+          borderColor="default"
         >
           <Link to="/">
             <Text as="span" variant="title">

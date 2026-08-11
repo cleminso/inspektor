@@ -5,9 +5,9 @@ import { textColors } from '../../tokens/semantics.stylex'
 export const textLinkStyles = stylex.create({
   base: {
     color: {
-      default: textColors['text-default'],
-      ':focus-visible': textColors['text-link'],
-      ':hover': textColors['text-link'],
+      default: textColors.default,
+      ':focus-visible': textColors.link,
+      ':hover': textColors.link,
     },
     textDecorationLine: 'none',
   },

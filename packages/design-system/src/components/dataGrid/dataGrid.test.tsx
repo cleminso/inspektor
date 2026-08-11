@@ -11,10 +11,59 @@ import { useState, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { DataGrid } from './dataGrid'
+import { dataGridColors } from './dataGridColors.stylex'
 import { dataGridStyles } from './dataGrid.styles'
 import { dataGridFeatures, type DataGridFeatures } from './dataGridFeatures'
 import { getDataGridHeaderSortableId } from './dataGridReorder'
 import { scrollAreaStyles } from '../scrollArea/scrollArea.styles'
+import {
+  accentElementColors,
+  borderColors,
+  dangerElementColors,
+  elementColors,
+  focusColors,
+  ghostElementColors,
+  selectionColors,
+  surfaceColors,
+  textColors,
+} from '../../tokens/semantics.stylex'
+
+describe('DataGrid color contract', () => {
+  it('defines component roles without adding table roles to global colors', () => {
+    expect(dataGridColors).toMatchObject({
+      background: expect.any(String),
+      headerBackground: expect.any(String),
+      headerBorder: expect.any(String),
+      headerText: expect.any(String),
+      rowHoverBackground: expect.any(String),
+      selectedRowBackground: expect.any(String),
+      selectedCellBackground: expect.any(String),
+      emphasizedCellBackground: expect.any(String),
+      emphasizedHeaderBackground: expect.any(String),
+      emphasizedColumnBackground: expect.any(String),
+      emphasizedColumnBorder: expect.any(String),
+      currentCellBackground: expect.any(String),
+      currentCellBorder: expect.any(String),
+      footerBackground: expect.any(String),
+      footerBorder: expect.any(String),
+      footerText: expect.any(String),
+      focusRing: expect.any(String),
+    })
+
+    const globalKeys = [
+      ...Object.keys(surfaceColors),
+      ...Object.keys(elementColors),
+      ...Object.keys(ghostElementColors),
+      ...Object.keys(accentElementColors),
+      ...Object.keys(dangerElementColors),
+      ...Object.keys(selectionColors),
+      ...Object.keys(borderColors),
+      ...Object.keys(textColors),
+      ...Object.keys(focusColors),
+    ]
+    expect(globalKeys.some((key) => /table/i.test(key))).toBe(false)
+  })
+})
 
 let onDataGridDragEnd: ((event: unknown) => void) | undefined
 let dragOverlayDropAnimation: unknown

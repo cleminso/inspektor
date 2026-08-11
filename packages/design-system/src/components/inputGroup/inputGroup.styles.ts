@@ -1,6 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
+import {
+  borderColors,
+  elementColors,
+  focusColors,
+  ghostElementColors,
+  spatial,
+  textColors,
+} from "../../tokens/semantics.stylex";
 import {
   borderRadii,
   fontFamilies,
@@ -32,6 +39,9 @@ export const inputGroupStyles = stylex.create({
     borderColor: inputGroupVars.focusedBorderColor,
     outlineWidth: spatial["focus-ring-width"],
   },
+  sizeXS: {
+    height: spatial["control-height-xs"],
+  },
   sizeS: {
     height: spatial["control-height-s"],
   },
@@ -45,14 +55,14 @@ export const inputGroupStyles = stylex.create({
     width: "100%",
   },
   invalid: {
-    [inputGroupVars.borderColor]: borderColors["border-danger"],
-    [inputGroupVars.focusedBorderColor]: borderColors["border-danger"],
-    [inputGroupVars.outlineColor]: borderColors["border-danger-subtle"],
+    [inputGroupVars.borderColor]: borderColors.danger,
+    [inputGroupVars.focusedBorderColor]: borderColors.danger,
+    [inputGroupVars.outlineColor]: focusColors.ringDanger,
     [inputGroupVars.outlineWidth]: spatial["focus-ring-width"],
   },
   disabled: {
-    [inputGroupVars.backgroundColor]: backgroundColors["bg-disabled"],
-    [inputGroupVars.textColor]: textColors["text-disabled"],
+    [inputGroupVars.backgroundColor]: elementColors.disabled,
+    [inputGroupVars.textColor]: textColors.disabled,
   },
   text: {
     paddingInline: spacing.m,
@@ -65,16 +75,16 @@ export const inputGroupStyles = stylex.create({
     whiteSpace: "nowrap",
   },
   prefix: {
-    borderInlineEndColor: borderColors["border-secondary"],
+    borderInlineEndColor: borderColors.subtle,
     borderInlineEndStyle: "solid",
     borderInlineEndWidth: 1,
-    color: textColors["text-muted"],
+    color: textColors.muted,
   },
   suffix: {
-    borderInlineStartColor: borderColors["border-secondary"],
+    borderInlineStartColor: borderColors.subtle,
     borderInlineStartStyle: "solid",
     borderInlineStartWidth: 1,
-    color: textColors["text-muted"],
+    color: textColors.muted,
   },
   action: {
     margin: 0,
@@ -83,21 +93,21 @@ export const inputGroupStyles = stylex.create({
     appearance: "none",
     backgroundColor: {
       default: "transparent",
-      ":hover": backgroundColors["bg-hover"],
-      ":active": backgroundColors["bg-pressed"],
+      ":hover": ghostElementColors.hover,
+      ":active": ghostElementColors.pressed,
     },
     borderBlockEndWidth: 0,
     borderBlockStartWidth: 0,
     borderInlineEndWidth: 0,
-    borderInlineStartColor: borderColors["border-secondary"],
+    borderInlineStartColor: borderColors.subtle,
     borderInlineStartStyle: "solid",
     borderInlineStartWidth: 1,
-    color: textColors["text-muted"],
+    color: textColors.muted,
     cursor: "pointer",
     display: "inline-flex",
     flexShrink: 0,
     justifyContent: "center",
-    outlineColor: borderColors["outline"],
+    outlineColor: focusColors.ring,
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: {
@@ -107,28 +117,31 @@ export const inputGroupStyles = stylex.create({
   },
   actionPressed: {
     backgroundColor: {
-      default: backgroundColors["bg-selected"],
-      ":hover": backgroundColors["bg-hover"],
-      ":active": backgroundColors["bg-pressed"],
+      default: ghostElementColors.selected,
+      ":hover": ghostElementColors.hover,
+      ":active": ghostElementColors.pressed,
     },
   },
+  actionXS: {
+    width: `calc(${spatial["control-height-xs"]} - 2px)`,
+  },
   actionS: {
-    width: spatial["control-inner-height-s"],
+    width: `calc(${spatial["control-height-s"]} - 2px)`,
   },
   actionM: {
-    width: spatial["control-inner-height-m"],
+    width: `calc(${spatial["control-height-m"]} - 2px)`,
   },
   actionL: {
-    width: spatial["control-inner-height-l"],
+    width: `calc(${spatial["control-height-l"]} - 2px)`,
   },
   checkboxField: {
     gap: spacing.s,
     paddingInline: spacing.m,
     alignItems: "center",
-    borderInlineStartColor: borderColors["border-secondary"],
+    borderInlineStartColor: borderColors.subtle,
     borderInlineStartStyle: "solid",
     borderInlineStartWidth: 1,
-    color: textColors["text-muted"],
+    color: textColors.muted,
     cursor: "pointer",
     display: "inline-flex",
     flexShrink: 0,
@@ -143,7 +156,7 @@ export const inputGroupStyles = stylex.create({
       ":hover": "transparent",
       ":active": "transparent",
     },
-    color: textColors["text-disabled"],
+    color: textColors.disabled,
     cursor: "not-allowed",
     outlineWidth: 0,
   },

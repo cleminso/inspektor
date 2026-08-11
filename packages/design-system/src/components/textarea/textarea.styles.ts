@@ -1,9 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 
 import {
-  backgroundColors,
   borderColors,
+  elementColors,
+  focusColors,
   spatial,
+  surfaceColors,
   textColors,
 } from "../../tokens/semantics.stylex";
 import {
@@ -18,8 +20,8 @@ export const textareaStyles = stylex.create({
   base: {
     margin: 0,
     borderColor: {
-      default: borderColors.border,
-      ":focus": borderColors["border-focused"],
+      default: borderColors.default,
+      ":focus": borderColors.focused,
     },
     borderRadius: borderRadii.xs,
     borderStyle: "solid",
@@ -27,18 +29,18 @@ export const textareaStyles = stylex.create({
     paddingBlock: spacing.s,
     paddingInline: spacing.m,
     appearance: "none",
-    backgroundColor: backgroundColors["bg-card"],
+    backgroundColor: surfaceColors.default,
     boxSizing: "border-box",
-    color: textColors["text-default"],
+    color: textColors.default,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    outlineColor: borderColors["outline"],
+    outlineColor: focusColors.ring,
     outlineStyle: "solid",
     outlineWidth: 0,
     resize: "vertical",
     minWidth: 0,
     "::placeholder": {
-      color: textColors["text-muted"],
+      color: textColors.muted,
     },
   },
   heightS: {
@@ -61,30 +63,30 @@ export const textareaStyles = stylex.create({
   },
   invalid: {
     borderColor: {
-      default: borderColors["border-danger"],
-      ":focus-visible": borderColors["border-danger"],
-      ":focus": borderColors["border-danger"],
+      default: borderColors.danger,
+      ":focus-visible": borderColors.danger,
+      ":focus": borderColors.danger,
     },
-    outlineColor: borderColors["border-danger-subtle"],
+    outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
     outlineStyle: "solid",
     outlineWidth: 0,
   },
   disabled: {
     backgroundColor: {
-      default: backgroundColors["bg-disabled"],
-      ":hover": backgroundColors["bg-disabled"],
+      default: elementColors.disabled,
+      ":hover": elementColors.disabled,
     },
-    color: textColors["text-disabled"],
+    color: textColors.disabled,
     cursor: "not-allowed",
     "::placeholder": {
-      color: textColors["text-disabled"],
+      color: textColors.disabled,
     },
   },
   readOnly: {
     backgroundColor: {
-      default: backgroundColors["bg-secondary"],
-      ":hover": backgroundColors["bg-secondary"],
+      default: elementColors.default,
+      ":hover": elementColors.default,
     },
     cursor: "default",
   },

@@ -494,7 +494,7 @@ test("extracts the constrained ToggleGroup compound API", () => {
   assert.equal(rootProps?.find(({ name }) => name === "loopFocus")?.defaultValue, "true");
   assert.equal(rootProps?.find(({ name }) => name === "multiple")?.defaultValue, "false");
   assert.equal(rootProps?.find(({ name }) => name === "orientation")?.defaultValue, '"horizontal"');
-  assert.equal(rootProps?.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(rootProps?.find(({ name }) => name === "size")?.defaultValue, '"l"');
   assert.deepEqual(
     itemProps?.map(({ name }) => name),
     ["value", "onPressedChange", "nativeButton", "disabled", "render"],
@@ -581,7 +581,7 @@ test("extracts Input API facts from the public package export", () => {
       "render",
     ],
   );
-  assert.equal(inputProps.find(({ name }) => name === "size")?.defaultValue, '"m"');
+  assert.equal(inputProps.find(({ name }) => name === "size")?.defaultValue, '"l"');
   assert.equal(inputProps.find(({ name }) => name === "variant")?.defaultValue, '"default"');
   assert.equal(inputProps.find(({ name }) => name === "font")?.defaultValue, '"sans"');
   assert.equal(inputProps.find(({ name }) => name === "fullWidth")?.defaultValue, "false");
@@ -1137,7 +1137,7 @@ test("extracts the constrained Select compound API", () => {
   );
   assert.equal(
     metadata["select.trigger"]?.find(({ name }) => name === "size")?.defaultValue,
-    '"m"',
+    '"l"',
   );
   assert.ok(metadata["select.trigger"]?.some(({ name }) => name === "placeholder"));
   assert.equal(metadata["select.positioner"], undefined);

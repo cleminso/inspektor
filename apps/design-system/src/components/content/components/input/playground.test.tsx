@@ -11,7 +11,7 @@ describe("Input playground", () => {
   it("omits package defaults from the initial source", () => {
     expect(
       serializeInputPlayground({
-        size: "m",
+        size: "l",
         variant: "default",
         font: "sans",
         fullWidth: false,

@@ -16,7 +16,7 @@ export interface ScrollAreaProps extends Omit<
   axis?: ScrollAreaAxis
 }
 
-type VerticalTrackOffset = 'control-height-m' | 'control-height-l'
+type VerticalTrackOffset = 'collection-row-l' | 'collection-row-xl'
 
 interface ScrollAreaPrivateProps extends ScrollAreaProps {
   layout?: 'fill' | 'content'
@@ -29,8 +29,8 @@ interface ScrollAreaPrivateProps extends ScrollAreaProps {
 }
 
 const verticalTrackOffsetStyles = {
-  'control-height-m': scrollAreaStyles.verticalTrackOffsetM,
-  'control-height-l': scrollAreaStyles.verticalTrackOffsetL,
+  'collection-row-l': scrollAreaStyles.verticalTrackOffsetM,
+  'collection-row-xl': scrollAreaStyles.verticalTrackOffsetL,
 } satisfies Record<VerticalTrackOffset, stylex.StyleXStyles>
 
 const maxHeightStyles = {

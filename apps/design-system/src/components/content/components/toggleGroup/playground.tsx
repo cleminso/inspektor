@@ -27,7 +27,7 @@ export interface ToggleGroupPlaygroundState {
 
 const initialState: ToggleGroupPlaygroundState = {
   orientation: "horizontal",
-  size: "m",
+  size: "l",
   width: "content",
   itemWidth: "content",
   multiple: false,
@@ -40,7 +40,7 @@ const controls = [
     kind: "select",
     key: "size",
     label: "Size",
-    options: ["s", "m"].map((value) => ({ label: value, value })),
+    options: ["s", "m", "l"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",
@@ -69,7 +69,7 @@ export function serializeToggleGroupPlayground(state: ToggleGroupPlaygroundState
   const props = [
     `defaultValue={[${state.multiple === true ? '"tables", "subscriptions"' : '"tables"'}]}`,
     state.orientation !== "horizontal" ? `orientation="${state.orientation}"` : null,
-    state.size !== "m" ? `size="${state.size}"` : null,
+    state.size !== "l" ? `size="${state.size}"` : null,
     state.width !== "content" ? `width="${state.width}"` : null,
     state.itemWidth !== "content" ? `itemWidth="${state.itemWidth}"` : null,
     state.multiple === true ? "multiple" : null,

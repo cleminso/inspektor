@@ -1,11 +1,18 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, expectTypeOf, it } from "vitest";
 
-import { Input } from "./input";
+import { Input, type InputSize } from "./input";
 
 afterEach(cleanup);
 
 describe("Input", () => {
+  it("uses the shared control size vocabulary and preserves the standard control height by default", () => {
+    render(<Input aria-label="Name" />);
+
+    expectTypeOf<InputSize>().toEqualTypeOf<"xs" | "s" | "m" | "l">();
+    expect(screen.getByRole("textbox", { name: "Name" }).getAttribute("data-size")).toBe("l");
+  });
+
   it("exposes its constrained visual variant", () => {
     render(<Input aria-label="Filter" variant="subtle" />);
 

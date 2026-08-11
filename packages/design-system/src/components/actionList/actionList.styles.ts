@@ -1,8 +1,9 @@
 import * as stylex from '@stylexjs/stylex'
 
 import {
-  backgroundColors,
-  borderColors,
+  elementColors,
+  focusColors,
+  ghostElementColors,
   spatial,
   textColors,
 } from '../../tokens/semantics.stylex'
@@ -38,11 +39,11 @@ export const actionListStyles = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':hover': backgroundColors['bg-hover'],
+      ':hover': ghostElementColors.hover,
     },
-    color: { default: textColors['text-muted'], ':hover': textColors['text-secondary'], },
+    color: { default: textColors.muted, ':hover': textColors.secondary, },
     display: 'flex',
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',
@@ -55,24 +56,24 @@ export const actionListStyles = stylex.create({
   },
   itemActive: {
     backgroundColor: {
-      default: backgroundColors['bg-secondary'],
-      ':focus-within': backgroundColors['bg-secondary'],
-      ':hover': backgroundColors['bg-secondary'],
+      default: elementColors.default,
+      ':focus-within': elementColors.default,
+      ':hover': elementColors.default,
     },
     color: {
-      default: textColors['text-default'],
-      ':focus-within': textColors['text-default'],
-      ':hover': textColors['text-default'],
+      default: textColors.default,
+      ':focus-within': textColors.default,
+      ':hover': textColors.default,
     },
   },
   itemChecked: {
     backgroundColor: {
-      default: backgroundColors['bg-selected'],
-      ':hover': backgroundColors['bg-selected'],
+      default: ghostElementColors.selected,
+      ':hover': ghostElementColors.selected,
     },
     color: {
-      default: textColors['text-default'],
-      ':hover': textColors['text-default'],
+      default: textColors.default,
+      ':hover': textColors.default,
     },
   },
   trigger: {
@@ -97,12 +98,12 @@ export const actionListStyles = stylex.create({
     outlineStyle: 'none',
     textAlign: 'start',
     userSelect: 'none',
-    minHeight: spatial['control-height-m'],
+    minHeight: spatial['collection-row-height-l'],
     minWidth: 0,
     width: '100%',
   },
   triggerDisabled: {
-    color: textColors['text-disabled'],
+    color: textColors.disabled,
     cursor: 'not-allowed',
   },
   selectionControl: {
@@ -170,14 +171,14 @@ export const actionListStyles = stylex.create({
     appearance: 'none',
     backgroundColor: {
       default: 'transparent',
-      ':hover': backgroundColors['bg-hover'],
+      ':hover': ghostElementColors.hover,
     },
-    color: textColors['text-muted'],
+    color: textColors.muted,
     cursor: 'pointer',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',
@@ -188,7 +189,7 @@ export const actionListStyles = stylex.create({
     width: spatial['control-height-xs'],
   },
   actionDisabled: {
-    color: textColors['text-disabled'],
+    color: textColors.disabled,
     cursor: 'not-allowed',
   },
 })

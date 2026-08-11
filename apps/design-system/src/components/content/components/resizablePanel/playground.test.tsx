@@ -28,8 +28,8 @@ describe("Resizable Panel playground", () => {
     });
 
     expect(source).toContain('<ResizablePanel defaultSize="40%" minSize="25%">');
-    expect(source).toContain('borderWidth={1} borderStyle="solid" borderColor="border"');
-    expect(source).toContain('backgroundColor="bg-secondary"');
+    expect(source).toContain('borderWidth={1} borderStyle="solid" borderColor="default"');
+    expect(source).toContain('backgroundColor="element-default"');
   });
 
   it("updates the preview and source from the disabled control", () => {

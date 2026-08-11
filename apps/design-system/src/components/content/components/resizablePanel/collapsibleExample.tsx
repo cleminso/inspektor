@@ -23,8 +23,8 @@ export default function CollapsibleExample(): ReactElement {
 
   return (
     <Box width="full" height="panel-height">
-      <Box flexDirection="column" borderWidth={1} borderStyle="solid" borderColor="border">
-        <Box padding="m" borderBottomWidth={1} borderStyle="solid" borderColor="border">
+      <Box flexDirection="column" borderWidth={1} borderStyle="solid" borderColor="default">
+        <Box padding="m" borderBottomWidth={1} borderStyle="solid" borderColor="default">
         <Button variant="secondary" size="s" onClick={toggleListPanel}>
           {isCollapsed === true ? "Show tables" : "Hide tables"}
         </Button>
@@ -39,7 +39,7 @@ export default function CollapsibleExample(): ReactElement {
             collapsible
             onResize={(size) => setIsCollapsed(size.inPixels === 0)}
           >
-            <Box height="full" alignItems="center" justifyContent="center" backgroundColor="bg-secondary">
+            <Box height="full" alignItems="center" justifyContent="center" backgroundColor="element-default">
               <Text>Table list</Text>
             </Box>
           </ResizablePanel>

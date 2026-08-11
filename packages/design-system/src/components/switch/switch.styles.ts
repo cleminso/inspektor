@@ -1,6 +1,13 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { backgroundColors, borderColors, spatial } from '../../tokens/semantics.stylex'
+import {
+  accentElementColors,
+  borderColors,
+  elementColors,
+  focusColors,
+  spatial,
+  surfaceColors,
+} from '../../tokens/semantics.stylex'
 import { borderRadii, spacing } from '../../tokens/value.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
@@ -14,12 +21,12 @@ export const switchStyles = stylex.create({
     borderWidth: 1,
     alignItems: 'center',
     appearance: 'none',
-    backgroundColor: backgroundColors['bg-secondary'],
+    backgroundColor: elementColors.default,
     boxSizing: 'border-box',
     cursor: 'pointer',
     display: 'inline-flex',
     flexShrink: 0,
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: 1,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
@@ -29,39 +36,39 @@ export const switchStyles = stylex.create({
   },
   rootChecked: {
     backgroundColor: {
-      default: backgroundColors['bg-primary'],
-      ':hover': backgroundColors['bg-primary-hover'],
-      ':active': backgroundColors['bg-primary-hover'],
+      default: accentElementColors.default,
+      ':hover': accentElementColors.hover,
+      ':active': accentElementColors.pressed,
     },
   },
   rootCheckedReadOnly: {
     backgroundColor: {
-      default: backgroundColors['bg-primary'],
-      ':hover': backgroundColors['bg-primary'],
-      ':active': backgroundColors['bg-primary'],
+      default: accentElementColors.default,
+      ':hover': accentElementColors.default,
+      ':active': accentElementColors.default,
     },
   },
   rootInvalid: {
-    borderColor: borderColors['border-danger'],
+    borderColor: borderColors.danger,
   },
   rootDisabled: {
     borderColor: {
-      default: borderColors['border-secondary'],
-      ':hover': borderColors['border-secondary'],
-      ':active': borderColors['border-secondary'],
+      default: borderColors.subtle,
+      ':hover': borderColors.subtle,
+      ':active': borderColors.subtle,
     },
     backgroundColor: {
-      default: backgroundColors['bg-disabled'],
-      ':hover': backgroundColors['bg-disabled'],
-      ':active': backgroundColors['bg-disabled'],
+      default: elementColors.disabled,
+      ':hover': elementColors.disabled,
+      ':active': elementColors.disabled,
     },
     cursor: 'not-allowed',
   },
   rootUncheckedReadOnly: {
     backgroundColor: {
-      default: backgroundColors['bg-secondary'],
-      ':hover': backgroundColors['bg-secondary'],
-      ':active': backgroundColors['bg-secondary'],
+      default: elementColors.default,
+      ':hover': elementColors.default,
+      ':active': elementColors.default,
     },
     cursor: 'default',
   },
@@ -83,7 +90,7 @@ export const switchStyles = stylex.create({
   },
   thumb: {
     borderRadius: borderRadii.xs,
-    backgroundColor: backgroundColors['bg-card'],
+    backgroundColor: surfaceColors.default,
     display: 'block',
     transform: 'translateX(0)',
     transitionDuration: { default: '120ms', [reducedMotion]: '0ms' },
@@ -91,7 +98,7 @@ export const switchStyles = stylex.create({
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
   },
   thumbChecked: {
-    backgroundColor: backgroundColors['bg-page'],
+    backgroundColor: surfaceColors.background,
   },
   thumbUnchecked: {},
   thumbDisabled: {},

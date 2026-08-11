@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex'
 
 import {
-  backgroundColors,
-  borderColors,
+  focusColors,
+  ghostElementColors,
   spatial,
   textColors,
 } from '../../tokens/semantics.stylex'
@@ -76,9 +76,9 @@ export const accordionStyles = stylex.create({
     appearance: 'none',
     backgroundColor: {
       default: 'transparent',
-      ':hover': backgroundColors['bg-hover'],
+      ':hover': ghostElementColors.hover,
     },
-    color: textColors['text-muted'],
+    color: textColors.muted,
     cursor: 'pointer',
     display: 'flex',
     fontFamily: fontFamilies.sans,
@@ -86,7 +86,7 @@ export const accordionStyles = stylex.create({
     fontWeight: fontWeights.regular,
     justifyContent: 'space-between',
     lineHeight: lineHeights.ui,
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',
@@ -102,7 +102,7 @@ export const accordionStyles = stylex.create({
     [accordionVars.indicatorTransform]: 'rotate(90deg)',
   },
   triggerDisabled: {
-    color: textColors['text-disabled'],
+    color: textColors.disabled,
     cursor: 'not-allowed',
   },
   triggerHorizontal: {},

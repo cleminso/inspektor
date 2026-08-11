@@ -8,8 +8,8 @@ export const scrollbarStyles = stylex.create({
   standard: {
     [scrollbarVars.thumbColor]: {
       default: 'transparent',
-      ':focus-within': borderColors['border-secondary'],
-      ':hover': borderColors['border-secondary'],
+      ':focus-within': borderColors.subtle,
+      ':hover': borderColors.subtle,
     },
     scrollbarColor: `${scrollbarVars.thumbColor} transparent`,
     scrollbarWidth: 'thin',

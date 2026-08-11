@@ -24,7 +24,7 @@ export const relationValueStyles = stylex.create({
     minWidth: 0,
   },
   compactId: {
-    color: textColors["text-default"],
+    color: textColors.default,
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
@@ -48,7 +48,7 @@ export const relationValueStyles = stylex.create({
     flexShrink: 0,
   },
   compactMissing: {
-    color: textColors["text-danger"],
+    color: textColors.danger,
     flexShrink: 0,
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
@@ -83,7 +83,7 @@ export const relationValueStyles = stylex.create({
     minWidth: 0,
   },
   label: {
-    color: textColors["text-muted"],
+    color: textColors.muted,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
@@ -91,7 +91,7 @@ export const relationValueStyles = stylex.create({
   },
   value: {
     margin: 0,
-    color: textColors["text-default"],
+    color: textColors.default,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,

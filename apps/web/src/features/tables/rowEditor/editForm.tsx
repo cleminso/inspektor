@@ -239,9 +239,9 @@ function LoadedEditRowForm({
             justifyContent="between"
             gap="m"
             borderTopWidth={1}
-            borderColor="border"
+            borderColor="default"
             borderStyle="solid"
-            backgroundColor="bg-page"
+            backgroundColor="surface-background"
             px="l"
           >
             {onDelete !== undefined ? (

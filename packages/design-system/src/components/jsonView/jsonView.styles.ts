@@ -1,7 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { jsonViewVars } from "./jsonViewVars.stylex";
-import { backgroundColors, borderColors, spatial, syntaxColors, textColors } from "../../tokens/semantics.stylex";
+import {
+  focusColors,
+  ghostElementColors,
+  spatial,
+  syntaxColors,
+  textColors,
+} from "../../tokens/semantics.stylex";
 import {
   borderRadii,
   fontFamilies,
@@ -30,7 +36,7 @@ export const jsonViewStyles = stylex.create({
     pointerEvents: "auto",
   },
   tree: {
-    color: textColors["text-default"],
+    color: textColors.default,
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,
@@ -52,17 +58,17 @@ export const jsonViewStyles = stylex.create({
   interactiveRow: {
     backgroundColor: {
       default: "transparent",
-      ":hover": backgroundColors["bg-hover"],
+      ":hover": ghostElementColors.hover,
     },
     [jsonViewVars.disclosureColor]: {
-      default: textColors["text-muted"],
-      ":hover": textColors["text-default"],
+      default: textColors.muted,
+      ":hover": textColors.default,
     },
     cursor: "pointer",
     userSelect: "none",
   },
   focusedRow: {
-    outlineColor: borderColors["outline"],
+    outlineColor: focusColors.ring,
     outlineOffset: -2,
     outlineStyle: "solid",
     outlineWidth: spatial["focus-ring-width"],
@@ -137,14 +143,14 @@ export const jsonViewStyles = stylex.create({
     },
     appearance: "none",
     backgroundColor: "transparent",
-    color: textColors["text-link"],
+    color: textColors.link,
     cursor: "pointer",
     fontFamily: fontFamilies.mono,
     fontSize: "inherit",
     lineHeight: "inherit",
   },
   limitMessage: {
-    color: textColors["text-muted"],
+    color: textColors.muted,
     userSelect: "none",
   },
   status: {

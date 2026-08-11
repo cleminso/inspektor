@@ -14,7 +14,7 @@ export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.R
       width="full"
       flexDirection="column"
       overflow="hidden"
-      backgroundColor="bg-page"
+      backgroundColor="surface-background"
     >
       <Box
         as="header"
@@ -23,9 +23,9 @@ export function ConnectionsLayout({ children }: ConnectionsLayoutProps): React.R
         alignItems="center"
         paddingHorizontal="l"
         paddingVertical="s"
-        backgroundColor="bg-secondary"
+        backgroundColor="element-default"
         borderBottomWidth={1}
-        borderColor="border-secondary"
+        borderColor="subtle"
         borderStyle="solid"
       >
         <ConnectionSwitcher triggerLabel="Open connection" />

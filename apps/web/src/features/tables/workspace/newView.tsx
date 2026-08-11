@@ -21,7 +21,7 @@ export function NewTableView(): React.ReactElement {
           <Text variant="caption" color="muted">
             RECENT VIEWS
           </Text>
-          <Box flex={1} borderTopWidth={1} borderColor="border-secondary" borderStyle="solid" />
+          <Box flex={1} borderTopWidth={1} borderColor="subtle" borderStyle="solid" />
         </Box>
         {recentViews.length === 0 ? (
           <Box paddingTop="m" paddingBottom="m">

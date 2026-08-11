@@ -92,7 +92,7 @@ export function RowEditorSidePanel({
           gap="m"
           padding="m"
           borderBottomWidth={1}
-          borderColor="border-secondary"
+          borderColor="subtle"
           borderStyle="solid"
         >
           <Box flexDirection="column" gap="xs">

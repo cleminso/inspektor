@@ -1,6 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { backgroundColors, borderColors, spatial, textColors } from "../../tokens/semantics.stylex";
+import {
+  borderColors,
+  elementColors,
+  focusColors,
+  spatial,
+  textColors,
+} from "../../tokens/semantics.stylex";
 import {
   fontFamilies,
   fontSizes,
@@ -25,7 +31,7 @@ export const fieldStyles = stylex.create({
   label: {
     gap: spacing.s,
     alignItems: "center",
-    color: textColors["text-default"],
+    color: textColors.default,
     display: "inline-flex",
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
@@ -39,24 +45,24 @@ export const fieldStyles = stylex.create({
     lineHeight: lineHeights.compact,
   },
   description: {
-    color: textColors["text-muted"],
+    color: textColors.muted,
   },
   error: {
-    color: textColors["text-danger"],
+    color: textColors.danger,
   },
   disabled: {
-    color: textColors["text-disabled"],
+    color: textColors.disabled,
     cursor: "not-allowed",
   },
   inputGroupInvalid: {
-    [inputGroupVars.borderColor]: borderColors["border-danger"],
-    [inputGroupVars.focusedBorderColor]: borderColors["border-danger"],
-    [inputGroupVars.outlineColor]: borderColors["border-danger-subtle"],
+    [inputGroupVars.borderColor]: borderColors.danger,
+    [inputGroupVars.focusedBorderColor]: borderColors.danger,
+    [inputGroupVars.outlineColor]: focusColors.ringDanger,
     [inputGroupVars.outlineWidth]: spatial["focus-ring-width"],
   },
   inputGroupDisabled: {
-    [inputGroupVars.backgroundColor]: backgroundColors["bg-disabled"],
-    [inputGroupVars.textColor]: textColors["text-disabled"],
+    [inputGroupVars.backgroundColor]: elementColors.disabled,
+    [inputGroupVars.textColor]: textColors.disabled,
   },
   rootDisabled: {},
   rootValid: {},

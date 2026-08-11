@@ -11,7 +11,7 @@ type WithoutStyles<Props> = Omit<Props, 'className' | 'style'>
 export type ToggleGroupOrientation = 'horizontal' | 'vertical'
 export type ToggleGroupWidth = 'content' | 'full'
 export type ToggleGroupItemWidth = 'content' | 'equal'
-export type ToggleGroupSize = 's' | 'm'
+export type ToggleGroupSize = 's' | 'm' | 'l'
 
 export interface ToggleGroupRootProps<Value extends string = string> extends Omit<
   WithoutStyles<BaseToggleGroup.Props<Value>>,
@@ -63,7 +63,7 @@ function ToggleGroupRootInner<Value extends string>(
     orientation = 'horizontal',
     width = 'content',
     itemWidth = 'content',
-    size = 'm',
+    size = 'l',
     ...props
   }: ToggleGroupRootProps<Value>,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -71,6 +71,7 @@ function ToggleGroupRootInner<Value extends string>(
   const sizeStyles = {
     s: toggleGroupStyles.rootSizeS,
     m: toggleGroupStyles.rootSizeM,
+    l: toggleGroupStyles.rootSizeL,
   } satisfies Record<ToggleGroupSize, unknown>
   const stateStyles = createStateStyleProps<BaseToggleGroup.State>((state) => [
     toggleGroupStyles.root,
@@ -108,6 +109,7 @@ const ToggleGroupItem = React.forwardRef<React.ComponentRef<typeof BaseToggle>, 
     const sizeStyles = {
       s: toggleGroupStyles.itemSizeS,
       m: toggleGroupStyles.itemSizeM,
+      l: toggleGroupStyles.itemSizeL,
     } satisfies Record<ToggleGroupSize, unknown>
     const stateStyles = createStateStyleProps<BaseToggle.State>((state) => [
       toggleGroupStyles.item,

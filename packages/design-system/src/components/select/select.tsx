@@ -11,7 +11,7 @@ import { selectStyles } from './select.styles'
 type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
 
 export type SelectTriggerSize = FormControlSize
-export type SelectWidth = 'compact' | 'content' | 'full'
+export type SelectWidth = 'content' | 'full'
 
 export type SelectRootProps<Value> = Omit<
   BaseSelect.Root.Props<Value, false>,
@@ -39,7 +39,7 @@ export interface SelectTriggerProps
   placeholder?: string
   /** Controls the trigger height and padding. */
   size?: SelectTriggerSize
-  /** Controls whether the trigger follows the selected value, reserves a stable compact width, or fills its container. */
+  /** Controls whether the trigger follows the selected value or fills its container. */
   width?: SelectWidth
 }
 
@@ -60,13 +60,13 @@ export interface SelectItemProps<Value> {
 }
 
 const sizeStyles = {
+  xs: selectStyles.sizeXS,
   s: selectStyles.sizeS,
   m: selectStyles.sizeM,
   l: selectStyles.sizeL,
 } satisfies Record<SelectTriggerSize, unknown>
 
 const widthStyles = {
-  compact: selectStyles.triggerWidthCompact,
   content: selectStyles.triggerWidthContent,
   full: selectStyles.triggerWidthFull,
 } satisfies Record<SelectWidth, unknown>
@@ -95,7 +95,7 @@ const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof BaseSelect.Trigger>,
   SelectTriggerProps
 >(function SelectTrigger(
-  { placeholder, size = 'm', width = 'content', ...props }: SelectTriggerProps,
+  { placeholder, size = 'l', width = 'content', ...props }: SelectTriggerProps,
   ref,
 ) {
   const stateStyles = createStateStyleProps<BaseSelect.Trigger.State>((state) => [

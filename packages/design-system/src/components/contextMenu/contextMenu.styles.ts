@@ -1,10 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { borderColors, spatial } from "../../tokens/semantics.stylex";
+import { focusColors, spatial } from "../../tokens/semantics.stylex";
 
 export const contextMenuStyles = stylex.create({
   trigger: {
-    outlineColor: borderColors["outline"],
+    outlineColor: focusColors.ring,
     outlineOffset: 2,
     outlineStyle: "solid",
     outlineWidth: { default: 0, ":focus-visible": spatial["focus-ring-width"] },

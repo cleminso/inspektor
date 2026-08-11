@@ -42,7 +42,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
       gap="l"
       flexShrink={0}
       padding="m"
-      backgroundColor="bg-page"
+      backgroundColor="surface-background"
     >
       <Box alignItems="center" gap="m" minWidth={0}>
         <Button

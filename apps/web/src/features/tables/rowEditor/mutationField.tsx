@@ -113,8 +113,8 @@ function StructuredValuePresentation({
   return (
     <Box
       aria-label={accessibilityLabel}
-      backgroundColor="bg-card"
-      borderColor="border"
+      backgroundColor="surface-default"
+      borderColor="default"
       borderRadius="xs"
       borderStyle="solid"
       borderWidth={1}

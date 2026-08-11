@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { borderColors, spatial, textColors } from '../../tokens/semantics.stylex'
+import { borderColors, focusColors, spatial, textColors } from '../../tokens/semantics.stylex'
 import { borderRadii, spacing } from '../../tokens/value.stylex'
 
 export const resizablePanelStyles = stylex.create({
@@ -19,22 +19,22 @@ export const resizablePanelStyles = stylex.create({
   handle: {
     alignItems: 'center',
     backgroundColor: {
-      default: borderColors['border-secondary'],
-      ':focus-visible': borderColors['border-focused'],
-      ':is([data-disabled])': borderColors['border-secondary'],
-      ':not([data-disabled]):hover': borderColors.border,
-      ':not([data-disabled]):is([data-separator="active"])': borderColors['border-focused'],
+      default: borderColors.subtle,
+      ':focus-visible': borderColors.focused,
+      ':is([data-disabled])': borderColors.subtle,
+      ':not([data-disabled]):hover': borderColors.default,
+      ':not([data-disabled]):is([data-separator="active"])': borderColors.strong,
     },
     color: {
-      default: borderColors.border,
-      ':focus-visible': borderColors['border-focused'],
-      ':is([data-disabled])': textColors['text-disabled'],
-      ':not([data-disabled]):hover': borderColors['border-focused'],
-      ':not([data-disabled]):is([data-separator="active"])': borderColors['border-focused'],
+      default: borderColors.default,
+      ':focus-visible': borderColors.focused,
+      ':is([data-disabled])': textColors.disabled,
+      ':not([data-disabled]):hover': borderColors.strong,
+      ':not([data-disabled]):is([data-separator="active"])': borderColors.strong,
     },
     display: 'flex',
     justifyContent: 'center',
-    outlineColor: borderColors['outline'],
+    outlineColor: focusColors.ring,
     outlineOffset: -1,
     outlineStyle: {
       default: 'none',

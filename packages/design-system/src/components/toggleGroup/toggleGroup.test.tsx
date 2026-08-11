@@ -42,15 +42,15 @@ describe('ToggleGroup', () => {
     expect(changeCount).toBe(0)
   })
 
-  it('uses the medium size by default', () => {
+  it('uses the large shared control size by default', () => {
     render(
       <ToggleGroup aria-label="Data view">
         <ToggleGroup.Item value="tables">Tables</ToggleGroup.Item>
       </ToggleGroup>,
     )
 
-    expect(screen.getByRole('group', { name: 'Data view' }).getAttribute('data-size')).toBe('m')
-    expect(screen.getByRole('button', { name: 'Tables' }).getAttribute('data-size')).toBe('m')
+    expect(screen.getByRole('group', { name: 'Data view' }).getAttribute('data-size')).toBe('l')
+    expect(screen.getByRole('button', { name: 'Tables' }).getAttribute('data-size')).toBe('l')
   })
 
   it('provides a compact small size', () => {

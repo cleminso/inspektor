@@ -1,9 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import { Select, type SelectRootProps } from './select'
-import { selectStyles } from './select.styles'
 
 afterEach(cleanup)
 
@@ -166,16 +164,14 @@ describe('Select', () => {
     expect(trigger.getAttribute('data-width')).toBe('full')
   })
 
-  it('applies the compact fixed width', () => {
+  it('uses the large shared control size by default', () => {
     render(
       <Select.Root>
-        <Select.Trigger aria-label="Page size" width="compact" />
+        <Select.Trigger aria-label="Branch" />
       </Select.Root>,
     )
 
-    expect(screen.getByRole('combobox').className).toContain(
-      stylex.props(selectStyles.triggerWidthCompact).className,
-    )
+    expect(screen.getByRole('combobox').getAttribute('data-size')).toBe('l')
   })
 
 })

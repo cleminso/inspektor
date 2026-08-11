@@ -13,79 +13,98 @@ import {
   syntaxPalette,
 } from './value.stylex'
 
-export const backgroundColors = stylex.defineVars({
-  // Surfaces
-  'bg-page': `light-dark(${palette.gray50}, ${palette.neutral950})`,
-  'bg-layout': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha100})`,
-  'bg-card': `light-dark(${palette.gray100}, ${palette.neutral900})`,
-  'bg-popover': `light-dark(${palette.gray100}, ${palette.neutral900})`,
-  'bg-subtle': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
-  'bg-tab': `light-dark(${palette.gray50}, ${palette.neutral950})`,
-  'bg-tab-hover': `light-dark(color-mix(in oklch, ${palette.gray100} 35%, ${palette.gray200}), ${palette.neutral900})`,
-  'bg-tab-selected': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'bg-table-header': `light-dark(${palette.gray100}, ${palette.neutral900})`,
-  'bg-table-header-cell-active': `light-dark(${palette.blue200}, ${palette.blue900})`,
-  'bg-table-column-cell-active': `light-dark(${palette.blue100}, ${palette.blue950})`,
-  'bg-table-row-cell-active': `light-dark(${palette.blue100}, ${palette.blue950})`,
-  'bg-table-row-cell-selected': `light-dark(${palette.blue100}, ${palette.blue950})`,
-  'bg-table-cell-active': `light-dark(${palette.blue100}, ${palette.blue950})`,
-  'bg-overlay': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
-  'bg-backdrop': `light-dark(${palette.grayAlpha500}, ${palette.neutralAlpha500})`,
-  'bg-inverse': `light-dark(${palette.gray900}, ${palette.neutral100})`,
-
-  // Interaction
-  'bg-hover': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
-  'bg-pressed': `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
-  'bg-selected': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
-  'bg-disabled': `light-dark(${palette.gray100}, ${palette.neutral900})`,
-
-  // Color roles
-  'bg-primary': `light-dark(${palette.blue600}, ${palette.blue700})`,
-  'bg-primary-hover': `light-dark(${palette.blue700}, ${palette.blue600})`,
-  'bg-secondary': `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha200})`,
-  'bg-secondary-hover': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'bg-danger': `light-dark(${palette.red100}, ${palette.red950})`,
-  'bg-danger-hover': `light-dark(${palette.red200}, ${palette.red900})`,
+/** Structural colors for application surfaces and overlays. */
+export const surfaceColors = stylex.defineVars({
+  background: `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  default: `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  raised: `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  canvas: `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha100})`,
+  subtle: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha200})`,
+  overlay: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
+  backdrop: `light-dark(${palette.grayAlpha500}, ${palette.neutralAlpha500})`,
+  inverse: `light-dark(${palette.gray900}, ${palette.neutral100})`,
 } as const)
 
+/** Neutral filled-element colors for interactive states. */
+export const elementColors = stylex.defineVars({
+  default: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha200})`,
+  hover: `light-dark(${palette.gray200}, ${palette.neutral800})`,
+  pressed: `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
+  selected: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
+  disabled: `light-dark(${palette.gray100}, ${palette.neutral900})`,
+} as const)
+
+/** Transparent element colors for low-emphasis interactions. */
+export const ghostElementColors = stylex.defineVars({
+  default: 'transparent',
+  hover: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
+  pressed: `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha200})`,
+  selected: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
+  disabled: `light-dark(${palette.gray100}, ${palette.neutral900})`,
+} as const)
+
+/** Accent element colors for primary interactions. */
+export const accentElementColors = stylex.defineVars({
+  default: `light-dark(${palette.blue600}, ${palette.blue700})`,
+  hover: `light-dark(${palette.blue700}, ${palette.blue600})`,
+  pressed: `light-dark(${palette.blue700}, ${palette.blue600})`,
+  disabled: `light-dark(${palette.gray100}, ${palette.neutral900})`,
+} as const)
+
+/** Danger element colors for destructive interactions. */
+export const dangerElementColors = stylex.defineVars({
+  default: `light-dark(${palette.red100}, ${palette.red950})`,
+  hover: `light-dark(${palette.red200}, ${palette.red900})`,
+  pressed: `light-dark(${palette.red200}, ${palette.red900})`,
+  disabled: `light-dark(${palette.gray100}, ${palette.neutral900})`,
+} as const)
+
+/** Colors that communicate selected content and controls. */
+export const selectionColors = stylex.defineVars({
+  background: `light-dark(${palette.blue100}, ${palette.blue950})`,
+  strongBackground: `light-dark(${palette.blue200}, ${palette.blue900})`,
+  border: `light-dark(${palette.blue500}, ${palette.blue500})`,
+  text: `light-dark(${palette.blue700}, ${palette.blue400})`,
+} as const)
+
+/** Semantic foreground colors for text and icons. */
 export const textColors = stylex.defineVars({
-  // Text on neutral surfaces
-  'text-default': `light-dark(${palette.gray900}, ${palette.neutral100})`,
-  'text-secondary': `light-dark(${palette.grayAlpha900}, ${palette.neutralAlpha900})`,
-  'text-muted': `light-dark(${palette.gray600}, ${palette.neutral400})`,
-  'text-disabled': `light-dark(${palette.gray400}, ${palette.neutral600})`,
-  'text-link': `light-dark(${palette.blue600}, ${palette.blue400})`,
-  'text-selected': `light-dark(${palette.blue700}, ${palette.blue400})`,
-  'text-success': `light-dark(${palette.green700}, ${palette.green400})`,
-  'text-warning': `light-dark(${palette.orange700}, ${palette.orange400})`,
-  'text-danger': `light-dark(${palette.red700}, ${palette.red500})`,
-
-  // Text on color-role surfaces
-  'text-on-primary': palette.gray50,
-  'text-on-inverse': `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  default: `light-dark(${palette.gray900}, ${palette.neutral100})`,
+  secondary: `light-dark(${palette.grayAlpha900}, ${palette.neutralAlpha900})`,
+  muted: `light-dark(${palette.gray600}, ${palette.neutral400})`,
+  placeholder: `light-dark(${palette.gray600}, ${palette.neutral400})`,
+  disabled: `light-dark(${palette.gray400}, ${palette.neutral600})`,
+  accent: `light-dark(${palette.blue700}, ${palette.blue400})`,
+  link: `light-dark(${palette.blue600}, ${palette.blue400})`,
+  success: `light-dark(${palette.green700}, ${palette.green400})`,
+  warning: `light-dark(${palette.orange700}, ${palette.orange400})`,
+  danger: `light-dark(${palette.red700}, ${palette.red500})`,
+  onAccent: palette.gray50,
+  onInverse: `light-dark(${palette.gray50}, ${palette.neutral950})`,
 } as const)
 
+/** Semantic border colors for hierarchy, state, and feedback. */
 export const borderColors = stylex.defineVars({
-  border: `light-dark(${palette.gray300}, ${palette.neutral700})`,
-  'border-secondary': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'border-focused': `light-dark(${palette.gray400}, ${palette.neutral500})`,
-
-  'border-table-header-cell': `light-dark(${palette.gray300}, ${palette.neutral700})`,
-  'border-table-cell': `light-dark(${palette.gray200}, ${palette.neutral800})`,
-  'border-table-column-active': `light-dark(${palette.blue500}, ${palette.blue500})`,
-
-  'border-table-cell-active': `light-dark(${palette.blue500}, ${palette.blue500})`,
-
-  'border-warning': `light-dark(${palette.orange600}, ${palette.orange400})`,
-  'border-danger': `light-dark(${palette.red500}, ${palette.red400})`,
-  'border-danger-subtle': `light-dark(${palette.red200}, ${palette.red900})`,
-  'border-success': `light-dark(${palette.green600}, ${palette.green300})`,
-
-  'outline': `light-dark(${palette.blue500}, ${palette.blue500})`,
-  'border-input-ring': `light-dark(${palette.blue200}, ${palette.blue900})`,
-  'border-input': `light-dark(${palette.blue500}, ${palette.blue500})`,
+  default: `light-dark(${palette.gray300}, ${palette.neutral700})`,
+  subtle: `light-dark(${palette.gray200}, ${palette.neutral800})`,
+  strong: `light-dark(${palette.gray400}, ${palette.neutral500})`,
+  focused: `light-dark(${palette.blue500}, ${palette.blue500})`,
+  selected: `light-dark(${palette.blue500}, ${palette.blue500})`,
+  disabled: `light-dark(${palette.gray200}, ${palette.neutral800})`,
+  warning: `light-dark(${palette.orange600}, ${palette.orange400})`,
+  danger: `light-dark(${palette.red500}, ${palette.red400})`,
+  dangerSubtle: `light-dark(${palette.red200}, ${palette.red900})`,
+  success: `light-dark(${palette.green600}, ${palette.green300})`,
 } as const)
 
+/** Focus-ring colors for keyboard focus affordances. */
+export const focusColors = stylex.defineVars({
+  ring: `light-dark(${palette.blue500}, ${palette.blue500})`,
+  ringSubtle: `light-dark(${palette.blue200}, ${palette.blue900})`,
+  ringDanger: `light-dark(${palette.red200}, ${palette.red900})`,
+} as const)
+
+/** Semantic colors used by syntax-highlighted content. */
 export const syntaxColors = stylex.defineVars({
   'syntax-attribute': `light-dark(${syntaxPalette.syntaxCyanLight}, ${syntaxPalette.syntaxCyanDark})`,
   'syntax-boolean': `light-dark(${syntaxPalette.syntaxPurpleLight}, ${syntaxPalette.syntaxPurpleDark})`,
@@ -107,17 +126,16 @@ export const syntaxColors = stylex.defineVars({
   'syntax-mark-foreground': `light-dark(${syntaxPalette.syntaxForegroundLight}, ${syntaxPalette.syntaxForegroundDark})`,
 } as const)
 
+/** Semantic dimensions and spacing for shared interface patterns. */
 export const spatial = stylex.defineVars({
-  'button-height-xs': dimensions[20],
-  'button-height-s': dimensions[22],
-  'button-height-m': dimensions[24],
   'control-height-xs': dimensions[20],
-  'control-height-s': dimensions[24],
-  'control-height-m': dimensions[28],
-  'control-height-l': dimensions[32],
-  'control-inner-height-s': `calc(${dimensions[24]} - 2px)`,
-  'control-inner-height-m': `calc(${dimensions[28]} - 2px)`,
-  'control-inner-height-l': `calc(${dimensions[32]} - 2px)`,
+  'control-height-s': dimensions[22],
+  'control-height-m': dimensions[24],
+  'control-height-l': dimensions[28],
+  'collection-row-height-s': dimensions[22],
+  'collection-row-height-m': dimensions[24],
+  'collection-row-height-l': dimensions[28],
+  'collection-row-height-xl': dimensions[32],
   'content-measure': dimensions[680],
   'content-width': dimensions[1220],
   'content-width-wide': dimensions[1440],
@@ -129,6 +147,7 @@ export const spatial = stylex.defineVars({
   'icon-size-xs': dimensions[12],
   'icon-size-s': dimensions[14],
   'icon-size-m': dimensions[16],
+  'interaction-target-min': dimensions[28],
   'label-width': dimensions[100],
   'menu-min-width': dimensions[140],
   'combobox-min-width': dimensions[200],
@@ -139,9 +158,6 @@ export const spatial = stylex.defineVars({
   'multi-select-width-l': dimensions[360],
   'popup-collection-padding': spacing.xxs,
   'popup-item-inline-padding': spacing.s,
-  'popup-row-min-height-s': dimensions[22],
-  'popup-row-min-height-m': dimensions[24],
-  'popup-row-min-height-l': dimensions[28],
   'popup-width-s': dimensions[240],
   'popup-width-m': dimensions[320],
   'popup-width-l': dimensions[400],
@@ -151,8 +167,6 @@ export const spatial = stylex.defineVars({
   'panel-gutter-size': spacing.xs,
   'scrollbar-track-size': dimensions[12],
   'scrollbar-thumb-size': spacing.s,
-  'select-compact-width': dimensions[72],
-  'select-min-width': dimensions[160],
   'switch-height-s': dimensions[16],
   'switch-height-m': dimensions[20],
   'switch-width-s': dimensions[28],
@@ -174,6 +188,7 @@ export const spatial = stylex.defineVars({
   'screen-height-small': '100svh',
 } as const)
 
+/** Typography styles for shared interface text roles. */
 export const textRoleStyles = stylex.create({
   default: {
     fontFamily: fontFamilies.sans,
@@ -215,8 +230,27 @@ type StyleXTokenKeys<T> = Exclude<
   '__opaqueId' | '__tokens' | symbol | 'toString' | 'valueOf' | 'description'
 >
 
-export type BackgroundColorToken = StyleXTokenKeys<typeof backgroundColors>
+export type SurfaceColorToken = StyleXTokenKeys<typeof surfaceColors>
+export type ElementColorToken = StyleXTokenKeys<typeof elementColors>
+export type GhostElementColorToken = StyleXTokenKeys<typeof ghostElementColors>
+export type AccentElementColorToken = StyleXTokenKeys<typeof accentElementColors>
+export type DangerElementColorToken = StyleXTokenKeys<typeof dangerElementColors>
+export type SelectionColorToken = StyleXTokenKeys<typeof selectionColors>
+export type BackgroundColorToken =
+  | `surface-${SurfaceColorToken}`
+  | `element-${ElementColorToken}`
+  | `ghost-element-${GhostElementColorToken}`
+  | `accent-element-${AccentElementColorToken}`
+  | `danger-element-${DangerElementColorToken}`
+  | 'selection-background'
+  | 'selection-strong-background'
 export type TextColorToken = StyleXTokenKeys<typeof textColors>
 export type BorderColorToken = StyleXTokenKeys<typeof borderColors>
+export type FocusColorToken = StyleXTokenKeys<typeof focusColors>
 export type SyntaxColorToken = StyleXTokenKeys<typeof syntaxColors>
-export type ColorToken = BackgroundColorToken | TextColorToken | BorderColorToken | SyntaxColorToken
+export type ColorToken =
+  | BackgroundColorToken
+  | TextColorToken
+  | BorderColorToken
+  | FocusColorToken
+  | SyntaxColorToken

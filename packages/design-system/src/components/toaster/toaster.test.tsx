@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { backgroundColors, borderColors, textColors } from '../../tokens/semantics.stylex'
+import { borderColors, surfaceColors, textColors } from '../../tokens/semantics.stylex'
 import { spacing } from '../../tokens/value.stylex'
 import { Toaster, toasts } from './toaster'
 import { toasterStyles } from './toaster.styles'
@@ -24,21 +24,21 @@ const stackContractStyles = stylex.create({
 
 const semanticStatusStyles = stylex.create({
   toast: {
-    borderColor: borderColors.border,
-    backgroundColor: backgroundColors['bg-popover'],
-    color: textColors['text-default'],
+    borderColor: borderColors.default,
+    backgroundColor: surfaceColors.raised,
+    color: textColors.default,
   },
   titleError: {
-    color: textColors['text-danger'],
+    color: textColors.danger,
   },
   titleSuccess: {
-    color: textColors['text-success'],
+    color: textColors.success,
   },
   titleWarning: {
-    color: textColors['text-warning'],
+    color: textColors.warning,
   },
   action: {
-    backgroundColor: backgroundColors['bg-subtle'],
+    backgroundColor: surfaceColors.subtle,
     borderWidth: 0,
   },
 })

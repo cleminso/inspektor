@@ -20,7 +20,7 @@ export interface SelectPlaygroundState {
 }
 
 const initialState: SelectPlaygroundState = {
-  size: "m",
+  size: "l",
   width: "content",
   disabled: false,
 };
@@ -36,13 +36,13 @@ const controls = [
     kind: "select",
     key: "size",
     label: "Size",
-    options: ["s", "m", "l"].map((value) => ({ label: value, value })),
+    options: ["xs", "s", "m", "l"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",
     key: "width",
     label: "Width",
-    options: ["compact", "content", "full"].map((value) => ({ label: value, value })),
+    options: ["content", "full"].map((value) => ({ label: value, value })),
   },
   { kind: "boolean", key: "disabled", label: "Disabled" },
 ] as const satisfies readonly PlaygroundControl<SelectPlaygroundState>[];
@@ -52,7 +52,7 @@ export function serializeSelectPlayground(state: SelectPlaygroundState): string 
   const triggerProps = ['aria-label="Branch"', 'placeholder="Select a branch"'];
   const itemProps = ['key={option.value}', 'value={option.value}'];
   if (state.disabled === true) rootProps.push("disabled");
-  if (state.size !== "m") triggerProps.push(`size="${state.size}"`);
+  if (state.size !== "l") triggerProps.push(`size="${state.size}"`);
   if (state.width !== "content") triggerProps.push(`width="${state.width}"`);
 
   return createPlaygroundSource({

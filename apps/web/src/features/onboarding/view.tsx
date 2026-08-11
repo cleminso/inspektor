@@ -20,7 +20,7 @@ function ConnectionsSection({ children, title }: ConnectionsSectionProps): React
         <Text as="h2" variant="label" color="muted">
           {title}
         </Text>
-        <Box flex={1} borderTopWidth={1} borderColor="border-secondary" borderStyle="solid" />
+        <Box flex={1} borderTopWidth={1} borderColor="subtle" borderStyle="solid" />
       </Box>
       <Box width="full" flexDirection="column" alignItems="start" paddingHorizontal="m">
         {children}

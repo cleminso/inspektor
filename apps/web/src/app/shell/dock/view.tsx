@@ -17,14 +17,12 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
     <Box
       as="footer"
       width="full"
-      height="control-height-l"
       flexShrink={0}
       alignItems="center"
       gap="s"
       paddingVertical="s"
       paddingHorizontal="xs"
-      backgroundColor="bg-page"
-      data-height="fixed"
+      backgroundColor="surface-background"
     >
       <Box minWidth={0} flex={1} alignItems="center" gap="xs">
         {leftDock !== undefined ? (

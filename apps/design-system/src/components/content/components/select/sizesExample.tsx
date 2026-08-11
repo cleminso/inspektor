@@ -1,7 +1,7 @@
 import { Box, Select } from "@inspector/ds";
 import { type ReactElement } from "react";
 
-const sizes = ["s", "m", "l"] as const;
+const sizes = ["xs", "s", "m", "l"] as const;
 const items = [
   { label: "Local", value: "local" },
   { label: "Production", value: "production" },

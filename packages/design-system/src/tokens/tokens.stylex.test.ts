@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import * as tokenExports from './tokens.stylex'
 import { breakpointQueries, breakpointValues } from './breakpoints.stylex'
 import {
-  backgroundColors,
   borderRadii,
   borderColors,
   layerIndexes,
@@ -22,16 +22,60 @@ const nonzeroValues = (values: Readonly<Record<string, string>>) =>
   Object.values(values).filter((value) => value !== '0')
 
 describe('semantic token contract', () => {
+  it('separates interface color roles from component color roles', () => {
+    expect(tokenExports).toMatchObject({
+      surfaceColors: expect.objectContaining({
+        background: expect.any(String),
+        default: expect.any(String),
+        raised: expect.any(String),
+        canvas: expect.any(String),
+      }),
+      elementColors: expect.objectContaining({
+        default: expect.any(String),
+        hover: expect.any(String),
+        pressed: expect.any(String),
+        selected: expect.any(String),
+        disabled: expect.any(String),
+      }),
+      ghostElementColors: expect.objectContaining({
+        default: expect.any(String),
+        hover: expect.any(String),
+        pressed: expect.any(String),
+        selected: expect.any(String),
+        disabled: expect.any(String),
+      }),
+      focusColors: expect.objectContaining({
+        ring: expect.any(String),
+        ringSubtle: expect.any(String),
+        ringDanger: expect.any(String),
+      }),
+      selectionColors: expect.objectContaining({
+        background: expect.any(String),
+        strongBackground: expect.any(String),
+        border: expect.any(String),
+        text: expect.any(String),
+      }),
+    })
+    expect(tokenExports).not.toHaveProperty('backgroundColors')
+  })
+
+  it('keeps component-specific colors out of interface semantics', () => {
+    expect(Object.keys(tokenExports.surfaceColors)).not.toContain('tab')
+    expect(Object.keys(tokenExports.surfaceColors)).not.toContain('tableHeader')
+    expect(Object.keys(tokenExports.borderColors)).not.toContain('input')
+    expect(Object.keys(tokenExports.borderColors)).not.toContain('tableCell')
+  })
+
   it('defines neutral toast border roles without notification surfaces', () => {
-    expect(backgroundColors).not.toHaveProperty('bg-notification-warning')
-    expect(backgroundColors).not.toHaveProperty('bg-notification-error')
-    expect(backgroundColors).not.toHaveProperty('bg-notification-info')
-    expect(backgroundColors).not.toHaveProperty('bg-notification-loading')
+    expect(tokenExports.surfaceColors).not.toHaveProperty('notificationWarning')
+    expect(tokenExports.surfaceColors).not.toHaveProperty('notificationError')
+    expect(tokenExports.surfaceColors).not.toHaveProperty('notificationInfo')
+    expect(tokenExports.surfaceColors).not.toHaveProperty('notificationLoading')
     expect(Object.keys(textColors).some((token) => token.startsWith('fg-'))).toBe(false)
     expect(borderColors).toMatchObject({
-      'border-warning': expect.any(String),
-      'border-danger': expect.any(String),
-      'border-success': expect.any(String),
+      warning: expect.any(String),
+      danger: expect.any(String),
+      success: expect.any(String),
     })
   })
 
@@ -68,16 +112,19 @@ describe('semantic token contract', () => {
       drag: expect.any(Number),
     })
     expect(spatial).toMatchObject({
-      'button-height-xs': expect.any(String),
-      'button-height-s': expect.any(String),
-      'button-height-m': expect.any(String),
       'tab-height': expect.any(String),
+      'control-height-xs': expect.any(String),
       'control-height-s': expect.any(String),
       'control-height-m': expect.any(String),
       'control-height-l': expect.any(String),
+      'collection-row-height-s': expect.any(String),
+      'collection-row-height-m': expect.any(String),
+      'collection-row-height-l': expect.any(String),
+      'collection-row-height-xl': expect.any(String),
       'icon-size-xs': expect.any(String),
       'icon-size-s': expect.any(String),
       'icon-size-m': expect.any(String),
+      'interaction-target-min': expect.any(String),
       'focus-ring-width': expect.any(String),
       'popup-width-s': expect.any(String),
       'popup-width-m': expect.any(String),
@@ -102,6 +149,18 @@ describe('semantic token contract', () => {
       'scrollbar-track-size': expect.any(String),
       'scrollbar-thumb-size': expect.any(String),
     })
+    expect(spatial).not.toHaveProperty('button-height-xs')
+    expect(spatial).not.toHaveProperty('button-height-s')
+    expect(spatial).not.toHaveProperty('button-height-m')
+    expect(spatial).not.toHaveProperty('control-inner-height-xs')
+    expect(spatial).not.toHaveProperty('control-inner-height-s')
+    expect(spatial).not.toHaveProperty('control-inner-height-m')
+    expect(spatial).not.toHaveProperty('control-inner-height-l')
+    expect(spatial).not.toHaveProperty('popup-row-min-height-s')
+    expect(spatial).not.toHaveProperty('popup-row-min-height-m')
+    expect(spatial).not.toHaveProperty('popup-row-min-height-l')
+    expect(spatial).not.toHaveProperty('select-compact-width')
+    expect(spatial).not.toHaveProperty('select-min-width')
   })
 
   it('exposes the reduced radius scale', () => {

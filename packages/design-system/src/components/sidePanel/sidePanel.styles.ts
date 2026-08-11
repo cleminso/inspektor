@@ -1,14 +1,14 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { backgroundColors, borderColors } from '../../tokens/semantics.stylex'
+import { borderColors, surfaceColors } from '../../tokens/semantics.stylex'
 import { spacing } from '../../tokens/value.stylex'
 
 export const sidePanelStyles = stylex.create({
   root: {
-    borderColor: borderColors['border-secondary'],
+    borderColor: borderColors.subtle,
     flex: '1',
     overflow: 'hidden',
-    backgroundColor: backgroundColors['bg-page'],
+    backgroundColor: surfaceColors.background,
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
@@ -19,7 +19,7 @@ export const sidePanelStyles = stylex.create({
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
-    borderBottomColor: borderColors['border-secondary'],
+    borderBottomColor: borderColors.subtle,
     borderBottomStyle: 'solid',
     borderBottomWidth: 1,
     minWidth: 0,
@@ -37,9 +37,9 @@ export const sidePanelStyles = stylex.create({
   },
   footer: {
     padding: spacing.s,
-    borderColor: borderColors['border-secondary'],
+    borderColor: borderColors.subtle,
     alignItems: 'center',
-    backgroundColor: backgroundColors['bg-page'],
+    backgroundColor: surfaceColors.background,
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'space-between',

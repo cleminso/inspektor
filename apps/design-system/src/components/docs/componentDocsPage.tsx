@@ -63,10 +63,10 @@ export function ComponentDocsPage({
               minWidth={0}
               borderWidth={1}
               borderStyle="solid"
-              borderColor="border"
+              borderColor="default"
               borderRadius="s"
               overflow="hidden"
-              backgroundColor="bg-page"
+              backgroundColor="surface-background"
             >
               <Box
                 minHeight="panel-height"
@@ -111,7 +111,7 @@ export function ComponentDocsPage({
           data-scrollable="false"
           padding="m"
           gap="2xl"
-          backgroundColor="bg-page"
+          backgroundColor="surface-background"
         >
           <Text variant="body" color="muted">
             {description}

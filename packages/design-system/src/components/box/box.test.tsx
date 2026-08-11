@@ -23,18 +23,23 @@ describe('Box', () => {
 
   it('resolves every semantic color token accepted by Box', () => {
     const backgroundColors = [
-      'bg-page', 'bg-layout', 'bg-card', 'bg-popover', 'bg-subtle', 'bg-overlay',
-      'bg-backdrop', 'bg-inverse', 'bg-hover', 'bg-pressed', 'bg-selected',
-      'bg-disabled', 'bg-primary', 'bg-primary-hover', 'bg-secondary',
-      'bg-danger', 'bg-danger-hover',
+      'surface-background', 'surface-default', 'surface-raised', 'surface-canvas',
+      'surface-subtle', 'surface-overlay', 'surface-backdrop', 'surface-inverse',
+      'element-default', 'element-hover', 'element-pressed', 'element-selected',
+      'element-disabled', 'ghost-element-default', 'ghost-element-hover',
+      'ghost-element-pressed', 'ghost-element-selected', 'ghost-element-disabled',
+      'accent-element-default', 'accent-element-hover', 'accent-element-pressed',
+      'accent-element-disabled', 'danger-element-default', 'danger-element-hover',
+      'danger-element-pressed', 'danger-element-disabled',
+      'selection-background', 'selection-strong-background',
     ] as const
     const colors = [
-      'text-default', 'text-secondary', 'text-muted', 'text-disabled', 'text-link',
-      'text-selected', 'text-danger', 'text-on-primary', 'text-on-inverse',
+      'default', 'secondary', 'muted', 'placeholder', 'disabled', 'accent', 'link',
+      'success', 'warning', 'danger', 'onAccent', 'onInverse',
     ] as const
     const borderColors = [
-      'border', 'border-secondary', 'border-focused', 'border-warning',
-      'border-danger', 'border-danger-subtle', 'border-success',
+      'default', 'subtle', 'strong', 'focused', 'selected', 'disabled', 'warning',
+      'danger', 'dangerSubtle', 'success',
     ] as const
 
     for (const backgroundColor of backgroundColors) {
@@ -131,7 +136,7 @@ describe('Box', () => {
 
   it('does not allow border style to activate the browser medium border width', () => {
     const resolved = resolveBoxStyles(
-      { borderColor: 'border', borderStyle: 'solid' },
+      { borderColor: 'default', borderStyle: 'solid' },
       'box-border-default',
     )
 

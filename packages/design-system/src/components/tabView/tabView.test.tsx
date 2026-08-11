@@ -6,7 +6,48 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Tooltip } from '../tooltip/tooltip'
 import { tooltipStyles } from '../tooltip/tooltip.styles'
 import { TabView } from './tabView'
+import { tabViewColors } from './tabViewColors.stylex'
 import { tabViewStyles } from './tabView.styles'
+import {
+  accentElementColors,
+  borderColors,
+  dangerElementColors,
+  elementColors,
+  focusColors,
+  ghostElementColors,
+  selectionColors,
+  surfaceColors,
+  textColors,
+} from '../../tokens/semantics.stylex'
+
+describe('TabView color contract', () => {
+  it('defines tab states without adding tab roles to global colors', () => {
+    expect(tabViewColors).toMatchObject({
+      background: expect.any(String),
+      hoverBackground: expect.any(String),
+      selectedBackground: expect.any(String),
+      disabledBackground: expect.any(String),
+      text: expect.any(String),
+      hoverText: expect.any(String),
+      selectedText: expect.any(String),
+      disabledText: expect.any(String),
+      focusRing: expect.any(String),
+    })
+
+    const globalKeys = [
+      ...Object.keys(surfaceColors),
+      ...Object.keys(elementColors),
+      ...Object.keys(ghostElementColors),
+      ...Object.keys(accentElementColors),
+      ...Object.keys(dangerElementColors),
+      ...Object.keys(selectionColors),
+      ...Object.keys(borderColors),
+      ...Object.keys(textColors),
+      ...Object.keys(focusColors),
+    ]
+    expect(globalKeys.some((key) => /tab/i.test(key))).toBe(false)
+  })
+})
 
 let onDragEnd: ((event: unknown) => void) | undefined
 let onDragStart: ((event: unknown) => void) | undefined

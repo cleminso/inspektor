@@ -27,8 +27,8 @@ export const keyboardInputStyles = stylex.create({
     lineHeight: lineHeights.ui,
     userSelect: "none",
     whiteSpace: "nowrap",
-    minHeight: spatial["control-height-s"],
-    minWidth: spatial["control-height-s"],
+    minHeight: spatial["control-height-m"],
+    minWidth: spatial["control-height-m"],
   },
   glyph: {
     display: "inline-block",

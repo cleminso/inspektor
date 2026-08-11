@@ -21,7 +21,7 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
   );
 
   return (
-    <Box minHeight={0} flex={1} flexDirection="column" overflow="hidden" backgroundColor="bg-page">
+    <Box minHeight={0} flex={1} flexDirection="column" overflow="hidden" backgroundColor="surface-background">
       <Box
         display="grid"
         minHeight={0}
@@ -36,7 +36,7 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
           overflow="hidden"
           borderBottomWidth={{ base: 1, xl: 0 }}
           borderRightWidth={{ base: 0, xl: 1 }}
-          borderColor="border"
+          borderColor="default"
           borderStyle="solid"
         >
           <Box
@@ -45,7 +45,7 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
             alignItems="center"
             justifyContent="between"
             borderBottomWidth={1}
-            borderColor="border"
+            borderColor="default"
             borderStyle="solid"
             px="l"
           >
@@ -67,7 +67,7 @@ export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
             alignItems="center"
             justifyContent="between"
             borderBottomWidth={1}
-            borderColor="border"
+            borderColor="default"
             borderStyle="solid"
             px="l"
           >

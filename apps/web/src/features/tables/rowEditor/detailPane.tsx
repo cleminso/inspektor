@@ -10,13 +10,13 @@ export function DetailPane({
   title,
 }: DetailPaneProps): React.ReactElement {
   return (
-    <Box height="full" flexDirection="column" overflow="hidden" backgroundColor="bg-page">
+    <Box height="full" flexDirection="column" overflow="hidden" backgroundColor="surface-background">
       <Box
         height="panel-bar-height"
         flexShrink={0}
         alignItems="center"
         borderBottomWidth={1}
-        borderColor="border"
+        borderColor="default"
         borderStyle="solid"
         px="l"
       >

@@ -12,6 +12,7 @@ export type InputVariant = "default" | "subtle";
 export type InputFont = "sans" | "mono";
 
 const sizeStyles = {
+  xs: inputStyles.sizeXS,
   s: inputStyles.sizeS,
   m: inputStyles.sizeM,
   l: inputStyles.sizeL,
@@ -54,7 +55,7 @@ export interface InputProps extends Omit<BaseInput.Props, "className" | "style" 
 
 export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(function Input(
   {
-    size = "m",
+    size = "l",
     variant = "default",
     font = "sans",
     fullWidth = false,

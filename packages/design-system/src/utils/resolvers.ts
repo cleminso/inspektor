@@ -2,10 +2,16 @@ import * as stylex from '@stylexjs/stylex'
 import type React from 'react'
 
 import {
-  backgroundColors,
+  accentElementColors,
   borderColors,
+  dangerElementColors,
+  elementColors,
+  ghostElementColors,
+  selectionColors,
+  surfaceColors,
   textColors,
 } from '../tokens/semantics.stylex'
+import type { BackgroundColorToken } from '../tokens/semantics.stylex'
 import { layerIndexes } from '../tokens/layers.stylex'
 import { breakpointValues } from '../tokens/breakpoints.stylex'
 import { spatial } from '../tokens/semantics.stylex'
@@ -265,8 +271,39 @@ function marginCss(token: keyof typeof spacing | 'auto'): string {
   return token === 'auto' ? 'auto' : (spacing[token] as string)
 }
 
-function backgroundColorCss(token: keyof typeof backgroundColors): string {
-  return backgroundColors[token] as string
+const backgroundColorValues = {
+  'surface-background': surfaceColors.background,
+  'surface-default': surfaceColors.default,
+  'surface-raised': surfaceColors.raised,
+  'surface-canvas': surfaceColors.canvas,
+  'surface-subtle': surfaceColors.subtle,
+  'surface-overlay': surfaceColors.overlay,
+  'surface-backdrop': surfaceColors.backdrop,
+  'surface-inverse': surfaceColors.inverse,
+  'element-default': elementColors.default,
+  'element-hover': elementColors.hover,
+  'element-pressed': elementColors.pressed,
+  'element-selected': elementColors.selected,
+  'element-disabled': elementColors.disabled,
+  'ghost-element-default': ghostElementColors.default,
+  'ghost-element-hover': ghostElementColors.hover,
+  'ghost-element-pressed': ghostElementColors.pressed,
+  'ghost-element-selected': ghostElementColors.selected,
+  'ghost-element-disabled': ghostElementColors.disabled,
+  'accent-element-default': accentElementColors.default,
+  'accent-element-hover': accentElementColors.hover,
+  'accent-element-pressed': accentElementColors.pressed,
+  'accent-element-disabled': accentElementColors.disabled,
+  'danger-element-default': dangerElementColors.default,
+  'danger-element-hover': dangerElementColors.hover,
+  'danger-element-pressed': dangerElementColors.pressed,
+  'danger-element-disabled': dangerElementColors.disabled,
+  'selection-background': selectionColors.background,
+  'selection-strong-background': selectionColors.strongBackground,
+} satisfies Record<BackgroundColorToken, string>
+
+function backgroundColorCss(token: BackgroundColorToken): string {
+  return backgroundColorValues[token] as string
 }
 
 function textColorCss(token: keyof typeof textColors): string {

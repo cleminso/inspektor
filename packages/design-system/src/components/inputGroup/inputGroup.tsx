@@ -81,19 +81,21 @@ export interface InputGroupCheckboxProps {
 }
 
 const sizeStyles = {
+  xs: inputGroupStyles.sizeXS,
   s: inputGroupStyles.sizeS,
   m: inputGroupStyles.sizeM,
   l: inputGroupStyles.sizeL,
 } satisfies Record<InputSize, unknown>;
 
 const actionSizeStyles = {
+  xs: inputGroupStyles.actionXS,
   s: inputGroupStyles.actionS,
   m: inputGroupStyles.actionM,
   l: inputGroupStyles.actionL,
 } satisfies Record<InputSize, unknown>;
 
 function InputGroupRoot({
-  size = "m",
+  size = "l",
   fullWidth = false,
   invalid = false,
   disabled = false,

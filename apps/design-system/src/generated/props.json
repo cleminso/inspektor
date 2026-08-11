@@ -1027,7 +1027,7 @@
     },
     {
       "name": "backgroundColor",
-      "type": "\"bg-page\" | \"bg-layout\" | \"bg-card\" | \"bg-popover\" | \"bg-subtle\" | \"bg-tab\" | \"bg-tab-hover\" | \"bg-tab-selected\" | \"bg-table-header\" | \"bg-table-header-cell-active\" | \"bg-table-column-cell-active\" | \"bg-table-row-cell-active\" | \"bg-table-row-cell-selected\" | \"bg-table-cell-active\" | \"bg-overlay\" | \"bg-backdrop\" | \"bg-inverse\" | \"bg-hover\" | \"bg-pressed\" | \"bg-selected\" | \"bg-disabled\" | \"bg-primary\" | \"bg-primary-hover\" | \"bg-secondary\" | \"bg-secondary-hover\" | \"bg-danger\" | \"bg-danger-hover\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BackgroundColorToken>>",
+      "type": "\"surface-default\" | \"surface-background\" | \"surface-raised\" | \"surface-canvas\" | \"surface-subtle\" | \"surface-overlay\" | \"surface-backdrop\" | \"surface-inverse\" | \"element-disabled\" | \"element-default\" | \"element-hover\" | \"element-pressed\" | \"element-selected\" | \"ghost-element-disabled\" | \"ghost-element-default\" | \"ghost-element-hover\" | \"ghost-element-pressed\" | \"ghost-element-selected\" | \"accent-element-disabled\" | \"accent-element-default\" | \"accent-element-hover\" | \"accent-element-pressed\" | \"danger-element-disabled\" | \"danger-element-default\" | \"danger-element-hover\" | \"danger-element-pressed\" | \"selection-background\" | \"selection-strong-background\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BackgroundColorToken>>",
       "required": false,
       "description": "",
       "source": {
@@ -1037,7 +1037,7 @@
     },
     {
       "name": "color",
-      "type": "\"text-default\" | \"text-secondary\" | \"text-muted\" | \"text-disabled\" | \"text-link\" | \"text-selected\" | \"text-success\" | \"text-warning\" | \"text-danger\" | \"text-on-inverse\" | \"text-on-primary\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, TextColorToken>>",
+      "type": "\"link\" | \"disabled\" | \"secondary\" | \"danger\" | \"default\" | \"muted\" | \"placeholder\" | \"accent\" | \"success\" | \"warning\" | \"onInverse\" | \"onAccent\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, TextColorToken>>",
       "required": false,
       "description": "",
       "source": {
@@ -1047,7 +1047,7 @@
     },
     {
       "name": "borderColor",
-      "type": "\"border\" | \"border-secondary\" | \"border-focused\" | \"border-table-header-cell\" | \"border-table-cell\" | \"border-table-column-active\" | \"border-table-cell-active\" | \"border-warning\" | \"border-danger\" | \"border-danger-subtle\" | \"border-success\" | \"outline\" | \"border-input-ring\" | \"border-input\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BorderColorToken>>",
+      "type": "\"strong\" | \"disabled\" | \"danger\" | \"default\" | \"subtle\" | \"selected\" | \"success\" | \"warning\" | \"focused\" | \"dangerSubtle\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, BorderColorToken>>",
       "required": false,
       "description": "",
       "source": {
@@ -1217,7 +1217,7 @@
     },
     {
       "name": "width",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height-s\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1227,7 +1227,7 @@
     },
     {
       "name": "height",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height-s\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1237,7 +1237,7 @@
     },
     {
       "name": "minWidth",
-      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height-s\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1247,7 +1247,7 @@
     },
     {
       "name": "maxWidth",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height-s\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1257,7 +1257,7 @@
     },
     {
       "name": "minHeight",
-      "type": "0 | \"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height-s\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1267,7 +1267,7 @@
     },
     {
       "name": "maxHeight",
-      "type": "\"control-inner-height-s\" | \"control-inner-height-m\" | \"control-inner-height-l\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"button-height-xs\" | \"button-height-s\" | \"button-height-m\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-row-min-height-s\" | \"popup-row-min-height-m\" | \"popup-row-min-height-l\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"select-compact-width\" | \"select-min-width\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-height-m\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"switch-thumb-m\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -2001,9 +2001,9 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\"",
+      "type": "\"s\" | \"m\" | \"l\"",
       "required": false,
-      "defaultValue": "\"m\"",
+      "defaultValue": "\"l\"",
       "description": "Controls the group height; items inherit the selected size.",
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
@@ -3743,13 +3743,13 @@
   "input": [
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"s\" | \"m\" | \"xs\" | \"l\"",
       "required": false,
-      "defaultValue": "\"m\"",
+      "defaultValue": "\"l\"",
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -3760,7 +3760,7 @@
       "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -3771,7 +3771,7 @@
       "description": "Selects proportional or data-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -3782,7 +3782,7 @@
       "description": "Stretches the input to the width of its container.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 38
+        "line": 39
       }
     },
     {
@@ -3793,7 +3793,7 @@
       "description": "Marks the input as invalid and exposes that state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 40
+        "line": 41
       }
     },
     {
@@ -3804,7 +3804,7 @@
       "description": "Disables editing and exposes the disabled state to assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 42
+        "line": 43
       }
     },
     {
@@ -3815,7 +3815,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -3825,7 +3825,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 46
+        "line": 47
       }
     },
     {
@@ -3835,7 +3835,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 48
+        "line": 49
       }
     },
     {
@@ -3845,7 +3845,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 50
+        "line": 51
       }
     },
     {
@@ -3855,7 +3855,7 @@
       "description": "Composes Input behavior and styles onto another input element.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 52
+        "line": 53
       }
     }
   ],
@@ -3970,9 +3970,9 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"s\" | \"m\" | \"xs\" | \"l\"",
       "required": false,
-      "defaultValue": "\"m\"",
+      "defaultValue": "\"l\"",
       "description": "Controls the height of the compound input.",
       "source": {
         "path": "packages/design-system/src/components/inputGroup/inputGroup.tsx",
@@ -4530,12 +4530,12 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"s\" | \"m\" | \"xs\" | \"l\"",
       "required": false,
       "description": "Controls the input height.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -4545,7 +4545,7 @@
       "description": "Controls the input's visual prominence.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -4555,7 +4555,7 @@
       "description": "Selects proportional or data-oriented typography.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -4565,7 +4565,7 @@
       "description": "Prevents editing while preserving focus and text selection.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -4575,7 +4575,7 @@
       "description": "Sets the initial value when the input is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 46
+        "line": 47
       }
     },
     {
@@ -4585,7 +4585,7 @@
       "description": "Sets the current value when the input is controlled.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 48
+        "line": 49
       }
     },
     {
@@ -4595,7 +4595,7 @@
       "description": "Runs when the input value changes.",
       "source": {
         "path": "packages/design-system/src/components/input/input.tsx",
-        "line": 50
+        "line": 51
       }
     }
   ],
@@ -6498,9 +6498,9 @@
     },
     {
       "name": "size",
-      "type": "\"s\" | \"m\" | \"l\"",
+      "type": "\"s\" | \"m\" | \"xs\" | \"l\"",
       "required": false,
-      "defaultValue": "\"m\"",
+      "defaultValue": "\"l\"",
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
@@ -6509,10 +6509,10 @@
     },
     {
       "name": "width",
-      "type": "\"content\" | \"full\" | \"compact\"",
+      "type": "\"content\" | \"full\"",
       "required": false,
       "defaultValue": "\"content\"",
-      "description": "Controls whether the trigger follows the selected value, reserves a stable compact width, or fills its container.",
+      "description": "Controls whether the trigger follows the selected value or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/select/select.tsx",
         "line": 43

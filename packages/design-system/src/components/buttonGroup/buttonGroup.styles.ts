@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex'
 
 import {
-  backgroundColors,
   borderColors,
+  elementColors,
   textColors,
 } from '../../tokens/semantics.stylex'
 import {
@@ -47,7 +47,7 @@ export const buttonGroupStyles = stylex.create({
     flexDirection: 'column',
   },
   text: {
-    borderColor: borderColors['border'],
+    borderColor: borderColors.default,
     borderRadius: borderRadii.xs,
     borderStyle: 'solid',
     borderWidth: 1,
@@ -55,8 +55,8 @@ export const buttonGroupStyles = stylex.create({
     paddingInline: spacing.m,
     alignItems: 'center',
     alignSelf: 'stretch',
-    backgroundColor: backgroundColors['bg-secondary'],
-    color: textColors['text-default'],
+    backgroundColor: elementColors.default,
+    color: textColors.default,
     display: 'inline-flex',
     flexShrink: 0,
     fontFamily: fontFamilies.sans,
@@ -67,7 +67,7 @@ export const buttonGroupStyles = stylex.create({
   },
   separator: {
     alignSelf: 'stretch',
-    backgroundColor: borderColors['border-secondary'],
+    backgroundColor: borderColors.subtle,
     flexShrink: 0,
   },
   separatorHorizontal: {

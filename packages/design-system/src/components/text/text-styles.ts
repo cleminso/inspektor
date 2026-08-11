@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { backgroundColors, textColors } from '../../tokens/semantics.stylex'
+import { elementColors, textColors } from '../../tokens/semantics.stylex'
 import { borderRadii, fontFamilies, spacing } from '../../tokens/value.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
@@ -15,12 +15,12 @@ export const textBaseStyles = stylex.create({
 })
 
 export const textColorStyles = stylex.create({
-  default: { color: textColors['text-default'] },
-  muted: { color: textColors['text-muted'] },
-  disabled: { color: textColors['text-disabled'] },
-  link: { color: textColors['text-link'] },
-  danger: { color: textColors['text-danger'] },
-  error: { color: textColors['text-danger'] },
+  default: { color: textColors.default },
+  muted: { color: textColors.muted },
+  disabled: { color: textColors.disabled },
+  link: { color: textColors.link },
+  danger: { color: textColors.danger },
+  error: { color: textColors.danger },
   inherit: {},
 })
 
@@ -80,7 +80,7 @@ export const textLoadingStyles = stylex.create({
     animationIterationCount: 'infinite',
     animationName: { default: pulse, [reducedMotion]: 'none' },
     animationTimingFunction: 'ease-in-out',
-    backgroundColor: backgroundColors['bg-secondary'],
+    backgroundColor: elementColors.default,
     position: 'absolute',
   },
   lines: {
@@ -95,7 +95,7 @@ export const textLoadingStyles = stylex.create({
     animationIterationCount: 'infinite',
     animationName: { default: pulse, [reducedMotion]: 'none' },
     animationTimingFunction: 'ease-in-out',
-    backgroundColor: backgroundColors['bg-secondary'],
+    backgroundColor: elementColors.default,
     display: 'block',
     height: '1em',
     width: '100%',

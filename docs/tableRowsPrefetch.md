@@ -161,7 +161,7 @@ icon actions, and a `Page x` label. While another page exists, the row status co
 `1–100 of 101+`. The final page proves the exact result count and can show a status such as `10,001–10,004 of 10,004`. The product
 table does not render a separate footer or claim an exact total before the query path establishes one. Empty results use
 `0–0 of 0`. During a page-size query, the toolbar keeps the last settled range and page visible while disabling page navigation. The
-page-size trigger has a fixed compact width, and both page navigation actions provide tooltips.
+page-size trigger follows its selected value, and both page navigation actions provide tooltips.
 
 `DataGrid.Content` uses a hybrid row-rendering boundary for the Inspector table. TanStack Table still produces the complete current-page
 row model. The default 100-row page renders directly. Larger row models use TanStack Virtual with a 48-row overscan; spacer rows

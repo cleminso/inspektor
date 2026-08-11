@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { backgroundColors, spatial, textColors } from '../../tokens/semantics.stylex'
+import { spatial, surfaceColors, textColors } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -48,8 +48,8 @@ export const tooltipStyles = stylex.create({
     borderRadius: borderRadii.xs,
     paddingBlock: spacing.xxs,
     paddingInline: spacing.s,
-    backgroundColor: backgroundColors['bg-inverse'],
-    color: textColors['text-on-inverse'],
+    backgroundColor: surfaceColors.inverse,
+    color: textColors.onInverse,
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,

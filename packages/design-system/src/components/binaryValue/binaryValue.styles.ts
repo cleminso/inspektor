@@ -9,7 +9,7 @@ import {
 
 export const binaryValueStyles = stylex.create({
   preview: {
-    color: textColors["text-default"],
+    color: textColors.default,
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
