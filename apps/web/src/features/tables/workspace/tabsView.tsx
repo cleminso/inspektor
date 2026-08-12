@@ -1,5 +1,11 @@
-import { Box, Button, Icon, TabView, Tooltip } from '@inspector/ds'
-import { Plus } from 'lucide-react'
+import {
+  Box,
+  Button,
+  Icon,
+  TabView,
+  Tooltip,
+} from '@inspector/ds'
+import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 import { useRef } from 'react'
 
 import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
@@ -13,6 +19,7 @@ import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { NewTableView } from '@tables/workspace/newView'
 import { SelectedTableView } from '@tables/workspace/selectedView'
 import { NEW_VIEW_TAB_ID, createBaseTableTabId, type TableDataTab } from '@tables/workspace/tabs'
+import { useTableNavigationControls } from '@tables/workspace/navigationHistory'
 
 interface TableTabsViewProps {
   tableName: string | null
@@ -20,6 +27,7 @@ interface TableTabsViewProps {
 
 export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactElement {
   const { activeTabId, activateTab, closeTab, openNewView, reorderTabs, tabs } = useTableTabs()
+  const { canGoBack, canGoForward, goBack, goForward } = useTableNavigationControls()
   const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
@@ -96,6 +104,57 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
         borderStyle="solid"
         overflow="hidden"
       >
+        <Box alignItems="center" gap="xxs" role="group" aria-label="Table navigation">
+          <Tooltip.Root>
+            <Tooltip.Trigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="s"
+                  radius="xs"
+                  aria-label="Go Back"
+                  disabled={canGoBack === false}
+                  focusableWhenDisabled
+                  iconOnly
+                  onClick={goBack}
+                >
+                  <Button.Glyph artwork={ArrowLeft} />
+                </Button>
+              }
+            />
+            <Tooltip.Content>Go Back</Tooltip.Content>
+          </Tooltip.Root>
+          <Tooltip.Root>
+            <Tooltip.Trigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="s"
+                  radius="xs"
+                  aria-label="Go Forward"
+                  disabled={canGoForward === false}
+                  focusableWhenDisabled
+                  iconOnly
+                  onClick={goForward}
+                >
+                  <Button.Glyph artwork={ArrowRight} />
+                </Button>
+              }
+            />
+            <Tooltip.Content>Go Forward</Tooltip.Content>
+          </Tooltip.Root>
+        </Box>
+        <Box
+          role="separator"
+          aria-orientation="vertical"
+          height="control-height-s"
+          flexShrink={0}
+          borderLeftWidth={1}
+          borderColor="subtle"
+          borderStyle="solid"
+        />
         <Box
           minWidth={0}
           flex={1}
@@ -195,7 +254,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                 <Button
                   type="button"
                   variant="ghost"
-                  size="xs"
+                  size="s"
                   radius="xs"
                   aria-label="Open new table view"
                   iconOnly

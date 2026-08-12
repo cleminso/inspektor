@@ -227,11 +227,11 @@ export function useTableViewState({
       setActiveColumnId(null)
 
       if (availableRowIds.length === 0) {
-        void searchState.setRowEditor(null, null, { replace: false })
+        void searchState.setRowEditor(null, null)
         return
       }
       if (resolvedActiveRowId !== undefined) {
-        void searchState.setRowEditor('edit', resolvedActiveRowId, { replace: false })
+        void searchState.setRowEditor('edit', resolvedActiveRowId)
       }
     }
     const changesDraftTarget =
@@ -385,17 +385,12 @@ export function useTableViewState({
 
   /** Closes presentation state without applying the stronger explicit-Cancel selection behavior. */
   const closeDetailPane = () => {
-    void searchState.setRowEditor(null, null, { replace: false })
+    void searchState.setRowEditor(null, null)
   }
 
   const handleEscape = () => {
     if (detailPaneMode !== 'closed') {
       draftTransition.request(() => {
-        if (activeRowId !== null) {
-          setSelectedRowIds((currentRowIds) =>
-            currentRowIds.filter((rowId) => rowId !== activeRowId),
-          )
-        }
         closeDetailPane()
       })
       return
@@ -414,7 +409,7 @@ export function useTableViewState({
 
   const openInsert = () => {
     draftTransition.request(() => {
-      void searchState.setRowEditor('insert', null, { replace: false })
+      void searchState.setRowEditor('insert', null)
     })
   }
 
@@ -425,7 +420,7 @@ export function useTableViewState({
     }
 
     draftTransition.request(() => {
-      void searchState.setRowEditor('edit', nextActiveRowId, { replace: false })
+      void searchState.setRowEditor('edit', nextActiveRowId)
     })
   }
 
@@ -467,7 +462,7 @@ export function useTableViewState({
           const nextActiveRowIndex = Math.min(activeRowIndex, nextEditedRowIds.length - 1)
           const nextActiveRowId = nextEditedRowIds[nextActiveRowIndex] ?? null
           setSelectedRowIds(nextEditedRowIds)
-          void searchState.setRowEditor('edit', nextActiveRowId, { replace: false })
+          void searchState.setRowEditor('edit', nextActiveRowId)
         }
       : undefined
 
@@ -488,10 +483,10 @@ export function useTableViewState({
     setSelectedRowIds(nextSelectedRowIds)
     const nextActiveRowId = getNearestSelectedRowId(validRowIds, nextSelectedRowIds, activeRowId)
     if (nextActiveRowId === null) {
-      void searchState.setRowEditor(null, null, { replace: false })
+      void searchState.setRowEditor(null, null)
       return
     }
-    void searchState.setRowEditor('edit', nextActiveRowId, { replace: false })
+    void searchState.setRowEditor('edit', nextActiveRowId)
   }
 
   return {

@@ -28,7 +28,7 @@ export type {
 
 type BaseButtonProps = Omit<
   BaseButton.Props,
-  'className' | 'focusableWhenDisabled' | 'nativeButton' | 'prefix' | 'style'
+  'className' | 'nativeButton' | 'prefix' | 'style'
 >
 
 interface ButtonSharedProps {
@@ -44,6 +44,8 @@ interface ButtonSharedProps {
   glyphSize?: ButtonGlyphSize
   /** Disables interaction and exposes the disabled state to assistive technology. */
   disabled?: BaseButton.Props['disabled']
+  /** Keeps a disabled action keyboard-focusable when its label or explanation must remain discoverable. */
+  focusableWhenDisabled?: BaseButton.Props['focusableWhenDisabled']
   /** Composes Button behavior and styles onto another native button component. */
   render?: BaseButton.Props['render']
 }
@@ -85,6 +87,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
     prefix,
     suffix,
     disabled = false,
+    focusableWhenDisabled = false,
     render,
     children,
     'aria-pressed': ariaPressed,
@@ -145,7 +148,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
       aria-pressed={ariaPressed}
       aria-expanded={ariaExpanded}
       disabled={isInteractionBlocked}
-      focusableWhenDisabled={loading === true}
+      focusableWhenDisabled={loading === true || focusableWhenDisabled === true}
       render={render}
       type={type}
       className={(state) => resolveStateStyleProps(state).className}

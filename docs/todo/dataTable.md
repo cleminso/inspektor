@@ -16,6 +16,12 @@
 
 [12/08/26]
 
+- [x] Replace the browser-owned rounded header focus outline with a contained Data Grid focus-visible outline.
+- [x] Render selected headers with a one-pixel perimeter and increase that same perimeter to the shared focus-ring width when selected and keyboard-focused.
+- [x] Remove the redundant active-header pseudo-element and duplicated inherited structural styles.
+
+[12/08/26]
+
 - [x] Follow TanStack's cell-selection example by letting each selected body cell paint the edges from `getSelectionEdges()` with composable inset shadows.
 - [x] Remove adjacent-cell edge inspection and neighbor-owned selection painting while keeping header selection styling unchanged.
 

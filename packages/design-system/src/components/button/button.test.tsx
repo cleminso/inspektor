@@ -155,6 +155,16 @@ describe("Button", () => {
     expect(activationCount).toBe(0);
   });
 
+  it("keeps disabled actions focusable only when their explanation must remain discoverable", () => {
+    render(<Button disabled focusableWhenDisabled>Previous page</Button>);
+
+    const button = screen.getByRole("button", { name: "Previous page" });
+
+    expect(button.getAttribute("aria-disabled")).toBe("true");
+    expect((button as HTMLButtonElement).disabled).toBe(false);
+    expect(button.tabIndex).toBe(0);
+  });
+
   it("uses a full-width start-aligned row layout", () => {
     render(
       <Button layout="row" prefix={<span>Prefix</span>} suffix={<span>Suffix</span>}>

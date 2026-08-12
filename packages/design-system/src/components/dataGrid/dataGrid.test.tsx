@@ -306,6 +306,15 @@ describe('DataGrid scrollbar', () => {
     )
   })
 
+  it('applies the controlled focus treatment to keyboard-focusable headers', () => {
+    render(<KeyboardSortableDataGrid onSortingChange={() => undefined} />)
+
+    const header = screen.getByRole('columnheader', { name: 'Name' })
+
+    expect(header.className).toContain(stylex.props(dataGridStyles.headerCell).className)
+    expect(header.tabIndex).toBe(0)
+  })
+
   it('lets the vertical thumb reach the grid end inset', () => {
     const { container } = render(<TestDataGrid />)
     const verticalTrack = container.querySelector<HTMLElement>(

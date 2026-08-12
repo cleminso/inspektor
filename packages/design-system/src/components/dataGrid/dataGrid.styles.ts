@@ -76,16 +76,19 @@ export const dataGridStyles = stylex.create({
   },
   headerCell: {
     backgroundColor: dataGridColors.headerBackground,
-    boxShadow: {
-      default: 'none',
-      ':focus-visible': `inset 0 0 0 ${spatial['focus-ring-width']} ${dataGridColors.focusRing}`,
-    },
     boxSizing: 'border-box',
     color: dataGridColors.headerText,
     borderBottomColor: dataGridColors.headerBorder,
     borderTopColor: dataGridColors.headerBorder,
     borderBottomStyle: 'solid',
     overflow: 'hidden',
+    outlineColor: dataGridColors.focusRing,
+    outlineOffset: -2,
+    outlineStyle: 'solid',
+    outlineWidth: {
+      default: 0,
+      ':focus-visible': spatial['focus-ring-width'],
+    },
     borderBottomWidth: 1,
     borderTopWidth: 1,
     fontWeight: fontWeights.regular,
@@ -113,32 +116,17 @@ export const dataGridStyles = stylex.create({
   },
   headerCellActive: {
     backgroundColor: dataGridColors.emphasizedHeaderBackground,
-    boxShadow: {
-      default: 'none',
-      ':focus-visible': `inset 0 0 0 ${spatial['focus-ring-width']} ${dataGridColors.focusRing}`,
-    },
     color: dataGridColors.emphasizedHeaderText,
-    position: 'sticky',
+    outlineColor: dataGridColors.emphasizedColumnBorder,
+    outlineOffset: {
+      default: -1,
+      ':focus-visible': -2,
+    },
+    outlineWidth: {
+      default: 1,
+      ':focus-visible': spatial['focus-ring-width'],
+    },
     zIndex: 3,
-    borderBottomColor: dataGridColors.headerBorder,
-    borderRightColor: {
-      default: dataGridColors.headerBorder,
-      ':has([data-resizing])': dataGridColors.emphasizedColumnBorder,
-      ':has([data-slot="data-grid-resize-handle"]:focus-visible)':
-        dataGridColors.emphasizedColumnBorder,
-      ':has([data-slot="data-grid-resize-handle"]:hover)':
-        dataGridColors.emphasizedColumnBorder,
-    },
-    borderTopColor: dataGridColors.headerBorder,
-    '::after': {
-      inset: 0,
-      borderColor: dataGridColors.emphasizedColumnBorder,
-      borderStyle: 'solid',
-      borderWidth: 1,
-      content: '',
-      pointerEvents: 'none',
-      position: 'absolute',
-    },
   },
   headerCellLayout: {
     paddingLeft: 0,

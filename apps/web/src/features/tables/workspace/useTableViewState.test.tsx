@@ -3,7 +3,6 @@ import { useReducer } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DataGrid } from '@inspector/ds'
-
 import { createInsertRowValues, useTableViewState } from '@tables/workspace/useTableViewState'
 
 const setRowEditor = vi.fn()
@@ -293,6 +292,14 @@ describe('useTableViewState', () => {
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('closed')
   })
 
+  it('stores cell selection in the active table view', () => {
+    render(<TableViewInteractionHarness />)
+
+    fireEvent.mouseDown(screen.getByRole('cell', { name: 'Ada' }))
+
+    expect(screen.getByRole('cell', { name: 'Ada' }).hasAttribute('data-cell-selected')).toBe(true)
+  })
+
   it('moves focus from a selected cell to a clicked column header', () => {
     render(<TableViewInteractionHarness />)
     const cell = screen.getByRole('cell', { name: 'Ada' })
@@ -317,7 +324,7 @@ describe('useTableViewState', () => {
       screen.getByRole('checkbox', { name: 'Select row row-1' }).getAttribute('aria-checked'),
     ).toBe('true')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
-    expect(setRowEditor).toHaveBeenCalledWith('edit', 'row-1', { replace: false })
+    expect(setRowEditor).toHaveBeenCalledWith('edit', 'row-1')
   })
 
   it('allows an individual row to be unchecked after its pane is closed', () => {
@@ -356,7 +363,7 @@ describe('useTableViewState', () => {
 
     expect(result.current.table.getRow('row-2').getIsSelected()).toBe(false)
     expect(result.current.table.getRow('row-1').getIsSelected()).toBe(true)
-    expect(setRowEditor).toHaveBeenLastCalledWith('edit', 'row-1', { replace: false })
+    expect(setRowEditor).toHaveBeenLastCalledWith('edit', 'row-1')
   })
 
   it('closes the row pane when cancelling its only checked row', () => {
@@ -372,7 +379,7 @@ describe('useTableViewState', () => {
     rerender()
 
     expect(result.current.table.getRow('row-1').getIsSelected()).toBe(false)
-    expect(setRowEditor).toHaveBeenLastCalledWith(null, null, { replace: false })
+    expect(setRowEditor).toHaveBeenLastCalledWith(null, null)
   })
 
   it('requires an explicit decision before dismissing a dirty row draft', () => {
@@ -401,7 +408,7 @@ describe('useTableViewState', () => {
     })
 
     expect(result.current.draftTransition.isPending).toBe(false)
-    expect(setRowEditor).toHaveBeenCalledWith(null, null, { replace: false })
+    expect(setRowEditor).toHaveBeenCalledWith(null, null)
     expect(routeBlocker.status).toBe('idle')
   })
 
@@ -441,7 +448,7 @@ describe('useTableViewState', () => {
 
     expect(updateRow).toHaveBeenCalledWith('row-1', { name: 'Grace' })
     expect(result.current.draftTransition.isPending).toBe(false)
-    expect(setRowEditor).toHaveBeenLastCalledWith(null, null, { replace: false })
+    expect(setRowEditor).toHaveBeenLastCalledWith(null, null)
   })
 
   it('does not reset the page after insert save continues a requested destination', async () => {
@@ -498,6 +505,15 @@ describe('useTableViewState', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select row row-1' }))
 
     expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('0')
+  })
+
+  it('preserves checkbox selection when dismissing the row pane', () => {
+    render(<TableViewInteractionHarness />)
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select row row-1' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss pane' }))
+
+    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('1')
   })
 
   it('restores the checked row represented by URL-backed edit state', () => {

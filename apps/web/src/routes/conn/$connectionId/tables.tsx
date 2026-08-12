@@ -4,6 +4,7 @@ import { InspectorLayout } from '@app/shell/layout'
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import { SidePanelLayoutProvider, useSidePanelLayout } from '@tables/tableList/layout'
 import { TableTabsProvider } from '@tables/workspace/tabsProvider'
+import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHistory'
 import { TableExplorerScreen } from '@tables/view'
 import type { TablePageSize, TableRouteSearch } from '@tables/tableTypes'
 
@@ -57,13 +58,12 @@ function TablesWorkspaceLayout(): React.ReactElement {
       leftDock={{ isOpen, onToggle: toggle }}
       pageTitle="Tables"
     >
-      <TableTabsProvider
-        key={tabScope}
-        scope={tabScope}
-      >
-        <TableExplorerScreen />
-        <Outlet />
-      </TableTabsProvider>
+      <TableNavigationHistoryProvider key={tabScope}>
+        <TableTabsProvider scope={tabScope}>
+          <TableExplorerScreen />
+          <Outlet />
+        </TableTabsProvider>
+      </TableNavigationHistoryProvider>
     </InspectorLayout>
   )
 }

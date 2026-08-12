@@ -78,6 +78,18 @@ describe("useTableExplorerSearchParams", () => {
     expect(nextSearch.view).toBeUndefined();
   });
 
+  it("replaces the current route when opening the row editor", async () => {
+    const { result } = renderHook(() => useTableExplorerSearchParams());
+
+    await act(async () => {
+      await result.current.setRowEditor("edit", "row-1");
+    });
+
+    expect(navigateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ replace: true }),
+    );
+  });
+
   it("preserves unrelated search params when updating filters", async () => {
     searchState.value = { tab: "new-view", custom: "kept" };
     const { result } = renderHook(() => useTableExplorerSearchParams());

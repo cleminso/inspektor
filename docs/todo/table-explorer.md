@@ -21,6 +21,26 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [12/08/26]
 
+- [x] Keep unavailable Tables navigation controls focusable so their authored tooltips remain discoverable.
+- [x] Render Back and Forward as independent buttons so each keeps its selected radius.
+
+[12/08/26]
+
+- [x] Replace the active route when opening, closing, or retargeting the row editor so Tables Back navigates directly to the preceding route.
+
+[12/08/26]
+
+- [x] Limit Tables history to route navigation and keep cell selection local to the active table view.
+- [x] Keep Tables history in memory rather than restoring transient navigation and selection state across reloads.
+- [x] Remove selection-history persistence, validation, replay, and subscription infrastructure.
+
+[12/08/26]
+
+- [x] Render Tables history controls as direct design-system Button Group members so Button radius and grouped-edge styles apply to the interactive elements.
+- [x] Reconcile native browser back and forward navigation against existing Tables history entries instead of resetting the Tables history stack.
+
+[12/08/26]
+
 - [x] Size the row-editor header and action footers from shared compact padding instead of a fixed panel-bar height.
 - [x] Align row-editor header, representation control, fields, and footer content to the same pane inset.
 
@@ -346,6 +366,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Persist column order and visibility by connection, branch, schema hash, and table.
 
 ### Workspace tabs
+
+[12/08/26]
+
+- [x] Add Tables-scoped Go Back and Go Forward controls before the workspace tabs without changing native browser history behavior.
+- [x] Disable each navigation control at its Tables-history boundary and expose authored Go Back and Go Forward tooltips.
+- [x] Replay route-backed table navigation, reopen route-backed closed tabs, and preserve replace navigation semantics.
+- [x] Keep cell selection local to its table view and outside Tables navigation history.
+- [x] Keep Tables navigation history scoped to the mounted workspace without persisting it across reloads.
 
 [07/08/26]
 
@@ -754,6 +782,14 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[12/08/26]
+
+- Unavailable Back and Forward actions retain disabled semantics and keyboard focus for tooltip discovery.
+
+[12/08/26]
+
+- Row-editor identity remains URL-backed, but pane interactions replace the active route instead of creating navigation-history entries.
 
 [11/08/26]
 

@@ -5,6 +5,8 @@ import { TableTabsView } from '@tables/workspace/tabsView'
 
 const mocks = vi.hoisted(() => ({
   activateTab: vi.fn(),
+  goBack: vi.fn(),
+  goForward: vi.fn(),
   closeTab: vi.fn(),
   openNewView: vi.fn(),
   reorderTabs: vi.fn(),
@@ -12,6 +14,8 @@ const mocks = vi.hoisted(() => ({
   startTableRowsPrefetch: vi.fn(),
   state: {
     activeTabId: null as string | null,
+    canGoBack: false,
+    canGoForward: false,
     tabs: [] as Array<
       | { kind: 'newView'; id: 'new-view' }
       | { kind: 'table'; id: string; tableName: string; search: Record<string, number | string> }
@@ -53,10 +57,21 @@ vi.mock('@tables/workspace/tabsProvider', () => ({
   }),
 }))
 
+vi.mock('@tables/workspace/navigationHistory', () => ({
+  useTableNavigationControls: () => ({
+    canGoBack: mocks.state.canGoBack,
+    canGoForward: mocks.state.canGoForward,
+    goBack: mocks.goBack,
+    goForward: mocks.goForward,
+  }),
+}))
+
 afterEach(cleanup)
 
 beforeEach(() => {
   mocks.activateTab.mockReset()
+  mocks.goBack.mockReset()
+  mocks.goForward.mockReset()
   mocks.closeTab.mockReset()
   mocks.openNewView.mockReset()
   mocks.reorderTabs.mockReset()
@@ -64,10 +79,68 @@ beforeEach(() => {
   mocks.startTableRowsPrefetch.mockReset()
   mocks.startTableRowsPrefetch.mockReturnValue(mocks.releasePrefetch)
   mocks.state.activeTabId = null
+  mocks.state.canGoBack = false
+  mocks.state.canGoForward = false
   mocks.state.tabs = []
 })
 
 describe('TableTabsView', () => {
+  it('exposes discoverable disabled Tables navigation controls at the history boundary', () => {
+    render(<TableTabsView tableName={null} />)
+
+    const backButton = screen.getByRole('button', { name: 'Go Back' })
+    const forwardButton = screen.getByRole('button', { name: 'Go Forward' })
+    expect(backButton.getAttribute('aria-disabled')).toBe('true')
+    expect(forwardButton.getAttribute('aria-disabled')).toBe('true')
+    expect(backButton.tabIndex).toBe(0)
+    expect(forwardButton.tabIndex).toBe(0)
+  })
+
+  it('moves through Tables navigation history', () => {
+    mocks.state.canGoBack = true
+    mocks.state.canGoForward = true
+
+    render(<TableTabsView tableName={null} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Go Back' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Go Forward' }))
+
+    expect(mocks.goBack).toHaveBeenCalledOnce()
+    expect(mocks.goForward).toHaveBeenCalledOnce()
+  })
+
+  it('renders navigation actions as design-system buttons', () => {
+    render(<TableTabsView tableName={null} />)
+
+    const backButton = screen.getByRole('button', { name: 'Go Back' })
+    const forwardButton = screen.getByRole('button', { name: 'Go Forward' })
+
+    expect(backButton.getAttribute('data-slot')).toBe('button')
+    expect(backButton.getAttribute('data-radius')).toBe('s')
+    expect(backButton.closest('[data-slot="button-group"]')).toBeNull()
+    expect(forwardButton.getAttribute('data-slot')).toBe('button')
+    expect(forwardButton.getAttribute('data-radius')).toBe('s')
+  })
+
+  it('shows authored tooltips for available Tables navigation', async () => {
+    mocks.state.canGoBack = true
+    mocks.state.canGoForward = true
+
+    render(<TableTabsView tableName={null} />)
+    const backButton = screen.getByRole('button', { name: 'Go Back' })
+    fireEvent.mouseEnter(backButton)
+    fireEvent.mouseMove(backButton)
+
+    expect(await screen.findByText('Go Back')).toBeTruthy()
+  })
+
+  it('shows authored tooltips for unavailable Tables navigation', async () => {
+    render(<TableTabsView tableName={null} />)
+    const backButton = screen.getByRole('button', { name: 'Go Back' })
+    fireEvent.focus(backButton)
+
+    expect(await screen.findByText('Go Back')).toBeTruthy()
+  })
+
   it('keeps the tab bar visible with an authored new-view tooltip', async () => {
     render(<TableTabsView tableName={null} />)
 
