@@ -63,6 +63,7 @@ test("extracts Button API facts from the public package export", () => {
       "radius",
       "glyphSize",
       "disabled",
+      "focusableWhenDisabled",
       "render",
       "iconOnly",
       "layout",
@@ -413,7 +414,7 @@ test("extracts the constrained JsonView API", () => {
 
   assert.deepEqual(
     jsonViewProps?.map(({ name }) => name),
-    ["accessibilityLabel", "data", "defaultExpandDepth", "search"],
+    ["accessibilityLabel", "data", "defaultExpandDepth", "showCopyAction", "search"],
   );
   assert.equal(jsonViewProps?.find(({ name }) => name === "defaultExpandDepth")?.defaultValue, "1");
   assert.equal(
@@ -796,6 +797,7 @@ test("extracts the constrained FindBar API", () => {
   assert.deepEqual(
     findBarProps?.map(({ name }) => name),
     [
+      "autoFocus",
       "label",
       "value",
       "onValueChange",
@@ -804,6 +806,7 @@ test("extracts the constrained FindBar API", () => {
       "onSearchOptionsChange",
       "onPreviousMatch",
       "onNextMatch",
+      "onDismiss",
     ],
   );
   assert.equal(

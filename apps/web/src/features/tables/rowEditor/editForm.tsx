@@ -96,6 +96,7 @@ function RowJsonRepresentation({
     activeIndex: null,
     count: 0,
     pending: false,
+    query: "",
   });
   const value = useMemo(
     () => createRowJsonViewValue(rowValues, schemaColumns),
@@ -104,14 +105,18 @@ function RowJsonRepresentation({
   const findState: FindBarState =
     searchQuery.length === 0
       ? { status: "idle" }
-      : searchResults.pending === true
+      : searchResults.query !== searchQuery && searchResults.query.length === 0
         ? { status: "searching" }
       : searchResults.activeIndex === null
-        ? { status: "empty" }
+        ? {
+            status: "empty",
+            pending: searchResults.query !== searchQuery || searchResults.pending,
+          }
         : {
             status: "matched",
             activeIndex: searchResults.activeIndex,
             count: searchResults.count,
+            pending: searchResults.query !== searchQuery || searchResults.pending,
           };
   return (
     <Box height="full" minHeight={0} flexDirection="column" gap="m" px="m" py="m" pr="l">
@@ -122,15 +127,13 @@ function RowJsonRepresentation({
           onValueChange={(nextValue) => {
             setSearchQuery(nextValue);
             setActiveMatchIndex(0);
-            setSearchResults({ activeIndex: null, count: 0, pending: true });
           }}
           state={findState}
           searchOptions={searchOptions}
-          onSearchOptionsChange={(nextOptions) => {
-            setSearchOptions(nextOptions);
-            setActiveMatchIndex(0);
-            setSearchResults({ activeIndex: null, count: 0, pending: true });
-          }}
+            onSearchOptionsChange={(nextOptions) => {
+              setSearchOptions(nextOptions);
+              setActiveMatchIndex(0);
+            }}
           onPreviousMatch={() => {
             setActiveMatchIndex((searchResults.activeIndex ?? 0) - 1);
           }}

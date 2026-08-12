@@ -1,4 +1,5 @@
 export const findBarPropNames = [
+  'autoFocus',
   'label',
   'value',
   'onValueChange',
@@ -7,4 +8,5 @@ export const findBarPropNames = [
   'onSearchOptionsChange',
   'onPreviousMatch',
   'onNextMatch',
+  'onDismiss',
 ] as const

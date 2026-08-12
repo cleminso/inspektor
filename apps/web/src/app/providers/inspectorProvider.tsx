@@ -242,6 +242,11 @@ export function useRuntimePermissions(): StoredPermissionsResponse | null {
   return useStore(runtime.$storedPermissions);
 }
 
+export function useRuntimePermissionsLoading(): boolean {
+  const runtime = useInspectorRuntimeContext();
+  return useStore(runtime.$isPermissionsLoading);
+}
+
 export function useRuntimeError(): string | null {
   const runtime = useInspectorRuntimeContext();
   return useStore(runtime.$error);

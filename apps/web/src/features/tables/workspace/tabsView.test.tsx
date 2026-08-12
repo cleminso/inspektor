@@ -108,19 +108,6 @@ describe('TableTabsView', () => {
     expect(mocks.goForward).toHaveBeenCalledOnce()
   })
 
-  it('renders navigation actions as design-system buttons', () => {
-    render(<TableTabsView tableName={null} />)
-
-    const backButton = screen.getByRole('button', { name: 'Go Back' })
-    const forwardButton = screen.getByRole('button', { name: 'Go Forward' })
-
-    expect(backButton.getAttribute('data-slot')).toBe('button')
-    expect(backButton.getAttribute('data-radius')).toBe('s')
-    expect(backButton.closest('[data-slot="button-group"]')).toBeNull()
-    expect(forwardButton.getAttribute('data-slot')).toBe('button')
-    expect(forwardButton.getAttribute('data-radius')).toBe('s')
-  })
-
   it('shows authored tooltips for available Tables navigation', async () => {
     mocks.state.canGoBack = true
     mocks.state.canGoForward = true

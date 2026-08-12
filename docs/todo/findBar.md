@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[12/08/26]
+
+- [x] Keep settled match arrows visually stable while deferred replacement results temporarily block navigation.
+- [x] Preserve settled result text while replacement search work is pending and disable stale navigation.
+- [x] Support action-opened Find Bars that autofocus their query and dismiss from Escape.
+
 [06/08/26]
 
 - [x] Replace native browser titles on search-option and match-navigation actions with shared Tooltip composition.
@@ -46,6 +52,12 @@
 - Find and replace mode, replacement input, and replacement actions are not part of the read-only Find Bar contract.
 
 ## Settled interaction decisions
+
+[12/08/26]
+
+- Pending replacement searches expose settled match arrows as unavailable without switching to disabled styling.
+- Pending replacement searches keep the preceding settled status visible without allowing navigation through stale results.
+- A transient Find Bar may move focus to its query when opened by an explicit user action and dismiss from Escape.
 
 [04/08/26]
 

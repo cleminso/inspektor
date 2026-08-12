@@ -25,15 +25,21 @@ export default function FindNavigationExample() {
     activeIndex: null,
     count: 0,
     pending: false,
+    query: "",
   })
   const state: FindBarState =
     query.length === 0
       ? { status: 'idle' }
-      : results.pending === true
+      : results.query !== query && results.query.length === 0
         ? { status: 'searching' }
       : results.activeIndex === null
-        ? { status: 'empty' }
-        : { status: 'matched', activeIndex: results.activeIndex, count: results.count }
+        ? { status: 'empty', pending: results.query !== query || results.pending }
+        : {
+            status: 'matched',
+            activeIndex: results.activeIndex,
+            count: results.count,
+            pending: results.query !== query || results.pending,
+          }
 
   return (
     <Box
@@ -47,14 +53,12 @@ export default function FindNavigationExample() {
         onValueChange={(nextQuery) => {
           setQuery(nextQuery)
           setActiveMatchIndex(0)
-          setResults({ activeIndex: null, count: 0, pending: true })
         }}
         state={state}
         searchOptions={searchOptions}
         onSearchOptionsChange={(nextOptions) => {
           setSearchOptions(nextOptions)
           setActiveMatchIndex(0)
-          setResults({ activeIndex: null, count: 0, pending: true })
         }}
         onPreviousMatch={() => {
           setActiveMatchIndex((results.activeIndex ?? 0) - 1)

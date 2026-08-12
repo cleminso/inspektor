@@ -10,8 +10,8 @@ import { findBarStyles } from './findBar.styles'
 export type FindBarState =
   | { status: 'idle' }
   | { status: 'searching' }
-  | { status: 'empty' }
-  | { status: 'matched'; activeIndex: number; count: number }
+  | { status: 'empty'; pending?: boolean }
+  | { status: 'matched'; activeIndex: number; count: number; pending?: boolean }
 
 export interface FindBarSearchOptions {
   /** Matches uppercase and lowercase characters separately. */
@@ -23,6 +23,8 @@ export interface FindBarSearchOptions {
 }
 
 export interface FindBarProps {
+  /** Moves focus to the query field when the Find Bar mounts. */
+  autoFocus?: boolean
   /** Accessible name for the find query field. */
   label: string
   /** Query used to find document occurrences. */
@@ -39,6 +41,8 @@ export interface FindBarProps {
   onPreviousMatch: () => void
   /** Requests the following match, wrapping from the last match to the first. */
   onNextMatch: () => void
+  /** Dismisses an optional Find Bar surface from the Escape key. */
+  onDismiss?: () => void
 }
 
 function PreviousIcon() {
@@ -92,6 +96,7 @@ function RegularExpressionIcon() {
 }
 
 export function FindBar({
+  autoFocus = false,
   label,
   value,
   onValueChange,
@@ -100,8 +105,11 @@ export function FindBar({
   onSearchOptionsChange,
   onPreviousMatch,
   onNextMatch,
+  onDismiss,
 }: FindBarProps) {
+  const pending = state.status !== 'idle' && state.status !== 'searching' && state.pending === true
   const hasMatches = state.status === 'matched'
+  const canNavigate = hasMatches === true && pending === false
   const statusText =
     state.status === 'matched'
       ? `${state.activeIndex + 1} of ${state.count}`
@@ -142,6 +150,9 @@ export function FindBar({
           fullWidth
         >
           <Input
+            // The optional transient Find Bar intentionally receives focus when its user action opens it.
+            // oxlint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={autoFocus}
             aria-label={label}
             role="searchbox"
             type="text"
@@ -151,7 +162,13 @@ export function FindBar({
               onValueChange(nextValue)
             }}
             onKeyDown={(event) => {
-              if (event.key !== 'Enter' || hasMatches === false) {
+              if (event.key === 'Escape' && onDismiss !== undefined) {
+                event.preventDefault()
+                onDismiss()
+                return
+              }
+
+              if (event.key !== 'Enter' || canNavigate === false) {
                 return
               }
 
@@ -243,6 +260,7 @@ export function FindBar({
       </Box>
       <Box
         alignItems="center"
+        aria-busy={pending === true ? true : undefined}
         aria-label={statusLabel}
         as="span"
         color="muted"
@@ -258,14 +276,19 @@ export function FindBar({
         alignItems="center"
         flexShrink={0}
       >
-        <Tooltip.Root disabled={hasMatches === false}>
+        <Tooltip.Root disabled={canNavigate === false}>
           <Tooltip.Trigger
             render={
               <Button
                 aria-label="Previous match"
+                aria-disabled={canNavigate === false ? true : undefined}
                 disabled={hasMatches === false}
                 iconOnly
-                onClick={onPreviousMatch}
+                onClick={() => {
+                  if (canNavigate === true) {
+                    onPreviousMatch()
+                  }
+                }}
                 radius="xs"
                 size="xs"
                 variant="ghost"
@@ -276,14 +299,19 @@ export function FindBar({
           />
           <Tooltip.Content>Previous match</Tooltip.Content>
         </Tooltip.Root>
-        <Tooltip.Root disabled={hasMatches === false}>
+        <Tooltip.Root disabled={canNavigate === false}>
           <Tooltip.Trigger
             render={
               <Button
                 aria-label="Next match"
+                aria-disabled={canNavigate === false ? true : undefined}
                 disabled={hasMatches === false}
                 iconOnly
-                onClick={onNextMatch}
+                onClick={() => {
+                  if (canNavigate === true) {
+                    onNextMatch()
+                  }
+                }}
                 radius="xs"
                 size="xs"
                 variant="ghost"

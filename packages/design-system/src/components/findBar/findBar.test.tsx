@@ -118,6 +118,33 @@ describe('FindBar', () => {
     expect(document.activeElement).toBe(input)
   })
 
+  it('autofocuses its query and dismisses from Escape', () => {
+    const onDismiss = vi.fn()
+
+    render(
+      <FindBar
+        // oxlint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus
+        label="Find in schema JSON"
+        value=""
+        onDismiss={onDismiss}
+        onValueChange={() => undefined}
+        state={{ status: 'idle' }}
+        searchOptions={searchOptions}
+        onSearchOptionsChange={() => undefined}
+        onPreviousMatch={() => undefined}
+        onNextMatch={() => undefined}
+      />,
+    )
+
+    const input = screen.getByRole('searchbox', { name: 'Find in schema JSON' })
+    expect(document.activeElement).toBe(input)
+
+    fireEvent.keyDown(input, { key: 'Escape' })
+
+    expect(onDismiss).toHaveBeenCalledOnce()
+  })
+
   it('reports no matches and disables navigation', () => {
     const onValueChange = vi.fn()
 
@@ -167,6 +194,55 @@ describe('FindBar', () => {
     expect((screen.getByRole('button', { name: 'Next match' }) as HTMLButtonElement).disabled).toBe(
       true,
     )
+  })
+
+  it('keeps settled match navigation visually stable while its replacement is pending', () => {
+    const onPreviousMatch = vi.fn()
+    const onNextMatch = vi.fn()
+    const { rerender } = render(
+      <FindBar
+        label="Find in row JSON"
+        value="profile"
+        onValueChange={() => undefined}
+        state={{ status: 'matched', activeIndex: 0, count: 7 }}
+        searchOptions={searchOptions}
+        onSearchOptionsChange={() => undefined}
+        onPreviousMatch={onPreviousMatch}
+        onNextMatch={onNextMatch}
+      />,
+    )
+
+    const previousMatch = screen.getByRole('button', { name: 'Previous match' })
+    const nextMatch = screen.getByRole('button', { name: 'Next match' })
+
+    expect((previousMatch as HTMLButtonElement).disabled).toBe(false)
+    expect((nextMatch as HTMLButtonElement).disabled).toBe(false)
+
+    rerender(
+      <FindBar
+        label="Find in row JSON"
+        value="profiles"
+        onValueChange={() => undefined}
+        state={{ status: 'matched', activeIndex: 0, count: 7, pending: true }}
+        searchOptions={searchOptions}
+        onSearchOptionsChange={() => undefined}
+        onPreviousMatch={onPreviousMatch}
+        onNextMatch={onNextMatch}
+      />,
+    )
+
+    expect(screen.getByRole('status').textContent).toBe('1 of 7')
+    expect(screen.getByRole('status').getAttribute('aria-busy')).toBe('true')
+    expect((previousMatch as HTMLButtonElement).disabled).toBe(false)
+    expect((nextMatch as HTMLButtonElement).disabled).toBe(false)
+    expect(previousMatch.getAttribute('aria-disabled')).toBe('true')
+    expect(nextMatch.getAttribute('aria-disabled')).toBe('true')
+
+    fireEvent.click(previousMatch)
+    fireEvent.click(nextMatch)
+
+    expect(onPreviousMatch).not.toHaveBeenCalled()
+    expect(onNextMatch).not.toHaveBeenCalled()
   })
 
   it('controls match case, whole word, and regular expression options', () => {

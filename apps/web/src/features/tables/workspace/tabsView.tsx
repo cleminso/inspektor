@@ -104,7 +104,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
         borderStyle="solid"
         overflow="hidden"
       >
-        <Box alignItems="center" gap="xxs" role="group" aria-label="Table navigation">
+        <Box alignItems="center" role="group" aria-label="Table navigation">
           <Tooltip.Root>
             <Tooltip.Trigger
               render={

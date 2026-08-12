@@ -30,6 +30,8 @@ export interface JsonViewSearchResults {
   count: number;
   /** Whether the reported occurrences belong to a query that is being replaced. */
   pending: boolean;
+  /** Query represented by these occurrence results. */
+  query: string;
 }
 
 export interface JsonViewSearch {
@@ -52,8 +54,10 @@ export interface JsonViewProps {
   accessibilityLabel: string;
   /** JSON-compatible object or array to inspect. */
   data: JsonViewObject | readonly JsonViewValue[];
-  /** Number of container levels expanded initially. */
-  defaultExpandDepth?: 0 | 1 | 2;
+  /** Number of container levels expanded initially, or every level within the safe render budget. */
+  defaultExpandDepth?: 0 | 1 | 2 | 3 | 4 | "all";
+  /** Whether to show the sticky copy action. */
+  showCopyAction?: boolean;
   /** Controls occurrence highlighting and active-match navigation. */
   search?: JsonViewSearch;
 }
@@ -69,6 +73,11 @@ type ContinuationKind = "batch" | "limit";
 interface ContainerRenderPlan {
   continuationKind: ContinuationKind | null;
   visibleChildCount: number;
+}
+
+interface RetainedSearchBranch {
+  expandedPaths: ReadonlySet<string>;
+  revealedChildCounts: ReadonlyMap<string, number>;
 }
 
 interface JsonRenderPlan {
@@ -180,21 +189,30 @@ function focusTreeItem(currentItem: HTMLElement, key: string): boolean {
 
 function createInitialExpansion(
   data: JsonViewObject | readonly JsonViewValue[],
-  defaultExpandDepth: 0 | 1 | 2,
+  defaultExpandDepth: 0 | 1 | 2 | 3 | 4 | "all",
 ): Set<string> {
   const paths = new Set<string>();
+  let visitedCount = 0;
 
   function visit(value: JsonViewValue, path: string, depth: number): void {
+    if (visitedCount >= visibleTreeItemLimit) {
+      return;
+    }
+    visitedCount += 1;
+
     if (
       isContainer(value) === false ||
       getEntries(value).length === 0 ||
-      depth >= defaultExpandDepth
+      (defaultExpandDepth !== "all" && depth >= defaultExpandDepth)
     ) {
       return;
     }
 
     paths.add(path);
     for (const [key, child] of getEntries(value)) {
+      if (visitedCount >= visibleTreeItemLimit) {
+        break;
+      }
       visit(child, getPath(path, key), depth + 1);
     }
   }
@@ -859,6 +877,7 @@ export function JsonView({
   accessibilityLabel,
   data,
   defaultExpandDepth = 1,
+  showCopyAction = true,
   search,
 }: JsonViewProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(() =>
@@ -872,19 +891,25 @@ export function JsonView({
   const [revealedStrings, setRevealedStrings] = useState<ReadonlySet<string>>(new Set());
   const treeRef = useRef<HTMLDivElement>(null);
   const onSearchResultsChangeRef = useRef(search?.onResultsChange);
-  const serializedData = useMemo(() => JSON.stringify(data, null, 2), [data]);
-  const searchQuery = search?.query ?? "";
-  const deferredSearchQuery = useDeferredValue(searchQuery);
-  const searchPending = searchQuery !== deferredSearchQuery;
+  const retainedSearchBranchRef = useRef<RetainedSearchBranch | null>(null);
+  const serializedData = useMemo(
+    () => (showCopyAction === true ? JSON.stringify(data, null, 2) : null),
+    [data, showCopyAction],
+  );
+  const searchRequest = useMemo(
+    () => ({
+      query: search?.query ?? "",
+      caseSensitive: search?.caseSensitive,
+      wholeWord: search?.wholeWord,
+      regularExpression: search?.regularExpression,
+    }),
+    [search?.caseSensitive, search?.query, search?.regularExpression, search?.wholeWord],
+  );
+  const deferredSearchRequest = useDeferredValue(searchRequest);
+  const searchPending = searchRequest !== deferredSearchRequest;
   const searchPattern = useMemo(
-    () =>
-      createSearchPattern({
-        query: deferredSearchQuery,
-        caseSensitive: search?.caseSensitive,
-        wholeWord: search?.wholeWord,
-        regularExpression: search?.regularExpression,
-      }),
-    [deferredSearchQuery, search?.caseSensitive, search?.regularExpression, search?.wholeWord],
+    () => createSearchPattern(deferredSearchRequest),
+    [deferredSearchRequest],
   );
   const searchModel = useMemo(
     () => createSearchModel(data, searchPattern),
@@ -926,8 +951,58 @@ export function JsonView({
       activeIndex: activeSearchMatchIndex,
       count: searchModel.matches.length,
       pending: searchPending,
+      query: deferredSearchRequest.query,
     });
-  }, [activeSearchMatchIndex, deferredSearchQuery, searchModel.matches.length, searchPattern, searchPending]);
+  }, [
+    activeSearchMatchIndex,
+    deferredSearchRequest.query,
+    searchModel.matches.length,
+    searchPending,
+  ]);
+
+  useLayoutEffect(() => {
+    if (search !== undefined) {
+      if (searchPending === true) {
+        return;
+      }
+
+      if (activeSearchMatch === undefined) {
+        retainedSearchBranchRef.current = null;
+        return;
+      }
+
+      const branchExpandedPaths = new Set(
+        Array.from(searchModel.expandedPaths).filter((path) =>
+          activeSearchMatch.path.startsWith(`${path}/`),
+        ),
+      );
+      const branchRevealedChildCounts = new Map(
+        Array.from(searchModel.revealedChildCounts).filter(([path]) =>
+          branchExpandedPaths.has(path),
+        ),
+      );
+      retainedSearchBranchRef.current = {
+        expandedPaths: branchExpandedPaths,
+        revealedChildCounts: branchRevealedChildCounts,
+      };
+      return;
+    }
+
+    if (retainedSearchBranchRef.current === null) {
+      return;
+    }
+
+    const retainedBranch = retainedSearchBranchRef.current;
+    retainedSearchBranchRef.current = null;
+    setExpandedPaths((current) => new Set([...current, ...retainedBranch.expandedPaths]));
+    setRevealedChildCounts((current) => {
+      const next = new Map(current);
+      for (const [path, count] of retainedBranch.revealedChildCounts) {
+        next.set(path, Math.max(next.get(path) ?? childBatchSize, count));
+      }
+      return next;
+    });
+  }, [activeSearchMatch, search, searchModel, searchPending]);
 
   useEffect(() => {
     if (activeSearchMatch === undefined || activeSearchMatchVisible === false) {
@@ -1011,16 +1086,18 @@ export function JsonView({
           </Text>
         </div>
       ) : null}
-      <div {...stylex.props(jsonViewStyles.copyActionLayer)}>
-        <div {...stylex.props(jsonViewStyles.copyAction)}>
-          <CopyButton
-            label="Copy JSON"
-            size="s"
-            textToCopy={serializedData}
-            tooltipSide="bottom"
-          />
+      {serializedData !== null ? (
+        <div {...stylex.props(jsonViewStyles.copyActionLayer)}>
+          <div {...stylex.props(jsonViewStyles.copyAction)}>
+            <CopyButton
+              label="Copy JSON"
+              size="s"
+              textToCopy={serializedData}
+              tooltipSide="bottom"
+            />
+          </div>
         </div>
-      </div>
+      ) : null}
       <div
         aria-label={accessibilityLabel}
         ref={treeRef}

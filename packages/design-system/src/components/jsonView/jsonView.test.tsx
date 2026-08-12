@@ -62,11 +62,13 @@ describe("JsonView", () => {
 
     fireEvent.change(input, { target: { value: "Grace" } });
 
-    expect(onResultsChange).toHaveBeenCalledWith(expect.objectContaining({ pending: true }));
+    expect(onResultsChange).toHaveBeenCalledWith(
+      expect.objectContaining({ pending: true, query: "Ada" }),
+    );
     await waitFor(() => expect(container.querySelector("mark")?.textContent).toBe("Grace"));
     await waitFor(() =>
       expect(onResultsChange).toHaveBeenLastCalledWith(
-        expect.objectContaining({ pending: false }),
+        expect.objectContaining({ pending: false, query: "Grace" }),
       ),
     );
   });
@@ -133,6 +135,18 @@ describe("JsonView", () => {
     expect(root.getAttribute("aria-expanded")).toBe("true");
   });
 
+  it("omits the sticky copy action when its containing surface owns copy", () => {
+    render(
+      <JsonView
+        accessibilityLabel="Embedded JSON"
+        showCopyAction={false}
+        data={{ profile: { name: "Ada" } }}
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: "Copy JSON" })).toBeNull();
+  });
+
   it("escapes string keys and values as valid JSON text", () => {
     render(
       <JsonView
@@ -186,6 +200,20 @@ describe("JsonView", () => {
     expect(emptyArray.querySelector("button")).toBeNull();
   });
 
+  it("expands every nested container within the safe render budget", () => {
+    render(
+      <JsonView
+        accessibilityLabel="Expanded JSON"
+        data={{ profile: { contact: { email: "ada@example.com" } } }}
+        defaultExpandDepth="all"
+      />,
+    );
+
+    expect(getTreeItem(/profile/i).getAttribute("aria-expanded")).toBe("true");
+    expect(getTreeItem(/contact/i).getAttribute("aria-expanded")).toBe("true");
+    expect(getTreeItem(/email/i)).toBeTruthy();
+  });
+
   it("uses expansion depth one by default", () => {
     render(
       <JsonView
@@ -201,8 +229,16 @@ describe("JsonView", () => {
     expect(screen.queryByText('"admin"')).toBeNull();
   });
 
-  it("supports initial expansion depths zero, one, and two", () => {
-    const data = { profile: { contact: { email: "ada@example.com" } } };
+  it("supports initial expansion depths zero through four", () => {
+    const data = {
+      profile: {
+        contact: {
+          address: {
+            city: { name: "London" },
+          },
+        },
+      },
+    };
     const { rerender } = render(
       <JsonView accessibilityLabel="Depth zero" data={data} defaultExpandDepth={0} />,
     );
@@ -225,6 +261,22 @@ describe("JsonView", () => {
     expect(getTreeItem(/profile/i).getAttribute("aria-expanded")).toBe("true");
     expect(getTreeItem(/contact/i).getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("treeitem", { name: /email/i })).toBeNull();
+
+    rerender(
+      <JsonView key="depth-three" accessibilityLabel="Depth three" data={data} defaultExpandDepth={3} />,
+    );
+
+    expect(getTreeItem(/contact/i).getAttribute("aria-expanded")).toBe("true");
+    expect(getTreeItem(/address/i).getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("treeitem", { name: /city/i })).toBeNull();
+
+    rerender(
+      <JsonView key="depth-four" accessibilityLabel="Depth four" data={data} defaultExpandDepth={4} />,
+    );
+
+    expect(getTreeItem(/address/i).getAttribute("aria-expanded")).toBe("true");
+    expect(getTreeItem(/city/i).getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("treeitem", { name: /name/i })).toBeNull();
   });
 
   it("keeps user expansion when equivalent data receives a new identity", () => {
@@ -453,7 +505,7 @@ describe("JsonView", () => {
     expect(getTreeItem(/profile\.name/i).textContent).toContain('"Ada.Lovelace"');
     expect(getTreeItem(/untouched/i).querySelector("mark")).toBeNull();
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2, pending: false });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2, pending: false, query: "." });
     });
   });
 
@@ -478,7 +530,7 @@ describe("JsonView", () => {
       "User",
     ]);
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 0, count: 1, pending: false });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 0, count: 1, pending: false, query: "User" });
     });
 
     rerender(
@@ -537,7 +589,7 @@ describe("JsonView", () => {
 
     expect(container.querySelector("mark")).toBeNull();
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0, pending: false });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0, pending: false, query: "[" });
     });
   });
 
@@ -556,15 +608,16 @@ describe("JsonView", () => {
     expect(marks[0]?.hasAttribute("data-active")).toBe(false);
     expect(marks[1]?.hasAttribute("data-active")).toBe(true);
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2, pending: false });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: 1, count: 2, pending: false, query: "match" });
     });
   });
 
-  it("opens collapsed ancestors to expose a search match without moving focus", () => {
-    render(
+  it("preserves the active match branch when search closes without moving focus", () => {
+    const data = { profile: { contact: { email: "needle@example.com" } } };
+    const { rerender } = render(
       <JsonView
         accessibilityLabel="Collapsed search"
-        data={{ profile: { contact: { email: "needle@example.com" } } }}
+        data={data}
         defaultExpandDepth={0}
         search={{ query: "needle", activeMatchIndex: 0, onResultsChange: () => undefined }}
       />,
@@ -575,6 +628,37 @@ describe("JsonView", () => {
     expect(getTreeItem(/contact/i).getAttribute("aria-expanded")).toBe("true");
     expect(getTreeItem(/email/i).querySelector("mark")?.textContent).toBe("needle");
     expect(document.activeElement).toBe(document.body);
+
+    rerender(
+      <JsonView accessibilityLabel="Collapsed search" data={data} defaultExpandDepth={0} />,
+    );
+
+    expect(getRootTreeItem().getAttribute("aria-expanded")).toBe("true");
+    expect(getTreeItem(/profile/i).getAttribute("aria-expanded")).toBe("true");
+    expect(getTreeItem(/contact/i).getAttribute("aria-expanded")).toBe("true");
+    expect(getTreeItem(/email/i).querySelector("mark")).toBeNull();
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("restores the existing tree when a search with no matches closes", () => {
+    const data = { profile: { contact: { email: "ada@example.com" } } };
+    const { rerender } = render(
+      <JsonView
+        accessibilityLabel="No matching branch"
+        data={data}
+        defaultExpandDepth={0}
+        search={{ query: "missing", activeMatchIndex: 0, onResultsChange: () => undefined }}
+      />,
+    );
+
+    expect(getRootTreeItem().getAttribute("aria-expanded")).toBe("false");
+
+    rerender(
+      <JsonView accessibilityLabel="No matching branch" data={data} defaultExpandDepth={0} />,
+    );
+
+    expect(getRootTreeItem().getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("treeitem", { name: /profile/i })).toBeNull();
   });
 
   it("reports when an active search has no matches", async () => {
@@ -588,7 +672,7 @@ describe("JsonView", () => {
     );
 
     await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0, pending: false });
+      expect(onResultsChange).toHaveBeenLastCalledWith({ activeIndex: null, count: 0, pending: false, query: "missing" });
     });
   });
 
@@ -794,6 +878,7 @@ describe("JsonView", () => {
       activeIndex: 599,
       count: 600,
       pending: false,
+      query: "a",
     });
   });
 

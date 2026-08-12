@@ -18,6 +18,7 @@ export interface InspectorRuntimeStore {
   $client: ReadableAtom<JazzClient | null>;
   $error: ReadableAtom<string | null>;
   $isSchemaHashesLoading: ReadableAtom<boolean>;
+  $isPermissionsLoading: ReadableAtom<boolean>;
   $isWasmSchemaLoading: ReadableAtom<boolean>;
   $storedPermissions: ReadableAtom<StoredPermissionsResponse | null>;
   $wasmSchema: ReadableAtom<WasmSchema | null>;
@@ -32,6 +33,7 @@ interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
   $client: WritableAtom<JazzClient | null>;
   $error: WritableAtom<string | null>;
   $isSchemaHashesLoading: WritableAtom<boolean>;
+  $isPermissionsLoading: WritableAtom<boolean>;
   $isWasmSchemaLoading: WritableAtom<boolean>;
   $storedPermissions: WritableAtom<StoredPermissionsResponse | null>;
   $wasmSchema: WritableAtom<WasmSchema | null>;
@@ -55,6 +57,7 @@ function createInspectorRuntimeStore(
   const $availableSchemaHashes = atom<readonly string[]>([]);
   const $error = atom<string | null>(null);
   const $isSchemaHashesLoading = atom(isSchemaHashesLoading);
+  const $isPermissionsLoading = atom(isWasmSchemaLoading);
   const $isWasmSchemaLoading = atom(isWasmSchemaLoading);
 
   const publishClient = (client: JazzClient) => {
@@ -79,6 +82,7 @@ function createInspectorRuntimeStore(
     $storedPermissions.set(null);
     $availableSchemaHashes.set([]);
     $isSchemaHashesLoading.set(false);
+    $isPermissionsLoading.set(false);
     $isWasmSchemaLoading.set(false);
     $error.set(null);
   };
@@ -88,6 +92,7 @@ function createInspectorRuntimeStore(
     $client,
     $error,
     $isSchemaHashesLoading,
+    $isPermissionsLoading,
     $isWasmSchemaLoading,
     $storedPermissions,
     $wasmSchema,
@@ -139,7 +144,7 @@ export function useInspectorRuntime({
 
     runtime.$error.set(null);
     runtime.$isWasmSchemaLoading.set(true);
-    runtime.$storedPermissions.set(null);
+    runtime.$isPermissionsLoading.set(true);
     runtime.$availableSchemaHashes.set(
       initialSchemaHashes !== undefined ? [...initialSchemaHashes] : [],
     );
@@ -183,9 +188,14 @@ export function useInspectorRuntime({
       (permissions) => {
         if (active === true) {
           runtime.$storedPermissions.set(permissions);
+          runtime.$isPermissionsLoading.set(false);
         }
       },
-      () => undefined,
+      () => {
+        if (active === true) {
+          runtime.$isPermissionsLoading.set(false);
+        }
+      },
     );
 
     void schemaRequest.catch(failRuntime);

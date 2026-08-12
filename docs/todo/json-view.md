@@ -11,6 +11,15 @@
 
 ## Implemented foundation
 
+[12/08/26]
+
+- [x] Preserve the active match's ancestor branch when a successful search closes.
+- [x] Correlate deferred search results with the query that produced them so consumers can reject stale result labels.
+- [x] Support safe initial expansion through depth four for document-specific inspection surfaces.
+- [x] Let containing surfaces reset expansion through React keys while preserving JsonView's mount-only default expansion.
+- [x] Allow containing surfaces to hide the sticky JSON copy action and own copy placement.
+- [x] Support safe initial expansion of every nested container while preserving branch and complete-tree rendering limits.
+
 [11/08/26]
 
 - [x] Defer complete-tree search while exposing stale-search status through the external Find Bar without changing occurrence results.
@@ -65,6 +74,16 @@
 - Editable JSON behavior is not part of the read-only component documentation.
 
 ## Settled interaction decisions
+
+[12/08/26]
+
+- Closing a successful search removes its highlights but preserves the active match's ancestor branch.
+- Closing a search with no active match restores the existing expansion state without retaining search-generated branches.
+
+[12/08/26]
+
+- Schema and permissions surfaces may place copy beside their document-level actions while `JsonView` continues to serialize the complete input.
+- Safe complete expansion remains bounded by the existing branch and complete-tree safeguards.
 
 [29/07/26]
 

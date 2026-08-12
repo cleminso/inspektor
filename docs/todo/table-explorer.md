@@ -21,6 +21,16 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [12/08/26]
 
+- [x] Separate schema and permissions with an explicit vertical divider and keep each JSON tree in its own bounded scroll viewport.
+- [x] Place each JSON scroll owner in a bounded remaining-height body beneath its fixed document header, with content padding inside the viewport.
+- [x] Keep each JSON content wrapper intrinsic so expanded trees overflow their viewport, and stretch the divider across the shared panel height.
+- [x] Expand schema to depth four and permissions to depth three by default.
+- [x] Replace raw table schema and permissions text with independently searchable, scrollable JSON trees.
+- [x] Group search, safe complete expansion, and copy actions in each schema document header.
+- [x] Reset schema document search and expansion state when table identity changes.
+
+[12/08/26]
+
 - [x] Keep unavailable Tables navigation controls focusable so their authored tooltips remain discoverable.
 - [x] Render Back and Forward as independent buttons so each keeps its selected radius.
 
@@ -782,6 +792,12 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[12/08/26]
+
+- Schema and permissions own independent search state and may remain open concurrently.
+- Escape closes only the focused document search, clears its query, and restores depth-based expansion.
+- Document expansion toggles between its document-specific default depth and complete safe expansion rather than bypassing JSON rendering limits.
 
 [12/08/26]
 

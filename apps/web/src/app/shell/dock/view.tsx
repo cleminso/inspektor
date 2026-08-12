@@ -26,7 +26,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
       paddingHorizontal="xs"
       backgroundColor="surface-background"
     >
-      <Box minWidth={0} flex={1} alignItems="center" gap="xs">
+      <Box minWidth={0} flex={1} alignItems="center">
         {leftDock !== undefined ? (
           <Tooltip.Root>
             <Tooltip.Trigger

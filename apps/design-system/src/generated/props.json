@@ -375,13 +375,24 @@
       }
     },
     {
+      "name": "focusableWhenDisabled",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the button should be focusable when disabled.\nKeeps a disabled action keyboard-focusable when its label or explanation must remain discoverable.",
+      "source": {
+        "path": "packages/design-system/src/components/button/button.tsx",
+        "line": 48
+      }
+    },
+    {
       "name": "render",
       "type": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ButtonState>",
       "required": false,
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes Button behavior and styles onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 48
+        "line": 50
       }
     },
     {
@@ -392,7 +403,7 @@
       "description": "Makes the button a square icon-only action.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 53
+        "line": 55
       }
     },
     {
@@ -403,7 +414,7 @@
       "description": "Selects inline or full-width row action layout.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 55
+        "line": 57
       }
     },
     {
@@ -413,7 +424,7 @@
       "description": "Renders decorative content before the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 57
+        "line": 59
       }
     },
     {
@@ -423,7 +434,7 @@
       "description": "Renders decorative content after the visible label.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 59
+        "line": 61
       }
     },
     {
@@ -433,7 +444,7 @@
       "description": "Defines a string value that labels the current element.\nIdentifies the icon-only action for assistive technology.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
-        "line": 66
+        "line": 68
       }
     }
   ],
@@ -1060,7 +1071,7 @@
     },
     {
       "name": "color",
-      "type": "\"link\" | \"disabled\" | \"secondary\" | \"danger\" | \"default\" | \"muted\" | \"placeholder\" | \"accent\" | \"success\" | \"warning\" | \"onInverse\" | \"onAccent\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, TextColorToken>>",
+      "type": "\"link\" | \"disabled\" | \"secondary\" | \"danger\" | \"default\" | \"muted\" | \"placeholder\" | \"accent\" | \"success\" | \"warning\" | \"onInverse\" | \"onDanger\" | \"onAccent\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, TextColorToken>>",
       "required": false,
       "description": "",
       "source": {
@@ -3487,7 +3498,7 @@
       "description": "Contextual label for the JSON tree.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 52
+        "line": 54
       }
     },
     {
@@ -3497,18 +3508,29 @@
       "description": "JSON-compatible object or array to inspect.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 54
+        "line": 56
       }
     },
     {
       "name": "defaultExpandDepth",
-      "type": "0 | 1 | 2",
+      "type": "0 | \"all\" | 1 | 2 | 3 | 4",
       "required": false,
       "defaultValue": "1",
-      "description": "Number of container levels expanded initially.",
+      "description": "Number of container levels expanded initially, or every level within the safe render budget.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 56
+        "line": 58
+      }
+    },
+    {
+      "name": "showCopyAction",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Whether to show the sticky copy action.",
+      "source": {
+        "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
+        "line": 60
       }
     },
     {
@@ -3518,7 +3540,7 @@
       "description": "Controls occurrence highlighting and active-match navigation.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 58
+        "line": 62
       }
     }
   ],
@@ -4665,13 +4687,24 @@
   ],
   "findBar": [
     {
+      "name": "autoFocus",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Moves focus to the query field when the Find Bar mounts.",
+      "source": {
+        "path": "packages/design-system/src/components/findBar/findBar.tsx",
+        "line": 27
+      }
+    },
+    {
       "name": "label",
       "type": "string",
       "required": true,
       "description": "Accessible name for the find query field.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 27
+        "line": 29
       }
     },
     {
@@ -4681,7 +4714,7 @@
       "description": "Query used to find document occurrences.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 29
+        "line": 31
       }
     },
     {
@@ -4691,17 +4724,17 @@
       "description": "Runs when the find query changes.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 31
+        "line": 33
       }
     },
     {
       "name": "state",
-      "type": "{ status: 'idle' } | { status: 'searching' } | { status: 'empty' } | { status: 'matched'; activeIndex: number; count: number }",
+      "type": "{ status: 'idle' } | { status: 'searching' } | { status: 'empty'; pending?: boolean } | { status: 'matched'; activeIndex: number; count: number; pending?: boolean }",
       "required": true,
       "description": "Describes the result state displayed beside the query.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 33
+        "line": 35
       }
     },
     {
@@ -4711,7 +4744,7 @@
       "description": "Controls how the document interprets the find query.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 35
+        "line": 37
       }
     },
     {
@@ -4721,7 +4754,7 @@
       "description": "Runs when a query interpretation option changes.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 37
+        "line": 39
       }
     },
     {
@@ -4731,7 +4764,7 @@
       "description": "Requests the preceding match, wrapping from the first match to the last.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 39
+        "line": 41
       }
     },
     {
@@ -4741,7 +4774,17 @@
       "description": "Requests the following match, wrapping from the last match to the first.",
       "source": {
         "path": "packages/design-system/src/components/findBar/findBar.tsx",
-        "line": 41
+        "line": 43
+      }
+    },
+    {
+      "name": "onDismiss",
+      "type": "() => void",
+      "required": false,
+      "description": "Dismisses an optional Find Bar surface from the Escape key.",
+      "source": {
+        "path": "packages/design-system/src/components/findBar/findBar.tsx",
+        "line": 45
       }
     }
   ],
