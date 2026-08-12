@@ -53,7 +53,7 @@ interface ButtonSharedProps {
 interface LabelButtonProps {
   /** Makes the button a square icon-only action. */
   iconOnly?: false
-  /** Selects inline or full-width row action layout. */
+  /** Selects inline, leading-aligned row, or centered fill action layout. */
   layout?: ButtonLayout
   /** Renders decorative content before the visible label. */
   prefix?: React.ReactNode

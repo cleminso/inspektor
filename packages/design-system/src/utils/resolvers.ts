@@ -298,6 +298,7 @@ const backgroundColorValues = {
   'danger-element-hover': dangerElementColors.hover,
   'danger-element-pressed': dangerElementColors.pressed,
   'danger-element-disabled': dangerElementColors.disabled,
+  'danger-element-subtle': dangerElementColors.subtle,
   'selection-background': selectionColors.background,
   'selection-strong-background': selectionColors.strongBackground,
 } satisfies Record<BackgroundColorToken, string>

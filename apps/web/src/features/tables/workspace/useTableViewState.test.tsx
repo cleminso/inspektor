@@ -327,6 +327,24 @@ describe('useTableViewState', () => {
     expect(setRowEditor).toHaveBeenCalledWith('edit', 'row-1')
   })
 
+  it('clears checked rows when opening the insert form from the row editor', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+
+    act(() => {
+      result.current.rowEditor.openInsert()
+    })
+    rerender()
+
+    expect(result.current.detailPaneMode).toBe('insert')
+    expect(result.current.table.getRow('row-1').getIsSelected()).toBe(false)
+    expect(result.current.rowEditor.editedRowIds).toEqual([])
+  })
+
   it('allows an individual row to be unchecked after its pane is closed', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
@@ -468,6 +486,20 @@ describe('useTableViewState', () => {
     expect(resetPage).not.toHaveBeenCalled()
   })
 
+  it('keeps insert mode open without resetting route state when Insert more is enabled', async () => {
+    searchState.editorMode = 'insert'
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    await act(async () => {
+      await result.current.handleInsertSave({ name: 'Grace' }, { keepOpen: true })
+    })
+
+    expect(insertRow).toHaveBeenCalledWith({ name: 'Grace' })
+    expect(resetPage).not.toHaveBeenCalled()
+    expect(setRowEditor).not.toHaveBeenCalled()
+    expect(result.current.detailPaneMode).toBe('insert')
+  })
+
   it('continues a blocked route transition only after the dirty draft is discarded', () => {
     const proceed = vi.fn()
     const reset = vi.fn()
@@ -559,6 +591,35 @@ describe('useTableViewState', () => {
 
     expect(document.activeElement).toBe(input)
     field.remove()
+  })
+
+  it('reports the active page row and selected data-column positions', () => {
+    searchState.editorMode = 'edit'
+    searchState.rowId = 'row-2'
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(result.current.rowEditor.activePageRowNumber).toBe(2)
+    expect(result.current.rowEditor.activeColumnNumber).toBe(0)
+
+    act(() => {
+      result.current.table.selectCellRange({
+        anchorRowId: 'row-2',
+        anchorColumnId: 'name',
+        focusRowId: 'row-2',
+        focusColumnId: 'name',
+      })
+    })
+
+    expect(result.current.rowEditor.activeColumnNumber).toBe(2)
+  })
+
+  it('does not report row zero when the edited row is outside the loaded page', () => {
+    searchState.editorMode = 'edit'
+    searchState.rowId = 'row-outside-page'
+
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(result.current.rowEditor.activePageRowNumber).toBeNull()
   })
 
   it('opens the row pane without clearing cell focus', () => {

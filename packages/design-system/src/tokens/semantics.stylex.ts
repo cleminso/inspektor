@@ -57,6 +57,7 @@ export const dangerElementColors = stylex.defineVars({
   hover: `light-dark(${palette.red600}, ${palette.red600})`,
   pressed: `light-dark(${palette.red700}, ${palette.red700})`,
   disabled: `light-dark(${palette.gray200}, ${palette.neutral800})`,
+  subtle: `light-dark(${palette.red200}, ${palette.red950})`,
 } as const)
 
 /** Colors that communicate selected content and controls. */
@@ -74,7 +75,7 @@ export const textColors = stylex.defineVars({
   muted: `light-dark(${palette.gray600}, ${palette.neutral400})`,
   placeholder: `light-dark(${palette.gray600}, ${palette.neutral400})`,
   disabled: `light-dark(${palette.gray400}, ${palette.neutral600})`,
-  accent: `light-dark(${palette.blue700}, ${palette.blue400})`,
+  accent: `light-dark(${palette.blue700}, ${palette.yellow400})`,
   link: `light-dark(${palette.blue600}, ${palette.blue400})`,
   success: `light-dark(${palette.green700}, ${palette.green400})`,
   warning: `light-dark(${palette.orange700}, ${palette.orange400})`,
@@ -169,11 +170,11 @@ export const spatial = stylex.defineVars({
   'scrollbar-track-size': dimensions[12],
   'scrollbar-thumb-size': spacing.s,
   'switch-height-s': dimensions[16],
-  'switch-height-m': dimensions[20],
-  'switch-width-s': dimensions[28],
+  'switch-height-m': '1.125rem',
+  'switch-width-s': dimensions[32],
   'switch-width-m': dimensions[36],
-  'switch-thumb-s': dimensions[12],
-  'switch-thumb-m': dimensions[14],
+  'switch-thumb-s': dimensions[16],
+  'switch-thumb-m': '1.125rem',
   'tab-height': dimensions[26],
   'tab-view-min-width': dimensions[64],
   'textarea-height-s': dimensions[72],

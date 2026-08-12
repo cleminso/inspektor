@@ -37,6 +37,8 @@ const tableViewState = vi.hoisted(() => ({
   pageSize: 100,
   reorderableColumnIds: [] as string[],
   rowEditor: {
+    activeColumnNumber: 0,
+    activePageRowNumber: 0,
     activeRowId: null,
     activeRowIndex: 0,
     editedRowIds: [] as string[],

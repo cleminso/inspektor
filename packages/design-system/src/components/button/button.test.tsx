@@ -188,6 +188,15 @@ describe("Button", () => {
     expect(button.textContent).toBe("PrefixLabelSuffix");
   });
 
+  it("uses a full-width centered fill layout", () => {
+    render(<Button layout="fill">Save</Button>);
+
+    const button = screen.getByRole("button", { name: "Save" });
+
+    expect(button.getAttribute("data-layout")).toBe("fill");
+    expect(button.getAttribute("data-full-width")).toBe("");
+  });
+
   it("retains constrained radius choices", () => {
     render(<Button radius="m">Save</Button>);
 
@@ -206,8 +215,8 @@ describe("Button", () => {
     const justify = <Button justify="start">Save</Button>;
     // @ts-expect-error Button width is selected through layout.
     const fullWidth = <Button fullWidth>Save</Button>;
-    // @ts-expect-error Button exposes only supported inline and row layouts.
-    const fill = <Button layout="fill">Save</Button>;
+    // @ts-expect-error Button exposes only supported inline, row, and fill layouts.
+    const invalidLayout = <Button layout="compact">Save</Button>;
     const iconLayout = (
       // @ts-expect-error Icon-only actions do not accept labelled-button layout.
       <Button iconOnly aria-label="Save" layout="row">
@@ -217,7 +226,7 @@ describe("Button", () => {
 
     expect(justify).toBeDefined();
     expect(fullWidth).toBeDefined();
-    expect(fill).toBeDefined();
+    expect(invalidLayout).toBeDefined();
     expect(iconLayout).toBeDefined();
   });
 

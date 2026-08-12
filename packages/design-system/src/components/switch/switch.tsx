@@ -53,6 +53,8 @@ export const Switch = forwardRef<HTMLElement, SwitchProps>(function Switch(
 ) {
   const rootStyleProps = createStateStyleProps<BaseSwitch.Root.State>((state) => [
     switchStyles.root,
+    switchStyles.rootPositioned,
+    switchStyles.rootOuterOutline,
     size === 's' ? switchStyles.rootSizeS : switchStyles.rootSizeM,
     state.checked === true && state.readOnly === false && switchStyles.rootChecked,
     state.checked === true && state.readOnly === true && switchStyles.rootCheckedReadOnly,
@@ -70,6 +72,8 @@ export const Switch = forwardRef<HTMLElement, SwitchProps>(function Switch(
   ])
   const thumbStyleProps = createStateStyleProps<BaseSwitch.Thumb.State>((state) => [
     switchStyles.thumb,
+    switchStyles.thumbPositioned,
+    switchStyles.thumbRaised,
     size === 's' ? switchStyles.thumbSizeS : switchStyles.thumbSizeM,
     state.checked === true && switchStyles.thumbChecked,
     state.checked === false && switchStyles.thumbUnchecked,

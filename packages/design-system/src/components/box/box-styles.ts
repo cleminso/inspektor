@@ -285,6 +285,7 @@ export const backgroundColorStyles = stylex.create({
   'danger-element-hover': { backgroundColor: dangerElementColors.hover },
   'danger-element-pressed': { backgroundColor: dangerElementColors.pressed },
   'danger-element-disabled': { backgroundColor: dangerElementColors.disabled },
+  'danger-element-subtle': { backgroundColor: dangerElementColors.subtle },
   'selection-background': { backgroundColor: selectionColors.background },
   'selection-strong-background': { backgroundColor: selectionColors.strongBackground },
 })

@@ -205,7 +205,13 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                       <Icon artwork={productGlyphs.derivedView} size="s" />
                     )
                   }
-                  details={isBaseTab === false ? `Filtered view of ${tab.tableName}` : undefined}
+                  details={
+                    isBaseTab === true
+                      ? undefined
+                      : tab.search.view === 'schema'
+                        ? `Schema of ${tab.tableName}`
+                        : `Filtered view of ${tab.tableName}`
+                  }
                   closeLabel={`Close ${tab.tableName}`}
                   reorderLabel={`Reorder ${tab.tableName}`}
                   onBlur={() => {

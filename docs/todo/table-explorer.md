@@ -21,6 +21,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [12/08/26]
 
+- [x] Show the active row's one-based page position and the selected data column's one-based visible position in the edit-pane title.
+- [x] Show column position zero in the edit-pane title when no grid cell is selected.
+- [x] Omit edit-pane coordinates when the active row is outside the loaded page.
+- [x] Keep Insert more enabled across repeated inserts and reset it when insert mode closes.
+
+[12/08/26]
+
 - [x] Separate schema and permissions with an explicit vertical divider and keep each JSON tree in its own bounded scroll viewport.
 - [x] Place each JSON scroll owner in a bounded remaining-height body beneath its fixed document header, with content padding inside the viewport.
 - [x] Keep each JSON content wrapper intrinsic so expanded trees overflow their viewport, and stretch the divider across the shared panel height.
@@ -263,6 +270,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Disable native text selection on the table surface so pointer gestures select cells instead of glyphs.
 
 ### Row selection
+
+[12/08/26]
+
+- [x] Clear checked rows when Insert row replaces the complete-row editor with the insert form.
 
 [05/08/26]
 

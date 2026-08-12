@@ -35,8 +35,8 @@ interface ButtonLinkSharedProps {
 interface LabelButtonLinkProps {
   /** Makes the link a square icon-only action. */
   iconOnly?: false
-  /** Selects inline or full-width row navigation layout. */
-  layout?: ButtonLayout
+  /** Selects inline or leading-aligned full-width row navigation layout. */
+  layout?: Exclude<ButtonLayout, 'fill'>
   /** Renders decorative content before the visible label. */
   prefix?: ReactNode
   /** Renders decorative content after the visible label. */

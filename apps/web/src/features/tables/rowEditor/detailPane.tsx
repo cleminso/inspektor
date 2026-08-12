@@ -10,19 +10,26 @@ export function DetailPane({
   title,
 }: DetailPaneProps): React.ReactElement {
   return (
-    <Box height="full" flexDirection="column" overflow="hidden" backgroundColor="surface-background" paddingVertical="xxs">
+    <Box height="full" flexDirection="column" overflow="hidden" backgroundColor="surface-background">
       <Box
         data-slot="row-editor-header"
         flexShrink={0}
         alignItems="center"
-        borderBottomWidth={1}
-        borderColor="default"
-        borderStyle="solid"
-        padding="m"
+        paddingHorizontal="m"
+        paddingVertical="s"
       >
         {title}
       </Box>
-      <Box minHeight={0} flex={1} flexDirection="column" overflow="hidden">
+      <Box
+        data-slot="row-editor-body"
+        minHeight={0}
+        flex={1}
+        flexDirection="column"
+        overflow="hidden"
+        borderTopWidth={1}
+        borderColor="default"
+        borderStyle="solid"
+      >
         {children}
       </Box>
     </Box>

@@ -5,23 +5,22 @@ import {
   borderColors,
   elementColors,
   focusColors,
+  selectionColors,
   spatial,
   surfaceColors,
 } from '../../tokens/semantics.stylex'
-import { borderRadii, spacing } from '../../tokens/value.stylex'
+import { borderRadii, shadows } from '../../tokens/value.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
 
 export const switchStyles = stylex.create({
   root: {
-    padding: spacing.xxs,
-    borderColor: 'transparent',
+    padding: 0,
     borderRadius: borderRadii.xs,
-    borderStyle: 'solid',
-    borderWidth: 1,
+    borderStyle: 'none',
     alignItems: 'center',
     appearance: 'none',
-    backgroundColor: elementColors.default,
+    backgroundColor: elementColors.hover,
     boxSizing: 'border-box',
     cursor: 'pointer',
     display: 'inline-flex',
@@ -30,9 +29,15 @@ export const switchStyles = stylex.create({
     outlineOffset: 1,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
-    transitionDuration: { default: '120ms', [reducedMotion]: '0ms' },
+    transitionDuration: { default: '200ms', [reducedMotion]: '0ms' },
     transitionProperty: 'background-color',
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  },
+  rootPositioned: {
+    position: 'relative',
+  },
+  rootOuterOutline: {
+    boxShadow: `0 0 0 1px ${borderColors.default}`,
   },
   rootChecked: {
     backgroundColor: {
@@ -40,6 +45,7 @@ export const switchStyles = stylex.create({
       ':hover': accentElementColors.hover,
       ':active': accentElementColors.pressed,
     },
+    boxShadow: `0 0 0 1px ${selectionColors.border}`,
   },
   rootCheckedReadOnly: {
     backgroundColor: {
@@ -47,28 +53,29 @@ export const switchStyles = stylex.create({
       ':hover': accentElementColors.default,
       ':active': accentElementColors.default,
     },
+    boxShadow: `0 0 0 1px ${selectionColors.border}`,
   },
   rootInvalid: {
-    borderColor: borderColors.danger,
+    boxShadow: `0 0 0 1px ${borderColors.danger}`,
   },
   rootDisabled: {
-    borderColor: {
-      default: borderColors.subtle,
-      ':hover': borderColors.subtle,
-      ':active': borderColors.subtle,
-    },
     backgroundColor: {
       default: elementColors.disabled,
       ':hover': elementColors.disabled,
       ':active': elementColors.disabled,
     },
+    boxShadow: {
+      default: `0 0 0 1px ${borderColors.subtle}`,
+      ':hover': `0 0 0 1px ${borderColors.subtle}`,
+      ':active': `0 0 0 1px ${borderColors.subtle}`,
+    },
     cursor: 'not-allowed',
   },
   rootUncheckedReadOnly: {
     backgroundColor: {
-      default: elementColors.default,
-      ':hover': elementColors.default,
-      ':active': elementColors.default,
+      default: elementColors.hover,
+      ':hover': elementColors.hover,
+      ':active': elementColors.hover,
     },
     cursor: 'default',
   },
@@ -90,12 +97,21 @@ export const switchStyles = stylex.create({
   },
   thumb: {
     borderRadius: borderRadii.xs,
-    backgroundColor: surfaceColors.default,
+    backgroundColor: surfaceColors.background,
     display: 'block',
     transform: 'translateX(0)',
     transitionDuration: { default: '120ms', [reducedMotion]: '0ms' },
     transitionProperty: 'transform, background-color',
     transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  },
+  thumbPositioned: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    top: 0,
+  },
+  thumbRaised: {
+    boxShadow: shadows.small,
   },
   thumbChecked: {
     backgroundColor: surfaceColors.background,
@@ -115,13 +131,13 @@ export const switchStyles = stylex.create({
     width: spatial['switch-thumb-s'],
   },
   thumbSizeSChecked: {
-    transform: `translateX(calc(${spatial['switch-width-s']} - ${spatial['switch-thumb-s']} - ${spacing.xxs} - ${spacing.xxs} - 2px))`,
+    transform: `translateX(calc(${spatial['switch-width-s']} - ${spatial['switch-thumb-s']}))`,
   },
   thumbSizeM: {
     height: spatial['switch-thumb-m'],
     width: spatial['switch-thumb-m'],
   },
   thumbSizeMChecked: {
-    transform: `translateX(calc(${spatial['switch-width-m']} - ${spatial['switch-thumb-m']} - ${spacing.xxs} - ${spacing.xxs} - 2px))`,
+    transform: `translateX(calc(${spatial['switch-width-m']} - ${spatial['switch-thumb-m']}))`,
   },
 })

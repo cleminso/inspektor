@@ -3,7 +3,7 @@ import '@fontsource-variable/geist/wght.css'
 
 import './index.css'
 
-import { Agentation } from 'agentation'
+// import { Agentation } from 'agentation'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { ThemeProvider } from 'next-themes'
@@ -48,7 +48,7 @@ if (rootElement !== null) {
       <Tooltip.Provider>
         <StrictMode>
           <RouterProvider router={router} />
-          {import.meta.env.DEV === true ? <Agentation endpoint="/agentation" /> : null}
+          {/*{import.meta.env.DEV === true ? <Agentation endpoint="/agentation" /> : null}*/}
         </StrictMode>
       </Tooltip.Provider>
     </ThemeProvider>,

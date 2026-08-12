@@ -15,7 +15,7 @@ export type ButtonVariant =
   | 'link'
 
 export type ButtonSize = 'xs' | 's' | 'm'
-export type ButtonLayout = 'inline' | 'row'
+export type ButtonLayout = 'inline' | 'row' | 'fill'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm'
 export type ButtonGlyphSize = 'standard' | 'compact'
 
@@ -49,6 +49,7 @@ const sizeStyles = {
 export const buttonLayoutOptions = {
   inline: { alignment: 'center', fill: false },
   row: { alignment: 'start', fill: true },
+  fill: { alignment: 'center', fill: true },
 } satisfies Record<ButtonLayout, ButtonLayoutOptions>
 
 const radiusStyles = {

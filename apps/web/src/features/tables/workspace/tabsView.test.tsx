@@ -162,6 +162,42 @@ describe('TableTabsView', () => {
     expect(screen.queryByText('New table view content')).toBeNull()
   })
 
+  it('describes schema and filtered data tabs according to their view', async () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+      {
+        kind: 'table',
+        id: 'schema:profiles',
+        tableName: 'profiles',
+        search: { view: 'schema' },
+      },
+      {
+        kind: 'table',
+        id: 'filtered:profiles',
+        tableName: 'profiles',
+        search: { filters: 'active' },
+      },
+    ]
+
+    const { unmount } = render(<TableTabsView tableName="accounts" />)
+
+    const profileTabs = screen.getAllByRole('tab', { name: 'profiles' })
+    fireEvent.focus(profileTabs[0]!)
+    expect(await screen.findByText('Schema of profiles')).toBeTruthy()
+
+    unmount()
+    mocks.state.tabs = [mocks.state.tabs[0]!, mocks.state.tabs[2]!]
+    render(<TableTabsView tableName="accounts" />)
+    fireEvent.focus(screen.getByRole('tab', { name: 'profiles' }))
+    expect(await screen.findByText('Filtered view of profiles')).toBeTruthy()
+  })
+
   it('does not offer to close the sole new-view tab', () => {
     mocks.state.activeTabId = 'new-view'
     mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]

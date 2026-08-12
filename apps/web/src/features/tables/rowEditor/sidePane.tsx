@@ -1,49 +1,94 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-import { Box, Button, Text } from "@inspector/ds";
+import { Box, Button, Switch, Text } from "@inspector/ds";
 
 import { DetailPane } from "@tables/rowEditor/detailPane";
 import { ROW_EDITOR_FORM_ID } from "@tables/rowEditor/editorForm";
 import type { TableRowId } from "@tables/tableTypes";
 
 interface RowEditorSidePanelProps {
+  activeColumnNumber: number;
+  activePageRowNumber: number | null;
   activeRowIndex: number;
   children: React.ReactNode;
   draftTransitionPending: boolean;
   draftTransitionSaving: boolean;
   editedRowIds: TableRowId[];
+  insertMoreEnabled?: boolean;
   mode: "insert" | "edit";
   onDiscardAndContinue: () => void;
+  onInsertMoreEnabledChange?: (enabled: boolean) => void;
   onKeepEditing: () => void;
   onNavigateNext: () => void;
   onNavigatePrevious: () => void;
 }
 
 export function RowEditorSidePanel({
+  activeColumnNumber,
+  activePageRowNumber,
   activeRowIndex,
   children,
   draftTransitionPending,
   draftTransitionSaving,
   editedRowIds,
+  insertMoreEnabled = false,
   mode,
   onDiscardAndContinue,
+  onInsertMoreEnabledChange,
   onKeepEditing,
   onNavigateNext,
   onNavigatePrevious,
 }: RowEditorSidePanelProps): React.ReactElement {
   const hasMultipleRows = editedRowIds.length > 1;
   const title =
-    mode === "insert" ? "Insert row" : editedRowIds.length > 1 ? "Edit rows" : "Edit row";
+    mode === "insert"
+      ? "Insert row"
+      : activePageRowNumber === null
+        ? "Edit row"
+        : `Edit row ${activePageRowNumber}:${activeColumnNumber}`;
+  const insertMoreFieldId = "insert-more";
 
   return (
     <DetailPane
       title={
-        <Box minWidth={0} flex={1} alignItems="center" gap="l">
+        <Box
+          data-slot="row-editor-header-content"
+          minWidth={0}
+          minHeight="control-height-s"
+          flex={1}
+          alignItems="center"
+          gap="l"
+        >
           <Box minWidth={0} flex={1}>
             <Text as="h2" variant="label" truncate>
               {title}
             </Text>
           </Box>
+          {mode === "insert" && onInsertMoreEnabledChange !== undefined ? (
+            <Box
+              as="label"
+              htmlFor={insertMoreFieldId}
+              display="flex"
+              ml="auto"
+              flexShrink={0}
+              alignItems="center"
+              gap="xs"
+            >
+              <Switch
+                id={insertMoreFieldId}
+                aria-labelledby={`${insertMoreFieldId}-label`}
+                checked={insertMoreEnabled}
+                disabled={draftTransitionSaving}
+                size="s"
+                onCheckedChange={(nextChecked) => {
+                  onInsertMoreEnabledChange(nextChecked === true)
+                }}
+              />
+              <Text as="span" id={`${insertMoreFieldId}-label`} color="muted">
+                Insert more
+              </Text>
+            </Box>
+          ) : null}
           {hasMultipleRows === true ? (
             <Box
               ml="auto"

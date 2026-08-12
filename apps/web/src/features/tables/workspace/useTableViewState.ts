@@ -40,6 +40,8 @@ interface UseTableViewStateOptions {
 }
 
 interface TableViewRowEditorState {
+  activeColumnNumber: number
+  activePageRowNumber: number | null
   activeRowId: TableRowId | null
   activeRowIndex: number
   editedRowIds: TableRowId[]
@@ -366,6 +368,16 @@ export function useTableViewState({
     onColumnMove: handleColumnMove,
     onColumnOrderChange: setColumnOrder,
   })
+  const activePageRowIndex =
+    activeRowId === null ? -1 : query.rows.findIndex((row) => String(row.id) === activeRowId)
+  const activePageRowNumber = activePageRowIndex < 0 ? null : activePageRowIndex + 1
+  const selectedColumnId = cellSelection.at(-1)?.focusColumnId ?? null
+  const activeColumnNumber =
+    selectedColumnId === null
+      ? 0
+      : order.columnOrder
+          .filter((columnId) => visibility.columnVisibility[columnId] !== false)
+          .indexOf(selectedColumnId) + 1
   const selectedRow = useMemo(() => {
     const visibleSelectedRow = query.rows.find((row) => String(row.id) === activeRowId) ?? null
     if (visibleSelectedRow !== null) {
@@ -409,6 +421,7 @@ export function useTableViewState({
 
   const openInsert = () => {
     draftTransition.request(() => {
+      resetSelection()
       void searchState.setRowEditor('insert', null)
     })
   }
@@ -529,6 +542,8 @@ export function useTableViewState({
     tableColumns: query.columns,
     rowValues,
     rowEditor: {
+      activeColumnNumber,
+      activePageRowNumber,
       activeRowId: detailPaneMode === 'rows' ? activeRowId : null,
       activeRowIndex,
       editedRowIds,
@@ -568,12 +583,11 @@ export function useTableViewState({
         return
       }
 
-      void query.resetPage()
-
       if (options?.keepOpen === true) {
         return
       }
 
+      void query.resetPage()
       closeDetailPane()
     },
   }

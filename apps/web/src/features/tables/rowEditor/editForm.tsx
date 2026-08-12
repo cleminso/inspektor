@@ -242,8 +242,7 @@ function LoadedEditRowForm({
             data-slot="row-editor-footer"
             flexShrink={0}
             alignItems="center"
-            justifyContent="between"
-            gap="m"
+            gap="xs"
             borderTopWidth={1}
             borderColor="default"
             borderStyle="solid"
@@ -252,21 +251,25 @@ function LoadedEditRowForm({
             paddingVertical="s"
             paddingRight="l"
           >
-            <Box ml={onDelete === undefined ? "auto" : "none"} alignItems="center" gap="s">
+            <Box flex={1}>
               <Button
                 type="submit"
                 variant="primary"
                 size="s"
+                layout="fill"
                 loading={rowEditor.isSaving === true}
                 disabled={isDeleting === true}
               >
                 Save
               </Button>
-              {onCancel !== undefined ? (
+            </Box>
+            {onCancel !== undefined ? (
+              <Box flex={1}>
                 <Button
                   type="button"
                   variant="ghost"
                   size="s"
+                  layout="fill"
                   onClick={() => {
                     if (isDeleteConfirming === true) {
                       setIsDeleteConfirming(false);
@@ -279,41 +282,44 @@ function LoadedEditRowForm({
                 >
                   Cancel
                 </Button>
-              ) : null}
-            </Box>
+              </Box>
+            ) : null}
             {onDelete !== undefined ? (
-              <Button
-                type="button"
-                variant="danger"
-                size="s"
-                disabled={isDeleting === true || rowEditor.isSaving === true}
-                onClick={async () => {
-                  if (isDeleteConfirming === false) {
-                    setDeleteError(null);
-                    setIsDeleteConfirming(true);
-                    return;
-                  }
+              <Box flex={1}>
+                <Button
+                  type="button"
+                  variant="danger"
+                  size="s"
+                  layout="fill"
+                  disabled={isDeleting === true || rowEditor.isSaving === true}
+                  onClick={async () => {
+                    if (isDeleteConfirming === false) {
+                      setDeleteError(null);
+                      setIsDeleteConfirming(true);
+                      return;
+                    }
 
-                  try {
-                    setIsDeleting(true);
-                    setDeleteError(null);
-                    await onDelete();
-                  } catch (nextError) {
-                    setDeleteError(
-                      nextError instanceof Error ? nextError.message : String(nextError),
-                    );
-                  } finally {
-                    setIsDeleting(false);
-                    setIsDeleteConfirming(false);
-                  }
-                }}
-              >
-                {isDeleting === true
-                  ? "Deleting…"
-                  : isDeleteConfirming === true
-                    ? "Confirm delete"
-                    : "Delete"}
-              </Button>
+                    try {
+                      setIsDeleting(true);
+                      setDeleteError(null);
+                      await onDelete();
+                    } catch (nextError) {
+                      setDeleteError(
+                        nextError instanceof Error ? nextError.message : String(nextError),
+                      );
+                    } finally {
+                      setIsDeleting(false);
+                      setIsDeleteConfirming(false);
+                    }
+                  }}
+                >
+                  {isDeleting === true
+                    ? "Deleting…"
+                    : isDeleteConfirming === true
+                      ? "Confirm delete"
+                      : "Delete"}
+                </Button>
+              </Box>
             ) : null}
           </Box>
         </Box>

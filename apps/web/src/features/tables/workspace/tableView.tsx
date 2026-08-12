@@ -46,6 +46,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
   const handleEscape = useEffectEvent(state.handleEscape)
   const refreshPendingRef = useRef(false)
   const [refreshAnnouncement, setRefreshAnnouncement] = useState('')
+  const [insertMoreEnabled, setInsertMoreEnabled] = useState(false)
   const filteredEmpty =
     state.error === null &&
     state.isInitialLoading === false &&
@@ -115,27 +116,29 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
           <Toolbar
             actions={
               <>
-                <Tooltip.Root>
-                  <Tooltip.Trigger
-                    render={
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="s"
-                        aria-label="Open schema"
-                        iconOnly
-                        disabled={state.canInspectSchema === false}
-                        onClick={() => {
-                          openSchemaView(tableName)
-                        }}
-                      >
-                        <Button.Glyph artwork={productGlyphs.schema} />
-                      </Button>
-                    }
-                  />
-                  <Tooltip.Content>Open schema</Tooltip.Content>
-                </Tooltip.Root>
-                <DataGridColumnVisibility table={state.table} />
+                <Box>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger
+                      render={
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="s"
+                          aria-label="Open schema"
+                          iconOnly
+                          disabled={state.canInspectSchema === false}
+                          onClick={() => {
+                            openSchemaView(tableName)
+                          }}
+                        >
+                          <Button.Glyph artwork={productGlyphs.schema} />
+                        </Button>
+                      }
+                    />
+                    <Tooltip.Content>Open schema</Tooltip.Content>
+                  </Tooltip.Root>
+                  <DataGridColumnVisibility table={state.table} />
+                </Box>
                 <Button
                   type="button"
                   variant="primary"
@@ -143,8 +146,10 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                   disabled={state.canOpenRowEditor === false}
                   onClick={() => {
                     if (state.detailPaneMode === 'insert') {
+                      setInsertMoreEnabled(false)
                       state.handleRowEditorOpenChange(false)
                     } else {
+                      setInsertMoreEnabled(false)
                       state.rowEditor.openInsert()
                     }
                   }}
@@ -234,13 +239,17 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
             maxSize={720}
           >
             <RowEditorSidePanel
+              activeColumnNumber={state.rowEditor.activeColumnNumber}
+              activePageRowNumber={state.rowEditor.activePageRowNumber}
               mode={state.detailPaneMode === 'insert' ? 'insert' : 'edit'}
               draftTransitionPending={state.draftTransition.isPending}
               draftTransitionSaving={state.draftTransition.isSaving}
               editedRowIds={state.rowEditor.editedRowIds}
+              insertMoreEnabled={insertMoreEnabled}
               activeRowIndex={state.rowEditor.activeRowIndex}
               onDiscardAndContinue={state.draftTransition.discardAndContinue}
               onKeepEditing={state.draftTransition.keepEditing}
+              onInsertMoreEnabledChange={setInsertMoreEnabled}
               onNavigatePrevious={state.rowEditor.goToPreviousRow}
               onNavigateNext={state.rowEditor.goToNextRow}
             >
@@ -248,14 +257,21 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                 {state.detailPaneMode === 'insert' ? (
                   <InsertRowForm
                     key={`${tableName}:insert`}
+                    insertMoreEnabled={insertMoreEnabled}
                     saveDisabled={state.canMutateRows === false}
                     rowValues={state.rowValues ?? {}}
                     schemaColumns={state.schemaColumns}
                     onCancel={() => {
+                      setInsertMoreEnabled(false)
                       state.handleRowEditorCancel()
                     }}
                     onDirtyChange={state.handleRowDraftDirtyChange}
-                    onSave={state.handleInsertSave}
+                    onSave={async (values, options) => {
+                      await state.handleInsertSave(values, options)
+                      if (options?.keepOpen !== true) {
+                        setInsertMoreEnabled(false)
+                      }
+                    }}
                   />
                 ) : (
                   <EditRowForm

@@ -7,9 +7,77 @@ import { RowEditorSidePanel } from "@tables/rowEditor/sidePane";
 afterEach(cleanup);
 
 describe("RowEditorSidePanel dirty transitions", () => {
+  it("shows the active page row and selected grid column in the edit title", () => {
+    render(
+      <RowEditorSidePanel
+        activeRowIndex={0}
+        activePageRowNumber={12}
+        activeColumnNumber={3}
+        draftTransitionPending={false}
+        draftTransitionSaving={false}
+        editedRowIds={["row-12"]}
+        mode="edit"
+        onDiscardAndContinue={() => undefined}
+        onKeepEditing={() => undefined}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Edit row 12:3" })).toBeTruthy();
+  });
+
+  it("shows column zero when no grid cell is selected", () => {
+    render(
+      <RowEditorSidePanel
+        activeRowIndex={0}
+        activePageRowNumber={1}
+        activeColumnNumber={0}
+        draftTransitionPending={false}
+        draftTransitionSaving={false}
+        editedRowIds={["row-1"]}
+        mode="edit"
+        onDiscardAndContinue={() => undefined}
+        onKeepEditing={() => undefined}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Edit row 1:0" })).toBeTruthy();
+  });
+
+  it("omits page coordinates when the edited row is outside the loaded page", () => {
+    render(
+      <RowEditorSidePanel
+        activeRowIndex={0}
+        activePageRowNumber={null}
+        activeColumnNumber={0}
+        draftTransitionPending={false}
+        draftTransitionSaving={false}
+        editedRowIds={["row-outside-page"]}
+        mode="edit"
+        onDiscardAndContinue={() => undefined}
+        onKeepEditing={() => undefined}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Edit row" })).toBeTruthy();
+  });
+
   it("renders compact selected-row navigation icons", () => {
     render(
       <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
         activeRowIndex={0}
         draftTransitionPending={false}
         draftTransitionSaving={false}
@@ -32,12 +100,41 @@ describe("RowEditorSidePanel dirty transitions", () => {
     }
   });
 
+  it("changes whether another row remains open after insertion", () => {
+    const onInsertMoreEnabledChange = vi.fn();
+    render(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        draftTransitionPending={false}
+        draftTransitionSaving={false}
+        editedRowIds={[]}
+        insertMoreEnabled={false}
+        mode="insert"
+        onDiscardAndContinue={() => undefined}
+        onInsertMoreEnabledChange={onInsertMoreEnabledChange}
+        onKeepEditing={() => undefined}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    fireEvent.click(screen.getByRole("switch", { name: "Insert more" }));
+
+    expect(onInsertMoreEnabledChange).toHaveBeenCalledWith(true);
+  });
+
   it("offers save, discard, and keep-editing decisions", () => {
     const onDiscardAndContinue = vi.fn();
     const onKeepEditing = vi.fn();
     const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
     render(
       <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
         activeRowIndex={0}
         draftTransitionPending={true}
         draftTransitionSaving={false}
@@ -65,6 +162,8 @@ describe("RowEditorSidePanel dirty transitions", () => {
   it("disables every transition decision while a mutation is pending", () => {
     render(
       <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
         activeRowIndex={0}
         draftTransitionPending={true}
         draftTransitionSaving={true}
