@@ -1160,7 +1160,6 @@ function DataGridRowImplementation<TData extends RowData>({
       {...stylex.props(
         dataGridStyles.row,
         isSelected === true && dataGridStyles.rowSelected,
-        isActive === true && dataGridStyles.rowActive,
       )}
       aria-selected={isSelected}
       aria-rowindex={ariaRowIndex}
@@ -1199,6 +1198,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   const isRowActive = activeRowId === target.rowId
   const isSelected = cell.row.getIsSelected()
   const isCellSelected = cell.getIsSelected()
+  const selectionEdges = isCellSelected === true ? cell.getSelectionEdges() : undefined
   const isActive = cell.getIsFocused()
   const tabIndex = cell.getTabIndex() === 0 || bodyCellEntryId === cell.id ? 0 : -1
   const registerCell = useCallback(
@@ -1293,13 +1293,27 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         isColumnActive === true && dataGridStyles.cellColumnActive,
         isSelected === true && dataGridStyles.cellSelected,
         isCellSelected === true && dataGridStyles.cellSelection,
-        isActive === true && dataGridStyles.cellActive,
+        selectionEdges?.top === true && dataGridStyles.cellSelectionEdgeTop,
+        selectionEdges?.right === true && dataGridStyles.cellSelectionEdgeRight,
+        selectionEdges?.bottom === true && dataGridStyles.cellSelectionEdgeBottom,
+        selectionEdges?.left === true && dataGridStyles.cellSelectionEdgeLeft,
+        isActive === true &&
+          (isCellSelected === true
+            ? dataGridStyles.cellActiveSelected
+            : dataGridStyles.cellActive),
       )}
       data-active={isActive === true ? '' : undefined}
       data-cell-selected={isCellSelected === true ? '' : undefined}
       data-column-id={target.columnId}
       data-column-active={isColumnActive === true ? '' : undefined}
       data-row-active={isRowActive === true ? '' : undefined}
+      data-selection-edges={
+        selectionEdges === undefined
+          ? undefined
+          : (['top', 'right', 'bottom', 'left'] as const)
+              .filter((edge) => selectionEdges[edge] === true)
+              .join(' ')
+      }
       data-selected={isSelected === true ? '' : undefined}
       data-slot="data-grid-cell"
       data-typography="mono"

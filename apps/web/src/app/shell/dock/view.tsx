@@ -34,7 +34,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
                 <Button
                   type="button"
                   variant="ghost"
-                  size="xs"
+                  size="s"
                   aria-label={leftDockLabel}
                   aria-pressed={leftDock.isOpen}
                   glyphSize="compact"
@@ -54,7 +54,7 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
               <Button
                 type="button"
                 variant="ghost"
-                size="xs"
+                size="s"
                 aria-label="Open subscriptions dock"
                 glyphSize="compact"
                 iconOnly

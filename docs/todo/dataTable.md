@@ -14,6 +14,27 @@
 
 ## Implemented foundation
 
+[12/08/26]
+
+- [x] Follow TanStack's cell-selection example by letting each selected body cell paint the edges from `getSelectionEdges()` with composable inset shadows.
+- [x] Remove adjacent-cell edge inspection and neighbor-owned selection painting while keeping header selection styling unchanged.
+
+[12/08/26]
+
+- [x] Paint body-cell selection bottom and inline-end edges from adjacent cells when those neighbors exist, leaving only outer table edges on the selected cell itself.
+- [x] Preserve the active-header perimeter implementation independently from body-cell edge ownership.
+
+[12/08/26]
+
+- [x] Keep the focused-cell ring and TanStack selection perimeter on one paint layer so selected cells do not stack lighter bottom or inline-end strokes.
+- [x] Keep active-header structural seams neutral beneath its internal selection perimeter so top, bottom, and inline-end edges render once.
+- [x] Remove the active-row top stroke so the documentation example matches the product grid's cell-selection treatment.
+
+[12/08/26]
+
+- [x] Draw active body-cell and header rings inside their measured boxes so sticky headers, paint containment, and table edges cannot clip or extend them.
+- [x] Use TanStack cell-selection edges to draw one layout-neutral perimeter around resolved selection ranges.
+
 [11/08/26]
 
 - [x] Keep the Data Grid's native two-axis viewport available for programmatic scrolling while removing its redundant sequential-focus stop in favor of the grid's interactive controls and roving body-cell entry point.
