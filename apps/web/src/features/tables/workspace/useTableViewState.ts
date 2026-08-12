@@ -390,7 +390,14 @@ export function useTableViewState({
 
   const handleEscape = () => {
     if (detailPaneMode !== 'closed') {
-      draftTransition.request(closeDetailPane)
+      draftTransition.request(() => {
+        if (activeRowId !== null) {
+          setSelectedRowIds((currentRowIds) =>
+            currentRowIds.filter((rowId) => rowId !== activeRowId),
+          )
+        }
+        closeDetailPane()
+      })
       return
     }
 

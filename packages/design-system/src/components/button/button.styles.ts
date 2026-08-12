@@ -69,7 +69,7 @@ export const buttonStyles = stylex.create({
       ':hover': dangerElementColors.hover,
       ':active': dangerElementColors.pressed,
     },
-    color: textColors.default,
+    color: textColors.onDanger,
   },
   ghost: {
     backgroundColor: {

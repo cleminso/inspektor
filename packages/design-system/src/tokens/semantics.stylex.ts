@@ -53,10 +53,10 @@ export const accentElementColors = stylex.defineVars({
 
 /** Danger element colors for destructive interactions. */
 export const dangerElementColors = stylex.defineVars({
-  default: `light-dark(${palette.red100}, ${palette.red950})`,
-  hover: `light-dark(${palette.red200}, ${palette.red900})`,
-  pressed: `light-dark(${palette.red200}, ${palette.red900})`,
-  disabled: `light-dark(${palette.gray100}, ${palette.neutral900})`,
+  default: `light-dark(${palette.red500}, ${palette.red500})`,
+  hover: `light-dark(${palette.red600}, ${palette.red600})`,
+  pressed: `light-dark(${palette.red700}, ${palette.red700})`,
+  disabled: `light-dark(${palette.gray200}, ${palette.neutral800})`,
 } as const)
 
 /** Colors that communicate selected content and controls. */
@@ -81,6 +81,7 @@ export const textColors = stylex.defineVars({
   danger: `light-dark(${palette.red700}, ${palette.red500})`,
   onAccent: palette.gray50,
   onInverse: `light-dark(${palette.gray50}, ${palette.neutral950})`,
+  onDanger: `light-dark(${palette.gray100}, ${palette.gray100})`,
 } as const)
 
 /** Semantic border colors for hierarchy, state, and feedback. */

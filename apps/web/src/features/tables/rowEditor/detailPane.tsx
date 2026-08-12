@@ -10,15 +10,15 @@ export function DetailPane({
   title,
 }: DetailPaneProps): React.ReactElement {
   return (
-    <Box height="full" flexDirection="column" overflow="hidden" backgroundColor="surface-background">
+    <Box height="full" flexDirection="column" overflow="hidden" backgroundColor="surface-background" paddingVertical="xxs">
       <Box
-        height="panel-bar-height"
+        data-slot="row-editor-header"
         flexShrink={0}
         alignItems="center"
         borderBottomWidth={1}
         borderColor="default"
         borderStyle="solid"
-        px="l"
+        padding="m"
       >
         {title}
       </Box>

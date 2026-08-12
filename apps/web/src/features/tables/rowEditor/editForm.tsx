@@ -114,7 +114,7 @@ function RowJsonRepresentation({
             count: searchResults.count,
           };
   return (
-    <Box height="full" minHeight={0} flexDirection="column" gap="m" px="m" py="m">
+    <Box height="full" minHeight={0} flexDirection="column" gap="m" px="m" py="m" pr="l">
       <Box flexShrink={0} alignItems="center" gap="m">
         <FindBar
           label="Find in row JSON"
@@ -177,7 +177,7 @@ function LoadedEditRowForm({
 
   return (
     <Box height="full" minHeight={0} flexDirection="column">
-      <Box px="m" pt="m">
+      <Box paddingHorizontal="m" paddingVertical="s" pr="l">
         <ToggleGroup<RowRepresentation>
           aria-label="Row representation"
           itemWidth="equal"
@@ -236,7 +236,7 @@ function LoadedEditRowForm({
           </Box>
 
           <Box
-            height="panel-bar-height"
+            data-slot="row-editor-footer"
             flexShrink={0}
             alignItems="center"
             justifyContent="between"
@@ -245,8 +245,39 @@ function LoadedEditRowForm({
             borderColor="default"
             borderStyle="solid"
             backgroundColor="surface-background"
-            px="l"
+            paddingHorizontal="m"
+            paddingVertical="s"
+            paddingRight="l"
           >
+            <Box ml={onDelete === undefined ? "auto" : "none"} alignItems="center" gap="s">
+              <Button
+                type="submit"
+                variant="primary"
+                size="s"
+                loading={rowEditor.isSaving === true}
+                disabled={isDeleting === true}
+              >
+                Save
+              </Button>
+              {onCancel !== undefined ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="s"
+                  onClick={() => {
+                    if (isDeleteConfirming === true) {
+                      setIsDeleteConfirming(false);
+                      return;
+                    }
+
+                    onCancel();
+                  }}
+                  disabled={rowEditor.isSaving === true || isDeleting === true}
+                >
+                  Cancel
+                </Button>
+              ) : null}
+            </Box>
             {onDelete !== undefined ? (
               <Button
                 type="button"
@@ -281,35 +312,6 @@ function LoadedEditRowForm({
                     : "Delete"}
               </Button>
             ) : null}
-            <Box ml={onDelete === undefined ? "auto" : "none"} alignItems="center" gap="m">
-              {onCancel !== undefined ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  onClick={() => {
-                    if (isDeleteConfirming === true) {
-                      setIsDeleteConfirming(false);
-                      return;
-                    }
-
-                    onCancel();
-                  }}
-                  disabled={rowEditor.isSaving === true || isDeleting === true}
-                >
-                  Cancel
-                </Button>
-              ) : null}
-              <Button
-                type="submit"
-                variant="primary"
-                size="s"
-                loading={rowEditor.isSaving === true}
-                disabled={isDeleting === true}
-              >
-                Save
-              </Button>
-            </Box>
           </Box>
         </Box>
       ) : (

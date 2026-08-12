@@ -93,7 +93,7 @@ function InsertRowFormFields({
       </Box>
 
       <Box
-        height="panel-bar-height"
+        data-slot="row-editor-footer"
         flexShrink={0}
         alignItems="center"
         justifyContent="between"
@@ -102,14 +102,40 @@ function InsertRowFormFields({
         borderColor="default"
         borderStyle="solid"
         backgroundColor="surface-background"
-        px="l"
+        padding="s"
       >
+        <Box
+          alignItems="center"
+          gap="s"
+        >
+          <Button
+            type="submit"
+            variant="primary"
+            size="s"
+            loading={rowEditor.isSaving === true}
+            disabled={saveDisabled === true}
+          >
+            Insert
+          </Button>
+          {onCancel !== undefined ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="s"
+              onClick={onCancel}
+              disabled={rowEditor.isSaving === true}
+            >
+              Cancel
+            </Button>
+          ) : null}
+        </Box>
         <Box
           as="label"
           htmlFor={insertMoreFieldId}
           display="flex"
           alignItems="center"
           gap="m"
+          paddingRight="m"
         >
           <Switch
             id={insertMoreFieldId}
@@ -127,31 +153,6 @@ function InsertRowFormFields({
           >
             Insert more
           </Text>
-        </Box>
-        <Box
-          alignItems="center"
-          gap="m"
-        >
-          {onCancel !== undefined ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="s"
-              onClick={onCancel}
-              disabled={rowEditor.isSaving === true}
-            >
-              Cancel
-            </Button>
-          ) : null}
-          <Button
-            type="submit"
-            variant="primary"
-            size="s"
-            loading={rowEditor.isSaving === true}
-            disabled={saveDisabled === true}
-          >
-            Insert
-          </Button>
         </Box>
       </Box>
     </Box>

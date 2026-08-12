@@ -33,7 +33,7 @@ export function InspectorHeader(): React.ReactElement {
         </Box>
       </Box>
 
-      <Box flex={1} justifyContent="end">
+      <Box flex={1} justifyContent="end" pr="s">
         <Tooltip.Root>
           <Tooltip.Trigger
             render={

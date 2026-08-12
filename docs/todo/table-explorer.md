@@ -19,6 +19,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[12/08/26]
+
+- [x] Size the row-editor header and action footers from shared compact padding instead of a fixed panel-bar height.
+- [x] Align row-editor header, representation control, fields, and footer content to the same pane inset.
+
 [11/08/26]
 
 - [x] Render table-list accordion sections as level-two headings beneath the Tables page heading.
@@ -268,6 +273,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Side-pane state and focus
 
+[12/08/26]
+
+- [x] Uncheck the active edited row when Escape dismisses its pane while preserving other checked rows.
+
 [23/07/26]
 
 - [x] Represent pane presentation explicitly as `closed`, `insert`, or `rows`.
@@ -278,7 +287,6 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Keep cells in other rows from silently retargeting the focused row editor.
 - [x] Activate a target column after clearing cell state.
 - [x] Use progressive Escape dismissal for pane, cell selection, cell focus, and column focus.
-- [x] Preserve checked rows when Escape dismisses a pane.
 - [x] Remove the non-interactive resizable panel and panel-group focus outline.
 - [x] Span the pane beside the action area, filter builder, table viewport, and footer.
 
