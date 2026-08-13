@@ -59,7 +59,7 @@ Inspector installation. It is not a portable remote-admin URL and does not carry
 
 ## Workspace-item routing
 
-The route describes active content, not `TabView` or a tab id.
+The route describes active content, not `WorkspaceTabs` or a tab id.
 
 A workspace item has:
 

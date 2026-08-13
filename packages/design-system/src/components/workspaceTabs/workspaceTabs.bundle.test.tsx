@@ -13,9 +13,9 @@ vi.mock('@dnd-kit/dom', () => ({
   PointerSensor: { configure: pointerSensorConfigure },
 }))
 
-import './tabView'
+import './workspaceTabs'
 
-describe('TabView module boundary', () => {
+describe('WorkspaceTabs module boundary', () => {
   it('does not initialize drag-and-drop when static tabs are imported', () => {
     expect(pointerSensorConfigure).not.toHaveBeenCalled()
   })

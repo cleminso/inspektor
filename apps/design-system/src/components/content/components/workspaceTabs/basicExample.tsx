@@ -1,4 +1,4 @@
-import { Box, Button, TabView, Text } from '@inspector/ds'
+import { Box, Button, WorkspaceTabs, Text } from '@inspector/ds'
 import { type ReactElement, useState } from 'react'
 
 const initialViews = [
@@ -61,44 +61,50 @@ export default function BasicExample(): ReactElement {
 
   return (
     <Box width="full" flexDirection="column" gap="l">
-      <TabView.Root value={value} onValueChange={(nextValue) => setValue(String(nextValue))}>
-        <Box width="full" minWidth={0} alignItems="center" gap="xs">
-          <TabView.List
+      <WorkspaceTabs.Root value={value} onValueChange={(nextValue) => setValue(String(nextValue))}>
+        <WorkspaceTabs.Bar>
+          <WorkspaceTabs.LeadingArea aria-label="View navigation">
+            <Button aria-label="Previous view" iconOnly variant="ghost" size="m" radius="m">
+              ←
+            </Button>
+          </WorkspaceTabs.LeadingArea>
+          <WorkspaceTabs.List
             aria-label="Account table views"
             values={views.map((view) => view.value)}
             onReorder={reorderViews}
           >
             {views.map((view) => (
-              <TabView.Item
+              <WorkspaceTabs.Tab
                 key={view.value}
                 value={view.value}
-                details={view.value === 'active' ? 'Filtered account table view' : undefined}
                 prefix={<TableIcon />}
                 closeLabel={`Close ${view.label}`}
                 reorderLabel={`Reorder ${view.label}`}
                 onClose={closeView}
               >
                 {view.label}
-              </TabView.Item>
+              </WorkspaceTabs.Tab>
             ))}
-          </TabView.List>
-          <Button
-            aria-label="Add table view"
-            iconOnly
-            variant="ghost"
-            size="m"
-            radius="m"
-            onClick={addView}
-          >
-            <PlusIcon />
-          </Button>
-        </Box>
+          </WorkspaceTabs.List>
+          <WorkspaceTabs.TrailingArea aria-label="Table view actions">
+            <Button
+              aria-label="Add table view"
+              iconOnly
+              variant="ghost"
+              size="m"
+              radius="m"
+              onClick={addView}
+            >
+              <PlusIcon />
+            </Button>
+          </WorkspaceTabs.TrailingArea>
+        </WorkspaceTabs.Bar>
         {views.map((view) => (
-          <TabView.Panel key={view.value} value={view.value}>
+          <WorkspaceTabs.Panel key={view.value} value={view.value}>
             <Text color="muted">{view.label} table state</Text>
-          </TabView.Panel>
+          </WorkspaceTabs.Panel>
         ))}
-      </TabView.Root>
+      </WorkspaceTabs.Root>
     </Box>
   )
 }

@@ -347,14 +347,17 @@ export type {
   ToggleGroupWidth,
   ToggleGroupRootProps,
 } from './components/toggleGroup/toggleGroup'
-export { TabView } from './components/tabView/tabView'
+export { WorkspaceTabs } from './components/workspaceTabs/workspaceTabs'
 export type {
-  TabViewItemProps,
-  TabViewListProps,
-  TabViewPanelProps,
-  TabViewRootProps,
-  TabViewValue,
-} from './components/tabView/tabView'
+  WorkspaceTabsBarProps,
+  WorkspaceTabsLeadingAreaProps,
+  WorkspaceTabsListProps,
+  WorkspaceTabsPanelProps,
+  WorkspaceTabsRootProps,
+  WorkspaceTabsTabProps,
+  WorkspaceTabsTrailingAreaProps,
+  WorkspaceTabsValue,
+} from './components/workspaceTabs/workspaceTabs'
 
 // Tokens
 export * from './tokens/tokens.stylex'

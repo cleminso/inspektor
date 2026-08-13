@@ -42,7 +42,6 @@ import { Route as ComponentsSidePanelRouteImport } from './routes/components/sid
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
 import { Route as ComponentsStructuredValuePreviewRouteImport } from './routes/components/structured-value-preview'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
-import { Route as ComponentsTabViewRouteImport } from './routes/components/tab-view'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
@@ -50,6 +49,7 @@ import { Route as ComponentsTimestampValueRouteImport } from './routes/component
 import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsToggleGroupRouteImport } from './routes/components/toggle-group'
 import { Route as ComponentsTooltipRouteImport } from './routes/components/tooltip'
+import { Route as ComponentsWorkspaceTabsRouteImport } from './routes/components/workspace-tabs'
 import { Route as FoundationsColorsRouteImport } from './routes/foundations/colors'
 import { Route as FoundationsTypographyRouteImport } from './routes/foundations/typography'
 
@@ -221,11 +221,6 @@ const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
   path: '/components/switch',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsTabViewRoute = ComponentsTabViewRouteImport.update({
-  id: '/components/tab-view',
-  path: '/components/tab-view',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
   id: '/components/text-field',
   path: '/components/text-field',
@@ -260,6 +255,11 @@ const ComponentsToggleGroupRoute = ComponentsToggleGroupRouteImport.update({
 const ComponentsTooltipRoute = ComponentsTooltipRouteImport.update({
   id: '/components/tooltip',
   path: '/components/tooltip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsWorkspaceTabsRoute = ComponentsWorkspaceTabsRouteImport.update({
+  id: '/components/workspace-tabs',
+  path: '/components/workspace-tabs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FoundationsColorsRoute = FoundationsColorsRouteImport.update({
@@ -307,7 +307,6 @@ export interface FileRoutesByFullPath {
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/switch': typeof ComponentsSwitchRoute
-  '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -315,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
+  '/components/workspace-tabs': typeof ComponentsWorkspaceTabsRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
 }
@@ -352,7 +352,6 @@ export interface FileRoutesByTo {
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/switch': typeof ComponentsSwitchRoute
-  '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -360,6 +359,7 @@ export interface FileRoutesByTo {
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
+  '/components/workspace-tabs': typeof ComponentsWorkspaceTabsRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
 }
@@ -398,7 +398,6 @@ export interface FileRoutesById {
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/switch': typeof ComponentsSwitchRoute
-  '/components/tab-view': typeof ComponentsTabViewRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
@@ -406,6 +405,7 @@ export interface FileRoutesById {
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
+  '/components/workspace-tabs': typeof ComponentsWorkspaceTabsRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
 }
@@ -445,7 +445,6 @@ export interface FileRouteTypes {
     | '/components/spinner'
     | '/components/structured-value-preview'
     | '/components/switch'
-    | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
@@ -453,6 +452,7 @@ export interface FileRouteTypes {
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
+    | '/components/workspace-tabs'
     | '/foundations/colors'
     | '/foundations/typography'
   fileRoutesByTo: FileRoutesByTo
@@ -490,7 +490,6 @@ export interface FileRouteTypes {
     | '/components/spinner'
     | '/components/structured-value-preview'
     | '/components/switch'
-    | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
@@ -498,6 +497,7 @@ export interface FileRouteTypes {
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
+    | '/components/workspace-tabs'
     | '/foundations/colors'
     | '/foundations/typography'
   id:
@@ -535,7 +535,6 @@ export interface FileRouteTypes {
     | '/components/spinner'
     | '/components/structured-value-preview'
     | '/components/switch'
-    | '/components/tab-view'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
@@ -543,6 +542,7 @@ export interface FileRouteTypes {
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
+    | '/components/workspace-tabs'
     | '/foundations/colors'
     | '/foundations/typography'
   fileRoutesById: FileRoutesById
@@ -581,7 +581,6 @@ export interface RootRouteChildren {
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
   ComponentsStructuredValuePreviewRoute: typeof ComponentsStructuredValuePreviewRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
-  ComponentsTabViewRoute: typeof ComponentsTabViewRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
@@ -589,6 +588,7 @@ export interface RootRouteChildren {
   ComponentsToastRoute: typeof ComponentsToastRoute
   ComponentsToggleGroupRoute: typeof ComponentsToggleGroupRoute
   ComponentsTooltipRoute: typeof ComponentsTooltipRoute
+  ComponentsWorkspaceTabsRoute: typeof ComponentsWorkspaceTabsRoute
   FoundationsColorsRoute: typeof FoundationsColorsRoute
   FoundationsTypographyRoute: typeof FoundationsTypographyRoute
 }
@@ -826,13 +826,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsSwitchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/components/tab-view': {
-      id: '/components/tab-view'
-      path: '/components/tab-view'
-      fullPath: '/components/tab-view'
-      preLoaderRoute: typeof ComponentsTabViewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/components/text-field': {
       id: '/components/text-field'
       path: '/components/text-field'
@@ -880,6 +873,13 @@ declare module '@tanstack/react-router' {
       path: '/components/tooltip'
       fullPath: '/components/tooltip'
       preLoaderRoute: typeof ComponentsTooltipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/workspace-tabs': {
+      id: '/components/workspace-tabs'
+      path: '/components/workspace-tabs'
+      fullPath: '/components/workspace-tabs'
+      preLoaderRoute: typeof ComponentsWorkspaceTabsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/foundations/colors': {
@@ -933,7 +933,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
   ComponentsStructuredValuePreviewRoute: ComponentsStructuredValuePreviewRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
-  ComponentsTabViewRoute: ComponentsTabViewRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextLinkRoute: ComponentsTextLinkRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,
@@ -941,6 +940,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsToastRoute: ComponentsToastRoute,
   ComponentsToggleGroupRoute: ComponentsToggleGroupRoute,
   ComponentsTooltipRoute: ComponentsTooltipRoute,
+  ComponentsWorkspaceTabsRoute: ComponentsWorkspaceTabsRoute,
   FoundationsColorsRoute: FoundationsColorsRoute,
   FoundationsTypographyRoute: FoundationsTypographyRoute,
 }

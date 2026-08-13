@@ -101,9 +101,9 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
-  ...["Root", "List", "Item", "Panel"].map((part) => ({
-    componentId: `tabView.${part[0].toLowerCase()}${part.slice(1)}`,
-    exportName: "TabView",
+  ...["Root", "Bar", "LeadingArea", "List", "Tab", "TrailingArea", "Panel"].map((part) => ({
+    componentId: `workspaceTabs.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "WorkspaceTabs",
     part,
     inheritedProps: [],
   })),

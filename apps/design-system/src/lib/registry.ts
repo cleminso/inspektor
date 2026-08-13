@@ -122,17 +122,17 @@ export const toggleGroupItem = {
   componentId: "toggleGroup",
 } satisfies NavItem;
 
-export const tabViewItem = {
-  title: "Tab View",
-  slug: "tab-view",
-  href: "/components/tab-view",
-  description: "Closable tabs for switching between captured representations of the same resource.",
+export const workspaceTabsItem = {
+  title: "Workspace Tabs",
+  slug: "workspace-tabs",
+  href: "/components/workspace-tabs",
+  description: "Reorderable workspace tabs with fixed control areas and horizontally scrolling views.",
   importPath: "@inspector/ds",
   source: {
-    label: "tabView.tsx",
-    path: "packages/design-system/src/components/tabView/tabView.tsx",
+    label: "workspaceTabs.tsx",
+    path: "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
   },
-  componentId: "tabView",
+  componentId: "workspaceTabs",
 } satisfies NavItem;
 
 export const checkboxItem = {
@@ -606,7 +606,7 @@ export const componentItems: NavItem[] = [
   fieldItem,
   fieldsetItem,
   textFieldItem,
-  tabViewItem,
+  workspaceTabsItem,
   toggleGroupItem,
 ];
 

@@ -1,12 +1,12 @@
 import { createContext, type ComponentType, type ReactNode } from 'react'
 
-export type TabViewValue = string | number
+export type WorkspaceTabsValue = string | number
 
-export function getReorderedTabViewValues(
-  values: readonly TabViewValue[],
-  sourceValue: TabViewValue,
+export function getReorderedWorkspaceTabsValues(
+  values: readonly WorkspaceTabsValue[],
+  sourceValue: WorkspaceTabsValue,
   destinationIndex: number,
-): TabViewValue[] | null {
+): WorkspaceTabsValue[] | null {
   const sourceIndex = values.indexOf(sourceValue)
   if (sourceIndex < 0 || destinationIndex < 0 || destinationIndex >= values.length) {
     return null
@@ -24,24 +24,24 @@ export function getReorderedTabViewValues(
   return reorderedValues
 }
 
-export interface TabViewSortableState {
+export interface WorkspaceTabsSortableState {
   isDragSource: boolean
   setReorderRef: (element: HTMLDivElement | null) => void
 }
 
-export interface TabViewSortableItemProps {
-  children: (state: TabViewSortableState) => ReactNode
+export interface WorkspaceTabsSortableItemProps {
+  children: (state: WorkspaceTabsSortableState) => ReactNode
   disabled?: boolean
   index: number
-  value: TabViewValue
+  value: WorkspaceTabsValue
 }
 
-export interface TabViewReorderContextValue {
-  getIndex: (value: TabViewValue) => number
-  Item: ComponentType<TabViewSortableItemProps> | null
+export interface WorkspaceTabsReorderContextValue {
+  getIndex: (value: WorkspaceTabsValue) => number
+  Item: ComponentType<WorkspaceTabsSortableItemProps> | null
 }
 
-export const TabViewReorderContext = createContext<TabViewReorderContextValue>({
+export const WorkspaceTabsReorderContext = createContext<WorkspaceTabsReorderContextValue>({
   getIndex: () => -1,
   Item: null,
 })

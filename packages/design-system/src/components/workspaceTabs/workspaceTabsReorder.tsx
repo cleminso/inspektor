@@ -12,20 +12,20 @@ import { isSortable, useSortable } from '@dnd-kit/react/sortable'
 import { useMemo, type ReactNode, type RefObject } from 'react'
 
 import {
-  TabViewReorderContext,
-  getReorderedTabViewValues,
-  type TabViewSortableItemProps,
-  type TabViewValue,
-} from './tabViewReorderContext'
+  WorkspaceTabsReorderContext,
+  getReorderedWorkspaceTabsValues,
+  type WorkspaceTabsSortableItemProps,
+  type WorkspaceTabsValue,
+} from './workspaceTabsReorderContext'
 
-export interface TabViewReorderProps {
+export interface WorkspaceTabsReorderProps {
   children: ReactNode
   listRef: RefObject<HTMLDivElement | null>
-  values: readonly TabViewValue[]
-  onReorder: (values: TabViewValue[]) => void
+  values: readonly WorkspaceTabsValue[]
+  onReorder: (values: WorkspaceTabsValue[]) => void
 }
 
-const tabViewPointerSensor = PointerSensor.configure({
+const workspaceTabsPointerSensor = PointerSensor.configure({
   activationConstraints: [new PointerActivationConstraints.Distance({ value: 4 })],
   preventActivation: (event) => {
     if (event.pointerType === 'touch') {
@@ -35,18 +35,17 @@ const tabViewPointerSensor = PointerSensor.configure({
       return false
     }
     return (
-      event.target.closest('[data-slot="tab-view-actions"], [data-slot="tab-view-close"]') !==
-        null ||
+      event.target.closest('[data-slot="workspace-tabs-close"]') !== null ||
       event.target.closest('[contenteditable="true"]') !== null
     )
   },
 })
 
-const tabViewSensors = [tabViewPointerSensor]
+const workspaceTabsSensors = [workspaceTabsPointerSensor]
 
-// Keep sortable ownership declarative: the hook's ref belongs to the TabView.Item for this value.
+// Keep sortable ownership declarative: the hook's ref belongs to the WorkspaceTabs.Tab for this value.
 // Do not replace this with DOM discovery or an external `element`; that caused cross-tab movement.
-function SortableTabViewItem({ children, disabled, index, value }: TabViewSortableItemProps) {
+function SortableWorkspaceTabsItem({ children, disabled, index, value }: WorkspaceTabsSortableItemProps) {
   const sortable = useSortable({
     id: value,
     index,
@@ -62,15 +61,15 @@ function SortableTabViewItem({ children, disabled, index, value }: TabViewSortab
   })
 }
 
-export function TabViewReorder({ children, listRef, values, onReorder }: TabViewReorderProps) {
+export function WorkspaceTabsReorder({ children, listRef, values, onReorder }: WorkspaceTabsReorderProps) {
   const valueIndices = useMemo(
     () => new Map(values.map((value, index) => [value, index])),
     [values],
   )
   const reorderContext = useMemo(
     () => ({
-      getIndex: (value: TabViewValue) => valueIndices.get(value) ?? -1,
-      Item: SortableTabViewItem,
+      getIndex: (value: WorkspaceTabsValue) => valueIndices.get(value) ?? -1,
+      Item: SortableWorkspaceTabsItem,
     }),
     [valueIndices],
   )
@@ -83,21 +82,15 @@ export function TabViewReorder({ children, listRef, values, onReorder }: TabView
   )
 
   return (
-    <TabViewReorderContext.Provider value={reorderContext}>
+    <WorkspaceTabsReorderContext.Provider value={reorderContext}>
       <DragDropProvider
-        sensors={tabViewSensors}
+        sensors={workspaceTabsSensors}
         modifiers={modifiers}
         plugins={(defaults) => [
           ...defaults.filter((plugin) => plugin !== Accessibility),
           AutoScroller.configure({ acceleration: 8, threshold: { x: 0.05, y: 0 } }),
           Feedback.configure({ dropAnimation: null }),
         ]}
-        onDragStart={(event) => {
-          const tab = event.operation.source?.element?.querySelector('[data-slot="tab-view-tab"]')
-          if (tab instanceof HTMLButtonElement && tab.disabled === false) {
-            tab.click()
-          }
-        }}
         onDragEnd={(event) => {
           if (event.canceled === true) {
             return
@@ -106,7 +99,11 @@ export function TabViewReorder({ children, listRef, values, onReorder }: TabView
           if (isSortable(source) === false) {
             return
           }
-          const reorderedValues = getReorderedTabViewValues(values, source.id, source.index)
+          const tab = source.element?.querySelector('[data-slot="workspace-tabs-tab"]')
+          if (tab instanceof HTMLButtonElement && tab.disabled === false) {
+            tab.click()
+          }
+          const reorderedValues = getReorderedWorkspaceTabsValues(values, source.id, source.index)
           if (reorderedValues !== null) {
             onReorder(reorderedValues)
           }
@@ -114,6 +111,6 @@ export function TabViewReorder({ children, listRef, values, onReorder }: TabView
       >
         {children}
       </DragDropProvider>
-    </TabViewReorderContext.Provider>
+    </WorkspaceTabsReorderContext.Provider>
   )
 }

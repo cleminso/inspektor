@@ -2,7 +2,7 @@ import {
   Box,
   Button,
   Icon,
-  TabView,
+  WorkspaceTabs,
   Tooltip,
 } from '@inspector/ds'
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
@@ -82,7 +82,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
   }
 
   return (
-    <TabView.Root
+    <WorkspaceTabs.Root
       value={activeTabId}
       onValueChange={(value) => {
         if (value !== null) {
@@ -104,65 +104,50 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
         borderStyle="solid"
         overflow="hidden"
       >
-        <Box alignItems="center" role="group" aria-label="Table navigation">
-          <Tooltip.Root>
-            <Tooltip.Trigger
-              render={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  radius="xs"
-                  aria-label="Go Back"
-                  disabled={canGoBack === false}
-                  focusableWhenDisabled
-                  iconOnly
-                  onClick={goBack}
-                >
-                  <Button.Glyph artwork={ArrowLeft} />
-                </Button>
-              }
-            />
-            <Tooltip.Content>Go Back</Tooltip.Content>
-          </Tooltip.Root>
-          <Tooltip.Root>
-            <Tooltip.Trigger
-              render={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  radius="xs"
-                  aria-label="Go Forward"
-                  disabled={canGoForward === false}
-                  focusableWhenDisabled
-                  iconOnly
-                  onClick={goForward}
-                >
-                  <Button.Glyph artwork={ArrowRight} />
-                </Button>
-              }
-            />
-            <Tooltip.Content>Go Forward</Tooltip.Content>
-          </Tooltip.Root>
-        </Box>
-        <Box
-          role="separator"
-          aria-orientation="vertical"
-          height="control-height-s"
-          flexShrink={0}
-          borderLeftWidth={1}
-          borderColor="subtle"
-          borderStyle="solid"
-        />
-        <Box
-          minWidth={0}
-          flex={1}
-          alignItems="center"
-          gap="xs"
-          overflow="hidden"
-        >
-          <TabView.List
+        <WorkspaceTabs.Bar>
+          <WorkspaceTabs.LeadingArea aria-label="Table navigation">
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    radius="xs"
+                    aria-label="Go Back"
+                    disabled={canGoBack === false}
+                    focusableWhenDisabled
+                    iconOnly
+                    onClick={goBack}
+                  >
+                    <Button.Glyph artwork={ArrowLeft} />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>Go Back</Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    radius="xs"
+                    aria-label="Go Forward"
+                    disabled={canGoForward === false}
+                    focusableWhenDisabled
+                    iconOnly
+                    onClick={goForward}
+                  >
+                    <Button.Glyph artwork={ArrowRight} />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>Go Forward</Tooltip.Content>
+            </Tooltip.Root>
+          </WorkspaceTabs.LeadingArea>
+          <WorkspaceTabs.List
             aria-label="Open table views"
             values={tabs.map((tab) => tab.id)}
             onReorder={(orderedTabIds) => {
@@ -175,7 +160,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
               if (tab.kind === 'newView') {
                 const canCloseNewView = tabs.length > 1
                 return (
-                  <TabView.Item
+                  <WorkspaceTabs.Tab
                     key={tab.id}
                     value={tab.id}
                     closeLabel="Close New view"
@@ -189,13 +174,19 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                     }
                   >
                     New view
-                  </TabView.Item>
+                  </WorkspaceTabs.Tab>
                 )
               }
 
               const isBaseTab = tab.id === createBaseTableTabId(tab.tableName)
+              const tabLabel =
+                isBaseTab === true
+                  ? tab.tableName
+                  : tab.search.view === 'schema'
+                    ? `${tab.tableName} schema`
+                    : `${tab.tableName} filtered view`
               return (
-                <TabView.Item
+                <WorkspaceTabs.Tab
                   key={tab.id}
                   value={tab.id}
                   prefix={
@@ -205,15 +196,8 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                       <Icon artwork={productGlyphs.derivedView} size="s" />
                     )
                   }
-                  details={
-                    isBaseTab === true
-                      ? undefined
-                      : tab.search.view === 'schema'
-                        ? `Schema of ${tab.tableName}`
-                        : `Filtered view of ${tab.tableName}`
-                  }
-                  closeLabel={`Close ${tab.tableName}`}
-                  reorderLabel={`Reorder ${tab.tableName}`}
+                  closeLabel={`Close ${tabLabel}`}
+                  reorderLabel={`Reorder ${tabLabel}`}
                   onBlur={() => {
                     if (focusedIntentTabIdRef.current === tab.id) {
                       focusedIntentTabIdRef.current = null
@@ -249,39 +233,41 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                     }
                   }}
                 >
-                  {tab.tableName}
-                </TabView.Item>
+                  {tabLabel}
+                </WorkspaceTabs.Tab>
               )
             })}
-          </TabView.List>
-          <Tooltip.Root>
-            <Tooltip.Trigger
-              render={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  radius="xs"
-                  aria-label="Open new table view"
-                  iconOnly
-                  onClick={openNewView}
-                >
-                  <Button.Glyph artwork={Plus} />
-                </Button>
-              }
-            />
-            <Tooltip.Content>Open new table view</Tooltip.Content>
-          </Tooltip.Root>
-        </Box>
+          </WorkspaceTabs.List>
+          <WorkspaceTabs.TrailingArea aria-label="Table view actions">
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    radius="xs"
+                    aria-label="Open new table view"
+                    iconOnly
+                    onClick={openNewView}
+                  >
+                    <Button.Glyph artwork={Plus} />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>Open new table view</Tooltip.Content>
+            </Tooltip.Root>
+          </WorkspaceTabs.TrailingArea>
+        </WorkspaceTabs.Bar>
       </Box>
       {activeTab?.kind === 'table' && tableName !== null ? (
-        <TabView.Panel value={activeTab.id}>
+        <WorkspaceTabs.Panel value={activeTab.id}>
           <SelectedTableView tableName={tableName} />
-        </TabView.Panel>
+        </WorkspaceTabs.Panel>
       ) : activeTab?.kind === 'newView' ? (
-        <TabView.Panel value={NEW_VIEW_TAB_ID}>
+        <WorkspaceTabs.Panel value={NEW_VIEW_TAB_ID}>
           <NewTableView />
-        </TabView.Panel>
+        </WorkspaceTabs.Panel>
       ) : (
         <Box
           minHeight={0}
@@ -290,6 +276,6 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
           <NewTableView />
         </Box>
       )}
-    </TabView.Root>
+    </WorkspaceTabs.Root>
   )
 }

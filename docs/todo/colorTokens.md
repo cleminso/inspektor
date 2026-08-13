@@ -16,7 +16,7 @@
 - [x] Separate primitive palette values from interface semantic colors.
 - [x] Group interface colors into surface, element, ghost element, accent element, danger element, text, border, focus, and selection roles.
 - [x] Remove component names for tables, tabs, and inputs from the global semantic namespace.
-- [x] Add private linked color tokens for DataGrid and TabView.
+- [x] Add private linked color tokens for DataGrid and WorkspaceTabs.
 - [x] Replace the overloaded `active` color vocabulary with selected, emphasized, current, dragged, hover, pressed, or focused component roles.
 - [x] Migrate Box to constrained family-prefixed background roles and direct text and border roles.
 - [x] Document primitive scales, interface semantics, and component-token ownership in the color foundation.
@@ -58,7 +58,7 @@
 ### [11/08/26] Foundation validation
 
 - [x] Token contract tests cover interface families and exclude component-specific keys.
-- [x] DataGrid and TabView tests cover their private component color contracts.
+- [x] DataGrid and WorkspaceTabs tests cover their private component color contracts.
 - [x] Changed-file StyleX and TypeScript lint pass.
 - [x] Design-system tests and typecheck pass.
 - [x] Product and documentation typechecks and builds pass.

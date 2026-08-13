@@ -45,7 +45,7 @@ test("preserves explicit null in public prop types", () => {
     /null/,
   );
   assert.match(
-    metadata["tabView.root"]?.find(({ name }) => name === "value")?.type ?? "",
+    metadata["workspaceTabs.root"]?.find(({ name }) => name === "value")?.type ?? "",
     /null/,
   );
 });
@@ -531,14 +531,14 @@ test("extracts the constrained ToggleGroup compound API", () => {
   );
 });
 
-test("extracts the constrained TabView compound API", () => {
+test("extracts the constrained WorkspaceTabs compound API", () => {
 
   assert.deepEqual(
-    metadata["tabView.root"]?.map(({ name }) => name),
+    metadata["workspaceTabs.root"]?.map(({ name }) => name),
     ["children", "value", "defaultValue", "onValueChange"],
   );
   assert.deepEqual(
-    metadata["tabView.list"]?.map(({ name }) => name),
+    metadata["workspaceTabs.list"]?.map(({ name }) => name),
     [
       "children",
       "aria-label",
@@ -550,11 +550,10 @@ test("extracts the constrained TabView compound API", () => {
     ],
   );
   assert.deepEqual(
-    metadata["tabView.item"]?.map(({ name }) => name),
+    metadata["workspaceTabs.tab"]?.map(({ name }) => name),
     [
       "value",
       "children",
-      "details",
       "prefix",
       "disabled",
       "onBlur",
@@ -568,15 +567,15 @@ test("extracts the constrained TabView compound API", () => {
     ],
   );
   assert.deepEqual(
-    metadata["tabView.panel"]?.map(({ name }) => name),
+    metadata["workspaceTabs.panel"]?.map(({ name }) => name),
     ["value", "children", "keepMounted"],
   );
   assert.equal(
-    metadata["tabView.item"]?.find(({ name }) => name === "closeLabel")?.defaultValue,
+    metadata["workspaceTabs.tab"]?.find(({ name }) => name === "closeLabel")?.defaultValue,
     '"Close tab"',
   );
   assert.equal(
-    metadata["tabView.item"]?.find(({ name }) => name === "className"),
+    metadata["workspaceTabs.tab"]?.find(({ name }) => name === "className"),
     undefined,
   );
 });

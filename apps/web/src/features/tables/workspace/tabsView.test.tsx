@@ -162,7 +162,7 @@ describe('TableTabsView', () => {
     expect(screen.queryByText('New table view content')).toBeNull()
   })
 
-  it('describes schema and filtered data tabs according to their view', async () => {
+  it('distinguishes schema and filtered data tabs without title tooltips', () => {
     mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [
       {
@@ -185,17 +185,14 @@ describe('TableTabsView', () => {
       },
     ]
 
-    const { unmount } = render(<TableTabsView tableName="accounts" />)
-
-    const profileTabs = screen.getAllByRole('tab', { name: 'profiles' })
-    fireEvent.focus(profileTabs[0]!)
-    expect(await screen.findByText('Schema of profiles')).toBeTruthy()
-
-    unmount()
-    mocks.state.tabs = [mocks.state.tabs[0]!, mocks.state.tabs[2]!]
     render(<TableTabsView tableName="accounts" />)
-    fireEvent.focus(screen.getByRole('tab', { name: 'profiles' }))
-    expect(await screen.findByText('Filtered view of profiles')).toBeTruthy()
+
+    const schemaTab = screen.getByRole('tab', { name: 'profiles schema' })
+    const filteredTab = screen.getByRole('tab', { name: 'profiles filtered view' })
+    expect(schemaTab.hasAttribute('data-base-ui-tooltip-trigger')).toBe(false)
+    expect(filteredTab.hasAttribute('data-base-ui-tooltip-trigger')).toBe(false)
+    expect(screen.getByRole('button', { name: 'Close profiles schema' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Close profiles filtered view' })).toBeTruthy()
   })
 
   it('does not offer to close the sole new-view tab', () => {
@@ -271,7 +268,7 @@ describe('TableTabsView', () => {
 
     render(<TableTabsView tableName="accounts" />)
 
-    const profilesTab = screen.getByRole('tab', { name: 'profiles' })
+    const profilesTab = screen.getByRole('tab', { name: 'profiles filtered view' })
     fireEvent.focus(profilesTab)
 
     expect(mocks.startTableRowsPrefetch).toHaveBeenCalledWith(

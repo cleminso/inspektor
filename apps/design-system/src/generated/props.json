@@ -1251,7 +1251,7 @@
     },
     {
       "name": "width",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1261,7 +1261,7 @@
     },
     {
       "name": "height",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1271,7 +1271,7 @@
     },
     {
       "name": "minWidth",
-      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1281,7 +1281,7 @@
     },
     {
       "name": "maxWidth",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1291,7 +1291,7 @@
     },
     {
       "name": "minHeight",
-      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1301,7 +1301,7 @@
     },
     {
       "name": "maxHeight",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"tab-view-min-width\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"tab-view-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -2099,15 +2099,15 @@
       }
     }
   ],
-  "tabView.root": [
+  "workspaceTabs.root": [
     {
       "name": "children",
       "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "The tab views and their associated panels.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 73
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 76
       }
     },
     {
@@ -2116,8 +2116,8 @@
       "required": false,
       "description": "The active view value when controlled.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 75
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 78
       }
     },
     {
@@ -2126,30 +2126,74 @@
       "required": false,
       "description": "The initially active view value when uncontrolled.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 77
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 80
       }
     },
     {
       "name": "onValueChange",
-      "type": "(value: TabViewValue | null, eventDetails: BaseTabs.Root.ChangeEventDetails) => void",
+      "type": "(value: WorkspaceTabsValue | null, eventDetails: BaseTabs.Root.ChangeEventDetails) => void",
       "required": false,
       "description": "Called when the active view changes.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 79
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 82
       }
     }
   ],
-  "tabView.list": [
+  "workspaceTabs.bar": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "The fixed edge areas and scrollable view list.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 118
+      }
+    }
+  ],
+  "workspaceTabs.leadingArea": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Controls that remain visible beside the scrollable view list.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 123
+      }
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "An accessible name for the fixed control group.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 125
+      }
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the element that labels the fixed control group.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 127
+      }
+    }
+  ],
+  "workspaceTabs.list": [
     {
       "name": "children",
       "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,
       "description": "The tab view items.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 87
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 90
       }
     },
     {
@@ -2158,8 +2202,8 @@
       "required": false,
       "description": "An accessible name for the tab list.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 89
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 92
       }
     },
     {
@@ -2168,19 +2212,19 @@
       "required": false,
       "description": "Identifies the element that labels the tab list.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 91
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 94
       }
     },
     {
       "name": "activateOnFocus",
       "type": "false | true",
       "required": false,
-      "defaultValue": "true",
+      "defaultValue": "false",
       "description": "Activates a view as arrow-key navigation moves focus.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 93
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 96
       }
     },
     {
@@ -2190,40 +2234,40 @@
       "defaultValue": "true",
       "description": "Loops keyboard focus between the first and last views.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 95
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 98
       }
     },
     {
       "name": "values",
-      "type": "readonly TabViewValue[]",
+      "type": "readonly WorkspaceTabsValue[]",
       "required": false,
       "description": "The tab values in their controlled visual order.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 100
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 103
       }
     },
     {
       "name": "onReorder",
-      "type": "(values: TabViewValue[]) => void",
+      "type": "(values: WorkspaceTabsValue[]) => void",
       "required": false,
       "description": "Called with the complete ordered value list after a tab is dragged.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 102
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 105
       }
     }
   ],
-  "tabView.item": [
+  "workspaceTabs.tab": [
     {
       "name": "value",
       "type": "string | number",
       "required": true,
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 115
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 136
       }
     },
     {
@@ -2232,18 +2276,8 @@
       "required": true,
       "description": "The visible view name.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 117
-      }
-    },
-    {
-      "name": "details",
-      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
-      "required": false,
-      "description": "Supplementary context shown in a tooltip even when the view name fits.",
-      "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 119
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 138
       }
     },
     {
@@ -2252,8 +2286,8 @@
       "required": false,
       "description": "Renders a decorative medium icon before the view name.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 121
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 140
       }
     },
     {
@@ -2262,8 +2296,8 @@
       "required": false,
       "description": "Disables selection and closing for this view.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 123
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 142
       }
     },
     {
@@ -2272,18 +2306,18 @@
       "required": false,
       "description": "Runs when focus leaves the tab button.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 125
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 144
       }
     },
     {
       "name": "onClose",
-      "type": "(value: TabViewValue) => void",
+      "type": "(value: WorkspaceTabsValue) => void",
       "required": false,
       "description": "Adds a close action to the view.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 127
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 146
       }
     },
     {
@@ -2292,8 +2326,8 @@
       "required": false,
       "description": "Runs when the tab button receives focus.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 129
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 148
       }
     },
     {
@@ -2302,8 +2336,8 @@
       "required": false,
       "description": "Runs when a pointer press starts on the tab button.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 131
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 150
       }
     },
     {
@@ -2312,8 +2346,8 @@
       "required": false,
       "description": "Runs when the pointer enters the tab button.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 133
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 152
       }
     },
     {
@@ -2322,8 +2356,8 @@
       "required": false,
       "description": "Runs when the pointer leaves the tab button.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 135
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 154
       }
     },
     {
@@ -2333,8 +2367,8 @@
       "defaultValue": "\"Close tab\"",
       "description": "Provides the accessible name for the close action.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 137
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 156
       }
     },
     {
@@ -2343,20 +2377,52 @@
       "required": false,
       "description": "Enables the reorder context menu and provides its accessible name.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 139
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 158
       }
     }
   ],
-  "tabView.panel": [
+  "workspaceTabs.trailingArea": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Controls that remain visible beside the scrollable view list.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 123
+      }
+    },
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": false,
+      "description": "An accessible name for the fixed control group.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 125
+      }
+    },
+    {
+      "name": "aria-labelledby",
+      "type": "string",
+      "required": false,
+      "description": "Identifies the element that labels the fixed control group.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 127
+      }
+    }
+  ],
+  "workspaceTabs.panel": [
     {
       "name": "value",
       "type": "string | number",
       "required": true,
       "description": "Identifies the view that controls this panel.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 144
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 163
       }
     },
     {
@@ -2365,8 +2431,8 @@
       "required": false,
       "description": "The view content.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 146
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 165
       }
     },
     {
@@ -2376,8 +2442,8 @@
       "defaultValue": "false",
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
-        "path": "packages/design-system/src/components/tabView/tabView.tsx",
-        "line": 148
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 167
       }
     }
   ],

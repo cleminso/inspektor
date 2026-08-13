@@ -74,7 +74,7 @@ A component translates its behavioral state model into interface roles through p
 Examples:
 
 - DataGrid owns header, row, column, current-cell, selected-cell, and focus roles.
-- TabView owns resting, hover, selected, disabled, text, and focus roles.
+- WorkspaceTabs owns resting, hover, selected, disabled, text, and focus roles.
 
 The component vocabulary remains specific while its default visual language stays connected to the interface system.
 
@@ -94,15 +94,15 @@ The contract distinguishes:
 
 Style rule names may retain library state terminology where changing behavior is out of scope, but color-role names must describe the actual visual meaning.
 
-### TabView
+### WorkspaceTabs
 
-`packages/design-system/src/components/tabView/tabViewColors.stylex.ts` owns tab-specific roles while linking most values to surface, element, ghost element, text, and focus semantics.
+`packages/design-system/src/components/workspaceTabs/workspaceTabsColors.stylex.ts` owns tab-specific roles while linking most values to surface, element, ghost element, text, and focus semantics.
 
-Its custom hover treatment remains private because it is a TabView visual decision rather than a new interface-wide hover rule.
+Its custom hover treatment remains private because it is a WorkspaceTabs visual decision rather than a new interface-wide hover rule.
 
 ### Box
 
-`Box` exposes constrained interface aliases such as surface, element, text, border, and selection roles. It does not expose DataGrid or TabView color tokens.
+`Box` exposes constrained interface aliases such as surface, element, text, border, and selection roles. It does not expose DataGrid or WorkspaceTabs color tokens.
 
 This allows applications to compose approved interface surfaces without depending on component internals.
 
@@ -173,7 +173,7 @@ When an interface role is proposed, ask:
 The migration established these observable outcomes:
 
 - component-specific table, tab, and input names left the interface namespace;
-- DataGrid and TabView gained private linked color contracts;
+- DataGrid and WorkspaceTabs gained private linked color contracts;
 - focus moved to explicit ring and border roles;
 - constrained Box aliases expose interface roles without component internals;
 - token, component, application, generated metadata, documentation, and browser states migrated together;

@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
-import { spatial } from '../../tokens/semantics.stylex'
+import { borderColors, spatial, surfaceColors } from '../../tokens/semantics.stylex'
+import { layerIndexes } from '../../tokens/layers.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -9,10 +10,10 @@ import {
   lineHeights,
   spacing,
 } from '../../tokens/value.stylex'
-import { tabViewColors } from './tabViewColors.stylex'
-import { tabViewVars } from './tabViewVars.stylex'
+import { workspaceTabsColors } from './workspaceTabsColors.stylex'
+import { workspaceTabsVars } from './workspaceTabsVars.stylex'
 
-export const tabViewStyles = stylex.create({
+export const workspaceTabsStyles = stylex.create({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -29,15 +30,59 @@ export const tabViewStyles = stylex.create({
   rootActivationUp: {},
   rootActivationDown: {},
   rootActivationNone: {},
-  list: {
-    gap: spacing.xs,
+  bar: {
+    overflow: 'hidden',
     alignItems: 'center',
     display: 'flex',
+    position: 'relative',
+    minWidth: 0,
+    width: '100%',
+  },
+  fixedArea: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: surfaceColors.background,
+    display: 'flex',
+    flexShrink: 0,
+    position: 'relative',
+    zIndex: layerIndexes.navigation,
+  },
+  leadingArea: {
+    paddingRight: spacing.xs,
+    '::after': {
+      backgroundColor: borderColors.subtle,
+      content: '',
+      pointerEvents: 'none',
+      position: 'absolute',
+      height: spatial['control-height-xs'],
+      right: 0,
+      width: 1,
+    },
+  },
+  trailingArea: {
+    paddingLeft: spacing.xs,
+    '::before': {
+      backgroundColor: borderColors.subtle,
+      content: '',
+      pointerEvents: 'none',
+      position: 'absolute',
+      height: spatial['control-height-xs'],
+      left: 0,
+      width: 1,
+    },
+  },
+  list: {
+    gap: spacing.xxs,
+    marginInline: spacing.xs,
+    alignItems: 'center',
+    display: 'flex',
+    flexGrow: 1,
     flexShrink: 1,
     minWidth: 0,
     overflowX: 'auto',
     overflowY: 'clip',
-    width: 'max-content',
+    overscrollBehaviorX: 'none',
+    width: 'auto',
   },
   listHorizontal: {},
   listVertical: {},
@@ -48,41 +93,39 @@ export const tabViewStyles = stylex.create({
   listActivationNone: {},
   item: {
     borderRadius: borderRadii.xs,
-    [tabViewVars.background]: {
-      default: tabViewColors.background,
-      ':focus-within': tabViewColors.hoverBackground,
-      ':hover': tabViewColors.hoverBackground,
+    [workspaceTabsVars.background]: {
+      default: workspaceTabsColors.background,
+      ':focus-within': workspaceTabsColors.hoverBackground,
+      ':hover': workspaceTabsColors.hoverBackground,
     },
-    [tabViewVars.closeBackground]: tabViewColors.closeBackground,
-    [tabViewVars.closeOpacity]: {
+    [workspaceTabsVars.closeOpacity]: {
       default: 0,
       ':focus-within': 1,
       ':hover': 1,
     },
-    [tabViewVars.closePointerEvents]: {
+    [workspaceTabsVars.closePointerEvents]: {
       default: 'none',
       ':focus-within': 'auto',
       ':hover': 'auto',
     },
     overflow: 'hidden',
     alignItems: 'center',
-    backgroundColor: tabViewVars.background,
+    backgroundColor: workspaceTabsVars.background,
     display: 'flex',
     flexBasis: 'auto',
     flexGrow: 0,
-    flexShrink: 1,
+    flexShrink: 0,
     position: 'relative',
     height: spatial['tab-height'],
-    maxWidth: spatial['tab-view-width'],
-    minWidth: spatial['tab-view-min-width'],
-    width: 'fit-content',
+    minWidth: spacing['5xl'],
+    width: 'max-content',
     '::after': {
       inset: `calc(${spatial['focus-ring-width']} / 2)`,
-      borderColor: tabViewColors.focusRing,
+      borderColor: workspaceTabsColors.focusRing,
       borderRadius: 'inherit',
       borderStyle: {
         default: 'none',
-        ':has([data-slot="tab-view-tab"]:focus-visible)': 'solid',
+        ':has([data-slot="workspace-tabs-tab"]:focus-visible)': 'solid',
       },
       borderWidth: spatial['focus-ring-width'],
       content: '',
@@ -91,35 +134,36 @@ export const tabViewStyles = stylex.create({
       zIndex: 2,
     },
   },
+  itemClosable: {
+    gap: spacing.xxs,
+    paddingRight: spacing.xs,
+  },
   itemActive: {
-    [tabViewVars.background]: tabViewColors.selectedBackground,
-    [tabViewVars.closeBackground]: tabViewColors.closeBackground,
-    [tabViewVars.closeOpacity]: 1,
-    [tabViewVars.closePointerEvents]: 'auto',
+    [workspaceTabsVars.background]: workspaceTabsColors.selectedBackground,
+    [workspaceTabsVars.closeOpacity]: 1,
+    [workspaceTabsVars.closePointerEvents]: 'auto',
   },
   itemDragging: {
-    [tabViewVars.background]: tabViewColors.hoverBackground,
-    [tabViewVars.closeBackground]: tabViewColors.closeBackground,
-    [tabViewVars.closeOpacity]: 1,
-    [tabViewVars.closePointerEvents]: 'auto',
+    [workspaceTabsVars.background]: workspaceTabsColors.hoverBackground,
+    [workspaceTabsVars.closeOpacity]: 1,
+    [workspaceTabsVars.closePointerEvents]: 'auto',
   },
   itemDisabled: {
-    [tabViewVars.background]: tabViewColors.disabledBackground,
-    [tabViewVars.closeOpacity]: 0,
-    [tabViewVars.closePointerEvents]: 'none',
+    [workspaceTabsVars.background]: workspaceTabsColors.disabledBackground,
+    [workspaceTabsVars.closeOpacity]: 0,
+    [workspaceTabsVars.closePointerEvents]: 'none',
     opacity: 0.6,
   },
   tab: {
     borderRadius: borderRadii.xs,
     borderStyle: 'none',
     gap: spacing.xs,
-    paddingInline: spacing.xs,
     alignItems: 'center',
     appearance: 'none',
-    backgroundColor: tabViewColors.buttonBackground,
+    backgroundColor: workspaceTabsColors.buttonBackground,
     color: {
-      default: tabViewColors.text,
-      ':hover': tabViewColors.hoverText,
+      default: workspaceTabsColors.text,
+      ':hover': workspaceTabsColors.hoverText,
     },
     cursor: 'pointer',
     display: 'flex',
@@ -133,16 +177,14 @@ export const tabViewStyles = stylex.create({
     userSelect: 'none',
     height: '100%',
     minWidth: 0,
-    width: '100%',
-  },
-  tabClosable: {
-    paddingRight: `calc(${spatial['control-height-m']} + ${spacing.xxs})`,
+    paddingLeft: spacing.xs,
+    width: 'auto',
   },
   tabActive: {
-    color: tabViewColors.selectedText,
+    color: workspaceTabsColors.selectedText,
   },
   tabDisabled: {
-    color: tabViewColors.disabledText,
+    color: workspaceTabsColors.disabledText,
     cursor: 'not-allowed',
   },
   tabHorizontal: {},
@@ -161,43 +203,22 @@ export const tabViewStyles = stylex.create({
     width: spatial['icon-size-m'],
   },
   title: {
-    overflow: 'hidden',
     display: 'block',
-    flexGrow: 1,
-    flexShrink: 1,
-    textOverflow: 'clip',
+    flexShrink: 0,
     whiteSpace: 'nowrap',
-    minWidth: 0,
   },
   closeContainer: {
     alignItems: 'center',
-    backgroundColor: tabViewVars.closeBackground,
     display: 'flex',
-    justifyContent: 'flex-start',
-    pointerEvents: tabViewVars.closePointerEvents,
-    position: 'absolute',
-    transform: 'translateY(-50%)',
-    zIndex: 1,
+    flexShrink: 0,
+    justifyContent: 'center',
+    opacity: workspaceTabsVars.closeOpacity,
+    pointerEvents: workspaceTabsVars.closePointerEvents,
     height: spatial['control-height-xs'],
-    right: 0,
-    top: '50%',
-    width: spatial['control-height-m'],
-  },
-  closeContainerOverflowing: {
-    '::before': {
-      backgroundImage: `linear-gradient(to right, transparent, ${tabViewVars.background})`,
-      content: '',
-      pointerEvents: 'none',
-      position: 'absolute',
-      zIndex: 0,
-      height: '100%',
-      right: '100%',
-      top: 0,
-      width: spacing.xl,
-    },
+    width: spatial['control-height-xs'],
   },
   closeAction: {
-    opacity: tabViewVars.closeOpacity,
+    opacity: workspaceTabsVars.closeOpacity,
     outlineOffset: {
       default: 0,
       ':focus-visible': 0,
@@ -205,7 +226,7 @@ export const tabViewStyles = stylex.create({
     zIndex: 1,
   },
   closeIcon: {
-    color: tabViewColors.closeIcon,
+    color: workspaceTabsColors.closeIcon,
     display: 'block',
     position: 'relative',
     zIndex: 1,
@@ -215,7 +236,7 @@ export const tabViewStyles = stylex.create({
   panel: {
     overflow: 'hidden',
     flexGrow: 1,
-    outlineColor: tabViewColors.focusRing,
+    outlineColor: workspaceTabsColors.focusRing,
     outlineOffset: -2,
     outlineStyle: {
       default: 'none',

@@ -380,7 +380,7 @@ export function ColorFoundationPage(): ReactElement {
 
         <Section
           title="Component semantics"
-          description="Components with distinct visual state models own private linked tokens. DataGrid defines header, row, column, cell, and focus roles; TabView defines resting, hover, selected, disabled, text, and focus roles."
+          description="Components with distinct visual state models own private linked tokens. DataGrid defines header, row, column, cell, and focus roles; WorkspaceTabs defines resting, hover, selected, disabled, text, and focus roles."
         >
           <Text color="muted">
             Component tokens remain beside their implementation and link to interface semantics by default.
