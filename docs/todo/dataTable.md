@@ -14,6 +14,11 @@
 
 ## Implemented foundation
 
+[13/08/26]
+
+- [x] Prevent horizontal and vertical overscroll from escaping the Data Grid viewport into browser navigation or ancestor scrolling.
+- [x] Suppress local boundary effects on the Data Grid's native two-axis scroll owner.
+
 [12/08/26]
 
 - [x] Replace the browser-owned rounded header focus outline with a contained Data Grid focus-visible outline.

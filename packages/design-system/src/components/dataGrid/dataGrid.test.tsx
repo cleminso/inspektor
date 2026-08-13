@@ -294,6 +294,16 @@ describe('DataGrid scrollbar', () => {
     )
   })
 
+  it('contains overscroll navigation at the grid viewport boundary', () => {
+    const { container } = render(<TestDataGrid />)
+    const viewport = container.querySelector<HTMLElement>('[data-slot="data-grid-viewport"]')
+
+    expect(viewport).not.toBeNull()
+    expect(viewport?.className).toContain(
+      stylex.props(scrollAreaStyles.viewportOverscrollNone).className,
+    )
+  })
+
   it('isolates the scrolling table from surrounding paint work', () => {
     const { container } = render(<TestDataGrid />)
     const scrollSurface = container.querySelector<HTMLElement>(

@@ -21,6 +21,7 @@ type VerticalTrackOffset = 'collection-row-l' | 'collection-row-xl'
 interface ScrollAreaPrivateProps extends ScrollAreaProps {
   layout?: 'fill' | 'content'
   maxHeight?: 's' | 'm' | 'l'
+  overscrollBehavior?: 'none'
   rootSlot?: string
   scrollRendering?: 'default' | 'frequent'
   verticalTrackOffset?: VerticalTrackOffset
@@ -53,6 +54,7 @@ function renderScrollArea(
     children,
     layout = 'fill',
     maxHeight,
+    overscrollBehavior,
     rootSlot = 'scroll-area',
     scrollRendering = 'default',
     verticalTrackOffset,
@@ -72,6 +74,7 @@ function renderScrollArea(
     layout === 'content' && scrollAreaStyles.viewportContent,
     scrollbarStyles.hidden,
     scrollRendering === 'frequent' && scrollAreaStyles.viewportFrequentScroll,
+    overscrollBehavior === 'none' && scrollAreaStyles.viewportOverscrollNone,
     viewportContainerType === 'size' && scrollAreaStyles.viewportSizeContainer,
     axis === 'none' && scrollAreaStyles.viewportNone,
     axis === 'vertical' && scrollAreaStyles.viewportVertical,

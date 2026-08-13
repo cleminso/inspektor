@@ -607,6 +607,7 @@ function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
   return (
     <ScrollAreaPrivate
       axis="both"
+      overscrollBehavior="none"
       ref={registerViewport}
       scrollRendering="frequent"
       tabIndex={-1}
