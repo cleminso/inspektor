@@ -13,6 +13,13 @@
 
 [13/08/26]
 
+- [x] Compact the popup controls, calendar cells, spacing, and actions.
+- [x] Let InputGroup own grouped trigger styling without affecting popup controls.
+- [x] Initialize an empty Calendar with the current date and time when opened.
+- [x] Show applied timestamps in row-editor triggers and disabled empty inputs in NULL mode.
+
+[13/08/26]
+
 - [x] Preserve canonical timestamp milliseconds when opening and applying unchanged values.
 - [x] Enforce minimum and maximum bounds against the complete pending timestamp.
 - [x] Restore the committed month after dismissing calendar navigation.
@@ -74,18 +81,21 @@
 - [x] Form fields use the default input-styled button trigger.
 - [x] Data-grid cells may provide another native button through Calendar.Trigger composition.
 - [x] Closing without Apply discards pending changes.
-- [x] Opening an empty value focuses today without selecting it.
-- [x] Opening an empty value initializes the time control without selecting a date.
+- [x] Opening an empty value selects the current local date and time as the pending value.
 - [x] Selecting an outside-month date changes the visible month.
 - [x] Jazz receives the applied instant through UTC ISO text and epoch-millisecond conversion.
 
 ## Open design decisions
 
-[13/08/26]
-
-- [ ] None within the timestamp form foundation.
+No unresolved Calendar design decisions.
 
 ## Validation checklist
+
+[13/08/26]
+
+- [x] Run focused Calendar and row-editor timestamp tests.
+- [x] Run changed-file lint and affected package validation.
+- [x] Verify the compact grouped Calendar popup in the browser.
 
 [13/08/26]
 

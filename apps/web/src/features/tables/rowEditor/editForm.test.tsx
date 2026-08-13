@@ -335,6 +335,33 @@ describe("EditRowForm Details and JSON views", () => {
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false));
   });
 
+  it("applies a changed timestamp before saving", async () => {
+    const onSave = vi.fn();
+    const initialTimestamp = new Date(2026, 7, 13, 9, 10, 11, 120);
+    const columns = [
+      { name: "publishedAt", column_type: { type: "Timestamp" }, nullable: true },
+    ] satisfies ColumnDescriptor[];
+    render(
+      <EditRowForm
+        onSave={onSave}
+        rowValues={{ id: "post-1", publishedAt: initialTimestamp.getTime() }}
+        schemaColumns={columns}
+        targetRowId="post-1"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "PublishedAt" }));
+    fireEvent.click(screen.getByRole("button", { name: /Friday, August 14th, 2026/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith({
+        publishedAt: new Date(2026, 7, 14, 9, 10, 11, 120).getTime(),
+      }),
+    );
+  });
+
   it("does not submit a clean row", () => {
     const onSave = vi.fn();
     render(

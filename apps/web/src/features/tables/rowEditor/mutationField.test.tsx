@@ -335,10 +335,34 @@ describe("MutationField", () => {
 
     const trigger = screen.getByRole("button", { name: "CreatedAt" });
     expect(trigger.textContent).toBe("2024-01-02T03:04:05");
-
     fireEvent.click(trigger);
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(onTextChange).toHaveBeenCalledWith(initialDate.toISOString());
+  });
+
+  it("presents a nullable timestamp as an empty input group while NULL is active", () => {
+    render(
+      <MutationField
+        canOmit={false}
+        column={column("publishedAt", { type: "Timestamp" }, { nullable: true })}
+        error={undefined}
+        expanded={false}
+        fieldState={{ isNull: true, isOmitted: false, text: "" }}
+        hidden={false}
+        initialValue={null}
+        onExpandedChange={vi.fn()}
+        onNullChange={vi.fn()}
+        onOmittedChange={vi.fn()}
+        onTextChange={vi.fn()}
+        readOnlyReason={null}
+      />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "PublishedAt" }) as HTMLInputElement;
+    expect(input.disabled).toBe(true);
+    expect(input.value).toBe("");
+    expect(screen.getByRole("checkbox", { name: "Set PublishedAt to NULL" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "PublishedAt" })).toBeNull();
   });
 
   it("presents an existing read-only binary value with copy formats and raw download", () => {

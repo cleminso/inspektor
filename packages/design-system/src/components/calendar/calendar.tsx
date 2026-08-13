@@ -28,6 +28,7 @@ import { popupPositioning } from '../../primitives/popupPositioning'
 import { Button } from '../button/button'
 import { Field } from '../field/field'
 import { Input } from '../input/input'
+import { InputGroupContext } from '../inputGroup/inputGroupContext'
 import { calendarStyles } from './calendar.styles'
 
 const calendarLabel = 'Choose date and time'
@@ -71,11 +72,9 @@ interface CalendarContextValue {
   disabled: boolean
   maxValue: Date | undefined
   minValue: Date | undefined
-  pendingValue: Date | undefined
-  pendingTime: Date
+  pendingValue: Date
   resetMonth: Date
-  setPendingValue: (value: Date | undefined) => void
-  setPendingTime: (value: Date) => void
+  setPendingValue: (value: Date) => void
   apply: () => void
   triggerRef: RefObject<ComponentRef<typeof BasePopover.Trigger> | null>
 }
@@ -109,25 +108,21 @@ function CalendarRoot({
   maxValue,
   disabled = false,
 }: CalendarRootProps): React.ReactElement {
-  const [pendingValue, setPendingValue] = useState<Date | undefined>(() => cloneDate(value))
-  const [pendingTime, setPendingTime] = useState<Date>(() => cloneDate(value) ?? new Date())
+  const [pendingValue, setPendingValue] = useState<Date>(() => cloneDate(value) ?? new Date())
   const [resetMonth, setResetMonth] = useState<Date>(() => cloneDate(value) ?? new Date())
   const triggerRef = useRef<ComponentRef<typeof BasePopover.Trigger>>(null)
   const handleOpenChange = useCallback<NonNullable<BasePopover.Root.Props['onOpenChange']>>(
     (nextOpen, eventDetails) => {
       if (nextOpen === true) {
-        const nextValue = cloneDate(value)
-        const nextTime = nextValue ?? new Date()
+        const nextValue = cloneDate(value) ?? new Date()
         setPendingValue(nextValue)
-        setPendingTime(nextTime)
-        setResetMonth(nextTime)
+        setResetMonth(nextValue)
       }
       onOpenChange?.(nextOpen, eventDetails)
     },
     [onOpenChange, value],
   )
   const apply = useCallback(() => {
-    if (pendingValue === undefined) return
     onApply(new Date(pendingValue.getTime()))
   }, [onApply, pendingValue])
   const contextValue = useMemo<CalendarContextValue>(
@@ -137,13 +132,11 @@ function CalendarRoot({
       maxValue,
       minValue,
       pendingValue,
-      pendingTime,
       resetMonth,
       setPendingValue,
-      setPendingTime,
       triggerRef,
     }),
-    [apply, disabled, maxValue, minValue, pendingTime, pendingValue, resetMonth],
+    [apply, disabled, maxValue, minValue, pendingValue, resetMonth],
   )
 
   return (
@@ -162,6 +155,7 @@ function CalendarRoot({
 const CalendarTrigger = forwardRef<ComponentRef<typeof BasePopover.Trigger>, CalendarTriggerProps>(
   function CalendarTrigger({ label, render, children, ...props }, forwardedRef) {
     const context = useCalendarContext()
+    const inputGroup = useContext(InputGroupContext)
     const triggerRef = useCallback(
       (element: ComponentRef<typeof BasePopover.Trigger> | null) => {
         context.triggerRef.current = element
@@ -184,6 +178,7 @@ const CalendarTrigger = forwardRef<ComponentRef<typeof BasePopover.Trigger>, Cal
     const triggerStyles = createStateStyleProps<BasePopover.Trigger.State>((state) => [
       render === undefined && calendarStyles.trigger,
       render === undefined && editableControlStyles.focusVisible,
+      render === undefined && inputGroup !== null && calendarStyles.triggerGrouped,
       state.open === true && calendarStyles.triggerOpen,
       state.open === false && calendarStyles.triggerClosed,
       state.disabled === true && calendarStyles.triggerDisabled,
@@ -198,6 +193,7 @@ const CalendarTrigger = forwardRef<ComponentRef<typeof BasePopover.Trigger>, Cal
         render={render}
         {...triggerStyles}
         data-slot={render === undefined ? 'calendar-trigger' : undefined}
+        data-grouped={render === undefined && inputGroup !== null ? '' : undefined}
       >
         {children}
       </BasePopover.Trigger>
@@ -250,8 +246,7 @@ function parseTimeInput(value: string): [hours: number, minutes: number, seconds
   return [hours, minutes, seconds]
 }
 
-function combineDayAndTime(day: Date, previous: Date | undefined): Date {
-  const time = previous ?? new Date()
+function combineDayAndTime(day: Date, time: Date): Date {
   return new Date(
     day.getFullYear(),
     day.getMonth(),
@@ -272,11 +267,10 @@ function getDayBoundary(value: Date): Date {
 }
 
 function isTimestampInRange(
-  value: Date | undefined,
+  value: Date,
   minValue: Date | undefined,
   maxValue: Date | undefined,
 ): boolean {
-  if (value === undefined) return false
   if (minValue !== undefined && value.getTime() < minValue.getTime()) return false
   if (maxValue !== undefined && value.getTime() > maxValue.getTime()) return false
   return true
@@ -300,9 +294,9 @@ function CalendarContent({
   const context = useCalendarContext()
   const popupRef = useRef<ComponentRef<typeof BasePopover.Popup>>(null)
   const [visibleMonth, setVisibleMonth] = useState(() => context.pendingValue ?? new Date())
-  const [timeInput, setTimeInput] = useState(() => formatTimeInput(context.pendingTime))
+  const [timeInput, setTimeInput] = useState(() => formatTimeInput(context.pendingValue))
   const parsedTime = parseTimeInput(timeInput)
-  useEffect(() => setTimeInput(formatTimeInput(context.pendingTime)), [context.pendingTime])
+  useEffect(() => setTimeInput(formatTimeInput(context.pendingValue)), [context.pendingValue])
   useEffect(() => {
     setVisibleMonth(context.resetMonth)
   }, [context.resetMonth])
@@ -373,14 +367,12 @@ function CalendarContent({
   const validateTime = (): string | null => {
     if (parsedTime === undefined) return 'Use HH:MM:SS format.'
     if (
-      context.pendingValue !== undefined &&
       context.minValue !== undefined &&
       context.pendingValue.getTime() < context.minValue.getTime()
     ) {
       return `Choose a date and time on or after ${formatTimestampBoundary(context.minValue)}.`
     }
     if (
-      context.pendingValue !== undefined &&
       context.maxValue !== undefined &&
       context.pendingValue.getTime() > context.maxValue.getTime()
     ) {
@@ -392,117 +384,112 @@ function CalendarContent({
 
   return (
     <BasePopover.Portal keepMounted={keepMounted}>
-      <BasePopover.Positioner
-        align={align}
-        sideOffset={popupPositioning.dropdownSideOffset}
-        {...positionerStyles}
-      >
-        <BasePopover.Popup
-          ref={popupRef}
-          aria-label={calendarLabel}
-          finalFocus={context.triggerRef}
-          role="dialog"
-          {...popupStyles}
+      <InputGroupContext.Provider value={null}>
+        <BasePopover.Positioner
+          align={align}
+          sideOffset={popupPositioning.dropdownSideOffset}
+          {...positionerStyles}
         >
-          <DayPicker
-            autoFocus
-            captionLayout="dropdown"
-            classNames={classNames}
-            components={{
-              Chevron: CalendarChevron,
-              DayButton: CalendarDayButton,
-            }}
-            disabled={disabled}
-            endMonth={endMonth}
-            fixedWeeks
-            formatters={{
-              formatMonthDropdown: (date) =>
-                date.toLocaleString(undefined, { month: 'short' }),
-            }}
-            mode="single"
-            month={visibleMonth}
-            navLayout="around"
-            required
-            selected={context.pendingValue}
-            showOutsideDays
-            startMonth={startMonth}
-            onMonthChange={handleMonthChange}
-            onSelect={(day) => {
-              const nextValue = combineDayAndTime(day, context.pendingTime)
-              context.setPendingValue(nextValue)
-              setVisibleMonth(nextValue)
-            }}
-          />
-          <div {...stylex.props(calendarStyles.controls)}>
-            <Field.Root
-              disabled={context.disabled}
-              validationMode="onBlur"
-              validate={validateTime}
-              {...stylex.props(calendarStyles.field)}
-            >
-              <Field.Label {...stylex.props(calendarStyles.controlLabel)}>Time</Field.Label>
-              <Input
-                disabled={context.disabled}
-                fullWidth
-                invalid={false}
-                inputMode="numeric"
-                size="l"
-                type="text"
-                value={timeInput}
-                onValueChange={(nextInput) => {
-                  setTimeInput(nextInput)
-                  const nextParsedTime = parseTimeInput(nextInput)
-                  if (nextParsedTime === undefined) return
-                  const [hours, minutes, seconds] = nextParsedTime
-                  const nextTime = new Date(context.pendingTime.getTime())
-                  nextTime.setHours(hours, minutes, seconds, nextTime.getMilliseconds())
-                  context.setPendingTime(nextTime)
-                  if (context.pendingValue !== undefined) {
-                    const nextValue = new Date(context.pendingValue.getTime())
-                    nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
-                    context.setPendingValue(nextValue)
-                  }
-                }}
-                render={<input aria-label="Time" {...stylex.props(calendarStyles.input)} />}
-              />
-              <Field.Error />
-            </Field.Root>
-            <div {...stylex.props(calendarStyles.actions)}>
-              <Button
-                disabled={context.disabled}
-                layout="fill"
-                variant="ghost"
-                onClick={() => {
-                  const now = new Date()
-                  context.setPendingValue(now)
-                  context.setPendingTime(now)
-                  setTimeInput(formatTimeInput(now))
-                  setVisibleMonth(now)
-                }}
-              >
-                Set now
-              </Button>
-              <BasePopover.Close
-                disabled={
-                  context.pendingValue === undefined ||
-                  context.disabled ||
-                  parsedTime === undefined ||
-                  pendingIsInRange === false
-                }
-                render={
-                  <Button
-                    layout="fill"
-                    variant="secondary"
+          <BasePopover.Popup
+            ref={popupRef}
+            aria-label={calendarLabel}
+            finalFocus={context.triggerRef}
+            role="dialog"
+            {...popupStyles}
+          >
+            <DayPicker
+              autoFocus
+              captionLayout="dropdown"
+              classNames={classNames}
+              components={{
+                Chevron: CalendarChevron,
+                DayButton: CalendarDayButton,
+              }}
+              disabled={disabled}
+              endMonth={endMonth}
+              fixedWeeks
+              formatters={{
+                formatMonthDropdown: (date) =>
+                  date.toLocaleString(undefined, { month: 'short' }),
+              }}
+              mode="single"
+              month={visibleMonth}
+              navLayout="around"
+              required
+              selected={context.pendingValue}
+              showOutsideDays
+              startMonth={startMonth}
+              onMonthChange={handleMonthChange}
+              onSelect={(day) => {
+                const nextValue = combineDayAndTime(day, context.pendingValue)
+                context.setPendingValue(nextValue)
+                setVisibleMonth(nextValue)
+              }}
+            />
+            <div {...stylex.props(calendarStyles.controls)}>
+              <div {...stylex.props(calendarStyles.timeRow)}>
+                <Field.Root
+                  disabled={context.disabled}
+                  validationMode="onBlur"
+                  validate={validateTime}
+                  {...stylex.props(calendarStyles.field)}
+                >
+                  <Field.Label {...stylex.props(calendarStyles.controlLabel)}>Time</Field.Label>
+                  <Input
+                    disabled={context.disabled}
+                    fullWidth
+                    invalid={false}
+                    inputMode="numeric"
+                    size="m"
+                    type="text"
+                    value={timeInput}
+                    onValueChange={(nextInput) => {
+                      setTimeInput(nextInput)
+                      const nextParsedTime = parseTimeInput(nextInput)
+                      if (nextParsedTime === undefined) return
+                      const [hours, minutes, seconds] = nextParsedTime
+                      const nextValue = new Date(context.pendingValue.getTime())
+                      nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
+                      context.setPendingValue(nextValue)
+                    }}
+                    render={<input aria-label="Time" {...stylex.props(calendarStyles.input)} />}
                   />
-                }
-                onClick={context.apply}
-              >
-                Apply
-              </BasePopover.Close>
+                  <Field.Error />
+                </Field.Root>
+                <div {...stylex.props(calendarStyles.setNowAction)}>
+                  <Button
+                    disabled={context.disabled}
+                    layout="fill"
+                    size="m"
+                    variant="ghost"
+                    onClick={() => {
+                      const now = new Date()
+                      context.setPendingValue(now)
+                      setTimeInput(formatTimeInput(now))
+                      setVisibleMonth(now)
+                    }}
+                  >
+                    Set now
+                  </Button>
+                </div>
+              </div>
+              <div {...stylex.props(calendarStyles.applyAction)}>
+                <BasePopover.Close
+                  disabled={
+                    context.disabled ||
+                    parsedTime === undefined ||
+                    pendingIsInRange === false
+                  }
+                  render={<Button layout="fill" size="s" variant="secondary" />}
+                  onClick={context.apply}
+                >
+                  Apply
+                </BasePopover.Close>
+              </div>
             </div>
-          </div>
-        </BasePopover.Popup>
-      </BasePopover.Positioner>
+          </BasePopover.Popup>
+        </BasePopover.Positioner>
+      </InputGroupContext.Provider>
     </BasePopover.Portal>
   )
 }

@@ -440,18 +440,20 @@ export function MutationField({
         />
       ) : isTimestampColumn === true && timestampInputValue !== null ? (
         <InputGroup fullWidth>
-          <Calendar
-            disabled={fieldState.isNull === true || isReadOnly === true}
-            value={timestampValue}
-            onApply={(nextValue) => onTextChange(nextValue.toISOString())}
-          >
-            <Calendar.Trigger id={fieldId} label={label}>
-              {timestampValue === undefined
-                ? "Select date and time"
-                : timestampInputValue}
-            </Calendar.Trigger>
-            <Calendar.Content />
-          </Calendar>
+          {fieldState.isNull === true ? (
+            <Input id={fieldId} aria-label={label} disabled font="mono" value="" />
+          ) : (
+            <Calendar
+              disabled={isReadOnly === true}
+              value={timestampValue}
+              onApply={(nextValue) => onTextChange(nextValue.toISOString())}
+            >
+              <Calendar.Trigger id={fieldId} label={label}>
+                {timestampInputValue.length === 0 ? "Select Date" : timestampInputValue}
+              </Calendar.Trigger>
+              <Calendar.Content />
+            </Calendar>
+          )}
           {column.nullable === true && readOnlyReason === null ? (
             <NullInputGroupCheckbox
               label={label}

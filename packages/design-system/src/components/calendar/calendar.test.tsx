@@ -3,6 +3,7 @@ import { createRef } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Button } from '../button/button'
+import { InputGroup } from '../inputGroup/inputGroup'
 import { Calendar } from './calendar'
 
 afterEach(cleanup)
@@ -23,6 +24,23 @@ describe('Calendar', () => {
     expect(screen.getByRole('dialog', { name: 'Choose date and time' })).toBeTruthy()
     expect(screen.getByRole('combobox', { name: 'Choose the Month' })).toBeTruthy()
     expect(screen.getByRole('combobox', { name: 'Choose the Year' })).toBeTruthy()
+  })
+
+  it('lets an InputGroup own the compound control border', () => {
+    render(
+      <InputGroup fullWidth>
+        <Calendar value={undefined} onApply={vi.fn()}>
+          <Calendar.Trigger label="Edit timestamp">Select Date</Calendar.Trigger>
+          <Calendar.Content />
+        </Calendar>
+        <InputGroup.Suffix>UTC</InputGroup.Suffix>
+      </InputGroup>,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Edit timestamp' })
+    expect(trigger.getAttribute('data-grouped')).toBe('')
+    expect(trigger.parentElement?.getAttribute('data-slot')).toBe('input-group')
+    expect(trigger.textContent).toBe('Select Date')
   })
 
   it('composes trigger behavior onto another design-system button', () => {
@@ -49,7 +67,7 @@ describe('Calendar', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
   })
 
-  it('focuses today without selecting it and initializes the local time when the value is empty', () => {
+  it('selects the current date and time when an empty Calendar opens', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(2026, 7, 13, 9, 10, 11, 120))
 
@@ -61,8 +79,8 @@ describe('Calendar', () => {
     )
 
     const today = screen.getByRole('button', { name: /Today, Thursday, August 13th, 2026/i })
-    expect(today.getAttribute('aria-selected')).not.toBe('true')
-    expect(screen.getByRole('button', { name: 'Apply' }).hasAttribute('disabled')).toBe(true)
+    expect(today.parentElement?.getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('button', { name: 'Apply' }).hasAttribute('disabled')).toBe(false)
     expect(screen.queryByRole('textbox', { name: 'Date' })).toBeNull()
     expect(screen.getByLabelText('Time').getAttribute('value')).toBe('09:10:11')
 

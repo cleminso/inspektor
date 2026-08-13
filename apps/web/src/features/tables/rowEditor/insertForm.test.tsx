@@ -304,4 +304,28 @@ describe("InsertRowForm structured values", () => {
       ),
     );
   });
+
+  it("applies the current timestamp before inserting a nullable timestamp value", async () => {
+    vi.useFakeTimers();
+    const now = new Date(2026, 7, 13, 9, 10, 11, 120);
+    vi.setSystemTime(now);
+    const onSave = vi.fn();
+    const columns = [
+      { name: "publishedAt", column_type: { type: "Timestamp" }, nullable: true },
+    ] satisfies ColumnDescriptor[];
+    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "Set PublishedAt to NULL" }));
+    fireEvent.click(screen.getByRole("button", { name: "PublishedAt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    await vi.waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith(
+        { publishedAt: now.getTime() },
+        { keepOpen: false },
+      ),
+    );
+    vi.useRealTimers();
+  });
 });
