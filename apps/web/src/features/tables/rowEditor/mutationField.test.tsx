@@ -312,9 +312,9 @@ describe("MutationField", () => {
     expect(onTextChange).toHaveBeenCalledWith("true");
   });
 
-  it("presents timestamps as editable text without the native calendar picker", () => {
+  it("presents timestamps with the shared calendar picker", () => {
     const onTextChange = vi.fn();
-    const initialDate = new Date(2024, 0, 2, 3, 4, 5);
+    const initialDate = new Date(2024, 0, 2, 3, 4, 5, 678);
 
     render(
       <MutationField
@@ -333,12 +333,12 @@ describe("MutationField", () => {
       />,
     );
 
-    const input = screen.getByLabelText("CreatedAt") as HTMLInputElement;
-    expect(input.type).toBe("text");
-    expect(input.value).toBe("2024-01-02T03:04:05");
+    const trigger = screen.getByRole("button", { name: "CreatedAt" });
+    expect(trigger.textContent).toBe("2024-01-02T03:04:05");
 
-    fireEvent.change(input, { target: { value: "2024-06-07T08:09:10" } });
-    expect(onTextChange).toHaveBeenCalledWith("2024-06-07T08:09:10");
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(onTextChange).toHaveBeenCalledWith(initialDate.toISOString());
   });
 
   it("presents an existing read-only binary value with copy formats and raw download", () => {

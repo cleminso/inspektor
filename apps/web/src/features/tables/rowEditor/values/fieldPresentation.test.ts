@@ -1,7 +1,11 @@
 import type { ColumnDescriptor } from "jazz-tools";
 import { describe, expect, it } from "vitest";
 
-import { formatColumnTypeLabel, safelySerializeStructuredValue } from "./fieldPresentation";
+import {
+  formatColumnTypeLabel,
+  parseTimestampValue,
+  safelySerializeStructuredValue,
+} from "./fieldPresentation";
 
 const jsonColumn = {
   column_type: { type: "Json" },
@@ -87,5 +91,18 @@ describe("formatColumnTypeLabel", () => {
         nullable: false,
       }),
     ).toBe("Typed JSON");
+  });
+});
+
+describe("parseTimestampValue", () => {
+  it("preserves milliseconds from an epoch timestamp", () => {
+    expect(parseTimestampValue("1704164645678")).toEqual(new Date(1704164645678));
+  });
+
+  it("accepts ISO timestamps and rejects invalid text", () => {
+    expect(parseTimestampValue("2024-01-02T03:04:05.678Z")).toEqual(
+      new Date("2024-01-02T03:04:05.678Z"),
+    );
+    expect(parseTimestampValue("not-a-timestamp")).toBeUndefined();
   });
 });

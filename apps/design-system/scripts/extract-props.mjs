@@ -392,6 +392,12 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...["Root", "Trigger", "Content"].map((part) => ({
+    componentId: `calendar.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "Calendar",
+    part,
+    inheritedProps: [],
+  })),
   ...[
     "Root",
     "Label",

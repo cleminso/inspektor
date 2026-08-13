@@ -163,6 +163,12 @@ export type {
 } from './components/binaryValue/binaryValue'
 export { TimestampValue } from './components/timestampValue/timestampValue'
 export type { TimestampValueProps } from './components/timestampValue/timestampValue'
+export { Calendar } from './components/calendar/calendar'
+export type {
+  CalendarContentProps,
+  CalendarRootProps,
+  CalendarTriggerProps,
+} from './components/calendar/calendar'
 export { StructuredValuePreview } from './components/structuredValuePreview/structuredValuePreview'
 export type {
   StructuredValuePreviewArrayModel,

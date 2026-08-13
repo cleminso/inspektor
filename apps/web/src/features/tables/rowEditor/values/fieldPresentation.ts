@@ -35,6 +35,19 @@ export function formatTimestampInputValue(valueText: string): string | null {
   return `${datePart}T${timePart}`;
 }
 
+export function parseTimestampValue(valueText: string): Date | undefined {
+  const trimmedValue = valueText.trim();
+  if (trimmedValue.length === 0) {
+    return undefined;
+  }
+
+  const epochMilliseconds = Number(trimmedValue);
+  const parsedValue = Number.isFinite(epochMilliseconds)
+    ? epochMilliseconds
+    : Date.parse(trimmedValue);
+  return Number.isFinite(parsedValue) ? new Date(parsedValue) : undefined;
+}
+
 export function formatColumnNameLabel(columnName: string): string {
   if (columnName.length === 0) {
     return columnName;

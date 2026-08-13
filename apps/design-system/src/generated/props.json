@@ -4942,7 +4942,7 @@
       "defaultValue": "\"bottom\"",
       "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
         "line": 86
       }
     },
@@ -4953,7 +4953,7 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
         "line": 116
       }
     }
@@ -5318,7 +5318,7 @@
       "defaultValue": "\"bottom\"",
       "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
         "line": 86
       }
     },
@@ -5329,7 +5329,7 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
         "line": 116
       }
     }
@@ -5892,7 +5892,7 @@
       "defaultValue": "\"bottom\"",
       "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
         "line": 86
       }
     },
@@ -5903,7 +5903,7 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@types+react@19.2.17_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
         "line": 116
       }
     }
@@ -6601,6 +6601,136 @@
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
         "line": 79
+      }
+    }
+  ],
+  "calendar.root": [
+    {
+      "name": "value",
+      "type": "Date",
+      "required": false,
+      "description": "The committed timestamp shown when the calendar opens.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 37
+      }
+    },
+    {
+      "name": "onApply",
+      "type": "(value: Date) => void",
+      "required": true,
+      "description": "Runs with the selected timestamp when Apply is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 39
+      }
+    },
+    {
+      "name": "open",
+      "type": "false | true",
+      "required": false,
+      "description": "Whether the popup is open.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 41
+      }
+    },
+    {
+      "name": "defaultOpen",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the popup is initially open.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 43
+      }
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean, eventDetails: BasePopover.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the popup opens or closes.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 45
+      }
+    },
+    {
+      "name": "minValue",
+      "type": "Date",
+      "required": false,
+      "description": "Earliest selectable timestamp.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 47
+      }
+    },
+    {
+      "name": "maxValue",
+      "type": "Date",
+      "required": false,
+      "description": "Latest selectable timestamp.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 49
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables the trigger and timestamp editing.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 51
+      }
+    }
+  ],
+  "calendar.trigger": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Stable accessible name for the timestamp trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 57
+      }
+    },
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, PopoverTriggerState>",
+      "required": false,
+      "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button component.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 59
+      }
+    }
+  ],
+  "calendar.content": [
+    {
+      "name": "align",
+      "type": "\"center\" | \"start\" | \"end\"",
+      "required": false,
+      "defaultValue": "\"start\"",
+      "description": "Aligns the popup along its trigger.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 65
+      }
+    },
+    {
+      "name": "keepMounted",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the popup mounted while closed.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 67
       }
     }
   ],

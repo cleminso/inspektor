@@ -528,6 +528,19 @@ export const selectItem = {
   componentId: "select",
 } satisfies NavItem;
 
+export const calendarItem = {
+  title: "Calendar",
+  slug: "calendar",
+  href: "/components/calendar",
+  description: "Timestamp selection with interchangeable triggers, calendar navigation, time, and explicit apply.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "calendar.tsx",
+    path: "packages/design-system/src/components/calendar/calendar.tsx",
+  },
+  componentId: "calendar",
+} satisfies NavItem;
+
 export const fieldItem = {
   title: "Field",
   slug: "field",
@@ -575,6 +588,7 @@ export const componentItems: NavItem[] = [
   buttonItem,
   buttonLinkItem,
   buttonGroupItem,
+  calendarItem,
   checkboxItem,
   codeEditorItem,
   comboboxItem,

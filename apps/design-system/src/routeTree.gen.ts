@@ -17,6 +17,7 @@ import { Route as ComponentsBoxRouteImport } from './routes/components/box'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
+import { Route as ComponentsCalendarRouteImport } from './routes/components/calendar'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsCodeEditorRouteImport } from './routes/components/code-editor'
 import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
@@ -91,6 +92,11 @@ const ComponentsButtonGroupRoute = ComponentsButtonGroupRouteImport.update({
 const ComponentsButtonLinkRoute = ComponentsButtonLinkRouteImport.update({
   id: '/components/button-link',
   path: '/components/button-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsCalendarRoute = ComponentsCalendarRouteImport.update({
+  id: '/components/calendar',
+  path: '/components/calendar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
+  '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
@@ -327,6 +334,7 @@ export interface FileRoutesByTo {
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
+  '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
@@ -373,6 +381,7 @@ export interface FileRoutesById {
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
+  '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
@@ -420,6 +429,7 @@ export interface FileRouteTypes {
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
+    | '/components/calendar'
     | '/components/checkbox'
     | '/components/code-editor'
     | '/components/combobox'
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
+    | '/components/calendar'
     | '/components/checkbox'
     | '/components/code-editor'
     | '/components/combobox'
@@ -510,6 +521,7 @@ export interface FileRouteTypes {
     | '/components/button'
     | '/components/button-group'
     | '/components/button-link'
+    | '/components/calendar'
     | '/components/checkbox'
     | '/components/code-editor'
     | '/components/combobox'
@@ -556,6 +568,7 @@ export interface RootRouteChildren {
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
+  ComponentsCalendarRoute: typeof ComponentsCalendarRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsCodeEditorRoute: typeof ComponentsCodeEditorRoute
   ComponentsComboboxRoute: typeof ComponentsComboboxRoute
@@ -649,6 +662,13 @@ declare module '@tanstack/react-router' {
       path: '/components/button-link'
       fullPath: '/components/button-link'
       preLoaderRoute: typeof ComponentsButtonLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/calendar': {
+      id: '/components/calendar'
+      path: '/components/calendar'
+      fullPath: '/components/calendar'
+      preLoaderRoute: typeof ComponentsCalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/checkbox': {
@@ -908,6 +928,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
+  ComponentsCalendarRoute: ComponentsCalendarRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsCodeEditorRoute: ComponentsCodeEditorRoute,
   ComponentsComboboxRoute: ComponentsComboboxRoute,

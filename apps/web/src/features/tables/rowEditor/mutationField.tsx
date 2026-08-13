@@ -6,6 +6,7 @@ import type { ColumnDescriptor } from "jazz-tools";
 import {
   BinaryDetails,
   Box,
+  Calendar,
   Checkbox,
   CodeEditor,
   Field,
@@ -25,6 +26,7 @@ import {
   formatTimestampInputValue,
   getBooleanFieldValue,
   isStructuredColumn,
+  parseTimestampValue,
   safelySerializeStructuredValue,
 } from "@tables/rowEditor/values/fieldPresentation";
 import { focusRowEditorField } from "@tables/rowEditor/fieldFocus";
@@ -199,6 +201,8 @@ export function MutationField({
       : null;
   const timestampInputValue =
     isTimestampColumn === true ? formatTimestampInputValue(fieldState.text) : null;
+  const timestampValue =
+    isTimestampColumn === true ? parseTimestampValue(fieldState.text) : undefined;
   const formattedDefault = column.default === undefined ? "" : formatColumnDefault(column);
   const defaultValue =
     column.default?.type === "Null"
@@ -436,16 +440,18 @@ export function MutationField({
         />
       ) : isTimestampColumn === true && timestampInputValue !== null ? (
         <InputGroup fullWidth>
-          <Input
-            id={fieldId}
-            font="mono"
-            type="text"
-            placeholder="YYYY-MM-DDTHH:mm:ss"
-            value={timestampInputValue}
-            disabled={fieldState.isNull === true}
-            readOnly={isReadOnly}
-            onValueChange={(nextValue) => onTextChange(nextValue)}
-          />
+          <Calendar
+            disabled={fieldState.isNull === true || isReadOnly === true}
+            value={timestampValue}
+            onApply={(nextValue) => onTextChange(nextValue.toISOString())}
+          >
+            <Calendar.Trigger id={fieldId} label={label}>
+              {timestampValue === undefined
+                ? "Select date and time"
+                : timestampInputValue}
+            </Calendar.Trigger>
+            <Calendar.Content />
+          </Calendar>
           {column.nullable === true && readOnlyReason === null ? (
             <NullInputGroupCheckbox
               label={label}
