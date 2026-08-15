@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -17,6 +17,16 @@ describe("InspectorDock", () => {
       expect(icon?.getAttribute("data-size")).toBe("xs");
       expect(button.getAttribute("title")).toBeNull();
     }
+  });
+
+  it("keeps table and subscription controls in the left dock group", () => {
+    render(<InspectorDock leftDock={{ isOpen: false, onToggle: () => undefined }} />);
+
+    const leftDock = screen.getByRole("group", { name: "dock left" });
+    expect(within(leftDock).getByRole("button", { name: "Open left dock" })).toBeTruthy();
+    expect(
+      within(leftDock).getByRole("button", { name: "Open subscriptions dock" }),
+    ).toBeTruthy();
   });
 
   it("opens and closes the left dock from one button", () => {

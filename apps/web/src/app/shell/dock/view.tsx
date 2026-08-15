@@ -2,6 +2,7 @@ import { Box, Button, Tooltip } from "@inspector/ds";
 import { Rss } from "lucide-react";
 
 import { productGlyphs } from "@app/icons/productGlyphs";
+import { InspectorDockCenterSlot } from "./centerSlot";
 
 export interface InspectorLeftDockControl {
   isOpen: boolean;
@@ -26,7 +27,13 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
       paddingHorizontal="xs"
       backgroundColor="surface-background"
     >
-      <Box minWidth={0} flex={1} alignItems="center">
+      <Box
+        role="group"
+        aria-label="dock left"
+        minWidth={0}
+        flex={1}
+        alignItems="center"
+      >
         {leftDock !== undefined ? (
           <Tooltip.Root>
             <Tooltip.Trigger
@@ -66,6 +73,10 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
           <Tooltip.Content>Open subscriptions dock</Tooltip.Content>
         </Tooltip.Root>
       </Box>
+      <Box flexShrink={0} alignItems="center" justifyContent="center">
+        <InspectorDockCenterSlot />
+      </Box>
+      <Box minWidth={0} flex={1} />
     </Box>
   );
 }

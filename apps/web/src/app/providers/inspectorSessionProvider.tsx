@@ -13,6 +13,10 @@ import {
 import { appRoutes } from "@app/routing/appRoutes";
 import { resolveTablesNavigationTarget } from "@app/routing/inspectorNavigation";
 import { useInspectorSession } from "@app/session/useInspectorSession";
+import {
+  RuntimeScopeExitGuardProvider,
+  useRuntimeScopeExitGuard,
+} from "@app/providers/runtimeScopeExitGuard";
 
 /**
  * Connection and route state that is safe to use before a Jazz client exists.
@@ -50,7 +54,16 @@ const InspectorSessionContext = createContext<InspectorSessionContextValue | nul
  * connection, branch, and schema-hash identity.
  */
 export function InspectorSessionProvider({ children }: PropsWithChildren): React.ReactElement {
+  return (
+    <RuntimeScopeExitGuardProvider>
+      <InspectorSessionProviderValue>{children}</InspectorSessionProviderValue>
+    </RuntimeScopeExitGuardProvider>
+  );
+}
+
+function InspectorSessionProviderValue({ children }: PropsWithChildren): React.ReactElement {
   const session = useInspectorSession();
+  const runtimeScopeExitGuard = useRuntimeScopeExitGuard();
   const navigate = useNavigate();
   const routeParams = useParams({ strict: false });
 
@@ -93,11 +106,27 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
     },
     [navigate, session],
   );
-  const { openingConnectionId, openConnection } =
+  const { openingConnectionId, openConnection: openCoordinatedConnection } =
     useConnectionOpenCoordinator(performConnectionOpen);
+  const openConnection = useCallback(
+    (connectionId: string, knownSchemaHashes?: readonly string[]) => {
+      if (
+        connectionId !== currentConnectionId &&
+        runtimeScopeExitGuard.isBlocked() === true
+      ) {
+        return Promise.resolve("ignored" as const);
+      }
+      return openCoordinatedConnection(connectionId, knownSchemaHashes);
+    },
+    [currentConnectionId, openCoordinatedConnection, runtimeScopeExitGuard],
+  );
 
   const switchBranch = useCallback(async (branch: string, knownSchemaHashes?: readonly string[]) => {
-    if (activeConnection === null) {
+    if (
+      activeConnection === null ||
+      branch === currentBranch ||
+      runtimeScopeExitGuard.isBlocked() === true
+    ) {
       return;
     }
 
@@ -120,15 +149,33 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       nextTarget.branch,
       nextTarget.schemaHash,
     );
-  }, [activeConnection, currentSchemaHash, session]);
+  }, [activeConnection, currentBranch, currentSchemaHash, runtimeScopeExitGuard, session]);
 
   const switchSchema = useCallback(async (schemaHash: string) => {
-    if (activeConnection === null || currentBranch === null) {
+    if (
+      activeConnection === null ||
+      currentBranch === null ||
+      schemaHash === currentSchemaHash ||
+      runtimeScopeExitGuard.isBlocked() === true
+    ) {
       return;
     }
 
     session.setConnectionContext(activeConnection.id, currentBranch, schemaHash);
-  }, [activeConnection, currentBranch, session]);
+  }, [activeConnection, currentBranch, currentSchemaHash, runtimeScopeExitGuard, session]);
+  const setConnectionContext = useCallback(
+    (connectionId: string, branch: string, schemaHash: string) => {
+      const changesRuntimeScope =
+        connectionId !== currentConnectionId ||
+        branch !== currentBranch ||
+        schemaHash !== currentSchemaHash;
+      if (changesRuntimeScope === true && runtimeScopeExitGuard.isBlocked() === true) {
+        return;
+      }
+      session.setConnectionContext(connectionId, branch, schemaHash);
+    },
+    [currentBranch, currentConnectionId, currentSchemaHash, runtimeScopeExitGuard, session],
+  );
 
   const value = useMemo<InspectorSessionContextValue>(
     () => ({
@@ -146,7 +193,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       switchSchema,
       saveConnection: session.saveConnection,
       deleteConnection: session.deleteConnection,
-      setConnectionContext: session.setConnectionContext,
+      setConnectionContext,
       prefill: session.prefill,
     }),
     [
@@ -158,6 +205,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
       openConnection,
       openingConnectionId,
       session,
+      setConnectionContext,
       switchBranch,
       switchSchema,
     ],

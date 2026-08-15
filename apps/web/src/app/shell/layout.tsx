@@ -4,6 +4,7 @@ import { Box, ButtonLink, Text } from '@inspector/ds'
 
 import { InspectorHeader } from './header/view'
 import { InspectorDock, type InspectorLeftDockControl } from './dock/view'
+import { InspectorDockCenterProvider } from './dock/centerSlot'
 
 interface InspectorLayoutProps extends PropsWithChildren {
   leftDock?: InspectorLeftDockControl
@@ -16,55 +17,57 @@ export function InspectorLayout({
   pageTitle,
 }: InspectorLayoutProps): React.ReactElement {
   return (
-    <Box
-      minHeight={0}
-      width="full"
-      flexDirection="column"
-      rowGap="xs"
-      overflow="hidden"
-      position="fixed"
-      inset="none"
-      backgroundColor="surface-canvas"
-      color="default"
-      height="screen-height-dynamic"
-      data-layout="viewport"
-      data-page-scroll="locked"
-    >
+    <InspectorDockCenterProvider>
       <Box
-        position="fixed"
-        top="xs"
-        left="xs"
-        zIndex="navigation"
-        opacity={{ base: 0, focusWithin: 1 }}
-        pointerEvents={{ base: 'none', focusWithin: 'auto' }}
-      >
-        <ButtonLink
-          href="#main-content"
-          size="s"
-        >
-          Skip to content
-        </ButtonLink>
-      </Box>
-      <InspectorHeader />
-      <Box
-        as="main"
-        id="main-content"
-        tabIndex={-1}
         minHeight={0}
-        minWidth={0}
-        flex={1}
+        width="full"
+        flexDirection="column"
+        rowGap="xs"
         overflow="hidden"
+        position="fixed"
+        inset="none"
+        backgroundColor="surface-canvas"
+        color="default"
+        height="screen-height-dynamic"
+        data-layout="viewport"
+        data-page-scroll="locked"
       >
         <Box
-          position="absolute"
-          opacity={0}
-          pointerEvents="none"
+          position="fixed"
+          top="xs"
+          left="xs"
+          zIndex="navigation"
+          opacity={{ base: 0, focusWithin: 1 }}
+          pointerEvents={{ base: 'none', focusWithin: 'auto' }}
         >
-          <Text as="h1">{pageTitle}</Text>
+          <ButtonLink
+            href="#main-content"
+            size="s"
+          >
+            Skip to content
+          </ButtonLink>
         </Box>
-        {children}
+        <InspectorHeader />
+        <Box
+          as="main"
+          id="main-content"
+          tabIndex={-1}
+          minHeight={0}
+          minWidth={0}
+          flex={1}
+          overflow="hidden"
+        >
+          <Box
+            position="absolute"
+            opacity={0}
+            pointerEvents="none"
+          >
+            <Text as="h1">{pageTitle}</Text>
+          </Box>
+          {children}
+        </Box>
+        <InspectorDock leftDock={leftDock} />
       </Box>
-      <InspectorDock leftDock={leftDock} />
-    </Box>
+    </InspectorDockCenterProvider>
   )
 }
