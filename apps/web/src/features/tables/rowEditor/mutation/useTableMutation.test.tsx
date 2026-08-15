@@ -6,7 +6,7 @@ import { useTableMutations } from './useTableMutation'
 const { insert, tableProxy, wait } = vi.hoisted(() => ({
   insert: vi.fn(),
   tableProxy: { name: 'users' },
-  wait: vi.fn().mockResolvedValue(undefined),
+  wait: vi.fn().mockResolvedValue({ id: 'row-1' }),
 }))
 const runtimeClient = { db: { insert } }
 const runtimeSchema = { tables: {} }
@@ -27,9 +27,13 @@ describe('useTableMutations', () => {
       }),
     )
 
-    await act(() => result.current.insertRow({ name: 'Ada', omitted: undefined }))
+    let insertedRowId: string | undefined
+    await act(async () => {
+      insertedRowId = await result.current.insertRow({ name: 'Ada', omitted: undefined })
+    })
 
     expect(insert).toHaveBeenCalledWith(tableProxy, { name: 'Ada' })
     expect(wait).toHaveBeenCalledWith({ tier: 'edge' })
+    expect(insertedRowId).toBe('row-1')
   })
 })

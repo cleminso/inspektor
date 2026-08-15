@@ -3,7 +3,6 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { Box, Button, Switch, Text } from "@inspector/ds";
 
 import { DetailPane } from "@tables/rowEditor/detailPane";
-import { ROW_EDITOR_FORM_ID } from "@tables/rowEditor/editorForm";
 import type { TableRowId } from "@tables/tableTypes";
 
 interface RowEditorSidePanelProps {
@@ -11,14 +10,10 @@ interface RowEditorSidePanelProps {
   activePageRowNumber: number | null;
   activeRowIndex: number;
   children: React.ReactNode;
-  draftTransitionPending: boolean;
-  draftTransitionSaving: boolean;
   editedRowIds: TableRowId[];
   insertMoreEnabled?: boolean;
   mode: "insert" | "edit";
-  onDiscardAndContinue: () => void;
   onInsertMoreEnabledChange?: (enabled: boolean) => void;
-  onKeepEditing: () => void;
   onNavigateNext: () => void;
   onNavigatePrevious: () => void;
 }
@@ -28,25 +23,21 @@ export function RowEditorSidePanel({
   activePageRowNumber,
   activeRowIndex,
   children,
-  draftTransitionPending,
-  draftTransitionSaving,
   editedRowIds,
   insertMoreEnabled = false,
   mode,
-  onDiscardAndContinue,
   onInsertMoreEnabledChange,
-  onKeepEditing,
   onNavigateNext,
   onNavigatePrevious,
 }: RowEditorSidePanelProps): React.ReactElement {
   const hasMultipleRows = editedRowIds.length > 1;
+  const insertMoreFieldId = "insert-more";
   const title =
     mode === "insert"
       ? "Insert row"
       : activePageRowNumber === null
         ? "Edit row"
         : `Edit row ${activePageRowNumber}:${activeColumnNumber}`;
-  const insertMoreFieldId = "insert-more";
 
   return (
     <DetailPane
@@ -78,10 +69,9 @@ export function RowEditorSidePanel({
                 id={insertMoreFieldId}
                 aria-labelledby={`${insertMoreFieldId}-label`}
                 checked={insertMoreEnabled}
-                disabled={draftTransitionSaving}
                 size="s"
-                onCheckedChange={(nextChecked) => {
-                  onInsertMoreEnabledChange(nextChecked === true)
+                onCheckedChange={(checked) => {
+                  onInsertMoreEnabledChange(checked === true);
                 }}
               />
               <Text as="span" id={`${insertMoreFieldId}-label`} color="muted">
@@ -128,57 +118,6 @@ export function RowEditorSidePanel({
         </Box>
       }
     >
-      {draftTransitionPending === true ? (
-        <Box
-          aria-label="Unsaved row changes"
-          role="alertdialog"
-          flexDirection="column"
-          flexShrink={0}
-          gap="m"
-          padding="m"
-          borderBottomWidth={1}
-          borderColor="subtle"
-          borderStyle="solid"
-        >
-          <Box flexDirection="column" gap="xs">
-            <Text variant="label">Save changes before continuing?</Text>
-            <Text color="muted" variant="caption">
-              The current row has staged changes.
-            </Text>
-          </Box>
-          <Box alignItems="center" gap="s" justifyContent="end">
-            <Button
-              type="button"
-              variant="ghost"
-              size="s"
-              autoFocus
-              disabled={draftTransitionSaving === true}
-              onClick={onKeepEditing}
-            >
-              Keep editing
-            </Button>
-            <Button
-              type="button"
-              variant="danger"
-              size="s"
-              disabled={draftTransitionSaving === true}
-              onClick={onDiscardAndContinue}
-            >
-              Discard and continue
-            </Button>
-            <Button
-              type="submit"
-              form={ROW_EDITOR_FORM_ID}
-              variant="primary"
-              size="s"
-              loading={draftTransitionSaving === true}
-              disabled={draftTransitionSaving === true}
-            >
-              Save and continue
-            </Button>
-          </Box>
-        </Box>
-      ) : null}
       {children}
     </DetailPane>
   );

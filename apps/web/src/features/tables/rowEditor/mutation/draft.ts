@@ -2,7 +2,7 @@
  * Surface-independent row mutation state for schema-driven insert and update interfaces.
  *
  * Jazz owns schema and persistence semantics. This module retains editable input, determines
- * mutation intent, reconciles live Jazz rows, and builds values for the Jazz mutation boundary.
+ * mutation intent and builds values for the Jazz mutation boundary.
  */
 import type { ColumnDescriptor, ColumnType, Value } from "jazz-tools";
 
@@ -356,7 +356,7 @@ export function setMutationFieldText(
       [column.name]: { mode: "value" as const, text },
     },
   };
-  return nextDraft;
+  return removeCleanUpdateInput(nextDraft, column, nextDraft.fieldInputs[column.name]);
 }
 
 export function setMutationFieldMode(
@@ -373,62 +373,6 @@ export function setMutationFieldMode(
     },
   };
   return removeCleanUpdateInput(nextDraft, column, nextDraft.fieldInputs[column.name]);
-}
-
-/**
- * Replaces the live source without overwriting staged mutation intent.
- *
- * For example, if `name` changes from source `Ada` to staged `Grace`, an incoming source value
- * of `Lin` leaves `Grace` staged. An incoming source value of `Grace` removes the overlay because
- * Jazz now contains the intended value. Insert drafts use their preceding baseline to distinguish
- * user edits from schema-derived initialization changes. Update overlays are also removed when
- * their schema column disappears, because an obsolete field cannot remain dirty or be submitted.
- */
-export function reconcileRowMutationSource(
-  draft: RowMutationDraft,
-  sourceValues: Record<string, unknown>,
-  columns: readonly ColumnDescriptor[],
-): RowMutationDraft {
-  let reconciledDraft: RowMutationDraft = { ...draft, sourceValues };
-  if (draft.kind === "insert") {
-    // Compare against the preceding baseline so schema changes replace only untouched fields.
-    const initialDraft = createInsertRowDraft(sourceValues, columns);
-    return {
-      ...reconciledDraft,
-      fieldInputs: Object.fromEntries(
-        columns.map((column) => {
-          const currentInput = draft.fieldInputs[column.name];
-          const previousInitialInput = draft.initialFieldInputs[column.name];
-          const nextInitialInput = getMutationFieldInput(initialDraft, column);
-          const wasEdited =
-            currentInput !== undefined &&
-            previousInitialInput !== undefined &&
-            areMutationFieldInputsEqual(currentInput, previousInitialInput) === false;
-          return [column.name, wasEdited === true ? currentInput : nextInitialInput];
-        }),
-      ),
-      initialFieldInputs: initialDraft.fieldInputs,
-    };
-  }
-
-  const columnsByName = new Map(columns.map((column) => [column.name, column]));
-  // A removed schema column cannot remain dirty or enter a later update patch.
-  reconciledDraft = {
-    ...reconciledDraft,
-    fieldInputs: Object.fromEntries(
-      Object.entries(reconciledDraft.fieldInputs).filter(([columnName]) =>
-        columnsByName.has(columnName),
-      ),
-    ),
-  };
-  // Untouched update fields read from sourceValues; dirty overlays survive until the source matches.
-  for (const [columnName, input] of Object.entries(reconciledDraft.fieldInputs)) {
-    const column = columnsByName.get(columnName);
-    if (column !== undefined) {
-      reconciledDraft = removeCleanUpdateInput(reconciledDraft, column, input);
-    }
-  }
-  return reconciledDraft;
 }
 
 export function isRowMutationDraftDirty(

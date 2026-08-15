@@ -20,7 +20,7 @@ interface UseTableMutationsResult {
   error: string | null;
   isPending: boolean;
   deleteRow: (rowId: string) => Promise<void>;
-  insertRow: (values: Record<string, unknown>) => Promise<void>;
+  insertRow: (values: Record<string, unknown>) => Promise<string>;
   updateRow: (rowId: string, values: Record<string, unknown>) => Promise<void>;
 }
 
@@ -65,11 +65,11 @@ export function useTableMutations({
    * failure is known. Errors are stored for shared UI and rethrown so the active form keeps its
    * draft and presents the same failure beside its controls.
    */
-  const runMutation = async (callback: () => Promise<void>) => {
+  const runMutation = async <Result,>(callback: () => Promise<Result>): Promise<Result> => {
     try {
       setPendingCount((currentPendingCount) => currentPendingCount + 1);
       setError(null);
-      await callback();
+      return await callback();
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : String(nextError));
       throw nextError;
@@ -86,9 +86,10 @@ export function useTableMutations({
         throw new Error("Table runtime is not loaded.");
       }
 
-      await runMutation(async () => {
-        await client.db.insert(tableProxy, omitUndefinedValues(values)).wait({ tier: "edge" });
-      });
+      const insertedRow = await runMutation(() =>
+        client.db.insert(tableProxy, omitUndefinedValues(values)).wait({ tier: "edge" }),
+      );
+      return insertedRow.id;
     },
     updateRow: async (rowId, values) => {
       if (tableProxy === null || client === null) {

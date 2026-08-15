@@ -20,16 +20,17 @@ import {
   useRowEditorFields,
 } from "@tables/rowEditor/editorFields";
 import { focusRowEditorField } from "@tables/rowEditor/fieldFocus";
-import { ROW_EDITOR_FORM_ID } from "@tables/rowEditor/editorForm";
 import {
-  createRowJsonViewValue,
-} from "@tables/rowEditor/values/jsonView";
+  useRowDraftController,
+  type RowDraftController,
+} from "@tables/rowEditor/mutation/useRowDraftController";
+import { createRowJsonViewValue } from "@tables/rowEditor/values/jsonView";
 
 interface EditRowFormProps {
+  draftController?: RowDraftController;
   onCancel?: () => void;
-  onDelete?: () => Promise<void> | void;
   onDirtyChange?: (isDirty: boolean) => void;
-  onSave: (values: Record<string, unknown>) => Promise<void> | void;
+  onSave?: (values: Record<string, unknown>) => Promise<void> | void;
   rowValues: Record<string, unknown> | null;
   schemaColumns: ColumnDescriptor[];
   targetRowId: string | null;
@@ -38,8 +39,8 @@ interface EditRowFormProps {
 export { focusRowEditorField };
 
 export function EditRowForm({
+  draftController,
   onCancel,
-  onDelete,
   onDirtyChange,
   onSave,
   rowValues,
@@ -60,21 +61,41 @@ export function EditRowForm({
     );
   }
 
-  return (
+  const loadedProps = {
+    onCancel,
+    onDirtyChange,
+    onSave,
+    rowValues,
+    schemaColumns,
+  };
+
+  return draftController === undefined ? (
+    <OwnedLoadedEditRowForm key={targetRowId ?? "unknown-row"} {...loadedProps} />
+  ) : (
     <LoadedEditRowForm
       key={targetRowId ?? "unknown-row"}
-      onCancel={onCancel}
-      onDelete={onDelete}
-      onDirtyChange={onDirtyChange}
-      onSave={onSave}
-      rowValues={rowValues}
-      schemaColumns={schemaColumns}
+      {...loadedProps}
+      draftController={draftController}
     />
   );
 }
 
-interface LoadedEditRowFormProps extends Omit<EditRowFormProps, "rowValues" | "targetRowId"> {
+interface LoadedEditRowFormProps
+  extends Omit<EditRowFormProps, "draftController" | "rowValues" | "targetRowId"> {
+  draftController: RowDraftController;
   rowValues: Record<string, unknown>;
+}
+
+type OwnedLoadedEditRowFormProps = Omit<LoadedEditRowFormProps, "draftController">;
+
+function OwnedLoadedEditRowForm(props: OwnedLoadedEditRowFormProps): React.ReactElement {
+  const draftController = useRowDraftController({
+    initialRowValues: props.rowValues,
+    mode: "edit",
+    schemaColumns: props.schemaColumns,
+  });
+
+  return <LoadedEditRowForm {...props} draftController={draftController} />;
 }
 
 type RowRepresentation = "details" | "json";
@@ -159,22 +180,19 @@ function RowJsonRepresentation({
 }
 
 function LoadedEditRowForm({
+  draftController,
   onCancel,
-  onDelete,
   onDirtyChange,
   onSave,
   rowValues,
   schemaColumns,
 }: LoadedEditRowFormProps): React.ReactElement {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [representation, setRepresentation] = useState<RowRepresentation>("details");
   const rowEditor = useRowEditorFields({
-    initialRowValues: rowValues,
+    draftController,
     mode: "edit",
     onDirtyChange,
-    onSubmit: onSave,
+    onSubmit: onSave ?? (() => undefined),
     schemaColumns,
   });
 
@@ -200,7 +218,7 @@ function LoadedEditRowForm({
       {representation === "details" ? (
         <Box
           as="form"
-          id={ROW_EDITOR_FORM_ID}
+          data-slot="edit-row-form"
           height="full"
           minHeight={0}
           flexDirection="column"
@@ -229,9 +247,9 @@ function LoadedEditRowForm({
                   onFieldTextChange={rowEditor.setFieldText}
                 />
 
-                {deleteError !== null || rowEditor.saveError !== null ? (
+                {rowEditor.saveError !== null ? (
                   <Text color="error" role="alert">
-                    {deleteError ?? rowEditor.saveError}
+                    {rowEditor.saveError}
                   </Text>
                 ) : null}
               </Box>
@@ -243,81 +261,23 @@ function LoadedEditRowForm({
             flexShrink={0}
             alignItems="center"
             gap="xs"
-            borderTopWidth={1}
-            borderColor="default"
-            borderStyle="solid"
             backgroundColor="surface-background"
             paddingHorizontal="m"
             paddingVertical="s"
             paddingRight="l"
           >
-            <Box flex={1}>
-              <Button
-                type="submit"
-                variant="primary"
-                size="s"
-                layout="fill"
-                loading={rowEditor.isSaving === true}
-                disabled={isDeleting === true}
-              >
-                Save
-              </Button>
-            </Box>
             {onCancel !== undefined ? (
-              <Box flex={1}>
+              <Box flex={1} justifyContent="end">
                 <Button
                   type="button"
                   variant="ghost"
                   size="s"
                   layout="fill"
                   onClick={() => {
-                    if (isDeleteConfirming === true) {
-                      setIsDeleteConfirming(false);
-                      return;
-                    }
-
                     onCancel();
                   }}
-                  disabled={rowEditor.isSaving === true || isDeleting === true}
                 >
-                  Cancel
-                </Button>
-              </Box>
-            ) : null}
-            {onDelete !== undefined ? (
-              <Box flex={1}>
-                <Button
-                  type="button"
-                  variant="danger"
-                  size="s"
-                  layout="fill"
-                  disabled={isDeleting === true || rowEditor.isSaving === true}
-                  onClick={async () => {
-                    if (isDeleteConfirming === false) {
-                      setDeleteError(null);
-                      setIsDeleteConfirming(true);
-                      return;
-                    }
-
-                    try {
-                      setIsDeleting(true);
-                      setDeleteError(null);
-                      await onDelete();
-                    } catch (nextError) {
-                      setDeleteError(
-                        nextError instanceof Error ? nextError.message : String(nextError),
-                      );
-                    } finally {
-                      setIsDeleting(false);
-                      setIsDeleteConfirming(false);
-                    }
-                  }}
-                >
-                  {isDeleting === true
-                    ? "Deleting…"
-                    : isDeleteConfirming === true
-                      ? "Confirm delete"
-                      : "Delete"}
+                  Close
                 </Button>
               </Box>
             ) : null}

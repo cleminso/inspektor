@@ -4,6 +4,7 @@ import type { ColumnDescriptor } from "jazz-tools";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditRowForm, focusRowEditorField } from "@tables/rowEditor/editForm";
+import { useRowDraftController } from "@tables/rowEditor/mutation/useRowDraftController";
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children }: React.ComponentProps<"a">) => <a href="/relation">{children}</a>,
@@ -103,13 +104,38 @@ const rowValues = {
 function renderEditRowForm() {
   return render(
     <EditRowForm
-      onDelete={() => undefined}
       onSave={() => undefined}
       rowValues={rowValues}
       schemaColumns={schemaColumns}
       targetRowId="person-1"
     />,
   );
+}
+
+function submitEditRowForm(): void {
+  const form = document.querySelector('[data-slot="edit-row-form"]');
+  if (!(form instanceof HTMLFormElement)) {
+    throw new Error("Expected the edit row form to be rendered");
+  }
+  fireEvent.submit(form);
+}
+
+function ExternallyOwnedEditDraft({ visible }: { visible: boolean }): React.ReactElement | null {
+  const controller = useRowDraftController({
+    initialRowValues: rowValues,
+    mode: "edit",
+    schemaColumns,
+  });
+
+  return visible === true ? (
+    <EditRowForm
+      draftController={controller}
+      onSave={() => undefined}
+      rowValues={rowValues}
+      schemaColumns={schemaColumns}
+      targetRowId="person-1"
+    />
+  ) : null;
 }
 
 afterEach(() => {
@@ -183,6 +209,23 @@ describe("focusRowEditorField", () => {
 });
 
 describe("EditRowForm Details and JSON views", () => {
+  it("does not expose a mutation-specific deletion confirmation", () => {
+    renderEditRowForm();
+
+    expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Confirm delete" })).toBeNull();
+  });
+
+  it("uses an externally owned draft across form remounts", () => {
+    const { rerender } = render(<ExternallyOwnedEditDraft visible />);
+
+    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
+    rerender(<ExternallyOwnedEditDraft visible={false} />);
+    rerender(<ExternallyOwnedEditDraft visible />);
+
+    expect((screen.getByLabelText("DisplayName") as HTMLInputElement).value).toBe("Grace");
+  });
+
   it("uses monospace typography for the synthetic row ID value", () => {
     renderEditRowForm();
 
@@ -256,7 +299,26 @@ describe("EditRowForm Details and JSON views", () => {
 
     expect(viewport?.getAttribute("data-scrollbar")).toBe("hidden");
     expect(viewport?.closest('[data-scrollbar="overlay"]')).toBeTruthy();
-    expect(viewport?.contains(screen.getByRole("button", { name: "Save" }))).toBe(false);
+    expect(viewport?.contains(container.querySelector('[data-slot="row-editor-footer"]'))).toBe(
+      false,
+    );
+  });
+
+  it("closes the pane without offering an immediate Save action", () => {
+    const onCancel = vi.fn();
+    render(
+      <EditRowForm
+        onCancel={onCancel}
+        rowValues={rowValues}
+        schemaColumns={schemaColumns}
+        targetRowId="person-1"
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    expect(onCancel).toHaveBeenCalledOnce();
   });
 
   it("preserves edited Details text after switching to JSON and back", () => {
@@ -282,7 +344,7 @@ describe("EditRowForm Details and JSON views", () => {
     );
 
     fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    submitEditRowForm();
 
     await waitFor(() => expect(onSave).toHaveBeenCalledWith({ displayName: "Grace" }));
   });
@@ -353,7 +415,7 @@ describe("EditRowForm Details and JSON views", () => {
     fireEvent.click(screen.getByRole("button", { name: "PublishedAt" }));
     fireEvent.click(screen.getByRole("button", { name: /Friday, August 14th, 2026/i }));
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    submitEditRowForm();
 
     await waitFor(() =>
       expect(onSave).toHaveBeenCalledWith({
@@ -373,34 +435,49 @@ describe("EditRowForm Details and JSON views", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    submitEditRowForm();
 
     expect(onSave).not.toHaveBeenCalled();
   });
 
-  it("reflects live source changes in untouched fields while preserving dirty fields", () => {
-    const { rerender } = render(
+  it("retains invalid raw input and does not submit it", async () => {
+    const onSave = vi.fn();
+    render(
       <EditRowForm
-        onSave={() => undefined}
+        onSave={onSave}
         rowValues={{ id: "person-1", displayName: "Ada", age: 37, active: true }}
         schemaColumns={schemaColumns}
         targetRowId="person-1"
       />,
     );
-    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
+    const age = screen.getByLabelText("Age") as HTMLInputElement;
 
-    rerender(
+    fireEvent.change(age, { target: { value: "not-a-number" } });
+    submitEditRowForm();
+
+    expect(await screen.findByText("Value must be an integer.")).toBeTruthy();
+    expect(age.value).toBe("not-a-number");
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it("submits an explicit NULL as a sparse update", async () => {
+    const onSave = vi.fn();
+    const columns = [
+      { name: "note", column_type: { type: "Text" }, nullable: true },
+    ] satisfies ColumnDescriptor[];
+    render(
       <EditRowForm
-        onSave={() => undefined}
-        rowValues={{ id: "person-1", displayName: "Katherine", age: 38, active: false }}
-        schemaColumns={schemaColumns}
+        onSave={onSave}
+        rowValues={{ id: "person-1", note: "Draft" }}
+        schemaColumns={columns}
         targetRowId="person-1"
       />,
     );
 
-    expect((screen.getByLabelText("DisplayName") as HTMLInputElement).value).toBe("Grace");
-    expect((screen.getByLabelText("Age") as HTMLInputElement).value).toBe("38");
-    expect(screen.getByRole("button", { name: "False" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Set Note to NULL" }));
+    submitEditRowForm();
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith({ note: null }));
   });
 
   it("highlights and reports a literal JSON find query", async () => {
@@ -517,7 +594,7 @@ describe("EditRowForm Details and JSON views", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Set AccountId to NULL" }));
     expect(input.disabled).toBe(false);
     fireEvent.change(input, { target: { value: "account-2" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    submitEditRowForm();
 
     await vi.waitFor(() => expect(onSave).toHaveBeenCalledWith({ accountId: "account-2" }));
   });
@@ -706,7 +783,7 @@ describe("EditRowForm Details and JSON views", () => {
     const editor = await screen.findByRole("textbox", { name: "Items" });
     fireEvent.input(editor, { target: { textContent: "{}" } });
 
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    submitEditRowForm();
 
     const error = await screen.findByText("Array must be valid JSON array.");
     await waitFor(() => {
@@ -741,7 +818,7 @@ describe("EditRowForm Details and JSON views", () => {
     });
     expect(age.closest("[hidden]")).not.toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    submitEditRowForm();
 
     await waitFor(() => {
       expect(document.activeElement).toBe(age);
@@ -752,22 +829,32 @@ describe("EditRowForm Details and JSON views", () => {
     );
   });
 
-  it("announces save errors", async () => {
+  it("retains the dirty patch after a save error so it can be retried", async () => {
+    const onSave = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Save failed"))
+      .mockResolvedValueOnce(undefined);
     render(
       <EditRowForm
-        onSave={() => {
-          throw new Error("Save failed");
-        }}
+        onSave={onSave}
         rowValues={{ ...rowValues, age: 42 }}
         schemaColumns={schemaColumns}
         targetRowId="person-1"
       />,
     );
 
-    fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    const displayName = screen.getByLabelText("DisplayName") as HTMLInputElement;
+    fireEvent.change(displayName, { target: { value: "Grace" } });
+    submitEditRowForm();
 
     expect((await screen.findByRole("alert")).textContent).toBe("Save failed");
+    expect(displayName.value).toBe("Grace");
+
+    submitEditRowForm();
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    expect(onSave).toHaveBeenNthCalledWith(1, { displayName: "Grace" });
+    expect(onSave).toHaveBeenNthCalledWith(2, { displayName: "Grace" });
   });
 
   it("does not submit the same dirty patch twice while a save is pending", async () => {
@@ -788,10 +875,8 @@ describe("EditRowForm Details and JSON views", () => {
     );
     fireEvent.change(screen.getByLabelText("DisplayName"), { target: { value: "Grace" } });
 
-    fireEvent.click(screen.getByRole("button", { name: "Save" }));
-    fireEvent.submit(
-      screen.getByRole("button", { name: "Save" }).closest("form") as HTMLFormElement,
-    );
+    submitEditRowForm();
+    submitEditRowForm();
 
     expect(onSave).toHaveBeenCalledOnce();
     await act(async () => {
@@ -799,24 +884,4 @@ describe("EditRowForm Details and JSON views", () => {
     });
   });
 
-  it("announces delete errors and retains the row controls", async () => {
-    render(
-      <EditRowForm
-        onDelete={() => {
-          throw new Error("Delete failed");
-        }}
-        onSave={() => undefined}
-        rowValues={rowValues}
-        schemaColumns={schemaColumns}
-        targetRowId="person-1"
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
-    fireEvent.click(screen.getByRole("button", { name: "Confirm delete" }));
-
-    expect((await screen.findByRole("alert")).textContent).toBe("Delete failed");
-    expect(screen.getByRole("button", { name: "Delete" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Save" })).toBeTruthy();
-  });
 });

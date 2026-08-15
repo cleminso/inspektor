@@ -1,71 +1,77 @@
-import { useState } from 'react'
+import { useState } from "react";
+import type { ColumnDescriptor } from "jazz-tools";
 
-import type { ColumnDescriptor } from 'jazz-tools'
+import { Box, Button, ScrollArea, Text } from "@inspector/ds";
 
-import { Box, Button, ScrollArea, Text } from '@inspector/ds'
-
-import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
-import { ROW_EDITOR_FORM_ID } from '@tables/rowEditor/editorForm'
+import { RowEditorFields, useRowEditorFields } from "@tables/rowEditor/editorFields";
+import { useRowDraftController } from "@tables/rowEditor/mutation/useRowDraftController";
 
 interface InsertRowFormProps {
-  insertMoreEnabled?: boolean
-  onCancel?: () => void
-  onDirtyChange?: (isDirty: boolean) => void
-  onSave: (values: Record<string, unknown>, options?: { keepOpen: boolean }) => Promise<void> | void
-  rowValues: Record<string, unknown>
-  saveDisabled?: boolean
-  schemaColumns: ColumnDescriptor[]
+  insertMoreEnabled?: boolean;
+  onDiscard?: () => void;
+  onDirtyChange?: (isDirty: boolean) => void;
+  onSave: (
+    values: Record<string, unknown>,
+    options: { keepOpen: boolean },
+  ) => Promise<void> | void;
+  rowValues: Record<string, unknown>;
+  saveDisabled?: boolean;
+  schemaColumns: ColumnDescriptor[];
 }
 
 interface InsertRowFormFieldsProps extends InsertRowFormProps {
-  insertMoreEnabled: boolean
-  onKeepOpenInsert: () => void
+  insertMoreEnabled: boolean;
+  onInserted: () => void;
 }
 
 function InsertRowFormFields({
   insertMoreEnabled,
-  onCancel,
-  onKeepOpenInsert,
+  onDiscard,
   onDirtyChange,
+  onInserted,
   onSave,
   rowValues,
-  saveDisabled,
+  saveDisabled = false,
   schemaColumns,
 }: InsertRowFormFieldsProps): React.ReactElement {
-  const rowEditor = useRowEditorFields({
+  const draftController = useRowDraftController({
     initialRowValues: rowValues,
-    mode: 'insert',
+    mode: "insert",
+    schemaColumns,
+  });
+  const rowEditor = useRowEditorFields({
+    draftController,
+    mode: "insert",
     onDirtyChange,
     onSubmit: async (values) => {
-      await onSave(values, { keepOpen: insertMoreEnabled === true })
-
+      await onSave(values, { keepOpen: insertMoreEnabled });
       if (insertMoreEnabled === true) {
-        onKeepOpenInsert()
+        onInserted();
       }
     },
     schemaColumns,
-  })
+  });
 
   return (
     <Box
       as="form"
-      id={ROW_EDITOR_FORM_ID}
+      data-slot="insert-row-form"
       height="full"
       minHeight={0}
       flexDirection="column"
       overflow="hidden"
       onSubmit={(event) => {
         if (saveDisabled === true) {
-          event.preventDefault()
-          return
+          event.preventDefault();
+          return;
         }
-        rowEditor.submit(event)
+        rowEditor.submit(event);
       }}
     >
       <Box flexGrow={1} mb="m" minHeight={0} overflow="hidden">
         <ScrollArea
-          axis={rowEditor.expandedColumnName === null ? 'vertical' : 'none'}
-          data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? 'form' : 'editor'}
+          axis={rowEditor.expandedColumnName === null ? "vertical" : "none"}
+          data-row-editor-scroll-owner={rowEditor.expandedColumnName === null ? "form" : "editor"}
         >
           <Box flexDirection="column" flexGrow={1} gap="xl" minHeight={0} px="m" py="m">
             <RowEditorFields
@@ -80,11 +86,11 @@ function InsertRowFormFields({
               onFieldOmittedChange={rowEditor.setFieldOmitted}
               onFieldTextChange={rowEditor.setFieldText}
             />
-            {rowEditor.saveError !== null ? (
+            {rowEditor.saveError === null ? null : (
               <Text color="error" role="alert">
                 {rowEditor.saveError}
               </Text>
-            ) : null}
+            )}
           </Box>
         </ScrollArea>
       </Box>
@@ -114,49 +120,39 @@ function InsertRowFormFields({
             Insert
           </Button>
         </Box>
-        {onCancel !== undefined ? (
+        {onDiscard === undefined ? null : (
           <Box flex={1}>
             <Button
               type="button"
               variant="ghost"
               size="s"
               layout="fill"
-              onClick={onCancel}
+              onClick={onDiscard}
               disabled={rowEditor.isSaving === true}
             >
-              Cancel
+              Discard
             </Button>
           </Box>
-        ) : null}
+        )}
       </Box>
     </Box>
-  )
+  );
 }
 
 export function InsertRowForm({
   insertMoreEnabled = false,
-  onCancel,
-  onDirtyChange,
-  onSave,
-  rowValues,
-  saveDisabled = false,
-  schemaColumns,
+  ...props
 }: InsertRowFormProps): React.ReactElement {
-  const [formVersion, setFormVersion] = useState(0)
+  const [formVersion, setFormVersion] = useState(0);
 
   return (
     <InsertRowFormFields
+      {...props}
       key={formVersion}
       insertMoreEnabled={insertMoreEnabled}
-      onKeepOpenInsert={() => {
-        setFormVersion((currentVersion) => currentVersion + 1)
+      onInserted={() => {
+        setFormVersion((currentVersion) => currentVersion + 1);
       }}
-      onCancel={onCancel}
-      onDirtyChange={onDirtyChange}
-      onSave={onSave}
-      rowValues={rowValues}
-      saveDisabled={saveDisabled}
-      schemaColumns={schemaColumns}
     />
-  )
+  );
 }

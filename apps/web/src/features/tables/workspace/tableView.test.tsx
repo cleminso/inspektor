@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -6,25 +6,21 @@ import { TableView } from '@tables/workspace/tableView'
 
 const tableViewState = vi.hoisted(() => ({
   activeColumnId: null,
+  activeFieldEditorTarget: null as { columnId: string; rowId: string } | null,
   canInspectSchema: true,
   canMutateRows: true,
   canOpenRowEditor: true,
+  cellFocusRequest: null,
   detailPaneMode: 'closed',
-  draftTransition: {
-    discardAndContinue: vi.fn(),
-    isPending: false,
-    isSaving: false,
-    keepEditing: vi.fn(),
-  },
   error: null as string | null,
   filters: [{ column: 'name', operator: 'equals', value: 'Ada' }],
   handleCellActivate: vi.fn(),
+  handleCellEditRequest: vi.fn(),
   handleColumnActivate: vi.fn(),
-  handleDelete: undefined,
-  handleEditSave: vi.fn(),
   handleEscape: vi.fn(),
-  handleInsertSave: vi.fn(),
-  handleRowDraftDirtyChange: vi.fn(),
+  handleFieldEditorCancel: vi.fn(),
+  handleFieldEditorComplete: vi.fn(),
+  handleMutationApplySuccess: vi.fn(),
   handleRowEditorCancel: vi.fn(),
   handleRowEditorOpenChange: vi.fn(),
   hasCellSelection: false,
@@ -33,6 +29,11 @@ const tableViewState = vi.hoisted(() => ({
   isInitialLoading: false,
   isRefreshing: false,
   loadedRowCount: 2,
+  mutationExecutor: {
+    deleteRow: vi.fn(),
+    insertRow: vi.fn(),
+    updateRow: vi.fn(),
+  },
   page: 1,
   pageSize: 100,
   reorderableColumnIds: [] as string[],
@@ -47,12 +48,18 @@ const tableViewState = vi.hoisted(() => ({
     openInsert: vi.fn(),
   },
   rowValues: null,
-  schemaColumns: [],
+  schemaColumns: [] as Array<{
+    column_type: { type: 'Text' }
+    name: string
+    nullable: boolean
+  }>,
+  selectedRowIds: [] as string[],
   setFilters: vi.fn(),
   setPage: vi.fn(),
   setPageSize: vi.fn(),
-  table: {},
-  tableColumns: [] as Array<{ id: string }>,
+  table: {} as { getRowModel?: () => { rows: Array<{ id: string; original: Record<string, unknown> }> } },
+  tableColumns: [] as Array<{ column?: unknown; id: string }>,
+  tableKey: 'connection-1:main:schema-1:accounts',
 }))
 
 vi.mock('@tables/workspace/useTableViewState', () => ({
@@ -61,6 +68,38 @@ vi.mock('@tables/workspace/useTableViewState', () => ({
 
 vi.mock('@tables/workspace/tabsProvider', () => ({
   useTableTabs: () => ({ openSchemaView: vi.fn() }),
+}))
+
+vi.mock('@tables/mutationLedger/provider', () => ({
+  TableMutationLedgerProvider: ({ children }: { children: ReactNode }) => children,
+  useTableMutationEditorController: () => ({
+    actions: {},
+    meta: {},
+    state: { draft: { sourceValues: {} } },
+  }),
+}))
+
+vi.mock('@tables/floatingWidget/floatingWidget', () => ({
+  TableMutationWidget: ({ onApplySuccess }: { onApplySuccess?: () => void }) => (
+    <button type="button" onClick={onApplySuccess}>Complete Apply</button>
+  ),
+}))
+
+vi.mock('@tables/floatingWidget/fieldEditorMutationWidgetModules', () => ({
+  FieldEditorMutationWidget: ({
+    column,
+    onClose,
+    onComplete,
+  }: {
+    column: { name: string }
+    onClose: () => void
+    onComplete: (direction: string) => void
+  }) => (
+    <div role="dialog" aria-label={`Edit ${column.name}`}>
+      <button type="button" onClick={onClose}>Close field</button>
+      <button type="button" onClick={() => onComplete('enter')}>Complete field</button>
+    </div>
+  ),
 }))
 
 vi.mock('@tables/grid/buildColumns', () => ({
@@ -166,9 +205,60 @@ afterEach(() => {
   tableViewState.isInitialLoading = false
   tableViewState.isRefreshing = false
   tableViewState.loadedRowCount = 2
+  tableViewState.activeFieldEditorTarget = null
+  tableViewState.detailPaneMode = 'closed'
+  tableViewState.table = {}
+  tableViewState.tableColumns = []
 })
 
 describe('TableView query status', () => {
+  it('wires the active scalar target to the explicit Floating field editor', () => {
+    tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
+    tableViewState.table = {
+      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: 'Ada' } }] }),
+    }
+    tableViewState.tableColumns = [
+      {
+        id: 'name',
+        column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
+      },
+    ]
+    tableViewState.schemaColumns = [
+      { name: 'name', column_type: { type: 'Text' }, nullable: false },
+    ]
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Close field' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Complete field' }))
+    expect(tableViewState.handleFieldEditorCancel).toHaveBeenCalledOnce()
+    expect(tableViewState.handleFieldEditorComplete).toHaveBeenCalledWith('enter')
+  })
+
+  it('suppresses inline editing while keeping the staged widget available beside the row pane', () => {
+    tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.table = {
+      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: 'Ada' } }] }),
+    }
+    tableViewState.tableColumns = [
+      {
+        id: 'name',
+        column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
+      },
+    ]
+    tableViewState.schemaColumns = [
+      { name: 'name', column_type: { type: 'Text' }, nullable: false },
+    ]
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.queryByRole('dialog', { name: 'Edit name' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Apply' }))
+    expect(tableViewState.handleMutationApplySuccess).toHaveBeenCalledOnce()
+  })
+
   it('announces refresh completion and filtered emptiness', async () => {
     const { rerender } = render(<TableView tableName="accounts" />)
     const status = screen.getByRole('status')

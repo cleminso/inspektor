@@ -66,16 +66,15 @@ afterEach(() => {
 });
 
 describe("InsertRowForm structured values", () => {
-  it("allows drafting while mutation submission is unavailable", () => {
-    const onSave = vi.fn();
+  it("keeps drafting available before adding another row", () => {
+    const onAddAnother = vi.fn();
     const columns = [
       { name: "name", column_type: { type: "Text" }, nullable: false },
     ] satisfies ColumnDescriptor[];
 
     render(
       <InsertRowForm
-        saveDisabled
-        onSave={onSave}
+        onSave={(values) => onAddAnother(values)}
         rowValues={{ name: "Ada" }}
         schemaColumns={columns}
       />,
@@ -84,15 +83,65 @@ describe("InsertRowForm structured values", () => {
     expect((screen.getByRole("textbox", { name: "Name" }) as HTMLInputElement).disabled).toBe(
       false,
     );
-    expect((screen.getByRole("button", { name: "Insert" }) as HTMLButtonElement).disabled).toBe(
-      true,
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+    expect(onAddAnother).toHaveBeenCalledWith({ name: "Ada" });
+  });
+
+  it("discards the insert draft without submitting it", () => {
+    const onDiscard = vi.fn();
+    const onSave = vi.fn();
+    const columns = [
+      { name: "name", column_type: { type: "Text" }, nullable: false },
+    ] satisfies ColumnDescriptor[];
+    render(
+      <InsertRowForm
+        onDiscard={onDiscard}
+        onSave={onSave}
+        rowValues={{ name: "Ada" }}
+        schemaColumns={columns}
+      />,
     );
-    fireEvent.submit(screen.getByRole("button", { name: "Insert" }).closest("form")!);
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Name" }), {
+      target: { value: "Grace" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Discard" }));
+
+    expect(onDiscard).toHaveBeenCalledOnce();
     expect(onSave).not.toHaveBeenCalled();
   });
 
+  it("resets the form after inserting while Insert more is enabled", async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const columns = [
+      { name: "name", column_type: { type: "Text" }, nullable: false },
+    ] satisfies ColumnDescriptor[];
+    render(
+      <InsertRowForm
+        insertMoreEnabled
+        onSave={onSave}
+        rowValues={{ name: "Ada" }}
+        schemaColumns={columns}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Name" }), {
+      target: { value: "Grace" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    await vi.waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith({ name: "Grace" }, { keepOpen: true }),
+    );
+    await vi.waitFor(() =>
+      expect((screen.getByRole("textbox", { name: "Name" }) as HTMLInputElement).value).toBe(
+        "Ada",
+      ),
+    );
+  });
+
   it("omits an untouched default-backed field from the insert payload", async () => {
-    const onSave = vi.fn();
+    const onAddAnother = vi.fn();
     const columns = [
       { name: "name", column_type: { type: "Text" }, nullable: false },
       {
@@ -102,17 +151,17 @@ describe("InsertRowForm structured values", () => {
         default: { type: "Text", value: "active" },
       },
     ] satisfies ColumnDescriptor[];
-    render(<InsertRowForm onSave={onSave} rowValues={{ name: "Ada" }} schemaColumns={columns} />);
+    render(<InsertRowForm onSave={(values) => onAddAnother(values)} rowValues={{ name: "Ada" }} schemaColumns={columns} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Insert" }));
 
     await vi.waitFor(() =>
-      expect(onSave).toHaveBeenCalledWith({ name: "Ada" }, { keepOpen: false }),
+      expect(onAddAnother).toHaveBeenCalledWith({ name: "Ada" }),
     );
   });
 
   it("allows a default-backed field to be changed to an explicit value", async () => {
-    const onSave = vi.fn();
+    const onAddAnother = vi.fn();
     const columns = [
       {
         name: "status",
@@ -121,7 +170,7 @@ describe("InsertRowForm structured values", () => {
         default: { type: "Text", value: "active" },
       },
     ] satisfies ColumnDescriptor[];
-    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+    render(<InsertRowForm onSave={(values) => onAddAnother(values)} rowValues={{}} schemaColumns={columns} />);
 
     expect(
       screen
@@ -135,12 +184,12 @@ describe("InsertRowForm structured values", () => {
     fireEvent.click(screen.getByRole("button", { name: "Insert" }));
 
     await vi.waitFor(() =>
-      expect(onSave).toHaveBeenCalledWith({ status: "archived" }, { keepOpen: false }),
+      expect(onAddAnother).toHaveBeenCalledWith({ status: "archived" }),
     );
   });
 
   it("allows an edited field to return to schema-default omission", async () => {
-    const onSave = vi.fn();
+    const onAddAnother = vi.fn();
     const columns = [
       {
         name: "status",
@@ -149,7 +198,7 @@ describe("InsertRowForm structured values", () => {
         default: { type: "Text", value: "active" },
       },
     ] satisfies ColumnDescriptor[];
-    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+    render(<InsertRowForm onSave={(values) => onAddAnother(values)} rowValues={{}} schemaColumns={columns} />);
 
     fireEvent.click(screen.getByRole("checkbox", { name: "Use default for Status" }));
     fireEvent.change(screen.getByRole("textbox", { name: "Status" }), {
@@ -158,7 +207,7 @@ describe("InsertRowForm structured values", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Use default for Status" }));
     fireEvent.click(screen.getByRole("button", { name: "Insert" }));
 
-    await vi.waitFor(() => expect(onSave).toHaveBeenCalledWith({}, { keepOpen: false }));
+    await vi.waitFor(() => expect(onAddAnother).toHaveBeenCalledWith({}));
   });
 
   it("keeps a default-backed read-only binary field omitted", () => {
@@ -221,13 +270,13 @@ describe("InsertRowForm structured values", () => {
   });
 
   it("respects a supplied value for a nullable structured field", async () => {
-    const onSave = vi.fn();
+    const onAddAnother = vi.fn();
     const columns = [
       { name: "settings", column_type: { type: "Json" }, nullable: true },
     ] satisfies ColumnDescriptor[];
     render(
       <InsertRowForm
-        onSave={onSave}
+        onSave={(values) => onAddAnother(values)}
         rowValues={{ settings: { enabled: true } }}
         schemaColumns={columns}
       />,
@@ -238,7 +287,7 @@ describe("InsertRowForm structured values", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Insert" }));
 
-    expect(onSave).toHaveBeenCalledWith({ settings: '{"enabled":true}' }, { keepOpen: false });
+    expect(onAddAnother).toHaveBeenCalledWith({ settings: '{"enabled":true}' });
   });
 
   it.each([
@@ -266,7 +315,7 @@ describe("InsertRowForm structured values", () => {
   });
 
   it("disables NULL primitive and enum controls and submits values after they are enabled", async () => {
-    const onSave = vi.fn();
+    const onAddAnother = vi.fn();
     const columns = [
       { name: "name", column_type: { type: "Text" }, nullable: true },
       {
@@ -276,7 +325,7 @@ describe("InsertRowForm structured values", () => {
       },
       { name: "enabled", column_type: { type: "Boolean" }, nullable: true },
     ] satisfies ColumnDescriptor[];
-    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+    render(<InsertRowForm onSave={(values) => onAddAnother(values)} rowValues={{}} schemaColumns={columns} />);
 
     const name = screen.getByLabelText("Name") as HTMLInputElement;
     const status = screen.getByRole("combobox", { name: "Status" }) as HTMLButtonElement;
@@ -298,10 +347,7 @@ describe("InsertRowForm structured values", () => {
     fireEvent.click(screen.getByRole("button", { name: "Insert" }));
 
     await vi.waitFor(() =>
-      expect(onSave).toHaveBeenCalledWith(
-        { enabled: true, name: "Ada", status: null },
-        { keepOpen: false },
-      ),
+      expect(onAddAnother).toHaveBeenCalledWith({ enabled: true, name: "Ada", status: null }),
     );
   });
 
@@ -309,11 +355,11 @@ describe("InsertRowForm structured values", () => {
     vi.useFakeTimers();
     const now = new Date(2026, 7, 13, 9, 10, 11, 120);
     vi.setSystemTime(now);
-    const onSave = vi.fn();
+    const onAddAnother = vi.fn();
     const columns = [
       { name: "publishedAt", column_type: { type: "Timestamp" }, nullable: true },
     ] satisfies ColumnDescriptor[];
-    render(<InsertRowForm onSave={onSave} rowValues={{}} schemaColumns={columns} />);
+    render(<InsertRowForm onSave={(values) => onAddAnother(values)} rowValues={{}} schemaColumns={columns} />);
 
     fireEvent.click(screen.getByRole("checkbox", { name: "Set PublishedAt to NULL" }));
     fireEvent.click(screen.getByRole("button", { name: "PublishedAt" }));
@@ -321,11 +367,38 @@ describe("InsertRowForm structured values", () => {
     fireEvent.click(screen.getByRole("button", { name: "Insert" }));
 
     await vi.waitFor(() =>
-      expect(onSave).toHaveBeenCalledWith(
-        { publishedAt: now.getTime() },
-        { keepOpen: false },
-      ),
+      expect(onAddAnother).toHaveBeenCalledWith({ publishedAt: now.getTime() }),
     );
     vi.useRealTimers();
+  });
+
+  it("retains insert values after a mutation error so they can be retried", async () => {
+    const onAddAnother = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Insert failed"))
+      .mockResolvedValueOnce(undefined);
+    const columns = [
+      { name: "name", column_type: { type: "Text" }, nullable: false },
+    ] satisfies ColumnDescriptor[];
+    render(
+      <InsertRowForm
+        onSave={(values) => onAddAnother(values)}
+        rowValues={{ name: "Ada" }}
+        schemaColumns={columns}
+      />,
+    );
+    const name = screen.getByRole("textbox", { name: "Name" }) as HTMLInputElement;
+
+    fireEvent.change(name, { target: { value: "Grace" } });
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    expect((await screen.findByRole("alert")).textContent).toBe("Insert failed");
+    expect(name.value).toBe("Grace");
+
+    fireEvent.click(screen.getByRole("button", { name: "Insert" }));
+
+    await vi.waitFor(() => expect(onAddAnother).toHaveBeenCalledTimes(2));
+    expect(onAddAnother).toHaveBeenNthCalledWith(1, { name: "Grace" });
+    expect(onAddAnother).toHaveBeenNthCalledWith(2, { name: "Grace" });
   });
 });

@@ -1,7 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ROW_EDITOR_FORM_ID } from "@tables/rowEditor/editorForm";
 import { RowEditorSidePanel } from "@tables/rowEditor/sidePane";
 
 afterEach(cleanup);
@@ -13,12 +12,8 @@ describe("RowEditorSidePanel dirty transitions", () => {
         activeRowIndex={0}
         activePageRowNumber={12}
         activeColumnNumber={3}
-        draftTransitionPending={false}
-        draftTransitionSaving={false}
         editedRowIds={["row-12"]}
         mode="edit"
-        onDiscardAndContinue={() => undefined}
-        onKeepEditing={() => undefined}
         onNavigateNext={() => undefined}
         onNavigatePrevious={() => undefined}
       >
@@ -35,12 +30,8 @@ describe("RowEditorSidePanel dirty transitions", () => {
         activeRowIndex={0}
         activePageRowNumber={1}
         activeColumnNumber={0}
-        draftTransitionPending={false}
-        draftTransitionSaving={false}
         editedRowIds={["row-1"]}
         mode="edit"
-        onDiscardAndContinue={() => undefined}
-        onKeepEditing={() => undefined}
         onNavigateNext={() => undefined}
         onNavigatePrevious={() => undefined}
       >
@@ -57,12 +48,8 @@ describe("RowEditorSidePanel dirty transitions", () => {
         activeRowIndex={0}
         activePageRowNumber={null}
         activeColumnNumber={0}
-        draftTransitionPending={false}
-        draftTransitionSaving={false}
         editedRowIds={["row-outside-page"]}
         mode="edit"
-        onDiscardAndContinue={() => undefined}
-        onKeepEditing={() => undefined}
         onNavigateNext={() => undefined}
         onNavigatePrevious={() => undefined}
       >
@@ -79,12 +66,8 @@ describe("RowEditorSidePanel dirty transitions", () => {
         activeColumnNumber={0}
         activePageRowNumber={1}
         activeRowIndex={0}
-        draftTransitionPending={false}
-        draftTransitionSaving={false}
         editedRowIds={["row-1", "row-2"]}
         mode="edit"
-        onDiscardAndContinue={() => undefined}
-        onKeepEditing={() => undefined}
         onNavigateNext={() => undefined}
         onNavigatePrevious={() => undefined}
       >
@@ -100,21 +83,16 @@ describe("RowEditorSidePanel dirty transitions", () => {
     }
   });
 
-  it("changes whether another row remains open after insertion", () => {
+  it("controls whether successful inserts keep the form open", () => {
     const onInsertMoreEnabledChange = vi.fn();
     render(
       <RowEditorSidePanel
         activeColumnNumber={0}
-        activePageRowNumber={1}
+        activePageRowNumber={null}
         activeRowIndex={0}
-        draftTransitionPending={false}
-        draftTransitionSaving={false}
         editedRowIds={[]}
-        insertMoreEnabled={false}
         mode="insert"
-        onDiscardAndContinue={() => undefined}
         onInsertMoreEnabledChange={onInsertMoreEnabledChange}
-        onKeepEditing={() => undefined}
         onNavigateNext={() => undefined}
         onNavigatePrevious={() => undefined}
       >
@@ -127,65 +105,4 @@ describe("RowEditorSidePanel dirty transitions", () => {
     expect(onInsertMoreEnabledChange).toHaveBeenCalledWith(true);
   });
 
-  it("offers save, discard, and keep-editing decisions", () => {
-    const onDiscardAndContinue = vi.fn();
-    const onKeepEditing = vi.fn();
-    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
-    render(
-      <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
-        draftTransitionPending={true}
-        draftTransitionSaving={false}
-        editedRowIds={["row-1"]}
-        mode="edit"
-        onDiscardAndContinue={onDiscardAndContinue}
-        onKeepEditing={onKeepEditing}
-        onNavigateNext={() => undefined}
-        onNavigatePrevious={() => undefined}
-      >
-        <form id={ROW_EDITOR_FORM_ID} onSubmit={onSubmit} />
-      </RowEditorSidePanel>,
-    );
-
-    expect(screen.getByRole("alertdialog", { name: "Unsaved row changes" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Keep editing" }));
-    fireEvent.click(screen.getByRole("button", { name: "Discard and continue" }));
-    fireEvent.click(screen.getByRole("button", { name: "Save and continue" }));
-
-    expect(onKeepEditing).toHaveBeenCalledOnce();
-    expect(onDiscardAndContinue).toHaveBeenCalledOnce();
-    expect(onSubmit).toHaveBeenCalledOnce();
-  });
-
-  it("disables every transition decision while a mutation is pending", () => {
-    render(
-      <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
-        draftTransitionPending={true}
-        draftTransitionSaving={true}
-        editedRowIds={["row-1"]}
-        mode="edit"
-        onDiscardAndContinue={() => undefined}
-        onKeepEditing={() => undefined}
-        onNavigateNext={() => undefined}
-        onNavigatePrevious={() => undefined}
-      >
-        <form id={ROW_EDITOR_FORM_ID} />
-      </RowEditorSidePanel>,
-    );
-
-    expect(screen.getByRole("button", { name: "Keep editing" }).hasAttribute("data-disabled")).toBe(
-      true,
-    );
-    expect(
-      screen.getByRole("button", { name: "Discard and continue" }).hasAttribute("data-disabled"),
-    ).toBe(true);
-    expect(
-      screen.getByRole("button", { name: "Save and continue" }).hasAttribute("data-disabled"),
-    ).toBe(true);
-  });
 });

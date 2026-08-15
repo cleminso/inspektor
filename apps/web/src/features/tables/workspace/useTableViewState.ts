@@ -2,12 +2,16 @@
  * Orchestrates the table query, selection, detail panes, row mutations, and draft transitions.
  *
  * URL search state owns query scope and row-editor identity. Local React state owns cell, column,
- * and checkbox selection. Row forms own field drafts. This hook connects those systems without
- * duplicating parsing, dirty comparison, or Jazz mutation rules.
+ * and checkbox selection. The table mutation provider owns edit drafts. This hook connects those
+ * systems without duplicating parsing, dirty comparison, or Jazz mutation rules.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type { DataGridCellTarget, DataGridTable } from '@inspector/ds'
+import type {
+  DataGridCellTarget,
+  DataGridFocusRequest,
+  DataGridTable,
+} from '@inspector/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
 import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
 
@@ -27,16 +31,25 @@ import { useTableGrid } from '@tables/grid/useTableGrid'
 import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
-import { useDraftTransitionGuard } from '@tables/rowEditor/mutation/useDraftTransitionGuard'
 import { useTableMutations } from '@tables/rowEditor/mutation/useTableMutation'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
+import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
 import type { TableColumnMeta, TablePageSize, TableRowId } from '@tables/tableTypes'
 import { getNearestSelectedRowId } from '@tables/grid/rowSelectionFocus'
+import {
+  getInlineFieldRoute,
+  resolveSpreadsheetCompletionTarget,
+  type SpreadsheetCompletionDirection,
+} from '@tables/grid/inlineEditing'
 
 interface UseTableViewStateOptions {
   tableName: string
+}
+
+interface InsertRowSaveOptions {
+  keepOpen: boolean
 }
 
 interface TableViewRowEditorState {
@@ -52,55 +65,49 @@ interface TableViewRowEditorState {
 
 export type TableViewDetailPaneMode = 'closed' | 'insert' | 'rows'
 
-interface InsertRowSaveOptions {
-  keepOpen: boolean
-}
-
-interface TableViewDraftTransitionState {
-  discardAndContinue: () => void
-  isPending: boolean
-  isSaving: boolean
-  keepEditing: () => void
-}
-
 interface UseTableViewStateResult {
   activeColumnId: string | null
+  activeFieldEditorTarget: DataGridCellTarget | null
   canInspectSchema: boolean
   canMutateRows: boolean
   canOpenRowEditor: boolean
+  cellFocusRequest: DataGridFocusRequest | null
   reorderableColumnIds: readonly string[]
   detailPaneMode: TableViewDetailPaneMode
-  draftTransition: TableViewDraftTransitionState
   error: string | null
   filters: TableFilterClause[]
-  handleDelete: (() => Promise<void>) | undefined
-  handleEditSave: (values: Record<string, unknown>) => Promise<void>
   handleEscape: () => void
+  handleCellActivate: (target: DataGridCellTarget) => void
+  handleCellEditRequest: (target: DataGridCellTarget) => void
+  handleColumnActivate: (columnId: string | null) => void
+  handleFieldEditorCancel: () => void
+  handleFieldEditorComplete: (direction: SpreadsheetCompletionDirection) => void
   handleInsertSave: (
     values: Record<string, unknown>,
-    options?: InsertRowSaveOptions,
+    options: InsertRowSaveOptions,
   ) => Promise<void>
-  handleCellActivate: (target: DataGridCellTarget) => void
-  handleColumnActivate: (columnId: string | null) => void
+  handleMutationApplySuccess: () => void
   handleRowEditorOpenChange: (open: boolean) => void
   handleRowEditorCancel: () => void
-  handleRowDraftDirtyChange: (isDirty: boolean) => void
   hasNextPage: boolean
   hasPreviousPage: boolean
   hasCellSelection: boolean
   isInitialLoading: boolean
   isRefreshing: boolean
   loadedRowCount: number
+  mutationExecutor: TableMutationExecutor
   page: number
   pageSize: TablePageSize
   rowEditor: TableViewRowEditorState
   rowValues: Record<string, unknown> | null
+  selectedRowIds: readonly TableRowId[]
   schemaColumns: ColumnDescriptor[]
   setFilters: (filters: TableFilterClause[]) => Promise<void>
   setPage: (page: number) => void
   setPageSize: (pageSize: TablePageSize) => void
   table: DataGridTable<DynamicTableRow>
   tableColumns: TableColumnMeta[]
+  tableKey: string
 }
 
 /**
@@ -116,10 +123,8 @@ export function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record
 /**
  * Builds the state and actions consumed by `TableView` for one runtime-selected Jazz table.
  *
- * Target-changing actions are closures passed to `useDraftTransitionGuard`. For example, selecting
- * row B while row A is dirty does not update selection or URL state immediately. The closure runs
- * only after Save and continue or Discard and continue. Selection changes around row A can proceed
- * because they do not replace the active draft target.
+ * Row target changes only change the visible projection. Provider-owned pending changes remain in
+ * the mounted table state until Apply or Discard resolves them.
  */
 export function useTableViewState({
   tableName,
@@ -137,12 +142,13 @@ export function useTableViewState({
   const activeRowId = searchState.editorMode === 'edit' ? searchState.rowId : null
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
+  const [activeFieldEditorTarget, setActiveFieldEditorTarget] =
+    useState<DataGridCellTarget | null>(null)
+  const [cellFocusRequest, setCellFocusRequest] = useState<DataGridFocusRequest | null>(null)
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
     activeRowId === null ? [] : [activeRowId],
   )
-  const deletedRowIdsRef = useRef<Set<TableRowId>>(new Set())
   const mutations = useTableMutations({ client, tableName, wasmSchema })
-  const draftTransition = useDraftTransitionGuard()
   const tableKey = `${currentConnectionId ?? 'unknown'}:${currentBranch ?? 'unknown'}:${currentSchemaHash ?? 'unknown'}:${tableName}`
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
   const visibility = useColumnVisibility({
@@ -190,14 +196,6 @@ export function useTableViewState({
   const editedRowIds = activeRowId === null ? [] : effectiveSelectedRowIds
   const activeRowIndex = activeRowId === null ? 0 : Math.max(editedRowIds.indexOf(activeRowId), 0)
   const validRowIds = useMemo(() => query.rows.map((row) => String(row.id)), [query.rows])
-  useEffect(() => {
-    const validRowIdSet = new Set(validRowIds)
-    for (const deletedRowId of deletedRowIdsRef.current) {
-      if (validRowIdSet.has(deletedRowId) === false) {
-        deletedRowIdsRef.current.delete(deletedRowId)
-      }
-    }
-  }, [validRowIds])
   const visibleSelectedRowIds = useMemo(() => {
     const validRowIdSet = new Set(validRowIds)
     return effectiveSelectedRowIds.filter((rowId) => validRowIdSet.has(rowId) === true)
@@ -218,15 +216,14 @@ export function useTableViewState({
         ? nextActiveRowId
         : nextSelectedRowIds[0]
     const transition = () => {
-      const availableRowIds = nextSelectedRowIds.filter(
-        (rowId) => deletedRowIdsRef.current.has(rowId) === false,
-      )
+      const availableRowIds = nextSelectedRowIds
       const resolvedActiveRowId =
         requestedActiveRowId !== undefined && availableRowIds.includes(requestedActiveRowId)
           ? requestedActiveRowId
           : availableRowIds[0]
       setSelectedRowIds(availableRowIds)
       setActiveColumnId(null)
+      setActiveFieldEditorTarget(null)
 
       if (availableRowIds.length === 0) {
         void searchState.setRowEditor(null, null)
@@ -236,15 +233,7 @@ export function useTableViewState({
         void searchState.setRowEditor('edit', resolvedActiveRowId)
       }
     }
-    const changesDraftTarget =
-      searchState.editorMode === 'insert' ||
-      (searchState.editorMode === 'edit' && requestedActiveRowId !== activeRowId)
-
-    if (changesDraftTarget === true) {
-      draftTransition.request(transition)
-    } else {
-      transition()
-    }
+    transition()
   }
 
   const handleSelectedRowIdsChange = (
@@ -281,6 +270,7 @@ export function useTableViewState({
     setSelectedRowIds([])
     setCellSelection([])
     setActiveColumnId(null)
+    setActiveFieldEditorTarget(null)
   }, [])
 
   useEffect(() => {
@@ -294,33 +284,26 @@ export function useTableViewState({
   }, [resetSelection, selectionScopeKey])
 
   const handleSortChange = (columnId: string, direction: 'asc' | 'desc') => {
-    draftTransition.request(() => {
-      // Set the ref inside the guarded closure so Keep editing leaves selection and scope untouched.
-      selectionScopeKeyRef.current = JSON.stringify({
-        filters: searchState.filters,
-        page: 1,
-        pageSize: searchState.pageSize,
-        sortColumn: columnId,
-        sortDirection: direction,
-        tableKey,
-      })
-      resetSelection()
-      void searchState.setSorting(columnId, direction)
+    selectionScopeKeyRef.current = JSON.stringify({
+      filters: searchState.filters,
+      page: 1,
+      pageSize: searchState.pageSize,
+      sortColumn: columnId,
+      sortDirection: direction,
+      tableKey,
     })
+    resetSelection()
+    void searchState.setSorting(columnId, direction)
   }
 
   const setPage = (page: number) => {
-    draftTransition.request(() => {
-      resetSelection()
-      void query.setPage(page)
-    })
+    resetSelection()
+    void query.setPage(page)
   }
 
   const setPageSize = (pageSize: TablePageSize) => {
-    draftTransition.request(() => {
-      resetSelection()
-      void query.setPageSize(pageSize)
-    })
+    resetSelection()
+    void query.setPageSize(pageSize)
   }
 
   const handleColumnVisibilityChange = (nextVisibility: Record<string, boolean>) => {
@@ -401,10 +384,21 @@ export function useTableViewState({
   }
 
   const handleEscape = () => {
+    if (activeFieldEditorTarget !== null) {
+      setActiveFieldEditorTarget(null)
+      setCellFocusRequest((current) => ({
+        requestId: (typeof current?.requestId === 'number' ? current.requestId : 0) + 1,
+        target: activeFieldEditorTarget,
+      }))
+      return
+    }
     if (detailPaneMode !== 'closed') {
-      draftTransition.request(() => {
-        closeDetailPane()
-      })
+      if (activeRowId !== null) {
+        setSelectedRowIds((currentRowIds) =>
+          currentRowIds.filter((rowId) => rowId !== activeRowId),
+        )
+      }
+      closeDetailPane()
       return
     }
 
@@ -420,10 +414,25 @@ export function useTableViewState({
   }
 
   const openInsert = () => {
-    draftTransition.request(() => {
-      resetSelection()
-      void searchState.setRowEditor('insert', null)
-    })
+    resetSelection()
+    void searchState.setRowEditor('insert', null)
+  }
+
+  const handleInsertSave = async (
+    values: Record<string, unknown>,
+    options: InsertRowSaveOptions,
+  ) => {
+    await mutations.insertRow(values)
+    if (options.keepOpen === true) {
+      return
+    }
+    query.resetPage()
+    closeDetailPane()
+  }
+
+  const handleMutationApplySuccess = () => {
+    resetSelection()
+    closeDetailPane()
   }
 
   const goToRowIndex = (nextActiveRowIndex: number) => {
@@ -432,9 +441,7 @@ export function useTableViewState({
       return
     }
 
-    draftTransition.request(() => {
-      void searchState.setRowEditor('edit', nextActiveRowId)
-    })
+    void searchState.setRowEditor('edit', nextActiveRowId)
   }
 
   const goToPreviousRow = () => {
@@ -445,40 +452,6 @@ export function useTableViewState({
     goToRowIndex(Math.min(activeRowIndex + 1, editedRowIds.length - 1))
   }
 
-  const handleDelete =
-    searchState.editorMode === 'edit' && activeRowId !== null
-      ? async () => {
-          const rowIdToDelete = activeRowId
-
-          if (rowIdToDelete === null) {
-            return
-          }
-
-          const continued = await draftTransition.runMutation(() =>
-            mutations.deleteRow(rowIdToDelete),
-          )
-          deletedRowIdsRef.current.add(rowIdToDelete)
-          setSelectedRowIds((currentRowIds) =>
-            currentRowIds.filter((rowId) => rowId !== rowIdToDelete),
-          )
-          if (continued === true) {
-            // Save/Discard continuation owns the destination; do not also choose a neighboring row.
-            return
-          }
-          const nextEditedRowIds = editedRowIds.filter((rowId) => rowId !== rowIdToDelete)
-
-          if (nextEditedRowIds.length === 0) {
-            closeDetailPane()
-            return
-          }
-
-          const nextActiveRowIndex = Math.min(activeRowIndex, nextEditedRowIds.length - 1)
-          const nextActiveRowId = nextEditedRowIds[nextActiveRowIndex] ?? null
-          setSelectedRowIds(nextEditedRowIds)
-          void searchState.setRowEditor('edit', nextActiveRowId)
-        }
-      : undefined
-
   /**
    * Performs explicit form Cancel rather than guarded pane dismissal.
    *
@@ -486,7 +459,6 @@ export function useTableViewState({
    * focuses the nearest remaining checked row or closes the pane when none remain.
    */
   const handleRowEditorCancel = () => {
-    draftTransition.clear()
     if (activeRowId === null) {
       closeDetailPane()
       return
@@ -502,17 +474,53 @@ export function useTableViewState({
     void searchState.setRowEditor('edit', nextActiveRowId)
   }
 
+  const requestCellFocus = (target: DataGridCellTarget) => {
+    setCellFocusRequest((current) => ({
+      requestId: (typeof current?.requestId === 'number' ? current.requestId : 0) + 1,
+      target,
+    }))
+  }
+
+  const handleFieldEditorCancel = () => {
+    if (activeFieldEditorTarget === null) {
+      return
+    }
+    setActiveFieldEditorTarget(null)
+    requestCellFocus(activeFieldEditorTarget)
+  }
+
+  const handleFieldEditorComplete = (direction: SpreadsheetCompletionDirection) => {
+    if (activeFieldEditorTarget === null) {
+      return
+    }
+    const focusableRows = table.getRowModel().rows.map((row) =>
+      row
+        .getVisibleCells()
+        .filter((cell) => cell.getCanSelect() === true)
+        .map((cell) => ({ columnId: cell.column.id, rowId: row.id })),
+    )
+    const target = resolveSpreadsheetCompletionTarget(
+      focusableRows,
+      activeFieldEditorTarget,
+      direction,
+    )
+    setActiveFieldEditorTarget(null)
+    requestCellFocus(target)
+  }
+
   return {
     activeColumnId,
+    activeFieldEditorTarget,
     canInspectSchema: wasmSchema !== null,
     canMutateRows: client !== null && wasmSchema !== null,
     canOpenRowEditor: wasmSchema !== null,
+    cellFocusRequest,
     reorderableColumnIds: columnIds,
     detailPaneMode,
-    draftTransition,
     error: query.error,
     table,
     loadedRowCount: query.loadedRowCount,
+    mutationExecutor: mutations,
     page: query.page,
     pageSize: query.pageSize,
     hasNextPage: query.hasNextPage,
@@ -524,23 +532,22 @@ export function useTableViewState({
     setPageSize,
     filters: searchState.filters,
     setFilters: async (filters) => {
-      draftTransition.request(() => {
-        // Keep the existing selection when the user rejects this guarded filter change.
-        selectionScopeKeyRef.current = JSON.stringify({
-          filters,
-          page: 1,
-          pageSize: searchState.pageSize,
-          sortColumn: searchState.sortColumn,
-          sortDirection: searchState.sortDirection,
-          tableKey,
-        })
-        resetSelection()
-        void searchState.setFilters(filters)
+      selectionScopeKeyRef.current = JSON.stringify({
+        filters,
+        page: 1,
+        pageSize: searchState.pageSize,
+        sortColumn: searchState.sortColumn,
+        sortDirection: searchState.sortDirection,
+        tableKey,
       })
+      resetSelection()
+      void searchState.setFilters(filters)
     },
     schemaColumns,
     tableColumns: query.columns,
+    tableKey,
     rowValues,
+    selectedRowIds,
     rowEditor: {
       activeColumnNumber,
       activePageRowNumber,
@@ -559,36 +566,44 @@ export function useTableViewState({
         })
       }
     },
+    handleCellEditRequest: (target) => {
+      if (
+        detailPaneMode !== 'closed'
+      ) {
+        return
+      }
+      const columnMeta = query.columns.find((column) => column.id === target.columnId)
+      if (columnMeta === undefined) {
+        return
+      }
+      const route = getInlineFieldRoute(columnMeta)
+      if (route === 'rowPane') {
+        const nextSelectedRowIds = effectiveSelectedRowIds.includes(target.rowId)
+          ? effectiveSelectedRowIds
+          : [...effectiveSelectedRowIds, target.rowId]
+        openRows(nextSelectedRowIds, target.rowId)
+        requestAnimationFrame(() => {
+          focusRowEditorField(target.columnId)
+        })
+        return
+      }
+      if (route === 'readOnly') {
+        return
+      }
+      setActiveColumnId(null)
+      setActiveFieldEditorTarget(target)
+    },
     handleEscape,
     handleColumnActivate,
+    handleFieldEditorCancel,
+    handleFieldEditorComplete,
+    handleInsertSave,
+    handleMutationApplySuccess,
     handleRowEditorOpenChange: (open) => {
       if (open === false) {
-        draftTransition.request(closeDetailPane)
+        closeDetailPane()
       }
     },
-    handleRowDraftDirtyChange: draftTransition.handleDirtyChange,
     handleRowEditorCancel,
-    handleDelete,
-    handleEditSave: async (values) => {
-      if (activeRowId !== null) {
-        // Ordinary edit saves keep the pane open; live row reconciliation clears saved overlays.
-        await draftTransition.runMutation(() => mutations.updateRow(activeRowId, values))
-      }
-    },
-    handleInsertSave: async (values, options) => {
-      const continued = await draftTransition.runMutation(() => mutations.insertRow(values))
-
-      if (continued === true) {
-        // A pending destination replaces normal close or Insert more behavior.
-        return
-      }
-
-      if (options?.keepOpen === true) {
-        return
-      }
-
-      void query.resetPage()
-      closeDetailPane()
-    },
   }
 }

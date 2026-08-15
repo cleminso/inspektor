@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import { useReducer } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ColumnDescriptor } from 'jazz-tools'
 
 import { DataGrid } from '@inspector/ds'
 import { createInsertRowValues, useTableViewState } from '@tables/workspace/useTableViewState'
@@ -12,6 +13,7 @@ const updateRow = vi.fn()
 const setPage = vi.fn()
 const setPageSize = vi.fn()
 const resetPage = vi.fn()
+const { focusRowEditorField } = vi.hoisted(() => ({ focusRowEditorField: vi.fn() }))
 const columnOrderState = {
   columnOrder: ['id', 'name'],
   setColumnOrder: vi.fn((updater: string[] | ((current: string[]) => string[])) => {
@@ -44,31 +46,19 @@ const tableColumns = [
   },
   {
     accessorKey: 'name',
-    column: null,
+    column: {
+      name: 'name',
+      column_type: { type: 'Text' },
+      nullable: false,
+    } as ColumnDescriptor,
     id: 'name',
     isSortable: true,
     label: 'Name',
   },
 ]
-const routeBlocker = {
-  action: undefined,
-  current: undefined,
-  next: undefined,
-  proceed: undefined,
-  reset: undefined,
-  status: 'idle' as const,
-}
-let shouldBlockNavigation = () => false
 const runtimeState = vi.hoisted(() => ({
   client: null as object | null,
   schema: null as Record<string, unknown> | null,
-}))
-
-vi.mock('@tanstack/react-router', () => ({
-  useBlocker: (options: { shouldBlockFn: () => boolean }) => {
-    shouldBlockNavigation = options.shouldBlockFn
-    return routeBlocker
-  },
 }))
 
 vi.mock('jazz-tools/react', () => ({
@@ -129,6 +119,12 @@ vi.mock('@tables/rowEditor/mutation/useTableMutation', () => ({
   }),
 }))
 
+vi.mock('@tables/rowEditor/fieldFocus', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@tables/rowEditor/fieldFocus')>()
+  focusRowEditorField.mockImplementation(original.focusRowEditorField)
+  return { focusRowEditorField }
+})
+
 vi.mock('@tables/query/useTableRows', () => ({
   useTableRows: () => ({
     columns: tableColumns,
@@ -155,6 +151,7 @@ beforeEach(() => {
   insertRow.mockReset()
   updateRow.mockReset()
   resetPage.mockReset()
+  focusRowEditorField.mockClear()
   setPage.mockReset()
   setPageSize.mockReset()
   setRowEditor.mockImplementation((mode: 'edit' | 'insert' | null, rowId: string | null) => {
@@ -167,16 +164,13 @@ beforeEach(() => {
   searchState.sortColumn = 'id'
   columnOrderState.columnOrder = ['id', 'name']
   activeRows = []
+  tableColumns[1]!.column = {
+    name: 'name',
+    column_type: { type: 'Text' },
+    nullable: false,
+  }
   runtimeState.client = null
   runtimeState.schema = null
-  Object.assign(routeBlocker, {
-    action: undefined,
-    current: undefined,
-    next: undefined,
-    proceed: undefined,
-    reset: undefined,
-    status: 'idle',
-  })
 })
 
 afterEach(cleanup)
@@ -190,6 +184,11 @@ function TableViewInteractionHarness(): React.ReactElement {
       <output aria-label="Pane mode">{state.detailPaneMode}</output>
       <output aria-label="Selected row count">
         {state.table.getSelectedRowModel().rows.length}
+      </output>
+      <output aria-label="Inline editor target">
+        {state.activeFieldEditorTarget === null
+          ? ""
+          : `${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
       </output>
       <button
         type="button"
@@ -206,6 +205,7 @@ function TableViewInteractionHarness(): React.ReactElement {
         activeColumnId={state.activeColumnId}
         activeRowId={state.rowEditor.activeRowId}
         onCellActivate={state.handleCellActivate}
+        onCellEditRequest={state.handleCellEditRequest}
         onColumnActivate={state.handleColumnActivate}
       >
         <DataGrid.Viewport>
@@ -219,6 +219,166 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
+  it('clears row selection and closes the edit pane after staged changes apply', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    expect(result.current.selectedRowIds).toEqual(['row-1'])
+    setRowEditor.mockClear()
+
+    act(() => {
+      result.current.handleMutationApplySuccess()
+    })
+
+    expect(result.current.selectedRowIds).toEqual([])
+    expect(setRowEditor).toHaveBeenCalledWith(null, null)
+  })
+
+  it('opens scalar editing only from an explicit cell edit request', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.handleCellActivate({ rowId: 'row-1', columnId: 'name' })
+    })
+    expect(result.current.activeFieldEditorTarget).toBeNull()
+
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.handleRowEditorOpenChange(false)
+    })
+    rerender()
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+    expect(result.current.activeFieldEditorTarget).toEqual({ rowId: 'row-1', columnId: 'name' })
+  })
+
+  it('opens structured fields in the Floating editor', () => {
+    tableColumns[1]!.column = {
+      name: 'name',
+      column_type: { type: 'Json' },
+      nullable: false,
+    }
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.handleRowEditorOpenChange(false)
+    })
+    rerender()
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+
+    expect(result.current.activeFieldEditorTarget).toEqual({ rowId: 'row-1', columnId: 'name' })
+  })
+
+  it.each([
+    {
+      column: {
+        name: 'name',
+        column_type: { type: 'Uuid' },
+        nullable: false,
+        references: 'accounts',
+      } satisfies ColumnDescriptor,
+      label: 'relation',
+    },
+    {
+      column: {
+        name: 'name',
+        column_type: { type: 'Bytea' },
+        nullable: false,
+      } satisfies ColumnDescriptor,
+      label: 'binary',
+    },
+  ])('routes $label fields to the complete-row pane', async ({ column }) => {
+    tableColumns[1]!.column = column
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.handleRowEditorOpenChange(false)
+    })
+    rerender()
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+
+    expect(result.current.activeFieldEditorTarget).toBeNull()
+    expect(setRowEditor).toHaveBeenCalledWith('edit', 'row-1')
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(focusRowEditorField).toHaveBeenCalledWith('name')
+  })
+
+  it('moves completed scalar edits with spreadsheet Enter and Tab navigation', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.handleRowEditorOpenChange(false)
+    })
+    rerender()
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+    act(() => {
+      result.current.handleFieldEditorComplete('enter')
+    })
+    expect(result.current.cellFocusRequest?.target).toEqual({
+      rowId: 'row-2',
+      columnId: 'name',
+    })
+    expect(result.current.activeFieldEditorTarget).toBeNull()
+
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+    act(() => {
+      result.current.handleFieldEditorComplete('tabForward')
+    })
+    expect(result.current.cellFocusRequest?.target).toEqual({
+      rowId: 'row-2',
+      columnId: 'id',
+    })
+  })
+
+  it('cancels scalar editing and requests focus on the originating cell', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.handleRowEditorOpenChange(false)
+    })
+    rerender()
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+    act(() => {
+      result.current.handleFieldEditorCancel()
+    })
+
+    expect(result.current.activeFieldEditorTarget).toBeNull()
+    expect(result.current.cellFocusRequest?.target).toEqual({
+      rowId: 'row-1',
+      columnId: 'name',
+    })
+  })
+
   it('keeps schema and insert UI available while mutations wait for the runtime client', () => {
     runtimeState.schema = { accounts: { columns: [] } }
 
@@ -227,6 +387,51 @@ describe('useTableViewState', () => {
     expect(result.current.canInspectSchema).toBe(true)
     expect(result.current.canOpenRowEditor).toBe(true)
     expect(result.current.canMutateRows).toBe(false)
+  })
+
+  it('persists an inserted row and closes the insert pane', async () => {
+    searchState.editorMode = 'insert'
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    await act(async () => {
+      await result.current.handleInsertSave({ name: 'Ada' }, { keepOpen: false })
+    })
+
+    expect(insertRow).toHaveBeenCalledWith({ name: 'Ada' })
+    expect(resetPage).toHaveBeenCalledOnce()
+    expect(setRowEditor).toHaveBeenLastCalledWith(null, null)
+  })
+
+  it('persists an inserted row and keeps the insert pane open when Insert more is enabled', async () => {
+    searchState.editorMode = 'insert'
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    await act(async () => {
+      await result.current.handleInsertSave({ name: 'Ada' }, { keepOpen: true })
+    })
+
+    expect(insertRow).toHaveBeenCalledWith({ name: 'Ada' })
+    expect(resetPage).not.toHaveBeenCalled()
+    expect(setRowEditor).not.toHaveBeenCalled()
+  })
+
+  it('opens inline editing without row selection and ignores requests while the row pane is open', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+    expect(result.current.activeFieldEditorTarget).toEqual({ rowId: 'row-1', columnId: 'name' })
+
+    act(() => {
+      result.current.handleFieldEditorCancel()
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+    expect(result.current.activeFieldEditorTarget).toBeNull()
   })
 
   it('keeps column definitions stable when only the rendered order changes', () => {
@@ -276,7 +481,7 @@ describe('useTableViewState', () => {
     expect(result.current.rowValues).toBeNull()
   })
 
-  it('keeps the side pane closed when a focused cell is double-clicked', () => {
+  it('opens inline editing without checking the row when a focused cell is double-clicked', () => {
     render(<TableViewInteractionHarness />)
     const cell = screen.getByRole('cell', { name: 'Ada' })
 
@@ -290,6 +495,10 @@ describe('useTableViewState', () => {
     fireEvent.doubleClick(cell)
 
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('closed')
+    expect(screen.getByRole('status', { name: 'Inline editor target' }).textContent).toBe(
+      'row-1:name',
+    )
+    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('0')
   })
 
   it('stores cell selection in the active table view', () => {
@@ -400,133 +609,20 @@ describe('useTableViewState', () => {
     expect(setRowEditor).toHaveBeenLastCalledWith(null, null)
   })
 
-  it('requires an explicit decision before dismissing a dirty row draft', () => {
+  it('dismisses the row pane without a single-draft transition decision', () => {
     searchState.editorMode = 'edit'
     searchState.rowId = 'row-1'
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.handleRowDraftDirtyChange(true)
-    })
     setRowEditor.mockClear()
 
     act(() => {
       result.current.handleRowEditorOpenChange(false)
     })
 
-    expect(result.current.draftTransition.isPending).toBe(true)
-    expect(setRowEditor).not.toHaveBeenCalled()
-    setRowEditor.mockImplementation(() => {
-      if (shouldBlockNavigation() === true) {
-        Object.assign(routeBlocker, { status: 'blocked' })
-      }
-    })
-
-    act(() => {
-      result.current.draftTransition.discardAndContinue()
-    })
-
-    expect(result.current.draftTransition.isPending).toBe(false)
     expect(setRowEditor).toHaveBeenCalledWith(null, null)
-    expect(routeBlocker.status).toBe('idle')
   })
 
-  it('keeps the active dirty row when a requested transition is cancelled', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.handleRowDraftDirtyChange(true)
-    })
-    act(() => {
-      result.current.handleRowEditorOpenChange(false)
-    })
-
-    act(() => {
-      result.current.draftTransition.keepEditing()
-    })
-
-    expect(result.current.draftTransition.isPending).toBe(false)
-    expect(result.current.detailPaneMode).toBe('rows')
-  })
-
-  it('saves the dirty patch before completing a requested transition', async () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.handleRowDraftDirtyChange(true)
-    })
-    act(() => {
-      result.current.handleRowEditorOpenChange(false)
-    })
-
-    await act(async () => {
-      await result.current.handleEditSave({ name: 'Grace' })
-    })
-
-    expect(updateRow).toHaveBeenCalledWith('row-1', { name: 'Grace' })
-    expect(result.current.draftTransition.isPending).toBe(false)
-    expect(setRowEditor).toHaveBeenLastCalledWith(null, null)
-  })
-
-  it('does not reset the page after insert save continues a requested destination', async () => {
-    searchState.editorMode = 'insert'
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.handleRowDraftDirtyChange(true)
-      result.current.setPage(2)
-    })
-
-    await act(async () => {
-      await result.current.handleInsertSave({ name: 'Grace' })
-    })
-
-    expect(insertRow).toHaveBeenCalledWith({ name: 'Grace' })
-    expect(setPage).toHaveBeenCalledWith(2)
-    expect(resetPage).not.toHaveBeenCalled()
-  })
-
-  it('keeps insert mode open without resetting route state when Insert more is enabled', async () => {
-    searchState.editorMode = 'insert'
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-
-    await act(async () => {
-      await result.current.handleInsertSave({ name: 'Grace' }, { keepOpen: true })
-    })
-
-    expect(insertRow).toHaveBeenCalledWith({ name: 'Grace' })
-    expect(resetPage).not.toHaveBeenCalled()
-    expect(setRowEditor).not.toHaveBeenCalled()
-    expect(result.current.detailPaneMode).toBe('insert')
-  })
-
-  it('continues a blocked route transition only after the dirty draft is discarded', () => {
-    const proceed = vi.fn()
-    const reset = vi.fn()
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.handleRowDraftDirtyChange(true)
-    })
-    Object.assign(routeBlocker, {
-      proceed,
-      reset,
-      status: 'blocked',
-    })
-    rerender()
-
-    expect(result.current.draftTransition.isPending).toBe(true)
-
-    act(() => {
-      result.current.draftTransition.discardAndContinue()
-    })
-
-    expect(proceed).toHaveBeenCalledOnce()
-    expect(reset).not.toHaveBeenCalled()
-  })
-
-  it('unchecks a row through its own checkbox after pane dismissal', () => {
+  it('allows a row to be checked again after Escape clears its selection', () => {
     render(<TableViewInteractionHarness />)
     const checkbox = screen.getByRole('checkbox', { name: 'Select row row-1' })
 
@@ -536,16 +632,17 @@ describe('useTableViewState', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss pane' }))
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select row row-1' }))
 
-    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('0')
+    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('1')
   })
 
-  it('preserves checkbox selection when dismissing the row pane', () => {
+  it('closes the row pane and clears its checked row on Escape', () => {
     render(<TableViewInteractionHarness />)
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select row row-1' }))
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss pane' }))
 
-    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('1')
+    expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('closed')
+    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('0')
   })
 
   it('restores the checked row represented by URL-backed edit state', () => {

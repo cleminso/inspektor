@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type RefCallback } from "react";
 
 import { Link } from "@tanstack/react-router";
 import type { ColumnDescriptor } from "jazz-tools";
@@ -38,10 +38,13 @@ import { formatColumnDefault } from "@tables/rowEditor/mutation/draft";
 interface MutationFieldProps {
   canOmit: boolean;
   column: ColumnDescriptor;
+  controlRef?: RefCallback<HTMLElement>;
   error: string | undefined;
   expanded: boolean;
   fieldState: { isNull: boolean; isOmitted: boolean; text: string };
+  focusOnMount?: boolean;
   hidden: boolean;
+  idPrefix?: string;
   initialValue: unknown;
   onExpandedChange: (expanded: boolean) => void;
   onNullChange: (isNull: boolean) => void;
@@ -155,10 +158,13 @@ function NullInputGroupCheckbox({
 export function MutationField({
   canOmit,
   column,
+  controlRef,
   error,
   expanded,
   fieldState,
+  focusOnMount = false,
   hidden,
+  idPrefix = "row-editor",
   initialValue,
   onExpandedChange,
   onNullChange,
@@ -168,7 +174,7 @@ export function MutationField({
 }: MutationFieldProps): React.ReactElement {
   const { currentConnectionId } = useInspectorSessionState();
   const label = formatColumnNameLabel(column.name);
-  const fieldId = `row-editor-${column.name}`;
+  const fieldId = `${idPrefix}-${column.name}`;
   const fieldLabelId = `${fieldId}-label`;
   const isBooleanColumn = column.column_type.type === "Boolean";
   const isBinaryColumn = column.column_type.type === "Bytea";
@@ -256,7 +262,7 @@ export function MutationField({
           : undefined
       }
       hidden={hidden}
-      id={`row-editor-field-${column.name}`}
+      id={`${idPrefix}-field-${column.name}`}
       invalid={hasFieldError}
       render={
         isEditableStructuredColumn === true ? (
@@ -368,7 +374,7 @@ export function MutationField({
           itemWidth="equal"
           aria-labelledby={fieldLabelId}
         >
-          <ToggleGroup.Item value="true">True</ToggleGroup.Item>
+          <ToggleGroup.Item ref={controlRef} value="true">True</ToggleGroup.Item>
           <ToggleGroup.Item value="false">False</ToggleGroup.Item>
           {column.nullable === true ? (
             <ToggleGroup.Item value="null">Null</ToggleGroup.Item>
@@ -389,7 +395,7 @@ export function MutationField({
               }
             }}
           >
-            <Select.Trigger id={fieldId} placeholder="Select value…" width="full" />
+            <Select.Trigger ref={controlRef} id={fieldId} placeholder="Select value…" width="full" />
             <Select.Content>
               {column.column_type.variants.map((variant) => (
                 <Select.Item key={variant} value={variant}>
@@ -421,6 +427,7 @@ export function MutationField({
                 labelledBy={fieldLabelId}
                 describedBy={hasFieldError === true ? `${fieldId}-error` : undefined}
                 expanded={expanded}
+                focusOnMount={focusOnMount}
                 invalid={hasFieldError}
                 layout={expanded === true ? "fill" : "intrinsic"}
                 readOnly={isReadOnly}
@@ -448,7 +455,7 @@ export function MutationField({
               value={timestampValue}
               onApply={(nextValue) => onTextChange(nextValue.toISOString())}
             >
-              <Calendar.Trigger id={fieldId} label={label}>
+              <Calendar.Trigger ref={controlRef} id={fieldId} label={label}>
                 {timestampInputValue.length === 0 ? "Select Date" : timestampInputValue}
               </Calendar.Trigger>
               <Calendar.Content />
@@ -467,6 +474,7 @@ export function MutationField({
         <Box flexDirection="column" gap="s">
           <InputGroup fullWidth>
             <Input
+              ref={controlRef}
               id={fieldId}
               font="mono"
               value={fieldState.text}

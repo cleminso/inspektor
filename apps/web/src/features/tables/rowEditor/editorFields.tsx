@@ -2,10 +2,10 @@
  * Connects the surface-independent row draft model to the pane form.
  *
  * This module owns form errors, focus, expanded editors, and duplicate-submit protection. Parsing,
- * dirty comparison, live reconciliation, and patch construction remain in the shared mutation
+ * dirty comparison and patch construction remain in the shared mutation
  * modules so an inline editor can reuse them without rendering this pane form.
  */
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
@@ -13,16 +13,8 @@ import { Box, Field, Input, Text } from "@inspector/ds";
 
 import { MutationField } from "@tables/rowEditor/mutationField";
 import { buildMutationFields, type MutationFormField } from "@tables/rowEditor/mutation/parsing";
-import {
-  buildRowMutationSubmission,
-  createInsertRowDraft,
-  createUpdateRowDraft,
-  getMutationFieldInput,
-  isRowMutationDraftDirty,
-  reconcileRowMutationSource,
-  setMutationFieldMode,
-  setMutationFieldText,
-} from "@tables/rowEditor/mutation/draft";
+import { getMutationFieldInput } from "@tables/rowEditor/mutation/draft";
+import type { RowDraftController } from "@tables/rowEditor/mutation/useRowDraftController";
 import type { DetailPaneMode } from "@tables/tableTypes";
 import { focusRowEditorField } from "@tables/rowEditor/fieldFocus";
 
@@ -35,7 +27,7 @@ export interface FieldState {
 type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
 
 interface UseRowEditorFieldsOptions {
-  initialRowValues: Record<string, unknown>;
+  draftController: RowDraftController;
   mode: DetailPaneMode;
   onDirtyChange?: (isDirty: boolean) => void;
   onSubmit: (values: Record<string, unknown>) => Promise<void> | void;
@@ -70,14 +62,6 @@ interface RowEditorFieldsProps {
   onFieldTextChange: (columnName: string, text: string) => void;
 }
 
-function isStructuredColumn(column: ColumnDescriptor): boolean {
-  return (
-    column.column_type.type === "Json" ||
-    column.column_type.type === "Array" ||
-    column.column_type.type === "Row"
-  );
-}
-
 /**
  * Owns one pane form draft from initialization through submission.
  *
@@ -87,33 +71,20 @@ function isStructuredColumn(column: ColumnDescriptor): boolean {
  * guard and send only validated values to `onSubmit`.
  */
 export function useRowEditorFields({
-  initialRowValues,
+  draftController,
   mode,
   onDirtyChange,
   onSubmit,
   schemaColumns,
 }: UseRowEditorFieldsOptions): UseRowEditorFieldsResult {
-  const [draft, setDraft] = useState(() =>
-    mode === "insert"
-      ? createInsertRowDraft(initialRowValues, schemaColumns)
-      : createUpdateRowDraft(initialRowValues),
-  );
+  const controller = draftController;
+  const { draft, isDirty } = controller.state;
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [expandedColumnName, setExpandedColumnName] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const isSavingRef = useRef(false);
   const formFields = useMemo(() => buildMutationFields(schemaColumns), [schemaColumns]);
-  const deferredDraft = useDeferredValue(draft);
-  const deferredIsDirty = useMemo(
-    () => isRowMutationDraftDirty(deferredDraft, schemaColumns),
-    [deferredDraft, schemaColumns],
-  );
-  const urgentIsDirty =
-    draft.kind === "update"
-      ? Object.keys(draft.fieldInputs).length > 0
-      : isRowMutationDraftDirty(draft, schemaColumns);
-  const isDirty = draft === deferredDraft ? deferredIsDirty : urgentIsDirty;
   const fieldStates = useMemo<Record<string, FieldState>>(
     () =>
       Object.fromEntries(
@@ -133,13 +104,6 @@ export function useRowEditorFields({
   );
 
   useEffect(() => {
-    // Reconcile live rows and schema changes without resetting dirty field overlays.
-    setDraft((currentDraft) =>
-      reconcileRowMutationSource(currentDraft, initialRowValues, schemaColumns),
-    );
-  }, [initialRowValues, schemaColumns]);
-
-  useEffect(() => {
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
 
@@ -152,39 +116,12 @@ export function useRowEditorFields({
   );
 
   const setFieldText = (columnName: string, text: string) => {
-    const column = schemaColumns.find((candidate) => candidate.name === columnName);
-    if (column === undefined) {
-      return;
-    }
-    setDraft((currentDraft) => {
-      // Disabled editors can emit delayed callbacks after NULL or DEFAULT becomes active.
-      if (getMutationFieldInput(currentDraft, column).mode !== "value") {
-        return currentDraft;
-      }
-      return setMutationFieldText(currentDraft, column, text);
-    });
+    controller.actions.setFieldText(columnName, text);
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: "" }));
   };
 
   const setFieldNull = (columnName: string, isNull: boolean) => {
-    setDraft((currentDraft) => {
-      const column = schemaColumns.find((candidate) => candidate.name === columnName);
-      if (column === undefined) {
-        return currentDraft;
-      }
-      const currentInput = getMutationFieldInput(currentDraft, column);
-      const shouldSeedStructuredValue =
-        isNull === false && currentInput.text.length === 0 && isStructuredColumn(column) === true;
-      if (shouldSeedStructuredValue === true) {
-        // Leaving NULL starts structured editors with valid JSON instead of an invalid blank value.
-        return setMutationFieldText(
-          currentDraft,
-          column,
-          column.column_type.type === "Array" ? "[]" : "{}",
-        );
-      }
-      return setMutationFieldMode(currentDraft, column, isNull === true ? "null" : "value");
-    });
+    controller.actions.setFieldNull(columnName, isNull);
     if (isNull === true) {
       setExpandedColumnName((currentColumnName) =>
         currentColumnName === columnName ? null : currentColumnName,
@@ -194,13 +131,7 @@ export function useRowEditorFields({
   };
 
   const setFieldOmitted = (columnName: string, isOmitted: boolean) => {
-    const column = schemaColumns.find((candidate) => candidate.name === columnName);
-    if (column === undefined) {
-      return;
-    }
-    setDraft((currentDraft) =>
-      setMutationFieldMode(currentDraft, column, isOmitted === true ? "omitted" : "value"),
-    );
+    controller.actions.setFieldOmitted(columnName, isOmitted);
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: "" }));
   };
 
@@ -216,7 +147,7 @@ export function useRowEditorFields({
     if (isSavingRef.current === true) {
       return;
     }
-    const submission = buildRowMutationSubmission(draft, schemaColumns);
+    const submission = controller.actions.buildSubmission();
     const nextErrors = submission.errors;
 
     setErrors(nextErrors);

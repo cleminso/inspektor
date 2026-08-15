@@ -24,6 +24,15 @@ import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import { getTableViewportScrollResetKey } from '@tables/workspace/tableViewport'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
+import {
+  TableMutationLedgerProvider,
+  useTableMutationEditorController,
+} from '@tables/mutationLedger/provider'
+import type { ColumnDescriptor } from 'jazz-tools'
+import type { TableRowId } from '@tables/tableTypes'
+import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
+import { FieldEditorMutationWidget } from '@tables/floatingWidget/fieldEditorMutationWidgetModules'
+import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
 
 interface TableViewProps {
   tableName: string
@@ -37,16 +46,114 @@ function RowEditorFormFallback(): React.ReactElement {
   )
 }
 
+interface StagedEditRowFormProps {
+  onCancel: () => void
+  rowId: TableRowId
+  rowValues: Record<string, unknown>
+  schemaColumns: ColumnDescriptor[]
+}
+
+function StagedEditRowForm({
+  onCancel,
+  rowId,
+  rowValues,
+  schemaColumns,
+}: StagedEditRowFormProps): React.ReactElement {
+  const draftController = useTableMutationEditorController({
+    initialRowValues: rowValues,
+    rowId,
+    schemaColumns,
+  })
+
+  return (
+    <EditRowForm
+      draftController={draftController}
+      rowValues={rowValues}
+      schemaColumns={schemaColumns}
+      targetRowId={rowId}
+      onCancel={onCancel}
+    />
+  )
+}
+
+interface StagedFieldEditorMutationWidgetProps {
+  column: ColumnDescriptor
+  onCancel: () => void
+  onComplete: (direction: SpreadsheetCompletionDirection) => void
+  rowId: TableRowId
+  rowValues: Record<string, unknown>
+  schemaColumns: ColumnDescriptor[]
+}
+
+function StagedFieldEditorMutationWidget({
+  column,
+  onCancel,
+  onComplete,
+  rowId,
+  rowValues,
+  schemaColumns,
+}: StagedFieldEditorMutationWidgetProps): React.ReactElement {
+  const controller = useTableMutationEditorController({
+    initialRowValues: rowValues,
+    rowId,
+    schemaColumns,
+  })
+
+  return (
+    <Suspense fallback={<RowEditorFormFallback />}>
+      <FieldEditorMutationWidget
+        column={column}
+        controller={controller}
+        onClose={onCancel}
+        onComplete={onComplete}
+      />
+    </Suspense>
+  )
+}
+
 export function TableView({ tableName }: TableViewProps): React.ReactElement {
-  const { openSchemaView } = useTableTabs()
   const state = useTableViewState({
     tableName,
   })
+
+  return (
+    <TableMutationLedgerProvider
+      key={state.tableKey}
+      schemaColumns={state.schemaColumns}
+    >
+      <TableViewContent
+        state={state}
+        tableName={tableName}
+      />
+    </TableMutationLedgerProvider>
+  )
+}
+
+function TableViewContent({
+  state,
+  tableName,
+}: {
+  state: ReturnType<typeof useTableViewState>
+  tableName: string
+}): React.ReactElement {
+  const { openSchemaView } = useTableTabs()
   const scrollResetKey = getTableViewportScrollResetKey(state)
   const handleEscape = useEffectEvent(state.handleEscape)
   const refreshPendingRef = useRef(false)
   const [refreshAnnouncement, setRefreshAnnouncement] = useState('')
   const [insertMoreEnabled, setInsertMoreEnabled] = useState(false)
+  const activeFieldRow =
+    state.activeFieldEditorTarget === null
+      ? undefined
+      : state.table
+          .getRowModel()
+          .rows.find((row) => row.id === state.activeFieldEditorTarget?.rowId)
+  const activeFieldColumn =
+    state.activeFieldEditorTarget === null
+      ? null
+      : (state.tableColumns.find(
+          (column) => column.id === state.activeFieldEditorTarget?.columnId,
+        )?.column ?? null)
   const filteredEmpty =
     state.error === null &&
     state.isInitialLoading === false &&
@@ -87,6 +194,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
   useEffect(() => {
     if (
       state.detailPaneMode === 'closed' &&
+      state.activeFieldEditorTarget === null &&
       state.hasCellSelection === false &&
       state.activeColumnId === null
     ) {
@@ -103,10 +211,16 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [state.activeColumnId, state.detailPaneMode, state.hasCellSelection])
+  }, [
+    state.activeColumnId,
+    state.activeFieldEditorTarget,
+    state.detailPaneMode,
+    state.hasCellSelection,
+  ])
 
   return (
-    <ResizablePanelGroup orientation="horizontal">
+    <>
+      <ResizablePanelGroup orientation="horizontal">
       <ResizablePanel>
         <Box
           height="full"
@@ -143,15 +257,15 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
                   type="button"
                   variant="primary"
                   size="s"
-                  disabled={state.canOpenRowEditor === false}
-                  onClick={() => {
-                    if (state.detailPaneMode === 'insert') {
-                      setInsertMoreEnabled(false)
-                      state.handleRowEditorOpenChange(false)
-                    } else {
-                      setInsertMoreEnabled(false)
-                      state.rowEditor.openInsert()
-                    }
+                   disabled={state.canOpenRowEditor === false}
+                   onClick={() => {
+                      if (state.detailPaneMode === 'insert') {
+                        setInsertMoreEnabled(false)
+                        state.handleRowEditorOpenChange(false)
+                      } else {
+                        setInsertMoreEnabled(false)
+                        state.rowEditor.openInsert()
+                     }
                   }}
                 >
                   Insert row
@@ -182,7 +296,9 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               density="compact"
               activeColumnId={state.activeColumnId}
               activeRowId={state.rowEditor.activeRowId}
+              focusRequest={state.cellFocusRequest}
               onCellActivate={state.handleCellActivate}
+              onCellEditRequest={state.handleCellEditRequest}
               columnDragPreview={(columnId) => {
                 const column = state.tableColumns.find((candidate) => candidate.id === columnId)
                 return column === undefined ? columnId : <ColumnDragPreview column={column} />
@@ -242,13 +358,9 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               activeColumnNumber={state.rowEditor.activeColumnNumber}
               activePageRowNumber={state.rowEditor.activePageRowNumber}
               mode={state.detailPaneMode === 'insert' ? 'insert' : 'edit'}
-              draftTransitionPending={state.draftTransition.isPending}
-              draftTransitionSaving={state.draftTransition.isSaving}
               editedRowIds={state.rowEditor.editedRowIds}
               insertMoreEnabled={insertMoreEnabled}
               activeRowIndex={state.rowEditor.activeRowIndex}
-              onDiscardAndContinue={state.draftTransition.discardAndContinue}
-              onKeepEditing={state.draftTransition.keepEditing}
               onInsertMoreEnabledChange={setInsertMoreEnabled}
               onNavigatePrevious={state.rowEditor.goToPreviousRow}
               onNavigateNext={state.rowEditor.goToNextRow}
@@ -256,42 +368,70 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
               <Suspense fallback={<RowEditorFormFallback />}>
                 {state.detailPaneMode === 'insert' ? (
                   <InsertRowForm
-                    key={`${tableName}:insert`}
-                    insertMoreEnabled={insertMoreEnabled}
-                    saveDisabled={state.canMutateRows === false}
-                    rowValues={state.rowValues ?? {}}
-                    schemaColumns={state.schemaColumns}
-                    onCancel={() => {
-                      setInsertMoreEnabled(false)
-                      state.handleRowEditorCancel()
-                    }}
-                    onDirtyChange={state.handleRowDraftDirtyChange}
-                    onSave={async (values, options) => {
-                      await state.handleInsertSave(values, options)
-                      if (options?.keepOpen !== true) {
+                      key={`${tableName}:insert`}
+                      rowValues={state.rowValues ?? {}}
+                      schemaColumns={state.schemaColumns}
+                      insertMoreEnabled={insertMoreEnabled}
+                      saveDisabled={state.canMutateRows === false}
+                      onDiscard={() => {
                         setInsertMoreEnabled(false)
-                      }
-                    }}
+                        state.handleRowEditorCancel()
+                      }}
+                      onSave={async (values, options) => {
+                        await state.handleInsertSave(values, options)
+                        if (options.keepOpen === false) {
+                          setInsertMoreEnabled(false)
+                        }
+                      }}
                   />
                 ) : (
-                  <EditRowForm
-                    key={`${tableName}:${state.rowEditor.activeRowId ?? 'none'}`}
-                    rowValues={state.rowValues}
-                    schemaColumns={state.schemaColumns}
-                    targetRowId={state.rowEditor.activeRowId}
-                    onCancel={() => {
-                      state.handleRowEditorCancel()
-                    }}
-                    onDelete={state.handleDelete}
-                    onDirtyChange={state.handleRowDraftDirtyChange}
-                    onSave={state.handleEditSave}
-                  />
+                  state.rowEditor.activeRowId !== null &&
+                  state.rowValues !== null ? (
+                    <StagedEditRowForm
+                      key={`${tableName}:${state.rowEditor.activeRowId}`}
+                      rowId={state.rowEditor.activeRowId}
+                      rowValues={state.rowValues}
+                      schemaColumns={state.schemaColumns}
+                      onCancel={state.handleRowEditorCancel}
+                    />
+                  ) : (
+                    <EditRowForm
+                      key={`${tableName}:${state.rowEditor.activeRowId ?? 'none'}`}
+                      rowValues={state.rowValues}
+                      schemaColumns={state.schemaColumns}
+                      targetRowId={state.rowEditor.activeRowId}
+                      onCancel={() => {
+                        state.handleRowEditorCancel()
+                      }}
+                    />
+                  )
                 )}
               </Suspense>
             </RowEditorSidePanel>
           </ResizablePanel>
         </>
       ) : null}
-    </ResizablePanelGroup>
+      </ResizablePanelGroup>
+      {state.detailPaneMode === 'closed' &&
+      state.activeFieldEditorTarget !== null &&
+      activeFieldRow !== undefined &&
+      activeFieldColumn !== null ? (
+        <StagedFieldEditorMutationWidget
+          key={`${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
+          column={activeFieldColumn}
+          rowId={state.activeFieldEditorTarget.rowId}
+          rowValues={activeFieldRow.original}
+          schemaColumns={state.schemaColumns}
+          onCancel={state.handleFieldEditorCancel}
+          onComplete={state.handleFieldEditorComplete}
+        />
+      ) : (
+        <TableMutationWidget
+          executor={state.mutationExecutor}
+          onApplySuccess={state.handleMutationApplySuccess}
+          selectedRowIds={state.selectedRowIds}
+        />
+      )}
+    </>
   )
 }

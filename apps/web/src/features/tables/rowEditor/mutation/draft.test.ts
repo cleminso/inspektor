@@ -7,7 +7,6 @@ import {
   createUpdateRowDraft,
   getMutationFieldInput,
   isRowMutationDraftDirty,
-  reconcileRowMutationSource,
   setMutationFieldMode,
   setMutationFieldText,
 } from "@tables/rowEditor/mutation/draft";
@@ -19,6 +18,17 @@ const columns = [
 ] satisfies ColumnDescriptor[];
 
 describe("update row drafts", () => {
+  it("removes a field overlay when text returns to the source value", () => {
+    const source = { id: "row-1", name: "Ada", count: 1, settings: null };
+    const changed = setMutationFieldText(createUpdateRowDraft(source), columns[0], "Grace");
+
+    const restored = setMutationFieldText(changed, columns[0], "Ada");
+
+    expect(restored.fieldInputs.name).toBeUndefined();
+    expect(isRowMutationDraftDirty(restored, columns)).toBe(false);
+    expect(buildRowMutationSubmission(restored, columns)).toEqual({ errors: {}, values: {} });
+  });
+
   it("builds a patch from dirty fields only", () => {
     const source = { id: "row-1", name: "Ada", count: 1, settings: null };
     const draft = setMutationFieldText(createUpdateRowDraft(source), columns[0], "Grace");
@@ -30,61 +40,6 @@ describe("update row drafts", () => {
     expect(isRowMutationDraftDirty(draft, columns)).toBe(true);
   });
 
-  it("reflects live changes for untouched fields without adding them to the patch", () => {
-    const source = { id: "row-1", name: "Ada", count: 1, settings: null };
-    const draft = setMutationFieldText(createUpdateRowDraft(source), columns[0], "Grace");
-    const reconciled = reconcileRowMutationSource(
-      draft,
-      { id: "row-1", name: "Ada", count: 2, settings: null },
-      columns,
-    );
-
-    expect(getMutationFieldInput(reconciled, columns[1])).toEqual({
-      mode: "value",
-      text: "2",
-    });
-    expect(buildRowMutationSubmission(reconciled, columns)).toEqual({
-      errors: {},
-      values: { name: "Grace" },
-    });
-  });
-
-  it("preserves a dirty field when its live source changes", () => {
-    const source = { id: "row-1", name: "Ada", count: 1, settings: null };
-    const draft = setMutationFieldText(createUpdateRowDraft(source), columns[0], "Grace");
-    const reconciled = reconcileRowMutationSource(
-      draft,
-      { id: "row-1", name: "Katherine", count: 1, settings: null },
-      columns,
-    );
-
-    expect(getMutationFieldInput(reconciled, columns[0])).toEqual({
-      mode: "value",
-      text: "Grace",
-    });
-    expect(buildRowMutationSubmission(reconciled, columns).values).toEqual({ name: "Grace" });
-  });
-
-  it("removes a dirty field when the latest source becomes semantically equal", () => {
-    const source = { id: "row-1", name: "Ada", count: 1, settings: { enabled: true } };
-    const draft = setMutationFieldText(
-      createUpdateRowDraft(source),
-      columns[2],
-      '{"enabled":false}',
-    );
-    const reconciled = reconcileRowMutationSource(
-      draft,
-      { id: "row-1", name: "Ada", count: 1, settings: { enabled: false } },
-      columns,
-    );
-
-    expect(buildRowMutationSubmission(reconciled, columns)).toEqual({ errors: {}, values: {} });
-    expect(getMutationFieldInput(reconciled, columns[2])).toEqual({
-      mode: "value",
-      text: ["{", '  "enabled": false', "}"].join("\n"),
-    });
-  });
-
   it("retains invalid raw input and excludes it from the patch", () => {
     const source = { id: "row-1", name: "Ada", count: 1, settings: null };
     const draft = setMutationFieldText(createUpdateRowDraft(source), columns[1], "one");
@@ -92,24 +47,6 @@ describe("update row drafts", () => {
     expect(getMutationFieldInput(draft, columns[1])).toEqual({ mode: "value", text: "one" });
     expect(buildRowMutationSubmission(draft, columns)).toEqual({
       errors: { count: "Value must be an integer." },
-      values: {},
-    });
-  });
-
-  it("removes dirty overlays for columns removed from the live schema", () => {
-    const source = { id: "row-1", name: "Ada", count: 1, settings: null };
-    const draft = setMutationFieldText(createUpdateRowDraft(source), columns[0], "Grace");
-    const remainingColumns = columns.filter((column) => column.name !== "name");
-
-    const reconciled = reconcileRowMutationSource(
-      draft,
-      { id: "row-1", count: 1, settings: null },
-      remainingColumns,
-    );
-
-    expect(isRowMutationDraftDirty(reconciled, remainingColumns)).toBe(false);
-    expect(buildRowMutationSubmission(reconciled, remainingColumns)).toEqual({
-      errors: {},
       values: {},
     });
   });
@@ -132,7 +69,7 @@ describe("update row drafts", () => {
     });
   });
 
-  it("retains structured text urgently and resolves semantic equality at submission", () => {
+  it("removes semantically equal structured text from the update overlay", () => {
     const settingsColumn = columns[2];
     const draft = setMutationFieldText(
       createUpdateRowDraft({ settings: { enabled: true } }),
@@ -140,10 +77,7 @@ describe("update row drafts", () => {
       '{"enabled":true}',
     );
 
-    expect(draft.fieldInputs.settings).toEqual({
-      mode: "value",
-      text: '{"enabled":true}',
-    });
+    expect(draft.fieldInputs.settings).toBeUndefined();
     expect(buildRowMutationSubmission(draft, [settingsColumn])).toEqual({
       errors: {},
       values: {},
@@ -262,73 +196,4 @@ describe("insert row drafts", () => {
     });
   });
 
-  it("initializes newly discovered insert columns without replacing existing field drafts", () => {
-    const nameColumn = insertColumns[0];
-    const initialDraft = setMutationFieldText(
-      createInsertRowDraft({}, [nameColumn]),
-      nameColumn,
-      "Ada",
-    );
-    const reconciledDraft = reconcileRowMutationSource(initialDraft, {}, insertColumns);
-
-    expect(getMutationFieldInput(reconciledDraft, nameColumn)).toEqual({
-      mode: "value",
-      text: "Ada",
-    });
-    expect(getMutationFieldInput(reconciledDraft, insertColumns[1])).toEqual({
-      mode: "omitted",
-      text: "active",
-    });
-    expect(getMutationFieldInput(reconciledDraft, insertColumns[3])).toEqual({
-      mode: "value",
-      text: "",
-    });
-  });
-
-  it("adopts a changed insert default when the field has not been edited", () => {
-    const nullableColumn = {
-      name: "status",
-      column_type: { type: "Text" },
-      nullable: true,
-    } satisfies ColumnDescriptor;
-    const defaultColumn = {
-      ...nullableColumn,
-      default: { type: "Text", value: "active" },
-    } satisfies ColumnDescriptor;
-    const reconciledDraft = reconcileRowMutationSource(
-      createInsertRowDraft({}, [nullableColumn]),
-      {},
-      [defaultColumn],
-    );
-
-    expect(getMutationFieldInput(reconciledDraft, defaultColumn)).toEqual({
-      mode: "omitted",
-      text: "active",
-    });
-    expect(isRowMutationDraftDirty(reconciledDraft, [defaultColumn])).toBe(false);
-  });
-
-  it("preserves an edited insert value when the column schema changes", () => {
-    const nullableColumn = {
-      name: "status",
-      column_type: { type: "Text" },
-      nullable: true,
-    } satisfies ColumnDescriptor;
-    const defaultColumn = {
-      ...nullableColumn,
-      default: { type: "Text", value: "active" },
-    } satisfies ColumnDescriptor;
-    const draft = setMutationFieldText(
-      createInsertRowDraft({}, [nullableColumn]),
-      nullableColumn,
-      "archived",
-    );
-    const reconciledDraft = reconcileRowMutationSource(draft, {}, [defaultColumn]);
-
-    expect(getMutationFieldInput(reconciledDraft, defaultColumn)).toEqual({
-      mode: "value",
-      text: "archived",
-    });
-    expect(isRowMutationDraftDirty(reconciledDraft, [defaultColumn])).toBe(true);
-  });
 });
