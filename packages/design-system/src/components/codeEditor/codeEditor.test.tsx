@@ -51,6 +51,20 @@ async function findCodeMirrorTextbox(name = "Settings JSON"): Promise<HTMLElemen
 }
 
 describe("CodeEditor", () => {
+  it("focuses the editor when its owner explicitly requests mount focus", async () => {
+    render(
+      <CodeEditor
+        accessibilityLabel="Settings JSON"
+        focusOnMount
+        value={'{"enabled":true}'}
+      />,
+    );
+
+    expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Settings JSON" }));
+    const codeMirrorTextbox = await findCodeMirrorTextbox();
+    expect(document.activeElement).toBe(codeMirrorTextbox);
+  });
+
   it("restores focus when CodeMirror replaces the static editor", async () => {
     render(<CodeEditor accessibilityLabel="Settings JSON" value={'{"enabled":true}'} />);
 

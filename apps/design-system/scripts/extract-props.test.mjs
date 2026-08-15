@@ -448,6 +448,7 @@ test("extracts the constrained CodeEditor API", () => {
       "defaultExpanded",
       "onExpandedChange",
       "layout",
+      "focusOnMount",
     ],
   );
   assert.equal(

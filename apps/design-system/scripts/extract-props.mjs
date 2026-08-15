@@ -126,6 +126,15 @@ const componentEntries = [
     part,
     inheritedProps: ["children"],
   })),
+  ...["Root", "Content", "Summary", "Actions"].map((part) => ({
+    componentId: `floatingPanel.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "FloatingPanel",
+    part,
+    inheritedProps:
+      part === "Root"
+        ? ["aria-label", "aria-labelledby", "children"]
+        : ["children"],
+  })),
   ...[
     "Root",
     "Viewport",

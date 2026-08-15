@@ -17,6 +17,7 @@ export interface DataGridContextValue<TData extends RowData> {
   bodyCellEntryId: string | null;
   density: DataGridDensity;
   onCellActivate?: (target: DataGridCellTarget) => void;
+  onCellEditRequest?: (target: DataGridCellTarget) => void;
   onCellContextMenu?: DataGridCellContextMenuHandler;
   onColumnActivate?: (columnId: string | null) => void;
   onHeaderContextMenu?: DataGridHeaderContextMenuHandler;

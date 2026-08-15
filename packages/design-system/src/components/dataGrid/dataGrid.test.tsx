@@ -161,9 +161,14 @@ interface TestDataGridProps {
   activeRowId?: string | null
   data?: Person[]
   emptyContent?: ReactNode
+  focusRequest?: {
+    requestId: number
+    target: { columnId: string; rowId: string }
+  } | null
   initialCellSelection?: CellSelectionState
   loading?: boolean
   onCellActivate?: (target: { columnId: string; rowId: string }) => void
+  onCellEditRequest?: (target: { columnId: string; rowId: string }) => void
   onCellContextMenu?: (target: { columnId: string; rowId: string }) => void
   onColumnActivate?: (columnId: string | null) => void
   onRowActivate?: (rowId: string) => void
@@ -178,9 +183,11 @@ function TestDataGrid({
   activeRowId = null,
   data = rows,
   emptyContent = 'No people',
+  focusRequest = null,
   initialCellSelection = [],
   loading = false,
   onCellActivate,
+  onCellEditRequest,
   onCellContextMenu,
   onColumnActivate,
   onRowActivate,
@@ -218,7 +225,9 @@ function TestDataGrid({
       table={table}
       activeColumnId={activeColumnId}
       activeRowId={activeRowId}
+      focusRequest={focusRequest}
       onCellActivate={onCellActivate}
+      onCellEditRequest={onCellEditRequest}
       onCellContextMenu={(target) => onCellContextMenu?.(target)}
       onColumnActivate={onColumnActivate}
       onRowActivate={onRowActivate}
@@ -890,9 +899,15 @@ describe('DataGrid', () => {
     expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: 'person-1', columnId: 'role' })
   })
 
-  it('activates a cell once across the click sequence of a double click', () => {
+  it('activates a cell once and requests editing once across a double-click sequence', () => {
     const onCellActivate = vi.fn()
-    render(<TestDataGrid onCellActivate={onCellActivate} />)
+    const onCellEditRequest = vi.fn()
+    render(
+      <TestDataGrid
+        onCellActivate={onCellActivate}
+        onCellEditRequest={onCellEditRequest}
+      />,
+    )
     const cell = screen.getByRole('cell', { name: 'Engineer' })
 
     fireEvent.click(cell, { detail: 1 })
@@ -900,6 +915,11 @@ describe('DataGrid', () => {
     fireEvent.doubleClick(cell)
 
     expect(onCellActivate).toHaveBeenCalledOnce()
+    expect(onCellEditRequest).toHaveBeenCalledOnce()
+    expect(onCellEditRequest).toHaveBeenCalledWith({
+      rowId: 'person-1',
+      columnId: 'role',
+    })
   })
 
   it('renders TanStack replacement and Shift-range selection', () => {
@@ -949,23 +969,51 @@ describe('DataGrid', () => {
     expect(admiralCell.tabIndex).toBe(0)
   })
 
-  it('activates a focused body cell with Enter and Space', () => {
+  it('requests editing with Enter and preserves Space activation', () => {
     const onCellActivate = vi.fn()
-    render(<TestDataGrid onCellActivate={onCellActivate} />)
+    const onCellEditRequest = vi.fn()
+    render(
+      <TestDataGrid
+        onCellActivate={onCellActivate}
+        onCellEditRequest={onCellEditRequest}
+      />,
+    )
     const cell = screen.getByRole('cell', { name: 'Engineer' })
 
     cell.focus()
     fireEvent.keyDown(cell, { key: 'Enter' })
     fireEvent.keyDown(cell, { key: ' ' })
 
-    expect(onCellActivate).toHaveBeenNthCalledWith(1, {
+    expect(onCellEditRequest).toHaveBeenCalledWith({
       rowId: 'person-1',
       columnId: 'role',
     })
-    expect(onCellActivate).toHaveBeenNthCalledWith(2, {
+    expect(onCellActivate).toHaveBeenCalledOnce()
+    expect(onCellActivate).toHaveBeenCalledWith({
       rowId: 'person-1',
       columnId: 'role',
     })
+  })
+
+  it('focuses a semantic body-cell request after focus leaves the grid', async () => {
+    const { rerender } = render(<TestDataGrid />)
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    outside.focus()
+
+    rerender(
+      <TestDataGrid
+        focusRequest={{
+          requestId: 1,
+          target: { rowId: 'person-2', columnId: 'role' },
+        }}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole('cell', { name: 'Admiral' }))
+    })
+    outside.remove()
   })
 
   it('does not handle body-cell navigation from an interactive descendant', () => {

@@ -28,6 +28,7 @@ import { Route as ComponentsDataGridRouteImport } from './routes/components/data
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsFindBarRouteImport } from './routes/components/find-bar'
+import { Route as ComponentsFloatingPanelRouteImport } from './routes/components/floating-panel'
 import { Route as ComponentsIconRouteImport } from './routes/components/icon'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsInputGroupRouteImport } from './routes/components/input-group'
@@ -148,6 +149,11 @@ const ComponentsFieldsetRoute = ComponentsFieldsetRouteImport.update({
 const ComponentsFindBarRoute = ComponentsFindBarRouteImport.update({
   id: '/components/find-bar',
   path: '/components/find-bar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsFloatingPanelRoute = ComponentsFloatingPanelRouteImport.update({
+  id: '/components/floating-panel',
+  path: '/components/floating-panel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsIconRoute = ComponentsIconRouteImport.update({
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
+  '/components/floating-panel': typeof ComponentsFloatingPanelRoute
   '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
@@ -345,6 +352,7 @@ export interface FileRoutesByTo {
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
+  '/components/floating-panel': typeof ComponentsFloatingPanelRoute
   '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
+  '/components/floating-panel': typeof ComponentsFloatingPanelRoute
   '/components/icon': typeof ComponentsIconRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/input-group': typeof ComponentsInputGroupRoute
@@ -440,6 +449,7 @@ export interface FileRouteTypes {
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
+    | '/components/floating-panel'
     | '/components/icon'
     | '/components/input'
     | '/components/input-group'
@@ -486,6 +496,7 @@ export interface FileRouteTypes {
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
+    | '/components/floating-panel'
     | '/components/icon'
     | '/components/input'
     | '/components/input-group'
@@ -532,6 +543,7 @@ export interface FileRouteTypes {
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
+    | '/components/floating-panel'
     | '/components/icon'
     | '/components/input'
     | '/components/input-group'
@@ -579,6 +591,7 @@ export interface RootRouteChildren {
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsFindBarRoute: typeof ComponentsFindBarRoute
+  ComponentsFloatingPanelRoute: typeof ComponentsFloatingPanelRoute
   ComponentsIconRoute: typeof ComponentsIconRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsInputGroupRoute: typeof ComponentsInputGroupRoute
@@ -739,6 +752,13 @@ declare module '@tanstack/react-router' {
       path: '/components/find-bar'
       fullPath: '/components/find-bar'
       preLoaderRoute: typeof ComponentsFindBarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/floating-panel': {
+      id: '/components/floating-panel'
+      path: '/components/floating-panel'
+      fullPath: '/components/floating-panel'
+      preLoaderRoute: typeof ComponentsFloatingPanelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/icon': {
@@ -939,6 +959,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsFindBarRoute: ComponentsFindBarRoute,
+  ComponentsFloatingPanelRoute: ComponentsFloatingPanelRoute,
   ComponentsIconRoute: ComponentsIconRoute,
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsInputGroupRoute: ComponentsInputGroupRoute,

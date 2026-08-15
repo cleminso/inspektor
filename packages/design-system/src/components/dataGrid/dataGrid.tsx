@@ -63,6 +63,13 @@ export interface DataGridCellTarget {
   rowId: string
 }
 
+export interface DataGridFocusRequest {
+  /** Changes when the same semantic cell must receive focus again. */
+  requestId: string | number
+  /** Cell that should receive DOM focus when it is available. */
+  target: DataGridCellTarget
+}
+
 export type DataGridHeaderContextMenuHandler = (
   columnId: string,
   event: MouseEvent<HTMLTableCellElement>,
@@ -85,8 +92,12 @@ interface DataGridRootBaseProps<TData extends RowData> {
   children: ReactNode
   /** Controls table row and cell spacing. */
   density?: DataGridDensity
+  /** Requests semantic body-cell focus, including after virtual remounts. */
+  focusRequest?: DataGridFocusRequest | null
   /** Runs when a non-interactive cell is activated. */
   onCellActivate?: (target: DataGridCellTarget) => void
+  /** Runs when a non-interactive cell requests editing through double-click or Enter. */
+  onCellEditRequest?: (target: DataGridCellTarget) => void
   /** Runs when a cell context menu is requested. */
   onCellContextMenu?: DataGridCellContextMenuHandler
   /** Runs when a column header is activated. */
@@ -314,7 +325,9 @@ function DataGridRoot<TData extends RowData>({
   children,
   columnDragPreview,
   density = 'default',
+  focusRequest = null,
   onCellActivate,
+  onCellEditRequest,
   onCellContextMenu,
   onColumnActivate,
   onHeaderContextMenu,
@@ -326,6 +339,7 @@ function DataGridRoot<TData extends RowData>({
   const rootRef = useRef<HTMLDivElement>(null)
   const cellElementsRef = useRef(new Map<string, HTMLTableCellElement>())
   const shouldFocusFocusedCellRef = useRef(false)
+  const processedFocusRequestRef = useRef<string | null>(null)
   const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null)
   const focusedColumnIdRef = useRef<string | null>(null)
   const onColumnActivateRef = useRef(onColumnActivate)
@@ -387,6 +401,7 @@ function DataGridRoot<TData extends RowData>({
         bodyCellEntryId,
         density,
         onCellActivate,
+        onCellEditRequest,
         onCellContextMenu,
         onColumnActivate,
         onHeaderContextMenu,
@@ -435,6 +450,7 @@ function DataGridRoot<TData extends RowData>({
       density,
       focusFocusedCell,
       onCellActivate,
+      onCellEditRequest,
       onCellContextMenu,
       onColumnActivate,
       onHeaderContextMenu,
@@ -464,6 +480,30 @@ function DataGridRoot<TData extends RowData>({
       shouldFocusFocusedCellRef.current = false
     }
   })
+
+  useEffect(() => {
+    if (focusRequest === null) {
+      return
+    }
+    const requestKey = `${focusRequest.requestId}:${focusRequest.target.rowId}:${focusRequest.target.columnId}`
+    if (processedFocusRequestRef.current === requestKey) {
+      return
+    }
+    processedFocusRequestRef.current = requestKey
+    shouldFocusFocusedCellRef.current = true
+    table.setFocusedCell(focusRequest.target.rowId, focusRequest.target.columnId)
+    const requestedCell = table
+      .getRowModel()
+      .rows.find((row) => row.id === focusRequest.target.rowId)
+      ?.getVisibleCells()
+      .find((cell) => cell.column.id === focusRequest.target.columnId)
+    const requestedCellElement =
+      requestedCell === undefined ? undefined : cellElementsRef.current.get(requestedCell.id)
+    if (requestedCellElement !== undefined) {
+      requestedCellElement.focus()
+      shouldFocusFocusedCellRef.current = false
+    }
+  }, [focusRequest, table])
 
   useEffect(() => {
     onColumnActivateRef.current = onColumnActivate
@@ -1189,6 +1229,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     density,
     focusFocusedCell,
     onCellActivate,
+    onCellEditRequest,
     onCellContextMenu,
     onColumnActivate,
     registerCellElement,
@@ -1252,6 +1293,17 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     onCellContextMenu(target, event)
   }
 
+  const handleDoubleClick = (event: MouseEvent<HTMLTableCellElement>) => {
+    if (event.button !== 0 || isInteractiveTarget(event.target) === true) {
+      return
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    event.currentTarget.focus()
+    onColumnActivate?.(null)
+    onCellEditRequest?.(target)
+  }
+
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLTableCellElement>) => {
     if (
       event.target !== event.currentTarget ||
@@ -1275,7 +1327,13 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       focusFocusedCell()
       return
     }
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      onColumnActivate?.(null)
+      onCellEditRequest?.(target)
+      return
+    }
+    if (event.key === ' ') {
       event.preventDefault()
       onColumnActivate?.(null)
       onCellActivate?.(target)
@@ -1321,6 +1379,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       ref={registerCell}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
+      onDoubleClick={handleDoubleClick}
       onFocus={() => {
         if (cell.getCanSelect() === true && cell.getIsFocused() === false) {
           table.setFocusedCell(target.rowId, target.columnId)

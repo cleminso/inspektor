@@ -12,4 +12,5 @@ export const codeEditorPropNames = [
   "defaultExpanded",
   "onExpandedChange",
   "layout",
+  "focusOnMount",
 ] as const;

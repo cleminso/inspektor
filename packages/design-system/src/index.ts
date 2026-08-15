@@ -9,6 +9,13 @@ export type {
   AccordionTriggerProps,
   AccordionValue,
 } from './components/accordion/accordion'
+export { FloatingPanel } from './components/floatingPanel/floatingPanel'
+export type {
+  FloatingPanelActionsProps,
+  FloatingPanelContentProps,
+  FloatingPanelRootProps,
+  FloatingPanelSummaryProps,
+} from './components/floatingPanel/floatingPanel'
 export { ScrollArea } from './components/scrollArea/scrollArea'
 export type { ScrollAreaAxis, ScrollAreaProps } from './components/scrollArea/scrollArea'
 export { ActionList } from './components/actionList/actionList'
@@ -31,6 +38,7 @@ export type {
   DataGridDensity,
   DataGridRowRendering,
   DataGridExpandedRowProps,
+  DataGridFocusRequest,
   DataGridFooterProps,
   DataGridHeaderCellProps,
   DataGridHeaderContextMenuHandler,

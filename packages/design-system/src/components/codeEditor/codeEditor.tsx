@@ -47,6 +47,8 @@ export interface CodeEditorProps {
   onExpandedChange?: (expanded: boolean) => void;
   /** Uses intrinsic sizing by default or fills a constrained parent when expanded. */
   layout?: CodeEditorLayout;
+  /** Moves focus into the editor after an explicit owner-driven mount. */
+  focusOnMount?: boolean;
 }
 
 export function CodeEditor({
@@ -54,6 +56,7 @@ export function CodeEditor({
   disabled = false,
   invalid = false,
   defaultExpanded = false,
+  focusOnMount = false,
   layout = "intrinsic",
   ...props
 }: CodeEditorProps) {
@@ -62,6 +65,12 @@ export function CodeEditor({
   const restoreFocusRef = useRef(false);
   const [implementation, setImplementation] = useState<CodeMirrorEditorModule | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (focusOnMount === true) {
+      fallbackRef.current?.focus();
+    }
+  }, [focusOnMount]);
 
   useEffect(() => {
     let active = true;

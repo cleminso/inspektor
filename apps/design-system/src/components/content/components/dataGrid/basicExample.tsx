@@ -31,6 +31,7 @@ export default function BasicExample() {
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([]);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<{ columnId: string; rowId: string } | null>(null);
   const [columnOrder, setColumnOrder] = useState(["id", "email", "role"]);
   const table = useTable({
     features: dataGridFeatures,
@@ -64,6 +65,7 @@ export default function BasicExample() {
         setActiveColumnId(null);
         setActiveRowId(target.rowId);
       }}
+      onCellEditRequest={setEditTarget}
     >
       <DataGrid.Viewport>
         <DataGrid.Table aria-label="Accounts">
@@ -75,7 +77,9 @@ export default function BasicExample() {
           1,000 rows
         </Text>
         <Text color="muted" variant="caption">
-          Select a row, column, or cell
+          {editTarget === null
+            ? "Select a row, column, or cell"
+            : `Edit ${editTarget.rowId} · ${editTarget.columnId}`}
         </Text>
       </DataGrid.Footer>
     </DataGrid.Root>

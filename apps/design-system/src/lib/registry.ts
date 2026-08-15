@@ -421,6 +421,19 @@ export const sidePanelItem = {
   componentId: "sidePanel",
 } satisfies NavItem;
 
+export const floatingPanelItem = {
+  title: "Floating Panel",
+  slug: "floating-panel",
+  href: "/components/floating-panel",
+  description: "A persistent non-modal controller surface with compact and expanded presentations.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "floatingPanel.tsx",
+    path: "packages/design-system/src/components/floatingPanel/floatingPanel.tsx",
+  },
+  componentId: "floatingPanel",
+} satisfies NavItem;
+
 export const scrollAreaItem = {
   title: "Scroll Area",
   slug: "scroll-area",
@@ -597,6 +610,7 @@ export const componentItems: NavItem[] = [
   copyButtonItem,
   dataGridItem,
   findBarItem,
+  floatingPanelItem,
   iconItem,
   inputItem,
   inputGroupItem,
