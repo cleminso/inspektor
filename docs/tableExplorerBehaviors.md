@@ -71,9 +71,8 @@ Pane precedence is explicit:
 - a single cell click changes cell focus without changing pane mode
 - a double-click starts schema-appropriate inline editing or routes relation and binary fields to `rows`
 
-When a double-click requests inline editing while a clean row pane is open, the row pane closes before inline editing starts. When
-the row pane is dirty, the mutation draft guard prevents the transition until the user chooses Save and continue, Discard and
-continue, or Keep editing.
+Pane and inline editing consume the same provider-owned row controller but are not shown simultaneously. Moving from inline editing
+to the complete-row pane preserves pending values and does not require a persistence decision.
 
 Selection belongs to the represented query result:
 
@@ -135,19 +134,22 @@ side pane remain the place for selecting and editing text.
 
 ### Edit one cell
 
-- **Given** one cell is focused
+- **Given** a data cell is focused and the complete-row pane is closed
 - **When** the user double-clicks that cell
 - **Then** the schema-appropriate inline editor opens when the field supports inline editing
 - **And** the cell remains focused
+- **And** the row remains unchecked unless the user selected its checkbox separately
 
 The Enter key offers an equivalent keyboard action when the table supports keyboard cell navigation. An unmodified double-click
 inside a multi-cell selection replaces that selection with the target cell before editing.
 
+While the complete-row pane is open, activating a cell in its focused checked row moves focus to the matching pane field.
+Double-clicking another row does not select it, add it to pane navigation, or open an inline editor.
+
 Field routing is schema-derived:
 
 - primitive scalar and enum values use constrained inline controls
-- JSON, Array, and Row values use an expanded code editor in an anchored inline dialog with Save and Cancel actions
-- the expanded structured editor exposes an expand action that opens the complete-row pane focused on that field
+- JSON, Array, and Row values use the Floating widget's expanded code editor with Save and Cancel actions
 - relation and binary values open the complete-row pane focused on their field
 - timestamps use an inline calendar when that control is available
 - generated, unsupported, and otherwise read-only values remain read-only in the grid
@@ -182,12 +184,12 @@ mounting one expanded control per cell.
 
 ## Editing surfaces
 
-Pane and inline editing are available together rather than selected through a workspace preference. Row checkbox selection opens
-the complete-row pane. Cell double-click or Enter starts inline editing when the schema-derived field interaction supports it.
+Pane and inline editing use the same mutation model but are not presented simultaneously. Row checkbox selection opens the
+complete-row pane. With the pane closed, cell double-click or Enter starts inline editing without requiring row checkbox selection
+when the schema-derived field interaction supports it.
 Relation and binary fields route to the complete-row pane, and unsupported read-only fields remain read-only in the grid.
 
-Both surfaces consume the same per-row draft, parsing, validation, dirty tracking, live reconciliation, save, and discard rules.
-Changing surfaces is a guarded transition when the active draft is dirty.
+Both surfaces consume the same provider-owned per-row draft, parsing, validation, dirty tracking, Apply, and Discard rules.
 
 ## Side-pane behavior
 
@@ -199,72 +201,59 @@ Changing surfaces is a guarded transition when the active draft is dirty.
 - The body renders all schema fields, including hidden table columns, using their field components.
 - Clicking a cell in the focused checked row moves focus to that field's first available control and leaves the row pane open.
 - Only the focused row is edited. A row action is not treated as a bulk action unless its label explicitly says so.
-- The footer contains mutation and dismissal actions appropriate to the focused row.
-- Save persists only the focused row's dirty-field patch.
-- Cancel discards the focused row draft and unchecks that row.
-- If Cancel removes the only checked row, the row pane closes.
+- Valid changed fields automatically enter the table's staged-change ledger without field or form confirmation.
+- The pane has no per-row persistence action; `Apply changes` persists the normalized table ledger.
+- Closing the pane preserves its valid pending fields and recoverable invalid input.
+- Double-clicking a field in the focused row keeps the pane open and focuses that field. Double-clicking another row does nothing.
+- If the final checked row is unchecked, the row pane closes.
 - If checked rows remain, the nearest checked row becomes focused and remains represented in the pane.
 
-### Cell activation and pane transitions
+### Cell activation and pane routing
 
-- Double-clicking a cell while a clean row pane is open closes the pane before starting inline editing or opening another row.
-- Double-clicking a cell while the row pane has staged changes invokes the mutation draft guard with `The current row has staged changes.`
-- Save and continue completes the row mutation, closes or retargets the pane, and continues the requested cell action.
-- Discard and continue discards the row draft, closes or retargets the pane, and continues the requested cell action.
-- Keep editing leaves the row pane and its draft unchanged and cancels the requested cell action.
-- When a structured inline editor requests expansion, the complete-row pane opens for that row and focuses the structured field.
-- Relation and binary cell activation opens the complete-row pane for that row and focuses the corresponding field.
-
-#### Move from a clean row pane to inline editing
-
-- **Given** row A is checked and represented by a clean row pane
-- **When** the user double-clicks an inline-editable cell in row B
-- **Then** the row pane closes
-- **And** row A remains checked
-- **And** inline editing starts in the targeted cell in row B
-
-#### Protect a dirty row pane from cell activation
-
-- **Given** row A is checked and its row pane has staged changes
-- **When** the user double-clicks a cell
-- **Then** the requested cell action does not start
-- **And** the mutation draft guard presents `The current row has staged changes.`
-- **And** the user can Save and continue, Discard and continue, or Keep editing
+- Double-click or Enter opens the Floating field editor for scalar and structured fields when the pane is closed, independently
+  from row checkbox selection.
+- Scalar Enter completes and moves down; Tab and Shift+Tab complete and move horizontally with row wrapping.
+- Structured Enter inserts a newline, Tab and Shift+Tab indent or outdent, Cmd/Ctrl+Enter completes, and Escape closes.
+- Completion and closure restore semantic grid focus without automatically opening another editor or discarding input.
+- Relation and binary activation opens the complete-row pane and focuses the corresponding field.
+- Generated and unsupported read-only fields do not open a mutation surface.
 
 Pressing Escape follows progressive dismissal:
 
-- with a pane open, Escape closes the pane and preserves its table selection
+- with a row pane open, Escape closes the pane and unchecks its active row while preserving other checked rows
+- clearing the final checked row closes selection-only widget state; staged changes keep the mutation widget available
 - without a pane open, Escape clears cell selection, cell focus, and column focus
-- Escape does not uncheck rows; checked-row selection changes only through its checkbox controls
 
-After the row pane closes, each checked row remains individually toggleable through its own checkbox. The header checkbox is the
+After the row pane closes, each remaining checked row stays individually toggleable through its own checkbox. The header checkbox is the
 bulk clear control; it is not the only route to unchecking rows.
 
-Pane dismissal and pane Cancel are different actions. The close control and Escape dismiss a clean pane while preserving table
-selection. Cancel discards the focused draft and removes its row from checkbox selection.
+Pane dismissal preserves valid staged fields and recoverable invalid input while clearing the active checked row. Staged changes
+are removed only through entry removal or the table-scoped `Discard` action.
 
 ## Mutation draft behavior
 
 Pane and inline editors consume the same per-row mutation model:
 
-- The latest live source row is stored separately from dirty field overlays.
-- Untouched fields follow live source changes.
-- Dirty fields preserve staged values when their source fields change.
-- Returning a field to its latest source value removes that field from the dirty set.
+- The source row captured when editing starts is stored separately from sparse field overlays.
+- Returning a field to that source value removes the field from the dirty set.
+- Removing a staged update from affected-row review resets the corresponding provider-owned row draft, including mounted pane
+  fields, to the captured source.
 - Invalid input retains its raw form and validation error but cannot enter a mutation patch.
-- Save sends valid dirty fields only rather than reconstructing the complete row.
+- Apply sends valid sparse fields only rather than reconstructing the complete row.
 - Mutation failure preserves the draft.
-- A remote change to a dirty field may be reported without blocking save or replacing the staged value.
 
 Insert fields distinguish `omitted`, `null`, `valid`, and `invalid`. Omitted fields are absent from the payload so stored defaults
-can apply. Explicit NULL remains a separate user choice.
+can apply. Explicit NULL remains a separate user choice. The insert pane persists a valid row directly through `Insert`; `Discard`
+closes without persistence, and `Insert more` resets and keeps the form open after each successful insert. Insert drafts do not
+enter the pending ledger.
 
-The active draft survives movement between fields in one row and switching between editable Details and read-only JSON
-representations. Changing the focused row, editing surface, query scope, table, schema, or route requires Save, Discard, or
-remaining on the active target when the draft is dirty. Relation navigation follows the same rule.
+Provider-owned edit drafts survive movement between fields and pane dismissal within one mounted table view. Several rows can retain
+isolated staged updates and deletions. Review remains available while the pane is open. Delete requires confirmation before selected
+rows enter the staged state. `Apply changes` is the persistence boundary for staged updates and deletions; complete-row inserts
+persist directly from the insert pane. A successful Apply clears selection, closes the pane, and removes the widget.
 
-Inline editing stages cells into the containing row draft. Saving persists that row's complete dirty-field patch. Supporting more
-than one retained row draft is an orchestration decision and does not change the per-row parsing or patch rules.
+Affected-row review presents each mutation kind as an accordion trigger. Every expanded operation section contains a semantic list
+with its own scroll area, while the staged summary and Apply controls remain fixed below the review.
 
 ## Column selection and bulk editing
 
@@ -359,14 +348,14 @@ The foundation establishes:
 - one focused row within checked rows
 - single-click cell focus without pane activation
 - double-click inline editing activation
-- clean row-pane dismissal before inline editing starts
-- dirty row-pane transition protection through the mutation draft guard
+- pane and inline editing over one provider-owned update controller without simultaneous edit surfaces
+- table-scoped pending updates and deletions with one Apply action, plus direct complete-row insertion
 - Command/Control additive multi-cell selection across rows and columns
 - Shift rectangular cell-range selection across visible rows and data columns
 - selection state independent from pane state
 - stable row-ID and column-ID targets
 - schema-derived row and inline editor presentation
-- structured inline expansion into the complete-row pane
+- structured editing in the Floating widget's expanded code editor
 - relation and binary activation into the complete-row pane
 - side-pane header, scrolling body, fixed footer, and accessible dismissal
 
@@ -380,12 +369,8 @@ The following behavior is part of the product direction but is outside the found
 - query-backed bulk editing across matching rows
 - transactional or batched mutation semantics
 - complete keyboard grid navigation
-- inline editing controls and pane fallback activation
 
 ## Open decisions
 
-- Whether pane and inline orchestration retain drafts for more than one row.
-- The exact Save, Discard and continue, and remain-on-target presentation used when a dirty transition is requested.
-- The inline field commit and cancellation triggers for Enter, Escape, blur, and pointer selection.
 - The exact visible-page versus loaded-result scope of column-selection operations.
 - The error and recovery presentation for partial bulk-write failure when atomic writes are unavailable.

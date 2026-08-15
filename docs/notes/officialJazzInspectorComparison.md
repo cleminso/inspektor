@@ -34,10 +34,10 @@ Official source reviewed:
 
 The official inspector is strongest in grid workflows:
 
-- It separates live source rows from staged dirty cell edits.
+- It separates live source rows from pending dirty cell edits.
 - It saves dirty-field patches instead of reconstructed rows.
-- Incoming live updates do not overwrite staged values.
-- Reverting a field to its current source value removes the staged edit.
+- Incoming live updates do not overwrite pending values.
+- Reverting a field to its current source value removes the pending edit.
 - Inserts omit default-backed columns so the database applies defaults.
 - Pagination requests `pageSize + 1` to derive whether another page exists.
 - Column preferences reconcile removed and newly discovered schema columns.
@@ -86,7 +86,7 @@ Selection, complete-row inspection, and editing are separate interactions:
 
 - **Selection** identifies the active cell or row. It does not imply mutation.
 - **Inspection** explains the value through compact presentation, the complete-row pane, copy actions, and relation navigation.
-- **Editing** changes a staged row draft through an explicit edit action or editing shortcut.
+- **Editing** changes a provider-owned row draft through an explicit edit action or editing shortcut.
 
 Cells do not open hover cards or a separate inspection-only cell pane. Complete inspection remains available through the
 complete-row pane, explicit commands, copy actions, and relation navigation.
@@ -99,34 +99,30 @@ Inspector will support two editing surfaces:
 ## Editing surfaces
 
 Pane and inline editing are simultaneously available. Row checkbox selection opens the complete-row pane. Cell double-click or
-Enter starts schema-appropriate inline editing. JSON, Array, and Row values use an expanded code editor in an anchored inline dialog whose expand action
-opens the complete-row pane focused on that field. Relation and binary cells open the complete-row pane directly. Timestamp cells
+Enter starts schema-appropriate inline editing. JSON, Array, and Row values use the Floating widget's expanded code editor.
+Relation and binary cells open the complete-row pane directly. Timestamp cells
 use an inline calendar when available. Generated, unsupported, and otherwise read-only values remain read-only in the grid.
 
-The activation route does not change parsing, validation, dirty tracking, save, discard, or live-update behavior. A dirty draft
-cannot move between surfaces or targets without Save and continue, Discard and continue, or Keep editing.
+The activation route does not change parsing, validation, dirty tracking, `Apply changes`, `Discard`, or live-update behavior. Pane and
+inline surfaces share provider-owned drafts and do not require a transition decision.
 
 ## Pane editing
 
 - Selecting a row through its checkbox opens the row pane and makes that row the focused row.
 - The pane edits one focused row even when several rows are checked.
-- Pane fields stage changes without persisting them immediately.
-- Save persists the focused row's dirty-field patch.
-- Cancel discards the focused row draft and unchecks that row.
-- When Cancel removes the only checked row, the row pane closes.
-- When other checked rows remain, focus moves to the nearest checked row and the pane represents that row.
-- Closing the pane through its close control or Escape is a presentation dismissal and preserves checked rows when no dirty draft
-  requires a decision.
-- Delete remains an explicit row mutation rather than a draft field change.
+- Valid pane fields automatically become table-scoped staged changes without persisting immediately.
+- The pane has no per-row persistence action; `Apply changes` persists the normalized table ledger.
+- Escape closes the pane and unchecks its active row while preserving other checked rows, valid staged fields, and recoverable invalid input.
+- Delete adds selected row identities to the same staged ledger and uses the same `Review changes` and `Apply changes` flow.
 
 ## Inline editing
 
 - Single-click selection remains separate from editing.
 - Double-click or Enter starts inline editing for a supported writable field.
-- Inline editing stages the changed cell in its row draft; it does not persist immediately.
+- Inline editing adds the changed cell to its provider-owned row draft; it does not persist immediately.
 - Moving between fields in the same row preserves the row draft.
-- Saving persists the complete dirty-field patch for that row, including changes staged through more than one inline cell.
-- JSON, Array, and Row values can use an expanded code editor in an anchored inline dialog and open the complete-row pane through an explicit expand action.
+- `Apply changes` persists normalized sparse patches across every staged row in the table.
+- JSON, Array, and Row values use the Floating widget's expanded code editor.
 - Relation and binary fields open the complete-row pane focused on their field.
 - Full value inspection remains available through the complete-row pane; inline editing does not add hover details.
 - Inline controls consume the same parsing, validation, NULL, omission, dirty, save, and discard rules as pane controls.
@@ -135,7 +131,7 @@ cannot move between surfaces or targets without Save and continue, Discard and c
 
 The mutation business logic must not depend on the active editing surface. It owns:
 
-- Latest live source row by semantic row identity.
+- Source row captured when editing starts.
 - Dirty field values only.
 - Raw input and parsed values where validation can fail.
 - Field and row validation errors.
@@ -149,17 +145,17 @@ semantics.
 
 ## Update drafts
 
-An update draft stores the latest live source row separately from dirty field overlays. For each dirty field it can retain raw
+An update draft stores its captured source row separately from dirty field overlays. For each dirty field it can retain raw
 input, a parsed value, and a validation error.
 
-- Untouched fields display the latest live source value.
+- Untouched fields display the captured source value while the draft remains mounted.
 - Editing a field creates or updates its dirty overlay.
-- Returning a field to its latest live source value removes the overlay.
+- Returning a field to its captured source value removes the overlay.
 - Invalid raw input remains in the draft and cannot enter the mutation patch.
 - Save constructs a patch from valid dirty fields only.
 - Untouched fields never enter the patch.
 - Mutation failure preserves the draft and exposes a row-level failure state.
-- Mutation success clears the saved dirty fields after the source row confirms the persisted values.
+- Complete mutation success clears the saved dirty fields.
 
 Value equality must follow schema semantics rather than reference identity so structured values, byte values, timestamps, and
 other non-primitive representations can return to a clean state correctly.
@@ -179,29 +175,21 @@ generated-column facts are available in stored schema metadata before deriving i
 
 ## Live update reconciliation
 
-Follow the official Jazz Inspector's live-update behavior:
-
-- Preserve a staged dirty value when the corresponding live source field changes.
-- Continue reflecting live changes for untouched fields.
-- Save only dirty fields, so untouched live values are not overwritten.
-- Do not introduce a blocking conflict-resolution flow as part of this model.
-
-A remote change to a dirty field may produce a non-blocking changed-remotely indicator. It does not replace the user's staged
-value or silently remove the dirty overlay. A remote change that makes the source value semantically equal to the staged value can
-return that field to clean state.
+The initial staged-editing foundation applies sparse dirty fields so untouched database values are not overwritten. Continuous
+source reconciliation and changed-remotely indicators remain separate product work rather than provider responsibilities.
 
 ## Draft lifecycle
 
 - Changing fields inside one row preserves the row draft.
-- Changing the focused row, editing surface, filter, sort, page, table, schema, or route cannot silently discard a dirty draft.
-- A dirty transition requires an explicit choice to Save, Discard and continue, or remain on the active target.
-- Row-pane Cancel discards the focused row draft and removes that row from checkbox selection.
+- Changing the focused row or editing surface preserves provider-owned drafts and pending changes within the mounted table view.
+- Changing the mounted table identity resets its table-local draft provider.
 - Opening read-only details does not disturb the active draft.
 - Switching between a row pane's Details and read-only JSON representations does not discard the draft.
 - Relation navigation cannot silently discard a dirty draft.
-- Clean pane dismissal can preserve row selection; pane Cancel has the stronger discard-and-unselect behavior described above.
+- Escape dismissal unchecks the active row while preserving other checked rows, staged changes, and recoverable invalid input.
 
-Both pane and inline editors must consume this same mutation layer. They may differ in layout and supported field types, but not in parsing, validation, dirty tracking, save, or discard semantics.
+Both pane and inline editors consume the same mutation layer. They may differ in layout and supported field types, but not in
+parsing, validation, dirty tracking, `Apply changes`, or `Discard` semantics.
 
 ## Migration constraint
 

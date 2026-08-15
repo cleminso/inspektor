@@ -875,15 +875,15 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] Table pointer gestures select cells rather than native text.
 - [x] Text remains selectable inside side-pane field controls.
 - [x] Clicking a header clears cell state and activates the column.
-- [x] Escape does not uncheck rows.
-- [x] Individual row checkboxes remain the single-row clear control after pane dismissal.
+- [x] Escape closes the pane and unchecks its active row while preserving other checked rows.
+- [x] Individual row checkboxes remain a single-row clear control outside pane dismissal.
 - [x] The header checkbox remains the bulk row clear control.
 - [x] Cell-range corners use row IDs and column IDs while range interiors follow the displayed table layout.
 - [x] Keep pane and inline editing simultaneously available without a workspace mode preference.
 - [x] Keep full inspection in the complete-row pane without adding a separate cell-inspection pane or hover cards.
 - [x] Close a clean row pane before starting inline editing on a double-clicked cell.
 - [x] Guard a dirty row-pane transition with Save and continue, Discard and continue, or Keep editing.
-- [x] Keep mutation parsing, validation, dirty tracking, live reconciliation, save, and discard independent from the editing surface.
+- [x] Keep mutation parsing, validation, dirty tracking, save, and discard independent from the editing surface.
 - [x] Distinguish pane dismissal, which preserves clean selection, from Cancel, which discards the focused draft and unchecks its row.
 - [x] Row IDs render as continuous text and use width-aware end truncation when the rendered value overflows.
 - [x] Relation cells show the stored relation ID as their primary value and navigate to the target table's default unfiltered tab.

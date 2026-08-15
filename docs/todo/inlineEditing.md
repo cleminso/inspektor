@@ -12,6 +12,176 @@
 
 ## Implemented foundation
 
+[15/08/26]
+
+### Widget disclosure and Escape dismissal
+
+- [x] Place the widget dock-trigger and staged-content disclosure chevrons after their labels.
+- [x] Make Escape close the row pane and uncheck its active row while preserving other checked rows and staged changes.
+- [x] Close selection-only widget state when Escape clears its final checked row.
+
+[15/08/26]
+
+### Widget undo, review sections, and direct cell editing
+
+- [x] Reset the provider-owned row draft when its staged update is removed from the widget so an open form returns to live source values.
+- [x] Present Updates and Deletions as independently collapsible accordion sections with a scrollable list in each expanded panel.
+- [x] Allow double-click and Enter to open supported inline cell editors without requiring the row checkbox to be selected.
+- [x] Complete inline cell editing through `Save`, return grid focus according to spreadsheet navigation, and expose the saved value in the shared staged queue.
+- [x] Keep pane and inline editing on the same provider-owned draft without presenting both editing surfaces simultaneously.
+
+[15/08/26]
+
+### Unified staged edit and delete flow
+
+This block supersedes the earlier pending-copy, immediate-delete, and review-suppression decisions below.
+
+- [x] Stage every valid pane field automatically without a field-level or form-level confirmation.
+- [x] Keep malformed field input recoverable and outside the staged ledger until corrected.
+- [x] Confirm selected-row deletion before adding it to the same table ledger used by updates.
+- [x] Keep `Apply changes` as the only Jazz persistence boundary for staged updates and deletions.
+- [x] Keep affected-row review available while the complete-row pane remains open.
+- [x] Clear row selection, close the row pane, and remove the widget after successful Apply.
+- [x] Keep Table and Query Subscriptions controls grouped in the `dock left` group.
+- [x] Use upward and rightward chevrons for expanded and collapsed widget disclosure.
+
+[15/08/26]
+
+### Pane and Floating-panel ownership
+
+- [x] Restore direct insert-pane persistence with `Insert`, `Discard`, and `Insert more` actions.
+- [x] Keep insert drafts outside the pending ledger and prevent insert typing from opening the Floating widget.
+- [x] Remove semantically reverted edit fields from provider drafts and pending updates immediately.
+- [x] Make table-scoped Discard reset pending entries, valid pane overlays, invalid raw input, and stale execution state together.
+- [x] Keep one centered application-dock trigger mounted while Floating content is expanded or collapsed.
+- [x] Place affected-row review above the persistent bottom summary and use the summary text as its disclosure control.
+
+[14/08/26]
+
+### Unified mutation UI cleanup
+
+- [x] Remove per-row persistence controls, transition-decision UI, immediate deletion confirmation, and old global form coupling.
+- [x] Use `Staged changes`, `Review changes`, `Apply changes`, and `Discard` across active product surfaces.
+- [x] Align the Table Explorer behavior and architecture documentation with provider-owned multi-row drafts and one table-ledger Apply flow.
+
+[14/08/26]
+
+### Structured and routed field editing
+
+- [x] Route JSON, Array, and Row fields to the Floating widget's expanded Code Editor.
+- [x] Keep the optional field editor behind a deferred module so the base table and pending widget do not load row-editor controls.
+- [x] Keep Enter and Tab editor-native, complete valid structured values with Cmd/Ctrl+Enter, and close without discarding through Escape.
+- [x] Add a semantic Code Editor mount-focus contract that transfers focus from its loading fallback to CodeMirror.
+- [x] Route relation and binary fields to the complete-row pane and focus the requested field after the pane renders.
+- [x] Keep generated and unsupported fields read-only instead of opening a mutation surface.
+- [x] Reuse the provider-owned row controller so structured, scalar, and pane edits share ledger identity and validation.
+
+[14/08/26]
+
+### Scalar inline editing
+
+- [x] Add distinct Data Grid edit requests for double-click and Enter without changing single-click or Space activation.
+- [x] Add semantic Data Grid focus requests that survive cell remounts and virtual rendering.
+- [x] Route supported scalar schema fields to an explicit Floating field-editor composition.
+- [x] Reuse the provider-owned row controller so pane and scalar edits merge into one row-ledger entry.
+- [x] Keep invalid raw input recoverable with colocated feedback and outside mutation payloads.
+- [x] Preserve the provider-owned field draft when Close or Escape dismisses the editor.
+- [x] Complete with spreadsheet navigation: Enter moves down, Tab and Shift+Tab move horizontally and wrap across rows, and table boundaries retain the originating cell.
+- [x] Verify Data Grid double-click and Enter behavior at a narrow dark viewport with no browser console errors.
+
+[14/08/26]
+
+### Ledger-owned transition policy
+
+- [x] Remove the edit-form Save-and-continue, Discard-and-continue, and Keep-editing controls.
+- [x] Remove global row-form submission coupling and the single-draft transition guard.
+- [x] Let pane and inline-editor dismissal preserve provider-owned pending changes without a prompt.
+- [x] Reset table-local staged state when the mounted table identity changes.
+
+[14/08/26]
+
+### Unified pending deletion
+
+- [x] Present deletion as a selection action in the Floating widget rather than a row-form action.
+- [x] Add every selected row id to the table ledger through delete-over-update normalization.
+- [x] Keep checkbox selection independent from pending deletion lifetime.
+- [x] Remove immediate deletion, the row-form confirmation state, and deletion-specific failure controls.
+- [x] Use the shared affected-row review and `Apply changes` action as the only deletion confirmation and persistence path.
+
+[14/08/26]
+
+### Table-ledger Apply orchestration
+
+- [x] Execute normalized updates and deletions through the generic Jazz mutation boundary.
+- [x] Prevent duplicate Apply synchronously and retain the complete client state after failure.
+- [x] Keep only idle, applying, and failed execution state in the table-local provider.
+- [x] Show applying and failure feedback within the pending widget.
+
+[14/08/26]
+
+### Apply execution policy
+
+- [x] Keep the initial Apply path on direct generic writes without promising atomicity or rollback.
+- [x] Execute updates, then deletions, and stop on the first rejection.
+- [x] Clear client state only after complete success and retain it after failure.
+
+[14/08/26]
+
+### Pending summary and affected-row review
+
+- [x] Add explicit selection and pending-change widget compositions over `FloatingPanel` parts.
+- [x] Show exact normalized totals and update and deletion groups without value-level diffs.
+- [x] Show shortened row identities, update field breadth, entry removal, and table-scoped discard.
+- [x] Keep collapse state local to the widget and distinguish pending changes from editor input that needs attention.
+- [x] Keep `Apply changes` unavailable until the execution policy and orchestrator are implemented.
+
+[14/08/26]
+
+### Floating panel presentation
+
+- [x] Add the constrained `FloatingPanel` compound component with Root, Content, Summary, and Actions parts.
+- [x] Keep the shell non-modal, portalled to a stable document-body target, and transparent to interaction outside its visible surface.
+- [x] Add a semantic floating layer below popups and tooltips so nested controls remain visible.
+- [x] Document the public compound API with generated prop metadata and executable compact, review, editor, failure, collapsed, and narrow-width states.
+- [x] Verify dark and light themes, keyboard disclosure semantics, outside interaction, and reflow at narrow workspace widths.
+
+[14/08/26]
+
+### Table-scoped provider and pane ownership
+
+- [x] Mount one `TableMutationLedgerProvider` around one table view.
+- [x] Keep edit-pane and inline drafts in one provider-owned record per row.
+- [x] Derive valid sparse updates and invalid state from each raw draft.
+- [x] Preserve pane drafts independently from checkbox selection, filtering, sorting, pagination, and pane visibility.
+
+[14/08/26]
+
+### Table mutation ledger domain
+
+- [x] Key the provider boundary with the table view's existing complete identity.
+- [x] Model raw row drafts and deduplicated deletion IDs as the canonical state.
+- [x] Derive grouped counts, affected rows, changed-field breadth, and Apply eligibility without rendering value diffs.
+- [x] Normalize field reversion, delete-over-update, duplicate deletion, restoration, entry removal, and discard as pure logic.
+- [x] Derive normalized mutation payloads while retaining invalid editor input in the canonical draft.
+
+[14/08/26]
+
+### Controlled row-draft controller
+
+- [x] Move draft creation, field updates, semantic dirty state, validation, and submission construction behind `useRowDraftController`.
+- [x] Support externally bound draft state through the controller's `state`, `actions`, and `meta` contract.
+- [x] Allow edit forms to consume an externally owned controller without changing the pane field model.
+- [x] Preserve externally owned edit values across form remounts.
+
+[14/08/26]
+
+### Floating mutation widget characterization
+
+- [x] Characterize invalid raw-input retention and exclusion from edit submissions.
+- [x] Characterize explicit NULL as a sparse update value.
+- [x] Characterize edit draft retention across mutation failures and retries.
+- [x] Confirm the retained-draft tests fail when mutation failure handling is intentionally changed to reset the draft.
+
 [28/07/26]
 
 ### Shared row mutation model
@@ -47,6 +217,12 @@
 - [x] Keep table cells schema-driven without embedding Jazz mutation rules in cell renderers.
 
 ## Open product work
+
+[14/08/26]
+
+The older blocks below record the superseded single-row draft design and are retained as implementation history. They are not
+active product requirements. Current work follows the implemented update-and-deletion ledger model above and the focused Floating
+mutation widget specification.
 
 [28/07/26]
 
@@ -122,10 +298,20 @@
 
 ## Settled interaction decisions
 
+[15/08/26]
+
+- [x] Complete-row inserts persist directly and do not enter the table mutation ledger.
+- [x] `Insert more` changes only whether a successful insert resets and retains the insert pane.
+- [x] Pane edits continue publishing valid sparse updates to the pending ledger.
+- [x] Double-click focuses a field only for the active row pane; it does nothing for another row while that pane is open.
+- [x] Inline field editing requires a closed complete-row pane but does not require a checked row.
+- [x] Selection presentation is replaced by pending presentation after the first edit and returns when all pending edits are discarded.
+- [x] Whole-panel disclosure belongs to the centered dock trigger; review disclosure belongs to the summary text.
+
 [28/07/26]
 
 - [x] Jazz owns schema, mutation conversion, permissions, persistence, and synchronization.
-- [x] Inspector owns draft input, validation presentation, dirty tracking, live reconciliation, and transition protection.
+- [x] Inspector owns draft input, validation presentation, dirty tracking, and transition protection.
 - [x] One active inline row draft is owned above cell renderers.
 - [x] Moving between fields in the same row preserves the row draft.
 - [x] Moving to another row is a guarded target change when the current draft is dirty.
@@ -141,6 +327,12 @@
 - [x] Inline editing applies to existing rows; row insertion remains in the pane.
 
 ## Open design decisions
+
+[14/08/26]
+
+The older completion, row-level persistence, and dirty-transition questions below are settled by the table-ledger model. Remaining
+product decisions concern timestamp interaction, pending-cell presentation, hidden pending columns, pagination presentation, and
+the final workspace-item close policy.
 
 [28/07/26]
 

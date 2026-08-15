@@ -149,7 +149,11 @@ flowchart TD
 
       DataState --> DataGrid["DataGrid"]
       DataState --> RowEditor["RowEditorSidePanel"]
-      DataState --> Mutations["useTableMutations"]
+      DataState --> MutationLedger["Table mutation ledger"]
+      DataGrid --> MutationLedger
+      RowEditor --> MutationLedger
+      MutationLedger --> FloatingWidget["Floating widget"]
+      MutationLedger --> Mutations["useTableMutations"]
       Mutations --> TableProxy["createTableProxy"]
       TableProxy --> UseDb["Jazz useDb"]
       UseDb --> MutationRuntime["Jazz mutation runtime"]
@@ -246,6 +250,48 @@ matching row updates back as data changes.
 **Sync Server**
 
 The Jazz server that accepts admin introspection requests, stores published schema metadata, coordinates sync, and reports server-visible query subscription snapshots.
+
+**Editing surface**
+
+A schema-aware interface for changing values before persistence. Inline cell editors and the complete-row pane are editing
+surfaces. They project the same table mutation state rather than owning independent persistence flows.
+
+**Staged change**
+
+A valid local update or confirmed deletion that has not been persisted to Jazz. Valid edits become staged automatically after
+field validation. A staged change can be reviewed, removed, discarded, or persisted through Apply changes.
+
+**Mutation ledger**
+
+The in-memory, table-scoped collection of staged updates and deletions. Each table has an isolated ledger. The
+Inspector never combines changes from different tables into one Apply operation, and refreshing the page discards the ledgers.
+
+**Floating widget**
+
+The table-owned controller for mutation actions and status. It changes presentation for field editing, validation, multi-row
+actions, review, Apply, Discard, and mutation failures. A centered application-dock trigger remains visible while the panel is
+expanded or collapsed and communicates whether the table has staged changes or input that needs attention.
+
+**Apply presentation**
+
+The Floating widget's final review state. It lists staged changes grouped as updates and deletions, then offers one
+`Apply changes` action. Delete confirmation only adds selected rows to this staged collection; Apply changes remains the sole
+persistence step.
+
+**Invalid editor input**
+
+Raw field input that failed schema-aware parsing or validation. It remains available for correction but does not enter the
+mutation ledger. Collapsing the Floating widget preserves the input and exposes a `Needs attention` status.
+
+**Apply changes**
+
+The action that persists the current table's staged updates and deletions. A deletion-only operation uses the same Apply boundary
+as a mixed update-and-deletion operation. Complete-row insertion persists through its pane's `Insert` action.
+
+**Staged changes**
+
+The dock trigger label for locally accumulated mutation state. The expanded widget uses `Review changes` for affected-row
+disclosure, `Apply changes` for persistence, `Discard` for removal, and `Needs attention` for invalid input or failed execution.
 
 ## Known pain points
 
@@ -685,19 +731,26 @@ Interaction state keeps these concepts separate:
 - the focused row is the selected row represented by the row side pane
 - bookmarked rows are persistent developer reference points
 
-Selection, inline editing, and side-pane presentation are independent. A cell can be focused without opening an editor, and a
-multi-cell selection can be assembled before the user chooses an explicit operation. The side pane uses an explicit presentation
-model:
+Selection, inline editing, side-pane presentation, and pending mutations are independent. A cell can be focused without opening
+an editor, a multi-cell selection can be assembled before the user chooses an operation, and pending changes can remain after an
+editing surface closes. The side pane uses an explicit presentation model:
 
 - `closed`: no side pane
 - `insert`: the schema-driven insert form
 - `rows`: checked row ids and one focused row rendered by the complete-row editor
 
-Single-clicking a cell focuses it without opening an editor or changing the pane. Double-clicking an editable scalar cell starts
-inline editing. JSON, Array, and Row values use an expanded code editor in an anchored inline dialog; its expand action opens the
-complete-row pane and focuses the corresponding field. Relation and binary cells open the complete-row pane focused on their
-field. Timestamp cells use an inline calendar editor when that control is available. Generated, unsupported, and otherwise read-only cells remain read-only
-in the grid; their complete representation remains available through the complete-row pane.
+Single-clicking a cell focuses it without opening an editor or changing the pane. With the complete-row pane closed,
+double-clicking an editable scalar cell or pressing Enter opens the schema-appropriate editor in the Floating widget without
+requiring row checkbox selection. JSON, Array,
+and Row values use the widget's
+expanded code editor. Relation and binary cells open the complete-row pane focused on their field. Timestamp cells use an inline
+calendar editor when that control is available. Generated, unsupported, and otherwise read-only cells remain read-only in the
+grid; their complete representation remains available through the complete-row pane.
+
+Save or a spreadsheet completion key validates editor input. Valid input becomes a pending change automatically; there is no
+`Stage change` action and Save does not persist to Jazz.
+Malformed input receives immediate colocated feedback, remains available for correction, and does not enter the mutation ledger.
+After a valid cell edit joins the ledger, focus returns to its originating grid cell.
 
 Command/Control interaction includes a range when it starts outside the selection and excludes a range when it starts inside,
 while Shift interaction extends the latest rectangle from its fixed anchor. Multi-cell copy and mutation actions remain explicit
@@ -707,24 +760,25 @@ Clicking checkboxes individually builds the checked-row set. TanStack's row-sele
 the visible range when another checkbox is Shift-clicked. The application chooses the focused row and opens the complete-row editor
 for the checked-row set. Previous and next controls navigate checked rows in active query order, while edit actions remain scoped
 to the focused row unless explicitly labelled as bulk actions.
-Insert remains a separate pane mode. Unless an open nested control consumes Escape first, Escape closes an open pane while
-preserving its table selection. With no pane open, Escape clears cell selection, cell focus, and column focus without unchecking
-rows.
+Insert remains a separate pane mode with direct `Insert`, `Discard`, and `Insert more` controls. Successful `Insert more` resets
+and retains the form; insert drafts never enter the pending ledger. Unless an open nested control consumes Escape first, Escape
+closes an open row pane and unchecks its active row while preserving other checked rows and staged changes. Clearing the final
+checked row closes selection-only widget state. With no pane open, Escape clears cell selection, cell focus, and column focus.
 
-Closing a pane preserves its table selection. Filter, sort, page, table, or schema changes clear row and cell selections. Column
+Closing a pane through Escape unchecks its active row. Filter, sort, page, table, or schema changes clear row and cell selections. Column
 reorder preserves range corners and recomputes the rectangle in displayed order. Hidden columns contract or suspend affected
 ranges without deleting their operation state. Loading more rows preserves existing ranges because stable row IDs and explicit
 query-scope resets define the selection lifecycle.
 
-Row-pane Cancel is distinct from pane dismissal. Cancel discards the focused row draft and unchecks that row. If other checked
-rows remain, focus moves to the nearest checked row; otherwise the row pane closes. The pane close control and Escape dismiss a
-clean pane while preserving selection.
+Pane dismissal and mutation discard are distinct. Escape dismisses the pane and unchecks its active row while preserving other
+checked rows and pending changes. Removing one staged update also resets its provider-owned row form to captured source values. `Discard`
+belongs to the Floating widget and removes pending changes from the current
+table ledger. Numeric row and column coordinates can support developer orientation, but row IDs and column IDs remain the
+selection identity.
 
-Focusing a cell in the focused checked row keeps the row pane open and focuses that field's first available control. A double-click
-that requests inline editing is a surface transition. If the open row pane is clean, the pane closes and inline editing starts on
-the target cell, including when the cell belongs to another row. If the row pane has staged changes, the mutation draft guard
-prevents the transition and presents Save and continue, Discard and continue, or Keep editing. Numeric row and column coordinates
-can support developer orientation, but row IDs and column IDs remain the selection identity.
+The Floating widget owns draft orchestration, validation, mutation review, Apply, Discard, deletion review, and
+mutation failures. The pane and grid are editing projections of that controller. Several rows and columns in one table can
+accumulate pending changes. Changing the mounted table identity resets its table-local in-memory state.
 
 A focused cell receives the selected-cell background and blue focus border without changing its whole row background. A checked
 row uses the selected-row background without an additional row border. The focused checked row adds a distinct blue focus edge.
@@ -733,13 +787,17 @@ editor rather than focusing a data cell.
 
 Clicking a column header clears cell focus and selection, then activates and highlights that column and its visible cells. Clicking
 the active header again, pressing Escape, clicking a cell, or pressing elsewhere in the interface clears the active column. Focus
-remains visible independently of color. Active column, active cell, checkbox selection, dirty state, validation state, and
+remains visible independently of color. Active column, active cell, checkbox selection, pending-change state, validation state, and
 live-update highlights use distinct semantic states so one highlight does not imply several meanings.
 
 Pane and inline editing are simultaneously available rather than selected through a workspace preference. Row checkbox selection
-opens the complete-row pane; cell double-click starts the schema-appropriate inline editor or routes to the complete-row pane for
-relation and binary fields. Both surfaces use the same parsing, validation, dirty tracking, live reconciliation, save, and discard
-behavior through the shared row-draft mutation layer.
+opens the complete-row pane; cell double-click or Enter starts the schema-appropriate editor or routes to the complete-row pane
+for relation and binary fields. Both surfaces use the same parsing, validation, dirty tracking, pending-change,
+Apply, and Discard behavior through the table mutation ledger.
+
+Scalar field completion follows spreadsheet navigation. Enter moves focus down in the same visible column. Tab and Shift+Tab move
+horizontally and wrap across rows. Completion closes the editor without opening the next cell; Escape preserves the draft and
+returns focus to the originating cell.
 
 Columns use schema-aware initial widths rather than one width for every value. Boolean and numeric columns start narrow; ids,
 relations, timestamps, text, and structured values receive progressively wider defaults. Header resize handles update TanStack
@@ -835,9 +893,10 @@ and it does not replace stored identifiers with inferred semantic labels. The co
 complete values, alternate representations, copying, validation, and editing. Cells do not open hover cards or a separate
 inspection-only pane.
 
-Double-click or Enter starts the schema-appropriate inline editor. Structured values use an expanded code editor in an anchored
-inline dialog with Save, Cancel, and expand actions. Expand opens the complete-row pane focused on the field. Relation and binary values open the complete-row pane
-directly. Timestamp values use an inline calendar when available. Read-only values remain read-only in the grid.
+Double-click or Enter starts the schema-appropriate inline editor in the Floating widget. Structured values use an expanded code
+editor with Cancel and expand actions. Completing a valid edit adds it to pending changes automatically. Expand opens the
+complete-row pane focused on the field. Relation and binary values open the complete-row pane directly. Timestamp values use an
+inline calendar when available. Read-only values remain read-only in the grid.
 
 | Condition                      | Grid representation                                                                                 | Side-pane representation                                                                                         |
 | ------------------------------ | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
@@ -929,7 +988,7 @@ Controls:
 
 - previous page
 - next page
-- page number input
+- page number input (not supported with current Jazz API)
 - rows per page
 
 Defaults:
@@ -960,7 +1019,7 @@ The side panel answers:
 - What are the full field values?
 - What fields changed?
 - What validation errors exist?
-- What happened after save/delete?
+- What happened after Apply?
 - Which values are read-only?
 
 The active row remains stable when possible. Filtering, sorting, or refreshing data does not make the user lose context
@@ -973,13 +1032,18 @@ field without introducing a separate cell-inspection pane.
 UI representation:
 
 - Surface: right side panel attached to the active table view.
-- Primary controls: close panel, save changes, reset changes, delete row, copy row, open relation target.
-- Primary content: active row id, field list, full values, relation targets, schema hints, staged changes, validation and mutation errors.
-- States: no active row, active row loading, clean row, dirty row, saving, saved, mutation rejected, row missing after refresh, unsupported read-only field.
+- Primary controls: close panel, edit fields, delete row, copy row, open relation target.
+- Primary content: active row id, field list, full values, relation targets, schema hints, pending values, and validation errors.
+- States: no active row, active row loading, clean row, pending changes, invalid input, mutation rejected, row missing after refresh, unsupported read-only field.
 
-Pane and inline controls consume one application-owned row-draft model. It separates the latest live source row from dirty field
-overlays, preserves dirty values across live updates, reflects live values for untouched fields, and saves dirty-field patches
-rather than reconstructed rows. Insert drafts distinguish omitted, explicit NULL, valid, and invalid field states.
+Pane and inline controls consume one application-owned mutation model. It separates the latest live source rows from dirty field
+overlays, preserves pending values across live updates, reflects live values for untouched fields, and applies sparse dirty-field
+patches rather than reconstructed rows. Insert input distinguishes omitted, explicit NULL, valid, and invalid field states.
+
+Valid updates and selected-row deletions accumulate in isolated table-scoped ledgers. Pane dismissal, query changes, and switching
+tables preserve those ledgers. The Floating widget exposes `Review changes`, `Apply changes`, and `Discard`; the update form has no persistence action, while
+the insert form persists complete rows directly. Leaving the connection, branch, schema, or Tables route remains blocked while unresolved mutations
+or recoverable invalid input exists.
 
 #### Schema context inside the explorer
 
@@ -1070,7 +1134,7 @@ UI representation:
 - Primary content: raw id, friendly label when resolved, target table name.
 - States: loading label, missing or inaccessible target, unsupported reference metadata.
 
-#### Mutation/insert
+#### Mutations
 
 As a developer I want to write inside tables for debugging and test setup.
 
@@ -1080,57 +1144,92 @@ As a developer I want to write inside tables for debugging and test setup.
 - relation and binary cells open the complete-row side panel focused on their field
 - timestamp cells use an inline calendar when available
 - generated, unsupported, and otherwise read-only cells remain read-only in the grid
-- edits are staged before save
+- valid field edits become pending changes automatically
 - insert uses the same side-panel form pattern
 - unsupported field types are visible but read-only
 
-Side-pane and inline editing are complementary presentations rather than workspace modes. Both presentations must use the same row
-draft, schema parsing, dirty-field, validation, conflict, and mutation controller rather than implementing separate write paths.
-Adding inline presentation does not cause single-click cell activation to write immediately.
+Side-pane and inline editing are complementary presentations rather than workspace modes. Both presentations use the same
+schema parsing, dirty-field, validation, conflict, and table mutation controller rather than implementing separate write paths.
+Adding inline presentation does not cause single-click cell activation to write immediately. Inline editing is available for
+supported cells while the complete-row pane is closed and remains independent from checkbox selection.
 
-The shared row draft tracks the baseline row, baseline update metadata, raw input, parsed values, dirty fields, validation
-issues, unsupported fields, mutation status, and remote-change status. Saves send a partial patch for dirty fields rather than
-resubmitting every editable field.
+The shared controller tracks baseline rows, update metadata, raw input, parsed values, dirty fields, validation issues,
+unsupported fields, mutation status, and remote-change status. Updates remain sparse patches, and the table ledger can accumulate
+updates across several rows together with deletions.
+
+Update and deletion mutations share one persistence boundary:
+
+1. The developer edits a field or requests deletion of selected rows.
+2. The controller validates the input and adds each valid operation to the table's staged changes.
+3. The Floating widget presents `Review changes`, grouped as updates and deletions.
+4. The developer chooses `Apply changes` to persist every staged operation in the current table ledger.
+5. If persistence fails, the widget preserves unresolved input and presents the rejection without silently discarding intent.
+
+There is no user-facing stage action and no mutation-specific persistence shortcut. `Apply changes` persists a deletion-only ledger and a
+mixed ledger through the same flow.
+
+Updates and deletions are accordion triggers in affected-row review. Each expanded section owns an independently scrollable list.
+Removing an update from that list also resets any mounted form projection for the same row.
+
+Apply uses direct Jazz writes in deterministic update, then deletion groups. The client clears staged state only when every request
+succeeds. A rejection preserves the complete client-side state and displays the error without implying rollback or atomicity.
+
+Installed Jazz supports authority-validated `db.transaction(...)`, but the initial ledger Apply path intentionally preserves the
+existing direct generic mutation boundary. Inspector does not promise atomic Apply behavior.
 
 Permissions are shown as debugging hints, not guarantees. The server/runtime response is authoritative.
 
 Inspector follows Jazz runtime behavior. The form is generated from stored schema metadata and writes through the generic Jazz runtime: `db.insert(...)`, `db.update(...)`, `db.delete(...)`, and `db.restore(...)` for immediate undo when available.
 
-Inspector does not disable admin insert, update, or delete only from stored permissions. If a mutation fails, keep the form open, preserve input, show the rejection, and let live data reconcile.
+Inspector does not disable admin insert, update, or delete only from stored permissions. If a mutation fails, preserve input and show the rejection.
 
 Values are parsed conservatively from schema metadata. Primitive values, enums, JSON-like values, arrays, and relation ids can be edited when Inspector can serialize them safely. Values Inspector cannot serialize safely remain visible and read-only.
 
 UI representation:
 
-- Surface: right row side panel.
-- Primary controls: save, reset, delete, undo delete, copy values.
-- Primary content: fields, schema hints, staged changes, validation errors.
-- States: clean, dirty, saving, saved, rejected, unsupported field, permission hint.
+- Surface: complete-row side pane, schema-appropriate field editor, and Floating widget.
+- Primary controls: edit, direct insert, delete, `Review changes`, `Apply changes`, `Discard`, and the persistent `Staged changes` dock disclosure trigger.
+- Primary content: fields, schema hints, staged changes grouped by mutation kind, validation errors, and mutation failures.
+- States: clean, editing, invalid input, staged changes, reviewing, applying, rejected, collapsed, unsupported field, permission hint.
+
+#### Inline mutation
+
+The grid and complete-row pane answer different editing needs without creating separate mutation modes. The grid provides quick,
+field-focused edits. The pane provides complete-row context and fields that need more space or richer controls. The Floating
+widget owns the shared operation state and the final Apply boundary.
+
+Closing the pane through Escape does not discard valid edits. It unchecks the active row while preserving other checked rows,
+staged changes, and recoverable invalid input. A developer can stage several valid fields without confirming each field or form.
+Review remains available while the pane is open. Invalid editor input survives widget collapse but remains outside the staged
+ledger until corrected.
 
 #### Delete rows
 
-Delete is useful and treated as a careful editing experience.
+Delete uses the same staged ledger and Apply boundary as update:
 
-Deletion needs:
+1. The developer selects rows.
+2. The developer chooses Delete.
+3. The developer confirms the destructive selection, which stages the deletions without writing to Jazz.
+4. The Floating widget presents the deletion in the final Apply presentation, stacked with any staged updates.
+5. `Apply changes` persists the complete current-table ledger.
 
-- clear destructive confirmation
-- visible row identity before confirmation
-- permission awareness
-- immediate undo after delete when possible
-- recovery behavior when the server rejects the mutation
-- careful copy so the user knows what will happen
+The widget snapshots the selected rows for confirmation before staging them. This confirmation does not persist data. Before
+Apply changes, a deletion is reversible by removing it from staged changes or discarding the ledger. Permission hints remain
+advisory, and a server rejection keeps the unresolved operation visible.
 
 Undo can call `db.restore(...)` for the deleted row. Full deleted-row browsing with `includeDeleted()` is out of scope for v1.
 
 #### Unsupported table actions
 
-v1 does not expose `upsert`, `transaction`, or `batch` flows. They depend on app-specific intent and are not simple row actions.
+v1 does not expose `upsert`, an arbitrary transaction builder, or an app-specific batch API. `Apply changes` submits the current
+table ledger as one product operation, but the interface does not promise database-level atomicity unless the Jazz mutation
+boundary provides it.
 
 Inspector also does not aim to support every Jazz query shape in the Table Explorer. v1 focuses on flat table queries: filters, sorting, limit, and offset.
 
 #### Explicit live-update UX
 
-Jazz data can change while the developer is inspecting a table, either through new rows, updated rows, deletes, or side-panel saves.
+Jazz data can change while the developer is inspecting a table, either through new rows, updated rows, deletes, or applied Inspector changes.
 
 v1 makes live updates visible without forcing the user to refresh and lose context.
 
@@ -1141,7 +1240,7 @@ Behavior:
 - animate deleted rows when the user deletes from the inspector
 - preserve the selected row and side panel when possible
 - avoid jumping scroll position or replacing the visible context unexpectedly
-- use the same changed-cell highlight after a successful side-panel save
+- use the same changed-cell highlight after Inspector applies an update
 
 Highlights are ephemeral and brief.
 
@@ -1504,8 +1603,8 @@ UI representation:
 1. Developer connects a Jazz app, validates credentials, and opens the intended branch and schema hash.
 2. Developer reopens a saved local connection and understands whether the server/runtime is reachable.
 3. Developer opens a table, filters rows, distinguishes empty from filtered-empty, and inspects one record.
-4. Developer single-clicks a cell to focus it, then double-clicks to edit it inline or route a relation or binary field to the complete-row pane.
-5. Developer edits or inserts a row, sees staged changes, and gets a clear rejection if the runtime/server denies the mutation.
+4. Developer double-clicks or presses Enter on a supported cell to edit it through the Floating widget without checking the row; relation and binary fields route to the complete-row pane.
+5. Developer accumulates pending updates and deletions for one table, reviews them together, and persists them through one Apply action.
 6. Developer follows a relation cell to inspect linked data in another Data workspace item without losing the original table context.
 7. Developer bookmarks rows in a large table, then jumps back to them after changing page or filter context.
 8. Developer sees live row changes while browsing and keeps selection context when possible.
@@ -1513,6 +1612,23 @@ UI representation:
 10. Developer changes an app filter and verifies that the active query shape changes in the next subscription snapshot.
 11. Developer sees an empty Query Subscriptions view and understands possible causes such as local-only queries, short-lived reads, wrong connection context, or telemetry failure.
 12. Developer opens a table Schema item from the Data toolbar to read and copy stored schema and permissions JSON.
+
+### Inline editing and mutation scenarios
+
+These scenarios define the Floating widget states and transitions:
+
+1. **Row selected:** Checking a row opens its complete-row pane and exposes row actions in the Floating widget.
+2. **Pane edit:** Every valid pane field becomes a staged update automatically without field or form confirmation. Escape closes the pane and unchecks its active row while preserving staged changes.
+3. **Scalar cell edit:** With the complete-row pane closed, double-clicking a supported cell or pressing Enter opens its schema-aware editor in the Floating widget without checking the row. Save stages a valid edit and returns focus according to spreadsheet navigation.
+4. **Validation feedback:** Malformed input receives immediate colocated feedback, remains available for correction, and does not enter staged changes.
+5. **Structured cell edit:** JSON, Array, and Row values use an expanded code editor with access to the complete-row pane for more context.
+6. **Review:** The Apply presentation groups staged operations into independently scrollable update and deletion accordion sections above the persistent bottom summary and remains available while the row pane is open. Removing an update resets its form projection.
+7. **Delete rows:** Selecting rows and choosing Delete opens confirmation. Confirm Delete stages the selected deletions; Apply changes is the only persistence boundary, whether deletion is the only operation or part of a mixed ledger.
+8. **Collapse and restore:** The centered dock trigger remains visible while the Floating widget is expanded or collapsed. Staged changes and invalid editor input survive collapse and are distinguishable when restored. Expanded disclosure points up and collapsed disclosure points right.
+9. **Insert row:** Insert opens the schema-driven pane. `Insert` persists directly, `Discard` closes without persistence, and `Insert more` resets and retains the pane after success.
+10. **Apply success:** Applying all staged changes clears row selection, closes the row pane, and removes the widget. Failures remain visible for retry.
+11. **Switch table:** Changing the mounted table identity resets its table-local staged state.
+12. **Multi-row actions:** Checking several rows exposes actions scoped to that selection, including confirming all selected rows as staged deletions.
 
 ## Product states
 
@@ -1531,7 +1647,11 @@ v1 should explicitly handle or acknowledge these states:
 - filtered-empty table
 - invalid filter value
 - stale saved workspace item
-- row editor dirty state
+- pending table changes
+- invalid editor input that needs attention
+- Floating widget collapsed with retained state
+- reviewing mixed mutation kinds
+- applying changes
 - unsupported field type
 - changed cells
 - inserted row
@@ -1548,7 +1668,6 @@ v1 should explicitly handle or acknowledge these states:
 
 Not v1:
 
-- inline cell editing
 - full deleted-row browsing with `includeDeleted()`
 - exact total row counts unless Jazz exposes a reliable count API
 - advanced export
