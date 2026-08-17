@@ -5,6 +5,7 @@ import {
   closeTableTab,
   createBaseTableTabId,
   createTableTabRouteSearch,
+  getFinalTableTabName,
   loadTableTabsState,
   openBaseTableTabs,
   openNewViewTab,
@@ -293,6 +294,23 @@ describe("table tabs", () => {
       tabs: [tabs[0], tabs[2]],
       nextActiveTab: tabs[2],
     });
+  });
+
+  it("identifies only the final workspace tab representing a table", () => {
+    const tabs: TableTab[] = [
+      { kind: "table", id: "accounts-data", tableName: "accounts", search: {} },
+      {
+        kind: "table",
+        id: "accounts-schema",
+        tableName: "accounts",
+        search: { view: "schema" },
+      },
+      { kind: "table", id: "profiles-data", tableName: "profiles", search: {} },
+    ];
+
+    expect(getFinalTableTabName(tabs, "accounts-data")).toBeNull();
+    expect(getFinalTableTabName(tabs, "accounts-schema")).toBeNull();
+    expect(getFinalTableTabName(tabs, "profiles-data")).toBe("profiles");
   });
 
   it("reorders existing tabs from a complete id permutation", () => {

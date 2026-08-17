@@ -361,6 +361,25 @@ export function closeTableTab(
   };
 }
 
+export function getFinalTableTabName(
+  tabs: readonly TableTab[],
+  tabId: string,
+): string | null {
+  const tab = tabs.find(
+    (candidate): candidate is TableDataTab => candidate.kind === "table" && candidate.id === tabId,
+  );
+  if (tab === undefined) {
+    return null;
+  }
+  const hasAnotherRepresentation = tabs.some(
+    (candidate) =>
+      candidate.kind === "table" &&
+      candidate.id !== tabId &&
+      candidate.tableName === tab.tableName,
+  );
+  return hasAnotherRepresentation === true ? null : tab.tableName;
+}
+
 function isTableTabSearch(value: unknown): value is TableTabSearch {
   if (typeof value !== "object" || value === null) {
     return false;

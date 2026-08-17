@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { AlertDialog, Button } from "@inspector/ds";
 
 import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import {
@@ -15,6 +16,7 @@ import {
   closeTableTab,
   createTableTabRouteSearch,
   createSchemaTableTabId,
+  getFinalTableTabName,
   loadTableTabsState,
   openBaseTableTabs,
   openNewViewTab,
@@ -32,6 +34,8 @@ import {
 } from "@tables/workspace/tabs";
 import { appRoutes } from "@app/routing/appRoutes";
 import { useAvailableTables } from "@tables/schema/useAvailableTables";
+import { useTableMutationWorkspace } from "@tables/mutationLedger/provider";
+import { createTableMutationScopeKey } from "@tables/mutationLedger/scope";
 
 interface RouteSearch extends TableTabsRouteSearch {
   tab?: string;
@@ -95,11 +99,19 @@ interface TableTabsProviderState extends TableTabsState {
   activeTabId: string | null;
 }
 
+interface PendingTabClose {
+  changeCount: number;
+  tableName: string;
+  tabId: string;
+}
+
 export function TableTabsProvider({ children, scope }: TableTabsProviderProps): React.ReactElement {
   const { currentConnectionId, currentTableName } = useInspectorSessionState();
   const navigate = useNavigate({ from: appRoutes.tables });
   const routeSearch = useSearch({ strict: false }) as RouteSearch;
   const { isSchemaReady, tables: availableTables } = useAvailableTables();
+  const mutationWorkspace = useTableMutationWorkspace();
+  const [pendingTabClose, setPendingTabClose] = useState<PendingTabClose | null>(null);
   const [state, setState] = useState<TableTabsProviderState>(() => ({
     ...loadTableTabsState(scope),
     activeTabId: null,
@@ -262,7 +274,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     [navigateToTab, state.tabs],
   );
 
-  const closeTab = useCallback(
+  const closeTabWithoutConfirmation = useCallback(
     (tabId: string) => {
       const result = closeTableTab(state.tabs, tabId);
       if (tabId !== state.activeTabId) {
@@ -298,6 +310,46 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       state.tabs,
     ],
   );
+
+  const closeTab = useCallback(
+    (tabId: string) => {
+      const finalTableName = getFinalTableTabName(state.tabs, tabId);
+      if (finalTableName !== null) {
+        const scopeKey = createTableMutationScopeKey(scope, finalTableName);
+        if (mutationWorkspace.hasPendingChanges(scopeKey) === true) {
+          const tab = state.tabs.find((candidate) => candidate.id === tabId);
+          if (tab !== undefined && tabId !== state.activeTabId) {
+            navigateToTab(tab);
+          }
+          setPendingTabClose({
+            changeCount: mutationWorkspace.getPendingChangeCount(scopeKey),
+            tableName: finalTableName,
+            tabId,
+          });
+          return;
+        }
+      }
+      closeTabWithoutConfirmation(tabId);
+    }, [
+      closeTabWithoutConfirmation,
+      mutationWorkspace,
+      navigateToTab,
+      scope,
+      state.activeTabId,
+      state.tabs,
+    ],
+  );
+
+  const discardPendingChangesAndCloseTab = useCallback(() => {
+    if (pendingTabClose === null) {
+      return;
+    }
+    mutationWorkspace.discardPendingChanges(
+      createTableMutationScopeKey(scope, pendingTabClose.tableName),
+    );
+    closeTabWithoutConfirmation(pendingTabClose.tabId);
+    setPendingTabClose(null);
+  }, [closeTabWithoutConfirmation, mutationWorkspace, pendingTabClose, scope]);
 
   const openNewView = useCallback(() => {
     const result = openNewViewTab(state.tabs);
@@ -393,7 +445,36 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     ],
   );
 
-  return <TableTabsContext.Provider value={value}>{children}</TableTabsContext.Provider>;
+  const stagedChangeLabel = pendingTabClose?.changeCount === 1 ? "change" : "changes";
+
+  return (
+    <TableTabsContext.Provider value={value}>
+      {children}
+      <AlertDialog.Root
+        open={pendingTabClose !== null}
+        onOpenChange={(open) => {
+          if (open === false) {
+            setPendingTabClose(null);
+          }
+        }}
+      >
+        <AlertDialog.Content>
+          <AlertDialog.Title>Discard staged changes?</AlertDialog.Title>
+          <AlertDialog.Description>
+            {pendingTabClose === null
+              ? null
+              : `Closing the final ${pendingTabClose.tableName} view will discard ${pendingTabClose.changeCount} staged ${stagedChangeLabel}. This cannot be undone.`}
+          </AlertDialog.Description>
+          <AlertDialog.Actions>
+            <AlertDialog.Close>Keep editing</AlertDialog.Close>
+            <Button variant="danger" onClick={discardPendingChangesAndCloseTab}>
+              Discard and close
+            </Button>
+          </AlertDialog.Actions>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
+    </TableTabsContext.Provider>
+  );
 }
 
 export function useTableTabs(): TableTabsContextValue {
