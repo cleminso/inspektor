@@ -30,6 +30,7 @@ interface UseTableGridOptions {
   columnOrder: string[]
   columnVisibility: TableColumnVisibilityState
   columns: TableColumnMeta[]
+  disabledRowIds: ReadonlySet<TableRowId>
   onColumnMenuOpen: (columnId: string) => void
   onColumnMove: (columnId: string, direction: ColumnMoveDirection) => void
   onColumnOrderChange: OnChangeFn<ColumnOrderState>
@@ -37,6 +38,7 @@ interface UseTableGridOptions {
   onCellSelectionChange: OnChangeFn<CellSelectionState>
   onSelectedRowIdsChange: (rowIds: TableRowId[], request: RowSelectionRequest | null) => void
   onSortChange: (columnId: string, direction: TableSortDirection) => void
+  onUndoRowDeletion?: (rowId: TableRowId) => void
   rows: DynamicTableRow[]
   selectedRowIds: TableRowId[]
   sortColumn: string
@@ -50,6 +52,7 @@ export function useTableGrid({
   columnOrder,
   columnVisibility,
   columns,
+  disabledRowIds,
   onColumnMenuOpen,
   onColumnMove,
   onColumnOrderChange,
@@ -57,6 +60,7 @@ export function useTableGrid({
   onCellSelectionChange,
   onSelectedRowIdsChange,
   onSortChange,
+  onUndoRowDeletion,
   rows,
   selectedRowIds,
   sortColumn,
@@ -69,11 +73,12 @@ export function useTableGrid({
         columns,
         onColumnMenuOpen,
         onColumnMove,
+        onUndoRowDeletion,
         onRowSelectionRequest: (request) => {
           rowSelectionRequestRef.current = request
         },
       }),
-    [columns, onColumnMenuOpen, onColumnMove],
+    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletion],
   )
 
   const rowSelection = useMemo<RowSelectionState>(() => {
@@ -97,7 +102,8 @@ export function useTableGrid({
       getRowId: (row) => String(row.id),
       autoResetCellSelection: false,
       columnResizeMode: 'onChange',
-      enableRowSelection: true,
+      enableRowSelection: (row) => disabledRowIds.has(row.id) === false,
+      enableCellSelection: (cell) => disabledRowIds.has(cell.row.id) === false,
       manualSorting: true,
       state: {
         cellSelection,

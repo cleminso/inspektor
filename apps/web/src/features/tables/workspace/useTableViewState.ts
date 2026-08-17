@@ -45,8 +45,12 @@ import {
 } from '@tables/grid/inlineEditing'
 
 interface UseTableViewStateOptions {
+  disabledRowIds?: ReadonlySet<TableRowId>
+  onUndoRowDeletion?: (rowId: TableRowId) => void
   tableName: string
 }
+
+const emptyDisabledRowIds: ReadonlySet<TableRowId> = new Set()
 
 interface InsertRowSaveOptions {
   keepOpen: boolean
@@ -87,6 +91,7 @@ interface UseTableViewStateResult {
     options: InsertRowSaveOptions,
   ) => Promise<void>
   handleMutationApplySuccess: () => void
+  handleRowsStagedForDeletion: (rowIds: readonly TableRowId[]) => void
   handleRowEditorOpenChange: (open: boolean) => void
   handleRowEditorCancel: () => void
   hasNextPage: boolean
@@ -127,6 +132,8 @@ export function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record
  * the mounted table state until Apply or Discard resolves them.
  */
 export function useTableViewState({
+  disabledRowIds = emptyDisabledRowIds,
+  onUndoRowDeletion,
   tableName,
 }: UseTableViewStateOptions): UseTableViewStateResult {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
@@ -337,6 +344,7 @@ export function useTableViewState({
   const table = useTableGrid({
     cellSelection,
     columnOrder: order.columnOrder,
+    disabledRowIds,
     rows: query.rows,
     columns: query.columns,
     sortColumn: searchState.sortColumn,
@@ -344,6 +352,7 @@ export function useTableViewState({
     selectedRowIds: visibleSelectedRowIds,
     columnVisibility: visibility.columnVisibility,
     onSortChange: handleSortChange,
+    onUndoRowDeletion,
     onSelectedRowIdsChange: handleSelectedRowIdsChange,
     onColumnVisibilityChange: handleColumnVisibilityChange,
     onCellSelectionChange: setCellSelection,
@@ -432,6 +441,17 @@ export function useTableViewState({
 
   const handleMutationApplySuccess = () => {
     resetSelection()
+    closeDetailPane()
+  }
+
+  const handleRowsStagedForDeletion = (rowIds: readonly TableRowId[]) => {
+    const deletedRowIds = new Set(rowIds)
+    setSelectedRowIds((currentRowIds) =>
+      currentRowIds.filter((rowId) => deletedRowIds.has(rowId) === false),
+    )
+    setCellSelection([])
+    setActiveColumnId(null)
+    setActiveFieldEditorTarget(null)
     closeDetailPane()
   }
 
@@ -599,6 +619,7 @@ export function useTableViewState({
     handleFieldEditorComplete,
     handleInsertSave,
     handleMutationApplySuccess,
+    handleRowsStagedForDeletion,
     handleRowEditorOpenChange: (open) => {
       if (open === false) {
         closeDetailPane()

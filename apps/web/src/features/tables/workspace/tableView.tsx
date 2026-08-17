@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 
 import {
   Box,
@@ -12,8 +12,11 @@ import {
 } from '@inspector/ds'
 
 import { productGlyphs } from '@app/icons/productGlyphs'
+import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
+import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
+import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
 import {
   EditRowForm,
@@ -21,18 +24,25 @@ import {
   preloadRowEditorForms,
 } from '@tables/rowEditor/rowEditorModules'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
+import { getTableColumns } from '@tables/schema/tableSchema'
 import { getTableViewportScrollResetKey } from '@tables/workspace/tableViewport'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
 import {
   TableMutationLedgerProvider,
   useTableMutationEditorController,
+  useTableMutationLedger,
+  type ScopedTableMutationLedger,
 } from '@tables/mutationLedger/provider'
 import type { ColumnDescriptor } from 'jazz-tools'
 import type { TableRowId } from '@tables/tableTypes'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import { FieldEditorMutationWidget } from '@tables/floatingWidget/fieldEditorMutationWidgetModules'
 import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
+import {
+  createTableMutationScopeKey,
+  createTableMutationWorkspaceScope,
+} from '@tables/mutationLedger/scope'
 
 interface TableViewProps {
   tableName: string
@@ -40,21 +50,25 @@ interface TableViewProps {
 
 function RowEditorFormFallback(): React.ReactElement {
   return (
-    <Box height="full" alignItems="center" justifyContent="center" role="status" aria-live="polite">
+    <Box
+      height="full"
+      alignItems="center"
+      justifyContent="center"
+      role="status"
+      aria-live="polite"
+    >
       <Text color="muted">Loading editor</Text>
     </Box>
   )
 }
 
 interface StagedEditRowFormProps {
-  onCancel: () => void
   rowId: TableRowId
   rowValues: Record<string, unknown>
   schemaColumns: ColumnDescriptor[]
 }
 
 function StagedEditRowForm({
-  onCancel,
   rowId,
   rowValues,
   schemaColumns,
@@ -71,7 +85,6 @@ function StagedEditRowForm({
       rowValues={rowValues}
       schemaColumns={schemaColumns}
       targetRowId={rowId}
-      onCancel={onCancel}
     />
   )
 }
@@ -112,31 +125,105 @@ function StagedFieldEditorMutationWidget({
 }
 
 export function TableView({ tableName }: TableViewProps): React.ReactElement {
-  const state = useTableViewState({
+  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
+  const wasmSchema = useRuntimeSchema()
+  const schemaColumns = useMemo(
+    () => getTableColumns(wasmSchema, tableName),
+    [tableName, wasmSchema],
+  )
+  const mutationScopeKey = createTableMutationScopeKey(
+    createTableMutationWorkspaceScope({
+      branch: currentBranch,
+      connectionId: currentConnectionId,
+      schemaHash: currentSchemaHash,
+    }),
     tableName,
-  })
+  )
 
   return (
     <TableMutationLedgerProvider
-      key={state.tableKey}
-      schemaColumns={state.schemaColumns}
+      schemaColumns={schemaColumns}
+      scopeKey={mutationScopeKey}
     >
-      <TableViewContent
-        state={state}
-        tableName={tableName}
-      />
+      <TableViewStatefulContent tableName={tableName} />
     </TableMutationLedgerProvider>
   )
 }
 
+function TableViewStatefulContent({ tableName }: TableViewProps): React.ReactElement {
+  const mutations = useTableMutationLedger()
+  const { ledger, removeEntry } = mutations
+  const stagedDeletionRowIds = useMemo(
+    () =>
+      new Set(
+        ledger.entries.filter((entry) => entry.kind === 'delete').map((entry) => entry.rowId),
+      ),
+    [ledger.entries],
+  )
+  const handleUndoRowDeletion = useCallback(
+    (rowId: TableRowId) => removeEntry(`delete:${rowId}`),
+    [removeEntry],
+  )
+  const state = useTableViewState({
+    disabledRowIds: stagedDeletionRowIds,
+    onUndoRowDeletion: handleUndoRowDeletion,
+    tableName,
+  })
+
+  return (
+    <TableViewContent
+      mutations={mutations}
+      stagedDeletionRowIds={stagedDeletionRowIds}
+      state={state}
+      tableName={tableName}
+    />
+  )
+}
+
 function TableViewContent({
+  mutations,
+  stagedDeletionRowIds,
   state,
   tableName,
 }: {
+  mutations: ScopedTableMutationLedger
+  stagedDeletionRowIds: ReadonlySet<TableRowId>
   state: ReturnType<typeof useTableViewState>
   tableName: string
 }): React.ReactElement {
   const { openSchemaView } = useTableTabs()
+  const getRowStatus = useCallback(
+    (row: { id: string }): 'default' | 'stagedDeletion' =>
+      stagedDeletionRowIds.has(row.id) ? 'stagedDeletion' : 'default',
+    [stagedDeletionRowIds],
+  )
+  const getCellStatus = useCallback(
+    (cell: { column: { id: string }; row: { id: string } }): 'default' | 'stagedUpdate' => {
+      if (cell.column.id === tableGridSelectionColumnId || stagedDeletionRowIds.has(cell.row.id)) {
+        return 'default'
+      }
+
+      if (
+        state.activeFieldEditorTarget?.rowId === cell.row.id &&
+        state.activeFieldEditorTarget.columnId === cell.column.id
+      ) {
+        return 'default'
+      }
+
+      return mutations.stagedFieldsByRowId[cell.row.id]?.has(cell.column.id) === true
+        ? 'stagedUpdate'
+        : 'default'
+    },
+    [mutations.stagedFieldsByRowId, stagedDeletionRowIds, state.activeFieldEditorTarget],
+  )
+  const handleCellEditRequest = useCallback(
+    (target: { columnId: string; rowId: string }) => {
+      if (stagedDeletionRowIds.has(target.rowId) === false) {
+        state.handleCellEditRequest(target)
+      }
+    },
+    [stagedDeletionRowIds, state],
+  )
   const scrollResetKey = getTableViewportScrollResetKey(state)
   const handleEscape = useEffectEvent(state.handleEscape)
   const refreshPendingRef = useRef(false)
@@ -151,9 +238,8 @@ function TableViewContent({
   const activeFieldColumn =
     state.activeFieldEditorTarget === null
       ? null
-      : (state.tableColumns.find(
-          (column) => column.id === state.activeFieldEditorTarget?.columnId,
-        )?.column ?? null)
+      : (state.tableColumns.find((column) => column.id === state.activeFieldEditorTarget?.columnId)
+          ?.column ?? null)
   const filteredEmpty =
     state.error === null &&
     state.isInitialLoading === false &&
@@ -221,153 +307,176 @@ function TableViewContent({
   return (
     <>
       <ResizablePanelGroup orientation="horizontal">
-      <ResizablePanel>
-        <Box
-          height="full"
-          flexDirection="column"
-          overflow="hidden"
-        >
-          <Toolbar
-            actions={
-              <>
-                <Box>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger
-                      render={
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="s"
-                          aria-label="Open schema"
-                          iconOnly
-                          disabled={state.canInspectSchema === false}
-                          onClick={() => {
-                            openSchemaView(tableName)
-                          }}
-                        >
-                          <Button.Glyph artwork={productGlyphs.schema} />
-                        </Button>
-                      }
-                    />
-                    <Tooltip.Content>Open schema</Tooltip.Content>
-                  </Tooltip.Root>
-                  <DataGridColumnVisibility table={state.table} />
-                </Box>
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="s"
-                   disabled={state.canOpenRowEditor === false}
-                   onClick={() => {
+        <ResizablePanel>
+          <Box
+            height="full"
+            flexDirection="column"
+            overflow="hidden"
+          >
+            <Toolbar
+              actions={
+                <>
+                  <Box>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger
+                        render={
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="s"
+                            aria-label="Open schema"
+                            iconOnly
+                            disabled={state.canInspectSchema === false}
+                            onClick={() => {
+                              openSchemaView(tableName)
+                            }}
+                          >
+                            <Button.Glyph artwork={productGlyphs.schema} />
+                          </Button>
+                        }
+                      />
+                      <Tooltip.Content>Open schema</Tooltip.Content>
+                    </Tooltip.Root>
+                    <DataGridColumnVisibility table={state.table} />
+                  </Box>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="s"
+                    disabled={state.canOpenRowEditor === false}
+                    onClick={() => {
                       if (state.detailPaneMode === 'insert') {
                         setInsertMoreEnabled(false)
                         state.handleRowEditorOpenChange(false)
                       } else {
                         setInsertMoreEnabled(false)
                         state.rowEditor.openInsert()
-                     }
-                  }}
-                >
-                  Insert row
-                </Button>
-              </>
-            }
-            pagination={
-              <TablePagination
-                hasNextPage={state.hasNextPage}
-                hasPreviousPage={state.hasPreviousPage}
-                loadedRowCount={state.loadedRowCount}
-                loading={state.isInitialLoading}
-                page={state.page}
-                pageSize={state.pageSize}
-                onPageChange={state.setPage}
-                onPageSizeChange={state.setPageSize}
-              />
-            }
-          />
-          <Box
-            minHeight={0}
-            flex={1}
-            overflow="hidden"
-          >
-            <DataGrid.Root
-              table={state.table}
-              reorderableColumnIds={state.reorderableColumnIds}
-              density="compact"
-              activeColumnId={state.activeColumnId}
-              activeRowId={state.rowEditor.activeRowId}
-              focusRequest={state.cellFocusRequest}
-              onCellActivate={state.handleCellActivate}
-              onCellEditRequest={state.handleCellEditRequest}
-              columnDragPreview={(columnId) => {
-                const column = state.tableColumns.find((candidate) => candidate.id === columnId)
-                return column === undefined ? columnId : <ColumnDragPreview column={column} />
-              }}
-              onColumnActivate={state.handleColumnActivate}
+                      }
+                    }}
+                  >
+                    Insert row
+                  </Button>
+                </>
+              }
+              pagination={
+                <TablePagination
+                  hasNextPage={state.hasNextPage}
+                  hasPreviousPage={state.hasPreviousPage}
+                  loadedRowCount={state.loadedRowCount}
+                  loading={state.isInitialLoading}
+                  page={state.page}
+                  pageSize={state.pageSize}
+                  onPageChange={state.setPage}
+                  onPageSizeChange={state.setPageSize}
+                />
+              }
+            />
+            <Box
+              minHeight={0}
+              flex={1}
+              overflow="hidden"
             >
-              <DataGrid.Viewport scrollResetKey={scrollResetKey}>
-                <DataGrid.Table
-                  aria-busy={state.isInitialLoading || state.isRefreshing}
-                  aria-label={`${tableName} rows`}
-                  statusContent={queryStatus}
-                >
-                  <DataGrid.Content
-                    loading={state.isInitialLoading}
-                    loadingContent="Loading rows"
-                    rowRendering="virtual"
-                    emptyContent={
-                      state.error === null ? (
-                        filteredEmpty ? (
-                          'No rows match these filters'
-                        ) : null
-                      ) : (
-                        <Box
-                          flexDirection="column"
-                          gap="xs"
-                          role="alert"
-                        >
-                          <Text
-                            color="error"
-                            variant="label"
-                          >
-                            Couldn't load rows
-                          </Text>
-                          <Text color="muted">{state.error}</Text>
-                          <Text color="muted">
-                            Check the connection, then reload the page to try again.
-                          </Text>
-                        </Box>
+              <TableGridContextMenu
+                revertField={mutations.revertField}
+                revertRowUpdate={mutations.revertRowUpdate}
+                stagedDeletionRowIds={stagedDeletionRowIds}
+                stagedFieldsByRowId={mutations.stagedFieldsByRowId}
+              >
+                {({ composeViewport, onCellContextMenu, onRowContextMenu }) => (
+                  <DataGrid.Root
+                    table={state.table}
+                    reorderableColumnIds={state.reorderableColumnIds}
+                    density="compact"
+                    activeColumnId={state.activeColumnId}
+                    activeRowId={state.rowEditor.activeRowId}
+                    focusRequest={state.cellFocusRequest}
+                    getCellStatus={getCellStatus}
+                    getRowStatus={getRowStatus}
+                    onCellActivate={state.handleCellActivate}
+                    onCellContextMenu={onCellContextMenu}
+                    onCellEditRequest={handleCellEditRequest}
+                    columnDragPreview={(columnId) => {
+                      const column = state.tableColumns.find(
+                        (candidate) => candidate.id === columnId,
                       )
-                    }
-                  />
-                </DataGrid.Table>
-              </DataGrid.Viewport>
-            </DataGrid.Root>
+                      return column === undefined ? columnId : <ColumnDragPreview column={column} />
+                    }}
+                    onColumnActivate={state.handleColumnActivate}
+                    onRowContextMenu={onRowContextMenu}
+                  >
+                    {composeViewport(
+                      <DataGrid.Viewport scrollResetKey={scrollResetKey}>
+                        <DataGrid.Table
+                          aria-busy={state.isInitialLoading || state.isRefreshing}
+                          aria-label={`${tableName} rows`}
+                          statusContent={queryStatus}
+                        >
+                          <DataGrid.Content
+                            loading={state.isInitialLoading}
+                            loadingContent="Loading rows"
+                            rowRendering="virtual"
+                            emptyContent={
+                              state.error === null ? (
+                                filteredEmpty ? (
+                                  'No rows match these filters'
+                                ) : null
+                              ) : (
+                                <Box
+                                  flexDirection="column"
+                                  gap="xs"
+                                  role="alert"
+                                >
+                                  <Text
+                                    color="error"
+                                    variant="label"
+                                  >
+                                    Couldn't load rows
+                                  </Text>
+                                  <Text color="muted">{state.error}</Text>
+                                  <Text color="muted">
+                                    Check the connection, then reload the page to try again.
+                                  </Text>
+                                </Box>
+                              )
+                            }
+                          />
+                        </DataGrid.Table>
+                      </DataGrid.Viewport>,
+                    )}
+                  </DataGrid.Root>
+                )}
+              </TableGridContextMenu>
+            </Box>
           </Box>
-        </Box>
-      </ResizablePanel>
-      {state.detailPaneMode !== 'closed' ? (
-        <>
-          <ResizableHandle />
-          <ResizablePanel
-            defaultSize={420}
-            minSize={320}
-            maxSize={720}
-          >
-            <RowEditorSidePanel
-              activeColumnNumber={state.rowEditor.activeColumnNumber}
-              activePageRowNumber={state.rowEditor.activePageRowNumber}
-              mode={state.detailPaneMode === 'insert' ? 'insert' : 'edit'}
-              editedRowIds={state.rowEditor.editedRowIds}
-              insertMoreEnabled={insertMoreEnabled}
-              activeRowIndex={state.rowEditor.activeRowIndex}
-              onInsertMoreEnabledChange={setInsertMoreEnabled}
-              onNavigatePrevious={state.rowEditor.goToPreviousRow}
-              onNavigateNext={state.rowEditor.goToNextRow}
+        </ResizablePanel>
+        {state.detailPaneMode !== 'closed' ? (
+          <>
+            <ResizableHandle />
+            <ResizablePanel
+              defaultSize={420}
+              minSize={320}
+              maxSize={720}
             >
-              <Suspense fallback={<RowEditorFormFallback />}>
-                {state.detailPaneMode === 'insert' ? (
-                  <InsertRowForm
+              <RowEditorSidePanel
+                activeColumnNumber={state.rowEditor.activeColumnNumber}
+                activePageRowNumber={state.rowEditor.activePageRowNumber}
+                mode={state.detailPaneMode === 'insert' ? 'insert' : 'edit'}
+                editedRowIds={state.rowEditor.editedRowIds}
+                insertMoreEnabled={insertMoreEnabled}
+                mutationDisabled={state.canMutateRows === false}
+                activeRowIndex={state.rowEditor.activeRowIndex}
+                onClose={state.handleRowEditorCancel}
+                onConfirmDelete={(rowIds) => {
+                  mutations.dispatch({ type: 'deleteRows', rowIds })
+                  state.handleRowsStagedForDeletion(rowIds)
+                }}
+                onInsertMoreEnabledChange={setInsertMoreEnabled}
+                onNavigatePrevious={state.rowEditor.goToPreviousRow}
+                onNavigateNext={state.rowEditor.goToNextRow}
+              >
+                <Suspense fallback={<RowEditorFormFallback />}>
+                  {state.detailPaneMode === 'insert' ? (
+                    <InsertRowForm
                       key={`${tableName}:insert`}
                       rowValues={state.rowValues ?? {}}
                       schemaColumns={state.schemaColumns}
@@ -383,16 +492,13 @@ function TableViewContent({
                           setInsertMoreEnabled(false)
                         }
                       }}
-                  />
-                ) : (
-                  state.rowEditor.activeRowId !== null &&
-                  state.rowValues !== null ? (
+                    />
+                  ) : state.rowEditor.activeRowId !== null && state.rowValues !== null ? (
                     <StagedEditRowForm
                       key={`${tableName}:${state.rowEditor.activeRowId}`}
                       rowId={state.rowEditor.activeRowId}
                       rowValues={state.rowValues}
                       schemaColumns={state.schemaColumns}
-                      onCancel={state.handleRowEditorCancel}
                     />
                   ) : (
                     <EditRowForm
@@ -400,17 +506,13 @@ function TableViewContent({
                       rowValues={state.rowValues}
                       schemaColumns={state.schemaColumns}
                       targetRowId={state.rowEditor.activeRowId}
-                      onCancel={() => {
-                        state.handleRowEditorCancel()
-                      }}
                     />
-                  )
-                )}
-              </Suspense>
-            </RowEditorSidePanel>
-          </ResizablePanel>
-        </>
-      ) : null}
+                  )}
+                </Suspense>
+              </RowEditorSidePanel>
+            </ResizablePanel>
+          </>
+        ) : null}
       </ResizablePanelGroup>
       {state.detailPaneMode === 'closed' &&
       state.activeFieldEditorTarget !== null &&
@@ -429,7 +531,6 @@ function TableViewContent({
         <TableMutationWidget
           executor={state.mutationExecutor}
           onApplySuccess={state.handleMutationApplySuccess}
-          selectedRowIds={state.selectedRowIds}
         />
       )}
     </>

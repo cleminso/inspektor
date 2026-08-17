@@ -4,7 +4,6 @@ import type { ColumnDescriptor } from "jazz-tools";
 
 import {
   Box,
-  Button,
   FindBar,
   JsonView,
   ScrollArea,
@@ -28,7 +27,6 @@ import { createRowJsonViewValue } from "@tables/rowEditor/values/jsonView";
 
 interface EditRowFormProps {
   draftController?: RowDraftController;
-  onCancel?: () => void;
   onDirtyChange?: (isDirty: boolean) => void;
   onSave?: (values: Record<string, unknown>) => Promise<void> | void;
   rowValues: Record<string, unknown> | null;
@@ -40,7 +38,6 @@ export { focusRowEditorField };
 
 export function EditRowForm({
   draftController,
-  onCancel,
   onDirtyChange,
   onSave,
   rowValues,
@@ -62,7 +59,6 @@ export function EditRowForm({
   }
 
   const loadedProps = {
-    onCancel,
     onDirtyChange,
     onSave,
     rowValues,
@@ -181,7 +177,6 @@ function RowJsonRepresentation({
 
 function LoadedEditRowForm({
   draftController,
-  onCancel,
   onDirtyChange,
   onSave,
   rowValues,
@@ -256,32 +251,6 @@ function LoadedEditRowForm({
             </ScrollArea>
           </Box>
 
-          <Box
-            data-slot="row-editor-footer"
-            flexShrink={0}
-            alignItems="center"
-            gap="xs"
-            backgroundColor="surface-background"
-            paddingHorizontal="m"
-            paddingVertical="s"
-            paddingRight="l"
-          >
-            {onCancel !== undefined ? (
-              <Box flex={1} justifyContent="end">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  layout="fill"
-                  onClick={() => {
-                    onCancel();
-                  }}
-                >
-                  Close
-                </Button>
-              </Box>
-            ) : null}
-          </Box>
         </Box>
       ) : (
         <RowJsonRepresentation rowValues={rowValues} schemaColumns={schemaColumns} />

@@ -1,15 +1,15 @@
-import { useId, useState } from 'react'
-import { ChevronRight, ChevronUp, X } from 'lucide-react'
+import { useId, useState, type UIEvent } from 'react'
+import { ChevronRight, ChevronUp } from 'lucide-react'
 
 import { Accordion, Box, Button, FloatingPanel, Text } from '@inspector/ds'
 
 import { InspectorDockCenterPortal } from '@app/shell/dock/centerSlot'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
 import {
-  selectAffectedRows,
   selectTableMutationCounts,
-  type TableMutationEntry,
   type TableMutationLedger,
+  type TableMutationReview,
+  type TableMutationReviewOperation,
 } from '@tables/mutationLedger/ledger'
 import { useTableMutationLedger } from '@tables/mutationLedger/provider'
 import { useApplyTableMutationLedger } from '@tables/mutationLedger/useApplyTableMutationLedger'
@@ -25,60 +25,126 @@ function formatStagedCount(ledger: TableMutationLedger): string {
   return `${counts.total} ${counts.total === 1 ? 'change' : 'changes'} staged`
 }
 
-function shortenIdentity(identity: string): string {
-  return identity.length <= 16 ? identity : `${identity.slice(0, 8)}…${identity.slice(-4)}`
+function formatOperationSummary(operation: TableMutationReviewOperation): string {
+  if (operation.kind === 'delete') {
+    return operation.affectedRowCount === 1
+      ? (operation.rowIds[0] ?? '')
+      : `${operation.affectedRowCount} selected rows`
+  }
+  return operation.rowId
 }
 
-function ReviewRow({
-  entryId,
-  fieldCount,
-  rowId,
-  onRemove,
+function OperationRow({
+  operation,
+  onUndo,
 }: {
-  entryId: TableMutationEntry['entryId']
-  fieldCount?: number
-  rowId: string
-  onRemove: (entryId: TableMutationEntry['entryId']) => void
+  operation: TableMutationReviewOperation
+  onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
 }): React.ReactElement {
-  const label = shortenIdentity(rowId)
+  const summary = formatOperationSummary(operation)
   return (
     <Box
       as="li"
       alignItems="center"
+      data-operation-row
+      display="flex"
       gap="s"
+      height="collection-row-height-xl"
       minWidth={0}
+      px="s"
+      width="full"
     >
-      <Text truncate>{label}</Text>
-      {fieldCount === undefined ? null : (
-        <Text
-          color="muted"
-          variant="caption"
-        >
-          {fieldCount} {fieldCount === 1 ? 'field' : 'fields'}
-        </Text>
-      )}
-      <Button
-        aria-label={`Remove ${label} staged change`}
-        iconOnly
-        size="s"
-        variant="ghost"
-        onClick={() => onRemove(entryId)}
+      <Box
+        alignItems="center"
+        flex={1}
+        gap="s"
+        minWidth={0}
       >
-        <Button.Glyph artwork={X} />
-      </Button>
+        <Text truncate>{summary}</Text>
+        {operation.kind === 'update' ? (
+          <Text
+            color="muted"
+            truncate
+            variant="caption"
+          >
+            {operation.fieldNames.join(', ')}
+          </Text>
+        ) : null}
+      </Box>
+      <Box flexShrink={0} ml="auto">
+        <Button
+          aria-label={`Undo: ${summary}`}
+          size="s"
+          variant="ghost"
+          onClick={() => onUndo(operation.operationId)}
+        >
+          Undo
+        </Button>
+      </Box>
+    </Box>
+  )
+}
+
+const directRenderLimit = 100
+const windowSize = 12
+
+function OperationList({
+  label,
+  operations,
+  onUndo,
+}: {
+  label: string
+  operations: readonly TableMutationReviewOperation[]
+  onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
+}): React.ReactElement {
+  const virtualized = operations.length > directRenderLimit
+  const [windowStart, setWindowStart] = useState(0)
+  const boundedStart = Math.min(windowStart, Math.max(0, operations.length - windowSize))
+  const visibleOperations = virtualized === true
+    ? operations.slice(boundedStart, boundedStart + windowSize)
+    : operations
+  const scrollable = operations.length > 10
+  const handleScroll = (event: UIEvent<HTMLElement>) => {
+    if (virtualized === false) return
+    const viewport = event.currentTarget
+    if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 1) {
+      setWindowStart((current) => Math.min(current + 10, operations.length - windowSize))
+      viewport.scrollTop = 1
+    } else if (viewport.scrollTop === 0) {
+      setWindowStart((current) => Math.max(0, current - 10))
+    }
+  }
+  return (
+    <Box
+      as="section"
+      aria-label={label}
+      data-scrollable={scrollable}
+      data-virtualized={virtualized}
+      maxHeight={scrollable === true ? 'viewport-height-l' : undefined}
+      overflowY={scrollable === true ? 'auto' : 'visible'}
+      width="full"
+      onScroll={handleScroll}
+    >
+      <Box as="ul" flexDirection="column" width="full">
+        {visibleOperations.map((operation) => (
+          <OperationRow key={operation.operationId} operation={operation} onUndo={onUndo} />
+        ))}
+      </Box>
     </Box>
   )
 }
 
 function ReviewSection({
-  children,
   count,
   label,
+  operations,
+  onUndo,
   value,
 }: {
-  children: React.ReactNode
   count: number
   label: string
+  operations: readonly TableMutationReviewOperation[]
+  onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
   value: string
 }): React.ReactElement {
   return (
@@ -102,29 +168,23 @@ function ReviewSection({
         </Accordion.Trigger>
       </Accordion.Header>
       <Accordion.Panel>
-        <Box
-          as="ul"
-          flexDirection="column"
-          gap="s"
-          paddingTop="xxs"
-        >
-          {children}
-        </Box>
+        <OperationList label={`${label.slice(0, -1)} operations`} operations={operations} onUndo={onUndo} />
       </Accordion.Panel>
     </Accordion.Item>
   )
 }
 
-function AffectedRowsReview({
+function OperationReview({
   id,
-  ledger,
-  onRemove,
+  review,
+  onUndo,
 }: {
   id: string
-  ledger: TableMutationLedger
-  onRemove: (entryId: TableMutationEntry['entryId']) => void
+  review: TableMutationReview
+  onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
 }): React.ReactElement {
-  const affectedRows = selectAffectedRows(ledger)
+  const updates = review.operations.filter((operation) => operation.kind === 'update')
+  const deletions = review.operations.filter((operation) => operation.kind === 'delete')
   return (
     <Box
       as="section"
@@ -134,46 +194,29 @@ function AffectedRowsReview({
       borderColor="subtle"
       borderStyle="solid"
       flexDirection="column"
-      height="panel-height"
-      padding="m"
+      padding="s"
     >
       <Accordion
         defaultValue={['updates', 'deletions']}
-        layout="fill"
         multiple
       >
-        {affectedRows.updates.length === 0 ? null : (
+        {updates.length === 0 ? null : (
           <ReviewSection
-            count={affectedRows.updates.length}
-            label="Updates"
+            count={updates.length}
+            label="Updated rows"
+            operations={updates}
             value="updates"
-          >
-            {affectedRows.updates.map((update) => (
-              <ReviewRow
-                key={update.entryId}
-                entryId={update.entryId}
-                fieldCount={update.fieldCount}
-                rowId={update.rowId}
-                onRemove={onRemove}
-              />
-            ))}
-          </ReviewSection>
+            onUndo={onUndo}
+          />
         )}
-        {affectedRows.deletes.length === 0 ? null : (
+        {deletions.length === 0 ? null : (
           <ReviewSection
-            count={affectedRows.deletes.length}
-            label="Deletions"
+            count={deletions.length}
+            label="Deleted rows"
+            operations={deletions}
             value="deletions"
-          >
-            {affectedRows.deletes.map((deletion) => (
-              <ReviewRow
-                key={deletion.entryId}
-                entryId={deletion.entryId}
-                rowId={deletion.rowId}
-                onRemove={onRemove}
-              />
-            ))}
-          </ReviewSection>
+            onUndo={onUndo}
+          />
         )}
       </Accordion>
     </Box>
@@ -182,11 +225,13 @@ function AffectedRowsReview({
 
 function DockTrigger({
   contentId,
+  count,
   expanded,
   label,
   onToggle,
 }: {
   contentId: string
+  count: number
   expanded: boolean
   label: string
   onToggle: () => void
@@ -196,6 +241,16 @@ function DockTrigger({
       <Button
         aria-controls={contentId}
         aria-expanded={expanded}
+        aria-pressed={expanded}
+        prefix={
+          <Text
+            as="span"
+            tabularNums
+            variant="caption"
+          >
+            {count}
+          </Text>
+        }
         suffix={<Button.Glyph artwork={expanded === true ? ChevronUp : ChevronRight} />}
         size="s"
         variant="ghost"
@@ -210,80 +265,67 @@ function DockTrigger({
 export function TableMutationWidget({
   executor,
   onApplySuccess,
-  selectedRowIds,
 }: {
   executor: TableMutationExecutor
   onApplySuccess?: () => void
-  selectedRowIds: readonly string[]
 }): React.ReactElement | null {
   const mutations = useTableMutationLedger()
   const apply = useApplyTableMutationLedger({ executor, onSuccess: onApplySuccess })
   const [collapsed, setCollapsed] = useState(false)
-  const [deleteConfirmationRowIds, setDeleteConfirmationRowIds] = useState<
-    readonly string[] | null
-  >(null)
   const [reviewExpanded, setReviewExpanded] = useState(false)
   const contentId = useId()
   const reviewId = useId()
   const hasPending =
     mutations.ledger.entries.length > 0 || mutations.hasInvalidEditor === true
 
-  if (hasPending === false && selectedRowIds.length === 0) {
+  if (hasPending === false) {
     return null
   }
 
   const expanded = collapsed === false
-  const label = hasPending === true
-    ? mutations.execution.status === 'applying'
-      ? `Applying changes · ${formatStagedCount(mutations.ledger)}`
-      : mutations.execution.status === 'failed' || mutations.hasInvalidEditor === true
-        ? `Needs attention · ${formatStagedCount(mutations.ledger)}`
-        : 'Staged changes'
-    : `${selectedRowIds.length} ${selectedRowIds.length === 1 ? 'row' : 'rows'} selected`
+  const label = mutations.execution.status === 'applying'
+    ? `Applying changes · ${formatStagedCount(mutations.ledger)}`
+    : mutations.execution.status === 'failed' || mutations.hasInvalidEditor === true
+      ? `Needs attention · ${formatStagedCount(mutations.ledger)}`
+      : 'Staged changes'
 
   return (
     <>
       <DockTrigger
         contentId={contentId}
+        count={mutations.stagedCount}
         expanded={expanded}
         label={label}
         onToggle={() => setCollapsed(expanded)}
       />
       {expanded === false ? null : (
-        <FloatingPanel.Root aria-label={hasPending === true ? 'Staged changes' : 'Row selection actions'}>
+        <FloatingPanel.Root aria-label="Staged changes">
           <FloatingPanel.Content id={contentId}>
-            {hasPending === true && reviewExpanded === true ? (
-              <AffectedRowsReview
+            {reviewExpanded === true ? (
+              <OperationReview
                 id={reviewId}
-                ledger={mutations.ledger}
-                onRemove={mutations.removeEntry}
+                review={mutations.review}
+                onUndo={mutations.undoReviewOperation}
               />
             ) : null}
             <FloatingPanel.Summary>
               <Box
+                alignItems="start"
                 flex={1}
                 minWidth={0}
                 flexDirection="column"
               >
-                {hasPending === true ? (
-                  <Button
-                    aria-controls={reviewId}
-                    aria-expanded={reviewExpanded}
-                    disabled={mutations.ledger.entries.length === 0}
-                    size="s"
-                    suffix={<Button.Glyph artwork={reviewExpanded === true ? ChevronUp : ChevronRight} />}
-                    variant="ghost"
-                    onClick={() => setReviewExpanded((current) => current === false)}
-                  >
-                    Review changes
-                  </Button>
-                ) : (
-                  <Text variant="label">
-                    {deleteConfirmationRowIds === null
-                      ? label
-                      : `Delete ${deleteConfirmationRowIds.length} ${deleteConfirmationRowIds.length === 1 ? 'row' : 'rows'}?`}
-                  </Text>
-                )}
+                <Button
+                  aria-controls={reviewId}
+                  aria-expanded={reviewExpanded}
+                  disabled={mutations.ledger.entries.length === 0}
+                  size="s"
+                  suffix={<Button.Glyph artwork={reviewExpanded === true ? ChevronUp : ChevronRight} />}
+                  variant="ghost"
+                  onClick={() => setReviewExpanded((current) => current === false)}
+                >
+                  Review changes
+                </Button>
                 {mutations.hasInvalidEditor === true ? (
                   <Text color="error">Correct invalid input before applying.</Text>
                 ) : mutations.execution.error === null ? null : (
@@ -291,53 +333,23 @@ export function TableMutationWidget({
                 )}
               </Box>
               <FloatingPanel.Actions>
-                {hasPending === true ? (
-                  mutations.execution.status === 'applying' ? (
-                    <Text color="muted">Applying changes</Text>
-                  ) : (
-                    <>
-                      <Button
-                        size="s"
-                        variant="ghost"
-                        onClick={mutations.discardAll}
-                      >
-                        Discard
-                      </Button>
-                      <Button
-                        disabled={mutations.hasInvalidEditor === true}
-                        size="s"
-                        onClick={() => void apply()}
-                      >
-                        Apply changes
-                      </Button>
-                    </>
-                  )
-                ) : deleteConfirmationRowIds === null ? (
-                  <Button
-                    size="s"
-                    variant="danger"
-                    onClick={() => setDeleteConfirmationRowIds([...selectedRowIds])}
-                  >
-                    Delete rows
-                  </Button>
+                {mutations.execution.status === 'applying' ? (
+                  <Text color="muted">Applying changes</Text>
                 ) : (
                   <>
                     <Button
                       size="s"
                       variant="ghost"
-                      onClick={() => setDeleteConfirmationRowIds(null)}
+                      onClick={mutations.discardAll}
                     >
-                      Cancel
+                      Discard
                     </Button>
                     <Button
+                      disabled={mutations.hasInvalidEditor === true}
                       size="s"
-                      variant="danger"
-                      onClick={() => {
-                        mutations.dispatch({ type: 'deleteRows', rowIds: deleteConfirmationRowIds })
-                        setDeleteConfirmationRowIds(null)
-                      }}
+                      onClick={() => void apply()}
                     >
-                      Confirm delete
+                      Apply changes
                     </Button>
                   </>
                 )}

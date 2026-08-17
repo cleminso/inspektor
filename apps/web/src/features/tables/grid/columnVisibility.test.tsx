@@ -28,6 +28,20 @@ function VisibilityMenu(): React.ReactElement {
 afterEach(cleanup);
 
 describe("DataGridColumnVisibility", () => {
+  it("marks the trigger as pressed while any column is hidden", () => {
+    render(<VisibilityMenu />);
+
+    const trigger = screen.getByRole("button", { name: "Choose visible columns" });
+    expect(trigger.getAttribute("aria-pressed")).toBe("false");
+
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select name" }));
+    expect(trigger.getAttribute("aria-pressed")).toBe("true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Check all from role" }));
+    expect(trigger.getAttribute("aria-pressed")).toBe("false");
+  });
+
   it("lists fixed and hideable columns and keeps the menu open for multiselect", () => {
     render(<VisibilityMenu />);
 

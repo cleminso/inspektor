@@ -1,8 +1,8 @@
-import { useRef, type MouseEvent } from "react";
+import { useEffect, useRef, type MouseEvent, type Ref } from "react";
 
 import type { Column, ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
-import { ChevronDown, KeyRound } from "lucide-react";
+import { ChevronDown, KeyRound, Undo2 } from "lucide-react";
 
 import {
   BinaryValue,
@@ -37,6 +37,7 @@ interface BuildDataGridColumnsOptions {
   onColumnMenuOpen?: (columnId: string) => void;
   onColumnMove?: (columnId: string, direction: ColumnMoveDirection) => void;
   onRowSelectionRequest?: (request: RowSelectionRequest) => void;
+  onUndoRowDeletion?: (rowId: string) => void;
 }
 
 export interface RowSelectionRequest {
@@ -182,6 +183,8 @@ function CompactCellValue({
 interface SelectionCheckboxProps {
   ariaLabel: string;
   checked: boolean;
+  checkboxRef?: Ref<HTMLElement>;
+  disabled?: boolean;
   indeterminate?: boolean;
   onCheckedChange: (checked: boolean, shiftKey: boolean) => void;
 }
@@ -189,6 +192,8 @@ interface SelectionCheckboxProps {
 function SelectionCheckbox({
   ariaLabel,
   checked,
+  checkboxRef,
+  disabled = false,
   indeterminate = false,
   onCheckedChange,
 }: SelectionCheckboxProps): React.ReactElement {
@@ -196,8 +201,10 @@ function SelectionCheckbox({
 
   return (
     <Checkbox
+      ref={checkboxRef}
       aria-label={ariaLabel}
       checked={checked}
+      disabled={disabled}
       indeterminate={indeterminate}
       size="m"
       onClickCapture={(event: MouseEvent<HTMLElement>) => {
@@ -207,6 +214,68 @@ function SelectionCheckbox({
         onCheckedChange(nextChecked === true, shiftKeyRef.current);
         shiftKeyRef.current = false;
       }}
+    />
+  );
+}
+
+interface RowSelectionControlProps {
+  canSelect: boolean;
+  checked: boolean;
+  onCheckedChange: (checked: boolean, shiftKey: boolean) => void;
+  onUndoDeletion?: () => void;
+  rowId: string;
+}
+
+function RowSelectionControl({
+  canSelect,
+  checked,
+  onCheckedChange,
+  onUndoDeletion,
+  rowId,
+}: RowSelectionControlProps): React.ReactElement {
+  const checkboxRef = useRef<HTMLElement>(null);
+  const restoreFocusRef = useRef(false);
+
+  useEffect(() => {
+    if (canSelect === true && restoreFocusRef.current === true) {
+      restoreFocusRef.current = false;
+      checkboxRef.current?.focus();
+    }
+  }, [canSelect]);
+
+  if (canSelect === false && onUndoDeletion !== undefined) {
+    return (
+      <Tooltip.Root>
+        <Tooltip.Trigger
+          render={
+            <Button
+              type="button"
+              aria-label={`Undo deletion for row ${rowId}`}
+              glyphSize="compact"
+              iconOnly
+              size="xs"
+              variant="ghost"
+              onClick={() => {
+                restoreFocusRef.current = true;
+                onUndoDeletion();
+              }}
+            >
+              <Button.Glyph artwork={Undo2} />
+            </Button>
+          }
+        />
+        <Tooltip.Content>Undo deletion</Tooltip.Content>
+      </Tooltip.Root>
+    );
+  }
+
+  return (
+    <SelectionCheckbox
+      ariaLabel={`Select row ${rowId}`}
+      checked={checked}
+      checkboxRef={checkboxRef}
+      disabled={canSelect === false}
+      onCheckedChange={onCheckedChange}
     />
   );
 }
@@ -468,6 +537,7 @@ export function buildDataGridColumns({
   onColumnMenuOpen,
   onColumnMove,
   onRowSelectionRequest,
+  onUndoRowDeletion,
 }: BuildDataGridColumnsOptions): ColumnDef<DataGridFeatures, DynamicTableRow, unknown>[] {
   const selectionColumn: ColumnDef<DataGridFeatures, DynamicTableRow, unknown> = {
     id: tableGridSelectionColumnId,
@@ -498,9 +568,15 @@ export function buildDataGridColumns({
     cell: ({ row }) => {
       return (
         <Box alignItems="center" justifyContent="center" width="full">
-          <SelectionCheckbox
+          <RowSelectionControl
+            canSelect={row.getCanSelect()}
             checked={row.getIsSelected()}
-            ariaLabel={`Select row ${String(row.original.id)}`}
+            rowId={String(row.original.id)}
+            onUndoDeletion={
+              onUndoRowDeletion === undefined
+                ? undefined
+                : () => onUndoRowDeletion(String(row.original.id))
+            }
             onCheckedChange={(value, shiftKey) => {
               onRowSelectionRequest?.({
                 checked: value,

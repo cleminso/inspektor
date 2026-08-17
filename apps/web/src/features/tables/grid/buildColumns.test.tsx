@@ -1,45 +1,59 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { type SortingState, useTable } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DataGrid, dataGridFeatures } from "@inspector/ds";
 
 import { buildDataGridColumns } from "@tables/grid/buildColumns";
 
+const doNothing = () => undefined;
+
 function TestTable({
   columns,
   data,
+  disabledRowIds,
   initialColumnSizing,
   onColumnMenuOpen,
   onColumnMove,
+  onUndoRowDeletion,
   onSortingChange,
 }: {
   columns?: Parameters<typeof buildDataGridColumns>[0]["columns"];
   data?: DynamicTableRow[];
+  disabledRowIds?: ReadonlySet<string>;
   initialColumnSizing?: Record<string, number>;
   onColumnMenuOpen?: (columnId: string) => void;
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]["onColumnMove"];
+  onUndoRowDeletion?: (rowId: string) => void;
   onSortingChange: () => void;
 }): React.ReactElement {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const columnDefs = useMemo(
+    () =>
+      buildDataGridColumns({
+        columns: columns ?? [
+          {
+            accessorKey: "name",
+            column: null,
+            id: "name",
+            isSortable: true,
+            label: "Name",
+          },
+        ],
+        onColumnMenuOpen,
+        onColumnMove,
+        onUndoRowDeletion,
+      }),
+    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletion],
+  );
   const table = useTable({
     features: dataGridFeatures,
-    columns: buildDataGridColumns({
-      columns: columns ?? [
-        {
-          accessorKey: "name",
-          column: null,
-          id: "name",
-          isSortable: true,
-          label: "Name",
-        },
-      ],
-      onColumnMenuOpen,
-      onColumnMove,
-    }),
+    columns: columnDefs,
     data: data ?? [{ id: "row-1", name: "Ada" } as DynamicTableRow],
+    enableRowSelection: (row) => disabledRowIds?.has(row.id) !== true,
+    getRowId: (row) => String(row.id),
     initialState: initialColumnSizing === undefined ? undefined : { columnSizing: initialColumnSizing },
     state: { sorting },
     onSortingChange: (updater) => {
@@ -62,6 +76,43 @@ function TestTable({
 afterEach(cleanup);
 
 describe("buildDataGridColumns", () => {
+  it("replaces an unavailable row checkbox with an Undo2 deletion action", async () => {
+    const onUndoRowDeletion = vi.fn();
+    const data = [{ id: "row-1", name: "Ada" } as DynamicTableRow];
+    const { rerender } = render(
+      <TestTable
+        data={data}
+        disabledRowIds={new Set(["row-1"])}
+        onUndoRowDeletion={onUndoRowDeletion}
+        onSortingChange={doNothing}
+      />,
+    );
+
+    const undoButton = screen.getByRole("button", { name: "Undo deletion for row row-1" });
+
+    expect(screen.queryByRole("checkbox", { name: "Select row row-1" })).toBeNull();
+    expect(undoButton.querySelector(".lucide-undo-2")).toBeTruthy();
+
+    fireEvent.focus(undoButton);
+    expect(await screen.findByText("Undo deletion")).toBeTruthy();
+
+    fireEvent.click(undoButton);
+
+    expect(onUndoRowDeletion).toHaveBeenCalledWith("row-1");
+
+    rerender(
+      <TestTable
+        data={data}
+        disabledRowIds={new Set()}
+        onUndoRowDeletion={onUndoRowDeletion}
+        onSortingChange={doNothing}
+      />,
+    );
+
+    const restoredCheckbox = screen.getByRole("checkbox", { name: "Select row row-1" });
+    await waitFor(() => expect(document.activeElement).toBe(restoredCheckbox));
+  });
+
   it("keeps direct header clicks for column activation and sorts from the action menu", () => {
     const onSortingChange = vi.fn();
     const onColumnMenuOpen = vi.fn();

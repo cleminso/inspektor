@@ -105,4 +105,67 @@ describe("RowEditorSidePanel dirty transitions", () => {
     expect(onInsertMoreEnabledChange).toHaveBeenCalledWith(true);
   });
 
+  it("confirms deletion of the focused row from the edit surface", () => {
+    const onConfirmDelete = vi.fn();
+    render(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        editedRowIds={["row-1"]}
+        mode="edit"
+        onClose={vi.fn()}
+        onConfirmDelete={onConfirmDelete}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete row" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm delete" }));
+
+    expect(onConfirmDelete).toHaveBeenCalledWith(["row-1"]);
+  });
+
+  it("names and snapshots every checked row for bulk deletion", () => {
+    const onConfirmDelete = vi.fn();
+    const { rerender } = render(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        editedRowIds={["row-1", "row-2", "row-3"]}
+        mode="edit"
+        onClose={vi.fn()}
+        onConfirmDelete={onConfirmDelete}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete 3 checked rows" }));
+    rerender(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        editedRowIds={["row-1"]}
+        mode="edit"
+        onClose={vi.fn()}
+        onConfirmDelete={onConfirmDelete}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Confirm delete" }));
+
+    expect(onConfirmDelete).toHaveBeenCalledWith(["row-1", "row-2", "row-3"]);
+  });
+
 });

@@ -2,11 +2,13 @@ import { Box } from "@inspector/ds";
 
 interface DetailPaneProps {
   children: React.ReactNode;
+  footer?: React.ReactNode;
   title: React.ReactNode;
 }
 
 export function DetailPane({
   children,
+  footer,
   title,
 }: DetailPaneProps): React.ReactElement {
   return (
@@ -32,6 +34,7 @@ export function DetailPane({
       >
         {children}
       </Box>
+      {footer}
     </Box>
   );
 }

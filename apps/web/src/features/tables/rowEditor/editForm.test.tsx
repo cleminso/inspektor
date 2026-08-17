@@ -304,23 +304,6 @@ describe("EditRowForm Details and JSON views", () => {
     );
   });
 
-  it("closes the pane without offering an immediate Save action", () => {
-    const onCancel = vi.fn();
-    render(
-      <EditRowForm
-        onCancel={onCancel}
-        rowValues={rowValues}
-        schemaColumns={schemaColumns}
-        targetRowId="person-1"
-      />,
-    );
-
-    expect(screen.queryByRole("button", { name: "Save" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Close" }));
-
-    expect(onCancel).toHaveBeenCalledOnce();
-  });
-
   it("preserves edited Details text after switching to JSON and back", () => {
     renderEditRowForm();
     const displayName = screen.getByLabelText("DisplayName");

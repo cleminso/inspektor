@@ -236,6 +236,43 @@ describe('useTableViewState', () => {
     expect(setRowEditor).toHaveBeenCalledWith(null, null)
   })
 
+  it('unchecks staged deletion rows and closes the edit pane', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
+    })
+    rerender()
+    setRowEditor.mockClear()
+
+    act(() => {
+      result.current.handleRowsStagedForDeletion(['row-2'])
+    })
+    rerender()
+
+    expect(result.current.selectedRowIds).toEqual(['row-1'])
+    expect(setRowEditor).toHaveBeenCalledWith(null, null)
+  })
+
+  it('prevents staged deletion rows from being selected again', () => {
+    const disabledRowIds = new Set(['row-2'])
+    const { result, rerender } = renderHook(() =>
+      useTableViewState({ disabledRowIds, tableName: 'accounts' }),
+    )
+
+    expect(result.current.table.getRow('row-2').getCanSelect()).toBe(false)
+
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
+    })
+    rerender()
+
+    expect(result.current.selectedRowIds).toEqual([])
+  })
+
   it('opens scalar editing only from an explicit cell edit request', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 

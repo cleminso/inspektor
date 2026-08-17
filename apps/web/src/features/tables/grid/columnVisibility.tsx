@@ -23,6 +23,7 @@ export function DataGridColumnVisibility({
   const visibleColumnIds = columns
     .filter((column) => column.getIsVisible() === true)
     .map((column) => column.id);
+  const hasHiddenColumns = visibleColumnIds.length < columns.length;
 
   return (
     <MultiSelect.Root
@@ -48,6 +49,7 @@ export function DataGridColumnVisibility({
             variant="ghost"
             size="s"
             aria-label="Choose visible columns"
+            aria-pressed={hasHiddenColumns}
             iconOnly
           />
         }
