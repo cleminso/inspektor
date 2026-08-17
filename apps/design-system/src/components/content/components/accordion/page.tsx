@@ -13,6 +13,7 @@ import basicSource from './basicExample.tsx?raw'
 import FillExample from './fillExample'
 import fillSource from './fillExample.tsx?raw'
 import {
+  accordionHeaderPropNames,
   accordionItemPropNames,
   accordionPanelPropNames,
   accordionRootPropNames,
@@ -21,6 +22,7 @@ import {
 
 const rootProps = getGeneratedProps('accordion.root', accordionRootPropNames)
 const itemProps = getGeneratedProps('accordion.item', accordionItemPropNames)
+const headerProps = getGeneratedProps('accordion.header', accordionHeaderPropNames)
 const triggerProps = getGeneratedProps('accordion.trigger', accordionTriggerPropNames)
 const panelProps = getGeneratedProps('accordion.panel', accordionPanelPropNames)
 
@@ -44,6 +46,9 @@ export function AccordionPage(): ReactElement {
       </Section>
       <Section title="Root props"><PropsTable rows={rootProps} /></Section>
       <Section title="Item props"><PropsTable rows={itemProps} /></Section>
+      <Section title="Header props">
+        <PropsTable rows={headerProps} />
+      </Section>
       <Section title="Trigger props"><PropsTable rows={triggerProps} /></Section>
       <Section title="Panel props"><PropsTable rows={panelProps} /></Section>
     </ComponentDocsPage>

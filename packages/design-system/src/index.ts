@@ -11,6 +11,7 @@ export type {
 export { Accordion } from './components/accordion/accordion'
 export type {
   AccordionHeaderProps,
+  AccordionHeadingLevel,
   AccordionItemProps,
   AccordionLayout,
   AccordionPanelProps,

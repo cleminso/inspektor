@@ -52,4 +52,34 @@ describe('Accordion', () => {
 
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
+
+  it('renders a constrained semantic heading level', () => {
+    render(
+      <Accordion>
+        <Accordion.Item value="tables">
+          <Accordion.Header level={2}>
+            <Accordion.Trigger>Tables</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel>Table list</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>,
+    )
+
+    expect(screen.getByRole('heading', { level: 2, name: 'Tables' })).toBeTruthy()
+  })
+
+  it('prefers custom heading composition over level', () => {
+    render(
+      <Accordion>
+        <Accordion.Item value="tables">
+          <Accordion.Header level={2} render={<h3>Tables</h3>}>
+            <Accordion.Trigger>Tables</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel>Table list</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>,
+    )
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Tables' })).toBeTruthy()
+  })
 })

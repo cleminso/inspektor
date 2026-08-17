@@ -318,8 +318,7 @@ export function TableListPane({
         >
           {pinnedTables.length > 0 ? (
             <Accordion.Item value="pinned">
-              {/* oxlint-disable-next-line jsx-a11y/heading-has-content -- Base UI composes the trigger child into this heading. */}
-              <Accordion.Header render={<h2 />}>
+              <Accordion.Header level={2}>
                 <Accordion.Trigger
                   suffix={
                     <Text
@@ -346,8 +345,7 @@ export function TableListPane({
             </Accordion.Item>
           ) : null}
           <Accordion.Item value="tables">
-            {/* oxlint-disable-next-line jsx-a11y/heading-has-content -- Base UI composes the trigger child into this heading. */}
-            <Accordion.Header render={<h2 />}>
+            <Accordion.Header level={2}>
               <Accordion.Trigger
                 suffix={
                   <Text

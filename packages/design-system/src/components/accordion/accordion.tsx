@@ -1,6 +1,6 @@
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion'
 import * as stylex from '@stylexjs/stylex'
-import { createContext, forwardRef, useContext, type ReactNode } from 'react'
+import { createContext, createElement, forwardRef, useContext, type ReactNode } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { ScrollAreaPrivate } from '../scrollArea/scrollArea'
@@ -10,6 +10,7 @@ type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
 
 export type AccordionValue = string | number
 export type AccordionLayout = 'content' | 'fill'
+export type AccordionHeadingLevel = 2 | 3 | 4 | 5 | 6
 
 const AccordionLayoutContext = createContext<AccordionLayout>('content')
 
@@ -41,6 +42,8 @@ export interface AccordionItemProps extends WithoutStyles<BaseAccordion.Item.Pro
 }
 
 export interface AccordionHeaderProps extends WithoutStyles<BaseAccordion.Header.Props> {
+  /** Renders the header at a constrained semantic heading level. Ignored when render is provided. */
+  level?: AccordionHeadingLevel
   /** Composes the heading behavior and styles onto another heading element. */
   render?: BaseAccordion.Header.Props['render']
 }
@@ -113,7 +116,7 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(function Ac
 })
 
 const AccordionHeader = forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
-  function AccordionHeader(props, forwardedRef) {
+  function AccordionHeader({ level, render, ...props }, forwardedRef) {
     const layout = useContext(AccordionLayoutContext)
     const stateStyles = createStateStyleProps<BaseAccordion.Header.State>((state) => [
       accordionStyles.header,
@@ -126,7 +129,14 @@ const AccordionHeader = forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
       state.hidden === true && accordionStyles.headerHidden,
       accordionStyles.headerIndexed,
     ])
-    return <BaseAccordion.Header {...props} ref={forwardedRef} {...stateStyles} />
+    return (
+      <BaseAccordion.Header
+        {...props}
+        ref={forwardedRef}
+        render={render ?? (level === undefined ? undefined : createElement(`h${level}`))}
+        {...stateStyles}
+      />
+    )
   },
 )
 

@@ -2455,7 +2455,7 @@
       "description": "Accordion items and their panels.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 21
+        "line": 22
       }
     },
     {
@@ -2465,7 +2465,7 @@
       "description": "Values expanded when the accordion is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 23
+        "line": 24
       }
     },
     {
@@ -2475,7 +2475,7 @@
       "description": "Values expanded when the accordion is controlled.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -2485,7 +2485,7 @@
       "description": "Runs when expanded values change.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 27
+        "line": 28
       }
     },
     {
@@ -2496,7 +2496,7 @@
       "description": "Allows more than one panel to remain expanded.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 29
+        "line": 30
       }
     },
     {
@@ -2507,7 +2507,7 @@
       "description": "Disables every accordion item.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 31
+        "line": 32
       }
     },
     {
@@ -2518,7 +2518,7 @@
       "description": "Controls whether panels use their content height or overlay scrolling in a constrained parent.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 33
+        "line": 34
       }
     }
   ],
@@ -2530,7 +2530,7 @@
       "description": "Identifies the item for controlled and initial state.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 38
+        "line": 39
       }
     },
     {
@@ -2541,11 +2541,21 @@
       "description": "Disables this accordion item.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 40
+        "line": 41
       }
     }
   ],
   "accordion.header": [
+    {
+      "name": "level",
+      "type": "2 | 3 | 4 | 5 | 6",
+      "required": false,
+      "description": "Renders the header at a constrained semantic heading level. Ignored when render is provided.",
+      "source": {
+        "path": "packages/design-system/src/components/accordion/accordion.tsx",
+        "line": 46
+      }
+    },
     {
       "name": "render",
       "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, AccordionHeaderState>",
@@ -2553,7 +2563,7 @@
       "description": "Composes the heading behavior and styles onto another heading element.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 45
+        "line": 48
       }
     }
   ],
@@ -2565,7 +2575,7 @@
       "description": "Visible heading text.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 53
+        "line": 56
       }
     },
     {
@@ -2575,7 +2585,7 @@
       "description": "Optional content aligned opposite the heading.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 55
+        "line": 58
       }
     },
     {
@@ -2585,7 +2595,7 @@
       "description": "Composes trigger behavior and styles onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 57
+        "line": 60
       }
     }
   ],
@@ -2597,7 +2607,7 @@
       "description": "Panel content.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 62
+        "line": 65
       }
     },
     {
@@ -2607,7 +2617,7 @@
       "description": "Keeps the panel mounted while collapsed.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 64
+        "line": 67
       }
     },
     {
@@ -2617,7 +2627,7 @@
       "description": "Allows browser find-in-page to reveal collapsed panel content.",
       "source": {
         "path": "packages/design-system/src/components/accordion/accordion.tsx",
-        "line": 66
+        "line": 69
       }
     }
   ],

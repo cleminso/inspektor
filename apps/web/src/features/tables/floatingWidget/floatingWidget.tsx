@@ -149,8 +149,7 @@ function ReviewSection({
 }): React.ReactElement {
   return (
     <Accordion.Item value={value}>
-      {/* oxlint-disable-next-line jsx-a11y/heading-has-content -- Base UI composes the trigger into this heading. */}
-      <Accordion.Header render={<h2 />}>
+      <Accordion.Header level={2}>
         <Accordion.Trigger
           aria-label={`${label}, ${count}`}
           suffix={
