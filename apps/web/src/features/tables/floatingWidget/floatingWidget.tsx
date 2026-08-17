@@ -272,7 +272,6 @@ export function TableMutationWidget({
   const mutations = useTableMutationLedger()
   const apply = useApplyTableMutationLedger({ executor, onSuccess: onApplySuccess })
   const [collapsed, setCollapsed] = useState(false)
-  const [panelSize, setPanelSize] = useState<'compact' | 'expanded'>('compact')
   const [reviewExpanded, setReviewExpanded] = useState(false)
   const contentId = useId()
   const reviewId = useId()
@@ -303,7 +302,7 @@ export function TableMutationWidget({
         <FloatingPanel.Root aria-label="Staged changes">
           <FloatingPanel.Content
             id={contentId}
-            size={panelSize}
+            size={reviewExpanded === true ? 'expanded' : 'compact'}
           >
             <FloatingPanel.Details
               open={reviewExpanded}
@@ -328,15 +327,7 @@ export function TableMutationWidget({
                   size="s"
                   suffix={<Button.Glyph artwork={reviewExpanded === true ? ChevronUp : ChevronRight} />}
                   variant="ghost"
-                  onClick={() => {
-                    if (reviewExpanded === false) {
-                      setPanelSize('expanded')
-                      setReviewExpanded(true)
-                    } else {
-                      setPanelSize('compact')
-                      setReviewExpanded(false)
-                    }
-                  }}
+                  onClick={() => setReviewExpanded(reviewExpanded === false)}
                 >
                   Review changes
                 </Button>

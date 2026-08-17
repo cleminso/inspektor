@@ -3045,16 +3045,6 @@
       }
     },
     {
-      "name": "onExitComplete",
-      "type": "() => void",
-      "required": false,
-      "description": "Runs after closing details have left the panel.",
-      "source": {
-        "path": "packages/design-system/src/components/floatingPanel/floatingPanel.tsx",
-        "line": 43
-      }
-    },
-    {
       "name": "children",
       "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
       "required": false,

@@ -1,11 +1,15 @@
-import { useCallback, useEffect, useRef, type KeyboardEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import type { ColumnDescriptor } from 'jazz-tools'
 
 import { Box, Button, FloatingPanel } from '@inspector/ds'
 
 import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
 import type { TableMutationEditorController } from '@tables/mutationLedger/provider'
-import { getMutationFieldInput } from '@tables/rowEditor/mutation/draft'
+import {
+  getMutationFieldError,
+  getMutationFieldInput,
+  type MutationFieldInput,
+} from '@tables/rowEditor/mutation/draft'
 import { getFieldReadOnlyReason } from '@tables/rowEditor/mutation/parsing'
 import { MutationField } from '@tables/rowEditor/mutationField'
 import {
@@ -26,19 +30,21 @@ export function FieldEditorMutationWidget({
   onClose,
   onComplete,
 }: FieldEditorMutationWidgetProps): React.ReactElement {
+  const [input, setInput] = useState<MutationFieldInput>(() =>
+    getMutationFieldInput(controller.state.draft, column),
+  )
   const controlElementRef = useRef<HTMLElement | null>(null)
   const setControlElement = useCallback((element: HTMLElement | null) => {
     controlElementRef.current = element
   }, [])
-  const input = getMutationFieldInput(controller.state.draft, column)
-  const submission = controller.actions.buildSubmission()
-  const error = submission.errors[column.name]
+  const error = getMutationFieldError(controller.state.draft, column, input)
   const label = formatColumnNameLabel(column.name)
   const isStructured = isStructuredColumn(column)
   const complete = (direction: SpreadsheetCompletionDirection): boolean => {
-    if (controller.actions.buildSubmission().errors[column.name] !== undefined) {
+    if (error !== undefined) {
       return false
     }
+    controller.commitFieldInput(column.name, input)
     onComplete(direction)
     return true
   }
@@ -49,7 +55,6 @@ export function FieldEditorMutationWidget({
     if (event.key === 'Escape') {
       event.preventDefault()
       event.stopPropagation()
-      // Closing changes presentation only; the provider keeps this raw field input.
       onClose()
       return
     }
@@ -103,11 +108,28 @@ export function FieldEditorMutationWidget({
             idPrefix="field-editor"
             initialValue={controller.state.draft.sourceValues[column.name]}
             onExpandedChange={() => undefined}
-            onNullChange={(isNull) => controller.actions.setFieldNull(column.name, isNull)}
-            onOmittedChange={(isOmitted) =>
-              controller.actions.setFieldOmitted(column.name, isOmitted)
-            }
-            onTextChange={(text) => controller.actions.setFieldText(column.name, text)}
+            onNullChange={(isNull) => {
+              setInput((current) => ({
+                mode: isNull === true ? 'null' : 'value',
+                text:
+                  isNull === false && current.text.length === 0 && isStructured === true
+                    ? column.column_type.type === 'Array'
+                      ? '[]'
+                      : '{}'
+                    : current.text,
+              }))
+            }}
+            onOmittedChange={(isOmitted) => {
+              setInput((current) => ({
+                ...current,
+                mode: isOmitted === true ? 'omitted' : 'value',
+              }))
+            }}
+            onTextChange={(text) => {
+              setInput((current) =>
+                current.mode === 'value' ? { ...current, text } : current,
+              )
+            }}
             readOnlyReason={getFieldReadOnlyReason(column)}
           />
           <FloatingPanel.Actions>

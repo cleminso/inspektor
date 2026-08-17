@@ -32,15 +32,13 @@ export type FloatingPanelContentProps = WithoutStyles<ComponentPropsWithRef<"div
   /** Controls the constrained panel width. */
   size?: FloatingPanelContentSize;
 };
-/** Props for optional panel details that leave before the panel width contracts. */
+/** Props for optional panel details that leave while the panel contracts. */
 export type FloatingPanelDetailsProps = Omit<
   WithoutStyles<ComponentPropsWithRef<"div">>,
   "aria-hidden" | "inert"
 > & {
   /** Keeps the details visible and interactive. */
   open: boolean;
-  /** Runs after closing details have left the panel. */
-  onExitComplete?: () => void;
 };
 /** Props for the compact status and primary-action row. */
 export type FloatingPanelSummaryProps = WithoutStyles<ComponentPropsWithRef<"div">>;
@@ -117,14 +115,12 @@ const FloatingPanelContent = forwardRef<HTMLDivElement, FloatingPanelContentProp
 
 const FloatingPanelDetails = forwardRef<HTMLDivElement, FloatingPanelDetailsProps>(
   function FloatingPanelDetails(
-    { children, open, onExitComplete, ...props },
+    { children, open, ...props },
     forwardedRef,
   ): React.ReactElement | null {
     const [detailsElement, setDetailsElement] = useState<HTMLDivElement | null>(null);
     const [present, setPresent] = useState(open);
-    const onExitCompleteRef = useRef(onExitComplete);
     const interruptedFrameRef = useRef<DetailsMotionFrame | null>(null);
-    onExitCompleteRef.current = onExitComplete;
     const setDetailsRef = useCallback(
       (node: HTMLDivElement | null) => {
         setDetailsElement(node);
@@ -147,7 +143,6 @@ const FloatingPanelDetails = forwardRef<HTMLDivElement, FloatingPanelDetailsProp
       const finishExit = () => {
         interruptedFrameRef.current = null;
         setPresent(false);
-        onExitCompleteRef.current?.();
       };
       const reducedMotion =
         window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;

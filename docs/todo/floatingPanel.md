@@ -13,6 +13,11 @@
 
 [17/08/26]
 
+- [x] Derive compact and expanded sizing from the active presentation instead of storing duplicate state.
+- [x] Keep the Details API focused on controlled presence without an unused exit callback.
+
+[17/08/26]
+
 - [x] Collapse the details wrapper height alongside its transform and opacity exit.
 - [x] Retarget interrupted height collapse and release the measured height when reopening settles.
 
@@ -88,6 +93,12 @@
 - None.
 
 ## Validation checklist
+
+[17/08/26]
+
+- [x] Run focused Floating Panel, documentation example, and table mutation widget tests.
+- [x] Run changed-file lint and affected-package typechecks and builds.
+- [x] Regenerate and verify component prop metadata.
 
 [17/08/26]
 

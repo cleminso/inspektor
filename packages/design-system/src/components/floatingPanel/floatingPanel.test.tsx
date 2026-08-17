@@ -72,11 +72,10 @@ describe("FloatingPanel", () => {
       configurable: true,
       value: animate,
     });
-    const onExitComplete = vi.fn();
     const { rerender } = render(
       <FloatingPanel.Root aria-label="Pending changes">
         <FloatingPanel.Content size="expanded">
-          <FloatingPanel.Details open onExitComplete={onExitComplete}>
+          <FloatingPanel.Details open>
             Review
           </FloatingPanel.Details>
           <FloatingPanel.Summary>Summary</FloatingPanel.Summary>
@@ -93,7 +92,7 @@ describe("FloatingPanel", () => {
     rerender(
       <FloatingPanel.Root aria-label="Pending changes">
         <FloatingPanel.Content size="expanded">
-          <FloatingPanel.Details open={false} onExitComplete={onExitComplete}>
+          <FloatingPanel.Details open={false}>
             Review
           </FloatingPanel.Details>
           <FloatingPanel.Summary>Summary</FloatingPanel.Summary>
@@ -111,12 +110,9 @@ describe("FloatingPanel", () => {
       ],
       expect.objectContaining({ duration: 120 }),
     );
-    expect(onExitComplete).not.toHaveBeenCalled();
-
     await act(async () => finishExit());
 
     expect(document.querySelector("[data-slot='floating-panel-details']")).toBeNull();
-    expect(onExitComplete).toHaveBeenCalledOnce();
     expect(cancel).toHaveBeenCalledOnce();
   });
 
@@ -127,11 +123,10 @@ describe("FloatingPanel", () => {
       value: animate,
     });
     vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })));
-    const onExitComplete = vi.fn();
     const { rerender } = render(
       <FloatingPanel.Root aria-label="Pending changes">
         <FloatingPanel.Content size="expanded">
-          <FloatingPanel.Details open onExitComplete={onExitComplete}>
+          <FloatingPanel.Details open>
             Review
           </FloatingPanel.Details>
         </FloatingPanel.Content>
@@ -141,7 +136,7 @@ describe("FloatingPanel", () => {
     rerender(
       <FloatingPanel.Root aria-label="Pending changes">
         <FloatingPanel.Content size="expanded">
-          <FloatingPanel.Details open={false} onExitComplete={onExitComplete}>
+          <FloatingPanel.Details open={false}>
             Review
           </FloatingPanel.Details>
         </FloatingPanel.Content>
@@ -151,7 +146,6 @@ describe("FloatingPanel", () => {
 
     expect(animate).not.toHaveBeenCalled();
     expect(document.querySelector("[data-slot='floating-panel-details']")).toBeNull();
-    expect(onExitComplete).toHaveBeenCalledOnce();
   });
 
   it("retargets an interrupted details exit from its visible position", async () => {
@@ -188,11 +182,10 @@ describe("FloatingPanel", () => {
         transform: "matrix(1, 0, 0, 1, 0, 5)",
       })),
     );
-    const onExitComplete = vi.fn();
     const { rerender } = render(
       <FloatingPanel.Root aria-label="Pending changes">
         <FloatingPanel.Content size="expanded">
-          <FloatingPanel.Details open onExitComplete={onExitComplete}>
+          <FloatingPanel.Details open>
             Review
           </FloatingPanel.Details>
         </FloatingPanel.Content>
@@ -208,7 +201,7 @@ describe("FloatingPanel", () => {
     rerender(
       <FloatingPanel.Root aria-label="Pending changes">
         <FloatingPanel.Content size="expanded">
-          <FloatingPanel.Details open={false} onExitComplete={onExitComplete}>
+          <FloatingPanel.Details open={false}>
             Review
           </FloatingPanel.Details>
         </FloatingPanel.Content>
@@ -217,7 +210,7 @@ describe("FloatingPanel", () => {
     rerender(
       <FloatingPanel.Root aria-label="Pending changes">
         <FloatingPanel.Content size="expanded">
-          <FloatingPanel.Details open onExitComplete={onExitComplete}>
+          <FloatingPanel.Details open>
             Review
           </FloatingPanel.Details>
         </FloatingPanel.Content>
@@ -236,8 +229,6 @@ describe("FloatingPanel", () => {
       ],
       expect.objectContaining({ duration: 160 }),
     );
-    expect(onExitComplete).not.toHaveBeenCalled();
-
     await act(async () => finishExit());
     expect(document.querySelector("[data-slot='floating-panel-details']")).not.toBeNull();
   });

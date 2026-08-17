@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ColumnDescriptor } from 'jazz-tools'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
@@ -90,12 +90,38 @@ function FieldEditorHarness({
           ? Object.keys(mutations.ledger.entries[0].fields).join(',')
           : ''}
       </output>
+      <output aria-label="Pending name">
+        {mutations.ledger.entries[0]?.kind === 'update'
+          ? String(mutations.ledger.entries[0].fields.name ?? '')
+          : ''}
+      </output>
     </>
   )
 }
 
 describe('FieldEditorMutationWidget', () => {
-  it('closes on Escape without discarding the staged field', () => {
+  it('keeps edits local until Save stages the field', () => {
+    const onComplete = vi.fn()
+    render(
+      <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
+        <FieldEditorHarness column={nameColumn} onClose={vi.fn()} onComplete={onComplete} />
+      </TestLedgerProvider>,
+    )
+    fireEvent.change(screen.getByRole('textbox', { name: 'Name' }), {
+      target: { value: 'Grace' },
+    })
+
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('')
+    expect(screen.getByLabelText('Pending name').textContent).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
+    expect(screen.getByLabelText('Pending name').textContent).toBe('Grace')
+    expect(onComplete).toHaveBeenCalledWith('enter')
+  })
+
+  it('closes on Escape and discards an uncommitted field edit', () => {
     const onClose = vi.fn()
     render(
       <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
@@ -107,7 +133,60 @@ describe('FieldEditorMutationWidget', () => {
     fireEvent.keyDown(input, { key: 'Escape' })
 
     expect(onClose).toHaveBeenCalledOnce()
-    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('')
+  })
+
+  it('preserves a previously staged value when a reopened edit closes', () => {
+    function ReopenedEditorHarness(): React.ReactElement {
+      const [open, setOpen] = useState(false)
+      const controller = useTableMutationEditorController({
+        initialRowValues: { id: 'row-1', name: 'Ada', count: 1 },
+        rowId: 'row-1',
+        schemaColumns: [nameColumn, countColumn],
+      })
+      const mutations = useTableMutationLedger()
+
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              controller.actions.setFieldText('name', 'Grace')
+              setOpen(true)
+            }}
+          >
+            Reopen staged field
+          </button>
+          {open === true ? (
+            <FieldEditorMutationWidget
+              column={nameColumn}
+              controller={controller}
+              onClose={() => setOpen(false)}
+              onComplete={() => setOpen(false)}
+            />
+          ) : null}
+          <output aria-label="Pending name">
+            {mutations.ledger.entries[0]?.kind === 'update'
+              ? String(mutations.ledger.entries[0].fields.name ?? '')
+              : ''}
+          </output>
+        </>
+      )
+    }
+
+    render(
+      <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
+        <ReopenedEditorHarness />
+      </TestLedgerProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Reopen staged field' }))
+    const input = screen.getByRole('textbox', { name: 'Name' }) as HTMLInputElement
+    expect(input.value).toBe('Grace')
+
+    fireEvent.change(input, { target: { value: 'Katherine' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+
+    expect(screen.getByLabelText('Pending name').textContent).toBe('Grace')
   })
 
   it('keeps invalid input open instead of completing it', async () => {

@@ -7,18 +7,9 @@ export default function BasicExample(): ReactElement {
   const contentId = useId()
   const reviewId = useId()
   const [open, setOpen] = useState(true)
-  const [panelSize, setPanelSize] = useState<'compact' | 'expanded'>('compact')
   const [presentation, setPresentation] = useState<Presentation>('summary')
   const reviewExpanded = presentation === 'review'
-  const showReview = () => {
-    if (reviewExpanded === true) {
-      setPanelSize('compact')
-      setPresentation('summary')
-    } else {
-      setPanelSize('expanded')
-      setPresentation('review')
-    }
-  }
+  const showReview = () => setPresentation(reviewExpanded === true ? 'summary' : 'review')
 
   return (
     <Box flexDirection="column" gap="m" alignItems="center">
@@ -35,7 +26,7 @@ export default function BasicExample(): ReactElement {
         <FloatingPanel.Root aria-label="Background task controller">
           <FloatingPanel.Content
             id={contentId}
-            size={panelSize}
+            size={reviewExpanded === true ? 'expanded' : 'compact'}
           >
             <FloatingPanel.Details
               open={reviewExpanded}
