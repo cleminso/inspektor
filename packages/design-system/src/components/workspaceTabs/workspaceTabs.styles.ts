@@ -72,7 +72,7 @@ export const workspaceTabsStyles = stylex.create({
     },
   },
   list: {
-    gap: spacing.xxs,
+    gap: spacing.xs,
     marginInline: spacing.xs,
     alignItems: 'center',
     display: 'flex',
@@ -98,15 +98,10 @@ export const workspaceTabsStyles = stylex.create({
       ':focus-within': workspaceTabsColors.hoverBackground,
       ':hover': workspaceTabsColors.hoverBackground,
     },
-    [workspaceTabsVars.closeOpacity]: {
-      default: 0,
-      ':focus-within': 1,
-      ':hover': 1,
-    },
-    [workspaceTabsVars.closePointerEvents]: {
-      default: 'none',
-      ':focus-within': 'auto',
-      ':hover': 'auto',
+    [workspaceTabsVars.tabTextColor]: {
+      default: workspaceTabsColors.text,
+      ':focus-within': workspaceTabsColors.hoverText,
+      ':hover': workspaceTabsColors.hoverText,
     },
     overflow: 'hidden',
     alignItems: 'center',
@@ -135,18 +130,22 @@ export const workspaceTabsStyles = stylex.create({
     },
   },
   itemClosable: {
-    gap: spacing.xxs,
-    paddingRight: spacing.xs,
+    [workspaceTabsVars.closeOpacity]: {
+      default: 0,
+      ':focus-within': 1,
+      ':hover': 1,
+    },
+    [workspaceTabsVars.closePointerEvents]: {
+      default: 'none',
+      ':focus-within': 'auto',
+      ':hover': 'auto',
+    },
   },
   itemActive: {
     [workspaceTabsVars.background]: workspaceTabsColors.selectedBackground,
-    [workspaceTabsVars.closeOpacity]: 1,
-    [workspaceTabsVars.closePointerEvents]: 'auto',
   },
   itemDragging: {
     [workspaceTabsVars.background]: workspaceTabsColors.hoverBackground,
-    [workspaceTabsVars.closeOpacity]: 1,
-    [workspaceTabsVars.closePointerEvents]: 'auto',
   },
   itemDisabled: {
     [workspaceTabsVars.background]: workspaceTabsColors.disabledBackground,
@@ -161,10 +160,7 @@ export const workspaceTabsStyles = stylex.create({
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: workspaceTabsColors.buttonBackground,
-    color: {
-      default: workspaceTabsColors.text,
-      ':hover': workspaceTabsColors.hoverText,
-    },
+    color: workspaceTabsVars.tabTextColor,
     cursor: 'pointer',
     display: 'flex',
     fontFamily: fontFamilies.sans,
@@ -182,6 +178,9 @@ export const workspaceTabsStyles = stylex.create({
   },
   tabActive: {
     color: workspaceTabsColors.selectedText,
+  },
+  tabClosable: {
+    paddingRight: spacing.xs,
   },
   tabDisabled: {
     color: workspaceTabsColors.disabledText,
@@ -209,24 +208,40 @@ export const workspaceTabsStyles = stylex.create({
   },
   closeContainer: {
     alignItems: 'center',
+    backgroundImage: `linear-gradient(to right, transparent 0, ${workspaceTabsVars.background} ${spacing.l}, ${workspaceTabsVars.background} 100%), linear-gradient(to right, transparent 0, ${workspaceTabsColors.closeBackdrop} ${spacing.l}, ${workspaceTabsColors.closeBackdrop} 100%)`,
     display: 'flex',
-    flexShrink: 0,
-    justifyContent: 'center',
+    insetInlineEnd: spacing.xxs,
+    justifyContent: 'flex-end',
     opacity: workspaceTabsVars.closeOpacity,
-    pointerEvents: workspaceTabsVars.closePointerEvents,
+    pointerEvents: 'none',
+    position: 'absolute',
+    transform: 'translateY(-50%)',
+    zIndex: 1,
     height: spatial['control-height-xs'],
-    width: spatial['control-height-xs'],
+    top: '50%',
+    width: `calc(${spatial['control-height-xs']} + ${spacing.l})`,
   },
   closeAction: {
-    opacity: workspaceTabsVars.closeOpacity,
+    [workspaceTabsVars.closeIconColor]: {
+      default: workspaceTabsColors.closeIcon,
+      ':focus-visible': workspaceTabsColors.closeIconHover,
+      ':hover': workspaceTabsColors.closeIconHover,
+    },
     outlineOffset: {
       default: 0,
       ':focus-visible': 0,
     },
+    pointerEvents: workspaceTabsVars.closePointerEvents,
     zIndex: 1,
+    '::before': {
+      insetBlock: `calc((${spatial['control-height-xs']} - ${spatial['tab-height']}) / 2)`,
+      insetInline: `calc((${spatial['control-height-xs']} - ${spatial['interaction-target-min']}) / 2)`,
+      content: '',
+      position: 'absolute',
+    },
   },
   closeIcon: {
-    color: workspaceTabsColors.closeIcon,
+    color: workspaceTabsVars.closeIconColor,
     display: 'block',
     position: 'relative',
     zIndex: 1,

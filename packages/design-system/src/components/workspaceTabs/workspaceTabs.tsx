@@ -436,6 +436,7 @@ function WorkspaceTabsTabContent({
     disabled === false
   const tabStyles = createStateStyleProps<BaseTabs.Tab.State>((state) => [
     workspaceTabsStyles.tab,
+    onClose !== undefined && workspaceTabsStyles.tabClosable,
     state.active === true && workspaceTabsStyles.tabActive,
     state.disabled === true && workspaceTabsStyles.tabDisabled,
     state.orientation === 'horizontal' && workspaceTabsStyles.tabHorizontal,

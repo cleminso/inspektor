@@ -11,6 +11,23 @@
 
 ## Implemented foundation
 
+[17/08/26]
+
+- [x] Composite the active tab's translucent selected color over an opaque surface inside the close overlay so title glyphs cannot show through.
+
+[17/08/26]
+
+- [x] Keep hovered tab text presentation stable while the pointer moves onto the close action.
+- [x] Use the ghost close action and make the overlay opaque beneath its icon.
+
+[17/08/26]
+
+- [x] Overlay the persistent close action above the trailing title instead of reserving its width in normal flow.
+- [x] Reveal the close action from item hover or keyboard focus while keeping selected-state presentation independent.
+- [x] Fade the complete title beneath the close overlay without changing tab geometry.
+- [x] Raise close-glyph contrast only when the close action itself is hovered or focused.
+- [x] Expand the close hit region without enlarging the visible glyph or blocking the surrounding tab surface.
+
 [13/08/26]
 
 - [x] Compose the tab button and close action as normal-flow siblings inside the shared item.
@@ -153,6 +170,22 @@
 
 ## Settled interaction decisions
 
+[17/08/26]
+
+- [x] Give active and inactive close overlays the same opaque title occlusion while preserving their distinct tab backgrounds.
+
+[17/08/26]
+
+- [x] Treat the close action as part of the parent tab item's hover state so the tab text does not revert while closing.
+- [x] Preserve the ghost close treatment while separating its opaque backing from the leading title fade.
+
+[17/08/26]
+
+- [x] Supersede the normal-flow close geometry with a fixed trailing overlay modeled on Linear's contextual tab action.
+- [x] Keep the native tab and close buttons as semantic siblings rather than reproducing nested button roles.
+- [x] Keep active tabs free of a permanently visible close action; selection and contextual-action visibility remain independent.
+- [x] Keep the state change motion-free and preserve the complete title in the DOM.
+
 [13/08/26]
 
 - [x] Keep the close button outside the semantic tab button while composing both actions in one flex item.
@@ -231,6 +264,26 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[17/08/26]
+
+- [x] Reproduce the active-only bleed caused by the translucent selected background.
+- [x] Cover the opaque close-backdrop color contract with a focused test.
+- [x] Verify active close hover in light and dark themes without changing inactive behavior.
+- [x] Verify design-system typecheck, build, and package tests.
+
+[17/08/26]
+
+- [x] Cover the ghost close variant and parent-owned hover text color with focused tests.
+- [x] Verify opaque close backing and stable hover text in the browser.
+- [ ] Verify changed-file lint, design-system typecheck, build, and package tests.
+
+[17/08/26]
+
+- [x] Cover overlay composition, stable semantics, focus reveal, close activation, and drag exclusion with focused tests.
+- [x] Verify unchanged item geometry, trailing title fade, close-action contrast, and pointer traversal in the browser.
+- [x] Verify Workspace Tabs tests, design-system typecheck, build, and package tests.
+- [ ] Resolve the remaining changed-file StyleX property-order warnings.
 
 [13/08/26]
 

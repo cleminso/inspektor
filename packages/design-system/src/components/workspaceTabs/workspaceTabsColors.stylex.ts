@@ -19,6 +19,8 @@ export const workspaceTabsColors = stylex.defineVars({
   hoverText: textColors.secondary,
   selectedText: textColors.default,
   disabledText: textColors.disabled,
+  closeBackdrop: surfaceColors.background,
   closeIcon: textColors.muted,
+  closeIconHover: textColors.default,
   focusRing: focusColors.ring,
 } as const)

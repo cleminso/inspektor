@@ -7,6 +7,7 @@ import { Tooltip } from '../tooltip/tooltip'
 import { WorkspaceTabs } from './workspaceTabs'
 import { workspaceTabsStyles } from './workspaceTabs.styles'
 import { workspaceTabsColors } from './workspaceTabsColors.stylex'
+import { workspaceTabsVars } from './workspaceTabsVars.stylex'
 import {
   accentElementColors,
   borderColors,
@@ -30,8 +31,13 @@ describe('WorkspaceTabs color contract', () => {
       hoverText: expect.any(String),
       selectedText: expect.any(String),
       disabledText: expect.any(String),
+      closeBackdrop: expect.any(String),
+      closeIcon: expect.any(String),
+      closeIconHover: expect.any(String),
       focusRing: expect.any(String),
     })
+    expect(workspaceTabsVars.closeIconColor).toEqual(expect.any(String))
+    expect(workspaceTabsVars.tabTextColor).toEqual(expect.any(String))
 
     const globalKeys = [
       ...Object.keys(surfaceColors),
@@ -865,7 +871,7 @@ describe('WorkspaceTabs', () => {
     expect(closeCount).toBe(0)
   })
 
-  it('composes the trailing close action in normal flow without replacing the leading prefix or title', () => {
+  it('overlays the trailing close action without replacing the leading prefix or title', () => {
     render(
       <WorkspaceTabs.Root defaultValue="all">
         <WorkspaceTabs.List aria-label="Table views">
@@ -896,8 +902,14 @@ describe('WorkspaceTabs', () => {
     expect(closableItem?.querySelector('[aria-hidden="true"] span')?.textContent).toBe('Table')
     const closeContainer = closableItem?.lastElementChild
     expect(closeContainer?.getAttribute('data-slot')).toBe('workspace-tabs-close')
+    expect(closeContainer?.querySelector('[data-slot="button"]')?.getAttribute('data-variant')).toBe(
+      'ghost',
+    )
     expect(closeContainer === undefined || closeContainer === null || closableTab.contains(closeContainer)).toBe(
       false,
+    )
+    expect(closableTab.className).toContain(
+      stylex.props(workspaceTabsStyles.tabClosable).className,
     )
     expect(closableItem?.className).toContain(
       stylex.props(workspaceTabsStyles.itemClosable).className,
