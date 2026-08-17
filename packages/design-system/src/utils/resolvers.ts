@@ -351,6 +351,7 @@ const GRID_TEMPLATE_COLUMNS_MAP = {
   two: 'repeat(2, minmax(0, 1fr))',
   three: 'repeat(3, minmax(0, 1fr))',
   four: 'repeat(4, minmax(0, 1fr))',
+  'three-one': 'minmax(0, 3fr) minmax(0, 1fr)',
   'auto-fit-s': `repeat(auto-fit, minmax(${spatial['grid-track-s']}, 1fr))`,
   'auto-fit-m': `repeat(auto-fit, minmax(${spatial['grid-track-m']}, 1fr))`,
   'label-content': `${spatial['label-width']} minmax(0, 1fr)`,

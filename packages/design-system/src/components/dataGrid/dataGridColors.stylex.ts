@@ -2,8 +2,10 @@ import * as stylex from '@stylexjs/stylex'
 
 import {
   borderColors,
+  dangerElementColors,
   focusColors,
   selectionColors,
+  stagedChangeColors,
   surfaceColors,
   textColors,
 } from '../../tokens/semantics.stylex'
@@ -23,6 +25,10 @@ export const dataGridColors = stylex.defineVars({
   draggedHeaderText: 'inherit',
   rowHoverBackground: surfaceColors.subtle,
   selectedRowBackground: 'transparent',
+  stagedDeletionRowBackground: dangerElementColors.subtle,
+  stagedDeletionRowBorder: borderColors.danger,
+  stagedUpdateCellBackground: stagedChangeColors.background,
+  stagedUpdateCellBorder: stagedChangeColors.border,
   currentRowBorder: selectionColors.border,
   cellBackground: 'transparent',
   cellBorder: borderColors.subtle,
@@ -31,8 +37,6 @@ export const dataGridColors = stylex.defineVars({
   emphasizedColumnBorder: selectionColors.border,
   selectedCellBackground: selectionColors.background,
   emphasizedCellBackground: selectionColors.background,
-  currentCellBackground: selectionColors.background,
-  currentCellBorder: selectionColors.border,
   currentCellInnerBorder: 'transparent',
   resizeHandleBackground: 'transparent',
   messageText: textColors.muted,

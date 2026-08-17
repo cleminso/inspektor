@@ -82,13 +82,6 @@ export const dataGridStyles = stylex.create({
     borderTopColor: dataGridColors.headerBorder,
     borderBottomStyle: 'solid',
     overflow: 'hidden',
-    outlineColor: dataGridColors.focusRing,
-    outlineOffset: -2,
-    outlineStyle: 'solid',
-    outlineWidth: {
-      default: 0,
-      ':focus-visible': spatial['focus-ring-width'],
-    },
     borderBottomWidth: 1,
     borderTopWidth: 1,
     fontWeight: fontWeights.regular,
@@ -114,10 +107,21 @@ export const dataGridStyles = stylex.create({
     paddingTop: 0,
     top: 0,
   },
-  headerCellActive: {
+  focusTarget: {
+    outlineColor: dataGridColors.focusRing,
+    outlineOffset: -2,
+    outlineStyle: 'solid',
+    outlineWidth: {
+      default: 0,
+      ':focus-visible': spatial['focus-ring-width'],
+    },
+  },
+  activeTarget: {
     backgroundColor: dataGridColors.emphasizedHeaderBackground,
-    color: dataGridColors.emphasizedHeaderText,
-    outlineColor: dataGridColors.emphasizedColumnBorder,
+    outlineColor: {
+      default: dataGridColors.emphasizedColumnBorder,
+      ':focus-visible': dataGridColors.focusRing,
+    },
     outlineOffset: {
       default: -1,
       ':focus-visible': -2,
@@ -126,6 +130,9 @@ export const dataGridStyles = stylex.create({
       default: 1,
       ':focus-visible': spatial['focus-ring-width'],
     },
+  },
+  headerCellActive: {
+    color: dataGridColors.emphasizedHeaderText,
     zIndex: 3,
   },
   headerCellLayout: {
@@ -189,6 +196,14 @@ export const dataGridStyles = stylex.create({
   rowSelected: {
     backgroundColor: dataGridColors.selectedRowBackground,
   },
+  rowStagedDeletion: {
+    backgroundColor: {
+      default: dataGridColors.stagedDeletionRowBackground,
+      ':hover': dataGridColors.stagedDeletionRowBackground,
+    },
+    boxShadow: `inset ${spatial['focus-ring-width']} 0 0 ${dataGridColors.stagedDeletionRowBorder}`,
+    textDecorationLine: 'line-through',
+  },
   rowActive: {
     boxShadow: `inset 0 ${spatial['focus-ring-width']} 0 ${dataGridColors.currentRowBorder}`,
   },
@@ -198,10 +213,7 @@ export const dataGridStyles = stylex.create({
     [dataGridVars.selectionEdgeBottom]: '0 0 0 0 transparent',
     [dataGridVars.selectionEdgeLeft]: '0 0 0 0 transparent',
     backgroundColor: dataGridColors.cellBackground,
-    boxShadow: {
-      default: 'none',
-      ':focus-visible': `inset 0 0 0 ${spatial['focus-ring-width']} ${dataGridColors.focusRing}`,
-    },
+    boxShadow: 'none',
     boxSizing: 'border-box',
     fontFamily: fontFamilies.mono,
     borderBottomColor: dataGridColors.cellBorder,
@@ -220,6 +232,26 @@ export const dataGridStyles = stylex.create({
   },
   cellColumnActive: {
     backgroundColor: dataGridColors.emphasizedColumnBackground,
+  },
+  cellStagedUpdate: {
+    backgroundColor: dataGridColors.stagedUpdateCellBackground,
+    outlineColor: {
+      default: dataGridColors.stagedUpdateCellBorder,
+      ':focus-visible': dataGridColors.stagedUpdateCellBorder,
+      '@media (forced-colors: active)': 'Highlight',
+    },
+  },
+  cellStagedSelectionEdgeTop: {
+    [dataGridVars.selectionEdgeTop]: `0 1px 0 0 ${dataGridColors.stagedUpdateCellBorder}`,
+  },
+  cellStagedSelectionEdgeRight: {
+    [dataGridVars.selectionEdgeRight]: `-1px 0 0 0 ${dataGridColors.stagedUpdateCellBorder}`,
+  },
+  cellStagedSelectionEdgeBottom: {
+    [dataGridVars.selectionEdgeBottom]: `0 -1px 0 0 ${dataGridColors.stagedUpdateCellBorder}`,
+  },
+  cellStagedSelectionEdgeLeft: {
+    [dataGridVars.selectionEdgeLeft]: `1px 0 0 0 ${dataGridColors.stagedUpdateCellBorder}`,
   },
   cellSelected: {
     backgroundColor: dataGridColors.selectedCellBackground,
@@ -241,18 +273,13 @@ export const dataGridStyles = stylex.create({
     [dataGridVars.selectionEdgeLeft]: `1px 0 0 0 ${dataGridColors.emphasizedColumnBorder}`,
   },
   cellActive: {
-    backgroundColor: dataGridColors.currentCellBackground,
-    boxShadow: {
-      default: `inset 0 0 0 1px ${dataGridColors.currentCellBorder}`,
-      ':focus-visible': `inset 0 0 0 ${spatial['focus-ring-width']} ${dataGridColors.focusRing}`,
-    },
+    backgroundColor: dataGridColors.emphasizedCellBackground,
     position: 'relative',
     zIndex: 1,
     borderBottomColor: dataGridColors.currentCellInnerBorder,
     borderRightColor: dataGridColors.currentCellInnerBorder,
   },
   cellActiveSelected: {
-    backgroundColor: dataGridColors.currentCellBackground,
     position: 'relative',
     zIndex: 1,
   },

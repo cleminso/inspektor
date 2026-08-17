@@ -24,6 +24,7 @@ import {
   focusColors,
   ghostElementColors,
   selectionColors,
+  stagedChangeColors,
   surfaceColors,
   textColors,
 } from '../../tokens/semantics.stylex'
@@ -37,13 +38,15 @@ describe('DataGrid color contract', () => {
       headerText: expect.any(String),
       rowHoverBackground: expect.any(String),
       selectedRowBackground: expect.any(String),
+      stagedDeletionRowBackground: expect.any(String),
+      stagedDeletionRowBorder: expect.any(String),
+      stagedUpdateCellBackground: expect.any(String),
+      stagedUpdateCellBorder: expect.any(String),
       selectedCellBackground: expect.any(String),
       emphasizedCellBackground: expect.any(String),
       emphasizedHeaderBackground: expect.any(String),
       emphasizedColumnBackground: expect.any(String),
       emphasizedColumnBorder: expect.any(String),
-      currentCellBackground: expect.any(String),
-      currentCellBorder: expect.any(String),
       footerBackground: expect.any(String),
       footerBorder: expect.any(String),
       footerText: expect.any(String),
@@ -57,6 +60,7 @@ describe('DataGrid color contract', () => {
       ...Object.keys(accentElementColors),
       ...Object.keys(dangerElementColors),
       ...Object.keys(selectionColors),
+      ...Object.keys(stagedChangeColors),
       ...Object.keys(borderColors),
       ...Object.keys(textColors),
       ...Object.keys(focusColors),
@@ -160,11 +164,16 @@ interface TestDataGridProps {
   activeColumnId?: string | null
   activeRowId?: string | null
   data?: Person[]
+  disabledCellRowIds?: ReadonlySet<string>
   emptyContent?: ReactNode
   focusRequest?: {
     requestId: number
     target: { columnId: string; rowId: string }
   } | null
+  getRowStatus?: (row: { id: string }) => 'default' | 'stagedDeletion'
+  getCellStatus?: (cell: { column: { id: string }; row: { id: string } }) =>
+    | 'default'
+    | 'stagedUpdate'
   initialCellSelection?: CellSelectionState
   loading?: boolean
   onCellActivate?: (target: { columnId: string; rowId: string }) => void
@@ -182,8 +191,11 @@ function TestDataGrid({
   activeColumnId = null,
   activeRowId = null,
   data = rows,
+  disabledCellRowIds = new Set(),
   emptyContent = 'No people',
   focusRequest = null,
+  getCellStatus,
+  getRowStatus,
   initialCellSelection = [],
   loading = false,
   onCellActivate,
@@ -204,6 +216,7 @@ function TestDataGrid({
     features: dataGridFeatures,
     columns,
     data,
+    enableCellSelection: (cell) => disabledCellRowIds.has(cell.row.id) === false,
     getRowId: (row) => row.id,
     state: {
       cellSelection,
@@ -226,6 +239,8 @@ function TestDataGrid({
       activeColumnId={activeColumnId}
       activeRowId={activeRowId}
       focusRequest={focusRequest}
+      getCellStatus={getCellStatus}
+      getRowStatus={getRowStatus}
       onCellActivate={onCellActivate}
       onCellEditRequest={onCellEditRequest}
       onCellContextMenu={(target) => onCellContextMenu?.(target)}
@@ -843,6 +858,125 @@ describe('DataGrid', () => {
     expect(activeCell.hasAttribute('data-column-active')).toBe(false)
     expect(activeCell.hasAttribute('data-row-active')).toBe(true)
     expect(graceRow.querySelectorAll('[data-selected]')).toHaveLength(2)
+  })
+
+  it('marks rows with their constrained semantic status', () => {
+    render(
+      <TestDataGrid
+        getRowStatus={(row) => (row.id === 'person-1' ? 'stagedDeletion' : 'default')}
+      />,
+    )
+
+    expect(screen.getByRole('row', { name: /Ada Engineer/ }).getAttribute('data-status')).toBe(
+      'stagedDeletion',
+    )
+    expect(screen.getByRole('row', { name: /Grace Admiral/ }).getAttribute('data-status')).toBe(
+      'default',
+    )
+  })
+
+  it('marks only cells reported as staged updates', () => {
+    render(
+      <TestDataGrid
+        getCellStatus={(cell) =>
+          cell.row.id === 'person-1' && cell.column.id === 'role' ? 'stagedUpdate' : 'default'
+        }
+      />,
+    )
+
+    const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
+    const defaultCell = screen.getByRole('cell', { name: 'Ada' })
+
+    expect(stagedCell.getAttribute('data-status')).toBe('stagedUpdate')
+    expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
+    expect(defaultCell.getAttribute('data-status')).toBe('default')
+    expect(defaultCell.className).not.toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
+  })
+
+  it('suppresses staged-update cell status for staged-deletion rows', () => {
+    render(
+      <TestDataGrid
+        getCellStatus={() => 'stagedUpdate'}
+        getRowStatus={(row) => (row.id === 'person-1' ? 'stagedDeletion' : 'default')}
+      />,
+    )
+
+    const deletedRowCell = screen.getByRole('cell', { name: 'Engineer' })
+    const updateCell = screen.getByRole('cell', { name: 'Admiral' })
+
+    expect(deletedRowCell.getAttribute('data-status')).toBe('default')
+    expect(deletedRowCell.className).not.toContain(
+      stylex.props(dataGridStyles.cellStagedUpdate).className,
+    )
+    expect(updateCell.getAttribute('data-status')).toBe('stagedUpdate')
+  })
+
+  it('keeps staged-update presentation composed with selected and active cell states', () => {
+    render(
+      <TestDataGrid
+        getCellStatus={() => 'stagedUpdate'}
+        initialCellSelection={[
+          {
+            anchorRowId: 'person-1',
+            anchorColumnId: 'role',
+            focusRowId: 'person-1',
+            focusColumnId: 'role',
+          },
+        ]}
+      />,
+    )
+
+    const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
+
+    expect(stagedCell.hasAttribute('data-active')).toBe(true)
+    expect(stagedCell.hasAttribute('data-cell-selected')).toBe(true)
+    expect(stagedCell.getAttribute('data-status')).toBe('stagedUpdate')
+    expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
+    expect(stagedCell.className).not.toContain(stylex.props(dataGridStyles.cellActive).className)
+    expect(stagedCell.className).toContain(
+      stylex.props(dataGridStyles.cellStagedSelectionEdgeTop).className,
+    )
+    expect(stagedCell.className).toContain(
+      stylex.props(dataGridStyles.cellStagedSelectionEdgeRight).className,
+    )
+    expect(stagedCell.className).toContain(
+      stylex.props(dataGridStyles.cellStagedSelectionEdgeBottom).className,
+    )
+    expect(stagedCell.className).toContain(
+      stylex.props(dataGridStyles.cellStagedSelectionEdgeLeft).className,
+    )
+  })
+
+  it('keeps staged-update presentation authoritative in an active column', () => {
+    render(
+      <TestDataGrid
+        activeColumnId="role"
+        getCellStatus={(cell) =>
+          cell.row.id === 'person-1' && cell.column.id === 'role' ? 'stagedUpdate' : 'default'
+        }
+      />,
+    )
+
+    const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
+    expect(stagedCell.hasAttribute('data-column-active')).toBe(true)
+    expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
+    expect(stagedCell.className).not.toContain(stylex.props(dataGridStyles.cellColumnActive).className)
+  })
+
+  it('does not apply active-column emphasis to cells that cannot be selected', () => {
+    render(
+      <TestDataGrid
+        activeColumnId="role"
+        disabledCellRowIds={new Set(['person-1'])}
+        getRowStatus={(row) => (row.id === 'person-1' ? 'stagedDeletion' : 'default')}
+      />,
+    )
+
+    const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
+    const selectableCell = screen.getByRole('cell', { name: 'Admiral' })
+
+    expect(stagedCell.hasAttribute('data-column-active')).toBe(false)
+    expect(selectableCell.hasAttribute('data-column-active')).toBe(true)
   })
 
   it('highlights a column when no cell is active', () => {

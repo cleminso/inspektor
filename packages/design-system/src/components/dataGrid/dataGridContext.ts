@@ -1,15 +1,17 @@
 import { createContext, use } from "react";
 
-import type { RowData } from "@tanstack/react-table";
+import type { Cell, Row, RowData } from "@tanstack/react-table";
 
 import type {
   DataGridCellTarget,
+  DataGridCellStatus,
   DataGridDensity,
   DataGridHeaderContextMenuHandler,
+  DataGridRowStatus,
   DataGridRowContextMenuHandler,
   DataGridCellContextMenuHandler,
 } from "./dataGrid";
-import type { DataGridTable } from "./dataGridFeatures";
+import type { DataGridFeatures, DataGridTable } from "./dataGridFeatures";
 
 export interface DataGridContextValue<TData extends RowData> {
   activeColumnId: string | null;
@@ -27,6 +29,8 @@ export interface DataGridContextValue<TData extends RowData> {
   getColumnReorderIndex: (columnId: string) => number;
   moveColumn: (columnId: string, offset: -1 | 1) => void;
   focusFocusedCell: () => void;
+  getRowStatus?: (row: Row<DataGridFeatures, TData>) => DataGridRowStatus;
+  getCellStatus?: (cell: Cell<DataGridFeatures, TData, unknown>) => DataGridCellStatus;
   registerCellElement: (cellId: string, element: HTMLTableCellElement | null) => void;
   table: DataGridTable<TData>;
   setViewportElement: (element: HTMLDivElement | null) => void;

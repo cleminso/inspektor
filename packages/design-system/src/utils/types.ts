@@ -141,7 +141,14 @@ export interface FlexProps {
 
 export interface GridProps {
   gridTemplateColumns?: ResponsiveValue<
-    'one' | 'two' | 'three' | 'four' | 'auto-fit-s' | 'auto-fit-m' | 'label-content'
+    | 'one'
+    | 'two'
+    | 'three'
+    | 'four'
+    | 'three-one'
+    | 'auto-fit-s'
+    | 'auto-fit-m'
+    | 'label-content'
   >
   gridTemplateRows?: ResponsiveValue<'one' | 'two' | 'three' | 'four'>
   gridColumn?: ResponsiveValue<

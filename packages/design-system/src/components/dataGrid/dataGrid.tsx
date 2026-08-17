@@ -30,6 +30,8 @@ import { useDataGridReorderContext } from './dataGridReorderContext'
 
 export type DataGridDensity = 'compact' | 'default'
 export type DataGridRowRendering = 'all' | 'virtual'
+export type DataGridRowStatus = 'default' | 'stagedDeletion'
+export type DataGridCellStatus = 'default' | 'stagedUpdate'
 
 const defaultColumnMinSize = 20
 const defaultColumnMaxSize = Number.MAX_SAFE_INTEGER
@@ -94,6 +96,10 @@ interface DataGridRootBaseProps<TData extends RowData> {
   density?: DataGridDensity
   /** Requests semantic body-cell focus, including after virtual remounts. */
   focusRequest?: DataGridFocusRequest | null
+  /** Selects a constrained semantic status for each rendered body cell. */
+  getCellStatus?: (cell: Cell<DataGridFeatures, TData, unknown>) => DataGridCellStatus
+  /** Selects a constrained semantic status for each rendered row. */
+  getRowStatus?: (row: Row<DataGridFeatures, TData>) => DataGridRowStatus
   /** Runs when a non-interactive cell is activated. */
   onCellActivate?: (target: DataGridCellTarget) => void
   /** Runs when a non-interactive cell requests editing through double-click or Enter. */
@@ -326,6 +332,8 @@ function DataGridRoot<TData extends RowData>({
   columnDragPreview,
   density = 'default',
   focusRequest = null,
+  getCellStatus,
+  getRowStatus,
   onCellActivate,
   onCellEditRequest,
   onCellContextMenu,
@@ -409,6 +417,8 @@ function DataGridRoot<TData extends RowData>({
         onRowContextMenu,
         columnReorderEnabled,
         focusFocusedCell,
+        getCellStatus,
+        getRowStatus,
         getColumnReorderIndex: (columnId: string) => columnReorderIndices.get(columnId) ?? -1,
         moveColumn: (columnId: string, offset: -1 | 1) => {
           if (reorderableColumnIds === undefined) {
@@ -449,6 +459,8 @@ function DataGridRoot<TData extends RowData>({
       completeColumnOrder,
       density,
       focusFocusedCell,
+      getCellStatus,
+      getRowStatus,
       onCellActivate,
       onCellEditRequest,
       onCellContextMenu,
@@ -924,8 +936,10 @@ function DataGridHeaderCell<TData extends RowData>({
         ref={setReorderRef}
         {...stylex.props(
           dataGridStyles.headerCell,
+          dataGridStyles.focusTarget,
           density === 'compact' && dataGridStyles.compactCell,
           dataGridStyles.headerCellLayout,
+          isActive === true && dataGridStyles.activeTarget,
           isActive === true && dataGridStyles.headerCellActive,
           columnReorderable === true && dataGridStyles.headerCellReorderable,
           isDragVisual === true && dataGridStyles.headerCellDragging,
@@ -1173,10 +1187,11 @@ function DataGridRowImplementation<TData extends RowData>({
   children,
   row,
 }: DataGridRowProps<TData> & { ariaRowIndex?: number }) {
-  const { activeRowId, onColumnActivate, onRowActivate, onRowContextMenu } =
+  const { activeRowId, getRowStatus, onColumnActivate, onRowActivate, onRowContextMenu } =
     useDataGridContext<TData>()
   const isActive = activeRowId === row.id
   const isSelected = row.getIsSelected()
+  const status = getRowStatus?.(row) ?? 'default'
 
   const handleClick = (event: MouseEvent<HTMLTableRowElement>) => {
     if (isInteractiveTarget(event.target) === true) {
@@ -1201,11 +1216,13 @@ function DataGridRowImplementation<TData extends RowData>({
       {...stylex.props(
         dataGridStyles.row,
         isSelected === true && dataGridStyles.rowSelected,
+        status === 'stagedDeletion' && dataGridStyles.rowStagedDeletion,
       )}
       aria-selected={isSelected}
       aria-rowindex={ariaRowIndex}
       data-active={isActive === true ? '' : undefined}
       data-selected={isSelected === true ? '' : undefined}
+      data-status={status}
       data-slot="data-grid-row"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
@@ -1228,6 +1245,8 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     bodyCellEntryId,
     density,
     focusFocusedCell,
+    getCellStatus,
+    getRowStatus,
     onCellActivate,
     onCellEditRequest,
     onCellContextMenu,
@@ -1236,12 +1255,18 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     table,
   } = useDataGridContext<TData>()
   const target = { rowId: cell.row.id, columnId: cell.column.id }
-  const isColumnActive = table.getFocusedCell() === undefined && activeColumnId === target.columnId
+  const isColumnActive =
+    cell.getCanSelect() === true &&
+    table.getFocusedCell() === undefined &&
+    activeColumnId === target.columnId
   const isRowActive = activeRowId === target.rowId
   const isSelected = cell.row.getIsSelected()
   const isCellSelected = cell.getIsSelected()
   const selectionEdges = isCellSelected === true ? cell.getSelectionEdges() : undefined
   const isActive = cell.getIsFocused()
+  const rowStatus = getRowStatus?.(cell.row) ?? 'default'
+  const status = rowStatus === 'stagedDeletion' ? 'default' : (getCellStatus?.(cell) ?? 'default')
+  const hasMultiCellSelection = table.getSelectedCellCount() > 1
   const tabIndex = cell.getTabIndex() === 0 || bodyCellEntryId === cell.id ? 0 : -1
   const registerCell = useCallback(
     (element: HTMLTableCellElement | null) => {
@@ -1347,6 +1372,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     <td
       {...stylex.props(
         dataGridStyles.cell,
+        dataGridStyles.focusTarget,
         density === 'compact' && dataGridStyles.compactCell,
         density === 'compact' && dataGridStyles.compactCellInlinePadding,
         isColumnActive === true && dataGridStyles.cellColumnActive,
@@ -1356,10 +1382,24 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         selectionEdges?.right === true && dataGridStyles.cellSelectionEdgeRight,
         selectionEdges?.bottom === true && dataGridStyles.cellSelectionEdgeBottom,
         selectionEdges?.left === true && dataGridStyles.cellSelectionEdgeLeft,
+        isActive === true && hasMultiCellSelection === true && dataGridStyles.activeTarget,
         isActive === true &&
           (isCellSelected === true
             ? dataGridStyles.cellActiveSelected
             : dataGridStyles.cellActive),
+        status === 'stagedUpdate' && dataGridStyles.cellStagedUpdate,
+        status === 'stagedUpdate' &&
+          selectionEdges?.top === true &&
+          dataGridStyles.cellStagedSelectionEdgeTop,
+        status === 'stagedUpdate' &&
+          selectionEdges?.right === true &&
+          dataGridStyles.cellStagedSelectionEdgeRight,
+        status === 'stagedUpdate' &&
+          selectionEdges?.bottom === true &&
+          dataGridStyles.cellStagedSelectionEdgeBottom,
+        status === 'stagedUpdate' &&
+          selectionEdges?.left === true &&
+          dataGridStyles.cellStagedSelectionEdgeLeft,
       )}
       data-active={isActive === true ? '' : undefined}
       data-cell-selected={isCellSelected === true ? '' : undefined}
@@ -1374,6 +1414,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
               .join(' ')
       }
       data-selected={isSelected === true ? '' : undefined}
+      data-status={status}
       data-slot="data-grid-cell"
       data-typography="mono"
       ref={registerCell}

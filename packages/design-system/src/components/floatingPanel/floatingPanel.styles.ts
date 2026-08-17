@@ -32,9 +32,9 @@ export const floatingPanelStyles = stylex.create({
     width: "100%",
   },
   summary: {
-    gap: spacing.s,
+    gap: spacing.xs,
     paddingBlock: spacing.s,
-    paddingInline: spacing.m,
+    paddingInline: spacing.s,
     alignItems: "center",
     display: "flex",
     flexWrap: "wrap",

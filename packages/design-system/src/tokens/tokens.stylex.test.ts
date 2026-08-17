@@ -55,6 +55,10 @@ describe('semantic token contract', () => {
         border: expect.any(String),
         text: expect.any(String),
       }),
+      stagedChangeColors: expect.objectContaining({
+        background: expect.any(String),
+        border: expect.any(String),
+      }),
     })
     expect(tokenExports).not.toHaveProperty('backgroundColors')
   })

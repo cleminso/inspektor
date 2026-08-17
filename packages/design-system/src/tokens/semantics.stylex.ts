@@ -68,6 +68,12 @@ export const selectionColors = stylex.defineVars({
   text: `light-dark(${palette.blue700}, ${palette.blue400})`,
 } as const)
 
+/** Colors that identify pending mutations without implying validation severity. */
+export const stagedChangeColors = stylex.defineVars({
+  background: `light-dark(${palette.yellow100}, ${palette.yellow800})`,
+  border: `light-dark(${palette.orange600}, ${palette.yellow400})`,
+} as const)
+
 /** Semantic foreground colors for text and icons. */
 export const textColors = stylex.defineVars({
   default: `light-dark(${palette.gray900}, ${palette.neutral100})`,
@@ -236,6 +242,7 @@ export type GhostElementColorToken = StyleXTokenKeys<typeof ghostElementColors>
 export type AccentElementColorToken = StyleXTokenKeys<typeof accentElementColors>
 export type DangerElementColorToken = StyleXTokenKeys<typeof dangerElementColors>
 export type SelectionColorToken = StyleXTokenKeys<typeof selectionColors>
+export type StagedChangeColorToken = StyleXTokenKeys<typeof stagedChangeColors>
 export type BackgroundColorToken =
   | `surface-${SurfaceColorToken}`
   | `element-${ElementColorToken}`
