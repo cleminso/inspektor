@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsAccordionRouteImport } from './routes/components/accordion'
 import { Route as ComponentsActionListRouteImport } from './routes/components/action-list'
+import { Route as ComponentsAlertDialogRouteImport } from './routes/components/alert-dialog'
 import { Route as ComponentsBinaryValueRouteImport } from './routes/components/binary-value'
 import { Route as ComponentsBoxRouteImport } from './routes/components/box'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
@@ -68,6 +69,11 @@ const ComponentsAccordionRoute = ComponentsAccordionRouteImport.update({
 const ComponentsActionListRoute = ComponentsActionListRouteImport.update({
   id: '/components/action-list',
   path: '/components/action-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsAlertDialogRoute = ComponentsAlertDialogRouteImport.update({
+  id: '/components/alert-dialog',
+  path: '/components/alert-dialog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsBinaryValueRoute = ComponentsBinaryValueRouteImport.update({
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
+  '/components/alert-dialog': typeof ComponentsAlertDialogRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
@@ -336,6 +343,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
+  '/components/alert-dialog': typeof ComponentsAlertDialogRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
+  '/components/alert-dialog': typeof ComponentsAlertDialogRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
@@ -433,6 +442,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/accordion'
     | '/components/action-list'
+    | '/components/alert-dialog'
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
@@ -480,6 +490,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/accordion'
     | '/components/action-list'
+    | '/components/alert-dialog'
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
@@ -527,6 +538,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/accordion'
     | '/components/action-list'
+    | '/components/alert-dialog'
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
@@ -575,6 +587,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsAccordionRoute: typeof ComponentsAccordionRoute
   ComponentsActionListRoute: typeof ComponentsActionListRoute
+  ComponentsAlertDialogRoute: typeof ComponentsAlertDialogRoute
   ComponentsBinaryValueRoute: typeof ComponentsBinaryValueRoute
   ComponentsBoxRoute: typeof ComponentsBoxRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
@@ -640,6 +653,13 @@ declare module '@tanstack/react-router' {
       path: '/components/action-list'
       fullPath: '/components/action-list'
       preLoaderRoute: typeof ComponentsActionListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/alert-dialog': {
+      id: '/components/alert-dialog'
+      path: '/components/alert-dialog'
+      fullPath: '/components/alert-dialog'
+      preLoaderRoute: typeof ComponentsAlertDialogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/binary-value': {
@@ -943,6 +963,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsAccordionRoute: ComponentsAccordionRoute,
   ComponentsActionListRoute: ComponentsActionListRoute,
+  ComponentsAlertDialogRoute: ComponentsAlertDialogRoute,
   ComponentsBinaryValueRoute: ComponentsBinaryValueRoute,
   ComponentsBoxRoute: ComponentsBoxRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,

@@ -25,6 +25,32 @@ test("extracts documented Accordion and ActionList props", () => {
   );
 });
 
+test("extracts the constrained AlertDialog compound API", () => {
+  assert.deepEqual(
+    metadata["alertDialog.root"]?.map(({ name }) => name),
+    ["defaultOpen", "open", "onOpenChange"],
+  );
+  assert.equal(
+    metadata["alertDialog.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
+    "false",
+  );
+  assert.deepEqual(
+    metadata["alertDialog.content"]?.map(({ name }) => name),
+    ["keepMounted", "initialFocus", "finalFocus"],
+  );
+  assert.deepEqual(
+    metadata["alertDialog.close"]?.map(({ name }) => name),
+    ["render"],
+  );
+  assert.equal(
+    metadata["alertDialog.close"]?.find(({ name }) => name === "className"),
+    undefined,
+  );
+  assert.ok(metadata["alertDialog.title"]);
+  assert.ok(metadata["alertDialog.description"]);
+  assert.ok(metadata["alertDialog.actions"]);
+});
+
 test("extracts direct and compound forwardRef component props", () => {
 
   assert.ok(metadata.input?.some(({ name }) => name === "size"));

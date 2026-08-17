@@ -57,6 +57,19 @@ export const buttonItem = {
   componentId: "button",
 } satisfies NavItem;
 
+export const alertDialogItem = {
+  title: "Alert Dialog",
+  slug: "alert-dialog",
+  href: "/components/alert-dialog",
+  description: "Modal confirmation that requires an explicit response before proceeding.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "alertDialog.tsx",
+    path: "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+  },
+  componentId: "alertDialog",
+} satisfies NavItem;
+
 export const buttonLinkItem = {
   title: "Button Link",
   slug: "button-link",
@@ -596,6 +609,7 @@ export const textFieldItem = {
 export const componentItems: NavItem[] = [
   accordionItem,
   actionListItem,
+  alertDialogItem,
   binaryValueItem,
   boxItem,
   buttonItem,

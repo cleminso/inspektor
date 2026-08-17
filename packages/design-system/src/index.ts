@@ -1,4 +1,13 @@
 // Components
+export { AlertDialog } from './components/alertDialog/alertDialog'
+export type {
+  AlertDialogActionsProps,
+  AlertDialogCloseProps,
+  AlertDialogContentProps,
+  AlertDialogDescriptionProps,
+  AlertDialogRootProps,
+  AlertDialogTitleProps,
+} from './components/alertDialog/alertDialog'
 export { Accordion } from './components/accordion/accordion'
 export type {
   AccordionHeaderProps,
@@ -33,10 +42,12 @@ export type {
   DataGridBodyProps,
   DataGridCellContextMenuHandler,
   DataGridCellProps,
+  DataGridCellStatus,
   DataGridCellTarget,
   DataGridContentProps,
   DataGridDensity,
   DataGridRowRendering,
+  DataGridRowStatus,
   DataGridExpandedRowProps,
   DataGridFocusRequest,
   DataGridFooterProps,

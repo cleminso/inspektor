@@ -1421,7 +1421,7 @@
     },
     {
       "name": "gridTemplateColumns",
-      "type": "\"one\" | \"two\" | \"three\" | \"four\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"one\" | \"two\" | \"three\" | \"four\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\">>",
+      "type": "\"one\" | \"two\" | \"three\" | \"four\" | \"three-one\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"one\" | \"two\" | \"three\" | \"four\" | \"three-one\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1436,7 +1436,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 146
+        "line": 153
       }
     },
     {
@@ -1446,7 +1446,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 147
+        "line": 154
       }
     },
     {
@@ -1456,7 +1456,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 150
+        "line": 157
       }
     },
     {
@@ -1466,7 +1466,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 153
+        "line": 160
       }
     },
     {
@@ -1476,7 +1476,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 159
+        "line": 166
       }
     },
     {
@@ -1486,7 +1486,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 162
+        "line": 169
       }
     },
     {
@@ -1496,7 +1496,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 163
+        "line": 170
       }
     },
     {
@@ -1506,7 +1506,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 164
+        "line": 171
       }
     },
     {
@@ -1516,7 +1516,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 165
+        "line": 172
       }
     },
     {
@@ -1526,7 +1526,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 166
+        "line": 173
       }
     },
     {
@@ -1536,7 +1536,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 167
+        "line": 174
       }
     },
     {
@@ -1546,7 +1546,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 172
+        "line": 179
       }
     },
     {
@@ -1556,7 +1556,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 173
+        "line": 180
       }
     },
     {
@@ -1566,7 +1566,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 183
+        "line": 190
       }
     },
     {
@@ -1576,7 +1576,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 184
+        "line": 191
       }
     },
     {
@@ -1586,7 +1586,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 185
+        "line": 192
       }
     },
     {
@@ -1596,7 +1596,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/utils/types.ts",
-        "line": 186
+        "line": 193
       }
     }
   ],
@@ -2621,6 +2621,88 @@
       }
     }
   ],
+  "alertDialog.root": [
+    {
+      "name": "defaultOpen",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the alert dialog is initially open.",
+      "source": {
+        "path": "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+        "line": 20
+      }
+    },
+    {
+      "name": "open",
+      "type": "false | true",
+      "required": false,
+      "description": "Whether the alert dialog is currently open.",
+      "source": {
+        "path": "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+        "line": 22
+      }
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean, eventDetails: BaseAlertDialog.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Runs when the alert dialog requests to open or close.",
+      "source": {
+        "path": "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+        "line": 24
+      }
+    }
+  ],
+  "alertDialog.content": [
+    {
+      "name": "keepMounted",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the dialog content mounted while it is closed.",
+      "source": {
+        "path": "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+        "line": 29
+      }
+    },
+    {
+      "name": "initialFocus",
+      "type": "false | true | RefObject<HTMLElement | null> | (openType: InteractionType) => boolean | HTMLElement | null | void",
+      "required": false,
+      "description": "Determines where focus moves when the dialog opens.",
+      "source": {
+        "path": "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+        "line": 31
+      }
+    },
+    {
+      "name": "finalFocus",
+      "type": "false | true | RefObject<HTMLElement | null> | (closeType: InteractionType) => boolean | HTMLElement | null | void",
+      "required": false,
+      "description": "Determines where focus moves when the dialog closes.",
+      "source": {
+        "path": "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+        "line": 33
+      }
+    }
+  ],
+  "alertDialog.title": [],
+  "alertDialog.description": [],
+  "alertDialog.actions": [],
+  "alertDialog.close": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, DialogCloseState>",
+      "required": false,
+      "defaultValue": "<Button variant=\"secondary\" />",
+      "description": "Composes close behavior onto a design-system Button.",
+      "source": {
+        "path": "packages/design-system/src/components/alertDialog/alertDialog.tsx",
+        "line": 50
+      }
+    }
+  ],
   "actionList.root": [
     {
       "name": "onEscapeKeyDown",
@@ -2973,7 +3055,7 @@
       "description": "Column highlighted across the header and visible rows.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 88
+        "line": 90
       }
     },
     {
@@ -2984,7 +3066,7 @@
       "description": "Row currently targeted for inspection.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 90
+        "line": 92
       }
     },
     {
@@ -2994,7 +3076,7 @@
       "description": "Data-table regions and companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 92
+        "line": 94
       }
     },
     {
@@ -3005,7 +3087,7 @@
       "description": "Controls table row and cell spacing.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 94
+        "line": 96
       }
     },
     {
@@ -3016,7 +3098,27 @@
       "description": "Requests semantic body-cell focus, including after virtual remounts.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 96
+        "line": 98
+      }
+    },
+    {
+      "name": "getCellStatus",
+      "type": "(cell: Cell<{ cellSelectionFeature: TableFeature; columnOrderingFeature: TableFeature; columnSizingFeature: TableFeature; columnResizingFeature: TableFeature; columnVisibilityFeature: TableFeature; rowSelectionFeature: TableFeature; rowSortingFeature: TableFeature; }, TData, unknown>) => DataGridCellStatus",
+      "required": false,
+      "description": "Selects a constrained semantic status for each rendered body cell.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
+        "line": 100
+      }
+    },
+    {
+      "name": "getRowStatus",
+      "type": "(row: Row<{ cellSelectionFeature: TableFeature; columnOrderingFeature: TableFeature; columnSizingFeature: TableFeature; columnResizingFeature: TableFeature; columnVisibilityFeature: TableFeature; rowSelectionFeature: TableFeature; rowSortingFeature: TableFeature; }, TData>) => DataGridRowStatus",
+      "required": false,
+      "description": "Selects a constrained semantic status for each rendered row.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
+        "line": 102
       }
     },
     {
@@ -3026,7 +3128,7 @@
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 98
+        "line": 104
       }
     },
     {
@@ -3036,7 +3138,7 @@
       "description": "Runs when a non-interactive cell requests editing through double-click or Enter.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 100
+        "line": 106
       }
     },
     {
@@ -3046,7 +3148,7 @@
       "description": "Runs when a cell context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 102
+        "line": 108
       }
     },
     {
@@ -3056,7 +3158,7 @@
       "description": "Runs when a column header is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 104
+        "line": 110
       }
     },
     {
@@ -3066,7 +3168,7 @@
       "description": "Runs when a column-header context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 106
+        "line": 112
       }
     },
     {
@@ -3076,7 +3178,7 @@
       "description": "Runs when a non-interactive row is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 108
+        "line": 114
       }
     },
     {
@@ -3086,7 +3188,7 @@
       "description": "Runs when a row context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 110
+        "line": 116
       }
     },
     {
@@ -3096,7 +3198,7 @@
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 112
+        "line": 118
       }
     },
     {
@@ -3106,7 +3208,7 @@
       "description": "Renders the inert visual shown while a column header is dragged.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 117
+        "line": 123
       }
     },
     {
@@ -3116,7 +3218,7 @@
       "description": "Leaf column ids that can be reordered. TanStack table state owns their current order.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 119
+        "line": 125
       }
     }
   ],
@@ -3128,7 +3230,7 @@
       "description": "Table or custom viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 132
+        "line": 138
       }
     },
     {
@@ -3138,7 +3240,7 @@
       "description": "Changing this value resets both scroll axes without remounting the viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 134
+        "line": 140
       }
     }
   ],
@@ -3150,7 +3252,7 @@
       "description": "Whether the table is updating while its settled rows remain available.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 139
+        "line": 145
       }
     },
     {
@@ -3160,7 +3262,7 @@
       "description": "Accessible name for the table.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 141
+        "line": 147
       }
     },
     {
@@ -3170,7 +3272,7 @@
       "description": "Header and body composition.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 143
+        "line": 149
       }
     },
     {
@@ -3180,7 +3282,7 @@
       "description": "Polite announcement rendered in a stable, visually hidden status region.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 145
+        "line": 151
       }
     }
   ],
@@ -3193,7 +3295,7 @@
       "description": "Content shown when the table has no rows. Pass `null` to render only the header.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 150
+        "line": 156
       }
     },
     {
@@ -3204,7 +3306,7 @@
       "description": "Whether loading content replaces the current row model.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 152
+        "line": 158
       }
     },
     {
@@ -3215,7 +3317,7 @@
       "description": "Content shown while rows are loading.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 154
+        "line": 160
       }
     },
     {
@@ -3226,7 +3328,7 @@
       "description": "Controls whether all rows render directly or larger row models use a virtual window.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 156
+        "line": 162
       }
     }
   ],
@@ -3238,7 +3340,7 @@
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 161
+        "line": 167
       }
     }
   ],
@@ -3250,7 +3352,7 @@
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 166
+        "line": 172
       }
     },
     {
@@ -3260,7 +3362,7 @@
       "description": "TanStack header group represented by this row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 168
+        "line": 174
       }
     }
   ],
@@ -3272,7 +3374,7 @@
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 173
+        "line": 179
       }
     },
     {
@@ -3282,7 +3384,7 @@
       "description": "TanStack header represented by this cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 175
+        "line": 181
       }
     }
   ],
@@ -3294,7 +3396,7 @@
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 180
+        "line": 186
       }
     }
   ],
@@ -3306,7 +3408,7 @@
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 185
+        "line": 191
       }
     },
     {
@@ -3316,7 +3418,7 @@
       "description": "TanStack row represented by this table row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 187
+        "line": 193
       }
     }
   ],
@@ -3328,7 +3430,7 @@
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 192
+        "line": 198
       }
     },
     {
@@ -3338,7 +3440,7 @@
       "description": "TanStack cell represented by this table cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 194
+        "line": 200
       }
     }
   ],
@@ -3350,7 +3452,7 @@
       "description": "Expanded content associated with the row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 199
+        "line": 205
       }
     },
     {
@@ -3360,7 +3462,7 @@
       "description": "TanStack row represented by this expanded region.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 201
+        "line": 207
       }
     }
   ],
@@ -3372,7 +3474,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 206
+        "line": 212
       }
     }
   ],
@@ -3384,7 +3486,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 206
+        "line": 212
       }
     }
   ],
@@ -3396,7 +3498,7 @@
       "description": "Status and table companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 211
+        "line": 217
       }
     }
   ],

@@ -113,6 +113,12 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...["Root", "Content", "Title", "Description", "Actions", "Close"].map((part) => ({
+    componentId: `alertDialog.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "AlertDialog",
+    part,
+    inheritedProps: [],
+  })),
   ...["Root", "Item", "SelectionControl", "Trigger", "Action"].map((part) => ({
     componentId: `actionList.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "ActionList",
