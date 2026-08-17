@@ -51,7 +51,7 @@ function OperationRow({
       gap="s"
       height="collection-row-height-xl"
       minWidth={0}
-      px="s"
+      paddingLeft="s"
       width="full"
     >
       <Box
@@ -272,6 +272,7 @@ export function TableMutationWidget({
   const mutations = useTableMutationLedger()
   const apply = useApplyTableMutationLedger({ executor, onSuccess: onApplySuccess })
   const [collapsed, setCollapsed] = useState(false)
+  const [panelSize, setPanelSize] = useState<'compact' | 'expanded'>('compact')
   const [reviewExpanded, setReviewExpanded] = useState(false)
   const contentId = useId()
   const reviewId = useId()
@@ -300,14 +301,19 @@ export function TableMutationWidget({
       />
       {expanded === false ? null : (
         <FloatingPanel.Root aria-label="Staged changes">
-          <FloatingPanel.Content id={contentId}>
-            {reviewExpanded === true ? (
+          <FloatingPanel.Content
+            id={contentId}
+            size={panelSize}
+          >
+            <FloatingPanel.Details
+              open={reviewExpanded}
+            >
               <OperationReview
                 id={reviewId}
                 review={mutations.review}
                 onUndo={mutations.undoReviewOperation}
               />
-            ) : null}
+            </FloatingPanel.Details>
             <FloatingPanel.Summary>
               <Box
                 alignItems="start"
@@ -322,7 +328,15 @@ export function TableMutationWidget({
                   size="s"
                   suffix={<Button.Glyph artwork={reviewExpanded === true ? ChevronUp : ChevronRight} />}
                   variant="ghost"
-                  onClick={() => setReviewExpanded((current) => current === false)}
+                  onClick={() => {
+                    if (reviewExpanded === false) {
+                      setPanelSize('expanded')
+                      setReviewExpanded(true)
+                    } else {
+                      setPanelSize('compact')
+                      setReviewExpanded(false)
+                    }
+                  }}
                 >
                   Review changes
                 </Button>

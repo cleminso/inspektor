@@ -132,7 +132,7 @@ const componentEntries = [
     part,
     inheritedProps: ["children"],
   })),
-  ...["Root", "Content", "Summary", "Actions"].map((part) => ({
+  ...["Root", "Content", "Details", "Summary", "Actions"].map((part) => ({
     componentId: `floatingPanel.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "FloatingPanel",
     part,

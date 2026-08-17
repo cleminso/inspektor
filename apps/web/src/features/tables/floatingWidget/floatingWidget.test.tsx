@@ -19,7 +19,15 @@ vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => ({ currentConnectionId: 'connection-1' }),
 }))
 
-afterEach(cleanup)
+const originalAnimate = HTMLElement.prototype.animate
+
+afterEach(() => {
+  cleanup()
+  Object.defineProperty(HTMLElement.prototype, 'animate', {
+    configurable: true,
+    value: originalAnimate,
+  })
+})
 
 const nameColumn = {
   name: 'name',
@@ -222,12 +230,45 @@ describe('TableMutationWidget', () => {
     expect(trigger.textContent).toContain('1')
     expect(trigger.getAttribute('aria-pressed')).toBe('true')
     const reviewButton = screen.getByRole('button', { name: 'Review changes' })
+    const panelContent = document.querySelector('[data-slot="floating-panel-content"]')
+    expect(panelContent?.getAttribute('data-size')).toBe('compact')
     expect(reviewButton.getAttribute('data-layout')).toBe('inline')
     fireEvent.click(reviewButton)
+    expect(panelContent?.getAttribute('data-size')).toBe('expanded')
     expect(screen.getByRole('region', { name: 'Affected rows' })).toBeTruthy()
     expect(screen.getByRole('listitem').querySelector('button')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Apply changes' }))
 
     await waitFor(() => expect(deleteRow).toHaveBeenCalledWith('row-1'))
+  })
+
+  it('contracts the panel while review details leave', async () => {
+    let finishExit: () => void = () => undefined
+    Object.defineProperty(HTMLElement.prototype, 'animate', {
+      configurable: true,
+      value: vi.fn(() => ({
+        cancel: vi.fn(),
+        finished: new Promise<void>((resolve) => {
+          finishExit = resolve
+        }),
+      }) as unknown as Animation),
+    })
+    renderReview()
+
+    const panelContent = document.querySelector('[data-slot="floating-panel-content"]')
+    const reviewButton = screen.getByRole('button', { name: 'Review changes' })
+    expect(panelContent?.getAttribute('data-size')).toBe('expanded')
+
+    fireEvent.click(reviewButton)
+
+    expect(panelContent?.getAttribute('data-size')).toBe('compact')
+    expect(screen.getByRole('region', { name: 'Affected rows', hidden: true })).toBeTruthy()
+
+    finishExit()
+
+    await waitFor(() => {
+      expect(panelContent?.getAttribute('data-size')).toBe('compact')
+      expect(screen.queryByRole('region', { name: 'Affected rows', hidden: true })).toBeNull()
+    })
   })
 })

@@ -7,8 +7,18 @@ export default function BasicExample(): ReactElement {
   const contentId = useId()
   const reviewId = useId()
   const [open, setOpen] = useState(true)
+  const [panelSize, setPanelSize] = useState<'compact' | 'expanded'>('compact')
   const [presentation, setPresentation] = useState<Presentation>('summary')
   const reviewExpanded = presentation === 'review'
+  const showReview = () => {
+    if (reviewExpanded === true) {
+      setPanelSize('compact')
+      setPresentation('summary')
+    } else {
+      setPanelSize('expanded')
+      setPresentation('review')
+    }
+  }
 
   return (
     <Box flexDirection="column" gap="m" alignItems="center">
@@ -23,8 +33,13 @@ export default function BasicExample(): ReactElement {
       </Button>
       {open === false ? null : (
         <FloatingPanel.Root aria-label="Background task controller">
-          <FloatingPanel.Content id={contentId}>
-            {reviewExpanded === true ? (
+          <FloatingPanel.Content
+            id={contentId}
+            size={panelSize}
+          >
+            <FloatingPanel.Details
+              open={reviewExpanded}
+            >
               <Box
                 as="section"
                 aria-label="Affected tasks"
@@ -36,7 +51,8 @@ export default function BasicExample(): ReactElement {
                 <Text variant="label">Affected tasks</Text>
                 <Text color="muted">2 updates · 1 removal</Text>
               </Box>
-            ) : presentation === 'editor' ? (
+            </FloatingPanel.Details>
+            {presentation === 'editor' ? (
               <Box flexDirection="column" gap="s" padding="m">
                 <Text as="label" htmlFor="floating-panel-example-name" variant="label">
                   Task name
@@ -56,7 +72,7 @@ export default function BasicExample(): ReactElement {
                   aria-expanded={reviewExpanded}
                   size="s"
                   variant="ghost"
-                  onClick={() => setPresentation(reviewExpanded === true ? 'summary' : 'review')}
+                  onClick={showReview}
                 >
                   3 pending tasks
                 </Button>

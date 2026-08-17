@@ -2986,7 +2986,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/components/floatingPanel/floatingPanel.tsx",
-        "line": 11
+        "line": 20
       }
     },
     {
@@ -2996,7 +2996,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/components/floatingPanel/floatingPanel.tsx",
-        "line": 11
+        "line": 20
       }
     },
     {
@@ -3011,6 +3011,49 @@
     }
   ],
   "floatingPanel.content": [
+    {
+      "name": "size",
+      "type": "\"compact\" | \"expanded\"",
+      "required": false,
+      "defaultValue": "\"compact\"",
+      "description": "Controls the constrained panel width.",
+      "source": {
+        "path": "packages/design-system/src/components/floatingPanel/floatingPanel.tsx",
+        "line": 33
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
+        "line": 2267
+      }
+    }
+  ],
+  "floatingPanel.details": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": true,
+      "description": "Keeps the details visible and interactive.",
+      "source": {
+        "path": "packages/design-system/src/components/floatingPanel/floatingPanel.tsx",
+        "line": 41
+      }
+    },
+    {
+      "name": "onExitComplete",
+      "type": "() => void",
+      "required": false,
+      "description": "Runs after closing details have left the panel.",
+      "source": {
+        "path": "packages/design-system/src/components/floatingPanel/floatingPanel.tsx",
+        "line": 43
+      }
+    },
     {
       "name": "children",
       "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",

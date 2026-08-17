@@ -21,7 +21,9 @@ export type {
 export { FloatingPanel } from './components/floatingPanel/floatingPanel'
 export type {
   FloatingPanelActionsProps,
+  FloatingPanelContentSize,
   FloatingPanelContentProps,
+  FloatingPanelDetailsProps,
   FloatingPanelRootProps,
   FloatingPanelSummaryProps,
 } from './components/floatingPanel/floatingPanel'
