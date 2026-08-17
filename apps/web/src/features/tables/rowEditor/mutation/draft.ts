@@ -375,6 +375,18 @@ export function setMutationFieldMode(
   return removeCleanUpdateInput(nextDraft, column, nextDraft.fieldInputs[column.name]);
 }
 
+export function revertMutationField(
+  draft: RowMutationDraft,
+  fieldName: string,
+): RowMutationDraft {
+  if (draft.kind !== "update" || draft.fieldInputs[fieldName] === undefined) {
+    return draft;
+  }
+  const { [fieldName]: removedInput, ...fieldInputs } = draft.fieldInputs;
+  void removedInput;
+  return { ...draft, fieldInputs };
+}
+
 export function isRowMutationDraftDirty(
   draft: RowMutationDraft,
   columns: readonly ColumnDescriptor[],

@@ -1,9 +1,12 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ColumnDescriptor } from 'jazz-tools'
+import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
 import {
   TableMutationLedgerProvider,
+  TableMutationLedgerWorkspaceProvider,
   useTableMutationEditorController,
   useTableMutationLedger,
 } from '@tables/mutationLedger/provider'
@@ -14,6 +17,21 @@ afterEach(cleanup)
 const columns = [
   { name: 'name', column_type: { type: 'Text' }, nullable: false },
 ] satisfies ColumnDescriptor[]
+
+function TestLedgerProvider({ children }: { children: ReactNode }): React.ReactElement {
+  return (
+    <RuntimeScopeExitGuardProvider>
+      <TableMutationLedgerWorkspaceProvider>
+        <TableMutationLedgerProvider
+          schemaColumns={columns}
+          scopeKey="test:accounts"
+        >
+          {children}
+        </TableMutationLedgerProvider>
+      </TableMutationLedgerWorkspaceProvider>
+    </RuntimeScopeExitGuardProvider>
+  )
+}
 
 function Harness({ updateRow, onSuccess }: { updateRow: () => Promise<void>; onSuccess?: () => void }) {
   const mutations = useTableMutationLedger()
@@ -48,9 +66,9 @@ describe('useApplyTableMutationLedger', () => {
       () => new Promise<void>((resolve) => { resolveUpdate = resolve }),
     )
     render(
-      <TableMutationLedgerProvider schemaColumns={columns}>
+      <TestLedgerProvider>
         <Harness updateRow={updateRow} onSuccess={onSuccess} />
-      </TableMutationLedgerProvider>,
+      </TestLedgerProvider>,
     )
     fireEvent.click(screen.getByRole('button', { name: 'Change' }))
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
@@ -66,9 +84,9 @@ describe('useApplyTableMutationLedger', () => {
 
   it('retains the complete staged state after failure', async () => {
     render(
-      <TableMutationLedgerProvider schemaColumns={columns}>
+      <TestLedgerProvider>
         <Harness updateRow={vi.fn().mockRejectedValue(new Error('Update rejected'))} />
-      </TableMutationLedgerProvider>,
+      </TestLedgerProvider>,
     )
     fireEvent.click(screen.getByRole('button', { name: 'Change' }))
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }))

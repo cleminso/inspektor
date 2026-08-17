@@ -7,6 +7,7 @@ import {
   createUpdateRowDraft,
   getMutationFieldInput,
   isRowMutationDraftDirty,
+  revertMutationField,
   setMutationFieldMode,
   setMutationFieldText,
 } from "@tables/rowEditor/mutation/draft";
@@ -46,6 +47,21 @@ describe("update row drafts", () => {
 
     expect(getMutationFieldInput(draft, columns[1])).toEqual({ mode: "value", text: "one" });
     expect(buildRowMutationSubmission(draft, columns)).toEqual({
+      errors: { count: "Value must be an integer." },
+      values: {},
+    });
+  });
+
+  it("reverts one field overlay while preserving invalid sibling input", () => {
+    const source = { id: "row-1", name: "Ada", count: 1, settings: null };
+    const changedName = setMutationFieldText(createUpdateRowDraft(source), columns[0], "Grace");
+    const invalidCount = setMutationFieldText(changedName, columns[1], "one");
+
+    const reverted = revertMutationField(invalidCount, "name");
+
+    expect(reverted.fieldInputs.name).toBeUndefined();
+    expect(reverted.fieldInputs.count).toEqual({ mode: "value", text: "one" });
+    expect(buildRowMutationSubmission(reverted, columns)).toEqual({
       errors: { count: "Value must be an integer." },
       values: {},
     });

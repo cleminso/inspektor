@@ -4,7 +4,9 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import {
   createTableMutationState,
   reduceTableMutationState,
+  selectStagedFieldsByRowId,
   selectTableMutationLedger,
+  selectTableMutationReview,
 } from '@tables/mutationLedger/ledger'
 import {
   createUpdateRowDraft,
@@ -78,14 +80,18 @@ describe('table mutation state', () => {
       schemaColumns: columns,
     })
     state = reduceTableMutationState(state, { type: 'deleteRows', rowIds: ['row-1'] })
+    state = reduceTableMutationState(state, {
+      type: 'setDraft',
+      rowId: 'row-1',
+      draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Katherine' }),
+      schemaColumns: columns,
+    })
 
     expect(state.draftsByRowId['row-1']).toBeUndefined()
     expect(selectTableMutationLedger(state, columns).entries).toEqual([
       { entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' },
     ])
 
-    state = reduceTableMutationState(state, { type: 'restoreRows', rowIds: ['row-1'] })
-    expect(selectTableMutationLedger(state, columns).entries).toEqual([])
   })
 
   it('removes one update or discards the complete staged state', () => {
@@ -99,9 +105,112 @@ describe('table mutation state', () => {
     state = reduceTableMutationState(state, { type: 'removeEntry', entryId: 'update:row-1' })
 
     expect(state.draftsByRowId['row-1']).toBeUndefined()
-    expect(state.deletedRowIds).toEqual(['row-2'])
+    expect(state.deletionOperations).toEqual([
+      { operationId: 'delete-operation:0', rowIds: ['row-2'] },
+    ])
 
     state = reduceTableMutationState(state, { type: 'discardAll' })
     expect(state).toEqual(createTableMutationState())
+  })
+
+  it('reverts one applicable field while preserving invalid sibling input', () => {
+    let state = reduceTableMutationState(createTableMutationState(), {
+      type: 'setDraft',
+      rowId: 'row-1',
+      draft: createDraft(
+        { id: 'row-1', name: 'Ada', age: 37 },
+        { name: 'Grace', age: 'invalid' },
+      ),
+      schemaColumns: columns,
+    })
+
+    state = reduceTableMutationState(state, {
+      type: 'revertUpdateField',
+      rowId: 'row-1',
+      fieldName: 'name',
+    })
+
+    expect(state.draftsByRowId['row-1']?.fieldInputs.age?.text).toBe('invalid')
+    expect(selectTableMutationLedger(state, columns)).toEqual({
+      entries: [],
+      hasInvalidDraft: true,
+    })
+  })
+
+  it('preserves deletion operation identity while deriving deduplicated Apply entries', () => {
+    let state = reduceTableMutationState(createTableMutationState(), {
+      type: 'deleteRows',
+      rowIds: ['row-2', 'row-1', 'row-2'],
+    })
+    state = reduceTableMutationState(state, {
+      type: 'deleteRows',
+      rowIds: ['row-3', 'row-2'],
+    })
+
+    expect(selectTableMutationReview(state, columns).operations).toEqual([
+      {
+        affectedRowCount: 2,
+        kind: 'delete',
+        operationId: 'delete-operation:0',
+        rowIds: ['row-2', 'row-1'],
+      },
+      {
+        affectedRowCount: 1,
+        kind: 'delete',
+        operationId: 'delete-operation:1',
+        rowIds: ['row-3'],
+      },
+    ])
+    expect(selectTableMutationLedger(state, columns).entries).toEqual([
+      { entryId: 'delete:row-2', kind: 'delete', rowId: 'row-2' },
+      { entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' },
+      { entryId: 'delete:row-3', kind: 'delete', rowId: 'row-3' },
+    ])
+  })
+
+  it('removes one deletion target or its complete review operation', () => {
+    let state = reduceTableMutationState(createTableMutationState(), {
+      type: 'deleteRows',
+      rowIds: ['row-1', 'row-2'],
+    })
+    state = reduceTableMutationState(state, {
+      type: 'undoDeletionTarget',
+      operationId: 'delete-operation:0',
+      rowId: 'row-1',
+    })
+    expect(state.deletionOperations[0]?.rowIds).toEqual(['row-2'])
+
+    state = reduceTableMutationState(state, {
+      type: 'undoReviewOperation',
+      operationId: 'delete-operation:0',
+    })
+    expect(state.deletionOperations).toEqual([])
+  })
+
+  it('projects row update review operations and applicable staged field membership', () => {
+    const state = reduceTableMutationState(createTableMutationState(), {
+      type: 'setDraft',
+      rowId: 'row-1',
+      draft: createDraft(
+        { id: 'row-1', name: 'Ada', age: 37 },
+        { name: 'Grace', age: 'invalid' },
+      ),
+      schemaColumns: columns,
+    })
+
+    expect(selectTableMutationReview(state, columns)).toEqual({
+      affectedRowCount: 1,
+      operationCount: 1,
+      operations: [
+        {
+          affectedRowCount: 1,
+          fieldNames: ['name'],
+          kind: 'update',
+          operationId: 'update:row-1',
+          rowId: 'row-1',
+        },
+      ],
+    })
+    expect(selectStagedFieldsByRowId(state, columns)['row-1']).toEqual(new Set(['name']))
   })
 })
