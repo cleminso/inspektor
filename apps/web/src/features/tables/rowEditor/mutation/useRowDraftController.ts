@@ -52,9 +52,9 @@ export interface RowDraftController {
 }
 
 interface UseRowDraftControllerOptions {
-  initialRowValues: Record<string, unknown>
+  initialRowValues: Readonly<Record<string, unknown>>
   mode: DetailPaneMode
-  schemaColumns: ColumnDescriptor[]
+  schemaColumns: readonly ColumnDescriptor[]
 }
 
 interface UseBoundRowDraftControllerOptions extends UseRowDraftControllerOptions {
@@ -63,7 +63,7 @@ interface UseBoundRowDraftControllerOptions extends UseRowDraftControllerOptions
 
 function createInitialDraft(
   mode: DetailPaneMode,
-  initialRowValues: Record<string, unknown>,
+  initialRowValues: Readonly<Record<string, unknown>>,
   schemaColumns: readonly ColumnDescriptor[],
 ): RowMutationDraft {
   return mode === 'insert'

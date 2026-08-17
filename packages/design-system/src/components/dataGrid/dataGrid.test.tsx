@@ -1191,7 +1191,7 @@ describe('DataGrid', () => {
     expect(handle.getAttribute('aria-valuenow')).toBe('120')
   })
 
-  it('extends TanStack selection while a primary-button drag enters cells', () => {
+  it('aligns the drag origin treatment with the selected range edges', () => {
     render(<TestDataGrid />)
     const adaCell = screen.getByRole('cell', { name: 'Ada' })
     const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
@@ -1203,6 +1203,7 @@ describe('DataGrid', () => {
     for (const cell of screen.getAllByRole('cell')) {
       expect(cell.hasAttribute('data-cell-selected')).toBe(true)
     }
+    expect(adaCell.className).toContain(stylex.props(dataGridStyles.cellDragOrigin).className)
   })
 
   it('does not start parent cell selection from an interactive descendant', () => {

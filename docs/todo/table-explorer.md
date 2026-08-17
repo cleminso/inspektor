@@ -21,6 +21,19 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [17/08/26]
 
+- [x] Keep the page-level `Undo2` header action visually neutral when all loaded rows are staged for deletion.
+
+[17/08/26]
+
+- [x] Mark checked rows with the selection-blue inline-start marker used by the grid selection treatment.
+
+[17/08/26]
+
+- [x] Replace the page selection checkbox with one `Undo2` action when every loaded row is staged for deletion.
+- [x] Undo all loaded-row deletions from the header action and restore focus to the page checkbox.
+
+[17/08/26]
+
 - [x] Keep tab close-policy commands referentially stable while scoped draft state changes.
 - [x] Preserve staged changes without confirmation when another view of the same table remains open.
 

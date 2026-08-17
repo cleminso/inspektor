@@ -68,7 +68,9 @@ export function CodeEditor({
 
   useEffect(() => {
     if (focusOnMount === true) {
-      fallbackRef.current?.focus();
+      const fallback = fallbackRef.current;
+      fallback?.focus();
+      fallback?.setSelectionRange(fallback.value.length, fallback.value.length);
     }
   }, [focusOnMount]);
 
@@ -105,6 +107,7 @@ export function CodeEditor({
         disabled={disabled}
         invalid={invalid}
         defaultExpanded={defaultExpanded}
+        focusOnMount={focusOnMount}
         layout={layout}
         restoreFocus={restoreFocusRef.current}
       />

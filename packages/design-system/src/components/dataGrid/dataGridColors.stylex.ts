@@ -25,6 +25,7 @@ export const dataGridColors = stylex.defineVars({
   draggedHeaderText: 'inherit',
   rowHoverBackground: surfaceColors.subtle,
   selectedRowBackground: 'transparent',
+  selectedRowBorder: selectionColors.border,
   stagedDeletionRowBackground: dangerElementColors.subtle,
   stagedDeletionRowBorder: borderColors.danger,
   stagedUpdateCellBackground: stagedChangeColors.background,

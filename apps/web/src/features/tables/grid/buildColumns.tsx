@@ -30,14 +30,15 @@ import { RelationCellLink } from "@tables/grid/relationCellLink";
 import { tableGridSelectionColumnId } from "@tables/grid/tableGridColumnIds";
 import { classifySchemaValue, type SchemaValuePresentation } from "@tables/grid/valuePresentation";
 import type { ColumnMoveDirection } from "@tables/grid/useColumnOrder";
-import type { TableColumnMeta } from "@tables/tableTypes";
+import type { TableColumnMeta, TableValuesByRowId } from "@tables/tableTypes";
 
 interface BuildDataGridColumnsOptions {
   columns: TableColumnMeta[];
   onColumnMenuOpen?: (columnId: string) => void;
   onColumnMove?: (columnId: string, direction: ColumnMoveDirection) => void;
   onRowSelectionRequest?: (request: RowSelectionRequest) => void;
-  onUndoRowDeletion?: (rowId: string) => void;
+  onUndoRowDeletions?: (rowIds: readonly string[]) => void;
+  stagedValuesByRowId?: TableValuesByRowId;
 }
 
 export interface RowSelectionRequest {
@@ -214,6 +215,74 @@ function SelectionCheckbox({
         onCheckedChange(nextChecked === true, shiftKeyRef.current);
         shiftKeyRef.current = false;
       }}
+    />
+  );
+}
+
+interface PageSelectionControlProps {
+  allRowsDeleted: boolean;
+  checked: boolean;
+  indeterminate: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  onUndoDeletions?: () => void;
+}
+
+function PageSelectionControl({
+  allRowsDeleted,
+  checked,
+  indeterminate,
+  onCheckedChange,
+  onUndoDeletions,
+}: PageSelectionControlProps): React.ReactElement {
+  const checkboxRef = useRef<HTMLElement>(null);
+  const restoreFocusRef = useRef(false);
+
+  useEffect(() => {
+    if (allRowsDeleted === false && restoreFocusRef.current === true) {
+      restoreFocusRef.current = false;
+      checkboxRef.current?.focus();
+    }
+  }, [allRowsDeleted]);
+
+  if (allRowsDeleted === true && onUndoDeletions !== undefined) {
+    return (
+      <Box
+        alignItems="center"
+        justifyContent="center"
+        width="full"
+      >
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                type="button"
+                aria-label="Undo deletion for all loaded rows"
+                glyphSize="compact"
+                iconOnly
+                size="xs"
+                variant="ghost"
+                onClick={() => {
+                  restoreFocusRef.current = true;
+                  onUndoDeletions();
+                }}
+              >
+                <Button.Glyph artwork={Undo2} />
+              </Button>
+            }
+          />
+          <Tooltip.Content>Undo all deletions</Tooltip.Content>
+        </Tooltip.Root>
+      </Box>
+    );
+  }
+
+  return (
+    <SelectionCheckbox
+      ariaLabel="Select all loaded rows"
+      checked={checked}
+      checkboxRef={checkboxRef}
+      indeterminate={indeterminate}
+      onCheckedChange={onCheckedChange}
     />
   );
 }
@@ -537,7 +606,8 @@ export function buildDataGridColumns({
   onColumnMenuOpen,
   onColumnMove,
   onRowSelectionRequest,
-  onUndoRowDeletion,
+  onUndoRowDeletions,
+  stagedValuesByRowId = {},
 }: BuildDataGridColumnsOptions): ColumnDef<DataGridFeatures, DynamicTableRow, unknown>[] {
   const selectionColumn: ColumnDef<DataGridFeatures, DynamicTableRow, unknown> = {
     id: tableGridSelectionColumnId,
@@ -551,16 +621,26 @@ export function buildDataGridColumns({
     header: ({ table }) => {
       const isAllSelected = table.getIsAllPageRowsSelected();
       const isSomeSelected = table.getIsSomePageRowsSelected();
+      const pageRows = table.getRowModel().rows;
+      const allRowsDeleted =
+        pageRows.length > 0 &&
+        onUndoRowDeletions !== undefined &&
+        pageRows.every((row) => row.getCanSelect() === false);
 
       return (
         <Box alignItems="center" justifyContent="center" width="full">
-          <SelectionCheckbox
+          <PageSelectionControl
+            allRowsDeleted={allRowsDeleted}
             checked={isAllSelected}
             indeterminate={isSomeSelected === true && isAllSelected === false}
-            ariaLabel="Select all loaded rows"
             onCheckedChange={(value) => {
               table.toggleAllPageRowsSelected(value);
             }}
+            onUndoDeletions={
+              onUndoRowDeletions === undefined
+                ? undefined
+                : () => onUndoRowDeletions(pageRows.map((row) => String(row.original.id)))
+            }
           />
         </Box>
       );
@@ -573,9 +653,9 @@ export function buildDataGridColumns({
             checked={row.getIsSelected()}
             rowId={String(row.original.id)}
             onUndoDeletion={
-              onUndoRowDeletion === undefined
+              onUndoRowDeletions === undefined
                 ? undefined
-                : () => onUndoRowDeletion(String(row.original.id))
+                : () => onUndoRowDeletions([String(row.original.id)])
             }
             onCheckedChange={(value, shiftKey) => {
               onRowSelectionRequest?.({
@@ -617,7 +697,11 @@ export function buildDataGridColumns({
           />
         ),
         cell: ({ row }) => {
-          const rawValue = row.original[column.accessorKey];
+          const stagedRowValues = stagedValuesByRowId[row.id];
+          const rawValue =
+            stagedRowValues !== undefined && Object.hasOwn(stagedRowValues, column.accessorKey)
+              ? stagedRowValues[column.accessorKey]
+              : row.original[column.accessorKey];
           const presentation = classifySchemaValue(rawValue, column.column);
 
           return (

@@ -39,6 +39,11 @@ const countColumn = {
   column_type: { type: 'Integer' },
   nullable: false,
 } satisfies ColumnDescriptor
+const settingsColumn = {
+  name: 'settings',
+  column_type: { type: 'Json' },
+  nullable: true,
+} satisfies ColumnDescriptor
 
 function TestLedgerProvider({
   children,
@@ -50,10 +55,7 @@ function TestLedgerProvider({
   return (
     <RuntimeScopeExitGuardProvider>
       <TableMutationLedgerWorkspaceProvider>
-        <TableMutationLedgerProvider
-          schemaColumns={schemaColumns}
-          scopeKey="test:accounts"
-        >
+        <TableMutationLedgerProvider schemaColumns={schemaColumns} scopeKey="test:accounts">
           {children}
         </TableMutationLedgerProvider>
       </TableMutationLedgerWorkspaceProvider>
@@ -63,16 +65,18 @@ function TestLedgerProvider({
 
 function FieldEditorHarness({
   column,
+  initialSettings = { enabled: true },
   onClose,
   onComplete,
 }: {
   column: ColumnDescriptor
+  initialSettings?: unknown
   onClose: () => void
   onComplete: (direction: 'enter' | 'tabBackward' | 'tabForward') => void
 }) {
-  const columns = [nameColumn, countColumn]
+  const columns = [nameColumn, countColumn, settingsColumn]
   const controller = useTableMutationEditorController({
-    initialRowValues: { id: 'row-1', name: 'Ada', count: 1 },
+    initialRowValues: { id: 'row-1', name: 'Ada', count: 1, settings: initialSettings },
     rowId: 'row-1',
     schemaColumns: columns,
   })
@@ -203,6 +207,27 @@ describe('FieldEditorMutationWidget', () => {
     expect(await screen.findByText('Value must be an integer.')).toBeTruthy()
     expect(onComplete).not.toHaveBeenCalled()
   })
+
+  it('opens a NULL JSON value with an empty object focused editor', async () => {
+    render(
+      <TestLedgerProvider schemaColumns={[nameColumn, countColumn, settingsColumn]}>
+        <FieldEditorHarness
+          column={settingsColumn}
+          initialSettings={null}
+          onClose={vi.fn()}
+          onComplete={vi.fn()}
+        />
+      </TestLedgerProvider>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Value' }))
+
+    await waitFor(() => {
+      const editor = screen.getByRole('textbox', { name: 'Settings' })
+      expect(editor.textContent).toBe('{}')
+      expect(document.activeElement).toBe(editor)
+    })
+  })
 })
 
 describe('TableMutationWidget', () => {
@@ -223,7 +248,9 @@ describe('TableMutationWidget', () => {
     }
     return (
       <>
-        <button type="button" onClick={stageReview}>Stage review</button>
+        <button type="button" onClick={stageReview}>
+          Stage review
+        </button>
         <TableMutationWidget executor={{ deleteRow: vi.fn(), updateRow: vi.fn() }} />
       </>
     )
@@ -254,19 +281,33 @@ describe('TableMutationWidget', () => {
     expect(screen.getByRole('button', { name: 'Deleted rows, 1' })).toBeTruthy()
     expect(screen.queryByText(/fields?/i)).toBeNull()
 
-    fireEvent.click(screen.getByRole('button', {
-      name: 'Undo: 2 selected rows',
-    }))
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Undo: 2 selected rows',
+      }),
+    )
     expect(screen.queryByText('2 selected rows')).toBeNull()
   })
 
   it('scrolls each operation list only above ten rows', () => {
     renderReview(12)
 
-    expect(screen.getByRole('region', { name: 'Updated row operations' }).getAttribute('data-scrollable')).toBe('false')
-    expect(screen.getByRole('region', { name: 'Deleted row operations' }).getAttribute('data-scrollable')).toBe('true')
-    expect(screen.getByRole('button', { name: /Updated rows, 1/ }).closest('[data-scrollable]')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Apply changes' }).closest('[data-scrollable]')).toBeNull()
+    expect(
+      screen
+        .getByRole('region', { name: 'Updated row operations' })
+        .getAttribute('data-scrollable'),
+    ).toBe('false')
+    expect(
+      screen
+        .getByRole('region', { name: 'Deleted row operations' })
+        .getAttribute('data-scrollable'),
+    ).toBe('true')
+    expect(
+      screen.getByRole('button', { name: /Updated rows, 1/ }).closest('[data-scrollable]'),
+    ).toBeNull()
+    expect(
+      screen.getByRole('button', { name: 'Apply changes' }).closest('[data-scrollable]'),
+    ).toBeNull()
   })
 
   it('bounds mounted operation rows above one hundred operations', () => {
@@ -325,12 +366,15 @@ describe('TableMutationWidget', () => {
     let finishExit: () => void = () => undefined
     Object.defineProperty(HTMLElement.prototype, 'animate', {
       configurable: true,
-      value: vi.fn(() => ({
-        cancel: vi.fn(),
-        finished: new Promise<void>((resolve) => {
-          finishExit = resolve
-        }),
-      }) as unknown as Animation),
+      value: vi.fn(
+        () =>
+          ({
+            cancel: vi.fn(),
+            finished: new Promise<void>((resolve) => {
+              finishExit = resolve
+            }),
+          }) as unknown as Animation,
+      ),
     })
     renderReview()
 

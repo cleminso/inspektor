@@ -391,6 +391,7 @@ export function CodeMirrorEditor({
   invalid = false,
   expanded,
   defaultExpanded = false,
+  focusOnMount = false,
   onExpandedChange,
   layout = "intrinsic",
   restoreFocus = false,
@@ -501,6 +502,9 @@ export function CodeMirrorEditor({
 
     editorViewRef.current = editorView;
     if (restoreFocus === true) {
+      if (focusOnMount === true) {
+        editorView.dispatch({ selection: { anchor: editorView.state.doc.length } });
+      }
       editorView.focus();
     }
     const resizeObserver = new ResizeObserver(() => {

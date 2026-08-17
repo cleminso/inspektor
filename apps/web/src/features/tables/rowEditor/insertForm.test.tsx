@@ -295,21 +295,21 @@ describe("InsertRowForm structured values", () => {
     ["Array", "[]"],
     ["Row", "{}"],
   ] as const)("seeds an empty %s field when switching to Value", async (type, seed) => {
-    const columns = [
-      {
-        name: "payload",
-        column_type:
-          type === "Array"
-            ? { type, element: { type: "Text" } as const }
-            : type === "Row"
-              ? { type, columns: [] }
-              : { type },
-        nullable: true,
-      },
-    ] satisfies ColumnDescriptor[];
-    render(<InsertRowForm onSave={() => undefined} rowValues={{}} schemaColumns={columns} />);
+      const columns = [
+        {
+          name: "payload",
+          column_type:
+            type === "Array"
+              ? { type, element: { type: "Text" } as const }
+              : type === "Row"
+                ? { type, columns: [] }
+                : { type },
+          nullable: true,
+        },
+      ] satisfies ColumnDescriptor[];
+      render(<InsertRowForm onSave={() => undefined} rowValues={{}} schemaColumns={columns} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Value" }));
+      fireEvent.click(screen.getByRole("button", { name: "Value" }));
 
     expect((await screen.findByRole("textbox", { name: "Payload" })).textContent).toBe(seed);
   });

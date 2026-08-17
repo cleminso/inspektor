@@ -45,6 +45,12 @@ export interface RowMutationSubmission {
   values: Record<string, unknown>;
 }
 
+export interface RowMutationValueProjection {
+  displayValues: Record<string, unknown>;
+  errors: Record<string, string>;
+  submissionValues: Record<string, unknown>;
+}
+
 function areMutationFieldInputsEqual(left: MutationFieldInput, right: MutationFieldInput): boolean {
   // NULL and DEFAULT ignore retained text so hidden values can be restored without staying dirty.
   return left.mode === right.mode && (left.mode !== "value" || left.text === right.text);
@@ -102,7 +108,9 @@ export function formatColumnDefault(column: ColumnDescriptor): string {
  * Untouched fields remain absent from `fieldInputs` and are read from `sourceValues`. Editing
  * `name` adds only `name` to the overlay, so saving cannot overwrite other live columns.
  */
-export function createUpdateRowDraft(sourceValues: Record<string, unknown>): RowMutationDraft {
+export function createUpdateRowDraft(
+  sourceValues: Readonly<Record<string, unknown>>,
+): RowMutationDraft {
   return { fieldInputs: {}, initialFieldInputs: {}, kind: "update", sourceValues };
 }
 
@@ -119,7 +127,7 @@ export function createUpdateRowDraft(sourceValues: Record<string, unknown>): Row
  * default changes, and other database-side semantics.
  */
 export function createInsertRowDraft(
-  sourceValues: Record<string, unknown>,
+  sourceValues: Readonly<Record<string, unknown>>,
   columns: readonly ColumnDescriptor[],
 ): RowMutationDraft {
   const fieldInputs = Object.fromEntries(
@@ -290,6 +298,15 @@ function resolveMutationField(
   }
 }
 
+export function getMutationFieldError(
+  draft: RowMutationDraft,
+  column: ColumnDescriptor,
+  input: MutationFieldInput,
+): string | undefined {
+  const resolved = resolveMutationField(draft, column, input);
+  return resolved.kind === "invalid" ? resolved.error : undefined;
+}
+
 /**
  * Converts parsed semantic values into the installed Jazz mutation representation.
  *
@@ -344,19 +361,27 @@ function removeCleanUpdateInput(
   return { ...draft, fieldInputs };
 }
 
-export function setMutationFieldText(
+export function setMutationFieldInput(
   draft: RowMutationDraft,
   column: ColumnDescriptor,
-  text: string,
+  input: MutationFieldInput,
 ): RowMutationDraft {
   const nextDraft = {
     ...draft,
     fieldInputs: {
       ...draft.fieldInputs,
-      [column.name]: { mode: "value" as const, text },
+      [column.name]: input,
     },
   };
-  return removeCleanUpdateInput(nextDraft, column, nextDraft.fieldInputs[column.name]);
+  return removeCleanUpdateInput(nextDraft, column, input);
+}
+
+export function setMutationFieldText(
+  draft: RowMutationDraft,
+  column: ColumnDescriptor,
+  text: string,
+): RowMutationDraft {
+  return setMutationFieldInput(draft, column, { mode: "value", text });
 }
 
 export function setMutationFieldMode(
@@ -365,14 +390,7 @@ export function setMutationFieldMode(
   mode: MutationFieldMode,
 ): RowMutationDraft {
   const currentInput = getMutationFieldInput(draft, column);
-  const nextDraft = {
-    ...draft,
-    fieldInputs: {
-      ...draft.fieldInputs,
-      [column.name]: { ...currentInput, mode },
-    },
-  };
-  return removeCleanUpdateInput(nextDraft, column, nextDraft.fieldInputs[column.name]);
+  return setMutationFieldInput(draft, column, { ...currentInput, mode });
 }
 
 export function revertMutationField(
@@ -427,12 +445,13 @@ export function isRowMutationDraftDirty(
  * Parsed Json values are encoded only at this final boundary so draft equality stays semantic while
  * Jazz receives the complete JSON text it expects.
  */
-export function buildRowMutationSubmission(
+export function buildRowMutationValueProjection(
   draft: RowMutationDraft,
   columns: readonly ColumnDescriptor[],
-): RowMutationSubmission {
+): RowMutationValueProjection {
+  const displayValues: Record<string, unknown> = {};
   const errors: Record<string, string> = {};
-  const values: Record<string, unknown> = {};
+  const submissionValues: Record<string, unknown> = {};
   // Inserts validate required untouched fields; updates submit only their sparse dirty overlay.
   const submittedColumns =
     draft.kind === "insert"
@@ -450,7 +469,8 @@ export function buildRowMutationSubmission(
         (draft.sourceValues[column.name] !== null &&
           draft.sourceValues[column.name] !== undefined)
       ) {
-        values[column.name] = null;
+        displayValues[column.name] = null;
+        submissionValues[column.name] = null;
       }
     } else if (resolved.kind === "valid") {
       if (
@@ -461,10 +481,31 @@ export function buildRowMutationSubmission(
           draft.sourceValues[column.name],
         ) === false
       ) {
-        values[column.name] = prepareMutationValueForJazz(column.column_type, resolved.value);
+        displayValues[column.name] = resolved.value;
+        submissionValues[column.name] = prepareMutationValueForJazz(
+          column.column_type,
+          resolved.value,
+        );
       }
     }
   }
 
-  return { errors, values };
+  return { displayValues, errors, submissionValues };
+}
+
+/** Builds valid staged values in the schema representation expected by grid presentation. */
+export function buildRowMutationDisplayValues(
+  draft: RowMutationDraft,
+  columns: readonly ColumnDescriptor[],
+): RowMutationSubmission {
+  const projection = buildRowMutationValueProjection(draft, columns);
+  return { errors: projection.errors, values: projection.displayValues };
+}
+
+export function buildRowMutationSubmission(
+  draft: RowMutationDraft,
+  columns: readonly ColumnDescriptor[],
+): RowMutationSubmission {
+  const projection = buildRowMutationValueProjection(draft, columns);
+  return { errors: projection.errors, values: projection.submissionValues };
 }

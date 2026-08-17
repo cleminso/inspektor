@@ -2,9 +2,11 @@ import type { ColumnDescriptor } from "jazz-tools";
 import { describe, expect, it } from "vitest";
 
 import {
+  buildRowMutationDisplayValues,
   buildRowMutationSubmission,
   createInsertRowDraft,
   createUpdateRowDraft,
+  getMutationFieldError,
   getMutationFieldInput,
   isRowMutationDraftDirty,
   revertMutationField,
@@ -41,6 +43,24 @@ describe("update row drafts", () => {
     expect(isRowMutationDraftDirty(draft, columns)).toBe(true);
   });
 
+  it("keeps staged display values in their decoded schema representation", () => {
+    const source = { id: "row-1", name: "Ada", count: 1, settings: null };
+    const draft = setMutationFieldText(
+      createUpdateRowDraft(source),
+      columns[2],
+      '{"enabled":true}',
+    );
+
+    expect(buildRowMutationDisplayValues(draft, columns)).toEqual({
+      errors: {},
+      values: { settings: { enabled: true } },
+    });
+    expect(buildRowMutationSubmission(draft, columns)).toEqual({
+      errors: {},
+      values: { settings: '{"enabled":true}' },
+    });
+  });
+
   it("retains invalid raw input and excludes it from the patch", () => {
     const source = { id: "row-1", name: "Ada", count: 1, settings: null };
     const draft = setMutationFieldText(createUpdateRowDraft(source), columns[1], "one");
@@ -50,6 +70,18 @@ describe("update row drafts", () => {
       errors: { count: "Value must be an integer." },
       values: {},
     });
+  });
+
+  it("validates one field without evaluating invalid sibling input", () => {
+    const source = { id: "row-1", name: "Ada", count: 1, settings: null };
+    const draft = setMutationFieldText(createUpdateRowDraft(source), columns[1], "one");
+
+    expect(
+      getMutationFieldError(draft, columns[0], { mode: "value", text: "Grace" }),
+    ).toBeUndefined();
+    expect(
+      getMutationFieldError(draft, columns[1], { mode: "value", text: "one" }),
+    ).toBe("Value must be an integer.");
   });
 
   it("reverts one field overlay while preserving invalid sibling input", () => {

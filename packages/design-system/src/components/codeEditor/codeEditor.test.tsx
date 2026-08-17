@@ -52,17 +52,19 @@ async function findCodeMirrorTextbox(name = "Settings JSON"): Promise<HTMLElemen
 
 describe("CodeEditor", () => {
   it("focuses the editor when its owner explicitly requests mount focus", async () => {
+    const value = '{"enabled":true}';
     render(
       <CodeEditor
         accessibilityLabel="Settings JSON"
         focusOnMount
-        value={'{"enabled":true}'}
+        value={value}
       />,
     );
 
     expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Settings JSON" }));
     const codeMirrorTextbox = await findCodeMirrorTextbox();
     expect(document.activeElement).toBe(codeMirrorTextbox);
+    expect(EditorView.findFromDOM(codeMirrorTextbox)?.state.selection.main.anchor).toBe(value.length);
   });
 
   it("restores focus when CodeMirror replaces the static editor", async () => {
@@ -74,6 +76,36 @@ describe("CodeEditor", () => {
     const editor = await findCodeMirrorTextbox();
 
     expect(document.activeElement).toBe(editor);
+  });
+
+  it("does not reclaim focus when focus moves before CodeMirror loads", async () => {
+    render(
+      <>
+        <CodeEditor accessibilityLabel="Settings JSON" focusOnMount value={'{"enabled":true}'} />
+        <button type="button">Outside action</button>
+      </>,
+    );
+
+    const outsideAction = screen.getByRole("button", { name: "Outside action" });
+    outsideAction.focus();
+    await findCodeMirrorTextbox();
+
+    expect(document.activeElement).toBe(outsideAction);
+  });
+
+  it("does not focus a disabled editor on mount", async () => {
+    render(
+      <CodeEditor
+        accessibilityLabel="Settings JSON"
+        disabled
+        focusOnMount
+        value={'{"enabled":true}'}
+      />,
+    );
+
+    const editor = await findCodeMirrorTextbox();
+
+    expect(document.activeElement).not.toBe(editor);
   });
 
   it("renders a JSON textbox with its controlled source", async () => {

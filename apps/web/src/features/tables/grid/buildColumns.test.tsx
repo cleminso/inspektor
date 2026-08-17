@@ -17,7 +17,8 @@ function TestTable({
   initialColumnSizing,
   onColumnMenuOpen,
   onColumnMove,
-  onUndoRowDeletion,
+  stagedValuesByRowId,
+  onUndoRowDeletions,
   onSortingChange,
 }: {
   columns?: Parameters<typeof buildDataGridColumns>[0]["columns"];
@@ -26,7 +27,8 @@ function TestTable({
   initialColumnSizing?: Record<string, number>;
   onColumnMenuOpen?: (columnId: string) => void;
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]["onColumnMove"];
-  onUndoRowDeletion?: (rowId: string) => void;
+  stagedValuesByRowId?: Parameters<typeof buildDataGridColumns>[0]["stagedValuesByRowId"];
+  onUndoRowDeletions?: (rowIds: readonly string[]) => void;
   onSortingChange: () => void;
 }): React.ReactElement {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -44,9 +46,10 @@ function TestTable({
         ],
         onColumnMenuOpen,
         onColumnMove,
-        onUndoRowDeletion,
+        stagedValuesByRowId,
+        onUndoRowDeletions,
       }),
-    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletion],
+    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletions, stagedValuesByRowId],
   );
   const table = useTable({
     features: dataGridFeatures,
@@ -76,14 +79,55 @@ function TestTable({
 afterEach(cleanup);
 
 describe("buildDataGridColumns", () => {
+  it("renders valid staged values over source row values", () => {
+    const data = [{ id: "row-1", name: "Ada" } as DynamicTableRow];
+    const { rerender } = render(
+      <TestTable
+        data={data}
+        stagedValuesByRowId={{ "row-1": { name: "Grace" } }}
+        onSortingChange={doNothing}
+      />,
+    );
+
+    expect(screen.getByText("Grace")).toBeTruthy();
+    expect(screen.queryByText("Ada")).toBeNull();
+
+    rerender(<TestTable data={data} stagedValuesByRowId={{}} onSortingChange={doNothing} />);
+
+    expect(screen.getByText("Ada")).toBeTruthy();
+    expect(screen.queryByText("Grace")).toBeNull();
+  });
+
+  it("projects an explicit staged null instead of falling back to the source value", () => {
+    render(
+      <TestTable
+        columns={[
+          {
+            accessorKey: "name",
+            column: { column_type: { type: "Text" }, name: "name", nullable: true } as never,
+            id: "name",
+            isSortable: true,
+            label: "Name",
+          },
+        ]}
+        data={[{ id: "row-1", name: "Ada" } as DynamicTableRow]}
+        stagedValuesByRowId={{ "row-1": { name: null } }}
+        onSortingChange={doNothing}
+      />,
+    );
+
+    expect(screen.getByText("NULL")).toBeTruthy();
+    expect(screen.queryByText("Ada")).toBeNull();
+  });
+
   it("replaces an unavailable row checkbox with an Undo2 deletion action", async () => {
-    const onUndoRowDeletion = vi.fn();
+    const onUndoRowDeletions = vi.fn();
     const data = [{ id: "row-1", name: "Ada" } as DynamicTableRow];
     const { rerender } = render(
       <TestTable
         data={data}
         disabledRowIds={new Set(["row-1"])}
-        onUndoRowDeletion={onUndoRowDeletion}
+        onUndoRowDeletions={onUndoRowDeletions}
         onSortingChange={doNothing}
       />,
     );
@@ -98,18 +142,53 @@ describe("buildDataGridColumns", () => {
 
     fireEvent.click(undoButton);
 
-    expect(onUndoRowDeletion).toHaveBeenCalledWith("row-1");
+    expect(onUndoRowDeletions).toHaveBeenCalledWith(["row-1"]);
 
     rerender(
       <TestTable
         data={data}
         disabledRowIds={new Set()}
-        onUndoRowDeletion={onUndoRowDeletion}
+        onUndoRowDeletions={onUndoRowDeletions}
         onSortingChange={doNothing}
       />,
     );
 
     const restoredCheckbox = screen.getByRole("checkbox", { name: "Select row row-1" });
+    await waitFor(() => expect(document.activeElement).toBe(restoredCheckbox));
+  });
+
+  it("replaces the page checkbox with one Undo2 action when every loaded row is deleted", async () => {
+    const onUndoRowDeletions = vi.fn();
+    const data = [
+      { id: "row-1", name: "Ada" } as DynamicTableRow,
+      { id: "row-2", name: "Grace" } as DynamicTableRow,
+    ];
+    const { rerender } = render(
+      <TestTable
+        data={data}
+        disabledRowIds={new Set(["row-1", "row-2"])}
+        onUndoRowDeletions={onUndoRowDeletions}
+        onSortingChange={doNothing}
+      />,
+    );
+
+    const undoButton = screen.getByRole("button", {
+      name: "Undo deletion for all loaded rows",
+    });
+    expect(screen.queryByRole("checkbox", { name: "Select all loaded rows" })).toBeNull();
+    fireEvent.click(undoButton);
+    expect(onUndoRowDeletions).toHaveBeenCalledOnce();
+    expect(onUndoRowDeletions).toHaveBeenCalledWith(["row-1", "row-2"]);
+
+    rerender(
+      <TestTable
+        data={data}
+        disabledRowIds={new Set()}
+        onUndoRowDeletions={onUndoRowDeletions}
+        onSortingChange={doNothing}
+      />,
+    );
+    const restoredCheckbox = screen.getByRole("checkbox", { name: "Select all loaded rows" });
     await waitFor(() => expect(document.activeElement).toBe(restoredCheckbox));
   });
 

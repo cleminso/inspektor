@@ -23,6 +23,7 @@ import type {
   TableColumnVisibilityState,
   TableRowId,
   TableSortDirection,
+  TableValuesByRowId,
 } from '@tables/tableTypes'
 
 interface UseTableGridOptions {
@@ -38,11 +39,12 @@ interface UseTableGridOptions {
   onCellSelectionChange: OnChangeFn<CellSelectionState>
   onSelectedRowIdsChange: (rowIds: TableRowId[], request: RowSelectionRequest | null) => void
   onSortChange: (columnId: string, direction: TableSortDirection) => void
-  onUndoRowDeletion?: (rowId: TableRowId) => void
+  onUndoRowDeletions?: (rowIds: readonly TableRowId[]) => void
   rows: DynamicTableRow[]
   selectedRowIds: TableRowId[]
   sortColumn: string
   sortDirection: TableSortDirection
+  stagedValuesByRowId: TableValuesByRowId
 }
 
 const selectNoInternalTableState = () => null
@@ -60,11 +62,12 @@ export function useTableGrid({
   onCellSelectionChange,
   onSelectedRowIdsChange,
   onSortChange,
-  onUndoRowDeletion,
+  onUndoRowDeletions,
   rows,
   selectedRowIds,
   sortColumn,
   sortDirection,
+  stagedValuesByRowId,
 }: UseTableGridOptions): DataGridTable<DynamicTableRow> {
   const rowSelectionRequestRef = useRef<RowSelectionRequest | null>(null)
   const columnDefs = useMemo(
@@ -73,12 +76,13 @@ export function useTableGrid({
         columns,
         onColumnMenuOpen,
         onColumnMove,
-        onUndoRowDeletion,
+        onUndoRowDeletions,
+        stagedValuesByRowId,
         onRowSelectionRequest: (request) => {
           rowSelectionRequestRef.current = request
         },
       }),
-    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletion],
+    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletions, stagedValuesByRowId],
   )
 
   const rowSelection = useMemo<RowSelectionState>(() => {

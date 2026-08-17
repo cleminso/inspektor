@@ -208,12 +208,13 @@ export const dataGridStyles = stylex.create({
     boxShadow: `inset 0 ${spatial['focus-ring-width']} 0 ${dataGridColors.currentRowBorder}`,
   },
   cell: {
+    [dataGridVars.selectedRowMarker]: '0 0 0 0 transparent',
     [dataGridVars.selectionEdgeTop]: '0 0 0 0 transparent',
     [dataGridVars.selectionEdgeRight]: '0 0 0 0 transparent',
     [dataGridVars.selectionEdgeBottom]: '0 0 0 0 transparent',
     [dataGridVars.selectionEdgeLeft]: '0 0 0 0 transparent',
     backgroundColor: dataGridColors.cellBackground,
-    boxShadow: 'none',
+    boxShadow: `inset ${dataGridVars.selectedRowMarker}, inset ${dataGridVars.selectionEdgeTop}, inset ${dataGridVars.selectionEdgeRight}, inset ${dataGridVars.selectionEdgeBottom}, inset ${dataGridVars.selectionEdgeLeft}`,
     boxSizing: 'border-box',
     fontFamily: fontFamilies.mono,
     borderBottomColor: dataGridColors.cellBorder,
@@ -256,9 +257,11 @@ export const dataGridStyles = stylex.create({
   cellSelected: {
     backgroundColor: dataGridColors.selectedCellBackground,
   },
+  cellSelectedMarker: {
+    [dataGridVars.selectedRowMarker]: `${spatial['focus-ring-width']} 0 0 ${dataGridColors.selectedRowBorder}`,
+  },
   cellSelection: {
     backgroundColor: dataGridColors.emphasizedCellBackground,
-    boxShadow: `inset ${dataGridVars.selectionEdgeTop}, inset ${dataGridVars.selectionEdgeRight}, inset ${dataGridVars.selectionEdgeBottom}, inset ${dataGridVars.selectionEdgeLeft}`,
   },
   cellSelectionEdgeTop: {
     [dataGridVars.selectionEdgeTop]: `0 1px 0 0 ${dataGridColors.emphasizedColumnBorder}`,
@@ -282,6 +285,10 @@ export const dataGridStyles = stylex.create({
   cellActiveSelected: {
     position: 'relative',
     zIndex: 1,
+  },
+  cellDragOrigin: {
+    backgroundColor: dataGridColors.emphasizedHeaderBackground,
+    boxShadow: `inset 0 1px 0 ${dataGridColors.emphasizedColumnBorder}, inset -1px 0 0 ${dataGridColors.emphasizedColumnBorder}, inset 0 -1px 0 ${dataGridColors.emphasizedColumnBorder}, inset 1px 0 0 ${dataGridColors.emphasizedColumnBorder}`,
   },
   resizeHandle: {
     backgroundColor: dataGridColors.resizeHandleBackground,

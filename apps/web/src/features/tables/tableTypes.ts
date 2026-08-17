@@ -35,6 +35,11 @@ export type TablePageSize = 100 | 500 | 1000;
 /** Runtime row IDs are normalized as strings for table state and URLs. */
 export type TableRowId = string;
 
+/** Sparse valid value overlays keyed by runtime row ID and schema field name. */
+export type TableValuesByRowId = Readonly<
+  Record<TableRowId, Readonly<Record<string, unknown>>>
+>;
+
 /** URL-safe table explorer state used to restore navigation and selected rows. */
 export interface TableExplorerSearchState {
   editorMode: DetailPaneMode | null;

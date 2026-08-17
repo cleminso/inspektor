@@ -30,16 +30,17 @@ export function FieldEditorMutationWidget({
   onClose,
   onComplete,
 }: FieldEditorMutationWidgetProps): React.ReactElement {
+  const isStructured = isStructuredColumn(column)
   const [input, setInput] = useState<MutationFieldInput>(() =>
     getMutationFieldInput(controller.state.draft, column),
   )
+  const [editorExpanded, setEditorExpanded] = useState(isStructured)
   const controlElementRef = useRef<HTMLElement | null>(null)
   const setControlElement = useCallback((element: HTMLElement | null) => {
     controlElementRef.current = element
   }, [])
   const error = getMutationFieldError(controller.state.draft, column, input)
   const label = formatColumnNameLabel(column.name)
-  const isStructured = isStructuredColumn(column)
   const complete = (direction: SpreadsheetCompletionDirection): boolean => {
     if (error !== undefined) {
       return false
@@ -97,7 +98,7 @@ export function FieldEditorMutationWidget({
             column={column}
             controlRef={setControlElement}
             error={error}
-            expanded={isStructured}
+            expanded={isStructured === true && editorExpanded === true}
             fieldState={{
               isNull: input.mode === 'null',
               isOmitted: input.mode === 'omitted',
@@ -107,7 +108,7 @@ export function FieldEditorMutationWidget({
             hidden={false}
             idPrefix="field-editor"
             initialValue={controller.state.draft.sourceValues[column.name]}
-            onExpandedChange={() => undefined}
+            onExpandedChange={setEditorExpanded}
             onNullChange={(isNull) => {
               setInput((current) => ({
                 mode: isNull === true ? 'null' : 'value',
@@ -126,11 +127,10 @@ export function FieldEditorMutationWidget({
               }))
             }}
             onTextChange={(text) => {
-              setInput((current) =>
-                current.mode === 'value' ? { ...current, text } : current,
-              )
+              setInput((current) => (current.mode === 'value' ? { ...current, text } : current))
             }}
             readOnlyReason={getFieldReadOnlyReason(column)}
+            structuredEditorLayout="intrinsic"
           />
           <FloatingPanel.Actions>
             <Button

@@ -17,6 +17,7 @@ import {
   Text,
   TextLink,
   ToggleGroup,
+  type CodeEditorLayout,
 } from "@inspector/ds";
 
 import { useInspectorSessionState } from "@app/providers/inspectorProvider";
@@ -51,6 +52,7 @@ interface MutationFieldProps {
   onOmittedChange: (isOmitted: boolean) => void;
   onTextChange: (text: string) => void;
   readOnlyReason: MutationFieldReadOnlyReason;
+  structuredEditorLayout?: CodeEditorLayout;
 }
 
 interface NullInputGroupCheckboxProps {
@@ -171,6 +173,7 @@ export function MutationField({
   onOmittedChange,
   onTextChange,
   readOnlyReason,
+  structuredEditorLayout = "fill",
 }: MutationFieldProps): React.ReactElement {
   const { currentConnectionId } = useInspectorSessionState();
   const label = formatColumnNameLabel(column.name);
@@ -429,7 +432,7 @@ export function MutationField({
                 expanded={expanded}
                 focusOnMount={focusOnMount}
                 invalid={hasFieldError}
-                layout={expanded === true ? "fill" : "intrinsic"}
+                layout={expanded === true ? structuredEditorLayout : "intrinsic"}
                 readOnly={isReadOnly}
                 onExpandedChange={onExpandedChange}
                 value={structuredPresentation?.source ?? fieldState.text}

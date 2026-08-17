@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 export const dataGridVars = stylex.defineVars({
+  selectedRowMarker: '0 0 0 0 transparent',
   selectionEdgeTop: '0 0 0 0 transparent',
   selectionEdgeRight: '0 0 0 0 transparent',
   selectionEdgeBottom: '0 0 0 0 transparent',

@@ -1261,6 +1261,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     activeColumnId === target.columnId
   const isRowActive = activeRowId === target.rowId
   const isSelected = cell.row.getIsSelected()
+  const isFirstVisibleCell = cell.row.getVisibleCells()[0]?.id === cell.id
   const isCellSelected = cell.getIsSelected()
   const selectionEdges = isCellSelected === true ? cell.getSelectionEdges() : undefined
   const isActive = cell.getIsFocused()
@@ -1377,12 +1378,16 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         density === 'compact' && dataGridStyles.compactCellInlinePadding,
         isColumnActive === true && dataGridStyles.cellColumnActive,
         isSelected === true && dataGridStyles.cellSelected,
+        isSelected === true &&
+          rowStatus !== 'stagedDeletion' &&
+          isFirstVisibleCell === true &&
+          dataGridStyles.cellSelectedMarker,
         isCellSelected === true && dataGridStyles.cellSelection,
         selectionEdges?.top === true && dataGridStyles.cellSelectionEdgeTop,
         selectionEdges?.right === true && dataGridStyles.cellSelectionEdgeRight,
         selectionEdges?.bottom === true && dataGridStyles.cellSelectionEdgeBottom,
         selectionEdges?.left === true && dataGridStyles.cellSelectionEdgeLeft,
-        isActive === true && hasMultiCellSelection === true && dataGridStyles.activeTarget,
+        isActive === true && hasMultiCellSelection === true && dataGridStyles.cellDragOrigin,
         isActive === true &&
           (isCellSelected === true
             ? dataGridStyles.cellActiveSelected

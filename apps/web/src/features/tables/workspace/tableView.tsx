@@ -152,7 +152,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
 
 function TableViewStatefulContent({ tableName }: TableViewProps): React.ReactElement {
   const mutations = useTableMutationLedger()
-  const { ledger, removeEntry } = mutations
+  const { ledger, undoDeletions } = mutations
   const stagedDeletionRowIds = useMemo(
     () =>
       new Set(
@@ -160,13 +160,10 @@ function TableViewStatefulContent({ tableName }: TableViewProps): React.ReactEle
       ),
     [ledger.entries],
   )
-  const handleUndoRowDeletion = useCallback(
-    (rowId: TableRowId) => removeEntry(`delete:${rowId}`),
-    [removeEntry],
-  )
   const state = useTableViewState({
     disabledRowIds: stagedDeletionRowIds,
-    onUndoRowDeletion: handleUndoRowDeletion,
+    onUndoRowDeletions: undoDeletions,
+    stagedValuesByRowId: mutations.stagedValuesByRowId,
     tableName,
   })
 

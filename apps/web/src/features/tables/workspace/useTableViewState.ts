@@ -36,7 +36,12 @@ import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchPara
 import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
-import type { TableColumnMeta, TablePageSize, TableRowId } from '@tables/tableTypes'
+import type {
+  TableColumnMeta,
+  TablePageSize,
+  TableRowId,
+  TableValuesByRowId,
+} from '@tables/tableTypes'
 import { getNearestSelectedRowId } from '@tables/grid/rowSelectionFocus'
 import {
   getInlineFieldRoute,
@@ -46,11 +51,13 @@ import {
 
 interface UseTableViewStateOptions {
   disabledRowIds?: ReadonlySet<TableRowId>
-  onUndoRowDeletion?: (rowId: TableRowId) => void
+  onUndoRowDeletions?: (rowIds: readonly TableRowId[]) => void
+  stagedValuesByRowId?: TableValuesByRowId
   tableName: string
 }
 
 const emptyDisabledRowIds: ReadonlySet<TableRowId> = new Set()
+const emptyStagedValuesByRowId: TableValuesByRowId = {}
 
 interface InsertRowSaveOptions {
   keepOpen: boolean
@@ -133,7 +140,8 @@ export function createInsertRowValues(schemaColumns: ColumnDescriptor[]): Record
  */
 export function useTableViewState({
   disabledRowIds = emptyDisabledRowIds,
-  onUndoRowDeletion,
+  onUndoRowDeletions,
+  stagedValuesByRowId = emptyStagedValuesByRowId,
   tableName,
 }: UseTableViewStateOptions): UseTableViewStateResult {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
@@ -349,10 +357,11 @@ export function useTableViewState({
     columns: query.columns,
     sortColumn: searchState.sortColumn,
     sortDirection: searchState.sortDirection,
+    stagedValuesByRowId,
     selectedRowIds: visibleSelectedRowIds,
     columnVisibility: visibility.columnVisibility,
     onSortChange: handleSortChange,
-    onUndoRowDeletion,
+    onUndoRowDeletions,
     onSelectedRowIdsChange: handleSelectedRowIdsChange,
     onColumnVisibilityChange: handleColumnVisibilityChange,
     onCellSelectionChange: setCellSelection,

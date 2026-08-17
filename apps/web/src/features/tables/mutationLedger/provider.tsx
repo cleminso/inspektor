@@ -16,9 +16,7 @@ import { useRegisterRuntimeScopeExitBlocker } from '@app/providers/runtimeScopeE
 import {
   createTableMutationState,
   reduceTableMutationState,
-  selectStagedFieldsByRowId,
-  selectTableMutationLedger,
-  selectTableMutationReview,
+  selectTableMutationProjection,
   type DeletionOperationId,
   type TableMutationEntry,
   type TableMutationLedger,
@@ -27,7 +25,13 @@ import {
   type TableMutationState,
   type TableMutationStateAction,
 } from '@tables/mutationLedger/ledger'
-import { createUpdateRowDraft, type RowMutationDraft } from '@tables/rowEditor/mutation/draft'
+import {
+  createUpdateRowDraft,
+  setMutationFieldInput,
+  type MutationFieldInput,
+  type RowMutationDraft,
+} from '@tables/rowEditor/mutation/draft'
+import type { TableRowId, TableValuesByRowId } from '@tables/tableTypes'
 import {
   useBoundRowDraftController,
   type RowDraftBinding,
@@ -62,7 +66,10 @@ interface TableMutationLedgerContextValue {
 const TableMutationLedgerContext = createContext<TableMutationLedgerContextValue | null>(null)
 const idleExecution: TableMutationExecutionState = { error: null, status: 'idle' }
 
-function reduceProviderState(state: TableMutationState, action: ProviderAction): TableMutationState {
+function reduceProviderState(
+  state: TableMutationState,
+  action: ProviderAction,
+): TableMutationState {
   if (action.type !== 'updateDraft') {
     return reduceTableMutationState(state, action)
   }
@@ -92,10 +99,7 @@ interface TableMutationLedgerWorkspaceContextValue {
   dispatch: (scopeKey: string, action: ProviderAction) => void
   getPendingChangeCount: (scopeKey: string) => number
   hasPendingChanges: (scopeKey: string) => boolean
-  setExecution: (
-    scopeKey: string,
-    update: SetStateAction<TableMutationExecutionState>,
-  ) => void
+  setExecution: (scopeKey: string, update: SetStateAction<TableMutationExecutionState>) => void
 }
 
 const TableMutationLedgerWorkspaceContext =
@@ -168,8 +172,7 @@ export function TableMutationLedgerWorkspaceProvider({
     (scopeKey: string, update: SetStateAction<TableMutationExecutionState>) => {
       setEntriesByScope((current) => {
         const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
-        const execution =
-          typeof update === 'function' ? update(currentEntry.execution) : update
+        const execution = typeof update === 'function' ? update(currentEntry.execution) : update
         return { ...current, [scopeKey]: { ...currentEntry, execution } }
       })
     },
@@ -282,7 +285,9 @@ export interface ScopedTableMutationLedger {
   review: TableMutationReview
   setExecution: Dispatch<SetStateAction<TableMutationExecutionState>>
   stagedFieldsByRowId: Readonly<Record<string, ReadonlySet<string>>>
+  stagedValuesByRowId: TableValuesByRowId
   stagedCount: number
+  undoDeletions: (rowIds: readonly TableRowId[]) => void
   undoDeletionTarget: (operationId: DeletionOperationId, rowId: string) => void
   undoReviewOperation: (operationId: TableMutationReviewOperation['operationId']) => void
 }
@@ -310,23 +315,19 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
   const context = useMutationContext()
   const contextDispatch = context.dispatch
   const setExecution = context.setExecution
-  const ledger = useMemo(
-    () => selectTableMutationLedger(context.state, context.schemaColumns),
+  const projection = useMemo(
+    () => selectTableMutationProjection(context.state, context.schemaColumns),
     [context.schemaColumns, context.state],
   )
-  const review = useMemo(
-    () => selectTableMutationReview(context.state, context.schemaColumns),
-    [context.schemaColumns, context.state],
-  )
-  const selectedStagedFields = useMemo(
-    () => selectStagedFieldsByRowId(context.state, context.schemaColumns),
-    [context.schemaColumns, context.state],
-  )
+  const ledger = projection.ledger
+  const review = projection.review
+  const selectedStagedFields = projection.stagedFieldsByRowId
   const stagedFieldsRef = useRef(selectedStagedFields)
   if (haveEqualStagedFields(stagedFieldsRef.current, selectedStagedFields) === false) {
     stagedFieldsRef.current = selectedStagedFields
   }
   const stagedFieldsByRowId = stagedFieldsRef.current
+  const stagedValuesByRowId = projection.stagedValuesByRowId
   const stagedCount = countUnresolvedMutationState(context.state)
   const dispatch = useCallback(
     (action: PublicMutationAction) => contextDispatch(action),
@@ -358,6 +359,10 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
     (rowId: string) => recover({ type: 'revertRowUpdate', rowId }),
     [recover],
   )
+  const undoDeletions = useCallback(
+    (rowIds: readonly TableRowId[]) => recover({ type: 'undoDeletions', rowIds }),
+    [recover],
+  )
   const undoDeletionTarget = useCallback(
     (operationId: DeletionOperationId, rowId: string) =>
       recover({ type: 'undoDeletionTarget', operationId, rowId }),
@@ -382,7 +387,9 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
       review,
       setExecution,
       stagedFieldsByRowId,
+      stagedValuesByRowId,
       stagedCount,
+      undoDeletions,
       undoDeletionTarget,
       undoReviewOperation,
     }),
@@ -398,6 +405,8 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
       setExecution,
       stagedCount,
       stagedFieldsByRowId,
+      stagedValuesByRowId,
+      undoDeletions,
       undoDeletionTarget,
       undoReviewOperation,
     ],
@@ -410,7 +419,9 @@ interface UseTableMutationEditorControllerOptions {
   schemaColumns: ColumnDescriptor[]
 }
 
-export type TableMutationEditorController = RowDraftController
+export interface TableMutationEditorController extends RowDraftController {
+  commitFieldInput: (columnName: string, input: MutationFieldInput) => void
+}
 
 export function useTableMutationEditorController({
   initialRowValues,
@@ -425,19 +436,28 @@ export function useTableMutationEditorController({
   const setDraft = useCallback<Dispatch<SetStateAction<RowMutationDraft>>>(
     (update) => {
       contextDispatch({ type: 'updateDraft', initialDraft, rowId, schemaColumns, update })
-      setExecution((current) =>
-        current.status === 'failed' ? idleExecution : current,
-      )
+      setExecution((current) => (current.status === 'failed' ? idleExecution : current))
     },
     [contextDispatch, initialDraft, rowId, schemaColumns, setExecution],
   )
   const binding = useMemo<RowDraftBinding>(() => ({ draft, setDraft }), [draft, setDraft])
 
-  // Pane and inline editors bind to the same provider draft instead of synchronizing copies.
-  return useBoundRowDraftController({
+  const controller = useBoundRowDraftController({
     binding,
     initialRowValues,
     mode: 'edit',
     schemaColumns,
   })
+  const commitFieldInput = useCallback(
+    (columnName: string, input: MutationFieldInput) => {
+      const column = schemaColumns.find((candidate) => candidate.name === columnName)
+      if (column === undefined) {
+        return
+      }
+      setDraft((currentDraft) => setMutationFieldInput(currentDraft, column, input))
+    },
+    [schemaColumns, setDraft],
+  )
+
+  return useMemo(() => ({ ...controller, commitFieldInput }), [commitFieldInput, controller])
 }

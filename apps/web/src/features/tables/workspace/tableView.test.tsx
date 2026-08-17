@@ -65,24 +65,33 @@ const tableViewState = vi.hoisted(() => ({
   tableKey: 'connection-1:main:schema-1:accounts',
 }))
 const mutationLedgerDispatch = vi.hoisted(() => vi.fn())
-const mutationLedgerRemoveEntry = vi.hoisted(() => vi.fn())
+const mutationLedgerUndoDeletions = vi.hoisted(() => vi.fn())
 const mutationLedgerRevertField = vi.hoisted(() => vi.fn())
 const mutationLedgerRevertRowUpdate = vi.hoisted(() => vi.fn())
 const stagedFieldsByRowId = vi.hoisted(() => ({
   current: {} as Readonly<Record<string, ReadonlySet<string>>>,
 }))
+const stagedValuesByRowId = vi.hoisted(() => ({
+  current: {} as Readonly<Record<string, Readonly<Record<string, unknown>>>>,
+}))
 const gridContextMenuProps = vi.hoisted(() => ({ current: null as null | Record<string, unknown> }))
 const gridCellContextMenu = vi.hoisted(() => vi.fn())
 const gridRowContextMenu = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
-  current: null as null | { onUndoRowDeletion?: (rowId: string) => void },
+  current: null as null | {
+    onUndoRowDeletions?: (rowIds: readonly string[]) => void
+    stagedValuesByRowId?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
+  },
 }))
 const mutationLedgerEntries = vi.hoisted(
   () => [] as Array<{ entryId: `delete:${string}`; kind: 'delete'; rowId: string }>,
 )
 
 vi.mock('@tables/workspace/useTableViewState', () => ({
-  useTableViewState: (options: { onUndoRowDeletion?: (rowId: string) => void }) => {
+  useTableViewState: (options: {
+    onUndoRowDeletions?: (rowIds: readonly string[]) => void
+    stagedValuesByRowId?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
+  }) => {
     useTableViewStateOptions.current = options
     return tableViewState
   },
@@ -110,10 +119,11 @@ vi.mock('@tables/mutationLedger/provider', () => ({
   useTableMutationLedger: () => ({
     dispatch: mutationLedgerDispatch,
     ledger: { entries: mutationLedgerEntries, hasInvalidDraft: false },
-    removeEntry: mutationLedgerRemoveEntry,
+    undoDeletions: mutationLedgerUndoDeletions,
     revertField: mutationLedgerRevertField,
     revertRowUpdate: mutationLedgerRevertRowUpdate,
     stagedFieldsByRowId: stagedFieldsByRowId.current,
+    stagedValuesByRowId: stagedValuesByRowId.current,
   }),
   useTableMutationEditorController: () => ({
     actions: {},
@@ -350,6 +360,7 @@ afterEach(() => {
   tableViewState.tableColumns = []
   mutationLedgerEntries.length = 0
   stagedFieldsByRowId.current = {}
+  stagedValuesByRowId.current = {}
   gridContextMenuProps.current = null
   useTableViewStateOptions.current = null
 })
@@ -390,6 +401,7 @@ describe('TableView query status', () => {
 
   it('projects only applicable staged data fields into grid cell status', () => {
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
+    stagedValuesByRowId.current = { 'row-1': { name: 'Grace' } }
 
     render(<TableView tableName="accounts" />)
 
@@ -436,13 +448,13 @@ describe('TableView query status', () => {
     })
   })
 
-  it('removes a staged deletion through the row selection control', () => {
+  it('undoes staged deletions through the row selection control', () => {
     mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
 
     render(<TableView tableName="accounts" />)
-    useTableViewStateOptions.current?.onUndoRowDeletion?.('row-1')
+    useTableViewStateOptions.current?.onUndoRowDeletions?.(['row-1'])
 
-    expect(mutationLedgerRemoveEntry).toHaveBeenCalledWith('delete:row-1')
+    expect(mutationLedgerUndoDeletions).toHaveBeenCalledWith(['row-1'])
   })
 
   it('wires the active scalar target to the explicit Floating field editor', () => {

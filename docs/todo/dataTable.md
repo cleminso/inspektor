@@ -16,6 +16,35 @@
 
 [17/08/26]
 
+- [x] Place the CodeEditor cursor at the end of its seeded value when mount focus is requested.
+
+[17/08/26]
+
+- [x] Render structured FloatingWidget editors with intrinsic height instead of the constrained-pane fill layout.
+- [x] Keep the FloatingWidget code editor's expand and collapse state local to the field editor.
+
+[17/08/26]
+
+- [x] Keep FloatingWidget editing scoped to one local field input instead of cloning and validating a complete row draft on each keystroke.
+- [x] Derive ledger, review, staged-field, and staged-value views through one memoized mutation projection.
+
+[17/08/26]
+
+- [x] Keep FloatingWidget field edits local until Save commits the field into the table mutation ledger.
+- [x] Preserve an existing staged field value when a reopened editor closes without saving.
+
+[17/08/26]
+
+- [x] Project valid staged field values into their grid cells while retaining query rows as the mutation source baseline.
+- [x] Keep decoded structured values available to grid presentation while preserving Jazz-specific encoding at the persistence boundary.
+
+[17/08/26]
+
+- [x] Remove the persistent active-cell outline from the drag origin when a multi-cell range is selected.
+- [x] Keep the range perimeter and keyboard-only focus-visible treatment independent from the origin cell.
+
+[17/08/26]
+
 - [x] Share one contained focus-ring treatment between header and body cells.
 - [x] Keep an ordinary focused cell on the light cell treatment and use the strong header treatment for multi-cell focus.
 - [x] Keep range-selection edges on their independent inset-shadow paint layer.
@@ -183,6 +212,10 @@
 
 ## Open product work
 
+[17/08/26]
+
+- [ ] Open the Calendar immediately when a timestamp field enters the floating editor, without changing staged or persisted value boundaries.
+
 [11/08/26]
 
 - [x] Stop `Menu.Trigger` presentation styles from overriding the Button-owned border, surface, radius, and height on column-header menu actions.
@@ -191,7 +224,7 @@
 [11/0826]
 
 - [ ] List all wrong interactions with the grid, row select when opening rowEditor
-- [ ] Think about cell reactivity UI feedback when value changes.
+- [x] Think about cell reactivity UI feedback when value changes.
 - [ ] Investigate how to improve grid cell selection border.
 - [ ] During Column resizing, should the column cell moves as well, or simply keep header? Change the current behavior to adopt spreadheet like column border moves?
 - [ ] Add actions "Hide other columns" and "Show all columns" from context menu.
@@ -212,6 +245,24 @@
 - [ ] Do not add a selected-range perimeter until product design requires it.
 
 ## Settled implementation decisions
+
+[17/08/26]
+
+- [x] Reserve fill-layout code editors for height-constrained surfaces and use intrinsic layout in floating surfaces.
+
+[17/08/26]
+
+- [x] Validate only the active FloatingWidget field during editing and defer row-wide mutation projection until the field is saved.
+
+[17/08/26]
+
+- [x] Treat Save as the field-to-ledger boundary and Apply as the ledger-to-Jazz persistence boundary.
+- [x] Make Close and Escape discard only the FloatingWidget's uncommitted field edit.
+
+[17/08/26]
+
+- [x] Show valid staged values in grid cells and keep the staged-update treatment until Apply persists them.
+- [x] Keep invalid editor input out of grid value projection while retaining it in the mutation draft for correction.
 
 [10/08/26]
 
@@ -260,6 +311,21 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[17/08/26]
+
+- [x] Verify field-scoped validation ignores invalid sibling input while preserving Save-only staging behavior.
+- [x] Verify one mutation projection produces consistent Apply, review, staged-status, and grid-value views.
+
+[17/08/26]
+
+- [x] Verify typing does not change the ledger or projected grid value before Save.
+- [x] Verify Save stages the edited field and Close or Escape preserves any previously staged value.
+
+[17/08/26]
+
+- [x] Verify primitive, timestamp, null, and structured staged values use the existing schema-aware cell presentations.
+- [x] Verify clearing staged value overlays restores query-owned grid values.
 
 [11/08/26]
 
