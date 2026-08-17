@@ -45,6 +45,7 @@ The Inspector remains schema-driven. Selection behavior is generic and does not 
 - **Cell selection**: ordered rectangular include and exclude operations resolved against the displayed rows and columns.
 - **Pane target**: the checked row represented in the side pane.
 - **Row draft**: the latest live source row plus dirty field overlays, raw input, parsed values, and validation state.
+- **Review operation**: one user-intent summary used for staged review, distinct from the row-level entries sent to Apply.
 - **Query position**: a row's position in the active filtered and sorted result, not a stable row identity.
 
 ## Behavior model
@@ -236,8 +237,8 @@ Pane and inline editors consume the same per-row mutation model:
 
 - The source row captured when editing starts is stored separately from sparse field overlays.
 - Returning a field to that source value removes the field from the dirty set.
-- Removing a staged update from affected-row review resets the corresponding provider-owned row draft, including mounted pane
-  fields, to the captured source.
+- Reverting one staged cell removes only that field overlay. Reverting a row update or undoing its review operation resets the
+  corresponding provider-owned row draft, including mounted pane fields, to the captured source.
 - Invalid input retains its raw form and validation error but cannot enter a mutation patch.
 - Apply sends valid sparse fields only rather than reconstructing the complete row.
 - Mutation failure preserves the draft.
@@ -248,12 +249,26 @@ closes without persistence, and `Insert more` resets and keeps the form open aft
 enter the pending ledger.
 
 Provider-owned edit drafts survive movement between fields and pane dismissal within one mounted table view. Several rows can retain
-isolated staged updates and deletions. Review remains available while the pane is open. Delete requires confirmation before selected
-rows enter the staged state. `Apply changes` is the persistence boundary for staged updates and deletions; complete-row inserts
-persist directly from the insert pane. A successful Apply clears selection, closes the pane, and removes the widget.
+isolated staged updates and deletions. Review remains available while the pane is open. The row pane shows `Delete row` for one
+checked row and `Delete N checked rows` for multiple checked rows as a full-width footer action. Activating it replaces the action
+with a 75/25 `Confirm delete` and `Cancel` row. Confirmation snapshots that checked scope, stages the deletions, closes the pane,
+and unchecks the affected rows. The pane's `Close` action remains at the right side of its header. `Apply changes` is the persistence
+boundary for staged updates and deletions; complete-row inserts persist directly from the insert pane. A successful Apply clears
+selection, closes the pane, and removes the widget.
 
-Affected-row review presents each mutation kind as an accordion trigger. Every expanded operation section contains a semantic list
-with its own scroll area, while the staged summary and Apply controls remain fixed below the review.
+Rows staged for deletion remain visible with a danger-tinted, struck-through grid treatment until Apply. Their selection checkbox
+becomes an `Undo deletion` icon action, so they cannot be selected into the row pane again. Their cells cannot open inline editors or
+receive active-column emphasis. Undoing the deletion restores the checkbox, returns focus to it, and restores normal row interaction.
+
+Valid staged-update fields receive a warm amber cell treatment without changing the complete row background or replacing its
+selection checkbox. The staged marker survives selection and focus presentation. A staged cell context menu exposes `Revert this
+change`; the same grid context menu exposes row-scoped `Revert staged changes` whenever that row contains an update. Staged
+deletion takes precedence over staged-update presentation.
+
+Review presents each mutation kind as an accordion trigger and renders plain-language operation summaries rather than an exhaustive
+affected-row inventory. Every expanded operation section contains a semantic list with its own scroll area, while the staged summary
+and Apply controls remain fixed below the review. Lists fit up to ten operation rows and scroll beyond that boundary. Each operation
+can be undone from review; lists above 100 operations are virtualized; `Discard` clears the complete table ledger.
 
 ## Column selection and bulk editing
 

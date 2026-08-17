@@ -4,6 +4,7 @@ export const dataGridRootPropNames = [
   'activeRowId',
   'activeColumnId',
   'focusRequest',
+  'getRowStatus',
   'onRowActivate',
   'onColumnActivate',
   'onCellActivate',

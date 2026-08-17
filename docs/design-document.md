@@ -16,6 +16,7 @@ the product direction.
 - [Non-goals](#non-goals)
 - [Architecture Diagram](#architecture-diagram)
 - [Glossary](#glossary)
+  - [Staged mutation lifecycle](#staged-mutation-lifecycle)
 - [Known pain points](#known-pain-points)
 - [Inspector](#inspector)
 - [User interface](#user-interface)
@@ -263,14 +264,28 @@ field validation. A staged change can be reviewed, removed, discarded, or persis
 
 **Mutation ledger**
 
-The in-memory, table-scoped collection of staged updates and deletions. Each table has an isolated ledger. The
-Inspector never combines changes from different tables into one Apply operation, and refreshing the page discards the ledgers.
+The in-memory, table-scoped collection of staged updates and deletions. Each table has an isolated ledger identified by its
+connection, branch, schema hash, and table name. The Inspector never combines changes from different tables into one Apply
+operation.
+
+### Staged mutation lifecycle
+
+1. Switching rows, filters, pages, representations, tables, or workspace tabs preserves each table's staged changes.
+2. Returning to a table restores its staged updates, deletions, recoverable invalid drafts, and failed Apply state.
+3. A successful `Apply changes` or explicit `Discard` clears that table's mutation ledger.
+4. Closing the final workspace tab representing a table with unresolved mutations opens an Alert Dialog. `Keep editing` cancels the
+   close; `Discard and close` clears that table's ledger and closes the tab. Closing a tab never silently discards staged changes.
+5. Changing the connection, branch, or schema requires the developer to resolve affected ledgers because their mutation scope is
+   no longer valid. Confirming discard clears them; canceling keeps the current scope active.
+6. Refreshing or closing the browser destroys the in-memory ledgers. The Inspector requests the browser's unload warning when
+   unresolved mutations or recoverable invalid drafts exist; the browser controls whether it appears and all displayed copy.
 
 **Floating widget**
 
-The table-owned controller for mutation actions and status. It changes presentation for field editing, validation, multi-row
-actions, review, Apply, Discard, and mutation failures. A centered application-dock trigger remains visible while the panel is
-expanded or collapsed and communicates whether the table has staged changes or input that needs attention.
+The table-owned projection of staged mutation state. It presents validation, review, Apply, Discard, and mutation failures. A
+centered application-dock trigger remains visible while the panel is expanded or collapsed, shows the staged count in leading
+position, and communicates whether the table has staged changes or input that needs attention. Contextual deletion initiation and
+confirmation remain in the complete-row pane.
 
 **Apply presentation**
 
@@ -771,14 +786,15 @@ ranges without deleting their operation state. Loading more rows preserves exist
 query-scope resets define the selection lifecycle.
 
 Pane dismissal and mutation discard are distinct. Escape dismisses the pane and unchecks its active row while preserving other
-checked rows and pending changes. Removing one staged update also resets its provider-owned row form to captured source values. `Discard`
-belongs to the Floating widget and removes pending changes from the current
+checked rows and pending changes. Reverting one staged cell removes that field overlay; reverting a row update resets its
+provider-owned row form to captured source values. `Discard` belongs to the Floating widget and removes pending changes from the current
 table ledger. Numeric row and column coordinates can support developer orientation, but row IDs and column IDs remain the
 selection identity.
 
-The Floating widget owns draft orchestration, validation, mutation review, Apply, Discard, deletion review, and
-mutation failures. The pane and grid are editing projections of that controller. Several rows and columns in one table can
-accumulate pending changes. Changing the mounted table identity resets its table-local in-memory state.
+The table mutation provider owns draft orchestration and validation. The complete-row pane owns contextual deletion initiation and
+confirmation. The Floating widget projects mutation review, Apply, Discard, deletion review, and mutation failures. The pane and
+grid are editing projections of the provider state. Several rows and columns in one table can accumulate pending changes. Changing
+the mounted table identity resets its table-local in-memory state.
 
 A focused cell receives the selected-cell background and blue focus border without changing its whole row background. A checked
 row uses the selected-row background without an additional row border. The focused checked row adds a distinct blue focus edge.
@@ -1040,10 +1056,10 @@ Pane and inline controls consume one application-owned mutation model. It separa
 overlays, preserves pending values across live updates, reflects live values for untouched fields, and applies sparse dirty-field
 patches rather than reconstructed rows. Insert input distinguishes omitted, explicit NULL, valid, and invalid field states.
 
-Valid updates and selected-row deletions accumulate in isolated table-scoped ledgers. Pane dismissal, query changes, and switching
-tables preserve those ledgers. The Floating widget exposes `Review changes`, `Apply changes`, and `Discard`; the update form has no persistence action, while
-the insert form persists complete rows directly. Leaving the connection, branch, schema, or Tables route remains blocked while unresolved mutations
-or recoverable invalid input exists.
+Valid updates and selected-row deletions accumulate in isolated table-scoped ledgers. Pane dismissal, query changes, and workspace
+navigation preserve those ledgers according to the staged mutation lifecycle. The Floating widget exposes `Review changes`,
+`Apply changes`, and `Discard`; the update form has no persistence action, while the insert form persists complete rows directly.
+Leaving the active mutation scope requires the developer to resolve unresolved mutations or recoverable invalid input.
 
 #### Schema context inside the explorer
 
@@ -1168,8 +1184,10 @@ Update and deletion mutations share one persistence boundary:
 There is no user-facing stage action and no mutation-specific persistence shortcut. `Apply changes` persists a deletion-only ledger and a
 mixed ledger through the same flow.
 
-Updates and deletions are accordion triggers in affected-row review. Each expanded section owns an independently scrollable list.
-Removing an update from that list also resets any mounted form projection for the same row.
+Updates and deletions are accordion triggers in operation review. Each expanded section owns an independently scrollable list whose
+trigger remains fixed. Review uses plain-language operation summaries, distinguishes operation count from affected-row count, and
+does not enumerate every bulk target. Operation undo resets the corresponding form projection. Visible staged-update cells use a
+dedicated warm amber pending-change treatment and expose cell- and row-scoped revert commands through grid context menus.
 
 Apply uses direct Jazz writes in deterministic update, then deletion groups. The client clears staged state only when every request
 succeeds. A rejection preserves the complete client-side state and displays the error without implying rollback or atomicity.
@@ -1208,14 +1226,17 @@ ledger until corrected.
 Delete uses the same staged ledger and Apply boundary as update:
 
 1. The developer selects rows.
-2. The developer chooses Delete.
+2. The row pane presents `Delete row` for one checked row or `Delete N checked rows` for a multi-row selection.
 3. The developer confirms the destructive selection, which stages the deletions without writing to Jazz.
-4. The Floating widget presents the deletion in the final Apply presentation, stacked with any staged updates.
-5. `Apply changes` persists the complete current-table ledger.
+4. Confirmation closes the pane and unchecks the affected rows.
+5. The grid marks each staged-deletion row, replaces its selection checkbox with `Undo deletion`, and prevents inline updates to it.
+6. The row is excluded from active-column emphasis and cannot reopen in the row pane.
+7. The Floating widget presents the deletion in the final Apply presentation, stacked with any staged updates.
+8. `Apply changes` persists the complete current-table ledger.
 
-The widget snapshots the selected rows for confirmation before staging them. This confirmation does not persist data. Before
-Apply changes, a deletion is reversible by removing it from staged changes or discarding the ledger. Permission hints remain
-advisory, and a server rejection keeps the unresolved operation visible.
+The row pane snapshots the checked rows for confirmation before staging them. This confirmation does not persist data. Before
+Apply changes, a deletion is reversible by removing it from staged changes or by discarding the ledger.
+Permission hints remain advisory, and a server rejection keeps the unresolved operation visible.
 
 Undo can call `db.restore(...)` for the deleted row. Full deleted-row browsing with `includeDeleted()` is out of scope for v1.
 
@@ -1617,13 +1638,13 @@ UI representation:
 
 These scenarios define the Floating widget states and transitions:
 
-1. **Row selected:** Checking a row opens its complete-row pane and exposes row actions in the Floating widget.
+1. **Row selected:** Checking a row opens its complete-row pane and exposes its contextual row actions.
 2. **Pane edit:** Every valid pane field becomes a staged update automatically without field or form confirmation. Escape closes the pane and unchecks its active row while preserving staged changes.
 3. **Scalar cell edit:** With the complete-row pane closed, double-clicking a supported cell or pressing Enter opens its schema-aware editor in the Floating widget without checking the row. Save stages a valid edit and returns focus according to spreadsheet navigation.
 4. **Validation feedback:** Malformed input receives immediate colocated feedback, remains available for correction, and does not enter staged changes.
 5. **Structured cell edit:** JSON, Array, and Row values use an expanded code editor with access to the complete-row pane for more context.
-6. **Review:** The Apply presentation groups staged operations into independently scrollable update and deletion accordion sections above the persistent bottom summary and remains available while the row pane is open. Removing an update resets its form projection.
-7. **Delete rows:** Selecting rows and choosing Delete opens confirmation. Confirm Delete stages the selected deletions; Apply changes is the only persistence boundary, whether deletion is the only operation or part of a mixed ledger.
+6. **Review:** The Apply presentation groups plain-language staged operations into independently scrollable update and deletion accordion sections above the persistent bottom summary and remains available while the row pane is open. Operation undo resets its form projection; grid context menus expose cell- and row-scoped update recovery.
+7. **Delete rows:** The complete-row pane labels its action `Delete row` for one checked row or `Delete N checked rows` for several. Confirm Delete stages the checked deletions, closes the pane, and unchecks those rows. Apply changes is the only persistence boundary, whether deletion is the only operation or part of a mixed ledger.
 8. **Collapse and restore:** The centered dock trigger remains visible while the Floating widget is expanded or collapsed. Staged changes and invalid editor input survive collapse and are distinguishable when restored. Expanded disclosure points up and collapsed disclosure points right.
 9. **Insert row:** Insert opens the schema-driven pane. `Insert` persists directly, `Discard` closes without persistence, and `Insert more` resets and retains the pane after success.
 10. **Apply success:** Applying all staged changes clears row selection, closes the row pane, and removes the widget. Failures remain visible for retry.

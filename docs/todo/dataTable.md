@@ -14,6 +14,12 @@
 
 ## Implemented foundation
 
+[17/08/26]
+
+- [x] Share one contained focus-ring treatment between header and body cells.
+- [x] Keep an ordinary focused cell on the light cell treatment and use the strong header treatment for multi-cell focus.
+- [x] Keep range-selection edges on their independent inset-shadow paint layer.
+
 [13/08/26]
 
 - [x] Prevent horizontal and vertical overscroll from escaping the Data Grid viewport into browser navigation or ancestor scrolling.

@@ -45,6 +45,8 @@ The visual states have distinct meanings:
 - **Active cell:** the anchor of the latest TanStack range operation. An exclusion anchor can be active without being selected.
 - **Selected row:** a row selected through TanStack row-selection state.
 - **Active row:** the current row-level product target.
+- **Staged-update cell:** a cell whose valid sparse field overlay will be included in Apply.
+- **Staged-deletion row:** a complete row whose deletion will be included in Apply.
 - **Resize target:** the column boundary under resize hover, keyboard focus, or active resizing.
 - **Drag source:** the column represented by the source cells and detached drag overlay.
 
@@ -127,7 +129,7 @@ Each channel communicates one kind of information.
 | Channel           | Meaning                      | Examples                                    |
 | ----------------- | ---------------------------- | ------------------------------------------- |
 | Structural border | Table geometry               | Header and body gridlines                   |
-| Background        | Membership or scope          | Active column, selected row, selected cells |
+| Background        | Membership, scope, or staged intent | Active column, selected row, selected cells, staged updates |
 | State ring        | Current product target       | Active header and cell                      |
 | Focus outline     | Current keyboard target      | Focused header or cell                      |
 | Emphasized edge   | Direct boundary manipulation | Resize hover and resizing                   |
@@ -147,8 +149,10 @@ States should combine across channels instead of overriding unrelated properties
 | Active-column cell   | Subtle column fill  | Neutral                                        | None                             | When focused               |
 | Selected-row cell    | Selected-row fill   | Neutral                                        | None                             | When focused               |
 | Selected cell        | Selected-cell fill  | Neutral                                        | None                             | When focused               |
+| Staged-update cell   | Warm amber pending fill | Neutral                                     | Non-layout-shifting staged marker | Preserve cell focus       |
 | Active cell          | Active-cell fill    | Owned bottom and inline-end colors transparent | Complete seam-aligned ring       | Two pixels when focused    |
 | Active row           | Row-level emphasis  | Neutral                                        | No cell rings by default         | Per focused cell           |
+| Staged-deletion row  | Danger row fill     | Preserve geometry                              | Danger leading marker            | Per focused Undo action    |
 
 The active cell may visually subsume selected-cell, selected-row, and active-column backgrounds. It must not remove structural gridlines or keyboard focus.
 
@@ -156,11 +160,17 @@ The active cell may visually subsume selected-cell, selected-row, and active-col
 
 Background precedence is:
 
-1. Active cell.
-2. Selected cell.
-3. Selected row.
-4. Active column.
-5. Default surface.
+1. Staged deletion for the complete row.
+2. Active cell.
+3. Selected cell.
+4. Staged-update cell.
+5. Selected row.
+6. Active column.
+7. Default surface.
+
+The staged-update marker is independent from background precedence and remains visible when active or
+selected presentation replaces the warm pending fill. A row cannot render staged-update and
+staged-deletion presentation simultaneously.
 
 Stroke precedence is:
 
@@ -268,6 +278,8 @@ The token model should distinguish:
 - Selected-row surface.
 - Selected-cell surface.
 - Active-cell surface.
+- `stagedChangeColors` background and marker roles linked through staged-update cell roles.
+- Staged-deletion row surface and marker.
 - Active-column edge.
 - Active-cell ring.
 - Keyboard-focus ring.
@@ -282,6 +294,7 @@ Line widths remain constrained semantic or value tokens. Interactive states must
 - Keyboard focus is visible independently from selection and active state.
 - Focus and active strokes maintain sufficient contrast against their immediate backgrounds.
 - Critical distinctions do not rely on color alone.
+- Staged updates use review and context-menu semantics in addition to their warm color treatment.
 - Forced-colors presentation retains focus and active state through borders or outlines because box shadows can be removed.
 - The resize button needs a visible focus state and a keyboard resizing contract before it is considered fully keyboard operable.
 - Native table semantics remain unless the component implements the complete keyboard and ARIA contract of an interactive grid.

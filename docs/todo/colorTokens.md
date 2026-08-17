@@ -23,6 +23,11 @@
 
 ## Open product work
 
+### [17/08/26] Staged mutation presentation
+
+- [ ] Add `stagedChangeColors` with warm amber background and marker roles without reusing success or warning meaning.
+- [ ] Verify the staged-update role against selection, focus, hover, staged deletion, forced colors, and both color schemes.
+
 ### [11/08/26] Theme editing
 
 - [ ] Decide whether Inspector should expose component tokens for product-level theme customization.

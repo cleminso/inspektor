@@ -12,6 +12,14 @@
 
 ## Implemented foundation
 
+[15/08/26]
+
+- [x] Keep expanded ghost Button text neutral by default so consumers opt into accent text only when the product meaning requires it.
+
+[15/08/26]
+
+- [x] Use accent text for expanded ghost Buttons so open triggers match Combobox and Context Switcher open-state text.
+
 [11/08/26]
 
 - [x] Clarify that CopyButton size controls its button frame while Button owns glyph sizing.

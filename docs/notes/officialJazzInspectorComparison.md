@@ -113,7 +113,9 @@ inline surfaces share provider-owned drafts and do not require a transition deci
 - Valid pane fields automatically become table-scoped staged changes without persisting immediately.
 - The pane has no per-row persistence action; `Apply changes` persists the normalized table ledger.
 - Escape closes the pane and unchecks its active row while preserving other checked rows, valid staged fields, and recoverable invalid input.
-- Delete adds selected row identities to the same staged ledger and uses the same `Review changes` and `Apply changes` flow.
+- The pane shows `Delete row` for one checked row and `Delete N checked rows` for several checked rows.
+- Confirm Delete stages the checked deletions, closes the pane, and unchecks the affected rows before the shared `Review changes`
+  and `Apply changes` flow.
 
 ## Inline editing
 

@@ -19,6 +19,58 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[17/08/26]
+
+- [x] Keep tab close-policy commands referentially stable while scoped draft state changes.
+- [x] Preserve staged changes without confirmation when another view of the same table remains open.
+
+[17/08/26]
+
+- [x] Show the visible-column toolbar trigger with the shared pressed-button treatment while any grid column is hidden.
+
+[16/08/26]
+
+- [x] Replace a staged-deletion row's checkbox with an `Undo2` icon action and `Undo deletion` tooltip.
+- [x] Restore focus to the row checkbox after undoing from the grid.
+- [x] Exclude staged-deletion cells from cell selection and active-column emphasis so their danger treatment remains visible.
+
+[16/08/26]
+
+- [x] Supersede the recoverable staged-deletion pane with disabled row selection.
+- [x] Disable each staged-deletion row's checkbox through TanStack row-selection eligibility.
+- [x] Keep staged-deletion rows visible with the semantic danger treatment until Apply, removal, or discard.
+
+[16/08/26]
+
+- [x] Replace editors with a recoverable deletion state when a staged-deletion row is reopened.
+- [x] Prevent staged-deletion rows from accepting pane or inline updates until deletion is undone.
+- [x] Mark staged-deletion grid rows with a semantic danger treatment.
+
+[15/08/26]
+
+- [x] Keep one contextual deletion action in the complete-row pane: `Delete row` for one checked row and `Delete N checked rows`
+  for several checked rows.
+- [x] Confirm deletion in the pane, then close it and uncheck the affected rows after staging.
+
+[15/08/26]
+
+- [x] Prevent the flexible summary text column from stretching the content-sized Review changes trigger.
+
+[15/08/26]
+
+- [x] Keep Review changes neutral and content-sized while limiting accent open-state text to the dock trigger.
+
+[15/08/26]
+
+- [x] Keep the Review changes trigger content-sized while retaining the shared expanded-trigger treatment.
+- [x] Explicitly render semantic affected-row list items as flex rows so their remove action stays on the same line.
+
+[15/08/26]
+
+- [x] Align affected-row review entries with their accordion triggers and keep row details in one flexible inline group.
+- [x] Let the affected-row review fit short content while bounding and scrolling longer reviews.
+- [x] Align the Review changes summary trigger label to the start of its available row.
+
 [12/08/26]
 
 - [x] Show the active row's one-based page position and the selected data column's one-based visible position in the edit-pane title.
@@ -905,6 +957,15 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] The application dock icon is the only table-list visibility toggle: the first activation opens the dock and the next activation closes it.
 
 ## Open design decisions
+
+[17/08/26]
+
+- [x] Supersede direct review resizing with fixed operation triggers and independently bounded ten-row operation lists.
+- [x] Supersede exhaustive affected-row review with operation summaries, operation Undo, and grid-scoped cell and row recovery.
+
+[15/08/26]
+
+- [ ] Decide whether the bounded affected-row review also needs direct vertical resizing.
 
 [23/07/26]
 

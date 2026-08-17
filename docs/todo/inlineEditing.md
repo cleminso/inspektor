@@ -12,6 +12,40 @@
 
 ## Implemented foundation
 
+[17/08/26]
+
+### Operation review and grid recovery implementation
+
+- [x] Preserve confirmed deletion batches as review operations while deriving deterministic row deletions for Apply.
+- [x] Expose field, row, deletion-target, operation, and complete-ledger recovery scopes.
+- [x] Project applicable staged fields into Data Grid cells with deletion precedence.
+- [x] Connect semantic grid targets to one shared context menu with focus restoration.
+- [x] Render plain-language operation summaries with operation and affected-row counts.
+- [x] Keep review controls fixed while bounding independently scrolling operation lists.
+- [x] Preserve invalid raw input and clear stale Apply failures after recovery.
+
+[17/08/26]
+
+- [x] Show the staged mutation count in the leading position of the Floating widget trigger.
+- [x] Replace final-table-tab warning feedback with an Alert Dialog that offers `Keep editing` and `Discard and close`.
+- [x] Clear the affected table ledger before completing a confirmed destructive tab close.
+
+[17/08/26]
+
+- [x] Move mutation ownership above the active table route into an in-memory workspace registry keyed by complete table scope.
+- [x] Restore staged updates, deletions, invalid drafts, and Apply execution state when a table view remounts.
+- [x] Register unresolved table ledgers with runtime-scope exit protection and the browser unload warning.
+- [x] Keep a table's final workspace tab open until its ledger is applied or discarded.
+
+[15/08/26]
+
+### Stable row-pane deletion
+
+- [x] Keep contextual deletion initiation and confirmation in the complete-row pane rather than the Floating widget.
+- [x] Label one checked target `Delete row` and multiple checked targets `Delete N checked rows`.
+- [x] Snapshot checked rows for confirmation, stage delete-over-update normalization, close the pane, and uncheck affected rows.
+- [x] Keep the Floating widget focused on staged review, Discard, Apply changes, and execution status.
+
 [15/08/26]
 
 ### Widget disclosure and Escape dismissal
@@ -218,6 +252,19 @@ This block supersedes the earlier pending-copy, immediate-delete, and review-sup
 
 ## Open product work
 
+[17/08/26]
+
+### Operation review and grid recovery
+
+- [ ] Complete the approved [Floating mutation widget implementation plan](../specs/floatingMutationWidget/tasks.md).
+- [ ] Replace affected-row and field-count review rows with plain-language operation summaries.
+- [ ] Preserve confirmed deletion batches as review operations while deriving row deletions for Apply.
+- [ ] Highlight valid staged-update cells with a dedicated warm amber pending-change treatment.
+- [ ] Add `Revert this change` and row-scoped `Revert staged changes` to the shared grid context menu.
+- [ ] Keep operation-level Undo in review and complete-ledger Discard in the Floating widget.
+- [ ] Keep accordion triggers fixed, fit up to ten operation rows, and scroll only each expanded operation list beyond that boundary.
+- [ ] Add bounded incremental or virtual rendering for large operation lists without virtualizing the accordion structure.
+
 [14/08/26]
 
 The older blocks below record the superseded single-row draft design and are retained as implementation history. They are not
@@ -298,6 +345,29 @@ mutation widget specification.
 
 ## Settled interaction decisions
 
+[17/08/26]
+
+- [x] Treat staged deletion as a complete-row state and staged update as a sparse cell state.
+- [x] Preserve the row checkbox for staged updates; only staged deletion replaces it with an Undo action.
+- [x] Use a dedicated warm amber staged-update role rather than success or warning semantics.
+- [x] Keep individual cell and row recovery in grid context menus while retaining operation Undo and complete-ledger Discard.
+- [x] Describe structured-value updates by row and column identity without serializing JSON or claiming an undefined path diff.
+- [x] Keep `Apply changes` as the only staged-update and staged-deletion persistence boundary.
+
+[17/08/26]
+
+- [x] Preserve staged changes across table and workspace-tab navigation without displaying a notification.
+- [x] Confirm final-table-tab data loss with an Alert Dialog rather than a toast or browser unload prompt.
+- [x] Keep refresh and browser-close protection on `beforeunload`; the browser owns prompt availability and copy.
+
+[17/08/26]
+
+- [x] Treat staged mutations as table-scoped workspace state keyed by connection, branch, schema hash, and table name.
+- [x] Preserve staged updates, deletions, invalid drafts, and Apply failures across table and workspace-tab navigation.
+- [x] Clear a table ledger only through successful Apply or explicit Discard before runtime-scope exit.
+- [x] Prevent closing a table's final workspace tab from silently discarding unresolved mutation state.
+- [x] Keep ledgers in memory only and warn before browser unload while unresolved state exists.
+
 [15/08/26]
 
 - [x] Complete-row inserts persist directly and do not enter the table mutation ledger.
@@ -328,11 +398,15 @@ mutation widget specification.
 
 ## Open design decisions
 
+[17/08/26]
+
+- [x] Supersede the pending-cell presentation question with a warm amber staged-cell treatment that remains distinct from selection and focus.
+- [x] Supersede row-level Save and Cancel placement with grid context-menu recovery and the table-ledger Apply boundary.
+
 [14/08/26]
 
 The older completion, row-level persistence, and dirty-transition questions below are settled by the table-ledger model. Remaining
-product decisions concern timestamp interaction, pending-cell presentation, hidden pending columns, pagination presentation, and
-the final workspace-item close policy.
+product decisions concern timestamp interaction, pending-cell presentation, hidden pending columns, and pagination presentation.
 
 [28/07/26]
 
