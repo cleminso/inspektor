@@ -5,10 +5,19 @@
  * parsing here makes URL filters, relation links, and manual filters resolve through the
  * same schema-driven rules before they reach `GenericQueryBuilder`.
  */
-import type { ColumnDescriptor, ColumnType } from "jazz-tools";
+import {
+  getSupportedWhereOperatorsForColumn,
+  getSupportedWhereOperatorsForSchemaColumn,
+  type ColumnDescriptor,
+  type ColumnType,
+  type WasmSchema,
+} from "jazz-tools";
 
-import { getSupportedWhereOperatorsForColumn } from "@tables/filters/whereOperators";
-import type { TableFilterClause, TableFilterOperator } from "@tables/filters/tableFilters";
+import {
+  tableFilterOperators,
+  type TableFilterClause,
+  type TableFilterOperator,
+} from "@tables/filters/tableFilters";
 import { parseBooleanValue } from "@tables/valueParsing";
 
 /** Supports Bytea filters with a simple comma-separated byte format in generic forms. */
@@ -147,11 +156,13 @@ export function parseFiltersFromSearchParam(value: string | null): TableFilterCl
       }
 
       const candidate = item as TableFilterClause;
-      return (
+      const isValid =
         typeof candidate.id === "string" &&
         typeof candidate.column === "string" &&
-        typeof candidate.operator === "string"
-      );
+        typeof candidate.operator === "string" &&
+        tableFilterOperators.some((operator) => operator === candidate.operator) &&
+        Object.hasOwn(item, "value");
+      return isValid;
     });
   } catch {
     return [];
@@ -174,5 +185,35 @@ export function getFilterOperatorsForColumn(column: ColumnDescriptor): TableFilt
     columnType: column.column_type,
     nullable: column.nullable,
     references: column.references,
+  });
+}
+
+/** Keeps URL or telemetry clauses that can target the selected runtime table. */
+export function filterTableFilterClauses({
+  filters,
+  schema,
+  tableName,
+}: {
+  filters: readonly TableFilterClause[];
+  schema: WasmSchema;
+  tableName: string;
+}): TableFilterClause[] {
+  const table = schema[tableName];
+  if (table === undefined) {
+    return [];
+  }
+
+  return filters.filter((filter) => {
+    const column = table.columns.find((candidate) => candidate.name === filter.column);
+    const supportedOperators = getSupportedWhereOperatorsForSchemaColumn(filter.column, column);
+    if (supportedOperators?.includes(filter.operator) !== true) return false;
+    if (filter.operator === "in" && Array.isArray(filter.value) === false) {
+      return false;
+    }
+    if (filter.operator === "isNull" && typeof filter.value !== "boolean") {
+      return false;
+    }
+
+    return true;
   });
 }

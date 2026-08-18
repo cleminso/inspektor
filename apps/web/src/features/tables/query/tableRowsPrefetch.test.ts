@@ -7,9 +7,15 @@ import { TABLE_ROWS_QUERY_OPTIONS } from '@tables/query/tableRowsQuery'
 
 const schema = {
   users: {
-    columns: [],
+    columns: [
+      {
+        name: 'name',
+        column_type: { type: 'Text' },
+        nullable: false,
+      },
+    ],
   },
-} as unknown as WasmSchema
+} satisfies WasmSchema
 
 describe('startTableRowsPrefetch', () => {
   it('owns the exact orchestrator entry consumed by the destination grid', () => {

@@ -33,4 +33,18 @@ describe('resolveTableRowsSearch', () => {
       sortDirection: 'asc',
     })
   })
+
+  it('discards malformed clauses without removing repeated predicates', () => {
+    const filters = [
+      { id: 'range', column: 'age', operator: 'gte', value: 18 },
+      { id: 'unknown', column: 'age', operator: 'matches', value: 30 },
+      { id: 'missing', column: 'age', operator: 'lte' },
+      { id: 'range', column: 'age', operator: 'lte', value: 65 },
+    ]
+
+    expect(resolveTableRowsSearch({ filters: JSON.stringify(filters) }).filters).toEqual([
+      { id: 'range', column: 'age', operator: 'gte', value: 18 },
+      { id: 'range', column: 'age', operator: 'lte', value: 65 },
+    ])
+  })
 })

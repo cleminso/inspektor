@@ -11,9 +11,20 @@ import {
 
 const schema = {
   users: {
-    columns: [],
+    columns: [
+      {
+        name: 'name',
+        column_type: { type: 'Text' },
+        nullable: false,
+      },
+      {
+        name: 'nickname',
+        column_type: { type: 'Text' },
+        nullable: true,
+      },
+    ],
   },
-} as unknown as WasmSchema
+} satisfies WasmSchema
 
 describe('tableRowsQuery', () => {
   it('builds the exact base query shared by table intent and the destination grid', () => {
@@ -63,6 +74,30 @@ describe('tableRowsQuery', () => {
       limit: 501,
       offset: 1000,
     })
+  })
+
+  it('ignores filters that cannot target the selected runtime table', () => {
+    const query = buildTableRowsQuery({
+      filters: [
+        { id: 'missing', column: 'missing', operator: 'eq', value: 'Ada' },
+        { id: 'invalid', column: 'name', operator: 'gte', value: 'Ada' },
+        { id: 'invalid-in', column: 'name', operator: 'in', value: 'Ada' },
+        { id: 'invalid-null', column: 'nickname', operator: 'isNull', value: 'true' },
+        { id: 'row-id', column: 'id', operator: 'eq', value: 'user-1' },
+        { id: 'valid', column: 'name', operator: 'contains', value: 'Ada' },
+      ],
+      page: 1,
+      pageSize: 100,
+      schema,
+      sortColumn: 'id',
+      sortDirection: 'asc',
+      tableName: 'users',
+    })
+
+    expect(JSON.parse(query._build()).conditions).toEqual([
+      { column: 'id', op: 'eq', value: 'user-1' },
+      { column: 'name', op: 'contains', value: 'Ada' },
+    ])
   })
 
   it('prefetches the exact stored destination page', () => {

@@ -1,6 +1,7 @@
 import type { QueryOptions, WasmSchema } from 'jazz-tools'
 
 import type { TableFilterClause } from '@tables/filters/tableFilters'
+import { filterTableFilterClauses } from '@tables/filters/filterParsing'
 import { GenericQueryBuilder } from '@tables/query/genericQueryBuilder'
 import type { TablePageSize, TableSortDirection } from '@tables/tableTypes'
 
@@ -43,8 +44,9 @@ export function buildTableRowsQuery({
   sortDirection,
   tableName,
 }: BuildTableRowsQueryOptions): GenericQueryBuilder {
+  const applicableFilters = filterTableFilterClauses({ filters, schema, tableName })
   let builder = new GenericQueryBuilder(tableName, schema)
-  for (const filter of filters) {
+  for (const filter of applicableFilters) {
     if (filter.operator === 'eq') {
       builder = builder.where({ [filter.column]: filter.value })
     } else {

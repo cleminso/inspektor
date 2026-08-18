@@ -79,7 +79,18 @@ beforeEach(() => {
   sortColumn = "id";
   sortDirection = "asc";
   runtimeClient = { manager: {} };
-  runtimeSchema = {};
+  runtimeSchema = {
+    accounts: { columns: [] },
+    users: {
+      columns: [
+        {
+          name: "name",
+          column_type: { type: "Text" },
+          nullable: false,
+        },
+      ],
+    },
+  };
   useJazzQueryStateMock.mockReset();
   useJazzQueryStateMock.mockImplementation(() =>
     queryError === null
@@ -189,7 +200,7 @@ describe("useTableRows", () => {
     {
       name: "filters",
       replaceScope: () => {
-        filters = [{ column: "name", operator: "equals", value: "Grace" }];
+        filters = [{ id: "name", column: "name", operator: "eq", value: "Grace" }];
       },
     },
   ])("does not preserve resolved rows when the $name scope changes", ({ replaceScope }) => {
