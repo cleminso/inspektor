@@ -95,6 +95,12 @@ export const calendarStyles = stylex.create({
     maxWidth: 'var(--available-width)',
     width: spatial['multi-select-width-s'],
   },
+  inlinePanel: {
+    padding: spacing.s,
+    alignSelf: 'center',
+    color: textColors.default,
+    width: spatial['multi-select-width-s'],
+  },
   popupOpen: {},
   popupClosed: {},
   popupStarting: { opacity: 0, transform: 'scale(0.98)' },

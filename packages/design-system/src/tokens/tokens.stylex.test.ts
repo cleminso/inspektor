@@ -121,6 +121,7 @@ describe('semantic token contract', () => {
       'control-height-s': expect.any(String),
       'control-height-m': expect.any(String),
       'control-height-l': expect.any(String),
+      'control-height-xl': expect.any(String),
       'collection-row-height-s': expect.any(String),
       'collection-row-height-m': expect.any(String),
       'collection-row-height-l': expect.any(String),

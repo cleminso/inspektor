@@ -101,6 +101,25 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...["Root", "Dialog", "Close", "Input", "Item", "ItemText"].map((part) => ({
+    componentId: `command.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "Command",
+    part,
+    inheritedProps:
+      part === "Root"
+        ? ["items", "inputValue", "defaultInputValue", "onInputValueChange"]
+        : part === "Dialog"
+          ? ["open", "defaultOpen", "onOpenChange"]
+          : part === "Item"
+            ? ["disabled"]
+            : [],
+  })),
+  ...["Root", "List", "Trigger", "Remove", "Column", "Operator", "Value"].map((part) => ({
+    componentId: `dataGridFilterClause.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "DataGridFilterClause",
+    part,
+    inheritedProps: part === "Trigger" || part === "Remove" ? ["disabled"] : [],
+  })),
   ...["Root", "Bar", "LeadingArea", "List", "Tab", "TrailingArea", "Panel"].map((part) => ({
     componentId: `workspaceTabs.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: "WorkspaceTabs",

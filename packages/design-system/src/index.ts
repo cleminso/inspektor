@@ -107,6 +107,37 @@ export type {
   ComboboxViewportHeight,
   ComboboxViewportProps,
 } from './components/combobox/combobox'
+export { Command } from './components/command/command'
+export type {
+  CommandCloseProps,
+  CommandDialogProps,
+  CommandEmptyProps,
+  CommandFooterProps,
+  CommandGroupLabelProps,
+  CommandGroupProps,
+  CommandInputRowProps,
+  CommandInputProps,
+  CommandItemProps,
+  CommandItemTextProps,
+  CommandListProps,
+  CommandKeyProps,
+  CommandRootProps,
+  CommandSeparatorProps,
+  CommandShortcutProps,
+  CommandTitleProps,
+  CommandValue,
+} from './components/command/command'
+export { DataGridFilterClause } from './components/dataGridFilterClause/dataGridFilterClause'
+export type {
+  DataGridFilterClauseColumnProps,
+  DataGridFilterClauseListProps,
+  DataGridFilterClauseOperatorProps,
+  DataGridFilterClausePartProps,
+  DataGridFilterClauseRemoveProps,
+  DataGridFilterClauseRootProps,
+  DataGridFilterClauseTriggerProps,
+  DataGridFilterClauseValueProps,
+} from './components/dataGridFilterClause/dataGridFilterClause'
 export { ContextSwitcher } from './components/contextSwitcher/contextSwitcher'
 export type {
   ContextSwitcherContentProps,

@@ -1116,8 +1116,8 @@ counts as table-wide facets.
 UI representation:
 
 - Surface: builder below the workspace-item tabs and direct controls in the Tables navigator.
-- Primary controls: type filter, choose column suggestion, choose operator, enter value, remove token, add more filters.
-- Primary content: compact filter tokens and a trailing `Add more filters...` input.
+- Primary controls: type filter, choose column suggestion, choose operator, enter value, remove token, add filters.
+- Primary content: compact filter tokens and a trailing `Add filters...` input.
 - States: invalid value, unsupported operator for type, no filters, unsupported query mapping.
 
 #### Relation navigation

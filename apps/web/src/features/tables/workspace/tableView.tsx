@@ -16,6 +16,7 @@ import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspe
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
+import { DataGridFilterBuilder } from '@tables/filters/dataGridFilterBuilder'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
 import {
@@ -367,7 +368,14 @@ function TableViewContent({
                   onPageSizeChange={state.setPageSize}
                 />
               }
-            />
+            >
+              <DataGridFilterBuilder
+                columns={state.schemaColumns}
+                filters={state.filters}
+                rows={state.rows}
+                onFiltersChange={state.setFilters}
+              />
+            </Toolbar>
             <Box
               minHeight={0}
               flex={1}
@@ -415,7 +423,23 @@ function TableViewContent({
                             emptyContent={
                               state.error === null ? (
                                 filteredEmpty ? (
-                                  'No rows match these filters'
+                                  <Box
+                                    alignItems="center"
+                                    flexDirection="column"
+                                    gap="xs"
+                                  >
+                                    <Text color="muted">No rows match these filters</Text>
+                                    <Button
+                                      type="button"
+                                      size="s"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        void state.setFilters([])
+                                      }}
+                                    >
+                                      Clear
+                                    </Button>
+                                  </Box>
                                 ) : null
                               ) : (
                                 <Box

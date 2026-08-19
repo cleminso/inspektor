@@ -140,6 +140,7 @@ export const spatial = stylex.defineVars({
   'control-height-s': dimensions[22],
   'control-height-m': dimensions[24],
   'control-height-l': dimensions[28],
+  'control-height-xl': dimensions[36],
   'collection-row-height-s': dimensions[22],
   'collection-row-height-m': dimensions[24],
   'collection-row-height-l': dimensions[28],

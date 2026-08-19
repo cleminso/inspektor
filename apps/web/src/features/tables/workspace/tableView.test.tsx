@@ -13,7 +13,7 @@ const tableViewState = vi.hoisted(() => ({
   cellFocusRequest: null,
   detailPaneMode: 'closed',
   error: null as string | null,
-  filters: [{ column: 'name', operator: 'equals', value: 'Ada' }],
+  filters: [{ id: 'filter-1', column: 'name', operator: 'eq', value: 'Ada' }],
   handleCellActivate: vi.fn(),
   handleCellEditRequest: vi.fn(),
   handleColumnActivate: vi.fn(),
@@ -191,10 +191,15 @@ vi.mock('@tables/grid/columnVisibility', () => ({
   DataGridColumnVisibility: () => null,
 }))
 
+vi.mock('@tables/filters/dataGridFilterBuilder', () => ({
+  DataGridFilterBuilder: () => <div>Filter builder</div>,
+}))
+
 vi.mock('@tables/grid/toolbar', () => ({
   TablePagination: () => null,
-  Toolbar: ({ actions, pagination }: { actions: ReactNode; pagination: ReactNode }) => (
+  Toolbar: ({ actions, children, pagination }: { actions: ReactNode; children: ReactNode; pagination: ReactNode }) => (
     <div>
+      {children}
       {actions}
       {pagination}
     </div>
@@ -322,9 +327,27 @@ vi.mock('@inspector/ds', () => {
     </div>
   )
 
+  const Button = ({
+    'aria-label': ariaLabel,
+    children,
+    disabled,
+    onClick,
+    type = 'button',
+  }: {
+    'aria-label'?: string
+    children?: ReactNode
+    disabled?: boolean
+    onClick?: () => void
+    type?: 'button' | 'submit' | 'reset'
+  }) => (
+    <button aria-label={ariaLabel} disabled={disabled} onClick={onClick} type={type}>
+      {children}
+    </button>
+  )
+
   return {
     Box: Container,
-    Button: Object.assign(Container, { Glyph: Container }),
+    Button: Object.assign(Button, { Glyph: Container }),
     DataGrid: {
       Content: DataGridContent,
       Root: DataGridRoot,
@@ -346,7 +369,7 @@ vi.mock('@inspector/ds', () => {
 afterEach(() => {
   cleanup()
   tableViewState.error = null
-  tableViewState.filters = [{ column: 'name', operator: 'equals', value: 'Ada' }]
+  tableViewState.filters = [{ id: 'filter-1', column: 'name', operator: 'eq', value: 'Ada' }]
   tableViewState.isInitialLoading = false
   tableViewState.isRefreshing = false
   tableViewState.loadedRowCount = 2
@@ -528,6 +551,17 @@ describe('TableView query status', () => {
     expect(screen.getByRole('table', { name: 'accounts rows' }).hasAttribute('aria-busy')).toBe(
       false,
     )
+  })
+
+  it('clears filters from the filtered-empty state', () => {
+    tableViewState.loadedRowCount = 0
+
+    render(<TableView tableName="accounts" />)
+
+    const clearButton = screen.getByRole('button', { name: 'Clear' })
+    fireEvent.click(clearButton)
+
+    expect(tableViewState.setFilters).toHaveBeenCalledWith([])
   })
 
   it('presents query failures as alerts with corrective reload guidance', () => {

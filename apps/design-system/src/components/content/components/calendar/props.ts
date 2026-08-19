@@ -9,4 +9,4 @@ export const calendarRootPropNames = [
   "disabled",
 ] as const;
 export const calendarTriggerPropNames = ["label", "render"] as const;
-export const calendarContentPropNames = ["align", "keepMounted"] as const;
+export const calendarContentPropNames = ["align", "autoFocus", "keepMounted", "mode"] as const;

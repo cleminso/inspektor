@@ -64,8 +64,12 @@ export type CalendarTriggerProps = PropsWithChildren<
 export interface CalendarContentProps {
   /** Aligns the popup along its trigger. */
   align?: BasePopover.Positioner.Props['align']
+  /** Moves focus to the calendar when the content mounts. Defaults to popover content only. */
+  autoFocus?: boolean
   /** Keeps the popup mounted while closed. */
   keepMounted?: boolean
+  /** Renders as a popup or as an inline step inside another surface. */
+  mode?: 'popover' | 'inline'
 }
 
 interface CalendarContextValue {
@@ -108,9 +112,15 @@ function CalendarRoot({
   maxValue,
   disabled = false,
 }: CalendarRootProps): React.ReactElement {
+  const committedTimestamp = isValidDate(value) === true ? value.getTime() : undefined
   const [pendingValue, setPendingValue] = useState<Date>(() => cloneDate(value) ?? new Date())
   const [resetMonth, setResetMonth] = useState<Date>(() => cloneDate(value) ?? new Date())
   const triggerRef = useRef<ComponentRef<typeof BasePopover.Trigger>>(null)
+  useEffect(() => {
+    const nextValue = committedTimestamp === undefined ? new Date() : new Date(committedTimestamp)
+    setPendingValue(nextValue)
+    setResetMonth(nextValue)
+  }, [committedTimestamp])
   const handleOpenChange = useCallback<NonNullable<BasePopover.Root.Props['onOpenChange']>>(
     (nextOpen, eventDetails) => {
       if (nextOpen === true) {
@@ -289,7 +299,9 @@ function formatTimestampBoundary(value: Date): string {
 
 function CalendarContent({
   align = 'start',
+  autoFocus,
   keepMounted = false,
+  mode = 'popover',
 }: CalendarContentProps): React.ReactElement {
   const context = useCalendarContext()
   const popupRef = useRef<ComponentRef<typeof BasePopover.Popup>>(null)
@@ -381,6 +393,123 @@ function CalendarContent({
     return null
   }
   const handleMonthChange: MonthChangeEventHandler = (month) => setVisibleMonth(month)
+  const applyDisabled =
+    context.disabled || parsedTime === undefined || pendingIsInRange === false
+  const calendarBody = (
+    <>
+      <DayPicker
+        // oxlint-disable-next-line jsx-a11y/no-autofocus -- Popovers and explicit command steps transfer focus into the calendar.
+        autoFocus={autoFocus ?? mode === 'popover'}
+        captionLayout="dropdown"
+        classNames={classNames}
+        components={{
+          Chevron: CalendarChevron,
+          DayButton: CalendarDayButton,
+        }}
+        disabled={disabled}
+        endMonth={endMonth}
+        fixedWeeks
+        formatters={{
+          formatMonthDropdown: (date) =>
+            date.toLocaleString(undefined, { month: 'short' }),
+        }}
+        mode="single"
+        month={visibleMonth}
+        navLayout="around"
+        required
+        selected={context.pendingValue}
+        showOutsideDays
+        startMonth={startMonth}
+        onMonthChange={handleMonthChange}
+        onSelect={(day) => {
+          const nextValue = combineDayAndTime(day, context.pendingValue)
+          context.setPendingValue(nextValue)
+          setVisibleMonth(nextValue)
+        }}
+      />
+      <div {...stylex.props(calendarStyles.controls)}>
+        <div {...stylex.props(calendarStyles.timeRow)}>
+          <Field.Root
+            disabled={context.disabled}
+            validationMode="onBlur"
+            validate={validateTime}
+            {...stylex.props(calendarStyles.field)}
+          >
+            <Field.Label {...stylex.props(calendarStyles.controlLabel)}>Time</Field.Label>
+            <Input
+              disabled={context.disabled}
+              fullWidth
+              invalid={false}
+              inputMode="numeric"
+              size="m"
+              type="text"
+              value={timeInput}
+              onValueChange={(nextInput) => {
+                setTimeInput(nextInput)
+                const nextParsedTime = parseTimeInput(nextInput)
+                if (nextParsedTime === undefined) return
+                const [hours, minutes, seconds] = nextParsedTime
+                const nextValue = new Date(context.pendingValue.getTime())
+                nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
+                context.setPendingValue(nextValue)
+              }}
+              render={<input aria-label="Time" {...stylex.props(calendarStyles.input)} />}
+            />
+            <Field.Error />
+          </Field.Root>
+          <div {...stylex.props(calendarStyles.setNowAction)}>
+            <Button
+              disabled={context.disabled}
+              layout="fill"
+              size="m"
+              variant="ghost"
+              onClick={() => {
+                const now = new Date()
+                context.setPendingValue(now)
+                setTimeInput(formatTimeInput(now))
+                setVisibleMonth(now)
+              }}
+            >
+              Set now
+            </Button>
+          </div>
+        </div>
+        <div {...stylex.props(calendarStyles.applyAction)}>
+          {mode === 'inline' ? (
+            <Button
+              disabled={applyDisabled}
+              layout="fill"
+              size="s"
+              variant="secondary"
+              onClick={context.apply}
+            >
+              Apply
+            </Button>
+          ) : (
+            <BasePopover.Close
+              disabled={applyDisabled}
+              render={<Button layout="fill" size="s" variant="secondary" />}
+              onClick={context.apply}
+            >
+              Apply
+            </BasePopover.Close>
+          )}
+        </div>
+      </div>
+    </>
+  )
+
+  if (mode === 'inline') {
+    return (
+      <div
+        aria-label={calendarLabel}
+        role="group"
+        {...stylex.props(calendarStyles.inlinePanel)}
+      >
+        {calendarBody}
+      </div>
+    )
+  }
 
   return (
     <BasePopover.Portal keepMounted={keepMounted}>
@@ -397,96 +526,7 @@ function CalendarContent({
             role="dialog"
             {...popupStyles}
           >
-            <DayPicker
-              autoFocus
-              captionLayout="dropdown"
-              classNames={classNames}
-              components={{
-                Chevron: CalendarChevron,
-                DayButton: CalendarDayButton,
-              }}
-              disabled={disabled}
-              endMonth={endMonth}
-              fixedWeeks
-              formatters={{
-                formatMonthDropdown: (date) =>
-                  date.toLocaleString(undefined, { month: 'short' }),
-              }}
-              mode="single"
-              month={visibleMonth}
-              navLayout="around"
-              required
-              selected={context.pendingValue}
-              showOutsideDays
-              startMonth={startMonth}
-              onMonthChange={handleMonthChange}
-              onSelect={(day) => {
-                const nextValue = combineDayAndTime(day, context.pendingValue)
-                context.setPendingValue(nextValue)
-                setVisibleMonth(nextValue)
-              }}
-            />
-            <div {...stylex.props(calendarStyles.controls)}>
-              <div {...stylex.props(calendarStyles.timeRow)}>
-                <Field.Root
-                  disabled={context.disabled}
-                  validationMode="onBlur"
-                  validate={validateTime}
-                  {...stylex.props(calendarStyles.field)}
-                >
-                  <Field.Label {...stylex.props(calendarStyles.controlLabel)}>Time</Field.Label>
-                  <Input
-                    disabled={context.disabled}
-                    fullWidth
-                    invalid={false}
-                    inputMode="numeric"
-                    size="m"
-                    type="text"
-                    value={timeInput}
-                    onValueChange={(nextInput) => {
-                      setTimeInput(nextInput)
-                      const nextParsedTime = parseTimeInput(nextInput)
-                      if (nextParsedTime === undefined) return
-                      const [hours, minutes, seconds] = nextParsedTime
-                      const nextValue = new Date(context.pendingValue.getTime())
-                      nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
-                      context.setPendingValue(nextValue)
-                    }}
-                    render={<input aria-label="Time" {...stylex.props(calendarStyles.input)} />}
-                  />
-                  <Field.Error />
-                </Field.Root>
-                <div {...stylex.props(calendarStyles.setNowAction)}>
-                  <Button
-                    disabled={context.disabled}
-                    layout="fill"
-                    size="m"
-                    variant="ghost"
-                    onClick={() => {
-                      const now = new Date()
-                      context.setPendingValue(now)
-                      setTimeInput(formatTimeInput(now))
-                      setVisibleMonth(now)
-                    }}
-                  >
-                    Set now
-                  </Button>
-                </div>
-              </div>
-              <div {...stylex.props(calendarStyles.applyAction)}>
-                <BasePopover.Close
-                  disabled={
-                    context.disabled ||
-                    parsedTime === undefined ||
-                    pendingIsInRange === false
-                  }
-                  render={<Button layout="fill" size="s" variant="secondary" />}
-                  onClick={context.apply}
-                >
-                  Apply
-                </BasePopover.Close>
-              </div>
-            </div>
+            {calendarBody}
           </BasePopover.Popup>
         </BasePopover.Positioner>
       </InputGroupContext.Provider>

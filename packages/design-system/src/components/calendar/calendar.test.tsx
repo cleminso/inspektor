@@ -9,6 +9,41 @@ import { Calendar } from './calendar'
 afterEach(cleanup)
 
 describe('Calendar', () => {
+  it('applies an inline date step without creating a nested popup', () => {
+    const onApply = vi.fn()
+    const value = new Date(2026, 7, 13, 12)
+    render(
+      <Calendar value={value} onApply={onApply}>
+        <Calendar.Content mode="inline" />
+      </Calendar>,
+    )
+
+    expect(screen.getByRole('group', { name: 'Choose date and time' })).toBeTruthy()
+    expect(screen.queryByRole('dialog', { name: 'Choose date and time' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(onApply).toHaveBeenCalledWith(value)
+  })
+
+  it('resets an inline draft when the committed value changes', () => {
+    const onApply = vi.fn()
+    const initialValue = new Date(2026, 7, 13, 12)
+    const nextValue = new Date(2026, 8, 2, 9, 30)
+    const { rerender } = render(
+      <Calendar value={initialValue} onApply={onApply}>
+        <Calendar.Content mode="inline" />
+      </Calendar>,
+    )
+
+    rerender(
+      <Calendar value={nextValue} onApply={onApply}>
+        <Calendar.Content mode="inline" />
+      </Calendar>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+
+    expect(onApply).toHaveBeenCalledWith(nextValue)
+  })
+
   it('opens from its input-styled button trigger', () => {
     render(
       <Calendar value={new Date(2026, 7, 13, 12)} onApply={vi.fn()}>

@@ -9,6 +9,8 @@ import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
 import ComposedTriggerExample from "./composedTriggerExample";
 import composedTriggerSource from "./composedTriggerExample.tsx?raw";
+import InlineExample from "./inlineExample";
+import inlineSource from "./inlineExample.tsx?raw";
 import { CalendarPlayground } from "./playground";
 import {
   calendarContentPropNames,
@@ -34,6 +36,14 @@ export function CalendarPage(): ReactElement {
       >
         <Example source={composedTriggerSource}>
           <ComposedTriggerExample />
+        </Example>
+      </Section>
+      <Section
+        title="Inline step"
+        description="Render calendar content inline when date selection is one stage inside another modal flow."
+      >
+        <Example source={inlineSource}>
+          <InlineExample />
         </Example>
       </Section>
       <Section title="Root props">

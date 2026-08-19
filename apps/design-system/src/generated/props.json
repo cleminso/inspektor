@@ -1251,7 +1251,7 @@
     },
     {
       "name": "width",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"control-height-xl\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1261,7 +1261,7 @@
     },
     {
       "name": "height",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"control-height-xl\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1271,7 +1271,7 @@
     },
     {
       "name": "minWidth",
-      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"control-height-xl\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1281,7 +1281,7 @@
     },
     {
       "name": "maxWidth",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"control-height-xl\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1291,7 +1291,7 @@
     },
     {
       "name": "minHeight",
-      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
+      "type": "0 | \"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"control-height-xl\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, 0 | SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -1301,7 +1301,7 @@
     },
     {
       "name": "maxHeight",
-      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
+      "type": "\"switch-height-m\" | \"switch-thumb-m\" | \"screen-height-dynamic\" | \"screen-height-small\" | \"control-height-xs\" | \"control-height-s\" | \"control-height-m\" | \"control-height-l\" | \"control-height-xl\" | \"collection-row-height-s\" | \"collection-row-height-m\" | \"collection-row-height-l\" | \"collection-row-height-xl\" | \"content-measure\" | \"content-width\" | \"content-width-wide\" | \"example-height\" | \"find-bar-status-width\" | \"focus-ring-width\" | \"grid-track-s\" | \"grid-track-m\" | \"icon-size-xs\" | \"icon-size-s\" | \"icon-size-m\" | \"interaction-target-min\" | \"label-width\" | \"menu-min-width\" | \"combobox-min-width\" | \"combobox-trigger-width-s\" | \"combobox-trigger-width-m\" | \"multi-select-width-s\" | \"multi-select-width-m\" | \"multi-select-width-l\" | \"popup-collection-padding\" | \"popup-item-inline-padding\" | \"popup-width-s\" | \"popup-width-m\" | \"popup-width-l\" | \"panel-height\" | \"panel-bar-height\" | \"panel-handle-size\" | \"panel-gutter-size\" | \"scrollbar-track-size\" | \"scrollbar-thumb-size\" | \"switch-height-s\" | \"switch-width-s\" | \"switch-width-m\" | \"switch-thumb-s\" | \"tab-height\" | \"textarea-height-s\" | \"textarea-height-m\" | \"textarea-height-l\" | \"toast-min-height\" | \"tooltip-width\" | \"viewport-height-s\" | \"viewport-height-m\" | \"viewport-height-l\" | \"full\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, SpatialToken | \"full\">>",
       "required": false,
       "description": "",
       "source": {
@@ -2096,6 +2096,342 @@
       "source": {
         "path": "packages/design-system/src/components/toggleGroup/toggleGroup.tsx",
         "line": 55
+      }
+    }
+  ],
+  "command.root": [
+    {
+      "name": "autoHighlight",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Controls whether the first matching item is highlighted while filtering.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "items",
+      "type": "readonly Value[]",
+      "required": false,
+      "description": "Flat collection filtered by the command query.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 44
+      }
+    },
+    {
+      "name": "inputValue",
+      "type": "string",
+      "required": false,
+      "description": "Controlled command query.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 42
+      }
+    },
+    {
+      "name": "defaultInputValue",
+      "type": "string",
+      "required": false,
+      "defaultValue": "\"\"",
+      "description": "Initial query for an uncontrolled command.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "onInputValueChange",
+      "type": "(inputValue: string, eventDetails: BaseCombobox.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Event handler called when the input value changes.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/root/ComboboxRoot.d.mts",
+        "line": 68
+      }
+    }
+  ],
+  "command.dialog": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Command content rendered inside the modal surface.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 51
+      }
+    },
+    {
+      "name": "keepMounted",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Keeps the dialog mounted while closed.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 53
+      }
+    },
+    {
+      "name": "initialFocus",
+      "type": "false | true | RefObject<HTMLElement | null> | (openType: InteractionType) => boolean | HTMLElement | null | void",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Determines where focus moves when the command dialog opens.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 55
+      }
+    },
+    {
+      "name": "finalFocus",
+      "type": "false | true | RefObject<HTMLElement | null> | (closeType: InteractionType) => boolean | HTMLElement | null | void",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Determines where focus moves after the command dialog closes.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 57
+      }
+    },
+    {
+      "name": "open",
+      "type": "false | true",
+      "required": false,
+      "description": "Whether the dialog is currently open.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "line": 18
+      }
+    },
+    {
+      "name": "defaultOpen",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Whether the dialog is initially open.\n\nTo render a controlled dialog, use the `open` prop instead.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "line": 25
+      }
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean, eventDetails: BaseDialog.Root.ChangeEventDetails) => void",
+      "required": false,
+      "description": "Event handler called when the dialog is opened or closed.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "line": 40
+      }
+    }
+  ],
+  "command.close": [],
+  "command.input": [
+    {
+      "name": "render",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, ComboboxInputState>",
+      "required": false,
+      "description": "Composes input behavior onto another input component.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 63
+      }
+    },
+    {
+      "name": "divider",
+      "type": "\"none\" | \"bottom\"",
+      "required": false,
+      "defaultValue": "\"bottom\"",
+      "description": "Controls whether the input separates itself from following command content.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 65
+      }
+    }
+  ],
+  "command.item": [
+    {
+      "name": "value",
+      "type": "CommandValue",
+      "required": true,
+      "description": "",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 74
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "description": "Whether the component should ignore user interaction.",
+      "source": {
+        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/item/ComboboxItem.d.mts",
+        "line": 44
+      }
+    }
+  ],
+  "command.itemText": [
+    {
+      "name": "label",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Primary option label.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 78
+      }
+    },
+    {
+      "name": "description",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional supporting description.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 80
+      }
+    },
+    {
+      "name": "layout",
+      "type": "\"inline\" | \"stacked\"",
+      "required": false,
+      "defaultValue": "\"stacked\"",
+      "description": "Arranges supporting metadata beside or below the primary label.",
+      "source": {
+        "path": "packages/design-system/src/components/command/command.tsx",
+        "line": 82
+      }
+    }
+  ],
+  "dataGridFilterClause.root": [
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables clause editing.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "invalid",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Marks the clause as invalid.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "invalidDescription",
+      "type": "string",
+      "required": false,
+      "description": "Explains how the clause became invalid.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 42
+      }
+    }
+  ],
+  "dataGridFilterClause.list": [],
+  "dataGridFilterClause.trigger": [
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": true,
+      "description": "Complete action-oriented name retained when visible content truncates.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 55
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Compound clause content.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 57
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
+        "line": 3053
+      }
+    }
+  ],
+  "dataGridFilterClause.remove": [
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": true,
+      "description": "Identifies the clause removed by this action.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 65
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
+        "line": 3053
+      }
+    }
+  ],
+  "dataGridFilterClause.column": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Visible clause part.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 73
+      }
+    }
+  ],
+  "dataGridFilterClause.operator": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Visible clause part.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 73
+      }
+    }
+  ],
+  "dataGridFilterClause.value": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Visible clause part.",
+      "source": {
+        "path": "packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx",
+        "line": 73
       }
     }
   ],
@@ -6968,6 +7304,16 @@
       }
     },
     {
+      "name": "autoFocus",
+      "type": "false | true",
+      "required": false,
+      "description": "Moves focus to the calendar when the content mounts. Defaults to popover content only.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 68
+      }
+    },
+    {
       "name": "keepMounted",
       "type": "false | true",
       "required": false,
@@ -6975,7 +7321,18 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 68
+        "line": 70
+      }
+    },
+    {
+      "name": "mode",
+      "type": "\"popover\" | \"inline\"",
+      "required": false,
+      "defaultValue": "\"popover\"",
+      "description": "Renders as a popup or as an inline step inside another surface.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 72
       }
     }
   ],

@@ -111,6 +111,7 @@ interface UseTableViewStateResult {
   page: number
   pageSize: TablePageSize
   rowEditor: TableViewRowEditorState
+  rows: DynamicTableRow[]
   rowValues: Record<string, unknown> | null
   selectedRowIds: readonly TableRowId[]
   schemaColumns: ColumnDescriptor[]
@@ -549,6 +550,7 @@ export function useTableViewState({
     error: query.error,
     table,
     loadedRowCount: query.loadedRowCount,
+    rows: query.rows,
     mutationExecutor: mutations,
     page: query.page,
     pageSize: query.pageSize,
@@ -570,7 +572,7 @@ export function useTableViewState({
         tableKey,
       })
       resetSelection()
-      void searchState.setFilters(filters)
+      await searchState.setFilters(filters)
     },
     schemaColumns,
     tableColumns: query.columns,

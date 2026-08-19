@@ -22,10 +22,12 @@ import { Route as ComponentsCalendarRouteImport } from './routes/components/cale
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsCodeEditorRouteImport } from './routes/components/code-editor'
 import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
+import { Route as ComponentsCommandRouteImport } from './routes/components/command'
 import { Route as ComponentsContextMenuRouteImport } from './routes/components/context-menu'
 import { Route as ComponentsContextSwitcherRouteImport } from './routes/components/context-switcher'
 import { Route as ComponentsCopyButtonRouteImport } from './routes/components/copy-button'
 import { Route as ComponentsDataGridRouteImport } from './routes/components/data-grid'
+import { Route as ComponentsDataGridFilterClauseRouteImport } from './routes/components/data-grid-filter-clause'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsFindBarRouteImport } from './routes/components/find-bar'
@@ -121,6 +123,11 @@ const ComponentsComboboxRoute = ComponentsComboboxRouteImport.update({
   path: '/components/combobox',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsCommandRoute = ComponentsCommandRouteImport.update({
+  id: '/components/command',
+  path: '/components/command',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsContextMenuRoute = ComponentsContextMenuRouteImport.update({
   id: '/components/context-menu',
   path: '/components/context-menu',
@@ -142,6 +149,12 @@ const ComponentsDataGridRoute = ComponentsDataGridRouteImport.update({
   path: '/components/data-grid',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsDataGridFilterClauseRoute =
+  ComponentsDataGridFilterClauseRouteImport.update({
+    id: '/components/data-grid-filter-clause',
+    path: '/components/data-grid-filter-clause',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsFieldRoute = ComponentsFieldRouteImport.update({
   id: '/components/field',
   path: '/components/field',
@@ -305,10 +318,12 @@ export interface FileRoutesByFullPath {
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/command': typeof ComponentsCommandRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/data-grid': typeof ComponentsDataGridRoute
+  '/components/data-grid-filter-clause': typeof ComponentsDataGridFilterClauseRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
@@ -353,10 +368,12 @@ export interface FileRoutesByTo {
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/command': typeof ComponentsCommandRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/data-grid': typeof ComponentsDataGridRoute
+  '/components/data-grid-filter-clause': typeof ComponentsDataGridFilterClauseRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
@@ -402,10 +419,12 @@ export interface FileRoutesById {
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
+  '/components/command': typeof ComponentsCommandRoute
   '/components/context-menu': typeof ComponentsContextMenuRoute
   '/components/context-switcher': typeof ComponentsContextSwitcherRoute
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/data-grid': typeof ComponentsDataGridRoute
+  '/components/data-grid-filter-clause': typeof ComponentsDataGridFilterClauseRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
@@ -452,10 +471,12 @@ export interface FileRouteTypes {
     | '/components/checkbox'
     | '/components/code-editor'
     | '/components/combobox'
+    | '/components/command'
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
     | '/components/data-grid'
+    | '/components/data-grid-filter-clause'
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
@@ -500,10 +521,12 @@ export interface FileRouteTypes {
     | '/components/checkbox'
     | '/components/code-editor'
     | '/components/combobox'
+    | '/components/command'
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
     | '/components/data-grid'
+    | '/components/data-grid-filter-clause'
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
@@ -548,10 +571,12 @@ export interface FileRouteTypes {
     | '/components/checkbox'
     | '/components/code-editor'
     | '/components/combobox'
+    | '/components/command'
     | '/components/context-menu'
     | '/components/context-switcher'
     | '/components/copy-button'
     | '/components/data-grid'
+    | '/components/data-grid-filter-clause'
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
@@ -597,10 +622,12 @@ export interface RootRouteChildren {
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsCodeEditorRoute: typeof ComponentsCodeEditorRoute
   ComponentsComboboxRoute: typeof ComponentsComboboxRoute
+  ComponentsCommandRoute: typeof ComponentsCommandRoute
   ComponentsContextMenuRoute: typeof ComponentsContextMenuRoute
   ComponentsContextSwitcherRoute: typeof ComponentsContextSwitcherRoute
   ComponentsCopyButtonRoute: typeof ComponentsCopyButtonRoute
   ComponentsDataGridRoute: typeof ComponentsDataGridRoute
+  ComponentsDataGridFilterClauseRoute: typeof ComponentsDataGridFilterClauseRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsFindBarRoute: typeof ComponentsFindBarRoute
@@ -725,6 +752,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsComboboxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/command': {
+      id: '/components/command'
+      path: '/components/command'
+      fullPath: '/components/command'
+      preLoaderRoute: typeof ComponentsCommandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/context-menu': {
       id: '/components/context-menu'
       path: '/components/context-menu'
@@ -751,6 +785,13 @@ declare module '@tanstack/react-router' {
       path: '/components/data-grid'
       fullPath: '/components/data-grid'
       preLoaderRoute: typeof ComponentsDataGridRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/data-grid-filter-clause': {
+      id: '/components/data-grid-filter-clause'
+      path: '/components/data-grid-filter-clause'
+      fullPath: '/components/data-grid-filter-clause'
+      preLoaderRoute: typeof ComponentsDataGridFilterClauseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/field': {
@@ -973,10 +1014,12 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsCodeEditorRoute: ComponentsCodeEditorRoute,
   ComponentsComboboxRoute: ComponentsComboboxRoute,
+  ComponentsCommandRoute: ComponentsCommandRoute,
   ComponentsContextMenuRoute: ComponentsContextMenuRoute,
   ComponentsContextSwitcherRoute: ComponentsContextSwitcherRoute,
   ComponentsCopyButtonRoute: ComponentsCopyButtonRoute,
   ComponentsDataGridRoute: ComponentsDataGridRoute,
+  ComponentsDataGridFilterClauseRoute: ComponentsDataGridFilterClauseRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsFindBarRoute: ComponentsFindBarRoute,

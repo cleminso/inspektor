@@ -66,7 +66,14 @@ function parseScalarValue(columnType: ColumnType, value: string): unknown {
 
       return parsedValue;
     }
-    case "Integer":
+    case "Integer": {
+      const parsedValue = Number(trimmedValue);
+      if (Number.isInteger(parsedValue) === false) {
+        throw new Error("Integer values must be integers.");
+      }
+
+      return parsedValue;
+    }
     case "Double": {
       const parsedValue = Number(trimmedValue);
       if (Number.isFinite(parsedValue) === false) {
@@ -82,6 +89,15 @@ function parseScalarValue(columnType: ColumnType, value: string): unknown {
       } catch {
         throw new Error("Value must be an integer.");
       }
+    }
+    case "Timestamp": {
+      const numericValue = Number(trimmedValue);
+      if (Number.isFinite(numericValue) === true) return numericValue;
+      const parsedValue = Date.parse(trimmedValue);
+      if (Number.isFinite(parsedValue) === false) {
+        throw new Error("Value must be a timestamp.");
+      }
+      return parsedValue;
     }
     case "Bytea":
       return parseBytea(trimmedValue);
@@ -99,9 +115,29 @@ function parseScalarValue(columnType: ColumnType, value: string): unknown {
   }
 }
 
+/** Splits pasted scalar values by lines so commas remain valid token content. */
+export function tokenizePastedFilterValues(value: string): string[] {
+  return value
+    .split(/\r?\n/u)
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+/** Parses each scalar `in` token through the selected runtime column schema. */
+export function parseFilterTokens(
+  column: Pick<ColumnDescriptor, "column_type">,
+  tokens: readonly string[],
+): unknown[] {
+  const normalizedTokens = tokens.map((token) => token.trim()).filter((token) => token.length > 0);
+  if (normalizedTokens.length === 0) {
+    throw new Error('The "in" operator requires at least one value.');
+  }
+  return normalizedTokens.map((token) => parseScalarValue(column.column_type, token));
+}
+
 /** Creates a client-only key for editable filter rows before they are serialized to the URL. */
 export function createFilterClauseId(): string {
-  return `filter-${Math.random().toString(16).slice(2, 10)}`;
+  return `filter-${crypto.randomUUID()}`;
 }
 
 /** Applies operator-specific parsing before a filter becomes generic query input. */
@@ -203,17 +239,35 @@ export function filterTableFilterClauses({
     return [];
   }
 
-  return filters.filter((filter) => {
+  return filters.flatMap((filter) => {
     const column = table.columns.find((candidate) => candidate.name === filter.column);
     const supportedOperators = getSupportedWhereOperatorsForSchemaColumn(filter.column, column);
-    if (supportedOperators?.includes(filter.operator) !== true) return false;
+    if (supportedOperators?.includes(filter.operator) !== true) return [];
     if (filter.operator === "in" && Array.isArray(filter.value) === false) {
-      return false;
+      return [];
     }
     if (filter.operator === "isNull" && typeof filter.value !== "boolean") {
-      return false;
+      return [];
     }
 
-    return true;
+    const parseColumn =
+      column ??
+      (filter.column === "id"
+        ? ({ name: "id", column_type: { type: "Uuid" }, nullable: false } as ColumnDescriptor)
+        : undefined);
+    if (parseColumn === undefined) return [];
+    try {
+      const value = filter.operator === "in"
+        ? parseFilterTokens(parseColumn, (filter.value as unknown[]).map((item) => String(item)))
+        : filter.operator === "isNull"
+          ? filter.value
+          : (parseColumn.column_type.type === "Json" || parseColumn.column_type.type === "Array") &&
+              typeof filter.value !== "string"
+            ? filter.value
+          : parseFilterValue(parseColumn, filter.operator, String(filter.value));
+      return [{ ...filter, value }];
+    } catch {
+      return [];
+    }
   });
 }
