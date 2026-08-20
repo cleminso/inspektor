@@ -37,6 +37,8 @@ const tableViewState = vi.hoisted(() => ({
   },
   page: 1,
   pageSize: 100,
+  recentlyAppliedCells: {} as Readonly<Record<string, ReadonlySet<string>>>,
+  recentlyInsertedRowIds: new Set<string>() as ReadonlySet<string>,
   reorderableColumnIds: [] as string[],
   rowEditor: {
     activeColumnNumber: 0,
@@ -155,8 +157,15 @@ vi.mock('@tables/grid/tableGridContextMenu', () => ({
 }))
 
 vi.mock('@tables/floatingWidget/floatingWidget', () => ({
-  TableMutationWidget: ({ onApplySuccess }: { onApplySuccess?: () => void }) => (
-    <button type="button" onClick={onApplySuccess}>
+  TableMutationWidget: ({
+    onApplySuccess,
+  }: {
+    onApplySuccess?: (appliedUpdateFields: Readonly<Record<string, ReadonlySet<string>>>) => void
+  }) => (
+    <button
+      type="button"
+      onClick={() => onApplySuccess?.({ 'row-1': new Set(['name']) })}
+    >
       Complete Apply
     </button>
   ),
@@ -382,6 +391,8 @@ afterEach(() => {
   tableViewState.table = {}
   tableViewState.tableColumns = []
   mutationLedgerEntries.length = 0
+  tableViewState.recentlyAppliedCells = {}
+  tableViewState.recentlyInsertedRowIds = new Set()
   stagedFieldsByRowId.current = {}
   stagedValuesByRowId.current = {}
   gridContextMenuProps.current = null
@@ -422,6 +433,23 @@ describe('TableView query status', () => {
     })
   })
 
+  it('marks recently inserted rows while their ephemeral highlight is active', () => {
+    tableViewState.recentlyInsertedRowIds = new Set(['row-1'])
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.getByTestId('row-1-status').textContent).toBe('recentlyInserted')
+  })
+
+  it('keeps staged deletion authoritative over the recently inserted highlight', () => {
+    tableViewState.recentlyInsertedRowIds = new Set(['row-1'])
+    mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.getByTestId('row-1-status').textContent).toBe('stagedDeletion')
+  })
+
   it('projects only applicable staged data fields into grid cell status', () => {
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
     stagedValuesByRowId.current = { 'row-1': { name: 'Grace' } }
@@ -431,6 +459,27 @@ describe('TableView query status', () => {
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('stagedUpdate')
     expect(screen.getByTestId('row-1-email-status').textContent).toBe('default')
     expect(screen.getByTestId('row-1-selection-status').textContent).toBe('default')
+  })
+
+  it('marks recently applied cells while their ephemeral highlight is active', () => {
+    tableViewState.recentlyAppliedCells = { 'row-1': new Set(['name']) }
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.getByTestId('row-1-name-status').textContent).toBe('recentlyApplied')
+    expect(screen.getByTestId('row-1-email-status').textContent).toBe('default')
+    expect(screen.getByTestId('row-1-selection-status').textContent).toBe('default')
+  })
+
+  it('keeps a staged update authoritative over the recently applied highlight', () => {
+    tableViewState.recentlyAppliedCells = { 'row-1': new Set(['name', 'email']) }
+    stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
+    stagedValuesByRowId.current = { 'row-1': { name: 'Grace' } }
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.getByTestId('row-1-name-status').textContent).toBe('stagedUpdate')
+    expect(screen.getByTestId('row-1-email-status').textContent).toBe('recentlyApplied')
   })
 
   it('uses the editing treatment after a staged cell opens its inline editor', () => {
@@ -524,7 +573,9 @@ describe('TableView query status', () => {
 
     expect(screen.queryByRole('dialog', { name: 'Edit name' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Complete Apply' }))
-    expect(tableViewState.handleMutationApplySuccess).toHaveBeenCalledOnce()
+    expect(tableViewState.handleMutationApplySuccess).toHaveBeenCalledWith({
+      'row-1': new Set(['name']),
+    })
   })
 
   it('announces refresh completion and filtered emptiness', async () => {

@@ -11,11 +11,13 @@ import {
   useTableMutationLedger,
 } from '@tables/mutationLedger/provider'
 import { useApplyTableMutationLedger } from '@tables/mutationLedger/useApplyTableMutationLedger'
+import type { TableFieldsByRowId } from '@tables/tableTypes'
 
 afterEach(cleanup)
 
 const columns = [
   { name: 'name', column_type: { type: 'Text' }, nullable: false },
+  { name: 'email', column_type: { type: 'Text' }, nullable: false },
 ] satisfies ColumnDescriptor[]
 
 function TestLedgerProvider({ children }: { children: ReactNode }): React.ReactElement {
@@ -33,10 +35,16 @@ function TestLedgerProvider({ children }: { children: ReactNode }): React.ReactE
   )
 }
 
-function Harness({ updateRow, onSuccess }: { updateRow: () => Promise<void>; onSuccess?: () => void }) {
+function Harness({
+  updateRow,
+  onSuccess,
+}: {
+  updateRow: () => Promise<void>
+  onSuccess?: (appliedUpdateFields: TableFieldsByRowId) => void
+}) {
   const mutations = useTableMutationLedger()
   const controller = useTableMutationEditorController({
-    initialRowValues: { id: 'row-1', name: 'Ada' },
+    initialRowValues: { email: 'ada@example.com', id: 'row-1', name: 'Ada' },
     rowId: 'row-1',
     schemaColumns: columns,
   })
@@ -50,6 +58,18 @@ function Harness({ updateRow, onSuccess }: { updateRow: () => Promise<void>; onS
       <output aria-label="Pending count">{mutations.ledger.entries.length}</output>
       <button type="button" onClick={() => controller.actions.setFieldText('name', 'Grace')}>
         Change
+      </button>
+      <button
+        type="button"
+        onClick={() => controller.actions.setFieldText('email', 'grace@example.com')}
+      >
+        Change email
+      </button>
+      <button
+        type="button"
+        onClick={() => mutations.dispatch({ type: 'deleteRows', rowIds: ['row-2'] })}
+      >
+        Delete row
       </button>
       <button type="button" onClick={() => void apply()}>
         Apply
@@ -83,9 +103,13 @@ describe('useApplyTableMutationLedger', () => {
   })
 
   it('retains the complete staged state after failure', async () => {
+    const onSuccess = vi.fn()
     render(
       <TestLedgerProvider>
-        <Harness updateRow={vi.fn().mockRejectedValue(new Error('Update rejected'))} />
+        <Harness
+          updateRow={vi.fn().mockRejectedValue(new Error('Update rejected'))}
+          onSuccess={onSuccess}
+        />
       </TestLedgerProvider>,
     )
     fireEvent.click(screen.getByRole('button', { name: 'Change' }))
@@ -93,5 +117,23 @@ describe('useApplyTableMutationLedger', () => {
 
     await waitFor(() => expect(screen.getByLabelText('Execution status').textContent).toBe('failed'))
     expect(screen.getByLabelText('Pending count').textContent).toBe('1')
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
+  it('reports every applied update field and excludes deletions', async () => {
+    const onSuccess = vi.fn()
+    render(
+      <TestLedgerProvider>
+        <Harness updateRow={vi.fn().mockResolvedValue(undefined)} onSuccess={onSuccess} />
+      </TestLedgerProvider>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Change' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Change email' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete row' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce())
+    expect(onSuccess).toHaveBeenCalledWith({ 'row-1': new Set(['name', 'email']) })
   })
 })

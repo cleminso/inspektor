@@ -40,6 +40,11 @@ export type TableValuesByRowId = Readonly<
   Record<TableRowId, Readonly<Record<string, unknown>>>
 >;
 
+/** Field-name sets keyed by runtime row ID, such as cells marked after staged updates apply. */
+export type TableFieldsByRowId = Readonly<
+  Record<TableRowId, ReadonlySet<string>>
+>;
+
 /** URL-safe table explorer state used to restore navigation and selected rows. */
 export interface TableExplorerSearchState {
   editorMode: DetailPaneMode | null;

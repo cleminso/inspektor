@@ -11,6 +11,40 @@ import {
 import { dataGridColors } from './dataGridColors.stylex'
 import { dataGridVars } from './dataGridVars.stylex'
 
+const reducedMotion = '@media (prefers-reduced-motion: reduce)'
+
+const recentlyInsertedRowBar = `inset ${spatial['focus-ring-width']} 0 0 ${dataGridColors.recentlyInsertedRowBorder}`
+
+/**
+ * Holds the inserted-row tint, then releases it. The static style below keeps the tint while the
+ * animation is disabled, and consumers clear the status after the animation has ended.
+ */
+const recentlyInsertedHighlight = stylex.keyframes({
+  '0%': {
+    backgroundColor: dataGridColors.recentlyInsertedRowBackground,
+    boxShadow: recentlyInsertedRowBar,
+  },
+  '65%': {
+    backgroundColor: dataGridColors.recentlyInsertedRowBackground,
+    boxShadow: recentlyInsertedRowBar,
+  },
+  '100%': {
+    backgroundColor: 'transparent',
+    boxShadow: `inset ${spatial['focus-ring-width']} 0 0 transparent`,
+  },
+})
+
+/**
+ * Releases the applied-cell tint in one continuous motion from the moment the staged treatment is
+ * withdrawn, so the staged border removal and the background drain read as a single event instead
+ * of a snap followed by a later fade. The static style below keeps the tint while the animation is
+ * disabled, and consumers clear the status after the animation has ended.
+ */
+const recentlyAppliedCellHighlight = stylex.keyframes({
+  '0%': { backgroundColor: dataGridColors.recentlyAppliedCellBackground },
+  '100%': { backgroundColor: 'transparent' },
+})
+
 export const dataGridStyles = stylex.create({
   root: {
     backgroundColor: dataGridColors.background,
@@ -204,6 +238,14 @@ export const dataGridStyles = stylex.create({
     boxShadow: `inset ${spatial['focus-ring-width']} 0 0 ${dataGridColors.stagedDeletionRowBorder}`,
     textDecorationLine: 'line-through',
   },
+  rowRecentlyInserted: {
+    animationDuration: '1200ms',
+    animationFillMode: 'forwards',
+    animationName: { default: recentlyInsertedHighlight, [reducedMotion]: 'none' },
+    animationTimingFunction: 'ease-in-out',
+    backgroundColor: dataGridColors.recentlyInsertedRowBackground,
+    boxShadow: recentlyInsertedRowBar,
+  },
   rowActive: {
     boxShadow: `inset 0 ${spatial['focus-ring-width']} 0 ${dataGridColors.currentRowBorder}`,
   },
@@ -253,6 +295,13 @@ export const dataGridStyles = stylex.create({
   },
   cellStagedSelectionEdgeLeft: {
     [dataGridVars.selectionEdgeLeft]: `1px 0 0 0 ${dataGridColors.stagedUpdateCellBorder}`,
+  },
+  cellRecentlyApplied: {
+    animationDuration: '1200ms',
+    animationFillMode: 'forwards',
+    animationName: { default: recentlyAppliedCellHighlight, [reducedMotion]: 'none' },
+    animationTimingFunction: 'ease-out',
+    backgroundColor: dataGridColors.recentlyAppliedCellBackground,
   },
   cellSelected: {
     backgroundColor: dataGridColors.selectedCellBackground,

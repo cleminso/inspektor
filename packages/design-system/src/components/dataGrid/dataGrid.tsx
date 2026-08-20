@@ -30,8 +30,8 @@ import { useDataGridReorderContext } from './dataGridReorderContext'
 
 export type DataGridDensity = 'compact' | 'default'
 export type DataGridRowRendering = 'all' | 'virtual'
-export type DataGridRowStatus = 'default' | 'stagedDeletion'
-export type DataGridCellStatus = 'default' | 'stagedUpdate'
+export type DataGridRowStatus = 'default' | 'stagedDeletion' | 'recentlyInserted'
+export type DataGridCellStatus = 'default' | 'stagedUpdate' | 'recentlyApplied'
 
 const defaultColumnMinSize = 20
 const defaultColumnMaxSize = Number.MAX_SAFE_INTEGER
@@ -1217,6 +1217,10 @@ function DataGridRowImplementation<TData extends RowData>({
         dataGridStyles.row,
         isSelected === true && dataGridStyles.rowSelected,
         status === 'stagedDeletion' && dataGridStyles.rowStagedDeletion,
+        status === 'recentlyInserted' &&
+          isSelected === false &&
+          isActive === false &&
+          dataGridStyles.rowRecentlyInserted,
       )}
       aria-selected={isSelected}
       aria-rowindex={ariaRowIndex}
@@ -1405,6 +1409,12 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         status === 'stagedUpdate' &&
           selectionEdges?.left === true &&
           dataGridStyles.cellStagedSelectionEdgeLeft,
+        status === 'recentlyApplied' &&
+          isSelected === false &&
+          isCellSelected === false &&
+          isActive === false &&
+          isColumnActive === false &&
+          dataGridStyles.cellRecentlyApplied,
       )}
       data-active={isActive === true ? '' : undefined}
       data-cell-selected={isCellSelected === true ? '' : undefined}

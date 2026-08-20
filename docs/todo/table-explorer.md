@@ -19,6 +19,22 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[19/08/26]
+
+- [x] Highlight a grid row in a green success tint with an inline-start success bar for a short hold-then-fade window after its
+      insert succeeds.
+- [x] Keep the highlight ephemeral: the DataGrid `recentlyInserted` row status owns a 1200ms hold-then-fade animation and the table
+      view clears the status when that feedback completes.
+- [x] Keep staged deletion authoritative over the recently inserted highlight when both apply to one row.
+- [x] Highlight cells whose staged updates applied with the ephemeral staged-change (yellow) tint: the apply hook reports the applied
+      field set per row, the table view projects a `recentlyApplied` cell status, and each apply expires after 1200ms.
+      Green stays reserved for inserted rows.
+- [x] Release the applied-cell tint as one continuous 1200ms ease-out drain starting when the staged treatment is withdrawn, so the
+      staged border removal and the background release read as a single event instead of a snap followed by a later fade.
+- [x] Keep a staged update authoritative over the recently applied cell highlight when both apply to one cell.
+- [x] Drop the redundant `N updates staged` segment from the mutation dock trigger label; the count prefix already communicates
+      staged size, and `Applying changes` and `Needs attention` stand alone.
+
 [17/08/26]
 
 - [x] Keep the page-level `Undo2` header action visually neutral when all loaded rows are staged for deletion.

@@ -5,13 +5,14 @@ import {
   type TableMutationExecutor,
 } from '@tables/mutationLedger/applyLedger'
 import { useTableMutationLedger } from '@tables/mutationLedger/provider'
+import type { TableFieldsByRowId } from '@tables/tableTypes'
 
 export function useApplyTableMutationLedger({
   executor,
   onSuccess,
 }: {
   executor: TableMutationExecutor
-  onSuccess?: () => void
+  onSuccess?: (appliedUpdateFields: TableFieldsByRowId) => void
 }): () => Promise<boolean | null> {
   const mutations = useTableMutationLedger()
   const applyingRef = useRef(false)
@@ -29,11 +30,12 @@ export function useApplyTableMutationLedger({
     applyingRef.current = true
     mutations.setExecution({ error: null, status: 'applying' })
     try {
+      const appliedUpdateFields = mutations.stagedFieldsByRowId
       await applyTableMutationLedger(mutations.ledger, executor)
       // Clear as one UI operation only after every request in the captured ledger succeeds.
       mutations.discardAll()
       mutations.setExecution({ error: null, status: 'idle' })
-      onSuccess?.()
+      onSuccess?.(appliedUpdateFields)
       return true
     } catch (error) {
       mutations.setExecution({

@@ -191,12 +191,16 @@ function TableViewContent({
 }): React.ReactElement {
   const { openSchemaView } = useTableTabs()
   const getRowStatus = useCallback(
-    (row: { id: string }): 'default' | 'stagedDeletion' =>
-      stagedDeletionRowIds.has(row.id) ? 'stagedDeletion' : 'default',
-    [stagedDeletionRowIds],
+    (row: { id: string }) =>
+      stagedDeletionRowIds.has(row.id)
+        ? 'stagedDeletion'
+        : state.recentlyInsertedRowIds.has(row.id)
+          ? 'recentlyInserted'
+          : 'default',
+    [stagedDeletionRowIds, state.recentlyInsertedRowIds],
   )
   const getCellStatus = useCallback(
-    (cell: { column: { id: string }; row: { id: string } }): 'default' | 'stagedUpdate' => {
+    (cell: { column: { id: string }; row: { id: string } }) => {
       if (cell.column.id === tableGridSelectionColumnId || stagedDeletionRowIds.has(cell.row.id)) {
         return 'default'
       }
@@ -208,11 +212,20 @@ function TableViewContent({
         return 'default'
       }
 
-      return mutations.stagedFieldsByRowId[cell.row.id]?.has(cell.column.id) === true
-        ? 'stagedUpdate'
+      if (mutations.stagedFieldsByRowId[cell.row.id]?.has(cell.column.id) === true) {
+        return 'stagedUpdate'
+      }
+
+      return state.recentlyAppliedCells[cell.row.id]?.has(cell.column.id) === true
+        ? 'recentlyApplied'
         : 'default'
     },
-    [mutations.stagedFieldsByRowId, stagedDeletionRowIds, state.activeFieldEditorTarget],
+    [
+      mutations.stagedFieldsByRowId,
+      stagedDeletionRowIds,
+      state.activeFieldEditorTarget,
+      state.recentlyAppliedCells,
+    ],
   )
   const handleCellEditRequest = useCallback(
     (target: { columnId: string; rowId: string }) => {

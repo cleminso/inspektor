@@ -6,24 +6,12 @@ import { Accordion, Box, Button, FloatingPanel, Text } from '@inspector/ds'
 import { InspectorDockCenterPortal } from '@app/shell/dock/centerSlot'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
 import {
-  selectTableMutationCounts,
-  type TableMutationLedger,
   type TableMutationReview,
   type TableMutationReviewOperation,
 } from '@tables/mutationLedger/ledger'
 import { useTableMutationLedger } from '@tables/mutationLedger/provider'
 import { useApplyTableMutationLedger } from '@tables/mutationLedger/useApplyTableMutationLedger'
-
-function formatStagedCount(ledger: TableMutationLedger): string {
-  const counts = selectTableMutationCounts(ledger)
-  if (counts.total === counts.update) {
-    return `${counts.total} ${counts.total === 1 ? 'update' : 'updates'} staged`
-  }
-  if (counts.total === counts.delete) {
-    return `${counts.total} ${counts.total === 1 ? 'deletion' : 'deletions'} staged`
-  }
-  return `${counts.total} ${counts.total === 1 ? 'change' : 'changes'} staged`
-}
+import type { TableFieldsByRowId } from '@tables/tableTypes'
 
 function formatOperationSummary(operation: TableMutationReviewOperation): string {
   if (operation.kind === 'delete') {
@@ -266,7 +254,7 @@ export function TableMutationWidget({
   onApplySuccess,
 }: {
   executor: TableMutationExecutor
-  onApplySuccess?: () => void
+  onApplySuccess?: (appliedUpdateFields: TableFieldsByRowId) => void
 }): React.ReactElement | null {
   const mutations = useTableMutationLedger()
   const apply = useApplyTableMutationLedger({ executor, onSuccess: onApplySuccess })
@@ -283,9 +271,9 @@ export function TableMutationWidget({
 
   const expanded = collapsed === false
   const label = mutations.execution.status === 'applying'
-    ? `Applying changes · ${formatStagedCount(mutations.ledger)}`
+    ? 'Applying changes'
     : mutations.execution.status === 'failed' || mutations.hasInvalidEditor === true
-      ? `Needs attention · ${formatStagedCount(mutations.ledger)}`
+      ? 'Needs attention'
       : 'Staged changes'
 
   return (

@@ -9,6 +9,7 @@ import {
   surfaceColors,
   textColors,
 } from '../../tokens/semantics.stylex'
+import { palette } from '../../tokens/value.stylex'
 
 export const dataGridColors = stylex.defineVars({
   background: surfaceColors.background,
@@ -30,6 +31,9 @@ export const dataGridColors = stylex.defineVars({
   stagedDeletionRowBorder: borderColors.danger,
   stagedUpdateCellBackground: stagedChangeColors.background,
   stagedUpdateCellBorder: stagedChangeColors.border,
+  recentlyInsertedRowBackground: `light-dark(${palette.green100}, ${palette.green800})`,
+  recentlyInsertedRowBorder: borderColors.success,
+  recentlyAppliedCellBackground: stagedChangeColors.background,
   currentRowBorder: selectionColors.border,
   cellBackground: 'transparent',
   cellBorder: borderColors.subtle,

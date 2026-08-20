@@ -4,7 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnDescriptor } from 'jazz-tools'
 
 import { DataGrid } from '@inspector/ds'
-import { createInsertRowValues, useTableViewState } from '@tables/workspace/useTableViewState'
+import {
+  createInsertRowValues,
+  useTableViewState,
+} from '@tables/workspace/useTableViewState'
 
 const setRowEditor = vi.fn()
 const deleteRow = vi.fn()
@@ -173,7 +176,10 @@ beforeEach(() => {
   runtimeState.schema = null
 })
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.useRealTimers()
+})
 
 function TableViewInteractionHarness(): React.ReactElement {
   const state = useTableViewState({ tableName: 'accounts' })
@@ -229,11 +235,52 @@ describe('useTableViewState', () => {
     setRowEditor.mockClear()
 
     act(() => {
-      result.current.handleMutationApplySuccess()
+      result.current.handleMutationApplySuccess({ 'row-1': new Set(['name']) })
     })
 
     expect(result.current.selectedRowIds).toEqual([])
     expect(setRowEditor).toHaveBeenCalledWith(null, null)
+  })
+
+  it('highlights applied cells until the ephemeral status expires', async () => {
+    vi.useFakeTimers()
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.handleMutationApplySuccess({ 'row-1': new Set(['name', 'email']) })
+    })
+
+    expect(result.current.recentlyAppliedCells).toEqual({
+      'row-1': new Set(['name', 'email']),
+    })
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync()
+    })
+
+    expect(result.current.recentlyAppliedCells).toEqual({})
+  })
+
+  it('replaces previous feedback when another apply succeeds', async () => {
+    vi.useFakeTimers()
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.handleMutationApplySuccess({ 'row-1': new Set(['name']) })
+    })
+    act(() => {
+      result.current.handleMutationApplySuccess({ 'row-2': new Set(['name']) })
+    })
+
+    expect(result.current.recentlyAppliedCells).toEqual({
+      'row-2': new Set(['name']),
+    })
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync()
+    })
+
+    expect(result.current.recentlyAppliedCells).toEqual({})
   })
 
   it('unchecks staged deletion rows and closes the edit pane', () => {
@@ -428,6 +475,7 @@ describe('useTableViewState', () => {
 
   it('persists an inserted row and closes the insert pane', async () => {
     searchState.editorMode = 'insert'
+    insertRow.mockResolvedValue('row-3')
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
     await act(async () => {
@@ -441,6 +489,7 @@ describe('useTableViewState', () => {
 
   it('persists an inserted row and keeps the insert pane open when Insert more is enabled', async () => {
     searchState.editorMode = 'insert'
+    insertRow.mockResolvedValue('row-3')
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
     await act(async () => {
@@ -450,6 +499,37 @@ describe('useTableViewState', () => {
     expect(insertRow).toHaveBeenCalledWith({ name: 'Ada' })
     expect(resetPage).not.toHaveBeenCalled()
     expect(setRowEditor).not.toHaveBeenCalled()
+  })
+
+  it('keeps each inserted row highlighted for its own expiry while Insert more repeats', async () => {
+    vi.useFakeTimers()
+    searchState.editorMode = 'insert'
+    insertRow.mockResolvedValueOnce('row-3').mockResolvedValueOnce('row-4')
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    await act(async () => {
+      await result.current.handleInsertSave({ name: 'Ada' }, { keepOpen: true })
+    })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(600)
+    })
+    await act(async () => {
+      await result.current.handleInsertSave({ name: 'Grace' }, { keepOpen: true })
+    })
+
+    expect(result.current.recentlyInsertedRowIds).toEqual(new Set(['row-3', 'row-4']))
+
+    await act(async () => {
+      await vi.advanceTimersToNextTimerAsync()
+    })
+
+    expect(result.current.recentlyInsertedRowIds).toEqual(new Set(['row-4']))
+
+    await act(async () => {
+      await vi.advanceTimersToNextTimerAsync()
+    })
+
+    expect(result.current.recentlyInsertedRowIds).toEqual(new Set())
   })
 
   it('opens inline editing without row selection and ignores requests while the row pane is open', () => {

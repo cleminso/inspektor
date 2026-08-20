@@ -37,6 +37,7 @@ import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
 import type {
+  TableFieldsByRowId,
   TableColumnMeta,
   TablePageSize,
   TableRowId,
@@ -57,7 +58,12 @@ interface UseTableViewStateOptions {
 }
 
 const emptyDisabledRowIds: ReadonlySet<TableRowId> = new Set()
+const emptyRecentlyAppliedCells: TableFieldsByRowId = {}
+const emptyRecentlyInsertedRowIds: ReadonlySet<TableRowId> = new Set()
 const emptyStagedValuesByRowId: TableValuesByRowId = {}
+
+const recentChangeStatusDuration = 1200
+const recentlyAppliedTimerKey = Symbol('recentlyApplied')
 
 interface InsertRowSaveOptions {
   keepOpen: boolean
@@ -97,7 +103,7 @@ interface UseTableViewStateResult {
     values: Record<string, unknown>,
     options: InsertRowSaveOptions,
   ) => Promise<void>
-  handleMutationApplySuccess: () => void
+  handleMutationApplySuccess: (appliedUpdateFields: TableFieldsByRowId) => void
   handleRowsStagedForDeletion: (rowIds: readonly TableRowId[]) => void
   handleRowEditorOpenChange: (open: boolean) => void
   handleRowEditorCancel: () => void
@@ -110,6 +116,8 @@ interface UseTableViewStateResult {
   mutationExecutor: TableMutationExecutor
   page: number
   pageSize: TablePageSize
+  recentlyAppliedCells: TableFieldsByRowId
+  recentlyInsertedRowIds: ReadonlySet<TableRowId>
   rowEditor: TableViewRowEditorState
   rows: DynamicTableRow[]
   rowValues: Record<string, unknown> | null
@@ -164,6 +172,77 @@ export function useTableViewState({
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
     activeRowId === null ? [] : [activeRowId],
   )
+  const [recentlyInsertedRowIds, setRecentlyInsertedRowIds] =
+    useState<ReadonlySet<TableRowId>>(emptyRecentlyInsertedRowIds)
+  const [recentlyAppliedCells, setRecentlyAppliedCells] = useState<TableFieldsByRowId>(
+    emptyRecentlyAppliedCells,
+  )
+  const recentChangeTimersRef = useRef(
+    new Map<TableRowId | typeof recentlyAppliedTimerKey, ReturnType<typeof setTimeout>>(),
+  )
+
+  useEffect(() => {
+    const timers = recentChangeTimersRef.current
+    return () => {
+      for (const timer of timers.values()) {
+        clearTimeout(timer)
+      }
+      timers.clear()
+    }
+  }, [])
+
+  const scheduleRecentChangeExpiry = (
+    key: TableRowId | typeof recentlyAppliedTimerKey,
+    onExpire: () => void,
+  ) => {
+    const timers = recentChangeTimersRef.current
+    clearTimeout(timers.get(key))
+    timers.set(
+      key,
+      setTimeout(() => {
+        timers.delete(key)
+        onExpire()
+      }, recentChangeStatusDuration),
+    )
+  }
+
+  /** Marks one inserted row for the ephemeral grid highlight, then clears the mark on expiry. */
+  const highlightRecentlyInsertedRow = (rowId: TableRowId) => {
+    setRecentlyInsertedRowIds((currentRowIds) => {
+      if (currentRowIds.has(rowId) === true) {
+        return currentRowIds
+      }
+
+      return new Set([...currentRowIds, rowId])
+    })
+
+    scheduleRecentChangeExpiry(
+      rowId,
+      () => {
+        setRecentlyInsertedRowIds((currentRowIds) => {
+          if (currentRowIds.has(rowId) === false) {
+            return currentRowIds
+          }
+
+          const nextRowIds = new Set(currentRowIds)
+          nextRowIds.delete(rowId)
+          return nextRowIds
+        })
+      },
+    )
+  }
+
+  /** Replaces the ephemeral grid highlight with the cells from the latest successful apply. */
+  const highlightRecentlyAppliedCells = (appliedUpdateFields: TableFieldsByRowId) => {
+    if (Object.keys(appliedUpdateFields).length === 0) {
+      return
+    }
+
+    setRecentlyAppliedCells(appliedUpdateFields)
+    scheduleRecentChangeExpiry(recentlyAppliedTimerKey, () => {
+      setRecentlyAppliedCells(emptyRecentlyAppliedCells)
+    })
+  }
   const mutations = useTableMutations({ client, tableName, wasmSchema })
   const tableKey = `${currentConnectionId ?? 'unknown'}:${currentBranch ?? 'unknown'}:${currentSchemaHash ?? 'unknown'}:${tableName}`
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
@@ -441,7 +520,8 @@ export function useTableViewState({
     values: Record<string, unknown>,
     options: InsertRowSaveOptions,
   ) => {
-    await mutations.insertRow(values)
+    const insertedRowId = await mutations.insertRow(values)
+    highlightRecentlyInsertedRow(insertedRowId)
     if (options.keepOpen === true) {
       return
     }
@@ -449,9 +529,10 @@ export function useTableViewState({
     closeDetailPane()
   }
 
-  const handleMutationApplySuccess = () => {
+  const handleMutationApplySuccess = (appliedUpdateFields: TableFieldsByRowId) => {
     resetSelection()
     closeDetailPane()
+    highlightRecentlyAppliedCells(appliedUpdateFields)
   }
 
   const handleRowsStagedForDeletion = (rowIds: readonly TableRowId[]) => {
@@ -546,6 +627,8 @@ export function useTableViewState({
     canOpenRowEditor: wasmSchema !== null,
     cellFocusRequest,
     reorderableColumnIds: columnIds,
+    recentlyAppliedCells,
+    recentlyInsertedRowIds,
     detailPaneMode,
     error: query.error,
     table,

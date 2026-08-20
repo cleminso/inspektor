@@ -42,6 +42,9 @@ describe('DataGrid color contract', () => {
       stagedDeletionRowBorder: expect.any(String),
       stagedUpdateCellBackground: expect.any(String),
       stagedUpdateCellBorder: expect.any(String),
+      recentlyInsertedRowBackground: expect.any(String),
+      recentlyInsertedRowBorder: expect.any(String),
+      recentlyAppliedCellBackground: expect.any(String),
       selectedCellBackground: expect.any(String),
       emphasizedCellBackground: expect.any(String),
       emphasizedHeaderBackground: expect.any(String),
@@ -170,9 +173,10 @@ interface TestDataGridProps {
     requestId: number
     target: { columnId: string; rowId: string }
   } | null
-  getRowStatus?: (row: { id: string }) => 'default' | 'stagedDeletion'
+  getRowStatus?: (row: { id: string }) => 'default' | 'recentlyInserted' | 'stagedDeletion'
   getCellStatus?: (cell: { column: { id: string }; row: { id: string } }) =>
     | 'default'
+    | 'recentlyApplied'
     | 'stagedUpdate'
   initialCellSelection?: CellSelectionState
   loading?: boolean
@@ -875,6 +879,44 @@ describe('DataGrid', () => {
     )
   })
 
+  it('marks recently inserted rows with the ephemeral highlight treatment', () => {
+    render(
+      <TestDataGrid
+        getRowStatus={(row) => (row.id === 'person-1' ? 'recentlyInserted' : 'default')}
+      />,
+    )
+
+    const insertedRow = screen.getByRole('row', { name: /Ada Engineer/ })
+
+    expect(insertedRow.getAttribute('data-status')).toBe('recentlyInserted')
+    expect(insertedRow.className).toContain(
+      stylex.props(dataGridStyles.rowRecentlyInserted).className,
+    )
+    expect(screen.getByRole('row', { name: /Grace Admiral/ }).getAttribute('data-status')).toBe(
+      'default',
+    )
+    expect(screen.getByRole('row', { name: /Grace Admiral/ }).className).not.toContain(
+      stylex.props(dataGridStyles.rowRecentlyInserted).className,
+    )
+  })
+
+  it('keeps selected-row presentation authoritative over a recent insert highlight', () => {
+    render(
+      <TestDataGrid
+        getRowStatus={() => 'recentlyInserted'}
+        selectedRowIds={['person-1']}
+      />,
+    )
+
+    const insertedRow = screen.getByRole('row', { name: /Ada Engineer/ })
+
+    expect(insertedRow.getAttribute('data-status')).toBe('recentlyInserted')
+    expect(insertedRow.getAttribute('aria-selected')).toBe('true')
+    expect(insertedRow.className).not.toContain(
+      stylex.props(dataGridStyles.rowRecentlyInserted).className,
+    )
+  })
+
   it('marks only cells reported as staged updates', () => {
     render(
       <TestDataGrid
@@ -909,6 +951,52 @@ describe('DataGrid', () => {
       stylex.props(dataGridStyles.cellStagedUpdate).className,
     )
     expect(updateCell.getAttribute('data-status')).toBe('stagedUpdate')
+  })
+
+  it('marks recently applied cells with the ephemeral highlight treatment', () => {
+    render(
+      <TestDataGrid
+        getCellStatus={(cell) =>
+          cell.row.id === 'person-1' && cell.column.id === 'role' ? 'recentlyApplied' : 'default'
+        }
+      />,
+    )
+
+    const appliedCell = screen.getByRole('cell', { name: 'Engineer' })
+    const defaultCell = screen.getByRole('cell', { name: 'Ada' })
+
+    expect(appliedCell.getAttribute('data-status')).toBe('recentlyApplied')
+    expect(appliedCell.className).toContain(
+      stylex.props(dataGridStyles.cellRecentlyApplied).className,
+    )
+    expect(defaultCell.getAttribute('data-status')).toBe('default')
+    expect(defaultCell.className).not.toContain(
+      stylex.props(dataGridStyles.cellRecentlyApplied).className,
+    )
+  })
+
+  it('keeps interactive cell backgrounds authoritative over a recent apply highlight', () => {
+    render(
+      <TestDataGrid
+        getCellStatus={() => 'recentlyApplied'}
+        initialCellSelection={[
+          {
+            anchorRowId: 'person-1',
+            anchorColumnId: 'role',
+            focusRowId: 'person-1',
+            focusColumnId: 'role',
+          },
+        ]}
+      />,
+    )
+
+    const appliedCell = screen.getByRole('cell', { name: 'Engineer' })
+
+    expect(appliedCell.getAttribute('data-status')).toBe('recentlyApplied')
+    expect(appliedCell.hasAttribute('data-active')).toBe(true)
+    expect(appliedCell.className).not.toContain(
+      stylex.props(dataGridStyles.cellRecentlyApplied).className,
+    )
   })
 
   it('keeps staged-update presentation composed with selected and active cell states', () => {
