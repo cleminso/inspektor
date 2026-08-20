@@ -8,32 +8,34 @@ vi.mock("@/lib/shiki", () => ({ useHighlightedCode: () => null }));
 afterEach(cleanup);
 
 describe("KeyboardInput playground", () => {
-  it("omits default props and serializes modifiers in component order", () => {
+  it("serializes a platform-specific outlined shortcut", () => {
     expect(
       serializeKeyboardInputPlayground({
-        keyName: "K",
-        platform: "macos",
+        hotkey: "Mod+Shift+K",
+        platform: "mac",
         size: "default",
-        meta: true,
-        ctrl: false,
-        shift: true,
-        alt: false,
+        variant: "outline",
       }),
-    ).toContain('<KeyboardInput modifiers={["meta", "shift"]} platform="macos">K</KeyboardInput>');
+    ).toContain('<KeyboardInput hotkey="Mod+Shift+K" platform="mac" variant="outline" />');
   });
 
-  it("updates and resets the keycap and generated source", () => {
+  it("serializes Backspace", () => {
+    expect(
+      serializeKeyboardInputPlayground({
+        hotkey: "Backspace",
+        platform: "auto",
+        size: "default",
+        variant: "default",
+      }),
+    ).toContain('<KeyboardInput hotkey="Backspace" />');
+  });
+
+  it("renders the default keycap and generated source", () => {
     const { container } = render(<KeyboardInputPlayground />);
 
-    fireEvent.click(screen.getByRole("switch", { name: "Meta" }));
     fireEvent.click(screen.getByRole("button", { name: "Show code" }));
 
-    expect(screen.getByLabelText("Control K")).toBeTruthy();
-    expect(container.querySelector("pre")?.textContent).toContain('modifiers={["meta"]}');
-
-    fireEvent.click(screen.getByRole("button", { name: "Reset controls" }));
-
-    expect(screen.getByLabelText("K")).toBeTruthy();
-    expect(container.querySelector("pre")?.textContent).not.toContain("modifiers");
+    expect(screen.getByLabelText("Ctrl+K")).toBeTruthy();
+    expect(container.querySelector("pre")?.textContent).toContain('hotkey="Mod+K"');
   });
 });

@@ -1,8 +1,8 @@
 import {
   KeyboardInput,
-  type KeyboardInputModifier,
   type KeyboardInputPlatform,
   type KeyboardInputSize,
+  type KeyboardInputVariant,
 } from "@inspector/ds";
 import { type ReactElement, type ReactNode, useState } from "react";
 
@@ -12,41 +12,38 @@ import { createPlaygroundSource } from "@/components/docs/playground/playgroundS
 import { type PlaygroundControl } from "@/components/docs/playground/playgroundTypes";
 import { keyboardInputItem } from "@/lib/registry";
 
-type KeyName = "K" | "Enter" | "Escape";
+type KeyboardInputHotkey = "Backspace" | "Mod+K" | "Mod+Shift+K" | "Enter" | "Escape";
 
 export interface KeyboardInputPlaygroundState {
-  keyName: KeyName;
+  hotkey: KeyboardInputHotkey;
   platform: KeyboardInputPlatform;
   size: KeyboardInputSize;
-  meta: boolean;
-  ctrl: boolean;
-  shift: boolean;
-  alt: boolean;
+  variant: KeyboardInputVariant;
   [key: string]: boolean | string;
 }
 
 const initialState: KeyboardInputPlaygroundState = {
-  keyName: "K",
-  platform: "other",
+  hotkey: "Mod+K",
+  platform: "auto",
   size: "default",
-  meta: false,
-  ctrl: false,
-  shift: false,
-  alt: false,
+  variant: "default",
 };
 
 const controls = [
   {
     kind: "select",
-    key: "keyName",
-    label: "Key",
-    options: ["K", "Enter", "Escape"].map((value) => ({ label: value, value })),
+    key: "hotkey",
+    label: "Hotkey",
+    options: ["Mod+K", "Mod+Shift+K", "Enter", "Escape", "Backspace"].map((value) => ({
+      label: value,
+      value,
+    })),
   },
   {
     kind: "select",
     key: "platform",
     label: "Platform",
-    options: ["other", "macos"].map((value) => ({ label: value, value })),
+    options: ["auto", "mac", "windows", "linux"].map((value) => ({ label: value, value })),
   },
   {
     kind: "select",
@@ -54,29 +51,23 @@ const controls = [
     label: "Size",
     options: ["default", "small"].map((value) => ({ label: value, value })),
   },
-  { kind: "boolean", key: "meta", label: "Meta" },
-  { kind: "boolean", key: "ctrl", label: "Control" },
-  { kind: "boolean", key: "shift", label: "Shift" },
-  { kind: "boolean", key: "alt", label: "Alt" },
+  {
+    kind: "select",
+    key: "variant",
+    label: "Variant",
+    options: ["default", "outline"].map((value) => ({ label: value, value })),
+  },
 ] as const satisfies readonly PlaygroundControl<KeyboardInputPlaygroundState>[];
 
-function getModifiers(state: KeyboardInputPlaygroundState): KeyboardInputModifier[] {
-  return (["meta", "ctrl", "shift", "alt"] as const).filter((modifier) => state[modifier] === true);
-}
-
 export function serializeKeyboardInputPlayground(state: KeyboardInputPlaygroundState): string {
-  const props: string[] = [];
-  const modifiers = getModifiers(state);
-  if (modifiers.length > 0) {
-    props.push(`modifiers={[${modifiers.map((modifier) => `"${modifier}"`).join(", ")}]}`);
-  }
-  if (state.platform !== "other") props.push(`platform="${state.platform}"`);
+  const props = [`hotkey="${state.hotkey}"`];
+  if (state.platform !== "auto") props.push(`platform="${state.platform}"`);
   if (state.size !== "default") props.push(`size="${state.size}"`);
-  const opening = props.length === 0 ? "<KeyboardInput>" : `<KeyboardInput ${props.join(" ")}>`;
+  if (state.variant !== "default") props.push(`variant="${state.variant}"`);
 
   return createPlaygroundSource({
     imports: { KeyboardInput: true },
-    example: `${opening}${state.keyName}</KeyboardInput>`,
+    example: `<KeyboardInput ${props.join(" ")} />`,
   });
 }
 
@@ -89,9 +80,12 @@ export function KeyboardInputPlayground({ children }: { children?: ReactNode }):
       description={keyboardInputItem.description}
       source={keyboardInputItem.source}
       preview={
-        <KeyboardInput modifiers={getModifiers(state)} platform={state.platform} size={state.size}>
-          {state.keyName}
-        </KeyboardInput>
+        <KeyboardInput
+          hotkey={state.hotkey}
+          platform={state.platform}
+          size={state.size}
+          variant={state.variant}
+        />
       }
       sourceCode={serializeKeyboardInputPlayground(state)}
       controls={

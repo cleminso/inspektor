@@ -35,6 +35,7 @@ export const workspaceTabsTabPropNames = [
   'onPointerDown',
   'onPointerEnter',
   'onPointerLeave',
+  'closeHotkey',
   'closeLabel',
   'reorderLabel',
   'contextMenuItems',

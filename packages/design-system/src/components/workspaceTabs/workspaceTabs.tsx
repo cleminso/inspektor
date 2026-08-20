@@ -18,6 +18,7 @@ import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import { Button } from '../button/button'
 import { ContextMenu } from '../contextMenu/contextMenu'
 import { CloseGlyph } from '../icon/iconArtwork'
+import { KeyboardInput, type KeyboardInputHotkey } from '../keyboardInput/keyboardInput'
 import { Tooltip } from '../tooltip/tooltip'
 import { workspaceTabsStyles } from './workspaceTabs.styles'
 import {
@@ -160,6 +161,8 @@ export interface WorkspaceTabsTabProps {
   onPointerLeave?: BaseTabs.Tab.Props['onPointerLeave']
   /** Provides the accessible name for the close action. */
   closeLabel?: string
+  /** Displays the application hotkey for closing this view. */
+  closeHotkey?: KeyboardInputHotkey
   /** Enables the reorder context menu and provides its accessible name. */
   reorderLabel?: string
   /** Additional actions rendered before the built-in reorder actions. */
@@ -439,6 +442,7 @@ function WorkspaceTabsTabContent({
   reorderLabel,
   contextMenuItems,
   contextMenuLabel,
+  closeHotkey,
   closeLabel = 'Close tab',
   isDragSource = false,
   reorderReady = false,
@@ -682,7 +686,15 @@ function WorkspaceTabsTabContent({
                 </Button>
               }
             />
-            <Tooltip.Content>Close view</Tooltip.Content>
+            <Tooltip.Content>
+              Close view
+              {closeHotkey === undefined ? null : (
+                <>
+                  {' '}
+                  <KeyboardInput hotkey={closeHotkey} size="small" />
+                </>
+              )}
+            </Tooltip.Content>
           </Tooltip.Root>
         </div>
       ) : null}

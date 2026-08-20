@@ -285,10 +285,11 @@ export type {
 } from './components/jsonView/jsonView'
 export { KeyboardInput } from './components/keyboardInput/keyboardInput'
 export type {
-  KeyboardInputModifier,
+  KeyboardInputHotkey,
   KeyboardInputPlatform,
   KeyboardInputProps,
   KeyboardInputSize,
+  KeyboardInputVariant,
 } from './components/keyboardInput/keyboardInput'
 export { Textarea } from './components/textarea/textarea'
 export type { TextareaFont, TextareaHeight, TextareaProps } from './components/textarea/textarea'

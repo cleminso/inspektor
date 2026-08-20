@@ -879,7 +879,12 @@ describe('WorkspaceTabs', () => {
       <Tooltip.Provider delay={0}>
         <WorkspaceTabs.Root defaultValue="accounts">
           <WorkspaceTabs.List aria-label="Table views">
-            <WorkspaceTabs.Tab value="accounts" closeLabel="Close Accounts" onClose={() => undefined}>
+            <WorkspaceTabs.Tab
+              value="accounts"
+              closeHotkey="W"
+              closeLabel="Close Accounts"
+              onClose={() => undefined}
+            >
               Accounts
             </WorkspaceTabs.Tab>
           </WorkspaceTabs.List>
@@ -892,6 +897,7 @@ describe('WorkspaceTabs', () => {
     fireEvent.mouseMove(closeButton)
 
     expect(await screen.findByText('Close view')).toBeTruthy()
+    expect(screen.getByLabelText('W')).toBeTruthy()
   })
 
   it('closes the focused view with the Delete key', () => {

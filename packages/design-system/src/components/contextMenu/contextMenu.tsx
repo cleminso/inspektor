@@ -5,6 +5,7 @@ import { type ComponentRef, forwardRef } from "react";
 
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
+import { KeyboardInput, type KeyboardInputProps } from "../keyboardInput/keyboardInput";
 import { menuStyles } from "../menu/menu.styles";
 import {
   getMenuCheckboxIndicatorStyles,
@@ -82,11 +83,11 @@ export interface ContextMenuLinkItemProps extends WithoutStyles<BaseContextMenu.
 export type ContextMenuGroupProps = WithoutStyles<BaseContextMenu.Group.Props>;
 export type ContextMenuGroupLabelProps = WithoutStyles<BaseContextMenu.GroupLabel.Props>;
 export type ContextMenuSeparatorProps = WithoutStyles<BaseContextMenu.Separator.Props>;
-export type ContextMenuShortcutProps = Omit<
+export type ContextMenuShortcutProps = Pick<KeyboardInputProps, "hotkey" | "platform">;
+export type ContextMenuPresentationProps = Omit<
   useRender.ComponentProps<"span">,
   "className" | "style" | "render"
 >;
-export type ContextMenuPresentationProps = ContextMenuShortcutProps;
 
 export interface ContextMenuCheckboxItemProps extends WithoutStyles<BaseContextMenu.CheckboxItem.Props> {
   /** Controls whether changing the option closes the menu. */
@@ -277,14 +278,15 @@ const ContextMenuSeparator = forwardRef<
 });
 
 const ContextMenuShortcut = forwardRef<HTMLSpanElement, ContextMenuShortcutProps>(
-  function ContextMenuShortcut(props, forwardedRef) {
+  function ContextMenuShortcut({ platform = "auto", ...props }, forwardedRef) {
     return (
       <span
-        {...props}
         ref={forwardedRef}
         {...stylex.props(menuStyles.shortcut)}
         data-slot="context-menu-shortcut"
-      />
+      >
+        <KeyboardInput {...props} platform={platform} size="small" variant="default" />
+      </span>
     );
   },
 );

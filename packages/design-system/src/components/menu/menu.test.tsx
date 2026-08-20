@@ -5,7 +5,6 @@ import { createRef } from "react";
 
 import { Button } from "../button/button";
 import { buttonStyles } from "../button/button.styles";
-import { KeyboardInput } from "../keyboardInput/keyboardInput";
 import { Menu } from "./menu";
 import { menuStyles } from "./menu.styles";
 
@@ -193,23 +192,20 @@ describe("Menu", () => {
         <Menu.Content>
           <Menu.Item>
             Move left
-            <Menu.Shortcut>
-              <KeyboardInput modifiers={["shift"]} size="small">
-                ←
-              </KeyboardInput>
-            </Menu.Shortcut>
+            <Menu.Shortcut hotkey="Shift+ArrowLeft" />
           </Menu.Item>
         </Menu.Content>
       </Menu.Root>,
     );
 
     const item = screen.getByRole("menuitem", { name: /Move left/ });
-    const shortcut = screen.getByLabelText("Shift ←");
+    const shortcut = screen.getByLabelText("Shift+ArrowLeft");
     const restingItemClassName = item.className;
 
     fireEvent.mouseMove(item);
 
     expect(item.className).not.toBe(restingItemClassName);
-    expect(shortcut).toBeTruthy();
+    expect(shortcut.getAttribute("data-variant")).toBe("default");
+    expect(shortcut.getAttribute("data-size")).toBe("small");
   });
 });

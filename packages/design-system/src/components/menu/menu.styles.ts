@@ -216,12 +216,7 @@ export const menuStyles = stylex.create({
     width: spatial["icon-size-xs"],
   },
   shortcut: {
-    color: textColors.muted,
     flexShrink: 0,
-    fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[1],
-    fontWeight: fontWeights.regular,
-    lineHeight: lineHeights.compact,
     marginInlineStart: "auto",
   },
   groupLabel: {

@@ -24,6 +24,7 @@ import {
   menuPositionerPropNames,
   menuRadioItemPropNames,
   menuRootPropNames,
+  menuShortcutPropNames,
   menuTriggerPropNames,
 } from "./props";
 import SelectionItemsExample from "./selectionItemsExample";
@@ -35,6 +36,7 @@ const contentProps = getGeneratedProps("menu.content", menuContentPropNames);
 const positionerProps = getGeneratedProps("menu.positioner", menuPositionerPropNames);
 const itemProps = getGeneratedProps("menu.item", menuItemPropNames);
 const linkItemProps = getGeneratedProps("menu.linkItem", menuLinkItemPropNames);
+const shortcutProps = getGeneratedProps("menu.shortcut", menuShortcutPropNames);
 const checkboxItemProps = getGeneratedProps("menu.checkboxItem", menuCheckboxItemPropNames);
 const radioItemProps = getGeneratedProps("menu.radioItem", menuRadioItemPropNames);
 
@@ -112,6 +114,9 @@ export function MenuPage(): ReactElement {
       </Section>
       <Section title="Link item props">
         <PropsTable rows={linkItemProps} />
+      </Section>
+      <Section title="Shortcut props">
+        <PropsTable rows={shortcutProps} />
       </Section>
       <Section title="Checkbox item props">
         <PropsTable rows={checkboxItemProps} />

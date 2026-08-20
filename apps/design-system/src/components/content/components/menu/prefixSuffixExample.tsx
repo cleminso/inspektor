@@ -1,4 +1,4 @@
-import { Button, KeyboardInput, Menu, Icon } from "@inspector/ds";
+import { Button, Menu, Icon } from "@inspector/ds";
 import { Copy, Pencil, Trash2 } from "lucide-react";
 import { type ReactElement } from "react";
 
@@ -12,29 +12,21 @@ export default function PrefixSuffixExample(): ReactElement {
             <Icon artwork={Pencil} size="s" />
           </Menu.Prefix>
           Rename
-          <Menu.Suffix>
-            <KeyboardInput size="small">F2</KeyboardInput>
-          </Menu.Suffix>
+          <Menu.Shortcut hotkey="F2" />
         </Menu.Item>
         <Menu.Item onClick={() => undefined}>
           <Menu.Prefix>
             <Icon artwork={Copy} size="s" />
           </Menu.Prefix>
           Duplicate
-          <Menu.Suffix>
-            <KeyboardInput modifiers={["meta"]} size="small" platform="macos">
-              D
-            </KeyboardInput>
-          </Menu.Suffix>
+          <Menu.Shortcut hotkey="Mod+D" />
         </Menu.Item>
         <Menu.Item variant="danger" onClick={() => undefined}>
           <Menu.Prefix>
             <Icon artwork={Trash2} size="s" />
           </Menu.Prefix>
           Delete
-          <Menu.Suffix>
-            <KeyboardInput size="small">Del</KeyboardInput>
-          </Menu.Suffix>
+          <Menu.Shortcut hotkey="Delete" />
         </Menu.Item>
       </Menu.Content>
     </Menu.Root>

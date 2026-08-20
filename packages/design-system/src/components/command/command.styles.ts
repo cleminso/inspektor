@@ -154,7 +154,7 @@ export const commandStyles = stylex.create({
     justifyContent: "space-between",
     height: spatial["control-height-xl"],
   },
-  shortcut: { flexShrink: 0, fontFamily: fontFamilies.mono, marginInlineStart: "auto" },
+  shortcut: { flexShrink: 0, marginInlineStart: "auto" },
   key: {
     borderColor: borderColors.subtle,
     borderRadius: borderRadii.xs,

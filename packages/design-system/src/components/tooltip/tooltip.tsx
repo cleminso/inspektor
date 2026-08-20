@@ -125,6 +125,7 @@ function TooltipContent({ side = 'top', align = 'center', children }: TooltipCon
   ])
   const popupStyleProps = createStateStyleProps<BaseTooltip.Popup.State>((state) => [
     tooltipStyles.popup,
+    tooltipStyles.keyboardInputContext,
     state.instant === undefined &&
       state.transitionStatus === 'starting' &&
       tooltipStyles.popupTransition,

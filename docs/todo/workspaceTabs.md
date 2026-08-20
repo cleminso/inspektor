@@ -13,6 +13,10 @@
 
 [20/08/26]
 
+- [x] Accept an optional canonical close hotkey and display it with Keyboard Input in the close-action tooltip.
+
+[20/08/26]
+
 - [x] Expose persistent and replaceable tab title presentation without moving application persistence state into the design system.
 - [x] Forward tab-button double clicks without including the sibling close action.
 - [x] Compose consumer context actions and built-in reorder actions inside one accessible tab menu.
@@ -276,6 +280,10 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Cover close-action shortcut display in the authored tooltip.
 
 [20/08/26]
 

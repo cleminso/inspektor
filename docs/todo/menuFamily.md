@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[20/08/26]
+
+- [x] Replace legacy Menu and Context Menu shortcut typography with canonical Keyboard Input rendering.
+- [x] Keep shortcut wrappers responsible only for trailing alignment.
+
 [11/08/26]
 
 - [x] Document that a composed Menu trigger control owns its visual presentation.
@@ -87,6 +92,10 @@
 - None.
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Cover default, small Keyboard Input rendering through Menu and Context Menu shortcut APIs.
 
 [05/08/26]
 

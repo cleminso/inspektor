@@ -1,5 +1,4 @@
 import { Menu as BaseMenu } from "@base-ui/react/menu";
-import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import * as stylex from "@stylexjs/stylex";
 import { forwardRef, useContext, type ComponentRef } from "react";
@@ -7,6 +6,7 @@ import { forwardRef, useContext, type ComponentRef } from "react";
 import { createStateStyleProps } from "../../primitives/createStateStyleProps";
 import { popupPositioning } from "../../primitives/popupPositioning";
 import { InputGroupContext } from "../inputGroup/inputGroupContext";
+import { KeyboardInput, type KeyboardInputProps } from "../keyboardInput/keyboardInput";
 import { menuStyles } from "./menu.styles";
 import {
   getMenuCheckboxIndicatorStyles,
@@ -99,10 +99,7 @@ export interface MenuGroupLabelProps extends WithoutStyles<BaseMenu.GroupLabel.P
   render?: BaseMenu.GroupLabel.Props["render"];
 }
 
-export interface MenuShortcutProps extends Omit<useRender.ComponentProps<"span">, "className" | "style"> {
-  /** Composes the shortcut label onto another element. */
-  render?: useRender.ComponentProps<"span">["render"];
-}
+export type MenuShortcutProps = Pick<KeyboardInputProps, "hotkey" | "platform">;
 
 export interface MenuCheckboxItemProps extends Omit<WithoutStyles<BaseMenu.CheckboxItem.Props>, "nativeButton"> {
   /** Controls the checked state. */
@@ -289,19 +286,15 @@ const MenuGroupLabel = forwardRef<ComponentRef<typeof BaseMenu.GroupLabel>, Menu
   return <BaseMenu.GroupLabel {...props} ref={ref} {...styles} data-slot="menu-group-label" />;
 });
 
-const MenuShortcut = forwardRef<HTMLElement, MenuShortcutProps>(function MenuShortcut({ render, ...props }, ref) {
-  const styles = stylex.props(menuStyles.shortcut);
-  const defaultProps = {
-    ...styles,
-    "data-slot": "menu-shortcut",
-  } as useRender.ComponentProps<"span">;
-
-  return useRender({
-    defaultTagName: "span",
-    render,
-    props: mergeProps<"span">(defaultProps, props),
-    ref,
-  });
+const MenuShortcut = forwardRef<HTMLSpanElement, MenuShortcutProps>(function MenuShortcut(
+  { platform = "auto", ...props },
+  ref,
+) {
+  return (
+    <span ref={ref} {...stylex.props(menuStyles.shortcut)} data-slot="menu-shortcut">
+      <KeyboardInput {...props} platform={platform} size="small" variant="default" />
+    </span>
+  );
 });
 
 const MenuCheckboxItem = forwardRef<HTMLDivElement, MenuCheckboxItemProps>(function MenuCheckboxItem(

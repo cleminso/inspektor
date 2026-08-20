@@ -20,6 +20,7 @@ import {
   contextMenuPositionerPropNames,
   contextMenuRadioItemPropNames,
   contextMenuRootPropNames,
+  contextMenuShortcutPropNames,
 } from "./props";
 
 const rootProps = getGeneratedProps("contextMenu.root", contextMenuRootPropNames);
@@ -30,6 +31,7 @@ const positionerProps = getGeneratedProps(
 );
 const itemProps = getGeneratedProps("contextMenu.item", contextMenuItemPropNames);
 const linkItemProps = getGeneratedProps("contextMenu.linkItem", contextMenuLinkItemPropNames);
+const shortcutProps = getGeneratedProps("contextMenu.shortcut", contextMenuShortcutPropNames);
 const checkboxItemProps = getGeneratedProps(
   "contextMenu.checkboxItem",
   contextMenuCheckboxItemPropNames,
@@ -83,6 +85,9 @@ export function ContextMenuPage(): ReactElement {
       </Section>
       <Section title="Link item props">
         <PropsTable rows={linkItemProps} />
+      </Section>
+      <Section title="Shortcut props">
+        <PropsTable rows={shortcutProps} />
       </Section>
       <Section title="Checkbox item props">
         <PropsTable rows={checkboxItemProps} />

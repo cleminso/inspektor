@@ -9,6 +9,7 @@ import {
   lineHeights,
   spacing,
 } from '../../tokens/value.stylex'
+import { keyboardInputVars } from '../keyboardInput/keyboardInputVars.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
 
@@ -63,6 +64,9 @@ export const tooltipStyles = stylex.create({
   popupTransition: {
     opacity: 0,
     transform: 'scale(0.98)',
+  },
+  keyboardInputContext: {
+    [keyboardInputVars.textColor]: textColors.onInverse,
   },
   popupOpen: {},
   popupClosed: {},

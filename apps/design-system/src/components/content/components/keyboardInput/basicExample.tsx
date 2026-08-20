@@ -2,5 +2,5 @@ import { KeyboardInput } from "@inspector/ds";
 import { type ReactElement } from "react";
 
 export default function BasicExample(): ReactElement {
-  return <KeyboardInput>Enter</KeyboardInput>;
+  return <KeyboardInput hotkey="Enter" />;
 }

@@ -559,10 +559,13 @@ test("extracts the constrained ToggleGroup compound API", () => {
 });
 
 test("extracts the constrained WorkspaceTabs compound API", () => {
-
   assert.deepEqual(
     metadata["workspaceTabs.root"]?.map(({ name }) => name),
     ["children", "value", "defaultValue", "onValueChange"],
+  );
+  assert.equal(
+    metadata["workspaceTabs.tab"]?.find(({ name }) => name === "closeHotkey")?.type,
+    "KeyboardInputHotkey",
   );
   assert.deepEqual(
     metadata["workspaceTabs.list"]?.map(({ name }) => name),
@@ -592,6 +595,7 @@ test("extracts the constrained WorkspaceTabs compound API", () => {
       "onPointerEnter",
       "onPointerLeave",
       "closeLabel",
+      "closeHotkey",
       "reorderLabel",
       "contextMenuItems",
       "contextMenuLabel",
@@ -612,6 +616,29 @@ test("extracts the constrained WorkspaceTabs compound API", () => {
   assert.equal(
     metadata["workspaceTabs.tab"]?.find(({ name }) => name === "className"),
     undefined,
+  );
+});
+
+test("preserves the exported KeyboardInputHotkey alias in generated APIs", () => {
+  assert.equal(
+    metadata.keyboardInput?.find(({ name }) => name === "hotkey")?.type,
+    "KeyboardInputHotkey",
+  );
+  assert.equal(
+    metadata["menu.shortcut"]?.find(({ name }) => name === "hotkey")?.type,
+    "KeyboardInputHotkey",
+  );
+  assert.equal(
+    metadata["contextMenu.shortcut"]?.find(({ name }) => name === "hotkey")?.type,
+    "KeyboardInputHotkey",
+  );
+  assert.equal(
+    metadata["menu.shortcut"]?.find(({ name }) => name === "platform")?.defaultValue,
+    '"auto"',
+  );
+  assert.equal(
+    metadata["contextMenu.shortcut"]?.find(({ name }) => name === "platform")?.defaultValue,
+    '"auto"',
   );
 });
 
@@ -911,7 +938,10 @@ test("extracts the constrained Menu compound API", () => {
     metadata["menu.groupLabel"]?.find(({ name }) => name === "className"),
     undefined,
   );
-  assert.ok(metadata["menu.shortcut"]?.some(({ name }) => name === "render"));
+  assert.deepEqual(
+    metadata["menu.shortcut"]?.map(({ name }) => name),
+    ["hotkey", "platform"],
+  );
   assert.equal(
     metadata["menu.shortcut"]?.find(({ name }) => name === "className"),
     undefined,
@@ -979,6 +1009,10 @@ test("extracts the constrained ContextMenu compound API", () => {
   assert.equal(
     metadata["contextMenu.item"]?.find(({ name }) => name === "className"),
     undefined,
+  );
+  assert.deepEqual(
+    metadata["contextMenu.shortcut"]?.map(({ name }) => name),
+    ["hotkey", "platform"],
   );
 });
 

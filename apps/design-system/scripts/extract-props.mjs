@@ -469,18 +469,24 @@ function getDeprecation(symbol, typeChecker) {
   return deprecatedTag.text?.map(({ text }) => text).join("") ?? "Deprecated.";
 }
 
-function formatType(type, location) {
+function formatType(type, location, declaration) {
+  const declaredTypeNode = declaration?.getTypeNode?.();
+  if (declaredTypeNode?.getText() === "KeyboardInputHotkey") {
+    return "KeyboardInputHotkey";
+  }
   const unionTypes = type.getUnionTypes();
   const definedUnionTypes = unionTypes.filter((unionType) => unionType.isUndefined() === false);
   if (definedUnionTypes.length > 0 && definedUnionTypes.length !== unionTypes.length) {
-    return definedUnionTypes.map((unionType) => formatType(unionType, location)).join(" | ");
+    return definedUnionTypes
+      .map((unionType) => formatType(unionType, location, declaration))
+      .join(" | ");
   }
 
   const normalizedType = type;
   if (normalizedType.isTypeParameter()) {
     const constraint = normalizedType.getConstraint();
     if (constraint !== undefined) {
-      return formatType(constraint, location);
+      return formatType(constraint, location, declaration);
     }
   }
   const aliasDeclaration = normalizedType
@@ -726,7 +732,11 @@ function extractComponentProps(project, entry) {
       return [
         {
           name: symbol.getName(),
-          type: formatType(symbol.getTypeAtLocation(componentDeclaration), componentDeclaration),
+          type: formatType(
+            symbol.getTypeAtLocation(componentDeclaration),
+            componentDeclaration,
+            declaration,
+          ),
           required: symbol.isOptional() === false,
           ...(runtimeDefaults.has(symbol.getName())
             ? { defaultValue: runtimeDefaults.get(symbol.getName()) }

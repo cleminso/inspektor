@@ -1,23 +1,24 @@
 import * as stylex from "@stylexjs/stylex";
 
 import {
+  borderRadii,
   fontFamilies,
   fontSizes,
   fontWeights,
   lineHeights,
   spacing,
 } from "../../tokens/value.stylex";
-import { spatial } from "../../tokens/semantics.stylex";
+import { borderColors, spatial } from "../../tokens/semantics.stylex";
 import { keyboardInputVars } from "./keyboardInputVars.stylex";
 
 export const keyboardInputStyles = stylex.create({
   root: {
-    // borderRadius: borderRadii.xs,
+    borderRadius: borderRadii.xs,
+    borderStyle: "solid",
+    borderWidth: 1,
     paddingInline: spacing.s,
     alignItems: "center",
-    // backgroundColor: keyboardInputVars.backgroundColor,
-    // boxShadow: keyboardInputVars.boxShadow,
-    // boxSizing: "border-box",
+    boxSizing: "border-box",
     color: keyboardInputVars.textColor,
     display: "inline-flex",
     fontFamily: fontFamilies.sans,
@@ -29,6 +30,14 @@ export const keyboardInputStyles = stylex.create({
     whiteSpace: "nowrap",
     minHeight: spatial["control-height-m"],
     minWidth: spatial["control-height-m"],
+  },
+  default: {
+    backgroundColor: "transparent",
+    borderColor: "transparent",
+  },
+  outline: {
+    backgroundColor: "transparent",
+    borderColor: borderColors.default,
   },
   glyph: {
     display: "inline-block",

@@ -21,7 +21,7 @@ export function KeyboardInputPage(): ReactElement {
     <KeyboardInputPlayground>
       <Section
         title="Key"
-        description="Use a keyboard input to show a single key required by an action."
+        description="Use a keyboard input to show the key required by an action."
       >
         <Example source={basicSource}>
           <BasicExample />
@@ -30,7 +30,7 @@ export function KeyboardInputPage(): ReactElement {
 
       <Section
         title="Combination"
-        description="Declare modifiers as a set. The component presents them in the platform-standard order."
+        description="Pass the same canonical TanStack hotkey used for registration. The component detects and formats the current platform automatically."
       >
         <Example source={combinationSource}>
           <CombinationExample />
@@ -38,8 +38,8 @@ export function KeyboardInputPage(): ReactElement {
       </Section>
 
       <Section
-        title="Platform and density"
-        description="Set the platform for the application keymap. The keycap uses a neutral surface with a light one-pixel shadow; use the small size in dense menus, command bars, and tables."
+        title="Platform, variant, and density"
+        description="Override platform detection for previews, use outline for emphasis on dense surfaces, and use the small size in menus, command bars, and tables."
       >
         <Example source={platformSource}>
           <PlatformExample />

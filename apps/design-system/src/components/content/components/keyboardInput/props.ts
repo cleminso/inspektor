@@ -1,1 +1,1 @@
-export const keyboardInputPropNames = ["modifiers", "platform", "size"] as const;
+export const keyboardInputPropNames = ["hotkey", "platform", "size", "variant"] as const;

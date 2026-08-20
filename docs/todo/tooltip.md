@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[20/08/26]
+
+- [x] Provide the inverse semantic foreground to nested Keyboard Input hints through their inherited context variable.
+
 [06/08/26]
 
 - [x] Remove tooltip exit motion so adjacent replacements cannot overlap while the next label opens.
@@ -58,6 +62,10 @@
 
 ## Settled interaction decisions
 
+[20/08/26]
+
+- [x] Inverse tooltip surfaces own the semantic foreground of nested shortcut hints.
+
 [06/08/26]
 
 - [x] Keep subtle motion for the initial entrance only; exits and adjacent replacements are immediate.
@@ -89,6 +97,10 @@
 - None.
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Cover inverse shortcut context composition in focused Tooltip tests.
 
 [06/08/26]
 

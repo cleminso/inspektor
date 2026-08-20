@@ -20,6 +20,24 @@ describe("ContextMenu", () => {
     expect(screen.getByRole("menu").getAttribute("data-scrollbar")).toBe("standard");
   });
 
+  it("renders shortcut hotkeys through KeyboardInput", () => {
+    render(
+      <ContextMenu.Root defaultOpen>
+        <ContextMenu.Trigger>Canvas</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item>
+            Move left
+            <ContextMenu.Shortcut hotkey="Shift+ArrowLeft" />
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>,
+    );
+
+    const shortcut = screen.getByLabelText("Shift+ArrowLeft");
+    expect(shortcut.getAttribute("data-variant")).toBe("default");
+    expect(shortcut.getAttribute("data-size")).toBe("small");
+  });
+
   it("opens from its trigger on a context-menu event", () => {
     render(
       <ContextMenu.Root>

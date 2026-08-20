@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import { KeyboardInput } from '../keyboardInput/keyboardInput'
 import { Tooltip } from './tooltip'
 import { tooltipStyles } from './tooltip.styles'
 
@@ -100,5 +101,23 @@ describe('Tooltip', () => {
     )
 
     expect(popup?.parentElement?.style.pointerEvents).toBe('none')
+  })
+
+  it('provides inverse context styling to nested keyboard input', async () => {
+    render(
+      <Tooltip.Provider delay={0}>
+        <Tooltip.Root defaultOpen>
+          <Tooltip.Trigger>Trigger</Tooltip.Trigger>
+          <Tooltip.Content>
+            Close view <KeyboardInput hotkey="W" size="small" />
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </Tooltip.Provider>,
+    )
+
+    const popup = (await screen.findByLabelText('W')).closest('[data-slot="tooltip-content"]')
+    expect(popup?.className).toContain(
+      stylex.props(tooltipStyles.keyboardInputContext).className,
+    )
   })
 })
