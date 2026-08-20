@@ -1618,8 +1618,8 @@
       "required": false,
       "description": "Defines a string value that labels the current element.",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2603
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2612
       }
     },
     {
@@ -1628,8 +1628,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -2148,7 +2148,7 @@
       "required": false,
       "description": "Event handler called when the input value changes.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/root/ComboboxRoot.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/root/ComboboxRoot.d.mts",
         "line": 68
       }
     }
@@ -2203,7 +2203,7 @@
       "required": false,
       "description": "Whether the dialog is currently open.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
         "line": 18
       }
     },
@@ -2214,7 +2214,7 @@
       "defaultValue": "false",
       "description": "Whether the dialog is initially open.\n\nTo render a controlled dialog, use the `open` prop instead.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
         "line": 25
       }
     },
@@ -2224,7 +2224,7 @@
       "required": false,
       "description": "Event handler called when the dialog is opened or closed.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
         "line": 40
       }
     }
@@ -2270,7 +2270,7 @@
       "required": false,
       "description": "Whether the component should ignore user interaction.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/item/ComboboxItem.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/item/ComboboxItem.d.mts",
         "line": 44
       }
     }
@@ -2371,8 +2371,8 @@
       "defaultValue": "false",
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 3053
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 3062
       }
     }
   ],
@@ -2394,8 +2394,8 @@
       "defaultValue": "false",
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 3053
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 3062
       }
     }
   ],
@@ -3117,8 +3117,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     },
     {
@@ -3127,8 +3127,8 @@
       "required": false,
       "description": "Defines a string value that labels the current element.",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2603
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2612
       }
     },
     {
@@ -3137,8 +3137,8 @@
       "required": false,
       "description": "Identifies the element (or elements) that labels the current element.",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2608
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2617
       }
     }
   ],
@@ -3334,8 +3334,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3346,8 +3346,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3358,8 +3358,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3370,8 +3370,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3402,8 +3402,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3425,8 +3425,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3447,8 +3447,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3459,8 +3459,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -3471,8 +3471,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2267
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
       }
     }
   ],
@@ -4889,8 +4889,8 @@
       "required": false,
       "description": "",
       "source": {
-        "path": "node_modules/.pnpm/@types+react@19.2.17/node_modules/@types/react/index.d.ts",
-        "line": 2375
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2384
       }
     }
   ],
@@ -5574,8 +5574,8 @@
       "defaultValue": "\"bottom\"",
       "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 86
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "line": 90
       }
     },
     {
@@ -5585,8 +5585,8 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 116
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "line": 120
       }
     }
   ],
@@ -5961,8 +5961,8 @@
       "defaultValue": "\"bottom\"",
       "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 86
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "line": 90
       }
     },
     {
@@ -5972,8 +5972,8 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 116
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "line": 120
       }
     }
   ],
@@ -6071,7 +6071,7 @@
     },
     {
       "name": "render",
-      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<HTMLProps, MenuLinkItemState>",
+      "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentRenderFn<DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>, MenuLinkItemState>",
       "required": false,
       "description": "Composes link-item behavior onto another link component.",
       "source": {
@@ -6557,8 +6557,8 @@
       "defaultValue": "\"bottom\"",
       "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 86
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "line": 90
       }
     },
     {
@@ -6568,8 +6568,8 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.6.0_@date-fns+tz@1.5.0_@types+react@19.2.17_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/utils/useAnchorPositioning.d.mts",
-        "line": 116
+        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "line": 120
       }
     }
   ],
