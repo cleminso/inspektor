@@ -9,7 +9,24 @@ const { releasePrefetch, startTableRowsPrefetch } = vi.hoisted(() => ({
 }))
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, ...props }: React.ComponentProps<'a'>) => <a {...props}>{children}</a>,
+  Link: ({
+    children,
+    params: _params,
+    search,
+    to: _to,
+    ...props
+  }: React.ComponentProps<'a'> & {
+    params?: unknown
+    search?: unknown
+    to?: string
+  }) => (
+    <a
+      {...props}
+      data-search={JSON.stringify(search)}
+    >
+      {children}
+    </a>
+  ),
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -39,6 +56,7 @@ describe('TableListPane', () => {
     pinnedTableNames: new Set<string>(),
     onOpenTables: vi.fn(),
     onPinTables: vi.fn(),
+    onPersistTable: vi.fn(),
     onReplaceSelection: vi.fn(),
     onUnpinTables: vi.fn(),
   }
@@ -161,6 +179,45 @@ describe('TableListPane', () => {
     )
 
     expect(screen.getByRole('button', { name: 'accounts' }).tagName).toBe('A')
+  })
+
+  it('persists a table from a double click without replacing link navigation', () => {
+    const onPersistTable = vi.fn()
+    render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={['accounts']}
+        onClearSelection={vi.fn()}
+        onPersistTable={onPersistTable}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    const accountsLink = screen.getByRole('button', { name: 'accounts' })
+    fireEvent.doubleClick(accountsLink)
+
+    expect(accountsLink.tagName).toBe('A')
+    expect(onPersistTable).toHaveBeenCalledWith('accounts')
+  })
+
+  it("opens an existing table with that tab's stored filter state", () => {
+    render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tableSearchByName={new Map([['accounts', { filters: 'active-filter', page: 2 }]])}
+        tables={['accounts']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'accounts' }).getAttribute('data-search')).toBe(
+      JSON.stringify({ filters: 'active-filter', page: 2 }),
+    )
   })
 
   it('prefetches the destination rows from pointer intent and releases ownership on exit', () => {

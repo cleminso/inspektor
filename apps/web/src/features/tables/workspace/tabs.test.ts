@@ -73,7 +73,7 @@ describe("table tabs", () => {
     });
   });
 
-  it("keeps filtered route state separate from the base table tab", () => {
+  it("keeps filtered route state on the table's single data tab", () => {
     const tabs: TableTab[] = [
       {
         kind: "table",
@@ -85,15 +85,14 @@ describe("table tabs", () => {
 
     const result = reconcileTableTab({
       activeTabId: "table:accounts",
-      createId: () => "accounts-filtered",
       search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
       tableName: "accounts",
       tabs,
     });
 
-    expect(result.activeTabId).toBe("view:accounts-filtered");
-    expect(result.tabs).toHaveLength(2);
-    expect(result.tabs[1]?.kind === "table" ? result.tabs[1].search : null).toEqual({
+    expect(result.activeTabId).toBe("table:accounts");
+    expect(result.tabs).toHaveLength(1);
+    expect(result.tabs[0]?.kind === "table" ? result.tabs[0].search : null).toEqual({
       filters: "active-filter",
       sort: "createdAt",
       dir: "desc",
@@ -110,7 +109,6 @@ describe("table tabs", () => {
 
     const result = reconcileTableTab({
       activeTabId: baseTab.id,
-      createId: () => "unused-view",
       search: { page: 2, pageSize: 500 },
       tableName: "accounts",
       tabs: [baseTab],
@@ -137,7 +135,6 @@ describe("table tabs", () => {
 
     const result = reconcileTableTab({
       activeTabId: baseTab.id,
-      createId: () => "accounts-schema",
       search: { view: "schema" },
       tableName: "accounts",
       tabs: [baseTab],
@@ -157,17 +154,16 @@ describe("table tabs", () => {
     });
   });
 
-  it("opens schema separately from an active filtered data view", () => {
+  it("opens schema separately from an active filtered table tab", () => {
     const filteredTab: TableDataTab = {
       kind: "table",
-      id: "view:accounts-filtered",
+      id: "table:accounts",
       tableName: "accounts",
       search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
     };
 
     const result = reconcileTableTab({
       activeTabId: filteredTab.id,
-      createId: () => "unused",
       search: { filters: "active-filter", sort: "createdAt", dir: "desc", view: "schema" },
       tableName: "accounts",
       tabs: [filteredTab],
@@ -197,7 +193,6 @@ describe("table tabs", () => {
 
     const result = reconcileTableTab({
       activeTabId: "table:accounts",
-      createId: () => "unused",
       search: { filters: "ignored-filter", sort: "ignored-sort", view: "schema" },
       tableName: "accounts",
       tabs: [
@@ -222,7 +217,6 @@ describe("table tabs", () => {
 
     const result = reconcileTableTab({
       activeTabId: NEW_VIEW_TAB_ID,
-      createId: () => "unused",
       search: {},
       tableName: "accounts",
       tabs: [existingTab, newViewTab],
@@ -245,7 +239,6 @@ describe("table tabs", () => {
 
     const result = reconcileTableTab({
       activeTabId: NEW_VIEW_TAB_ID,
-      createId: () => "unused",
       search: {},
       tableName: "accounts",
       tabs: [existingTab, newViewTab],
@@ -254,33 +247,42 @@ describe("table tabs", () => {
     expect(result.tabs).toEqual([existingTab, newViewTab]);
   });
 
-  it("updates the active filtered tab when its route search changes", () => {
+  it("replaces the current replaceable data tab when another table opens", () => {
+    const result = reconcileTableTab({
+      activeTabId: "table:accounts",
+      replaceableTabId: "table:accounts",
+      search: {},
+      tableName: "profiles",
+      tabs: [
+        { kind: "table", id: "table:users", tableName: "users", search: {} },
+        { kind: "table", id: "table:accounts", tableName: "accounts", search: {} },
+      ],
+    });
+
+    expect(result).toEqual({
+      activeTabId: "table:profiles",
+      tabs: [
+        { kind: "table", id: "table:users", tableName: "users", search: {} },
+        { kind: "table", id: "table:profiles", tableName: "profiles", search: {} },
+      ],
+    });
+  });
+
+  it("activates an existing retained table without replacing the replaceable tab", () => {
     const tabs: TableTab[] = [
+      { kind: "table", id: "table:users", tableName: "users", search: {} },
       { kind: "table", id: "table:accounts", tableName: "accounts", search: {} },
-      {
-        kind: "table",
-        id: "view:accounts-filtered",
-        tableName: "accounts",
-        search: { filters: "active-filter" },
-      },
     ];
 
-    const result = reconcileTableTab({
-      activeTabId: "view:accounts-filtered",
-      createId: () => "unused",
-      search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
-      tableName: "accounts",
-      tabs,
-    });
-
-    expect(result.activeTabId).toBe("view:accounts-filtered");
-    expect(result.tabs).toHaveLength(2);
-    expect(result.tabs[1]).toEqual({
-      kind: "table",
-      id: "view:accounts-filtered",
-      tableName: "accounts",
-      search: { filters: "active-filter", sort: "createdAt", dir: "desc" },
-    });
+    expect(
+      reconcileTableTab({
+        activeTabId: "table:accounts",
+        replaceableTabId: "table:accounts",
+        search: {},
+        tableName: "users",
+        tabs,
+      }),
+    ).toEqual({ activeTabId: "table:users", tabs });
   });
 
   it("selects the tab to the right when the active tab closes", () => {
@@ -393,6 +395,33 @@ describe("table tabs", () => {
     ]);
   });
 
+  it("collapses persisted base and filtered data views into one table tab", () => {
+    expect(
+      sanitizeTableTabsState(
+        {
+          tabs: [
+            { kind: "table", id: "table:accounts", tableName: "accounts", search: {} },
+            {
+              kind: "table",
+              id: "view:accounts-filtered",
+              tableName: "accounts",
+              search: { filters: "active-filter" },
+            },
+          ],
+          recentViews: [],
+        },
+        ["accounts"],
+      ).tabs,
+    ).toEqual([
+      {
+        kind: "table",
+        id: "table:accounts",
+        tableName: "accounts",
+        search: { filters: "active-filter" },
+      },
+    ]);
+  });
+
   it("preserves state identity when persisted tabs already match the available schema", () => {
     const state = {
       tabs: [
@@ -429,7 +458,7 @@ describe("table tabs", () => {
     expect(replaceNewViewTab(newViewTabs, selectedView)).toEqual([selectedView]);
   });
 
-  it("keeps five distinct recent table view configurations", () => {
+  it("keeps one current recent data view per table", () => {
     const views: TableDataTab[] = Array.from({ length: 6 }, (_, index) => ({
       kind: "table" as const,
       id: `view:${index}`,
@@ -441,8 +470,12 @@ describe("table tabs", () => {
       [] as TableDataTab[],
     );
 
-    expect(recentViews).toEqual([...views].reverse().slice(0, 5));
-    expect(recordRecentTableView(recentViews, views[5]!)).toEqual(recentViews);
+    expect(recentViews).toEqual([
+      {
+        ...views[5],
+        id: "table:accounts",
+      },
+    ]);
   });
 
   it("migrates stored table tabs into the view-aware storage shape", () => {

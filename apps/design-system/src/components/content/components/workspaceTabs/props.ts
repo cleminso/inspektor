@@ -26,15 +26,19 @@ export const workspaceTabsListPropNames = [
 export const workspaceTabsTabPropNames = [
   'value',
   'prefix',
+  'retention',
   'disabled',
   'onBlur',
   'onClose',
   'onFocus',
+  'onDoubleClick',
   'onPointerDown',
   'onPointerEnter',
   'onPointerLeave',
   'closeLabel',
   'reorderLabel',
+  'contextMenuItems',
+  'contextMenuLabel',
 ] as const
 
 export const workspaceTabsPanelPropNames = ['value', 'keepMounted'] as const

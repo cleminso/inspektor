@@ -1,10 +1,10 @@
-import { Box, Button, WorkspaceTabs, Text } from '@inspector/ds'
+import { Box, Button, ContextMenu, WorkspaceTabs, Text } from '@inspector/ds'
 import { type ReactElement, useState } from 'react'
 
 const initialViews = [
-  { value: 'all', label: 'All' },
-  { value: 'active', label: 'Active accounts sorted by creation date' },
-  { value: 'archived', label: 'Archived accounts' },
+  { value: 'all', label: 'All', replaceable: false },
+  { value: 'active', label: 'Active accounts sorted by creation date', replaceable: false },
+  { value: 'archived', label: 'Archived accounts', replaceable: true },
 ]
 
 function TableIcon(): ReactElement {
@@ -41,12 +41,27 @@ export default function BasicExample(): ReactElement {
 
   const addView = () => {
     const nextValue = `custom-${nextViewNumber}`
-    setViews((currentViews) => [
-      ...currentViews,
-      { value: nextValue, label: `Filtered accounts ${nextViewNumber}` },
-    ])
+    setViews((currentViews) => {
+      const nextView = {
+        value: nextValue,
+        label: `Accounts view ${nextViewNumber}`,
+        replaceable: true,
+      }
+      const replaceableIndex = currentViews.findIndex((view) => view.replaceable === true)
+      return replaceableIndex === -1
+        ? [...currentViews, nextView]
+        : currentViews.map((view, index) => (index === replaceableIndex ? nextView : view))
+    })
     setValue(nextValue)
     setNextViewNumber((currentNumber) => currentNumber + 1)
+  }
+
+  const keepOpen = (viewValue: string) => {
+    setViews((currentViews) =>
+      currentViews.map((view) =>
+        view.value === viewValue ? { ...view, replaceable: false } : view,
+      ),
+    )
   }
 
   const reorderViews = (orderedValues: Array<string | number>) => {
@@ -78,9 +93,19 @@ export default function BasicExample(): ReactElement {
                 key={view.value}
                 value={view.value}
                 prefix={<TableIcon />}
+                retention={view.replaceable === true ? 'replaceable' : 'persistent'}
                 closeLabel={`Close ${view.label}`}
+                contextMenuItems={
+                  view.replaceable === true ? (
+                    <ContextMenu.Item onClick={() => keepOpen(view.value)}>Keep open</ContextMenu.Item>
+                  ) : undefined
+                }
+                contextMenuLabel={view.replaceable === true ? `${view.label} actions` : undefined}
                 reorderLabel={`Reorder ${view.label}`}
                 onClose={closeView}
+                onDoubleClick={
+                  view.replaceable === true ? () => keepOpen(view.value) : undefined
+                }
               >
                 {view.label}
               </WorkspaceTabs.Tab>

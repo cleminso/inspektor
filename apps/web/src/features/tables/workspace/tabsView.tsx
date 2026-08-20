@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  ContextMenu,
   Icon,
   WorkspaceTabs,
   Tooltip,
@@ -18,7 +19,7 @@ import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { NewTableView } from '@tables/workspace/newView'
 import { SelectedTableView } from '@tables/workspace/selectedView'
-import { NEW_VIEW_TAB_ID, createBaseTableTabId, type TableDataTab } from '@tables/workspace/tabs'
+import { NEW_VIEW_TAB_ID, type TableDataTab } from '@tables/workspace/tabs'
 import { useTableNavigationControls } from '@tables/workspace/navigationHistory'
 
 interface TableTabsViewProps {
@@ -26,7 +27,16 @@ interface TableTabsViewProps {
 }
 
 export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactElement {
-  const { activeTabId, activateTab, closeTab, openNewView, reorderTabs, tabs } = useTableTabs()
+  const {
+    activeTabId,
+    activateTab,
+    closeTab,
+    openNewView,
+    persistTab,
+    reorderTabs,
+    replaceableTabId,
+    tabs,
+  } = useTableTabs()
   const { canGoBack, canGoForward, goBack, goForward } = useTableNavigationControls()
   const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
@@ -178,25 +188,34 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                 )
               }
 
-              const isBaseTab = tab.id === createBaseTableTabId(tab.tableName)
-              const tabLabel =
-                isBaseTab === true
-                  ? tab.tableName
-                  : tab.search.view === 'schema'
-                    ? `${tab.tableName} schema`
-                    : `${tab.tableName} filtered view`
+              const isSchemaTab = tab.search.view === 'schema'
+              const isReplaceable = tab.id === replaceableTabId
+              const tabLabel = isSchemaTab === true ? `${tab.tableName} schema` : tab.tableName
               return (
                 <WorkspaceTabs.Tab
                   key={tab.id}
                   value={tab.id}
                   prefix={
-                    isBaseTab === true ? (
-                      <Icon artwork={productGlyphs.table} size="s" />
-                    ) : (
+                    isSchemaTab === true ? (
                       <Icon artwork={productGlyphs.derivedView} size="s" />
+                    ) : (
+                      <Icon artwork={productGlyphs.table} size="s" />
                     )
                   }
+                  retention={isReplaceable === true ? 'replaceable' : 'persistent'}
                   closeLabel={`Close ${tabLabel}`}
+                  contextMenuItems={
+                    isReplaceable === true ? (
+                      <ContextMenu.Item
+                        onClick={() => {
+                          persistTab(tab.id)
+                        }}
+                      >
+                        Keep open
+                      </ContextMenu.Item>
+                    ) : undefined
+                  }
+                  contextMenuLabel={isReplaceable === true ? `${tabLabel} actions` : undefined}
                   reorderLabel={`Reorder ${tabLabel}`}
                   onBlur={() => {
                     if (focusedIntentTabIdRef.current === tab.id) {
@@ -215,6 +234,13 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                     focusedIntentTabIdRef.current = tab.id
                     prefetchTabRows(tab.id)
                   }}
+                  onDoubleClick={
+                    isReplaceable === true
+                      ? () => {
+                          persistTab(tab.id)
+                        }
+                      : undefined
+                  }
                   onPointerDown={() => {
                     pointerIntentTabIdRef.current = tab.id
                     prefetchTabRows(tab.id)

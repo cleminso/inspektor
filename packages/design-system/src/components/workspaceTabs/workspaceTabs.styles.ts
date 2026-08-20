@@ -206,6 +206,9 @@ export const workspaceTabsStyles = stylex.create({
     flexShrink: 0,
     whiteSpace: 'nowrap',
   },
+  titleReplaceable: {
+    fontStyle: 'italic',
+  },
   closeContainer: {
     alignItems: 'center',
     backgroundImage: `linear-gradient(to right, transparent 0, ${workspaceTabsVars.background} ${spacing.l}, ${workspaceTabsVars.background} 100%), linear-gradient(to right, transparent 0, ${workspaceTabsColors.closeBackdrop} ${spacing.l}, ${workspaceTabsColors.closeBackdrop} 100%)`,

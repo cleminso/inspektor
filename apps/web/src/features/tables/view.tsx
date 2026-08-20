@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import {
@@ -28,7 +28,18 @@ export function TableExplorerScreen(): React.ReactElement {
   const tableSelectionAnchorRef = useRef<string | null>(null);
   const tableSelectionSectionRef = useRef<TableListSection | null>(null);
   const { isSchemaReady, tables } = useAvailableTables();
-  const { openBaseTabs } = useTableTabs();
+  const { openBaseTabs, persistTable, tabs: openTabs } = useTableTabs();
+  const tableSearchByName = useMemo(
+    () =>
+      new Map(
+        openTabs.flatMap((tab) =>
+          tab.kind === "table" && tab.search.view !== "schema"
+            ? [[tab.tableName, tab.search] as const]
+            : [],
+        ),
+      ),
+    [openTabs],
+  );
 
   const handleTableCheckedChange = (
     tableName: string,
@@ -92,9 +103,11 @@ export function TableExplorerScreen(): React.ReactElement {
           isSchemaReady={isSchemaReady}
           pinnedTableNames={pinnedTableNames}
           selectedTableName={currentTableName}
+          tableSearchByName={tableSearchByName}
           tables={tables}
           onClearSelection={clearTableSelection}
           onOpenTables={handleOpenTables}
+          onPersistTable={persistTable}
           onPinTables={(tableNames) => handlePinnedTablesChange(tableNames, true)}
           onReplaceSelection={replaceTableSelection}
           onTableCheckedChange={handleTableCheckedChange}

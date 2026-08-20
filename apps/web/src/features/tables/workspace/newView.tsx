@@ -2,7 +2,6 @@ import { ActionList, Box, Icon, Text } from "@inspector/ds";
 
 import { productGlyphs } from "@app/icons/productGlyphs";
 import { useTableTabs } from "@tables/workspace/tabsProvider";
-import { createBaseTableTabId } from "@tables/workspace/tabs";
 
 export function NewTableView(): React.ReactElement {
   const { openRecentView, recentViews } = useTableTabs();
@@ -32,15 +31,15 @@ export function NewTableView(): React.ReactElement {
         ) : (
           <ActionList aria-label="Recent table views">
             {recentViews.map((view) => {
-              const isBaseView = view.id === createBaseTableTabId(view.tableName);
+              const isSchemaView = view.search.view === "schema";
               return (
                 <ActionList.Item key={view.id}>
                   <ActionList.Trigger
                     prefix={
-                      isBaseView === true ? (
-                        <Icon artwork={productGlyphs.table} size="s" />
-                      ) : (
+                      isSchemaView === true ? (
                         <Icon artwork={productGlyphs.derivedView} size="s" />
+                      ) : (
+                        <Icon artwork={productGlyphs.table} size="s" />
                       )
                     }
                     onClick={() => {

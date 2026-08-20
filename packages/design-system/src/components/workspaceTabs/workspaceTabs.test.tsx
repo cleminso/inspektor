@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Tooltip } from '../tooltip/tooltip'
+import { ContextMenu } from '../contextMenu/contextMenu'
 import { WorkspaceTabs } from './workspaceTabs'
 import { workspaceTabsStyles } from './workspaceTabs.styles'
 import { workspaceTabsColors } from './workspaceTabsColors.stylex'
@@ -209,6 +210,82 @@ describe('WorkspaceTabs', () => {
 
     expect(onPointerEnter).toHaveBeenCalledOnce()
     expect(onFocus).toHaveBeenCalledOnce()
+  })
+
+  it('forwards double click from the tab without including its close action', () => {
+    const onDoubleClick = vi.fn()
+
+    render(
+      <WorkspaceTabs.Root defaultValue="all">
+        <WorkspaceTabs.List aria-label="Table views">
+          <WorkspaceTabs.Tab
+            value="all"
+            closeLabel="Close All accounts"
+            onClose={() => undefined}
+            onDoubleClick={onDoubleClick}
+          >
+            All accounts
+          </WorkspaceTabs.Tab>
+        </WorkspaceTabs.List>
+      </WorkspaceTabs.Root>,
+    )
+
+    fireEvent.doubleClick(screen.getByRole('tab', { name: 'All accounts' }))
+    fireEvent.doubleClick(screen.getByRole('button', { name: 'Close All accounts' }))
+
+    expect(onDoubleClick).toHaveBeenCalledOnce()
+  })
+
+  it('composes consumer actions with built-in reorder actions in one context menu', async () => {
+    const onKeepOpen = vi.fn()
+
+    render(
+      <WorkspaceTabs.Root defaultValue="active">
+        <WorkspaceTabs.List
+          aria-label="Table views"
+          values={['all', 'active']}
+          onReorder={() => undefined}
+        >
+          <WorkspaceTabs.Tab value="all">All accounts</WorkspaceTabs.Tab>
+          <WorkspaceTabs.Tab
+            value="active"
+            contextMenuItems={<ContextMenu.Item onClick={onKeepOpen}>Keep open</ContextMenu.Item>}
+            contextMenuLabel="Active accounts actions"
+            reorderLabel="Reorder Active accounts"
+          >
+            Active accounts
+          </WorkspaceTabs.Tab>
+        </WorkspaceTabs.List>
+      </WorkspaceTabs.Root>,
+    )
+
+    const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
+    fireEvent.contextMenu(activeTab, { clientX: 40, clientY: 20 })
+
+    expect(await screen.findByRole('menu', { name: 'Active accounts actions' })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: 'Move left' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Keep open' }))
+    expect(onKeepOpen).toHaveBeenCalledOnce()
+  })
+
+  it('marks replaceable tab title presentation without changing its accessible name', () => {
+    render(
+      <WorkspaceTabs.Root defaultValue="active">
+        <WorkspaceTabs.List aria-label="Table views">
+          <WorkspaceTabs.Tab value="active" retention="replaceable">
+            Active accounts
+          </WorkspaceTabs.Tab>
+        </WorkspaceTabs.List>
+      </WorkspaceTabs.Root>,
+    )
+
+    const tab = screen.getByRole('tab', { name: 'Active accounts' })
+    expect(tab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-retention')).toBe(
+      'replaceable',
+    )
+    expect(tab.querySelector('[data-slot="workspace-tabs-title"]')?.className).toContain(
+      stylex.props(workspaceTabsStyles.titleReplaceable).className,
+    )
   })
 
   it('keeps fixed edge controls outside the scrollable list', () => {

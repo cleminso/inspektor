@@ -414,6 +414,7 @@ export type {
   WorkspaceTabsPanelProps,
   WorkspaceTabsRootProps,
   WorkspaceTabsTabProps,
+  WorkspaceTabsTabRetention,
   WorkspaceTabsTrailingAreaProps,
   WorkspaceTabsValue,
 } from './components/workspaceTabs/workspaceTabs'

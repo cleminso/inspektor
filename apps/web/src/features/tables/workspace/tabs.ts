@@ -34,7 +34,7 @@ export interface TableTabsState {
 
 interface ReconcileTableTabInput {
   activeTabId: string | null;
-  createId: () => string;
+  replaceableTabId?: string | null;
   search: TableTabSearch;
   tableName: string;
   tabs: readonly TableTab[];
@@ -124,15 +124,6 @@ export function reorderTableTabs(
   return reorderedTabs.length === tabs.length ? reorderedTabs : [...tabs];
 }
 
-function isBaseSearch(search: TableTabSearch): boolean {
-  return (
-    search.filters === undefined &&
-    search.sort === undefined &&
-    search.dir === undefined &&
-    (search.view === undefined || search.view === "data")
-  );
-}
-
 function isSchemaSearch(search: TableTabSearch): boolean {
   return search.view === "schema";
 }
@@ -141,30 +132,35 @@ function canonicalizeSearch(search: TableTabSearch): TableTabSearch {
   return isSchemaSearch(search) === true ? { view: "schema" } : search;
 }
 
-function normalizeTableTab(tab: TableTab): TableTab {
-  if (tab.kind === "newView" || isSchemaSearch(tab.search) === false) {
-    return tab;
-  }
-
+function normalizeTableDataTab(tab: TableDataTab): TableDataTab {
   return {
     kind: "table",
-    id: createSchemaTableTabId(tab.tableName),
+    id:
+      isSchemaSearch(tab.search) === true
+        ? createSchemaTableTabId(tab.tableName)
+        : createBaseTableTabId(tab.tableName),
     tableName: tab.tableName,
-    search: { view: "schema" },
+    search: canonicalizeSearch(tab.search),
   };
 }
 
+function normalizeTableTab(tab: TableTab): TableTab {
+  return tab.kind === "newView" ? tab : normalizeTableDataTab(tab);
+}
+
 function normalizeTabs(tabs: readonly TableTab[]): TableTab[] {
-  const tabIds = new Set<string>();
+  const tabIndexes = new Map<string, number>();
   const nextTabs: TableTab[] = [];
 
   for (const candidate of tabs) {
     const tab = normalizeTableTab(candidate);
-    if (tabIds.has(tab.id) === true) {
+    const existingIndex = tabIndexes.get(tab.id);
+    if (existingIndex !== undefined) {
+      nextTabs[existingIndex] = tab;
       continue;
     }
 
-    tabIds.add(tab.id);
+    tabIndexes.set(tab.id, nextTabs.length);
     nextTabs.push(tab);
   }
 
@@ -214,37 +210,22 @@ function tabStatesMatch(left: readonly TableTab[], right: readonly TableTab[]): 
 
 export function reconcileTableTab({
   activeTabId: currentActiveTabId,
-  createId,
+  replaceableTabId = null,
   search,
   tableName,
   tabs,
 }: ReconcileTableTabInput): ReconcileTableTabResult {
   const canonicalSearch = canonicalizeSearch(search);
   const normalizedTabs = normalizeTabs(tabs);
-  const matchingView = normalizedTabs.find(
-    (tab): tab is TableDataTab =>
-      tab.kind === "table" &&
-      tab.tableName === tableName &&
-      searchesMatch(tab.search, canonicalSearch),
-  );
-  const reconciledTabs =
-    currentActiveTabId === NEW_VIEW_TAB_ID && matchingView === undefined
-      ? normalizedTabs.filter((tab) => tab.kind !== "newView")
-      : removeSoleNewViewTab(normalizedTabs);
-  const activeView = reconciledTabs.find(
-    (tab): tab is TableDataTab =>
-      tab.kind === "table" &&
-      tab.id === currentActiveTabId &&
-      tab.tableName === tableName &&
-      isSchemaSearch(tab.search) === false &&
-      tab.id !== createBaseTableTabId(tableName),
-  );
   const activeTabId =
     isSchemaSearch(canonicalSearch) === true
       ? createSchemaTableTabId(tableName)
-      : isBaseSearch(canonicalSearch) === true
-      ? createBaseTableTabId(tableName)
-      : (matchingView?.id ?? activeView?.id ?? `view:${createId()}`);
+      : createBaseTableTabId(tableName);
+  const existingView = normalizedTabs.find((tab) => tab.id === activeTabId);
+  const reconciledTabs =
+    currentActiveTabId === NEW_VIEW_TAB_ID && existingView === undefined
+      ? normalizedTabs.filter((tab) => tab.kind !== "newView")
+      : removeSoleNewViewTab(normalizedTabs);
   const nextTab: TableDataTab = {
     kind: "table",
     id: activeTabId,
@@ -254,6 +235,17 @@ export function reconcileTableTab({
   const existingIndex = reconciledTabs.findIndex((tab) => tab.id === activeTabId);
 
   if (existingIndex === -1) {
+    const replaceableIndex =
+      isSchemaSearch(canonicalSearch) === false
+        ? reconciledTabs.findIndex((tab) => tab.id === replaceableTabId)
+        : -1;
+    if (replaceableIndex >= 0) {
+      return {
+        activeTabId,
+        tabs: reconciledTabs.map((tab, index) => (index === replaceableIndex ? nextTab : tab)),
+      };
+    }
+
     return {
       activeTabId,
       tabs: [...reconciledTabs, nextTab],
@@ -326,15 +318,16 @@ export function recordRecentTableView(
   recentViews: readonly TableDataTab[],
   tableView: TableDataTab,
 ): TableDataTab[] {
-  const matchingIndex = recentViews.findIndex((view) => tableViewsMatch(view, tableView));
-  if (matchingIndex === 0 && tableViewsMatch(recentViews[0]!, tableView)) {
-    return [...recentViews];
-  }
-
-  return [tableView, ...recentViews.filter((view) => tableViewsMatch(view, tableView) === false)].slice(
-    0,
-    MAX_RECENT_VIEWS,
+  const normalizedView = normalizeTableDataTab(tableView);
+  const normalizedRecentViews = normalizeTabs(recentViews).filter(
+    (view): view is TableDataTab => view.kind === "table",
   );
+  return [
+    normalizedView,
+    ...normalizedRecentViews.filter(
+      (view) => tableViewsMatch(view, normalizedView) === false,
+    ),
+  ].slice(0, MAX_RECENT_VIEWS);
 }
 
 export function closeTableTab(

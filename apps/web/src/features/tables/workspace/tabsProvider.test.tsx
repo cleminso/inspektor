@@ -11,11 +11,15 @@ import {
 import { TableTabsProvider, useTableTabs } from '@tables/workspace/tabsProvider'
 
 const navigate = vi.hoisted(() => vi.fn())
-const availableTables = vi.hoisted(() => ['accounts'])
+const routeSearch = vi.hoisted(() => ({ filters: undefined as string | undefined }))
+const schemaState = vi.hoisted(() => ({
+  isSchemaReady: true,
+  tables: ['accounts', 'profiles'],
+}))
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigate,
-  useSearch: () => ({}),
+  useSearch: () => routeSearch,
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -26,13 +30,16 @@ vi.mock('@app/providers/inspectorProvider', () => ({
 }))
 
 vi.mock('@tables/schema/useAvailableTables', () => ({
-  useAvailableTables: () => ({ isSchemaReady: true, tables: availableTables }),
+  useAvailableTables: () => schemaState,
 }))
 
 afterEach(cleanup)
 
 beforeEach(() => {
   navigate.mockReset()
+  routeSearch.filters = undefined
+  schemaState.isSchemaReady = true
+  schemaState.tables = ['accounts', 'profiles']
   const values = new Map<string, string>()
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
@@ -63,16 +70,23 @@ function MutationActions(): React.ReactElement {
 }
 
 function TabActions(): React.ReactElement {
-  const { closeTab, tabs } = useTableTabs()
+  const { closeTab, openBaseTabs, persistTable, replaceableTabId, tabs } = useTableTabs()
   const mutationWorkspace = useTableMutationWorkspace()
   return (
     <>
       <output aria-label="Open tabs">{tabs.map((tab) => tab.id).join(',')}</output>
+      <output aria-label="Replaceable tab">{replaceableTabId ?? 'none'}</output>
       <output aria-label="Workspace pending">
         {String(mutationWorkspace.hasPendingChanges('scope:accounts'))}
       </output>
       <button type="button" onClick={() => closeTab('table:accounts')}>
         Close accounts
+      </button>
+      <button type="button" onClick={() => openBaseTabs(['accounts'])}>
+        Open accounts persistently
+      </button>
+      <button type="button" onClick={() => persistTable('profiles')}>
+        Keep profiles open
       </button>
     </>
   )
@@ -96,7 +110,74 @@ function Harness(): React.ReactElement {
   )
 }
 
-describe('TableTabsProvider staged mutation close policy', () => {
+describe('TableTabsProvider', () => {
+  it('opens a missing routed table as replaceable and persists it through bulk open', async () => {
+    render(<Harness />)
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Replaceable tab').textContent).toBe('table:accounts'),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Open accounts persistently' }))
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none'),
+    )
+    expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts')
+  })
+
+  it('persists an unopened table while replacing the current replaceable tab', async () => {
+    render(<Harness />)
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Replaceable tab').textContent).toBe('table:accounts'),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Keep profiles open' }))
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none'),
+    )
+    expect(screen.getByLabelText('Open tabs').textContent).toBe('table:profiles')
+  })
+
+  it('retains a legacy routed data tab while schema metadata is loading', async () => {
+    routeSearch.filters = 'active-filter'
+    schemaState.isSchemaReady = false
+    window.localStorage.setItem(
+      'regarde-inspector-tabs',
+      JSON.stringify({
+        version: 2,
+        scopes: {
+          scope: {
+            recentViews: [],
+            tabs: [
+              {
+                id: 'view:accounts-filtered',
+                kind: 'table',
+                search: { filters: 'active-filter' },
+                tableName: 'accounts',
+              },
+            ],
+          },
+        },
+      }),
+    )
+
+    render(<Harness />)
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts'),
+    )
+    expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none')
+    await waitFor(() => {
+      const storedState = JSON.parse(
+        window.localStorage.getItem('regarde-inspector-tabs') ?? 'null',
+      ) as {
+        scopes: { scope: { tabs: Array<{ search: { filters?: string } }> } }
+      }
+      expect(storedState.scopes.scope.tabs[0]?.search.filters).toBe('active-filter')
+    })
+  })
+
   it('confirms before discarding changes and closing the final table tab', async () => {
     render(<Harness />)
     await waitFor(() =>
@@ -139,9 +220,9 @@ describe('TableTabsProvider staged mutation close policy', () => {
             tabs: [
               { id: 'table:accounts', kind: 'table', search: {}, tableName: 'accounts' },
               {
-                id: 'view:filtered-accounts',
+                id: 'schema:accounts',
                 kind: 'table',
-                search: { filters: 'name:eq:Ada' },
+                search: { view: 'schema' },
                 tableName: 'accounts',
               },
             ],
@@ -151,7 +232,7 @@ describe('TableTabsProvider staged mutation close policy', () => {
     )
     render(<Harness />)
     await waitFor(() =>
-      expect(screen.getByLabelText('Open tabs').textContent).toContain('view:filtered-accounts'),
+      expect(screen.getByLabelText('Open tabs').textContent).toContain('schema:accounts'),
     )
     fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
 
@@ -160,7 +241,7 @@ describe('TableTabsProvider staged mutation close policy', () => {
     expect(screen.queryByRole('alertdialog')).toBeNull()
     expect(screen.getByLabelText('Staged changes').textContent).toBe('1')
     await waitFor(() =>
-      expect(screen.getByLabelText('Open tabs').textContent).toBe('view:filtered-accounts'),
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('schema:accounts'),
     )
   })
 })

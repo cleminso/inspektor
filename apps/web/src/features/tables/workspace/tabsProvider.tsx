@@ -14,6 +14,7 @@ import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
+  createBaseTableTabId,
   createTableTabRouteSearch,
   createSchemaTableTabId,
   getFinalTableTabName,
@@ -44,6 +45,7 @@ interface RouteSearch extends TableTabsRouteSearch {
 interface TableTabsContextValue {
   activeTabId: string | null;
   recentViews: readonly TableDataTab[];
+  replaceableTabId: string | null;
   tabs: readonly TableTab[];
   activateTab: (tabId: string) => void;
   closeTab: (tabId: string) => void;
@@ -51,14 +53,12 @@ interface TableTabsContextValue {
   openNewView: () => void;
   openRecentView: (view: TableDataTab) => void;
   openSchemaView: (tableName: string) => void;
+  persistTab: (tabId: string) => void;
+  persistTable: (tableName: string) => void;
   reorderTabs: (orderedTabIds: readonly string[]) => void;
 }
 
 const TableTabsContext = createContext<TableTabsContextValue | null>(null);
-
-function createViewId(): string {
-  return globalThis.crypto.randomUUID();
-}
 
 function searchesMatch(left: TableTabSearch, right: TableTabSearch): boolean {
   return (
@@ -97,6 +97,7 @@ interface TableTabsProviderProps {
 
 interface TableTabsProviderState extends TableTabsState {
   activeTabId: string | null;
+  replaceableTabId: string | null;
 }
 
 interface PendingTabClose {
@@ -115,6 +116,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const [state, setState] = useState<TableTabsProviderState>(() => ({
     ...loadTableTabsState(scope),
     activeTabId: null,
+    replaceableTabId: null,
   }));
   const currentSearch = useMemo<TableTabSearch>(
     () => ({
@@ -135,8 +137,11 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     ],
   );
   useEffect(() => {
-    saveTableTabsState(scope, { tabs: state.tabs, recentViews: state.recentViews });
-  }, [scope, state.recentViews, state.tabs]);
+    saveTableTabsState(scope, {
+      tabs: state.tabs.filter((tab) => tab.id !== state.replaceableTabId),
+      recentViews: state.recentViews,
+    });
+  }, [scope, state.recentViews, state.replaceableTabId, state.tabs]);
 
   useEffect(() => {
     if (routeSearch.tab === undefined) {
@@ -162,7 +167,16 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       const sanitizedState =
         sanitizedTabsState === currentState
           ? currentState
-          : { ...sanitizedTabsState, activeTabId: currentState.activeTabId };
+          : {
+              ...sanitizedTabsState,
+              activeTabId: currentState.activeTabId,
+              replaceableTabId:
+                sanitizedTabsState.tabs.some(
+                  (tab) => tab.id === currentState.replaceableTabId,
+                ) === true
+                  ? currentState.replaceableTabId
+                  : null,
+            };
       if (currentTableName === null) {
         if (routeSearch.empty === "true") {
           const result = openNewViewTab(sanitizedState.tabs);
@@ -191,11 +205,21 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
 
       const result = reconcileTableTab({
         activeTabId: sanitizedState.activeTabId,
-        createId: createViewId,
+        replaceableTabId: sanitizedState.replaceableTabId,
         search: currentSearch,
         tableName: currentTableName,
         tabs: sanitizedState.tabs,
       });
+      const destinationWasOpen = sanitizedState.tabs.some(
+        (tab) =>
+          tab.kind === "table" &&
+          tab.tableName === currentTableName &&
+          (tab.search.view === "schema") === (currentSearch.view === "schema"),
+      );
+      const replaceableTabId =
+        currentSearch.view === "schema" || destinationWasOpen === true
+          ? sanitizedState.replaceableTabId
+          : result.activeTabId;
       const activeTableTab = result.tabs.find(
         (tab): tab is TableDataTab => tab.kind === "table" && tab.id === result.activeTabId,
       );
@@ -206,12 +230,18 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       if (
         tabsMatch(result.tabs, sanitizedState.tabs) === true &&
         tabsMatch(recentViews, sanitizedState.recentViews) === true &&
-        sanitizedState.activeTabId === result.activeTabId
+        sanitizedState.activeTabId === result.activeTabId &&
+        sanitizedState.replaceableTabId === replaceableTabId
       ) {
         return sanitizedState;
       }
 
-      return { tabs: result.tabs, recentViews, activeTabId: result.activeTabId };
+      return {
+        tabs: result.tabs,
+        recentViews,
+        activeTabId: result.activeTabId,
+        replaceableTabId,
+      };
     });
   }, [availableTables, currentSearch, currentTableName, isSchemaReady, routeSearch.empty]);
 
@@ -278,7 +308,12 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     (tabId: string) => {
       const result = closeTableTab(state.tabs, tabId);
       if (tabId !== state.activeTabId) {
-        setState((currentState) => ({ ...currentState, tabs: result.tabs }));
+        setState((currentState) => ({
+          ...currentState,
+          tabs: result.tabs,
+          replaceableTabId:
+            currentState.replaceableTabId === tabId ? null : currentState.replaceableTabId,
+        }));
         return;
       }
 
@@ -286,6 +321,8 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
         ...currentState,
         tabs: result.tabs,
         activeTabId: result.nextActiveTab?.id ?? null,
+        replaceableTabId:
+          currentState.replaceableTabId === tabId ? null : currentState.replaceableTabId,
       }));
       if (result.nextActiveTab !== null) {
         navigateToTab(result.nextActiveTab);
@@ -381,6 +418,12 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
         ...currentState,
         tabs: result.tabs,
         activeTabId: result.activeTabId,
+        replaceableTabId:
+          orderedTableNames.some(
+            (tableName) => createBaseTableTabId(tableName) === currentState.replaceableTabId,
+          ) === true
+            ? null
+            : currentState.replaceableTabId,
       }));
       navigateToTab(activeTab);
     },
@@ -394,10 +437,11 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
         tabs,
         recentViews: recordRecentTableView(state.recentViews, view),
         activeTabId: view.id,
+        replaceableTabId: state.replaceableTabId === view.id ? null : state.replaceableTabId,
       });
       navigateToTab(view);
     },
-    [navigateToTab, state.recentViews, state.tabs],
+    [navigateToTab, state.recentViews, state.replaceableTabId, state.tabs],
   );
 
   const openSchemaView = useCallback(
@@ -420,10 +464,44 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     }));
   }, []);
 
+  const persistTab = useCallback((tabId: string) => {
+    setState((currentState) =>
+      currentState.replaceableTabId === tabId
+        ? { ...currentState, replaceableTabId: null }
+        : currentState,
+    );
+  }, []);
+
+  const persistTable = useCallback((tableName: string) => {
+    const tabId = createBaseTableTabId(tableName);
+    setState((currentState) => {
+      if (currentState.tabs.some((tab) => tab.id === tabId)) {
+        return currentState.replaceableTabId === tabId
+          ? { ...currentState, replaceableTabId: null }
+          : currentState;
+      }
+
+      const result = reconcileTableTab({
+        activeTabId: currentState.activeTabId,
+        replaceableTabId: currentState.replaceableTabId,
+        search: {},
+        tableName,
+        tabs: currentState.tabs,
+      });
+      return {
+        ...currentState,
+        activeTabId: result.activeTabId,
+        tabs: result.tabs,
+        replaceableTabId: null,
+      };
+    });
+  }, []);
+
   const value = useMemo<TableTabsContextValue>(
     () => ({
       activeTabId: state.activeTabId,
       recentViews: state.recentViews,
+      replaceableTabId: state.replaceableTabId,
       tabs: state.tabs,
       activateTab,
       closeTab,
@@ -431,6 +509,8 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       openNewView,
       openRecentView,
       openSchemaView,
+      persistTab,
+      persistTable,
       reorderTabs,
     }),
     [
@@ -440,6 +520,8 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       openNewView,
       openRecentView,
       openSchemaView,
+      persistTab,
+      persistTable,
       reorderTabs,
       state,
     ],

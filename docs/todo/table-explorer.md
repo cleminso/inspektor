@@ -469,6 +469,15 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Workspace tabs
 
+[20/08/26]
+
+- [x] Keep one canonical Data tab per table and store its current filter, sort, and pagination route state on that tab.
+- [x] Remove filtered-view tab identity and labels while keeping Schema as a separate canonical representation.
+- [x] Open a missing table in one replaceable slot and replace that slot when another missing table opens.
+- [x] Keep a replaceable table open from a table-list or tab double click and from the tab context menu.
+- [x] Open bulk-selected tables as persistent tabs while preserving their visible list order.
+- [x] Preserve an existing table tab's stored route search when it is opened from the table list.
+
 [12/08/26]
 
 - [x] Add Tables-scoped Go Back and Go Forward controls before the workspace tabs without changing native browser history behavior.
@@ -1008,6 +1017,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Cover canonical Data identity, replaceable-slot replacement, stored-search activation, table-list and tab promotion, bulk persistence, and legacy tab collapse.
+- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
+- [x] Verify replaceable presentation and pointer and keyboard context actions in the Workspace Tabs browser fixture.
 
 [10/08/26]
 

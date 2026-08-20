@@ -2603,7 +2603,7 @@
       "description": "Uniquely identifies the view and links it to a matching panel.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 136
+        "line": 138
       }
     },
     {
@@ -2613,7 +2613,7 @@
       "description": "The visible view name.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 138
+        "line": 140
       }
     },
     {
@@ -2623,7 +2623,18 @@
       "description": "Renders a decorative medium icon before the view name.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 140
+        "line": 142
+      }
+    },
+    {
+      "name": "retention",
+      "type": "\"persistent\" | \"replaceable\"",
+      "required": false,
+      "defaultValue": "\"persistent\"",
+      "description": "Indicates whether a later workspace navigation may replace this tab.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 144
       }
     },
     {
@@ -2633,7 +2644,7 @@
       "description": "Disables selection and closing for this view.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 142
+        "line": 146
       }
     },
     {
@@ -2643,7 +2654,7 @@
       "description": "Runs when focus leaves the tab button.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 144
+        "line": 148
       }
     },
     {
@@ -2653,7 +2664,7 @@
       "description": "Adds a close action to the view.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 146
+        "line": 150
       }
     },
     {
@@ -2663,7 +2674,17 @@
       "description": "Runs when the tab button receives focus.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 148
+        "line": 152
+      }
+    },
+    {
+      "name": "onDoubleClick",
+      "type": "(event: BaseUIEvent<MouseEvent<HTMLButtonElement, globalThis.MouseEvent>>) => void",
+      "required": false,
+      "description": "Runs when the tab button is double-clicked.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 154
       }
     },
     {
@@ -2673,7 +2694,7 @@
       "description": "Runs when a pointer press starts on the tab button.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 150
+        "line": 156
       }
     },
     {
@@ -2683,7 +2704,7 @@
       "description": "Runs when the pointer enters the tab button.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 152
+        "line": 158
       }
     },
     {
@@ -2693,7 +2714,7 @@
       "description": "Runs when the pointer leaves the tab button.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 154
+        "line": 160
       }
     },
     {
@@ -2704,7 +2725,7 @@
       "description": "Provides the accessible name for the close action.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 156
+        "line": 162
       }
     },
     {
@@ -2714,7 +2735,27 @@
       "description": "Enables the reorder context menu and provides its accessible name.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 158
+        "line": 164
+      }
+    },
+    {
+      "name": "contextMenuItems",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Additional actions rendered before the built-in reorder actions.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 166
+      }
+    },
+    {
+      "name": "contextMenuLabel",
+      "type": "string",
+      "required": false,
+      "description": "Provides the accessible name for the complete tab context menu.",
+      "source": {
+        "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
+        "line": 168
       }
     }
   ],
@@ -2758,7 +2799,7 @@
       "description": "Identifies the view that controls this panel.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 163
+        "line": 173
       }
     },
     {
@@ -2768,7 +2809,7 @@
       "description": "The view content.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 165
+        "line": 175
       }
     },
     {
@@ -2779,7 +2820,7 @@
       "description": "Keeps the panel mounted while another view is active.",
       "source": {
         "path": "packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx",
-        "line": 167
+        "line": 177
       }
     }
   ],

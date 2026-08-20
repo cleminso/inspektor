@@ -9,11 +9,13 @@ const mocks = vi.hoisted(() => ({
   goForward: vi.fn(),
   closeTab: vi.fn(),
   openNewView: vi.fn(),
+  persistTab: vi.fn(),
   reorderTabs: vi.fn(),
   releasePrefetch: vi.fn(),
   startTableRowsPrefetch: vi.fn(),
   state: {
     activeTabId: null as string | null,
+    replaceableTabId: null as string | null,
     canGoBack: false,
     canGoForward: false,
     tabs: [] as Array<
@@ -52,6 +54,8 @@ vi.mock('@tables/workspace/tabsProvider', () => ({
     activateTab: mocks.activateTab,
     closeTab: mocks.closeTab,
     openNewView: mocks.openNewView,
+    persistTab: mocks.persistTab,
+    replaceableTabId: mocks.state.replaceableTabId,
     reorderTabs: mocks.reorderTabs,
     tabs: mocks.state.tabs,
   }),
@@ -74,11 +78,13 @@ beforeEach(() => {
   mocks.goForward.mockReset()
   mocks.closeTab.mockReset()
   mocks.openNewView.mockReset()
+  mocks.persistTab.mockReset()
   mocks.reorderTabs.mockReset()
   mocks.releasePrefetch.mockReset()
   mocks.startTableRowsPrefetch.mockReset()
   mocks.startTableRowsPrefetch.mockReturnValue(mocks.releasePrefetch)
   mocks.state.activeTabId = null
+  mocks.state.replaceableTabId = null
   mocks.state.canGoBack = false
   mocks.state.canGoForward = false
   mocks.state.tabs = []
@@ -162,7 +168,7 @@ describe('TableTabsView', () => {
     expect(screen.queryByText('New table view content')).toBeNull()
   })
 
-  it('distinguishes schema and filtered data tabs without title tooltips', () => {
+  it('distinguishes schema while keeping filtered data under the table label', () => {
     mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [
       {
@@ -179,7 +185,7 @@ describe('TableTabsView', () => {
       },
       {
         kind: 'table',
-        id: 'filtered:profiles',
+        id: 'table:profiles',
         tableName: 'profiles',
         search: { filters: 'active' },
       },
@@ -188,11 +194,35 @@ describe('TableTabsView', () => {
     render(<TableTabsView tableName="accounts" />)
 
     const schemaTab = screen.getByRole('tab', { name: 'profiles schema' })
-    const filteredTab = screen.getByRole('tab', { name: 'profiles filtered view' })
+    const filteredTab = screen.getByRole('tab', { name: 'profiles' })
     expect(schemaTab.hasAttribute('data-base-ui-tooltip-trigger')).toBe(false)
     expect(filteredTab.hasAttribute('data-base-ui-tooltip-trigger')).toBe(false)
     expect(screen.getByRole('button', { name: 'Close profiles schema' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Close profiles filtered view' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Close profiles' })).toBeTruthy()
+  })
+
+  it('keeps a replaceable table open from double click or its context menu', async () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.replaceableTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+    ]
+
+    render(<TableTabsView tableName="accounts" />)
+
+    const accountsTab = screen.getByRole('tab', { name: 'accounts' })
+    fireEvent.doubleClick(accountsTab)
+    expect(mocks.persistTab).toHaveBeenCalledWith('table:accounts')
+
+    mocks.persistTab.mockClear()
+    fireEvent.contextMenu(accountsTab, { clientX: 40, clientY: 20 })
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Keep open' }))
+    expect(mocks.persistTab).toHaveBeenCalledWith('table:accounts')
   })
 
   it('does not offer to close the sole new-view tab', () => {
@@ -247,7 +277,7 @@ describe('TableTabsView', () => {
       },
       {
         kind: 'table',
-        id: 'view:profiles',
+        id: 'table:profiles',
         tableName: 'profiles',
         search: {
           dir: 'desc',
@@ -268,7 +298,7 @@ describe('TableTabsView', () => {
 
     render(<TableTabsView tableName="accounts" />)
 
-    const profilesTab = screen.getByRole('tab', { name: 'profiles filtered view' })
+    const profilesTab = screen.getByRole('tab', { name: 'profiles' })
     fireEvent.focus(profilesTab)
 
     expect(mocks.startTableRowsPrefetch).toHaveBeenCalledWith(

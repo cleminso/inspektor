@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[20/08/26]
+
+- [x] Expose persistent and replaceable tab title presentation without moving application persistence state into the design system.
+- [x] Forward tab-button double clicks without including the sibling close action.
+- [x] Compose consumer context actions and built-in reorder actions inside one accessible tab menu.
+
 [17/08/26]
 
 - [x] Composite the active tab's translucent selected color over an opaque surface inside the close overlay so title glyphs cannot show through.
@@ -170,6 +176,12 @@
 
 ## Settled interaction decisions
 
+[20/08/26]
+
+- [x] Use an italic title to distinguish a replaceable tab without changing its accessible name.
+- [x] Keep replacement and persistence mutations consumer-owned while `WorkspaceTabs` owns presentation and event composition.
+- [x] Open consumer and reorder actions from the same pointer or keyboard context menu.
+
 [17/08/26]
 
 - [x] Give active and inactive close overlays the same opaque title occlusion while preserving their distinct tab backgrounds.
@@ -264,6 +276,11 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Cover replaceable presentation, double-click event boundaries, and combined consumer and reorder actions.
+- [x] Verify generated metadata, documentation, changed-file lint, package checks, and browser behavior.
 
 [17/08/26]
 

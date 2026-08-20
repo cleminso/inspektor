@@ -10,8 +10,10 @@ import {
 } from '@app/providers/inspectorProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 import { useTableRowsPrefetchIntent } from '@tables/query/useTableRowsPrefetchIntent'
+import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const deferredRenderingThreshold = 50
+const emptyTableSearchByName: ReadonlyMap<string, TableTabSearch> = new Map()
 
 export type TableListSection = 'pinned' | 'tables'
 
@@ -26,9 +28,11 @@ interface TableListPaneProps {
   isSchemaReady?: boolean
   pinnedTableNames: ReadonlySet<string>
   selectedTableName: string | null
+  tableSearchByName?: ReadonlyMap<string, TableTabSearch>
   tables: string[]
   onClearSelection: () => void
   onOpenTables: (orderedTableNames: readonly string[]) => void
+  onPersistTable: (tableName: string) => void
   onPinTables: (tableNames: readonly string[]) => void
   onReplaceSelection: (tableName: string, section: TableListSection) => void
   onTableCheckedChange: (
@@ -66,9 +70,11 @@ export function TableListPane({
   isSchemaReady = true,
   pinnedTableNames,
   selectedTableName,
+  tableSearchByName = emptyTableSearchByName,
   tables,
   onClearSelection,
   onOpenTables,
+  onPersistTable,
   onPinTables,
   onReplaceSelection,
   onTableCheckedChange,
@@ -201,11 +207,14 @@ export function TableListPane({
                     <Link
                       to={appRoutes.table}
                       params={tableParams}
-                      search={{}}
+                      search={tableSearchByName.get(tableName) ?? {}}
                       aria-current={isActive === true ? 'page' : undefined}
                       onBlur={() => {
                         prefetchIntent.cancelScheduled()
                         prefetchIntent.release(tableName)
+                      }}
+                      onDoubleClick={() => {
+                        onPersistTable(tableName)
                       }}
                       onFocus={() => prefetchIntent.prefetch({ key: tableName, tableName })}
                       onPointerDown={() => prefetchIntent.prefetch({ key: tableName, tableName })}

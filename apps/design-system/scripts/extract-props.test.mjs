@@ -582,15 +582,19 @@ test("extracts the constrained WorkspaceTabs compound API", () => {
       "value",
       "children",
       "prefix",
+      "retention",
       "disabled",
       "onBlur",
       "onClose",
       "onFocus",
+      "onDoubleClick",
       "onPointerDown",
       "onPointerEnter",
       "onPointerLeave",
       "closeLabel",
       "reorderLabel",
+      "contextMenuItems",
+      "contextMenuLabel",
     ],
   );
   assert.deepEqual(
@@ -600,6 +604,10 @@ test("extracts the constrained WorkspaceTabs compound API", () => {
   assert.equal(
     metadata["workspaceTabs.tab"]?.find(({ name }) => name === "closeLabel")?.defaultValue,
     '"Close tab"',
+  );
+  assert.equal(
+    metadata["workspaceTabs.tab"]?.find(({ name }) => name === "retention")?.defaultValue,
+    '"persistent"',
   );
   assert.equal(
     metadata["workspaceTabs.tab"]?.find(({ name }) => name === "className"),

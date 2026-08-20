@@ -131,6 +131,8 @@ export type WorkspaceTabsLeadingAreaProps = WorkspaceTabsFixedAreaProps
 
 export type WorkspaceTabsTrailingAreaProps = WorkspaceTabsFixedAreaProps
 
+export type WorkspaceTabsTabRetention = 'persistent' | 'replaceable'
+
 export interface WorkspaceTabsTabProps {
   /** Uniquely identifies the view and links it to a matching panel. */
   value: WorkspaceTabsValue
@@ -138,6 +140,8 @@ export interface WorkspaceTabsTabProps {
   children: ReactNode
   /** Renders a decorative medium icon before the view name. */
   prefix?: ReactNode
+  /** Indicates whether a later workspace navigation may replace this tab. */
+  retention?: WorkspaceTabsTabRetention
   /** Disables selection and closing for this view. */
   disabled?: boolean
   /** Runs when focus leaves the tab button. */
@@ -146,6 +150,8 @@ export interface WorkspaceTabsTabProps {
   onClose?: (value: WorkspaceTabsValue) => void
   /** Runs when the tab button receives focus. */
   onFocus?: BaseTabs.Tab.Props['onFocus']
+  /** Runs when the tab button is double-clicked. */
+  onDoubleClick?: BaseTabs.Tab.Props['onDoubleClick']
   /** Runs when a pointer press starts on the tab button. */
   onPointerDown?: BaseTabs.Tab.Props['onPointerDown']
   /** Runs when the pointer enters the tab button. */
@@ -156,6 +162,10 @@ export interface WorkspaceTabsTabProps {
   closeLabel?: string
   /** Enables the reorder context menu and provides its accessible name. */
   reorderLabel?: string
+  /** Additional actions rendered before the built-in reorder actions. */
+  contextMenuItems?: ReactNode
+  /** Provides the accessible name for the complete tab context menu. */
+  contextMenuLabel?: string
 }
 
 export interface WorkspaceTabsPanelProps {
@@ -368,7 +378,11 @@ function WorkspaceTabsTrailingArea(props: WorkspaceTabsTrailingAreaProps) {
   )
 }
 
-function WorkspaceTabsTab({ closeLabel = 'Close tab', ...props }: WorkspaceTabsTabProps) {
+function WorkspaceTabsTab({
+  closeLabel = 'Close tab',
+  retention = 'persistent',
+  ...props
+}: WorkspaceTabsTabProps) {
   const reorderContext = useContext(WorkspaceTabsReorderContext)
   const index = reorderContext.getIndex(props.value)
   const SortableItem = reorderContext.Item
@@ -384,6 +398,7 @@ function WorkspaceTabsTab({ closeLabel = 'Close tab', ...props }: WorkspaceTabsT
           <WorkspaceTabsTabContent
             {...props}
             closeLabel={closeLabel}
+            retention={retention}
             isDragSource={sortable.isDragSource}
             reorderReady
             setReorderRef={sortable.setReorderRef}
@@ -397,6 +412,7 @@ function WorkspaceTabsTab({ closeLabel = 'Close tab', ...props }: WorkspaceTabsT
     <WorkspaceTabsTabContent
       {...props}
       closeLabel={closeLabel}
+      retention={retention}
     />
   )
 }
@@ -411,14 +427,18 @@ function WorkspaceTabsTabContent({
   value,
   children,
   prefix,
+  retention = 'persistent',
   disabled = false,
   onBlur,
   onClose,
   onFocus,
+  onDoubleClick,
   onPointerDown,
   onPointerEnter,
   onPointerLeave,
   reorderLabel,
+  contextMenuItems,
+  contextMenuLabel,
   closeLabel = 'Close tab',
   isDragSource = false,
   reorderReady = false,
@@ -434,6 +454,9 @@ function WorkspaceTabsTabContent({
     reorderIndex >= 0 &&
     (reorderActions?.values.length ?? 0) > 1 &&
     disabled === false
+  const showCustomActions =
+    contextMenuItems !== undefined && contextMenuItems !== null && disabled === false
+  const showContextMenu = showReorderActions === true || showCustomActions === true
   const tabStyles = createStateStyleProps<BaseTabs.Tab.State>((state) => [
     workspaceTabsStyles.tab,
     onClose !== undefined && workspaceTabsStyles.tabClosable,
@@ -469,7 +492,7 @@ function WorkspaceTabsTabContent({
         event.altKey === false &&
         event.ctrlKey === false &&
         event.metaKey === false)
-    if (showReorderActions === true && opensContextMenu === true) {
+    if (showContextMenu === true && opensContextMenu === true) {
       event.preventDefault()
       event.stopPropagation()
       const bounds = event.currentTarget.getBoundingClientRect()
@@ -591,6 +614,7 @@ function WorkspaceTabsTabContent({
       data-dragging={isDragSource === true ? '' : undefined}
       data-reorder-key={getWorkspaceTabsValueKey(value)}
       data-reorder-ready={reorderReady === true && showReorderActions === true ? '' : undefined}
+      data-retention={retention}
       data-slot="workspace-tabs-item"
     >
       <BaseTabs.Tab
@@ -599,6 +623,7 @@ function WorkspaceTabsTabContent({
         tabIndex={disabled === true ? -1 : 0}
         onBlur={onBlur}
         onFocus={onFocus}
+        onDoubleClick={onDoubleClick}
         onKeyDown={handleTabKeyDown}
         onMouseDown={handleTabMouseDown}
         onPointerDown={onPointerDown}
@@ -616,7 +641,10 @@ function WorkspaceTabsTabContent({
           </span>
         ) : null}
         <span
-          {...stylex.props(workspaceTabsStyles.title)}
+          {...stylex.props(
+            workspaceTabsStyles.title,
+            retention === 'replaceable' && workspaceTabsStyles.titleReplaceable,
+          )}
           data-slot="workspace-tabs-title"
         >
           {children}
@@ -661,30 +689,38 @@ function WorkspaceTabsTabContent({
     </div>
   )
 
-  if (showReorderActions === false) {
+  if (showContextMenu === false) {
     return item
   }
 
   return (
     <ContextMenu.Root>
       <ContextMenu.Trigger render={item} />
-      <ContextMenu.Content aria-label={reorderLabel}>
-        <ContextMenu.Item
-          disabled={reorderIndex <= 0}
-          onClick={() => {
-            moveTab(reorderIndex - 1)
-          }}
-        >
-          Move left
-        </ContextMenu.Item>
-        <ContextMenu.Item
-          disabled={reorderIndex >= (reorderActions?.values.length ?? 0) - 1}
-          onClick={() => {
-            moveTab(reorderIndex + 1)
-          }}
-        >
-          Move right
-        </ContextMenu.Item>
+      <ContextMenu.Content aria-label={contextMenuLabel ?? reorderLabel}>
+        {contextMenuItems}
+        {showCustomActions === true && showReorderActions === true ? (
+          <ContextMenu.Separator />
+        ) : null}
+        {showReorderActions === true ? (
+          <>
+            <ContextMenu.Item
+              disabled={reorderIndex <= 0}
+              onClick={() => {
+                moveTab(reorderIndex - 1)
+              }}
+            >
+              Move left
+            </ContextMenu.Item>
+            <ContextMenu.Item
+              disabled={reorderIndex >= (reorderActions?.values.length ?? 0) - 1}
+              onClick={() => {
+                moveTab(reorderIndex + 1)
+              }}
+            >
+              Move right
+            </ContextMenu.Item>
+          </>
+        ) : null}
       </ContextMenu.Content>
     </ContextMenu.Root>
   )
