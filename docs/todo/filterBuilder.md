@@ -7,9 +7,16 @@
   - [Implementation plan](#implementation-plan)
 - [Work outside the foundation scope](#work-outside-the-foundation-scope)
 - [Settled interaction decisions](#settled-interaction-decisions)
+- [Open design decisions](#open-design-decisions)
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+### Filter action label
+
+[20/08/26]
+
+- [x] Rename the empty toolbar action from `Filter table by column` to `Filter table` without changing its filtering scope.
 
 ### Staged chip Backspace deletion
 
@@ -483,6 +490,10 @@
 - [x] Applied clauses remain URL-backed and combine as a flat `AND`.
 - [x] Draft column, operator, raw value, completion stage, and validation issue remain transient UI state.
 - [x] Filter changes reset pagination and clear table selection state.
+
+## Open design decisions
+
+None.
 
 ## Validation checklist
 

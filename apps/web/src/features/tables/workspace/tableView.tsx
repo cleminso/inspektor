@@ -10,7 +10,9 @@ import {
   Text,
   Tooltip,
 } from '@inspector/ds'
+import { useHotkey } from '@tanstack/react-hotkeys'
 
+import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
@@ -190,6 +192,7 @@ function TableViewContent({
   tableName: string
 }): React.ReactElement {
   const { openSchemaView } = useTableTabs()
+  const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)
   const getRowStatus = useCallback(
     (row: { id: string }) =>
       stagedDeletionRowIds.has(row.id)
@@ -257,6 +260,47 @@ function TableViewContent({
     state.isRefreshing === false &&
     state.loadedRowCount === 0 &&
     state.filters.length > 0
+  const { page, setPage } = state
+  const canGoToPreviousPage = state.isInitialLoading === false && state.hasPreviousPage === true
+  const canGoToNextPage = state.isInitialLoading === false && state.hasNextPage === true
+  useHotkey(
+    appHotkeys.previousTablePage,
+    (event) => {
+      if (event.defaultPrevented === true || event.isComposing === true) {
+        return
+      }
+      event.preventDefault()
+      event.stopPropagation()
+      if (canGoToPreviousPage === true) {
+        setPage(page - 1)
+      }
+    },
+    {
+      ignoreInputs: true,
+      preventDefault: false,
+      stopPropagation: false,
+      target: gridHotkeyTargetRef,
+    },
+  )
+  useHotkey(
+    appHotkeys.nextTablePage,
+    (event) => {
+      if (event.defaultPrevented === true || event.isComposing === true) {
+        return
+      }
+      event.preventDefault()
+      event.stopPropagation()
+      if (canGoToNextPage === true) {
+        setPage(page + 1)
+      }
+    },
+    {
+      ignoreInputs: true,
+      preventDefault: false,
+      stopPropagation: false,
+      target: gridHotkeyTargetRef,
+    },
+  )
   const queryStatus =
     state.error !== null
       ? ''
@@ -390,9 +434,11 @@ function TableViewContent({
               />
             </Toolbar>
             <Box
+              ref={gridHotkeyTargetRef}
               minHeight={0}
               flex={1}
               overflow="hidden"
+              data-hotkey-scope="table-grid"
             >
               <TableGridContextMenu
                 revertField={mutations.revertField}

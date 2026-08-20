@@ -261,7 +261,7 @@ describe('TableMutationWidget', () => {
       <InspectorDockCenterProvider>
         <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
           <ReviewHarness operationCount={operationCount} />
-          <InspectorDock />
+          <InspectorDock onOpenCommands={() => undefined} />
         </TestLedgerProvider>
       </InspectorDockCenterProvider>,
     )
@@ -339,7 +339,7 @@ describe('TableMutationWidget', () => {
       <InspectorDockCenterProvider>
         <TestLedgerProvider schemaColumns={[]}>
           <DeletionHarness />
-          <InspectorDock />
+          <InspectorDock onOpenCommands={() => undefined} />
         </TestLedgerProvider>
       </InspectorDockCenterProvider>,
     )

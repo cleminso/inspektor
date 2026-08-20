@@ -1,5 +1,6 @@
-import { useEffect, useRef, type MouseEvent, type Ref } from "react";
+import { useEffect, useRef, type KeyboardEvent, type MouseEvent, type Ref } from "react";
 
+import { matchesKeyboardEvent } from "@tanstack/react-hotkeys";
 import type { Column, ColumnDef } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 import { ChevronDown, KeyRound, Undo2 } from "lucide-react";
@@ -10,7 +11,6 @@ import {
   Checkbox,
   ContextMenu,
   Button,
-  KeyboardInput,
   Menu,
   MiddleTruncate,
   StructuredValuePreview,
@@ -22,6 +22,7 @@ import {
 } from "@inspector/ds";
 
 import { productGlyphs } from "@app/icons/productGlyphs";
+import { appHotkeys } from "@app/hotkeys/hotkeyCatalog";
 import {
   getColumnTypeMarker,
   type ColumnTypeMarker as ColumnTypeMarkerModel,
@@ -381,6 +382,40 @@ export function ColumnDragPreview({ column }: { column: TableColumnMeta }): Reac
   );
 }
 
+const columnMoveHotkeys = [
+  { direction: "left", hotkey: appHotkeys.moveTableColumnLeft },
+  { direction: "right", hotkey: appHotkeys.moveTableColumnRight },
+] as const satisfies readonly {
+  direction: ColumnMoveDirection;
+  hotkey: (typeof appHotkeys)[keyof typeof appHotkeys];
+}[];
+
+/** Captures column-move shortcuts before Base UI interprets their arrow keys as menu navigation. */
+function runColumnMoveHotkey(
+  event: KeyboardEvent<HTMLDivElement>,
+  columnId: string,
+  onMove: (columnId: string, direction: ColumnMoveDirection) => void,
+): void {
+  if (
+    event.isDefaultPrevented() === true ||
+    event.nativeEvent.isComposing === true ||
+    event.repeat === true
+  ) {
+    return;
+  }
+
+  const movement = columnMoveHotkeys.find(
+    ({ hotkey }) => matchesKeyboardEvent(event.nativeEvent, hotkey) === true,
+  );
+  if (movement === undefined) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  onMove(columnId, movement.direction);
+}
+
 function MenuMoveActions({
   columnId,
   onMove,
@@ -394,23 +429,19 @@ function MenuMoveActions({
       <Menu.Content side="right" align="start">
         <Menu.Item onClick={() => onMove(columnId, "left")}>
           Move left
-          <Menu.Shortcut>
-            <KeyboardInput modifiers={["shift"]} size="small">
-              ←
-            </KeyboardInput>
-          </Menu.Shortcut>
+          <Menu.Shortcut hotkey={appHotkeys.moveTableColumnLeft} />
         </Menu.Item>
         <Menu.Item onClick={() => onMove(columnId, "right")}>
           Move right
-          <Menu.Shortcut>
-            <KeyboardInput modifiers={["shift"]} size="small">
-              →
-            </KeyboardInput>
-          </Menu.Shortcut>
+          <Menu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </Menu.Item>
         <Menu.Separator />
-        <Menu.Item onClick={() => onMove(columnId, "start")}>Move to start</Menu.Item>
-        <Menu.Item onClick={() => onMove(columnId, "end")}>Move to end</Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, "start")}>
+          Move to start
+        </Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, "end")}>
+          Move to end
+        </Menu.Item>
       </Menu.Content>
     </Menu.SubmenuRoot>
   );
@@ -468,23 +499,19 @@ function ContextMoveActions({
       <ContextMenu.Content side="right" align="start">
         <ContextMenu.Item onClick={() => onMove(columnId, "left")}>
           Move left
-          <ContextMenu.Shortcut>
-            <KeyboardInput modifiers={["shift"]} size="small">
-              ←
-            </KeyboardInput>
-          </ContextMenu.Shortcut>
+          <ContextMenu.Shortcut hotkey={appHotkeys.moveTableColumnLeft} />
         </ContextMenu.Item>
         <ContextMenu.Item onClick={() => onMove(columnId, "right")}>
           Move right
-          <ContextMenu.Shortcut>
-            <KeyboardInput modifiers={["shift"]} size="small">
-              →
-            </KeyboardInput>
-          </ContextMenu.Shortcut>
+          <ContextMenu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </ContextMenu.Item>
         <ContextMenu.Separator />
-        <ContextMenu.Item onClick={() => onMove(columnId, "start")}>Move to start</ContextMenu.Item>
-        <ContextMenu.Item onClick={() => onMove(columnId, "end")}>Move to end</ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, "start")}>
+          Move to start
+        </ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, "end")}>
+          Move to end
+        </ContextMenu.Item>
       </ContextMenu.Content>
     </ContextMenu.SubmenuRoot>
   );
@@ -589,12 +616,25 @@ function ColumnHeader({
               </Button>
             }
           />
-          <Menu.Content align="end">
+          <Menu.Content
+            align="end"
+            onKeyDownCapture={
+              onMove === undefined
+                ? undefined
+                : (event) => runColumnMoveHotkey(event, column.id, onMove)
+            }
+          >
             <MenuColumnActions column={column} onMove={onMove} />
           </Menu.Content>
         </Menu.Root>
       </ContextMenu.Trigger>
-      <ContextMenu.Content>
+      <ContextMenu.Content
+        onKeyDownCapture={
+          onMove === undefined
+            ? undefined
+            : (event) => runColumnMoveHotkey(event, column.id, onMove)
+        }
+      >
         <ContextColumnActions column={column} onMove={onMove} />
       </ContextMenu.Content>
     </ContextMenu.Root>

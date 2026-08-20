@@ -1,0 +1,18 @@
+import type { Hotkey } from '@tanstack/react-hotkeys'
+
+/**
+ * Canonical application shortcuts shared by handlers and visible shortcut hints.
+ * Keep a shortcut here instead of duplicating its string at each call site.
+ */
+export const appHotkeys = {
+  closeTableView: 'Alt+W',
+  goBack: 'Alt+[',
+  goForward: 'Alt+]',
+  moveTableColumnLeft: 'Shift+ArrowLeft',
+  moveTableColumnRight: 'Shift+ArrowRight',
+  nextTablePage: 'Mod+ArrowRight',
+  openCommandPalette: 'Mod+K',
+  openTableView: 'Alt+N',
+  previousTablePage: 'Mod+ArrowLeft',
+  toggleTableNavigator: 'Mod+B',
+} as const satisfies Record<string, Hotkey>

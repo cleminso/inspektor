@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import type { ReactNode } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TableView } from '@tables/workspace/tableView'
@@ -201,7 +201,7 @@ vi.mock('@tables/grid/columnVisibility', () => ({
 }))
 
 vi.mock('@tables/filters/dataGridFilterBuilder', () => ({
-  DataGridFilterBuilder: () => <div>Filter builder</div>,
+  DataGridFilterBuilder: () => <input aria-label="Filter input" />,
 }))
 
 vi.mock('@tables/grid/toolbar', () => ({
@@ -243,19 +243,21 @@ vi.mock('@tables/rowEditor/sidePane', () => ({
 }))
 
 vi.mock('@inspector/ds', () => {
-  const Container = ({
-    'aria-live': ariaLive,
-    children,
-    role,
-  }: {
-    'aria-live'?: 'polite'
-    children?: ReactNode
-    role?: string
-  }) => (
-    <div aria-live={ariaLive} role={role}>
-      {children}
-    </div>
-  )
+  const Container = forwardRef<
+    HTMLDivElement,
+    {
+      'aria-live'?: 'polite'
+      'data-hotkey-scope'?: string
+      children?: ReactNode
+      role?: string
+    }
+  >(function Container({ 'aria-live': ariaLive, 'data-hotkey-scope': hotkeyScope, children, role }, ref) {
+    return (
+      <div ref={ref} aria-live={ariaLive} data-hotkey-scope={hotkeyScope} role={role}>
+        {children}
+      </div>
+    )
+  })
   const DataGridTable = ({
     'aria-busy': ariaBusy,
     'aria-label': ariaLabel,
@@ -381,7 +383,10 @@ afterEach(() => {
   tableViewState.filters = [{ id: 'filter-1', column: 'name', operator: 'eq', value: 'Ada' }]
   tableViewState.isInitialLoading = false
   tableViewState.isRefreshing = false
+  tableViewState.hasNextPage = false
+  tableViewState.hasPreviousPage = false
   tableViewState.loadedRowCount = 2
+  tableViewState.page = 1
   tableViewState.activeFieldEditorTarget = null
   tableViewState.detailPaneMode = 'closed'
   tableViewState.rowEditor.activeRowId = null
@@ -397,6 +402,52 @@ afterEach(() => {
   stagedValuesByRowId.current = {}
   gridContextMenuProps.current = null
   useTableViewStateOptions.current = null
+  tableViewState.setPage.mockReset()
+})
+
+describe('TableView pagination hotkeys', () => {
+  it('changes page only while focus is within the grid scope', () => {
+    tableViewState.hasNextPage = true
+    tableViewState.hasPreviousPage = true
+    tableViewState.page = 2
+
+    render(<TableView tableName="accounts" />)
+
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
+      key: 'ArrowRight',
+      ctrlKey: true,
+    })
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
+      key: 'ArrowLeft',
+      ctrlKey: true,
+    })
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Filter input' }), {
+      key: 'ArrowRight',
+      ctrlKey: true,
+    })
+
+    expect(tableViewState.setPage.mock.calls).toEqual([[3], [1]])
+  })
+
+  it('does not paginate through unavailable or loading pages', () => {
+    tableViewState.hasNextPage = false
+    tableViewState.hasPreviousPage = false
+    tableViewState.isInitialLoading = true
+    tableViewState.page = 2
+
+    render(<TableView tableName="accounts" />)
+
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
+      key: 'ArrowRight',
+      ctrlKey: true,
+    })
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
+      key: 'ArrowLeft',
+      ctrlKey: true,
+    })
+
+    expect(tableViewState.setPage).not.toHaveBeenCalled()
+  })
 })
 
 describe('TableView query status', () => {

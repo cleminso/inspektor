@@ -448,7 +448,7 @@ export function DataGridFilterBuilder({
         }}
       >
         <Text as="span" color="muted" variant="caption">
-          {filters.length === 0 ? "Filter table by column" : "Add more filters"}
+          {filters.length === 0 ? "Filter table" : "Add more filters"}
         </Text>
       </Button>
     </Box>

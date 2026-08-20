@@ -280,6 +280,67 @@ describe("buildDataGridColumns", () => {
     expect(onColumnMove).toHaveBeenCalledWith("name", "right");
   });
 
+  it("keeps boundary movement as menu actions without hotkey hints", async () => {
+    render(<TestTable onColumnMove={() => undefined} onSortingChange={() => undefined} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+    fireEvent.keyDown(screen.getByRole("menuitem", { name: "Move" }), { key: "ArrowRight" });
+
+    expect(await screen.findByRole("menuitem", { name: "Move to start" })).toBeTruthy();
+    expect(screen.getByRole("menuitem", { name: "Move to end" })).toBeTruthy();
+    expect(screen.queryByLabelText("Ctrl+Shift+ArrowLeft")).toBeNull();
+    expect(screen.queryByLabelText("Ctrl+Shift+ArrowRight")).toBeNull();
+  });
+
+  it.each([
+    {
+      ctrlKey: false,
+      direction: "left" as const,
+      hotkey: "Shift+ArrowLeft",
+      key: "ArrowLeft",
+      label: /Move left/,
+    },
+    {
+      ctrlKey: false,
+      direction: "right" as const,
+      hotkey: "Shift+ArrowRight",
+      key: "ArrowRight",
+      label: /Move right/,
+    },
+  ])("moves a column $direction with its recorded menu hotkey", async ({
+    ctrlKey,
+    direction,
+    hotkey,
+    key,
+    label,
+  }) => {
+    const onColumnMove = vi.fn();
+    render(<TestTable onColumnMove={onColumnMove} onSortingChange={() => undefined} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+    fireEvent.keyDown(screen.getByRole("menuitem", { name: "Move" }), { key: "ArrowRight" });
+
+    const moveItem = await screen.findByRole("menuitem", { name: label });
+    expect(screen.getByLabelText(hotkey)).toBeTruthy();
+    fireEvent.keyDown(moveItem, { ctrlKey, key, shiftKey: true });
+
+    expect(onColumnMove).toHaveBeenCalledWith("name", direction);
+  });
+
+  it("moves a column with the recorded context-menu hotkey", async () => {
+    const onColumnMove = vi.fn();
+    render(<TestTable onColumnMove={onColumnMove} onSortingChange={() => undefined} />);
+
+    fireEvent.contextMenu(screen.getByText("Name"));
+    fireEvent.keyDown(screen.getByRole("menuitem", { name: "Move" }), { key: "ArrowRight" });
+
+    const moveLeft = await screen.findByRole("menuitem", { name: /Move left/ });
+    expect(screen.getByLabelText("Shift+ArrowLeft")).toBeTruthy();
+    fireEvent.keyDown(moveLeft, { key: "ArrowLeft", shiftKey: true });
+
+    expect(onColumnMove).toHaveBeenCalledWith("name", "left");
+  });
+
   it("hides a column through the header action menu", () => {
     render(<TestTable onSortingChange={() => undefined} />);
 

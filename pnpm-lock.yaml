@@ -9,6 +9,9 @@ catalogs:
     '@base-ui/react':
       specifier: ^1.6.0
       version: 1.6.0
+    '@tanstack/react-hotkeys':
+      specifier: ^0.10.0
+      version: 0.10.0
     '@tanstack/react-router':
       specifier: ^1.170.18
       version: 1.170.18
@@ -96,7 +99,7 @@ importers:
         specifier: ^0.19.0
         version: 0.19.0
       '@tanstack/react-hotkeys':
-        specifier: ^0.10.0
+        specifier: 'catalog:'
         version: 0.10.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tanstack/react-router':
         specifier: 'catalog:'
@@ -226,6 +229,9 @@ importers:
       '@nanostores/react':
         specifier: ^1.1.0
         version: 1.1.0(nanostores@1.4.2)(react@19.2.6)
+      '@tanstack/react-hotkeys':
+        specifier: 'catalog:'
+        version: 0.10.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tanstack/react-router':
         specifier: 'catalog:'
         version: 1.170.18(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -347,6 +353,9 @@ importers:
       '@stylexjs/stylex':
         specifier: ^0.19.0
         version: 0.19.0
+      '@tanstack/react-hotkeys':
+        specifier: 'catalog:'
+        version: 0.10.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tanstack/react-table':
         specifier: 'catalog:'
         version: 9.0.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)

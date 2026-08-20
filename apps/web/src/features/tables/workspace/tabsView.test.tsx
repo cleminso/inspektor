@@ -124,6 +124,23 @@ describe('TableTabsView', () => {
     fireEvent.mouseMove(backButton)
 
     expect(await screen.findByText('Go Back')).toBeTruthy()
+    expect(
+      [...document.querySelectorAll('[data-slot="keyboard-input"]')].some((shortcut) =>
+        shortcut.textContent?.includes('['),
+      ),
+    ).toBe(true)
+
+    fireEvent.mouseLeave(backButton)
+    const forwardButton = screen.getByRole('button', { name: 'Go Forward' })
+    fireEvent.mouseEnter(forwardButton)
+    fireEvent.mouseMove(forwardButton)
+
+    expect(await screen.findByText('Go Forward')).toBeTruthy()
+    expect(
+      [...document.querySelectorAll('[data-slot="keyboard-input"]')].some((shortcut) =>
+        shortcut.textContent?.includes(']'),
+      ),
+    ).toBe(true)
   })
 
   it('shows authored tooltips for unavailable Tables navigation', async () => {
@@ -137,17 +154,42 @@ describe('TableTabsView', () => {
   it('keeps the tab bar visible with an authored new-view tooltip', async () => {
     render(<TableTabsView tableName={null} />)
 
-    const addButton = screen.getByRole('button', { name: 'Open new table view' })
+    const addButton = screen.getByRole('button', { name: 'New view' })
     expect(addButton.getAttribute('title')).toBeNull()
     expect(screen.getByRole('tablist', { name: 'Open table views' })).toBeTruthy()
     expect(screen.getByText('New table view content')).toBeTruthy()
 
     fireEvent.mouseEnter(addButton)
     fireEvent.mouseMove(addButton)
-    expect(await screen.findByText('Open new table view')).toBeTruthy()
+    expect(await screen.findByText('New view')).toBeTruthy()
+    expect(
+      [...document.querySelectorAll('[data-slot="keyboard-input"]')].some((shortcut) =>
+        shortcut.textContent?.includes('N'),
+      ),
+    ).toBe(true)
 
     fireEvent.click(addButton)
     expect(mocks.openNewView).toHaveBeenCalledOnce()
+  })
+
+  it('shows the close-view hotkey in a table tab tooltip', async () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+    ]
+
+    render(<TableTabsView tableName="accounts" />)
+    const closeButton = screen.getByRole('button', { name: 'Close accounts' })
+    fireEvent.mouseEnter(closeButton)
+    fireEvent.mouseMove(closeButton)
+
+    expect(await screen.findByText('Close view')).toBeTruthy()
+    expect(screen.getByLabelText('Alt+W')).toBeTruthy()
   })
 
   it('renders table content only for an active table tab', () => {

@@ -19,6 +19,7 @@
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@inspector/ds": "workspace:*",
     "@nanostores/react": "^1.1.0",
+    "@tanstack/react-hotkeys": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-table": "catalog:",

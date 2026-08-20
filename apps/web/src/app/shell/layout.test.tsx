@@ -1,6 +1,8 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
+
 import { InspectorLayout } from './layout'
 
 vi.mock('./header/view', () => ({
@@ -9,13 +11,19 @@ vi.mock('./header/view', () => ({
 
 afterEach(cleanup)
 
-describe('InspectorLayout', () => {
-  it('locks the application shell to the viewport', () => {
-    const { container } = render(
+function renderLayout(): ReturnType<typeof render> {
+  return render(
+    <AppHotkeysProvider>
       <InspectorLayout pageTitle="Tables">
         <div>Content</div>
-      </InspectorLayout>,
-    )
+      </InspectorLayout>
+    </AppHotkeysProvider>,
+  )
+}
+
+describe('InspectorLayout', () => {
+  it('locks the application shell to the viewport', () => {
+    const { container } = renderLayout()
     const root = container.firstElementChild as HTMLElement
 
     expect(root.classList.contains('h-dvh')).toBe(false)
@@ -26,11 +34,7 @@ describe('InspectorLayout', () => {
   })
 
   it('provides a skip link and a focusable titled main landmark', () => {
-    render(
-      <InspectorLayout pageTitle="Tables">
-        <div>Content</div>
-      </InspectorLayout>,
-    )
+    renderLayout()
 
     const skipLink = screen.getByRole('link', { name: 'Skip to content' })
     const main = screen.getByRole('main')

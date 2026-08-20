@@ -4,6 +4,7 @@ import { InspectorLayout } from '@app/shell/layout'
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import { SidePanelLayoutProvider, useSidePanelLayout } from '@tables/tableList/layout'
 import { TableTabsProvider } from '@tables/workspace/tabsProvider'
+import { TableHotkeys } from '@tables/workspace/tableHotkeys'
 import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHistory'
 import { TableMutationLedgerWorkspaceProvider } from '@tables/mutationLedger/provider'
 import { createTableMutationWorkspaceScope } from '@tables/mutationLedger/scope'
@@ -67,6 +68,7 @@ function TablesWorkspaceLayout(): React.ReactElement {
       <TableMutationLedgerWorkspaceProvider key={tabScope}>
         <TableNavigationHistoryProvider>
           <TableTabsProvider scope={tabScope}>
+            <TableHotkeys />
             <TableExplorerScreen />
             <Outlet />
           </TableTabsProvider>

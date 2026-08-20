@@ -3,6 +3,7 @@ import {
   Button,
   ContextMenu,
   Icon,
+  KeyboardInput,
   WorkspaceTabs,
   Tooltip,
 } from '@inspector/ds'
@@ -10,6 +11,7 @@ import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 import { useRef } from 'react'
 
 import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import {
   type TableRowsPrefetchTarget,
@@ -134,7 +136,9 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   </Button>
                 }
               />
-              <Tooltip.Content>Go Back</Tooltip.Content>
+              <Tooltip.Content>
+                Go Back <KeyboardInput hotkey={appHotkeys.goBack} size="small" />
+              </Tooltip.Content>
             </Tooltip.Root>
             <Tooltip.Root>
               <Tooltip.Trigger
@@ -154,7 +158,9 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   </Button>
                 }
               />
-              <Tooltip.Content>Go Forward</Tooltip.Content>
+              <Tooltip.Content>
+                Go Forward <KeyboardInput hotkey={appHotkeys.goForward} size="small" />
+              </Tooltip.Content>
             </Tooltip.Root>
           </WorkspaceTabs.LeadingArea>
           <WorkspaceTabs.List
@@ -173,6 +179,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   <WorkspaceTabs.Tab
                     key={tab.id}
                     value={tab.id}
+                    closeHotkey={appHotkeys.closeTableView}
                     closeLabel="Close New view"
                     reorderLabel="Reorder New view"
                     onClose={
@@ -203,6 +210,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                     )
                   }
                   retention={isReplaceable === true ? 'replaceable' : 'persistent'}
+                  closeHotkey={appHotkeys.closeTableView}
                   closeLabel={`Close ${tabLabel}`}
                   contextMenuItems={
                     isReplaceable === true ? (
@@ -273,7 +281,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                     variant="ghost"
                     size="s"
                     radius="xs"
-                    aria-label="Open new table view"
+                    aria-label="New view"
                     iconOnly
                     onClick={openNewView}
                   >
@@ -281,7 +289,9 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   </Button>
                 }
               />
-              <Tooltip.Content>Open new table view</Tooltip.Content>
+              <Tooltip.Content>
+                New view <KeyboardInput hotkey={appHotkeys.openTableView} size="small" />
+              </Tooltip.Content>
             </Tooltip.Root>
           </WorkspaceTabs.TrailingArea>
         </WorkspaceTabs.Bar>

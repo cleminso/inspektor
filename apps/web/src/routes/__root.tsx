@@ -2,6 +2,7 @@ import { HeadContent, Outlet, createRootRoute } from '@tanstack/react-router'
 import { Toaster } from '@inspector/ds'
 
 import { InspectorSessionProvider } from '@app/providers/inspectorSessionProvider'
+import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -14,10 +15,12 @@ function RootComponent(): React.ReactElement {
   return (
     <>
       <HeadContent />
-      <InspectorSessionProvider>
-        <Outlet />
-        <Toaster />
-      </InspectorSessionProvider>
+      <AppHotkeysProvider>
+        <InspectorSessionProvider>
+          <Outlet />
+          <Toaster />
+        </InspectorSessionProvider>
+      </AppHotkeysProvider>
     </>
   )
 }

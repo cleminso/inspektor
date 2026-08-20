@@ -14,6 +14,28 @@
 
 ## Implemented foundation
 
+[20/08/26]
+
+- [x] Remove the unreliable Move to start and Move to end hotkeys and their Menu and Context Menu hints while retaining the menu actions.
+
+[20/08/26]
+
+- [x] Handle column-move shortcuts from the parent column menu so pointer-opened submenus do not require keyboard focus to enter the submenu first.
+
+[20/08/26]
+
+- [x] Resolve `Mod` as the macOS Command key from the keyboard event when automatic platform detection is unavailable or inaccurate.
+
+[20/08/26]
+
+- [x] Add canonical `Mod+Shift+ArrowLeft` and `Mod+Shift+ArrowRight` hotkeys for moving a column directly to the start or end.
+- [x] Display the boundary-move hotkeys beside the matching Menu and Context Menu actions.
+
+[20/08/26]
+
+- [x] Record canonical `Shift+ArrowLeft` and `Shift+ArrowRight` column-move hotkeys.
+- [x] Expose the hotkeys through Menu and Context Menu shortcut hints and execute them within the Move submenu.
+
 [17/08/26]
 
 - [x] Place the CodeEditor cursor at the end of its seeded value when mount focus is requested.
@@ -246,6 +268,10 @@
 
 ## Settled implementation decisions
 
+[20/08/26]
+
+- Move to start and Move to end remain explicit menu actions without keyboard shortcuts.
+
 [17/08/26]
 
 - [x] Reserve fill-layout code editors for height-constrained surfaces and use intrinsic layout in floating surfaces.
@@ -311,6 +337,26 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Cover boundary movement while focus remains in the parent column menu and verify the rendered order in the browser runtime.
+
+[20/08/26]
+
+- [x] Verify Command+Shift+ArrowLeft/Right against a deployed multi-column schema in the Inspector browser runtime and assert rendered column order in the component test.
+
+[20/08/26]
+
+- [x] Cover Move to start and Move to end with macOS Command-key events.
+
+[20/08/26]
+
+- [x] Cover Move to start and Move to end through their recorded Menu hotkeys.
+
+[20/08/26]
+
+- [x] Cover left and right column movement through the recorded Menu hotkeys and left movement through the Context Menu hotkey.
 
 [17/08/26]
 

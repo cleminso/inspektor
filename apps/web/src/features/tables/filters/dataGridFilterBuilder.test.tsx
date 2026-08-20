@@ -58,7 +58,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /age Integer/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
     const valueInput = await screen.findByRole("combobox", { name: "Filter value" });
@@ -83,7 +83,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /age Integer/u }));
     fireEvent.click(await screen.findByRole("option", { name: /Is any of/u }));
     const input = await screen.findByRole("combobox", { name: "Filter value" });
@@ -198,7 +198,7 @@ describe("DataGridFilterBuilder", () => {
     fireEvent.keyDown(nameClause, { key: "Backspace" });
 
     expect(screen.queryByRole("button", { name: "Edit filter name equals Ada" })).toBeNull();
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("button", { name: "Filter table by column" })));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("button", { name: "Filter table" })));
   });
 
   it("restores clause focus after an asynchronous removal is rendered", async () => {
@@ -263,7 +263,7 @@ describe("DataGridFilterBuilder", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
 
@@ -289,7 +289,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
     const valueInput = await screen.findByRole("combobox", { name: "Filter value" });
@@ -312,7 +312,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
     const valueInput = await screen.findByRole("combobox", { name: "Filter value" });
@@ -335,7 +335,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
     const valueInput = await screen.findByRole("combobox", { name: "Filter value" });
@@ -359,7 +359,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
     const valueInput = await screen.findByRole("combobox", { name: "Filter value" });
@@ -395,7 +395,7 @@ describe("DataGridFilterBuilder", () => {
     const React = await import("react");
     render(<ControlledExample />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
     const firstValueInput = await screen.findByRole("combobox", { name: "Filter value" });
@@ -424,7 +424,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /createdAt Timestamp/u }));
     fireEvent.click(await screen.findByRole("option", { name: "Is greater than" }));
 
@@ -467,7 +467,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /status Enum/u }));
     fireEvent.click(await screen.findByRole("option", { name: /^Equals/u }));
     const valueInput = await screen.findByRole("combobox", { name: "Filter value" });
@@ -484,7 +484,7 @@ describe("DataGridFilterBuilder", () => {
   it("focuses the draft chip before Backspace clears it", async () => {
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     fireEvent.click(await screen.findByRole("option", { name: /Equals/u }));
     const input = await screen.findByRole("combobox", { name: "Filter value" });
@@ -503,7 +503,7 @@ describe("DataGridFilterBuilder", () => {
   it("supports explicit keyboard navigation across stage changes", async () => {
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     const columnInput = await screen.findByRole("combobox", { name: "Filter columns" });
     fireEvent.keyDown(columnInput, { key: "ArrowDown" });
     fireEvent.keyDown(columnInput, { key: "Enter" });
@@ -518,7 +518,7 @@ describe("DataGridFilterBuilder", () => {
   it("accepts standard operator glyphs and aliases from the palette input", async () => {
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /name Text/u }));
     const operatorInput = await screen.findByRole("combobox", { name: "Filter operators" });
     fireEvent.change(operatorInput, { target: { value: "!=" } });
@@ -534,7 +534,7 @@ describe("DataGridFilterBuilder", () => {
     const onFiltersChange = vi.fn();
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={onFiltersChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Filter table by column" }));
+    fireEvent.click(screen.getByRole("button", { name: "Filter table" }));
     fireEvent.click(await screen.findByRole("option", { name: /ownerId UUID/u }));
     fireEvent.click(await screen.findByRole("option", { name: "Is not null" }));
     fireEvent.keyDown(await screen.findByRole("combobox", { name: "Filter columns" }), { key: "Enter" });

@@ -1,7 +1,8 @@
-import { Box, Button, Tooltip } from "@inspector/ds";
-import { Rss } from "lucide-react";
+import { Box, Button, KeyboardInput, Tooltip } from "@inspector/ds";
+import { Rss, Search } from "lucide-react";
 
 import { productGlyphs } from "@app/icons/productGlyphs";
+import { appHotkeys } from "@app/hotkeys/hotkeyCatalog";
 import { InspectorDockCenterSlot } from "./centerSlot";
 
 export interface InspectorLeftDockControl {
@@ -11,9 +12,10 @@ export interface InspectorLeftDockControl {
 
 interface InspectorDockProps {
   leftDock?: InspectorLeftDockControl;
+  onOpenCommands: () => void;
 }
 
-export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElement {
+export function InspectorDock({ leftDock, onOpenCommands }: InspectorDockProps): React.ReactElement {
   const leftDockLabel = leftDock?.isOpen === true ? "Close left dock" : "Open left dock";
 
   return (
@@ -52,7 +54,9 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
                 </Button>
               }
             />
-            <Tooltip.Content>{leftDockLabel}</Tooltip.Content>
+            <Tooltip.Content>
+              {leftDockLabel} <KeyboardInput hotkey={appHotkeys.toggleTableNavigator} size="small" />
+            </Tooltip.Content>
           </Tooltip.Root>
         ) : null}
         <Tooltip.Root>
@@ -71,6 +75,37 @@ export function InspectorDock({ leftDock }: InspectorDockProps): React.ReactElem
             }
           />
           <Tooltip.Content>Open subscriptions dock</Tooltip.Content>
+        </Tooltip.Root>
+        <Box
+          as="span"
+          role="separator"
+          aria-label="Command actions"
+          aria-orientation="vertical"
+          height="icon-size-xs"
+          mx="xxs"
+          borderLeftWidth={1}
+          borderColor="subtle"
+          borderStyle="solid"
+        />
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="s"
+                aria-label="Open commands"
+                glyphSize="compact"
+                iconOnly
+                onClick={onOpenCommands}
+              >
+                <Button.Glyph artwork={Search} />
+              </Button>
+            }
+          />
+          <Tooltip.Content>
+            Open commands <KeyboardInput hotkey={appHotkeys.openCommandPalette} size="small" />
+          </Tooltip.Content>
         </Tooltip.Root>
       </Box>
       <Box flexShrink={0} alignItems="center" justifyContent="center">
