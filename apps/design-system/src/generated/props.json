@@ -7234,7 +7234,7 @@
       "description": "The committed timestamp shown when the calendar opens.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 38
+        "line": 47
       }
     },
     {
@@ -7244,7 +7244,7 @@
       "description": "Runs with the selected timestamp when Apply is activated.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 40
+        "line": 49
       }
     },
     {
@@ -7254,7 +7254,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 42
+        "line": 51
       }
     },
     {
@@ -7265,7 +7265,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 44
+        "line": 53
       }
     },
     {
@@ -7275,7 +7275,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 46
+        "line": 55
       }
     },
     {
@@ -7285,7 +7285,7 @@
       "description": "Earliest selectable timestamp.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 48
+        "line": 57
       }
     },
     {
@@ -7295,7 +7295,7 @@
       "description": "Latest selectable timestamp.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 50
+        "line": 59
       }
     },
     {
@@ -7306,7 +7306,7 @@
       "description": "Disables the trigger and timestamp editing.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 52
+        "line": 61
       }
     }
   ],
@@ -7318,7 +7318,7 @@
       "description": "Stable accessible name for the timestamp trigger.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 58
+        "line": 67
       }
     },
     {
@@ -7328,7 +7328,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 60
+        "line": 69
       }
     }
   ],
@@ -7341,7 +7341,7 @@
       "description": "Aligns the popup along its trigger.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 66
+        "line": 75
       }
     },
     {
@@ -7351,7 +7351,7 @@
       "description": "Moves focus to the calendar when the content mounts. Defaults to popover content only.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 68
+        "line": 77
       }
     },
     {
@@ -7362,7 +7362,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 70
+        "line": 79
       }
     },
     {
@@ -7373,7 +7373,7 @@
       "description": "Renders as a popup or as an inline step inside another surface.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 72
+        "line": 81
       }
     }
   ],

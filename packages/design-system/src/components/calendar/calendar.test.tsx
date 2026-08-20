@@ -57,8 +57,8 @@ describe('Calendar', () => {
 
     fireEvent.click(trigger)
     expect(screen.getByRole('dialog', { name: 'Choose date and time' })).toBeTruthy()
-    expect(screen.getByRole('combobox', { name: 'Choose the Month' })).toBeTruthy()
-    expect(screen.getByRole('combobox', { name: 'Choose the Year' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Choose month, August' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Choose year, 2026' })).toBeTruthy()
   })
 
   it('lets an InputGroup own the compound control border', () => {
@@ -169,8 +169,8 @@ describe('Calendar', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit timestamp' }))
     expect(screen.getByRole('button', { name: 'Go to the Previous Month' }).tabIndex).toBe(0)
-    expect(screen.getByRole('combobox', { name: 'Choose the Month' }).tabIndex).toBe(0)
-    expect(screen.getByRole('combobox', { name: 'Choose the Year' }).tabIndex).toBe(0)
+    expect(screen.getByRole('button', { name: 'Choose month, August' }).tabIndex).toBe(0)
+    expect(screen.getByRole('button', { name: 'Choose year, 2026' }).tabIndex).toBe(0)
     expect(screen.getByRole('button', { name: 'Go to the Next Month' }).tabIndex).toBe(0)
 
     const selectedDay = screen.getByRole('button', {
@@ -248,6 +248,24 @@ describe('Calendar', () => {
     expect(screen.getByText(/on or before/)).toBeTruthy()
   })
 
+  it('disables day selection with the rest of timestamp editing', () => {
+    render(
+      <Calendar value={new Date(2026, 7, 13, 12)} onApply={vi.fn()} disabled>
+        <Calendar.Content mode="inline" />
+      </Calendar>,
+    )
+
+    expect(
+      screen
+        .getByRole('button', { name: /Thursday, August 13th, 2026, selected/i })
+        .hasAttribute('disabled'),
+    ).toBe(true)
+    expect(screen.getByRole('button', { name: 'Choose month, August' }).hasAttribute('disabled')).toBe(
+      true,
+    )
+    expect(screen.getByRole('button', { name: 'Apply' }).hasAttribute('disabled')).toBe(true)
+  })
+
   it('sets the pending value to now and applies it explicitly', () => {
     vi.useFakeTimers()
     const now = new Date(2026, 7, 13, 17, 45, 30, 456)
@@ -301,20 +319,127 @@ describe('Calendar', () => {
 
     const trigger = screen.getByRole('button', { name: 'Edit timestamp' })
     fireEvent.click(trigger)
+    expect(screen.getByRole('status').textContent).toBe('August 2026')
     fireEvent.click(screen.getByRole('button', { name: 'Go to the Next Month' }))
-    expect(
-      (screen.getByRole('combobox', { name: 'Choose the Month' }) as HTMLSelectElement)
-        .selectedOptions[0]?.textContent,
-    ).toBe('Sep')
+    expect(screen.getByRole('button', { name: 'Choose month, September' })).toBeTruthy()
+    expect(screen.getByRole('status').textContent).toBe('September 2026')
 
     fireEvent.keyDown(screen.getByRole('dialog', { name: 'Choose date and time' }), {
       key: 'Escape',
     })
     fireEvent.click(trigger)
 
-    expect(
-      (screen.getByRole('combobox', { name: 'Choose the Month' }) as HTMLSelectElement)
-        .selectedOptions[0]?.textContent,
-    ).toBe('Aug')
+    expect(screen.getByRole('button', { name: 'Choose month, August' })).toBeTruthy()
+  })
+
+  it('selects a visible month from an in-calendar grid without changing the pending date', () => {
+    const value = new Date(2026, 7, 13, 12)
+    const onApply = vi.fn()
+    render(
+      <Calendar value={value} onApply={onApply} defaultOpen>
+        <Calendar.Trigger label="Edit timestamp">Timestamp</Calendar.Trigger>
+        <Calendar.Content />
+      </Calendar>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Choose month, August' }))
+    expect(screen.getByRole('grid', { name: 'Choose month' })).toBeTruthy()
+    expect(screen.queryByLabelText('Time')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Apply' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Go to the Previous Month' }).hasAttribute('disabled')).toBe(
+      true,
+    )
+    expect(screen.getByRole('button', { name: 'Go to the Next Month' }).hasAttribute('disabled')).toBe(
+      true,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'September' }))
+    expect(screen.queryByRole('grid', { name: 'Choose month' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Choose month, September' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(onApply).toHaveBeenCalledWith(value)
+  })
+
+  it('pages through years and returns to the day grid after choosing a year', async () => {
+    const value = new Date(2026, 7, 13, 12)
+    const onApply = vi.fn()
+    render(
+      <Calendar
+        value={value}
+        minValue={new Date(2000, 0, 1)}
+        maxValue={new Date(2060, 11, 31, 23, 59, 59)}
+        onApply={onApply}
+        defaultOpen
+      >
+        <Calendar.Trigger label="Edit timestamp">Timestamp</Calendar.Trigger>
+        <Calendar.Content />
+      </Calendar>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Choose month, August' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Choose year, 2026' }))
+    expect(screen.getByRole('grid', { name: 'Choose year' })).toBeTruthy()
+    expect(screen.queryByLabelText('Time')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Apply' })).toBeNull()
+    const selectedYear = screen.getByRole('button', { name: '2026' })
+    await waitFor(() => expect(document.activeElement).toBe(selectedYear))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show next 20 years' }))
+    expect(screen.queryByRole('button', { name: '2026' })).toBeNull()
+    expect(screen.getByRole('status').textContent).toBe('Years 2040 to 2059')
+    fireEvent.click(screen.getByRole('button', { name: '2042' }))
+
+    expect(screen.queryByRole('grid', { name: 'Choose year' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Choose year, 2042' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(onApply).toHaveBeenCalledWith(value)
+  })
+
+  it('supports arrow-key month selection and restores focus to the month trigger', async () => {
+    const onKeyDown = vi.fn()
+    render(
+      <div
+        aria-label="Calendar keyboard boundary"
+        role="toolbar"
+        tabIndex={-1}
+        onKeyDown={onKeyDown}
+      >
+        <Calendar value={new Date(2026, 7, 13, 12)} onApply={vi.fn()} defaultOpen>
+          <Calendar.Trigger label="Edit timestamp">Timestamp</Calendar.Trigger>
+          <Calendar.Content />
+        </Calendar>
+      </div>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Choose month, August' }))
+    const august = screen.getByRole('button', { name: 'August' })
+    await waitFor(() => expect(document.activeElement).toBe(august))
+    fireEvent.keyDown(august, { key: 'ArrowRight' })
+    const september = screen.getByRole('button', { name: 'September' })
+    expect(document.activeElement).toBe(september)
+    expect(onKeyDown).not.toHaveBeenCalled()
+    fireEvent.keyDown(september, { key: 'Enter' })
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'Choose month, September' }),
+    )
+  })
+
+  it('returns from a selector grid before Escape closes the calendar', () => {
+    render(
+      <Calendar value={new Date(2026, 7, 13, 12)} onApply={vi.fn()} defaultOpen>
+        <Calendar.Trigger label="Edit timestamp">Timestamp</Calendar.Trigger>
+        <Calendar.Content />
+      </Calendar>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Choose month, August' }))
+    fireEvent.keyDown(screen.getByRole('grid', { name: 'Choose month' }), { key: 'Escape' })
+
+    expect(screen.queryByRole('grid', { name: 'Choose month' })).toBeNull()
+    expect(screen.getByRole('dialog', { name: 'Choose date and time' })).toBeTruthy()
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'Choose month, August' }),
+    )
   })
 })

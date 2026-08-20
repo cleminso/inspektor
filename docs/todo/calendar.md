@@ -11,6 +11,18 @@
 
 ## Implemented foundation
 
+[20/08/26]
+
+- [x] Hide time and Apply controls while month or year selection is active.
+- [x] Let month and year grids size to compact content, superseding the earlier stable-height behavior for selector views.
+
+[20/08/26]
+
+- [x] Replace native month and year selectors with in-calendar selection grids.
+- [x] Keep month and year navigation separate from the pending timestamp until a day is selected.
+- [x] Add roving focus, directional keyboard navigation, selection focus, and selector Escape handling.
+- [x] Keep the calendar body height stable across day, month, and year views.
+
 [13/08/26]
 
 - [x] Compact the popup controls, calendar cells, spacing, and actions.
@@ -71,6 +83,18 @@
 
 ## Settled interaction decisions
 
+[20/08/26]
+
+- [x] Timestamp controls appear only in the day-selection view.
+
+[20/08/26]
+
+- [x] Month selection uses a twelve-month grid and disables header navigation while the grid is open.
+- [x] Year selection uses twenty-year pages controlled by the header navigation buttons.
+- [x] Selecting a month or year returns to the day grid without changing the pending timestamp.
+- [x] Escape returns from a month or year grid before it closes the Calendar surface.
+- [x] Month and year header buttons do not use dropdown chevrons.
+
 [13/08/26]
 
 - [x] Time validation uses `HH:MM:SS` and reports timestamp boundary violations beside the control.
@@ -90,6 +114,14 @@
 No unresolved Calendar design decisions.
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Run focused Calendar tests and changed-file lint.
+- [x] Run design-system package tests, typecheck, and build.
+- [x] Run design-system documentation checks, tests, typecheck, lint, and build.
+- [x] Verify day, month, and year views in light and dark themes.
+- [x] Verify selector keyboard navigation, focus restoration, and Escape behavior in the browser.
 
 [13/08/26]
 

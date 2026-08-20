@@ -1,6 +1,6 @@
 import { Popover as BasePopover } from '@base-ui/react/popover'
 import * as stylex from '@stylexjs/stylex'
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   createContext,
   forwardRef,
@@ -11,13 +11,13 @@ import {
   useRef,
   useState,
   type ComponentRef,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PropsWithChildren,
   type RefCallback,
   type RefObject,
 } from 'react'
 import {
   DayPicker,
-  type ChevronProps,
   type DayButtonProps,
   type MonthChangeEventHandler,
 } from 'react-day-picker'
@@ -32,6 +32,15 @@ import { InputGroupContext } from '../inputGroup/inputGroupContext'
 import { calendarStyles } from './calendar.styles'
 
 const calendarLabel = 'Choose date and time'
+const yearPageSize = 20
+
+type CalendarView = 'day' | 'month' | 'year'
+
+interface CalendarSelectorOption {
+  disabled: boolean
+  label: string
+  value: number
+}
 
 export interface CalendarRootProps extends PropsWithChildren {
   /** The committed timestamp shown when the calendar opens. */
@@ -211,15 +220,6 @@ const CalendarTrigger = forwardRef<ComponentRef<typeof BasePopover.Trigger>, Cal
   },
 )
 
-function CalendarChevron({ orientation, ...props }: ChevronProps): React.ReactElement {
-  const iconStyles = stylex.props(calendarStyles.chevron)
-  if (orientation === 'down') {
-    return <ChevronDown {...props} {...iconStyles} strokeWidth={1.5} />
-  }
-  const NavigationChevron = orientation === 'left' ? ChevronLeft : ChevronRight
-  return <NavigationChevron {...props} {...iconStyles} strokeWidth={1.5} />
-}
-
 function CalendarDayButton({ modifiers, ...props }: DayButtonProps): React.ReactElement {
   const ref = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -239,6 +239,10 @@ function CalendarDayButton({ modifiers, ...props }: DayButtonProps): React.React
       )}
     />
   )
+}
+
+function CalendarHiddenMonthCaption(): React.ReactElement {
+  return <div hidden />
 }
 
 function formatTimeInput(value: Date): string {
@@ -276,6 +280,175 @@ function getDayBoundary(value: Date): Date {
   return new Date(value.getFullYear(), value.getMonth(), value.getDate())
 }
 
+function getMonthIndex(value: Date): number {
+  return value.getFullYear() * 12 + value.getMonth()
+}
+
+function getMonthFromIndex(monthIndex: number): Date {
+  return new Date(Math.floor(monthIndex / 12), monthIndex % 12, 1)
+}
+
+function clampMonth(value: Date, startMonth: Date, endMonth: Date): Date {
+  const monthIndex = Math.min(
+    Math.max(getMonthIndex(value), getMonthIndex(startMonth)),
+    getMonthIndex(endMonth),
+  )
+  return getMonthFromIndex(monthIndex)
+}
+
+function getYearPageStart(year: number, startYear: number, endYear: number): number {
+  const boundedYear = Math.min(Math.max(year, startYear), endYear)
+  return startYear + Math.floor((boundedYear - startYear) / yearPageSize) * yearPageSize
+}
+
+function getEnabledOptionIndex(
+  options: CalendarSelectorOption[],
+  initialIndex: number,
+  step: number,
+  boundaryIndex: number,
+): number {
+  let optionIndex = initialIndex
+  while (
+    optionIndex >= 0 &&
+    optionIndex < options.length &&
+    (step > 0 ? optionIndex <= boundaryIndex : optionIndex >= boundaryIndex)
+  ) {
+    if (options[optionIndex]?.disabled === false) return optionIndex
+    optionIndex += step
+  }
+  return -1
+}
+
+interface CalendarSelectorGridProps {
+  columns: 3 | 5
+  label: string
+  options: CalendarSelectorOption[]
+  selectedValue: number
+  onSelect: (value: number) => void
+}
+
+function CalendarSelectorGrid({
+  columns,
+  label,
+  options,
+  selectedValue,
+  onSelect,
+}: CalendarSelectorGridProps): React.ReactElement {
+  const optionRefs = useRef(new Map<number, HTMLButtonElement>())
+  const initialFocusedValue =
+    options.find((option) => option.value === selectedValue && option.disabled === false)?.value ??
+    options.find((option) => option.disabled === false)?.value
+  const [focusedValue, setFocusedValue] = useState<number | undefined>(
+    initialFocusedValue,
+  )
+
+  useEffect(() => {
+    if (initialFocusedValue !== undefined) {
+      optionRefs.current.get(initialFocusedValue)?.focus()
+    }
+  }, [initialFocusedValue])
+
+  const focusOption = (optionIndex: number): void => {
+    const option = options[optionIndex]
+    if (option === undefined || option.disabled === true) return
+    setFocusedValue(option.value)
+    optionRefs.current.get(option.value)?.focus()
+  }
+  const handleOptionKeyDown = (
+    event: ReactKeyboardEvent<HTMLButtonElement>,
+    optionIndex: number,
+  ): void => {
+    const rowStart = Math.floor(optionIndex / columns) * columns
+    const rowEnd = Math.min(rowStart + columns - 1, options.length - 1)
+    let nextIndex = -1
+    if (event.key === 'ArrowLeft') {
+      nextIndex = getEnabledOptionIndex(options, optionIndex - 1, -1, rowStart)
+    } else if (event.key === 'ArrowRight') {
+      nextIndex = getEnabledOptionIndex(options, optionIndex + 1, 1, rowEnd)
+    } else if (event.key === 'ArrowUp') {
+      nextIndex = getEnabledOptionIndex(options, optionIndex - columns, -columns, 0)
+    } else if (event.key === 'ArrowDown') {
+      nextIndex = getEnabledOptionIndex(
+        options,
+        optionIndex + columns,
+        columns,
+        options.length - 1,
+      )
+    } else if (event.key === 'Home') {
+      nextIndex = getEnabledOptionIndex(
+        options,
+        event.ctrlKey === true ? 0 : rowStart,
+        1,
+        event.ctrlKey === true ? options.length - 1 : rowEnd,
+      )
+    } else if (event.key === 'End') {
+      nextIndex = getEnabledOptionIndex(
+        options,
+        event.ctrlKey === true ? options.length - 1 : rowEnd,
+        -1,
+        event.ctrlKey === true ? 0 : rowStart,
+      )
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      event.stopPropagation()
+      const option = options[optionIndex]
+      if (option?.disabled === false) onSelect(option.value)
+      return
+    } else {
+      return
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    if (nextIndex !== -1) focusOption(nextIndex)
+  }
+  const rows = Array.from({ length: Math.ceil(options.length / columns) }, (_, rowIndex) =>
+    options.slice(rowIndex * columns, rowIndex * columns + columns),
+  )
+
+  return (
+    <div aria-label={label} role="grid" {...stylex.props(calendarStyles.selectorGrid)}>
+      {rows.map((row, rowIndex) => (
+        <div
+          key={row[0]?.value ?? rowIndex}
+          role="row"
+          {...stylex.props(
+            calendarStyles.selectorRow,
+            columns === 3 && calendarStyles.selectorRowMonths,
+            columns === 5 && calendarStyles.selectorRowYears,
+          )}
+        >
+          {row.map((option, columnIndex) => {
+            const optionIndex = rowIndex * columns + columnIndex
+            const selected = option.value === selectedValue
+            return (
+              <div key={option.value} aria-selected={selected} role="gridcell">
+                <button
+                  ref={(element) => {
+                    if (element === null) optionRefs.current.delete(option.value)
+                    else optionRefs.current.set(option.value, element)
+                  }}
+                  disabled={option.disabled}
+                  tabIndex={option.value === focusedValue ? 0 : -1}
+                  type="button"
+                  {...stylex.props(
+                    calendarStyles.selectorButton,
+                    selected && calendarStyles.selectorButtonSelected,
+                  )}
+                  onClick={() => onSelect(option.value)}
+                  onFocus={() => setFocusedValue(option.value)}
+                  onKeyDown={(event) => handleOptionKeyDown(event, optionIndex)}
+                >
+                  {option.label}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function isTimestampInRange(
   value: Date,
   minValue: Date | undefined,
@@ -306,11 +479,17 @@ function CalendarContent({
   const context = useCalendarContext()
   const popupRef = useRef<ComponentRef<typeof BasePopover.Popup>>(null)
   const [visibleMonth, setVisibleMonth] = useState(() => context.pendingValue ?? new Date())
+  const [view, setView] = useState<CalendarView>('day')
+  const [dayGridAutoFocus, setDayGridAutoFocus] = useState(true)
   const [timeInput, setTimeInput] = useState(() => formatTimeInput(context.pendingValue))
+  const monthButtonRef = useRef<HTMLButtonElement>(null)
+  const yearButtonRef = useRef<HTMLButtonElement>(null)
   const parsedTime = parseTimeInput(timeInput)
   useEffect(() => setTimeInput(formatTimeInput(context.pendingValue)), [context.pendingValue])
   useEffect(() => {
     setVisibleMonth(context.resetMonth)
+    setView('day')
+    setDayGridAutoFocus(true)
   }, [context.resetMonth])
   const positionerStyles = createStateStyleProps<BasePopover.Positioner.State>((state) => [
     calendarStyles.positioner,
@@ -348,29 +527,27 @@ function CalendarContent({
   const nowYear = new Date().getFullYear()
   const startMonth = getYearBoundary(context.minValue, nowYear - 100)
   const endMonth = getYearBoundary(context.maxValue, nowYear + 100)
+  const startYear = startMonth.getFullYear()
+  const endYear = endMonth.getFullYear()
+  const startMonthIndex = getMonthIndex(startMonth)
+  const endMonthIndex = getMonthIndex(endMonth)
+  const [yearPageStart, setYearPageStart] = useState(() =>
+    getYearPageStart(visibleMonth.getFullYear(), startYear, endYear),
+  )
   const classNames = {
     root: stylex.props(calendarStyles.calendarRoot).className,
     months: stylex.props(calendarStyles.months).className,
     month: stylex.props(calendarStyles.month).className,
-    month_caption: stylex.props(calendarStyles.monthCaption).className,
-    dropdowns: stylex.props(calendarStyles.dropdowns).className,
-    dropdown_root: stylex.props(calendarStyles.dropdownRoot).className,
-    dropdown: stylex.props(calendarStyles.dropdown).className,
-    caption_label: stylex.props(calendarStyles.captionLabel).className,
-    nav: stylex.props(calendarStyles.nav).className,
-    button_previous: stylex.props(
-      calendarStyles.navButton,
-      calendarStyles.navButtonPrevious,
-    ).className,
-    button_next: stylex.props(calendarStyles.navButton, calendarStyles.navButtonNext).className,
     month_grid: stylex.props(calendarStyles.monthGrid).className,
     weekday: stylex.props(calendarStyles.weekday).className,
     day: stylex.props(calendarStyles.day).className,
   }
-  const disabled = [
-    ...(context.minValue === undefined ? [] : [{ before: getDayBoundary(context.minValue) }]),
-    ...(context.maxValue === undefined ? [] : [{ after: getDayBoundary(context.maxValue) }]),
-  ]
+  const disabled = context.disabled
+    ? true
+    : [
+        ...(context.minValue === undefined ? [] : [{ before: getDayBoundary(context.minValue) }]),
+        ...(context.maxValue === undefined ? [] : [{ after: getDayBoundary(context.maxValue) }]),
+      ]
   const pendingIsInRange = isTimestampInRange(
     context.pendingValue,
     context.minValue,
@@ -395,107 +572,270 @@ function CalendarContent({
   const handleMonthChange: MonthChangeEventHandler = (month) => setVisibleMonth(month)
   const applyDisabled =
     context.disabled || parsedTime === undefined || pendingIsInRange === false
+  const visibleMonthIndex = getMonthIndex(visibleMonth)
+  const monthOptions = Array.from({ length: 12 }, (_, month) => {
+    const value = new Date(visibleMonth.getFullYear(), month, 1)
+    const monthIndex = getMonthIndex(value)
+    return {
+      disabled:
+        context.disabled === true ||
+        monthIndex < startMonthIndex ||
+        monthIndex > endMonthIndex,
+      label: value.toLocaleString(undefined, { month: 'long' }),
+      value: month,
+    }
+  })
+  const yearOptions = Array.from(
+    { length: Math.max(0, Math.min(yearPageSize, endYear - yearPageStart + 1)) },
+    (_, index) => {
+      const year = yearPageStart + index
+      return { disabled: context.disabled, label: String(year), value: year }
+    },
+  )
+  const previousNavigationDisabled =
+    context.disabled === true ||
+    view === 'month' ||
+    (view === 'day' && visibleMonthIndex <= startMonthIndex) ||
+    (view === 'year' && yearPageStart <= startYear)
+  const nextNavigationDisabled =
+    context.disabled === true ||
+    view === 'month' ||
+    (view === 'day' && visibleMonthIndex >= endMonthIndex) ||
+    (view === 'year' && yearPageStart + yearPageSize > endYear)
+  const navigationLabel =
+    view === 'year'
+      ? { next: 'Show next 20 years', previous: 'Show previous 20 years' }
+      : { next: 'Go to the Next Month', previous: 'Go to the Previous Month' }
+  const handleNavigation = (direction: -1 | 1): void => {
+    if (view === 'day') {
+      setVisibleMonth(getMonthFromIndex(visibleMonthIndex + direction))
+    } else if (view === 'year') {
+      setYearPageStart((pageStart) => pageStart + direction * yearPageSize)
+    }
+  }
+  const closeSelector = (nextMonth: Date, trigger: RefObject<HTMLButtonElement | null>): void => {
+    setVisibleMonth(clampMonth(nextMonth, startMonth, endMonth))
+    trigger.current?.focus()
+    setView('day')
+  }
+  const calendarNavigation = (
+    <div {...stylex.props(calendarStyles.calendarHeader)}>
+      <button
+        aria-label={navigationLabel.previous}
+        disabled={previousNavigationDisabled}
+        type="button"
+        {...stylex.props(calendarStyles.navButton)}
+        onClick={() => handleNavigation(-1)}
+      >
+        <ChevronLeft {...stylex.props(calendarStyles.chevron)} aria-hidden strokeWidth={1.5} />
+      </button>
+      <div {...stylex.props(calendarStyles.headerLabels)}>
+        <button
+          ref={monthButtonRef}
+          aria-label={`Choose month, ${visibleMonth.toLocaleString(undefined, { month: 'long' })}`}
+          aria-pressed={view === 'month'}
+          disabled={context.disabled}
+          type="button"
+          {...stylex.props(
+            calendarStyles.headerButton,
+            view === 'month' && calendarStyles.headerButtonSelected,
+          )}
+          onClick={() => {
+            setDayGridAutoFocus(false)
+            setView((currentView) => (currentView === 'month' ? 'day' : 'month'))
+          }}
+        >
+          {visibleMonth.toLocaleString(undefined, { month: 'long' })}
+        </button>
+        <button
+          ref={yearButtonRef}
+          aria-label={`Choose year, ${visibleMonth.getFullYear()}`}
+          aria-pressed={view === 'year'}
+          disabled={context.disabled}
+          type="button"
+          {...stylex.props(
+            calendarStyles.headerButton,
+            view === 'year' && calendarStyles.headerButtonSelected,
+          )}
+          onClick={() => {
+            if (view === 'year') {
+              setView('day')
+              return
+            }
+            setYearPageStart(getYearPageStart(visibleMonth.getFullYear(), startYear, endYear))
+            setDayGridAutoFocus(false)
+            setView('year')
+          }}
+        >
+          {visibleMonth.getFullYear()}
+        </button>
+      </div>
+      <button
+        aria-label={navigationLabel.next}
+        disabled={nextNavigationDisabled}
+        type="button"
+        {...stylex.props(calendarStyles.navButton)}
+        onClick={() => handleNavigation(1)}
+      >
+        <ChevronRight {...stylex.props(calendarStyles.chevron)} aria-hidden strokeWidth={1.5} />
+      </button>
+    </div>
+  )
   const calendarBody = (
     <>
-      <DayPicker
-        // oxlint-disable-next-line jsx-a11y/no-autofocus -- Popovers and explicit command steps transfer focus into the calendar.
-        autoFocus={autoFocus ?? mode === 'popover'}
-        captionLayout="dropdown"
-        classNames={classNames}
-        components={{
-          Chevron: CalendarChevron,
-          DayButton: CalendarDayButton,
+      <div
+        {...stylex.props(calendarStyles.calendarSurface)}
+        onKeyDownCapture={(event) => {
+          if (event.key !== 'Escape' || view === 'day') return
+          event.preventDefault()
+          event.stopPropagation()
+          if (view === 'month') monthButtonRef.current?.focus()
+          else yearButtonRef.current?.focus()
+          setView('day')
         }}
-        disabled={disabled}
-        endMonth={endMonth}
-        fixedWeeks
-        formatters={{
-          formatMonthDropdown: (date) =>
-            date.toLocaleString(undefined, { month: 'short' }),
-        }}
-        mode="single"
-        month={visibleMonth}
-        navLayout="around"
-        required
-        selected={context.pendingValue}
-        showOutsideDays
-        startMonth={startMonth}
-        onMonthChange={handleMonthChange}
-        onSelect={(day) => {
-          const nextValue = combineDayAndTime(day, context.pendingValue)
-          context.setPendingValue(nextValue)
-          setVisibleMonth(nextValue)
-        }}
-      />
-      <div {...stylex.props(calendarStyles.controls)}>
-        <div {...stylex.props(calendarStyles.timeRow)}>
-          <Field.Root
-            disabled={context.disabled}
-            validationMode="onBlur"
-            validate={validateTime}
-            {...stylex.props(calendarStyles.field)}
-          >
-            <Field.Label {...stylex.props(calendarStyles.controlLabel)}>Time</Field.Label>
-            <Input
-              disabled={context.disabled}
-              fullWidth
-              invalid={false}
-              inputMode="numeric"
-              size="m"
-              type="text"
-              value={timeInput}
-              onValueChange={(nextInput) => {
-                setTimeInput(nextInput)
-                const nextParsedTime = parseTimeInput(nextInput)
-                if (nextParsedTime === undefined) return
-                const [hours, minutes, seconds] = nextParsedTime
-                const nextValue = new Date(context.pendingValue.getTime())
-                nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
-                context.setPendingValue(nextValue)
-              }}
-              render={<input aria-label="Time" {...stylex.props(calendarStyles.input)} />}
-            />
-            <Field.Error />
-          </Field.Root>
-          <div {...stylex.props(calendarStyles.setNowAction)}>
-            <Button
-              disabled={context.disabled}
-              layout="fill"
-              size="m"
-              variant="ghost"
-              onClick={() => {
-                const now = new Date()
-                context.setPendingValue(now)
-                setTimeInput(formatTimeInput(now))
-                setVisibleMonth(now)
-              }}
-            >
-              Set now
-            </Button>
-          </div>
+      >
+        {calendarNavigation}
+        <div
+          aria-atomic="true"
+          aria-live="polite"
+          role="status"
+          {...stylex.props(calendarStyles.visuallyHidden)}
+        >
+          {view === 'year'
+            ? `Years ${yearPageStart} to ${Math.min(yearPageStart + yearPageSize - 1, endYear)}`
+            : visibleMonth.toLocaleString(undefined, { month: 'long', year: 'numeric' })}
         </div>
-        <div {...stylex.props(calendarStyles.applyAction)}>
-          {mode === 'inline' ? (
-            <Button
-              disabled={applyDisabled}
-              layout="fill"
-              size="s"
-              variant="secondary"
-              onClick={context.apply}
-            >
-              Apply
-            </Button>
+        <div
+          {...stylex.props(
+            calendarStyles.calendarView,
+            view !== 'day' && calendarStyles.calendarViewSelector,
+          )}
+        >
+          {view === 'day' ? (
+            <DayPicker
+              // oxlint-disable-next-line jsx-a11y/no-autofocus -- Popovers and explicit command steps transfer focus into the calendar.
+              autoFocus={(autoFocus ?? mode === 'popover') && dayGridAutoFocus}
+              classNames={classNames}
+              components={{
+                DayButton: CalendarDayButton,
+                MonthCaption: CalendarHiddenMonthCaption,
+              }}
+              disabled={disabled}
+              endMonth={endMonth}
+              fixedWeeks
+              hideNavigation
+              mode="single"
+              month={visibleMonth}
+              required
+              selected={context.pendingValue}
+              showOutsideDays
+              startMonth={startMonth}
+              onMonthChange={handleMonthChange}
+              onSelect={(day) => {
+                const nextValue = combineDayAndTime(day, context.pendingValue)
+                context.setPendingValue(nextValue)
+                setVisibleMonth(nextValue)
+              }}
+            />
+          ) : view === 'month' ? (
+            <CalendarSelectorGrid
+              key="month"
+              columns={3}
+              label="Choose month"
+              options={monthOptions}
+              selectedValue={visibleMonth.getMonth()}
+              onSelect={(month) =>
+                closeSelector(
+                  new Date(visibleMonth.getFullYear(), month, 1),
+                  monthButtonRef,
+                )
+              }
+            />
           ) : (
-            <BasePopover.Close
-              disabled={applyDisabled}
-              render={<Button layout="fill" size="s" variant="secondary" />}
-              onClick={context.apply}
-            >
-              Apply
-            </BasePopover.Close>
+            <CalendarSelectorGrid
+              key={`year-${yearPageStart}`}
+              columns={5}
+              label="Choose year"
+              options={yearOptions}
+              selectedValue={visibleMonth.getFullYear()}
+              onSelect={(year) =>
+                closeSelector(new Date(year, visibleMonth.getMonth(), 1), yearButtonRef)
+              }
+            />
           )}
         </div>
       </div>
+      {view === 'day' && (
+        <div {...stylex.props(calendarStyles.controls)}>
+          <div {...stylex.props(calendarStyles.timeRow)}>
+            <Field.Root
+              disabled={context.disabled}
+              validationMode="onBlur"
+              validate={validateTime}
+              {...stylex.props(calendarStyles.field)}
+            >
+              <Field.Label {...stylex.props(calendarStyles.controlLabel)}>Time</Field.Label>
+              <Input
+                disabled={context.disabled}
+                fullWidth
+                invalid={false}
+                inputMode="numeric"
+                size="m"
+                type="text"
+                value={timeInput}
+                onValueChange={(nextInput) => {
+                  setTimeInput(nextInput)
+                  const nextParsedTime = parseTimeInput(nextInput)
+                  if (nextParsedTime === undefined) return
+                  const [hours, minutes, seconds] = nextParsedTime
+                  const nextValue = new Date(context.pendingValue.getTime())
+                  nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
+                  context.setPendingValue(nextValue)
+                }}
+                render={<input aria-label="Time" {...stylex.props(calendarStyles.input)} />}
+              />
+              <Field.Error />
+            </Field.Root>
+            <div {...stylex.props(calendarStyles.setNowAction)}>
+              <Button
+                disabled={context.disabled}
+                layout="fill"
+                size="m"
+                variant="ghost"
+                onClick={() => {
+                  const now = new Date()
+                  context.setPendingValue(now)
+                  setTimeInput(formatTimeInput(now))
+                  setVisibleMonth(now)
+                }}
+              >
+                Set now
+              </Button>
+            </div>
+          </div>
+          <div {...stylex.props(calendarStyles.applyAction)}>
+            {mode === 'inline' ? (
+              <Button
+                disabled={applyDisabled}
+                layout="fill"
+                size="s"
+                variant="secondary"
+                onClick={context.apply}
+              >
+                Apply
+              </Button>
+            ) : (
+              <BasePopover.Close
+                disabled={applyDisabled}
+                render={<Button layout="fill" size="s" variant="secondary" />}
+                onClick={context.apply}
+              >
+                Apply
+              </BasePopover.Close>
+            )}
+          </div>
+        </div>
+      )}
     </>
   )
 
