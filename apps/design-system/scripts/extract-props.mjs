@@ -426,9 +426,14 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
-  ...["Root", "Trigger", "Content"].map((part) => ({
-    componentId: `calendar.${part[0].toLowerCase()}${part.slice(1)}`,
+  {
+    componentId: "calendar",
     exportName: "Calendar",
+    inheritedProps: [],
+  },
+  ...["Root", "Trigger", "Content", "Panel"].map((part) => ({
+    componentId: `datePicker.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: "DatePicker",
     part,
     inheritedProps: [],
   })),

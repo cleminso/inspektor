@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ColumnDescriptor, DynamicTableRow } from "jazz-tools";
-import { Box, Button, Calendar, Command, DataGridFilterClause, Field, Text } from "@inspector/ds";
+import { Box, Button, Command, DataGridFilterClause, DatePicker, Field, Text } from "@inspector/ds";
 
 import {
   applyFilterDraft,
@@ -770,13 +770,13 @@ export function DataGridFilterBuilder({
               </Command.List>
             )}
             {showsCalendar === true ? (
-              <Calendar
+              <DatePicker
                 value={draft.rawValue.length === 0 ? undefined : new Date(Number(draft.rawValue))}
                 onApply={(value) => stageDraft(setFilterDraftValue(draft, String(value.getTime())))}
               >
                 {/* oxlint-disable-next-line jsx-a11y/no-autofocus -- Entering the explicit date stage transfers focus into the calendar. */}
-                <Calendar.Content autoFocus mode="inline" />
-              </Calendar>
+                <DatePicker.Panel autoFocus />
+              </DatePicker>
             ) : null}
             {draft.operator === "in" && draft.stage === "value" && draft.tokens.length > 0 ? (
               <Box flexWrap="wrap" gap="xs" padding="s">

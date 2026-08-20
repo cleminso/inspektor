@@ -1,12 +1,9 @@
-export const calendarRootPropNames = [
+export const calendarPropNames = [
   "value",
-  "onApply",
-  "open",
-  "defaultOpen",
-  "onOpenChange",
+  "defaultValue",
+  "onValueChange",
   "minValue",
   "maxValue",
   "disabled",
+  "autoFocus",
 ] as const;
-export const calendarTriggerPropNames = ["label", "render"] as const;
-export const calendarContentPropNames = ["align", "autoFocus", "keepMounted", "mode"] as const;

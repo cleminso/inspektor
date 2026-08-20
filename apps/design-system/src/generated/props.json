@@ -7269,15 +7269,87 @@
       }
     }
   ],
-  "calendar.root": [
+  "calendar": [
     {
       "name": "value",
       "type": "Date",
       "required": false,
-      "description": "The committed timestamp shown when the calendar opens.",
+      "description": "The selected date.",
       "source": {
         "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 47
+        "line": 30
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "Date",
+      "required": false,
+      "description": "The initially selected date when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: Date | undefined) => void",
+      "required": false,
+      "description": "Runs when the selected date changes.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 34
+      }
+    },
+    {
+      "name": "minValue",
+      "type": "Date",
+      "required": false,
+      "description": "Earliest selectable date.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 36
+      }
+    },
+    {
+      "name": "maxValue",
+      "type": "Date",
+      "required": false,
+      "description": "Latest selectable date.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 38
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "description": "Disables date selection and calendar navigation.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 40
+      }
+    },
+    {
+      "name": "autoFocus",
+      "type": "false | true",
+      "required": false,
+      "description": "Moves focus to the selected date when the calendar mounts.",
+      "source": {
+        "path": "packages/design-system/src/components/calendar/calendar.tsx",
+        "line": 42
+      }
+    }
+  ],
+  "datePicker.root": [
+    {
+      "name": "value",
+      "type": "Date",
+      "required": false,
+      "description": "The committed timestamp shown when the picker opens.",
+      "source": {
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 32
       }
     },
     {
@@ -7286,8 +7358,8 @@
       "required": true,
       "description": "Runs with the selected timestamp when Apply is activated.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 49
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 34
       }
     },
     {
@@ -7296,8 +7368,8 @@
       "required": false,
       "description": "Whether the popup is open.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 51
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 36
       }
     },
     {
@@ -7307,8 +7379,8 @@
       "defaultValue": "false",
       "description": "Whether the popup is initially open.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 53
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 38
       }
     },
     {
@@ -7317,8 +7389,8 @@
       "required": false,
       "description": "Runs when the popup opens or closes.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 55
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 40
       }
     },
     {
@@ -7327,8 +7399,8 @@
       "required": false,
       "description": "Earliest selectable timestamp.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 57
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 42
       }
     },
     {
@@ -7337,8 +7409,8 @@
       "required": false,
       "description": "Latest selectable timestamp.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 59
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 44
       }
     },
     {
@@ -7348,20 +7420,20 @@
       "defaultValue": "false",
       "description": "Disables the trigger and timestamp editing.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 61
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 46
       }
     }
   ],
-  "calendar.trigger": [
+  "datePicker.trigger": [
     {
       "name": "label",
       "type": "string",
       "required": true,
       "description": "Stable accessible name for the timestamp trigger.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 67
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 52
       }
     },
     {
@@ -7370,12 +7442,12 @@
       "required": false,
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button component.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 69
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 54
       }
     }
   ],
-  "calendar.content": [
+  "datePicker.content": [
     {
       "name": "align",
       "type": "\"center\" | \"start\" | \"end\"",
@@ -7383,18 +7455,19 @@
       "defaultValue": "\"start\"",
       "description": "Aligns the popup along its trigger.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 75
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 60
       }
     },
     {
       "name": "autoFocus",
       "type": "false | true",
       "required": false,
-      "description": "Moves focus to the calendar when the content mounts. Defaults to popover content only.",
+      "defaultValue": "true",
+      "description": "Moves focus to the calendar when the content mounts.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 77
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 62
       }
     },
     {
@@ -7404,19 +7477,21 @@
       "defaultValue": "false",
       "description": "Keeps the popup mounted while closed.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 79
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 64
       }
-    },
+    }
+  ],
+  "datePicker.panel": [
     {
-      "name": "mode",
-      "type": "\"popover\" | \"inline\"",
+      "name": "autoFocus",
+      "type": "false | true",
       "required": false,
-      "defaultValue": "\"popover\"",
-      "description": "Renders as a popup or as an inline step inside another surface.",
+      "defaultValue": "false",
+      "description": "Moves focus to the calendar when the panel mounts.",
       "source": {
-        "path": "packages/design-system/src/components/calendar/calendar.tsx",
-        "line": 81
+        "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
+        "line": 69
       }
     }
   ],

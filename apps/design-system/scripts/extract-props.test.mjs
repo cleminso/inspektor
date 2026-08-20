@@ -1225,6 +1225,42 @@ test("extracts the constrained Select compound API", () => {
   );
 });
 
+test("extracts standalone Calendar and compound DatePicker APIs", () => {
+  assert.deepEqual(
+    metadata.calendar?.map(({ name }) => name),
+    [
+      "value",
+      "defaultValue",
+      "onValueChange",
+      "minValue",
+      "maxValue",
+      "disabled",
+      "autoFocus",
+    ],
+  );
+  assert.deepEqual(
+    metadata["datePicker.root"]?.map(({ name }) => name),
+    [
+      "value",
+      "onApply",
+      "open",
+      "defaultOpen",
+      "onOpenChange",
+      "minValue",
+      "maxValue",
+      "disabled",
+    ],
+  );
+  assert.deepEqual(
+    metadata["datePicker.content"]?.map(({ name }) => name),
+    ["align", "autoFocus", "keepMounted"],
+  );
+  assert.deepEqual(
+    metadata["datePicker.panel"]?.map(({ name }) => name),
+    ["autoFocus"],
+  );
+});
+
 test("extracts the value presentation component APIs", () => {
 
   assert.deepEqual(

@@ -217,11 +217,14 @@ export type {
 export { TimestampValue } from './components/timestampValue/timestampValue'
 export type { TimestampValueProps } from './components/timestampValue/timestampValue'
 export { Calendar } from './components/calendar/calendar'
+export type { CalendarProps } from './components/calendar/calendar'
+export { DatePicker } from './components/datePicker/datePicker'
 export type {
-  CalendarContentProps,
-  CalendarRootProps,
-  CalendarTriggerProps,
-} from './components/calendar/calendar'
+  DatePickerContentProps,
+  DatePickerPanelProps,
+  DatePickerRootProps,
+  DatePickerTriggerProps,
+} from './components/datePicker/datePicker'
 export { StructuredValuePreview } from './components/structuredValuePreview/structuredValuePreview'
 export type {
   StructuredValuePreviewArrayModel,

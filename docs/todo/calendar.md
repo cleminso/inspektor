@@ -13,6 +13,17 @@
 
 [20/08/26]
 
+- [x] Use the same accent-filled selected treatment for dates, months, years, and active selector headers.
+- [x] Preserve compact month and year grids without reserved empty control space.
+
+[20/08/26]
+
+- [x] Separate the standalone date-selection surface from timestamp picker composition.
+- [x] Keep day, month, year, boundary, and keyboard-navigation behavior in Calendar.
+- [x] Support controlled and uncontrolled standalone date selection.
+
+[20/08/26]
+
 - [x] Hide time and Apply controls while month or year selection is active.
 - [x] Let month and year grids size to compact content, superseding the earlier stable-height behavior for selector views.
 
@@ -70,11 +81,19 @@
 
 ## Open product work
 
+[20/08/26]
+
+- [x] Supersede the Calendar trigger item below; inline timestamp trigger work is tracked by DatePicker.
+
 [13/08/26]
 
 - [ ] Compose the Calendar trigger onto the inline data-grid cell editor when inline editing is implemented.
 
 ## Work outside the foundation scope
+
+[20/08/26]
+
+- [ ] Timestamp input, explicit Apply, trigger, and popup behavior belong to DatePicker.
 
 [13/08/26]
 
@@ -82,6 +101,14 @@
 - [ ] Inline row draft ownership and save behavior remain part of inline editing.
 
 ## Settled interaction decisions
+
+[20/08/26]
+
+- [x] Treat the timestamp-specific decisions below as DatePicker contracts; Calendar owns date selection only.
+
+[20/08/26]
+
+- [x] Selected dates, months, and years use the same accent background and on-accent foreground.
 
 [20/08/26]
 
@@ -114,6 +141,11 @@
 No unresolved Calendar design decisions.
 
 ## Validation checklist
+
+[20/08/26]
+
+- [x] Cover standalone controlled and uncontrolled selection with focused tests.
+- [x] Cover standalone month and year selector composition with focused tests.
 
 [20/08/26]
 

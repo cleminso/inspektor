@@ -558,13 +558,26 @@ export const calendarItem = {
   title: "Calendar",
   slug: "calendar",
   href: "/components/calendar",
-  description: "Timestamp selection with interchangeable triggers, calendar navigation, time, and explicit apply.",
+  description: "Standalone date selection with day, month, and year navigation.",
   importPath: "@inspector/ds",
   source: {
     label: "calendar.tsx",
     path: "packages/design-system/src/components/calendar/calendar.tsx",
   },
   componentId: "calendar",
+} satisfies NavItem;
+
+export const datePickerItem = {
+  title: "DatePicker",
+  slug: "date-picker",
+  href: "/components/date-picker",
+  description: "Timestamp selection with popup and inline compositions, time entry, and explicit apply.",
+  importPath: "@inspector/ds",
+  source: {
+    label: "datePicker.tsx",
+    path: "packages/design-system/src/components/datePicker/datePicker.tsx",
+  },
+  componentId: "datePicker",
 } satisfies NavItem;
 
 export const fieldItem = {
@@ -632,6 +645,7 @@ export const componentItems: NavItem[] = [
   contextSwitcherItem,
   copyButtonItem,
   dataGridItem,
+  datePickerItem,
   {
     title: "Data Grid Filter Clause",
     slug: "data-grid-filter-clause",

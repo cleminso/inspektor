@@ -28,6 +28,7 @@ import { Route as ComponentsContextSwitcherRouteImport } from './routes/componen
 import { Route as ComponentsCopyButtonRouteImport } from './routes/components/copy-button'
 import { Route as ComponentsDataGridRouteImport } from './routes/components/data-grid'
 import { Route as ComponentsDataGridFilterClauseRouteImport } from './routes/components/data-grid-filter-clause'
+import { Route as ComponentsDatePickerRouteImport } from './routes/components/date-picker'
 import { Route as ComponentsFieldRouteImport } from './routes/components/field'
 import { Route as ComponentsFieldsetRouteImport } from './routes/components/fieldset'
 import { Route as ComponentsFindBarRouteImport } from './routes/components/find-bar'
@@ -155,6 +156,11 @@ const ComponentsDataGridFilterClauseRoute =
     path: '/components/data-grid-filter-clause',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ComponentsDatePickerRoute = ComponentsDatePickerRouteImport.update({
+  id: '/components/date-picker',
+  path: '/components/date-picker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsFieldRoute = ComponentsFieldRouteImport.update({
   id: '/components/field',
   path: '/components/field',
@@ -324,6 +330,7 @@ export interface FileRoutesByFullPath {
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/data-grid-filter-clause': typeof ComponentsDataGridFilterClauseRoute
+  '/components/date-picker': typeof ComponentsDatePickerRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
@@ -374,6 +381,7 @@ export interface FileRoutesByTo {
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/data-grid-filter-clause': typeof ComponentsDataGridFilterClauseRoute
+  '/components/date-picker': typeof ComponentsDatePickerRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
@@ -425,6 +433,7 @@ export interface FileRoutesById {
   '/components/copy-button': typeof ComponentsCopyButtonRoute
   '/components/data-grid': typeof ComponentsDataGridRoute
   '/components/data-grid-filter-clause': typeof ComponentsDataGridFilterClauseRoute
+  '/components/date-picker': typeof ComponentsDatePickerRoute
   '/components/field': typeof ComponentsFieldRoute
   '/components/fieldset': typeof ComponentsFieldsetRoute
   '/components/find-bar': typeof ComponentsFindBarRoute
@@ -477,6 +486,7 @@ export interface FileRouteTypes {
     | '/components/copy-button'
     | '/components/data-grid'
     | '/components/data-grid-filter-clause'
+    | '/components/date-picker'
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
@@ -527,6 +537,7 @@ export interface FileRouteTypes {
     | '/components/copy-button'
     | '/components/data-grid'
     | '/components/data-grid-filter-clause'
+    | '/components/date-picker'
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
@@ -577,6 +588,7 @@ export interface FileRouteTypes {
     | '/components/copy-button'
     | '/components/data-grid'
     | '/components/data-grid-filter-clause'
+    | '/components/date-picker'
     | '/components/field'
     | '/components/fieldset'
     | '/components/find-bar'
@@ -628,6 +640,7 @@ export interface RootRouteChildren {
   ComponentsCopyButtonRoute: typeof ComponentsCopyButtonRoute
   ComponentsDataGridRoute: typeof ComponentsDataGridRoute
   ComponentsDataGridFilterClauseRoute: typeof ComponentsDataGridFilterClauseRoute
+  ComponentsDatePickerRoute: typeof ComponentsDatePickerRoute
   ComponentsFieldRoute: typeof ComponentsFieldRoute
   ComponentsFieldsetRoute: typeof ComponentsFieldsetRoute
   ComponentsFindBarRoute: typeof ComponentsFindBarRoute
@@ -792,6 +805,13 @@ declare module '@tanstack/react-router' {
       path: '/components/data-grid-filter-clause'
       fullPath: '/components/data-grid-filter-clause'
       preLoaderRoute: typeof ComponentsDataGridFilterClauseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/date-picker': {
+      id: '/components/date-picker'
+      path: '/components/date-picker'
+      fullPath: '/components/date-picker'
+      preLoaderRoute: typeof ComponentsDatePickerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/field': {
@@ -1020,6 +1040,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsCopyButtonRoute: ComponentsCopyButtonRoute,
   ComponentsDataGridRoute: ComponentsDataGridRoute,
   ComponentsDataGridFilterClauseRoute: ComponentsDataGridFilterClauseRoute,
+  ComponentsDatePickerRoute: ComponentsDatePickerRoute,
   ComponentsFieldRoute: ComponentsFieldRoute,
   ComponentsFieldsetRoute: ComponentsFieldsetRoute,
   ComponentsFindBarRoute: ComponentsFindBarRoute,

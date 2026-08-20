@@ -6,9 +6,9 @@ import type { ColumnDescriptor } from "jazz-tools";
 import {
   BinaryDetails,
   Box,
-  Calendar,
   Checkbox,
   CodeEditor,
+  DatePicker,
   Field,
   Input,
   InputGroup,
@@ -453,16 +453,16 @@ export function MutationField({
           {fieldState.isNull === true ? (
             <Input id={fieldId} aria-label={label} disabled font="mono" value="" />
           ) : (
-            <Calendar
+            <DatePicker
               disabled={isReadOnly === true}
               value={timestampValue}
               onApply={(nextValue) => onTextChange(nextValue.toISOString())}
             >
-              <Calendar.Trigger ref={controlRef} id={fieldId} label={label}>
+              <DatePicker.Trigger ref={controlRef} id={fieldId} label={label}>
                 {timestampInputValue.length === 0 ? "Select Date" : timestampInputValue}
-              </Calendar.Trigger>
-              <Calendar.Content />
-            </Calendar>
+              </DatePicker.Trigger>
+              <DatePicker.Content />
+            </DatePicker>
           )}
           {column.nullable === true && readOnlyReason === null ? (
             <NullInputGroupCheckbox

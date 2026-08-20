@@ -7,53 +7,24 @@ import { getGeneratedProps } from "@/lib/propsData";
 
 import BasicExample from "./basicExample";
 import basicSource from "./basicExample.tsx?raw";
-import ComposedTriggerExample from "./composedTriggerExample";
-import composedTriggerSource from "./composedTriggerExample.tsx?raw";
-import InlineExample from "./inlineExample";
-import inlineSource from "./inlineExample.tsx?raw";
 import { CalendarPlayground } from "./playground";
-import {
-  calendarContentPropNames,
-  calendarRootPropNames,
-  calendarTriggerPropNames,
-} from "./props";
+import { calendarPropNames } from "./props";
 
-const rootProps = getGeneratedProps("calendar.root", calendarRootPropNames);
-const triggerProps = getGeneratedProps("calendar.trigger", calendarTriggerPropNames);
-const contentProps = getGeneratedProps("calendar.content", calendarContentPropNames);
+const calendarProps = getGeneratedProps("calendar", calendarPropNames);
 
 export function CalendarPage(): ReactElement {
   return (
     <CalendarPlayground>
-      <Section title="Timestamp field" description="Use the default input-styled trigger in forms.">
+      <Section
+        title="Date selection"
+        description="Use Calendar as a standalone surface for controlled or uncontrolled date selection."
+      >
         <Example source={basicSource}>
           <BasicExample />
         </Example>
       </Section>
-      <Section
-        title="Composed trigger"
-        description="Compose Calendar trigger behavior onto another design-system button for cells and compact surfaces."
-      >
-        <Example source={composedTriggerSource}>
-          <ComposedTriggerExample />
-        </Example>
-      </Section>
-      <Section
-        title="Inline step"
-        description="Render calendar content inline when date selection is one stage inside another modal flow."
-      >
-        <Example source={inlineSource}>
-          <InlineExample />
-        </Example>
-      </Section>
-      <Section title="Root props">
-        <PropsTable rows={rootProps} />
-      </Section>
-      <Section title="Trigger props">
-        <PropsTable rows={triggerProps} />
-      </Section>
-      <Section title="Content props">
-        <PropsTable rows={contentProps} />
+      <Section title="Props">
+        <PropsTable rows={calendarProps} />
       </Section>
     </CalendarPlayground>
   );

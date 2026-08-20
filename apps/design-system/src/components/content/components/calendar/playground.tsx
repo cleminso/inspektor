@@ -5,13 +5,8 @@ import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
 import { calendarItem } from "@/lib/registry";
 
 export function CalendarPlayground({ children }: { children?: ReactNode }): ReactElement {
-  const [value, setValue] = useState(new Date(2026, 7, 13, 12));
-  const preview = (
-    <Calendar value={value} onApply={setValue}>
-      <Calendar.Trigger label="Edit timestamp">{value.toLocaleString()}</Calendar.Trigger>
-      <Calendar.Content />
-    </Calendar>
-  );
+  const [value, setValue] = useState<Date | undefined>(new Date(2026, 7, 13));
+  const preview = <Calendar value={value} onValueChange={setValue} />;
 
   return (
     <ComponentDocsPage
@@ -19,16 +14,9 @@ export function CalendarPlayground({ children }: { children?: ReactNode }): Reac
       description={calendarItem.description}
       source={calendarItem.source}
       preview={preview}
-      sourceCode={`const [value, setValue] = useState(new Date(2026, 7, 13, 12));
+      sourceCode={`const [value, setValue] = useState<Date | undefined>(new Date(2026, 7, 13));
 
-return (
-  <Calendar value={value} onApply={setValue}>
-    <Calendar.Trigger label="Edit timestamp">
-      {value.toLocaleString()}
-    </Calendar.Trigger>
-    <Calendar.Content />
-  </Calendar>
-);`}
+return <Calendar value={value} onValueChange={setValue} />;`}
     >
       {children}
     </ComponentDocsPage>
