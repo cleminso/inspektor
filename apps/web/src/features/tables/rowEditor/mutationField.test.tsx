@@ -334,7 +334,17 @@ describe("MutationField", () => {
     );
 
     const trigger = screen.getByRole("button", { name: "CreatedAt" });
-    expect(trigger.textContent).toBe("2024-01-02T03:04:05");
+    const expectedText = new Intl.DateTimeFormat(undefined, {
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      month: "short",
+      second: "2-digit",
+      year: "numeric",
+    }).format(initialDate);
+    const time = screen.getByText(expectedText);
+    expect(trigger.contains(time)).toBe(true);
+    expect(time.getAttribute("datetime")).toBe(initialDate.toISOString());
     fireEvent.click(trigger);
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(onTextChange).toHaveBeenCalledWith(initialDate.toISOString());

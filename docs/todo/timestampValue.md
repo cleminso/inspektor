@@ -16,6 +16,12 @@ This checklist tracks the reusable compact timestamp value component.
 
 ## Implemented foundation
 
+[21/08/26]
+
+- [x] Reuse `TimestampValue` for valid row-editor timestamp triggers so table cells and form fields share one browser-local visible representation and exact ISO semantics.
+- [x] Keep Jazz mutation values normalized to epoch milliseconds while preserving timestamp milliseconds through calendar edits.
+- [x] Fall back to raw text editing for malformed timestamp values.
+
 [05/08/26]
 
 - [x] Render compact timestamp values in monospace typography while preserving tabular numerals and semantic time markup.
@@ -44,6 +50,11 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[21/08/26]
+
+- [x] Treat Jazz `Timestamp` as the product contract because Jazz does not expose PostgreSQL `timestamp` and `timestamptz` as distinct schema types.
+- [x] Share visible timestamp formatting across read-only cells and editable field triggers without coupling presentation to mutation serialization.
+
 [27/07/26]
 
 - [x] Use `TimestampValue` only for compact read-only table presentation.
@@ -55,6 +66,11 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[21/08/26]
+
+- [x] Verify focused timestamp presentation and row-editor tests, changed-file lint, application typecheck and build, and all application test assertions.
+- [ ] Verify the shared timestamp representation in a browser session connected to a dataset containing a Jazz `Timestamp` column.
 
 [05/08/26]
 

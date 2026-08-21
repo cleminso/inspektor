@@ -14,27 +14,6 @@ export function formatColumnTypeLabel(column: ColumnDescriptor | null): string |
   return column === null ? null : formatColumnTypeName(column.column_type);
 }
 
-export function formatTimestampInputValue(valueText: string): string | null {
-  const trimmedValue = valueText.trim();
-  if (trimmedValue.length === 0) {
-    return "";
-  }
-
-  const epochMilliseconds = Number(trimmedValue);
-  if (Number.isFinite(epochMilliseconds) === false) {
-    return valueText;
-  }
-  const date = new Date(epochMilliseconds);
-  if (Number.isNaN(date.getTime()) === true) {
-    return null;
-  }
-
-  const pad = (value: number) => String(value).padStart(2, "0");
-  const datePart = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  const timePart = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-  return `${datePart}T${timePart}`;
-}
-
 export function parseTimestampValue(valueText: string): Date | undefined {
   const trimmedValue = valueText.trim();
   if (trimmedValue.length === 0) {

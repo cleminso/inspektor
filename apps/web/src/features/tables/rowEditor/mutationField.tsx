@@ -16,6 +16,7 @@ import {
   Select,
   Text,
   TextLink,
+  TimestampValue,
   ToggleGroup,
   type CodeEditorLayout,
 } from "@inspector/ds";
@@ -24,7 +25,6 @@ import { useInspectorSessionState } from "@app/providers/inspectorProvider";
 import {
   formatColumnNameLabel,
   formatColumnTypeLabel,
-  formatTimestampInputValue,
   getBooleanFieldValue,
   isStructuredColumn,
   parseTimestampValue,
@@ -208,10 +208,9 @@ export function MutationField({
     fieldState.text.trim().length > 0
       ? fieldState.text.trim()
       : null;
-  const timestampInputValue =
-    isTimestampColumn === true ? formatTimestampInputValue(fieldState.text) : null;
   const timestampValue =
     isTimestampColumn === true ? parseTimestampValue(fieldState.text) : undefined;
+  const timestampTextIsEmpty = fieldState.text.trim().length === 0;
   const formattedDefault = column.default === undefined ? "" : formatColumnDefault(column);
   const defaultValue =
     column.default?.type === "Null"
@@ -448,7 +447,8 @@ export function MutationField({
           onCopy={(format) => copyBinaryValue(initialValue, format)}
           onDownload={() => downloadBinaryValue(initialValue, `${column.name}.bin`)}
         />
-      ) : isTimestampColumn === true && timestampInputValue !== null ? (
+      ) : isTimestampColumn === true &&
+        (timestampValue !== undefined || timestampTextIsEmpty === true) ? (
         <InputGroup fullWidth>
           {fieldState.isNull === true ? (
             <Input id={fieldId} aria-label={label} disabled font="mono" value="" />
@@ -459,7 +459,7 @@ export function MutationField({
               onApply={(nextValue) => onTextChange(nextValue.toISOString())}
             >
               <DatePicker.Trigger ref={controlRef} id={fieldId} label={label}>
-                {timestampInputValue.length === 0 ? "Select Date" : timestampInputValue}
+                {timestampValue === undefined ? "Select Date" : <TimestampValue value={timestampValue} />}
               </DatePicker.Trigger>
               <DatePicker.Content />
             </DatePicker>
