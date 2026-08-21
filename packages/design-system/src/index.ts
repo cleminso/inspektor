@@ -44,6 +44,7 @@ export type { DataGridFeatures, DataGridTable } from './components/dataGrid/data
 export type {
   DataGridBodyProps,
   DataGridCellContextMenuHandler,
+  DataGridCellContextMenuTouchStartHandler,
   DataGridCellProps,
   DataGridCellStatus,
   DataGridCellTarget,
@@ -61,6 +62,7 @@ export type {
   DataGridMessageProps,
   DataGridRootProps,
   DataGridRowContextMenuHandler,
+  DataGridRowContextMenuTouchStartHandler,
   DataGridRowProps,
   DataGridTableProps,
   DataGridViewportProps,
@@ -388,6 +390,7 @@ export type { SwitchProps, SwitchSize } from './components/switch/switch'
 export { Toaster, toasts } from './components/toaster/toaster'
 export type {
   ToasterProps,
+  ToastDuration,
   ToastId,
   ToastOptions,
   ToastPromiseOptions,

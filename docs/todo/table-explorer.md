@@ -21,6 +21,24 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [21/08/26]
 
+- [x] Present binary clipboard encodings as direct `Copy as Hex` and `Copy as Base64` actions instead of duplicating the default format across `Copy` and a submenu.
+
+[21/08/26]
+
+- [x] Describe clipboard confirmation as `Cell value copied`, including the selected binary format when relevant.
+- [x] Deduplicate repeated copy notifications by table cell identity while keeping notifications for different cells separate.
+
+[21/08/26]
+
+- [x] Open one semantic cell context menu from a direct right-click without requiring prior selection.
+- [x] Offer Edit only for writable cells and route it through the existing inline and complete-row editor logic.
+- [x] Build Filter by clauses from the displayed cell value, including staged overlays, through the shared Filter Builder parser.
+- [x] Copy the focused cell with `Mod+C` and expose matching Copy actions in the cell context menu.
+- [x] Copy binary cells as Hex or Base64 while keeping Hex as the default keyboard-copy representation.
+- [x] Render a success toast after keyboard, Copy, and Copy as clipboard writes.
+
+[21/08/26]
+
 - [x] Keep column-order and column-width reset actions visible in both header menus while disabling each action when its reset would not change the grid.
 
 [21/08/26]
@@ -411,7 +429,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Render selected-cell background independently from the focused-cell border.
 - [x] Keep double-click from opening an inspection-only cell pane while inline editor routing is unavailable.
 - [x] Clear cell selection when a column header receives focus.
-- [ ] Click cell then right-click open context menu with action (copy, etc)
+- [x] Open cell context actions from either a selected cell or a direct right-click target.
 
 ### Side-pane state and focus
 
@@ -806,8 +824,8 @@ through the behavior discussion. Detailed acceptance rules remain in
 [23/07/26]
 
 - [ ] Add a selected-cell context menu with explicit copy and supported mutation commands.
-- [ ] Keep right-click inside the current selection from replacing it.
-- [ ] Replace selection when right-click targets an unselected cell.
+- [x] Keep right-click inside the current selection from replacing it.
+- [x] Replace selection when right-click targets an unselected cell.
 - [ ] Group bulk-operation targets by schema column in visible column order.
 - [ ] Order targets inside each group by active query row order.
 - [ ] Identify each target by stable row ID with query position as supporting information.
@@ -818,11 +836,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [28/07/26]
 
-- [ ] Implement cell commands for copying a cell value, copying a row, filtering by value, editing a row, and opening selected
-      cells.
+- [ ] Implement remaining cell commands for copying a row and opening selected cells.
 - [ ] Implement row context commands derived from row state and schema capabilities.
 - [ ] Implement column-header context commands with explicit visible-result and matching-query scope.
-- [ ] Complete `Filter by value` through the generic filter builder with `eq` as the initial operator.
+- [x] Complete `Filter by value` through the generic filter builder with `eq` as the initial operator.
 - [ ] Keep context-menu availability schema-driven and generic across inspected applications.
 
 ### Keyboard data-grid behavior
@@ -835,7 +852,8 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [ ] Implement Space and Shift+Space for focused row-checkbox selection.
 - [ ] Implement keyboard additive and range cell selection.
 - [ ] Define keyboard focus restoration after pane dismissal.
-- [ ] Provide copy shortcuts for focused and selected cells.
+- [x] Provide a copy shortcut for the focused cell.
+- [ ] Provide copy shortcuts for selected cells.
 - [ ] Verify screen-reader announcements for focused cell, selection size, row position, and pane target.
 
 ### Column selection and bulk editing
@@ -893,6 +911,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Work outside the foundation scope
 
+[21/08/26]
+
+- The earlier editable single-cell mutation exclusion is superseded by the implemented cell Edit action and existing editor flow.
+
 [06/08/26]
 
 - [x] Supersede the earlier virtualization exclusion with fixed-height virtual rendering for standard Data Grid rows.
@@ -913,6 +935,16 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[21/08/26]
+
+- Binary cell menus name the copied encoding explicitly; `Mod+C` maps to the direct Hex action.
+- Two available binary encodings remain direct menu actions rather than introducing a submenu.
+
+[21/08/26]
+
+- Cell copy notifications use the Toaster's brief auto-dismiss duration.
+- Repeated copies of one cell update its mounted notification and refresh dismissal; copies from different cells remain distinct.
 
 [21/08/26]
 
@@ -1048,6 +1080,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[21/08/26]
+
+- [x] Cover focused-cell copy, binary formats, staged-value filtering, context-menu focus behavior, and clipboard failure feedback with focused tests.
+- [x] Run application and design-system typechecks and builds.
+- [ ] Verify context actions and copy feedback in the connected Inspector runtime.
 
 [21/08/26]
 

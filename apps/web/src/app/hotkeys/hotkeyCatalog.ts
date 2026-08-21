@@ -6,6 +6,7 @@ import type { Hotkey } from '@tanstack/react-hotkeys'
  */
 export const appHotkeys = {
   closeTableView: 'Alt+W',
+  copyCell: 'Mod+C',
   goBack: 'Alt+[',
   goForward: 'Alt+]',
   moveTableColumnLeft: 'Shift+ArrowLeft',

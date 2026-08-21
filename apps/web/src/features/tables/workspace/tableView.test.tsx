@@ -61,9 +61,20 @@ const tableViewState = vi.hoisted(() => ({
   setPage: vi.fn(),
   setPageSize: vi.fn(),
   table: {} as {
+    getFocusedCell?: () => { column: { id: string }; row: { id: string } } | undefined
     getRowModel?: () => { rows: Array<{ id: string; original: Record<string, unknown> }> }
   },
-  tableColumns: [] as Array<{ column?: unknown; id: string }>,
+  tableColumns: [] as Array<{
+    accessorKey: string
+    column: null | {
+      column_type: { type: string }
+      name: string
+      nullable: boolean
+    }
+    id: string
+    isSortable: boolean
+    label: string
+  }>,
   tableKey: 'connection-1:main:schema-1:accounts',
 }))
 const mutationLedgerDispatch = vi.hoisted(() => vi.fn())
@@ -79,6 +90,8 @@ const stagedValuesByRowId = vi.hoisted(() => ({
 const gridContextMenuProps = vi.hoisted(() => ({ current: null as null | Record<string, unknown> }))
 const gridCellContextMenu = vi.hoisted(() => vi.fn())
 const gridRowContextMenu = vi.hoisted(() => vi.fn())
+const toastError = vi.hoisted(() => vi.fn())
+const toastSuccess = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
   current: null as null | {
     onUndoRowDeletions?: (rowIds: readonly string[]) => void
@@ -162,10 +175,7 @@ vi.mock('@tables/floatingWidget/floatingWidget', () => ({
   }: {
     onApplySuccess?: (appliedUpdateFields: Readonly<Record<string, ReadonlySet<string>>>) => void
   }) => (
-    <button
-      type="button"
-      onClick={() => onApplySuccess?.({ 'row-1': new Set(['name']) })}
-    >
+    <button type="button" onClick={() => onApplySuccess?.({ 'row-1': new Set(['name']) })}>
       Complete Apply
     </button>
   ),
@@ -206,7 +216,15 @@ vi.mock('@tables/filters/dataGridFilterBuilder', () => ({
 
 vi.mock('@tables/grid/toolbar', () => ({
   TablePagination: () => null,
-  Toolbar: ({ actions, children, pagination }: { actions: ReactNode; children: ReactNode; pagination: ReactNode }) => (
+  Toolbar: ({
+    actions,
+    children,
+    pagination,
+  }: {
+    actions: ReactNode
+    children: ReactNode
+    pagination: ReactNode
+  }) => (
     <div>
       {children}
       {actions}
@@ -251,7 +269,10 @@ vi.mock('@inspector/ds', () => {
       children?: ReactNode
       role?: string
     }
-  >(function Container({ 'aria-live': ariaLive, 'data-hotkey-scope': hotkeyScope, children, role }, ref) {
+  >(function Container(
+    { 'aria-live': ariaLive, 'data-hotkey-scope': hotkeyScope, children, role },
+    ref,
+  ) {
     return (
       <div ref={ref} aria-live={ariaLive} data-hotkey-scope={hotkeyScope} role={role}>
         {children}
@@ -374,8 +395,11 @@ vi.mock('@inspector/ds', () => {
       Root: Container,
       Trigger: Container,
     },
+    toasts: { error: toastError, success: toastSuccess },
   }
 })
+
+const initialClipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
 
 afterEach(() => {
   cleanup()
@@ -403,6 +427,173 @@ afterEach(() => {
   gridContextMenuProps.current = null
   useTableViewStateOptions.current = null
   tableViewState.setPage.mockReset()
+  tableViewState.setFilters.mockReset()
+  tableViewState.handleCellEditRequest.mockReset()
+  toastError.mockReset()
+  toastSuccess.mockReset()
+  if (initialClipboardDescriptor === undefined) {
+    Reflect.deleteProperty(navigator, 'clipboard')
+  } else {
+    Object.defineProperty(navigator, 'clipboard', initialClipboardDescriptor)
+  }
+})
+
+describe('TableView cell actions', () => {
+  function configureNameCell(value: unknown) {
+    tableViewState.tableColumns = [
+      {
+        accessorKey: 'name',
+        column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
+        id: 'name',
+        isSortable: true,
+        label: 'Name',
+      },
+    ]
+    tableViewState.table = {
+      getFocusedCell: () => ({ column: { id: 'name' }, row: { id: 'row-1' } }),
+      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: value } }] }),
+    }
+  }
+
+  it('edits and filters by the displayed staged value through the shared context actions', () => {
+    configureNameCell('Grace')
+    stagedValuesByRowId.current = { 'row-1': { name: 'Katherine' } }
+    render(<TableView tableName="accounts" />)
+    const menuProps = gridContextMenuProps.current as {
+      getCellActions: (target: { columnId: string; rowId: string }) => {
+        canEdit: boolean
+        canFilterBy: boolean
+      }
+      onEditCell: (target: { columnId: string; rowId: string }) => void
+      onFilterByCell: (target: { columnId: string; rowId: string }) => void
+    }
+    const target = { columnId: 'name', rowId: 'row-1' }
+
+    expect(menuProps.getCellActions(target)).toMatchObject({ canEdit: true, canFilterBy: true })
+    menuProps.onEditCell(target)
+    menuProps.onFilterByCell(target)
+
+    expect(tableViewState.handleCellEditRequest).toHaveBeenCalledWith(target)
+    expect(tableViewState.setFilters).toHaveBeenCalledWith([
+      tableViewState.filters[0],
+      expect.objectContaining({ column: 'name', operator: 'eq', value: 'Katherine' }),
+    ])
+  })
+
+  it('copies the focused cell with Mod+C and renders a success toast', async () => {
+    configureNameCell('Grace')
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    render(<TableView tableName="accounts" />)
+
+    const defaultAllowed = fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
+      key: 'c',
+      ctrlKey: true,
+    })
+
+    expect(defaultAllowed).toBe(false)
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('Grace')
+    })
+    expect(toastSuccess).toHaveBeenCalledWith('Cell value copied', {
+      duration: 'brief',
+      id: '["cell-copy","connection-1:main:schema-1:accounts","row-1","name"]',
+    })
+  })
+
+  it('renders an error toast when the clipboard write fails', async () => {
+    configureNameCell('Grace')
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: vi.fn().mockRejectedValue(new Error('Clipboard denied')) },
+    })
+    render(<TableView tableName="accounts" />)
+
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
+      key: 'c',
+      ctrlKey: true,
+    })
+
+    await waitFor(() => {
+      expect(toastError).toHaveBeenCalledWith("Couldn't copy value")
+    })
+    expect(toastSuccess).not.toHaveBeenCalled()
+  })
+
+  it('copies a binary context target in the selected format and renders a success toast', async () => {
+    const value = new Uint8Array([0, 1, 254, 255])
+    tableViewState.tableColumns = [
+      {
+        accessorKey: 'payload',
+        column: { name: 'payload', column_type: { type: 'Bytea' }, nullable: false },
+        id: 'payload',
+        isSortable: false,
+        label: 'Payload',
+      },
+    ]
+    tableViewState.table = {
+      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', payload: value } }] }),
+    }
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    render(<TableView tableName="accounts" />)
+    const menuProps = gridContextMenuProps.current as {
+      getCellActions: (target: { columnId: string; rowId: string }) => { copyAs: string[] }
+      onCopyCell: (target: { columnId: string; rowId: string }, format: 'hex' | 'base64') => void
+    }
+    const target = { columnId: 'payload', rowId: 'row-1' }
+
+    expect(menuProps.getCellActions(target).copyAs).toEqual(['hex', 'base64'])
+    menuProps.onCopyCell(target, 'base64')
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('AAH+/w==')
+    })
+    expect(toastSuccess).toHaveBeenCalledWith('Cell value copied as Base64', {
+      duration: 'brief',
+      id: '["cell-copy","connection-1:main:schema-1:accounts","row-1","payload"]',
+    })
+  })
+
+  it('deduplicates repeated copies of one cell without merging different cells', async () => {
+    configureNameCell('Grace')
+    tableViewState.table = {
+      getFocusedCell: () => ({ column: { id: 'name' }, row: { id: 'row-1' } }),
+      getRowModel: () => ({
+        rows: [
+          { id: 'row-1', original: { id: 'row-1', name: 'Grace' } },
+          { id: 'row-2', original: { id: 'row-2', name: 'Ada' } },
+        ],
+      }),
+    }
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+    })
+    render(<TableView tableName="accounts" />)
+    const menuProps = gridContextMenuProps.current as {
+      onCopyCell: (target: { columnId: string; rowId: string }) => void
+    }
+
+    menuProps.onCopyCell({ columnId: 'name', rowId: 'row-1' })
+    menuProps.onCopyCell({ columnId: 'name', rowId: 'row-1' })
+    menuProps.onCopyCell({ columnId: 'name', rowId: 'row-2' })
+
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledTimes(3)
+    })
+    expect(toastSuccess.mock.calls.map(([, options]) => options.id)).toEqual([
+      '["cell-copy","connection-1:main:schema-1:accounts","row-1","name"]',
+      '["cell-copy","connection-1:main:schema-1:accounts","row-1","name"]',
+      '["cell-copy","connection-1:main:schema-1:accounts","row-2","name"]',
+    ])
+  })
 })
 
 describe('TableView pagination hotkeys', () => {
@@ -587,7 +778,10 @@ describe('TableView query status', () => {
     }
     tableViewState.tableColumns = [
       {
+        accessorKey: 'name',
         id: 'name',
+        isSortable: true,
+        label: 'Name',
         column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
       },
     ]
@@ -612,7 +806,10 @@ describe('TableView query status', () => {
     }
     tableViewState.tableColumns = [
       {
+        accessorKey: 'name',
         id: 'name',
+        isSortable: true,
+        label: 'Name',
         column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
       },
     ]

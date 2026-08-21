@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[21/08/26]
+
+- [x] Add constrained brief and standard auto-dismiss durations without exposing arbitrary timeout values.
+
 [09/08/26]
 
 - [x] Coordinate connection opening before entry-surface error handling so overlapping consumers cannot duplicate failure notifications.
@@ -71,6 +75,10 @@
 
 ## Settled interaction decisions
 
+[21/08/26]
+
+- Lightweight confirmations can request the brief duration; preserved notifications continue to override automatic dismissal.
+
 [09/08/26]
 
 - A connection-opening failure does not reopen a switcher that the user explicitly dismissed.
@@ -102,6 +110,18 @@
 - None.
 
 ## Validation checklist
+
+[21/08/26]
+
+- [x] Cover normalization that keeps brief timing off warnings and notifications with actions or supporting content.
+
+[21/08/26]
+
+- [x] Verify brief notifications enter their closing transition automatically.
+- [x] Run focused Toaster tests and lint.
+- [x] Run design-system tests, typecheck, and build.
+- [x] Regenerate and verify component API metadata.
+- [x] Run design-system documentation tests, typecheck, and build.
 
 [09/08/26]
 

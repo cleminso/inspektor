@@ -10,6 +10,8 @@ import type {
   DataGridRowStatus,
   DataGridRowContextMenuHandler,
   DataGridCellContextMenuHandler,
+  DataGridCellContextMenuTouchStartHandler,
+  DataGridRowContextMenuTouchStartHandler,
 } from "./dataGrid";
 import type { DataGridFeatures, DataGridTable } from "./dataGridFeatures";
 
@@ -21,10 +23,12 @@ export interface DataGridContextValue<TData extends RowData> {
   onCellActivate?: (target: DataGridCellTarget) => void;
   onCellEditRequest?: (target: DataGridCellTarget) => void;
   onCellContextMenu?: DataGridCellContextMenuHandler;
+  onCellContextMenuTouchStart?: DataGridCellContextMenuTouchStartHandler;
   onColumnActivate?: (columnId: string | null) => void;
   onHeaderContextMenu?: DataGridHeaderContextMenuHandler;
   onRowActivate?: (rowId: string) => void;
   onRowContextMenu?: DataGridRowContextMenuHandler;
+  onRowContextMenuTouchStart?: DataGridRowContextMenuTouchStartHandler;
   columnReorderEnabled: boolean;
   getColumnReorderIndex: (columnId: string) => number;
   moveColumn: (columnId: string, offset: -1 | 1) => void;

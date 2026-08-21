@@ -20,6 +20,12 @@ import {
 } from "@tables/filters/tableFilters";
 import { parseBooleanValue } from "@tables/valueParsing";
 
+export const tableIdFilterColumn = {
+  name: "id",
+  column_type: { type: "Uuid" },
+  nullable: false,
+} as ColumnDescriptor;
+
 /** Supports Bytea filters with a simple comma-separated byte format in generic forms. */
 function parseBytea(value: string): Uint8Array {
   const parts = value
@@ -224,6 +230,91 @@ export function getFilterOperatorsForColumn(column: ColumnDescriptor): TableFilt
   });
 }
 
+function getTableFilterPredicateFromValue(
+  column: ColumnDescriptor,
+  value: unknown,
+): Pick<TableFilterClause, "operator" | "value"> | null {
+  if (value === undefined) {
+    return null;
+  }
+
+  const supportedOperators = getFilterOperatorsForColumn(column);
+  if (value === null) {
+    if (supportedOperators.includes("isNull") === false) {
+      return null;
+    }
+    return { operator: "isNull", value: true };
+  }
+
+  if (supportedOperators.includes("eq") === false) {
+    return null;
+  }
+
+  switch (column.column_type.type) {
+    case "Boolean":
+      return typeof value === "boolean" ? { operator: "eq", value } : null;
+    case "Integer":
+      return typeof value === "number" && Number.isInteger(value)
+        ? { operator: "eq", value }
+        : null;
+    case "Double":
+      return typeof value === "number" && Number.isFinite(value)
+        ? { operator: "eq", value }
+        : null;
+    case "Timestamp": {
+      const epochMilliseconds = value instanceof Date ? value.getTime() : value;
+      return typeof epochMilliseconds === "number" &&
+        Number.isFinite(new Date(epochMilliseconds).getTime())
+        ? { operator: "eq", value: epochMilliseconds }
+        : null;
+    }
+    case "BigInt":
+      if (typeof value !== "string" && typeof value !== "number" && typeof value !== "bigint") {
+        return null;
+      }
+      if (typeof value === "number" && Number.isSafeInteger(value) === false) {
+        return null;
+      }
+      try {
+        return { operator: "eq", value: String(BigInt(value)) };
+      } catch {
+        return null;
+      }
+    case "Enum":
+      return typeof value === "string" && column.column_type.variants.includes(value)
+        ? { operator: "eq", value }
+        : null;
+    case "Text":
+    case "Uuid":
+      return typeof value === "string" ? { operator: "eq", value } : null;
+    default:
+      return null;
+  }
+}
+
+export function canCreateTableFilterClauseFromValue(
+  column: ColumnDescriptor,
+  value: unknown,
+): boolean {
+  return getTableFilterPredicateFromValue(column, value) !== null;
+}
+
+/** Builds the same normalized clause used by the Filter Builder from a runtime cell value. */
+export function createTableFilterClauseFromValue(
+  column: ColumnDescriptor,
+  value: unknown,
+): TableFilterClause | null {
+  const predicate = getTableFilterPredicateFromValue(column, value);
+  if (predicate === null) {
+    return null;
+  }
+  return {
+    id: createFilterClauseId(),
+    column: column.name,
+    ...predicate,
+  };
+}
+
 /** Keeps URL or telemetry clauses that can target the selected runtime table. */
 export function filterTableFilterClauses({
   filters,
@@ -252,15 +343,17 @@ export function filterTableFilterClauses({
 
     const parseColumn =
       column ??
-      (filter.column === "id"
-        ? ({ name: "id", column_type: { type: "Uuid" }, nullable: false } as ColumnDescriptor)
-        : undefined);
+      (filter.column === "id" ? tableIdFilterColumn : undefined);
     if (parseColumn === undefined) return [];
     try {
       const value = filter.operator === "in"
         ? parseFilterTokens(parseColumn, (filter.value as unknown[]).map((item) => String(item)))
         : filter.operator === "isNull"
           ? filter.value
+          : parseColumn.column_type.type === "Text" &&
+              filter.operator === "eq" &&
+              typeof filter.value === "string"
+            ? filter.value
           : (parseColumn.column_type.type === "Json" || parseColumn.column_type.type === "Array") &&
               typeof filter.value !== "string"
             ? filter.value

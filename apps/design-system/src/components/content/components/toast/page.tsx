@@ -16,7 +16,7 @@ export function ToastPage(): ReactElement {
     <ToastPlayground withToaster={false}>
       <Section
         title="Semantic messages"
-        description="Mount one Toaster and create neutral, success, warning, or error notifications through toasts."
+        description="Mount one Toaster and create neutral, success, warning, or error notifications through toasts. Use the brief duration for lightweight confirmations."
       >
         <Example source={basicSource}>
           <BasicExample />

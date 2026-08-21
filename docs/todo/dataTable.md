@@ -14,6 +14,22 @@
 
 ## Implemented foundation
 
+[21/08/26]
+
+- [x] Forward composed behavior and refs from `DataGrid.Viewport` to its scroll viewport so body-cell context-menu triggers receive the native event.
+- [x] Scope the table cell context-menu trigger to body rows and cells without opening it from headers or empty viewport space.
+
+[21/08/26]
+
+- [x] Preserve Base UI focus restoration when a cell context menu or its direct Copy actions are dismissed with Escape.
+- [x] Suppress context-menu focus restoration only when Edit intentionally transfers focus to the cell editor.
+
+[21/08/26]
+
+- [x] Let cell context-menu events reach the composed viewport trigger while suppressing duplicate row targeting.
+- [x] Replace selection when a cell outside the current selection is right-clicked.
+- [x] Preserve a multi-cell range when its context menu opens from a selected cell.
+
 [20/08/26]
 
 - [x] Remove the unreliable Move to start and Move to end hotkeys and their Menu and Context Menu hints while retaining the menu actions.
@@ -337,6 +353,12 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[21/08/26]
+
+- [x] Cover direct mouse and touch context-menu activation, unavailable targets, selection replacement, and focus restoration with focused tests.
+- [x] Run changed-file lint, focused tests, design-system typecheck and build, application typecheck and build, and documentation metadata checks.
+- [ ] Verify mouse, keyboard, and touch context-menu behavior in the connected Inspector runtime.
 
 [20/08/26]
 

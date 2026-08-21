@@ -9,6 +9,9 @@ import {
   ResizablePanelGroup,
   Text,
   Tooltip,
+  toasts,
+  type BinaryCopyFormat,
+  type DataGridCellTarget,
 } from '@inspector/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 
@@ -19,6 +22,12 @@ import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
 import { DataGridFilterBuilder } from '@tables/filters/dataGridFilterBuilder'
+import {
+  canCreateTableFilterClauseFromValue,
+  createTableFilterClauseFromValue,
+  tableIdFilterColumn,
+} from '@tables/filters/filterParsing'
+import { serializeCellValueForClipboard } from '@tables/grid/cellActions'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
 import {
@@ -42,6 +51,7 @@ import type { TableRowId } from '@tables/tableTypes'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import { FieldEditorMutationWidget } from '@tables/floatingWidget/fieldEditorMutationWidgetModules'
 import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
+import { getFieldReadOnlyReason } from '@tables/rowEditor/mutation/parsing'
 import {
   createTableMutationScopeKey,
   createTableMutationWorkspaceScope,
@@ -238,6 +248,98 @@ function TableViewContent({
     },
     [stagedDeletionRowIds, state],
   )
+  const resolveCellAction = useCallback(
+    (target: DataGridCellTarget) => {
+      const columnMeta = state.tableColumns.find((column) => column.id === target.columnId)
+      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === target.rowId)
+      if (columnMeta === undefined || row === undefined) {
+        return null
+      }
+      const stagedRowValues = mutations.stagedValuesByRowId[target.rowId]
+      const value =
+        stagedRowValues !== undefined && Object.hasOwn(stagedRowValues, columnMeta.accessorKey)
+          ? stagedRowValues[columnMeta.accessorKey]
+          : row.original[columnMeta.accessorKey]
+      return { columnMeta, value }
+    },
+    [mutations.stagedValuesByRowId, state.table, state.tableColumns],
+  )
+  const getCellActions = useCallback(
+    (target: DataGridCellTarget) => {
+      const resolvedCell = resolveCellAction(target)
+      if (resolvedCell === null) {
+        return { canCopy: false, canEdit: false, canFilterBy: false, copyAs: [] }
+      }
+      const { columnMeta, value } = resolvedCell
+      const filterColumn = columnMeta.column ?? tableIdFilterColumn
+      const canEdit =
+        state.detailPaneMode === 'closed' &&
+        state.canMutateRows === true &&
+        stagedDeletionRowIds.has(target.rowId) === false &&
+        columnMeta.column !== null &&
+        getFieldReadOnlyReason(columnMeta.column) === null
+      return {
+        canCopy: value !== undefined,
+        canEdit,
+        canFilterBy: canCreateTableFilterClauseFromValue(filterColumn, value),
+        copyAs: value instanceof Uint8Array ? (['hex', 'base64'] as const) : [],
+      }
+    },
+    [resolveCellAction, stagedDeletionRowIds, state.canMutateRows, state.detailPaneMode],
+  )
+  const handleCopyCell = useCallback(
+    async (target: DataGridCellTarget, format?: BinaryCopyFormat) => {
+      const resolvedCell = resolveCellAction(target)
+      if (resolvedCell === null) {
+        return
+      }
+      try {
+        const serializedValue = serializeCellValueForClipboard(
+          resolvedCell.value,
+          format ?? 'default',
+        )
+        await navigator.clipboard.writeText(serializedValue.text)
+        toasts.success(serializedValue.toast, {
+          duration: 'brief',
+          id: JSON.stringify(['cell-copy', state.tableKey, target.rowId, target.columnId]),
+        })
+      } catch {
+        toasts.error("Couldn't copy value")
+      }
+    },
+    [resolveCellAction, state.tableKey],
+  )
+  const handleFilterByCell = useCallback(
+    (target: DataGridCellTarget) => {
+      const resolvedCell = resolveCellAction(target)
+      if (resolvedCell === null) {
+        return
+      }
+      const clause = createTableFilterClauseFromValue(
+        resolvedCell.columnMeta.column ?? tableIdFilterColumn,
+        resolvedCell.value,
+      )
+      if (clause !== null) {
+        void state.setFilters([...state.filters, clause])
+      }
+    },
+    [resolveCellAction, state],
+  )
+  const handleTouchCellContextMenuOpen = useCallback(
+    (target: DataGridCellTarget) => {
+      const row = state.table.getRowModel().rows.find((candidate) => candidate.id === target.rowId)
+      const cell = row?.getVisibleCells().find((candidate) => candidate.column.id === target.columnId)
+      if (cell?.getCanSelect() === true && cell.getIsSelected() === false) {
+        state.table.selectCellRange({
+          anchorRowId: target.rowId,
+          anchorColumnId: target.columnId,
+          focusRowId: target.rowId,
+          focusColumnId: target.columnId,
+        })
+      }
+    },
+    [state.table],
+  )
   const scrollResetKey = getTableViewportScrollResetKey(state)
   const handleEscape = useEffectEvent(state.handleEscape)
   const refreshPendingRef = useRef(false)
@@ -270,6 +372,31 @@ function TableViewContent({
   const { page, setPage } = state
   const canGoToPreviousPage = state.isInitialLoading === false && state.hasPreviousPage === true
   const canGoToNextPage = state.isInitialLoading === false && state.hasNextPage === true
+  useHotkey(
+    appHotkeys.copyCell,
+    (event) => {
+      if (event.defaultPrevented === true || event.isComposing === true) {
+        return
+      }
+      const focusedCell = state.table.getFocusedCell()
+      if (focusedCell === undefined) {
+        return
+      }
+      const target = { columnId: focusedCell.column.id, rowId: focusedCell.row.id }
+      if (getCellActions(target).canCopy === false) {
+        return
+      }
+      event.preventDefault()
+      event.stopPropagation()
+      void handleCopyCell(target)
+    },
+    {
+      ignoreInputs: true,
+      preventDefault: false,
+      stopPropagation: false,
+      target: gridHotkeyTargetRef,
+    },
+  )
   useHotkey(
     appHotkeys.previousTablePage,
     (event) => {
@@ -455,12 +582,25 @@ function TableViewContent({
               data-hotkey-scope="table-grid"
             >
               <TableGridContextMenu
+                getCellActions={getCellActions}
+                onCopyCell={(target, format) => {
+                  void handleCopyCell(target, format)
+                }}
+                onEditCell={handleCellEditRequest}
+                onFilterByCell={handleFilterByCell}
+                onTouchCellContextMenuOpen={handleTouchCellContextMenuOpen}
                 revertField={mutations.revertField}
                 revertRowUpdate={mutations.revertRowUpdate}
                 stagedDeletionRowIds={stagedDeletionRowIds}
                 stagedFieldsByRowId={mutations.stagedFieldsByRowId}
               >
-                {({ composeViewport, onCellContextMenu, onRowContextMenu }) => (
+                {({
+                  composeViewport,
+                  onCellContextMenu,
+                  onCellContextMenuTouchStart,
+                  onRowContextMenu,
+                  onRowContextMenuTouchStart,
+                }) => (
                   <DataGrid.Root
                     table={state.table}
                     reorderableColumnIds={state.reorderableColumnIds}
@@ -472,6 +612,7 @@ function TableViewContent({
                     getRowStatus={getRowStatus}
                     onCellActivate={state.handleCellActivate}
                     onCellContextMenu={onCellContextMenu}
+                    onCellContextMenuTouchStart={onCellContextMenuTouchStart}
                     onCellEditRequest={handleCellEditRequest}
                     columnDragPreview={(columnId) => {
                       const column = state.tableColumns.find(
@@ -481,6 +622,7 @@ function TableViewContent({
                     }}
                     onColumnActivate={state.handleColumnActivate}
                     onRowContextMenu={onRowContextMenu}
+                    onRowContextMenuTouchStart={onRowContextMenuTouchStart}
                   >
                     {composeViewport(
                       <DataGrid.Viewport scrollResetKey={scrollResetKey}>

@@ -10,18 +10,21 @@ import {
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import {
+  forwardRef,
   useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  type ForwardedRef,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
-  type ReactNode,
+    type ReactNode,
+    type TouchEvent,
 } from 'react'
 
-import { ScrollAreaPrivate } from '../scrollArea/scrollArea'
+import { ScrollAreaPrivate, type ScrollAreaProps } from '../scrollArea/scrollArea'
 import { Spinner } from '../spinner/spinner'
 import { dataGridStyles } from './dataGrid.styles'
 import { DataGridContext, type DataGridContextValue, useDataGridContext } from './dataGridContext'
@@ -84,6 +87,14 @@ export type DataGridCellContextMenuHandler = (
   target: DataGridCellTarget,
   event: MouseEvent<HTMLTableCellElement>,
 ) => void
+export type DataGridRowContextMenuTouchStartHandler = (
+  rowId: string,
+  event: TouchEvent<HTMLTableRowElement>,
+) => void
+export type DataGridCellContextMenuTouchStartHandler = (
+  target: DataGridCellTarget,
+  event: TouchEvent<HTMLTableCellElement>,
+) => void
 
 interface DataGridRootBaseProps<TData extends RowData> {
   /** Column highlighted across the header and visible rows. */
@@ -106,6 +117,8 @@ interface DataGridRootBaseProps<TData extends RowData> {
   onCellEditRequest?: (target: DataGridCellTarget) => void
   /** Runs when a cell context menu is requested. */
   onCellContextMenu?: DataGridCellContextMenuHandler
+  /** Records the semantic cell targeted by a possible touch context-menu gesture. */
+  onCellContextMenuTouchStart?: DataGridCellContextMenuTouchStartHandler
   /** Runs when a column header is activated. */
   onColumnActivate?: (columnId: string | null) => void
   /** Runs when a column-header context menu is requested. */
@@ -114,6 +127,8 @@ interface DataGridRootBaseProps<TData extends RowData> {
   onRowActivate?: (rowId: string) => void
   /** Runs when a row context menu is requested. */
   onRowContextMenu?: DataGridRowContextMenuHandler
+  /** Records the semantic row targeted by a possible touch context-menu gesture. */
+  onRowContextMenuTouchStart?: DataGridRowContextMenuTouchStartHandler
   /** Controlled TanStack table instance rendered by the compound parts. */
   table: DataGridTable<TData>
 }
@@ -133,7 +148,10 @@ interface StaticDataGridRootProps {
 export type DataGridRootProps<TData extends RowData> = DataGridRootBaseProps<TData> &
   (ReorderableDataGridRootProps | StaticDataGridRootProps)
 
-export interface DataGridViewportProps {
+export interface DataGridViewportProps extends Omit<
+  ScrollAreaProps,
+  'axis' | 'children' | 'tabIndex'
+> {
   /** Table or custom viewport content. */
   children: ReactNode
   /** Changing this value resets both scroll axes without remounting the viewport content. */
@@ -337,10 +355,12 @@ function DataGridRoot<TData extends RowData>({
   onCellActivate,
   onCellEditRequest,
   onCellContextMenu,
+  onCellContextMenuTouchStart,
   onColumnActivate,
   onHeaderContextMenu,
   onRowActivate,
   onRowContextMenu,
+  onRowContextMenuTouchStart,
   reorderableColumnIds,
   table,
 }: DataGridRootProps<TData>) {
@@ -411,10 +431,12 @@ function DataGridRoot<TData extends RowData>({
         onCellActivate,
         onCellEditRequest,
         onCellContextMenu,
+        onCellContextMenuTouchStart,
         onColumnActivate,
         onHeaderContextMenu,
         onRowActivate,
         onRowContextMenu,
+        onRowContextMenuTouchStart,
         columnReorderEnabled,
         focusFocusedCell,
         getCellStatus,
@@ -464,10 +486,12 @@ function DataGridRoot<TData extends RowData>({
       onCellActivate,
       onCellEditRequest,
       onCellContextMenu,
+      onCellContextMenuTouchStart,
       onColumnActivate,
       onHeaderContextMenu,
       onRowActivate,
       onRowContextMenu,
+      onRowContextMenuTouchStart,
       reorderableColumnIdSet,
       reorderableColumnIds,
       registerCellElement,
@@ -635,15 +659,30 @@ function DataGridRoot<TData extends RowData>({
   )
 }
 
-function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
+function setForwardedViewportRef(
+  ref: ForwardedRef<HTMLDivElement>,
+  element: HTMLDivElement | null,
+): void {
+  if (typeof ref === 'function') {
+    ref(element)
+  } else if (ref !== null) {
+    ref.current = element
+  }
+}
+
+const DataGridViewport = forwardRef<HTMLDivElement, DataGridViewportProps>(function DataGridViewport(
+  { children, scrollResetKey, ...props },
+  forwardedRef,
+) {
   const { density, setViewportElement } = useDataGridContext()
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const registerViewport = useCallback(
     (element: HTMLDivElement | null) => {
       viewportRef.current = element
       setViewportElement(element)
+      setForwardedViewportRef(forwardedRef, element)
     },
-    [setViewportElement],
+    [forwardedRef, setViewportElement],
   )
 
   useLayoutEffect(() => {
@@ -658,6 +697,7 @@ function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
 
   return (
     <ScrollAreaPrivate
+      {...props}
       axis="both"
       overscrollBehavior="none"
       ref={registerViewport}
@@ -670,7 +710,7 @@ function DataGridViewport({ children, scrollResetKey }: DataGridViewportProps) {
       {children}
     </ScrollAreaPrivate>
   )
-}
+})
 
 function DataGridTable(props: DataGridTableProps) {
   const { table } = useDataGridContext()
@@ -1187,8 +1227,16 @@ function DataGridRowImplementation<TData extends RowData>({
   children,
   row,
 }: DataGridRowProps<TData> & { ariaRowIndex?: number }) {
-  const { activeRowId, getRowStatus, onColumnActivate, onRowActivate, onRowContextMenu } =
-    useDataGridContext<TData>()
+  const {
+    activeRowId,
+    getRowStatus,
+    onCellContextMenu,
+    onCellContextMenuTouchStart,
+    onColumnActivate,
+    onRowActivate,
+    onRowContextMenu,
+    onRowContextMenuTouchStart,
+  } = useDataGridContext<TData>()
   const isActive = activeRowId === row.id
   const isSelected = row.getIsSelected()
   const status = getRowStatus?.(row) ?? 'default'
@@ -1203,12 +1251,30 @@ function DataGridRowImplementation<TData extends RowData>({
   }
 
   const handleContextMenu = (event: MouseEvent<HTMLTableRowElement>) => {
-    if (onRowContextMenu === undefined || event.defaultPrevented === true) {
+    if (
+      onRowContextMenu === undefined ||
+      event.defaultPrevented === true ||
+      (onCellContextMenu !== undefined &&
+        event.target instanceof Element &&
+        event.target.closest('[data-slot="data-grid-cell"]') !== null)
+    ) {
       return
     }
 
     event.preventDefault()
     onRowContextMenu(row.id, event)
+  }
+
+  const handleTouchStart = (event: TouchEvent<HTMLTableRowElement>) => {
+    if (
+      onRowContextMenuTouchStart === undefined ||
+      (onCellContextMenuTouchStart !== undefined &&
+        event.target instanceof Element &&
+        event.target.closest('[data-slot="data-grid-cell"]') !== null)
+    ) {
+      return
+    }
+    onRowContextMenuTouchStart(row.id, event)
   }
 
   return (
@@ -1230,6 +1296,7 @@ function DataGridRowImplementation<TData extends RowData>({
       data-slot="data-grid-row"
       onClick={handleClick}
       onContextMenu={handleContextMenu}
+      onTouchStart={handleTouchStart}
     >
       {children ??
         row.getVisibleCells().map((cell) => (
@@ -1254,6 +1321,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     onCellActivate,
     onCellEditRequest,
     onCellContextMenu,
+    onCellContextMenuTouchStart,
     onColumnActivate,
     registerCellElement,
     table,
@@ -1319,8 +1387,20 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     }
 
     event.preventDefault()
-    event.stopPropagation()
+    if (cell.getCanSelect() === true && cell.getIsSelected() === false) {
+      table.selectCellRange({
+        anchorRowId: target.rowId,
+        anchorColumnId: target.columnId,
+        focusRowId: target.rowId,
+        focusColumnId: target.columnId,
+      })
+      event.currentTarget.focus()
+    }
     onCellContextMenu(target, event)
+  }
+
+  const handleTouchStart = (event: TouchEvent<HTMLTableCellElement>) => {
+    onCellContextMenuTouchStart?.(target, event)
   }
 
   const handleDoubleClick = (event: MouseEvent<HTMLTableCellElement>) => {
@@ -1444,6 +1524,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
       onKeyDown={handleKeyDown}
       onMouseDown={handleMouseDown}
       onMouseEnter={cell.getSelectionExtendHandler()}
+      onTouchStart={handleTouchStart}
       tabIndex={tabIndex}
     >
       {children ?? <FlexRender cell={cell} />}

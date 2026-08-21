@@ -20,6 +20,7 @@ import {
   getFilterOperatorsForColumn,
   parseFilterTokens,
   parseFilterValue,
+  tableIdFilterColumn,
   tokenizePastedFilterValues,
 } from "./filterParsing";
 import type { TableFilterClause, TableFilterOperator } from "./tableFilters";
@@ -92,14 +93,8 @@ const visibleColumnTypes = new Set([
   "Boolean",
 ]);
 
-const idColumn = {
-  name: "id",
-  column_type: { type: "Uuid" },
-  nullable: false,
-} as ColumnDescriptor;
-
 function getVisibleColumns(columns: readonly ColumnDescriptor[]): ColumnDescriptor[] {
-  return [idColumn, ...columns].filter((column) => visibleColumnTypes.has(column.column_type.type));
+  return [tableIdFilterColumn, ...columns].filter((column) => visibleColumnTypes.has(column.column_type.type));
 }
 
 function getColumnTypeLabel(column: ColumnDescriptor): string {
@@ -234,6 +229,12 @@ function getClauseIssue(
       parseFilterTokens(column, clause.value.map((value) => String(value)));
     } else if (clause.operator === "isNull") {
       if (typeof clause.value !== "boolean") return "Null check is invalid.";
+    } else if (
+      column.column_type.type === "Text" &&
+      clause.operator === "eq" &&
+      typeof clause.value === "string"
+    ) {
+      return null;
     } else {
       parseFilterValue(column, clause.operator, String(clause.value));
     }

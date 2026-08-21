@@ -6,6 +6,12 @@ export default function BasicExample(): ReactElement {
     <Box gap="m" flexWrap="wrap">
       <Button variant="secondary" onClick={() => toasts.message("Row inserted")}>Message</Button>
       <Button variant="secondary" onClick={() => toasts.success("Connection saved")}>Success</Button>
+      <Button
+        variant="secondary"
+        onClick={() => toasts.success("Cell value copied", { duration: "brief" })}
+      >
+        Brief success
+      </Button>
       <Button variant="secondary" onClick={() => toasts.warning("Schema changed")}>Warning</Button>
       <Button
         variant="secondary"

@@ -12,6 +12,15 @@
 
 ## Implemented foundation
 
+### Cell context filter action
+
+[21/08/26]
+
+- [x] Build cell equality and null clauses through the schema-driven Filter Builder parsing boundary.
+- [x] Reuse the shared implicit ID descriptor instead of recreating it at the cell action entry point.
+- [x] Filter by the staged overlay when it is the value displayed in the grid.
+- [x] Keep undefined, structured, unsupported, and Bytea values out of the cell Filter by action.
+
 ### Filter action label
 
 [20/08/26]
@@ -496,6 +505,13 @@
 None.
 
 ## Validation checklist
+
+### Cell context filter action
+
+[21/08/26]
+
+- [x] Cover supported runtime values, exact text, null predicates, invalid enum values, and imprecise BigInt numbers with focused tests.
+- [x] Run application typecheck and build.
 
 ### Clause deletion cancellation
 

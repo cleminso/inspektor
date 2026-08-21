@@ -7,7 +7,7 @@ import {
   type SortingState,
   useTable,
 } from '@tanstack/react-table'
-import { useState, type ReactNode } from 'react'
+import { useState, type ReactElement, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { DataGrid } from './dataGrid'
@@ -15,6 +15,7 @@ import { dataGridColors } from './dataGridColors.stylex'
 import { dataGridStyles } from './dataGrid.styles'
 import { dataGridFeatures, type DataGridFeatures } from './dataGridFeatures'
 import { getDataGridHeaderSortableId } from './dataGridReorder'
+import { ContextMenu } from '../contextMenu/contextMenu'
 import { scrollAreaStyles } from '../scrollArea/scrollArea.styles'
 import {
   accentElementColors,
@@ -167,6 +168,7 @@ interface TestDataGridProps {
   activeColumnId?: string | null
   activeRowId?: string | null
   data?: Person[]
+  composeViewport?: (viewport: ReactElement) => ReactElement
   disabledCellRowIds?: ReadonlySet<string>
   emptyContent?: ReactNode
   focusRequest?: {
@@ -185,6 +187,7 @@ interface TestDataGridProps {
   onCellContextMenu?: (target: { columnId: string; rowId: string }) => void
   onColumnActivate?: (columnId: string | null) => void
   onRowActivate?: (rowId: string) => void
+  onRowContextMenu?: (rowId: string) => void
   resizingColumnId?: string | null
   rowRendering?: 'all' | 'virtual'
   scrollResetKey?: string
@@ -195,6 +198,7 @@ function TestDataGrid({
   activeColumnId = null,
   activeRowId = null,
   data = rows,
+  composeViewport = (viewport) => viewport,
   disabledCellRowIds = new Set(),
   emptyContent = 'No people',
   focusRequest = null,
@@ -207,6 +211,7 @@ function TestDataGrid({
   onCellContextMenu,
   onColumnActivate,
   onRowActivate,
+  onRowContextMenu,
   resizingColumnId = null,
   rowRendering,
   scrollResetKey,
@@ -247,20 +252,27 @@ function TestDataGrid({
       getRowStatus={getRowStatus}
       onCellActivate={onCellActivate}
       onCellEditRequest={onCellEditRequest}
-      onCellContextMenu={(target) => onCellContextMenu?.(target)}
+      onCellContextMenu={
+        onCellContextMenu === undefined ? undefined : (target) => onCellContextMenu(target)
+      }
       onColumnActivate={onColumnActivate}
       onRowActivate={onRowActivate}
+      onRowContextMenu={
+        onRowContextMenu === undefined ? undefined : (rowId) => onRowContextMenu(rowId)
+      }
     >
-      <DataGrid.Viewport scrollResetKey={scrollResetKey}>
-        <DataGrid.Table aria-label="People">
-          <DataGrid.Content
-            loading={loading}
-            emptyContent={emptyContent}
-            loadingContent="Loading people"
-            rowRendering={rowRendering}
-          />
-        </DataGrid.Table>
-      </DataGrid.Viewport>
+      {composeViewport(
+        <DataGrid.Viewport scrollResetKey={scrollResetKey}>
+          <DataGrid.Table aria-label="People">
+            <DataGrid.Content
+              loading={loading}
+              emptyContent={emptyContent}
+              loadingContent="Loading people"
+              rowRendering={rowRendering}
+            />
+          </DataGrid.Table>
+        </DataGrid.Viewport>,
+      )}
     </DataGrid.Root>
   )
 }
@@ -1113,12 +1125,89 @@ describe('DataGrid', () => {
     fireEvent.mouseDown(admiralCell)
     fireEvent.mouseUp(document)
     fireEvent.click(admiralCell)
-    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Engineer' }))
+    expect(fireEvent.contextMenu(screen.getByRole('cell', { name: 'Engineer' }))).toBe(false)
 
     expect(onColumnActivate).toHaveBeenCalledWith('role')
     expect(onRowActivate).toHaveBeenCalledWith('person-1')
     expect(onCellActivate).toHaveBeenCalledWith({ rowId: 'person-2', columnId: 'role' })
     expect(onCellContextMenu).toHaveBeenCalledWith({ rowId: 'person-1', columnId: 'role' })
+  })
+
+  it('replaces an unselected cell range on right-click and lets the request reach an ancestor menu trigger', () => {
+    const onAncestorContextMenu = vi.fn()
+    render(
+      <div onContextMenu={onAncestorContextMenu}>
+        <TestDataGrid
+          initialCellSelection={[
+            {
+              anchorRowId: 'person-1',
+              anchorColumnId: 'name',
+              focusRowId: 'person-1',
+              focusColumnId: 'name',
+            },
+          ]}
+          onCellContextMenu={vi.fn()}
+        />
+      </div>,
+    )
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Admiral' }))
+
+    expect(screen.getByRole('cell', { name: 'Admiral' }).hasAttribute('data-cell-selected')).toBe(
+      true,
+    )
+    expect(screen.getByRole('cell', { name: 'Ada' }).hasAttribute('data-cell-selected')).toBe(false)
+    expect(onAncestorContextMenu).toHaveBeenCalledOnce()
+  })
+
+  it('opens a composed context menu when a body cell is right-clicked', async () => {
+    render(
+      <ContextMenu.Root>
+        <TestDataGrid
+          composeViewport={(viewport) => <ContextMenu.Trigger render={viewport} />}
+          onCellContextMenu={vi.fn()}
+        />
+        <ContextMenu.Content>
+          <ContextMenu.Item>Edit</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>,
+    )
+
+    expect(fireEvent.contextMenu(screen.getByRole('cell', { name: 'Engineer' }))).toBe(false)
+
+    expect(await screen.findByRole('menuitem', { name: 'Edit' })).toBeTruthy()
+  })
+
+  it('preserves a multi-cell range when right-clicking inside it', () => {
+    render(
+      <TestDataGrid
+        initialCellSelection={[
+          {
+            anchorRowId: 'person-1',
+            anchorColumnId: 'name',
+            focusRowId: 'person-2',
+            focusColumnId: 'role',
+          },
+        ]}
+        onCellContextMenu={vi.fn()}
+      />,
+    )
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Engineer' }))
+
+    expect(screen.getByRole('cell', { name: 'Ada' }).hasAttribute('data-cell-selected')).toBe(true)
+    expect(screen.getByRole('cell', { name: 'Admiral' }).hasAttribute('data-cell-selected')).toBe(
+      true,
+    )
+  })
+
+  it('keeps row context targeting available from cells when no cell menu is configured', () => {
+    const onRowContextMenu = vi.fn()
+    render(<TestDataGrid onRowContextMenu={onRowContextMenu} />)
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Engineer' }))
+
+    expect(onRowContextMenu).toHaveBeenCalledWith('person-1')
   })
 
   it('activates a cell once and requests editing once across a double-click sequence', () => {

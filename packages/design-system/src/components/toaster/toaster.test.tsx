@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -68,6 +68,67 @@ describe('Toaster', () => {
     expect(notificationRegion.getAttribute('role')).toBe('region')
     expect(toast?.getAttribute('data-status')).toBe('message')
     expect(document.querySelector('[data-sonner-toaster]')).toBeNull()
+  })
+
+  it('automatically closes a brief notification', async () => {
+    vi.useFakeTimers()
+
+    try {
+      render(<Toaster />)
+      toasts.success('Cell value copied', { duration: 'brief' })
+
+      await act(async () => undefined)
+      const toast = screen.getByText('Cell value copied').closest('[data-slot="toast"]')
+
+      act(() => vi.advanceTimersByTime(1_499))
+      expect(toast?.hasAttribute('data-ending-style')).toBe(false)
+
+      act(() => vi.advanceTimersByTime(1))
+      expect(toast?.hasAttribute('data-ending-style')).toBe(true)
+      act(() => vi.runAllTimers())
+      expect(screen.queryByText('Cell value copied')).toBeNull()
+    } finally {
+      toasts.dismiss()
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
+    }
+  })
+
+  it('keeps brief timing off warnings and notifications with supporting content', async () => {
+    vi.useFakeTimers()
+
+    try {
+      render(<Toaster />)
+      toasts.warning('Schema changed', { duration: 'brief' })
+      toasts.success('Row deleted', { duration: 'brief', undo: vi.fn() })
+      toasts.success('Import complete', { description: 'Review imported rows', duration: 'brief' })
+
+      await act(async () => undefined)
+      act(() => vi.advanceTimersByTime(1_500))
+
+      expect(
+        screen
+          .getByText('Schema changed')
+          .closest('[data-slot="toast"]')
+          ?.hasAttribute('data-ending-style'),
+      ).toBe(false)
+      expect(
+        screen
+          .getByText('Row deleted')
+          .closest('[data-slot="toast"]')
+          ?.hasAttribute('data-ending-style'),
+      ).toBe(false)
+      expect(
+        screen
+          .getByText('Import complete')
+          .closest('[data-slot="toast"]')
+          ?.hasAttribute('data-ending-style'),
+      ).toBe(false)
+    } finally {
+      toasts.dismiss()
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
+    }
   })
 
   it('renders the loading state used by promise notifications', async () => {

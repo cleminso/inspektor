@@ -10,6 +10,7 @@ import { CloseGlyph } from '../icon/iconArtwork'
 import { toasterStyles } from './toaster.styles'
 
 export type ToastId = string | number
+export type ToastDuration = 'brief' | 'standard'
 export type ToastStatus = 'message' | 'success' | 'warning' | 'error' | 'loading'
 
 export interface ToasterProps {}
@@ -17,6 +18,8 @@ export interface ToasterProps {}
 export interface ToastOptions {
   /** Adds supporting content below the primary message. */
   description?: string
+  /** Selects a constrained auto-dismiss duration. */
+  duration?: ToastDuration
   /** Keeps the toast visible until it is dismissed. */
   preserve?: boolean
   /** Identifies a toast so it can be updated or dismissed. */
@@ -24,6 +27,11 @@ export interface ToastOptions {
   /** Adds the fixed Undo action to a reversible operation. */
   undo?: () => void
 }
+
+const toastDurationTimeouts = {
+  brief: 1_500,
+  standard: undefined,
+} satisfies Record<ToastDuration, number | undefined>
 
 export interface ToastPromiseOptions<Data> {
   /** Announces that the asynchronous operation has started. */
@@ -54,12 +62,23 @@ function getToastOptions(
   status: Exclude<ToastStatus, 'loading'>,
   options?: ToastOptions,
 ) {
+  const duration =
+    options?.description === undefined &&
+    options?.undo === undefined &&
+    (status === 'message' || status === 'success')
+      ? options?.duration
+      : undefined
   return {
     actionProps:
       options?.undo === undefined ? undefined : { children: 'Undo', onClick: options.undo },
     description: options?.description,
     id: normalizeToastId(options?.id ?? content),
-    timeout: options?.preserve === true ? 0 : undefined,
+    timeout:
+      options?.preserve === true
+        ? 0
+        : duration === undefined
+          ? undefined
+          : toastDurationTimeouts[duration],
     title: content,
     type: status,
   }
