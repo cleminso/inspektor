@@ -228,45 +228,72 @@ describe("buildDataGridColumns", () => {
     expect(screen.getByRole("menuitem", { name: "Hide column" })).toBeTruthy();
   });
 
-  it("resets only the context column to its schema-aware initial width", () => {
-    render(
-      <TestTable
-        columns={[
-          {
-            accessorKey: "name",
-            column: null,
-            id: "name",
-            isSortable: true,
-            label: "Name",
-          },
-          {
-            accessorKey: "email",
-            column: null,
-            id: "email",
-            isSortable: true,
-            label: "Email",
-          },
-        ]}
-        data={[{ id: "row-1", name: "Ada", email: "ada@example.com" } as DynamicTableRow]}
-        initialColumnSizing={{ name: 420, email: 360 }}
-        onSortingChange={() => undefined}
-      />,
-    );
+  it.each(["button", "context"] as const)(
+    "disables unavailable reset actions in the %s header menu",
+    (menuType) => {
+      render(<TestTable onSortingChange={() => undefined} />);
 
-    const table = screen.getByRole("table", { name: "People" });
-    const renderedColumns = table.querySelectorAll("col");
-    const nameColumn = renderedColumns[1];
-    const emailColumn = renderedColumns[2];
+      if (menuType === "button") {
+        fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+      } else {
+        fireEvent.contextMenu(screen.getByText("Name"));
+      }
 
-    expect(nameColumn?.style.width).toBe("420px");
-    expect(emailColumn?.style.width).toBe("360px");
+      expect(
+        screen.getByRole("menuitem", { name: "Reset column order" }).getAttribute("aria-disabled"),
+      ).toBe("true");
+      expect(
+        screen.getByRole("menuitem", { name: "Reset column width" }).getAttribute("aria-disabled"),
+      ).toBe("true");
+    },
+  );
 
-    fireEvent.contextMenu(screen.getByText("Name"));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Reset column width" }));
+  it.each(["button", "context"] as const)(
+    "resets only the selected column to its schema-aware initial width from the %s header menu",
+    (menuType) => {
+      render(
+        <TestTable
+          columns={[
+            {
+              accessorKey: "name",
+              column: null,
+              id: "name",
+              isSortable: true,
+              label: "Name",
+            },
+            {
+              accessorKey: "email",
+              column: null,
+              id: "email",
+              isSortable: true,
+              label: "Email",
+            },
+          ]}
+          data={[{ id: "row-1", name: "Ada", email: "ada@example.com" } as DynamicTableRow]}
+          initialColumnSizing={{ name: 420, email: 360 }}
+          onSortingChange={() => undefined}
+        />,
+      );
 
-    expect(nameColumn?.style.width).toBe("294px");
-    expect(emailColumn?.style.width).toBe("360px");
-  });
+      const table = screen.getByRole("table", { name: "People" });
+      const renderedColumns = table.querySelectorAll("col");
+      const nameColumn = renderedColumns[1];
+      const emailColumn = renderedColumns[2];
+
+      expect(nameColumn?.style.width).toBe("420px");
+      expect(emailColumn?.style.width).toBe("360px");
+
+      if (menuType === "button") {
+        fireEvent.click(screen.getByRole("button", { name: "Open Name column menu" }));
+      } else {
+        fireEvent.contextMenu(screen.getByText("Name"));
+      }
+      fireEvent.click(screen.getByRole("menuitem", { name: "Reset column width" }));
+
+      expect(nameColumn?.style.width).toBe("294px");
+      expect(emailColumn?.style.width).toBe("360px");
+    },
+  );
 
   it.each(["button", "context"] as const)(
     "resets reordered columns to their definition order from the %s header menu",

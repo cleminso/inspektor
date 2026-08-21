@@ -21,6 +21,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [21/08/26]
 
+- [x] Keep column-order and column-width reset actions visible in both header menus while disabling each action when its reset would not change the grid.
+
+[21/08/26]
+
 - [x] Restore schema-definition column order from both header action menus through TanStack Table's column-order reset API.
 - [x] Place the edit-pane `Close` action in the footer after the row-deletion action instead of in the pane header.
 
@@ -912,6 +916,10 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [21/08/26]
 
+- [x] Preserve stable header-menu structure and action discoverability by disabling unavailable reset actions instead of hiding them.
+
+[21/08/26]
+
 - [x] Supersede column-local-only reset: either column-header menu may restore the complete grid to schema-definition order.
 - [x] Supersede the toolbar-only pristine-empty action with a contextual action that opens the existing insert-row pane.
 - [x] Do not represent insertion as a synthetic first row until inline row creation has complete editing, validation, save,
@@ -1040,6 +1048,10 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[21/08/26]
+
+- [x] Cover disabled pristine reset actions and enabled reordered or resized reset actions in both header menus, then verify focused tests, changed-file lint, typecheck, build, and package tests.
 
 [21/08/26]
 

@@ -447,13 +447,37 @@ function MenuMoveActions({
   );
 }
 
+function hasCustomColumnOrder(
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>,
+  defaultColumnOrder: readonly string[],
+): boolean {
+  const defaultColumnIds = new Set(defaultColumnOrder);
+  const currentColumnOrder = (column.table.options.state?.columnOrder ?? []).filter((columnId) =>
+    defaultColumnIds.has(columnId),
+  );
+  const currentColumnIds = new Set(currentColumnOrder);
+  const normalizedColumnOrder = [
+    ...currentColumnOrder,
+    ...defaultColumnOrder.filter((columnId) => currentColumnIds.has(columnId) === false),
+  ];
+
+  return normalizedColumnOrder.some(
+    (columnId, index) => columnId !== defaultColumnOrder[index],
+  );
+}
+
 function MenuColumnActions({
   column,
+  defaultColumnOrder,
   onMove,
 }: {
   column: Column<DataGridFeatures, DynamicTableRow, unknown>;
+  defaultColumnOrder: readonly string[];
   onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
 }): React.ReactElement {
+  const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder);
+  const canResetColumnWidth = column.getSize() !== column.columnDef.size;
+
   return (
     <>
       <Menu.Item
@@ -475,10 +499,15 @@ function MenuColumnActions({
         </>
       )}
       <Menu.Separator />
-      <Menu.Item onClick={() => column.table.resetColumnOrder(true)}>
+      <Menu.Item
+        disabled={canResetColumnOrder === false}
+        onClick={() => column.table.resetColumnOrder(true)}
+      >
         Reset column order
       </Menu.Item>
-      <Menu.Item onClick={() => column.resetSize()}>Reset column width</Menu.Item>
+      <Menu.Item disabled={canResetColumnWidth === false} onClick={() => column.resetSize()}>
+        Reset column width
+      </Menu.Item>
       <Menu.Item
         disabled={column.getCanHide() === false}
         onClick={() => column.toggleVisibility(false)}
@@ -522,11 +551,16 @@ function ContextMoveActions({
 
 function ContextColumnActions({
   column,
+  defaultColumnOrder,
   onMove,
 }: {
   column: Column<DataGridFeatures, DynamicTableRow, unknown>;
+  defaultColumnOrder: readonly string[];
   onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
 }): React.ReactElement {
+  const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder);
+  const canResetColumnWidth = column.getSize() !== column.columnDef.size;
+
   return (
     <>
       <ContextMenu.Item
@@ -548,10 +582,15 @@ function ContextColumnActions({
         </>
       )}
       <ContextMenu.Separator />
-      <ContextMenu.Item onClick={() => column.table.resetColumnOrder(true)}>
+      <ContextMenu.Item
+        disabled={canResetColumnOrder === false}
+        onClick={() => column.table.resetColumnOrder(true)}
+      >
         Reset column order
       </ContextMenu.Item>
-      <ContextMenu.Item onClick={() => column.resetSize()}>Reset column width</ContextMenu.Item>
+      <ContextMenu.Item disabled={canResetColumnWidth === false} onClick={() => column.resetSize()}>
+        Reset column width
+      </ContextMenu.Item>
       <ContextMenu.Item
         disabled={column.getCanHide() === false}
         onClick={() => column.toggleVisibility(false)}
@@ -564,12 +603,14 @@ function ContextColumnActions({
 
 function ColumnHeader({
   column,
+  defaultColumnOrder,
   label,
   marker,
   onMenuOpen,
   onMove,
 }: {
   column: Column<DataGridFeatures, DynamicTableRow, unknown>;
+  defaultColumnOrder: readonly string[];
   label: string;
   marker: ColumnTypeMarkerModel;
   onMenuOpen?: (columnId: string) => void;
@@ -630,7 +671,11 @@ function ColumnHeader({
                 : (event) => runColumnMoveHotkey(event, column.id, onMove)
             }
           >
-            <MenuColumnActions column={column} onMove={onMove} />
+            <MenuColumnActions
+              column={column}
+              defaultColumnOrder={defaultColumnOrder}
+              onMove={onMove}
+            />
           </Menu.Content>
         </Menu.Root>
       </ContextMenu.Trigger>
@@ -641,7 +686,11 @@ function ColumnHeader({
             : (event) => runColumnMoveHotkey(event, column.id, onMove)
         }
       >
-        <ContextColumnActions column={column} onMove={onMove} />
+        <ContextColumnActions
+          column={column}
+          defaultColumnOrder={defaultColumnOrder}
+          onMove={onMove}
+        />
       </ContextMenu.Content>
     </ContextMenu.Root>
   );
@@ -655,6 +704,7 @@ export function buildDataGridColumns({
   onUndoRowDeletions,
   stagedValuesByRowId = {},
 }: BuildDataGridColumnsOptions): ColumnDef<DataGridFeatures, DynamicTableRow, unknown>[] {
+  const defaultColumnOrder = columns.map((column) => column.id);
   const selectionColumn: ColumnDef<DataGridFeatures, DynamicTableRow, unknown> = {
     id: tableGridSelectionColumnId,
     size: 36,
@@ -736,6 +786,7 @@ export function buildDataGridColumns({
         header: ({ column: tableColumn }) => (
           <ColumnHeader
             column={tableColumn}
+            defaultColumnOrder={defaultColumnOrder}
             label={column.label}
             marker={marker}
             onMenuOpen={onColumnMenuOpen}
