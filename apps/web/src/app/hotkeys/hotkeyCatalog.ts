@@ -9,6 +9,7 @@ export const appHotkeys = {
   copyCell: 'Mod+C',
   goBack: 'Alt+[',
   goForward: 'Alt+]',
+  insertRow: 'Alt+I',
   moveTableColumnLeft: 'Shift+ArrowLeft',
   moveTableColumnRight: 'Shift+ArrowRight',
   nextTablePage: 'Mod+ArrowRight',

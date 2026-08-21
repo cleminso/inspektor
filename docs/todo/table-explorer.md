@@ -19,6 +19,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[22/08/26]
+
+- [x] Toggle the insert-row pane with `Alt+I` from the active table view and expose the shortcut in the toolbar Insert row tooltip.
+- [x] Register Insert row as a table-scoped command-palette command, disabled when the editor cannot open.
+
 [21/08/26]
 
 - [x] Present binary clipboard encodings as direct `Copy as Hex` and `Copy as Base64` actions instead of duplicating the default format across `Copy` and a submenu.

@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   DataGrid,
+  KeyboardInput,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -15,6 +16,7 @@ import {
 } from '@inspector/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 
+import { isAppHotkeyInteractionLayer, useAppCommands, type AppCommand } from '@app/hotkeys/appHotkeys'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspectorProvider'
@@ -435,6 +437,57 @@ function TableViewContent({
       target: gridHotkeyTargetRef,
     },
   )
+  const { canOpenRowEditor, detailPaneMode, handleRowEditorOpenChange, rowEditor } = state
+  const { openInsert } = rowEditor
+  const openInsertPane = useCallback(() => {
+    setInsertMoreEnabled(false)
+    openInsert()
+  }, [openInsert])
+  const toggleInsertPane = useCallback(() => {
+    if (canOpenRowEditor === false) {
+      return
+    }
+    if (detailPaneMode === 'insert') {
+      setInsertMoreEnabled(false)
+      handleRowEditorOpenChange(false)
+    } else {
+      openInsertPane()
+    }
+  }, [canOpenRowEditor, detailPaneMode, handleRowEditorOpenChange, openInsertPane])
+  useHotkey(
+    appHotkeys.insertRow,
+    (event) => {
+      if (
+        event.defaultPrevented === true ||
+        event.isComposing === true ||
+        event.repeat === true ||
+        isAppHotkeyInteractionLayer(event.target)
+      ) {
+        return
+      }
+      event.preventDefault()
+      event.stopPropagation()
+      toggleInsertPane()
+    },
+    {
+      ignoreInputs: true,
+      preventDefault: false,
+      stopPropagation: false,
+    },
+  )
+  const commands = useMemo<readonly AppCommand[]>(
+    () => [
+      {
+        id: 'tables.insertRow',
+        label: 'Insert row',
+        disabled: state.canOpenRowEditor === false,
+        hotkey: appHotkeys.insertRow,
+        perform: toggleInsertPane,
+      },
+    ],
+    [state.canOpenRowEditor, toggleInsertPane],
+  )
+  useAppCommands(commands)
   const queryStatus =
     state.error !== null
       ? ''
@@ -535,23 +588,25 @@ function TableViewContent({
                     </Tooltip.Root>
                     <DataGridColumnVisibility table={state.table} />
                   </Box>
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="s"
-                    disabled={state.canOpenRowEditor === false}
-                    onClick={() => {
-                      if (state.detailPaneMode === 'insert') {
-                        setInsertMoreEnabled(false)
-                        state.handleRowEditorOpenChange(false)
-                      } else {
-                        setInsertMoreEnabled(false)
-                        state.rowEditor.openInsert()
+                  <Tooltip.Root>
+                    <Tooltip.Trigger
+                      render={
+                        <Button
+                          type="button"
+                          variant="primary"
+                          size="s"
+                          disabled={state.canOpenRowEditor === false}
+                          focusableWhenDisabled
+                          onClick={toggleInsertPane}
+                        >
+                          Insert row
+                        </Button>
                       }
-                    }}
-                  >
-                    Insert row
-                  </Button>
+                    />
+                    <Tooltip.Content>
+                      Insert row <KeyboardInput hotkey={appHotkeys.insertRow} size="small" />
+                    </Tooltip.Content>
+                  </Tooltip.Root>
                 </>
               }
               pagination={
@@ -667,10 +722,7 @@ function TableViewContent({
                                       size="s"
                                       variant="primary"
                                       disabled={state.canOpenRowEditor === false}
-                                      onClick={() => {
-                                        setInsertMoreEnabled(false)
-                                        state.rowEditor.openInsert()
-                                      }}
+                                      onClick={openInsertPane}
                                     >
                                       Insert row
                                     </Button>

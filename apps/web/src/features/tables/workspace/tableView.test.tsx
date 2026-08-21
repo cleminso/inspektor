@@ -1,7 +1,9 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef, type ReactElement, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
+import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { TableView } from '@tables/workspace/tableView'
 
 const tableViewState = vi.hoisted(() => ({
@@ -261,20 +263,21 @@ vi.mock('@tables/rowEditor/sidePane', () => ({
 }))
 
 vi.mock('@inspector/ds', () => {
-  const Container = forwardRef<
-    HTMLDivElement,
-    {
-      'aria-live'?: 'polite'
-      'data-hotkey-scope'?: string
-      children?: ReactNode
-      role?: string
-    }
-  >(function Container(
-    { 'aria-live': ariaLive, 'data-hotkey-scope': hotkeyScope, children, role },
+  interface ContainerProps {
+    'aria-live'?: 'polite'
+    'data-hotkey-scope'?: string
+    children?: ReactNode
+    render?: ReactElement
+    role?: string
+  }
+
+  const Container = forwardRef<HTMLDivElement, ContainerProps>(function Container(
+    { 'aria-live': ariaLive, 'data-hotkey-scope': hotkeyScope, children, render, role },
     ref,
   ) {
     return (
       <div ref={ref} aria-live={ariaLive} data-hotkey-scope={hotkeyScope} role={role}>
+        {render}
         {children}
       </div>
     )
@@ -377,15 +380,60 @@ vi.mock('@inspector/ds', () => {
     </button>
   )
 
+  const KeyboardInput = ({ hotkey }: { hotkey: string }) => <span data-testid="keyboard-input">{hotkey}</span>
+
+  const CommandItem = ({
+    children,
+    disabled,
+    onClick,
+    value,
+  }: {
+    children?: ReactNode
+    disabled?: boolean
+    onClick?: () => void
+    value?: { label: string }
+  }) => (
+    <div
+      role="option"
+      aria-disabled={disabled === true ? 'true' : undefined}
+      aria-label={value?.label}
+      aria-selected="false"
+      tabIndex={-1}
+      onClick={onClick}
+      onKeyDown={onClick === undefined ? undefined : () => onClick()}
+    >
+      {children}
+    </div>
+  )
+
+  const Command = {
+    Close: () => null,
+    Dialog: ({ children, open }: { children: ReactNode; open?: boolean }) =>
+      open === true ? <div role="dialog">{children}</div> : null,
+    Empty: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    Footer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    Input: (props: Record<string, unknown>) => <input {...props} />,
+    InputRow: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    Item: CommandItem,
+    ItemText: ({ label }: { label: string }) => <span>{label}</span>,
+    Key: ({ children }: { children: ReactNode }) => <kbd>{children}</kbd>,
+    List: ({ children }: { children: ReactNode }) => <div role="listbox">{children}</div>,
+    Root: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    Shortcut: ({ children }: { children: ReactNode }) => <span>{children}</span>,
+    Title: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  }
+
   return {
     Box: Container,
     Button: Object.assign(Button, { Glyph: Container }),
+    Command,
     DataGrid: {
       Content: DataGridContent,
       Root: DataGridRoot,
       Table: DataGridTable,
       Viewport: Container,
     },
+    KeyboardInput,
     ResizableHandle: Container,
     ResizablePanel: Container,
     ResizablePanelGroup: Container,
@@ -404,6 +452,7 @@ const initialClipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'c
 afterEach(() => {
   cleanup()
   tableViewState.error = null
+  tableViewState.canOpenRowEditor = true
   tableViewState.filters = [{ id: 'filter-1', column: 'name', operator: 'eq', value: 'Ada' }]
   tableViewState.isInitialLoading = false
   tableViewState.isRefreshing = false
@@ -429,6 +478,8 @@ afterEach(() => {
   tableViewState.setPage.mockReset()
   tableViewState.setFilters.mockReset()
   tableViewState.handleCellEditRequest.mockReset()
+  tableViewState.handleRowEditorOpenChange.mockReset()
+  tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
   toastSuccess.mockReset()
   if (initialClipboardDescriptor === undefined) {
@@ -437,6 +488,24 @@ afterEach(() => {
     Object.defineProperty(navigator, 'clipboard', initialClipboardDescriptor)
   }
 })
+
+function renderTableView(): ReturnType<typeof render> & { rerenderTableView: () => void } {
+  const result = render(
+    <AppHotkeysProvider>
+      <TableView tableName="accounts" />
+    </AppHotkeysProvider>,
+  )
+  return {
+    ...result,
+    rerenderTableView: () => {
+      result.rerender(
+        <AppHotkeysProvider>
+          <TableView tableName="accounts" />
+        </AppHotkeysProvider>,
+      )
+    },
+  }
+}
 
 describe('TableView cell actions', () => {
   function configureNameCell(value: unknown) {
@@ -458,7 +527,7 @@ describe('TableView cell actions', () => {
   it('edits and filters by the displayed staged value through the shared context actions', () => {
     configureNameCell('Grace')
     stagedValuesByRowId.current = { 'row-1': { name: 'Katherine' } }
-    render(<TableView tableName="accounts" />)
+    renderTableView()
     const menuProps = gridContextMenuProps.current as {
       getCellActions: (target: { columnId: string; rowId: string }) => {
         canEdit: boolean
@@ -487,7 +556,7 @@ describe('TableView cell actions', () => {
       configurable: true,
       value: { writeText },
     })
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     const defaultAllowed = fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
       key: 'c',
@@ -510,7 +579,7 @@ describe('TableView cell actions', () => {
       configurable: true,
       value: { writeText: vi.fn().mockRejectedValue(new Error('Clipboard denied')) },
     })
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
       key: 'c',
@@ -542,7 +611,7 @@ describe('TableView cell actions', () => {
       configurable: true,
       value: { writeText },
     })
-    render(<TableView tableName="accounts" />)
+    renderTableView()
     const menuProps = gridContextMenuProps.current as {
       getCellActions: (target: { columnId: string; rowId: string }) => { copyAs: string[] }
       onCopyCell: (target: { columnId: string; rowId: string }, format: 'hex' | 'base64') => void
@@ -576,7 +645,7 @@ describe('TableView cell actions', () => {
       configurable: true,
       value: { writeText: vi.fn().mockResolvedValue(undefined) },
     })
-    render(<TableView tableName="accounts" />)
+    renderTableView()
     const menuProps = gridContextMenuProps.current as {
       onCopyCell: (target: { columnId: string; rowId: string }) => void
     }
@@ -602,7 +671,7 @@ describe('TableView pagination hotkeys', () => {
     tableViewState.hasPreviousPage = true
     tableViewState.page = 2
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
       key: 'ArrowRight',
@@ -626,7 +695,7 @@ describe('TableView pagination hotkeys', () => {
     tableViewState.isInitialLoading = true
     tableViewState.page = 2
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     fireEvent.keyDown(screen.getByRole('button', { name: 'Edit row 1' }), {
       key: 'ArrowRight',
@@ -648,7 +717,7 @@ describe('TableView query status', () => {
     tableViewState.rowEditor.editedRowIds = ['row-1', 'row-2']
     tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete checked rows' }))
 
@@ -662,7 +731,7 @@ describe('TableView query status', () => {
   it('blocks inline editing and marks rows while their deletion is staged', () => {
     mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-status').textContent).toBe('stagedDeletion')
     fireEvent.click(screen.getByRole('button', { name: 'Edit row 1' }))
@@ -678,7 +747,7 @@ describe('TableView query status', () => {
   it('marks recently inserted rows while their ephemeral highlight is active', () => {
     tableViewState.recentlyInsertedRowIds = new Set(['row-1'])
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-status').textContent).toBe('recentlyInserted')
   })
@@ -687,7 +756,7 @@ describe('TableView query status', () => {
     tableViewState.recentlyInsertedRowIds = new Set(['row-1'])
     mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-status').textContent).toBe('stagedDeletion')
   })
@@ -696,7 +765,7 @@ describe('TableView query status', () => {
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
     stagedValuesByRowId.current = { 'row-1': { name: 'Grace' } }
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('stagedUpdate')
     expect(screen.getByTestId('row-1-email-status').textContent).toBe('default')
@@ -706,7 +775,7 @@ describe('TableView query status', () => {
   it('marks recently applied cells while their ephemeral highlight is active', () => {
     tableViewState.recentlyAppliedCells = { 'row-1': new Set(['name']) }
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('recentlyApplied')
     expect(screen.getByTestId('row-1-email-status').textContent).toBe('default')
@@ -718,7 +787,7 @@ describe('TableView query status', () => {
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
     stagedValuesByRowId.current = { 'row-1': { name: 'Grace' } }
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('stagedUpdate')
     expect(screen.getByTestId('row-1-email-status').textContent).toBe('recentlyApplied')
@@ -729,7 +798,7 @@ describe('TableView query status', () => {
     tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
     tableViewState.table = { getRowModel: () => ({ rows: [] }) }
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('default')
   })
@@ -738,13 +807,13 @@ describe('TableView query status', () => {
     mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('default')
   })
 
   it('wires one viewport context bridge to semantic Data Grid callbacks and ledger recovery', () => {
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getAllByTestId('shared-grid-context-trigger')).toHaveLength(1)
     fireEvent.click(screen.getByRole('button', { name: 'Open cell context' }))
@@ -765,7 +834,7 @@ describe('TableView query status', () => {
   it('undoes staged deletions through the row selection control', () => {
     mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
     useTableViewStateOptions.current?.onUndoRowDeletions?.(['row-1'])
 
     expect(mutationLedgerUndoDeletions).toHaveBeenCalledWith(['row-1'])
@@ -789,7 +858,7 @@ describe('TableView query status', () => {
       { name: 'name', column_type: { type: 'Text' }, nullable: false },
     ]
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Close field' }))
@@ -817,7 +886,7 @@ describe('TableView query status', () => {
       { name: 'name', column_type: { type: 'Text' }, nullable: false },
     ]
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.queryByRole('dialog', { name: 'Edit name' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Complete Apply' }))
@@ -827,11 +896,11 @@ describe('TableView query status', () => {
   })
 
   it('announces refresh completion and filtered emptiness', async () => {
-    const { rerender } = render(<TableView tableName="accounts" />)
+    const { rerenderTableView } = renderTableView()
     const status = screen.getByRole('status')
 
     tableViewState.isRefreshing = true
-    rerender(<TableView tableName="accounts" />)
+    rerenderTableView()
 
     expect(screen.getByRole('table', { name: 'accounts rows' }).getAttribute('aria-busy')).toBe(
       'true',
@@ -841,7 +910,7 @@ describe('TableView query status', () => {
 
     tableViewState.isRefreshing = false
     tableViewState.loadedRowCount = 0
-    rerender(<TableView tableName="accounts" />)
+    rerenderTableView()
 
     await waitFor(() => {
       expect(status.textContent).toBe('Rows refreshed. No rows match these filters')
@@ -855,7 +924,7 @@ describe('TableView query status', () => {
   it('clears filters from the filtered-empty state', () => {
     tableViewState.loadedRowCount = 0
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     const clearButton = screen.getByRole('button', { name: 'Clear' })
     fireEvent.click(clearButton)
@@ -867,7 +936,7 @@ describe('TableView query status', () => {
     tableViewState.filters = []
     tableViewState.loadedRowCount = 0
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.getAllByText('This table is empty')).toHaveLength(2)
     expect(screen.getByRole('status').textContent).toBe('This table is empty')
@@ -893,7 +962,7 @@ describe('TableView query status', () => {
     tableViewState.loadedRowCount = 0
     tableViewState.page = 2
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     expect(screen.queryByText('This table is empty')).toBeNull()
     expect(
@@ -908,11 +977,83 @@ describe('TableView query status', () => {
     tableViewState.filters = []
     tableViewState.loadedRowCount = 0
 
-    render(<TableView tableName="accounts" />)
+    renderTableView()
 
     const alert = screen.getByRole('alert')
     expect(alert.textContent).toContain("Couldn't load rows")
     expect(alert.textContent).toContain('Network request failed')
     expect(alert.textContent).toContain('Check the connection, then reload the page to try again.')
+  })
+})
+
+describe('TableView insert row hotkey', () => {
+  it('opens the insert pane with Alt+I', () => {
+    renderTableView()
+
+    fireEvent.keyDown(document, { altKey: true, key: 'i' })
+
+    expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledTimes(1)
+    expect(tableViewState.handleRowEditorOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('closes the insert pane with Alt+I when insert is already open', () => {
+    tableViewState.detailPaneMode = 'insert'
+    renderTableView()
+
+    fireEvent.keyDown(document, { altKey: true, key: 'i' })
+
+    expect(tableViewState.handleRowEditorOpenChange).toHaveBeenCalledWith(false)
+    expect(tableViewState.rowEditor.openInsert).not.toHaveBeenCalled()
+  })
+
+  it('does not open insert with Alt+I when the editor cannot open', () => {
+    tableViewState.canOpenRowEditor = false
+    renderTableView()
+
+    fireEvent.keyDown(document, { altKey: true, key: 'i' })
+
+    expect(tableViewState.rowEditor.openInsert).not.toHaveBeenCalled()
+    expect(tableViewState.handleRowEditorOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('does not run the insert hotkey from text inputs', () => {
+    renderTableView()
+    const input = document.createElement('input')
+    document.body.appendChild(input)
+    input.focus()
+
+    fireEvent.keyDown(input, { altKey: true, key: 'i' })
+
+    expect(tableViewState.rowEditor.openInsert).not.toHaveBeenCalled()
+    document.body.removeChild(input)
+  })
+
+  it('does not run the insert hotkey from dialog interaction layers', () => {
+    renderTableView()
+    const dialog = document.createElement('div')
+    dialog.setAttribute('role', 'alertdialog')
+    const button = document.createElement('button')
+    dialog.appendChild(button)
+    document.body.appendChild(dialog)
+    button.focus()
+
+    fireEvent.keyDown(button, { altKey: true, key: 'i' })
+
+    expect(tableViewState.rowEditor.openInsert).not.toHaveBeenCalled()
+    document.body.removeChild(dialog)
+  })
+
+  it('shows the insert row shortcut in the toolbar button tooltip', () => {
+    renderTableView()
+
+    expect(screen.getByTestId('keyboard-input').textContent).toBe(appHotkeys.insertRow)
+  })
+
+  it('registers an Insert row command in the command palette', () => {
+    renderTableView()
+
+    fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
+
+    expect(screen.getByRole('option', { name: 'Insert row' })).toBeTruthy()
   })
 })

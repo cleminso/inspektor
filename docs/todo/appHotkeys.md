@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[22/08/26]
+
+- [x] Add `Alt+I` to toggle the active table's insert-row pane, registered as a table-scoped command and shown in the toolbar Insert row tooltip.
+- [x] Keep the insert-row shortcut ignored inside text-entry controls and modal, menu, listbox, and expanded combobox interaction layers.
+- [x] Disable the Insert row command when the row editor cannot open and make the toolbar button focusable when disabled so the shortcut remains discoverable.
+
 [20/08/26]
 
 - [x] Move the command-palette action from the connected header to the bottom dock after the dock controls.
