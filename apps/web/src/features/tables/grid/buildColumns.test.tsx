@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { type SortingState, useTable } from "@tanstack/react-table";
+import { type ColumnOrderState, type SortingState, useTable } from "@tanstack/react-table";
 import type { DynamicTableRow } from "jazz-tools";
 import { useMemo, useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -15,6 +15,7 @@ function TestTable({
   data,
   disabledRowIds,
   initialColumnSizing,
+  initialColumnOrder,
   onColumnMenuOpen,
   onColumnMove,
   stagedValuesByRowId,
@@ -25,6 +26,7 @@ function TestTable({
   data?: DynamicTableRow[];
   disabledRowIds?: ReadonlySet<string>;
   initialColumnSizing?: Record<string, number>;
+  initialColumnOrder?: ColumnOrderState;
   onColumnMenuOpen?: (columnId: string) => void;
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]["onColumnMove"];
   stagedValuesByRowId?: Parameters<typeof buildDataGridColumns>[0]["stagedValuesByRowId"];
@@ -32,6 +34,7 @@ function TestTable({
   onSortingChange: () => void;
 }): React.ReactElement {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(initialColumnOrder ?? []);
   const columnDefs = useMemo(
     () =>
       buildDataGridColumns({
@@ -58,7 +61,8 @@ function TestTable({
     enableRowSelection: (row) => disabledRowIds?.has(row.id) !== true,
     getRowId: (row) => String(row.id),
     initialState: initialColumnSizing === undefined ? undefined : { columnSizing: initialColumnSizing },
-    state: { sorting },
+    state: { columnOrder, sorting },
+    onColumnOrderChange: setColumnOrder,
     onSortingChange: (updater) => {
       setSorting(updater);
       onSortingChange();
@@ -263,6 +267,52 @@ describe("buildDataGridColumns", () => {
     expect(nameColumn?.style.width).toBe("294px");
     expect(emailColumn?.style.width).toBe("360px");
   });
+
+  it.each(["button", "context"] as const)(
+    "resets reordered columns to their definition order from the %s header menu",
+    (menuType) => {
+      render(
+        <TestTable
+          columns={[
+            {
+              accessorKey: "name",
+              column: null,
+              id: "name",
+              isSortable: true,
+              label: "Name",
+            },
+            {
+              accessorKey: "email",
+              column: null,
+              id: "email",
+              isSortable: true,
+              label: "Email",
+            },
+          ]}
+          data={[{ id: "row-1", name: "Ada", email: "ada@example.com" } as DynamicTableRow]}
+          initialColumnOrder={["email", "name"]}
+          onSortingChange={() => undefined}
+        />,
+      );
+
+      const getHeaderLabels = () =>
+        screen
+          .getAllByRole("columnheader")
+          .map((header) => header.textContent)
+          .filter((label) => label === "Name" || label === "Email");
+
+      expect(getHeaderLabels()).toEqual(["Email", "Name"]);
+
+      if (menuType === "button") {
+        fireEvent.click(screen.getByRole("button", { name: "Open Email column menu" }));
+      } else {
+        fireEvent.contextMenu(screen.getByText("Email"));
+      }
+      fireEvent.click(screen.getByRole("menuitem", { name: "Reset column order" }));
+
+      expect(getHeaderLabels()).toEqual(["Name", "Email"]);
+    },
+  );
 
   it("moves a column through the shared Move submenu", async () => {
     const onColumnMove = vi.fn();

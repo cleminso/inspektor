@@ -260,6 +260,13 @@ function TableViewContent({
     state.isRefreshing === false &&
     state.loadedRowCount === 0 &&
     state.filters.length > 0
+  const unfilteredEmpty =
+    state.error === null &&
+    state.isInitialLoading === false &&
+    state.isRefreshing === false &&
+    state.loadedRowCount === 0 &&
+    state.page === 1 &&
+    state.filters.length === 0
   const { page, setPage } = state
   const canGoToPreviousPage = state.isInitialLoading === false && state.hasPreviousPage === true
   const canGoToNextPage = state.isInitialLoading === false && state.hasNextPage === true
@@ -306,7 +313,14 @@ function TableViewContent({
       ? ''
       : state.isRefreshing === true
         ? 'Refreshing rows'
-        : [refreshAnnouncement, filteredEmpty ? 'No rows match these filters' : '']
+        : [
+            refreshAnnouncement,
+            filteredEmpty
+              ? 'No rows match these filters'
+              : unfilteredEmpty
+                ? 'This table is empty'
+                : '',
+          ]
             .filter(Boolean)
             .join('. ')
 
@@ -497,6 +511,26 @@ function TableViewContent({
                                       }}
                                     >
                                       Clear
+                                    </Button>
+                                  </Box>
+                                ) : unfilteredEmpty ? (
+                                  <Box
+                                    alignItems="center"
+                                    flexDirection="column"
+                                    gap="xs"
+                                  >
+                                    <Text color="muted">This table is empty</Text>
+                                    <Button
+                                      type="button"
+                                      size="s"
+                                      variant="primary"
+                                      disabled={state.canOpenRowEditor === false}
+                                      onClick={() => {
+                                        setInsertMoreEnabled(false)
+                                        state.rowEditor.openInsert()
+                                      }}
+                                    >
+                                      Insert row
                                     </Button>
                                   </Box>
                                 ) : null

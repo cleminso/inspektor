@@ -19,6 +19,22 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[21/08/26]
+
+- [x] Restore schema-definition column order from both header action menus through TanStack Table's column-order reset API.
+- [x] Place the edit-pane `Close` action in the footer after the row-deletion action instead of in the pane header.
+
+[21/08/26]
+
+- [x] Keep complete table-list names in normal text flow and apply native end truncation without replacing the visible value from resize measurements.
+- [x] Enable the complete-name tooltip only when the rendered label's scroll width exceeds its available width.
+
+[21/08/26]
+
+- [x] Present an unfiltered empty table with centered `This table is empty` copy and a contextual `Insert row` action.
+- [x] Keep the empty-table prompt centered in the visible Data Grid viewport when wide columns enable horizontal scrolling.
+- [x] Announce unfiltered emptiness through the Data Grid's stable polite status region.
+
 [19/08/26]
 
 - [x] Highlight a grid row in a green success tint with an inline-start success bar for a short hold-then-fade window after its
@@ -894,6 +910,13 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[21/08/26]
+
+- [x] Supersede column-local-only reset: either column-header menu may restore the complete grid to schema-definition order.
+- [x] Supersede the toolbar-only pristine-empty action with a contextual action that opens the existing insert-row pane.
+- [x] Do not represent insertion as a synthetic first row until inline row creation has complete editing, validation, save,
+      cancel, and keyboard contracts.
+
 [12/08/26]
 
 - Schema and permissions own independent search state and may remain open concurrently.
@@ -1017,6 +1040,18 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[21/08/26]
+
+- [x] Cover complete in-flow table-list names, overflow-only tooltip disclosure, and fitting-label suppression with a focused test.
+- [ ] Verify long table names at the minimum dock width through pointer and keyboard tooltip interaction.
+
+[21/08/26]
+
+- [x] Reproduce unfiltered empty-table silence with a failing table-view regression test.
+- [x] Cover empty copy, polite announcement, contextual insertion, and the existing toolbar action.
+- [x] Verify the focused table-view test, complete Inspector test suite, typecheck, and production build.
+- [ ] Verify the centered prompt in a connected empty table whose columns overflow the viewport horizontally.
 
 [20/08/26]
 

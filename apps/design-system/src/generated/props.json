@@ -4466,7 +4466,7 @@
       "description": "Complete string whose start and end remain visible when space is constrained.",
       "source": {
         "path": "packages/design-system/src/components/middleTruncate/middleTruncate.tsx",
-        "line": 8
+        "line": 45
       }
     }
   ],

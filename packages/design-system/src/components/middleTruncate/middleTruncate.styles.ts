@@ -10,27 +10,18 @@ export const middleTruncateStyles = stylex.create({
     width: '100%',
   },
   preview: {
-    display: 'flex',
-    minWidth: 0,
-    width: '100%',
-  },
-  start: {
     overflow: 'hidden',
-    flexShrink: 1,
+    display: 'block',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    minWidth: 0,
+    width: '100%',
   },
-  endClip: {
-    overflow: 'hidden',
-    display: 'flex',
-    flexShrink: 1,
-    justifyContent: 'flex-end',
-    minWidth: 0,
-  },
-  end: {
-    flexShrink: 0,
+  measurement: {
+    pointerEvents: 'none',
+    position: 'absolute',
+    visibility: 'hidden',
     whiteSpace: 'nowrap',
+    width: 'max-content',
   },
   visuallyHidden: {
     padding: 0,

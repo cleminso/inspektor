@@ -56,7 +56,7 @@ export function ChevronDownGlyph({ variant = 'stroke', ...props }: ChevronDownGl
 export function ChevronRightGlyph(props: GlyphProps) {
   return (
     <svg {...props} aria-hidden="true" focusable="false" viewBox="0 0 16 16">
-      <path d="m6 3 5 5-5 5z" />
+      <path d="m6 3 5 5-5 5" />
     </svg>
   )
 }

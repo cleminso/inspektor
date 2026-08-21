@@ -16,6 +16,16 @@ This checklist tracks responsive middle truncation for identity-bearing strings.
 
 ## Implemented foundation
 
+[21/08/26]
+
+- [x] Reduce preview state to one rendered string and share one measurement invalidation path for resize and font changes.
+- [x] Keep native end ellipsis as a safety fallback until the measured middle preview is available.
+
+[21/08/26]
+
+- [x] Supersede balanced CSS clipping with measured leading and trailing grapheme segments around an explicit ellipsis.
+- [x] Share one resize observer across instances and remeasure after the active document fonts resolve.
+
 [06/08/26]
 
 - [x] Replace per-instance resize observation and synchronous text measurement with balanced CSS clipping.
@@ -45,6 +55,15 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[21/08/26]
+
+- [x] Retain rendered-width measurement because truncation must never expose part of a grapheme.
+- [x] Hide the visual preview when the available width cannot contain the ellipsis; keep the complete accessible value.
+
+[21/08/26]
+
+- [x] Omit a boundary grapheme completely when its rendered width does not fit; never expose a partial glyph beside the ellipsis.
+
 [05/08/26]
 
 - [x] Keep end truncation for prefix-oriented structured previews; reserve middle truncation for identity-bearing values.
@@ -61,6 +80,14 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[21/08/26]
+
+- [x] Replace observer-lifecycle implementation tests with focused fit, complete-grapheme, minimum-width, font-change, resize, and accessible-value behavior coverage.
+
+[21/08/26]
+
+- [x] Supersede the observer-free clipping check with coverage for fitting values, measured grapheme retention, explicit ellipsis rendering, and resize recovery.
 
 [06/08/26]
 

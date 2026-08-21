@@ -1,6 +1,23 @@
-import { Accordion, ActionList, Box, ContextMenu, Icon, Menu, SidePanel, Text } from '@inspector/ds'
+import {
+  Accordion,
+  ActionList,
+  Box,
+  ContextMenu,
+  Icon,
+  Menu,
+  SidePanel,
+  Text,
+  Tooltip,
+} from '@inspector/ds'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useEffectEvent, useRef } from 'react'
+import {
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactElement,
+} from 'react'
 
 import { productGlyphs } from '@app/icons/productGlyphs'
 import {
@@ -14,6 +31,81 @@ import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const deferredRenderingThreshold = 50
 const emptyTableSearchByName: ReadonlyMap<string, TableTabSearch> = new Map()
+const tableNameResizeSubscriptions = new Map<Element, () => void>()
+let tableNameResizeObserver: ResizeObserver | null = null
+let tableNameObservedFontSet: FontFaceSet | null = null
+
+function updateTableNameMeasurements(): void {
+  for (const updateMeasurement of tableNameResizeSubscriptions.values()) {
+    updateMeasurement()
+  }
+}
+
+function observeTableNameResize(element: Element, callback: () => void): () => void {
+  tableNameResizeObserver ??= new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      tableNameResizeSubscriptions.get(entry.target)?.()
+    }
+  })
+  tableNameResizeSubscriptions.set(element, callback)
+  tableNameResizeObserver.observe(element)
+  if (tableNameResizeSubscriptions.size === 1) {
+    tableNameObservedFontSet = document.fonts
+    tableNameObservedFontSet?.addEventListener('loadingdone', updateTableNameMeasurements)
+  }
+
+  return () => {
+    tableNameResizeSubscriptions.delete(element)
+    tableNameResizeObserver?.unobserve(element)
+    if (tableNameResizeSubscriptions.size === 0) {
+      tableNameResizeObserver?.disconnect()
+      tableNameResizeObserver = null
+      tableNameObservedFontSet?.removeEventListener('loadingdone', updateTableNameMeasurements)
+      tableNameObservedFontSet = null
+    }
+  }
+}
+
+function TableNameTooltip({
+  renderTrigger,
+  tableName,
+}: {
+  renderTrigger: (label: ReactElement) => ReactElement
+  tableName: string
+}): ReactElement {
+  const [truncated, setTruncated] = useState(false)
+  const tableNameRef = useRef<HTMLSpanElement>(null)
+  useLayoutEffect(() => {
+    const tableNameElement = tableNameRef.current
+    if (tableNameElement === null) {
+      return
+    }
+
+    const updateTruncation = () => {
+      setTruncated(tableNameElement.scrollWidth > tableNameElement.clientWidth)
+    }
+    updateTruncation()
+    return observeTableNameResize(tableNameElement, updateTruncation)
+  }, [tableName])
+  const trigger = renderTrigger(
+    <Text
+      ref={tableNameRef}
+      as="span"
+      color="inherit"
+      truncate
+      data-slot="table-name"
+    >
+      {tableName}
+    </Text>,
+  )
+
+  return (
+    <Tooltip.Root disabled={truncated === false}>
+      <Tooltip.Trigger render={trigger} />
+      <Tooltip.Content side="top">{tableName}</Tooltip.Content>
+    </Tooltip.Root>
+  )
+}
 
 export type TableListSection = 'pinned' | 'tables'
 
@@ -189,16 +281,16 @@ export function TableListPane({
                 section,
               })
             }
-            const trigger =
+            const renderTrigger = (label: ReactElement): ReactElement =>
               tableParams === null ? (
-                <ActionList.Trigger disabled>{tableName}</ActionList.Trigger>
+                <ActionList.Trigger disabled>{label}</ActionList.Trigger>
               ) : hasCheckedTables === true ? (
                 <ActionList.Trigger
                   onClick={(event) => {
                     changeChecked(isChecked === false, event.nativeEvent)
                   }}
                 >
-                  {tableName}
+                  {label}
                 </ActionList.Trigger>
               ) : (
                 <ActionList.Trigger
@@ -226,7 +318,7 @@ export function TableListPane({
                     />
                   }
                 >
-                  {tableName}
+                  {label}
                 </ActionList.Trigger>
               )
 
@@ -251,7 +343,10 @@ export function TableListPane({
                     changeChecked(checked === true, eventDetails.event)
                   }}
                 />
-                {trigger}
+                <TableNameTooltip
+                  renderTrigger={renderTrigger}
+                  tableName={tableName}
+                />
                 <Menu.Root
                   onOpenChange={handleActionsOpenChange}
                   onOpenChangeComplete={handleActionsOpenChangeComplete}

@@ -64,6 +64,25 @@ describe("moveColumnInOrder", () => {
 });
 
 describe("useColumnOrder", () => {
+  it("restores and persists schema order when TanStack resets to an empty order", () => {
+    const { result } = renderHook(() =>
+      useColumnOrder({
+        columnIds: ["id", "name", "role"],
+        tableKey: "connection:accounts",
+      }),
+    );
+
+    act(() => {
+      result.current.setColumnOrder(["role", "id", "name"]);
+      result.current.setColumnOrder([]);
+    });
+
+    expect(result.current.columnOrder).toEqual(["id", "name", "role"]);
+    expect(window.localStorage.getItem("inspector:column-order:connection:accounts")).toBe(
+      JSON.stringify(["id", "name", "role"]),
+    );
+  });
+
   it("exposes persisted order without a default-order render", () => {
     window.localStorage.setItem(
       "inspector:column-order:connection:accounts",

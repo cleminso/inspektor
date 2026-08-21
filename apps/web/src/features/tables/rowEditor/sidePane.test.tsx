@@ -129,6 +129,60 @@ describe("RowEditorSidePanel dirty transitions", () => {
     expect(onConfirmDelete).toHaveBeenCalledWith(["row-1"]);
   });
 
+  it("places the edit close action in the footer after the delete action", () => {
+    const onClose = vi.fn();
+    render(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        editedRowIds={["row-1"]}
+        mode="edit"
+        onClose={onClose}
+        onConfirmDelete={() => undefined}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    const closeButton = screen.getByRole("button", { name: "Close" });
+    const footer = closeButton.closest("footer");
+
+    expect(footer).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Delete row" }).compareDocumentPosition(closeButton) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
+
+    fireEvent.click(closeButton);
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the edit close action when deletion is unavailable", () => {
+    const onClose = vi.fn();
+    render(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        editedRowIds={["row-1"]}
+        mode="edit"
+        onClose={onClose}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("button", { name: "Delete row" })).toBeNull();
+  });
+
   it("names and snapshots every checked row for bulk deletion", () => {
     const onConfirmDelete = vi.fn();
     const { rerender } = render(

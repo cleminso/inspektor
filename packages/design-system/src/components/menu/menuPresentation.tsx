@@ -167,7 +167,11 @@ export function MenuRadioIcon() {
 export function MenuSubmenuIcon() {
   return (
     <ChevronRightGlyph
-      fill="currentColor"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
       {...stylex.props(menuStyles.submenuIcon)}
     />
   )

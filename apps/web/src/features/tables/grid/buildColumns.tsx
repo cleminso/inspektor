@@ -475,6 +475,9 @@ function MenuColumnActions({
         </>
       )}
       <Menu.Separator />
+      <Menu.Item onClick={() => column.table.resetColumnOrder(true)}>
+        Reset column order
+      </Menu.Item>
       <Menu.Item onClick={() => column.resetSize()}>Reset column width</Menu.Item>
       <Menu.Item
         disabled={column.getCanHide() === false}
@@ -545,6 +548,9 @@ function ContextColumnActions({
         </>
       )}
       <ContextMenu.Separator />
+      <ContextMenu.Item onClick={() => column.table.resetColumnOrder(true)}>
+        Reset column order
+      </ContextMenu.Item>
       <ContextMenu.Item onClick={() => column.resetSize()}>Reset column width</ContextMenu.Item>
       <ContextMenu.Item
         disabled={column.getCanHide() === false}

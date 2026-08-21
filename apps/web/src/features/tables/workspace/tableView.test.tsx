@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { forwardRef, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -664,6 +664,46 @@ describe('TableView query status', () => {
     fireEvent.click(clearButton)
 
     expect(tableViewState.setFilters).toHaveBeenCalledWith([])
+  })
+
+  it('offers row insertion from an unfiltered empty table', () => {
+    tableViewState.filters = []
+    tableViewState.loadedRowCount = 0
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.getAllByText('This table is empty')).toHaveLength(2)
+    expect(screen.getByRole('status').textContent).toBe('This table is empty')
+    const table = screen.getByRole('table', { name: 'accounts rows' })
+    const contextualInsert = within(table).getByRole('button', { name: 'Insert row' })
+    const toolbarInsert = screen
+      .getAllByRole('button', { name: 'Insert row' })
+      .find((button) => button !== contextualInsert)
+    if (toolbarInsert === undefined) {
+      throw new Error('Expected the toolbar insert action')
+    }
+
+    fireEvent.click(contextualInsert)
+    expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledOnce()
+
+    tableViewState.rowEditor.openInsert.mockClear()
+    fireEvent.click(toolbarInsert)
+    expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledOnce()
+  })
+
+  it('does not present a later empty page as an empty table', () => {
+    tableViewState.filters = []
+    tableViewState.loadedRowCount = 0
+    tableViewState.page = 2
+
+    render(<TableView tableName="accounts" />)
+
+    expect(screen.queryByText('This table is empty')).toBeNull()
+    expect(
+      within(screen.getByRole('table', { name: 'accounts rows' })).queryByRole('button', {
+        name: 'Insert row',
+      }),
+    ).toBeNull()
   })
 
   it('presents query failures as alerts with corrective reload guidance', () => {

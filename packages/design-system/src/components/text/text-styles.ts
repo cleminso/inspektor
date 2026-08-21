@@ -47,6 +47,7 @@ export const textUtilityStyles = stylex.create({
   tabularNums: { fontVariantNumeric: 'tabular-nums' },
   truncate: {
     overflow: 'hidden',
+    display: 'block',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },

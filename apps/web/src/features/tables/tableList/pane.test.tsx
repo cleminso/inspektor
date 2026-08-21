@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { Tooltip } from '@inspector/ds'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TableListPane } from './pane'
@@ -7,6 +8,44 @@ const { releasePrefetch, startTableRowsPrefetch } = vi.hoisted(() => ({
   releasePrefetch: vi.fn(),
   startTableRowsPrefetch: vi.fn(),
 }))
+let restoreDocumentFonts: (() => void) | null = null
+
+function mockDocumentFonts() {
+  const originalDescriptor = Object.getOwnPropertyDescriptor(document, 'fonts')
+  const listeners = new Set<EventListener>()
+  const fontSet = {
+    addEventListener: vi.fn((type: string, listener: EventListener) => {
+      if (type === 'loadingdone') {
+        listeners.add(listener)
+      }
+    }),
+    removeEventListener: vi.fn((type: string, listener: EventListener) => {
+      if (type === 'loadingdone') {
+        listeners.delete(listener)
+      }
+    }),
+  }
+  Object.defineProperty(document, 'fonts', {
+    configurable: true,
+    value: fontSet,
+  })
+  restoreDocumentFonts = () => {
+    if (originalDescriptor === undefined) {
+      Reflect.deleteProperty(document, 'fonts')
+    } else {
+      Object.defineProperty(document, 'fonts', originalDescriptor)
+    }
+  }
+  return {
+    dispatchLoadingDone: () => {
+      const event = new Event('loadingdone')
+      for (const listener of listeners) {
+        listener(event)
+      }
+    },
+    fontSet,
+  }
+}
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -20,10 +59,7 @@ vi.mock('@tanstack/react-router', () => ({
     search?: unknown
     to?: string
   }) => (
-    <a
-      {...props}
-      data-search={JSON.stringify(search)}
-    >
+    <a {...props} data-search={JSON.stringify(search)}>
       {children}
     </a>
   ),
@@ -40,8 +76,67 @@ vi.mock('@tables/query/tableRowsPrefetch', () => ({
   startTableRowsPrefetch,
 }))
 
+function mockTableNameOverflow(
+  initialClientWidth: number,
+  initialScrollWidth: number,
+) {
+  let clientWidth = initialClientWidth
+  let scrollWidth = initialScrollWidth
+  const observers: ResizeObserverMock[] = []
+  class ResizeObserverMock {
+    readonly callback: ResizeObserverCallback
+    readonly elements = new Set<Element>()
+
+    constructor(callback: ResizeObserverCallback) {
+      this.callback = callback
+      observers.push(this)
+    }
+    disconnect = vi.fn(() => this.elements.clear())
+    observe = vi.fn((element: Element) => this.elements.add(element))
+    unobserve = vi.fn((element: Element) => this.elements.delete(element))
+  }
+  vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(
+    function (this: HTMLElement) {
+      return this.dataset.slot === 'table-name' ? clientWidth : 0
+    },
+  )
+  vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockImplementation(
+    function (this: HTMLElement) {
+      return this.dataset.slot === 'table-name' ? scrollWidth : 0
+    },
+  )
+  return {
+    getTableNameObservers: () =>
+      observers.filter((observer) =>
+        Array.from(observer.elements).some(
+          (element) => element instanceof HTMLElement && element.dataset.slot === 'table-name',
+        ),
+      ),
+    setDimensions: (nextClientWidth: number, nextScrollWidth: number) => {
+      clientWidth = nextClientWidth
+      scrollWidth = nextScrollWidth
+    },
+    resize: (element: Element, nextClientWidth: number, nextScrollWidth: number) => {
+      clientWidth = nextClientWidth
+      scrollWidth = nextScrollWidth
+      act(() => {
+        for (const observer of observers) {
+          if (observer.elements.has(element)) {
+            observer.callback([{ target: element } as ResizeObserverEntry], {} as ResizeObserver)
+          }
+        }
+      })
+    },
+  }
+}
+
 afterEach(() => {
   cleanup()
+  restoreDocumentFonts?.()
+  restoreDocumentFonts = null
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
   vi.useRealTimers()
 })
 
@@ -179,6 +274,149 @@ describe('TableListPane', () => {
     )
 
     expect(screen.getByRole('button', { name: 'accounts' }).tagName).toBe('A')
+  })
+
+  it('keeps the complete table name in flow and exposes it in a tooltip when it overflows', async () => {
+    const tableName = 'better_auth_verification'
+    mockTableNameOverflow(130, 220)
+    const { container } = render(
+      <Tooltip.Provider delay={0}>
+        <TableListPane
+          checkedTableNames={new Set()}
+          {...defaultActionProps}
+          selectedTableName={null}
+          tables={[tableName]}
+          onClearSelection={vi.fn()}
+          onTableCheckedChange={vi.fn()}
+        />
+      </Tooltip.Provider>,
+    )
+
+    const tableLink = screen.getByRole('button', { name: tableName })
+    const tableNameText = container.querySelector('[data-slot="table-name"]')
+
+    expect(tableNameText?.textContent).toBe(tableName)
+
+    fireEvent.mouseEnter(tableLink)
+
+    expect(await screen.findAllByText(tableName)).toHaveLength(2)
+  })
+
+  it('does not expose a tooltip when the complete table name fits', async () => {
+    const tableName = 'accounts'
+    mockTableNameOverflow(100, 100)
+    render(
+      <Tooltip.Provider delay={0}>
+        <TableListPane
+          checkedTableNames={new Set()}
+          {...defaultActionProps}
+          selectedTableName={null}
+          tables={[tableName]}
+          onClearSelection={vi.fn()}
+          onTableCheckedChange={vi.fn()}
+        />
+      </Tooltip.Provider>,
+    )
+
+    fireEvent.focus(screen.getByRole('button', { name: tableName }))
+    await Promise.resolve()
+
+    expect(document.querySelector('[data-slot="tooltip-content"]')).toBeNull()
+  })
+
+  it('enables the complete-name tooltip when a fitting label becomes truncated', async () => {
+    const tableName = 'better_auth_verification'
+    const overflow = mockTableNameOverflow(220, 220)
+    const { container } = render(
+      <Tooltip.Provider delay={0}>
+        <TableListPane
+          checkedTableNames={new Set()}
+          {...defaultActionProps}
+          selectedTableName={null}
+          tables={[tableName]}
+          onClearSelection={vi.fn()}
+          onTableCheckedChange={vi.fn()}
+        />
+      </Tooltip.Provider>,
+    )
+    const tableLink = screen.getByRole('button', { name: tableName })
+    const tableNameText = container.querySelector('[data-slot="table-name"]')
+    if (tableNameText === null) {
+      throw new Error('Expected a table-name text element')
+    }
+
+    overflow.resize(tableNameText, 130, 220)
+    fireEvent.mouseEnter(tableLink)
+
+    expect(await screen.findAllByText(tableName)).toHaveLength(2)
+  })
+
+  it('remeasures table-name overflow after fonts load and removes the listener on unmount', async () => {
+    const fonts = mockDocumentFonts()
+    const overflow = mockTableNameOverflow(220, 220)
+    const tableName = 'better_auth_verification'
+    const { unmount } = render(
+      <Tooltip.Provider delay={0}>
+        <TableListPane
+          checkedTableNames={new Set()}
+          {...defaultActionProps}
+          selectedTableName={null}
+          tables={[tableName]}
+          onClearSelection={vi.fn()}
+          onTableCheckedChange={vi.fn()}
+        />
+      </Tooltip.Provider>,
+    )
+    const listener = fonts.fontSet.addEventListener.mock.calls.find(
+      ([type]) => type === 'loadingdone',
+    )?.[1]
+    if (listener === undefined) {
+      throw new Error('Expected a font loading listener')
+    }
+
+    overflow.setDimensions(130, 220)
+    act(() => fonts.dispatchLoadingDone())
+    fireEvent.mouseEnter(screen.getByRole('button', { name: tableName }))
+
+    expect(await screen.findAllByText(tableName)).toHaveLength(2)
+
+    unmount()
+    expect(fonts.fontSet.removeEventListener).toHaveBeenCalledWith('loadingdone', listener)
+  })
+
+  it('releases shared table-name resize observation after the final label unmounts', () => {
+    const overflow = mockTableNameOverflow(100, 100)
+    const { unmount } = render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={['accounts', 'profiles']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    const observer = overflow.getTableNameObservers()[0]
+    expect(observer?.observe).toHaveBeenCalledTimes(2)
+
+    unmount()
+    expect(observer?.unobserve).toHaveBeenCalledTimes(2)
+    expect(observer?.disconnect).toHaveBeenCalledOnce()
+
+    render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={['sessions']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+    const remountedObserver = overflow.getTableNameObservers()[0]
+    expect(remountedObserver).toBeDefined()
+    expect(remountedObserver).not.toBe(observer)
   })
 
   it('persists a table from a double click without replacing link navigation', () => {

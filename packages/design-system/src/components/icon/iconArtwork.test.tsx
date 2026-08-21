@@ -34,6 +34,6 @@ describe('package-private icon artwork', () => {
     expect(container.querySelector('path')?.getAttribute('d')).not.toBe(strokedPath)
 
     rerender(<ChevronRightGlyph />)
-    expect(container.querySelector('path')).toBeTruthy()
+    expect(container.querySelector('path')?.getAttribute('d')).not.toMatch(/[zZ]\s*$/)
   })
 })

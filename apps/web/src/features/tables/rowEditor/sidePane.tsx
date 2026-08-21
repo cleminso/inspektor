@@ -51,16 +51,19 @@ export function RowEditorSidePanel({
   const deleteRowIds = deleteConfirmationRowIds ?? editedRowIds;
   const deleteLabel =
     deleteRowIds.length === 1 ? "Delete row" : `Delete ${deleteRowIds.length} checked rows`;
+  const hasTwoFooterActions =
+    deleteConfirmationRowIds !== null ||
+    (onConfirmDelete !== undefined && onClose !== undefined);
   const footer =
-    mode === "edit" && onConfirmDelete !== undefined ? (
+    mode === "edit" && (onConfirmDelete !== undefined || onClose !== undefined) ? (
       <Box
         as="footer"
         data-slot="row-editor-footer"
-        display={deleteConfirmationRowIds === null ? "flex" : "grid"}
+        display={hasTwoFooterActions === true ? "grid" : "flex"}
         flexShrink={0}
         alignItems="center"
         gap="xs"
-        gridTemplateColumns={deleteConfirmationRowIds === null ? undefined : "three-one"}
+        gridTemplateColumns={hasTwoFooterActions === true ? "three-one" : undefined}
         borderTopWidth={1}
         borderColor="default"
         borderStyle="solid"
@@ -69,17 +72,26 @@ export function RowEditorSidePanel({
         paddingVertical="s"
         paddingRight="l"
       >
-        {deleteConfirmationRowIds === null ? (
-          <Button
-            type="button"
-            disabled={mutationDisabled === true || editedRowIds.length === 0}
-            layout="fill"
-            size="s"
-            variant="danger"
-            onClick={() => setDeleteConfirmationRowIds([...editedRowIds])}
-          >
-            {deleteLabel}
-          </Button>
+        {deleteConfirmationRowIds === null || onConfirmDelete === undefined ? (
+          <>
+            {onConfirmDelete === undefined ? null : (
+              <Button
+                type="button"
+                disabled={mutationDisabled === true || editedRowIds.length === 0}
+                layout="fill"
+                size="s"
+                variant="danger"
+                onClick={() => setDeleteConfirmationRowIds([...editedRowIds])}
+              >
+                {deleteLabel}
+              </Button>
+            )}
+            {onClose === undefined ? null : (
+              <Button type="button" layout="fill" size="s" variant="ghost" onClick={onClose}>
+                Close
+              </Button>
+            )}
+          </>
         ) : (
           <>
             <Button
@@ -185,11 +197,6 @@ export function RowEditorSidePanel({
                 </Button>
               </Box>
             </Box>
-          ) : null}
-          {mode === "edit" && onClose !== undefined ? (
-            <Button type="button" size="s" variant="ghost" onClick={onClose}>
-              Close
-            </Button>
           ) : null}
         </Box>
       }
