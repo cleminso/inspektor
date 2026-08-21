@@ -3,6 +3,7 @@ import { Toaster } from '@inspector/ds'
 
 import { InspectorSessionProvider } from '@app/providers/inspectorSessionProvider'
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
+import { InspectorDevtools } from '@app/devtools/inspectorDevtools'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -19,6 +20,7 @@ function RootComponent(): React.ReactElement {
         <InspectorSessionProvider>
           <Outlet />
           <Toaster />
+          <InspectorDevtools />
         </InspectorSessionProvider>
       </AppHotkeysProvider>
     </>

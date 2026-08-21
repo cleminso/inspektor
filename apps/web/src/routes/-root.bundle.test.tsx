@@ -1,6 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 
 const jazzModuleLoaded = vi.hoisted(() => vi.fn());
+const reactDevtoolsModuleLoaded = vi.hoisted(() => vi.fn());
+
+vi.mock("@tanstack/react-devtools", () => {
+  reactDevtoolsModuleLoaded();
+
+  return {
+    TanStackDevtools: vi.fn(),
+  };
+});
 
 vi.mock("jazz-tools", () => {
   jazzModuleLoaded();
@@ -25,5 +34,9 @@ import "./__root";
 describe("root route module boundary", () => {
   it("does not initialize Jazz when the application root is imported", () => {
     expect(jazzModuleLoaded).not.toHaveBeenCalled();
+  });
+
+  it("does not initialize React Devtools when the application root is imported", () => {
+    expect(reactDevtoolsModuleLoaded).not.toHaveBeenCalled();
   });
 });
