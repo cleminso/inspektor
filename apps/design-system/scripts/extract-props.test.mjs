@@ -115,13 +115,13 @@ test("extracts Button API facts from the public package export", () => {
 
   const layout = buttonProps.find(({ name }) => name === "layout");
   assert.equal(layout?.defaultValue, '"inline"');
-  for (const value of ['"inline"', '"row"', '"fill"']) {
+  for (const value of ['"inline"', '"row"', '"fill"', '"stacked"']) {
     assert.match(layout?.type ?? "", new RegExp(value));
   }
   assert.equal(layout?.required, false);
   assert.equal(
     layout?.description,
-    "Selects inline, leading-aligned row, or centered fill action layout.",
+    "Selects inline, leading-aligned row, centered fill, or padded stacked action layout.",
   );
 
   const ariaLabel = buttonProps.find(({ name }) => name === "aria-label");

@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
 
 import { Link } from '@tanstack/react-router'
 
 import {
   ButtonLink,
   ContextSwitcher,
+  Icon,
   Text,
-  toasts,
   type ContextSwitcherTriggerSize,
   type ContextSwitcherTriggerWidth,
 } from '@inspector/ds'
@@ -14,11 +15,11 @@ import {
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import {
   getConnectionDisplayName,
-  getConnectionSecondaryLabel,
   type StoredConnection,
 } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
-import { normalizeConnectionOpenError } from '@app/connections/connectionValidation'
+
+import { useSavedConnectionOpen } from './useSavedConnectionOpen'
 
 interface ConnectionSwitcherProps {
   size?: ContextSwitcherTriggerSize
@@ -45,9 +46,10 @@ export function ConnectionSwitcher({
   triggerLabel,
   width = 'content',
 }: ConnectionSwitcherProps = {}): React.ReactElement {
-  const { connections, currentConnectionId, openingConnectionId, openConnection } =
-    useInspectorSessionContext()
+  const { connections, currentConnectionId } = useInspectorSessionContext()
+  const openConnection = useSavedConnectionOpen()
   const [open, setOpen] = useState(false)
+  const [hoveredConnectionId, setHoveredConnectionId] = useState<string | null>(null)
 
   const orderedConnections = useMemo(
     () => sortConnections(connections, currentConnectionId),
@@ -77,20 +79,15 @@ export function ConnectionSwitcher({
           return
         }
 
+        if (nextOpen === false) {
+          setHoveredConnectionId(null)
+        }
         setOpen(nextOpen)
       }}
       onValueChange={(connection) => {
         if (connection !== null) {
-          void openConnection(connection.id)
-            .then((result) => {
-              if (result === 'opened') {
-                setOpen(false)
-              }
-            })
-            .catch((error: unknown) => {
-              const normalizedError = normalizeConnectionOpenError(error)
-              toasts.error(normalizedError.title, { description: normalizedError.description })
-            })
+          setOpen(false)
+          openConnection(connection.id)
         }
       }}
     >
@@ -116,9 +113,6 @@ export function ConnectionSwitcher({
         ) : null}
         {orderedConnections.length > 0 ? (
           <ContextSwitcher.Viewport maxHeight="l">
-            {openingConnectionId !== null ? (
-              <ContextSwitcher.Status>Opening connection…</ContextSwitcher.Status>
-            ) : null}
             {orderedConnections.length > 1 ? (
               <ContextSwitcher.Empty>No matching connections.</ContextSwitcher.Empty>
             ) : null}
@@ -127,12 +121,22 @@ export function ConnectionSwitcher({
                 <ContextSwitcher.Item
                   key={connection.id}
                   value={connection}
-                  disabled={openingConnectionId !== null}
+                  indicator="none"
+                  onMouseEnter={() => {
+                    setHoveredConnectionId(connection.id)
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredConnectionId(null)
+                  }}
                 >
                   <ContextSwitcher.ItemText
                     label={getConnectionDisplayName(connection)}
-                    description={getConnectionSecondaryLabel(connection)}
+                    description={connection.appId}
                   />
+                  {connection.id !== currentConnectionId &&
+                  connection.id === hoveredConnectionId ? (
+                    <Icon artwork={ArrowRight} size="s" />
+                  ) : null}
                 </ContextSwitcher.Item>
               )}
             </ContextSwitcher.List>

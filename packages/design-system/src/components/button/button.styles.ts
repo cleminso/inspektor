@@ -90,12 +90,12 @@ export const buttonStyles = stylex.create({
     textUnderlineOffset: `calc(${spacing.s} / 2)`,
   },
   sizeXS: {
-    paddingInline: spacing.s,
+    paddingInline: spacing.xs,
     fontSize: fontSizes[2],
     height: spatial['control-height-xs'],
   },
   sizeS: {
-    paddingInline: spacing.s,
+    paddingInline: spacing.xs,
     fontSize: fontSizes[2],
     height: spatial['control-height-s'],
   },
@@ -148,6 +148,11 @@ export const buttonStyles = stylex.create({
   alignStart: {
     justifyContent: 'flex-start',
   },
+  stacked: {
+    paddingBlock: spacing.xs,
+    height: 'auto',
+    minHeight: spatial['control-height-m'],
+  },
   disabled: {
     borderColor: 'transparent',
     backgroundColor: {
@@ -175,6 +180,12 @@ export const buttonStyles = stylex.create({
     justifyContent: 'center',
     lineHeight: lineHeights.ui,
     minWidth: 0,
+  },
+  contentStacked: {
+    gap: spacing.xxs,
+    alignItems: 'flex-start',
+    flexDirection: 'column',
+    width: '100%',
   },
   iconSlot: {
     alignItems: 'center',

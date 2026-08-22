@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[22/08/26]
+
+- [x] Delegate saved-connection selection and normalized failure presentation to the shared saved-connection opener.
+- [x] Dismiss the popup on selection without rendering request-level pending decoration.
+
 [09/08/26]
 
 - [x] Keep connection choices disabled while the shared session opens a saved connection.
@@ -55,6 +60,10 @@
 
 ## Settled interaction decisions
 
+[22/08/26]
+
+- Connection selection dismisses the popup immediately and leaves in-flight coordination to the session boundary. This supersedes the switcher-specific pending presentation from [09/08/26].
+
 [09/08/26]
 
 - Selecting a saved connection keeps the popup available during the request, but users can explicitly dismiss it.
@@ -85,6 +94,10 @@
 - None.
 
 ## Validation checklist
+
+[22/08/26]
+
+- [x] Verify selection closes the popup, uses the shared opener, and preserves normalized failure guidance without pending feedback.
 
 [09/08/26]
 

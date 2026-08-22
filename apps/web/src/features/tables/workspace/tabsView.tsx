@@ -228,7 +228,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
 
               const isSchemaTab = tab.search.view === 'schema'
               const isReplaceable = tab.id === replaceableTabId
-              const tabLabel = isSchemaTab === true ? `${tab.tableName} schema` : tab.tableName
+              const tabLabel = tab.tableName
               return (
                 <WorkspaceTabs.Tab
                   key={tab.id}

@@ -236,7 +236,7 @@ describe('TableTabsView', () => {
     expect(screen.queryByText('New table view content')).toBeNull()
   })
 
-  it('distinguishes schema while keeping filtered data under the table label', () => {
+  it('uses the table name for schema and filtered data tabs', () => {
     mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [
       {
@@ -261,12 +261,12 @@ describe('TableTabsView', () => {
 
     render(<TableTabsView tableName="accounts" />)
 
-    const schemaTab = screen.getByRole('tab', { name: 'profiles schema' })
-    const filteredTab = screen.getByRole('tab', { name: 'profiles' })
-    expect(schemaTab.hasAttribute('data-base-ui-tooltip-trigger')).toBe(false)
-    expect(filteredTab.hasAttribute('data-base-ui-tooltip-trigger')).toBe(false)
-    expect(screen.getByRole('button', { name: 'Close profiles schema' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Close profiles' })).toBeTruthy()
+    const profilesTabs = screen.getAllByRole('tab', { name: 'profiles' })
+    expect(profilesTabs).toHaveLength(2)
+    expect(
+      profilesTabs.every((tab) => tab.hasAttribute('data-base-ui-tooltip-trigger') === false),
+    ).toBe(true)
+    expect(screen.getAllByRole('button', { name: 'Close profiles' })).toHaveLength(2)
   })
 
   it('keeps a replaceable table open from double click or its context menu', async () => {

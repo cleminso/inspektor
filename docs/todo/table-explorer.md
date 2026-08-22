@@ -21,6 +21,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [22/08/26]
 
+- [x] Use the table name alone for schema workspace tabs while retaining the schema-specific icon and workspace identity.
+
+[22/08/26]
+
 - [x] Present runtime initialization failures with a `Try again` action while keeping raw errors out of the table workspace.
 - [x] Reset schema loading and the Jazz client boundary through one explicit retry action without unmounting the route-owned workspace.
 - [x] Keep runtime recovery visible when schema loading cannot select an initial table.

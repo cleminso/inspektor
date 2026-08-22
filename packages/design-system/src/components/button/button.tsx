@@ -53,7 +53,7 @@ interface ButtonSharedProps {
 interface LabelButtonProps {
   /** Makes the button a square icon-only action. */
   iconOnly?: false
-  /** Selects inline, leading-aligned row, or centered fill action layout. */
+  /** Selects inline, leading-aligned row, centered fill, or padded stacked action layout. */
   layout?: ButtonLayout
   /** Renders decorative content before the visible label. */
   prefix?: React.ReactNode
@@ -111,6 +111,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
       radius,
       fill: layoutOptions.fill,
       alignment: layoutOptions.alignment,
+      stacked: layout === 'stacked',
       orientation: buttonGroupOrientation,
       disabled: state.disabled,
       hasPrefix: loading === true || prefix !== undefined,
@@ -173,6 +174,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
         iconOnly={iconOnly}
         size={size}
         glyphSize={glyphSize}
+        layout={layout}
       >
         {children}
       </ButtonContent>

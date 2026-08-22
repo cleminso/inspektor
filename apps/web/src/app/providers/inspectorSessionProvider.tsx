@@ -6,12 +6,12 @@ import {
   ConnectionNavigationError,
   NoStoredSchemasError,
 } from "@app/connections/connectionValidation";
-import {
-  useConnectionOpenCoordinator,
-  type ConnectionOpenResult,
-} from "@app/connections/useConnectionOpenCoordinator";
+import { useConnectionOpenCoordinator } from "@app/connections/useConnectionOpenCoordinator";
 import { appRoutes } from "@app/routing/appRoutes";
-import { resolveTablesNavigationTarget } from "@app/routing/inspectorNavigation";
+import {
+  prepareStoredTablesNavigationTarget,
+  resolveTablesNavigationTarget,
+} from "@app/routing/inspectorNavigation";
 import { useInspectorSession } from "@app/session/useInspectorSession";
 import {
   RuntimeScopeExitGuardProvider,
@@ -33,11 +33,10 @@ export interface InspectorSessionContextValue {
   currentTableName: string | null;
   connectionLabel: string | null;
   rememberedBranches: string[];
-  openingConnectionId: string | null;
   openConnection: (
     connectionId: string,
     knownSchemaHashes?: readonly string[],
-  ) => Promise<ConnectionOpenResult>;
+  ) => Promise<void>;
   switchBranch: (branch: string, knownSchemaHashes?: readonly string[]) => Promise<void>;
   switchSchema: (schemaHash: string) => Promise<void>;
   saveConnection: ReturnType<typeof useInspectorSession>["saveConnection"];
@@ -92,8 +91,13 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       if (nextTarget === null) {
         throw new NoStoredSchemasError();
       }
+      const connection = session.getConnection(connectionId);
+      if (connection === null) {
+        throw new NoStoredSchemasError();
+      }
 
       session.setConnectionContext(connectionId, nextTarget.branch, nextTarget.schemaHash);
+      const clearPreparedTarget = prepareStoredTablesNavigationTarget(connection, nextTarget);
 
       try {
         await navigate({
@@ -102,19 +106,20 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         });
       } catch {
         throw new ConnectionNavigationError();
+      } finally {
+        clearPreparedTarget();
       }
     },
     [navigate, session],
   );
-  const { openingConnectionId, openConnection: openCoordinatedConnection } =
-    useConnectionOpenCoordinator(performConnectionOpen);
+  const openCoordinatedConnection = useConnectionOpenCoordinator(performConnectionOpen);
   const openConnection = useCallback(
     (connectionId: string, knownSchemaHashes?: readonly string[]) => {
       if (
         connectionId !== currentConnectionId &&
         runtimeScopeExitGuard.isBlocked() === true
       ) {
-        return Promise.resolve("ignored" as const);
+        return Promise.resolve();
       }
       return openCoordinatedConnection(connectionId, knownSchemaHashes);
     },
@@ -187,7 +192,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentTableName,
       connectionLabel: activeConnection !== null ? getConnectionDisplayName(activeConnection) : null,
       rememberedBranches: activeConnection !== null ? session.getRememberedBranches(activeConnection.id) : [],
-      openingConnectionId,
       openConnection,
       switchBranch,
       switchSchema,
@@ -203,7 +207,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentSchemaHash,
       currentTableName,
       openConnection,
-      openingConnectionId,
       session,
       setConnectionContext,
       switchBranch,

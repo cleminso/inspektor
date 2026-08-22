@@ -49,6 +49,66 @@ interface ResolveStoredTablesNavigationTargetOptions {
   store?: StoredConnectionsStore;
 }
 
+interface PreparedTablesNavigationTarget {
+  connection: StoredConnection;
+  target: ResolvedTablesNavigationTarget;
+}
+
+const preparedTablesNavigationTargets = new Map<string, PreparedTablesNavigationTarget>();
+
+function hasSameRuntimeProfile(left: StoredConnection, right: StoredConnection): boolean {
+  return (
+    left.id === right.id &&
+    left.serverUrl === right.serverUrl &&
+    left.appId === right.appId &&
+    left.adminSecret === right.adminSecret &&
+    left.env === right.env
+  );
+}
+
+export function prepareStoredTablesNavigationTarget(
+  connection: StoredConnection,
+  target: ResolvedTablesNavigationTarget,
+): () => void {
+  const preparedTarget = { connection, target };
+  preparedTablesNavigationTargets.set(connection.id, preparedTarget);
+
+  return () => {
+    if (preparedTablesNavigationTargets.get(connection.id) === preparedTarget) {
+      preparedTablesNavigationTargets.delete(connection.id);
+    }
+  };
+}
+
+function consumePreparedTablesNavigationTarget(
+  connection: StoredConnection,
+  store: StoredConnectionsStore,
+  branchOverride?: string | null,
+  schemaHashOverride?: string | null,
+): ResolvedTablesNavigationTarget | null {
+  const preparedTarget = preparedTablesNavigationTargets.get(connection.id);
+  if (preparedTarget === undefined) {
+    return null;
+  }
+  preparedTablesNavigationTargets.delete(connection.id);
+
+  if (hasSameRuntimeProfile(preparedTarget.connection, connection) === false) {
+    return null;
+  }
+
+  const expectedBranch = resolveDefaultBranch(store, connection.id, branchOverride);
+  const expectedSchemaHash = resolveDefaultSchemaHash(
+    store,
+    connection.id,
+    preparedTarget.target.availableSchemaHashes,
+    schemaHashOverride,
+  );
+  return preparedTarget.target.branch === expectedBranch &&
+    preparedTarget.target.schemaHash === expectedSchemaHash
+    ? preparedTarget.target
+    : null;
+}
+
 async function fetchConnectionSchemaHashes(
   connection: StoredConnection,
 ): Promise<readonly string[]> {
@@ -127,6 +187,15 @@ export async function resolveStoredTablesNavigationTarget({
   const branch = resolveDefaultBranch(resolvedStore, connectionId, branchOverride);
   const preferredSchemaHash =
     schemaHashOverride ?? getConnectionPreferences(resolvedStore, connectionId).lastSchemaHash;
+  const preparedTarget = consumePreparedTablesNavigationTarget(
+    connection,
+    resolvedStore,
+    branchOverride,
+    schemaHashOverride,
+  );
+  if (preparedTarget !== null) {
+    return preparedTarget;
+  }
 
   let availableSchemaHashes: readonly string[];
   try {

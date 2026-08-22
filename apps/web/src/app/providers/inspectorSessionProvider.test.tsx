@@ -9,11 +9,22 @@ import { useRegisterRuntimeScopeExitBlocker } from "@app/providers/runtimeScopeE
 
 const navigate = vi.fn();
 const setConnectionContext = vi.fn();
+const navigationMocks = vi.hoisted(() => {
+  const clearPreparedTarget = vi.fn();
+  return {
+    clearPreparedTarget,
+    prepareStoredTablesNavigationTarget: vi.fn(() => clearPreparedTarget),
+  };
+});
+const connections = {
+  "connection-1": { id: "connection-1", name: "Connection 1" },
+  "connection-2": { id: "connection-2", name: "Connection 2" },
+} as const;
 const session = {
   activeConnectionId: "connection-1",
   connections: [],
   deleteConnection: vi.fn(),
-  getConnection: vi.fn(() => ({ id: "connection-1", name: "Connection" })),
+  getConnection: vi.fn((connectionId: keyof typeof connections) => connections[connectionId]),
   getConnectionPreferences: vi.fn(() => ({
     lastBranch: "main",
     lastSchemaHash: "schema-1",
@@ -41,16 +52,14 @@ vi.mock("@app/session/useInspectorSession", () => ({
 vi.mock("@app/connections/useConnectionOpenCoordinator", () => ({
   useConnectionOpenCoordinator: (
     performOpen: (connectionId: string, knownSchemaHashes?: readonly string[]) => Promise<void>,
-  ) => ({
-    openingConnectionId: null,
-    openConnection: async (connectionId: string, knownSchemaHashes?: readonly string[]) => {
+  ) =>
+    async (connectionId: string, knownSchemaHashes?: readonly string[]) => {
       await performOpen(connectionId, knownSchemaHashes);
-      return "opened" as const;
     },
-  }),
 }));
 
 vi.mock("@app/routing/inspectorNavigation", () => ({
+  prepareStoredTablesNavigationTarget: navigationMocks.prepareStoredTablesNavigationTarget,
   resolveTablesNavigationTarget: async ({
     branchOverride,
     connectionId,
@@ -60,6 +69,7 @@ vi.mock("@app/routing/inspectorNavigation", () => ({
     connectionId: string;
     schemaHashOverride?: string | null;
   }) => ({
+    availableSchemaHashes: ["schema-1"],
     branch: branchOverride ?? "main",
     connectionId,
     schemaHash: schemaHashOverride ?? "schema-1",
@@ -70,6 +80,8 @@ afterEach(() => {
   cleanup();
   navigate.mockReset();
   setConnectionContext.mockReset();
+  navigationMocks.clearPreparedTarget.mockReset();
+  navigationMocks.prepareStoredTablesNavigationTarget.mockClear();
 });
 
 function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
@@ -130,5 +142,31 @@ describe("InspectorSessionProvider runtime-scope exit policy", () => {
     });
 
     expect(setConnectionContext).toHaveBeenCalledWith("connection-1", "feature", "schema-1");
+  });
+
+  it("hands the resolved target to the route loader before navigation", async () => {
+    render(
+      <InspectorSessionProvider>
+        <SessionActions blocked={false} />
+      </InspectorSessionProvider>,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Switch connection" }));
+    });
+
+    expect(navigationMocks.prepareStoredTablesNavigationTarget).toHaveBeenCalledWith(
+      connections["connection-2"],
+      {
+        availableSchemaHashes: ["schema-1"],
+        branch: "main",
+        connectionId: "connection-2",
+        schemaHash: "schema-1",
+      },
+    );
+    expect(navigate).toHaveBeenCalledOnce();
+    expect(navigationMocks.prepareStoredTablesNavigationTarget).toHaveBeenCalledBefore(navigate);
+    expect(navigationMocks.clearPreparedTarget).toHaveBeenCalledOnce();
+    expect(navigationMocks.clearPreparedTarget).toHaveBeenCalledAfter(navigate);
   });
 });

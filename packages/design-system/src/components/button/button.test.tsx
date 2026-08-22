@@ -197,6 +197,20 @@ describe("Button", () => {
     expect(button.getAttribute("data-full-width")).toBe("");
   });
 
+  it("uses an auto-height padded stacked layout for multi-line actions", () => {
+    render(
+      <Button layout="stacked">
+        <span>Connection</span>
+        <span>app-id</span>
+      </Button>,
+    );
+
+    const button = screen.getByRole("button", { name: /Connection/ });
+
+    expect(button.getAttribute("data-layout")).toBe("stacked");
+    expect(button.getAttribute("data-full-width")).toBe("");
+  });
+
   it("retains constrained radius choices", () => {
     render(<Button radius="m">Save</Button>);
 

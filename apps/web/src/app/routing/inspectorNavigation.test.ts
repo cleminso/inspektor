@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createEmptyConnectionStore, type StoredConnectionsStore } from "@app/connections/connections";
-import { resolveStoredTablesNavigationTarget } from "@app/routing/inspectorNavigation";
+import {
+  prepareStoredTablesNavigationTarget,
+  resolveStoredTablesNavigationTarget,
+} from "@app/routing/inspectorNavigation";
 
 const fetchSchemaHashes = vi.fn();
 
@@ -38,6 +41,63 @@ function createStore(lastSchemaHash: string | null = "schema-1"): StoredConnecti
 }
 
 describe("resolveStoredTablesNavigationTarget", () => {
+  it("reuses a prepared connection target without repeating schema discovery", async () => {
+    const store = createStore();
+    const connection = store.connections[0];
+    if (connection === undefined) {
+      throw new Error("Expected a stored connection");
+    }
+    const target = {
+      connectionId: "connection-1",
+      branch: "main",
+      schemaHash: "schema-1",
+      availableSchemaHashes: ["schema-2", "schema-1"],
+    } as const;
+    const clearPreparedTarget = prepareStoredTablesNavigationTarget(connection, target);
+
+    await expect(
+      resolveStoredTablesNavigationTarget({
+        connectionId: "connection-1",
+        store,
+      }),
+    ).resolves.toEqual(target);
+    expect(fetchSchemaHashes).not.toHaveBeenCalled();
+
+    fetchSchemaHashes.mockResolvedValueOnce({ hashes: ["schema-2", "schema-1"] });
+    await resolveStoredTablesNavigationTarget({
+      connectionId: "connection-1",
+      store,
+    });
+    expect(fetchSchemaHashes).toHaveBeenCalledOnce();
+
+    clearPreparedTarget();
+  });
+
+  it("rejects a prepared target after the connection profile changes", async () => {
+    const store = createStore();
+    const connection = store.connections[0];
+    if (connection === undefined) {
+      throw new Error("Expected a stored connection");
+    }
+    prepareStoredTablesNavigationTarget(connection, {
+      connectionId: "connection-1",
+      branch: "main",
+      schemaHash: "schema-1",
+      availableSchemaHashes: ["schema-1"],
+    });
+    fetchSchemaHashes.mockResolvedValueOnce({ hashes: ["schema-1"] });
+
+    await resolveStoredTablesNavigationTarget({
+      connectionId: "connection-1",
+      store: {
+        ...store,
+        connections: [{ ...connection, adminSecret: "replacement-secret" }],
+      },
+    });
+
+    expect(fetchSchemaHashes).toHaveBeenCalledOnce();
+  });
+
   it("validates the persisted runtime target against available schemas", async () => {
     fetchSchemaHashes.mockResolvedValueOnce({ hashes: ["schema-2", "schema-1"] });
 

@@ -1,48 +1,33 @@
-import { useCallback, useRef, useState } from "react";
-
-export type ConnectionOpenResult = "opened" | "ignored";
+import { useCallback, useRef } from "react";
 
 type PerformConnectionOpen = (
   connectionId: string,
   knownSchemaHashes?: readonly string[],
 ) => Promise<void>;
 
-interface ConnectionOpenCoordinator {
-  openingConnectionId: string | null;
-  openConnection: (
-    connectionId: string,
-    knownSchemaHashes?: readonly string[],
-  ) => Promise<ConnectionOpenResult>;
-}
-
 export function useConnectionOpenCoordinator(
   performOpen: PerformConnectionOpen,
-): ConnectionOpenCoordinator {
-  const requestRef = useRef<Promise<ConnectionOpenResult> | null>(null);
-  const [openingConnectionId, setOpeningConnectionId] = useState<string | null>(null);
+): PerformConnectionOpen {
+  const requestRef = useRef<Promise<void> | null>(null);
 
-  const openConnection = useCallback(
+  return useCallback(
     (
       connectionId: string,
       knownSchemaHashes?: readonly string[],
-    ): Promise<ConnectionOpenResult> => {
+    ): Promise<void> => {
       if (requestRef.current !== null) {
-        return Promise.resolve("ignored");
+        return Promise.resolve();
       }
 
-      setOpeningConnectionId(connectionId);
-      const request = performOpen(connectionId, knownSchemaHashes).then(() => "opened" as const);
+      const request = performOpen(connectionId, knownSchemaHashes);
       requestRef.current = request;
 
       return request.finally(() => {
         if (requestRef.current === request) {
           requestRef.current = null;
-          setOpeningConnectionId(null);
         }
       });
     },
     [performOpen],
   );
-
-  return { openingConnectionId, openConnection };
 }

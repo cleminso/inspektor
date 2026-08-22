@@ -10,6 +10,8 @@ import { ButtonPlayground } from "./playground";
 import GlyphCompositionExample from "./glyphCompositionExample";
 import glyphCompositionSource from "./glyphCompositionExample.tsx?raw";
 import { buttonGlyphPropNames, buttonPropNames } from "./props";
+import StackedExample from "./stackedExample";
+import stackedSource from "./stackedExample.tsx?raw";
 import VariantsExample from "./variantsExample";
 import variantsSource from "./variantsExample.tsx?raw";
 
@@ -22,6 +24,15 @@ export function ButtonPage(): ReactElement {
       <Section title="All variants and states">
         <Example source={variantsSource}>
           <VariantsExample />
+        </Example>
+      </Section>
+
+      <Section
+        title="Stacked action"
+        description="Use the stacked layout for a full-width action with primary and secondary labels. The button owns its vertical padding and grows with its content."
+      >
+        <Example source={stackedSource}>
+          <StackedExample />
         </Example>
       </Section>
 

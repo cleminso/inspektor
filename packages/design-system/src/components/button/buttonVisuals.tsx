@@ -15,7 +15,7 @@ export type ButtonVariant =
   | 'link'
 
 export type ButtonSize = 'xs' | 's' | 'm'
-export type ButtonLayout = 'inline' | 'row' | 'fill'
+export type ButtonLayout = 'inline' | 'row' | 'fill' | 'stacked'
 export type ButtonRadius = 'none' | 'xs' | 's' | 'm'
 export type ButtonGlyphSize = 'standard' | 'compact'
 
@@ -50,6 +50,7 @@ export const buttonLayoutOptions = {
   inline: { alignment: 'center', fill: false },
   row: { alignment: 'start', fill: true },
   fill: { alignment: 'center', fill: true },
+  stacked: { alignment: 'start', fill: true },
 } satisfies Record<ButtonLayout, ButtonLayoutOptions>
 
 const radiusStyles = {
@@ -90,6 +91,7 @@ interface ButtonVisualStylesOptions {
   expanded?: boolean
   fill: boolean
   alignment: ButtonLayoutOptions['alignment']
+  stacked?: boolean
   radius: ButtonRadius
   orientation: ButtonGroupOrientation | null
   disabled: boolean
@@ -105,6 +107,7 @@ export function getButtonVisualStyles({
   expanded = false,
   fill,
   alignment,
+  stacked = false,
   radius,
   orientation,
   disabled,
@@ -126,6 +129,7 @@ export function getButtonVisualStyles({
     orientation === 'vertical' && buttonGroupStyles.memberVertical,
     fill === true && buttonStyles.fill,
     alignment === 'start' && buttonStyles.alignStart,
+    stacked === true && buttonStyles.stacked,
     disabled === true &&
       (variant === 'ghost' || variant === 'link'
         ? buttonStyles.disabledBare
@@ -141,6 +145,7 @@ interface ButtonContentProps {
   loading?: boolean
   size: ButtonSize
   glyphSize?: ButtonGlyphSize
+  layout?: ButtonLayout
 }
 
 export function ButtonContent({
@@ -151,6 +156,7 @@ export function ButtonContent({
   loading = false,
   size,
   glyphSize = 'standard',
+  layout = 'inline',
 }: ButtonContentProps) {
   const spinnerSize = spinnerSizes[size]
   const iconSize = glyphSizes[glyphSize]
@@ -175,7 +181,10 @@ export function ButtonContent({
     <ButtonGlyphSizeContext.Provider value={iconSize}>
       <span
         data-slot="button-content"
-        {...stylex.props(buttonStyles.content)}
+        {...stylex.props(
+          buttonStyles.content,
+          layout === 'stacked' && buttonStyles.contentStacked,
+        )}
       >
         {prefixContent}
         {children}

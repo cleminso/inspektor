@@ -11,6 +11,29 @@
 
 ## Implemented foundation
 
+[22/08/26]
+
+- [x] Route context-switcher and recent-connection selections through one shared saved-connection opener with normalized toast handling.
+- [x] Keep recent-connection content unchanged while the session boundary coordinates opening, without an item spinner or disabled presentation.
+- [x] Keep in-flight request identity private to the connection-open coordinator instead of projecting unused pending state through session context.
+
+[22/08/26]
+
+- [x] Hand a validated connection target to the matching route loader so switching does not repeat schema-hash discovery before rendering the destination workspace.
+
+[22/08/26]
+
+- [x] Present recent connections as auto-height stacked actions whose button surface owns its padding and app-ID-only metadata.
+
+[22/08/26]
+
+- [x] Reveal the directional arrow only while an inactive connection item is hovered.
+
+[22/08/26]
+
+- [x] Present each saved connection with its app ID and a directional arrow instead of server metadata and selected-state checkmarks.
+- [x] Close the connection switcher as soon as a connection is selected while preserving coordinated opening and normalized error handling.
+
 [11/08/26]
 
 - [x] Keep submit available for native required validation and disable it only while submission is active.
@@ -40,6 +63,14 @@
 
 ## Open product work
 
+[22/08/26]
+
+- [ ] Measure pre-navigation schema-hash discovery separately from runtime startup and evaluate short-lived, runtime-profile-keyed metadata reuse only if discovery remains perceptible.
+
+[22/08/26]
+
+- [ ] Evaluate bounded warm-client retention only if Jazz client startup remains the dominant repeat-switch cost after metadata request deduplication.
+
 [07/08/26]
 
 - [ ] Adopt a canonical Jazz Cloud admin-secret validator only if Jazz exposes a documented format or validator.
@@ -52,6 +83,23 @@
 - Do not apply Jazz Cloud identifier constraints to self-hosted servers.
 
 ## Settled interaction decisions
+
+[22/08/26]
+
+- Saved-connection entry surfaces do not present request-level pending decoration; the destination workspace owns schema, runtime, and row-loading feedback.
+- Removing entry-item pending decoration does not require route prefetching. Prefetch is reserved for evidence that destination preparation, rather than Jazz runtime startup, is the remaining interaction bottleneck.
+
+[22/08/26]
+
+- A connection target prepared by an explicit open is single-use and only reusable by the route loader when the saved runtime profile, branch, and schema still match.
+
+[22/08/26]
+
+- The connection-item arrow is hover affordance for inactive connections; active connections do not show it.
+
+[22/08/26]
+
+- Connection selection dismisses the switcher immediately and does not present opening status inside the popup. Shared session coordination continues to reject overlapping requests. This supersedes the switcher-specific pending presentation decision from [09/08/26].
 
 [09/08/26]
 
@@ -78,6 +126,32 @@
 - None.
 
 ## Validation checklist
+
+[22/08/26]
+
+- [x] Verify recent-connection selection preserves its name and app ID without spinner, busy, or disabled presentation.
+- [x] Verify context-switcher and recent-connection failures retain the same normalized toast guidance through the shared opener.
+- [x] Verify overlapping selections still start only one shared connection-open request.
+
+[22/08/26]
+
+- [x] Verify a saved-connection open and its route loader share one schema-hash discovery result.
+- [x] Verify changed connection credentials reject a prepared route target.
+- [x] Verify the isolated Inspector Test fixture reaches schema and row rendering through the optimized route handoff.
+
+[22/08/26]
+
+- [x] Verify recent connections keep both labels inside a padded button surface, omit redundant server labels, and retain compact item separation.
+
+[22/08/26]
+
+- [x] Verify inactive items reveal the arrow on hover and active items never show it.
+
+[22/08/26]
+
+- [x] Verify connection items show only the app ID and a directional arrow.
+- [x] Verify selection closes the popup before connection opening resolves and failures still produce normalized toast guidance.
+- [x] Verify an existing opening request does not render pending feedback inside the switcher.
 
 [09/08/26]
 

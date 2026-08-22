@@ -4,8 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ConnectionList } from "./connectionList";
 
-const openConnection = vi.fn<() => Promise<"opened" | "ignored">>();
-let openingConnectionId: string | null = null;
+const openConnection = vi.fn<() => Promise<void>>();
 
 vi.mock("@app/providers/inspectorSessionProvider", () => ({
   useInspectorSessionContext: () => ({
@@ -19,19 +18,37 @@ vi.mock("@app/providers/inspectorSessionProvider", () => ({
         env: "dev",
       },
     ],
-    openingConnectionId,
     openConnection,
   }),
 }));
 
 afterEach(() => {
   cleanup();
-  openingConnectionId = null;
   openConnection.mockReset();
   vi.restoreAllMocks();
 });
 
 describe("ConnectionList", () => {
+  it("stacks each connection name above its app ID", () => {
+    render(<ConnectionList />);
+
+    const content = screen
+      .getByRole("button", { name: /Example/ })
+      .querySelector('[data-slot="button-content"]');
+
+    expect(content?.children).toHaveLength(2);
+    expect(content?.children[0]?.textContent).toBe("Example");
+    expect(content?.children[1]?.textContent).toBe("app-1");
+  });
+
+  it("identifies each connection by app ID without repeating its server", () => {
+    render(<ConnectionList />);
+
+    const connection = screen.getByRole("button", { name: /Example/ });
+    expect(connection.textContent).toContain("app-1");
+    expect(connection.textContent).not.toContain("example.com");
+  });
+
   it("reports a saved connection failure without an unhandled rejection", async () => {
     openConnection.mockRejectedValueOnce(new TypeError("Failed to fetch"));
     const toastError = vi.spyOn(toasts, "error");
@@ -47,14 +64,15 @@ describe("ConnectionList", () => {
     expect(openConnection).toHaveBeenCalledWith("connection-1");
   });
 
-  it("disables saved connections while one is opening", () => {
-    openingConnectionId = "connection-1";
+  it("keeps connection content unchanged while an open is coordinated", () => {
+    openConnection.mockReturnValueOnce(new Promise(() => undefined));
     render(<ConnectionList />);
 
     const connection = screen.getByRole("button", { name: /Example/ });
     fireEvent.click(connection);
 
-    expect(connection.getAttribute("aria-disabled")).toBe("true");
-    expect(openConnection).not.toHaveBeenCalled();
+    expect(connection.getAttribute("aria-disabled")).not.toBe("true");
+    expect(connection.getAttribute("aria-busy")).toBeNull();
+    expect(connection.textContent).toBe("Exampleapp-1");
   });
 });

@@ -408,10 +408,10 @@
     },
     {
       "name": "layout",
-      "type": "\"row\" | \"inline\" | \"fill\"",
+      "type": "\"row\" | \"inline\" | \"fill\" | \"stacked\"",
       "required": false,
       "defaultValue": "\"inline\"",
-      "description": "Selects inline, leading-aligned row, or centered fill action layout.",
+      "description": "Selects inline, leading-aligned row, centered fill, or padded stacked action layout.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
         "line": 57
@@ -456,7 +456,7 @@
       "description": "SVG artwork rendered at the size selected by the surrounding button.",
       "source": {
         "path": "packages/design-system/src/components/button/buttonVisuals.tsx",
-        "line": 77
+        "line": 78
       }
     }
   ],

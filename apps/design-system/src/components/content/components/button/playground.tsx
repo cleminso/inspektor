@@ -69,7 +69,7 @@ const controls = [
     kind: "select",
     key: "layout",
     label: "Layout",
-    options: ["inline", "row"].map((value) => ({ label: value, value })),
+    options: ["inline", "row", "stacked"].map((value) => ({ label: value, value })),
   },
   { kind: "boolean", key: "loading", label: "Loading" },
   { kind: "boolean", key: "disabled", label: "Disabled" },

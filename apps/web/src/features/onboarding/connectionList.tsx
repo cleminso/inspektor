@@ -1,39 +1,33 @@
-import { Box, Button, Text, toasts } from "@inspector/ds";
+import { Box, Button, Text } from "@inspector/ds";
 
 import { useInspectorSessionContext } from "@app/providers/inspectorSessionProvider";
-import { getConnectionDisplayName, getConnectionSecondaryLabel } from "@app/connections/connections";
-import { normalizeConnectionOpenError } from "@app/connections/connectionValidation";
+import { getConnectionDisplayName } from "@app/connections/connections";
+import { useSavedConnectionOpen } from "@shared/connections/useSavedConnectionOpen";
 
 export function ConnectionList(): React.ReactElement {
-  const { connections, openingConnectionId, openConnection } = useInspectorSessionContext();
+  const { connections } = useInspectorSessionContext();
+  const openConnection = useSavedConnectionOpen();
 
   return (
-    <Box width="full" flexDirection="column" gap="xs">
+    <Box width="full" flexDirection="column" gap="xxs">
       {connections.map((connection) => (
         <Button
           key={connection.id}
           type="button"
           variant="ghost"
-          size="s"
-          layout="row"
-          disabled={openingConnectionId !== null}
-          loading={openingConnectionId === connection.id}
+          size="xs"
+          layout="stacked"
+          aria-label={`${getConnectionDisplayName(connection)} ${connection.appId}`}
           onClick={() => {
-            void openConnection(connection.id)
-              .catch((error: unknown) => {
-                const normalizedError = normalizeConnectionOpenError(error);
-                toasts.error(normalizedError.title, { description: normalizedError.description });
-              });
+            openConnection(connection.id);
           }}
         >
-          <Box minWidth={0} flexDirection="column" alignItems="start" gap="xs">
-            <Text as="span" variant="default" color="inherit">
-              {getConnectionDisplayName(connection)}
-            </Text>
-            <Text as="span" variant="caption" color="muted" truncate>
-              {getConnectionSecondaryLabel(connection)}
-            </Text>
-          </Box>
+          <Text as="span" variant="default" color="inherit">
+            {getConnectionDisplayName(connection)}
+          </Text>
+          <Text as="span" variant="caption" color="muted" truncate>
+            {connection.appId}
+          </Text>
         </Button>
       ))}
     </Box>
