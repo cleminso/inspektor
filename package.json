@@ -19,6 +19,7 @@
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
+    "test:handles": "pnpm --filter @inspector/ds exec vitest run src/tokens/tokens.stylex.test.ts --reporter=default --reporter=hanging-process",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "engines": {

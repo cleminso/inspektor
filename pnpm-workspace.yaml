@@ -47,4 +47,9 @@ minimumReleaseAgeExclude:
   - "@tanstack/react-table@9.0.0"
   - "@tanstack/table-core@9.0.0"
 
+patchedDependencies:
+  # Prevent Vitest from hanging on file handles and a referenced polling timer.
+  # Remove after @stylexjs/unplugin includes https://github.com/facebook/stylex/pull/1534.
+  '@stylexjs/unplugin@0.19.0': patches/@stylexjs__unplugin@0.19.0.patch
+
 # onlyBuiltDependencies:
