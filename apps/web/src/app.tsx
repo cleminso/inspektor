@@ -13,6 +13,7 @@ import { Tooltip } from '@inspector/ds/tooltip'
 
 import { routeTree } from './routeTree.gen'
 import { ThemeMetadata } from './app/themeMetadata'
+import { reportCaughtReactError } from './app/runtime/runtimeError'
 import ReactDOM from 'react-dom/client'
 
 if (import.meta.env.DEV === true) {
@@ -37,7 +38,7 @@ declare module '@tanstack/react-router' {
 
 const rootElement = document.getElementById('root')
 if (rootElement !== null) {
-  ReactDOM.createRoot(rootElement).render(
+  ReactDOM.createRoot(rootElement, { onCaughtError: reportCaughtReactError }).render(
     <ThemeProvider
       attribute="class"
       defaultTheme="system"

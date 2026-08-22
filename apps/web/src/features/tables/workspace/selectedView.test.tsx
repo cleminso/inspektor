@@ -11,14 +11,12 @@ const inspectorState = {
   currentConnectionId: "connection-1",
   currentSchemaHash: "schema-1",
   runtime: {
-    error: null as string | null,
     wasmSchema: null as Record<string, unknown> | null,
   },
 };
 
 vi.mock("@app/providers/inspectorProvider", () => ({
   useInspectorSessionState: () => inspectorState,
-  useRuntimeError: () => inspectorState.runtime.error,
   useRuntimeSchema: () => inspectorState.runtime.wasmSchema,
 }));
 
@@ -40,7 +38,6 @@ vi.mock("@tables/schema/view", () => ({
 afterEach(() => {
   cleanup();
   mountCount = 0;
-  inspectorState.runtime.error = null;
   inspectorState.runtime.wasmSchema = null;
 });
 
@@ -50,16 +47,6 @@ describe("SelectedTableView", () => {
 
     expect(screen.getByText("accounts:1")).not.toBeNull();
     expect(screen.queryByText("Loading table")).toBeNull();
-  });
-
-  it("presents a runtime failure without exposing its raw message", () => {
-    inspectorState.runtime.error = "Failed to fetch";
-
-    render(<SelectedTableView tableName="accounts" />);
-
-    const alertText = screen.getByRole("alert").textContent;
-    expect(alertText).toContain("Couldn't load this table");
-    expect(alertText).not.toContain("Failed to fetch");
   });
 
   it("remounts table-scoped data state when the table changes", () => {

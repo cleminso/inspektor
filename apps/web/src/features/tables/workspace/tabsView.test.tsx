@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   openNewView: vi.fn(),
   persistTab: vi.fn(),
   reorderTabs: vi.fn(),
+  retryRuntime: vi.fn(),
   releasePrefetch: vi.fn(),
   startTableRowsPrefetch: vi.fn(),
   state: {
@@ -18,6 +19,7 @@ const mocks = vi.hoisted(() => ({
     replaceableTabId: null as string | null,
     canGoBack: false,
     canGoForward: false,
+    runtimeError: null as { source: 'client' | 'schema'; error: Error } | null,
     tabs: [] as Array<
       | { kind: 'newView'; id: 'new-view' }
       | { kind: 'table'; id: string; tableName: string; search: Record<string, number | string> }
@@ -27,6 +29,8 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@app/providers/inspectorProvider', () => ({
   useRuntimeClient: () => ({ manager: {} }),
+  useRuntimeError: () => mocks.state.runtimeError,
+  useRuntimeRetry: () => mocks.retryRuntime,
   useRuntimeSchema: () => ({
     accounts: { columns: [] },
     profiles: { columns: [] },
@@ -80,6 +84,7 @@ beforeEach(() => {
   mocks.openNewView.mockReset()
   mocks.persistTab.mockReset()
   mocks.reorderTabs.mockReset()
+  mocks.retryRuntime.mockReset()
   mocks.releasePrefetch.mockReset()
   mocks.startTableRowsPrefetch.mockReset()
   mocks.startTableRowsPrefetch.mockReturnValue(mocks.releasePrefetch)
@@ -87,7 +92,28 @@ beforeEach(() => {
   mocks.state.replaceableTabId = null
   mocks.state.canGoBack = false
   mocks.state.canGoForward = false
+  mocks.state.runtimeError = null
   mocks.state.tabs = []
+})
+
+it('shows safe runtime recovery with or without a selected table', () => {
+  mocks.state.runtimeError = { source: 'schema', error: new Error('Runtime failed') }
+
+  const { rerender } = render(<TableTabsView tableName={null} />)
+
+  const alert = screen.getByRole('alert')
+  expect(alert.textContent).toContain("Couldn't initialize the Inspector")
+  expect(alert.textContent).not.toContain('Runtime failed')
+  expect(screen.queryByText('New table view content')).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+  expect(mocks.retryRuntime).toHaveBeenCalledOnce()
+
+  mocks.state.activeTabId = 'table:accounts'
+  mocks.state.tabs = [{ kind: 'table', id: 'table:accounts', tableName: 'accounts', search: {} }]
+  rerender(<TableTabsView tableName="accounts" />)
+
+  expect(screen.getByRole('alert')).toBeTruthy()
+  expect(screen.queryByText('Selected table: accounts')).toBeNull()
 })
 
 describe('TableTabsView', () => {

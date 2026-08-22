@@ -87,7 +87,7 @@ export function RowEditorSidePanel({
               </Button>
             )}
             {onClose === undefined ? null : (
-              <Button type="button" layout="fill" size="s" variant="ghost" onClick={onClose}>
+              <Button type="button" layout="fill" size="s" variant="secondary" onClick={onClose}>
                 Close
               </Button>
             )}
@@ -111,7 +111,7 @@ export function RowEditorSidePanel({
               type="button"
               layout="fill"
               size="s"
-              variant="ghost"
+              variant="secondary"
               onClick={() => setDeleteConfirmationRowIds(null)}
             >
               Cancel

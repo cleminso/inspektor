@@ -1,14 +1,20 @@
-import { act, cleanup, render, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { atom } from "nanostores";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { InspectorProvider, useRuntimeSchema } from "@app/providers/inspectorProvider";
+import {
+  InspectorProvider,
+  useRuntimeRetry,
+  useRuntimeSchema,
+} from "@app/providers/inspectorProvider";
 import type { StoredConnection } from "@app/connections/connections";
 
 const runtimeHolder = vi.hoisted(() => ({ current: null as unknown }));
+const runtimeOptionsHolder = vi.hoisted(() => ({ current: null as unknown }));
 const sessionHolder = vi.hoisted(() => ({ current: null as unknown }));
 const jazzReactMocks = vi.hoisted(() => ({
   clients: new Map<string, { manager: object }>(),
+  errors: new Map<string, Error>(),
   provider: vi.fn(),
   subscriptions: new Map<
     string,
@@ -51,7 +57,10 @@ const session = {
 sessionHolder.current = session;
 
 vi.mock("@app/runtime/useInspectorRuntime", () => ({
-  useInspectorRuntime: () => runtimeHolder.current,
+  useInspectorRuntime: (options: unknown) => {
+    runtimeOptionsHolder.current = options;
+    return runtimeHolder.current;
+  },
 }));
 
 vi.mock("@app/providers/inspectorSessionProvider", () => ({
@@ -72,6 +81,8 @@ vi.mock("jazz-tools/react", async () => {
   }) {
     jazzReactMocks.provider({ autoAttachDevTools, config });
     const clientKey = `${config.appId}:${config.userBranch}:${config.adminSecret}`;
+    const error = jazzReactMocks.errors.get(clientKey);
+    if (error !== undefined) throw error;
     const [client, setClient] = React.useState(() => jazzReactMocks.clients.get(clientKey));
     React.useEffect(() => {
       const listeners = jazzReactMocks.subscriptions.get(clientKey) ?? new Set();
@@ -94,7 +105,10 @@ vi.mock("jazz-tools/react", async () => {
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
+  runtime.$availableSchemaHashes.set([]);
   runtime.$storedPermissions.set(null);
+  runtime.$error.set(null);
   runtime.$wasmSchema.set({ accounts: { columns: [] } });
   runtime.$isWasmSchemaLoading.set(false);
   runtime.clearClient.mockClear();
@@ -102,19 +116,82 @@ afterEach(() => {
   runtime.publishClientError.mockClear();
   jazzReactMocks.provider.mockClear();
   jazzReactMocks.clients.clear();
+  jazzReactMocks.errors.clear();
   jazzReactMocks.subscriptions.clear();
   session.activeConnection = null;
   session.currentConnectionId = "connection-1";
   session.currentBranch = "main";
+  session.currentSchemaHash = "schema-1";
+  session.switchSchema.mockClear();
   runtimeHolder.current = runtime;
+  runtimeOptionsHolder.current = null;
 });
 
 describe("InspectorProvider runtime projections", () => {
+  it("retries a runtime failure that appears after the document resumes", async () => {
+    const visibilityState = vi.spyOn(document, "visibilityState", "get");
+    visibilityState.mockReturnValue("hidden");
+    render(<InspectorProvider>Workspace</InspectorProvider>);
+
+    fireEvent(document, new Event("visibilitychange"));
+    visibilityState.mockReturnValue("visible");
+    fireEvent(document, new Event("visibilitychange"));
+    act(() => {
+      runtime.$error.set("Client failed");
+    });
+
+    await waitFor(() =>
+      expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 })),
+    );
+  });
+
+  it("falls back when runtime discovery rejects the selected schema", async () => {
+    render(<InspectorProvider>Workspace</InspectorProvider>);
+
+    act(() => {
+      runtime.$availableSchemaHashes.set(["schema-2"]);
+    });
+
+    await waitFor(() => expect(session.switchSchema).toHaveBeenCalledWith("schema-2"));
+  });
+
+  it("recovers the same client configuration through the runtime retry action", async () => {
+    session.activeConnection = {
+      id: "connection-1",
+      name: "Local app",
+      serverUrl: "https://example.com",
+      appId: "app-1",
+      adminSecret: "secret",
+      env: "dev",
+    };
+    const clientError = new Error("Client failed");
+    const client = { manager: {} };
+    jazzReactMocks.errors.set("app-1:main:secret", clientError);
+    jazzReactMocks.clients.set("app-1:main:secret", client);
+    function RetryControl() {
+      const retryRuntime = useRuntimeRetry();
+      return <button onClick={retryRuntime}>Retry runtime</button>;
+    }
+
+    render(
+      <InspectorProvider>
+        <RetryControl />
+      </InspectorProvider>,
+    );
+    await waitFor(() => expect(runtime.publishClientError).toHaveBeenCalledWith(clientError));
+
+    jazzReactMocks.errors.delete("app-1:main:secret");
+    fireEvent.click(screen.getByRole("button", { name: "Retry runtime" }));
+
+    expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 }));
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(client));
+  });
+
   it("does not rerender a schema consumer when permissions resolve", () => {
-    let renderCount = 0;
+    const onSchemaConsumerRender = vi.fn();
     function SchemaConsumer() {
       useRuntimeSchema();
-      renderCount += 1;
+      onSchemaConsumerRender();
       return null;
     }
 
@@ -127,12 +204,12 @@ describe("InspectorProvider runtime projections", () => {
     act(() => {
       runtime.$storedPermissions.set({ permissions: {}, head: null });
     });
-    expect(renderCount).toBe(1);
+    expect(onSchemaConsumerRender).toHaveBeenCalledOnce();
 
     act(() => {
       runtime.$wasmSchema.set({ users: { columns: [] } });
     });
-    expect(renderCount).toBe(2);
+    expect(onSchemaConsumerRender).toHaveBeenCalledTimes(2);
   });
 
   it("publishes clients through Jazz's registry-backed React provider", async () => {

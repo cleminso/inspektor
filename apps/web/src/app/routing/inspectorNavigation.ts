@@ -49,6 +49,18 @@ interface ResolveStoredTablesNavigationTargetOptions {
   store?: StoredConnectionsStore;
 }
 
+async function fetchConnectionSchemaHashes(
+  connection: StoredConnection,
+): Promise<readonly string[]> {
+  const { fetchSchemaHashes } = await import("jazz-tools");
+  return (
+    await fetchSchemaHashes(connection.serverUrl, {
+      appId: connection.appId,
+      adminSecret: connection.adminSecret,
+    })
+  ).hashes;
+}
+
 /**
  * Resolves a connection into branch and schema-hash route params without requiring a mounted Jazz
  * provider.
@@ -73,20 +85,12 @@ export async function resolveTablesNavigationTarget({
   }
 
   const branch = resolveBranch(connectionId, branchOverride);
-  const fetchSchemaHashes = async () => {
-    const jazzTools = await import("jazz-tools");
-
-    return jazzTools.fetchSchemaHashes(connection.serverUrl, {
-      appId: connection.appId,
-      adminSecret: connection.adminSecret,
-    });
-  };
   let availableSchemaHashes: readonly string[];
   if (knownSchemaHashes !== undefined && knownSchemaHashes.length > 0) {
     availableSchemaHashes = knownSchemaHashes;
   } else {
     try {
-      availableSchemaHashes = (await fetchSchemaHashes()).hashes;
+      availableSchemaHashes = await fetchConnectionSchemaHashes(connection);
     } catch (error) {
       if (schemaFetchError === "throw") {
         throw error;
@@ -123,9 +127,15 @@ export async function resolveStoredTablesNavigationTarget({
   const branch = resolveDefaultBranch(resolvedStore, connectionId, branchOverride);
   const preferredSchemaHash =
     schemaHashOverride ?? getConnectionPreferences(resolvedStore, connectionId).lastSchemaHash;
-  if (preferredSchemaHash !== null) {
-    // Persisted hashes allow immediate navigation; the mounted runtime fetches the selected schema
-    // and discovers the complete hash list without adding Jazz metadata to the root import graph.
+
+  let availableSchemaHashes: readonly string[];
+  try {
+    availableSchemaHashes = await fetchConnectionSchemaHashes(connection);
+  } catch (error) {
+    if (preferredSchemaHash === null) {
+      throw error;
+    }
+
     return {
       connectionId,
       branch,
@@ -134,16 +144,15 @@ export async function resolveStoredTablesNavigationTarget({
     };
   }
 
-  return resolveTablesNavigationTarget({
+  const schemaHash = resolveDefaultSchemaHash(
+    resolvedStore,
     connectionId,
-    branchOverride,
+    availableSchemaHashes,
     schemaHashOverride,
-    getConnection: (nextConnectionId) => getConnectionById(resolvedStore, nextConnectionId),
-    resolveBranch: (nextConnectionId, nextBranchOverride) => resolveDefaultBranch(resolvedStore, nextConnectionId, nextBranchOverride),
-    resolveSchemaHash: (nextConnectionId, availableSchemaHashes, nextSchemaHashOverride) =>
-      resolveDefaultSchemaHash(resolvedStore, nextConnectionId, availableSchemaHashes, nextSchemaHashOverride),
-    schemaFetchError: "throw",
-  });
+  );
+  return schemaHash === null
+    ? null
+    : { connectionId, branch, schemaHash, availableSchemaHashes };
 }
 
 /** Sends users back to connection setup when a Jazz runtime target is unavailable. */

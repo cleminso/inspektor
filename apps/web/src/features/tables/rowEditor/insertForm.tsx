@@ -124,7 +124,7 @@ function InsertRowFormFields({
           <Box flex={1}>
             <Button
               type="button"
-              variant="ghost"
+              variant="secondary"
               size="s"
               layout="fill"
               onClick={onDiscard}

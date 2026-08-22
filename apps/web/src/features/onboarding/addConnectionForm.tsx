@@ -137,21 +137,21 @@ export function AddConnectionForm({
       ) : null}
       <Box alignItems="center" justifyContent="end" gap="m">
         <Button
-          type="button"
-          variant="ghost"
-          size="s"
-          onClick={onCancel}
-          disabled={isSubmitting === true}
-        >
-          Cancel
-        </Button>
-        <Button
           type="submit"
           size="s"
           disabled={isSubmitting === true}
           loading={isSubmitting === true}
         >
           Add connection
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          size="s"
+          onClick={onCancel}
+          disabled={isSubmitting === true}
+        >
+          Cancel
         </Button>
       </Box>
     </Box>

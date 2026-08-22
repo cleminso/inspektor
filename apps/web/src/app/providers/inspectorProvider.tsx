@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useReducer,
   type PropsWithChildren,
   type ReactNode,
 } from "react";
@@ -17,6 +18,7 @@ import {
   useInspectorRuntime,
   type InspectorRuntimeStore,
 } from "@app/runtime/useInspectorRuntime";
+import type { InspectorRuntimeError } from "@app/runtime/runtimeError";
 import type { ResolvedTablesNavigationTarget } from "@app/routing/inspectorNavigation";
 import {
   useInspectorSessionContext,
@@ -25,8 +27,13 @@ import {
 
 type InspectorContextValue = InspectorSessionContextValue;
 
+interface InspectorRuntimeContextValue {
+  retry: () => void;
+  runtime: InspectorRuntimeStore;
+}
+
 const InspectorContext = createContext<InspectorContextValue | null>(null);
-const InspectorRuntimeContext = createContext<InspectorRuntimeStore | null>(null);
+const InspectorRuntimeContext = createContext<InspectorRuntimeContextValue | null>(null);
 const connectionProfileTokens = new WeakMap<object, number>();
 let nextConnectionProfileToken = 0;
 
@@ -67,16 +74,68 @@ function RuntimeClientProjection({ runtime }: { runtime: InspectorRuntimeStore }
   return null;
 }
 
+function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void): void {
+  useEffect(() => {
+    let retryOnResume = document.visibilityState === "hidden";
+    const retryIfNeeded = () => {
+      if (
+        retryOnResume === true &&
+        document.visibilityState === "visible" &&
+        runtime.$error.get() !== null
+      ) {
+        retryOnResume = false;
+        retry();
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        retryOnResume = true;
+      } else {
+        retryIfNeeded();
+      }
+    };
+
+    const unsubscribeFromError = runtime.$error.subscribe(retryIfNeeded);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      unsubscribeFromError();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [retry, runtime]);
+}
+
+function RuntimeSchemaFallback({
+  runtime,
+  schemaHash,
+  switchSchema,
+}: {
+  runtime: InspectorRuntimeStore;
+  schemaHash: string | null;
+  switchSchema: (schemaHash: string) => Promise<void>;
+}) {
+  const availableSchemaHashes = useStore(runtime.$availableSchemaHashes);
+
+  useEffect(() => {
+    const fallbackSchemaHash = availableSchemaHashes[0];
+    if (
+      fallbackSchemaHash !== undefined &&
+      schemaHash !== null &&
+      availableSchemaHashes.includes(schemaHash) === false
+    ) {
+      void switchSchema(fallbackSchemaHash);
+    }
+  }, [availableSchemaHashes, schemaHash, switchSchema]);
+
+  return null;
+}
+
 interface RuntimeClientErrorBoundaryProps {
   children: ReactNode;
   onError: (error: unknown) => void;
-  /** Memoized client configuration used to recover without serializing credentials into a key. */
-  resetToken: object;
 }
 
 interface RuntimeClientErrorBoundaryState {
   failed: boolean;
-  resetToken: object;
 }
 
 class RuntimeClientErrorBoundary extends Component<
@@ -85,17 +144,7 @@ class RuntimeClientErrorBoundary extends Component<
 > {
   state: RuntimeClientErrorBoundaryState = {
     failed: false,
-    resetToken: this.props.resetToken,
   };
-
-  static getDerivedStateFromProps(
-    props: RuntimeClientErrorBoundaryProps,
-    state: RuntimeClientErrorBoundaryState,
-  ): Partial<RuntimeClientErrorBoundaryState> | null {
-    return props.resetToken === state.resetToken
-      ? null
-      : { failed: false, resetToken: props.resetToken };
-  }
 
   static getDerivedStateFromError(): Partial<RuntimeClientErrorBoundaryState> {
     return { failed: true };
@@ -119,6 +168,10 @@ class RuntimeClientErrorBoundary extends Component<
  */
 export function InspectorProvider({ children, initialRuntimeTarget }: InspectorProviderProps) {
   const session = useInspectorSessionContext();
+  const [retryGeneration, retryRuntime] = useReducer(
+    (generation: number) => generation + 1,
+    0,
+  );
   const initialSchemaHashes =
     initialRuntimeTarget?.connectionId === session.currentConnectionId &&
     initialRuntimeTarget.branch === session.currentBranch &&
@@ -131,7 +184,13 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
     branch: session.currentBranch,
     schemaHash: session.currentSchemaHash,
     initialSchemaHashes,
+    retryGeneration,
   });
+  const runtimeContext = useMemo(
+    () => ({ retry: retryRuntime, runtime }),
+    [retryRuntime, runtime],
+  );
+  useRuntimeResumeRetry(runtime, retryRuntime);
   const clientConfig = useMemo(
     () =>
       session.activeConnection !== null && session.currentBranch !== null
@@ -179,18 +238,18 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
   );
 
   return (
-    <InspectorRuntimeContext.Provider value={runtime}>
+    <InspectorRuntimeContext.Provider value={runtimeContext}>
+      <RuntimeSchemaFallback
+        runtime={runtime}
+        schemaHash={session.currentSchemaHash}
+        switchSchema={session.switchSchema}
+      />
       {clientConfig === null ? null : (
         <RuntimeClientErrorBoundary
+          key={`${clientIdentity ?? "unknown"}:${retryGeneration}`}
           onError={runtime.publishClientError}
-          resetToken={clientConfig}
         >
-          <JazzProvider
-            key={clientIdentity}
-            autoAttachDevTools={false}
-            config={clientConfig}
-            fallback={null}
-          >
+          <JazzProvider autoAttachDevTools={false} config={clientConfig} fallback={null}>
             <RuntimeClientProjection runtime={runtime} />
           </JazzProvider>
         </RuntimeClientErrorBoundary>
@@ -214,7 +273,7 @@ function useInspectorRuntimeContext(): InspectorRuntimeStore {
   if (context === null) {
     throw new Error("Runtime projections must be used within InspectorProvider");
   }
-  return context;
+  return context.runtime;
 }
 
 export function useRuntimeClient(): JazzClient | null {
@@ -247,7 +306,16 @@ export function useRuntimePermissionsLoading(): boolean {
   return useStore(runtime.$isPermissionsLoading);
 }
 
-export function useRuntimeError(): string | null {
+export function useRuntimeError(): InspectorRuntimeError | null {
   const runtime = useInspectorRuntimeContext();
   return useStore(runtime.$error);
+}
+
+export function useRuntimeRetry(): () => void {
+  const context = useContext(InspectorRuntimeContext);
+  if (context === null) {
+    throw new Error("useRuntimeRetry must be used within InspectorProvider");
+  }
+
+  return context.retry;
 }

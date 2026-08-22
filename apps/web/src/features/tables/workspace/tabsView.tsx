@@ -4,13 +4,19 @@ import {
   ContextMenu,
   Icon,
   KeyboardInput,
+  Text,
   WorkspaceTabs,
   Tooltip,
 } from '@inspector/ds'
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 import { useRef } from 'react'
 
-import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import {
+  useRuntimeClient,
+  useRuntimeError,
+  useRuntimeRetry,
+  useRuntimeSchema,
+} from '@app/providers/inspectorProvider'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import {
@@ -28,6 +34,30 @@ interface TableTabsViewProps {
   tableName: string | null
 }
 
+function RuntimeErrorStatus(): React.ReactElement {
+  const retryRuntime = useRuntimeRetry()
+
+  return (
+    <Box
+      flex={1}
+      alignItems="center"
+      justifyContent="center"
+      backgroundColor="surface-background"
+      role="alert"
+    >
+      <Box flexDirection="column" alignItems="center" gap="xs">
+        <Text variant="label" color="error">
+          Couldn't initialize the Inspector
+        </Text>
+        <Text color="muted">Check the connection and schema details.</Text>
+        <Button type="button" size="s" variant="secondary" onClick={retryRuntime}>
+          Try again
+        </Button>
+      </Box>
+    </Box>
+  )
+}
+
 export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactElement {
   const {
     activeTabId,
@@ -41,6 +71,7 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
   } = useTableTabs()
   const { canGoBack, canGoForward, goBack, goForward } = useTableNavigationControls()
   const client = useRuntimeClient()
+  const runtimeError = useRuntimeError()
   const wasmSchema = useRuntimeSchema()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
   const pointerIntentTabIdRef = useRef<string | null>(null)
@@ -296,7 +327,9 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
           </WorkspaceTabs.TrailingArea>
         </WorkspaceTabs.Bar>
       </Box>
-      {activeTab?.kind === 'table' && tableName !== null ? (
+      {runtimeError !== null ? (
+        <RuntimeErrorStatus />
+      ) : activeTab?.kind === 'table' && tableName !== null ? (
         <WorkspaceTabs.Panel value={activeTab.id}>
           <SelectedTableView tableName={tableName} />
         </WorkspaceTabs.Panel>

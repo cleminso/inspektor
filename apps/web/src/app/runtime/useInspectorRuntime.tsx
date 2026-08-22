@@ -11,12 +11,17 @@ import {
 import type { JazzClient } from "jazz-tools/react";
 
 import type { StoredConnection } from "@app/connections/connections";
+import {
+  normalizeRuntimeError,
+  reportRuntimeError,
+  type InspectorRuntimeError,
+} from "@app/runtime/runtimeError";
 import { readCachedWasmSchema, writeCachedWasmSchema } from "@app/runtime/wasmSchemaCache";
 
 export interface InspectorRuntimeStore {
   $availableSchemaHashes: ReadableAtom<readonly string[]>;
   $client: ReadableAtom<JazzClient | null>;
-  $error: ReadableAtom<string | null>;
+  $error: ReadableAtom<InspectorRuntimeError | null>;
   $isSchemaHashesLoading: ReadableAtom<boolean>;
   $isPermissionsLoading: ReadableAtom<boolean>;
   $isWasmSchemaLoading: ReadableAtom<boolean>;
@@ -31,7 +36,7 @@ export interface InspectorRuntimeStore {
 interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
   $availableSchemaHashes: WritableAtom<readonly string[]>;
   $client: WritableAtom<JazzClient | null>;
-  $error: WritableAtom<string | null>;
+  $error: WritableAtom<InspectorRuntimeError | null>;
   $isSchemaHashesLoading: WritableAtom<boolean>;
   $isPermissionsLoading: WritableAtom<boolean>;
   $isWasmSchemaLoading: WritableAtom<boolean>;
@@ -44,18 +49,20 @@ interface UseInspectorRuntimeOptions {
   branch: string | null;
   schemaHash: string | null;
   initialSchemaHashes?: readonly string[];
+  retryGeneration?: number;
 }
 
 function createInspectorRuntimeStore(
   initialSchema: WasmSchema | null,
   isSchemaHashesLoading: boolean,
   isWasmSchemaLoading: boolean,
+  sensitiveValues: readonly string[],
 ): MutableInspectorRuntimeStore {
   const $client = atom<JazzClient | null>(null);
   const $wasmSchema = atom<WasmSchema | null>(initialSchema);
   const $storedPermissions = atom<StoredPermissionsResponse | null>(null);
   const $availableSchemaHashes = atom<readonly string[]>([]);
-  const $error = atom<string | null>(null);
+  const $error = atom<InspectorRuntimeError | null>(null);
   const $isSchemaHashesLoading = atom(isSchemaHashesLoading);
   const $isPermissionsLoading = atom(isWasmSchemaLoading);
   const $isWasmSchemaLoading = atom(isWasmSchemaLoading);
@@ -73,7 +80,9 @@ function createInspectorRuntimeStore(
 
   const publishClientError = (error: unknown) => {
     $client.set(null);
-    $error.set(error instanceof Error ? error.message : String(error));
+    const runtimeError = { source: "client", error: normalizeRuntimeError(error) } as const;
+    $error.set(runtimeError);
+    reportRuntimeError(runtimeError, sensitiveValues);
   };
 
   const clearRuntime = () => {
@@ -109,6 +118,7 @@ export function useInspectorRuntime({
   branch,
   schemaHash,
   initialSchemaHashes,
+  retryGeneration = 0,
 }: UseInspectorRuntimeOptions): InspectorRuntimeStore {
   const shouldDiscoverSchemaHashes =
     initialSchemaHashes === undefined || initialSchemaHashes.length === 0;
@@ -123,8 +133,10 @@ export function useInspectorRuntime({
           schemaHash !== null &&
           shouldDiscoverSchemaHashes,
         connection !== null && branch !== null && schemaHash !== null,
+        connection === null ? [] : [connection.adminSecret],
       ),
-    [branch, connection, schemaHash, shouldDiscoverSchemaHashes],
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Retry intentionally replaces the runtime store.
+    [branch, connection, retryGeneration, schemaHash, shouldDiscoverSchemaHashes],
   );
 
   useEffect(() => {
@@ -138,13 +150,15 @@ export function useInspectorRuntime({
       if (active === false) {
         return;
       }
-      runtime.$error.set(error instanceof Error ? error.message : String(error));
+      const runtimeError = { source: "schema", error: normalizeRuntimeError(error) } as const;
+      runtime.$error.set(runtimeError);
+      reportRuntimeError(runtimeError, [connection.adminSecret]);
       runtime.$isWasmSchemaLoading.set(false);
     };
 
-    runtime.$error.set(null);
     runtime.$isWasmSchemaLoading.set(true);
     runtime.$isPermissionsLoading.set(true);
+    runtime.$isSchemaHashesLoading.set(shouldDiscoverSchemaHashes);
     runtime.$availableSchemaHashes.set(
       initialSchemaHashes !== undefined ? [...initialSchemaHashes] : [],
     );

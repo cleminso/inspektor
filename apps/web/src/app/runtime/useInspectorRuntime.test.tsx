@@ -45,6 +45,49 @@ beforeEach(() => {
 });
 
 describe("useInspectorRuntime", () => {
+  it("reruns runtime metadata when the retry generation changes", async () => {
+    const schemaError = new Error("Failed once");
+    jazzMocks.fetchStoredWasmSchema
+      .mockRejectedValueOnce(schemaError)
+      .mockResolvedValueOnce({ schema: { accounts: { columns: [] } } });
+    jazzMocks.fetchStoredPermissions.mockResolvedValue(null);
+    jazzMocks.fetchSchemaHashes.mockResolvedValue({ hashes: ["schema-1"] });
+    const connection = {
+      id: "connection-1",
+      name: "Local app",
+      serverUrl: "https://example.com",
+      appId: "app-1",
+      adminSecret: "secret",
+      env: "dev",
+    } as const;
+
+    const { result, rerender } = renderHook(
+      ({ retryGeneration }: { retryGeneration: number }) =>
+        useInspectorRuntime({
+          connection,
+          branch: "main",
+          schemaHash: "schema-1",
+          retryGeneration,
+        }),
+      { initialProps: { retryGeneration: 0 } },
+    );
+
+    await waitFor(() =>
+      expect(result.current.$error.get()).toEqual({ source: "schema", error: schemaError }),
+    );
+
+    const failedRuntime = result.current;
+    rerender({ retryGeneration: 1 });
+
+    expect(result.current).not.toBe(failedRuntime);
+    expect(result.current.$client.get()).toBeNull();
+    await waitFor(() =>
+      expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } }),
+    );
+    expect(result.current.$error.get()).toBeNull();
+    expect(jazzMocks.fetchStoredWasmSchema).toHaveBeenCalledTimes(2);
+  });
+
   it("hydrates the schema projection from the saved runtime target", () => {
     const connection = {
       id: "connection-1",

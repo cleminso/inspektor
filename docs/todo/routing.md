@@ -11,6 +11,19 @@
 
 ## Implemented foundation
 
+[22/08/26]
+
+- [x] Retry runtime initialization once when a failure follows a hidden-to-visible document transition.
+
+[22/08/26]
+
+- [x] Supersede optimistic direct-link entry by validating persisted schema preferences before mounting the runtime when hash discovery is available.
+- [x] Fall back to the first available schema when the remembered schema no longer exists and persist the corrected runtime target.
+- [x] Retain the remembered target when loader validation is unavailable, then fall back if runtime discovery rejects it.
+- [x] Classify runtime initialization failures as schema or client errors while retaining the original error internally.
+- [x] Retry schema metadata and the registry-backed Jazz provider through one runtime command without adding credentials to provider identity.
+- [x] Replace React's raw caught-error console reporting with a generic root diagnostic while the runtime boundary logs its redacted error clone.
+
 [11/08/26]
 
 - [x] Render TanStack Router head content with route-specific titles.
@@ -99,6 +112,12 @@
 
 ## Settled interaction decisions
 
+[22/08/26]
+
+- Direct connection entry validates its remembered schema when hash discovery is available and otherwise delegates verification to the recoverable runtime boundary.
+- Runtime retry keeps the selected connection, branch, and schema while replacing failed metadata projections and resetting the Jazz provider boundary.
+- Runtime diagnostics may log a redacted error clone; the original error remains internal and is not rendered in the workspace.
+
 [08/08/26]
 
 - A connection or branch replacement remains clientless until the matching registry-backed Jazz provider resolves.
@@ -138,6 +157,17 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[22/08/26]
+
+- [x] Cover a runtime failure that arrives after the document resumes.
+
+[22/08/26]
+
+- [x] Cover schema and client error classification, original error retention, credential redaction, safe React caught-error reporting, schema retry, same-configuration client recovery, and stale direct-link fallback.
+- [x] Cover the workspace retry action without exposing the raw runtime error.
+- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
+- [ ] Verify schema and client recovery against a connected Inspector runtime.
 
 [08/08/26]
 

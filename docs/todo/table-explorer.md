@@ -21,6 +21,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [22/08/26]
 
+- [x] Present runtime initialization failures with a `Try again` action while keeping raw errors out of the table workspace.
+- [x] Reset schema loading and the Jazz client boundary through one explicit retry action without unmounting the route-owned workspace.
+- [x] Keep runtime recovery visible when schema loading cannot select an initial table.
+
+[22/08/26]
+
 - [x] Toggle the insert-row pane with `Alt+I` from the active table view and expose the shortcut in the toolbar Insert row tooltip.
 - [x] Register Insert row as a table-scoped command-palette command, disabled when the editor cannot open.
 
@@ -1085,6 +1091,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[22/08/26]
+
+- [x] Cover generic runtime error presentation, hidden raw details, and explicit retry invocation.
+- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
+- [ ] Verify the retry control through keyboard and pointer interaction against a connected runtime failure.
 
 [21/08/26]
 
