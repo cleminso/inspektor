@@ -9,6 +9,11 @@ allowBuilds:
   msw: true
   protobufjs: true
 
+overrides:
+  "@opentelemetry/core": 2.8.0
+  "esbuild@>=0.27.3 <0.28.1": 0.28.2
+  "protobufjs@>=8.0.0 <8.6.6": 8.7.2
+
 catalog:
   "@base-ui/react": ^1.7.0
   "@tailwindcss/vite": ^4.3.3

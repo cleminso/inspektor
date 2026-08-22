@@ -1,13 +1,20 @@
 {
-  "name": "my-jazz-app",
+  "name": "inspector-test",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "cloud:deploy": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/deployInspectorTest.ts",
+    "cloud:initialize": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/initializeInspectorTest.ts",
+    "cloud:seed": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/seedInspectorTest.ts",
+    "cloud:validate": "jazz-tools validate",
+    "fixture:start": "tsx scripts/startInspectorTestFixture.ts",
+    "lint": "oxlint .",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.inspectorTest.json --noEmit && tsc -b"
   },
   "dependencies": {
     "@regarde/jazz-dev-tools": "workspace:*",
@@ -25,8 +32,10 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "tsx": "^4.23.12",
     "typescript": "catalog:",
     "typescript-eslint": "^8.58.2",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "^4.1.10"
   }
 }

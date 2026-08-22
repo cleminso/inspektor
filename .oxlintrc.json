@@ -134,7 +134,6 @@
   "ignorePatterns": [
     "**/dist/**",
     "**/node_modules/**",
-    "apps/my-jazz-app/**",
     "packages/jazz-dev-tools/**"
   ]
 }

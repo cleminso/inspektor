@@ -28,7 +28,9 @@ function TodoApp(): React.ReactElement | null {
       }}
     >
       <QuerySubscriptionsProbe />
-      <h1>Todos</h1>
+      <h1>Inspector Test</h1>
+      <p>This app supplies representative schema and data to Inspector.</p>
+      <h2>Editable todos</h2>
       <TodoList />
     </JazzProvider>
   );
