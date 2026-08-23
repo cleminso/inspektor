@@ -40,7 +40,7 @@ export function ConnectionsLayout({
         width="full"
         flexShrink={0}
         alignItems="center"
-        paddingHorizontal="l"
+        paddingHorizontal="xs"
         paddingVertical="s"
         backgroundColor="element-default"
         borderBottomWidth={1}

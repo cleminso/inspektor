@@ -66,7 +66,7 @@
     "@dnd-kit/helpers": "^0.5.0",
     "@dnd-kit/react": "^0.5.0",
     "@lezer/highlight": "^1.2.3",
-    "@stylexjs/stylex": "^0.19.0",
+    "@stylexjs/stylex": "catalog:",
     "@tanstack/react-hotkeys": "catalog:",
     "@tanstack/react-table": "catalog:",
     "@tanstack/react-virtual": "catalog:",
@@ -75,15 +75,15 @@
     "react-resizable-panels": "catalog:"
   },
   "devDependencies": {
-    "@stylexjs/unplugin": "^0.19.0",
-    "@testing-library/react": "^16.3.2",
+    "@stylexjs/unplugin": "catalog:",
+    "@testing-library/react": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "jsdom": "^29.1.1",
+    "jsdom": "catalog:",
     "tsdown": "catalog:",
-    "typescript": "^7.0.2",
+    "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "^4.1.10"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "react": "^18 || ^19",
