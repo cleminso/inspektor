@@ -46,7 +46,7 @@ export const actionListStyles = stylex.create({
       default: 'transparent',
       ':hover': ghostElementColors.hover,
     },
-    color: { default: textColors.muted, ':hover': textColors.secondary, },
+    color: { default: textColors.muted, ':hover': textColors.secondary },
     display: 'flex',
     outlineColor: focusColors.ring,
     outlineOffset: -2,

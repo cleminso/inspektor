@@ -1,19 +1,19 @@
 const rowEditorFocusableSelector = [
-  "input:not([disabled])",
-  "textarea:not([disabled])",
-  "button:not([disabled])",
+  'input:not([disabled])',
+  'textarea:not([disabled])',
+  'button:not([disabled])',
   "[tabindex]:not([tabindex='-1'])",
-].join(",");
+].join(',')
 
 function getRowEditorFieldControl(field: HTMLElement): HTMLElement | null {
-  if (field.dataset.valueMode === "null" || field.dataset.valueMode === "omitted") {
-    return field.querySelector<HTMLElement>("[data-value-mode-control]");
+  if (field.dataset.valueMode === 'null' || field.dataset.valueMode === 'omitted') {
+    return field.querySelector<HTMLElement>('[data-value-mode-control]')
   }
 
   return (
     field.querySelector<HTMLElement>("[role='textbox']:not([aria-disabled='true'])") ??
     field.querySelector<HTMLElement>(rowEditorFocusableSelector)
-  );
+  )
 }
 
 /**
@@ -23,17 +23,17 @@ function getRowEditorFieldControl(field: HTMLElement): HTMLElement | null {
  * after the relevant editor is rendered instead of observing the DOM for a future control.
  */
 export function focusRowEditorField(fieldName: string): boolean {
-  const field = document.getElementById(`row-editor-field-${fieldName}`);
+  const field = document.getElementById(`row-editor-field-${fieldName}`)
   if (field === null) {
-    return false;
+    return false
   }
 
-  const control = getRowEditorFieldControl(field);
+  const control = getRowEditorFieldControl(field)
   if (control === null) {
-    return false;
+    return false
   }
 
-  field.scrollIntoView?.({ block: "nearest" });
-  control.focus();
-  return true;
+  field.scrollIntoView?.({ block: 'nearest' })
+  control.focus()
+  return true
 }

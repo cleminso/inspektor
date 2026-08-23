@@ -1,19 +1,19 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
-import { timestampValueItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
+import { timestampValueItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { timestampValuePropNames } from "./props";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { timestampValuePropNames } from './props'
 
 const timestampValueProps = getGeneratedProps(
   timestampValueItem.componentId,
   timestampValuePropNames,
-);
+)
 export function TimestampValuePage(): ReactElement {
   return (
     <ComponentDocsPage
@@ -31,5 +31,5 @@ export function TimestampValuePage(): ReactElement {
         <PropsTable rows={timestampValueProps} />
       </Section>
     </ComponentDocsPage>
-  );
+  )
 }

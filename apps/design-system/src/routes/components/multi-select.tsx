@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router'
 
-import { MultiSelectPage } from "@/components/content/components/multiSelect/page";
+import { MultiSelectPage } from '@/components/content/components/multiSelect/page'
 
-export const Route = createFileRoute("/components/multi-select")({
+export const Route = createFileRoute('/components/multi-select')({
   component: MultiSelectPage,
-  head: () => ({ meta: [{ title: "Multi Select · Inspector Design System" }] }),
-});
+  head: () => ({ meta: [{ title: 'Multi Select · Inspector Design System' }] }),
+})

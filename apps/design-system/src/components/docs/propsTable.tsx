@@ -1,12 +1,15 @@
-import { Box } from "@inspector/ds";
-import * as stylex from "@stylexjs/stylex";
-import { type ReactElement } from "react";
+import { Box } from '@inspector/ds'
+import * as stylex from '@stylexjs/stylex'
+import { type ReactElement } from 'react'
 
-import { type GeneratedPropItem } from "@/lib/propsData";
+import { type GeneratedPropItem } from '@/lib/propsData'
 
 export function PropsTable({ rows }: { rows: readonly GeneratedPropItem[] }): ReactElement {
   return (
-    <Box display="block" overflowX="auto">
+    <Box
+      display="block"
+      overflowX="auto"
+    >
       <table {...stylex.props(styles.table)}>
         <thead>
           <tr>
@@ -18,7 +21,10 @@ export function PropsTable({ rows }: { rows: readonly GeneratedPropItem[] }): Re
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.name} {...stylex.props(styles.row)}>
+            <tr
+              key={row.name}
+              {...stylex.props(styles.row)}
+            >
               <td {...stylex.props(styles.cell, styles.nameCell)}>
                 <code>{row.name}</code>
                 {row.required === true ? (
@@ -29,7 +35,7 @@ export function PropsTable({ rows }: { rows: readonly GeneratedPropItem[] }): Re
                 <code {...stylex.props(styles.type)}>{row.type}</code>
               </td>
               <td {...stylex.props(styles.cell)}>
-                {row.defaultValue !== undefined ? <code>{row.defaultValue}</code> : "—"}
+                {row.defaultValue !== undefined ? <code>{row.defaultValue}</code> : '—'}
               </td>
               <td {...stylex.props(styles.cell, styles.description)}>{row.description}</td>
             </tr>
@@ -37,47 +43,47 @@ export function PropsTable({ rows }: { rows: readonly GeneratedPropItem[] }): Re
         </tbody>
       </table>
     </Box>
-  );
+  )
 }
 
 const styles = stylex.create({
   table: {
-    width: "100%",
+    width: '100%',
     minWidth: 720,
-    borderCollapse: "collapse",
+    borderCollapse: 'collapse',
     fontSize: 13,
-    lineHeight: "20px",
+    lineHeight: '20px',
   },
   heading: {
-    padding: "10px 12px",
+    padding: '10px 12px',
     borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: "light-dark(oklch(0.852 0.006 43.325), oklch(0.391 0.0077 317.73))",
-    textAlign: "left",
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'light-dark(oklch(0.852 0.006 43.325), oklch(0.391 0.0077 317.73))',
+    textAlign: 'left',
     fontWeight: 500,
   },
   row: {
     borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: "light-dark(oklch(0.925 0.004 34.309), oklch(0.391 0.0077 317.73))",
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'light-dark(oklch(0.925 0.004 34.309), oklch(0.391 0.0077 317.73))',
   },
   cell: {
     padding: 12,
-    verticalAlign: "top",
+    verticalAlign: 'top',
   },
   nameCell: {
-    whiteSpace: "nowrap",
+    whiteSpace: 'nowrap',
   },
   required: {
-    display: "block",
+    display: 'block',
     fontSize: 11,
-    color: "light-dark(oklch(0.627 0.192 6.574), oklch(0.706 0.194 8.454))",
+    color: 'light-dark(oklch(0.627 0.192 6.574), oklch(0.706 0.194 8.454))',
   },
   type: {
-    color: "light-dark(oklch(0.535 0.154 291.137), oklch(0.741 0.121 290.676))",
+    color: 'light-dark(oklch(0.535 0.154 291.137), oklch(0.741 0.121 290.676))',
   },
   description: {
     minWidth: 240,
-    color: "light-dark(oklch(0.645 0.007 350.912), oklch(0.661 0.002 325.597))",
+    color: 'light-dark(oklch(0.645 0.007 350.912), oklch(0.661 0.002 325.597))',
   },
-});
+})

@@ -1,5 +1,5 @@
-import { CodeEditor, Field } from "@inspector/ds";
-import { useState } from "react";
+import { CodeEditor, Field } from '@inspector/ds'
+import { useState } from 'react'
 
 const initialValue = JSON.stringify(
   {
@@ -10,14 +10,17 @@ const initialValue = JSON.stringify(
   },
   null,
   2,
-);
+)
 
 export default function BasicExample() {
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(initialValue)
 
   return (
     <Field.Root>
-      <Field.Label id="settings-json-label" htmlFor="settings-json">
+      <Field.Label
+        id="settings-json-label"
+        htmlFor="settings-json"
+      >
         Editor settings
       </Field.Label>
       <CodeEditor
@@ -27,5 +30,5 @@ export default function BasicExample() {
         onValueChange={setValue}
       />
     </Field.Root>
-  );
+  )
 }

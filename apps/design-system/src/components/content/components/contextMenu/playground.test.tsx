@@ -1,32 +1,32 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { ContextMenuPlayground, serializeContextMenuPlayground } from "./playground";
+import { ContextMenuPlayground, serializeContextMenuPlayground } from './playground'
 
-vi.mock("@/lib/shiki", () => ({ useHighlightedCode: () => null }));
+vi.mock('@/lib/shiki', () => ({ useHighlightedCode: () => null }))
 
-afterEach(cleanup);
+afterEach(cleanup)
 
-describe("ContextMenu playground", () => {
-  it("serializes a safe representative composition", () => {
+describe('ContextMenu playground', () => {
+  it('serializes a safe representative composition', () => {
     const source = serializeContextMenuPlayground({
-      side: "right",
-      align: "center",
+      side: 'right',
+      align: 'center',
       disabled: false,
       danger: true,
-    });
+    })
 
-    expect(source).toContain('import { ContextMenu } from "@inspector/ds";');
-    expect(source).toContain('<ContextMenu.Content side="right" align="center">');
-    expect(source).toContain('<ContextMenu.Item variant="danger"');
-  });
+    expect(source).toContain('import { ContextMenu } from "@inspector/ds";')
+    expect(source).toContain('<ContextMenu.Content side="right" align="center">')
+    expect(source).toContain('<ContextMenu.Item variant="danger"')
+  })
 
-  it("updates serialized root state from curated controls", () => {
-    const { container } = render(<ContextMenuPlayground />);
+  it('updates serialized root state from curated controls', () => {
+    const { container } = render(<ContextMenuPlayground />)
 
-    fireEvent.click(screen.getByRole("switch", { name: "Disabled" }));
-    fireEvent.click(screen.getByRole("button", { name: "Show code" }));
+    fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
 
-    expect(container.querySelector("pre")?.textContent).toContain("<ContextMenu.Root disabled>");
-  });
-});
+    expect(container.querySelector('pre')?.textContent).toContain('<ContextMenu.Root disabled>')
+  })
+})

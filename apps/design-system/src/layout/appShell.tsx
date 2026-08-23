@@ -1,81 +1,87 @@
-import { Box, Button, ButtonLink, Text, Tooltip } from "@inspector/ds";
-import { useHotkey } from "@tanstack/react-hotkeys";
-import { HeadContent, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-import { type ReactElement } from "react";
+import { Box, Button, ButtonLink, Text, Tooltip } from '@inspector/ds'
+import { useHotkey } from '@tanstack/react-hotkeys'
+import { HeadContent, Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
+import { Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { type ReactElement } from 'react'
 
-import { navigationItems, navSections, type NavItem } from "@/lib/registry";
-import { AppShellLayoutProvider, useAppShellLayout } from "@/layout/appShellLayout";
+import { navigationItems, navSections, type NavItem } from '@/lib/registry'
+import { AppShellLayoutProvider, useAppShellLayout } from '@/layout/appShellLayout'
 
-export function getMainContentOverflowY(pathname: string): "auto" | "hidden" {
-  return pathname.startsWith("/components/") || pathname.startsWith("/foundations/")
-    ? "hidden"
-    : "auto";
+export function getMainContentOverflowY(pathname: string): 'auto' | 'hidden' {
+  return pathname.startsWith('/components/') || pathname.startsWith('/foundations/')
+    ? 'hidden'
+    : 'auto'
 }
 
 export function getAdjacentNavigationItems(pathname: string): {
-  previous: NavItem | undefined;
-  next: NavItem | undefined;
+  previous: NavItem | undefined
+  next: NavItem | undefined
 } {
-  const currentIndex = navigationItems.findIndex((item) => item.href === pathname);
+  const currentIndex = navigationItems.findIndex((item) => item.href === pathname)
 
   if (currentIndex < 0) {
-    return { previous: undefined, next: undefined };
+    return { previous: undefined, next: undefined }
   }
 
   return {
     previous: navigationItems.at(currentIndex - 1) ?? navigationItems.at(-1),
     next: navigationItems[currentIndex + 1] ?? navigationItems[0],
-  };
+  }
 }
 
 function ThemeSwitch(): ReactElement {
-  const { resolvedTheme, setTheme } = useTheme();
-  const label = resolvedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+  const { resolvedTheme, setTheme } = useTheme()
+  const label = resolvedTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
 
   const handleToggleTheme = (): void => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
-  };
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  }
 
   return (
     <Tooltip.Root>
       <Tooltip.Trigger
         render={
-          <Button iconOnly variant="ghost" size="s" onClick={handleToggleTheme} aria-label={label}>
-            <Button.Glyph artwork={resolvedTheme === "dark" ? Sun : Moon} />
+          <Button
+            iconOnly
+            variant="ghost"
+            size="s"
+            onClick={handleToggleTheme}
+            aria-label={label}
+          >
+            <Button.Glyph artwork={resolvedTheme === 'dark' ? Sun : Moon} />
           </Button>
         }
       />
       <Tooltip.Content>{label}</Tooltip.Content>
     </Tooltip.Root>
-  );
+  )
 }
 
 function AppShellContent(): ReactElement {
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const navigate = useNavigate();
-  const { isNavigationOpen } = useAppShellLayout();
-  const { previous, next } = getAdjacentNavigationItems(pathname);
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const navigate = useNavigate()
+  const { isNavigationOpen } = useAppShellLayout()
+  const { previous, next } = getAdjacentNavigationItems(pathname)
 
   useHotkey(
-    "ArrowLeft",
+    'ArrowLeft',
     () => {
       if (previous !== undefined) {
-        void navigate({ to: previous.href });
+        void navigate({ to: previous.href })
       }
     },
     { enabled: previous !== undefined, ignoreInputs: true },
-  );
+  )
   useHotkey(
-    "ArrowRight",
+    'ArrowRight',
     () => {
       if (next !== undefined) {
-        void navigate({ to: next.href });
+        void navigate({ to: next.href })
       }
     },
     { enabled: next !== undefined, ignoreInputs: true },
-  );
+  )
 
   return (
     <>
@@ -92,25 +98,32 @@ function AppShellContent(): ReactElement {
           alignItems="center"
           justifyContent="between"
           flexShrink={0}
-          paddingHorizontal={{ base: "xl", md: "xl" }}
+          paddingHorizontal={{ base: 'xl', md: 'xl' }}
           paddingVertical="m"
           borderBottomWidth={1}
           borderStyle="solid"
           borderColor="default"
         >
           <Link to="/">
-            <Text as="span" variant="title">
+            <Text
+              as="span"
+              variant="title"
+            >
               Inspector Design System
             </Text>
           </Link>
           <ThemeSwitch />
         </Box>
 
-        <Box flex={1} flexDirection={{ base: "column", xl: "row" }} minHeight={0}>
+        <Box
+          flex={1}
+          flexDirection={{ base: 'column', xl: 'row' }}
+          minHeight={0}
+        >
           {isNavigationOpen === true ? (
             <Box
               as="aside"
-              display={{ base: "none", xl: "flex" }}
+              display={{ base: 'none', xl: 'flex' }}
               flexDirection="column"
               flexShrink={0}
               gap="2xl"
@@ -119,28 +132,45 @@ function AppShellContent(): ReactElement {
               data-scroll-area="navigation"
               padding="m"
             >
-              <Box as="nav" flexDirection="column" gap="2xl" aria-label="Design system navigation">
+              <Box
+                as="nav"
+                flexDirection="column"
+                gap="2xl"
+                aria-label="Design system navigation"
+              >
                 {navSections.map((section) => (
-                  <Box as="section" key={section.title} flexDirection="column" gap="m">
-                    <Text as="span" variant="label" color="muted">
+                  <Box
+                    as="section"
+                    key={section.title}
+                    flexDirection="column"
+                    gap="m"
+                  >
+                    <Text
+                      as="span"
+                      variant="label"
+                      color="muted"
+                    >
                       {section.title}
                     </Text>
-                    <Box flexDirection="column" gap="none">
+                    <Box
+                      flexDirection="column"
+                      gap="none"
+                    >
                       {section.items.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive = pathname === item.href
                         return (
                           <ButtonLink
                             key={item.href}
-                            variant={isActive === true ? "secondary" : "ghost"}
+                            variant={isActive === true ? 'secondary' : 'ghost'}
                             size="m"
                             layout="row"
                             render={<Link to={item.href} />}
-                            aria-current={isActive === true ? "page" : undefined}
+                            aria-current={isActive === true ? 'page' : undefined}
                             radius="none"
                           >
                             {item.title}
                           </ButtonLink>
-                        );
+                        )
                       })}
                     </Box>
                   </Box>
@@ -159,7 +189,7 @@ function AppShellContent(): ReactElement {
             overflowX="hidden"
             overflowY={getMainContentOverflowY(pathname)}
             data-scroll-area={
-              getMainContentOverflowY(pathname) === "auto" ? "main-content" : undefined
+              getMainContentOverflowY(pathname) === 'auto' ? 'main-content' : undefined
             }
           >
             <Outlet />
@@ -167,7 +197,7 @@ function AppShellContent(): ReactElement {
         </Box>
       </Box>
     </>
-  );
+  )
 }
 
 export function AppShell(): ReactElement {
@@ -175,5 +205,5 @@ export function AppShell(): ReactElement {
     <AppShellLayoutProvider>
       <AppShellContent />
     </AppShellLayoutProvider>
-  );
+  )
 }

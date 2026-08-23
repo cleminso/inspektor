@@ -2,19 +2,12 @@ import * as stylex from '@stylexjs/stylex'
 import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 
 import { useClipboard } from '../../hooks/useClipboard'
-import {
-  Button,
-  type ButtonSize,
-  type ButtonVariant,
-} from '../button/button'
+import { Button, type ButtonSize, type ButtonVariant } from '../button/button'
 import { Tooltip, type TooltipContentProps } from '../tooltip/tooltip'
 import { copyButtonStyles } from './copyButton.styles'
 
 export type CopyButtonSize = ButtonSize
-export type CopyButtonVariant = Extract<
-  ButtonVariant,
-  'ghost' | 'secondary'
->
+export type CopyButtonVariant = Extract<ButtonVariant, 'ghost' | 'secondary'>
 
 export interface CopyButtonProps {
   /** Text written to the clipboard when the button is activated. */
@@ -52,7 +45,13 @@ const CopyArtwork = forwardRef<SVGSVGElement, ComponentPropsWithoutRef<'svg'>>(
         strokeWidth={2}
         viewBox="0 0 24 24"
       >
-        <rect height="12" rx="1" width="12" x="8" y="8" />
+        <rect
+          height="12"
+          rx="1"
+          width="12"
+          x="8"
+          y="8"
+        />
         <path d="M16 6V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h1" />
       </svg>
     )

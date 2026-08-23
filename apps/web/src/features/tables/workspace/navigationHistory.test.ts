@@ -64,10 +64,7 @@ describe('table navigation history', () => {
     })
 
     expect(history.index).toBe(0)
-    expect(history.entries).toEqual([
-      '/conn/1/tables/accounts',
-      '/conn/1/tables/profiles',
-    ])
+    expect(history.entries).toEqual(['/conn/1/tables/accounts', '/conn/1/tables/profiles'])
   })
 
   it('appends an unknown route after native history navigation', () => {

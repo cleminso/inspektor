@@ -1,112 +1,112 @@
-import type { TablePageSize } from "@tables/tableTypes";
+import type { TablePageSize } from '@tables/tableTypes'
 
 export interface TableTabSearch {
-  dir?: string;
-  filters?: string;
-  page?: number;
-  pageSize?: TablePageSize;
-  sort?: string;
-  view?: string;
+  dir?: string
+  filters?: string
+  page?: number
+  pageSize?: TablePageSize
+  sort?: string
+  view?: string
 }
 
 export interface TableTabsRouteSearch extends TableTabSearch {
-  empty?: "true";
+  empty?: 'true'
 }
 
 export interface TableDataTab {
-  kind: "table";
-  id: string;
-  tableName: string;
-  search: TableTabSearch;
+  kind: 'table'
+  id: string
+  tableName: string
+  search: TableTabSearch
 }
 
 export interface NewViewTab {
-  kind: "newView";
-  id: typeof NEW_VIEW_TAB_ID;
+  kind: 'newView'
+  id: typeof NEW_VIEW_TAB_ID
 }
 
-export type TableTab = TableDataTab | NewViewTab;
+export type TableTab = TableDataTab | NewViewTab
 
 export interface TableTabsState {
-  tabs: TableTab[];
-  recentViews: TableDataTab[];
+  tabs: TableTab[]
+  recentViews: TableDataTab[]
 }
 
 interface ReconcileTableTabInput {
-  activeTabId: string | null;
-  replaceableTabId?: string | null;
-  search: TableTabSearch;
-  tableName: string;
-  tabs: readonly TableTab[];
+  activeTabId: string | null
+  replaceableTabId?: string | null
+  search: TableTabSearch
+  tableName: string
+  tabs: readonly TableTab[]
 }
 
 interface ReconcileTableTabResult {
-  activeTabId: string;
-  tabs: TableTab[];
+  activeTabId: string
+  tabs: TableTab[]
 }
 
 interface CloseTableTabResult {
-  tabs: TableTab[];
-  nextActiveTab: TableTab | null;
+  tabs: TableTab[]
+  nextActiveTab: TableTab | null
 }
 
 interface OpenNewViewTabResult {
-  activeTabId: typeof NEW_VIEW_TAB_ID;
-  tabs: TableTab[];
+  activeTabId: typeof NEW_VIEW_TAB_ID
+  tabs: TableTab[]
 }
 
 interface OpenBaseTableTabsResult {
-  activeTabId: string | null;
-  tabs: TableTab[];
+  activeTabId: string | null
+  tabs: TableTab[]
 }
 
-const TABLE_TABS_STORAGE_KEY = "regarde-inspector-tabs";
-const MAX_RECENT_VIEWS = 5;
-export const NEW_VIEW_TAB_ID = "new-view" as const;
+const TABLE_TABS_STORAGE_KEY = 'regarde-inspector-tabs'
+const MAX_RECENT_VIEWS = 5
+export const NEW_VIEW_TAB_ID = 'new-view' as const
 
-const createNewViewTab = (): NewViewTab => ({ kind: "newView", id: NEW_VIEW_TAB_ID });
+const createNewViewTab = (): NewViewTab => ({ kind: 'newView', id: NEW_VIEW_TAB_ID })
 
 function removeSoleNewViewTab(tabs: readonly TableTab[]): TableTab[] {
-  return tabs.length === 1 && tabs[0]?.kind === "newView" ? [] : [...tabs];
+  return tabs.length === 1 && tabs[0]?.kind === 'newView' ? [] : [...tabs]
 }
 
 const emptyTableTabsState = (): TableTabsState => ({
   tabs: [createNewViewTab()],
   recentViews: [],
-});
+})
 
 export function createBaseTableTabId(tableName: string): string {
-  return `table:${encodeURIComponent(tableName)}`;
+  return `table:${encodeURIComponent(tableName)}`
 }
 
 export function createSchemaTableTabId(tableName: string): string {
-  return `schema:${encodeURIComponent(tableName)}`;
+  return `schema:${encodeURIComponent(tableName)}`
 }
 
 export function createTableTabRouteSearch(tab: TableTab): TableTabsRouteSearch {
-  return tab.kind === "newView" ? { empty: "true" } : { ...tab.search };
+  return tab.kind === 'newView' ? { empty: 'true' } : { ...tab.search }
 }
 
 export function openBaseTableTabs(
   tabs: readonly TableTab[],
   orderedTableNames: readonly string[],
 ): OpenBaseTableTabsResult {
-  const nextTabs = removeSoleNewViewTab(tabs);
-  const tabIds = new Set(nextTabs.map((tab) => tab.id));
-  let activeTabId: string | null = null;
+  const nextTabs = removeSoleNewViewTab(tabs)
+  const tabIds = new Set(nextTabs.map((tab) => tab.id))
+  let activeTabId: string | null = null
 
   for (const tableName of orderedTableNames) {
-    const tabId = createBaseTableTabId(tableName);
-    activeTabId = tabId;
+    const tabId = createBaseTableTabId(tableName)
+    activeTabId = tabId
     if (tabIds.has(tabId) === true) {
-      continue;
+      continue
     }
 
-    nextTabs.push({ kind: "table", id: tabId, tableName, search: {} });
-    tabIds.add(tabId);
+    nextTabs.push({ kind: 'table', id: tabId, tableName, search: {} })
+    tabIds.add(tabId)
   }
 
-  return { activeTabId, tabs: nextTabs };
+  return { activeTabId, tabs: nextTabs }
 }
 
 export function reorderTableTabs(
@@ -114,57 +114,57 @@ export function reorderTableTabs(
   orderedTabIds: readonly string[],
 ): TableTab[] {
   if (orderedTabIds.length !== tabs.length || new Set(orderedTabIds).size !== tabs.length) {
-    return [...tabs];
+    return [...tabs]
   }
-  const tabsById = new Map(tabs.map((tab) => [tab.id, tab]));
+  const tabsById = new Map(tabs.map((tab) => [tab.id, tab]))
   const reorderedTabs = orderedTabIds.flatMap((tabId) => {
-    const tab = tabsById.get(tabId);
-    return tab === undefined ? [] : [tab];
-  });
-  return reorderedTabs.length === tabs.length ? reorderedTabs : [...tabs];
+    const tab = tabsById.get(tabId)
+    return tab === undefined ? [] : [tab]
+  })
+  return reorderedTabs.length === tabs.length ? reorderedTabs : [...tabs]
 }
 
 function isSchemaSearch(search: TableTabSearch): boolean {
-  return search.view === "schema";
+  return search.view === 'schema'
 }
 
 function canonicalizeSearch(search: TableTabSearch): TableTabSearch {
-  return isSchemaSearch(search) === true ? { view: "schema" } : search;
+  return isSchemaSearch(search) === true ? { view: 'schema' } : search
 }
 
 function normalizeTableDataTab(tab: TableDataTab): TableDataTab {
   return {
-    kind: "table",
+    kind: 'table',
     id:
       isSchemaSearch(tab.search) === true
         ? createSchemaTableTabId(tab.tableName)
         : createBaseTableTabId(tab.tableName),
     tableName: tab.tableName,
     search: canonicalizeSearch(tab.search),
-  };
+  }
 }
 
 function normalizeTableTab(tab: TableTab): TableTab {
-  return tab.kind === "newView" ? tab : normalizeTableDataTab(tab);
+  return tab.kind === 'newView' ? tab : normalizeTableDataTab(tab)
 }
 
 function normalizeTabs(tabs: readonly TableTab[]): TableTab[] {
-  const tabIndexes = new Map<string, number>();
-  const nextTabs: TableTab[] = [];
+  const tabIndexes = new Map<string, number>()
+  const nextTabs: TableTab[] = []
 
   for (const candidate of tabs) {
-    const tab = normalizeTableTab(candidate);
-    const existingIndex = tabIndexes.get(tab.id);
+    const tab = normalizeTableTab(candidate)
+    const existingIndex = tabIndexes.get(tab.id)
     if (existingIndex !== undefined) {
-      nextTabs[existingIndex] = tab;
-      continue;
+      nextTabs[existingIndex] = tab
+      continue
     }
 
-    tabIndexes.set(tab.id, nextTabs.length);
-    nextTabs.push(tab);
+    tabIndexes.set(tab.id, nextTabs.length)
+    nextTabs.push(tab)
   }
 
-  return nextTabs;
+  return nextTabs
 }
 
 function searchesMatch(left: TableTabSearch, right: TableTabSearch): boolean {
@@ -173,26 +173,26 @@ function searchesMatch(left: TableTabSearch, right: TableTabSearch): boolean {
     left.filters === right.filters &&
     left.sort === right.sort &&
     left.view === right.view
-  );
+  )
 }
 
 function tableViewsMatch(left: TableDataTab, right: TableDataTab): boolean {
   return (
     left.id === right.id ||
     (left.tableName === right.tableName && searchesMatch(left.search, right.search))
-  );
+  )
 }
 
 function tabStatesMatch(left: readonly TableTab[], right: readonly TableTab[]): boolean {
   return (
     left.length === right.length &&
     left.every((tab, index) => {
-      const candidate = right[index];
+      const candidate = right[index]
       if (candidate === undefined || tab.kind !== candidate.kind || tab.id !== candidate.id) {
-        return false;
+        return false
       }
-      if (tab.kind === "newView" || candidate.kind === "newView") {
-        return true;
+      if (tab.kind === 'newView' || candidate.kind === 'newView') {
+        return true
       }
 
       return (
@@ -203,9 +203,9 @@ function tabStatesMatch(left: readonly TableTab[], right: readonly TableTab[]): 
         tab.search.pageSize === candidate.search.pageSize &&
         tab.search.sort === candidate.search.sort &&
         tab.search.view === candidate.search.view
-      );
+      )
     })
-  );
+  )
 }
 
 export function reconcileTableTab({
@@ -215,47 +215,47 @@ export function reconcileTableTab({
   tableName,
   tabs,
 }: ReconcileTableTabInput): ReconcileTableTabResult {
-  const canonicalSearch = canonicalizeSearch(search);
-  const normalizedTabs = normalizeTabs(tabs);
+  const canonicalSearch = canonicalizeSearch(search)
+  const normalizedTabs = normalizeTabs(tabs)
   const activeTabId =
     isSchemaSearch(canonicalSearch) === true
       ? createSchemaTableTabId(tableName)
-      : createBaseTableTabId(tableName);
-  const existingView = normalizedTabs.find((tab) => tab.id === activeTabId);
+      : createBaseTableTabId(tableName)
+  const existingView = normalizedTabs.find((tab) => tab.id === activeTabId)
   const reconciledTabs =
     currentActiveTabId === NEW_VIEW_TAB_ID && existingView === undefined
-      ? normalizedTabs.filter((tab) => tab.kind !== "newView")
-      : removeSoleNewViewTab(normalizedTabs);
+      ? normalizedTabs.filter((tab) => tab.kind !== 'newView')
+      : removeSoleNewViewTab(normalizedTabs)
   const nextTab: TableDataTab = {
-    kind: "table",
+    kind: 'table',
     id: activeTabId,
     tableName,
     search: canonicalSearch,
-  };
-  const existingIndex = reconciledTabs.findIndex((tab) => tab.id === activeTabId);
+  }
+  const existingIndex = reconciledTabs.findIndex((tab) => tab.id === activeTabId)
 
   if (existingIndex === -1) {
     const replaceableIndex =
       isSchemaSearch(canonicalSearch) === false
         ? reconciledTabs.findIndex((tab) => tab.id === replaceableTabId)
-        : -1;
+        : -1
     if (replaceableIndex >= 0) {
       return {
         activeTabId,
         tabs: reconciledTabs.map((tab, index) => (index === replaceableIndex ? nextTab : tab)),
-      };
+      }
     }
 
     return {
       activeTabId,
       tabs: [...reconciledTabs, nextTab],
-    };
+    }
   }
 
   return {
     activeTabId,
     tabs: reconciledTabs.map((tab, index) => (index === existingIndex ? nextTab : tab)),
-  };
+  }
 }
 
 /**
@@ -267,242 +267,231 @@ export function sanitizeTableTabsState(
   state: TableTabsState,
   availableTableNames: readonly string[],
 ): TableTabsState {
-  const availableTables = new Set(availableTableNames);
+  const availableTables = new Set(availableTableNames)
   const tabs = normalizeTabs(state.tabs).filter(
-    (tab) => tab.kind === "newView" || availableTables.has(tab.tableName),
-  );
+    (tab) => tab.kind === 'newView' || availableTables.has(tab.tableName),
+  )
   const recentViews = normalizeTabs(state.recentViews)
     .filter(
-      (tab): tab is TableDataTab =>
-        tab.kind === "table" && availableTables.has(tab.tableName),
+      (tab): tab is TableDataTab => tab.kind === 'table' && availableTables.has(tab.tableName),
     )
-    .slice(0, MAX_RECENT_VIEWS);
-  const nextTabs = tabs.length === 0 ? [createNewViewTab()] : tabs;
+    .slice(0, MAX_RECENT_VIEWS)
+  const nextTabs = tabs.length === 0 ? [createNewViewTab()] : tabs
 
   if (
     tabStatesMatch(nextTabs, state.tabs) === true &&
     tabStatesMatch(recentViews, state.recentViews) === true
   ) {
-    return state;
+    return state
   }
 
   return {
     tabs: nextTabs,
     recentViews,
-  };
+  }
 }
 
 export function openNewViewTab(tabs: readonly TableTab[]): OpenNewViewTabResult {
-  if (tabs.some((tab) => tab.kind === "newView")) {
-    return { activeTabId: NEW_VIEW_TAB_ID, tabs: [...tabs] };
+  if (tabs.some((tab) => tab.kind === 'newView')) {
+    return { activeTabId: NEW_VIEW_TAB_ID, tabs: [...tabs] }
   }
 
   return {
     activeTabId: NEW_VIEW_TAB_ID,
     tabs: [...tabs, createNewViewTab()],
-  };
+  }
 }
 
 export function replaceNewViewTab(
   tabs: readonly TableTab[],
   selectedView: TableDataTab,
 ): TableTab[] {
-  const sourceTabs = tabs.filter((tab) => tab.kind !== "newView");
-  const selectedViewIndex = sourceTabs.findIndex((tab) => tab.id === selectedView.id);
+  const sourceTabs = tabs.filter((tab) => tab.kind !== 'newView')
+  const selectedViewIndex = sourceTabs.findIndex((tab) => tab.id === selectedView.id)
   return selectedViewIndex === -1
     ? [...sourceTabs, selectedView]
-    : sourceTabs.map((tab, index) => (index === selectedViewIndex ? selectedView : tab));
+    : sourceTabs.map((tab, index) => (index === selectedViewIndex ? selectedView : tab))
 }
 
 export function recordRecentTableView(
   recentViews: readonly TableDataTab[],
   tableView: TableDataTab,
 ): TableDataTab[] {
-  const normalizedView = normalizeTableDataTab(tableView);
+  const normalizedView = normalizeTableDataTab(tableView)
   const normalizedRecentViews = normalizeTabs(recentViews).filter(
-    (view): view is TableDataTab => view.kind === "table",
-  );
+    (view): view is TableDataTab => view.kind === 'table',
+  )
   return [
     normalizedView,
-    ...normalizedRecentViews.filter(
-      (view) => tableViewsMatch(view, normalizedView) === false,
-    ),
-  ].slice(0, MAX_RECENT_VIEWS);
+    ...normalizedRecentViews.filter((view) => tableViewsMatch(view, normalizedView) === false),
+  ].slice(0, MAX_RECENT_VIEWS)
 }
 
-export function closeTableTab(
-  tabs: readonly TableTab[],
-  tabId: string,
-): CloseTableTabResult {
-  const closedIndex = tabs.findIndex((tab) => tab.id === tabId);
+export function closeTableTab(tabs: readonly TableTab[], tabId: string): CloseTableTabResult {
+  const closedIndex = tabs.findIndex((tab) => tab.id === tabId)
   if (closedIndex === -1) {
-    return { tabs: [...tabs], nextActiveTab: null };
+    return { tabs: [...tabs], nextActiveTab: null }
   }
 
-  const nextTabs = tabs.filter((tab) => tab.id !== tabId);
+  const nextTabs = tabs.filter((tab) => tab.id !== tabId)
   if (nextTabs.length === 0) {
-    const newViewTab = createNewViewTab();
+    const newViewTab = createNewViewTab()
     return {
       tabs: [newViewTab],
       nextActiveTab: newViewTab,
-    };
+    }
   }
 
   return {
     tabs: nextTabs,
     nextActiveTab: nextTabs[closedIndex] ?? nextTabs[closedIndex - 1] ?? null,
-  };
+  }
 }
 
-export function getFinalTableTabName(
-  tabs: readonly TableTab[],
-  tabId: string,
-): string | null {
+export function getFinalTableTabName(tabs: readonly TableTab[], tabId: string): string | null {
   const tab = tabs.find(
-    (candidate): candidate is TableDataTab => candidate.kind === "table" && candidate.id === tabId,
-  );
+    (candidate): candidate is TableDataTab => candidate.kind === 'table' && candidate.id === tabId,
+  )
   if (tab === undefined) {
-    return null;
+    return null
   }
   const hasAnotherRepresentation = tabs.some(
     (candidate) =>
-      candidate.kind === "table" &&
-      candidate.id !== tabId &&
-      candidate.tableName === tab.tableName,
-  );
-  return hasAnotherRepresentation === true ? null : tab.tableName;
+      candidate.kind === 'table' && candidate.id !== tabId && candidate.tableName === tab.tableName,
+  )
+  return hasAnotherRepresentation === true ? null : tab.tableName
 }
 
 function isTableTabSearch(value: unknown): value is TableTabSearch {
-  if (typeof value !== "object" || value === null) {
-    return false;
+  if (typeof value !== 'object' || value === null) {
+    return false
   }
 
-  const search = value as TableTabSearch;
+  const search = value as TableTabSearch
   return (
-    (search.dir === undefined || typeof search.dir === "string") &&
-    (search.filters === undefined || typeof search.filters === "string") &&
+    (search.dir === undefined || typeof search.dir === 'string') &&
+    (search.filters === undefined || typeof search.filters === 'string') &&
     (search.page === undefined || (Number.isInteger(search.page) && search.page > 0)) &&
     (search.pageSize === undefined ||
       search.pageSize === 100 ||
       search.pageSize === 500 ||
       search.pageSize === 1000) &&
-    (search.sort === undefined || typeof search.sort === "string") &&
-    (search.view === undefined || typeof search.view === "string")
-  );
+    (search.sort === undefined || typeof search.sort === 'string') &&
+    (search.view === undefined || typeof search.view === 'string')
+  )
 }
 
 function parseTableDataTab(value: unknown): TableDataTab | null {
-  if (typeof value !== "object" || value === null) {
-    return null;
+  if (typeof value !== 'object' || value === null) {
+    return null
   }
 
-  const tab = value as Partial<TableDataTab>;
+  const tab = value as Partial<TableDataTab>
   if (
-    (tab.kind !== undefined && tab.kind !== "table") ||
-    typeof tab.id !== "string" ||
-    typeof tab.tableName !== "string" ||
+    (tab.kind !== undefined && tab.kind !== 'table') ||
+    typeof tab.id !== 'string' ||
+    typeof tab.tableName !== 'string' ||
     isTableTabSearch(tab.search) === false
   ) {
-    return null;
+    return null
   }
 
   return {
-    kind: "table",
+    kind: 'table',
     id: tab.id,
     tableName: tab.tableName,
     search: tab.search,
-  };
+  }
 }
 
 function parseTableTab(value: unknown): TableTab | null {
   if (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
-    "kind" in value &&
-    value.kind === "newView" &&
-    "id" in value &&
+    'kind' in value &&
+    value.kind === 'newView' &&
+    'id' in value &&
     value.id === NEW_VIEW_TAB_ID
   ) {
-    return { kind: "newView", id: NEW_VIEW_TAB_ID };
+    return { kind: 'newView', id: NEW_VIEW_TAB_ID }
   }
 
-  return parseTableDataTab(value);
+  return parseTableDataTab(value)
 }
 
 function parseTabs(values: unknown): TableTab[] {
   if (Array.isArray(values) === false) {
-    return [];
+    return []
   }
 
   return values.flatMap((value) => {
-    const tab = parseTableTab(value);
-    return tab === null ? [] : [tab];
-  });
+    const tab = parseTableTab(value)
+    return tab === null ? [] : [tab]
+  })
 }
 
 function parseRecentViews(values: unknown): TableDataTab[] {
   if (Array.isArray(values) === false) {
-    return [];
+    return []
   }
 
   return values
     .flatMap((value) => {
-      const tab = parseTableDataTab(value);
-      return tab === null ? [] : [tab];
+      const tab = parseTableDataTab(value)
+      return tab === null ? [] : [tab]
     })
-    .slice(0, MAX_RECENT_VIEWS);
+    .slice(0, MAX_RECENT_VIEWS)
 }
 
 function readStoredScopes(): Record<string, TableTabsState> {
-  if (typeof window === "undefined") {
-    return {};
+  if (typeof window === 'undefined') {
+    return {}
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(TABLE_TABS_STORAGE_KEY) ?? "null") as {
-      version?: unknown;
-      scopes?: unknown;
-    } | null;
-    if (typeof parsed?.scopes !== "object" || parsed.scopes === null) {
-      return {};
+    const parsed = JSON.parse(window.localStorage.getItem(TABLE_TABS_STORAGE_KEY) ?? 'null') as {
+      version?: unknown
+      scopes?: unknown
+    } | null
+    if (typeof parsed?.scopes !== 'object' || parsed.scopes === null) {
+      return {}
     }
 
-    const scopes: Record<string, TableTabsState> = {};
+    const scopes: Record<string, TableTabsState> = {}
     for (const [scope, value] of Object.entries(parsed.scopes)) {
       if (parsed.version === 1) {
-        scopes[scope] = { tabs: parseTabs(value), recentViews: [] };
-        continue;
+        scopes[scope] = { tabs: parseTabs(value), recentViews: [] }
+        continue
       }
-      if (parsed.version !== 2 || typeof value !== "object" || value === null) {
-        continue;
+      if (parsed.version !== 2 || typeof value !== 'object' || value === null) {
+        continue
       }
 
-      const storedState = value as Partial<TableTabsState>;
+      const storedState = value as Partial<TableTabsState>
       scopes[scope] = {
         tabs: parseTabs(storedState.tabs),
         recentViews: parseRecentViews(storedState.recentViews),
-      };
+      }
     }
-    return scopes;
+    return scopes
   } catch {
-    return {};
+    return {}
   }
 }
 
 export function loadTableTabsState(scope: string): TableTabsState {
-  const state = readStoredScopes()[scope] ?? emptyTableTabsState();
-  return state.tabs.length === 0 ? { ...state, tabs: [createNewViewTab()] } : state;
+  const state = readStoredScopes()[scope] ?? emptyTableTabsState()
+  return state.tabs.length === 0 ? { ...state, tabs: [createNewViewTab()] } : state
 }
 
 export function saveTableTabsState(scope: string, state: TableTabsState): void {
-  if (typeof window === "undefined") {
-    return;
+  if (typeof window === 'undefined') {
+    return
   }
 
   try {
-    const scopes = readStoredScopes();
-    scopes[scope] = state;
-    window.localStorage.setItem(TABLE_TABS_STORAGE_KEY, JSON.stringify({ version: 2, scopes }));
+    const scopes = readStoredScopes()
+    scopes[scope] = state
+    window.localStorage.setItem(TABLE_TABS_STORAGE_KEY, JSON.stringify({ version: 2, scopes }))
   } catch {}
 }

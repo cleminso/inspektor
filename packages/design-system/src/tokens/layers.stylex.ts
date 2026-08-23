@@ -1,4 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
 export const layerIndexes = stylex.defineConsts({
   content: 1,
@@ -10,4 +10,4 @@ export const layerIndexes = stylex.defineConsts({
   modal: 400,
   toast: 500,
   drag: 600,
-});
+})

@@ -1,9 +1,12 @@
-import { Box, Field, Switch } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Box, Field, Switch } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function StatesExample(): ReactElement {
   return (
-    <Box flexDirection="column" gap="m">
+    <Box
+      flexDirection="column"
+      gap="m"
+    >
       <Field.Root>
         <Field.Label>
           <Switch size="s" />
@@ -24,10 +27,13 @@ export default function StatesExample(): ReactElement {
       </Field.Root>
       <Field.Root>
         <Field.Label>
-          <Switch defaultChecked readOnly />
+          <Switch
+            defaultChecked
+            readOnly
+          />
           Read-only
         </Field.Label>
       </Field.Root>
     </Box>
-  );
+  )
 }

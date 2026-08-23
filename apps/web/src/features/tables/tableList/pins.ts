@@ -1,38 +1,38 @@
-const TABLE_PINS_STORAGE_KEY = "regarde-inspector-table-pins";
+const TABLE_PINS_STORAGE_KEY = 'regarde-inspector-table-pins'
 
 interface StoredTablePins {
-  version: 1;
-  scopes: Record<string, string[]>;
+  version: 1
+  scopes: Record<string, string[]>
 }
 
 function readStoredScopes(): Record<string, string[]> {
-  if (typeof window === "undefined") {
-    return {};
+  if (typeof window === 'undefined') {
+    return {}
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(TABLE_PINS_STORAGE_KEY) ?? "null") as {
-      version?: unknown;
-      scopes?: unknown;
-    } | null;
-    if (parsed?.version !== 1 || typeof parsed.scopes !== "object" || parsed.scopes === null) {
-      return {};
+    const parsed = JSON.parse(window.localStorage.getItem(TABLE_PINS_STORAGE_KEY) ?? 'null') as {
+      version?: unknown
+      scopes?: unknown
+    } | null
+    if (parsed?.version !== 1 || typeof parsed.scopes !== 'object' || parsed.scopes === null) {
+      return {}
     }
 
-    const scopes: Record<string, string[]> = {};
+    const scopes: Record<string, string[]> = {}
     for (const [scope, value] of Object.entries(parsed.scopes)) {
-      if (Array.isArray(value) === true && value.every((entry) => typeof entry === "string")) {
-        scopes[scope] = value;
+      if (Array.isArray(value) === true && value.every((entry) => typeof entry === 'string')) {
+        scopes[scope] = value
       }
     }
-    return scopes;
+    return scopes
   } catch {
-    return {};
+    return {}
   }
 }
 
 export function loadPinnedTableNames(scope: string): ReadonlySet<string> {
-  return new Set(readStoredScopes()[scope] ?? []);
+  return new Set(readStoredScopes()[scope] ?? [])
 }
 
 export function updatePinnedTableNames(
@@ -40,26 +40,26 @@ export function updatePinnedTableNames(
   tableNames: readonly string[],
   pinned: boolean,
 ): ReadonlySet<string> {
-  const nextTableNames = new Set(currentTableNames);
+  const nextTableNames = new Set(currentTableNames)
   for (const tableName of tableNames) {
     if (pinned === true) {
-      nextTableNames.add(tableName);
+      nextTableNames.add(tableName)
     } else {
-      nextTableNames.delete(tableName);
+      nextTableNames.delete(tableName)
     }
   }
-  return nextTableNames;
+  return nextTableNames
 }
 
 export function savePinnedTableNames(scope: string, tableNames: ReadonlySet<string>): void {
-  if (typeof window === "undefined") {
-    return;
+  if (typeof window === 'undefined') {
+    return
   }
 
   try {
-    const scopes = readStoredScopes();
-    scopes[scope] = [...tableNames];
-    const value: StoredTablePins = { version: 1, scopes };
-    window.localStorage.setItem(TABLE_PINS_STORAGE_KEY, JSON.stringify(value));
+    const scopes = readStoredScopes()
+    scopes[scope] = [...tableNames]
+    const value: StoredTablePins = { version: 1, scopes }
+    window.localStorage.setItem(TABLE_PINS_STORAGE_KEY, JSON.stringify(value))
   } catch {}
 }

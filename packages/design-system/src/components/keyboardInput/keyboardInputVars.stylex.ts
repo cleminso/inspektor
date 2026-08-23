@@ -4,13 +4,13 @@
  * `keyboardInput.styles.ts`. Ancestors such as danger-highlighted menu items
  * override the text color without prop drilling.
  */
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
-import { textColors } from "../../tokens/semantics.stylex";
+import { textColors } from '../../tokens/semantics.stylex'
 
 export const keyboardInputVars = stylex.defineVars({
   textColor: {
     default: textColors.muted,
     ':hover': textColors.default,
   },
-});
+})

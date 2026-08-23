@@ -59,7 +59,10 @@ function OperationRow({
           </Text>
         ) : null}
       </Box>
-      <Box flexShrink={0} ml="auto">
+      <Box
+        flexShrink={0}
+        ml="auto"
+      >
         <Button
           aria-label={`Undo: ${summary}`}
           size="s"
@@ -88,9 +91,8 @@ function OperationList({
   const virtualized = operations.length > directRenderLimit
   const [windowStart, setWindowStart] = useState(0)
   const boundedStart = Math.min(windowStart, Math.max(0, operations.length - windowSize))
-  const visibleOperations = virtualized === true
-    ? operations.slice(boundedStart, boundedStart + windowSize)
-    : operations
+  const visibleOperations =
+    virtualized === true ? operations.slice(boundedStart, boundedStart + windowSize) : operations
   const scrollable = operations.length > 10
   const handleScroll = (event: UIEvent<HTMLElement>) => {
     if (virtualized === false) return
@@ -113,9 +115,17 @@ function OperationList({
       width="full"
       onScroll={handleScroll}
     >
-      <Box as="ul" flexDirection="column" width="full">
+      <Box
+        as="ul"
+        flexDirection="column"
+        width="full"
+      >
         {visibleOperations.map((operation) => (
-          <OperationRow key={operation.operationId} operation={operation} onUndo={onUndo} />
+          <OperationRow
+            key={operation.operationId}
+            operation={operation}
+            onUndo={onUndo}
+          />
         ))}
       </Box>
     </Box>
@@ -155,7 +165,11 @@ function ReviewSection({
         </Accordion.Trigger>
       </Accordion.Header>
       <Accordion.Panel>
-        <OperationList label={`${label.slice(0, -1)} operations`} operations={operations} onUndo={onUndo} />
+        <OperationList
+          label={`${label.slice(0, -1)} operations`}
+          operations={operations}
+          onUndo={onUndo}
+        />
       </Accordion.Panel>
     </Accordion.Item>
   )
@@ -262,19 +276,19 @@ export function TableMutationWidget({
   const [reviewExpanded, setReviewExpanded] = useState(false)
   const contentId = useId()
   const reviewId = useId()
-  const hasPending =
-    mutations.ledger.entries.length > 0 || mutations.hasInvalidEditor === true
+  const hasPending = mutations.ledger.entries.length > 0 || mutations.hasInvalidEditor === true
 
   if (hasPending === false) {
     return null
   }
 
   const expanded = collapsed === false
-  const label = mutations.execution.status === 'applying'
-    ? 'Applying changes'
-    : mutations.execution.status === 'failed' || mutations.hasInvalidEditor === true
-      ? 'Needs attention'
-      : 'Staged changes'
+  const label =
+    mutations.execution.status === 'applying'
+      ? 'Applying changes'
+      : mutations.execution.status === 'failed' || mutations.hasInvalidEditor === true
+        ? 'Needs attention'
+        : 'Staged changes'
 
   return (
     <>
@@ -291,9 +305,7 @@ export function TableMutationWidget({
             id={contentId}
             size={reviewExpanded === true ? 'expanded' : 'compact'}
           >
-            <FloatingPanel.Details
-              open={reviewExpanded}
-            >
+            <FloatingPanel.Details open={reviewExpanded}>
               <OperationReview
                 id={reviewId}
                 review={mutations.review}
@@ -312,7 +324,9 @@ export function TableMutationWidget({
                   aria-expanded={reviewExpanded}
                   disabled={mutations.ledger.entries.length === 0}
                   size="s"
-                  suffix={<Button.Glyph artwork={reviewExpanded === true ? ChevronUp : ChevronRight} />}
+                  suffix={
+                    <Button.Glyph artwork={reviewExpanded === true ? ChevronUp : ChevronRight} />
+                  }
                   variant="ghost"
                   onClick={() => setReviewExpanded(reviewExpanded === false)}
                 >

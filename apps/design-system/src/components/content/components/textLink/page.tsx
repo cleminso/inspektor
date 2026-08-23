@@ -1,21 +1,21 @@
-import { TextLink } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { TextLink } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { createPlaygroundSource } from "@/components/docs/playground/playgroundSource";
-import { getGeneratedProps } from "@/lib/propsData";
-import { textLinkItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { createPlaygroundSource } from '@/components/docs/playground/playgroundSource'
+import { getGeneratedProps } from '@/lib/propsData'
+import { textLinkItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { textLinkPropNames } from "./props";
-import RouterExample from "./routerExample";
-import routerSource from "./routerExample.tsx?raw";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { textLinkPropNames } from './props'
+import RouterExample from './routerExample'
+import routerSource from './routerExample.tsx?raw'
 
-const textLinkProps = getGeneratedProps(textLinkItem.componentId, textLinkPropNames);
+const textLinkProps = getGeneratedProps(textLinkItem.componentId, textLinkPropNames)
 
 export function TextLinkPage(): ReactElement {
   return (
@@ -49,5 +49,5 @@ export function TextLinkPage(): ReactElement {
         <PropsTable rows={textLinkProps} />
       </Section>
     </ComponentDocsPage>
-  );
+  )
 }

@@ -3,11 +3,7 @@ import type {
   BorderColorToken,
   TextColorToken,
 } from '../tokens/semantics.stylex'
-import type {
-  BorderRadiusToken,
-  ShadowToken,
-  SpacingToken,
-} from '../tokens/value.stylex'
+import type { BorderRadiusToken, ShadowToken, SpacingToken } from '../tokens/value.stylex'
 import type { BreakpointKey } from '../tokens/breakpointTypes'
 import { layerIndexes } from '../tokens/layers.stylex'
 import { spatial } from '../tokens/semantics.stylex'
@@ -20,16 +16,9 @@ type StyleXTokenKeys<T> = Exclude<
 type SpatialToken = StyleXTokenKeys<typeof spatial>
 type LayerIndex = keyof typeof layerIndexes
 
-export type PseudoState =
-  | 'hover'
-  | 'focus'
-  | 'active'
-  | 'focusVisible'
-  | 'focusWithin'
+export type PseudoState = 'hover' | 'focus' | 'active' | 'focusVisible' | 'focusWithin'
 
-export type ResponsiveValue<T> =
-  | T
-  | Partial<Record<'base' | BreakpointKey | PseudoState, T>>
+export type ResponsiveValue<T> = T | Partial<Record<'base' | BreakpointKey | PseudoState, T>>
 
 export interface SpacingProps {
   padding?: ResponsiveValue<SpacingToken>
@@ -118,22 +107,14 @@ export interface LayoutProps {
 
 export interface FlexProps {
   flex?: ResponsiveValue<0 | 1 | 'none'>
-  flexDirection?: ResponsiveValue<
-    'row' | 'column' | 'row-reverse' | 'column-reverse'
-  >
+  flexDirection?: ResponsiveValue<'row' | 'column' | 'row-reverse' | 'column-reverse'>
   flexWrap?: ResponsiveValue<'wrap' | 'nowrap' | 'wrap-reverse'>
   flexGrow?: ResponsiveValue<0 | 1>
   flexShrink?: ResponsiveValue<0 | 1>
   flexBasis?: ResponsiveValue<0 | 'auto'>
-  alignItems?: ResponsiveValue<
-    'start' | 'end' | 'center' | 'baseline' | 'stretch'
-  >
-  alignSelf?: ResponsiveValue<
-    'start' | 'end' | 'center' | 'baseline' | 'stretch' | 'auto'
-  >
-  justifyContent?: ResponsiveValue<
-    'start' | 'end' | 'center' | 'between' | 'around' | 'evenly'
-  >
+  alignItems?: ResponsiveValue<'start' | 'end' | 'center' | 'baseline' | 'stretch'>
+  alignSelf?: ResponsiveValue<'start' | 'end' | 'center' | 'baseline' | 'stretch' | 'auto'>
+  justifyContent?: ResponsiveValue<'start' | 'end' | 'center' | 'between' | 'around' | 'evenly'>
   alignContent?: ResponsiveValue<
     'start' | 'end' | 'center' | 'between' | 'around' | 'evenly' | 'stretch'
   >
@@ -141,31 +122,16 @@ export interface FlexProps {
 
 export interface GridProps {
   gridTemplateColumns?: ResponsiveValue<
-    | 'one'
-    | 'two'
-    | 'three'
-    | 'four'
-    | 'three-one'
-    | 'auto-fit-s'
-    | 'auto-fit-m'
-    | 'label-content'
+    'one' | 'two' | 'three' | 'four' | 'three-one' | 'auto-fit-s' | 'auto-fit-m' | 'label-content'
   >
   gridTemplateRows?: ResponsiveValue<'one' | 'two' | 'three' | 'four'>
-  gridColumn?: ResponsiveValue<
-    'auto' | 'span-1' | 'span-2' | 'span-3' | 'span-4' | 'full'
-  >
-  gridRow?: ResponsiveValue<
-    'auto' | 'span-1' | 'span-2' | 'span-3' | 'span-4' | 'full'
-  >
-  gridAutoFlow?: ResponsiveValue<
-    'row' | 'column' | 'dense' | 'row-dense' | 'column-dense'
-  >
+  gridColumn?: ResponsiveValue<'auto' | 'span-1' | 'span-2' | 'span-3' | 'span-4' | 'full'>
+  gridRow?: ResponsiveValue<'auto' | 'span-1' | 'span-2' | 'span-3' | 'span-4' | 'full'>
+  gridAutoFlow?: ResponsiveValue<'row' | 'column' | 'dense' | 'row-dense' | 'column-dense'>
 }
 
 export interface PositionProps {
-  position?: ResponsiveValue<
-    'relative' | 'absolute' | 'fixed' | 'sticky' | 'static'
-  >
+  position?: ResponsiveValue<'relative' | 'absolute' | 'fixed' | 'sticky' | 'static'>
   top?: ResponsiveValue<SpacingToken>
   right?: ResponsiveValue<SpacingToken>
   bottom?: ResponsiveValue<SpacingToken>
@@ -174,18 +140,10 @@ export interface PositionProps {
   zIndex?: ResponsiveValue<LayerIndex>
 }
 
-
 export interface VisualProps {
   opacity?: ResponsiveValue<0 | 1>
   cursor?: ResponsiveValue<
-    | 'pointer'
-    | 'default'
-    | 'not-allowed'
-    | 'grab'
-    | 'grabbing'
-    | 'text'
-    | 'move'
-    | 'wait'
+    'pointer' | 'default' | 'not-allowed' | 'grab' | 'grabbing' | 'text' | 'move' | 'wait'
   >
   pointerEvents?: ResponsiveValue<'none' | 'auto'>
   visibility?: ResponsiveValue<'visible' | 'hidden'>

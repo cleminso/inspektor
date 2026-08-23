@@ -102,7 +102,10 @@ export const Switch = forwardRef<HTMLElement, SwitchProps>(function Switch(
       data-slot="switch"
       data-size={size}
     >
-      <BaseSwitch.Thumb {...thumbStyleProps} data-slot="switch-thumb" />
+      <BaseSwitch.Thumb
+        {...thumbStyleProps}
+        data-slot="switch-thumb"
+      />
     </BaseSwitch.Root>
   )
 })

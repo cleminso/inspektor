@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router'
 
-import { IconPage } from "@/components/content/components/icon/page";
+import { IconPage } from '@/components/content/components/icon/page'
 
-export const Route = createFileRoute("/components/icon")({
+export const Route = createFileRoute('/components/icon')({
   component: IconPage,
-  head: () => ({ meta: [{ title: "Icon · Inspector Design System" }] }),
-});
+  head: () => ({ meta: [{ title: 'Icon · Inspector Design System' }] }),
+})

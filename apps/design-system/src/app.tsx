@@ -1,36 +1,36 @@
-import "@fontsource-variable/geist-mono/wght.css";
-import "@fontsource-variable/geist/wght.css";
+import '@fontsource-variable/geist-mono/wght.css'
+import '@fontsource-variable/geist/wght.css'
 
-import "./index.css";
+import './index.css'
 
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { Tooltip } from "@inspector/ds";
-import { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
+import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { Tooltip } from '@inspector/ds'
+import { StrictMode } from 'react'
+import ReactDOM from 'react-dom/client'
 
-import { ThemeProvider } from "@/components/themeProvider";
+import { ThemeProvider } from '@/components/themeProvider'
 
-import { routeTree } from "./routeTree.gen";
+import { routeTree } from './routeTree.gen'
 
 if (import.meta.env.DEV === true) {
-  void import("virtual:stylex:runtime");
+  void import('virtual:stylex:runtime')
 }
 
 const router = createRouter({
   routeTree,
-  defaultPreload: "intent",
+  defaultPreload: 'intent',
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
-});
+})
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface Register {
-    router: typeof router;
+    router: typeof router
   }
 }
 
-const rootElement = document.getElementById("root");
+const rootElement = document.getElementById('root')
 if (rootElement !== null) {
   ReactDOM.createRoot(rootElement).render(
     <StrictMode>
@@ -40,5 +40,5 @@ if (rootElement !== null) {
         </Tooltip.Provider>
       </ThemeProvider>
     </StrictMode>,
-  );
+  )
 }

@@ -40,10 +40,7 @@ const TableNavigationControlsContext = createContext<TableNavigationControlsCont
   null,
 )
 
-function appendHref(
-  state: TableNavigationHistoryState,
-  href: string,
-): TableNavigationHistoryState {
+function appendHref(state: TableNavigationHistoryState, href: string): TableNavigationHistoryState {
   const entries = [...state.entries.slice(0, state.index + 1), href]
   return { entries, index: entries.length - 1 }
 }
@@ -115,11 +112,7 @@ export function TableNavigationHistoryProvider({
             reduceTableNavigationHistory(currentHistory, {
               type: 'reconcile',
               direction:
-                action.type === 'BACK'
-                  ? 'back'
-                  : action.type === 'FORWARD'
-                    ? 'forward'
-                    : 'unknown',
+                action.type === 'BACK' ? 'back' : action.type === 'FORWARD' ? 'forward' : 'unknown',
               href: location.href,
             }),
           )

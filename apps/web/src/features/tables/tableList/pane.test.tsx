@@ -76,10 +76,7 @@ vi.mock('@tables/query/tableRowsPrefetch', () => ({
   startTableRowsPrefetch,
 }))
 
-function mockTableNameOverflow(
-  initialClientWidth: number,
-  initialScrollWidth: number,
-) {
+function mockTableNameOverflow(initialClientWidth: number, initialScrollWidth: number) {
   let clientWidth = initialClientWidth
   let scrollWidth = initialScrollWidth
   const observers: ResizeObserverMock[] = []

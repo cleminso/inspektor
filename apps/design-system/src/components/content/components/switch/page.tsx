@@ -1,19 +1,19 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
-import { switchItem } from "@/lib/registry";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
+import { switchItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { SwitchPlayground } from "./playground";
-import { switchPropNames } from "./props";
-import StatesExample from "./statesExample";
-import statesSource from "./statesExample.tsx?raw";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { SwitchPlayground } from './playground'
+import { switchPropNames } from './props'
+import StatesExample from './statesExample'
+import statesSource from './statesExample.tsx?raw'
 
-const switchProps = getGeneratedProps(switchItem.componentId, switchPropNames);
+const switchProps = getGeneratedProps(switchItem.componentId, switchPropNames)
 
 export function SwitchPage(): ReactElement {
   return (
@@ -41,5 +41,5 @@ export function SwitchPage(): ReactElement {
         <PropsTable rows={switchProps} />
       </Section>
     </SwitchPlayground>
-  );
+  )
 }

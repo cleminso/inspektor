@@ -63,7 +63,11 @@ describe('ButtonLink', () => {
   })
 
   it('renders button presentation with native link semantics', () => {
-    render(<ButtonLink href="/catalog" radius="m">Open catalog</ButtonLink>)
+    render(
+      <ButtonLink href="/catalog" radius="m">
+        Open catalog
+      </ButtonLink>,
+    )
 
     const link = screen.getByRole('link', { name: 'Open catalog' })
     const radiusClassName = stylex.props(buttonStyles.radiusM).className

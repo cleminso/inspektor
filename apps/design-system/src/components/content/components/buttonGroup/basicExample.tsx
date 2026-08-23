@@ -1,5 +1,5 @@
-import { Button, ButtonGroup, ButtonGroupText } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Button, ButtonGroup, ButtonGroupText } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {
   return (
@@ -9,5 +9,5 @@ export default function BasicExample(): ReactElement {
       <Button variant="secondary">Report</Button>
       <Button variant="secondary">Snooze</Button>
     </ButtonGroup>
-  );
+  )
 }

@@ -35,11 +35,21 @@ export function FloatingPanelPage(): ReactElement {
         title="Composition"
         description="Compose one persistent non-modal controller from summary, details, content, and action parts. Content is compact by default and can expand for detailed review. Width contraction overlaps the detail height, transform, and opacity exit so the whole surface collapses continuously, while nested content changes remain immediate. The panel is portalled for placement while interaction outside remains available."
       />
-      <Section title="Root props"><PropsTable rows={rootProps} /></Section>
-      <Section title="Content props"><PropsTable rows={contentProps} /></Section>
-      <Section title="Details props"><PropsTable rows={detailsProps} /></Section>
-      <Section title="Summary props"><PropsTable rows={summaryProps} /></Section>
-      <Section title="Actions props"><PropsTable rows={actionsProps} /></Section>
+      <Section title="Root props">
+        <PropsTable rows={rootProps} />
+      </Section>
+      <Section title="Content props">
+        <PropsTable rows={contentProps} />
+      </Section>
+      <Section title="Details props">
+        <PropsTable rows={detailsProps} />
+      </Section>
+      <Section title="Summary props">
+        <PropsTable rows={summaryProps} />
+      </Section>
+      <Section title="Actions props">
+        <PropsTable rows={actionsProps} />
+      </Section>
     </ComponentDocsPage>
   )
 }

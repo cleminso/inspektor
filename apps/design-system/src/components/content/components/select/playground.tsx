@@ -1,59 +1,54 @@
-import {
-  Box,
-  Select,
-  type SelectTriggerSize,
-  type SelectWidth,
-} from "@inspector/ds";
-import { type ReactElement, type ReactNode, useState } from "react";
+import { Box, Select, type SelectTriggerSize, type SelectWidth } from '@inspector/ds'
+import { type ReactElement, type ReactNode, useState } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { PlaygroundControls } from "@/components/docs/playground/playgroundControls";
-import { createPlaygroundSource } from "@/components/docs/playground/playgroundSource";
-import { type PlaygroundControl } from "@/components/docs/playground/playgroundTypes";
-import { selectItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
+import { createPlaygroundSource } from '@/components/docs/playground/playgroundSource'
+import { type PlaygroundControl } from '@/components/docs/playground/playgroundTypes'
+import { selectItem } from '@/lib/registry'
 
 export interface SelectPlaygroundState {
-  size: SelectTriggerSize;
-  width: SelectWidth;
-  disabled: boolean;
-  [key: string]: boolean | string;
+  size: SelectTriggerSize
+  width: SelectWidth
+  disabled: boolean
+  [key: string]: boolean | string
 }
 
 const initialState: SelectPlaygroundState = {
-  size: "l",
-  width: "content",
+  size: 'l',
+  width: 'content',
   disabled: false,
-};
+}
 
 const options = [
-  { label: "Main", value: "main" },
-  { label: "Develop", value: "develop" },
-  { label: "Schema preview", value: "schema-preview" },
-];
+  { label: 'Main', value: 'main' },
+  { label: 'Develop', value: 'develop' },
+  { label: 'Schema preview', value: 'schema-preview' },
+]
 
 const controls = [
   {
-    kind: "select",
-    key: "size",
-    label: "Size",
-    options: ["xs", "s", "m", "l"].map((value) => ({ label: value, value })),
+    kind: 'select',
+    key: 'size',
+    label: 'Size',
+    options: ['xs', 's', 'm', 'l'].map((value) => ({ label: value, value })),
   },
   {
-    kind: "select",
-    key: "width",
-    label: "Width",
-    options: ["content", "full"].map((value) => ({ label: value, value })),
+    kind: 'select',
+    key: 'width',
+    label: 'Width',
+    options: ['content', 'full'].map((value) => ({ label: value, value })),
   },
-  { kind: "boolean", key: "disabled", label: "Disabled" },
-] as const satisfies readonly PlaygroundControl<SelectPlaygroundState>[];
+  { kind: 'boolean', key: 'disabled', label: 'Disabled' },
+] as const satisfies readonly PlaygroundControl<SelectPlaygroundState>[]
 
 export function serializeSelectPlayground(state: SelectPlaygroundState): string {
-  const rootProps = ["items={options}", 'defaultValue="main"'];
-  const triggerProps = ['aria-label="Branch"', 'placeholder="Select a branch"'];
-  const itemProps = ['key={option.value}', 'value={option.value}'];
-  if (state.disabled === true) rootProps.push("disabled");
-  if (state.size !== "l") triggerProps.push(`size="${state.size}"`);
-  if (state.width !== "content") triggerProps.push(`width="${state.width}"`);
+  const rootProps = ['items={options}', 'defaultValue="main"']
+  const triggerProps = ['aria-label="Branch"', 'placeholder="Select a branch"']
+  const itemProps = ['key={option.value}', 'value={option.value}']
+  if (state.disabled === true) rootProps.push('disabled')
+  if (state.size !== 'l') triggerProps.push(`size="${state.size}"`)
+  if (state.width !== 'content') triggerProps.push(`width="${state.width}"`)
 
   return createPlaygroundSource({
     imports: { Select: true },
@@ -63,25 +58,29 @@ export function serializeSelectPlayground(state: SelectPlaygroundState): string 
   { label: "Schema preview", value: "schema-preview" },
 ];`,
     example: `(
-    <Select.Root ${rootProps.join(" ")}>
-      <Select.Trigger ${triggerProps.join(" ")} />
+    <Select.Root ${rootProps.join(' ')}>
+      <Select.Trigger ${triggerProps.join(' ')} />
       <Select.Content>
         {options.map((option) => (
-          <Select.Item ${itemProps.join(" ")}>
+          <Select.Item ${itemProps.join(' ')}>
             {option.label}
           </Select.Item>
         ))}
       </Select.Content>
     </Select.Root>
   )`,
-  });
+  })
 }
 
 export function SelectPlayground({ children }: { children?: ReactNode }): ReactElement {
-  const [state, setState] = useState<SelectPlaygroundState>(initialState);
+  const [state, setState] = useState<SelectPlaygroundState>(initialState)
   const preview = (
     <Box>
-      <Select.Root items={options} defaultValue="main" disabled={state.disabled}>
+      <Select.Root
+        items={options}
+        defaultValue="main"
+        disabled={state.disabled}
+      >
         <Select.Trigger
           aria-label="Branch"
           placeholder="Select a branch"
@@ -90,14 +89,17 @@ export function SelectPlayground({ children }: { children?: ReactNode }): ReactE
         />
         <Select.Content>
           {options.map((option) => (
-            <Select.Item key={option.value} value={option.value}>
+            <Select.Item
+              key={option.value}
+              value={option.value}
+            >
               {option.label}
             </Select.Item>
           ))}
         </Select.Content>
       </Select.Root>
     </Box>
-  );
+  )
 
   return (
     <ComponentDocsPage
@@ -117,5 +119,5 @@ export function SelectPlayground({ children }: { children?: ReactNode }): ReactE
     >
       {children}
     </ComponentDocsPage>
-  );
+  )
 }

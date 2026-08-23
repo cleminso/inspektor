@@ -24,10 +24,7 @@ function TestLedgerProvider({ children }: { children: ReactNode }): React.ReactE
   return (
     <RuntimeScopeExitGuardProvider>
       <TableMutationLedgerWorkspaceProvider>
-        <TableMutationLedgerProvider
-          schemaColumns={columns}
-          scopeKey="test:accounts"
-        >
+        <TableMutationLedgerProvider schemaColumns={columns} scopeKey="test:accounts">
           {children}
         </TableMutationLedgerProvider>
       </TableMutationLedgerWorkspaceProvider>
@@ -83,7 +80,10 @@ describe('useApplyTableMutationLedger', () => {
     const onSuccess = vi.fn()
     let resolveUpdate: (() => void) | undefined
     const updateRow = vi.fn(
-      () => new Promise<void>((resolve) => { resolveUpdate = resolve }),
+      () =>
+        new Promise<void>((resolve) => {
+          resolveUpdate = resolve
+        }),
     )
     render(
       <TestLedgerProvider>
@@ -115,7 +115,9 @@ describe('useApplyTableMutationLedger', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Change' }))
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
 
-    await waitFor(() => expect(screen.getByLabelText('Execution status').textContent).toBe('failed'))
+    await waitFor(() =>
+      expect(screen.getByLabelText('Execution status').textContent).toBe('failed'),
+    )
     expect(screen.getByLabelText('Pending count').textContent).toBe('1')
     expect(onSuccess).not.toHaveBeenCalled()
   })

@@ -9,7 +9,7 @@ afterEach(cleanup)
 
 describe('Textarea', () => {
   it('participates in Field labeling and value changes', () => {
-    const onValueChange = vi.fn((_: string, _details: { event: Event }) => undefined)
+    const onValueChange = vi.fn((_value: string, _details: { event: Event }) => undefined)
     render(
       <Field.Root>
         <Field.Label>JSON value</Field.Label>

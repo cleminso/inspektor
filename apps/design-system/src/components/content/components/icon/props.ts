@@ -1,1 +1,1 @@
-export const iconPropNames = ["artwork", "size"] as const;
+export const iconPropNames = ['artwork', 'size'] as const

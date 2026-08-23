@@ -1,5 +1,5 @@
-import { Button, ButtonGroup, ButtonGroupSeparator } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Button, ButtonGroup, ButtonGroupSeparator } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function CompositionExample(): ReactElement {
   return (
@@ -8,5 +8,5 @@ export default function CompositionExample(): ReactElement {
       <ButtonGroupSeparator />
       <Button variant="ghost">Paste</Button>
     </ButtonGroup>
-  );
+  )
 }

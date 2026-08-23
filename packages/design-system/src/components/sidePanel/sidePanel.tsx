@@ -12,7 +12,12 @@ export type SidePanelFooterProps = Omit<ComponentPropsWithRef<'div'>, 'className
 const SidePanelRoot = forwardRef<HTMLElement, SidePanelRootProps>(
   function SidePanelRoot(props, ref) {
     return (
-      <aside {...props} ref={ref} {...stylex.props(sidePanelStyles.root)} data-slot="side-panel" />
+      <aside
+        {...props}
+        ref={ref}
+        {...stylex.props(sidePanelStyles.root)}
+        data-slot="side-panel"
+      />
     )
   },
 )
@@ -30,21 +35,25 @@ const SidePanelHeader = forwardRef<HTMLDivElement, SidePanelHeaderProps>(
   },
 )
 
-const SidePanelBody = forwardRef<HTMLDivElement, SidePanelBodyProps>(
-  function SidePanelBody({ children, ...props }, ref) {
-    return (
-      <ScrollAreaPrivate
-        {...props}
-        ref={ref}
-        viewportSlot="side-panel-body"
+const SidePanelBody = forwardRef<HTMLDivElement, SidePanelBodyProps>(function SidePanelBody(
+  { children, ...props },
+  ref,
+) {
+  return (
+    <ScrollAreaPrivate
+      {...props}
+      ref={ref}
+      viewportSlot="side-panel-body"
+    >
+      <div
+        {...stylex.props(sidePanelStyles.body)}
+        data-slot="side-panel-body-content"
       >
-        <div {...stylex.props(sidePanelStyles.body)} data-slot="side-panel-body-content">
-          {children}
-        </div>
-      </ScrollAreaPrivate>
-    )
-  },
-)
+        {children}
+      </div>
+    </ScrollAreaPrivate>
+  )
+})
 
 const SidePanelFooter = forwardRef<HTMLDivElement, SidePanelFooterProps>(
   function SidePanelFooter(props, ref) {

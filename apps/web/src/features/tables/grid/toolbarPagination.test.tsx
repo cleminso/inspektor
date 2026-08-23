@@ -31,7 +31,6 @@ describe('TablePagination', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next page' }))
 
     expect(onPageChange).toHaveBeenCalledWith(2)
-
   })
 
   it('reports a supported page-size selection', () => {

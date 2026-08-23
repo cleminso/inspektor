@@ -45,12 +45,24 @@ function RuntimeErrorStatus(): React.ReactElement {
       backgroundColor="surface-background"
       role="alert"
     >
-      <Box flexDirection="column" alignItems="center" gap="xs">
-        <Text variant="label" color="error">
+      <Box
+        flexDirection="column"
+        alignItems="center"
+        gap="xs"
+      >
+        <Text
+          variant="label"
+          color="error"
+        >
           Couldn't initialize the Inspector
         </Text>
         <Text color="muted">Check the connection and schema details.</Text>
-        <Button type="button" size="s" variant="secondary" onClick={retryRuntime}>
+        <Button
+          type="button"
+          size="s"
+          variant="secondary"
+          onClick={retryRuntime}
+        >
           Try again
         </Button>
       </Box>
@@ -168,7 +180,11 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                 }
               />
               <Tooltip.Content>
-                Go Back <KeyboardInput hotkey={appHotkeys.goBack} size="small" />
+                Go Back{' '}
+                <KeyboardInput
+                  hotkey={appHotkeys.goBack}
+                  size="small"
+                />
               </Tooltip.Content>
             </Tooltip.Root>
             <Tooltip.Root>
@@ -190,7 +206,11 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                 }
               />
               <Tooltip.Content>
-                Go Forward <KeyboardInput hotkey={appHotkeys.goForward} size="small" />
+                Go Forward{' '}
+                <KeyboardInput
+                  hotkey={appHotkeys.goForward}
+                  size="small"
+                />
               </Tooltip.Content>
             </Tooltip.Root>
           </WorkspaceTabs.LeadingArea>
@@ -235,9 +255,15 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                   value={tab.id}
                   prefix={
                     isSchemaTab === true ? (
-                      <Icon artwork={productGlyphs.derivedView} size="s" />
+                      <Icon
+                        artwork={productGlyphs.derivedView}
+                        size="s"
+                      />
                     ) : (
-                      <Icon artwork={productGlyphs.table} size="s" />
+                      <Icon
+                        artwork={productGlyphs.table}
+                        size="s"
+                      />
                     )
                   }
                   retention={isReplaceable === true ? 'replaceable' : 'persistent'}
@@ -321,7 +347,11 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
                 }
               />
               <Tooltip.Content>
-                New view <KeyboardInput hotkey={appHotkeys.openTableView} size="small" />
+                New view{' '}
+                <KeyboardInput
+                  hotkey={appHotkeys.openTableView}
+                  size="small"
+                />
               </Tooltip.Content>
             </Tooltip.Root>
           </WorkspaceTabs.TrailingArea>

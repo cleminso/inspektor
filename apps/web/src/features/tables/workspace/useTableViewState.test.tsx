@@ -4,10 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnDescriptor } from 'jazz-tools'
 
 import { DataGrid } from '@inspector/ds'
-import {
-  createInsertRowValues,
-  useTableViewState,
-} from '@tables/workspace/useTableViewState'
+import { createInsertRowValues, useTableViewState } from '@tables/workspace/useTableViewState'
 
 const setRowEditor = vi.fn()
 const deleteRow = vi.fn()
@@ -193,7 +190,7 @@ function TableViewInteractionHarness(): React.ReactElement {
       </output>
       <output aria-label="Inline editor target">
         {state.activeFieldEditorTarget === null
-          ? ""
+          ? ''
           : `${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
       </output>
       <button

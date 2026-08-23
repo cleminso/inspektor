@@ -23,23 +23,60 @@ describe('Box', () => {
 
   it('resolves every semantic color token accepted by Box', () => {
     const backgroundColors = [
-      'surface-background', 'surface-default', 'surface-raised', 'surface-canvas',
-      'surface-subtle', 'surface-overlay', 'surface-backdrop', 'surface-inverse',
-      'element-default', 'element-hover', 'element-pressed', 'element-selected',
-      'element-disabled', 'ghost-element-default', 'ghost-element-hover',
-      'ghost-element-pressed', 'ghost-element-selected', 'ghost-element-disabled',
-      'accent-element-default', 'accent-element-hover', 'accent-element-pressed',
-      'accent-element-disabled', 'danger-element-default', 'danger-element-hover',
-      'danger-element-pressed', 'danger-element-disabled',
-      'selection-background', 'selection-strong-background',
+      'surface-background',
+      'surface-default',
+      'surface-raised',
+      'surface-canvas',
+      'surface-subtle',
+      'surface-overlay',
+      'surface-backdrop',
+      'surface-inverse',
+      'element-default',
+      'element-hover',
+      'element-pressed',
+      'element-selected',
+      'element-disabled',
+      'ghost-element-default',
+      'ghost-element-hover',
+      'ghost-element-pressed',
+      'ghost-element-selected',
+      'ghost-element-disabled',
+      'accent-element-default',
+      'accent-element-hover',
+      'accent-element-pressed',
+      'accent-element-disabled',
+      'danger-element-default',
+      'danger-element-hover',
+      'danger-element-pressed',
+      'danger-element-disabled',
+      'selection-background',
+      'selection-strong-background',
     ] as const
     const colors = [
-      'default', 'secondary', 'muted', 'placeholder', 'disabled', 'accent', 'link',
-      'success', 'warning', 'danger', 'onAccent', 'onInverse',
+      'default',
+      'secondary',
+      'muted',
+      'placeholder',
+      'disabled',
+      'accent',
+      'link',
+      'success',
+      'warning',
+      'danger',
+      'onAccent',
+      'onInverse',
     ] as const
     const borderColors = [
-      'default', 'subtle', 'strong', 'focused', 'selected', 'disabled', 'warning',
-      'danger', 'dangerSubtle', 'success',
+      'default',
+      'subtle',
+      'strong',
+      'focused',
+      'selected',
+      'disabled',
+      'warning',
+      'danger',
+      'dangerSubtle',
+      'success',
     ] as const
 
     for (const backgroundColor of backgroundColors) {
@@ -56,9 +93,7 @@ describe('Box', () => {
   it('forwards semantic DOM attributes', () => {
     render(<Box aria-label="Layout region" />)
 
-    expect(screen.getByLabelText('Layout region').getAttribute('aria-label')).toBe(
-      'Layout region',
-    )
+    expect(screen.getByLabelText('Layout region').getAttribute('aria-label')).toBe('Layout region')
   })
 
   it('strips styling escape hatches passed by untyped consumers', () => {
@@ -135,14 +170,9 @@ describe('Box', () => {
   })
 
   it('resolves a three-to-one grid track ratio', () => {
-    const resolved = resolveBoxStyles(
-      { gridTemplateColumns: 'three-one' },
-      'box-grid-three-one',
-    )
+    const resolved = resolveBoxStyles({ gridTemplateColumns: 'three-one' }, 'box-grid-three-one')
 
-    expect(resolved.inlineStyle.gridTemplateColumns).toBe(
-      'minmax(0, 3fr) minmax(0, 1fr)',
-    )
+    expect(resolved.inlineStyle.gridTemplateColumns).toBe('minmax(0, 3fr) minmax(0, 1fr)')
   })
 
   it('does not allow border style to activate the browser medium border width', () => {

@@ -27,10 +27,7 @@ function TestLedgerProvider({ children }: { children: React.ReactNode }): React.
   return (
     <RuntimeScopeExitGuardProvider>
       <TableMutationLedgerWorkspaceProvider>
-        <TableMutationLedgerProvider
-          schemaColumns={columns}
-          scopeKey="test:accounts"
-        >
+        <TableMutationLedgerProvider schemaColumns={columns} scopeKey="test:accounts">
           {children}
         </TableMutationLedgerProvider>
       </TableMutationLedgerWorkspaceProvider>
@@ -86,10 +83,7 @@ function EditorHarness() {
       >
         Undo deletion target
       </button>
-      <button
-        type="button"
-        onClick={() => mutations.undoReviewOperation('delete-operation:0')}
-      >
+      <button type="button" onClick={() => mutations.undoReviewOperation('delete-operation:0')}>
         Undo deletion operation
       </button>
       <button
@@ -124,11 +118,7 @@ function WorkspaceHarness({
         <button type="button" onClick={() => setScopeKey('connection:branch:schema:profiles')}>
           Open profiles
         </button>
-        <TableMutationLedgerProvider
-          key={scopeKey}
-          schemaColumns={columns}
-          scopeKey={scopeKey}
-        >
+        <TableMutationLedgerProvider key={scopeKey} schemaColumns={columns} scopeKey={scopeKey}>
           <EditorHarness />
         </TableMutationLedgerProvider>
       </TableMutationLedgerWorkspaceProvider>

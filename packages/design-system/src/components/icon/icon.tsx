@@ -1,9 +1,5 @@
 import * as stylex from '@stylexjs/stylex'
-import {
-  forwardRef,
-  type ComponentPropsWithRef,
-  type ForwardRefExoticComponent,
-} from 'react'
+import { forwardRef, type ComponentPropsWithRef, type ForwardRefExoticComponent } from 'react'
 
 import { iconStyles } from './icon.styles'
 

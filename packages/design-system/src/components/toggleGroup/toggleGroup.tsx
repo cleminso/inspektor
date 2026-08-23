@@ -103,36 +103,37 @@ const ToggleGroupRoot = React.forwardRef(ToggleGroupRootInner) as <Value extends
   props: ToggleGroupRootProps<Value> & RefAttributes<HTMLDivElement>,
 ) => ReactElement
 
-const ToggleGroupItem = React.forwardRef<React.ComponentRef<typeof BaseToggle>, ToggleGroupItemProps>(
-  function ToggleGroupItem({ nativeButton = true, disabled = false, ...props }, ref) {
-    const { equalWidth, size } = useContext(ToggleGroupContext)
-    const sizeStyles = {
-      s: toggleGroupStyles.itemSizeS,
-      m: toggleGroupStyles.itemSizeM,
-      l: toggleGroupStyles.itemSizeL,
-    } satisfies Record<ToggleGroupSize, unknown>
-    const stateStyles = createStateStyleProps<BaseToggle.State>((state) => [
-      toggleGroupStyles.item,
-      sizeStyles[size],
-      equalWidth === true && toggleGroupStyles.itemEqualWidth,
-      state.pressed === true && toggleGroupStyles.itemPressed,
-      state.disabled === true && toggleGroupStyles.itemDisabled,
-      state.pressed === true && state.disabled === true && toggleGroupStyles.itemPressedDisabled,
-    ])
+const ToggleGroupItem = React.forwardRef<
+  React.ComponentRef<typeof BaseToggle>,
+  ToggleGroupItemProps
+>(function ToggleGroupItem({ nativeButton = true, disabled = false, ...props }, ref) {
+  const { equalWidth, size } = useContext(ToggleGroupContext)
+  const sizeStyles = {
+    s: toggleGroupStyles.itemSizeS,
+    m: toggleGroupStyles.itemSizeM,
+    l: toggleGroupStyles.itemSizeL,
+  } satisfies Record<ToggleGroupSize, unknown>
+  const stateStyles = createStateStyleProps<BaseToggle.State>((state) => [
+    toggleGroupStyles.item,
+    sizeStyles[size],
+    equalWidth === true && toggleGroupStyles.itemEqualWidth,
+    state.pressed === true && toggleGroupStyles.itemPressed,
+    state.disabled === true && toggleGroupStyles.itemDisabled,
+    state.pressed === true && state.disabled === true && toggleGroupStyles.itemPressedDisabled,
+  ])
 
-    return (
-      <BaseToggle
-        {...props}
-        ref={ref}
-        nativeButton={nativeButton}
-        disabled={disabled}
-        {...stateStyles}
-        data-size={size}
-        data-slot="toggle-group-item"
-      />
-    )
-  },
-)
+  return (
+    <BaseToggle
+      {...props}
+      ref={ref}
+      nativeButton={nativeButton}
+      disabled={disabled}
+      {...stateStyles}
+      data-size={size}
+      data-slot="toggle-group-item"
+    />
+  )
+})
 
 export const ToggleGroup = Object.assign(ToggleGroupRoot, {
   Root: ToggleGroupRoot,

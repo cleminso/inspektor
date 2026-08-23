@@ -104,12 +104,7 @@ export function TableHotkeys(): null {
         },
       },
     ],
-    [
-      activeTabId,
-      canCloseActiveTab,
-      closeTab,
-      openNewView,
-    ],
+    [activeTabId, canCloseActiveTab, closeTab, openNewView],
   )
   useAppCommands(commands)
 

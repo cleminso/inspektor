@@ -1,12 +1,17 @@
-import { Button, Menu } from "@inspector/ds";
-import { ChevronDown } from "lucide-react";
-import { type ReactElement } from "react";
+import { Button, Menu } from '@inspector/ds'
+import { ChevronDown } from 'lucide-react'
+import { type ReactElement } from 'react'
 
 export default function ChevronExample(): ReactElement {
   return (
     <Menu.Root>
       <Menu.Trigger
-        render={<Button variant="secondary" suffix={<Button.Glyph artwork={ChevronDown} />} />}
+        render={
+          <Button
+            variant="secondary"
+            suffix={<Button.Glyph artwork={ChevronDown} />}
+          />
+        }
       >
         View
       </Menu.Trigger>
@@ -16,5 +21,5 @@ export default function ChevronExample(): ReactElement {
         <Menu.Item onClick={() => undefined}>Timeline</Menu.Item>
       </Menu.Content>
     </Menu.Root>
-  );
+  )
 }

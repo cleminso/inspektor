@@ -1,22 +1,28 @@
-import { Button, Menu } from "@inspector/ds";
-import { type ReactElement, useState } from "react";
+import { Button, Menu } from '@inspector/ds'
+import { type ReactElement, useState } from 'react'
 
 export default function SelectionItemsExample(): ReactElement {
-  const [showSystemTables, setShowSystemTables] = useState(false);
-  const [density, setDensity] = useState("comfortable");
+  const [showSystemTables, setShowSystemTables] = useState(false)
+  const [density, setDensity] = useState('comfortable')
 
   return (
     <Menu.Root>
       <Menu.Trigger render={<Button variant="secondary" />}>Table options</Menu.Trigger>
       <Menu.Content>
-        <Menu.CheckboxItem checked={showSystemTables} onCheckedChange={setShowSystemTables}>
+        <Menu.CheckboxItem
+          checked={showSystemTables}
+          onCheckedChange={setShowSystemTables}
+        >
           <Menu.CheckboxItemIndicator />
           Show system tables
         </Menu.CheckboxItem>
         <Menu.Separator />
         <Menu.Group>
           <Menu.GroupLabel>Density</Menu.GroupLabel>
-          <Menu.RadioGroup value={density} onValueChange={setDensity}>
+          <Menu.RadioGroup
+            value={density}
+            onValueChange={setDensity}
+          >
             <Menu.RadioItem value="compact">
               <Menu.RadioItemIndicator />
               Compact
@@ -29,5 +35,5 @@ export default function SelectionItemsExample(): ReactElement {
         </Menu.Group>
       </Menu.Content>
     </Menu.Root>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
 import {
   borderColors,
@@ -7,45 +7,45 @@ import {
   spatial,
   surfaceColors,
   textColors,
-} from "../../tokens/semantics.stylex";
+} from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
   fontSizes,
   lineHeights,
   spacing,
-} from "../../tokens/value.stylex";
+} from '../../tokens/value.stylex'
 
 export const inputStyles = stylex.create({
   base: {
     margin: 0,
     borderRadius: borderRadii.xs,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderWidth: 1,
     paddingBlock: 0,
     paddingInline: spacing.xs,
-    appearance: "none",
+    appearance: 'none',
     backgroundColor: surfaceColors.default,
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
     color: textColors.default,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
     minWidth: 0,
-    "::placeholder": {
+    '::placeholder': {
       color: textColors.muted,
     },
   },
   sizeXS: {
-    height: spatial["control-height-xs"],
+    height: spatial['control-height-xs'],
   },
   sizeS: {
-    height: spatial["control-height-s"],
+    height: spatial['control-height-s'],
   },
   sizeM: {
-    height: spatial["control-height-m"],
+    height: spatial['control-height-m'],
   },
   sizeL: {
-    height: spatial["control-height-l"],
+    height: spatial['control-height-l'],
   },
   fontSans: {
     fontFamily: fontFamilies.sans,
@@ -55,55 +55,55 @@ export const inputStyles = stylex.create({
   },
   subtle: {
     borderColor: {
-      default: "transparent",
-      ":focus-visible": borderColors.focused,
-      ":hover": borderColors.default,
+      default: 'transparent',
+      ':focus-visible': borderColors.focused,
+      ':hover': borderColors.default,
     },
     backgroundColor: surfaceColors.subtle,
   },
   fullWidth: {
-    width: "100%",
+    width: '100%',
   },
   grouped: {
-    borderColor: "transparent",
+    borderColor: 'transparent',
     borderRadius: 0,
     borderWidth: 0,
-    flexBasis: "0%",
-    flexGrow: "1",
-    flexShrink: "1",
+    flexBasis: '0%',
+    flexGrow: '1',
+    flexShrink: '1',
     outlineWidth: 0,
-    height: "100%",
+    height: '100%',
     minWidth: 0,
   },
   disabled: {
     backgroundColor: {
       default: elementColors.disabled,
-      ":hover": elementColors.disabled,
+      ':hover': elementColors.disabled,
     },
     color: textColors.disabled,
-    cursor: "not-allowed",
-    "::placeholder": {
+    cursor: 'not-allowed',
+    '::placeholder': {
       color: textColors.disabled,
     },
   },
   readOnly: {
     backgroundColor: {
       default: elementColors.default,
-      ":hover": elementColors.default,
+      ':hover': elementColors.default,
     },
-    cursor: "default",
+    cursor: 'default',
   },
   invalid: {
     borderColor: {
       default: borderColors.danger,
-      ":focus-visible": borderColors.danger,
+      ':focus-visible': borderColors.danger,
     },
     outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
-    outlineStyle: "solid",
+    outlineStyle: 'solid',
     outlineWidth: {
       default: 0,
-      ":focus-visible": spatial["focus-ring-width"],
+      ':focus-visible': spatial['focus-ring-width'],
     },
   },
   valid: {},
@@ -111,4 +111,4 @@ export const inputStyles = stylex.create({
   dirty: {},
   filled: {},
   focused: {},
-});
+})

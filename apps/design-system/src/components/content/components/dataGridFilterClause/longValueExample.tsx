@@ -1,7 +1,7 @@
-import { DataGridFilterClause } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { DataGridFilterClause } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-const value = "a-complete-value-that-is-longer-than-the-visible-segment";
+const value = 'a-complete-value-that-is-longer-than-the-visible-segment'
 export default function LongValueExample(): ReactElement {
   return (
     <DataGridFilterClause.Root>
@@ -12,5 +12,5 @@ export default function LongValueExample(): ReactElement {
       </DataGridFilterClause.Trigger>
       <DataGridFilterClause.Remove aria-label={`Remove filter identifier equals ${value}`} />
     </DataGridFilterClause.Root>
-  );
+  )
 }

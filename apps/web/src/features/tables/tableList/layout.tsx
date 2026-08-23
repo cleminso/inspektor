@@ -7,70 +7,70 @@ import {
   ResizablePanelGroup,
   useResizablePanelRef,
   type ResizablePanelSize,
-} from "@inspector/ds";
-import { createContext, use, useCallback, useMemo, useState } from "react";
+} from '@inspector/ds'
+import { createContext, use, useCallback, useMemo, useState } from 'react'
 
 interface SidePanelLayoutContextValue {
-  isOpen: boolean;
-  panelRef: ReturnType<typeof useResizablePanelRef>;
-  setIsOpenFromSize: (size: ResizablePanelSize) => void;
-  toggle: () => void;
+  isOpen: boolean
+  panelRef: ReturnType<typeof useResizablePanelRef>
+  setIsOpenFromSize: (size: ResizablePanelSize) => void
+  toggle: () => void
 }
 
-const SidePanelLayoutContext = createContext<SidePanelLayoutContextValue | null>(null);
+const SidePanelLayoutContext = createContext<SidePanelLayoutContextValue | null>(null)
 
 export function useSidePanelLayout(): SidePanelLayoutContextValue {
-  const value = use(SidePanelLayoutContext);
+  const value = use(SidePanelLayoutContext)
 
   if (value === null) {
-    throw new Error("SidePanelLayout components must be rendered within SidePanelLayoutProvider");
+    throw new Error('SidePanelLayout components must be rendered within SidePanelLayoutProvider')
   }
 
-  return value;
+  return value
 }
 
 interface SidePanelLayoutProviderProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 interface SidePanelLayoutRootProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export function SidePanelLayoutProvider({
   children,
 }: SidePanelLayoutProviderProps): React.ReactElement {
-  const panelRef = useResizablePanelRef();
-  const [isOpen, setIsOpen] = useState(true);
+  const panelRef = useResizablePanelRef()
+  const [isOpen, setIsOpen] = useState(true)
 
   const setIsOpenFromSize = useCallback((size: ResizablePanelSize) => {
-    setIsOpen(size.inPixels > 0);
-  }, []);
+    setIsOpen(size.inPixels > 0)
+  }, [])
 
   const toggle = useCallback(() => {
-    const panel = panelRef.current;
+    const panel = panelRef.current
     if (panel === null) {
-      return;
+      return
     }
 
     if (isOpen === true) {
-      panel.collapse();
-      setIsOpen(false);
+      panel.collapse()
+      setIsOpen(false)
     } else {
-      panel.expand();
-      setIsOpen(true);
+      panel.expand()
+      setIsOpen(true)
     }
-  }, [isOpen, panelRef]);
+  }, [isOpen, panelRef])
 
   const contextValue = useMemo(
     () => ({ isOpen, panelRef, setIsOpenFromSize, toggle }),
     [isOpen, panelRef, setIsOpenFromSize, toggle],
-  );
+  )
   return (
     <SidePanelLayoutContext.Provider value={contextValue}>
       {children}
     </SidePanelLayoutContext.Provider>
-  );
+  )
 }
 
 function SidePanelLayoutRoot({ children }: SidePanelLayoutRootProps): React.ReactElement {
@@ -84,15 +84,15 @@ function SidePanelLayoutRoot({ children }: SidePanelLayoutRootProps): React.Reac
     >
       <ResizablePanelGroup orientation="horizontal">{children}</ResizablePanelGroup>
     </Box>
-  );
+  )
 }
 
 interface SidePanelLayoutPartProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.ReactElement {
-  const { isOpen, panelRef, setIsOpenFromSize } = useSidePanelLayout();
+  const { isOpen, panelRef, setIsOpenFromSize } = useSidePanelLayout()
 
   return (
     <>
@@ -118,7 +118,7 @@ function SidePanelLayoutPanel({ children }: SidePanelLayoutPartProps): React.Rea
       </ResizablePanel>
       {isOpen === true ? <ResizableHandle appearance="gutter" /> : null}
     </>
-  );
+  )
 }
 
 function SidePanelLayoutContent({ children }: SidePanelLayoutPartProps): React.ReactElement {
@@ -136,10 +136,10 @@ function SidePanelLayoutContent({ children }: SidePanelLayoutPartProps): React.R
         {children}
       </Box>
     </ResizablePanel>
-  );
+  )
 }
 
 export const SidePanelLayout = Object.assign(SidePanelLayoutRoot, {
   Content: SidePanelLayoutContent,
   Panel: SidePanelLayoutPanel,
-});
+})

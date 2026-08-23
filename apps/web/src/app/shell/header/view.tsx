@@ -1,15 +1,15 @@
-import { Box, Button, Text, Tooltip } from "@inspector/ds";
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Box, Button, Text, Tooltip } from '@inspector/ds'
+import { Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
 
-import { BranchSwitcher } from "@app/shell/header/branchSwitcher";
-import { SchemaSwitcher } from "@app/shell/header/schemaSwitcher";
-import { ConnectionSwitcher } from "@shared/connections/connectionSwitcher";
+import { BranchSwitcher } from '@app/shell/header/branchSwitcher'
+import { SchemaSwitcher } from '@app/shell/header/schemaSwitcher'
+import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 
 export function InspectorHeader(): React.ReactElement {
-  const { resolvedTheme, setTheme } = useTheme();
-  const isDarkTheme = resolvedTheme === "dark";
-  const themeLabel = isDarkTheme === true ? "Switch to light theme" : "Switch to dark theme";
+  const { resolvedTheme, setTheme } = useTheme()
+  const isDarkTheme = resolvedTheme === 'dark'
+  const themeLabel = isDarkTheme === true ? 'Switch to light theme' : 'Switch to dark theme'
 
   return (
     <Box
@@ -22,18 +22,35 @@ export function InspectorHeader(): React.ReactElement {
       paddingHorizontal="xs"
       backgroundColor="surface-background"
     >
-      <Box minWidth={0} flex={1} alignItems="center" gap="xxs">
+      <Box
+        minWidth={0}
+        flex={1}
+        alignItems="center"
+        gap="xxs"
+      >
         <ConnectionSwitcher width="m" />
-        <Box minWidth={0} alignItems="center" gap="xxs">
+        <Box
+          minWidth={0}
+          alignItems="center"
+          gap="xxs"
+        >
           <BranchSwitcher width="s" />
-          <Text as="span" color="muted" aria-hidden="true">
+          <Text
+            as="span"
+            color="muted"
+            aria-hidden="true"
+          >
             /
           </Text>
           <SchemaSwitcher width="m" />
         </Box>
       </Box>
 
-      <Box flex={1} justifyContent="end" pr="s">
+      <Box
+        flex={1}
+        justifyContent="end"
+        pr="s"
+      >
         <Tooltip.Root>
           <Tooltip.Trigger
             render={
@@ -44,7 +61,7 @@ export function InspectorHeader(): React.ReactElement {
                 aria-label="Toggle theme"
                 iconOnly
                 onClick={() => {
-                  setTheme(isDarkTheme === true ? "light" : "dark");
+                  setTheme(isDarkTheme === true ? 'light' : 'dark')
                 }}
               >
                 <Button.Glyph artwork={isDarkTheme === true ? Sun : Moon} />
@@ -55,5 +72,5 @@ export function InspectorHeader(): React.ReactElement {
         </Tooltip.Root>
       </Box>
     </Box>
-  );
+  )
 }

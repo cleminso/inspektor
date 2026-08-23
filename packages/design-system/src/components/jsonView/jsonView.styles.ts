@@ -1,39 +1,39 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
-import { jsonViewVars } from "./jsonViewVars.stylex";
+import { jsonViewVars } from './jsonViewVars.stylex'
 import {
   focusColors,
   ghostElementColors,
   spatial,
   syntaxColors,
   textColors,
-} from "../../tokens/semantics.stylex";
+} from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
   fontSizes,
   lineHeights,
   spacing,
-} from "../../tokens/value.stylex";
+} from '../../tokens/value.stylex'
 
 export const jsonViewStyles = stylex.create({
   root: {
-    position: "relative",
+    position: 'relative',
     minWidth: 0,
-    width: "100%",
+    width: '100%',
   },
   copyActionLayer: {
-    display: "flex",
-    justifyContent: "flex-end",
-    pointerEvents: "none",
-    position: "sticky",
+    display: 'flex',
+    justifyContent: 'flex-end',
+    pointerEvents: 'none',
+    position: 'sticky',
     zIndex: 1,
     height: 0,
     top: 0,
-    width: "100%",
+    width: '100%',
   },
   copyAction: {
-    pointerEvents: "auto",
+    pointerEvents: 'auto',
   },
   tree: {
     color: textColors.default,
@@ -41,119 +41,119 @@ export const jsonViewStyles = stylex.create({
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,
     minWidth: 0,
-    width: "100%",
+    width: '100%',
   },
   item: {
     minWidth: 0,
-    outline: "none",
+    outline: 'none',
   },
   row: {
     borderRadius: borderRadii.xs,
-    display: "flex",
+    display: 'flex',
     paddingInlineEnd: spacing.xs,
-    maxWidth: "100%",
+    maxWidth: '100%',
     minWidth: 0,
-    width: "fit-content",
+    width: 'fit-content',
   },
   interactiveRow: {
     backgroundColor: {
-      default: "transparent",
-      ":hover": ghostElementColors.hover,
+      default: 'transparent',
+      ':hover': ghostElementColors.hover,
     },
     [jsonViewVars.disclosureColor]: {
       default: textColors.muted,
-      ":hover": textColors.default,
+      ':hover': textColors.default,
     },
-    cursor: "pointer",
-    userSelect: "none",
+    cursor: 'pointer',
+    userSelect: 'none',
   },
   focusedRow: {
     outlineColor: focusColors.ring,
     outlineOffset: -2,
-    outlineStyle: "solid",
-    outlineWidth: spatial["focus-ring-width"],
+    outlineStyle: 'solid',
+    outlineWidth: spatial['focus-ring-width'],
   },
   group: {
     paddingInlineStart: spacing.l,
   },
   disclosureSlot: {
-    alignItems: "center",
-    display: "flex",
+    alignItems: 'center',
+    display: 'flex',
     flexShrink: 0,
-    justifyContent: "center",
-    width: spatial["icon-size-m"],
+    justifyContent: 'center',
+    width: spatial['icon-size-m'],
   },
   disclosure: {
     padding: 0,
     borderRadius: borderRadii.xs,
-    borderStyle: "none",
-    alignItems: "center",
-    appearance: "none",
+    borderStyle: 'none',
+    alignItems: 'center',
+    appearance: 'none',
     color: jsonViewVars.disclosureColor,
-    cursor: "pointer",
-    display: "flex",
-    justifyContent: "center",
-    height: spatial["icon-size-m"],
-    width: spatial["icon-size-m"],
+    cursor: 'pointer',
+    display: 'flex',
+    justifyContent: 'center',
+    height: spatial['icon-size-m'],
+    width: spatial['icon-size-m'],
   },
   disclosureIcon: {
-    display: "block",
-    height: spatial["icon-size-xs"],
-    width: spatial["icon-size-xs"],
+    display: 'block',
+    height: spatial['icon-size-xs'],
+    width: spatial['icon-size-xs'],
   },
   content: {
-    overflowWrap: "anywhere",
-    userSelect: "text",
-    whiteSpace: "pre-wrap",
+    overflowWrap: 'anywhere',
+    userSelect: 'text',
+    whiteSpace: 'pre-wrap',
     minWidth: 0,
   },
   key: {
-    color: syntaxColors["syntax-property"],
+    color: syntaxColors['syntax-property'],
   },
   string: {
-    color: syntaxColors["syntax-string"],
+    color: syntaxColors['syntax-string'],
   },
   number: {
-    color: syntaxColors["syntax-number"],
+    color: syntaxColors['syntax-number'],
   },
   boolean: {
-    color: syntaxColors["syntax-boolean"],
+    color: syntaxColors['syntax-boolean'],
   },
   null: {
-    color: syntaxColors["syntax-constant"],
+    color: syntaxColors['syntax-constant'],
   },
   punctuation: {
-    color: syntaxColors["syntax-punctuation"],
+    color: syntaxColors['syntax-punctuation'],
   },
   mark: {
-    backgroundColor: syntaxColors["syntax-mark-background"],
-    color: syntaxColors["syntax-mark-foreground"],
+    backgroundColor: syntaxColors['syntax-mark-background'],
+    color: syntaxColors['syntax-mark-foreground'],
   },
   activeMark: {
-    backgroundColor: syntaxColors["syntax-mark-active-background"],
-    color: syntaxColors["syntax-mark-foreground"],
+    backgroundColor: syntaxColors['syntax-mark-active-background'],
+    color: syntaxColors['syntax-mark-foreground'],
   },
   inlineAction: {
-    borderStyle: "none",
+    borderStyle: 'none',
     paddingBlock: 0,
     paddingInline: spacing.xs,
     textDecoration: {
-      default: "none",
-      ":hover": "underline",
+      default: 'none',
+      ':hover': 'underline',
     },
-    appearance: "none",
-    backgroundColor: "transparent",
+    appearance: 'none',
+    backgroundColor: 'transparent',
     color: textColors.link,
-    cursor: "pointer",
+    cursor: 'pointer',
     fontFamily: fontFamilies.mono,
-    fontSize: "inherit",
-    lineHeight: "inherit",
+    fontSize: 'inherit',
+    lineHeight: 'inherit',
   },
   limitMessage: {
     color: textColors.muted,
-    userSelect: "none",
+    userSelect: 'none',
   },
   status: {
     paddingBlockEnd: spacing.xs,
   },
-});
+})

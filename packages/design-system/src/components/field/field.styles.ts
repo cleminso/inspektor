@@ -1,37 +1,32 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
-import {
-  borderColors,
-  elementColors,
-  focusColors,
-  textColors,
-} from "../../tokens/semantics.stylex";
+import { borderColors, elementColors, focusColors, textColors } from '../../tokens/semantics.stylex'
 import {
   fontFamilies,
   fontSizes,
   fontWeights,
   lineHeights,
   spacing,
-} from "../../tokens/value.stylex";
-import { inputGroupVars } from "../inputGroup/inputGroupVars.stylex";
+} from '../../tokens/value.stylex'
+import { inputGroupVars } from '../inputGroup/inputGroupVars.stylex'
 
 export const fieldStyles = stylex.create({
   root: {
     gap: spacing.xs,
-    alignItems: "stretch",
-    display: "flex",
-    flexDirection: "column",
+    alignItems: 'stretch',
+    display: 'flex',
+    flexDirection: 'column',
     minWidth: 0,
-    width: "100%",
+    width: '100%',
   },
   hidden: {
-    display: "none",
+    display: 'none',
   },
   label: {
     gap: spacing.s,
-    alignItems: "center",
+    alignItems: 'center',
     color: textColors.default,
-    display: "inline-flex",
+    display: 'inline-flex',
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.regular,
@@ -51,7 +46,7 @@ export const fieldStyles = stylex.create({
   },
   disabled: {
     color: textColors.disabled,
-    cursor: "not-allowed",
+    cursor: 'not-allowed',
   },
   inputGroupInvalid: {
     [inputGroupVars.borderColor]: borderColors.danger,
@@ -92,4 +87,4 @@ export const fieldStyles = stylex.create({
   errorFocused: {},
   errorStarting: {},
   errorEnding: {},
-});
+})

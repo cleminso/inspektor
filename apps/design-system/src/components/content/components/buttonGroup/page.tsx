@@ -1,26 +1,26 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import CompositionExample from "./compositionExample";
-import compositionSource from "./compositionExample.tsx?raw";
-import OrientationExample from "./orientationExample";
-import orientationSource from "./orientationExample.tsx?raw";
-import { ButtonGroupPlayground } from "./playground";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import CompositionExample from './compositionExample'
+import compositionSource from './compositionExample.tsx?raw'
+import OrientationExample from './orientationExample'
+import orientationSource from './orientationExample.tsx?raw'
+import { ButtonGroupPlayground } from './playground'
 import {
   buttonGroupRootPropNames,
   buttonGroupSeparatorPropNames,
   buttonGroupTextPropNames,
-} from "./props";
+} from './props'
 
-const rootProps = getGeneratedProps("buttonGroup.root", buttonGroupRootPropNames);
-const separatorProps = getGeneratedProps("buttonGroup.separator", buttonGroupSeparatorPropNames);
-const textProps = getGeneratedProps("buttonGroup.text", buttonGroupTextPropNames);
+const rootProps = getGeneratedProps('buttonGroup.root', buttonGroupRootPropNames)
+const separatorProps = getGeneratedProps('buttonGroup.separator', buttonGroupSeparatorPropNames)
+const textProps = getGeneratedProps('buttonGroup.text', buttonGroupTextPropNames)
 
 export function ButtonGroupPage(): ReactElement {
   return (
@@ -62,5 +62,5 @@ export function ButtonGroupPage(): ReactElement {
         <PropsTable rows={textProps} />
       </Section>
     </ButtonGroupPlayground>
-  );
+  )
 }

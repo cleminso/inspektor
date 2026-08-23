@@ -4,16 +4,16 @@
  * Dev-tool links can be opened repeatedly, so matching is based on the Jazz admin
  * credentials rather than Inspector labels or view preferences.
  */
-import type { ConnectionCredentials, StoredConnection } from "./connections";
+import type { ConnectionCredentials, StoredConnection } from './connections'
 
 /** Compares server identity without treating a trailing slash as a different app. */
 function normalizeServerUrl(serverUrl: string): string {
-  return serverUrl.trim().replace(/\/+$/u, "");
+  return serverUrl.trim().replace(/\/+$/u, '')
 }
 
 /** Removes form/link whitespace that is not part of the credential identity. */
 function normalizeCredentialField(value: string): string {
-  return value.trim();
+  return value.trim()
 }
 
 /**
@@ -30,7 +30,7 @@ export function matchesConnectionCredentials(
     normalizeServerUrl(connection.serverUrl) === normalizeServerUrl(draft.serverUrl) &&
     normalizeCredentialField(connection.appId) === normalizeCredentialField(draft.appId) &&
     normalizeCredentialField(connection.adminSecret) === normalizeCredentialField(draft.adminSecret)
-  );
+  )
 }
 
 /** Finds the saved Inspector profile for the same Jazz admin credentials. */
@@ -38,5 +38,5 @@ export function findConnectionByCredentials(
   connections: StoredConnection[],
   draft: ConnectionCredentials,
 ): StoredConnection | null {
-  return connections.find((connection) => matchesConnectionCredentials(connection, draft)) ?? null;
+  return connections.find((connection) => matchesConnectionCredentials(connection, draft)) ?? null
 }

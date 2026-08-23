@@ -1,10 +1,10 @@
 import { eslintCompatPlugin } from '@oxlint/plugins'
 
-import { noChainedTypeAssertionsRule } from './rules/noChainedTypeAssertions'
-import { noConditionalEmptyObjectSpreadRule } from './rules/noConditionalEmptyObjectSpread'
-import { noReflectApplyRule } from './rules/noReflectApply'
-import { noReflectGetRule } from './rules/noReflectGet'
-import { noForbiddenTermInSymbolNamesRule } from './rules/noShapeInSymbolNames'
+import { noChainedTypeAssertionsRule } from './rules/noChainedTypeAssertions.ts'
+import { noConditionalEmptyObjectSpreadRule } from './rules/noConditionalEmptyObjectSpread.ts'
+import { noReflectApplyRule } from './rules/noReflectApply.ts'
+import { noReflectGetRule } from './rules/noReflectGet.ts'
+import { noForbiddenTermInSymbolNamesRule } from './rules/noShapeInSymbolNames.ts'
 
 // Vendored subset of https://github.com/dmmulroy/anti-slop.
 const antiSlopPlugin = eslintCompatPlugin({

@@ -1,4 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
 import {
   borderColors,
@@ -7,43 +7,43 @@ import {
   spatial,
   surfaceColors,
   textColors,
-} from "../../tokens/semantics.stylex";
+} from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
   fontSizes,
   lineHeights,
   spacing,
-} from "../../tokens/value.stylex";
+} from '../../tokens/value.stylex'
 
 export const textareaStyles = stylex.create({
   base: {
     margin: 0,
     borderRadius: borderRadii.xs,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderWidth: 1,
     paddingBlock: spacing.s,
     paddingInline: spacing.m,
-    appearance: "none",
+    appearance: 'none',
     backgroundColor: surfaceColors.default,
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
     color: textColors.default,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    resize: "vertical",
+    resize: 'vertical',
     minWidth: 0,
-    "::placeholder": {
+    '::placeholder': {
       color: textColors.muted,
     },
   },
   heightS: {
-    minHeight: spatial["textarea-height-s"],
+    minHeight: spatial['textarea-height-s'],
   },
   heightM: {
-    minHeight: spatial["textarea-height-m"],
+    minHeight: spatial['textarea-height-m'],
   },
   heightL: {
-    minHeight: spatial["textarea-height-l"],
+    minHeight: spatial['textarea-height-l'],
   },
   fontSans: {
     fontFamily: fontFamilies.sans,
@@ -52,42 +52,42 @@ export const textareaStyles = stylex.create({
     fontFamily: fontFamilies.mono,
   },
   fullWidth: {
-    width: "100%",
+    width: '100%',
   },
   invalid: {
     borderColor: {
       default: borderColors.danger,
-      ":focus-visible": borderColors.danger,
+      ':focus-visible': borderColors.danger,
     },
     outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
-    outlineStyle: "solid",
+    outlineStyle: 'solid',
     outlineWidth: {
       default: 0,
-      ":focus-visible": spatial["focus-ring-width"],
+      ':focus-visible': spatial['focus-ring-width'],
     },
   },
   disabled: {
     backgroundColor: {
       default: elementColors.disabled,
-      ":hover": elementColors.disabled,
+      ':hover': elementColors.disabled,
     },
     color: textColors.disabled,
-    cursor: "not-allowed",
-    "::placeholder": {
+    cursor: 'not-allowed',
+    '::placeholder': {
       color: textColors.disabled,
     },
   },
   readOnly: {
     backgroundColor: {
       default: elementColors.default,
-      ":hover": elementColors.default,
+      ':hover': elementColors.default,
     },
-    cursor: "default",
+    cursor: 'default',
   },
   valid: {},
   touched: {},
   dirty: {},
   filled: {},
   focused: {},
-});
+})

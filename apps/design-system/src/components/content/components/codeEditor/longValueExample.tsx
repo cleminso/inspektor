@@ -1,5 +1,5 @@
-import { CodeEditor } from "@inspector/ds";
-import { useState } from "react";
+import { CodeEditor } from '@inspector/ds'
+import { useState } from 'react'
 
 const initialValue = JSON.stringify(
   {
@@ -7,21 +7,21 @@ const initialValue = JSON.stringify(
       fontSize: 14,
       fontLigatures: true,
       letterSpacing: -0.25,
-      lineNumbers: "on",
+      lineNumbers: 'on',
       minimap: { enabled: false },
       padding: { top: 16, bottom: 16 },
-      renderLineHighlight: "all",
+      renderLineHighlight: 'all',
       scrollBeyondLastLine: false,
       smoothScrolling: true,
-      wordWrap: "on",
+      wordWrap: 'on',
     },
   },
   null,
   2,
-);
+)
 
 export default function LongValueExample() {
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(initialValue)
 
   return (
     <CodeEditor
@@ -29,5 +29,5 @@ export default function LongValueExample() {
       value={value}
       onValueChange={setValue}
     />
-  );
+  )
 }

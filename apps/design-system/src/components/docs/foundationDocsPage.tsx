@@ -1,13 +1,13 @@
-import { Box, Text } from "@inspector/ds";
-import { type ReactElement, type ReactNode } from "react";
+import { Box, Text } from '@inspector/ds'
+import { type ReactElement, type ReactNode } from 'react'
 
-import { DocsHeader } from "@/components/docs/docsHeader";
-import { DocsPage } from "@/components/docs/docsPage";
-import { type NavItem } from "@/lib/registry";
+import { DocsHeader } from '@/components/docs/docsHeader'
+import { DocsPage } from '@/components/docs/docsPage'
+import { type NavItem } from '@/lib/registry'
 
 interface FoundationDocsPageProps {
-  item: NavItem;
-  children: ReactNode;
+  item: NavItem
+  children: ReactNode
 }
 
 export function FoundationDocsPage({ item, children }: FoundationDocsPageProps): ReactElement {
@@ -33,8 +33,14 @@ export function FoundationDocsPage({ item, children }: FoundationDocsPageProps):
         data-scroll-fade="top"
       >
         <DocsPage>
-          <Box display="block" maxWidth="content-measure">
-            <Text variant="body" color="muted">
+          <Box
+            display="block"
+            maxWidth="content-measure"
+          >
+            <Text
+              variant="body"
+              color="muted"
+            >
               {item.description}
             </Text>
           </Box>
@@ -42,5 +48,5 @@ export function FoundationDocsPage({ item, children }: FoundationDocsPageProps):
         </DocsPage>
       </Box>
     </Box>
-  );
+  )
 }

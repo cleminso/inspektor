@@ -1,1 +1,1 @@
-export const structuredValuePreviewPropNames = ["model", "variant"] as const;
+export const structuredValuePreviewPropNames = ['model', 'variant'] as const

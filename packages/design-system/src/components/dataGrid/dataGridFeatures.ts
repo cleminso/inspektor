@@ -9,7 +9,7 @@ import {
   tableFeatures,
   type RowData,
   type Table,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table'
 
 export const dataGridFeatures = tableFeatures({
   cellSelectionFeature,
@@ -19,7 +19,7 @@ export const dataGridFeatures = tableFeatures({
   columnVisibilityFeature,
   rowSelectionFeature,
   rowSortingFeature,
-});
+})
 
-export type DataGridFeatures = typeof dataGridFeatures;
-export type DataGridTable<TData extends RowData> = Table<DataGridFeatures, TData>;
+export type DataGridFeatures = typeof dataGridFeatures
+export type DataGridTable<TData extends RowData> = Table<DataGridFeatures, TData>

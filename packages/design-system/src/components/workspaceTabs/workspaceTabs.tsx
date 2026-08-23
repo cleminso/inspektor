@@ -43,7 +43,8 @@ interface WorkspaceTabsReorderActionsContextValue {
   onReorder: (values: WorkspaceTabsValue[]) => void
 }
 
-const WorkspaceTabsReorderActionsContext = createContext<WorkspaceTabsReorderActionsContextValue | null>(null)
+const WorkspaceTabsReorderActionsContext =
+  createContext<WorkspaceTabsReorderActionsContextValue | null>(null)
 
 /**
  * Why: importing DND from this static module pulled the shared sortable chunk into the initial
@@ -180,7 +181,12 @@ export interface WorkspaceTabsPanelProps {
   keepMounted?: boolean
 }
 
-function WorkspaceTabsRoot({ children, value, defaultValue, onValueChange }: WorkspaceTabsRootProps) {
+function WorkspaceTabsRoot({
+  children,
+  value,
+  defaultValue,
+  onValueChange,
+}: WorkspaceTabsRootProps) {
   const [uncontrolledValue, setUncontrolledValue] = useState<WorkspaceTabsValue | null>(
     defaultValue ?? null,
   )
@@ -691,7 +697,10 @@ function WorkspaceTabsTabContent({
               {closeHotkey === undefined ? null : (
                 <>
                   {' '}
-                  <KeyboardInput hotkey={closeHotkey} size="small" />
+                  <KeyboardInput
+                    hotkey={closeHotkey}
+                    size="small"
+                  />
                 </>
               )}
             </Tooltip.Content>

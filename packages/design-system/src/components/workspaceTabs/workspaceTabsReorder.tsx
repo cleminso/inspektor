@@ -45,7 +45,12 @@ const workspaceTabsSensors = [workspaceTabsPointerSensor]
 
 // Keep sortable ownership declarative: the hook's ref belongs to the WorkspaceTabs.Tab for this value.
 // Do not replace this with DOM discovery or an external `element`; that caused cross-tab movement.
-function SortableWorkspaceTabsItem({ children, disabled, index, value }: WorkspaceTabsSortableItemProps) {
+function SortableWorkspaceTabsItem({
+  children,
+  disabled,
+  index,
+  value,
+}: WorkspaceTabsSortableItemProps) {
   const sortable = useSortable({
     id: value,
     index,
@@ -61,7 +66,12 @@ function SortableWorkspaceTabsItem({ children, disabled, index, value }: Workspa
   })
 }
 
-export function WorkspaceTabsReorder({ children, listRef, values, onReorder }: WorkspaceTabsReorderProps) {
+export function WorkspaceTabsReorder({
+  children,
+  listRef,
+  values,
+  onReorder,
+}: WorkspaceTabsReorderProps) {
   const valueIndices = useMemo(
     () => new Map(values.map((value, index) => [value, index])),
     [values],

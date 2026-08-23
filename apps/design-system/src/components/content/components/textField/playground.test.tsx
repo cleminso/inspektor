@@ -1,14 +1,14 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { serializeTextFieldPlayground, TextFieldPlayground } from "./playground";
+import { serializeTextFieldPlayground, TextFieldPlayground } from './playground'
 
-vi.mock("@/lib/shiki", () => ({ useHighlightedCode: () => null }));
+vi.mock('@/lib/shiki', () => ({ useHighlightedCode: () => null }))
 
-afterEach(cleanup);
+afterEach(cleanup)
 
-describe("TextField playground", () => {
-  it("serializes only the selected TextField options", () => {
+describe('TextField playground', () => {
+  it('serializes only the selected TextField options', () => {
     const source = serializeTextFieldPlayground({
       required: false,
       disabled: false,
@@ -16,30 +16,30 @@ describe("TextField playground", () => {
       fullWidth: true,
       description: true,
       error: false,
-    });
+    })
 
-    expect(source).toContain('description="Sync server that stores your app data."');
-    expect(source).not.toContain("required");
-    expect(source).not.toContain("disabled");
-    expect(source).not.toContain("fullWidth");
-  });
+    expect(source).toContain('description="Sync server that stores your app data."')
+    expect(source).not.toContain('required')
+    expect(source).not.toContain('disabled')
+    expect(source).not.toContain('fullWidth')
+  })
 
-  it("uses one state for preview, source, and reset", () => {
-    const { container } = render(<TextFieldPlayground />);
+  it('uses one state for preview, source, and reset', () => {
+    const { container } = render(<TextFieldPlayground />)
 
-    fireEvent.click(screen.getByRole("switch", { name: "Required" }));
-    fireEvent.click(screen.getByRole("button", { name: "Show code" }));
+    fireEvent.click(screen.getByRole('switch', { name: 'Required' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
 
-    expect((screen.getByRole("textbox", { name: "Server URL" }) as HTMLInputElement).required).toBe(
+    expect((screen.getByRole('textbox', { name: 'Server URL' }) as HTMLInputElement).required).toBe(
       true,
-    );
-    expect(container.querySelector("pre")?.textContent).toContain("required");
+    )
+    expect(container.querySelector('pre')?.textContent).toContain('required')
 
-    fireEvent.click(screen.getByRole("button", { name: "Reset controls" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset controls' }))
 
-    expect((screen.getByRole("textbox", { name: "Server URL" }) as HTMLInputElement).required).toBe(
+    expect((screen.getByRole('textbox', { name: 'Server URL' }) as HTMLInputElement).required).toBe(
       false,
-    );
-    expect(container.querySelector("pre")?.textContent).not.toContain("required");
-  });
-});
+    )
+    expect(container.querySelector('pre')?.textContent).not.toContain('required')
+  })
+})

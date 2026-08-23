@@ -1,8 +1,8 @@
-import { Button, toasts } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Button, toasts } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 function saveConnection(): Promise<string> {
-  return Promise.resolve("Production");
+  return Promise.resolve('Production')
 }
 
 export default function PromiseExample(): ReactElement {
@@ -11,13 +11,13 @@ export default function PromiseExample(): ReactElement {
       variant="secondary"
       onClick={() =>
         toasts.promise(saveConnection(), {
-          loading: "Saving connection",
+          loading: 'Saving connection',
           success: (name) => `${name} connection saved`,
-          error: "Could not save connection",
+          error: 'Could not save connection',
         })
       }
     >
       Save connection
     </Button>
-  );
+  )
 }

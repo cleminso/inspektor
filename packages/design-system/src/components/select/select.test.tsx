@@ -72,9 +72,7 @@ describe('Select', () => {
     expectTypeOf<SelectRootProps<'main' | 'preview'>['defaultValue']>().toEqualTypeOf<
       'main' | 'preview' | null | undefined
     >()
-    expectTypeOf<SelectRootProps<'main' | 'preview'>['name']>().toEqualTypeOf<
-      string | undefined
-    >()
+    expectTypeOf<SelectRootProps<'main' | 'preview'>['name']>().toEqualTypeOf<string | undefined>()
   })
 
   it('updates an uncontrolled value through an item', () => {
@@ -173,5 +171,4 @@ describe('Select', () => {
 
     expect(screen.getByRole('combobox').getAttribute('data-size')).toBe('l')
   })
-
 })

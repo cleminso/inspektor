@@ -1,21 +1,21 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import DefaultExample from "./defaultExample";
-import defaultSource from "./defaultExample.tsx?raw";
+import DefaultExample from './defaultExample'
+import defaultSource from './defaultExample.tsx?raw'
 import {
   alertDialogClosePropNames,
   alertDialogContentPropNames,
   alertDialogRootPropNames,
-} from "./props";
+} from './props'
 
-const rootProps = getGeneratedProps("alertDialog.root", alertDialogRootPropNames);
-const contentProps = getGeneratedProps("alertDialog.content", alertDialogContentPropNames);
-const closeProps = getGeneratedProps("alertDialog.close", alertDialogClosePropNames);
+const rootProps = getGeneratedProps('alertDialog.root', alertDialogRootPropNames)
+const contentProps = getGeneratedProps('alertDialog.content', alertDialogContentPropNames)
+const closeProps = getGeneratedProps('alertDialog.close', alertDialogClosePropNames)
 
 export function AlertDialogPage(): ReactElement {
   return (
@@ -42,5 +42,5 @@ export function AlertDialogPage(): ReactElement {
         <PropsTable rows={closeProps} />
       </Section>
     </>
-  );
+  )
 }

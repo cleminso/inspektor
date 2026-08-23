@@ -17,7 +17,12 @@ export const dataGridRootPropNames = [
   'children',
 ] as const
 
-export const dataGridTablePropNames = ['aria-busy', 'aria-label', 'statusContent', 'children'] as const
+export const dataGridTablePropNames = [
+  'aria-busy',
+  'aria-label',
+  'statusContent',
+  'children',
+] as const
 export const dataGridContentPropNames = [
   'loading',
   'loadingContent',

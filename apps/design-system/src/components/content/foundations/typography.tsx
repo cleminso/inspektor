@@ -1,28 +1,28 @@
-import { Box, Text, type TextColor, type TextVariant } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Box, Text, type TextColor, type TextVariant } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-import { FoundationDocsPage } from "@/components/docs/foundationDocsPage";
-import { Section } from "@/components/docs/section";
-import { typographyFoundationItem } from "@/lib/registry";
+import { FoundationDocsPage } from '@/components/docs/foundationDocsPage'
+import { Section } from '@/components/docs/section'
+import { typographyFoundationItem } from '@/lib/registry'
 
 const textVariants: Array<{ variant: TextVariant; sample: string }> = [
-  { variant: "default", sample: "Default interface text" },
-  { variant: "heading", sample: "Section heading" },
-  { variant: "title", sample: "Interface title" },
-  { variant: "body", sample: "Body text supports readable product descriptions and guidance." },
-  { variant: "label", sample: "Control label" },
-  { variant: "caption", sample: "Supporting caption" },
-];
+  { variant: 'default', sample: 'Default interface text' },
+  { variant: 'heading', sample: 'Section heading' },
+  { variant: 'title', sample: 'Interface title' },
+  { variant: 'body', sample: 'Body text supports readable product descriptions and guidance.' },
+  { variant: 'label', sample: 'Control label' },
+  { variant: 'caption', sample: 'Supporting caption' },
+]
 
 const textColors = [
-  "default",
-  "muted",
-  "disabled",
-  "danger",
-  "error",
-  "link",
-  "inherit",
-] as const satisfies readonly TextColor[];
+  'default',
+  'muted',
+  'disabled',
+  'danger',
+  'error',
+  'link',
+  'inherit',
+] as const satisfies readonly TextColor[]
 
 export function TypographyFoundationPage(): ReactElement {
   return (
@@ -49,10 +49,17 @@ export function TypographyFoundationPage(): ReactElement {
               borderStyle="solid"
               borderColor="default"
             >
-              <Text as="code" variant="caption" color="muted">
+              <Text
+                as="code"
+                variant="caption"
+                color="muted"
+              >
                 {variant}
               </Text>
-              <Text as="div" variant={variant}>
+              <Text
+                as="div"
+                variant={variant}
+              >
                 {sample}
               </Text>
             </Box>
@@ -60,7 +67,10 @@ export function TypographyFoundationPage(): ReactElement {
         </Box>
       </Section>
 
-      <Section title="Colors" description="Text colors express hierarchy and semantic status.">
+      <Section
+        title="Colors"
+        description="Text colors express hierarchy and semantic status."
+      >
         <Box
           display="grid"
           gridTemplateColumns="auto-fit-s"
@@ -72,27 +82,42 @@ export function TypographyFoundationPage(): ReactElement {
           borderRadius="m"
         >
           {textColors.map((color) => (
-            <Text key={color} color={color}>
+            <Text
+              key={color}
+              color={color}
+            >
               {color}
             </Text>
           ))}
         </Box>
       </Section>
 
-      <Section title="Utilities" description="Formatting helpers cover data-heavy interfaces.">
-        <Box flexDirection="column" gap="m">
+      <Section
+        title="Utilities"
+        description="Formatting helpers cover data-heavy interfaces."
+      >
+        <Box
+          flexDirection="column"
+          gap="m"
+        >
           <Text monospace>monospace: connection_42</Text>
           <Text tabularNums>tabularNums: 1,234,567</Text>
           <Text formatter="compact">{1284000}</Text>
           <Text lineThrough>Previous value</Text>
-          <Text loading placeholderText="Loading account name">
+          <Text
+            loading
+            placeholderText="Loading account name"
+          >
             Account name
           </Text>
-          <Text loading placeholderNumberOfLines={3}>
+          <Text
+            loading
+            placeholderNumberOfLines={3}
+          >
             Loading description
           </Text>
         </Box>
       </Section>
     </FoundationDocsPage>
-  );
+  )
 }

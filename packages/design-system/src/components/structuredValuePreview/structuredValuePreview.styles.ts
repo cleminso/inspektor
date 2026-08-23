@@ -1,11 +1,11 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
 import {
   borderColors,
   surfaceColors,
   syntaxColors,
   textColors,
-} from "../../tokens/semantics.stylex";
+} from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   dimensions,
@@ -14,20 +14,20 @@ import {
   fontWeights,
   lineHeights,
   spacing,
-} from "../../tokens/value.stylex";
+} from '../../tokens/value.stylex'
 
 export const structuredValuePreviewStyles = stylex.create({
   root: {
     gap: spacing.s,
-    alignItems: "baseline",
-    display: "inline-flex",
-    maxWidth: "100%",
+    alignItems: 'baseline',
+    display: 'inline-flex',
+    maxWidth: '100%',
     minWidth: 0,
   },
   typedMarker: {
     borderColor: borderColors.subtle,
     borderRadius: borderRadii.xs,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderWidth: 1,
     paddingBlock: spacing.xxs,
     paddingInline: spacing.xs,
@@ -40,26 +40,26 @@ export const structuredValuePreviewStyles = stylex.create({
     lineHeight: lineHeights.compact,
   },
   value: {
-    alignItems: "baseline",
-    color: syntaxColors["syntax-property"],
+    alignItems: 'baseline',
+    color: syntaxColors['syntax-property'],
     columnGap: spacing.s,
-    display: "inline-flex",
+    display: 'inline-flex',
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    maxWidth: "100%",
+    maxWidth: '100%',
     minWidth: 0,
   },
   markerRail: {
-    overflow: "hidden",
+    overflow: 'hidden',
     flexShrink: 0,
-    textOverflow: "ellipsis",
+    textOverflow: 'ellipsis',
     width: dimensions[32],
   },
   preview: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
     minWidth: 0,
   },
-});
+})

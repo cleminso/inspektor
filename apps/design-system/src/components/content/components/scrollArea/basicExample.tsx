@@ -4,9 +4,16 @@ const items = Array.from({ length: 12 }, (_, index) => `Scrollable item ${index 
 
 export default function BasicExample() {
   return (
-    <Box width="popup-width-m" height="viewport-height-s">
+    <Box
+      width="popup-width-m"
+      height="viewport-height-s"
+    >
       <ScrollArea aria-label="Scrollable items">
-        <Box flexDirection="column" gap="m" padding="m">
+        <Box
+          flexDirection="column"
+          gap="m"
+          padding="m"
+        >
           {items.map((item) => (
             <Text key={item}>{item}</Text>
           ))}

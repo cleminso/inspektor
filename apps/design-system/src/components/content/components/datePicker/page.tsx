@@ -1,33 +1,36 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import ComposedTriggerExample from "./composedTriggerExample";
-import composedTriggerSource from "./composedTriggerExample.tsx?raw";
-import InlineExample from "./inlineExample";
-import inlineSource from "./inlineExample.tsx?raw";
-import { DatePickerPlayground } from "./playground";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import ComposedTriggerExample from './composedTriggerExample'
+import composedTriggerSource from './composedTriggerExample.tsx?raw'
+import InlineExample from './inlineExample'
+import inlineSource from './inlineExample.tsx?raw'
+import { DatePickerPlayground } from './playground'
 import {
   datePickerContentPropNames,
   datePickerPanelPropNames,
   datePickerRootPropNames,
   datePickerTriggerPropNames,
-} from "./props";
+} from './props'
 
-const rootProps = getGeneratedProps("datePicker.root", datePickerRootPropNames);
-const triggerProps = getGeneratedProps("datePicker.trigger", datePickerTriggerPropNames);
-const contentProps = getGeneratedProps("datePicker.content", datePickerContentPropNames);
-const panelProps = getGeneratedProps("datePicker.panel", datePickerPanelPropNames);
+const rootProps = getGeneratedProps('datePicker.root', datePickerRootPropNames)
+const triggerProps = getGeneratedProps('datePicker.trigger', datePickerTriggerPropNames)
+const contentProps = getGeneratedProps('datePicker.content', datePickerContentPropNames)
+const panelProps = getGeneratedProps('datePicker.panel', datePickerPanelPropNames)
 
 export function DatePickerPage(): ReactElement {
   return (
     <DatePickerPlayground>
-      <Section title="Timestamp field" description="Use the default input-styled trigger in forms.">
+      <Section
+        title="Timestamp field"
+        description="Use the default input-styled trigger in forms."
+      >
         <Example source={basicSource}>
           <BasicExample />
         </Example>
@@ -61,5 +64,5 @@ export function DatePickerPage(): ReactElement {
         <PropsTable rows={panelProps} />
       </Section>
     </DatePickerPlayground>
-  );
+  )
 }

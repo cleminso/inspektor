@@ -5,26 +5,26 @@
  * admin connection to fetch grouped query subscriptions and renders them as debugging
  * context for which tables and queries the sync server is currently tracking.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
-import { fetchServerSubscriptions, type IntrospectionSubscriptionGroup } from "jazz-tools";
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { fetchServerSubscriptions, type IntrospectionSubscriptionGroup } from 'jazz-tools'
 
-import { useInspectorSessionState } from "@app/providers/inspectorProvider";
+import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 
-const LIVE_QUERY_POLL_MS = 20_000;
+const LIVE_QUERY_POLL_MS = 20_000
 
 export interface UseSubscriptionTelemetryResult {
-  error: string | null;
-  generatedAt: number | null;
-  isInitialLoading: boolean;
-  isRefreshing: boolean;
-  rows: IntrospectionSubscriptionGroup[];
+  error: string | null
+  generatedAt: number | null
+  isInitialLoading: boolean
+  isRefreshing: boolean
+  rows: IntrospectionSubscriptionGroup[]
 }
 
 // Module-level cache prevents empty flashes when navigating away from and back to telemetry.
 const QuerySubscriptionTelemetryCache = new Map<
   string,
-  Pick<UseSubscriptionTelemetryResult, "generatedAt" | "rows">
->();
+  Pick<UseSubscriptionTelemetryResult, 'generatedAt' | 'rows'>
+>()
 
 /**
  * Loads query subscription telemetry for the active Inspector connection.
@@ -34,7 +34,7 @@ const QuerySubscriptionTelemetryCache = new Map<
  * instead of the Inspector's own background reads.
  */
 export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
-  const { activeConnection } = useInspectorSessionState();
+  const { activeConnection } = useInspectorSessionState()
   const connectionConfig = useMemo(() => {
     if (
       activeConnection === null ||
@@ -46,7 +46,7 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
       activeConnection.appId === null ||
       activeConnection.appId === undefined
     ) {
-      return null;
+      return null
     }
 
     return {
@@ -54,43 +54,43 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
       serverUrl: activeConnection.serverUrl,
       adminSecret: activeConnection.adminSecret,
       appId: activeConnection.appId,
-    };
-  }, [activeConnection]);
+    }
+  }, [activeConnection])
   const cachedTelemetry = useMemo(
     () =>
       connectionConfig !== null
         ? (QuerySubscriptionTelemetryCache.get(connectionConfig.connectionKey) ?? null)
         : null,
     [connectionConfig],
-  );
+  )
   // Prevent overlapping telemetry requests when a refresh is still resolving.
-  const isFetchingRef = useRef(false);
+  const isFetchingRef = useRef(false)
   const [state, setState] = useState<UseSubscriptionTelemetryResult>(() => ({
     rows: cachedTelemetry?.rows ?? [],
     generatedAt: cachedTelemetry?.generatedAt ?? null,
-    error: connectionConfig === null ? "No connection selected." : null,
+    error: connectionConfig === null ? 'No connection selected.' : null,
     isInitialLoading: connectionConfig !== null && cachedTelemetry === null,
     isRefreshing: false,
-  }));
+  }))
 
   useEffect(() => {
     // Polling can outlive a connection switch; ignore late responses for old connections.
-    let cancelled = false;
-    const isCancelled = () => cancelled;
+    let cancelled = false
+    const isCancelled = () => cancelled
     const nextCachedTelemetry =
       connectionConfig !== null
         ? (QuerySubscriptionTelemetryCache.get(connectionConfig.connectionKey) ?? null)
-        : null;
+        : null
 
     if (connectionConfig === null) {
       setState({
         rows: [],
         generatedAt: null,
-        error: "No connection selected.",
+        error: 'No connection selected.',
         isInitialLoading: false,
         isRefreshing: false,
-      });
-      return;
+      })
+      return
     }
 
     if (nextCachedTelemetry !== null) {
@@ -101,7 +101,7 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
         error: null,
         isInitialLoading: false,
         isRefreshing: false,
-      });
+      })
     } else {
       setState({
         rows: [],
@@ -109,36 +109,36 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
         error: null,
         isInitialLoading: true,
         isRefreshing: false,
-      });
+      })
     }
 
-    const load = async (mode: "initial" | "refresh") => {
+    const load = async (mode: 'initial' | 'refresh') => {
       if (isCancelled() === true || isFetchingRef.current === true) {
-        return;
+        return
       }
 
-      isFetchingRef.current = true;
+      isFetchingRef.current = true
 
       setState((currentState) => ({
         ...currentState,
-        isInitialLoading: mode === "initial" && currentState.rows.length === 0,
-        isRefreshing: mode === "refresh" || currentState.rows.length > 0,
-      }));
+        isInitialLoading: mode === 'initial' && currentState.rows.length === 0,
+        isRefreshing: mode === 'refresh' || currentState.rows.length > 0,
+      }))
 
       try {
         const response = await fetchServerSubscriptions(connectionConfig.serverUrl, {
           adminSecret: connectionConfig.adminSecret,
           appId: connectionConfig.appId,
-        });
+        })
 
         if (isCancelled() === true) {
-          return;
+          return
         }
 
         QuerySubscriptionTelemetryCache.set(connectionConfig.connectionKey, {
           rows: response.queries,
           generatedAt: response.generatedAt,
-        });
+        })
 
         setState({
           rows: response.queries,
@@ -146,10 +146,10 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
           error: null,
           isInitialLoading: false,
           isRefreshing: false,
-        });
+        })
       } catch (QuerySubscriptionError) {
         if (isCancelled() === true) {
-          return;
+          return
         }
 
         setState((currentState) => ({
@@ -160,23 +160,23 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
               : String(QuerySubscriptionError),
           isInitialLoading: false,
           isRefreshing: false,
-        }));
+        }))
       } finally {
-        isFetchingRef.current = false;
+        isFetchingRef.current = false
       }
-    };
+    }
 
-    void load(nextCachedTelemetry === null ? "initial" : "refresh");
+    void load(nextCachedTelemetry === null ? 'initial' : 'refresh')
     const intervalId = window.setInterval(() => {
-      void load("refresh");
-    }, LIVE_QUERY_POLL_MS);
+      void load('refresh')
+    }, LIVE_QUERY_POLL_MS)
 
     return () => {
-      cancelled = true;
-      isFetchingRef.current = false;
-      window.clearInterval(intervalId);
-    };
-  }, [connectionConfig]);
+      cancelled = true
+      isFetchingRef.current = false
+      window.clearInterval(intervalId)
+    }
+  }, [connectionConfig])
 
-  return state;
+  return state
 }

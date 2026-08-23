@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import * as stylex from "@stylexjs/stylex";
-import { createPortal } from "react-dom";
+import * as stylex from '@stylexjs/stylex'
+import { createPortal } from 'react-dom'
 import {
   forwardRef,
   useCallback,
@@ -11,62 +11,65 @@ import {
   useState,
   type ComponentPropsWithRef,
   type ForwardedRef,
-} from "react";
+} from 'react'
 
-import { floatingPanelStyles } from "./floatingPanel.styles";
+import { floatingPanelStyles } from './floatingPanel.styles'
 
-type WithoutStyles<Props> = Omit<Props, "className" | "style">;
+type WithoutStyles<Props> = Omit<Props, 'className' | 'style'>
 type FloatingPanelAccessibleName =
-  | { "aria-label": string; "aria-labelledby"?: never }
-  | { "aria-label"?: never; "aria-labelledby": string };
-export type FloatingPanelContentSize = "compact" | "expanded";
+  | { 'aria-label': string; 'aria-labelledby'?: never }
+  | { 'aria-label'?: never; 'aria-labelledby': string }
+export type FloatingPanelContentSize = 'compact' | 'expanded'
 
 /** Props for the labelled non-modal surface portalled to the document body. */
 export type FloatingPanelRootProps = Omit<
-  WithoutStyles<ComponentPropsWithRef<"aside">>,
-  "aria-label" | "aria-labelledby"
+  WithoutStyles<ComponentPropsWithRef<'aside'>>,
+  'aria-label' | 'aria-labelledby'
 > &
-  FloatingPanelAccessibleName;
+  FloatingPanelAccessibleName
 /** Props for the raised panel surface rendered inside the fixed portal boundary. */
-export type FloatingPanelContentProps = WithoutStyles<ComponentPropsWithRef<"div">> & {
+export type FloatingPanelContentProps = WithoutStyles<ComponentPropsWithRef<'div'>> & {
   /** Controls the constrained panel width. */
-  size?: FloatingPanelContentSize;
-};
+  size?: FloatingPanelContentSize
+}
 /** Props for optional panel details that leave while the panel contracts. */
 export type FloatingPanelDetailsProps = Omit<
-  WithoutStyles<ComponentPropsWithRef<"div">>,
-  "aria-hidden" | "inert"
+  WithoutStyles<ComponentPropsWithRef<'div'>>,
+  'aria-hidden' | 'inert'
 > & {
   /** Keeps the details visible and interactive. */
-  open: boolean;
-};
+  open: boolean
+}
 /** Props for the compact status and primary-action row. */
-export type FloatingPanelSummaryProps = WithoutStyles<ComponentPropsWithRef<"div">>;
+export type FloatingPanelSummaryProps = WithoutStyles<ComponentPropsWithRef<'div'>>
 /** Props for a wrapping group of related panel actions. */
-export type FloatingPanelActionsProps = WithoutStyles<ComponentPropsWithRef<"div">>;
+export type FloatingPanelActionsProps = WithoutStyles<ComponentPropsWithRef<'div'>>
 
 type DetailsMotionFrame = {
-  height: string;
-  opacity: number;
-  transform: string;
-};
+  height: string
+  opacity: number
+  transform: string
+}
 
-const detailsOpenFrame = { opacity: 1, transform: "translateY(0)" } as const;
-const detailsClosedFrame = { opacity: 0, transform: "translateY(0.25rem)" } as const;
+const detailsOpenFrame = { opacity: 1, transform: 'translateY(0)' } as const
+const detailsClosedFrame = { opacity: 0, transform: 'translateY(0.25rem)' } as const
 
 function readDetailsMotionFrame(element: HTMLDivElement): DetailsMotionFrame {
-  const styles = window.getComputedStyle(element);
-  const opacity = Number.parseFloat(styles.opacity);
+  const styles = window.getComputedStyle(element)
+  const opacity = Number.parseFloat(styles.opacity)
   return {
     height: styles.height,
     opacity: Number.isFinite(opacity) ? opacity : 1,
-    transform: styles.transform === "none" ? detailsOpenFrame.transform : styles.transform,
-  };
+    transform: styles.transform === 'none' ? detailsOpenFrame.transform : styles.transform,
+  }
 }
 
-function FloatingPanelRoot({ children, ...props }: FloatingPanelRootProps): React.ReactPortal | null {
-  if (typeof document === "undefined") {
-    return null;
+function FloatingPanelRoot({
+  children,
+  ...props
+}: FloatingPanelRootProps): React.ReactPortal | null {
+  if (typeof document === 'undefined') {
+    return null
   }
 
   return createPortal(
@@ -78,28 +81,25 @@ function FloatingPanelRoot({ children, ...props }: FloatingPanelRootProps): Reac
       {children}
     </aside>,
     document.body,
-  );
+  )
 }
 
 const contentSizeStyles = {
   compact: floatingPanelStyles.contentCompact,
   expanded: floatingPanelStyles.contentExpanded,
-} satisfies Record<FloatingPanelContentSize, unknown>;
+} satisfies Record<FloatingPanelContentSize, unknown>
 
 function setForwardedRef(ref: ForwardedRef<HTMLDivElement>, node: HTMLDivElement | null): void {
-  if (typeof ref === "function") {
-    ref(node);
+  if (typeof ref === 'function') {
+    ref(node)
   } else if (ref !== null) {
-    ref.current = node;
+    ref.current = node
   }
 }
 
 const FloatingPanelContent = forwardRef<HTMLDivElement, FloatingPanelContentProps>(
-  function FloatingPanelContent({ size = "compact", ...props }, forwardedRef): React.ReactElement {
-    const contentStyleProps = stylex.props(
-      floatingPanelStyles.content,
-      contentSizeStyles[size],
-    );
+  function FloatingPanelContent({ size = 'compact', ...props }, forwardedRef): React.ReactElement {
+    const contentStyleProps = stylex.props(floatingPanelStyles.content, contentSizeStyles[size])
 
     return (
       <div
@@ -109,66 +109,68 @@ const FloatingPanelContent = forwardRef<HTMLDivElement, FloatingPanelContentProp
         data-size={size}
         data-slot="floating-panel-content"
       />
-    );
+    )
   },
-);
+)
 
 const FloatingPanelDetails = forwardRef<HTMLDivElement, FloatingPanelDetailsProps>(
   function FloatingPanelDetails(
     { children, open, ...props },
     forwardedRef,
   ): React.ReactElement | null {
-    const [detailsElement, setDetailsElement] = useState<HTMLDivElement | null>(null);
-    const [present, setPresent] = useState(open);
-    const interruptedFrameRef = useRef<DetailsMotionFrame | null>(null);
+    const [detailsElement, setDetailsElement] = useState<HTMLDivElement | null>(null)
+    const [present, setPresent] = useState(open)
+    const interruptedFrameRef = useRef<DetailsMotionFrame | null>(null)
     const setDetailsRef = useCallback(
       (node: HTMLDivElement | null) => {
-        setDetailsElement(node);
-        setForwardedRef(forwardedRef, node);
+        setDetailsElement(node)
+        setForwardedRef(forwardedRef, node)
       },
       [forwardedRef],
-    );
+    )
 
     useLayoutEffect(() => {
       if (open === true) {
-        setPresent(true);
+        setPresent(true)
       }
-    }, [open]);
+    }, [open])
 
     useEffect(() => {
       if (present === false || detailsElement === null) {
-        return;
+        return
       }
 
       const finishExit = () => {
-        interruptedFrameRef.current = null;
-        setPresent(false);
-      };
-      const reducedMotion =
-        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
-      const interruptedFrame = interruptedFrameRef.current;
-      interruptedFrameRef.current = null;
+        interruptedFrameRef.current = null
+        setPresent(false)
+      }
+      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+      const interruptedFrame = interruptedFrameRef.current
+      interruptedFrameRef.current = null
 
       if (open === true && interruptedFrame === null) {
-        return;
+        return
       }
 
-      if (reducedMotion === true || typeof detailsElement.animate !== "function") {
+      if (reducedMotion === true || typeof detailsElement.animate !== 'function') {
         if (open === false) {
-          finishExit();
+          finishExit()
         }
-        return;
+        return
       }
 
-      const opening = open === true;
+      const opening = open === true
       const openFrame = {
         height: `${opening ? detailsElement.scrollHeight : detailsElement.offsetHeight}px`,
         ...detailsOpenFrame,
-      } satisfies DetailsMotionFrame;
-      const startFrame = interruptedFrame ?? openFrame;
+      } satisfies DetailsMotionFrame
+      const startFrame = interruptedFrame ?? openFrame
       const endFrame = opening
-        ? ({ height: `${detailsElement.scrollHeight}px`, ...detailsOpenFrame } satisfies DetailsMotionFrame)
-        : ({ height: "0px", ...detailsClosedFrame } satisfies DetailsMotionFrame);
+        ? ({
+            height: `${detailsElement.scrollHeight}px`,
+            ...detailsOpenFrame,
+          } satisfies DetailsMotionFrame)
+        : ({ height: '0px', ...detailsClosedFrame } satisfies DetailsMotionFrame)
       const keyframes: Keyframe[] = [
         {
           height: startFrame.height,
@@ -180,43 +182,40 @@ const FloatingPanelDetails = forwardRef<HTMLDivElement, FloatingPanelDetailsProp
           opacity: endFrame.opacity,
           transform: endFrame.transform,
         },
-      ];
+      ]
 
-      let cancelled = false;
-      let completed = false;
-      const animation = detailsElement.animate(
-        keyframes,
-        {
-          duration: opening ? 160 : 120,
-          easing: "cubic-bezier(0.23, 1, 0.32, 1)",
-          fill: "forwards",
-        },
-      );
+      let cancelled = false
+      let completed = false
+      const animation = detailsElement.animate(keyframes, {
+        duration: opening ? 160 : 120,
+        easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+        fill: 'forwards',
+      })
       void animation.finished
         .then(() => {
           if (cancelled === false) {
-            completed = true;
-            interruptedFrameRef.current = null;
+            completed = true
+            interruptedFrameRef.current = null
             if (opening === false) {
-              finishExit();
+              finishExit()
             } else {
-              animation.cancel();
+              animation.cancel()
             }
           }
         })
-        .catch(() => undefined);
+        .catch(() => undefined)
 
       return () => {
         if (completed === false) {
-          interruptedFrameRef.current = readDetailsMotionFrame(detailsElement);
+          interruptedFrameRef.current = readDetailsMotionFrame(detailsElement)
         }
-        cancelled = true;
-        animation.cancel();
-      };
-    }, [detailsElement, open, present]);
+        cancelled = true
+        animation.cancel()
+      }
+    }, [detailsElement, open, present])
 
     if (present === false) {
-      return null;
+      return null
     }
 
     return (
@@ -231,9 +230,9 @@ const FloatingPanelDetails = forwardRef<HTMLDivElement, FloatingPanelDetailsProp
       >
         {children}
       </div>
-    );
+    )
   },
-);
+)
 
 function FloatingPanelSummary(props: FloatingPanelSummaryProps): React.ReactElement {
   return (
@@ -242,7 +241,7 @@ function FloatingPanelSummary(props: FloatingPanelSummaryProps): React.ReactElem
       {...stylex.props(floatingPanelStyles.summary)}
       data-slot="floating-panel-summary"
     />
-  );
+  )
 }
 
 function FloatingPanelActions(props: FloatingPanelActionsProps): React.ReactElement {
@@ -252,7 +251,7 @@ function FloatingPanelActions(props: FloatingPanelActionsProps): React.ReactElem
       {...stylex.props(floatingPanelStyles.actions)}
       data-slot="floating-panel-actions"
     />
-  );
+  )
 }
 
 export const FloatingPanel = Object.assign(FloatingPanelRoot, {
@@ -261,4 +260,4 @@ export const FloatingPanel = Object.assign(FloatingPanelRoot, {
   Content: FloatingPanelContent,
   Details: FloatingPanelDetails,
   Summary: FloatingPanelSummary,
-});
+})

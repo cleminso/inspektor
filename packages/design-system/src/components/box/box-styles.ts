@@ -197,8 +197,7 @@ export const marginInlineStyles = stylex.create({
   '3xl': { marginInline: spacing['3xl'] },
   '4xl': { marginInline: spacing['4xl'] },
   '5xl': { marginInline: spacing['5xl'] },
-  auto: { marginInline: 'auto' }
-,
+  auto: { marginInline: 'auto' },
 })
 
 export const marginBlockStyles = stylex.create({

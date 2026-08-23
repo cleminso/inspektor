@@ -1,75 +1,75 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { useTable, type ColumnVisibilityState } from "@tanstack/react-table";
-import type { DynamicTableRow } from "jazz-tools";
-import { useState } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { useTable, type ColumnVisibilityState } from '@tanstack/react-table'
+import type { DynamicTableRow } from 'jazz-tools'
+import { useState } from 'react'
+import { afterEach, describe, expect, it } from 'vitest'
 
-import { dataGridFeatures } from "@inspector/ds";
+import { dataGridFeatures } from '@inspector/ds'
 
-import { DataGridColumnVisibility } from "@tables/grid/columnVisibility";
+import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 
 function VisibilityMenu(): React.ReactElement {
-  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({})
   const table = useTable({
     features: dataGridFeatures,
     columns: [
-      { accessorKey: "id", enableHiding: false },
-      { accessorKey: "name" },
-      { accessorKey: "role" },
+      { accessorKey: 'id', enableHiding: false },
+      { accessorKey: 'name' },
+      { accessorKey: 'role' },
     ],
     data: [] as DynamicTableRow[],
     state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
-  });
+  })
 
-  return <DataGridColumnVisibility table={table} />;
+  return <DataGridColumnVisibility table={table} />
 }
 
-afterEach(cleanup);
+afterEach(cleanup)
 
-describe("DataGridColumnVisibility", () => {
-  it("marks the trigger as pressed while any column is hidden", () => {
-    render(<VisibilityMenu />);
+describe('DataGridColumnVisibility', () => {
+  it('marks the trigger as pressed while any column is hidden', () => {
+    render(<VisibilityMenu />)
 
-    const trigger = screen.getByRole("button", { name: "Choose visible columns" });
-    expect(trigger.getAttribute("aria-pressed")).toBe("false");
+    const trigger = screen.getByRole('button', { name: 'Choose visible columns' })
+    expect(trigger.getAttribute('aria-pressed')).toBe('false')
 
-    fireEvent.click(trigger);
-    fireEvent.click(screen.getByRole("checkbox", { name: "Select name" }));
-    expect(trigger.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(trigger)
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select name' }))
+    expect(trigger.getAttribute('aria-pressed')).toBe('true')
 
-    fireEvent.click(screen.getByRole("button", { name: "Check all from role" }));
-    expect(trigger.getAttribute("aria-pressed")).toBe("false");
-  });
+    fireEvent.click(screen.getByRole('button', { name: 'Check all from role' }))
+    expect(trigger.getAttribute('aria-pressed')).toBe('false')
+  })
 
-  it("lists fixed and hideable columns and keeps the menu open for multiselect", () => {
-    render(<VisibilityMenu />);
+  it('lists fixed and hideable columns and keeps the menu open for multiselect', () => {
+    render(<VisibilityMenu />)
 
-    fireEvent.click(screen.getByRole("button", { name: "Choose visible columns" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Choose visible columns' }))
 
-    expect(screen.getByRole("checkbox", { name: "Select id" }).getAttribute("aria-disabled")).toBe(
-      "true",
-    );
-    fireEvent.click(screen.getByRole("checkbox", { name: "Select name" }));
+    expect(screen.getByRole('checkbox', { name: 'Select id' }).getAttribute('aria-disabled')).toBe(
+      'true',
+    )
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select name' }))
 
-    expect(screen.getByRole("checkbox", { name: "Select name" }).getAttribute("aria-checked")).toBe(
-      "false",
-    );
-    expect(screen.getByRole("dialog", { name: "Visible columns" })).toBeTruthy();
-  });
+    expect(screen.getByRole('checkbox', { name: 'Select name' }).getAttribute('aria-checked')).toBe(
+      'false',
+    )
+    expect(screen.getByRole('dialog', { name: 'Visible columns' })).toBeTruthy()
+  })
 
-  it("restores every hideable column through one convenience action", () => {
-    render(<VisibilityMenu />);
+  it('restores every hideable column through one convenience action', () => {
+    render(<VisibilityMenu />)
 
-    fireEvent.click(screen.getByRole("button", { name: "Choose visible columns" }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "Select name" }));
-    fireEvent.click(screen.getByRole("button", { name: "Check all from role" }));
+    fireEvent.click(screen.getByRole('button', { name: 'Choose visible columns' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select name' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Check all from role' }))
 
-    expect(screen.getByRole("checkbox", { name: "Select name" }).getAttribute("aria-checked")).toBe(
-      "true",
-    );
-    expect(screen.getByRole("checkbox", { name: "Select role" }).getAttribute("aria-checked")).toBe(
-      "true",
-    );
-  });
-});
+    expect(screen.getByRole('checkbox', { name: 'Select name' }).getAttribute('aria-checked')).toBe(
+      'true',
+    )
+    expect(screen.getByRole('checkbox', { name: 'Select role' }).getAttribute('aria-checked')).toBe(
+      'true',
+    )
+  })
+})

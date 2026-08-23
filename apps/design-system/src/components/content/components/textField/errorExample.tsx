@@ -1,5 +1,5 @@
-import { TextField } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { TextField } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function ErrorExample(): ReactElement {
   return (
@@ -10,5 +10,5 @@ export default function ErrorExample(): ReactElement {
       defaultValue="admin"
       error="This username is unavailable."
     />
-  );
+  )
 }

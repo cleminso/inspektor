@@ -1,20 +1,20 @@
 export const toggleGroupRootPropNames = [
-  "value",
-  "defaultValue",
-  "onValueChange",
-  "loopFocus",
-  "multiple",
-  "disabled",
-  "orientation",
-  "size",
-  "width",
-  "itemWidth",
-] as const;
+  'value',
+  'defaultValue',
+  'onValueChange',
+  'loopFocus',
+  'multiple',
+  'disabled',
+  'orientation',
+  'size',
+  'width',
+  'itemWidth',
+] as const
 
 export const toggleGroupItemPropNames = [
-  "value",
-  "onPressedChange",
-  "nativeButton",
-  "disabled",
-  "render",
-] as const;
+  'value',
+  'onPressedChange',
+  'nativeButton',
+  'disabled',
+  'render',
+] as const

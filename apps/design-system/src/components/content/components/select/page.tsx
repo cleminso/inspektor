@@ -1,30 +1,26 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import DefaultOptionsExample from "./defaultOptionsExample";
-import defaultOptionsSource from "./defaultOptionsExample.tsx?raw";
-import DisabledExample from "./disabledExample";
-import disabledSource from "./disabledExample.tsx?raw";
-import LabelExample from "./labelExample";
-import labelSource from "./labelExample.tsx?raw";
-import { SelectPlayground } from "./playground";
-import {
-  selectItemPropNames,
-  selectRootPropNames,
-  selectTriggerPropNames,
-} from "./props";
-import SizesExample from "./sizesExample";
-import sizesSource from "./sizesExample.tsx?raw";
-import WidthsExample from "./widthsExample";
-import widthsSource from "./widthsExample.tsx?raw";
+import DefaultOptionsExample from './defaultOptionsExample'
+import defaultOptionsSource from './defaultOptionsExample.tsx?raw'
+import DisabledExample from './disabledExample'
+import disabledSource from './disabledExample.tsx?raw'
+import LabelExample from './labelExample'
+import labelSource from './labelExample.tsx?raw'
+import { SelectPlayground } from './playground'
+import { selectItemPropNames, selectRootPropNames, selectTriggerPropNames } from './props'
+import SizesExample from './sizesExample'
+import sizesSource from './sizesExample.tsx?raw'
+import WidthsExample from './widthsExample'
+import widthsSource from './widthsExample.tsx?raw'
 
-const rootProps = getGeneratedProps("select.root", selectRootPropNames);
-const triggerProps = getGeneratedProps("select.trigger", selectTriggerPropNames);
-const itemProps = getGeneratedProps("select.item", selectItemPropNames);
+const rootProps = getGeneratedProps('select.root', selectRootPropNames)
+const triggerProps = getGeneratedProps('select.trigger', selectTriggerPropNames)
+const itemProps = getGeneratedProps('select.item', selectItemPropNames)
 
 export function SelectPage(): ReactElement {
   return (
@@ -37,7 +33,10 @@ export function SelectPage(): ReactElement {
           <DefaultOptionsExample />
         </Example>
       </Section>
-      <Section title="Sizes" description="Match the trigger size to adjacent controls.">
+      <Section
+        title="Sizes"
+        description="Match the trigger size to adjacent controls."
+      >
         <Example source={sizesSource}>
           <SizesExample />
         </Example>
@@ -58,7 +57,10 @@ export function SelectPage(): ReactElement {
           <DisabledExample />
         </Example>
       </Section>
-      <Section title="Label" description="Use Select.Label to provide an accessible visible name.">
+      <Section
+        title="Label"
+        description="Use Select.Label to provide an accessible visible name."
+      >
         <Example source={labelSource}>
           <LabelExample />
         </Example>
@@ -76,5 +78,5 @@ export function SelectPage(): ReactElement {
         <PropsTable rows={itemProps} />
       </Section>
     </SelectPlayground>
-  );
+  )
 }

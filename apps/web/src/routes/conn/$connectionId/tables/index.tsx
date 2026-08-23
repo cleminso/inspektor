@@ -1,26 +1,22 @@
-import { useEffect } from "react";
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect } from 'react'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 
-import { appRoutes } from "@app/routing/appRoutes";
-import { useAvailableTables } from "@tables/schema/useAvailableTables";
+import { appRoutes } from '@app/routing/appRoutes'
+import { useAvailableTables } from '@tables/schema/useAvailableTables'
 
-export const Route = createFileRoute("/conn/$connectionId/tables/")({
+export const Route = createFileRoute('/conn/$connectionId/tables/')({
   component: TablesRoute,
-});
+})
 
 function TablesRoute(): null {
-  const navigate = useNavigate();
-  const params = Route.useParams();
-  const search = useSearch({ strict: false }) as { empty?: string };
-  const { isSchemaReady, tables } = useAvailableTables();
+  const navigate = useNavigate()
+  const params = Route.useParams()
+  const search = useSearch({ strict: false }) as { empty?: string }
+  const { isSchemaReady, tables } = useAvailableTables()
 
   useEffect(() => {
-    if (
-      search.empty === "true" ||
-      isSchemaReady === false ||
-      tables.length === 0
-    ) {
-      return;
+    if (search.empty === 'true' || isSchemaReady === false || tables.length === 0) {
+      return
     }
 
     void navigate({
@@ -30,8 +26,8 @@ function TablesRoute(): null {
         tableName: tables[0],
       },
       replace: true,
-    });
-  }, [isSchemaReady, navigate, params, search.empty, tables]);
+    })
+  }, [isSchemaReady, navigate, params, search.empty, tables])
 
-  return null;
+  return null
 }

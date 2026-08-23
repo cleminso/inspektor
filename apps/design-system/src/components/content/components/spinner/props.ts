@@ -1,1 +1,1 @@
-export const spinnerPropNames = ["label", "size"] as const;
+export const spinnerPropNames = ['label', 'size'] as const

@@ -1,13 +1,21 @@
-import { AlertDialog, Button } from "@inspector/ds";
-import { type ReactElement, useState } from "react";
+import { AlertDialog, Button } from '@inspector/ds'
+import { type ReactElement, useState } from 'react'
 
 export default function DefaultExample(): ReactElement {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   return (
     <>
-      <Button variant="danger" onClick={() => setOpen(true)}>Delete connection</Button>
-      <AlertDialog.Root open={open} onOpenChange={setOpen}>
+      <Button
+        variant="danger"
+        onClick={() => setOpen(true)}
+      >
+        Delete connection
+      </Button>
+      <AlertDialog.Root
+        open={open}
+        onOpenChange={setOpen}
+      >
         <AlertDialog.Content>
           <AlertDialog.Title>Delete connection?</AlertDialog.Title>
           <AlertDialog.Description>
@@ -22,5 +30,5 @@ export default function DefaultExample(): ReactElement {
         </AlertDialog.Content>
       </AlertDialog.Root>
     </>
-  );
+  )
 }

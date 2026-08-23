@@ -1,78 +1,78 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { toasts } from "@inspector/ds";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { toasts } from '@inspector/ds'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { ConnectionList } from "./connectionList";
+import { ConnectionList } from './connectionList'
 
-const openConnection = vi.fn<() => Promise<void>>();
+const openConnection = vi.fn<() => Promise<void>>()
 
-vi.mock("@app/providers/inspectorSessionProvider", () => ({
+vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
     connections: [
       {
-        id: "connection-1",
-        name: "Example",
-        serverUrl: "https://example.com",
-        appId: "app-1",
-        adminSecret: "secret",
-        env: "dev",
+        id: 'connection-1',
+        name: 'Example',
+        serverUrl: 'https://example.com',
+        appId: 'app-1',
+        adminSecret: 'secret',
+        env: 'dev',
       },
     ],
     openConnection,
   }),
-}));
+}))
 
 afterEach(() => {
-  cleanup();
-  openConnection.mockReset();
-  vi.restoreAllMocks();
-});
+  cleanup()
+  openConnection.mockReset()
+  vi.restoreAllMocks()
+})
 
-describe("ConnectionList", () => {
-  it("stacks each connection name above its app ID", () => {
-    render(<ConnectionList />);
+describe('ConnectionList', () => {
+  it('stacks each connection name above its app ID', () => {
+    render(<ConnectionList />)
 
     const content = screen
-      .getByRole("button", { name: /Example/ })
-      .querySelector('[data-slot="button-content"]');
+      .getByRole('button', { name: /Example/ })
+      .querySelector('[data-slot="button-content"]')
 
-    expect(content?.children).toHaveLength(2);
-    expect(content?.children[0]?.textContent).toBe("Example");
-    expect(content?.children[1]?.textContent).toBe("app-1");
-  });
+    expect(content?.children).toHaveLength(2)
+    expect(content?.children[0]?.textContent).toBe('Example')
+    expect(content?.children[1]?.textContent).toBe('app-1')
+  })
 
-  it("identifies each connection by app ID without repeating its server", () => {
-    render(<ConnectionList />);
+  it('identifies each connection by app ID without repeating its server', () => {
+    render(<ConnectionList />)
 
-    const connection = screen.getByRole("button", { name: /Example/ });
-    expect(connection.textContent).toContain("app-1");
-    expect(connection.textContent).not.toContain("example.com");
-  });
+    const connection = screen.getByRole('button', { name: /Example/ })
+    expect(connection.textContent).toContain('app-1')
+    expect(connection.textContent).not.toContain('example.com')
+  })
 
-  it("reports a saved connection failure without an unhandled rejection", async () => {
-    openConnection.mockRejectedValueOnce(new TypeError("Failed to fetch"));
-    const toastError = vi.spyOn(toasts, "error");
-    render(<ConnectionList />);
+  it('reports a saved connection failure without an unhandled rejection', async () => {
+    openConnection.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    const toastError = vi.spyOn(toasts, 'error')
+    render(<ConnectionList />)
 
-    fireEvent.click(screen.getByRole("button", { name: /Example/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Example/ }))
 
     await waitFor(() =>
       expect(toastError).toHaveBeenCalledWith("Couldn't validate this connection", {
-        description: "Check the server URL, app ID, and admin secret.",
+        description: 'Check the server URL, app ID, and admin secret.',
       }),
-    );
-    expect(openConnection).toHaveBeenCalledWith("connection-1");
-  });
+    )
+    expect(openConnection).toHaveBeenCalledWith('connection-1')
+  })
 
-  it("keeps connection content unchanged while an open is coordinated", () => {
-    openConnection.mockReturnValueOnce(new Promise(() => undefined));
-    render(<ConnectionList />);
+  it('keeps connection content unchanged while an open is coordinated', () => {
+    openConnection.mockReturnValueOnce(new Promise(() => undefined))
+    render(<ConnectionList />)
 
-    const connection = screen.getByRole("button", { name: /Example/ });
-    fireEvent.click(connection);
+    const connection = screen.getByRole('button', { name: /Example/ })
+    fireEvent.click(connection)
 
-    expect(connection.getAttribute("aria-disabled")).not.toBe("true");
-    expect(connection.getAttribute("aria-busy")).toBeNull();
-    expect(connection.textContent).toBe("Exampleapp-1");
-  });
-});
+    expect(connection.getAttribute('aria-disabled')).not.toBe('true')
+    expect(connection.getAttribute('aria-busy')).toBeNull()
+    expect(connection.textContent).toBe('Exampleapp-1')
+  })
+})

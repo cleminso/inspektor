@@ -97,10 +97,7 @@ function Harness(): React.ReactElement {
     <RuntimeScopeExitGuardProvider>
       <TableMutationLedgerWorkspaceProvider>
         <TableTabsProvider scope="scope">
-          <TableMutationLedgerProvider
-            schemaColumns={[]}
-            scopeKey="scope:accounts"
-          >
+          <TableMutationLedgerProvider schemaColumns={[]} scopeKey="scope:accounts">
             <MutationActions />
           </TableMutationLedgerProvider>
           <TabActions />
@@ -119,9 +116,7 @@ describe('TableTabsProvider', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Open accounts persistently' }))
 
-    await waitFor(() =>
-      expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none'),
-    )
+    await waitFor(() => expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none'))
     expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts')
   })
 
@@ -133,9 +128,7 @@ describe('TableTabsProvider', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Keep profiles open' }))
 
-    await waitFor(() =>
-      expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none'),
-    )
+    await waitFor(() => expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none'))
     expect(screen.getByLabelText('Open tabs').textContent).toBe('table:profiles')
   })
 
@@ -189,9 +182,7 @@ describe('TableTabsProvider', () => {
     expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts')
     expect(
       screen.getByRole('alertdialog', { name: 'Discard staged changes?' }).textContent,
-    ).toContain(
-      'Closing the final accounts view will discard 1 staged change.',
-    )
+    ).toContain('Closing the final accounts view will discard 1 staged change.')
 
     fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
@@ -200,13 +191,9 @@ describe('TableTabsProvider', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
     fireEvent.click(screen.getByRole('button', { name: 'Discard and close' }))
-    await waitFor(() =>
-      expect(screen.getByLabelText('Staged changes').textContent).toBe('0'),
-    )
+    await waitFor(() => expect(screen.getByLabelText('Staged changes').textContent).toBe('0'))
     expect(screen.getByLabelText('Workspace pending').textContent).toBe('false')
-    await waitFor(() =>
-      expect(screen.getByLabelText('Open tabs').textContent).toBe('new-view'),
-    )
+    await waitFor(() => expect(screen.getByLabelText('Open tabs').textContent).toBe('new-view'))
   })
 
   it('closes a non-final table view without discarding staged changes', async () => {

@@ -380,7 +380,9 @@ vi.mock('@inspector/ds', () => {
     </button>
   )
 
-  const KeyboardInput = ({ hotkey }: { hotkey: string }) => <span data-testid="keyboard-input">{hotkey}</span>
+  const KeyboardInput = ({ hotkey }: { hotkey: string }) => (
+    <span data-testid="keyboard-input">{hotkey}</span>
+  )
 
   const CommandItem = ({
     children,

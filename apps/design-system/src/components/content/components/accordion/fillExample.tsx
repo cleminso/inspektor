@@ -15,8 +15,15 @@ const tableNames = [
 
 export default function FillExample() {
   return (
-    <Box width="popup-width-m" height="viewport-height-s">
-      <Accordion defaultValue={['pinned', 'tables']} layout="fill" multiple>
+    <Box
+      width="popup-width-m"
+      height="viewport-height-s"
+    >
+      <Accordion
+        defaultValue={['pinned', 'tables']}
+        layout="fill"
+        multiple
+      >
         <Accordion.Item value="pinned">
           <Accordion.Header>
             <Accordion.Trigger>Pinned</Accordion.Trigger>

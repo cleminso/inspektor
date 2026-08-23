@@ -1,13 +1,13 @@
-import { Box, Text } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Box, Text } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-import { SourceLink } from "@/components/docs/sourceLink";
-import { type SourceReference } from "@/lib/registry";
+import { SourceLink } from '@/components/docs/sourceLink'
+import { type SourceReference } from '@/lib/registry'
 
 interface PageHeaderProps {
-  title: string;
-  description: string;
-  source?: SourceReference;
+  title: string
+  description: string
+  source?: SourceReference
 }
 
 export function PageHeader({ title, description, source }: PageHeaderProps): ReactElement {
@@ -21,15 +21,31 @@ export function PageHeader({ title, description, source }: PageHeaderProps): Rea
       borderStyle="solid"
       borderColor="default"
     >
-      <Box flexDirection="row" alignItems="center" justifyContent="between" gap="xl">
-        <Text as="h1" variant="heading">
+      <Box
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="between"
+        gap="xl"
+      >
+        <Text
+          as="h1"
+          variant="heading"
+        >
           {title}
         </Text>
         {source !== undefined ? <SourceLink source={source} /> : null}
       </Box>
-      <Box display="block" maxWidth="content-measure">
-        <Text variant="body" color="muted">{description}</Text>
+      <Box
+        display="block"
+        maxWidth="content-measure"
+      >
+        <Text
+          variant="body"
+          color="muted"
+        >
+          {description}
+        </Text>
       </Box>
     </Box>
-  );
+  )
 }

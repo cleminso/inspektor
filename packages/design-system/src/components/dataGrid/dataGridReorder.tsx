@@ -1,5 +1,10 @@
 import { RestrictToHorizontalAxis } from '@dnd-kit/abstract/modifiers'
-import { Accessibility, AutoScroller, PointerActivationConstraints, PointerSensor } from '@dnd-kit/dom'
+import {
+  Accessibility,
+  AutoScroller,
+  PointerActivationConstraints,
+  PointerSensor,
+} from '@dnd-kit/dom'
 import { RestrictToElement } from '@dnd-kit/dom/modifiers'
 import { move } from '@dnd-kit/helpers'
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react'

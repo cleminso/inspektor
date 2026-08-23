@@ -1,34 +1,34 @@
-import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-import { Box, Button, Select, Text, Tooltip } from "@inspector/ds";
+import { Box, Button, Select, Text, Tooltip } from '@inspector/ds'
 
-import { TABLE_PAGE_SIZE_OPTIONS } from "@tables/query/tableRowsQuery";
-import type { TablePageSize } from "@tables/tableTypes";
+import { TABLE_PAGE_SIZE_OPTIONS } from '@tables/query/tableRowsQuery'
+import type { TablePageSize } from '@tables/tableTypes'
 
 const pageSizeItems = TABLE_PAGE_SIZE_OPTIONS.map((value) => ({
   label: String(value),
   value,
-}));
+}))
 
-const rowCountFormatter = new Intl.NumberFormat(undefined);
+const rowCountFormatter = new Intl.NumberFormat(undefined)
 
 interface TablePaginationProps {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  loadedRowCount: number;
-  loading?: boolean;
-  page: number;
-  pageSize: TablePageSize;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (pageSize: TablePageSize) => void;
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  loadedRowCount: number
+  loading?: boolean
+  page: number
+  pageSize: TablePageSize
+  onPageChange: (page: number) => void
+  onPageSizeChange: (pageSize: TablePageSize) => void
 }
 
 interface PaginationSummary {
-  hasNextPage: boolean;
-  loadedRowCount: number;
-  page: number;
-  pageSize: TablePageSize;
+  hasNextPage: boolean
+  loadedRowCount: number
+  page: number
+  pageSize: TablePageSize
 }
 
 export function TablePagination({
@@ -41,25 +41,31 @@ export function TablePagination({
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps): React.ReactElement {
-  const currentSummary = { hasNextPage, loadedRowCount, page, pageSize };
-  const [settledSummary, setSettledSummary] = useState<PaginationSummary>(currentSummary);
+  const currentSummary = { hasNextPage, loadedRowCount, page, pageSize }
+  const [settledSummary, setSettledSummary] = useState<PaginationSummary>(currentSummary)
   useEffect(() => {
     if (loading === false) {
-      setSettledSummary({ hasNextPage, loadedRowCount, page, pageSize });
+      setSettledSummary({ hasNextPage, loadedRowCount, page, pageSize })
     }
-  }, [hasNextPage, loadedRowCount, loading, page, pageSize]);
-  const summary = loading === true ? settledSummary : currentSummary;
-  const firstRow = summary.loadedRowCount === 0 ? 0 : (summary.page - 1) * summary.pageSize + 1;
-  const lastRow = (summary.page - 1) * summary.pageSize + summary.loadedRowCount;
+  }, [hasNextPage, loadedRowCount, loading, page, pageSize])
+  const summary = loading === true ? settledSummary : currentSummary
+  const firstRow = summary.loadedRowCount === 0 ? 0 : (summary.page - 1) * summary.pageSize + 1
+  const lastRow = (summary.page - 1) * summary.pageSize + summary.loadedRowCount
   const total =
     summary.hasNextPage === true
       ? `${rowCountFormatter.format(lastRow + 1)}+`
-      : rowCountFormatter.format(lastRow);
-  const rowStatus = `${rowCountFormatter.format(firstRow)}–${rowCountFormatter.format(lastRow)} of ${total}`;
+      : rowCountFormatter.format(lastRow)
+  const rowStatus = `${rowCountFormatter.format(firstRow)}–${rowCountFormatter.format(lastRow)} of ${total}`
 
   return (
-    <Box alignItems="center" gap="xs">
-      <Text color="muted" variant="caption">
+    <Box
+      alignItems="center"
+      gap="xs"
+    >
+      <Text
+        color="muted"
+        variant="caption"
+      >
         {rowStatus}
       </Text>
       <Select.Root
@@ -67,14 +73,21 @@ export function TablePagination({
         value={pageSize}
         onValueChange={(value) => {
           if (value !== null) {
-            onPageSizeChange(value);
+            onPageSizeChange(value)
           }
         }}
       >
-        <Select.Trigger aria-label="Rows per page" size="s" width="content" />
+        <Select.Trigger
+          aria-label="Rows per page"
+          size="s"
+          width="content"
+        />
         <Select.Content>
           {pageSizeItems.map((item) => (
-            <Select.Item key={item.value} value={item.value}>
+            <Select.Item
+              key={item.value}
+              value={item.value}
+            >
               {item.label}
             </Select.Item>
           ))}
@@ -97,7 +110,12 @@ export function TablePagination({
         />
         <Tooltip.Content>Previous page</Tooltip.Content>
       </Tooltip.Root>
-      <Text color="muted" data-numeric-variant="tabular" tabularNums variant="caption">
+      <Text
+        color="muted"
+        data-numeric-variant="tabular"
+        tabularNums
+        variant="caption"
+      >
         Page {summary.page}
       </Text>
       <Tooltip.Root>
@@ -118,13 +136,13 @@ export function TablePagination({
         <Tooltip.Content>Next page</Tooltip.Content>
       </Tooltip.Root>
     </Box>
-  );
+  )
 }
 
 interface ToolbarProps {
-  actions: React.ReactNode;
-  children?: React.ReactNode;
-  pagination?: React.ReactNode;
+  actions: React.ReactNode
+  children?: React.ReactNode
+  pagination?: React.ReactNode
 }
 
 export function Toolbar({ actions, children, pagination }: ToolbarProps): React.ReactElement {
@@ -137,13 +155,20 @@ export function Toolbar({ actions, children, pagination }: ToolbarProps): React.
       padding="s"
       backgroundColor="surface-background"
     >
-      <Box minWidth={0} flex={1}>
+      <Box
+        minWidth={0}
+        flex={1}
+      >
         {children}
       </Box>
-      <Box flexShrink={0} alignItems="center" gap="s">
+      <Box
+        flexShrink={0}
+        alignItems="center"
+        gap="s"
+      >
         {pagination}
       </Box>
       {actions}
     </Box>
-  );
+  )
 }

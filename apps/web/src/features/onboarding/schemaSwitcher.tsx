@@ -1,14 +1,14 @@
-import { Box, Button, CopyButton, Text } from "@inspector/ds";
+import { Box, Button, CopyButton, Text } from '@inspector/ds'
 
-import type { ConnectionError } from "@app/connections/connectionValidation";
+import type { ConnectionError } from '@app/connections/connectionValidation'
 
 interface SchemaSwitcherProps {
-  appId: string;
-  error: ConnectionError | null;
-  isSubmitting: boolean;
-  onCancel: () => void;
-  onSelectSchema: (schemaHash: string) => Promise<void>;
-  schemaHashes: string[];
+  appId: string
+  error: ConnectionError | null
+  isSubmitting: boolean
+  onCancel: () => void
+  onSelectSchema: (schemaHash: string) => Promise<void>
+  schemaHashes: string[]
 }
 
 export function SchemaSwitcher({
@@ -19,19 +19,36 @@ export function SchemaSwitcher({
   onSelectSchema,
   schemaHashes,
 }: SchemaSwitcherProps): React.ReactElement {
-  const hasError = error !== null;
-  const hasSchemas = schemaHashes.length > 0;
-  const appLabel = appId.trim().length > 0 ? appId.trim() : "this connection";
+  const hasError = error !== null
+  const hasSchemas = schemaHashes.length > 0
+  const appLabel = appId.trim().length > 0 ? appId.trim() : 'this connection'
 
   return (
-    <Box minHeight={0} width="full" flexDirection="column" gap="xl">
-      <Box flexDirection="column" gap="xs">
-        <Text as="h2" variant="label">
+    <Box
+      minHeight={0}
+      width="full"
+      flexDirection="column"
+      gap="xl"
+    >
+      <Box
+        flexDirection="column"
+        gap="xs"
+      >
+        <Text
+          as="h2"
+          variant="label"
+        >
           Select schema
         </Text>
         <Text color="muted">Choose the stored schema to open for {appLabel}.</Text>
       </Box>
-      <Box minHeight={0} flexDirection="column" gap="m" overflowY="auto" paddingRight="xs">
+      <Box
+        minHeight={0}
+        flexDirection="column"
+        gap="m"
+        overflowY="auto"
+        paddingRight="xs"
+      >
         {hasSchemas === true ? (
           schemaHashes.map((schemaHash) => (
             <Box
@@ -51,12 +68,17 @@ export function SchemaSwitcher({
                 size="s"
                 layout="row"
                 onClick={() => {
-                  void onSelectSchema(schemaHash);
+                  void onSelectSchema(schemaHash)
                 }}
                 disabled={isSubmitting === true}
                 aria-label={`Open schema ${schemaHash}`}
               >
-                <Text as="span" color="inherit" monospace truncate>
+                <Text
+                  as="span"
+                  color="inherit"
+                  monospace
+                  truncate
+                >
                   {schemaHash}
                 </Text>
               </Button>
@@ -68,25 +90,46 @@ export function SchemaSwitcher({
             </Box>
           ))
         ) : (
-          <Box flexDirection="column" gap="xs" paddingVertical="2xl">
+          <Box
+            flexDirection="column"
+            gap="xs"
+            paddingVertical="2xl"
+          >
             <Text variant="label">No schemas found</Text>
             <Text color="muted">Try a different server, app ID, or admin secret.</Text>
           </Box>
         )}
       </Box>
       {hasError === true ? (
-        <Box flexDirection="column" gap="xs" role="status" aria-live="polite">
-          <Text color="error" variant="label">
+        <Box
+          flexDirection="column"
+          gap="xs"
+          role="status"
+          aria-live="polite"
+        >
+          <Text
+            color="error"
+            variant="label"
+          >
             {error.title}
           </Text>
           <Text color="error">{error.description}</Text>
         </Box>
       ) : null}
-      <Box alignItems="center" justifyContent="end" paddingTop="xl">
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting === true}>
+      <Box
+        alignItems="center"
+        justifyContent="end"
+        paddingTop="xl"
+      >
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onCancel}
+          disabled={isSubmitting === true}
+        >
           Cancel
         </Button>
       </Box>
     </Box>
-  );
+  )
 }

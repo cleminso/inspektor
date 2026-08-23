@@ -25,7 +25,10 @@ export function resolveTableRowsSearch(
 ): ResolvedTableRowsSearch {
   return {
     filters: parsedFilters,
-    page: Number.isInteger(search.page) && search.page !== undefined && search.page > 0 ? search.page : 1,
+    page:
+      Number.isInteger(search.page) && search.page !== undefined && search.page > 0
+        ? search.page
+        : 1,
     pageSize: search.pageSize === 500 || search.pageSize === 1000 ? search.pageSize : 100,
     sortColumn: search.sort ?? 'id',
     sortDirection: search.dir === 'desc' ? 'desc' : 'asc',

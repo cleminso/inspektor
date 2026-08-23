@@ -13,10 +13,7 @@ import {
 } from '@inspector/ds'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
-import {
-  getConnectionDisplayName,
-  type StoredConnection,
-} from '@app/connections/connections'
+import { getConnectionDisplayName, type StoredConnection } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
 
 import { useSavedConnectionOpen } from './useSavedConnectionOpen'
@@ -135,7 +132,10 @@ export function ConnectionSwitcher({
                   />
                   {connection.id !== currentConnectionId &&
                   connection.id === hoveredConnectionId ? (
-                    <Icon artwork={ArrowRight} size="s" />
+                    <Icon
+                      artwork={ArrowRight}
+                      size="s"
+                    />
                   ) : null}
                 </ContextSwitcher.Item>
               )}

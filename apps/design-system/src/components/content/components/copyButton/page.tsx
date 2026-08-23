@@ -1,18 +1,18 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { CopyButtonPlayground } from "./playground";
-import { copyButtonPropNames } from "./props";
-import VariantsExample from "./variantsExample";
-import variantsSource from "./variantsExample.tsx?raw";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { CopyButtonPlayground } from './playground'
+import { copyButtonPropNames } from './props'
+import VariantsExample from './variantsExample'
+import variantsSource from './variantsExample.tsx?raw'
 
-const props = getGeneratedProps("copyButton", copyButtonPropNames);
+const props = getGeneratedProps('copyButton', copyButtonPropNames)
 
 export function CopyButtonPage(): ReactElement {
   return (
@@ -39,5 +39,5 @@ export function CopyButtonPage(): ReactElement {
         <PropsTable rows={props} />
       </Section>
     </CopyButtonPlayground>
-  );
+  )
 }

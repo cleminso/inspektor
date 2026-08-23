@@ -5,10 +5,10 @@
  * connection preferences displayed by the Inspector header.
  */
 export const appRoutes = {
-  connections: "/conn",
-  newConnection: "/conn/new",
-  connection: "/conn/$connectionId",
-  tables: "/conn/$connectionId/tables",
-  queries: "/conn/$connectionId/queries",
-  table: "/conn/$connectionId/tables/$tableName",
-} as const;
+  connections: '/conn',
+  newConnection: '/conn/new',
+  connection: '/conn/$connectionId',
+  tables: '/conn/$connectionId/tables',
+  queries: '/conn/$connectionId/queries',
+  table: '/conn/$connectionId/tables/$tableName',
+} as const

@@ -7,28 +7,28 @@
  * generic query constraints.
  */
 
-import type { WhereOperator } from "jazz-tools";
+import type { WhereOperator } from 'jazz-tools'
 
 /** Operators exposed by the generic filter UI and supported by query translation. */
-export type TableFilterOperator = WhereOperator;
+export type TableFilterOperator = WhereOperator
 
 /** Runtime operator list used to reject malformed URL-backed clauses. */
 export const tableFilterOperators = [
-  "eq",
-  "ne",
-  "gt",
-  "gte",
-  "lt",
-  "lte",
-  "contains",
-  "in",
-  "isNull",
-] as const satisfies readonly TableFilterOperator[];
+  'eq',
+  'ne',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'contains',
+  'in',
+  'isNull',
+] as const satisfies readonly TableFilterOperator[]
 
 /** One URL-serializable filter clause targeting a runtime schema column. */
 export interface TableFilterClause {
-  id: string;
-  column: string;
-  operator: TableFilterOperator;
-  value: unknown;
+  id: string
+  column: string
+  operator: TableFilterOperator
+  value: unknown
 }

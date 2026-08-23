@@ -7,11 +7,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type RefObject,
 } from 'react'
-import {
-  DayPicker,
-  type DayButtonProps,
-  type MonthChangeEventHandler,
-} from 'react-day-picker'
+import { DayPicker, type DayButtonProps, type MonthChangeEventHandler } from 'react-day-picker'
 
 import { calendarStyles } from './calendar.styles'
 
@@ -184,12 +180,7 @@ function CalendarSelectorGrid({
     } else if (event.key === 'ArrowUp') {
       nextIndex = getEnabledOptionIndex(options, optionIndex - columns, -columns, 0)
     } else if (event.key === 'ArrowDown') {
-      nextIndex = getEnabledOptionIndex(
-        options,
-        optionIndex + columns,
-        columns,
-        options.length - 1,
-      )
+      nextIndex = getEnabledOptionIndex(options, optionIndex + columns, columns, options.length - 1)
     } else if (event.key === 'Home') {
       nextIndex = getEnabledOptionIndex(
         options,
@@ -222,7 +213,11 @@ function CalendarSelectorGrid({
   )
 
   return (
-    <div aria-label={label} role="grid" {...stylex.props(calendarStyles.selectorGrid)}>
+    <div
+      aria-label={label}
+      role="grid"
+      {...stylex.props(calendarStyles.selectorGrid)}
+    >
       {rows.map((row, rowIndex) => (
         <div
           key={row[0]?.value ?? rowIndex}
@@ -237,7 +232,11 @@ function CalendarSelectorGrid({
             const optionIndex = rowIndex * columns + columnIndex
             const selected = option.value === selectedValue
             return (
-              <div key={option.value} aria-selected={selected} role="gridcell">
+              <div
+                key={option.value}
+                aria-selected={selected}
+                role="gridcell"
+              >
                 <button
                   ref={(element) => {
                     if (element === null) optionRefs.current.delete(option.value)
@@ -392,7 +391,11 @@ function CalendarSurface(props: CalendarSurfaceProps): React.ReactElement {
           {...stylex.props(calendarStyles.navButton)}
           onClick={() => handleNavigation(-1)}
         >
-          <ChevronLeft {...stylex.props(calendarStyles.chevron)} aria-hidden strokeWidth={1.5} />
+          <ChevronLeft
+            {...stylex.props(calendarStyles.chevron)}
+            aria-hidden
+            strokeWidth={1.5}
+          />
         </button>
         <div {...stylex.props(calendarStyles.headerLabels)}>
           <button
@@ -442,7 +445,11 @@ function CalendarSurface(props: CalendarSurfaceProps): React.ReactElement {
           {...stylex.props(calendarStyles.navButton)}
           onClick={() => handleNavigation(1)}
         >
-          <ChevronRight {...stylex.props(calendarStyles.chevron)} aria-hidden strokeWidth={1.5} />
+          <ChevronRight
+            {...stylex.props(calendarStyles.chevron)}
+            aria-hidden
+            strokeWidth={1.5}
+          />
         </button>
       </div>
       <div

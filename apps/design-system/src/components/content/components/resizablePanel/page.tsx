@@ -1,24 +1,24 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import CollapsibleExample from "./collapsibleExample";
-import collapsibleSource from "./collapsibleExample.tsx?raw";
-import { ResizablePanelPlayground } from "./playground";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import CollapsibleExample from './collapsibleExample'
+import collapsibleSource from './collapsibleExample.tsx?raw'
+import { ResizablePanelPlayground } from './playground'
 import {
   resizableHandlePropNames,
   resizablePanelGroupPropNames,
   resizablePanelPropNames,
-} from "./props";
+} from './props'
 
-const groupProps = getGeneratedProps("resizablePanelGroup", resizablePanelGroupPropNames);
-const panelProps = getGeneratedProps("resizablePanel", resizablePanelPropNames);
-const handleProps = getGeneratedProps("resizableHandle", resizableHandlePropNames);
+const groupProps = getGeneratedProps('resizablePanelGroup', resizablePanelGroupPropNames)
+const panelProps = getGeneratedProps('resizablePanel', resizablePanelPropNames)
+const handleProps = getGeneratedProps('resizableHandle', resizableHandlePropNames)
 
 export function ResizablePanelPage(): ReactElement {
   return (
@@ -27,7 +27,10 @@ export function ResizablePanelPage(): ReactElement {
         title="Split layout"
         description="Combine pixel-sized side panels with a flexible center panel. Handles can render as a line, transparent gutter, or visible grip while preserving keyboard and pointer resizing."
       >
-        <Example source={basicSource} align="stretch">
+        <Example
+          source={basicSource}
+          align="stretch"
+        >
           <BasicExample />
         </Example>
       </Section>
@@ -36,7 +39,10 @@ export function ResizablePanelPage(): ReactElement {
         title="Collapsible panel"
         description="Collapsible panels open at 200px by default. Use the panel ref for explicit collapse controls while onResize keeps application state synchronized."
       >
-        <Example source={collapsibleSource} align="stretch">
+        <Example
+          source={collapsibleSource}
+          align="stretch"
+        >
           <CollapsibleExample />
         </Example>
       </Section>
@@ -51,5 +57,5 @@ export function ResizablePanelPage(): ReactElement {
         <PropsTable rows={handleProps} />
       </Section>
     </ResizablePanelPlayground>
-  );
+  )
 }

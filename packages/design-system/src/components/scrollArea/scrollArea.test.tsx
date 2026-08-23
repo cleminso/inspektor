@@ -28,9 +28,7 @@ describe('ScrollArea', () => {
     const { container } = render(<ScrollArea axis="both">Content</ScrollArea>)
 
     const viewport = container.querySelector('[data-slot="scroll-area-viewport"]')
-    const scrollbars = Array.from(
-      container.querySelectorAll('[data-slot="scroll-area-scrollbar"]'),
-    )
+    const scrollbars = Array.from(container.querySelectorAll('[data-slot="scroll-area-scrollbar"]'))
 
     expect(scrollbars.map((scrollbar) => scrollbar.getAttribute('data-orientation'))).toEqual([
       'vertical',

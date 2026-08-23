@@ -1,4 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 import {
   useDeferredValue,
   useEffect,
@@ -9,220 +9,223 @@ import {
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
-} from "react";
+} from 'react'
 
-import { CopyButton } from "../copyButton/copyButton";
-import { Text } from "../text/text";
-import { jsonViewStyles } from "./jsonView.styles";
+import { CopyButton } from '../copyButton/copyButton'
+import { Text } from '../text/text'
+import { jsonViewStyles } from './jsonView.styles'
 
-export type JsonViewPrimitive = string | number | boolean | null;
+export type JsonViewPrimitive = string | number | boolean | null
 
 export interface JsonViewObject {
-  readonly [key: string]: JsonViewValue;
+  readonly [key: string]: JsonViewValue
 }
 
-export type JsonViewValue = JsonViewPrimitive | JsonViewObject | readonly JsonViewValue[];
+export type JsonViewValue = JsonViewPrimitive | JsonViewObject | readonly JsonViewValue[]
 
 export interface JsonViewSearchResults {
   /** Zero-based index of the active occurrence, or null when no occurrence matches. */
-  activeIndex: number | null;
+  activeIndex: number | null
   /** Number of textual occurrences found in the complete JSON value. */
-  count: number;
+  count: number
   /** Whether the reported occurrences belong to a query that is being replaced. */
-  pending: boolean;
+  pending: boolean
   /** Query represented by these occurrence results. */
-  query: string;
+  query: string
 }
 
 export interface JsonViewSearch {
   /** Query highlighted in keys and primitive values. */
-  query: string;
+  query: string
   /** Matches uppercase and lowercase characters separately. */
-  caseSensitive?: boolean;
+  caseSensitive?: boolean
   /** Matches the query only when it forms a complete word. */
-  wholeWord?: boolean;
+  wholeWord?: boolean
   /** Interprets the query as a regular expression. */
-  regularExpression?: boolean;
+  regularExpression?: boolean
   /** Requested zero-based occurrence index. Values outside the result range wrap. */
-  activeMatchIndex: number;
+  activeMatchIndex: number
   /** Runs when the effective active occurrence or result count changes. */
-  onResultsChange: (results: JsonViewSearchResults) => void;
+  onResultsChange: (results: JsonViewSearchResults) => void
 }
 
 export interface JsonViewProps {
   /** Contextual label for the JSON tree. */
-  accessibilityLabel: string;
+  accessibilityLabel: string
   /** JSON-compatible object or array to inspect. */
-  data: JsonViewObject | readonly JsonViewValue[];
+  data: JsonViewObject | readonly JsonViewValue[]
   /** Number of container levels expanded initially, or every level within the safe render budget. */
-  defaultExpandDepth?: 0 | 1 | 2 | 3 | 4 | "all";
+  defaultExpandDepth?: 0 | 1 | 2 | 3 | 4 | 'all'
   /** Whether to show the sticky copy action. */
-  showCopyAction?: boolean;
+  showCopyAction?: boolean
   /** Controls occurrence highlighting and active-match navigation. */
-  search?: JsonViewSearch;
+  search?: JsonViewSearch
 }
 
-const childBatchSize = 100;
-const highlightedSearchMatchLimit = 500;
-const stringDisplayLimit = 4_000;
-const visibleTreeItemLimit = 500;
-const rootPath = "$";
+const childBatchSize = 100
+const highlightedSearchMatchLimit = 500
+const stringDisplayLimit = 4_000
+const visibleTreeItemLimit = 500
+const rootPath = '$'
 
-type ContinuationKind = "batch" | "limit";
+type ContinuationKind = 'batch' | 'limit'
 
 interface ContainerRenderPlan {
-  continuationKind: ContinuationKind | null;
-  visibleChildCount: number;
+  continuationKind: ContinuationKind | null
+  visibleChildCount: number
 }
 
 interface RetainedSearchBranch {
-  expandedPaths: ReadonlySet<string>;
-  revealedChildCounts: ReadonlyMap<string, number>;
+  expandedPaths: ReadonlySet<string>
+  revealedChildCounts: ReadonlyMap<string, number>
 }
 
 interface JsonRenderPlan {
-  containers: ReadonlyMap<string, ContainerRenderPlan>;
-  visiblePaths: ReadonlySet<string>;
+  containers: ReadonlyMap<string, ContainerRenderPlan>
+  visiblePaths: ReadonlySet<string>
 }
 
 interface DisplayedString {
-  text: string;
-  truncated: boolean;
+  text: string
+  truncated: boolean
 }
 
 interface JsonNodeProps {
-  activePath: string;
-  activeSearchMatchId: string | undefined;
-  expandedPaths: ReadonlySet<string>;
-  focusVisiblePath: string | null;
-  keyName?: string;
-  level: number;
-  onActivePathChange: (path: string) => void;
-  onChildBatchReveal: (path: string) => void;
-  onFocusedPathChange: (path: string | null) => void;
-  onStringReveal: (path: string) => void;
-  onToggle: (path: string, item: HTMLElement) => void;
-  path: string;
-  position: number;
-  revealedStrings: ReadonlySet<string>;
-  renderPlan: ReadonlyMap<string, ContainerRenderPlan>;
-  searchPattern: SearchPattern;
-  setSize: number;
-  value: JsonViewValue;
+  activePath: string
+  activeSearchMatchId: string | undefined
+  expandedPaths: ReadonlySet<string>
+  focusVisiblePath: string | null
+  keyName?: string
+  level: number
+  onActivePathChange: (path: string) => void
+  onChildBatchReveal: (path: string) => void
+  onFocusedPathChange: (path: string | null) => void
+  onStringReveal: (path: string) => void
+  onToggle: (path: string, item: HTMLElement) => void
+  path: string
+  position: number
+  revealedStrings: ReadonlySet<string>
+  renderPlan: ReadonlyMap<string, ContainerRenderPlan>
+  searchPattern: SearchPattern
+  setSize: number
+  value: JsonViewValue
 }
 
 interface SearchModel {
-  expandedPaths: ReadonlySet<string>;
-  matches: readonly SearchMatch[];
-  revealedChildCounts: ReadonlyMap<string, number>;
+  expandedPaths: ReadonlySet<string>
+  matches: readonly SearchMatch[]
+  revealedChildCounts: ReadonlyMap<string, number>
 }
 
 interface SearchMatch {
-  id: string;
-  path: string;
+  id: string
+  path: string
 }
 
 interface SearchOccurrence {
-  index: number;
-  length: number;
+  index: number
+  length: number
 }
 
 interface SearchPattern {
-  expression: RegExp | null;
-  wholeWord: boolean;
+  expression: RegExp | null
+  wholeWord: boolean
 }
 
 function isContainer(value: JsonViewValue): value is JsonViewObject | readonly JsonViewValue[] {
-  return value !== null && typeof value === "object";
+  return value !== null && typeof value === 'object'
 }
 
 function getEntries(
   value: JsonViewObject | readonly JsonViewValue[],
 ): readonly [string, JsonViewValue][] {
   if (Array.isArray(value) === true) {
-    return value.map((item, index) => [String(index), item] as const);
+    return value.map((item, index) => [String(index), item] as const)
   }
 
-  return Object.entries(value);
+  return Object.entries(value)
 }
 
 function getPath(parentPath: string, key: string): string {
-  return `${parentPath}/${encodeURIComponent(key)}`;
+  return `${parentPath}/${encodeURIComponent(key)}`
 }
 
 function escapeJsonString(value: string): string {
-  return JSON.stringify(value).slice(1, -1);
+  return JSON.stringify(value).slice(1, -1)
 }
 
-function truncateString(value: string, codePointLimit: number): { text: string; truncated: boolean } {
-  let codePointCount = 0;
-  let endIndex = 0;
+function truncateString(
+  value: string,
+  codePointLimit: number,
+): { text: string; truncated: boolean } {
+  let codePointCount = 0
+  let endIndex = 0
 
   while (endIndex < value.length && codePointCount < codePointLimit) {
-    const codePoint = value.codePointAt(endIndex);
-    endIndex += codePoint !== undefined && codePoint > 0xffff ? 2 : 1;
-    codePointCount += 1;
+    const codePoint = value.codePointAt(endIndex)
+    endIndex += codePoint !== undefined && codePoint > 0xffff ? 2 : 1
+    codePointCount += 1
   }
 
-  return { text: value.slice(0, endIndex), truncated: endIndex < value.length };
+  return { text: value.slice(0, endIndex), truncated: endIndex < value.length }
 }
 
 function focusTreeItem(currentItem: HTMLElement, key: string): boolean {
-  const tree = currentItem.closest('[role="tree"]');
+  const tree = currentItem.closest('[role="tree"]')
   const items =
-    tree === null ? [] : Array.from(tree.querySelectorAll<HTMLElement>('[role="treeitem"]'));
-  const index = items.indexOf(currentItem);
+    tree === null ? [] : Array.from(tree.querySelectorAll<HTMLElement>('[role="treeitem"]'))
+  const index = items.indexOf(currentItem)
   const target =
-    key === "ArrowDown"
+    key === 'ArrowDown'
       ? items[index + 1]
-      : key === "ArrowUp"
+      : key === 'ArrowUp'
         ? items[index - 1]
-        : key === "Home"
+        : key === 'Home'
           ? items[0]
-          : key === "End"
+          : key === 'End'
             ? items.at(-1)
-            : undefined;
+            : undefined
 
-  target?.focus();
-  return target !== undefined;
+  target?.focus()
+  return target !== undefined
 }
 
 function createInitialExpansion(
   data: JsonViewObject | readonly JsonViewValue[],
-  defaultExpandDepth: 0 | 1 | 2 | 3 | 4 | "all",
+  defaultExpandDepth: 0 | 1 | 2 | 3 | 4 | 'all',
 ): Set<string> {
-  const paths = new Set<string>();
-  let visitedCount = 0;
+  const paths = new Set<string>()
+  let visitedCount = 0
 
   function visit(value: JsonViewValue, path: string, depth: number): void {
     if (visitedCount >= visibleTreeItemLimit) {
-      return;
+      return
     }
-    visitedCount += 1;
+    visitedCount += 1
 
     if (
       isContainer(value) === false ||
       getEntries(value).length === 0 ||
-      (defaultExpandDepth !== "all" && depth >= defaultExpandDepth)
+      (defaultExpandDepth !== 'all' && depth >= defaultExpandDepth)
     ) {
-      return;
+      return
     }
 
-    paths.add(path);
+    paths.add(path)
     for (const [key, child] of getEntries(value)) {
       if (visitedCount >= visibleTreeItemLimit) {
-        break;
+        break
       }
-      visit(child, getPath(path, key), depth + 1);
+      visit(child, getPath(path, key), depth + 1)
     }
   }
 
-  visit(data, rootPath, 0);
-  return paths;
+  visit(data, rootPath, 0)
+  return paths
 }
 
 function escapeRegularExpression(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function createSearchPattern({
@@ -232,33 +235,33 @@ function createSearchPattern({
   regularExpression,
 }: Pick<
   JsonViewSearch,
-  "query" | "caseSensitive" | "wholeWord" | "regularExpression"
+  'query' | 'caseSensitive' | 'wholeWord' | 'regularExpression'
 >): SearchPattern {
   if (query.length === 0) {
-    return { expression: null, wholeWord: wholeWord === true };
+    return { expression: null, wholeWord: wholeWord === true }
   }
 
   try {
     return {
       expression: new RegExp(
         regularExpression === true ? query : escapeRegularExpression(query),
-        caseSensitive === true ? "gu" : "giu",
+        caseSensitive === true ? 'gu' : 'giu',
       ),
       wholeWord: wholeWord === true,
-    };
+    }
   } catch {
-    return { expression: null, wholeWord: wholeWord === true };
+    return { expression: null, wholeWord: wholeWord === true }
   }
 }
 
-const wordCharacterAtEnd = /[\p{L}\p{N}_]$/u;
-const wordCharacterAtStart = /^[\p{L}\p{N}_]/u;
+const wordCharacterAtEnd = /[\p{L}\p{N}_]$/u
+const wordCharacterAtStart = /^[\p{L}\p{N}_]/u
 
 function isWholeWordOccurrence(text: string, occurrence: SearchOccurrence): boolean {
   return (
     wordCharacterAtEnd.test(text.slice(0, occurrence.index)) === false &&
     wordCharacterAtStart.test(text.slice(occurrence.index + occurrence.length)) === false
-  );
+  )
 }
 
 function getSearchOccurrences(
@@ -266,21 +269,21 @@ function getSearchOccurrences(
   searchPattern: SearchPattern,
 ): readonly SearchOccurrence[] {
   if (searchPattern.expression === null) {
-    return [];
+    return []
   }
 
   const occurrences = Array.from(
     text.matchAll(searchPattern.expression),
     (match): SearchOccurrence => ({ index: match.index, length: match[0].length }),
-  ).filter((occurrence) => occurrence.length > 0);
+  ).filter((occurrence) => occurrence.length > 0)
 
   return searchPattern.wholeWord === true
     ? occurrences.filter((occurrence) => isWholeWordOccurrence(text, occurrence))
-    : occurrences;
+    : occurrences
 }
 
-function getSearchMatchId(path: string, target: "key" | "value", matchIndex: number): string {
-  return `${path}#search-${target}-${matchIndex}`;
+function getSearchMatchId(path: string, target: 'key' | 'value', matchIndex: number): string {
+  return `${path}#search-${target}-${matchIndex}`
 }
 
 function createSearchModel(
@@ -292,61 +295,61 @@ function createSearchModel(
       expandedPaths: new Set(),
       matches: [],
       revealedChildCounts: new Map(),
-    };
+    }
   }
 
-  const expandedPaths = new Set<string>();
-  const matches: SearchMatch[] = [];
-  const revealedChildCounts = new Map<string, number>();
+  const expandedPaths = new Set<string>()
+  const matches: SearchMatch[] = []
+  const revealedChildCounts = new Map<string, number>()
 
   function visit(value: JsonViewValue, path: string, keyName?: string): boolean {
-    const container = isContainer(value);
+    const container = isContainer(value)
     const keyOccurrences =
-      keyName === undefined ? [] : getSearchOccurrences(escapeJsonString(keyName), searchPattern);
+      keyName === undefined ? [] : getSearchOccurrences(escapeJsonString(keyName), searchPattern)
     const valueOccurrences =
       container === true
         ? []
         : getSearchOccurrences(
-            typeof value === "string"
+            typeof value === 'string'
               ? escapeJsonString(value)
               : value === null
-                ? "null"
+                ? 'null'
                 : String(value),
             searchPattern,
-          );
-    const selfMatches = keyOccurrences.length > 0 || valueOccurrences.length > 0;
-    let descendantMatches = false;
+          )
+    const selfMatches = keyOccurrences.length > 0 || valueOccurrences.length > 0
+    let descendantMatches = false
 
     for (const occurrence of keyOccurrences) {
-      matches.push({ id: getSearchMatchId(path, "key", occurrence.index), path });
+      matches.push({ id: getSearchMatchId(path, 'key', occurrence.index), path })
     }
     for (const occurrence of valueOccurrences) {
-      matches.push({ id: getSearchMatchId(path, "value", occurrence.index), path });
+      matches.push({ id: getSearchMatchId(path, 'value', occurrence.index), path })
     }
 
     if (container === true) {
       for (const [index, [key, child]] of getEntries(value).entries()) {
         if (visit(child, getPath(path, key), key) === true) {
-          descendantMatches = true;
-          revealedChildCounts.set(path, Math.max(revealedChildCounts.get(path) ?? 0, index + 1));
+          descendantMatches = true
+          revealedChildCounts.set(path, Math.max(revealedChildCounts.get(path) ?? 0, index + 1))
         }
       }
 
       if (descendantMatches === true) {
-        expandedPaths.add(path);
+        expandedPaths.add(path)
       }
     }
 
-    return selfMatches || descendantMatches;
+    return selfMatches || descendantMatches
   }
 
-  visit(data, rootPath);
+  visit(data, rootPath)
 
   return {
     expandedPaths,
     matches,
     revealedChildCounts,
-  };
+  }
 }
 
 function createRenderPlan(
@@ -354,53 +357,53 @@ function createRenderPlan(
   expandedPaths: ReadonlySet<string>,
   revealedChildCounts: ReadonlyMap<string, number>,
 ): JsonRenderPlan {
-  const containers = new Map<string, ContainerRenderPlan>();
-  const visiblePaths = new Set<string>([rootPath]);
-  let remainingTreeItems = visibleTreeItemLimit - 1;
+  const containers = new Map<string, ContainerRenderPlan>()
+  const visiblePaths = new Set<string>([rootPath])
+  let remainingTreeItems = visibleTreeItemLimit - 1
 
   function visit(value: JsonViewValue, path: string, reservedTreeItems: number): void {
     if (isContainer(value) === false || expandedPaths.has(path) === false) {
-      return;
+      return
     }
 
-    const entries = getEntries(value);
+    const entries = getEntries(value)
     const requestedChildCount = Math.min(
       revealedChildCounts.get(path) ?? childBatchSize,
       entries.length,
-    );
-    let visibleChildCount = 0;
+    )
+    let visibleChildCount = 0
 
     for (let index = 0; index < requestedChildCount; index += 1) {
-      const entry = entries[index];
+      const entry = entries[index]
       if (entry === undefined) {
-        break;
+        break
       }
 
-      const hasFollowingEntry = index + 1 < entries.length;
-      const continuationReserve = hasFollowingEntry === true ? 1 : 0;
+      const hasFollowingEntry = index + 1 < entries.length
+      const continuationReserve = hasFollowingEntry === true ? 1 : 0
       if (remainingTreeItems <= reservedTreeItems + continuationReserve) {
-        break;
+        break
       }
 
-      const [key, child] = entry;
-      const childPath = getPath(path, key);
-      remainingTreeItems -= 1;
-      visibleChildCount += 1;
-      visiblePaths.add(childPath);
-      visit(child, childPath, reservedTreeItems + continuationReserve);
+      const [key, child] = entry
+      const childPath = getPath(path, key)
+      remainingTreeItems -= 1
+      visibleChildCount += 1
+      visiblePaths.add(childPath)
+      visit(child, childPath, reservedTreeItems + continuationReserve)
     }
 
-    let continuationKind: ContinuationKind | null = null;
+    let continuationKind: ContinuationKind | null = null
     if (visibleChildCount < entries.length && remainingTreeItems > reservedTreeItems) {
-      remainingTreeItems -= 1;
-      continuationKind = visibleChildCount < requestedChildCount ? "limit" : "batch";
+      remainingTreeItems -= 1
+      continuationKind = visibleChildCount < requestedChildCount ? 'limit' : 'batch'
     }
 
-    containers.set(path, { continuationKind, visibleChildCount });
+    containers.set(path, { continuationKind, visibleChildCount })
   }
 
-  visit(data, rootPath, 0);
-  return { containers, visiblePaths };
+  visit(data, rootPath, 0)
+  return { containers, visiblePaths }
 }
 
 function getDisplayedString(
@@ -411,24 +414,20 @@ function getDisplayedString(
   activeSearchMatchId: string | undefined,
 ): DisplayedString {
   if (revealed === true) {
-    return { text: value, truncated: false };
+    return { text: value, truncated: false }
   }
 
-  const bounded = truncateString(value, stringDisplayLimit);
-  const boundedOccurrences = getSearchOccurrences(
-    escapeJsonString(bounded.text),
-    searchPattern,
-  );
-  const activeValueMatchPrefix = `${path}#search-value-`;
+  const bounded = truncateString(value, stringDisplayLimit)
+  const boundedOccurrences = getSearchOccurrences(escapeJsonString(bounded.text), searchPattern)
+  const activeValueMatchPrefix = `${path}#search-value-`
   const hiddenActiveMatch =
     bounded.truncated === true &&
     activeSearchMatchId?.startsWith(activeValueMatchPrefix) === true &&
     boundedOccurrences.some(
-      (occurrence) =>
-        getSearchMatchId(path, "value", occurrence.index) === activeSearchMatchId,
-    ) === false;
+      (occurrence) => getSearchMatchId(path, 'value', occurrence.index) === activeSearchMatchId,
+    ) === false
 
-  return hiddenActiveMatch === true ? { text: value, truncated: false } : bounded;
+  return hiddenActiveMatch === true ? { text: value, truncated: false } : bounded
 }
 
 function HighlightedText({
@@ -438,32 +437,32 @@ function HighlightedText({
   target,
   text,
 }: {
-  activeSearchMatchId: string | undefined;
-  path: string;
-  searchPattern: SearchPattern;
-  target: "key" | "value";
-  text: string;
+  activeSearchMatchId: string | undefined
+  path: string
+  searchPattern: SearchPattern
+  target: 'key' | 'value'
+  text: string
 }) {
   if (searchPattern.expression === null) {
-    return text;
+    return text
   }
 
-  const parts: ReactNode[] = [];
-  let cursor = 0;
+  const parts: ReactNode[] = []
+  let cursor = 0
   const occurrences = getSearchOccurrences(text, searchPattern).filter((occurrence, index) => {
-    const matchId = getSearchMatchId(path, target, occurrence.index);
-    return index < highlightedSearchMatchLimit || matchId === activeSearchMatchId;
-  });
+    const matchId = getSearchMatchId(path, target, occurrence.index)
+    return index < highlightedSearchMatchLimit || matchId === activeSearchMatchId
+  })
 
   for (const occurrence of occurrences) {
     if (occurrence.index > cursor) {
-      parts.push(text.slice(cursor, occurrence.index));
+      parts.push(text.slice(cursor, occurrence.index))
     }
-    const matchId = getSearchMatchId(path, target, occurrence.index);
+    const matchId = getSearchMatchId(path, target, occurrence.index)
     parts.push(
       <mark
         key={matchId}
-        data-active={activeSearchMatchId === matchId ? "" : undefined}
+        data-active={activeSearchMatchId === matchId ? '' : undefined}
         data-json-search-match={matchId}
         {...stylex.props(
           jsonViewStyles.mark,
@@ -472,15 +471,15 @@ function HighlightedText({
       >
         {text.slice(occurrence.index, occurrence.index + occurrence.length)}
       </mark>,
-    );
-    cursor = occurrence.index + occurrence.length;
+    )
+    cursor = occurrence.index + occurrence.length
   }
 
   if (cursor < text.length) {
-    parts.push(text.slice(cursor));
+    parts.push(text.slice(cursor))
   }
 
-  return parts;
+  return parts
 }
 
 function PrimitiveValue({
@@ -491,17 +490,17 @@ function PrimitiveValue({
   value,
   onReveal,
 }: {
-  activeSearchMatchId: string | undefined;
-  displayedString: DisplayedString | null;
-  path: string;
-  searchPattern: SearchPattern;
-  value: JsonViewPrimitive;
-  onReveal: (path: string) => void;
+  activeSearchMatchId: string | undefined
+  displayedString: DisplayedString | null
+  path: string
+  searchPattern: SearchPattern
+  value: JsonViewPrimitive
+  onReveal: (path: string) => void
 }) {
-  if (typeof value === "string") {
-    const bounded = displayedString?.text ?? value;
-    const truncated = displayedString?.truncated ?? false;
-    const escaped = escapeJsonString(bounded);
+  if (typeof value === 'string') {
+    const bounded = displayedString?.text ?? value
+    const truncated = displayedString?.truncated ?? false
+    const escaped = escapeJsonString(bounded)
     return (
       <>
         <span {...stylex.props(jsonViewStyles.string)}>
@@ -513,7 +512,7 @@ function PrimitiveValue({
             target="value"
             text={escaped}
           />
-          {truncated === true ? "…" : null}&quot;
+          {truncated === true ? '…' : null}&quot;
         </span>
         {truncated === true ? (
           <button
@@ -527,16 +526,16 @@ function PrimitiveValue({
           </button>
         ) : null}
       </>
-    );
+    )
   }
 
-  const text = value === null ? "null" : String(value);
+  const text = value === null ? 'null' : String(value)
   const valueStyle =
     value === null
       ? jsonViewStyles.null
-      : typeof value === "number"
+      : typeof value === 'number'
         ? jsonViewStyles.number
-        : jsonViewStyles.boolean;
+        : jsonViewStyles.boolean
 
   return (
     <span {...stylex.props(valueStyle)}>
@@ -548,7 +547,7 @@ function PrimitiveValue({
         text={text}
       />
     </span>
-  );
+  )
 }
 
 function JsonNode({
@@ -571,12 +570,12 @@ function JsonNode({
   setSize,
   value,
 }: JsonNodeProps) {
-  const container = isContainer(value);
-  const entries = container === true ? getEntries(value) : [];
-  const expandable = entries.length > 0;
-  const expanded = expandable === true && expandedPaths.has(path);
+  const container = isContainer(value)
+  const entries = container === true ? getEntries(value) : []
+  const expandable = entries.length > 0
+  const expanded = expandable === true && expandedPaths.has(path)
   const displayedString =
-    typeof value === "string"
+    typeof value === 'string'
       ? getDisplayedString(
           value,
           revealedStrings.has(path),
@@ -584,91 +583,91 @@ function JsonNode({
           path,
           activeSearchMatchId,
         )
-      : null;
-  const containerPunctuation = Array.isArray(value) === true ? ["[", "]"] : ["{", "}"];
+      : null
+  const containerPunctuation = Array.isArray(value) === true ? ['[', ']'] : ['{', '}']
   const name =
     keyName === undefined
       ? Array.isArray(value) === true
-        ? "JSON array"
-        : "JSON object"
+        ? 'JSON array'
+        : 'JSON object'
       : container === true
-        ? `${keyName}: ${Array.isArray(value) === true ? "array" : "object"}`
+        ? `${keyName}: ${Array.isArray(value) === true ? 'array' : 'object'}`
         : `${keyName}: ${
             displayedString === null
               ? value === null
-                ? "null"
+                ? 'null'
                 : String(value)
-              : `${displayedString.text}${displayedString.truncated === true ? "…" : ""}`
-          }`;
+              : `${displayedString.text}${displayedString.truncated === true ? '…' : ''}`
+          }`
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>): void {
     if (event.currentTarget !== event.target) {
-      return;
+      return
     }
 
-    const tree = event.currentTarget.closest('[role="tree"]');
+    const tree = event.currentTarget.closest('[role="tree"]')
     const items =
-      tree === null ? [] : Array.from(tree.querySelectorAll<HTMLElement>('[role="treeitem"]'));
-    const index = items.indexOf(event.currentTarget);
-    let target: HTMLElement | undefined;
+      tree === null ? [] : Array.from(tree.querySelectorAll<HTMLElement>('[role="treeitem"]'))
+    const index = items.indexOf(event.currentTarget)
+    let target: HTMLElement | undefined
 
-    if (event.key === "ArrowDown") {
-      target = items[index + 1];
-    } else if (event.key === "ArrowUp") {
-      target = items[index - 1];
-    } else if (event.key === "Home") {
-      target = items[0];
-    } else if (event.key === "End") {
-      target = items.at(-1);
-    } else if (event.key === "ArrowRight" && expandable === true) {
+    if (event.key === 'ArrowDown') {
+      target = items[index + 1]
+    } else if (event.key === 'ArrowUp') {
+      target = items[index - 1]
+    } else if (event.key === 'Home') {
+      target = items[0]
+    } else if (event.key === 'End') {
+      target = items.at(-1)
+    } else if (event.key === 'ArrowRight' && expandable === true) {
       if (expanded === false) {
-        onToggle(path, event.currentTarget);
+        onToggle(path, event.currentTarget)
       } else {
-        target = items[index + 1];
+        target = items[index + 1]
       }
-    } else if (event.key === "ArrowLeft") {
+    } else if (event.key === 'ArrowLeft') {
       if (expanded === true) {
-        onToggle(path, event.currentTarget);
+        onToggle(path, event.currentTarget)
       } else {
         target =
-          event.currentTarget.parentElement?.closest<HTMLElement>('[role="treeitem"]') ?? undefined;
+          event.currentTarget.parentElement?.closest<HTMLElement>('[role="treeitem"]') ?? undefined
       }
-    } else if (event.key === "Enter" || event.key === " ") {
+    } else if (event.key === 'Enter' || event.key === ' ') {
       if (expandable === true) {
-        onToggle(path, event.currentTarget);
+        onToggle(path, event.currentTarget)
       } else if (displayedString?.truncated === true) {
-        onStringReveal(path);
+        onStringReveal(path)
       } else {
-        return;
+        return
       }
     } else {
-      return;
+      return
     }
 
-    event.preventDefault();
-    onFocusedPathChange(target?.dataset.jsonPath ?? path);
+    event.preventDefault()
+    onFocusedPathChange(target?.dataset.jsonPath ?? path)
     if (target !== undefined) {
-      onActivePathChange(target.dataset.jsonPath ?? rootPath);
-      target.focus();
+      onActivePathChange(target.dataset.jsonPath ?? rootPath)
+      target.focus()
     }
   }
 
-  const nodeRenderPlan = renderPlan.get(path);
-  const visibleChildCount = nodeRenderPlan?.visibleChildCount ?? 0;
-  const continuationKind = nodeRenderPlan?.continuationKind ?? null;
-  const continuationPath = `${path}#continuation`;
+  const nodeRenderPlan = renderPlan.get(path)
+  const visibleChildCount = nodeRenderPlan?.visibleChildCount ?? 0
+  const continuationKind = nodeRenderPlan?.continuationKind ?? null
+  const continuationPath = `${path}#continuation`
 
   function handleRowClick(event: MouseEvent<HTMLDivElement>): void {
     if (expandable === false) {
-      return;
+      return
     }
 
-    const item = event.currentTarget.closest<HTMLElement>('[role="treeitem"]');
+    const item = event.currentTarget.closest<HTMLElement>('[role="treeitem"]')
     if (item !== null) {
-      onActivePathChange(path);
-      item.focus();
-      onFocusedPathChange(null);
-      onToggle(path, item);
+      onActivePathChange(path)
+      item.focus()
+      onFocusedPathChange(null)
+      onToggle(path, item)
     }
   }
 
@@ -682,13 +681,13 @@ function JsonNode({
       data-json-path={path}
       onFocus={(event) => {
         if (event.currentTarget === event.target) {
-          onActivePathChange(path);
-          onFocusedPathChange(event.currentTarget.matches(":focus-visible") ? path : null);
+          onActivePathChange(path)
+          onFocusedPathChange(event.currentTarget.matches(':focus-visible') ? path : null)
         }
       }}
       onBlur={(event) => {
         if (event.currentTarget === event.target) {
-          onFocusedPathChange(null);
+          onFocusedPathChange(null)
         }
       }}
       onKeyDown={handleKeyDown}
@@ -697,12 +696,12 @@ function JsonNode({
       {...stylex.props(jsonViewStyles.item)}
     >
       <div
-        data-focus-visible={focusVisiblePath === path ? "true" : undefined}
+        data-focus-visible={focusVisiblePath === path ? 'true' : undefined}
         onClick={handleRowClick}
         onMouseDown={(event) => {
           if (expandable === true) {
-            event.preventDefault();
-            onFocusedPathChange(null);
+            event.preventDefault()
+            onFocusedPathChange(null)
           }
         }}
         {...stylex.props(
@@ -714,15 +713,15 @@ function JsonNode({
         <span {...stylex.props(jsonViewStyles.disclosureSlot)}>
           {expandable === true ? (
             <button
-              aria-label={`${expanded === true ? "Collapse" : "Expand"} ${keyName ?? "JSON"}`}
+              aria-label={`${expanded === true ? 'Collapse' : 'Expand'} ${keyName ?? 'JSON'}`}
               onClick={(event) => {
-                event.stopPropagation();
-                const item = event.currentTarget.closest<HTMLElement>('[role="treeitem"]');
+                event.stopPropagation()
+                const item = event.currentTarget.closest<HTMLElement>('[role="treeitem"]')
                 if (item !== null) {
-                  onActivePathChange(path);
-                  item.focus();
-                  onFocusedPathChange(null);
-                  onToggle(path, item);
+                  onActivePathChange(path)
+                  item.focus()
+                  onFocusedPathChange(null)
+                  onToggle(path, item)
                 }
               }}
               tabIndex={-1}
@@ -735,7 +734,7 @@ function JsonNode({
                 {...stylex.props(jsonViewStyles.disclosureIcon)}
               >
                 <path
-                  d={expanded === true ? "m2.5 4 3.5 3.5L9.5 4" : "m4 2.5 3.5 3.5L4 9.5"}
+                  d={expanded === true ? 'm2.5 4 3.5 3.5L9.5 4' : 'm4 2.5 3.5 3.5L4 9.5'}
                   fill="none"
                   stroke="currentColor"
                   strokeLinecap="round"
@@ -782,7 +781,10 @@ function JsonNode({
         </span>
       </div>
       {container === true && expanded === true ? (
-        <div role="group" {...stylex.props(jsonViewStyles.group)}>
+        <div
+          role="group"
+          {...stylex.props(jsonViewStyles.group)}
+        >
           {entries.slice(0, visibleChildCount).map(([key, child], index) => (
             <JsonNode
               activePath={activePath}
@@ -809,9 +811,9 @@ function JsonNode({
           {continuationKind !== null ? (
             <div
               aria-label={
-                continuationKind === "batch"
-                  ? `Show more ${keyName ?? "JSON"} items`
-                  : `Visible limit reached in ${keyName ?? "JSON"}`
+                continuationKind === 'batch'
+                  ? `Show more ${keyName ?? 'JSON'} items`
+                  : `Visible limit reached in ${keyName ?? 'JSON'}`
               }
               aria-level={level + 1}
               aria-posinset={visibleChildCount + 1}
@@ -819,24 +821,21 @@ function JsonNode({
               data-json-path={continuationPath}
               onFocus={(event) => {
                 if (event.currentTarget === event.target) {
-                  onActivePathChange(continuationPath);
-                  onFocusedPathChange(continuationPath);
+                  onActivePathChange(continuationPath)
+                  onFocusedPathChange(continuationPath)
                 }
               }}
               onBlur={(event) => {
                 if (event.currentTarget === event.target) {
-                  onFocusedPathChange(null);
+                  onFocusedPathChange(null)
                 }
               }}
               onKeyDown={(event) => {
-                if (
-                  continuationKind === "batch" &&
-                  (event.key === "Enter" || event.key === " ")
-                ) {
-                  event.preventDefault();
-                  onChildBatchReveal(path);
+                if (continuationKind === 'batch' && (event.key === 'Enter' || event.key === ' ')) {
+                  event.preventDefault()
+                  onChildBatchReveal(path)
                 } else if (focusTreeItem(event.currentTarget, event.key) === true) {
-                  event.preventDefault();
+                  event.preventDefault()
                 }
               }}
               role="treeitem"
@@ -845,7 +844,7 @@ function JsonNode({
             >
               <div {...stylex.props(jsonViewStyles.row)}>
                 <span {...stylex.props(jsonViewStyles.disclosureSlot)} />
-                {continuationKind === "batch" ? (
+                {continuationKind === 'batch' ? (
                   <button
                     aria-label="Show more items"
                     onClick={() => onChildBatchReveal(path)}
@@ -864,13 +863,16 @@ function JsonNode({
         </div>
       ) : null}
       {container === true && expandable === true && expanded === true ? (
-        <div aria-hidden="true" {...stylex.props(jsonViewStyles.row)}>
+        <div
+          aria-hidden="true"
+          {...stylex.props(jsonViewStyles.row)}
+        >
           <span {...stylex.props(jsonViewStyles.disclosureSlot)} />
           <span {...stylex.props(jsonViewStyles.punctuation)}>{containerPunctuation[1]}</span>
         </div>
       ) : null}
     </div>
-  );
+  )
 }
 
 export function JsonView({
@@ -882,69 +884,66 @@ export function JsonView({
 }: JsonViewProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(() =>
     createInitialExpansion(data, defaultExpandDepth),
-  );
-  const [activePath, setActivePath] = useState(rootPath);
-  const [focusVisiblePath, setFocusVisiblePath] = useState<string | null>(null);
+  )
+  const [activePath, setActivePath] = useState(rootPath)
+  const [focusVisiblePath, setFocusVisiblePath] = useState<string | null>(null)
   const [revealedChildCounts, setRevealedChildCounts] = useState<ReadonlyMap<string, number>>(
     new Map(),
-  );
-  const [revealedStrings, setRevealedStrings] = useState<ReadonlySet<string>>(new Set());
-  const treeRef = useRef<HTMLDivElement>(null);
-  const onSearchResultsChangeRef = useRef(search?.onResultsChange);
-  const retainedSearchBranchRef = useRef<RetainedSearchBranch | null>(null);
+  )
+  const [revealedStrings, setRevealedStrings] = useState<ReadonlySet<string>>(new Set())
+  const treeRef = useRef<HTMLDivElement>(null)
+  const onSearchResultsChangeRef = useRef(search?.onResultsChange)
+  const retainedSearchBranchRef = useRef<RetainedSearchBranch | null>(null)
   const serializedData = useMemo(
     () => (showCopyAction === true ? JSON.stringify(data, null, 2) : null),
     [data, showCopyAction],
-  );
+  )
   const searchRequest = useMemo(
     () => ({
-      query: search?.query ?? "",
+      query: search?.query ?? '',
       caseSensitive: search?.caseSensitive,
       wholeWord: search?.wholeWord,
       regularExpression: search?.regularExpression,
     }),
     [search?.caseSensitive, search?.query, search?.regularExpression, search?.wholeWord],
-  );
-  const deferredSearchRequest = useDeferredValue(searchRequest);
-  const searchPending = searchRequest !== deferredSearchRequest;
+  )
+  const deferredSearchRequest = useDeferredValue(searchRequest)
+  const searchPending = searchRequest !== deferredSearchRequest
   const searchPattern = useMemo(
     () => createSearchPattern(deferredSearchRequest),
     [deferredSearchRequest],
-  );
-  const searchModel = useMemo(
-    () => createSearchModel(data, searchPattern),
-    [data, searchPattern],
-  );
+  )
+  const searchModel = useMemo(() => createSearchModel(data, searchPattern), [data, searchPattern])
   const activeSearchMatchIndex =
     searchModel.matches.length === 0
       ? null
       : (((search?.activeMatchIndex ?? 0) % searchModel.matches.length) +
           searchModel.matches.length) %
-        searchModel.matches.length;
+        searchModel.matches.length
   const activeSearchMatch =
-    activeSearchMatchIndex === null ? undefined : searchModel.matches[activeSearchMatchIndex];
+    activeSearchMatchIndex === null ? undefined : searchModel.matches[activeSearchMatchIndex]
   const effectiveExpandedPaths = useMemo(
     () => new Set([...expandedPaths, ...searchModel.expandedPaths]),
     [expandedPaths, searchModel.expandedPaths],
-  );
+  )
   const effectiveRevealedChildCounts = useMemo(() => {
-    const next = new Map(revealedChildCounts);
+    const next = new Map(revealedChildCounts)
     for (const [path, count] of searchModel.revealedChildCounts) {
-      next.set(path, Math.max(next.get(path) ?? childBatchSize, count));
+      next.set(path, Math.max(next.get(path) ?? childBatchSize, count))
     }
-    return next;
-  }, [revealedChildCounts, searchModel.revealedChildCounts]);
+    return next
+  }, [revealedChildCounts, searchModel.revealedChildCounts])
   const renderPlan = useMemo(
     () => createRenderPlan(data, effectiveExpandedPaths, effectiveRevealedChildCounts),
     [data, effectiveExpandedPaths, effectiveRevealedChildCounts],
-  );
+  )
   const searchMatchLimited =
-    activeSearchMatch !== undefined && renderPlan.visiblePaths.has(activeSearchMatch.path) === false;
-  const activeSearchMatchVisible = activeSearchMatch !== undefined && searchMatchLimited === false;
+    activeSearchMatch !== undefined && renderPlan.visiblePaths.has(activeSearchMatch.path) === false
+  const activeSearchMatchVisible = activeSearchMatch !== undefined && searchMatchLimited === false
 
   useLayoutEffect(() => {
-    onSearchResultsChangeRef.current = search?.onResultsChange;
-  }, [search?.onResultsChange]);
+    onSearchResultsChangeRef.current = search?.onResultsChange
+  }, [search?.onResultsChange])
 
   useLayoutEffect(() => {
     onSearchResultsChangeRef.current?.({
@@ -952,128 +951,130 @@ export function JsonView({
       count: searchModel.matches.length,
       pending: searchPending,
       query: deferredSearchRequest.query,
-    });
+    })
   }, [
     activeSearchMatchIndex,
     deferredSearchRequest.query,
     searchModel.matches.length,
     searchPending,
-  ]);
+  ])
 
   useLayoutEffect(() => {
     if (search !== undefined) {
       if (searchPending === true) {
-        return;
+        return
       }
 
       if (activeSearchMatch === undefined) {
-        retainedSearchBranchRef.current = null;
-        return;
+        retainedSearchBranchRef.current = null
+        return
       }
 
       const branchExpandedPaths = new Set(
         Array.from(searchModel.expandedPaths).filter((path) =>
           activeSearchMatch.path.startsWith(`${path}/`),
         ),
-      );
+      )
       const branchRevealedChildCounts = new Map(
         Array.from(searchModel.revealedChildCounts).filter(([path]) =>
           branchExpandedPaths.has(path),
         ),
-      );
+      )
       retainedSearchBranchRef.current = {
         expandedPaths: branchExpandedPaths,
         revealedChildCounts: branchRevealedChildCounts,
-      };
-      return;
+      }
+      return
     }
 
     if (retainedSearchBranchRef.current === null) {
-      return;
+      return
     }
 
-    const retainedBranch = retainedSearchBranchRef.current;
-    retainedSearchBranchRef.current = null;
-    setExpandedPaths((current) => new Set([...current, ...retainedBranch.expandedPaths]));
+    const retainedBranch = retainedSearchBranchRef.current
+    retainedSearchBranchRef.current = null
+    setExpandedPaths((current) => new Set([...current, ...retainedBranch.expandedPaths]))
     setRevealedChildCounts((current) => {
-      const next = new Map(current);
+      const next = new Map(current)
       for (const [path, count] of retainedBranch.revealedChildCounts) {
-        next.set(path, Math.max(next.get(path) ?? childBatchSize, count));
+        next.set(path, Math.max(next.get(path) ?? childBatchSize, count))
       }
-      return next;
-    });
-  }, [activeSearchMatch, search, searchModel, searchPending]);
+      return next
+    })
+  }, [activeSearchMatch, search, searchModel, searchPending])
 
   useEffect(() => {
     if (activeSearchMatch === undefined || activeSearchMatchVisible === false) {
-      return;
+      return
     }
 
     const match = Array.from(
-      treeRef.current?.querySelectorAll<HTMLElement>("[data-json-search-match]") ?? [],
-    ).find((item) => item.dataset.jsonSearchMatch === activeSearchMatch.id);
-    match?.scrollIntoView?.({ block: "nearest" });
-  }, [activeSearchMatch, activeSearchMatchVisible]);
+      treeRef.current?.querySelectorAll<HTMLElement>('[data-json-search-match]') ?? [],
+    ).find((item) => item.dataset.jsonSearchMatch === activeSearchMatch.id)
+    match?.scrollIntoView?.({ block: 'nearest' })
+  }, [activeSearchMatch, activeSearchMatchVisible])
 
   useEffect(() => {
-    const tree = treeRef.current;
+    const tree = treeRef.current
     if (tree === null) {
-      return;
+      return
     }
 
-    const activeItem = Array.from(tree.querySelectorAll<HTMLElement>("[data-json-path]")).find(
+    const activeItem = Array.from(tree.querySelectorAll<HTMLElement>('[data-json-path]')).find(
       (item) => item.dataset.jsonPath === activePath,
-    );
+    )
     if (activeItem !== undefined) {
-      return;
+      return
     }
 
-    let recoveryPath = activePath.includes("#") ? activePath.slice(0, activePath.indexOf("#")) : activePath;
-    let recoveryItem: HTMLElement | undefined;
+    let recoveryPath = activePath.includes('#')
+      ? activePath.slice(0, activePath.indexOf('#'))
+      : activePath
+    let recoveryItem: HTMLElement | undefined
     while (recoveryItem === undefined) {
-      recoveryItem = Array.from(tree.querySelectorAll<HTMLElement>("[data-json-path]")).find(
+      recoveryItem = Array.from(tree.querySelectorAll<HTMLElement>('[data-json-path]')).find(
         (item) => item.dataset.jsonPath === recoveryPath,
-      );
+      )
       if (recoveryItem !== undefined || recoveryPath === rootPath) {
-        break;
+        break
       }
-      recoveryPath = recoveryPath.slice(0, recoveryPath.lastIndexOf("/")) || rootPath;
+      recoveryPath = recoveryPath.slice(0, recoveryPath.lastIndexOf('/')) || rootPath
     }
 
     if (recoveryItem === undefined) {
-      return;
+      return
     }
 
-    setActivePath(recoveryPath);
+    setActivePath(recoveryPath)
     if (focusVisiblePath !== null) {
-      setFocusVisiblePath(recoveryPath);
-      recoveryItem.focus();
+      setFocusVisiblePath(recoveryPath)
+      recoveryItem.focus()
     } else if (document.activeElement === document.body) {
-      recoveryItem.focus();
+      recoveryItem.focus()
     }
-  }, [activePath, focusVisiblePath, renderPlan]);
+  }, [activePath, focusVisiblePath, renderPlan])
 
   function toggle(path: string, item: HTMLElement): void {
-    const tree = item.closest('[role="tree"]');
+    const tree = item.closest('[role="tree"]')
     const focusedPath = tree?.contains(document.activeElement)
-      ? document.activeElement?.closest<HTMLElement>("[data-json-path]")?.dataset.jsonPath
-      : undefined;
+      ? document.activeElement?.closest<HTMLElement>('[data-json-path]')?.dataset.jsonPath
+      : undefined
     const collapsingFocusedDescendant =
-      expandedPaths.has(path) && focusedPath !== undefined && focusedPath.startsWith(`${path}/`);
+      expandedPaths.has(path) && focusedPath !== undefined && focusedPath.startsWith(`${path}/`)
 
     setExpandedPaths((current) => {
-      const next = new Set(current);
+      const next = new Set(current)
       if (next.has(path)) {
-        next.delete(path);
+        next.delete(path)
       } else {
-        next.add(path);
+        next.add(path)
       }
-      return next;
-    });
+      return next
+    })
 
     if (collapsingFocusedDescendant === true) {
-      setActivePath(path);
-      item.focus();
+      setActivePath(path)
+      item.focus()
     }
   }
 
@@ -1081,7 +1082,13 @@ export function JsonView({
     <div {...stylex.props(jsonViewStyles.root)}>
       {searchMatchLimited === true ? (
         <div {...stylex.props(jsonViewStyles.status)}>
-          <Text as="div" color="muted" monospace role="status" variant="caption">
+          <Text
+            as="div"
+            color="muted"
+            monospace
+            role="status"
+            variant="caption"
+          >
             Match outside visible limit
           </Text>
         </div>
@@ -1113,14 +1120,14 @@ export function JsonView({
           onActivePathChange={setActivePath}
           onChildBatchReveal={(path) => {
             setRevealedChildCounts((current) => {
-              const next = new Map(current);
-              next.set(path, (current.get(path) ?? childBatchSize) + childBatchSize);
-              return next;
-            });
+              const next = new Map(current)
+              next.set(path, (current.get(path) ?? childBatchSize) + childBatchSize)
+              return next
+            })
           }}
           onFocusedPathChange={setFocusVisiblePath}
           onStringReveal={(path) => {
-            setRevealedStrings((current) => new Set(current).add(path));
+            setRevealedStrings((current) => new Set(current).add(path))
           }}
           onToggle={toggle}
           path={rootPath}
@@ -1133,5 +1140,5 @@ export function JsonView({
         />
       </div>
     </div>
-  );
+  )
 }

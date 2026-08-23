@@ -155,5 +155,4 @@ describe('ConnectionSwitcher', () => {
         .some((status) => status.textContent?.includes('Opening connection')),
     ).toBe(false)
   })
-
 })

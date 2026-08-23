@@ -1,22 +1,25 @@
-import { Box, Button, KeyboardInput, Tooltip } from "@inspector/ds";
-import { Rss, Search } from "lucide-react";
+import { Box, Button, KeyboardInput, Tooltip } from '@inspector/ds'
+import { Rss, Search } from 'lucide-react'
 
-import { productGlyphs } from "@app/icons/productGlyphs";
-import { appHotkeys } from "@app/hotkeys/hotkeyCatalog";
-import { InspectorDockCenterSlot } from "./centerSlot";
+import { productGlyphs } from '@app/icons/productGlyphs'
+import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
+import { InspectorDockCenterSlot } from './centerSlot'
 
 export interface InspectorLeftDockControl {
-  isOpen: boolean;
-  onToggle: () => void;
+  isOpen: boolean
+  onToggle: () => void
 }
 
 interface InspectorDockProps {
-  leftDock?: InspectorLeftDockControl;
-  onOpenCommands: () => void;
+  leftDock?: InspectorLeftDockControl
+  onOpenCommands: () => void
 }
 
-export function InspectorDock({ leftDock, onOpenCommands }: InspectorDockProps): React.ReactElement {
-  const leftDockLabel = leftDock?.isOpen === true ? "Close left dock" : "Open left dock";
+export function InspectorDock({
+  leftDock,
+  onOpenCommands,
+}: InspectorDockProps): React.ReactElement {
+  const leftDockLabel = leftDock?.isOpen === true ? 'Close left dock' : 'Open left dock'
 
   return (
     <Box
@@ -55,7 +58,11 @@ export function InspectorDock({ leftDock, onOpenCommands }: InspectorDockProps):
               }
             />
             <Tooltip.Content>
-              {leftDockLabel} <KeyboardInput hotkey={appHotkeys.toggleTableNavigator} size="small" />
+              {leftDockLabel}{' '}
+              <KeyboardInput
+                hotkey={appHotkeys.toggleTableNavigator}
+                size="small"
+              />
             </Tooltip.Content>
           </Tooltip.Root>
         ) : null}
@@ -104,14 +111,25 @@ export function InspectorDock({ leftDock, onOpenCommands }: InspectorDockProps):
             }
           />
           <Tooltip.Content>
-            Open commands <KeyboardInput hotkey={appHotkeys.openCommandPalette} size="small" />
+            Open commands{' '}
+            <KeyboardInput
+              hotkey={appHotkeys.openCommandPalette}
+              size="small"
+            />
           </Tooltip.Content>
         </Tooltip.Root>
       </Box>
-      <Box flexShrink={0} alignItems="center" justifyContent="center">
+      <Box
+        flexShrink={0}
+        alignItems="center"
+        justifyContent="center"
+      >
         <InspectorDockCenterSlot />
       </Box>
-      <Box minWidth={0} flex={1} />
+      <Box
+        minWidth={0}
+        flex={1}
+      />
     </Box>
-  );
+  )
 }

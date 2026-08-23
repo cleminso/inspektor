@@ -1,21 +1,21 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import ChevronExample from "./chevronExample";
-import chevronSource from "./chevronExample.tsx?raw";
-import DefaultExample from "./defaultExample";
-import defaultSource from "./defaultExample.tsx?raw";
-import DisabledItemsExample from "./disabledItemsExample";
-import disabledItemsSource from "./disabledItemsExample.tsx?raw";
-import LinkItemsExample from "./linkItemsExample";
-import linkItemsSource from "./linkItemsExample.tsx?raw";
-import PrefixSuffixExample from "./prefixSuffixExample";
-import prefixSuffixSource from "./prefixSuffixExample.tsx?raw";
-import { MenuPlayground } from "./playground";
+import ChevronExample from './chevronExample'
+import chevronSource from './chevronExample.tsx?raw'
+import DefaultExample from './defaultExample'
+import defaultSource from './defaultExample.tsx?raw'
+import DisabledItemsExample from './disabledItemsExample'
+import disabledItemsSource from './disabledItemsExample.tsx?raw'
+import LinkItemsExample from './linkItemsExample'
+import linkItemsSource from './linkItemsExample.tsx?raw'
+import PrefixSuffixExample from './prefixSuffixExample'
+import prefixSuffixSource from './prefixSuffixExample.tsx?raw'
+import { MenuPlayground } from './playground'
 import {
   menuCheckboxItemPropNames,
   menuContentPropNames,
@@ -26,19 +26,19 @@ import {
   menuRootPropNames,
   menuShortcutPropNames,
   menuTriggerPropNames,
-} from "./props";
-import SelectionItemsExample from "./selectionItemsExample";
-import selectionItemsSource from "./selectionItemsExample.tsx?raw";
+} from './props'
+import SelectionItemsExample from './selectionItemsExample'
+import selectionItemsSource from './selectionItemsExample.tsx?raw'
 
-const rootProps = getGeneratedProps("menu.root", menuRootPropNames);
-const triggerProps = getGeneratedProps("menu.trigger", menuTriggerPropNames);
-const contentProps = getGeneratedProps("menu.content", menuContentPropNames);
-const positionerProps = getGeneratedProps("menu.positioner", menuPositionerPropNames);
-const itemProps = getGeneratedProps("menu.item", menuItemPropNames);
-const linkItemProps = getGeneratedProps("menu.linkItem", menuLinkItemPropNames);
-const shortcutProps = getGeneratedProps("menu.shortcut", menuShortcutPropNames);
-const checkboxItemProps = getGeneratedProps("menu.checkboxItem", menuCheckboxItemPropNames);
-const radioItemProps = getGeneratedProps("menu.radioItem", menuRadioItemPropNames);
+const rootProps = getGeneratedProps('menu.root', menuRootPropNames)
+const triggerProps = getGeneratedProps('menu.trigger', menuTriggerPropNames)
+const contentProps = getGeneratedProps('menu.content', menuContentPropNames)
+const positionerProps = getGeneratedProps('menu.positioner', menuPositionerPropNames)
+const itemProps = getGeneratedProps('menu.item', menuItemPropNames)
+const linkItemProps = getGeneratedProps('menu.linkItem', menuLinkItemPropNames)
+const shortcutProps = getGeneratedProps('menu.shortcut', menuShortcutPropNames)
+const checkboxItemProps = getGeneratedProps('menu.checkboxItem', menuCheckboxItemPropNames)
+const radioItemProps = getGeneratedProps('menu.radioItem', menuRadioItemPropNames)
 
 export function MenuPage(): ReactElement {
   return (
@@ -125,5 +125,5 @@ export function MenuPage(): ReactElement {
         <PropsTable rows={radioItemProps} />
       </Section>
     </MenuPlayground>
-  );
+  )
 }

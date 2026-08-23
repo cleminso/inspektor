@@ -1,15 +1,15 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Box } from "@inspector/ds";
+import { Box } from '@inspector/ds'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
-import { dataGridItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
+import { dataGridItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
 import {
   dataGridBodyPropNames,
   dataGridCellPropNames,
@@ -22,21 +22,21 @@ import {
   dataGridRowPropNames,
   dataGridTablePropNames,
   dataGridViewportPropNames,
-} from "./props";
+} from './props'
 
-const rootProps = getGeneratedProps("dataGrid.root", dataGridRootPropNames);
-const viewportProps = getGeneratedProps("dataGrid.viewport", dataGridViewportPropNames);
-const tableProps = getGeneratedProps("dataGrid.table", dataGridTablePropNames);
-const contentProps = getGeneratedProps("dataGrid.content", dataGridContentPropNames);
-const headerProps = getGeneratedProps("dataGrid.header", dataGridPartPropNames);
-const headerRowProps = getGeneratedProps("dataGrid.headerRow", dataGridHeaderRowPropNames);
-const headerCellProps = getGeneratedProps("dataGrid.headerCell", dataGridHeaderCellPropNames);
-const bodyProps = getGeneratedProps("dataGrid.body", dataGridBodyPropNames);
-const rowProps = getGeneratedProps("dataGrid.row", dataGridRowPropNames);
-const cellProps = getGeneratedProps("dataGrid.cell", dataGridCellPropNames);
-const expandedRowProps = getGeneratedProps("dataGrid.expandedRow", dataGridExpandedRowPropNames);
-const messageProps = getGeneratedProps("dataGrid.empty", dataGridPartPropNames);
-const footerProps = getGeneratedProps("dataGrid.footer", dataGridPartPropNames);
+const rootProps = getGeneratedProps('dataGrid.root', dataGridRootPropNames)
+const viewportProps = getGeneratedProps('dataGrid.viewport', dataGridViewportPropNames)
+const tableProps = getGeneratedProps('dataGrid.table', dataGridTablePropNames)
+const contentProps = getGeneratedProps('dataGrid.content', dataGridContentPropNames)
+const headerProps = getGeneratedProps('dataGrid.header', dataGridPartPropNames)
+const headerRowProps = getGeneratedProps('dataGrid.headerRow', dataGridHeaderRowPropNames)
+const headerCellProps = getGeneratedProps('dataGrid.headerCell', dataGridHeaderCellPropNames)
+const bodyProps = getGeneratedProps('dataGrid.body', dataGridBodyPropNames)
+const rowProps = getGeneratedProps('dataGrid.row', dataGridRowPropNames)
+const cellProps = getGeneratedProps('dataGrid.cell', dataGridCellPropNames)
+const expandedRowProps = getGeneratedProps('dataGrid.expandedRow', dataGridExpandedRowPropNames)
+const messageProps = getGeneratedProps('dataGrid.empty', dataGridPartPropNames)
+const footerProps = getGeneratedProps('dataGrid.footer', dataGridPartPropNames)
 
 export function DataGridPage(): ReactElement {
   return (
@@ -45,7 +45,10 @@ export function DataGridPage(): ReactElement {
       description={dataGridItem.description}
       source={dataGridItem.source}
       preview={
-        <Box width="full" height="panel-height">
+        <Box
+          width="full"
+          height="panel-height"
+        >
           <BasicExample />
         </Box>
       }
@@ -95,5 +98,5 @@ export function DataGridPage(): ReactElement {
         <PropsTable rows={footerProps} />
       </Section>
     </ComponentDocsPage>
-  );
+  )
 }

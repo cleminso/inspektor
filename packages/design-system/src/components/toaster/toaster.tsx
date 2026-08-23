@@ -281,7 +281,11 @@ function ToastList() {
   const { toasts: activeToasts } = BaseToast.useToastManager()
 
   return activeToasts.map((toast, index) => (
-    <ToastItem key={toast.id} index={index} toast={toast} />
+    <ToastItem
+      key={toast.id}
+      index={index}
+      toast={toast}
+    />
   ))
 }
 
@@ -291,7 +295,11 @@ export function Toaster(_props: ToasterProps) {
     state.expanded === true && toasterStyles.viewportExpanded,
   ])
   return (
-    <BaseToast.Provider toastManager={toastManager} limit={3} timeout={5_000}>
+    <BaseToast.Provider
+      toastManager={toastManager}
+      limit={3}
+      timeout={5_000}
+    >
       <BaseToast.Portal>
         <BaseToast.Viewport
           {...viewportStyleProps}

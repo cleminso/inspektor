@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router'
 
-import { ContextSwitcherPage } from "@/components/content/components/contextSwitcher/page";
+import { ContextSwitcherPage } from '@/components/content/components/contextSwitcher/page'
 
-export const Route = createFileRoute("/components/context-switcher")({
+export const Route = createFileRoute('/components/context-switcher')({
   component: ContextSwitcherPage,
   head: () => ({
-    meta: [{ title: "Context Switcher · Inspector Design System" }],
+    meta: [{ title: 'Context Switcher · Inspector Design System' }],
   }),
-});
+})

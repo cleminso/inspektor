@@ -66,7 +66,10 @@ export interface ActionListTriggerProps extends Omit<
   render?: BaseButton.Props['render']
 }
 
-export interface ActionListActionProps extends Omit<WithoutStyles<BaseButton.Props>, 'nativeButton'> {
+export interface ActionListActionProps extends Omit<
+  WithoutStyles<BaseButton.Props>,
+  'nativeButton'
+> {
   /** Accessible name for an icon-only action. */
   'aria-label': string
   /** Disables the trailing action. */
@@ -160,7 +163,10 @@ function ActionListSelectionControl({
       )}
       data-slot="action-list-selection-control"
     >
-      <span aria-hidden="true" {...stylex.props(actionListStyles.selectionIcon)}>
+      <span
+        aria-hidden="true"
+        {...stylex.props(actionListStyles.selectionIcon)}
+      >
         {icon}
       </span>
       <span {...stylex.props(actionListStyles.selectionCheckbox)}>
@@ -196,7 +202,10 @@ const ActionListTrigger = forwardRef<HTMLElement, ActionListTriggerProps>(
         data-slot="action-list-trigger"
       >
         {prefix === undefined ? null : (
-          <span aria-hidden="true" {...stylex.props(actionListStyles.prefix)}>
+          <span
+            aria-hidden="true"
+            {...stylex.props(actionListStyles.prefix)}
+          >
             {prefix}
           </span>
         )}

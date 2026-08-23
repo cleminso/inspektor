@@ -7,11 +7,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type {
-  DataGridCellTarget,
-  DataGridFocusRequest,
-  DataGridTable,
-} from '@inspector/ds'
+import type { DataGridCellTarget, DataGridFocusRequest, DataGridTable } from '@inspector/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
 import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
 
@@ -166,17 +162,18 @@ export function useTableViewState({
   const activeRowId = searchState.editorMode === 'edit' ? searchState.rowId : null
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
-  const [activeFieldEditorTarget, setActiveFieldEditorTarget] =
-    useState<DataGridCellTarget | null>(null)
+  const [activeFieldEditorTarget, setActiveFieldEditorTarget] = useState<DataGridCellTarget | null>(
+    null,
+  )
   const [cellFocusRequest, setCellFocusRequest] = useState<DataGridFocusRequest | null>(null)
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
     activeRowId === null ? [] : [activeRowId],
   )
-  const [recentlyInsertedRowIds, setRecentlyInsertedRowIds] =
-    useState<ReadonlySet<TableRowId>>(emptyRecentlyInsertedRowIds)
-  const [recentlyAppliedCells, setRecentlyAppliedCells] = useState<TableFieldsByRowId>(
-    emptyRecentlyAppliedCells,
+  const [recentlyInsertedRowIds, setRecentlyInsertedRowIds] = useState<ReadonlySet<TableRowId>>(
+    emptyRecentlyInsertedRowIds,
   )
+  const [recentlyAppliedCells, setRecentlyAppliedCells] =
+    useState<TableFieldsByRowId>(emptyRecentlyAppliedCells)
   const recentChangeTimersRef = useRef(
     new Map<TableRowId | typeof recentlyAppliedTimerKey, ReturnType<typeof setTimeout>>(),
   )
@@ -216,20 +213,17 @@ export function useTableViewState({
       return new Set([...currentRowIds, rowId])
     })
 
-    scheduleRecentChangeExpiry(
-      rowId,
-      () => {
-        setRecentlyInsertedRowIds((currentRowIds) => {
-          if (currentRowIds.has(rowId) === false) {
-            return currentRowIds
-          }
+    scheduleRecentChangeExpiry(rowId, () => {
+      setRecentlyInsertedRowIds((currentRowIds) => {
+        if (currentRowIds.has(rowId) === false) {
+          return currentRowIds
+        }
 
-          const nextRowIds = new Set(currentRowIds)
-          nextRowIds.delete(rowId)
-          return nextRowIds
-        })
-      },
-    )
+        const nextRowIds = new Set(currentRowIds)
+        nextRowIds.delete(rowId)
+        return nextRowIds
+      })
+    })
   }
 
   /** Replaces the ephemeral grid highlight with the cells from the latest successful apply. */
@@ -492,9 +486,7 @@ export function useTableViewState({
     }
     if (detailPaneMode !== 'closed') {
       if (activeRowId !== null) {
-        setSelectedRowIds((currentRowIds) =>
-          currentRowIds.filter((rowId) => rowId !== activeRowId),
-        )
+        setSelectedRowIds((currentRowIds) => currentRowIds.filter((rowId) => rowId !== activeRowId))
       }
       closeDetailPane()
       return
@@ -681,9 +673,7 @@ export function useTableViewState({
       }
     },
     handleCellEditRequest: (target) => {
-      if (
-        detailPaneMode !== 'closed'
-      ) {
+      if (detailPaneMode !== 'closed') {
         return
       }
       const columnMeta = query.columns.find((column) => column.id === target.columnId)

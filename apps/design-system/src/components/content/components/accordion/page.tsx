@@ -32,25 +32,43 @@ export function AccordionPage(): ReactElement {
       title={accordionItem.title}
       description={accordionItem.description}
       source={accordionItem.source}
-      preview={<Box width="popup-width-m"><BasicExample /></Box>}
+      preview={
+        <Box width="popup-width-m">
+          <BasicExample />
+        </Box>
+      }
       sourceCode={basicSource}
     >
-      <Section title="Composition" description="Use one item for each related collapsible section." />
+      <Section
+        title="Composition"
+        description="Use one item for each related collapsible section."
+      />
       <Section
         title="Constrained height"
         description="Use the fill layout to keep complete section headers separated while overflowing panel content scrolls under overlay scrollbar chrome."
       >
-        <Example source={fillSource} align="start">
+        <Example
+          source={fillSource}
+          align="start"
+        >
           <FillExample />
         </Example>
       </Section>
-      <Section title="Root props"><PropsTable rows={rootProps} /></Section>
-      <Section title="Item props"><PropsTable rows={itemProps} /></Section>
+      <Section title="Root props">
+        <PropsTable rows={rootProps} />
+      </Section>
+      <Section title="Item props">
+        <PropsTable rows={itemProps} />
+      </Section>
       <Section title="Header props">
         <PropsTable rows={headerProps} />
       </Section>
-      <Section title="Trigger props"><PropsTable rows={triggerProps} /></Section>
-      <Section title="Panel props"><PropsTable rows={panelProps} /></Section>
+      <Section title="Trigger props">
+        <PropsTable rows={triggerProps} />
+      </Section>
+      <Section title="Panel props">
+        <PropsTable rows={panelProps} />
+      </Section>
     </ComponentDocsPage>
   )
 }

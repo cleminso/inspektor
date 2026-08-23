@@ -1,7 +1,7 @@
-import { createContext } from "react";
+import { createContext } from 'react'
 
 export interface FieldContextValue {
-  disabled: boolean;
+  disabled: boolean
 }
 
-export const FieldContext = createContext<FieldContextValue | null>(null);
+export const FieldContext = createContext<FieldContextValue | null>(null)

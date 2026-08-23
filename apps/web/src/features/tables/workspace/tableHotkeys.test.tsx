@@ -49,7 +49,11 @@ afterEach(() => {
 
 describe('TableHotkeys', () => {
   it('runs workspace commands from their canonical hotkeys', () => {
-    render(<AppHotkeysProvider><TableHotkeys /></AppHotkeysProvider>)
+    render(
+      <AppHotkeysProvider>
+        <TableHotkeys />
+      </AppHotkeysProvider>,
+    )
 
     fireEvent.keyDown(document, { key: 'b', ctrlKey: true })
     fireEvent.keyDown(document, { altKey: true, key: 'n' })
@@ -149,7 +153,9 @@ describe('TableHotkeys', () => {
       <AppHotkeysProvider>
         <TableHotkeys />
         <div role="menu" aria-label="View actions">
-          <button type="button" role="menuitem">Rename view</button>
+          <button type="button" role="menuitem">
+            Rename view
+          </button>
         </div>
       </AppHotkeysProvider>,
     )
@@ -163,7 +169,11 @@ describe('TableHotkeys', () => {
   })
 
   it('runs one-shot workspace actions once per key press', () => {
-    render(<AppHotkeysProvider><TableHotkeys /></AppHotkeysProvider>)
+    render(
+      <AppHotkeysProvider>
+        <TableHotkeys />
+      </AppHotkeysProvider>,
+    )
 
     fireEvent.keyDown(document, { altKey: true, key: 'w' })
     fireEvent.keyDown(document, { altKey: true, key: 'w', repeat: true })
@@ -177,7 +187,11 @@ describe('TableHotkeys', () => {
     tableHotkeyState.canGoForward = false
     tableHotkeyState.tabs = [{ id: 'new-view', kind: 'newView' }]
 
-    render(<AppHotkeysProvider><TableHotkeys /></AppHotkeysProvider>)
+    render(
+      <AppHotkeysProvider>
+        <TableHotkeys />
+      </AppHotkeysProvider>,
+    )
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
 
     expect(

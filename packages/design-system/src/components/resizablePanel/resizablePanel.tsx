@@ -38,8 +38,10 @@ const gutterOrientationStyles = {
   vertical: resizablePanelStyles.gutterVertical,
 } satisfies Record<ResizablePanelOrientation, unknown>
 
-export interface ResizablePanelGroupProps
-  extends Omit<BaseGroupProps, 'className' | 'style' | 'resizeTargetMinimumSize'> {
+export interface ResizablePanelGroupProps extends Omit<
+  BaseGroupProps,
+  'className' | 'style' | 'resizeTargetMinimumSize'
+> {
   /** Controls whether panels are arranged and resized horizontally or vertically. */
   orientation?: BaseGroupProps['orientation']
   /** Restores a previously saved layout keyed by panel id. */
@@ -85,8 +87,10 @@ export interface ResizablePanelProps extends Omit<BasePanelProps, 'className' | 
   elementRef?: BasePanelProps['elementRef']
 }
 
-export interface ResizableHandleProps
-  extends Omit<BaseSeparatorProps, 'children' | 'className' | 'style'> {
+export interface ResizableHandleProps extends Omit<
+  BaseSeparatorProps,
+  'children' | 'className' | 'style'
+> {
   /** Controls whether the separator is a line, a transparent gutter, or includes a visible grip. */
   appearance?: ResizableHandleAppearance
   /** Uniquely identifies the handle within its group. */

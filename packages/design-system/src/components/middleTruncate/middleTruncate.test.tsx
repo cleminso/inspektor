@@ -114,9 +114,7 @@ describe('MiddleTruncate', () => {
       },
     )
 
-    const { container, unmount } = render(
-      <MiddleTruncate value="better_auth_verification" />,
-    )
+    const { container, unmount } = render(<MiddleTruncate value="better_auth_verification" />)
     const root = container.querySelector('[data-slot="middle-truncate"]')
     const preview = container.querySelector('[data-slot="middle-truncate-preview"]')
     const accessibleValue = container.querySelector(

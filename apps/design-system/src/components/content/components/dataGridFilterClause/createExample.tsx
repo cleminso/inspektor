@@ -1,5 +1,5 @@
-import { DataGridFilterClause } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { DataGridFilterClause } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function CreateExample(): ReactElement {
   return (
@@ -11,5 +11,5 @@ export default function CreateExample(): ReactElement {
       </DataGridFilterClause.Trigger>
       <DataGridFilterClause.Remove aria-label="Remove filter created at after August 18" />
     </DataGridFilterClause.Root>
-  );
+  )
 }

@@ -25,13 +25,7 @@ type BoxElement =
   | 'ol'
   | 'li'
 
-const NON_FLEX_DEFAULT_ELEMENTS = new Set<BoxElement>([
-  'span',
-  'label',
-  'ul',
-  'ol',
-  'li',
-])
+const NON_FLEX_DEFAULT_ELEMENTS = new Set<BoxElement>(['span', 'label', 'ul', 'ol', 'li'])
 
 type BoxOwnProps<E extends BoxElement = 'div'> = BoxStyleProps & {
   as?: E
@@ -100,10 +94,7 @@ function BoxInner<E extends BoxElement = 'div'>(
   const hasStyle = Object.keys(mergedStyle).length > 0
 
   const classes =
-    [
-      stylexProps.className ?? null,
-      responsiveCSS !== null ? scopeClass : null,
-    ]
+    [stylexProps.className ?? null, responsiveCSS !== null ? scopeClass : null]
       .filter(Boolean)
       .join(' ') || undefined
 

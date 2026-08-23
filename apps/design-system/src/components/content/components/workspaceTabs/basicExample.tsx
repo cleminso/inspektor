@@ -9,17 +9,43 @@ const initialViews = [
 
 function TableIcon(): ReactElement {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" width="16" height="16">
-      <rect x="2.5" y="2.5" width="11" height="11" rx="1" stroke="currentColor" />
-      <path d="M2.5 6h11M6 2.5v11" stroke="currentColor" />
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      fill="none"
+      width="16"
+      height="16"
+    >
+      <rect
+        x="2.5"
+        y="2.5"
+        width="11"
+        height="11"
+        rx="1"
+        stroke="currentColor"
+      />
+      <path
+        d="M2.5 6h11M6 2.5v11"
+        stroke="currentColor"
+      />
     </svg>
   )
 }
 
 function PlusIcon(): ReactElement {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" width="16" height="16">
-      <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" />
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      fill="none"
+      width="16"
+      height="16"
+    >
+      <path
+        d="M8 3.5v9M3.5 8h9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
     </svg>
   )
 }
@@ -75,11 +101,24 @@ export default function BasicExample(): ReactElement {
   }
 
   return (
-    <Box width="full" flexDirection="column" gap="l">
-      <WorkspaceTabs.Root value={value} onValueChange={(nextValue) => setValue(String(nextValue))}>
+    <Box
+      width="full"
+      flexDirection="column"
+      gap="l"
+    >
+      <WorkspaceTabs.Root
+        value={value}
+        onValueChange={(nextValue) => setValue(String(nextValue))}
+      >
         <WorkspaceTabs.Bar>
           <WorkspaceTabs.LeadingArea aria-label="View navigation">
-            <Button aria-label="Previous view" iconOnly variant="ghost" size="m" radius="m">
+            <Button
+              aria-label="Previous view"
+              iconOnly
+              variant="ghost"
+              size="m"
+              radius="m"
+            >
               ←
             </Button>
           </WorkspaceTabs.LeadingArea>
@@ -97,15 +136,15 @@ export default function BasicExample(): ReactElement {
                 closeLabel={`Close ${view.label}`}
                 contextMenuItems={
                   view.replaceable === true ? (
-                    <ContextMenu.Item onClick={() => keepOpen(view.value)}>Keep open</ContextMenu.Item>
+                    <ContextMenu.Item onClick={() => keepOpen(view.value)}>
+                      Keep open
+                    </ContextMenu.Item>
                   ) : undefined
                 }
                 contextMenuLabel={view.replaceable === true ? `${view.label} actions` : undefined}
                 reorderLabel={`Reorder ${view.label}`}
                 onClose={closeView}
-                onDoubleClick={
-                  view.replaceable === true ? () => keepOpen(view.value) : undefined
-                }
+                onDoubleClick={view.replaceable === true ? () => keepOpen(view.value) : undefined}
               >
                 {view.label}
               </WorkspaceTabs.Tab>
@@ -125,7 +164,10 @@ export default function BasicExample(): ReactElement {
           </WorkspaceTabs.TrailingArea>
         </WorkspaceTabs.Bar>
         {views.map((view) => (
-          <WorkspaceTabs.Panel key={view.value} value={view.value}>
+          <WorkspaceTabs.Panel
+            key={view.value}
+            value={view.value}
+          >
             <Text color="muted">{view.label} table state</Text>
           </WorkspaceTabs.Panel>
         ))}

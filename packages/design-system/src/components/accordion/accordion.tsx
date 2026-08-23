@@ -112,7 +112,14 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(function Ac
     state.hidden === true && accordionStyles.itemHidden,
     accordionStyles.itemIndexed,
   ])
-  return <BaseAccordion.Item {...props} ref={forwardedRef} disabled={disabled} {...stateStyles} />
+  return (
+    <BaseAccordion.Item
+      {...props}
+      ref={forwardedRef}
+      disabled={disabled}
+      {...stateStyles}
+    />
+  )
 })
 
 const AccordionHeader = forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
@@ -156,11 +163,24 @@ const AccordionTrigger = forwardRef<HTMLElement, AccordionTriggerProps>(function
   ])
 
   return (
-    <BaseAccordion.Trigger {...props} ref={forwardedRef} {...stateStyles}>
+    <BaseAccordion.Trigger
+      {...props}
+      ref={forwardedRef}
+      {...stateStyles}
+    >
       <span {...stylex.props(accordionStyles.leading)}>
         <span {...stylex.props(accordionStyles.label)}>{children}</span>
-        <svg aria-hidden="true" viewBox="0 0 14 14" {...stylex.props(accordionStyles.indicator)}>
-          <path d="m5 3 4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 14 14"
+          {...stylex.props(accordionStyles.indicator)}
+        >
+          <path
+            d="m5 3 4 4-4 4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
         </svg>
       </span>
       {suffix === undefined ? null : (
@@ -170,37 +190,38 @@ const AccordionTrigger = forwardRef<HTMLElement, AccordionTriggerProps>(function
   )
 })
 
-const AccordionPanel = forwardRef<HTMLDivElement, AccordionPanelProps>(
-  function AccordionPanel({ children, ...props }, forwardedRef) {
-    const layout = useContext(AccordionLayoutContext)
-    const stateStyles = createStateStyleProps<BaseAccordion.Panel.State>((state) => [
-      accordionStyles.panel,
-      layout === 'fill' && accordionStyles.panelFill,
-      (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
-        accordionStyles.panelTransitioning,
-      state.open === true && accordionStyles.panelOpen,
-      state.open === false && accordionStyles.panelClosed,
-      state.disabled === true && accordionStyles.panelDisabled,
-      state.orientation === 'horizontal' && accordionStyles.panelHorizontal,
-      state.orientation === 'vertical' && accordionStyles.panelVertical,
-      state.hidden === true && accordionStyles.panelHidden,
-      accordionStyles.panelIndexed,
-      state.transitionStatus === 'starting' && accordionStyles.panelStarting,
-      state.transitionStatus === 'ending' && accordionStyles.panelEnding,
-    ])
-    return (
-      <BaseAccordion.Panel
-        {...props}
-        ref={forwardedRef}
-        data-overflow={layout === 'fill' ? 'clipped' : undefined}
-        data-slot="accordion-panel"
-        {...stateStyles}
-      >
-        {layout === 'fill' ? <ScrollAreaPrivate>{children}</ScrollAreaPrivate> : children}
-      </BaseAccordion.Panel>
-    )
-  },
-)
+const AccordionPanel = forwardRef<HTMLDivElement, AccordionPanelProps>(function AccordionPanel(
+  { children, ...props },
+  forwardedRef,
+) {
+  const layout = useContext(AccordionLayoutContext)
+  const stateStyles = createStateStyleProps<BaseAccordion.Panel.State>((state) => [
+    accordionStyles.panel,
+    layout === 'fill' && accordionStyles.panelFill,
+    (state.transitionStatus === 'starting' || state.transitionStatus === 'ending') &&
+      accordionStyles.panelTransitioning,
+    state.open === true && accordionStyles.panelOpen,
+    state.open === false && accordionStyles.panelClosed,
+    state.disabled === true && accordionStyles.panelDisabled,
+    state.orientation === 'horizontal' && accordionStyles.panelHorizontal,
+    state.orientation === 'vertical' && accordionStyles.panelVertical,
+    state.hidden === true && accordionStyles.panelHidden,
+    accordionStyles.panelIndexed,
+    state.transitionStatus === 'starting' && accordionStyles.panelStarting,
+    state.transitionStatus === 'ending' && accordionStyles.panelEnding,
+  ])
+  return (
+    <BaseAccordion.Panel
+      {...props}
+      ref={forwardedRef}
+      data-overflow={layout === 'fill' ? 'clipped' : undefined}
+      data-slot="accordion-panel"
+      {...stateStyles}
+    >
+      {layout === 'fill' ? <ScrollAreaPrivate>{children}</ScrollAreaPrivate> : children}
+    </BaseAccordion.Panel>
+  )
+})
 
 export const Accordion = Object.assign(AccordionRoot, {
   Root: AccordionRoot,

@@ -1,15 +1,15 @@
-import { Box, CopyButton, Icon } from "@inspector/ds";
-import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { type ReactElement, useId, useState } from "react";
+import { Box, CopyButton, Icon } from '@inspector/ds'
+import * as stylex from '@stylexjs/stylex'
+import { ChevronDown } from 'lucide-react'
+import { type ReactElement, useId, useState } from 'react'
 
-import { useHighlightedCode } from "@/lib/shiki";
+import { useHighlightedCode } from '@/lib/shiki'
 
 export function CodeBlock({ source }: { source: string }): ReactElement {
-  const code = source.trim();
-  const highlightedHtml = useHighlightedCode(code);
-  const contentId = useId();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const code = source.trim()
+  const highlightedHtml = useHighlightedCode(code)
+  const contentId = useId()
+  const [isExpanded, setIsExpanded] = useState(false)
 
   return (
     <Box
@@ -29,15 +29,15 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
         width="full"
         borderBottomLeftRadius="m"
         borderBottomRightRadius="m"
-        data-state={isExpanded === true ? "open" : "closed"}
+        data-state={isExpanded === true ? 'open' : 'closed'}
       >
         <button
           type="button"
           aria-controls={contentId}
           aria-expanded={isExpanded}
-          data-state={isExpanded === true ? "open" : "closed"}
+          data-state={isExpanded === true ? 'open' : 'closed'}
           onClick={() => {
-            setIsExpanded((expanded) => expanded === false);
+            setIsExpanded((expanded) => expanded === false)
           }}
           {...stylex.props(styles.trigger, isExpanded === true && styles.triggerExpanded)}
         >
@@ -48,15 +48,18 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
               isExpanded === false && styles.triggerIconCollapsed,
             )}
           >
-            <Icon artwork={ChevronDown} size="s" />
+            <Icon
+              artwork={ChevronDown}
+              size="s"
+            />
           </span>
-          {isExpanded === true ? "Hide code" : "Show code"}
+          {isExpanded === true ? 'Hide code' : 'Show code'}
         </button>
         <Box
           id={contentId}
-          data-state={isExpanded === true ? "open" : "closed"}
+          data-state={isExpanded === true ? 'open' : 'closed'}
           hidden={isExpanded === false}
-          display={isExpanded === true ? "block" : "none"}
+          display={isExpanded === true ? 'block' : 'none'}
           position="relative"
           backgroundColor="surface-background"
           borderColor="default"
@@ -64,8 +67,16 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
           borderWidth={0}
           borderTopWidth={1}
         >
-          <Box position="absolute" right="l" top="l" zIndex="content">
-            <CopyButton textToCopy={source} label="Copy source" />
+          <Box
+            position="absolute"
+            right="l"
+            top="l"
+            zIndex="content"
+          >
+            <CopyButton
+              textToCopy={source}
+              label="Copy source"
+            />
           </Box>
           {highlightedHtml !== null ? (
             <div
@@ -81,59 +92,59 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
         </Box>
       </Box>
     </Box>
-  );
+  )
 }
 
 const styles = stylex.create({
-  codeContent: { display: "block" },
+  codeContent: { display: 'block' },
   trigger: {
-    alignItems: "center",
-    appearance: "none",
-    backgroundColor: "transparent",
+    alignItems: 'center',
+    appearance: 'none',
+    backgroundColor: 'transparent',
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
     borderWidth: 0,
-    color: "inherit",
-    cursor: "pointer",
-    display: "flex",
+    color: 'inherit',
+    cursor: 'pointer',
+    display: 'flex',
     fontFamily: "'Geist Variable', 'Inter', sans-serif",
     fontSize: 14,
     gap: 12,
     height: 48,
     outlineColor: {
-      default: "transparent",
-      ":focus-visible": "currentColor",
+      default: 'transparent',
+      ':focus-visible': 'currentColor',
     },
     outlineOffset: -2,
-    outlineStyle: "solid",
+    outlineStyle: 'solid',
     outlineWidth: {
       default: 0,
-      ":focus-visible": 2,
+      ':focus-visible': 2,
     },
     paddingInline: 16,
-    textAlign: "left",
-    width: "100%",
+    textAlign: 'left',
+    width: '100%',
   },
   triggerExpanded: {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
   },
   triggerIcon: {
-    display: "flex",
+    display: 'flex',
     flexShrink: 0,
-    transform: "rotate(0deg)",
+    transform: 'rotate(0deg)',
   },
   triggerIconCollapsed: {
-    transform: "rotate(-90deg)",
+    transform: 'rotate(-90deg)',
   },
   pre: {
-    color: "inherit",
+    color: 'inherit',
     fontFamily: "'Geist Mono Variable', ui-monospace, SFMono-Regular, Consolas, monospace",
     fontSize: 13,
-    lineHeight: "20px",
+    lineHeight: '20px',
     margin: 0,
-    overflowX: "auto",
-    padding: "16px 48px 16px 16px",
-    whiteSpace: "pre",
+    overflowX: 'auto',
+    padding: '16px 48px 16px 16px',
+    whiteSpace: 'pre',
   },
-});
+})

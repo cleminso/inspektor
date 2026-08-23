@@ -129,8 +129,12 @@ function WorkspaceTabsSelectionHarness() {
         <WorkspaceTabs.Tab value="all">All accounts</WorkspaceTabs.Tab>
         <WorkspaceTabs.Tab value="active">Active accounts</WorkspaceTabs.Tab>
       </WorkspaceTabs.List>
-      <WorkspaceTabs.Panel value="all" keepMounted>All account rows</WorkspaceTabs.Panel>
-      <WorkspaceTabs.Panel value="active" keepMounted>Active account rows</WorkspaceTabs.Panel>
+      <WorkspaceTabs.Panel value="all" keepMounted>
+        All account rows
+      </WorkspaceTabs.Panel>
+      <WorkspaceTabs.Panel value="active" keepMounted>
+        Active account rows
+      </WorkspaceTabs.Panel>
     </WorkspaceTabs.Root>
   )
 }
@@ -398,8 +402,12 @@ describe('WorkspaceTabs', () => {
     })
     expect(fireEvent.mouseDown(activeTab, { button: 0 })).toBe(false)
 
-    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe('')
-    expect(activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBeNull()
+    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe(
+      '',
+    )
+    expect(
+      activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
+    ).toBeNull()
     expect(screen.getByText('All account rows').hasAttribute('hidden')).toBe(false)
     expect(screen.getByText('Active account rows').hasAttribute('hidden')).toBe(true)
 
@@ -439,8 +447,12 @@ describe('WorkspaceTabs', () => {
     })
     expect(fireEvent.mouseDown(activeTab, { button: 0 })).toBe(false)
 
-    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe('')
-    expect(activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBeNull()
+    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe(
+      '',
+    )
+    expect(
+      activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
+    ).toBeNull()
     expect(screen.getByText('All account rows').hasAttribute('hidden')).toBe(false)
     expect(screen.getByText('Active account rows').hasAttribute('hidden')).toBe(true)
 
@@ -459,8 +471,12 @@ describe('WorkspaceTabs', () => {
       })
     })
 
-    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe('')
-    expect(activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBeNull()
+    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe(
+      '',
+    )
+    expect(
+      activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
+    ).toBeNull()
     expect(screen.getByText('All account rows').hasAttribute('hidden')).toBe(false)
     expect(screen.getByText('Active account rows').hasAttribute('hidden')).toBe(true)
   })
@@ -548,9 +564,9 @@ describe('WorkspaceTabs', () => {
 
     const moveLeft = await screen.findByRole('menuitem', { name: 'Move left' })
     expect(screen.getByRole('menu', { name: 'Reorder Active accounts' })).toBeTruthy()
-    expect(
-      screen.getByRole('menuitem', { name: 'Move right' }).hasAttribute('aria-disabled'),
-    ).toBe(false)
+    expect(screen.getByRole('menuitem', { name: 'Move right' }).hasAttribute('aria-disabled')).toBe(
+      false,
+    )
     fireEvent.click(moveLeft)
 
     expect(handleReorder).toHaveBeenCalledWith(['active', 'all', 'archived'])
@@ -634,11 +650,7 @@ describe('WorkspaceTabs', () => {
           <WorkspaceTabs.Tab value="all" reorderLabel="Reorder All accounts">
             All accounts
           </WorkspaceTabs.Tab>
-          <WorkspaceTabs.Tab
-            disabled
-            value="archived"
-            reorderLabel="Reorder Archived accounts"
-          >
+          <WorkspaceTabs.Tab disabled value="archived" reorderLabel="Reorder Archived accounts">
             Archived accounts
           </WorkspaceTabs.Tab>
         </WorkspaceTabs.List>
@@ -687,9 +699,9 @@ describe('WorkspaceTabs', () => {
     expect(
       (await screen.findByRole('menuitem', { name: 'Move left' })).getAttribute('aria-disabled'),
     ).toBe('true')
-    expect(
-      screen.getByRole('menuitem', { name: 'Move right' }).hasAttribute('aria-disabled'),
-    ).toBe(false)
+    expect(screen.getByRole('menuitem', { name: 'Move right' }).hasAttribute('aria-disabled')).toBe(
+      false,
+    )
   })
 
   it('switches the active view and its associated panel', () => {
@@ -734,9 +746,13 @@ describe('WorkspaceTabs', () => {
     const allTab = screen.getByRole('tab', { name: 'All accounts' })
     const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
     expect(allTab.getAttribute('data-active')).toBe('')
-    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe('')
+    expect(allTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe(
+      '',
+    )
     expect(activeTab.getAttribute('data-active')).toBeNull()
-    expect(activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBeNull()
+    expect(
+      activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
+    ).toBeNull()
   })
 
   it('keeps automatic fallback changes aligned when cancellation is requested', () => {
@@ -765,7 +781,9 @@ describe('WorkspaceTabs', () => {
 
     const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
     expect(activeTab.getAttribute('data-active')).toBe('')
-    expect(activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active')).toBe('')
+    expect(
+      activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
+    ).toBe('')
   })
 
   it('closes a view without selecting it', () => {
@@ -803,8 +821,12 @@ describe('WorkspaceTabs', () => {
     render(
       <WorkspaceTabs.Root defaultValue="all">
         <WorkspaceTabs.List aria-label="Table views">
-          <WorkspaceTabs.Tab value="all" onClose={() => undefined}>All accounts</WorkspaceTabs.Tab>
-          <WorkspaceTabs.Tab value="active" onClose={() => undefined}>Active accounts</WorkspaceTabs.Tab>
+          <WorkspaceTabs.Tab value="all" onClose={() => undefined}>
+            All accounts
+          </WorkspaceTabs.Tab>
+          <WorkspaceTabs.Tab value="active" onClose={() => undefined}>
+            Active accounts
+          </WorkspaceTabs.Tab>
         </WorkspaceTabs.List>
         <WorkspaceTabs.Panel value="all">All account rows</WorkspaceTabs.Panel>
         <WorkspaceTabs.Panel value="active">Active account rows</WorkspaceTabs.Panel>
@@ -985,18 +1007,17 @@ describe('WorkspaceTabs', () => {
     expect(closableItem?.querySelector('[aria-hidden="true"] span')?.textContent).toBe('Table')
     const closeContainer = closableItem?.lastElementChild
     expect(closeContainer?.getAttribute('data-slot')).toBe('workspace-tabs-close')
-    expect(closeContainer?.querySelector('[data-slot="button"]')?.getAttribute('data-variant')).toBe(
-      'ghost',
-    )
-    expect(closeContainer === undefined || closeContainer === null || closableTab.contains(closeContainer)).toBe(
-      false,
-    )
-    expect(closableTab.className).toContain(
-      stylex.props(workspaceTabsStyles.tabClosable).className,
-    )
+    expect(
+      closeContainer?.querySelector('[data-slot="button"]')?.getAttribute('data-variant'),
+    ).toBe('ghost')
+    expect(
+      closeContainer === undefined ||
+        closeContainer === null ||
+        closableTab.contains(closeContainer),
+    ).toBe(false)
+    expect(closableTab.className).toContain(stylex.props(workspaceTabsStyles.tabClosable).className)
     expect(closableItem?.className).toContain(
       stylex.props(workspaceTabsStyles.itemClosable).className,
     )
   })
-
 })

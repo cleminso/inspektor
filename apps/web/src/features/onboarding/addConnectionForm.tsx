@@ -1,18 +1,18 @@
-import { useEffect, useRef, type FormEventHandler } from "react";
+import { useEffect, useRef, type FormEventHandler } from 'react'
 
-import { Box, Button, Text, TextField } from "@inspector/ds";
+import { Box, Button, Text, TextField } from '@inspector/ds'
 
-import type { ConnectionError } from "@app/connections/connectionValidation";
+import type { ConnectionError } from '@app/connections/connectionValidation'
 
-import type { AddConnectionFormValues } from "./connectionFormTypes";
+import type { AddConnectionFormValues } from './connectionFormTypes'
 
 interface AddConnectionFormProps {
-  error: ConnectionError | null;
-  formValues: AddConnectionFormValues;
-  isSubmitting: boolean;
-  onCancel: () => void;
-  onSubmit: FormEventHandler<HTMLFormElement>;
-  onUpdateField: (field: keyof AddConnectionFormValues, value: string) => void;
+  error: ConnectionError | null
+  formValues: AddConnectionFormValues
+  isSubmitting: boolean
+  onCancel: () => void
+  onSubmit: FormEventHandler<HTMLFormElement>
+  onUpdateField: (field: keyof AddConnectionFormValues, value: string) => void
 }
 
 export function AddConnectionForm({
@@ -23,25 +23,35 @@ export function AddConnectionForm({
   onSubmit,
   onUpdateField,
 }: AddConnectionFormProps): React.ReactElement {
-  const hasError = error !== null;
-  const serverUrlRef = useRef<HTMLInputElement>(null);
-  const appIdRef = useRef<HTMLInputElement>(null);
-  const adminSecretRef = useRef<HTMLInputElement>(null);
-  const errorField = error?.field;
+  const hasError = error !== null
+  const serverUrlRef = useRef<HTMLInputElement>(null)
+  const appIdRef = useRef<HTMLInputElement>(null)
+  const adminSecretRef = useRef<HTMLInputElement>(null)
+  const errorField = error?.field
 
   useEffect(() => {
-    if (errorField === "serverUrl") {
-      serverUrlRef.current?.focus();
-    } else if (errorField === "appId") {
-      appIdRef.current?.focus();
-    } else if (errorField === "adminSecret") {
-      adminSecretRef.current?.focus();
+    if (errorField === 'serverUrl') {
+      serverUrlRef.current?.focus()
+    } else if (errorField === 'appId') {
+      appIdRef.current?.focus()
+    } else if (errorField === 'adminSecret') {
+      adminSecretRef.current?.focus()
     }
-  }, [errorField]);
+  }, [errorField])
 
   return (
-    <Box as="form" minHeight={0} width="full" flexDirection="column" gap="3xl" onSubmit={onSubmit}>
-      <Box flexDirection="column" gap="xl">
+    <Box
+      as="form"
+      minHeight={0}
+      width="full"
+      flexDirection="column"
+      gap="3xl"
+      onSubmit={onSubmit}
+    >
+      <Box
+        flexDirection="column"
+        gap="xl"
+      >
         <TextField
           id="connection-name"
           label="Connection name"
@@ -49,7 +59,7 @@ export function AddConnectionForm({
           autoComplete="off"
           value={formValues.name}
           onValueChange={(value) => {
-            onUpdateField("name", value);
+            onUpdateField('name', value)
           }}
           placeholder="My Jazz app…"
         />
@@ -59,14 +69,14 @@ export function AddConnectionForm({
           name="serverUrl"
           autoComplete="url"
           description="Sync server that stores your app data."
-          error={error?.field === "serverUrl" ? error.description : undefined}
+          error={error?.field === 'serverUrl' ? error.description : undefined}
           ref={serverUrlRef}
           type="url"
           inputMode="url"
           spellCheck={false}
           value={formValues.serverUrl}
           onValueChange={(value) => {
-            onUpdateField("serverUrl", value);
+            onUpdateField('serverUrl', value)
           }}
           placeholder="https://v2.sync.jazz.tools/"
           required={true}
@@ -76,12 +86,12 @@ export function AddConnectionForm({
           label="App ID"
           name="appId"
           autoComplete="off"
-          error={error?.field === "appId" ? error.description : undefined}
+          error={error?.field === 'appId' ? error.description : undefined}
           ref={appIdRef}
           spellCheck={false}
           value={formValues.appId}
           onValueChange={(value) => {
-            onUpdateField("appId", value);
+            onUpdateField('appId', value)
           }}
           required={true}
         />
@@ -90,17 +100,21 @@ export function AddConnectionForm({
           label="Admin secret"
           name="adminSecret"
           autoComplete="off"
-          error={error?.field === "adminSecret" ? error.description : undefined}
+          error={error?.field === 'adminSecret' ? error.description : undefined}
           ref={adminSecretRef}
           type="password"
           spellCheck={false}
           value={formValues.adminSecret}
           onValueChange={(value) => {
-            onUpdateField("adminSecret", value);
+            onUpdateField('adminSecret', value)
           }}
           required={true}
         />
-        <Box display="grid" gridTemplateColumns={{ base: "one", sm: "two" }} gap="m">
+        <Box
+          display="grid"
+          gridTemplateColumns={{ base: 'one', sm: 'two' }}
+          gap="m"
+        >
           <TextField
             id="connection-env"
             label="Env"
@@ -109,7 +123,7 @@ export function AddConnectionForm({
             spellCheck={false}
             value={formValues.env}
             onValueChange={(value) => {
-              onUpdateField("env", value);
+              onUpdateField('env', value)
             }}
           />
           <TextField
@@ -120,20 +134,32 @@ export function AddConnectionForm({
             spellCheck={false}
             value={formValues.branch}
             onValueChange={(value) => {
-              onUpdateField("branch", value);
+              onUpdateField('branch', value)
             }}
           />
         </Box>
       </Box>
       {hasError === true ? (
-        <Box flexDirection="column" gap="xs" role="status" aria-live="polite">
-          <Text color="error" variant="label">
+        <Box
+          flexDirection="column"
+          gap="xs"
+          role="status"
+          aria-live="polite"
+        >
+          <Text
+            color="error"
+            variant="label"
+          >
             {error.title}
           </Text>
           {error.field === undefined ? <Text color="error">{error.description}</Text> : null}
         </Box>
       ) : null}
-      <Box alignItems="center" justifyContent="end" gap="m">
+      <Box
+        alignItems="center"
+        justifyContent="end"
+        gap="m"
+      >
         <Button
           type="submit"
           size="s"
@@ -153,5 +179,5 @@ export function AddConnectionForm({
         </Button>
       </Box>
     </Box>
-  );
+  )
 }

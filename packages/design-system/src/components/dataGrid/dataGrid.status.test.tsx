@@ -32,11 +32,7 @@ function StatusDataGrid({
   return (
     <DataGrid.Root table={table}>
       <DataGrid.Viewport>
-        <DataGrid.Table
-          aria-busy={busy}
-          aria-label="People"
-          statusContent={statusContent}
-        >
+        <DataGrid.Table aria-busy={busy} aria-label="People" statusContent={statusContent}>
           <DataGrid.Content />
         </DataGrid.Table>
       </DataGrid.Viewport>
@@ -48,12 +44,7 @@ afterEach(cleanup)
 
 describe('DataGrid status semantics', () => {
   it('keeps settled rows while exposing refresh progress and completion through stable semantics', () => {
-    const { rerender } = render(
-      <StatusDataGrid
-        busy
-        statusContent="Refreshing people"
-      />,
-    )
+    const { rerender } = render(<StatusDataGrid busy statusContent="Refreshing people" />)
     const table = screen.getByRole('table', { name: 'People' })
     const status = screen.getByRole('status')
 

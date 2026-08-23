@@ -1,25 +1,25 @@
-import { useState } from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { useState } from 'react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 
-import { Box, Button, Switch, Text } from "@inspector/ds";
+import { Box, Button, Switch, Text } from '@inspector/ds'
 
-import { DetailPane } from "@tables/rowEditor/detailPane";
-import type { TableRowId } from "@tables/tableTypes";
+import { DetailPane } from '@tables/rowEditor/detailPane'
+import type { TableRowId } from '@tables/tableTypes'
 
 interface RowEditorSidePanelProps {
-  activeColumnNumber: number;
-  activePageRowNumber: number | null;
-  activeRowIndex: number;
-  children: React.ReactNode;
-  editedRowIds: TableRowId[];
-  insertMoreEnabled?: boolean;
-  mode: "insert" | "edit";
-  mutationDisabled?: boolean;
-  onClose?: () => void;
-  onConfirmDelete?: (rowIds: readonly TableRowId[]) => void;
-  onInsertMoreEnabledChange?: (enabled: boolean) => void;
-  onNavigateNext: () => void;
-  onNavigatePrevious: () => void;
+  activeColumnNumber: number
+  activePageRowNumber: number | null
+  activeRowIndex: number
+  children: React.ReactNode
+  editedRowIds: TableRowId[]
+  insertMoreEnabled?: boolean
+  mode: 'insert' | 'edit'
+  mutationDisabled?: boolean
+  onClose?: () => void
+  onConfirmDelete?: (rowIds: readonly TableRowId[]) => void
+  onInsertMoreEnabledChange?: (enabled: boolean) => void
+  onNavigateNext: () => void
+  onNavigatePrevious: () => void
 }
 
 export function RowEditorSidePanel({
@@ -39,31 +39,30 @@ export function RowEditorSidePanel({
 }: RowEditorSidePanelProps): React.ReactElement {
   const [deleteConfirmationRowIds, setDeleteConfirmationRowIds] = useState<
     readonly TableRowId[] | null
-  >(null);
-  const hasMultipleRows = editedRowIds.length > 1;
-  const insertMoreFieldId = "insert-more";
+  >(null)
+  const hasMultipleRows = editedRowIds.length > 1
+  const insertMoreFieldId = 'insert-more'
   const title =
-    mode === "insert"
-      ? "Insert row"
+    mode === 'insert'
+      ? 'Insert row'
       : activePageRowNumber === null
-        ? "Edit row"
-        : `Edit row ${activePageRowNumber}:${activeColumnNumber}`;
-  const deleteRowIds = deleteConfirmationRowIds ?? editedRowIds;
+        ? 'Edit row'
+        : `Edit row ${activePageRowNumber}:${activeColumnNumber}`
+  const deleteRowIds = deleteConfirmationRowIds ?? editedRowIds
   const deleteLabel =
-    deleteRowIds.length === 1 ? "Delete row" : `Delete ${deleteRowIds.length} checked rows`;
+    deleteRowIds.length === 1 ? 'Delete row' : `Delete ${deleteRowIds.length} checked rows`
   const hasTwoFooterActions =
-    deleteConfirmationRowIds !== null ||
-    (onConfirmDelete !== undefined && onClose !== undefined);
+    deleteConfirmationRowIds !== null || (onConfirmDelete !== undefined && onClose !== undefined)
   const footer =
-    mode === "edit" && (onConfirmDelete !== undefined || onClose !== undefined) ? (
+    mode === 'edit' && (onConfirmDelete !== undefined || onClose !== undefined) ? (
       <Box
         as="footer"
         data-slot="row-editor-footer"
-        display={hasTwoFooterActions === true ? "grid" : "flex"}
+        display={hasTwoFooterActions === true ? 'grid' : 'flex'}
         flexShrink={0}
         alignItems="center"
         gap="xs"
-        gridTemplateColumns={hasTwoFooterActions === true ? "three-one" : undefined}
+        gridTemplateColumns={hasTwoFooterActions === true ? 'three-one' : undefined}
         borderTopWidth={1}
         borderColor="default"
         borderStyle="solid"
@@ -87,7 +86,13 @@ export function RowEditorSidePanel({
               </Button>
             )}
             {onClose === undefined ? null : (
-              <Button type="button" layout="fill" size="s" variant="secondary" onClick={onClose}>
+              <Button
+                type="button"
+                layout="fill"
+                size="s"
+                variant="secondary"
+                onClick={onClose}
+              >
                 Close
               </Button>
             )}
@@ -100,9 +105,9 @@ export function RowEditorSidePanel({
               size="s"
               variant="danger"
               onClick={() => {
-                const confirmedRowIds = deleteConfirmationRowIds;
-                setDeleteConfirmationRowIds(null);
-                onConfirmDelete(confirmedRowIds);
+                const confirmedRowIds = deleteConfirmationRowIds
+                setDeleteConfirmationRowIds(null)
+                onConfirmDelete(confirmedRowIds)
               }}
             >
               Confirm delete
@@ -119,7 +124,7 @@ export function RowEditorSidePanel({
           </>
         )}
       </Box>
-    ) : undefined;
+    ) : undefined
 
   return (
     <DetailPane
@@ -133,12 +138,19 @@ export function RowEditorSidePanel({
           alignItems="center"
           gap="l"
         >
-          <Box minWidth={0} flex={1}>
-            <Text as="h2" variant="label" truncate>
+          <Box
+            minWidth={0}
+            flex={1}
+          >
+            <Text
+              as="h2"
+              variant="label"
+              truncate
+            >
               {title}
             </Text>
           </Box>
-          {mode === "insert" && onInsertMoreEnabledChange !== undefined ? (
+          {mode === 'insert' && onInsertMoreEnabledChange !== undefined ? (
             <Box
               as="label"
               htmlFor={insertMoreFieldId}
@@ -154,10 +166,14 @@ export function RowEditorSidePanel({
                 checked={insertMoreEnabled}
                 size="s"
                 onCheckedChange={(checked) => {
-                  onInsertMoreEnabledChange(checked === true);
+                  onInsertMoreEnabledChange(checked === true)
                 }}
               />
-              <Text as="span" id={`${insertMoreFieldId}-label`} color="muted">
+              <Text
+                as="span"
+                id={`${insertMoreFieldId}-label`}
+                color="muted"
+              >
                 Insert more
               </Text>
             </Box>
@@ -169,7 +185,11 @@ export function RowEditorSidePanel({
               alignItems="center"
               gap="xs"
             >
-              <Text as="span" color="muted" tabularNums>
+              <Text
+                as="span"
+                color="muted"
+                tabularNums
+              >
                 {activeRowIndex + 1} / {editedRowIds.length}
               </Text>
               <Box alignItems="center">
@@ -203,5 +223,5 @@ export function RowEditorSidePanel({
     >
       {children}
     </DetailPane>
-  );
+  )
 }

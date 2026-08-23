@@ -12,12 +12,7 @@ describe('Calendar', () => {
   it('selects a date without rendering timestamp controls', () => {
     const onValueChange = vi.fn()
 
-    render(
-      <Calendar
-        value={new Date(2026, 7, 13)}
-        onValueChange={onValueChange}
-      />,
-    )
+    render(<Calendar value={new Date(2026, 7, 13)} onValueChange={onValueChange} />)
 
     fireEvent.click(screen.getByRole('button', { name: /Friday, August 14th, 2026/i }))
 
@@ -46,7 +41,9 @@ describe('Calendar', () => {
     fireEvent.click(screen.getByRole('button', { name: /Friday, August 14th, 2026/i }))
 
     expect(onValueChange).toHaveBeenCalledWith(new Date(2026, 7, 14))
-    expect(screen.queryByRole('button', { name: /Friday, August 14th, 2026, selected/i })).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: /Friday, August 14th, 2026, selected/i }),
+    ).toBeNull()
   })
 
   it('preserves years below 100 during month navigation', () => {

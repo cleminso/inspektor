@@ -194,12 +194,7 @@ export type {
 export { ButtonLink } from './components/buttonLink/buttonLink'
 export type { ButtonLinkProps } from './components/buttonLink/buttonLink'
 export { Icon } from './components/icon/icon'
-export type {
-  IconArtwork,
-  IconArtworkProps,
-  IconProps,
-  IconSize,
-} from './components/icon/icon'
+export type { IconArtwork, IconArtworkProps, IconProps, IconSize } from './components/icon/icon'
 export { TextLink } from './components/textLink/textLink'
 export type { TextLinkProps } from './components/textLink/textLink'
 export { Spinner } from './components/spinner/spinner'

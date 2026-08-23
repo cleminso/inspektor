@@ -1,12 +1,7 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
-import { layerIndexes } from "../../tokens/layers.stylex";
-import {
-  borderColors,
-  spatial,
-  surfaceColors,
-  textColors,
-} from "../../tokens/semantics.stylex";
+import { layerIndexes } from '../../tokens/layers.stylex'
+import { borderColors, spatial, surfaceColors, textColors } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -15,13 +10,13 @@ import {
   lineHeights,
   shadows,
   spacing,
-} from "../../tokens/value.stylex";
+} from '../../tokens/value.stylex'
 
 export const alertDialogStyles = stylex.create({
   backdrop: {
     inset: 0,
     backgroundColor: surfaceColors.backdrop,
-    position: "fixed",
+    position: 'fixed',
     zIndex: layerIndexes.modal,
   },
   backdropOpen: {},
@@ -31,12 +26,12 @@ export const alertDialogStyles = stylex.create({
   viewport: {
     inset: 0,
     padding: spacing.xl,
-    alignItems: "center",
-    display: "flex",
-    justifyContent: "center",
-    position: "fixed",
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    position: 'fixed',
     zIndex: layerIndexes.modal,
-    overflowY: "auto",
+    overflowY: 'auto',
   },
   viewportOpen: {},
   viewportClosed: {},
@@ -48,18 +43,18 @@ export const alertDialogStyles = stylex.create({
     padding: spacing.m,
     borderColor: borderColors.default,
     borderRadius: borderRadii.s,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderWidth: 1,
     gap: spacing.s,
-    outline: "none",
+    outline: 'none',
     backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
     color: textColors.default,
-    display: "flex",
-    flexDirection: "column",
-    maxWidth: spatial["popup-width-l"],
-    width: "100%",
+    display: 'flex',
+    flexDirection: 'column',
+    maxWidth: spatial['popup-width-l'],
+    width: '100%',
   },
   popupOpen: {},
   popupClosed: {},
@@ -84,10 +79,10 @@ export const alertDialogStyles = stylex.create({
   },
   actions: {
     gap: spacing.s,
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "flex-end",
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
   },
   closeEnabled: {},
   closeDisabled: {},
-});
+})

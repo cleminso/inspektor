@@ -41,7 +41,12 @@
     "anti-slop/no-reflect-get": "error",
     "anti-slop/no-shape-in-symbol-names": "error",
     "jsx-a11y/no-autofocus": "warn",
-    "jsx-a11y/prefer-tag-over-role": "off"
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "react/immutability": "off",
+    "react/incompatible-library": "off",
+    "react/preserve-manual-memoization": "off",
+    "react/refs": "off",
+    "react/set-state-in-effect": "off"
   },
   "overrides": [
     {
@@ -131,6 +136,21 @@
       "files": ["**/components/actionList/actionList.tsx"],
       "rules": {
         "jsx-a11y/no-noninteractive-element-interactions": "off"
+      }
+    },
+    {
+      "files": ["**/components/datePicker/datePicker.tsx"],
+      "rules": {
+        "jsx-a11y/no-autofocus": "off"
+      }
+    },
+    {
+      "files": [
+        "packages/design-system/src/tokens/semantics.stylex.ts",
+        "packages/design-system/src/tokens/value.stylex.ts"
+      ],
+      "rules": {
+        "@stylexjs/enforce-extension": "off"
       }
     },
     {

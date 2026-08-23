@@ -1,62 +1,62 @@
-import { describe, expect, it } from "vitest";
-import type { IntrospectionSubscriptionGroup } from "jazz-tools";
+import { describe, expect, it } from 'vitest'
+import type { IntrospectionSubscriptionGroup } from 'jazz-tools'
 
 import {
   filterQuerySubscriptionRows,
   filterQuerySubscriptionTableNames,
-} from "./subscriptionFilters";
+} from './subscriptionFilters'
 
 const rows: IntrospectionSubscriptionGroup[] = [
   {
-    branches: ["main"],
+    branches: ['main'],
     count: 2,
-    groupKey: "accounts-full",
-    propagation: "full",
-    query: "accounts query",
-    table: "accounts",
+    groupKey: 'accounts-full',
+    propagation: 'full',
+    query: 'accounts query',
+    table: 'accounts',
   },
   {
-    branches: ["main"],
+    branches: ['main'],
     count: 1,
-    groupKey: "accounts-local",
-    propagation: "local-only",
-    query: "local accounts query",
-    table: "accounts",
+    groupKey: 'accounts-local',
+    propagation: 'local-only',
+    query: 'local accounts query',
+    table: 'accounts',
   },
   {
-    branches: ["main"],
+    branches: ['main'],
     count: 3,
-    groupKey: "rooms-full",
-    propagation: "full",
-    query: "rooms query",
-    table: "rooms",
+    groupKey: 'rooms-full',
+    propagation: 'full',
+    query: 'rooms query',
+    table: 'rooms',
   },
-];
+]
 
-describe("filterQuerySubscriptionTableNames", () => {
-  it("filters schema tables without depending on active telemetry", () => {
+describe('filterQuerySubscriptionTableNames', () => {
+  it('filters schema tables without depending on active telemetry', () => {
     expect(
-      filterQuerySubscriptionTableNames(["accounts", "archived_accounts", "rooms"], "ARCHIVED"),
-    ).toEqual(["archived_accounts"]);
-  });
-});
+      filterQuerySubscriptionTableNames(['accounts', 'archived_accounts', 'rooms'], 'ARCHIVED'),
+    ).toEqual(['archived_accounts'])
+  })
+})
 
-describe("filterQuerySubscriptionRows", () => {
-  it("does not filter propagation when no propagation option is selected", () => {
+describe('filterQuerySubscriptionRows', () => {
+  it('does not filter propagation when no propagation option is selected', () => {
     expect(
       filterQuerySubscriptionRows(rows, {
         selectedPropagations: [],
-        selectedTableName: "accounts",
+        selectedTableName: 'accounts',
       }),
-    ).toEqual([rows[0], rows[1]]);
-  });
+    ).toEqual([rows[0], rows[1]])
+  })
 
-  it("combines table and propagation filters", () => {
+  it('combines table and propagation filters', () => {
     expect(
       filterQuerySubscriptionRows(rows, {
-        selectedPropagations: ["full"],
-        selectedTableName: "accounts",
+        selectedPropagations: ['full'],
+        selectedTableName: 'accounts',
       }),
-    ).toEqual([rows[0]]);
-  });
-});
+    ).toEqual([rows[0]])
+  })
+})

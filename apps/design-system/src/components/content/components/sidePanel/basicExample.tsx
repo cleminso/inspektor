@@ -5,7 +5,12 @@ export default function BasicExample(): ReactElement {
   return (
     <SidePanel>
       <SidePanel.Header>
-        <Input aria-label="Filter tables" placeholder="Filter" type="search" fullWidth />
+        <Input
+          aria-label="Filter tables"
+          placeholder="Filter"
+          type="search"
+          fullWidth
+        />
       </SidePanel.Header>
       <SidePanel.Body>
         <Text color="muted">Scrollable panel content</Text>

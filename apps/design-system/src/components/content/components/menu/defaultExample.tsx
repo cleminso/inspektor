@@ -1,5 +1,5 @@
-import { Button, Menu } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Button, Menu } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function DefaultExample(): ReactElement {
   return (
@@ -9,10 +9,13 @@ export default function DefaultExample(): ReactElement {
         <Menu.Item onClick={() => undefined}>Rename</Menu.Item>
         <Menu.Item onClick={() => undefined}>Duplicate</Menu.Item>
         <Menu.Separator />
-        <Menu.Item variant="danger" onClick={() => undefined}>
+        <Menu.Item
+          variant="danger"
+          onClick={() => undefined}
+        >
           Delete
         </Menu.Item>
       </Menu.Content>
     </Menu.Root>
-  );
+  )
 }

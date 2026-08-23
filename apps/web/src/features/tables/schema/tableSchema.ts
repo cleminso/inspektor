@@ -4,56 +4,59 @@
  * Table lists, column lists, and relation labels must come from runtime metadata so the
  * Inspector can browse any app without importing generated schema code.
  */
-import type { ColumnDescriptor, WasmSchema } from "jazz-tools";
+import type { ColumnDescriptor, WasmSchema } from 'jazz-tools'
 
 const RELATION_LABEL_COLUMN_PRIORITY = [
-  "name",
-  "title",
-  "label",
-  "displayName",
-  "display_name",
-  "username",
-  "handle",
-  "slug",
-  "email",
-] as const;
+  'name',
+  'title',
+  'label',
+  'displayName',
+  'display_name',
+  'username',
+  'handle',
+  'slug',
+  'email',
+] as const
 
 /** Avoids IDs, nested references, and complex values when labeling relation links. */
 function isDisplayFriendlyColumn(column: ColumnDescriptor): boolean {
-  if (column.name === "id" || column.references !== undefined) {
-    return false;
+  if (column.name === 'id' || column.references !== undefined) {
+    return false
   }
 
   switch (column.column_type.type) {
-    case "Text":
-    case "Enum":
-    case "Timestamp":
-    case "Integer":
-    case "BigInt":
-    case "Double":
-    case "Boolean":
-      return true;
+    case 'Text':
+    case 'Enum':
+    case 'Timestamp':
+    case 'Integer':
+    case 'BigInt':
+    case 'Double':
+    case 'Boolean':
+      return true
     default:
-      return false;
+      return false
   }
 }
 
 /** Gives the table explorer deterministic navigation from unordered schema metadata. */
 export function getTableNames(schema: WasmSchema | null): string[] {
   if (schema === null) {
-    return [];
+    return []
   }
 
-  return Object.keys(schema).sort((left, right) => left.localeCompare(right));
+  return Object.keys(schema).sort((left, right) => left.localeCompare(right))
 }
 
 /** Keeps callers generic by treating unresolved schema/table state as no columns. */
-export function getTableColumns(schema: WasmSchema | null, tableName: string | null): ColumnDescriptor[] {
+export function getTableColumns(
+  schema: WasmSchema | null,
+  tableName: string | null,
+): ColumnDescriptor[] {
   if (schema === null || tableName === null) {
-    return [];
+    return []
   }
 
-  return schema[tableName]?.columns ?? [];
+  return schema[tableName]?.columns ?? []
 }
 
 /**
@@ -66,23 +69,23 @@ export function getRelationDisplayColumn(
   schema: WasmSchema | null,
   tableName: string | null,
 ): ColumnDescriptor | null {
-  const columns = getTableColumns(schema, tableName);
+  const columns = getTableColumns(schema, tableName)
 
   for (const columnName of RELATION_LABEL_COLUMN_PRIORITY) {
     const match = columns.find(
       (column) => column.name === columnName && isDisplayFriendlyColumn(column) === true,
-    );
+    )
     if (match !== undefined) {
-      return match;
+      return match
     }
   }
 
   const firstTextColumn = columns.find(
-    (column) => column.column_type.type === "Text" && isDisplayFriendlyColumn(column) === true,
-  );
+    (column) => column.column_type.type === 'Text' && isDisplayFriendlyColumn(column) === true,
+  )
   if (firstTextColumn !== undefined) {
-    return firstTextColumn;
+    return firstTextColumn
   }
 
-  return columns.find((column) => isDisplayFriendlyColumn(column) === true) ?? null;
+  return columns.find((column) => isDisplayFriendlyColumn(column) === true) ?? null
 }

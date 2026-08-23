@@ -1,26 +1,26 @@
-import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
-import { type ComponentProps, type ReactElement, useEffect } from "react";
+import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
+import { type ComponentProps, type ReactElement, useEffect } from 'react'
 
 const themeColorByValue = {
-  dark: "#19181a",
-  light: "#fafafa",
-} as const;
+  dark: '#19181a',
+  light: '#fafafa',
+} as const
 
 function ThemeHeadEffects(): null {
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
-    const theme = resolvedTheme === "dark" ? "dark" : "light";
+    const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
     const themeColorMeta = document.querySelector<HTMLMetaElement>(
       'meta[name="theme-color"][data-inspector-theme-color="true"]',
-    );
+    )
 
     if (themeColorMeta !== null) {
-      themeColorMeta.content = themeColorByValue[theme];
+      themeColorMeta.content = themeColorByValue[theme]
     }
-  }, [resolvedTheme]);
+  }, [resolvedTheme])
 
-  return null;
+  return null
 }
 
 export function ThemeProvider({
@@ -39,5 +39,5 @@ export function ThemeProvider({
       <ThemeHeadEffects />
       {children}
     </NextThemesProvider>
-  );
+  )
 }

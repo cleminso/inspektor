@@ -25,21 +25,21 @@ export default function FindNavigationExample() {
     activeIndex: null,
     count: 0,
     pending: false,
-    query: "",
+    query: '',
   })
   const state: FindBarState =
     query.length === 0
       ? { status: 'idle' }
       : results.query !== query && results.query.length === 0
         ? { status: 'searching' }
-      : results.activeIndex === null
-        ? { status: 'empty', pending: results.query !== query || results.pending }
-        : {
-            status: 'matched',
-            activeIndex: results.activeIndex,
-            count: results.count,
-            pending: results.query !== query || results.pending,
-          }
+        : results.activeIndex === null
+          ? { status: 'empty', pending: results.query !== query || results.pending }
+          : {
+              status: 'matched',
+              activeIndex: results.activeIndex,
+              count: results.count,
+              pending: results.query !== query || results.pending,
+            }
 
   return (
     <Box

@@ -1,7 +1,10 @@
 import { describe, expectTypeOf, it } from 'vitest'
 
 import type { ComboboxContentProps, ComboboxPositionerProps } from '../components/combobox/combobox'
-import type { ContextMenuContentProps, ContextMenuPositionerProps } from '../components/contextMenu/contextMenu'
+import type {
+  ContextMenuContentProps,
+  ContextMenuPositionerProps,
+} from '../components/contextMenu/contextMenu'
 import type { ContextSwitcherContentProps } from '../components/contextSwitcher/contextSwitcher'
 import type { MenuContentProps, MenuPositionerProps } from '../components/menu/menu'
 import type { MultiSelectContentProps } from '../components/multiSelect/multiSelect'

@@ -1,12 +1,12 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import ConnectionExample from "./connectionExample";
-import connectionSource from "./connectionExample.tsx?raw";
+import ConnectionExample from './connectionExample'
+import connectionSource from './connectionExample.tsx?raw'
 import {
   contextSwitcherContentPropNames,
   contextSwitcherItemPropNames,
@@ -15,26 +15,26 @@ import {
   contextSwitcherSearchPropNames,
   contextSwitcherTriggerPropNames,
   contextSwitcherViewportPropNames,
-} from "./props";
-import { ContextSwitcherPlayground } from "./playground";
-import SimpleExample from "./simpleExample";
-import simpleSource from "./simpleExample.tsx?raw";
-import StatusExample from "./statusExample";
-import statusSource from "./statusExample.tsx?raw";
+} from './props'
+import { ContextSwitcherPlayground } from './playground'
+import SimpleExample from './simpleExample'
+import simpleSource from './simpleExample.tsx?raw'
+import StatusExample from './statusExample'
+import statusSource from './statusExample.tsx?raw'
 
-const rootProps = getGeneratedProps("contextSwitcher.root", contextSwitcherRootPropNames);
-const triggerProps = getGeneratedProps("contextSwitcher.trigger", contextSwitcherTriggerPropNames);
-const searchProps = getGeneratedProps("contextSwitcher.search", contextSwitcherSearchPropNames);
-const contentProps = getGeneratedProps("contextSwitcher.content", contextSwitcherContentPropNames);
+const rootProps = getGeneratedProps('contextSwitcher.root', contextSwitcherRootPropNames)
+const triggerProps = getGeneratedProps('contextSwitcher.trigger', contextSwitcherTriggerPropNames)
+const searchProps = getGeneratedProps('contextSwitcher.search', contextSwitcherSearchPropNames)
+const contentProps = getGeneratedProps('contextSwitcher.content', contextSwitcherContentPropNames)
 const viewportProps = getGeneratedProps(
-  "contextSwitcher.viewport",
+  'contextSwitcher.viewport',
   contextSwitcherViewportPropNames,
-);
-const itemProps = getGeneratedProps("contextSwitcher.item", contextSwitcherItemPropNames);
+)
+const itemProps = getGeneratedProps('contextSwitcher.item', contextSwitcherItemPropNames)
 const itemTextProps = getGeneratedProps(
-  "contextSwitcher.itemText",
+  'contextSwitcher.itemText',
   contextSwitcherItemTextPropNames,
-);
+)
 
 export function ContextSwitcherPage(): ReactElement {
   return (
@@ -88,5 +88,5 @@ export function ContextSwitcherPage(): ReactElement {
         <PropsTable rows={itemTextProps} />
       </Section>
     </ContextSwitcherPlayground>
-  );
+  )
 }

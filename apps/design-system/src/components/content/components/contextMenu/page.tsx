@@ -1,17 +1,17 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import DefaultExample from "./defaultExample";
-import defaultSource from "./defaultExample.tsx?raw";
-import DisabledItemsExample from "./disabledItemsExample";
-import disabledItemsSource from "./disabledItemsExample.tsx?raw";
-import PrefixSuffixExample from "./prefixSuffixExample";
-import prefixSuffixSource from "./prefixSuffixExample.tsx?raw";
-import { ContextMenuPlayground } from "./playground";
+import DefaultExample from './defaultExample'
+import defaultSource from './defaultExample.tsx?raw'
+import DisabledItemsExample from './disabledItemsExample'
+import disabledItemsSource from './disabledItemsExample.tsx?raw'
+import PrefixSuffixExample from './prefixSuffixExample'
+import prefixSuffixSource from './prefixSuffixExample.tsx?raw'
+import { ContextMenuPlayground } from './playground'
 import {
   contextMenuCheckboxItemPropNames,
   contextMenuContentPropNames,
@@ -21,22 +21,19 @@ import {
   contextMenuRadioItemPropNames,
   contextMenuRootPropNames,
   contextMenuShortcutPropNames,
-} from "./props";
+} from './props'
 
-const rootProps = getGeneratedProps("contextMenu.root", contextMenuRootPropNames);
-const contentProps = getGeneratedProps("contextMenu.content", contextMenuContentPropNames);
-const positionerProps = getGeneratedProps(
-  "contextMenu.positioner",
-  contextMenuPositionerPropNames,
-);
-const itemProps = getGeneratedProps("contextMenu.item", contextMenuItemPropNames);
-const linkItemProps = getGeneratedProps("contextMenu.linkItem", contextMenuLinkItemPropNames);
-const shortcutProps = getGeneratedProps("contextMenu.shortcut", contextMenuShortcutPropNames);
+const rootProps = getGeneratedProps('contextMenu.root', contextMenuRootPropNames)
+const contentProps = getGeneratedProps('contextMenu.content', contextMenuContentPropNames)
+const positionerProps = getGeneratedProps('contextMenu.positioner', contextMenuPositionerPropNames)
+const itemProps = getGeneratedProps('contextMenu.item', contextMenuItemPropNames)
+const linkItemProps = getGeneratedProps('contextMenu.linkItem', contextMenuLinkItemPropNames)
+const shortcutProps = getGeneratedProps('contextMenu.shortcut', contextMenuShortcutPropNames)
 const checkboxItemProps = getGeneratedProps(
-  "contextMenu.checkboxItem",
+  'contextMenu.checkboxItem',
   contextMenuCheckboxItemPropNames,
-);
-const radioItemProps = getGeneratedProps("contextMenu.radioItem", contextMenuRadioItemPropNames);
+)
+const radioItemProps = getGeneratedProps('contextMenu.radioItem', contextMenuRadioItemPropNames)
 
 export function ContextMenuPage(): ReactElement {
   return (
@@ -96,5 +93,5 @@ export function ContextMenuPage(): ReactElement {
         <PropsTable rows={radioItemProps} />
       </Section>
     </ContextMenuPlayground>
-  );
+  )
 }

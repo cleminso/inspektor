@@ -38,17 +38,25 @@ describe('AppHotkeysProvider', () => {
     fireEvent.keyDown(pageInput, { key: 'k', ctrlKey: true })
 
     expect(await screen.findByRole('dialog', { name: 'Commands' })).toBeTruthy()
-    expect(screen.getByRole('option', { name: 'Run test command Verify the command palette' })).toBeTruthy()
+    expect(
+      screen.getByRole('option', { name: 'Run test command Verify the command palette' }),
+    ).toBeTruthy()
     expect(screen.getByLabelText('Ctrl+B').getAttribute('data-variant')).toBe('default')
 
-    fireEvent.click(screen.getByRole('option', { name: 'Run test command Verify the command palette' }))
+    fireEvent.click(
+      screen.getByRole('option', { name: 'Run test command Verify the command palette' }),
+    )
 
     expect(perform).toHaveBeenCalledTimes(1)
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Commands' })).toBeNull())
   })
 
   it('shows an empty state when the current route has no commands', async () => {
-    render(<AppHotkeysProvider><div>Content</div></AppHotkeysProvider>)
+    render(
+      <AppHotkeysProvider>
+        <div>Content</div>
+      </AppHotkeysProvider>,
+    )
 
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
 
@@ -56,7 +64,11 @@ describe('AppHotkeysProvider', () => {
   })
 
   it('does not open the command palette while text composition is active', () => {
-    render(<AppHotkeysProvider><input aria-label="Composing input" /></AppHotkeysProvider>)
+    render(
+      <AppHotkeysProvider>
+        <input aria-label="Composing input" />
+      </AppHotkeysProvider>,
+    )
 
     fireEvent.keyDown(screen.getByRole('textbox', { name: 'Composing input' }), {
       key: 'k',
@@ -111,7 +123,11 @@ describe('AppHotkeysProvider', () => {
       return <button onClick={open}>Open commands</button>
     }
 
-    render(<AppHotkeysProvider><PaletteTrigger /></AppHotkeysProvider>)
+    render(
+      <AppHotkeysProvider>
+        <PaletteTrigger />
+      </AppHotkeysProvider>,
+    )
     fireEvent.click(screen.getByRole('button', { name: 'Open commands' }))
 
     expect(await screen.findByRole('dialog', { name: 'Commands' })).toBeTruthy()

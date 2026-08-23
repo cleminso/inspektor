@@ -1,24 +1,24 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
-import { spatial, textColors } from "../../tokens/semantics.stylex";
+import { spatial, textColors } from '../../tokens/semantics.stylex'
 import {
   fontFamilies,
   fontSizes,
   fontWeights,
   lineHeights,
   spacing,
-} from "../../tokens/value.stylex";
+} from '../../tokens/value.stylex'
 
 export const relationValueStyles = stylex.create({
   compact: {
     gap: spacing.xs,
-    alignItems: "center",
-    display: "flex",
+    alignItems: 'center',
+    display: 'flex',
     minWidth: 0,
-    width: "100%",
+    width: '100%',
   },
   compactValue: {
-    overflow: "hidden",
+    overflow: 'hidden',
     flexBasis: 0,
     flexGrow: 1,
     minWidth: 0,
@@ -31,20 +31,20 @@ export const relationValueStyles = stylex.create({
   },
   compactNavigation: {
     gap: spacing.xs,
-    alignItems: "center",
-    display: "flex",
+    alignItems: 'center',
+    display: 'flex',
     minWidth: 0,
-    width: "100%",
+    width: '100%',
   },
   compactNavigationValue: {
-    overflow: "hidden",
+    overflow: 'hidden',
     flexBasis: 0,
     flexGrow: 1,
     minWidth: 0,
   },
   compactNavigationIcon: {
-    alignItems: "center",
-    display: "inline-flex",
+    alignItems: 'center',
+    display: 'inline-flex',
     flexShrink: 0,
   },
   compactMissing: {
@@ -56,30 +56,30 @@ export const relationValueStyles = stylex.create({
     lineHeight: lineHeights.compact,
   },
   arrow: {
-    fill: "none",
-    stroke: "currentColor",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
     strokeWidth: 1.25,
-    display: "block",
-    height: spatial["icon-size-xs"],
-    width: spatial["icon-size-xs"],
+    display: 'block',
+    height: spatial['icon-size-xs'],
+    width: spatial['icon-size-xs'],
   },
   details: {
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     minWidth: 0,
   },
   fields: {
     margin: 0,
     gap: spacing.m,
-    display: "grid",
+    display: 'grid',
     minWidth: 0,
   },
   field: {
     margin: 0,
     gap: spacing.xs,
-    display: "grid",
+    display: 'grid',
     minWidth: 0,
   },
   label: {
@@ -95,14 +95,14 @@ export const relationValueStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    overflowWrap: "anywhere",
+    overflowWrap: 'anywhere',
   },
   displayValue: {
     margin: 0,
     gap: spacing.s,
-    alignItems: "center",
-    display: "flex",
-    justifyContent: "space-between",
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
     minWidth: 0,
   },
   groupValue: {
@@ -111,7 +111,7 @@ export const relationValueStyles = stylex.create({
   },
   groupActions: {
     gap: spacing.s,
-    alignItems: "center",
-    display: "flex",
+    alignItems: 'center',
+    display: 'flex',
   },
-});
+})

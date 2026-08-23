@@ -1,189 +1,189 @@
-import type { ConnectionCredentials } from "./connections";
+import type { ConnectionCredentials } from './connections'
 
-export type ConnectionField = "serverUrl" | "appId" | "adminSecret";
+export type ConnectionField = 'serverUrl' | 'appId' | 'adminSecret'
 
 export interface ConnectionError {
-  title: string;
-  description: string;
-  field?: ConnectionField;
+  title: string
+  description: string
+  field?: ConnectionField
 }
 
 type ConnectionValidationResult =
   | { valid: true; value: ConnectionCredentials }
-  | { valid: false; error: ConnectionError };
+  | { valid: false; error: ConnectionError }
 
 export const EMPTY_SCHEMA_ERROR: ConnectionError = {
-  title: "No stored schemas found",
-  description: "This app has no published schema.",
-};
+  title: 'No stored schemas found',
+  description: 'This app has no published schema.',
+}
 
 export class NoStoredSchemasError extends Error {
-  override name = "NoStoredSchemasError";
+  override name = 'NoStoredSchemasError'
 }
 
 export class ConnectionNavigationError extends Error {
-  override name = "ConnectionNavigationError";
+  override name = 'ConnectionNavigationError'
 
   constructor() {
-    super("Connection navigation failed");
+    super('Connection navigation failed')
   }
 }
 
 const INVALID_SERVER_URL_ERROR: ConnectionError = {
-  title: "Invalid server URL",
-  description: "Enter a valid HTTP or HTTPS URL.",
-  field: "serverUrl",
-};
+  title: 'Invalid server URL',
+  description: 'Enter a valid HTTP or HTTPS URL.',
+  field: 'serverUrl',
+}
 
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export function validateConnectionInput(input: ConnectionCredentials): ConnectionValidationResult {
-  const serverUrl = input.serverUrl.trim();
-  const appId = input.appId.trim();
-  const adminSecret = input.adminSecret.trim();
-  let parsedServerUrl: URL;
+  const serverUrl = input.serverUrl.trim()
+  const appId = input.appId.trim()
+  const adminSecret = input.adminSecret.trim()
+  let parsedServerUrl: URL
 
   try {
-    parsedServerUrl = new URL(serverUrl);
+    parsedServerUrl = new URL(serverUrl)
   } catch {
-    return invalidServerUrl();
+    return invalidServerUrl()
   }
 
-  if (parsedServerUrl.protocol !== "http:" && parsedServerUrl.protocol !== "https:") {
-    return invalidServerUrl();
+  if (parsedServerUrl.protocol !== 'http:' && parsedServerUrl.protocol !== 'https:') {
+    return invalidServerUrl()
   }
 
   if (appId.length === 0) {
     return {
       valid: false,
       error: {
-        title: "App ID required",
-        description: "Enter an app ID.",
-        field: "appId",
+        title: 'App ID required',
+        description: 'Enter an app ID.',
+        field: 'appId',
       },
-    };
+    }
   }
 
-  const hostname = parsedServerUrl.hostname.toLowerCase().replace(/\.$/, "");
-  if (hostname === "v2.sync.jazz.tools" && uuidPattern.test(appId) === false) {
+  const hostname = parsedServerUrl.hostname.toLowerCase().replace(/\.$/, '')
+  if (hostname === 'v2.sync.jazz.tools' && uuidPattern.test(appId) === false) {
     return {
       valid: false,
       error: {
-        title: "Invalid app ID",
-        description: "Enter the UUID from your Jazz app settings.",
-        field: "appId",
+        title: 'Invalid app ID',
+        description: 'Enter the UUID from your Jazz app settings.',
+        field: 'appId',
       },
-    };
+    }
   }
 
   if (adminSecret.length === 0) {
     return {
       valid: false,
       error: {
-        title: "Admin secret required",
-        description: "Enter an admin secret.",
-        field: "adminSecret",
+        title: 'Admin secret required',
+        description: 'Enter an admin secret.',
+        field: 'adminSecret',
       },
-    };
+    }
   }
 
   return {
     valid: true,
     value: { serverUrl, appId, adminSecret },
-  };
+  }
 }
 
 export function normalizeSchemaFetchError(error: unknown): ConnectionError {
   if (error instanceof NoStoredSchemasError) {
-    return EMPTY_SCHEMA_ERROR;
+    return EMPTY_SCHEMA_ERROR
   }
 
-  const status = getErrorStatus(error);
+  const status = getErrorStatus(error)
 
   if (status === 401 || status === 403) {
     return {
-      title: "Connection was rejected",
-      description: "Check the app ID and admin secret.",
-    };
+      title: 'Connection was rejected',
+      description: 'Check the app ID and admin secret.',
+    }
   }
 
   if (status === 404) {
     return {
-      title: "Jazz app not found",
-      description: "Check the server URL and app ID.",
-    };
+      title: 'Jazz app not found',
+      description: 'Check the server URL and app ID.',
+    }
   }
 
   if (status !== null && status >= 500) {
     return {
-      title: "Schema service unavailable",
-      description: "Check the server status.",
-    };
+      title: 'Schema service unavailable',
+      description: 'Check the server status.',
+    }
   }
 
-  if (error instanceof TypeError && error.message.toLowerCase().includes("invalid url")) {
-    return INVALID_SERVER_URL_ERROR;
+  if (error instanceof TypeError && error.message.toLowerCase().includes('invalid url')) {
+    return INVALID_SERVER_URL_ERROR
   }
 
   if (
     error instanceof TypeError ||
-    (error instanceof Error && error.message.toLowerCase().includes("failed to fetch"))
+    (error instanceof Error && error.message.toLowerCase().includes('failed to fetch'))
   ) {
     return {
       title: "Couldn't validate this connection",
-      description: "Check the server URL, app ID, and admin secret.",
-    };
+      description: 'Check the server URL, app ID, and admin secret.',
+    }
   }
 
   return {
     title: "Couldn't validate this connection",
-    description: "Check the server URL, app ID, and admin secret.",
-  };
+    description: 'Check the server URL, app ID, and admin secret.',
+  }
 }
 
 export function normalizeConnectionOpenError(error: unknown): ConnectionError {
   if (error instanceof ConnectionNavigationError) {
     return {
       title: "Couldn't open this connection",
-      description: "Try again.",
-    };
+      description: 'Try again.',
+    }
   }
 
-  return normalizeSchemaFetchError(error);
+  return normalizeSchemaFetchError(error)
 }
 
 function invalidServerUrl(): ConnectionValidationResult {
   return {
     valid: false,
     error: INVALID_SERVER_URL_ERROR,
-  };
+  }
 }
 
 function getErrorStatus(error: unknown): number | null {
   if (error instanceof Error) {
-    const statusMatch = /(?:fetch failed:|status(?: code)?)\s*(\d{3})\b/i.exec(error.message);
+    const statusMatch = /(?:fetch failed:|status(?: code)?)\s*(\d{3})\b/i.exec(error.message)
     if (statusMatch?.[1] !== undefined) {
-      return Number(statusMatch[1]);
+      return Number(statusMatch[1])
     }
   }
 
-  if (typeof error !== "object" || error === null) {
-    return null;
+  if (typeof error !== 'object' || error === null) {
+    return null
   }
 
-  if ("status" in error && typeof error.status === "number") {
-    return error.status;
+  if ('status' in error && typeof error.status === 'number') {
+    return error.status
   }
 
   if (
-    "response" in error &&
-    typeof error.response === "object" &&
+    'response' in error &&
+    typeof error.response === 'object' &&
     error.response !== null &&
-    "status" in error.response &&
-    typeof error.response.status === "number"
+    'status' in error.response &&
+    typeof error.response.status === 'number'
   ) {
-    return error.response.status;
+    return error.response.status
   }
 
-  return null;
+  return null
 }

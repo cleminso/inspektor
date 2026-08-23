@@ -1,30 +1,30 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
-import { fieldItem } from "@/lib/registry";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
+import { fieldItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
 import {
   fieldDescriptionPropNames,
   fieldErrorPropNames,
   fieldLabelPropNames,
   fieldRootPropNames,
-} from "./props";
-import { FieldPlayground } from "./playground";
-import ValidationExample from "./validationExample";
-import validationSource from "./validationExample.tsx?raw";
+} from './props'
+import { FieldPlayground } from './playground'
+import ValidationExample from './validationExample'
+import validationSource from './validationExample.tsx?raw'
 
-const rootProps = getGeneratedProps(`${fieldItem.componentId}.root`, fieldRootPropNames);
-const labelProps = getGeneratedProps(`${fieldItem.componentId}.label`, fieldLabelPropNames);
+const rootProps = getGeneratedProps(`${fieldItem.componentId}.root`, fieldRootPropNames)
+const labelProps = getGeneratedProps(`${fieldItem.componentId}.label`, fieldLabelPropNames)
 const descriptionProps = getGeneratedProps(
   `${fieldItem.componentId}.description`,
   fieldDescriptionPropNames,
-);
-const errorProps = getGeneratedProps(`${fieldItem.componentId}.error`, fieldErrorPropNames);
+)
+const errorProps = getGeneratedProps(`${fieldItem.componentId}.error`, fieldErrorPropNames)
 
 export function FieldPage(): ReactElement {
   return (
@@ -33,7 +33,10 @@ export function FieldPage(): ReactElement {
         title="Composition"
         description="Field associates its label and description with a nested Base UI control."
       >
-        <Example source={basicSource} align="stretch">
+        <Example
+          source={basicSource}
+          align="stretch"
+        >
           <BasicExample />
         </Example>
       </Section>
@@ -42,16 +45,25 @@ export function FieldPage(): ReactElement {
         title="Validation"
         description="Control invalid state externally or use blur validation through Field.Root."
       >
-        <Example source={validationSource} align="stretch">
+        <Example
+          source={validationSource}
+          align="stretch"
+        >
           <ValidationExample />
         </Example>
       </Section>
 
-      <Section title="Root props" description="Root owns field state and validation.">
+      <Section
+        title="Root props"
+        description="Root owns field state and validation."
+      >
         <PropsTable rows={rootProps} />
       </Section>
 
-      <Section title="Label props" description="Label provides the control's accessible name.">
+      <Section
+        title="Label props"
+        description="Label provides the control's accessible name."
+      >
         <PropsTable rows={labelProps} />
       </Section>
 
@@ -62,9 +74,12 @@ export function FieldPage(): ReactElement {
         <PropsTable rows={descriptionProps} />
       </Section>
 
-      <Section title="Error props" description="Error displays matching validation messages.">
+      <Section
+        title="Error props"
+        description="Error displays matching validation messages."
+      >
         <PropsTable rows={errorProps} />
       </Section>
     </FieldPlayground>
-  );
+  )
 }

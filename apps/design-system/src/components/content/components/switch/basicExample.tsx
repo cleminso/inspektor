@@ -1,5 +1,5 @@
-import { Field, Switch } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Field, Switch } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {
   return (
@@ -9,5 +9,5 @@ export default function BasicExample(): ReactElement {
         Insert more
       </Field.Label>
     </Field.Root>
-  );
+  )
 }

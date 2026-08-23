@@ -26,10 +26,7 @@ export type {
   ButtonVariant,
 } from './buttonVisuals'
 
-type BaseButtonProps = Omit<
-  BaseButton.Props,
-  'className' | 'nativeButton' | 'prefix' | 'style'
->
+type BaseButtonProps = Omit<BaseButton.Props, 'className' | 'nativeButton' | 'prefix' | 'style'>
 
 interface ButtonSharedProps {
   /** Controls the visual treatment and emphasis of the action. */
@@ -118,8 +115,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
       hasSuffix: suffix !== undefined,
     }),
   )
-  const compositionProps = props as typeof props &
-    Pick<BaseButton.Props, 'className' | 'style'>
+  const compositionProps = props as typeof props & Pick<BaseButton.Props, 'className' | 'style'>
   const {
     className: compositionClassName,
     style: compositionStyle,
@@ -136,8 +132,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
           typeof compositionClassName === 'function'
             ? compositionClassName(state)
             : compositionClassName,
-        style:
-          typeof compositionStyle === 'function' ? compositionStyle(state) : compositionStyle,
+        style: typeof compositionStyle === 'function' ? compositionStyle(state) : compositionStyle,
       },
     )
   }

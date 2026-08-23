@@ -70,7 +70,10 @@ export function InspectorLayout({
           </Box>
           {children}
         </Box>
-        <InspectorDock leftDock={leftDock} onOpenCommands={commandPalette.open} />
+        <InspectorDock
+          leftDock={leftDock}
+          onOpenCommands={commandPalette.open}
+        />
       </Box>
     </InspectorDockCenterProvider>
   )

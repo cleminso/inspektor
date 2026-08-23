@@ -5,6 +5,12 @@ export const actionListItemPropNames = [
   'deferOffscreenRendering',
   'render',
 ] as const
-export const actionListSelectionControlPropNames = ['aria-label', 'checked', 'disabled', 'icon', 'onCheckedChange'] as const
+export const actionListSelectionControlPropNames = [
+  'aria-label',
+  'checked',
+  'disabled',
+  'icon',
+  'onCheckedChange',
+] as const
 export const actionListTriggerPropNames = ['prefix', 'disabled', 'nativeButton', 'render'] as const
 export const actionListActionPropNames = ['aria-label', 'disabled', 'render'] as const

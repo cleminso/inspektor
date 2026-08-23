@@ -1,5 +1,5 @@
-import { Button, Menu } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Button, Menu } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function LinkItemsExample(): ReactElement {
   return (
@@ -12,5 +12,5 @@ export default function LinkItemsExample(): ReactElement {
         </Menu.LinkItem>
       </Menu.Content>
     </Menu.Root>
-  );
+  )
 }

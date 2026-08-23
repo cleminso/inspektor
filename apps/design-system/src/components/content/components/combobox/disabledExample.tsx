@@ -1,13 +1,17 @@
-import { Combobox, Field } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Combobox, Field } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-const branches = ["main", "develop"];
+const branches = ['main', 'develop']
 
 export default function DisabledExample(): ReactElement {
   return (
     <Field.Root name="disabled-branch">
       <Field.Label>Branch</Field.Label>
-      <Combobox.Root items={branches} defaultValue="main" disabled>
+      <Combobox.Root
+        items={branches}
+        defaultValue="main"
+        disabled
+      >
         <Combobox.InputGroup>
           <Combobox.Input aria-label="Branch" />
           <Combobox.Clear />
@@ -17,7 +21,10 @@ export default function DisabledExample(): ReactElement {
           <Combobox.Viewport>
             <Combobox.List>
               {(branch: string) => (
-                <Combobox.Item key={branch} value={branch}>
+                <Combobox.Item
+                  key={branch}
+                  value={branch}
+                >
                   {branch}
                 </Combobox.Item>
               )}
@@ -27,5 +34,5 @@ export default function DisabledExample(): ReactElement {
       </Combobox.Root>
       <Field.Description>Selection is unavailable for this connection.</Field.Description>
     </Field.Root>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from 'react'
 
 import {
   createConnectionFromDraft,
@@ -16,8 +16,8 @@ import {
   type ConnectionDraft,
   type StoredConnection,
   type StoredConnectionsStore,
-} from "@app/connections/connections";
-import { readPrefillConfig, type PrefillConfig } from "@app/connections/prefill";
+} from '@app/connections/connections'
+import { readPrefillConfig, type PrefillConfig } from '@app/connections/prefill'
 
 /**
  * React-facing API for the Inspector connection session.
@@ -27,29 +27,31 @@ import { readPrefillConfig, type PrefillConfig } from "@app/connections/prefill"
  * synchronized through one state boundary.
  */
 export interface UseInspectorSessionResult {
-  store: StoredConnectionsStore;
-  connections: StoredConnection[];
-  activeConnection: StoredConnection | null;
-  activeConnectionId: string | null;
-  prefill: PrefillConfig | null;
-  getConnection: (connectionId: string | null | undefined) => StoredConnection | null;
-  getConnectionLabel: (connectionId: string) => string | null;
-  getConnectionPreferences: (connectionId: string) => ReturnType<typeof getStoredConnectionPreferences>;
-  getRememberedBranches: (connectionId: string) => string[];
-  resolveBranch: (connectionId: string, branch?: string | null) => string;
+  store: StoredConnectionsStore
+  connections: StoredConnection[]
+  activeConnection: StoredConnection | null
+  activeConnectionId: string | null
+  prefill: PrefillConfig | null
+  getConnection: (connectionId: string | null | undefined) => StoredConnection | null
+  getConnectionLabel: (connectionId: string) => string | null
+  getConnectionPreferences: (
+    connectionId: string,
+  ) => ReturnType<typeof getStoredConnectionPreferences>
+  getRememberedBranches: (connectionId: string) => string[]
+  resolveBranch: (connectionId: string, branch?: string | null) => string
   resolveSchemaHash: (
     connectionId: string,
     availableSchemaHashes: readonly string[],
     schemaHash?: string | null,
-  ) => string | null;
-  saveConnection: (draft: ConnectionDraft, connectionId?: string) => StoredConnection;
-  deleteConnection: (connectionId: string) => void;
-  setConnectionContext: (connectionId: string, branch: string, schemaHash: string) => void;
+  ) => string | null
+  saveConnection: (draft: ConnectionDraft, connectionId?: string) => StoredConnection
+  deleteConnection: (connectionId: string) => void
+  setConnectionContext: (connectionId: string, branch: string, schemaHash: string) => void
 }
 
 interface SessionState {
-  store: StoredConnectionsStore;
-  prefill: PrefillConfig | null;
+  store: StoredConnectionsStore
+  prefill: PrefillConfig | null
 }
 
 /**
@@ -65,43 +67,46 @@ export function useInspectorSession(): UseInspectorSessionResult {
   const [state, setState] = useState<SessionState>(() => ({
     store: readStoredConnections(),
     prefill: readPrefillConfig(),
-  }));
-  const storeRef = useRef(state.store);
+  }))
+  const storeRef = useRef(state.store)
 
-  const updateStore = useCallback((update: (store: StoredConnectionsStore) => StoredConnectionsStore) => {
-    const store = update(storeRef.current);
-    storeRef.current = store;
-    writeStoredConnections(store);
-    setState((currentState) => ({ ...currentState, store }));
-  }, []);
+  const updateStore = useCallback(
+    (update: (store: StoredConnectionsStore) => StoredConnectionsStore) => {
+      const store = update(storeRef.current)
+      storeRef.current = store
+      writeStoredConnections(store)
+      setState((currentState) => ({ ...currentState, store }))
+    },
+    [],
+  )
 
   const getConnection = useCallback(
     (connectionId: string | null | undefined) => getConnectionById(state.store, connectionId),
     [state.store],
-  );
+  )
 
   const saveConnection = useCallback(
     (draft: ConnectionDraft, connectionId?: string) => {
-      const connection = createConnectionFromDraft(draft, connectionId);
-      updateStore((store) => upsertConnection(store, connection));
-      return connection;
+      const connection = createConnectionFromDraft(draft, connectionId)
+      updateStore((store) => upsertConnection(store, connection))
+      return connection
     },
     [updateStore],
-  );
+  )
 
   const deleteConnection = useCallback(
     (connectionId: string) => {
-      updateStore((store) => removeConnection(store, connectionId));
+      updateStore((store) => removeConnection(store, connectionId))
     },
     [updateStore],
-  );
+  )
 
   const setConnectionContext = useCallback(
     (connectionId: string, branch: string, schemaHash: string) => {
-      updateStore((store) => setActiveConnectionContext(store, connectionId, branch, schemaHash));
+      updateStore((store) => setActiveConnectionContext(store, connectionId, branch, schemaHash))
     },
     [updateStore],
-  );
+  )
 
   // Keep the returned session object stable for consumers that depend on it as one value.
   return useMemo(
@@ -113,8 +118,8 @@ export function useInspectorSession(): UseInspectorSessionResult {
       prefill: state.prefill,
       getConnection,
       getConnectionLabel: (connectionId: string) => {
-        const connection = getConnection(connectionId);
-        return connection ? getConnectionDisplayName(connection) : null;
+        const connection = getConnection(connectionId)
+        return connection ? getConnectionDisplayName(connection) : null
       },
       getConnectionPreferences: (connectionId: string) =>
         getStoredConnectionPreferences(state.store, connectionId),
@@ -122,8 +127,11 @@ export function useInspectorSession(): UseInspectorSessionResult {
         getStoredConnectionPreferences(state.store, connectionId).rememberedBranches,
       resolveBranch: (connectionId: string, branch?: string | null) =>
         resolveDefaultBranch(state.store, connectionId, branch),
-      resolveSchemaHash: (connectionId: string, availableSchemaHashes: readonly string[], schemaHash?: string | null) =>
-        resolveDefaultSchemaHash(state.store, connectionId, availableSchemaHashes, schemaHash),
+      resolveSchemaHash: (
+        connectionId: string,
+        availableSchemaHashes: readonly string[],
+        schemaHash?: string | null,
+      ) => resolveDefaultSchemaHash(state.store, connectionId, availableSchemaHashes, schemaHash),
       saveConnection,
       deleteConnection,
       setConnectionContext,
@@ -136,5 +144,5 @@ export function useInspectorSession(): UseInspectorSessionResult {
       state.prefill,
       state.store,
     ],
-  );
+  )
 }

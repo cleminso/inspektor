@@ -16,7 +16,11 @@ import {
 } from '@inspector/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 
-import { isAppHotkeyInteractionLayer, useAppCommands, type AppCommand } from '@app/hotkeys/appHotkeys'
+import {
+  isAppHotkeyInteractionLayer,
+  useAppCommands,
+  type AppCommand,
+} from '@app/hotkeys/appHotkeys'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspectorProvider'
@@ -330,7 +334,9 @@ function TableViewContent({
   const handleTouchCellContextMenuOpen = useCallback(
     (target: DataGridCellTarget) => {
       const row = state.table.getRowModel().rows.find((candidate) => candidate.id === target.rowId)
-      const cell = row?.getVisibleCells().find((candidate) => candidate.column.id === target.columnId)
+      const cell = row
+        ?.getVisibleCells()
+        .find((candidate) => candidate.column.id === target.columnId)
       if (cell?.getCanSelect() === true && cell.getIsSelected() === false) {
         state.table.selectCellRange({
           anchorRowId: target.rowId,
@@ -604,7 +610,11 @@ function TableViewContent({
                       }
                     />
                     <Tooltip.Content>
-                      Insert row <KeyboardInput hotkey={appHotkeys.insertRow} size="small" />
+                      Insert row{' '}
+                      <KeyboardInput
+                        hotkey={appHotkeys.insertRow}
+                        size="small"
+                      />
                     </Tooltip.Content>
                   </Tooltip.Root>
                 </>

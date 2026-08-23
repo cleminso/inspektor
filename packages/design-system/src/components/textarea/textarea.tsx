@@ -59,6 +59,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   },
   ref,
 ) {
+  // oxlint-disable-next-line anti-slop/no-chained-type-assertions -- Base UI's polymorphic control props cannot preserve this wrapper's narrowed textarea contract.
   const controlProps = props as unknown as Omit<
     BaseField.Control.Props,
     'className' | 'defaultValue' | 'onValueChange' | 'readOnly' | 'render' | 'style' | 'value'

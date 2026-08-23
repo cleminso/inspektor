@@ -1,6 +1,6 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
-import { interactiveControlVars } from "../../primitives/interactiveControlVars.stylex";
+import { interactiveControlVars } from '../../primitives/interactiveControlVars.stylex'
 import {
   borderColors,
   elementColors,
@@ -8,7 +8,7 @@ import {
   surfaceColors,
   textColors,
   spatial,
-} from "../../tokens/semantics.stylex";
+} from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,
@@ -16,80 +16,80 @@ import {
   fontWeights,
   lineHeights,
   spacing,
-} from "../../tokens/value.stylex";
+} from '../../tokens/value.stylex'
 
 export const checkboxStyles = stylex.create({
   label: {
     [interactiveControlVars.hoverBorderColor]: {
       default: borderColors.default,
-      ":hover": borderColors.strong,
+      ':hover': borderColors.strong,
     },
     gap: spacing.s,
-    alignItems: "center",
+    alignItems: 'center',
     color: textColors.default,
-    cursor: "pointer",
-    display: "inline-flex",
+    cursor: 'pointer',
+    display: 'inline-flex',
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
     fontWeight: fontWeights.medium,
     lineHeight: lineHeights.compact,
-    userSelect: "none",
+    userSelect: 'none',
   },
   labelRow: {
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
     paddingLeft: spacing.m,
     paddingRight: spacing.m,
-    width: "100%",
+    width: '100%',
   },
   root: {
     margin: 0,
     padding: 0,
     borderColor: {
       default: borderColors.default,
-      ":focus-visible": borderColors.focused,
+      ':focus-visible': borderColors.focused,
     },
     borderRadius: borderRadii.xs,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderWidth: 1,
-    alignItems: "center",
-    appearance: "none",
+    alignItems: 'center',
+    appearance: 'none',
     backgroundColor: surfaceColors.default,
-    color: "transparent",
-    cursor: "pointer",
-    display: "inline-flex",
+    color: 'transparent',
+    cursor: 'pointer',
+    display: 'inline-flex',
     flexShrink: 0,
-    justifyContent: "center",
+    justifyContent: 'center',
     outlineColor: focusColors.ring,
     outlineOffset: 2,
-    outlineStyle: "solid",
+    outlineStyle: 'solid',
     outlineWidth: {
       default: 0,
-      ":focus-visible": spatial["focus-ring-width"],
+      ':focus-visible': spatial['focus-ring-width'],
     },
-    position: "relative",
-    "::before": {
-      content: "",
-      position: "absolute",
-      transform: "translate(-50%, -50%)",
-      height: spatial["interaction-target-min"],
-      left: "50%",
-      top: "50%",
-      width: spatial["interaction-target-min"],
+    position: 'relative',
+    '::before': {
+      content: '',
+      position: 'absolute',
+      transform: 'translate(-50%, -50%)',
+      height: spatial['interaction-target-min'],
+      left: '50%',
+      top: '50%',
+      width: spatial['interaction-target-min'],
     },
   },
   hoverable: {
     borderColor: {
       default: interactiveControlVars.hoverBorderColor,
-      ":hover": borderColors.strong,
+      ':hover': borderColors.strong,
     },
   },
   sizeS: {
-    height: spatial["icon-size-s"],
-    width: spatial["icon-size-s"],
+    height: spatial['icon-size-s'],
+    width: spatial['icon-size-s'],
   },
   sizeM: {
-    height: spatial["icon-size-m"],
-    width: spatial["icon-size-m"],
+    height: spatial['icon-size-m'],
+    width: spatial['icon-size-m'],
   },
   selected: {
     borderColor: surfaceColors.inverse,
@@ -103,13 +103,13 @@ export const checkboxStyles = stylex.create({
     borderColor: borderColors.subtle,
     backgroundColor: elementColors.disabled,
     color: textColors.disabled,
-    cursor: "not-allowed",
+    cursor: 'not-allowed',
   },
   selectedDisabled: {
     borderColor: borderColors.subtle,
   },
   readOnly: {
-    cursor: "default",
+    cursor: 'default',
   },
   rootChecked: {},
   rootUnchecked: {},
@@ -124,11 +124,11 @@ export const checkboxStyles = stylex.create({
   rootFilled: {},
   rootFocused: {},
   indicator: {
-    alignItems: "center",
-    display: "inline-flex",
-    justifyContent: "center",
-    height: "100%",
-    width: "100%",
+    alignItems: 'center',
+    display: 'inline-flex',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
   },
   indicatorChecked: {},
   indicatorUnchecked: {},
@@ -145,8 +145,8 @@ export const checkboxStyles = stylex.create({
   indicatorStarting: {},
   indicatorEnding: {},
   icon: {
-    display: "block",
-    height: "100%",
-    width: "100%",
+    display: 'block',
+    height: '100%',
+    width: '100%',
   },
-});
+})

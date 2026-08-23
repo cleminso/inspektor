@@ -1,15 +1,15 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { Input } from "../input/input";
-import { InputGroup } from "../inputGroup/inputGroup";
-import { Field } from "./field";
+import { Input } from '../input/input'
+import { InputGroup } from '../inputGroup/inputGroup'
+import { Field } from './field'
 
-afterEach(cleanup);
+afterEach(cleanup)
 
-describe("Field", () => {
-  it("disables compound input actions with its control", () => {
-    const onClick = vi.fn();
+describe('Field', () => {
+  it('disables compound input actions with its control', () => {
+    const onClick = vi.fn()
     render(
       <Field.Root disabled>
         <Field.Label>Secret</Field.Label>
@@ -20,13 +20,13 @@ describe("Field", () => {
           </InputGroup.Action>
         </InputGroup>
       </Field.Root>,
-    );
+    )
 
-    const action = screen.getByRole("button", { name: "Reveal secret" }) as HTMLButtonElement;
+    const action = screen.getByRole('button', { name: 'Reveal secret' }) as HTMLButtonElement
 
-    fireEvent.click(action);
+    fireEvent.click(action)
 
-    expect(action.disabled).toBe(true);
-    expect(onClick).not.toHaveBeenCalled();
-  });
-});
+    expect(action.disabled).toBe(true)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+})

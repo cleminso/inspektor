@@ -5,14 +5,14 @@
  * adapter keeps the query-subscriptions page generic by recovering only filters the table explorer
  * already understands, then falling back to the plain table route when parsing fails.
  */
-import { appRoutes } from "@app/routing/appRoutes";
+import { appRoutes } from '@app/routing/appRoutes'
 
-import { extractFiltersFromIR } from "../telemetry/extractFiltersFromIr";
+import { extractFiltersFromIR } from '../telemetry/extractFiltersFromIr'
 
 interface BuildTableExplorerLinkOptions {
-  connectionId: string;
-  query: string;
-  tableName: string;
+  connectionId: string
+  query: string
+  tableName: string
 }
 
 /** Adds recovered query filters to the table link when telemetry exposes a supported relation IR. */
@@ -27,14 +27,14 @@ export function buildTableExplorerLink({
       connectionId,
       tableName,
     },
-  } as const;
+  } as const
 
   try {
-    const parsedQuery = JSON.parse(query) as { relation_ir?: unknown };
-    const filters = extractFiltersFromIR(parsedQuery.relation_ir);
+    const parsedQuery = JSON.parse(query) as { relation_ir?: unknown }
+    const filters = extractFiltersFromIR(parsedQuery.relation_ir)
 
     if (filters.length === 0) {
-      return link;
+      return link
     }
 
     return {
@@ -42,8 +42,8 @@ export function buildTableExplorerLink({
       search: {
         filters: JSON.stringify(filters),
       },
-    } as const;
+    } as const
   } catch {
-    return link;
+    return link
   }
 }

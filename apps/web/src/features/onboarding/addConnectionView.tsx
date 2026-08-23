@@ -1,39 +1,52 @@
-import { Box, Button, TextLink } from "@inspector/ds";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Box, Button, TextLink } from '@inspector/ds'
+import { Link, useNavigate } from '@tanstack/react-router'
 
-import { useInspectorSessionContext } from "@app/providers/inspectorSessionProvider";
-import { appRoutes } from "@app/routing/appRoutes";
+import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
+import { appRoutes } from '@app/routing/appRoutes'
 
-import { AddConnectionForm } from "./addConnectionForm";
-import { getPrefillKey } from "./connectionFormTypes";
-import { SchemaSwitcher } from "./schemaSwitcher";
-import { useAddConnectionFlow } from "./useAddConnectionFlow";
+import { AddConnectionForm } from './addConnectionForm'
+import { getPrefillKey } from './connectionFormTypes'
+import { SchemaSwitcher } from './schemaSwitcher'
+import { useAddConnectionFlow } from './useAddConnectionFlow'
 
 export function AddConnectionView(): React.ReactElement {
-  const { prefill } = useInspectorSessionContext();
-  const navigate = useNavigate();
-  const prefillKey = getPrefillKey(prefill);
+  const { prefill } = useInspectorSessionContext()
+  const navigate = useNavigate()
+  const prefillKey = getPrefillKey(prefill)
 
   const closeView = () => {
-    void navigate({ to: appRoutes.connections });
-  };
+    void navigate({ to: appRoutes.connections })
+  }
 
-  return <AddConnectionViewContent key={prefillKey} onClose={closeView} />;
+  return (
+    <AddConnectionViewContent
+      key={prefillKey}
+      onClose={closeView}
+    />
+  )
 }
 
 interface AddConnectionViewContentProps {
-  onClose: () => void;
+  onClose: () => void
 }
 
 function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): React.ReactElement {
-  const flow = useAddConnectionFlow();
-  const isFormStep = flow.step === "form";
+  const flow = useAddConnectionFlow()
+  const isFormStep = flow.step === 'form'
 
   return (
-    <Box width="full" maxWidth="popup-width-l" flexDirection="column" gap="xl">
+    <Box
+      width="full"
+      maxWidth="popup-width-l"
+      flexDirection="column"
+      gap="xl"
+    >
       <Box justifyContent="end">
         {isFormStep === true ? (
-          <TextLink variant="caption" render={<Link to={appRoutes.connections} />}>
+          <TextLink
+            variant="caption"
+            render={<Link to={appRoutes.connections} />}
+          >
             Back
           </TextLink>
         ) : (
@@ -69,5 +82,5 @@ function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): R
         />
       )}
     </Box>
-  );
+  )
 }

@@ -3,7 +3,11 @@
   "semi": false,
   "singleQuote": true,
   "singleAttributePerLine": true,
-  "ignorePatterns": ["apps/my-jazz-app/**", "packages/jazz-dev-tools/**"],
+  "ignorePatterns": [
+    "apps/my-jazz-app/**",
+    "packages/jazz-dev-tools/**",
+    "tools/oxlint/antiSlop/**"
+  ],
   "overrides": [
     {
       "files": ["**/*.test.tsx"],

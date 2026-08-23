@@ -1,28 +1,48 @@
-import { Box, Button } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { Box, Button } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-const sizes = ["xs", "s", "m"] as const;
+const sizes = ['xs', 's', 'm'] as const
 
 export default function VariantsExample(): ReactElement {
   return (
-    <Box flexDirection="column" gap="xl">
+    <Box
+      flexDirection="column"
+      gap="xl"
+    >
       {sizes.map((size) => (
-        <Box key={size} alignItems="center" flexWrap="wrap" gap="l">
+        <Box
+          key={size}
+          alignItems="center"
+          flexWrap="wrap"
+          gap="l"
+        >
           <Button size={size}>Primary</Button>
-          <Button size={size} variant="secondary">
+          <Button
+            size={size}
+            variant="secondary"
+          >
             Secondary
           </Button>
-          <Button size={size} variant="danger">
+          <Button
+            size={size}
+            variant="danger"
+          >
             Danger
           </Button>
-          <Button size={size} variant="ghost">
+          <Button
+            size={size}
+            variant="ghost"
+          >
             Ghost
           </Button>
-          <Button size={size} variant="link">
+          <Button
+            size={size}
+            variant="link"
+          >
             Link
           </Button>
         </Box>
       ))}
     </Box>
-  );
+  )
 }

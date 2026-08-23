@@ -1,6 +1,6 @@
-import { createContext, use } from "react";
+import { createContext, use } from 'react'
 
-import type { Cell, Row, RowData } from "@tanstack/react-table";
+import type { Cell, Row, RowData } from '@tanstack/react-table'
 
 import type {
   DataGridCellTarget,
@@ -12,43 +12,43 @@ import type {
   DataGridCellContextMenuHandler,
   DataGridCellContextMenuTouchStartHandler,
   DataGridRowContextMenuTouchStartHandler,
-} from "./dataGrid";
-import type { DataGridFeatures, DataGridTable } from "./dataGridFeatures";
+} from './dataGrid'
+import type { DataGridFeatures, DataGridTable } from './dataGridFeatures'
 
 export interface DataGridContextValue<TData extends RowData> {
-  activeColumnId: string | null;
-  activeRowId: string | null;
-  bodyCellEntryId: string | null;
-  density: DataGridDensity;
-  onCellActivate?: (target: DataGridCellTarget) => void;
-  onCellEditRequest?: (target: DataGridCellTarget) => void;
-  onCellContextMenu?: DataGridCellContextMenuHandler;
-  onCellContextMenuTouchStart?: DataGridCellContextMenuTouchStartHandler;
-  onColumnActivate?: (columnId: string | null) => void;
-  onHeaderContextMenu?: DataGridHeaderContextMenuHandler;
-  onRowActivate?: (rowId: string) => void;
-  onRowContextMenu?: DataGridRowContextMenuHandler;
-  onRowContextMenuTouchStart?: DataGridRowContextMenuTouchStartHandler;
-  columnReorderEnabled: boolean;
-  getColumnReorderIndex: (columnId: string) => number;
-  moveColumn: (columnId: string, offset: -1 | 1) => void;
-  focusFocusedCell: () => void;
-  getRowStatus?: (row: Row<DataGridFeatures, TData>) => DataGridRowStatus;
-  getCellStatus?: (cell: Cell<DataGridFeatures, TData, unknown>) => DataGridCellStatus;
-  registerCellElement: (cellId: string, element: HTMLTableCellElement | null) => void;
-  table: DataGridTable<TData>;
-  setViewportElement: (element: HTMLDivElement | null) => void;
-  viewportElement: HTMLDivElement | null;
+  activeColumnId: string | null
+  activeRowId: string | null
+  bodyCellEntryId: string | null
+  density: DataGridDensity
+  onCellActivate?: (target: DataGridCellTarget) => void
+  onCellEditRequest?: (target: DataGridCellTarget) => void
+  onCellContextMenu?: DataGridCellContextMenuHandler
+  onCellContextMenuTouchStart?: DataGridCellContextMenuTouchStartHandler
+  onColumnActivate?: (columnId: string | null) => void
+  onHeaderContextMenu?: DataGridHeaderContextMenuHandler
+  onRowActivate?: (rowId: string) => void
+  onRowContextMenu?: DataGridRowContextMenuHandler
+  onRowContextMenuTouchStart?: DataGridRowContextMenuTouchStartHandler
+  columnReorderEnabled: boolean
+  getColumnReorderIndex: (columnId: string) => number
+  moveColumn: (columnId: string, offset: -1 | 1) => void
+  focusFocusedCell: () => void
+  getRowStatus?: (row: Row<DataGridFeatures, TData>) => DataGridRowStatus
+  getCellStatus?: (cell: Cell<DataGridFeatures, TData, unknown>) => DataGridCellStatus
+  registerCellElement: (cellId: string, element: HTMLTableCellElement | null) => void
+  table: DataGridTable<TData>
+  setViewportElement: (element: HTMLDivElement | null) => void
+  viewportElement: HTMLDivElement | null
 }
 
-export const DataGridContext = createContext<DataGridContextValue<RowData> | null>(null);
+export const DataGridContext = createContext<DataGridContextValue<RowData> | null>(null)
 
 export function useDataGridContext<TData extends RowData>(): DataGridContextValue<TData> {
-  const context = use(DataGridContext);
+  const context = use(DataGridContext)
 
   if (context === null) {
-    throw new Error("DataGrid parts must be rendered inside DataGrid.Root");
+    throw new Error('DataGrid parts must be rendered inside DataGrid.Root')
   }
 
-  return context as DataGridContextValue<TData>;
+  return context as DataGridContextValue<TData>
 }

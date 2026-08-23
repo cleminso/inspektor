@@ -161,7 +161,11 @@ function TextInner<E extends TextTag = 'p'>(
     loading === false ? (
       formattedContent
     ) : loadingLineCount > 1 ? (
-      <span data-slot="text-skeleton" aria-hidden="true" {...stylex.props(textLoadingStyles.lines)}>
+      <span
+        data-slot="text-skeleton"
+        aria-hidden="true"
+        {...stylex.props(textLoadingStyles.lines)}
+      >
         {Array.from({ length: loadingLineCount }, (_, index) => (
           <span
             key={index}
@@ -212,16 +216,16 @@ function TextInner<E extends TextTag = 'p'>(
     trailingIcon !== undefined && textUtilityStyles.withTrailingIcon,
   )
 
-  const inlineStyle = {
+  const inlineStyle: React.CSSProperties = {
     ...stylexProps.style,
-    ...(typeof truncate === 'number'
-      ? {
-          display: '-webkit-box',
-          WebkitLineClamp: truncate,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }
-      : {}),
+  }
+  if (typeof truncate === 'number') {
+    Object.assign(inlineStyle, {
+      display: '-webkit-box',
+      WebkitLineClamp: truncate,
+      WebkitBoxOrient: 'vertical',
+      overflow: 'hidden',
+    })
   }
 
   const domProps = Object.fromEntries(

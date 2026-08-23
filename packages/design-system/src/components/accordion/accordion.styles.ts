@@ -1,11 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import {
-  focusColors,
-  ghostElementColors,
-  spatial,
-  textColors,
-} from '../../tokens/semantics.stylex'
+import { focusColors, ghostElementColors, spatial, textColors } from '../../tokens/semantics.stylex'
 import {
   fontFamilies,
   fontSizes,

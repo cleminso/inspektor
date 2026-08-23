@@ -1,75 +1,75 @@
-import { Box, Input, type InputFont, type InputSize, type InputVariant } from "@inspector/ds";
-import { type ReactElement, type ReactNode, useState } from "react";
+import { Box, Input, type InputFont, type InputSize, type InputVariant } from '@inspector/ds'
+import { type ReactElement, type ReactNode, useState } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { PlaygroundControls } from "@/components/docs/playground/playgroundControls";
-import { createPlaygroundSource } from "@/components/docs/playground/playgroundSource";
-import { type PlaygroundControl } from "@/components/docs/playground/playgroundTypes";
-import { inputItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
+import { createPlaygroundSource } from '@/components/docs/playground/playgroundSource'
+import { type PlaygroundControl } from '@/components/docs/playground/playgroundTypes'
+import { inputItem } from '@/lib/registry'
 
 export interface InputPlaygroundState {
-  size: InputSize;
-  variant: InputVariant;
-  font: InputFont;
-  fullWidth: boolean;
-  invalid: boolean;
-  disabled: boolean;
-  readOnly: boolean;
-  [key: string]: boolean | string;
+  size: InputSize
+  variant: InputVariant
+  font: InputFont
+  fullWidth: boolean
+  invalid: boolean
+  disabled: boolean
+  readOnly: boolean
+  [key: string]: boolean | string
 }
 
 const initialState: InputPlaygroundState = {
-  size: "l",
-  variant: "default",
-  font: "sans",
+  size: 'l',
+  variant: 'default',
+  font: 'sans',
   fullWidth: false,
   invalid: false,
   disabled: false,
   readOnly: false,
-};
+}
 
 const controls = [
   {
-    kind: "select",
-    key: "size",
-    label: "Size",
-    options: ["xs", "s", "m", "l"].map((value) => ({ label: value, value })),
+    kind: 'select',
+    key: 'size',
+    label: 'Size',
+    options: ['xs', 's', 'm', 'l'].map((value) => ({ label: value, value })),
   },
   {
-    kind: "select",
-    key: "variant",
-    label: "Variant",
-    options: ["default", "subtle"].map((value) => ({ label: value, value })),
+    kind: 'select',
+    key: 'variant',
+    label: 'Variant',
+    options: ['default', 'subtle'].map((value) => ({ label: value, value })),
   },
   {
-    kind: "select",
-    key: "font",
-    label: "Font",
-    options: ["sans", "mono"].map((value) => ({ label: value, value })),
+    kind: 'select',
+    key: 'font',
+    label: 'Font',
+    options: ['sans', 'mono'].map((value) => ({ label: value, value })),
   },
-  { kind: "boolean", key: "fullWidth", label: "Full width" },
-  { kind: "boolean", key: "invalid", label: "Invalid" },
-  { kind: "boolean", key: "disabled", label: "Disabled" },
-  { kind: "boolean", key: "readOnly", label: "Read only" },
-] as const satisfies readonly PlaygroundControl<InputPlaygroundState>[];
+  { kind: 'boolean', key: 'fullWidth', label: 'Full width' },
+  { kind: 'boolean', key: 'invalid', label: 'Invalid' },
+  { kind: 'boolean', key: 'disabled', label: 'Disabled' },
+  { kind: 'boolean', key: 'readOnly', label: 'Read only' },
+] as const satisfies readonly PlaygroundControl<InputPlaygroundState>[]
 
 export function serializeInputPlayground(state: InputPlaygroundState): string {
-  const props = ['aria-label="Email"', 'placeholder="name@example.com"'];
-  if (state.size !== "l") props.push(`size="${state.size}"`);
-  if (state.variant !== "default") props.push(`variant="${state.variant}"`);
-  if (state.font !== "sans") props.push(`font="${state.font}"`);
-  if (state.fullWidth === true) props.push("fullWidth");
-  if (state.invalid === true) props.push("invalid");
-  if (state.disabled === true) props.push("disabled");
-  if (state.readOnly === true) props.push("readOnly");
+  const props = ['aria-label="Email"', 'placeholder="name@example.com"']
+  if (state.size !== 'l') props.push(`size="${state.size}"`)
+  if (state.variant !== 'default') props.push(`variant="${state.variant}"`)
+  if (state.font !== 'sans') props.push(`font="${state.font}"`)
+  if (state.fullWidth === true) props.push('fullWidth')
+  if (state.invalid === true) props.push('invalid')
+  if (state.disabled === true) props.push('disabled')
+  if (state.readOnly === true) props.push('readOnly')
   return createPlaygroundSource({
     imports: { Input: true },
-    example: `<Input ${props.join(" ")} />`,
-  });
+    example: `<Input ${props.join(' ')} />`,
+  })
 }
 
 export function InputPlayground({ children }: { children?: ReactNode }): ReactElement {
-  const [state, setState] = useState<InputPlaygroundState>(initialState);
+  const [state, setState] = useState<InputPlaygroundState>(initialState)
   const controlsPane = (
     <PlaygroundControls
       controls={controls}
@@ -77,7 +77,7 @@ export function InputPlayground({ children }: { children?: ReactNode }): ReactEl
       onChange={(key, value) => setState((current) => ({ ...current, [key]: value }))}
       onReset={() => setState(initialState)}
     />
-  );
+  )
 
   return (
     <ComponentDocsPage
@@ -86,7 +86,11 @@ export function InputPlayground({ children }: { children?: ReactNode }): ReactEl
       source={inputItem.source}
       preview={
         <Box>
-          <Input aria-label="Email" placeholder="name@example.com" {...state} />
+          <Input
+            aria-label="Email"
+            placeholder="name@example.com"
+            {...state}
+          />
         </Box>
       }
       sourceCode={serializeInputPlayground(state)}
@@ -94,5 +98,5 @@ export function InputPlayground({ children }: { children?: ReactNode }): ReactEl
     >
       {children}
     </ComponentDocsPage>
-  );
+  )
 }

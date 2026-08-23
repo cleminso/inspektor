@@ -53,8 +53,7 @@ export const toasterStyles = stylex.create({
     opacity: 1,
     overflowWrap: 'anywhere',
     position: 'absolute',
-    transform:
-      `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-swipe-movement-y) - var(--toast-index) * ${spacing.m})) scale(calc(1 - var(--toast-index) * 0.04))`,
+    transform: `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-swipe-movement-y) - var(--toast-index) * ${spacing.m})) scale(calc(1 - var(--toast-index) * 0.04))`,
     transformOrigin: 'bottom right',
     transitionDuration: { default: '240ms', [reducedMotion]: '0ms' },
     transitionProperty: 'transform, opacity',
@@ -78,8 +77,7 @@ export const toasterStyles = stylex.create({
   toastBack: { zIndex: 1 },
   toastExpanded: {
     height: 'var(--toast-height)',
-    transform:
-      `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${spacing.m} + var(--toast-swipe-movement-y)))`,
+    transform: `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${spacing.m} + var(--toast-swipe-movement-y)))`,
   },
   toastLimited: { opacity: 0, zIndex: 0 },
   toastStarting: { opacity: 0, transform: 'translateY(100%)' },

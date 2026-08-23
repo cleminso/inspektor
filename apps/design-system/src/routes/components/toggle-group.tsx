@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router'
 
-import { ToggleGroupPage } from "@/components/content/components/toggleGroup/page";
+import { ToggleGroupPage } from '@/components/content/components/toggleGroup/page'
 
-export const Route = createFileRoute("/components/toggle-group")({
+export const Route = createFileRoute('/components/toggle-group')({
   component: ToggleGroupPage,
   head: () => ({
-    meta: [{ title: "Toggle Group · Inspector Design System" }],
+    meta: [{ title: 'Toggle Group · Inspector Design System' }],
   }),
-});
+})

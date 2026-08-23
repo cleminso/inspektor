@@ -13,7 +13,12 @@ export default function BasicExample(): ReactElement {
       borderColor="default"
       borderRadius="s"
     >
-      <Text as="h2" variant="label">Layout region</Text>
+      <Text
+        as="h2"
+        variant="label"
+      >
+        Layout region
+      </Text>
       <Box
         maxHeight="viewport-height-s"
         overflow="auto"

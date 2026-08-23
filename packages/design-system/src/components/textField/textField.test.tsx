@@ -37,5 +37,4 @@ describe('TextField', () => {
 
     expect(input.validity.valueMissing).toBe(false)
   })
-
 })

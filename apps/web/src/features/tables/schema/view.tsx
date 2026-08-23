@@ -11,32 +11,32 @@ import {
   type FindBarState,
   type JsonViewSearchResults,
   type JsonViewValue,
-} from "@inspector/ds";
-import { Search, ChevronsUpDown, ChevronsDownUp } from "lucide-react";
-import { useMemo, useState } from "react";
+} from '@inspector/ds'
+import { Search, ChevronsUpDown, ChevronsDownUp } from 'lucide-react'
+import { useMemo, useState } from 'react'
 
 import {
   useRuntimePermissions,
   useRuntimePermissionsLoading,
   useRuntimeSchema,
-} from "@app/providers/inspectorProvider";
+} from '@app/providers/inspectorProvider'
 
 interface SchemaViewProps {
-  tableName: string;
+  tableName: string
 }
 
 interface SchemaDocumentPanelProps {
-  data: Record<string, JsonViewValue>;
-  defaultExpandDepth: 3 | 4;
-  documentName: "permissions" | "schema";
-  title: "Permissions" | "Schema";
+  data: Record<string, JsonViewValue>
+  defaultExpandDepth: 3 | 4
+  documentName: 'permissions' | 'schema'
+  title: 'Permissions' | 'Schema'
 }
 
 const defaultFindOptions: FindBarSearchOptions = {
   caseSensitive: false,
   wholeWord: false,
   regularExpression: false,
-};
+}
 
 function SchemaDocumentPanel({
   data,
@@ -44,45 +44,45 @@ function SchemaDocumentPanel({
   documentName,
   title,
 }: SchemaDocumentPanelProps): React.ReactElement {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isFullyExpanded, setIsFullyExpanded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchOptions, setSearchOptions] = useState(defaultFindOptions);
-  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isFullyExpanded, setIsFullyExpanded] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchOptions, setSearchOptions] = useState(defaultFindOptions)
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0)
   const [searchResults, setSearchResults] = useState<JsonViewSearchResults>({
     activeIndex: null,
     count: 0,
     pending: false,
-    query: "",
-  });
-  const serializedData = useMemo(() => JSON.stringify(data, null, 2), [data]);
-  const resultsMatchSearch = searchResults.query === searchQuery;
+    query: '',
+  })
+  const serializedData = useMemo(() => JSON.stringify(data, null, 2), [data])
+  const resultsMatchSearch = searchResults.query === searchQuery
   const findState: FindBarState =
     searchQuery.length === 0
-      ? { status: "idle" }
+      ? { status: 'idle' }
       : resultsMatchSearch === false && searchResults.query.length === 0
-        ? { status: "searching" }
+        ? { status: 'searching' }
         : searchResults.activeIndex === null
-          ? { status: "empty", pending: resultsMatchSearch === false || searchResults.pending }
+          ? { status: 'empty', pending: resultsMatchSearch === false || searchResults.pending }
           : {
-              status: "matched",
+              status: 'matched',
               activeIndex: searchResults.activeIndex,
               count: searchResults.count,
               pending: resultsMatchSearch === false || searchResults.pending,
-            };
-  const searchLabel = `Find ${documentName} JSON`;
-  const expansionLabel = isFullyExpanded ? `Collapse` : `Expand`;
+            }
+  const searchLabel = `Find ${documentName} JSON`
+  const expansionLabel = isFullyExpanded ? `Collapse` : `Expand`
 
   function dismissSearch(): void {
-    setIsSearchOpen(false);
-    setSearchQuery("");
-    setActiveMatchIndex(0);
+    setIsSearchOpen(false)
+    setSearchQuery('')
+    setActiveMatchIndex(0)
     setSearchResults({
       activeIndex: null,
       count: 0,
       pending: false,
-      query: "",
-    });
+      query: '',
+    })
   }
 
   return (
@@ -108,7 +108,10 @@ function SchemaDocumentPanel({
           justifyContent="between"
           px="s"
         >
-          <Text as="h2" variant="caption">
+          <Text
+            as="h2"
+            variant="caption"
+          >
             {title}
           </Text>
           <Box alignItems="center">
@@ -122,9 +125,9 @@ function SchemaDocumentPanel({
                     iconOnly
                     onClick={() => {
                       if (isSearchOpen === true) {
-                        dismissSearch();
+                        dismissSearch()
                       } else {
-                        setIsSearchOpen(true);
+                        setIsSearchOpen(true)
                       }
                     }}
                     size="s"
@@ -148,7 +151,9 @@ function SchemaDocumentPanel({
                     size="s"
                     variant="ghost"
                   >
-                    <Button.Glyph artwork={isFullyExpanded === true ? ChevronsDownUp : ChevronsUpDown} />
+                    <Button.Glyph
+                      artwork={isFullyExpanded === true ? ChevronsDownUp : ChevronsUpDown}
+                    />
                   </Button>
                 }
               />
@@ -163,7 +168,10 @@ function SchemaDocumentPanel({
           </Box>
         </Box>
         {isSearchOpen === true ? (
-          <Box px="xs" pb="xs">
+          <Box
+            px="xs"
+            pb="xs"
+          >
             <FindBar
               // oxlint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
@@ -172,12 +180,12 @@ function SchemaDocumentPanel({
               onNextMatch={() => setActiveMatchIndex((searchResults.activeIndex ?? 0) + 1)}
               onPreviousMatch={() => setActiveMatchIndex((searchResults.activeIndex ?? 0) - 1)}
               onSearchOptionsChange={(nextOptions) => {
-                setSearchOptions(nextOptions);
-                setActiveMatchIndex(0);
+                setSearchOptions(nextOptions)
+                setActiveMatchIndex(0)
               }}
               onValueChange={(nextValue) => {
-                setSearchQuery(nextValue);
-                setActiveMatchIndex(0);
+                setSearchQuery(nextValue)
+                setActiveMatchIndex(0)
               }}
               searchOptions={searchOptions}
               state={findState}
@@ -186,7 +194,11 @@ function SchemaDocumentPanel({
           </Box>
         ) : null}
       </Box>
-      <Box minHeight={0} flex={1} overflow="hidden">
+      <Box
+        minHeight={0}
+        flex={1}
+        overflow="hidden"
+      >
         <ScrollArea>
           <Box
             flex="none"
@@ -196,8 +208,8 @@ function SchemaDocumentPanel({
             <JsonView
               accessibilityLabel={`${title} JSON`}
               data={data}
-              defaultExpandDepth={isFullyExpanded === true ? "all" : defaultExpandDepth}
-              key={isFullyExpanded === true ? "all" : defaultExpandDepth}
+              defaultExpandDepth={isFullyExpanded === true ? 'all' : defaultExpandDepth}
+              key={isFullyExpanded === true ? 'all' : defaultExpandDepth}
               showCopyAction={false}
               search={
                 isSearchOpen === true
@@ -214,19 +226,19 @@ function SchemaDocumentPanel({
         </ScrollArea>
       </Box>
     </Box>
-  );
+  )
 }
 
 function LoadedSchemaView({ tableName }: SchemaViewProps): React.ReactElement {
-  const wasmSchema = useRuntimeSchema();
-  const storedPermissions = useRuntimePermissions();
-  const isPermissionsLoading = useRuntimePermissionsLoading();
-  const tableSchema = wasmSchema?.[tableName] ?? null;
-  const tablePermissions = storedPermissions?.permissions?.[tableName] ?? null;
+  const wasmSchema = useRuntimeSchema()
+  const storedPermissions = useRuntimePermissions()
+  const isPermissionsLoading = useRuntimePermissionsLoading()
+  const tableSchema = wasmSchema?.[tableName] ?? null
+  const tablePermissions = storedPermissions?.permissions?.[tableName] ?? null
   const schemaData = useMemo<Record<string, JsonViewValue>>(
     () => JSON.parse(JSON.stringify({ [tableName]: tableSchema })) as Record<string, JsonViewValue>,
     [tableName, tableSchema],
-  );
+  )
   const permissionsData = useMemo<Record<string, JsonViewValue>>(
     () =>
       JSON.parse(JSON.stringify({ [tableName]: tablePermissions })) as Record<
@@ -234,7 +246,7 @@ function LoadedSchemaView({ tableName }: SchemaViewProps): React.ReactElement {
         JsonViewValue
       >,
     [tableName, tablePermissions],
-  );
+  )
 
   return (
     <Box
@@ -248,7 +260,7 @@ function LoadedSchemaView({ tableName }: SchemaViewProps): React.ReactElement {
       <Box
         minHeight={0}
         flex={1}
-        flexDirection={{ base: "column", xl: "row" }}
+        flexDirection={{ base: 'column', xl: 'row' }}
         overflow="hidden"
       >
         <SchemaDocumentPanel
@@ -261,7 +273,7 @@ function LoadedSchemaView({ tableName }: SchemaViewProps): React.ReactElement {
           aria-label="Schema document separator"
           aria-orientation="vertical"
           role="separator"
-          display={{ base: "none", xl: "flex" }}
+          display={{ base: 'none', xl: 'flex' }}
           width="panel-handle-size"
           alignSelf="stretch"
           flexShrink={0}
@@ -278,7 +290,10 @@ function LoadedSchemaView({ tableName }: SchemaViewProps): React.ReactElement {
             flex={1}
             padding="s"
           >
-            <Text color="muted" variant="caption">
+            <Text
+              color="muted"
+              variant="caption"
+            >
               Loading permissions…
             </Text>
           </Box>
@@ -292,9 +307,14 @@ function LoadedSchemaView({ tableName }: SchemaViewProps): React.ReactElement {
         )}
       </Box>
     </Box>
-  );
+  )
 }
 
 export function SchemaView({ tableName }: SchemaViewProps): React.ReactElement {
-  return <LoadedSchemaView key={tableName} tableName={tableName} />;
+  return (
+    <LoadedSchemaView
+      key={tableName}
+      tableName={tableName}
+    />
+  )
 }

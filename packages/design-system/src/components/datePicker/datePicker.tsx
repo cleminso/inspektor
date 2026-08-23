@@ -148,7 +148,11 @@ function DatePickerRoot({
 
   return (
     <DatePickerContext.Provider value={contextValue}>
-      <BasePopover.Root defaultOpen={defaultOpen} open={open} onOpenChange={handleOpenChange}>
+      <BasePopover.Root
+        defaultOpen={defaultOpen}
+        open={open}
+        onOpenChange={handleOpenChange}
+      >
         {children}
       </BasePopover.Root>
     </DatePickerContext.Provider>
@@ -210,7 +214,9 @@ function formatTimeInput(value: Date): string {
   return `${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`
 }
 
-function parseTimeInput(value: string): [hours: number, minutes: number, seconds: number] | undefined {
+function parseTimeInput(
+  value: string,
+): [hours: number, minutes: number, seconds: number] | undefined {
   const match = /^(\d{2}):(\d{2}):(\d{2})$/.exec(value)
   if (match === null) return undefined
   const hours = Number(match[1])
@@ -305,7 +311,8 @@ function DatePickerPanelBody({
         resetValue={context.resetValue}
         value={context.pendingValue}
         onValueChange={(day) => {
-          if (day !== undefined) context.setPendingValue(combineDayAndTime(day, context.pendingValue))
+          if (day !== undefined)
+            context.setPendingValue(combineDayAndTime(day, context.pendingValue))
         }}
         onViewChange={setView}
       />
@@ -336,7 +343,12 @@ function DatePickerPanelBody({
                   nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
                   context.setPendingValue(nextValue)
                 }}
-                render={<input aria-label="Time" {...stylex.props(datePickerStyles.input)} />}
+                render={
+                  <input
+                    aria-label="Time"
+                    {...stylex.props(datePickerStyles.input)}
+                  />
+                }
               />
               <Field.Error />
             </Field.Root>
@@ -358,7 +370,10 @@ function DatePickerPanelBody({
           </div>
           <div {...stylex.props(datePickerStyles.applyAction)}>
             {closeOnApply ? (
-              <BasePopover.Close disabled={applyDisabled} render={applyButton} />
+              <BasePopover.Close
+                disabled={applyDisabled}
+                render={applyButton}
+              />
             ) : (
               applyButton
             )}
@@ -377,7 +392,10 @@ function DatePickerPanel({ autoFocus = false }: DatePickerPanelProps): React.Rea
       {...stylex.props(datePickerStyles.inlinePanel)}
     >
       {/* oxlint-disable-next-line jsx-a11y/no-autofocus -- Explicit picker steps transfer focus into the calendar. */}
-      <DatePickerPanelBody autoFocus={autoFocus} closeOnApply={false} />
+      <DatePickerPanelBody
+        autoFocus={autoFocus}
+        closeOnApply={false}
+      />
     </div>
   )
 }
@@ -436,7 +454,10 @@ function DatePickerContent({
             role="dialog"
             {...popupStyles}
           >
-            <DatePickerPanelBody autoFocus={autoFocus} closeOnApply />
+            <DatePickerPanelBody
+              autoFocus={autoFocus}
+              closeOnApply
+            />
           </BasePopover.Popup>
         </BasePopover.Positioner>
       </InputGroupContext.Provider>

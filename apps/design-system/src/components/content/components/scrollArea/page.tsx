@@ -32,7 +32,10 @@ export function ScrollAreaPage(): ReactElement {
         title="Both axes"
         description="Use both axes for intrinsic-width content such as data tables."
       >
-        <Example source={bothAxesSource} align="start">
+        <Example
+          source={bothAxesSource}
+          align="start"
+        >
           <BothAxesExample />
         </Example>
       </Section>

@@ -5,17 +5,17 @@
  * import that generated code, so it uses runtime `ColumnType` metadata to perform the equivalent
  * parsing and validation before calling Jazz.
  */
-import type { ColumnDescriptor, ColumnType } from "jazz-tools";
+import type { ColumnDescriptor, ColumnType } from 'jazz-tools'
 
-import { parseBooleanValue } from "@tables/valueParsing";
+import { parseBooleanValue } from '@tables/valueParsing'
 
 /** Reason the generic mutation form cannot safely edit a column. */
-export type MutationFieldReadOnlyReason = "binary" | null;
+export type MutationFieldReadOnlyReason = 'binary' | null
 
 /** Schema column plus generic-form editability metadata. */
 export interface MutationFormField {
-  column: ColumnDescriptor;
-  readOnlyReason: MutationFieldReadOnlyReason;
+  column: ColumnDescriptor
+  readOnlyReason: MutationFieldReadOnlyReason
 }
 
 /**
@@ -25,22 +25,22 @@ export interface MutationFormField {
  * hex, Base64, UTF-8, or raw bytes. Reading remains supported; only text-based editing is blocked.
  */
 function isBinaryColumnType(columnType: ColumnType): boolean {
-  if (columnType.type === "Bytea") {
-    return true;
+  if (columnType.type === 'Bytea') {
+    return true
   }
-  if (columnType.type === "Array") {
-    return isBinaryColumnType(columnType.element);
+  if (columnType.type === 'Array') {
+    return isBinaryColumnType(columnType.element)
   }
-  return false;
+  return false
 }
 
 /** Explains when the schema-driven form should display a value without accepting edits. */
 export function getFieldReadOnlyReason(column: ColumnDescriptor): MutationFieldReadOnlyReason {
   if (isBinaryColumnType(column.column_type) === true) {
-    return "binary";
+    return 'binary'
   }
 
-  return null;
+  return null
 }
 
 /** Pairs schema columns with the editability decisions needed by the mutation UI. */
@@ -48,7 +48,7 @@ export function buildMutationFields(columns: ColumnDescriptor[]): MutationFormFi
   return columns.map((column) => ({
     column,
     readOnlyReason: getFieldReadOnlyReason(column),
-  }));
+  }))
 }
 
 /**
@@ -56,25 +56,25 @@ export function buildMutationFields(columns: ColumnDescriptor[]): MutationFormFi
  * runtime, rejecting values that would lose precision at that boundary.
  */
 function parseSafeBigIntValue(value: unknown): number {
-  if (typeof value !== "number" && typeof value !== "string") {
-    throw new Error("Expected an integer value.");
+  if (typeof value !== 'number' && typeof value !== 'string') {
+    throw new Error('Expected an integer value.')
   }
 
-  let parsedValue: bigint;
+  let parsedValue: bigint
   try {
-    parsedValue = BigInt(value);
+    parsedValue = BigInt(value)
   } catch {
-    throw new Error("Expected an integer value.");
+    throw new Error('Expected an integer value.')
   }
 
   if (
     parsedValue < BigInt(Number.MIN_SAFE_INTEGER) ||
     parsedValue > BigInt(Number.MAX_SAFE_INTEGER)
   ) {
-    throw new Error("BigInt value must be within JavaScript's safe integer range.");
+    throw new Error("BigInt value must be within JavaScript's safe integer range.")
   }
 
-  return Number(parsedValue);
+  return Number(parsedValue)
 }
 
 /**
@@ -87,87 +87,87 @@ function parseSafeBigIntValue(value: unknown): number {
  * top-level Json field.
  */
 function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): unknown {
-  if (columnType.type === "Json") {
+  if (columnType.type === 'Json') {
     if (value === null) {
-      throw new Error("JSON null is not supported. Use SQL NULL where the schema permits it.");
+      throw new Error('JSON null is not supported. Use SQL NULL where the schema permits it.')
     }
-    return value;
+    return value
   }
   if (value === null || value === undefined) {
-    return null;
+    return null
   }
 
   switch (columnType.type) {
-    case "Boolean":
-      if (typeof value !== "boolean") throw new Error("Expected a boolean value.");
-      return value;
-    case "Integer":
-      if (typeof value !== "number" || Number.isInteger(value) === false) {
-        throw new Error("Expected an integer value.");
+    case 'Boolean':
+      if (typeof value !== 'boolean') throw new Error('Expected a boolean value.')
+      return value
+    case 'Integer':
+      if (typeof value !== 'number' || Number.isInteger(value) === false) {
+        throw new Error('Expected an integer value.')
       }
-      return value;
-    case "Double":
-      if (typeof value !== "number" || Number.isFinite(value) === false) {
-        throw new Error("Expected a finite numeric value.");
+      return value
+    case 'Double':
+      if (typeof value !== 'number' || Number.isFinite(value) === false) {
+        throw new Error('Expected a finite numeric value.')
       }
-      return value;
-    case "BigInt":
-      return parseSafeBigIntValue(value);
-    case "Timestamp": {
-      if (typeof value !== "number" && typeof value !== "string") {
-        throw new Error("Expected a timestamp value.");
+      return value
+    case 'BigInt':
+      return parseSafeBigIntValue(value)
+    case 'Timestamp': {
+      if (typeof value !== 'number' && typeof value !== 'string') {
+        throw new Error('Expected a timestamp value.')
       }
-      const numericValue = Number(value);
+      const numericValue = Number(value)
       if (Number.isFinite(numericValue) === true) {
-        return numericValue;
+        return numericValue
       }
-      if (typeof value !== "string") {
-        throw new Error("Expected a timestamp value.");
+      if (typeof value !== 'string') {
+        throw new Error('Expected a timestamp value.')
       }
-      const parsedValue = Date.parse(value);
+      const parsedValue = Date.parse(value)
       if (Number.isFinite(parsedValue) === false) {
-        throw new Error("Expected a timestamp value.");
+        throw new Error('Expected a timestamp value.')
       }
-      return parsedValue;
+      return parsedValue
     }
-    case "Text":
-    case "Uuid":
-      if (typeof value !== "string") throw new Error("Expected a text value.");
-      return value;
-    case "Enum":
-      if (typeof value !== "string" || columnType.variants.includes(value) === false) {
-        throw new Error(`Expected one of: ${columnType.variants.join(", ")}`);
+    case 'Text':
+    case 'Uuid':
+      if (typeof value !== 'string') throw new Error('Expected a text value.')
+      return value
+    case 'Enum':
+      if (typeof value !== 'string' || columnType.variants.includes(value) === false) {
+        throw new Error(`Expected one of: ${columnType.variants.join(', ')}`)
       }
-      return value;
-    case "Bytea":
-      throw new Error("Binary fields are read-only in the inspector.");
-    case "Array":
-      if (Array.isArray(value) === false) throw new Error("Expected an array value.");
-      return value.map((item) => normalizeNestedMutationValue(columnType.element, item));
-    case "Row": {
-      const isTuple = Array.isArray(value);
-      if ((typeof value !== "object" || value === null) && isTuple === false) {
-        throw new Error("Expected a row value.");
+      return value
+    case 'Bytea':
+      throw new Error('Binary fields are read-only in the inspector.')
+    case 'Array':
+      if (Array.isArray(value) === false) throw new Error('Expected an array value.')
+      return value.map((item) => normalizeNestedMutationValue(columnType.element, item))
+    case 'Row': {
+      const isTuple = Array.isArray(value)
+      if ((typeof value !== 'object' || value === null) && isTuple === false) {
+        throw new Error('Expected a row value.')
       }
       if (isTuple === true && value.length !== columnType.columns.length) {
-        throw new Error("Expected a complete row tuple.");
+        throw new Error('Expected a complete row tuple.')
       }
-      const record = value as Record<string, unknown>;
+      const record = value as Record<string, unknown>
       if (isTuple === false) {
-        const knownColumnNames = new Set(columnType.columns.map((column) => column.name));
+        const knownColumnNames = new Set(columnType.columns.map((column) => column.name))
         if (Object.keys(record).some((key) => knownColumnNames.has(key) === false)) {
-          throw new Error("Row value contains an unknown field.");
+          throw new Error('Row value contains an unknown field.')
         }
       }
       return Object.fromEntries(
         columnType.columns.map((column, index) => {
-          const fieldValue = isTuple === true ? value[index] : record[column.name];
+          const fieldValue = isTuple === true ? value[index] : record[column.name]
           if ((fieldValue === null || fieldValue === undefined) && column.nullable === false) {
-            throw new Error(`Row field ${column.name} is required.`);
+            throw new Error(`Row field ${column.name} is required.`)
           }
-          return [column.name, normalizeNestedMutationValue(column.column_type, fieldValue)];
+          return [column.name, normalizeNestedMutationValue(column.column_type, fieldValue)]
         }),
-      );
+      )
     }
   }
 }
@@ -185,107 +185,106 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
  * columns use the separate NULL field mode for SQL NULL.
  */
 export function parseMutationFieldValue(columnType: ColumnType, valueText: string): unknown {
-  const trimmedValue = valueText.trim();
+  const trimmedValue = valueText.trim()
 
   switch (columnType.type) {
-    case "Boolean": {
-      const parsedValue = parseBooleanValue(trimmedValue);
+    case 'Boolean': {
+      const parsedValue = parseBooleanValue(trimmedValue)
       if (parsedValue === null) {
-        throw new Error('Boolean values must be "true" or "false".');
+        throw new Error('Boolean values must be "true" or "false".')
       }
-      return parsedValue;
+      return parsedValue
     }
-    case "Integer": {
+    case 'Integer': {
       if (trimmedValue.length === 0) {
-        throw new Error("Value is required.");
+        throw new Error('Value is required.')
       }
-      const parsedValue = Number(trimmedValue);
+      const parsedValue = Number(trimmedValue)
       if (Number.isInteger(parsedValue) === false) {
-        throw new Error("Value must be an integer.");
+        throw new Error('Value must be an integer.')
       }
-      return parsedValue;
+      return parsedValue
     }
-    case "BigInt": {
+    case 'BigInt': {
       if (trimmedValue.length === 0) {
-        throw new Error("Value is required.");
+        throw new Error('Value is required.')
       }
       try {
-        return parseSafeBigIntValue(trimmedValue);
+        return parseSafeBigIntValue(trimmedValue)
       } catch (error) {
-        if (error instanceof Error && error.message.includes("safe integer range")) {
-          throw error;
+        if (error instanceof Error && error.message.includes('safe integer range')) {
+          throw error
         }
-        throw new Error("Value must be an integer.");
+        throw new Error('Value must be an integer.')
       }
     }
-    case "Double": {
+    case 'Double': {
       if (trimmedValue.length === 0) {
-        throw new Error("Value is required.");
+        throw new Error('Value is required.')
       }
-      const parsedValue = Number(trimmedValue);
+      const parsedValue = Number(trimmedValue)
       if (Number.isFinite(parsedValue) === false) {
-        throw new Error("Value must be a finite number.");
+        throw new Error('Value must be a finite number.')
       }
-      return parsedValue;
+      return parsedValue
     }
-    case "Timestamp": {
+    case 'Timestamp': {
       if (trimmedValue.length === 0) {
-        throw new Error("Timestamp is required.");
+        throw new Error('Timestamp is required.')
       }
-      const parsedAsNumber = Number(trimmedValue);
+      const parsedAsNumber = Number(trimmedValue)
       if (Number.isFinite(parsedAsNumber) === true) {
-        return parsedAsNumber;
+        return parsedAsNumber
       }
-      const parsedAsDate = Date.parse(trimmedValue);
+      const parsedAsDate = Date.parse(trimmedValue)
       if (Number.isFinite(parsedAsDate) === true) {
-        return parsedAsDate;
+        return parsedAsDate
       }
-      throw new Error("Timestamp must be milliseconds or an ISO date string.");
+      throw new Error('Timestamp must be milliseconds or an ISO date string.')
     }
-    case "Json": {
+    case 'Json': {
       if (trimmedValue.length === 0) {
-        throw new Error("JSON value is required.");
+        throw new Error('JSON value is required.')
       }
-      let parsedValue: unknown;
+      let parsedValue: unknown
       try {
-        parsedValue = JSON.parse(trimmedValue) as unknown;
+        parsedValue = JSON.parse(trimmedValue) as unknown
       } catch {
-        throw new Error("JSON value is invalid.");
+        throw new Error('JSON value is invalid.')
       }
       if (parsedValue === null) {
-        throw new Error("JSON null is not supported. Use the NULL field mode for SQL NULL.");
+        throw new Error('JSON null is not supported. Use the NULL field mode for SQL NULL.')
       }
-      return parsedValue;
+      return parsedValue
     }
-    case "Bytea":
-      throw new Error("Binary fields are read-only in the inspector.");
-    case "Array": {
+    case 'Bytea':
+      throw new Error('Binary fields are read-only in the inspector.')
+    case 'Array': {
       try {
-        const parsedValue = JSON.parse(trimmedValue) as unknown;
-        return normalizeNestedMutationValue(columnType, parsedValue);
+        const parsedValue = JSON.parse(trimmedValue) as unknown
+        return normalizeNestedMutationValue(columnType, parsedValue)
       } catch {
-        throw new Error("Array must be valid JSON array.");
+        throw new Error('Array must be valid JSON array.')
       }
     }
-    case "Row": {
-      const errorMessage =
-        "Row value must be a valid JSON object or descriptor-compatible tuple.";
+    case 'Row': {
+      const errorMessage = 'Row value must be a valid JSON object or descriptor-compatible tuple.'
       try {
-        const parsedValue = JSON.parse(trimmedValue) as unknown;
-        return normalizeNestedMutationValue(columnType, parsedValue);
+        const parsedValue = JSON.parse(trimmedValue) as unknown
+        return normalizeNestedMutationValue(columnType, parsedValue)
       } catch {
-        throw new Error(errorMessage);
+        throw new Error(errorMessage)
       }
     }
-    case "Enum":
+    case 'Enum':
       if (columnType.variants.includes(valueText) === false) {
-        throw new Error(`Expected one of: ${columnType.variants.join(", ")}`);
+        throw new Error(`Expected one of: ${columnType.variants.join(', ')}`)
       }
-      return valueText;
-    case "Text":
-    case "Uuid":
+      return valueText
+    case 'Text':
+    case 'Uuid':
     default:
-      return valueText;
+      return valueText
   }
 }
 
@@ -297,16 +296,16 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
  */
 export function formatMutationFieldValue(value: unknown, columnType: ColumnType): string {
   if (value === null || value === undefined) {
-    return "";
+    return ''
   }
   if (value instanceof Date) {
-    return value.toISOString();
+    return value.toISOString()
   }
   if (value instanceof Uint8Array) {
-    return `(${value.length} bytes)`;
+    return `(${value.length} bytes)`
   }
-  if (columnType.type === "Json" || columnType.type === "Array" || columnType.type === "Row") {
-    return JSON.stringify(value, null, 2);
+  if (columnType.type === 'Json' || columnType.type === 'Array' || columnType.type === 'Row') {
+    return JSON.stringify(value, null, 2)
   }
-  return String(value);
+  return String(value)
 }

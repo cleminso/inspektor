@@ -17,9 +17,9 @@ describe('Tooltip', () => {
       </Tooltip.Root>,
     )
 
-    expect(screen.getByRole('button', { name: 'Trigger' }).getAttribute('data-trigger-disabled')).toBe(
-      '',
-    )
+    expect(
+      screen.getByRole('button', { name: 'Trigger' }).getAttribute('data-trigger-disabled'),
+    ).toBe('')
   })
 
   it('does not apply transition start styles during an instant focus open', async () => {
@@ -64,9 +64,7 @@ describe('Tooltip', () => {
     fireEvent.mouseEnter(screen.getByRole('tab', { name: 'Accounts' }))
     await screen.findByText('Account details')
 
-    expect(screen.getByRole('tab', { name: 'Accounts' }).className).toBe(
-      'composed-trigger-state',
-    )
+    expect(screen.getByRole('tab', { name: 'Accounts' }).className).toBe('composed-trigger-state')
   })
 
   it('renders without an arrow indicator', async () => {
@@ -116,8 +114,6 @@ describe('Tooltip', () => {
     )
 
     const popup = (await screen.findByLabelText('W')).closest('[data-slot="tooltip-content"]')
-    expect(popup?.className).toContain(
-      stylex.props(tooltipStyles.keyboardInputContext).className,
-    )
+    expect(popup?.className).toContain(stylex.props(tooltipStyles.keyboardInputContext).className)
   })
 })

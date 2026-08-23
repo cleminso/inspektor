@@ -1,15 +1,15 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { Section } from "@/components/docs/section";
+import { Example } from '@/components/docs/example'
+import { Section } from '@/components/docs/section'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { ToastPlayground } from "./playground";
-import PreserveExample from "./preserveExample";
-import preserveSource from "./preserveExample.tsx?raw";
-import PromiseExample from "./promiseExample";
-import promiseSource from "./promiseExample.tsx?raw";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { ToastPlayground } from './playground'
+import PreserveExample from './preserveExample'
+import preserveSource from './preserveExample.tsx?raw'
+import PromiseExample from './promiseExample'
+import promiseSource from './promiseExample.tsx?raw'
 
 export function ToastPage(): ReactElement {
   return (
@@ -39,5 +39,5 @@ export function ToastPage(): ReactElement {
         </Example>
       </Section>
     </ToastPlayground>
-  );
+  )
 }

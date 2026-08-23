@@ -1,19 +1,19 @@
-import { Box, Icon, Text } from "@inspector/ds";
-import { Table } from "lucide-react";
-import { type ReactElement } from "react";
+import { Box, Icon, Text } from '@inspector/ds'
+import { Table } from 'lucide-react'
+import { type ReactElement } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
-import { iconItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
+import { iconItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { iconPropNames } from "./props";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { iconPropNames } from './props'
 
-const iconProps = getGeneratedProps(iconItem.componentId, iconPropNames);
+const iconProps = getGeneratedProps(iconItem.componentId, iconPropNames)
 
 export function IconPage(): ReactElement {
   return (
@@ -36,19 +36,23 @@ export function IconPage(): ReactElement {
         title="Artwork contract"
         description="Pass a ref-forwarding SVG component through artwork. Icon does not accept plain function components, configured elements, render callbacks, non-SVG targets, presentation props, or meaningful-image labels."
       >
-        <Box flexDirection="column" gap="s">
+        <Box
+          flexDirection="column"
+          gap="s"
+        >
           <Text>
-            The type requires a React 18-compatible forwarded SVG ref. Artwork must also forward every
-            received SVG prop to one SVG root, preserve a stable viewBox, and use currentColor for visible
-            paths or fills; those runtime requirements form the trusted artwork protocol.
+            The type requires a React 18-compatible forwarded SVG ref. Artwork must also forward
+            every received SVG prop to one SVG root, preserve a stable viewBox, and use currentColor
+            for visible paths or fills; those runtime requirements form the trusted artwork
+            protocol.
           </Text>
           <Text>
             Artwork owns geometry and its documented stroke or fill category. Icon owns dimensions,
             inherited color, decorative accessibility, and layout normalization.
           </Text>
           <Text>
-            Do not attach width, height, className, style, color, stroke, or accessibility overrides at
-            the call site. No universal viewBox is required.
+            Do not attach width, height, className, style, color, stroke, or accessibility overrides
+            at the call site. No universal viewBox is required.
           </Text>
         </Box>
       </Section>
@@ -60,5 +64,5 @@ export function IconPage(): ReactElement {
         <PropsTable rows={iconProps} />
       </Section>
     </ComponentDocsPage>
-  );
+  )
 }

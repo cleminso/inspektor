@@ -291,9 +291,9 @@ describe('DatePicker', () => {
         .getByRole('button', { name: /Thursday, August 13th, 2026, selected/i })
         .hasAttribute('disabled'),
     ).toBe(true)
-    expect(screen.getByRole('button', { name: 'Choose month, August' }).hasAttribute('disabled')).toBe(
-      true,
-    )
+    expect(
+      screen.getByRole('button', { name: 'Choose month, August' }).hasAttribute('disabled'),
+    ).toBe(true)
     expect(screen.getByRole('button', { name: 'Apply' }).hasAttribute('disabled')).toBe(true)
   })
 
@@ -377,12 +377,12 @@ describe('DatePicker', () => {
     expect(screen.getByRole('grid', { name: 'Choose month' })).toBeTruthy()
     expect(screen.queryByLabelText('Time')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Apply' })).toBeNull()
-    expect(screen.getByRole('button', { name: 'Go to the Previous Month' }).hasAttribute('disabled')).toBe(
-      true,
-    )
-    expect(screen.getByRole('button', { name: 'Go to the Next Month' }).hasAttribute('disabled')).toBe(
-      true,
-    )
+    expect(
+      screen.getByRole('button', { name: 'Go to the Previous Month' }).hasAttribute('disabled'),
+    ).toBe(true)
+    expect(
+      screen.getByRole('button', { name: 'Go to the Next Month' }).hasAttribute('disabled'),
+    ).toBe(true)
 
     fireEvent.click(screen.getByRole('button', { name: 'September' }))
     expect(screen.queryByRole('grid', { name: 'Choose month' })).toBeNull()

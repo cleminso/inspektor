@@ -248,9 +248,7 @@ export function TableGridContextMenu({
             Filter by
           </ContextMenu.Item>
         ) : null}
-        {cellActions?.canCopy === true &&
-        cellActions.copyAs.length === 0 &&
-        cellTarget !== null ? (
+        {cellActions?.canCopy === true && cellActions.copyAs.length === 0 && cellTarget !== null ? (
           <ContextMenu.Item
             onClick={() => {
               onCopyCell(cellTarget)

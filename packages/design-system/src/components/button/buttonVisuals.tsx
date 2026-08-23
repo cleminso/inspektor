@@ -7,12 +7,7 @@ import { Icon, type IconArtwork, type IconSize } from '../icon/icon'
 import { Spinner, type SpinnerSize } from '../spinner/spinner'
 import { buttonStyles } from './button.styles'
 
-export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'danger'
-  | 'ghost'
-  | 'link'
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'link'
 
 export type ButtonSize = 'xs' | 's' | 'm'
 export type ButtonLayout = 'inline' | 'row' | 'fill' | 'stacked'
@@ -80,7 +75,12 @@ export interface ButtonGlyphProps {
 
 export function ButtonGlyph({ artwork }: ButtonGlyphProps) {
   const size = useContext(ButtonGlyphSizeContext)
-  return <Icon artwork={artwork} size={size} />
+  return (
+    <Icon
+      artwork={artwork}
+      size={size}
+    />
+  )
 }
 
 interface ButtonVisualStylesOptions {
@@ -164,32 +164,40 @@ export function ButtonContent({
   if (iconOnly === true) {
     return (
       <ButtonGlyphSizeContext.Provider value={iconSize}>
-        <span aria-hidden="true" data-slot="button-icon" {...stylex.props(buttonStyles.iconSlot)}>
+        <span
+          aria-hidden="true"
+          data-slot="button-icon"
+          {...stylex.props(buttonStyles.iconSlot)}
+        >
           {loading === true ? <Spinner size={spinnerSize} /> : children}
         </span>
       </ButtonGlyphSizeContext.Provider>
     )
   }
 
-  const prefixContent = loading === true || prefix !== undefined ? (
-    <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
-      {loading === true ? <Spinner size={spinnerSize} /> : prefix}
-    </span>
-  ) : null
+  const prefixContent =
+    loading === true || prefix !== undefined ? (
+      <span
+        aria-hidden="true"
+        {...stylex.props(buttonStyles.iconSlot)}
+      >
+        {loading === true ? <Spinner size={spinnerSize} /> : prefix}
+      </span>
+    ) : null
 
   return (
     <ButtonGlyphSizeContext.Provider value={iconSize}>
       <span
         data-slot="button-content"
-        {...stylex.props(
-          buttonStyles.content,
-          layout === 'stacked' && buttonStyles.contentStacked,
-        )}
+        {...stylex.props(buttonStyles.content, layout === 'stacked' && buttonStyles.contentStacked)}
       >
         {prefixContent}
         {children}
         {suffix !== undefined ? (
-          <span aria-hidden="true" {...stylex.props(buttonStyles.iconSlot)}>
+          <span
+            aria-hidden="true"
+            {...stylex.props(buttonStyles.iconSlot)}
+          >
             {suffix}
           </span>
         ) : null}

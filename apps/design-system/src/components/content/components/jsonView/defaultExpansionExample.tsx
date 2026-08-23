@@ -1,14 +1,19 @@
-import { JsonView } from "@inspector/ds";
+import { JsonView } from '@inspector/ds'
 
 const connection = {
-  app: { id: "co_z3f2", name: "Storefront" },
+  app: { id: 'co_z3f2', name: 'Storefront' },
   branches: [
-    { name: "main", active: true },
-    { name: "preview", active: false },
+    { name: 'main', active: true },
+    { name: 'preview', active: false },
   ],
-  schema: { tables: ["accounts", "orders"] },
-};
+  schema: { tables: ['accounts', 'orders'] },
+}
 
 export default function DefaultExpansionExample() {
-  return <JsonView accessibilityLabel="Connection details" data={connection} />;
+  return (
+    <JsonView
+      accessibilityLabel="Connection details"
+      data={connection}
+    />
+  )
 }

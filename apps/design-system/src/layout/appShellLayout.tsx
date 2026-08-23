@@ -5,13 +5,13 @@ import {
   useContext,
   useMemo,
   useState,
-} from "react";
+} from 'react'
 
 interface AppShellLayoutValue {
-  isControlsOpen: boolean;
-  isNavigationOpen: boolean;
-  toggleControls: () => void;
-  toggleNavigation: () => void;
+  isControlsOpen: boolean
+  isNavigationOpen: boolean
+  toggleControls: () => void
+  toggleNavigation: () => void
 }
 
 const AppShellLayoutContext = createContext<AppShellLayoutValue>({
@@ -19,11 +19,11 @@ const AppShellLayoutContext = createContext<AppShellLayoutValue>({
   isNavigationOpen: true,
   toggleControls: () => undefined,
   toggleNavigation: () => undefined,
-});
+})
 
 export function AppShellLayoutProvider({ children }: { children: ReactNode }): ReactElement {
-  const [isControlsOpen, setIsControlsOpen] = useState(true);
-  const [isNavigationOpen, setIsNavigationOpen] = useState(true);
+  const [isControlsOpen, setIsControlsOpen] = useState(true)
+  const [isNavigationOpen, setIsNavigationOpen] = useState(true)
   const value = useMemo(
     () => ({
       isControlsOpen,
@@ -32,11 +32,11 @@ export function AppShellLayoutProvider({ children }: { children: ReactNode }): R
       toggleNavigation: () => setIsNavigationOpen((isOpen) => isOpen === false),
     }),
     [isControlsOpen, isNavigationOpen],
-  );
+  )
 
-  return <AppShellLayoutContext.Provider value={value}>{children}</AppShellLayoutContext.Provider>;
+  return <AppShellLayoutContext.Provider value={value}>{children}</AppShellLayoutContext.Provider>
 }
 
 export function useAppShellLayout(): AppShellLayoutValue {
-  return useContext(AppShellLayoutContext);
+  return useContext(AppShellLayoutContext)
 }

@@ -1,21 +1,21 @@
-import { ButtonLink } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { ButtonLink } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { createPlaygroundSource } from "@/components/docs/playground/playgroundSource";
-import { getGeneratedProps } from "@/lib/propsData";
-import { buttonLinkItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { createPlaygroundSource } from '@/components/docs/playground/playgroundSource'
+import { getGeneratedProps } from '@/lib/propsData'
+import { buttonLinkItem } from '@/lib/registry'
 
-import { buttonLinkPropNames } from "./props";
-import RouterExample from "./routerExample";
-import routerSource from "./routerExample.tsx?raw";
-import VariantsExample from "./variantsExample";
-import variantsSource from "./variantsExample.tsx?raw";
+import { buttonLinkPropNames } from './props'
+import RouterExample from './routerExample'
+import routerSource from './routerExample.tsx?raw'
+import VariantsExample from './variantsExample'
+import variantsSource from './variantsExample.tsx?raw'
 
-const buttonLinkProps = getGeneratedProps(buttonLinkItem.componentId, buttonLinkPropNames);
+const buttonLinkProps = getGeneratedProps(buttonLinkItem.componentId, buttonLinkPropNames)
 
 export function ButtonLinkPage(): ReactElement {
   return (
@@ -49,5 +49,5 @@ export function ButtonLinkPage(): ReactElement {
         <PropsTable rows={buttonLinkProps} />
       </Section>
     </ComponentDocsPage>
-  );
+  )
 }

@@ -32,11 +32,10 @@ export type SelectRootProps<Value> = Omit<
 }
 export type SelectLabelProps = WithoutStyles<BaseSelect.Label.Props>
 
-export interface SelectTriggerProps
-  extends Omit<
-    WithoutStyles<BaseSelect.Trigger.Props>,
-    'children' | 'disabled' | 'nativeButton' | 'prefix' | 'size'
-  > {
+export interface SelectTriggerProps extends Omit<
+  WithoutStyles<BaseSelect.Trigger.Props>,
+  'children' | 'disabled' | 'nativeButton' | 'prefix' | 'size'
+> {
   /** Text displayed when the Select has no value. */
   placeholder?: string
   /** Controls the trigger height and padding. */
@@ -74,7 +73,12 @@ const widthStyles = {
 } satisfies Record<SelectWidth, unknown>
 
 function SelectRoot<Value>({ disabled = false, ...props }: SelectRootProps<Value>) {
-  return <BaseSelect.Root {...props} disabled={disabled} />
+  return (
+    <BaseSelect.Root
+      {...props}
+      disabled={disabled}
+    />
+  )
 }
 
 const SelectLabel = React.forwardRef<HTMLDivElement, SelectLabelProps>(
@@ -89,7 +93,13 @@ const SelectLabel = React.forwardRef<HTMLDivElement, SelectLabelProps>(
       state.filled === true && selectStyles.labelFilled,
       state.focused === true && selectStyles.labelFocused,
     ])
-    return <BaseSelect.Label {...props} ref={ref} {...stateStyles} />
+    return (
+      <BaseSelect.Label
+        {...props}
+        ref={ref}
+        {...stateStyles}
+      />
+    )
   },
 )
 
@@ -145,7 +155,13 @@ const SelectValue = React.forwardRef<HTMLSpanElement, BaseSelect.Value.Props>(
     const stateStyles = createStateStyleProps<BaseSelect.Value.State>((state) => [
       state.placeholder === true && selectStyles.valuePlaceholder,
     ])
-    return <BaseSelect.Value {...props} ref={ref} {...stateStyles} />
+    return (
+      <BaseSelect.Value
+        {...props}
+        ref={ref}
+        {...stateStyles}
+      />
+    )
   },
 )
 
@@ -157,7 +173,12 @@ const SelectIcon = React.forwardRef<HTMLSpanElement, BaseSelect.Icon.Props>(
     ])
     const iconStyles = stylex.props(selectStyles.icon)
     return (
-      <BaseSelect.Icon {...props} ref={ref} {...stateStyles} data-slot="select-icon">
+      <BaseSelect.Icon
+        {...props}
+        ref={ref}
+        {...stateStyles}
+        data-slot="select-icon"
+      >
         <ChevronDownGlyph
           data-slot="select-chevron"
           fill="none"
@@ -226,14 +247,27 @@ const SelectPopup = React.forwardRef<HTMLDivElement, Pick<BaseSelect.Popup.Props
       state.align === 'center' && selectStyles.popupAlignCenter,
       state.align === 'end' && selectStyles.popupAlignEnd,
     ])
-    return <BaseSelect.Popup {...props} ref={ref} {...stateStyles} />
+    return (
+      <BaseSelect.Popup
+        {...props}
+        ref={ref}
+        {...stateStyles}
+      />
+    )
   },
 )
 
 const SelectList = React.forwardRef<HTMLDivElement, Pick<BaseSelect.List.Props, 'children'>>(
   function SelectList(props, ref) {
     const styles = stylex.props(selectStyles.list, scrollbarStyles.standard)
-    return <BaseSelect.List {...props} ref={ref} {...styles} data-scrollbar="standard" />
+    return (
+      <BaseSelect.List
+        {...props}
+        ref={ref}
+        {...styles}
+        data-scrollbar="standard"
+      />
+    )
   },
 )
 
@@ -285,7 +319,14 @@ const SelectItem = React.forwardRef(SelectItemInner) as <Value>(
 const SelectItemText = React.forwardRef<HTMLDivElement, BaseSelect.ItemText.Props>(
   function SelectItemText(props, ref) {
     const styles = stylex.props(selectStyles.itemText)
-    return <BaseSelect.ItemText {...props} ref={ref} {...styles} data-slot="select-item-text" />
+    return (
+      <BaseSelect.ItemText
+        {...props}
+        ref={ref}
+        {...styles}
+        data-slot="select-item-text"
+      />
+    )
   },
 )
 

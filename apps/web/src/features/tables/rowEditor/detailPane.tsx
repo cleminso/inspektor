@@ -1,18 +1,19 @@
-import { Box } from "@inspector/ds";
+import { Box } from '@inspector/ds'
 
 interface DetailPaneProps {
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-  title: React.ReactNode;
+  children: React.ReactNode
+  footer?: React.ReactNode
+  title: React.ReactNode
 }
 
-export function DetailPane({
-  children,
-  footer,
-  title,
-}: DetailPaneProps): React.ReactElement {
+export function DetailPane({ children, footer, title }: DetailPaneProps): React.ReactElement {
   return (
-    <Box height="full" flexDirection="column" overflow="hidden" backgroundColor="surface-background">
+    <Box
+      height="full"
+      flexDirection="column"
+      overflow="hidden"
+      backgroundColor="surface-background"
+    >
       <Box
         data-slot="row-editor-header"
         flexShrink={0}
@@ -36,5 +37,5 @@ export function DetailPane({
       </Box>
       {footer}
     </Box>
-  );
+  )
 }

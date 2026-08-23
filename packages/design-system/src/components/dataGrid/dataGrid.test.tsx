@@ -176,10 +176,10 @@ interface TestDataGridProps {
     target: { columnId: string; rowId: string }
   } | null
   getRowStatus?: (row: { id: string }) => 'default' | 'recentlyInserted' | 'stagedDeletion'
-  getCellStatus?: (cell: { column: { id: string }; row: { id: string } }) =>
-    | 'default'
-    | 'recentlyApplied'
-    | 'stagedUpdate'
+  getCellStatus?: (cell: {
+    column: { id: string }
+    row: { id: string }
+  }) => 'default' | 'recentlyApplied' | 'stagedUpdate'
   initialCellSelection?: CellSelectionState
   loading?: boolean
   onCellActivate?: (target: { columnId: string; rowId: string }) => void
@@ -825,9 +825,7 @@ describe('DataGrid', () => {
       container.querySelector('[data-slot="data-grid-loading"]')?.getAttribute('aria-busy'),
     ).toBe('true')
     expect(
-      container
-        .querySelector('[data-slot="data-grid-message-content"]')
-        ?.getAttribute('role'),
+      container.querySelector('[data-slot="data-grid-message-content"]')?.getAttribute('role'),
     ).toBe('status')
     expect(screen.getByText('Loading people')).toBeTruthy()
   })
@@ -913,12 +911,7 @@ describe('DataGrid', () => {
   })
 
   it('keeps selected-row presentation authoritative over a recent insert highlight', () => {
-    render(
-      <TestDataGrid
-        getRowStatus={() => 'recentlyInserted'}
-        selectedRowIds={['person-1']}
-      />,
-    )
+    render(<TestDataGrid getRowStatus={() => 'recentlyInserted'} selectedRowIds={['person-1']} />)
 
     const insertedRow = screen.getByRole('row', { name: /Ada Engineer/ })
 
@@ -944,7 +937,9 @@ describe('DataGrid', () => {
     expect(stagedCell.getAttribute('data-status')).toBe('stagedUpdate')
     expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
     expect(defaultCell.getAttribute('data-status')).toBe('default')
-    expect(defaultCell.className).not.toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
+    expect(defaultCell.className).not.toContain(
+      stylex.props(dataGridStyles.cellStagedUpdate).className,
+    )
   })
 
   it('suppresses staged-update cell status for staged-deletion rows', () => {
@@ -1060,7 +1055,9 @@ describe('DataGrid', () => {
     const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
     expect(stagedCell.hasAttribute('data-column-active')).toBe(true)
     expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
-    expect(stagedCell.className).not.toContain(stylex.props(dataGridStyles.cellColumnActive).className)
+    expect(stagedCell.className).not.toContain(
+      stylex.props(dataGridStyles.cellColumnActive).className,
+    )
   })
 
   it('does not apply active-column emphasis to cells that cannot be selected', () => {
@@ -1213,12 +1210,7 @@ describe('DataGrid', () => {
   it('activates a cell once and requests editing once across a double-click sequence', () => {
     const onCellActivate = vi.fn()
     const onCellEditRequest = vi.fn()
-    render(
-      <TestDataGrid
-        onCellActivate={onCellActivate}
-        onCellEditRequest={onCellEditRequest}
-      />,
-    )
+    render(<TestDataGrid onCellActivate={onCellActivate} onCellEditRequest={onCellEditRequest} />)
     const cell = screen.getByRole('cell', { name: 'Engineer' })
 
     fireEvent.click(cell, { detail: 1 })
@@ -1283,12 +1275,7 @@ describe('DataGrid', () => {
   it('requests editing with Enter and preserves Space activation', () => {
     const onCellActivate = vi.fn()
     const onCellEditRequest = vi.fn()
-    render(
-      <TestDataGrid
-        onCellActivate={onCellActivate}
-        onCellEditRequest={onCellEditRequest}
-      />,
-    )
+    render(<TestDataGrid onCellActivate={onCellActivate} onCellEditRequest={onCellEditRequest} />)
     const cell = screen.getByRole('cell', { name: 'Engineer' })
 
     cell.focus()

@@ -1,10 +1,6 @@
 import * as stylex from '@stylexjs/stylex'
 
-import {
-  borderColors,
-  elementColors,
-  textColors,
-} from '../../tokens/semantics.stylex'
+import { borderColors, elementColors, textColors } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
   fontFamilies,

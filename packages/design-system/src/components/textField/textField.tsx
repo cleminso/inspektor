@@ -60,7 +60,10 @@ export function TextField({
       validationDebounceTime={validationDebounceTime}
     >
       <Field.Label>{label}</Field.Label>
-      <Input {...inputProps} fullWidth={fullWidth} />
+      <Input
+        {...inputProps}
+        fullWidth={fullWidth}
+      />
       {description === undefined ? null : <Field.Description>{description}</Field.Description>}
       {error == null ? <Field.Error /> : <Field.Error match>{error}</Field.Error>}
     </Field.Root>

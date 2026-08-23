@@ -1,5 +1,5 @@
-import type { IconArtwork } from "@inspector/ds";
-import { ArrowUpRight, EllipsisVertical, Layers, Layers3, Table2 } from "lucide-react";
+import type { IconArtwork } from '@inspector/ds'
+import { ArrowUpRight, EllipsisVertical, Layers, Layers3, Table2 } from 'lucide-react'
 
 export const productGlyphs = {
   derivedView: Layers3,
@@ -7,4 +7,4 @@ export const productGlyphs = {
   relation: ArrowUpRight,
   schema: Layers,
   table: Table2,
-} satisfies Record<string, IconArtwork>;
+} satisfies Record<string, IconArtwork>

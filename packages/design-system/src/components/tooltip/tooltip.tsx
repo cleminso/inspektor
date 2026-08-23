@@ -57,7 +57,12 @@ export type TooltipContentProps = PropsWithChildren<{
 }>
 
 function TooltipProvider({ timeout = 400, ...props }: TooltipProviderProps) {
-  return <BaseTooltip.Provider {...props} timeout={timeout} />
+  return (
+    <BaseTooltip.Provider
+      {...props}
+      timeout={timeout}
+    />
+  )
 }
 
 function TooltipRoot({
@@ -78,33 +83,34 @@ function TooltipRoot({
   )
 }
 
-const TooltipTrigger = React.forwardRef<React.ComponentRef<typeof BaseTooltip.Trigger>, TooltipTriggerProps>(
-  function TooltipTrigger(
-    { delay = 500, closeOnClick = true, closeDelay = 0, disabled, render, ...props },
-    ref,
-  ) {
-    const stateStyleProps =
-      render === undefined
-        ? createStateStyleProps<BaseTooltip.Trigger.State>((state) => [
-            tooltipStyles.trigger,
-            state.open === true && tooltipStyles.triggerOpen,
-          ])
-        : undefined
-    return (
-      <BaseTooltip.Trigger
-        {...props}
-        ref={ref as BaseTooltip.Trigger.Props['ref']}
-        delay={delay}
-        closeOnClick={closeOnClick}
-        closeDelay={closeDelay}
-        disabled={disabled}
-        render={render}
-        {...stateStyleProps}
-        data-slot="tooltip-trigger"
-      />
-    )
-  },
-)
+const TooltipTrigger = React.forwardRef<
+  React.ComponentRef<typeof BaseTooltip.Trigger>,
+  TooltipTriggerProps
+>(function TooltipTrigger(
+  { delay = 500, closeOnClick = true, closeDelay = 0, disabled, render, ...props },
+  ref,
+) {
+  const stateStyleProps =
+    render === undefined
+      ? createStateStyleProps<BaseTooltip.Trigger.State>((state) => [
+          tooltipStyles.trigger,
+          state.open === true && tooltipStyles.triggerOpen,
+        ])
+      : undefined
+  return (
+    <BaseTooltip.Trigger
+      {...props}
+      ref={ref as BaseTooltip.Trigger.Props['ref']}
+      delay={delay}
+      closeOnClick={closeOnClick}
+      closeDelay={closeDelay}
+      disabled={disabled}
+      render={render}
+      {...stateStyleProps}
+      data-slot="tooltip-trigger"
+    />
+  )
+})
 
 function TooltipContent({ side = 'top', align = 'center', children }: TooltipContentProps) {
   const positionerStyleProps = createStateStyleProps<BaseTooltip.Positioner.State>((state) => [
@@ -152,7 +158,10 @@ function TooltipContent({ side = 'top', align = 'center', children }: TooltipCon
         sideOffset={popupPositioning.tooltipSideOffset}
         {...positionerStyleProps}
       >
-        <BaseTooltip.Popup {...popupStyleProps} data-slot="tooltip-content">
+        <BaseTooltip.Popup
+          {...popupStyleProps}
+          data-slot="tooltip-content"
+        >
           {children}
         </BaseTooltip.Popup>
       </BaseTooltip.Positioner>

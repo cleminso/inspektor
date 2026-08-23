@@ -176,9 +176,7 @@ describe('Toaster', () => {
     const title = await screen.findByText('Couldn’t insert row')
     const description = screen.getByText('Review the values and try again')
     const action = screen.getByRole('button', { name: 'Undo' })
-    const close = document.querySelector<HTMLButtonElement>(
-      '[aria-label="Dismiss notification"]',
-    )
+    const close = document.querySelector<HTMLButtonElement>('[aria-label="Dismiss notification"]')
     const header = title.parentElement
 
     expect(close).not.toBeNull()

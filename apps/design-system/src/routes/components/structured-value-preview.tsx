@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router'
 
-import { StructuredValuePreviewPage } from "@/components/content/components/structuredValuePreview/page";
+import { StructuredValuePreviewPage } from '@/components/content/components/structuredValuePreview/page'
 
-export const Route = createFileRoute("/components/structured-value-preview")({
+export const Route = createFileRoute('/components/structured-value-preview')({
   component: StructuredValuePreviewPage,
-  head: () => ({ meta: [{ title: "Structured Value Preview · Inspector Design System" }] }),
-});
+  head: () => ({ meta: [{ title: 'Structured Value Preview · Inspector Design System' }] }),
+})

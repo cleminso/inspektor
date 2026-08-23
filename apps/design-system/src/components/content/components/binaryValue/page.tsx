@@ -1,17 +1,17 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
-import { binaryValueItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
+import { binaryValueItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { binaryDetailsPropNames, binaryValuePropNames } from "./props";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { binaryDetailsPropNames, binaryValuePropNames } from './props'
 
-const binaryValueProps = getGeneratedProps(binaryValueItem.componentId, binaryValuePropNames);
-const binaryDetailsProps = getGeneratedProps("binaryDetails", binaryDetailsPropNames);
+const binaryValueProps = getGeneratedProps(binaryValueItem.componentId, binaryValuePropNames)
+const binaryDetailsProps = getGeneratedProps('binaryDetails', binaryDetailsPropNames)
 
 export function BinaryValuePage(): ReactElement {
   return (
@@ -33,5 +33,5 @@ export function BinaryValuePage(): ReactElement {
         <PropsTable rows={binaryDetailsProps} />
       </Section>
     </ComponentDocsPage>
-  );
+  )
 }

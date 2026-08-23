@@ -1,5 +1,5 @@
-import { TextField } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { TextField } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {
   return (
@@ -11,5 +11,5 @@ export default function BasicExample(): ReactElement {
       placeholder="https://v2.sync.jazz.tools/"
       required
     />
-  );
+  )
 }

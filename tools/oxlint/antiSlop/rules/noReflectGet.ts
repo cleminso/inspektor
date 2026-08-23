@@ -1,6 +1,6 @@
 import { defineRule } from '@oxlint/plugins'
 
-import { isGlobalReflectMethodCall } from '../shared/reflectMethod'
+import { isGlobalReflectMethodCall } from '../shared/reflectMethod.ts'
 
 export const noReflectGetRule = defineRule({
   meta: {

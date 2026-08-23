@@ -1,13 +1,13 @@
-import { ButtonLink, Text, TextLink } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { ButtonLink, Text, TextLink } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
-import { type SourceReference } from "@/lib/registry";
+import { type SourceReference } from '@/lib/registry'
 
-const repositoryUrl = "https://github.com/regardedev/inspector/blob/main";
+const repositoryUrl = 'https://github.com/regardedev/inspector/blob/main'
 
 interface SourceLinkProps {
-  source: SourceReference;
-  title?: string;
+  source: SourceReference
+  title?: string
 }
 
 function OpenNewWindowIcon(): ReactElement {
@@ -34,15 +34,19 @@ function OpenNewWindowIcon(): ReactElement {
         strokeLinecap="round"
       />
     </svg>
-  );
+  )
 }
 
 export function SourceLink({ source, title }: SourceLinkProps): ReactElement {
-  const href = `${repositoryUrl}/${source.path}`;
+  const href = `${repositoryUrl}/${source.path}`
 
   if (title !== undefined) {
     return (
-      <Text as="h1" variant="title" aria-label={title}>
+      <Text
+        as="h1"
+        variant="title"
+        aria-label={title}
+      >
         <TextLink
           variant="title"
           href={href}
@@ -54,7 +58,7 @@ export function SourceLink({ source, title }: SourceLinkProps): ReactElement {
           {title}
         </TextLink>
       </Text>
-    );
+    )
   }
 
   return (
@@ -70,5 +74,5 @@ export function SourceLink({ source, title }: SourceLinkProps): ReactElement {
     >
       <OpenNewWindowIcon />
     </ButtonLink>
-  );
+  )
 }

@@ -20,8 +20,8 @@ import {
   type ForwardedRef,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
-    type ReactNode,
-    type TouchEvent,
+  type ReactNode,
+  type TouchEvent,
 } from 'react'
 
 import { ScrollAreaPrivate, type ScrollAreaProps } from '../scrollArea/scrollArea'
@@ -410,10 +410,7 @@ function DataGridRoot<TData extends RowData>({
         cellElementsRef.current.delete(cellId)
       } else {
         cellElementsRef.current.set(cellId, element)
-        if (
-          shouldFocusFocusedCellRef.current === true &&
-          table.getFocusedCell()?.id === cellId
-        ) {
+        if (shouldFocusFocusedCellRef.current === true && table.getFocusedCell()?.id === cellId) {
           element.focus()
           shouldFocusFocusedCellRef.current = false
         }
@@ -670,47 +667,46 @@ function setForwardedViewportRef(
   }
 }
 
-const DataGridViewport = forwardRef<HTMLDivElement, DataGridViewportProps>(function DataGridViewport(
-  { children, scrollResetKey, ...props },
-  forwardedRef,
-) {
-  const { density, setViewportElement } = useDataGridContext()
-  const viewportRef = useRef<HTMLDivElement | null>(null)
-  const registerViewport = useCallback(
-    (element: HTMLDivElement | null) => {
-      viewportRef.current = element
-      setViewportElement(element)
-      setForwardedViewportRef(forwardedRef, element)
-    },
-    [forwardedRef, setViewportElement],
-  )
+const DataGridViewport = forwardRef<HTMLDivElement, DataGridViewportProps>(
+  function DataGridViewport({ children, scrollResetKey, ...props }, forwardedRef) {
+    const { density, setViewportElement } = useDataGridContext()
+    const viewportRef = useRef<HTMLDivElement | null>(null)
+    const registerViewport = useCallback(
+      (element: HTMLDivElement | null) => {
+        viewportRef.current = element
+        setViewportElement(element)
+        setForwardedViewportRef(forwardedRef, element)
+      },
+      [forwardedRef, setViewportElement],
+    )
 
-  useLayoutEffect(() => {
-    const viewport = viewportRef.current
-    if (viewport === null) {
-      return
-    }
+    useLayoutEffect(() => {
+      const viewport = viewportRef.current
+      if (viewport === null) {
+        return
+      }
 
-    viewport.scrollLeft = 0
-    viewport.scrollTop = 0
-  }, [scrollResetKey])
+      viewport.scrollLeft = 0
+      viewport.scrollTop = 0
+    }, [scrollResetKey])
 
-  return (
-    <ScrollAreaPrivate
-      {...props}
-      axis="both"
-      overscrollBehavior="none"
-      ref={registerViewport}
-      scrollRendering="frequent"
-      tabIndex={-1}
-      verticalTrackOffset={density === 'compact' ? 'collection-row-l' : 'collection-row-xl'}
-      viewportContainerType="size"
-      viewportSlot="data-grid-viewport"
-    >
-      {children}
-    </ScrollAreaPrivate>
-  )
-})
+    return (
+      <ScrollAreaPrivate
+        {...props}
+        axis="both"
+        overscrollBehavior="none"
+        ref={registerViewport}
+        scrollRendering="frequent"
+        tabIndex={-1}
+        verticalTrackOffset={density === 'compact' ? 'collection-row-l' : 'collection-row-xl'}
+        viewportContainerType="size"
+        viewportSlot="data-grid-viewport"
+      >
+        {children}
+      </ScrollAreaPrivate>
+    )
+  },
+)
 
 function DataGridTable(props: DataGridTableProps) {
   const { table } = useDataGridContext()
@@ -1473,9 +1469,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
         selectionEdges?.left === true && dataGridStyles.cellSelectionEdgeLeft,
         isActive === true && hasMultiCellSelection === true && dataGridStyles.cellDragOrigin,
         isActive === true &&
-          (isCellSelected === true
-            ? dataGridStyles.cellActiveSelected
-            : dataGridStyles.cellActive),
+          (isCellSelected === true ? dataGridStyles.cellActiveSelected : dataGridStyles.cellActive),
         status === 'stagedUpdate' && dataGridStyles.cellStagedUpdate,
         status === 'stagedUpdate' &&
           selectionEdges?.top === true &&

@@ -1,8 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from 'vitest'
 
-const pointerSensorConfigure = vi.hoisted(() => vi.fn(() => ({})));
+const pointerSensorConfigure = vi.hoisted(() => vi.fn(() => ({})))
 
-vi.mock("@dnd-kit/dom", () => ({
+vi.mock('@dnd-kit/dom', () => ({
   AutoScroller: { configure: () => ({}) },
   PointerActivationConstraints: {
     Distance: class Distance {
@@ -10,12 +10,12 @@ vi.mock("@dnd-kit/dom", () => ({
     },
   },
   PointerSensor: { configure: pointerSensorConfigure },
-}));
+}))
 
-import "./dataGrid";
+import './dataGrid'
 
-describe("DataGrid module boundary", () => {
-  it("does not initialize drag-and-drop when the static table is imported", () => {
-    expect(pointerSensorConfigure).not.toHaveBeenCalled();
-  });
-});
+describe('DataGrid module boundary', () => {
+  it('does not initialize drag-and-drop when the static table is imported', () => {
+    expect(pointerSensorConfigure).not.toHaveBeenCalled()
+  })
+})

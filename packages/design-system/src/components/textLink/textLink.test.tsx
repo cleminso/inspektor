@@ -66,5 +66,4 @@ describe('TextLink', () => {
     expect(link.getAttribute('color')).toBeNull()
     expect(link.style.color).not.toBe('red')
   })
-
 })

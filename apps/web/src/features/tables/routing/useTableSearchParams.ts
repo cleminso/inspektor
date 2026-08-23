@@ -215,7 +215,13 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
       await updateSearch({ mode: null, rowId: null }, options)
     },
     setSorting: async (sortColumn, sortDirection) => {
-      await updateSearch({ sort: sortColumn, dir: sortDirection, mode: null, page: undefined, rowId: null })
+      await updateSearch({
+        sort: sortColumn,
+        dir: sortDirection,
+        mode: null,
+        page: undefined,
+        rowId: null,
+      })
     },
   }
 }

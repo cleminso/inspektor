@@ -22,14 +22,32 @@ export function SidePanelPage(): ReactElement {
       title={sidePanelItem.title}
       description={sidePanelItem.description}
       source={sidePanelItem.source}
-      preview={<Box width="popup-width-m" height="panel-height"><BasicExample /></Box>}
+      preview={
+        <Box
+          width="popup-width-m"
+          height="panel-height"
+        >
+          <BasicExample />
+        </Box>
+      }
       sourceCode={basicSource}
     >
-      <Section title="Composition" description="Compose feature controls inside the fixed header, scrolling body, and fixed footer regions." />
-      <Section title="Root props"><PropsTable rows={rootProps} /></Section>
-      <Section title="Header props"><PropsTable rows={headerProps} /></Section>
-      <Section title="Body props"><PropsTable rows={bodyProps} /></Section>
-      <Section title="Footer props"><PropsTable rows={footerProps} /></Section>
+      <Section
+        title="Composition"
+        description="Compose feature controls inside the fixed header, scrolling body, and fixed footer regions."
+      />
+      <Section title="Root props">
+        <PropsTable rows={rootProps} />
+      </Section>
+      <Section title="Header props">
+        <PropsTable rows={headerProps} />
+      </Section>
+      <Section title="Body props">
+        <PropsTable rows={bodyProps} />
+      </Section>
+      <Section title="Footer props">
+        <PropsTable rows={footerProps} />
+      </Section>
     </ComponentDocsPage>
   )
 }

@@ -1,20 +1,20 @@
-import { Box, Text } from "@inspector/ds";
-import { type ReactElement, type ReactNode } from "react";
+import { Box, Text } from '@inspector/ds'
+import { type ReactElement, type ReactNode } from 'react'
 
-import { CodeBlock } from "@/components/docs/codeBlock";
-import { DocsHeader } from "@/components/docs/docsHeader";
-import { DocsPage } from "@/components/docs/docsPage";
-import { navigationItems, type SourceReference } from "@/lib/registry";
-import { useAppShellLayout } from "@/layout/appShellLayout";
+import { CodeBlock } from '@/components/docs/codeBlock'
+import { DocsHeader } from '@/components/docs/docsHeader'
+import { DocsPage } from '@/components/docs/docsPage'
+import { navigationItems, type SourceReference } from '@/lib/registry'
+import { useAppShellLayout } from '@/layout/appShellLayout'
 
 interface ComponentDocsPageProps {
-  title: string;
-  description: string;
-  source: SourceReference;
-  preview: ReactNode;
-  sourceCode: string;
-  controls?: ReactNode;
-  children?: ReactNode;
+  title: string
+  description: string
+  source: SourceReference
+  preview: ReactNode
+  sourceCode: string
+  controls?: ReactNode
+  children?: ReactNode
 }
 
 export function ComponentDocsPage({
@@ -26,16 +26,28 @@ export function ComponentDocsPage({
   controls,
   children,
 }: ComponentDocsPageProps): ReactElement {
-  const { isControlsOpen } = useAppShellLayout();
-  const item = navigationItems.find((navigationItem) => navigationItem.source.path === source.path);
+  const { isControlsOpen } = useAppShellLayout()
+  const item = navigationItems.find((navigationItem) => navigationItem.source.path === source.path)
 
   if (item === undefined) {
-    throw new Error(`No navigation item found for ${source.path}`);
+    throw new Error(`No navigation item found for ${source.path}`)
   }
 
   return (
-    <Box width="full" height="full" minWidth={0} minHeight={0} overflow="hidden">
-      <Box flex={1} minWidth={0} minHeight={0} flexDirection="column" overflow="hidden">
+    <Box
+      width="full"
+      height="full"
+      minWidth={0}
+      minHeight={0}
+      overflow="hidden"
+    >
+      <Box
+        flex={1}
+        minWidth={0}
+        minHeight={0}
+        flexDirection="column"
+        overflow="hidden"
+      >
         <DocsHeader item={item} />
 
         <Box
@@ -101,7 +113,7 @@ export function ComponentDocsPage({
         <Box
           as="aside"
           aria-label={`${title} controls`}
-          display={{ base: "none", xl: "flex" }}
+          display={{ base: 'none', xl: 'flex' }}
           flexDirection="column"
           flexShrink={0}
           width="popup-width-m"
@@ -113,12 +125,15 @@ export function ComponentDocsPage({
           gap="2xl"
           backgroundColor="surface-background"
         >
-          <Text variant="body" color="muted">
+          <Text
+            variant="body"
+            color="muted"
+          >
             {description}
           </Text>
           {controls}
         </Box>
       ) : null}
     </Box>
-  );
+  )
 }

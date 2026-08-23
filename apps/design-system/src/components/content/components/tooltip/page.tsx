@@ -1,26 +1,26 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import CellValueExample from "./cellValueExample";
-import cellValueSource from "./cellValueExample.tsx?raw";
-import PositionExample from "./positionExample";
-import positionSource from "./positionExample.tsx?raw";
-import { TooltipPlayground } from "./playground";
+import CellValueExample from './cellValueExample'
+import cellValueSource from './cellValueExample.tsx?raw'
+import PositionExample from './positionExample'
+import positionSource from './positionExample.tsx?raw'
+import { TooltipPlayground } from './playground'
 import {
   tooltipContentPropNames,
   tooltipProviderPropNames,
   tooltipRootPropNames,
   tooltipTriggerPropNames,
-} from "./props";
+} from './props'
 
-const providerProps = getGeneratedProps("tooltip.provider", tooltipProviderPropNames);
-const rootProps = getGeneratedProps("tooltip.root", tooltipRootPropNames);
-const triggerProps = getGeneratedProps("tooltip.trigger", tooltipTriggerPropNames);
-const contentProps = getGeneratedProps("tooltip.content", tooltipContentPropNames);
+const providerProps = getGeneratedProps('tooltip.provider', tooltipProviderPropNames)
+const rootProps = getGeneratedProps('tooltip.root', tooltipRootPropNames)
+const triggerProps = getGeneratedProps('tooltip.trigger', tooltipTriggerPropNames)
+const contentProps = getGeneratedProps('tooltip.content', tooltipContentPropNames)
 
 export function TooltipPage(): ReactElement {
   return (
@@ -58,5 +58,5 @@ export function TooltipPage(): ReactElement {
         <PropsTable rows={contentProps} />
       </Section>
     </TooltipPlayground>
-  );
+  )
 }

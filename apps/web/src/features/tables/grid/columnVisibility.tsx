@@ -1,12 +1,12 @@
-import type { DynamicTableRow } from "jazz-tools";
-import { Settings2 } from "lucide-react";
+import type { DynamicTableRow } from 'jazz-tools'
+import { Settings2 } from 'lucide-react'
 
-import { Button, MultiSelect, type DataGridTable, type MultiSelectItem } from "@inspector/ds";
+import { Button, MultiSelect, type DataGridTable, type MultiSelectItem } from '@inspector/ds'
 
-import { tableGridSelectionColumnId } from "@tables/grid/tableGridColumnIds";
+import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 
 interface DataGridColumnVisibilityProps {
-  table: DataGridTable<DynamicTableRow>;
+  table: DataGridTable<DynamicTableRow>
 }
 
 export function DataGridColumnVisibility({
@@ -14,23 +14,23 @@ export function DataGridColumnVisibility({
 }: DataGridColumnVisibilityProps): React.ReactElement {
   const columns = table
     .getAllLeafColumns()
-    .filter((column) => column.id !== tableGridSelectionColumnId);
+    .filter((column) => column.id !== tableGridSelectionColumnId)
   const items: readonly MultiSelectItem[] = columns.map((column) => ({
     disabled: column.getCanHide() === false,
     label: column.id,
     value: column.id,
-  }));
+  }))
   const visibleColumnIds = columns
     .filter((column) => column.getIsVisible() === true)
-    .map((column) => column.id);
-  const hasHiddenColumns = visibleColumnIds.length < columns.length;
+    .map((column) => column.id)
+  const hasHiddenColumns = visibleColumnIds.length < columns.length
 
   return (
     <MultiSelect.Root
       items={items}
       value={visibleColumnIds}
       onValueChange={(nextVisibleColumnIds) => {
-        const nextVisibleColumnIdSet = new Set(nextVisibleColumnIds);
+        const nextVisibleColumnIdSet = new Set(nextVisibleColumnIds)
         table.setColumnVisibility(
           Object.fromEntries(
             columns.map((column) => [
@@ -38,7 +38,7 @@ export function DataGridColumnVisibility({
               column.getCanHide() === false || nextVisibleColumnIdSet.has(column.id),
             ]),
           ),
-        );
+        )
       }}
     >
       <MultiSelect.Trigger
@@ -61,5 +61,5 @@ export function DataGridColumnVisibility({
         label="Visible columns"
       />
     </MultiSelect.Root>
-  );
+  )
 }

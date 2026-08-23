@@ -52,9 +52,8 @@ export function isAppHotkeyInteractionLayer(target: EventTarget | null): boolean
   return (
     target instanceof Element &&
     (target.matches('[role="combobox"][aria-expanded="true"]') ||
-      target.closest(
-        '[role="alertdialog"], [role="dialog"], [role="listbox"], [role="menu"]',
-      ) !== null)
+      target.closest('[role="alertdialog"], [role="dialog"], [role="listbox"], [role="menu"]') !==
+        null)
   )
 }
 
@@ -93,15 +92,21 @@ function AppCommandPalette({
     },
   )
 
-  const handleOpenChange = useCallback((nextOpen: boolean) => {
-    onOpenChange(nextOpen)
-    if (nextOpen === false) {
-      setQuery('')
-    }
-  }, [onOpenChange])
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      onOpenChange(nextOpen)
+      if (nextOpen === false) {
+        setQuery('')
+      }
+    },
+    [onOpenChange],
+  )
 
   return (
-    <Command.Dialog open={open} onOpenChange={handleOpenChange}>
+    <Command.Dialog
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
       <Command.Title>Commands</Command.Title>
       <Command.Root
         items={commands}
@@ -110,7 +115,10 @@ function AppCommandPalette({
         onInputValueChange={setQuery}
       >
         <Command.InputRow aria-label="Command query">
-          <Command.Input aria-label="Search commands" placeholder="Search commands" />
+          <Command.Input
+            aria-label="Search commands"
+            placeholder="Search commands"
+          />
         </Command.InputRow>
         <Command.List>
           <Command.Empty>
@@ -129,19 +137,31 @@ function AppCommandPalette({
                 handleOpenChange(false)
               }}
             >
-              <Command.ItemText label={command.label} description={command.description} />
+              <Command.ItemText
+                label={command.label}
+                description={command.description}
+              />
               {command.hotkey === undefined ? null : (
                 <Command.Shortcut>
-                  <KeyboardInput hotkey={command.hotkey} size="small" />
+                  <KeyboardInput
+                    hotkey={command.hotkey}
+                    size="small"
+                  />
                 </Command.Shortcut>
               )}
             </Command.Item>
           ))}
         </Command.List>
         <Command.Footer>
-          <span><Command.Key>↑ ↓</Command.Key> Navigate</span>
-          <span><Command.Key>Enter</Command.Key> Select</span>
-          <span><Command.Key>Esc</Command.Key> Close</span>
+          <span>
+            <Command.Key>↑ ↓</Command.Key> Navigate
+          </span>
+          <span>
+            <Command.Key>Enter</Command.Key> Select
+          </span>
+          <span>
+            <Command.Key>Esc</Command.Key> Close
+          </span>
         </Command.Footer>
       </Command.Root>
       <Command.Close />
@@ -154,9 +174,7 @@ function AppCommandPalette({
  */
 export function AppHotkeysProvider({ children }: { children: ReactNode }): React.ReactElement {
   const [paletteOpen, setPaletteOpen] = useState(false)
-  const [registrations, setRegistrations] = useState(
-    () => new Map<string, readonly AppCommand[]>(),
-  )
+  const [registrations, setRegistrations] = useState(() => new Map<string, readonly AppCommand[]>())
   const register = useCallback((ownerId: string, commands: readonly AppCommand[]) => {
     setRegistrations((current) => {
       const next = new Map(current)
@@ -174,10 +192,7 @@ export function AppHotkeysProvider({ children }: { children: ReactNode }): React
       })
     }
   }, [])
-  const commands = useMemo(
-    () => Array.from(registrations.values()).flat(),
-    [registrations],
-  )
+  const commands = useMemo(() => Array.from(registrations.values()).flat(), [registrations])
   const registrationContextValue = useMemo<AppCommandsRegistrationContextValue>(
     () => ({ register }),
     [register],
@@ -196,7 +211,10 @@ export function AppHotkeysProvider({ children }: { children: ReactNode }): React
         <AppCommandsRegistrationContext.Provider value={registrationContextValue}>
           <AppCommandsListContext.Provider value={commands}>
             {children}
-            <AppCommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+            <AppCommandPalette
+              open={paletteOpen}
+              onOpenChange={setPaletteOpen}
+            />
           </AppCommandsListContext.Provider>
         </AppCommandsRegistrationContext.Provider>
       </AppCommandPaletteContext.Provider>

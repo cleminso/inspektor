@@ -1,17 +1,17 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { ComponentDocsPage } from "@/components/docs/componentDocsPage";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
-import { relationValueItem } from "@/lib/registry";
+import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
+import { relationValueItem } from '@/lib/registry'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import { relationDetailsPropNames, relationValuePropNames } from "./props";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import { relationDetailsPropNames, relationValuePropNames } from './props'
 
-const valueProps = getGeneratedProps("relationValue", relationValuePropNames);
-const detailsProps = getGeneratedProps("relationDetails", relationDetailsPropNames);
+const valueProps = getGeneratedProps('relationValue', relationValuePropNames)
+const detailsProps = getGeneratedProps('relationDetails', relationDetailsPropNames)
 
 export function RelationValuePage(): ReactElement {
   return (
@@ -33,5 +33,5 @@ export function RelationValuePage(): ReactElement {
         <PropsTable rows={detailsProps} />
       </Section>
     </ComponentDocsPage>
-  );
+  )
 }

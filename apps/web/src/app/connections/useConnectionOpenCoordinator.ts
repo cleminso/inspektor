@@ -1,33 +1,30 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef } from 'react'
 
 type PerformConnectionOpen = (
   connectionId: string,
   knownSchemaHashes?: readonly string[],
-) => Promise<void>;
+) => Promise<void>
 
 export function useConnectionOpenCoordinator(
   performOpen: PerformConnectionOpen,
 ): PerformConnectionOpen {
-  const requestRef = useRef<Promise<void> | null>(null);
+  const requestRef = useRef<Promise<void> | null>(null)
 
   return useCallback(
-    (
-      connectionId: string,
-      knownSchemaHashes?: readonly string[],
-    ): Promise<void> => {
+    (connectionId: string, knownSchemaHashes?: readonly string[]): Promise<void> => {
       if (requestRef.current !== null) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
 
-      const request = performOpen(connectionId, knownSchemaHashes);
-      requestRef.current = request;
+      const request = performOpen(connectionId, knownSchemaHashes)
+      requestRef.current = request
 
       return request.finally(() => {
         if (requestRef.current === request) {
-          requestRef.current = null;
+          requestRef.current = null
         }
-      });
+      })
     },
     [performOpen],
-  );
+  )
 }

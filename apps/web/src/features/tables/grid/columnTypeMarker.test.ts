@@ -1,73 +1,73 @@
-import type { ColumnDescriptor } from "jazz-tools";
-import { describe, expect, it } from "vitest";
+import type { ColumnDescriptor } from 'jazz-tools'
+import { describe, expect, it } from 'vitest'
 
-import { getColumnTypeMarker } from "@tables/grid/columnTypeMarker";
-import type { TableColumnMeta } from "@tables/tableTypes";
+import { getColumnTypeMarker } from '@tables/grid/columnTypeMarker'
+import type { TableColumnMeta } from '@tables/tableTypes'
 
 function createColumn(
-  column: Pick<ColumnDescriptor, "column_type" | "nullable"> &
-    Partial<Pick<ColumnDescriptor, "references">>,
+  column: Pick<ColumnDescriptor, 'column_type' | 'nullable'> &
+    Partial<Pick<ColumnDescriptor, 'references'>>,
 ): TableColumnMeta {
   return {
-    accessorKey: "value",
-    column: { name: "value", ...column } as ColumnDescriptor,
-    id: "value",
+    accessorKey: 'value',
+    column: { name: 'value', ...column } as ColumnDescriptor,
+    id: 'value',
     isSortable: false,
-    label: "Value",
-  };
+    label: 'Value',
+  }
 }
 
-describe("getColumnTypeMarker", () => {
-  it("distinguishes the synthetic Jazz row ID from stored UUID values", () => {
+describe('getColumnTypeMarker', () => {
+  it('distinguishes the synthetic Jazz row ID from stored UUID values', () => {
     expect(
       getColumnTypeMarker({
-        accessorKey: "id",
+        accessorKey: 'id',
         column: null,
-        id: "id",
+        id: 'id',
         isSortable: true,
-        label: "id",
+        label: 'id',
       }),
-    ).toEqual({ icon: "key", label: "Row ID", suffix: "" });
+    ).toEqual({ icon: 'key', label: 'Row ID', suffix: '' })
     expect(
-      getColumnTypeMarker(createColumn({ column_type: { type: "Uuid" }, nullable: false })),
-    ).toEqual({ icon: null, label: "UUID", suffix: "ID" });
-  });
+      getColumnTypeMarker(createColumn({ column_type: { type: 'Uuid' }, nullable: false })),
+    ).toEqual({ icon: null, label: 'UUID', suffix: 'ID' })
+  })
 
-  it("keeps array headers compact without nested or optional modifiers", () => {
+  it('keeps array headers compact without nested or optional modifiers', () => {
     expect(
       getColumnTypeMarker(
         createColumn({
-          column_type: { type: "Array", element: { type: "Text" } },
+          column_type: { type: 'Array', element: { type: 'Text' } },
           nullable: true,
         }),
       ),
-    ).toEqual({ icon: null, label: "Array", suffix: "[ ]" });
-  });
+    ).toEqual({ icon: null, label: 'Array', suffix: '[ ]' })
+  })
 
-  it("uses one relation marker without array or optional modifiers", () => {
+  it('uses one relation marker without array or optional modifiers', () => {
     expect(
       getColumnTypeMarker(
         createColumn({
-          column_type: { type: "Array", element: { type: "Uuid" } },
+          column_type: { type: 'Array', element: { type: 'Uuid' } },
           nullable: true,
-          references: "accounts",
+          references: 'accounts',
         }),
       ),
     ).toEqual({
-      icon: "relation",
-      label: "Reference",
-      suffix: "",
-    });
-  });
+      icon: 'relation',
+      label: 'Reference',
+      suffix: '',
+    })
+  })
 
-  it("distinguishes typed and untyped JSON", () => {
+  it('distinguishes typed and untyped JSON', () => {
     expect(
-      getColumnTypeMarker(createColumn({ column_type: { type: "Json" }, nullable: false })),
-    ).toMatchObject({ label: "JSON", suffix: "{ }" });
+      getColumnTypeMarker(createColumn({ column_type: { type: 'Json' }, nullable: false })),
+    ).toMatchObject({ label: 'JSON', suffix: '{ }' })
     expect(
       getColumnTypeMarker(
-        createColumn({ column_type: { type: "Json", schema: {} }, nullable: false }),
+        createColumn({ column_type: { type: 'Json', schema: {} }, nullable: false }),
       ),
-    ).toMatchObject({ label: "Typed JSON", suffix: "{T}" });
-  });
-});
+    ).toMatchObject({ label: 'Typed JSON', suffix: '{T}' })
+  })
+})

@@ -1,4 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
+import * as stylex from '@stylexjs/stylex'
 
 import {
   borderColors,
@@ -7,28 +7,34 @@ import {
   spatial,
   surfaceColors,
   textColors,
-} from "../../tokens/semantics.stylex";
-import { borderRadii, fontFamilies, fontSizes, lineHeights, spacing } from "../../tokens/value.stylex";
-import { codeEditorVars } from "./codeEditorVars.stylex";
+} from '../../tokens/semantics.stylex'
+import {
+  borderRadii,
+  fontFamilies,
+  fontSizes,
+  lineHeights,
+  spacing,
+} from '../../tokens/value.stylex'
+import { codeEditorVars } from './codeEditorVars.stylex'
 
 export const codeEditorStyles = stylex.create({
   root: {
     [codeEditorVars.backgroundColor]: surfaceColors.default,
     borderColor: {
       default: borderColors.default,
-      ":focus-within": borderColors.focused,
+      ':focus-within': borderColors.focused,
     },
     borderRadius: borderRadii.xs,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderWidth: 1,
-    overflow: "hidden",
+    overflow: 'hidden',
     backgroundColor: codeEditorVars.backgroundColor,
-    boxSizing: "border-box",
-    display: "flex",
-    flexDirection: "column",
-    position: "relative",
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
     minWidth: 0,
-    width: "100%",
+    width: '100%',
   },
   rootFill: {
     flexBasis: 0,
@@ -39,17 +45,17 @@ export const codeEditorStyles = stylex.create({
   invalid: {
     borderColor: {
       default: borderColors.danger,
-      ":focus-within": borderColors.danger,
+      ':focus-within': borderColors.danger,
     },
     outlineColor: focusColors.ringDanger,
     outlineOffset: 0,
-    outlineStyle: "solid",
+    outlineStyle: 'solid',
     outlineWidth: 0,
   },
   disabled: {
     [codeEditorVars.backgroundColor]: elementColors.disabled,
     color: textColors.disabled,
-    cursor: "not-allowed",
+    cursor: 'not-allowed',
   },
   readOnly: {
     [codeEditorVars.backgroundColor]: elementColors.default,
@@ -57,10 +63,10 @@ export const codeEditorStyles = stylex.create({
   viewport: {
     minHeight: 0,
     minWidth: 0,
-    width: "100%",
+    width: '100%',
   },
   viewportExpandedFill: {
-    overflow: "hidden",
+    overflow: 'hidden',
     flexBasis: 0,
     flexGrow: 1,
     flexShrink: 1,
@@ -68,20 +74,20 @@ export const codeEditorStyles = stylex.create({
   fallbackInput: {
     padding: spacing.m,
     borderWidth: 0,
-    backgroundColor: "transparent",
-    color: "inherit",
+    backgroundColor: 'transparent',
+    color: 'inherit',
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,
     outlineWidth: 0,
-    resize: "none",
-    minHeight: spatial["viewport-height-s"],
-    width: "100%",
+    resize: 'none',
+    minHeight: spatial['viewport-height-s'],
+    width: '100%',
   },
   loadError: {
     padding: spacing.xs,
     borderColor: borderColors.default,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     color: textColors.danger,
     fontSize: fontSizes[1],
     lineHeight: lineHeights.compact,
@@ -90,22 +96,22 @@ export const codeEditorStyles = stylex.create({
   toolbar: {
     padding: spacing.xs,
     borderColor: borderColors.default,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderWidth: 0,
     gap: spacing.xxs,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: elementColors.default,
-    display: "flex",
-    justifyContent: "flex-end",
+    display: 'flex',
+    justifyContent: 'flex-end',
     borderTopWidth: 1,
   },
   icon: {
-    fill: "none",
-    stroke: "currentColor",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    display: "block",
-    height: spatial["icon-size-s"],
-    width: spatial["icon-size-s"],
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    display: 'block',
+    height: spatial['icon-size-s'],
+    width: spatial['icon-size-s'],
   },
-});
+})

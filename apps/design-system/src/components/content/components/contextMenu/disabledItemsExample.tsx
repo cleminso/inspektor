@@ -1,5 +1,5 @@
-import { ContextMenu } from "@inspector/ds";
-import { type ReactElement } from "react";
+import { ContextMenu } from '@inspector/ds'
+import { type ReactElement } from 'react'
 
 export default function DisabledItemsExample(): ReactElement {
   return (
@@ -11,5 +11,5 @@ export default function DisabledItemsExample(): ReactElement {
         <ContextMenu.Item disabled>Close tabs to the right</ContextMenu.Item>
       </ContextMenu.Content>
     </ContextMenu.Root>
-  );
+  )
 }

@@ -1,1 +1,1 @@
-export const timestampValuePropNames = ["value"] as const;
+export const timestampValuePropNames = ['value'] as const

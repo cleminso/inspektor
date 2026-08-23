@@ -1,9 +1,9 @@
-import { useEffect, useRef, type KeyboardEvent, type MouseEvent, type Ref } from "react";
+import { useEffect, useRef, type KeyboardEvent, type MouseEvent, type Ref } from 'react'
 
-import { matchesKeyboardEvent } from "@tanstack/react-hotkeys";
-import type { Column, ColumnDef } from "@tanstack/react-table";
-import type { DynamicTableRow } from "jazz-tools";
-import { ChevronDown, KeyRound, Undo2 } from "lucide-react";
+import { matchesKeyboardEvent } from '@tanstack/react-hotkeys'
+import type { Column, ColumnDef } from '@tanstack/react-table'
+import type { DynamicTableRow } from 'jazz-tools'
+import { ChevronDown, KeyRound, Undo2 } from 'lucide-react'
 
 import {
   BinaryValue,
@@ -19,74 +19,74 @@ import {
   Tooltip,
   Icon,
   type DataGridFeatures,
-} from "@inspector/ds";
+} from '@inspector/ds'
 
-import { productGlyphs } from "@app/icons/productGlyphs";
-import { appHotkeys } from "@app/hotkeys/hotkeyCatalog";
+import { productGlyphs } from '@app/icons/productGlyphs'
+import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import {
   getColumnTypeMarker,
   type ColumnTypeMarker as ColumnTypeMarkerModel,
-} from "@tables/grid/columnTypeMarker";
-import { RelationCellLink } from "@tables/grid/relationCellLink";
-import { tableGridSelectionColumnId } from "@tables/grid/tableGridColumnIds";
-import { classifySchemaValue, type SchemaValuePresentation } from "@tables/grid/valuePresentation";
-import type { ColumnMoveDirection } from "@tables/grid/useColumnOrder";
-import type { TableColumnMeta, TableValuesByRowId } from "@tables/tableTypes";
+} from '@tables/grid/columnTypeMarker'
+import { RelationCellLink } from '@tables/grid/relationCellLink'
+import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
+import { classifySchemaValue, type SchemaValuePresentation } from '@tables/grid/valuePresentation'
+import type { ColumnMoveDirection } from '@tables/grid/useColumnOrder'
+import type { TableColumnMeta, TableValuesByRowId } from '@tables/tableTypes'
 
 interface BuildDataGridColumnsOptions {
-  columns: TableColumnMeta[];
-  onColumnMenuOpen?: (columnId: string) => void;
-  onColumnMove?: (columnId: string, direction: ColumnMoveDirection) => void;
-  onRowSelectionRequest?: (request: RowSelectionRequest) => void;
-  onUndoRowDeletions?: (rowIds: readonly string[]) => void;
-  stagedValuesByRowId?: TableValuesByRowId;
+  columns: TableColumnMeta[]
+  onColumnMenuOpen?: (columnId: string) => void
+  onColumnMove?: (columnId: string, direction: ColumnMoveDirection) => void
+  onRowSelectionRequest?: (request: RowSelectionRequest) => void
+  onUndoRowDeletions?: (rowIds: readonly string[]) => void
+  stagedValuesByRowId?: TableValuesByRowId
 }
 
 export interface RowSelectionRequest {
-  checked: boolean;
-  rowId: string;
-  shiftKey: boolean;
+  checked: boolean
+  rowId: string
+  shiftKey: boolean
 }
 
 interface ColumnSizing {
-  maxSize?: number;
-  minSize: number;
-  size: number;
+  maxSize?: number
+  minSize: number
+  size: number
 }
 
 function getColumnSizing(column: TableColumnMeta): ColumnSizing {
-  if (column.id === "id" || column.column === null) {
-    return { size: 294, minSize: 154 };
+  if (column.id === 'id' || column.column === null) {
+    return { size: 294, minSize: 154 }
   }
 
   if (column.column.references !== undefined) {
-    return { size: 310, minSize: 170 };
+    return { size: 310, minSize: 170 }
   }
 
   switch (column.column.column_type.type) {
-    case "Boolean":
-      return { size: 220, minSize: 120 };
-    case "Integer":
-    case "BigInt":
-    case "Double":
-      return { size: 220, minSize: 120 };
-    case "Timestamp":
-      return { size: 210, minSize: 114 };
-    case "Uuid":
-      return { size: 220, minSize: 156 };
-    case "Json":
-      return { size: 220, minSize: 160 };
-    case "Array":
-      return { size: 220, minSize: 160 };
-    case "Row":
-      return { size: 220, minSize: 160 };
-    case "Enum":
-      return { size: 160, minSize: 120 };
-    case "Bytea":
-      return { size: 144, minSize: 144 };
-    case "Text":
+    case 'Boolean':
+      return { size: 220, minSize: 120 }
+    case 'Integer':
+    case 'BigInt':
+    case 'Double':
+      return { size: 220, minSize: 120 }
+    case 'Timestamp':
+      return { size: 210, minSize: 114 }
+    case 'Uuid':
+      return { size: 220, minSize: 156 }
+    case 'Json':
+      return { size: 220, minSize: 160 }
+    case 'Array':
+      return { size: 220, minSize: 160 }
+    case 'Row':
+      return { size: 220, minSize: 160 }
+    case 'Enum':
+      return { size: 160, minSize: 120 }
+    case 'Bytea':
+      return { size: 144, minSize: 144 }
+    case 'Text':
     default:
-      return { size: 280, minSize: 120 };
+      return { size: 280, minSize: 120 }
   }
 }
 
@@ -94,31 +94,36 @@ function CompactCellValue({
   isRowId,
   presentation,
 }: {
-  isRowId: boolean;
-  presentation: SchemaValuePresentation;
+  isRowId: boolean
+  presentation: SchemaValuePresentation
 }): React.ReactElement {
-  if (presentation.kind === "relation") {
+  if (presentation.kind === 'relation') {
     return (
       <RelationCellLink
         relationTable={presentation.relationTable}
         relationId={presentation.relationId}
       />
-    );
+    )
   }
 
-  if (presentation.kind === "bytes") {
-    return <BinaryValue byteLength={presentation.byteLength} />;
+  if (presentation.kind === 'bytes') {
+    return <BinaryValue byteLength={presentation.byteLength} />
   }
 
-  if (presentation.kind === "timestamp") {
-    return <TimestampValue value={presentation.epochMilliseconds} />;
+  if (presentation.kind === 'timestamp') {
+    return <TimestampValue value={presentation.epochMilliseconds} />
   }
 
-  if (presentation.kind === "structured") {
-    return <StructuredValuePreview model={presentation.model} variant={presentation.variant} />;
+  if (presentation.kind === 'structured') {
+    return (
+      <StructuredValuePreview
+        model={presentation.model}
+        variant={presentation.variant}
+      />
+    )
   }
 
-  if (isRowId === true && "displayValue" in presentation) {
+  if (isRowId === true && 'displayValue' in presentation) {
     return (
       <Text
         as="span"
@@ -128,12 +133,15 @@ function CompactCellValue({
       >
         <MiddleTruncate value={presentation.displayValue} />
       </Text>
-    );
+    )
   }
 
-  if (presentation.kind === "number") {
+  if (presentation.kind === 'number') {
     return (
-      <Box justifyContent="end" width="full">
+      <Box
+        justifyContent="end"
+        width="full"
+      >
         <Text
           as="span"
           align="right"
@@ -147,29 +155,41 @@ function CompactCellValue({
           {presentation.displayValue}
         </Text>
       </Box>
-    );
+    )
   }
 
-  if (presentation.kind === "boolean") {
+  if (presentation.kind === 'boolean') {
     return (
-      <Box as="span" alignItems="center" gap="xs">
-        <Text as="span" aria-label={`Boolean ${String(presentation.value)}`} color="muted"></Text>
-        <Text as="span" data-cell-typography="mono" monospace>
+      <Box
+        as="span"
+        alignItems="center"
+        gap="xs"
+      >
+        <Text
+          as="span"
+          aria-label={`Boolean ${String(presentation.value)}`}
+          color="muted"
+        ></Text>
+        <Text
+          as="span"
+          data-cell-typography="mono"
+          monospace
+        >
           {String(presentation.value)}
         </Text>
       </Box>
-    );
+    )
   }
 
-  const isSubdued = presentation.kind === "null" || presentation.kind === "unavailable";
+  const isSubdued = presentation.kind === 'null' || presentation.kind === 'unavailable'
   return (
     <Text
       as="span"
       color={
-        presentation.kind === "unsupported" || presentation.kind === "invalid"
-          ? "danger"
+        presentation.kind === 'unsupported' || presentation.kind === 'invalid'
+          ? 'danger'
           : isSubdued === true
-            ? "muted"
+            ? 'muted'
             : undefined
       }
       data-cell-overflow="truncate"
@@ -179,16 +199,16 @@ function CompactCellValue({
     >
       {presentation.displayValue}
     </Text>
-  );
+  )
 }
 
 interface SelectionCheckboxProps {
-  ariaLabel: string;
-  checked: boolean;
-  checkboxRef?: Ref<HTMLElement>;
-  disabled?: boolean;
-  indeterminate?: boolean;
-  onCheckedChange: (checked: boolean, shiftKey: boolean) => void;
+  ariaLabel: string
+  checked: boolean
+  checkboxRef?: Ref<HTMLElement>
+  disabled?: boolean
+  indeterminate?: boolean
+  onCheckedChange: (checked: boolean, shiftKey: boolean) => void
 }
 
 function SelectionCheckbox({
@@ -199,7 +219,7 @@ function SelectionCheckbox({
   indeterminate = false,
   onCheckedChange,
 }: SelectionCheckboxProps): React.ReactElement {
-  const shiftKeyRef = useRef(false);
+  const shiftKeyRef = useRef(false)
 
   return (
     <Checkbox
@@ -210,22 +230,22 @@ function SelectionCheckbox({
       indeterminate={indeterminate}
       size="m"
       onClickCapture={(event: MouseEvent<HTMLElement>) => {
-        shiftKeyRef.current = event.shiftKey;
+        shiftKeyRef.current = event.shiftKey
       }}
       onCheckedChange={(nextChecked: boolean) => {
-        onCheckedChange(nextChecked === true, shiftKeyRef.current);
-        shiftKeyRef.current = false;
+        onCheckedChange(nextChecked === true, shiftKeyRef.current)
+        shiftKeyRef.current = false
       }}
     />
-  );
+  )
 }
 
 interface PageSelectionControlProps {
-  allRowsDeleted: boolean;
-  checked: boolean;
-  indeterminate: boolean;
-  onCheckedChange: (checked: boolean) => void;
-  onUndoDeletions?: () => void;
+  allRowsDeleted: boolean
+  checked: boolean
+  indeterminate: boolean
+  onCheckedChange: (checked: boolean) => void
+  onUndoDeletions?: () => void
 }
 
 function PageSelectionControl({
@@ -235,15 +255,15 @@ function PageSelectionControl({
   onCheckedChange,
   onUndoDeletions,
 }: PageSelectionControlProps): React.ReactElement {
-  const checkboxRef = useRef<HTMLElement>(null);
-  const restoreFocusRef = useRef(false);
+  const checkboxRef = useRef<HTMLElement>(null)
+  const restoreFocusRef = useRef(false)
 
   useEffect(() => {
     if (allRowsDeleted === false && restoreFocusRef.current === true) {
-      restoreFocusRef.current = false;
-      checkboxRef.current?.focus();
+      restoreFocusRef.current = false
+      checkboxRef.current?.focus()
     }
-  }, [allRowsDeleted]);
+  }, [allRowsDeleted])
 
   if (allRowsDeleted === true && onUndoDeletions !== undefined) {
     return (
@@ -263,8 +283,8 @@ function PageSelectionControl({
                 size="xs"
                 variant="ghost"
                 onClick={() => {
-                  restoreFocusRef.current = true;
-                  onUndoDeletions();
+                  restoreFocusRef.current = true
+                  onUndoDeletions()
                 }}
               >
                 <Button.Glyph artwork={Undo2} />
@@ -274,7 +294,7 @@ function PageSelectionControl({
           <Tooltip.Content>Undo all deletions</Tooltip.Content>
         </Tooltip.Root>
       </Box>
-    );
+    )
   }
 
   return (
@@ -285,15 +305,15 @@ function PageSelectionControl({
       indeterminate={indeterminate}
       onCheckedChange={onCheckedChange}
     />
-  );
+  )
 }
 
 interface RowSelectionControlProps {
-  canSelect: boolean;
-  checked: boolean;
-  onCheckedChange: (checked: boolean, shiftKey: boolean) => void;
-  onUndoDeletion?: () => void;
-  rowId: string;
+  canSelect: boolean
+  checked: boolean
+  onCheckedChange: (checked: boolean, shiftKey: boolean) => void
+  onUndoDeletion?: () => void
+  rowId: string
 }
 
 function RowSelectionControl({
@@ -303,15 +323,15 @@ function RowSelectionControl({
   onUndoDeletion,
   rowId,
 }: RowSelectionControlProps): React.ReactElement {
-  const checkboxRef = useRef<HTMLElement>(null);
-  const restoreFocusRef = useRef(false);
+  const checkboxRef = useRef<HTMLElement>(null)
+  const restoreFocusRef = useRef(false)
 
   useEffect(() => {
     if (canSelect === true && restoreFocusRef.current === true) {
-      restoreFocusRef.current = false;
-      checkboxRef.current?.focus();
+      restoreFocusRef.current = false
+      checkboxRef.current?.focus()
     }
-  }, [canSelect]);
+  }, [canSelect])
 
   if (canSelect === false && onUndoDeletion !== undefined) {
     return (
@@ -326,8 +346,8 @@ function RowSelectionControl({
               size="xs"
               variant="ghost"
               onClick={() => {
-                restoreFocusRef.current = true;
-                onUndoDeletion();
+                restoreFocusRef.current = true
+                onUndoDeletion()
               }}
             >
               <Button.Glyph artwork={Undo2} />
@@ -336,7 +356,7 @@ function RowSelectionControl({
         />
         <Tooltip.Content>Undo deletion</Tooltip.Content>
       </Tooltip.Root>
-    );
+    )
   }
 
   return (
@@ -347,7 +367,7 @@ function RowSelectionControl({
       disabled={canSelect === false}
       onCheckedChange={onCheckedChange}
     />
-  );
+  )
 }
 
 function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.ReactElement {
@@ -355,11 +375,27 @@ function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.
     <Tooltip.Root>
       <Tooltip.Trigger
         render={
-          <Text as="span" color="muted" variant="caption">
-            <Box as="span" alignItems="center" display="flex">
-              {marker.icon === "key" ? <Icon artwork={KeyRound} size="xs" /> : null}
-              {marker.icon === "relation" ? (
-                <Icon artwork={productGlyphs.relation} size="xs" />
+          <Text
+            as="span"
+            color="muted"
+            variant="caption"
+          >
+            <Box
+              as="span"
+              alignItems="center"
+              display="flex"
+            >
+              {marker.icon === 'key' ? (
+                <Icon
+                  artwork={KeyRound}
+                  size="xs"
+                />
+              ) : null}
+              {marker.icon === 'relation' ? (
+                <Icon
+                  artwork={productGlyphs.relation}
+                  size="xs"
+                />
               ) : null}
               {marker.suffix}
             </Box>
@@ -368,27 +404,37 @@ function ColumnTypeMarker({ marker }: { marker: ColumnTypeMarkerModel }): React.
       />
       <Tooltip.Content>{marker.label}</Tooltip.Content>
     </Tooltip.Root>
-  );
+  )
 }
 
 export function ColumnDragPreview({ column }: { column: TableColumnMeta }): React.ReactElement {
   return (
-    <Box as="span" alignItems="center" display="flex" gap="xxs" minWidth={0}>
+    <Box
+      as="span"
+      alignItems="center"
+      display="flex"
+      gap="xxs"
+      minWidth={0}
+    >
       <ColumnTypeMarker marker={getColumnTypeMarker(column)} />
-      <Text as="span" truncate variant="caption">
+      <Text
+        as="span"
+        truncate
+        variant="caption"
+      >
         {column.label}
       </Text>
     </Box>
-  );
+  )
 }
 
 const columnMoveHotkeys = [
-  { direction: "left", hotkey: appHotkeys.moveTableColumnLeft },
-  { direction: "right", hotkey: appHotkeys.moveTableColumnRight },
+  { direction: 'left', hotkey: appHotkeys.moveTableColumnLeft },
+  { direction: 'right', hotkey: appHotkeys.moveTableColumnRight },
 ] as const satisfies readonly {
-  direction: ColumnMoveDirection;
-  hotkey: (typeof appHotkeys)[keyof typeof appHotkeys];
-}[];
+  direction: ColumnMoveDirection
+  hotkey: (typeof appHotkeys)[keyof typeof appHotkeys]
+}[]
 
 /** Captures column-move shortcuts before Base UI interprets their arrow keys as menu navigation. */
 function runColumnMoveHotkey(
@@ -401,69 +447,66 @@ function runColumnMoveHotkey(
     event.nativeEvent.isComposing === true ||
     event.repeat === true
   ) {
-    return;
+    return
   }
 
   const movement = columnMoveHotkeys.find(
     ({ hotkey }) => matchesKeyboardEvent(event.nativeEvent, hotkey) === true,
-  );
+  )
   if (movement === undefined) {
-    return;
+    return
   }
 
-  event.preventDefault();
-  event.stopPropagation();
-  onMove(columnId, movement.direction);
+  event.preventDefault()
+  event.stopPropagation()
+  onMove(columnId, movement.direction)
 }
 
 function MenuMoveActions({
   columnId,
   onMove,
 }: {
-  columnId: string;
-  onMove: (columnId: string, direction: ColumnMoveDirection) => void;
+  columnId: string
+  onMove: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
   return (
     <Menu.SubmenuRoot>
       <Menu.SubmenuTrigger>Move</Menu.SubmenuTrigger>
-      <Menu.Content side="right" align="start">
-        <Menu.Item onClick={() => onMove(columnId, "left")}>
+      <Menu.Content
+        side="right"
+        align="start"
+      >
+        <Menu.Item onClick={() => onMove(columnId, 'left')}>
           Move left
           <Menu.Shortcut hotkey={appHotkeys.moveTableColumnLeft} />
         </Menu.Item>
-        <Menu.Item onClick={() => onMove(columnId, "right")}>
+        <Menu.Item onClick={() => onMove(columnId, 'right')}>
           Move right
           <Menu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </Menu.Item>
         <Menu.Separator />
-        <Menu.Item onClick={() => onMove(columnId, "start")}>
-          Move to start
-        </Menu.Item>
-        <Menu.Item onClick={() => onMove(columnId, "end")}>
-          Move to end
-        </Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, 'start')}>Move to start</Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, 'end')}>Move to end</Menu.Item>
       </Menu.Content>
     </Menu.SubmenuRoot>
-  );
+  )
 }
 
 function hasCustomColumnOrder(
   column: Column<DataGridFeatures, DynamicTableRow, unknown>,
   defaultColumnOrder: readonly string[],
 ): boolean {
-  const defaultColumnIds = new Set(defaultColumnOrder);
+  const defaultColumnIds = new Set(defaultColumnOrder)
   const currentColumnOrder = (column.table.options.state?.columnOrder ?? []).filter((columnId) =>
     defaultColumnIds.has(columnId),
-  );
-  const currentColumnIds = new Set(currentColumnOrder);
+  )
+  const currentColumnIds = new Set(currentColumnOrder)
   const normalizedColumnOrder = [
     ...currentColumnOrder,
     ...defaultColumnOrder.filter((columnId) => currentColumnIds.has(columnId) === false),
-  ];
+  ]
 
-  return normalizedColumnOrder.some(
-    (columnId, index) => columnId !== defaultColumnOrder[index],
-  );
+  return normalizedColumnOrder.some((columnId, index) => columnId !== defaultColumnOrder[index])
 }
 
 function MenuColumnActions({
@@ -471,12 +514,12 @@ function MenuColumnActions({
   defaultColumnOrder,
   onMove,
 }: {
-  column: Column<DataGridFeatures, DynamicTableRow, unknown>;
-  defaultColumnOrder: readonly string[];
-  onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>
+  defaultColumnOrder: readonly string[]
+  onMove?: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
-  const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder);
-  const canResetColumnWidth = column.getSize() !== column.columnDef.size;
+  const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder)
+  const canResetColumnWidth = column.getSize() !== column.columnDef.size
 
   return (
     <>
@@ -495,7 +538,10 @@ function MenuColumnActions({
       {onMove === undefined ? null : (
         <>
           <Menu.Separator />
-          <MenuMoveActions columnId={column.id} onMove={onMove} />
+          <MenuMoveActions
+            columnId={column.id}
+            onMove={onMove}
+          />
         </>
       )}
       <Menu.Separator />
@@ -505,7 +551,10 @@ function MenuColumnActions({
       >
         Reset column order
       </Menu.Item>
-      <Menu.Item disabled={canResetColumnWidth === false} onClick={() => column.resetSize()}>
+      <Menu.Item
+        disabled={canResetColumnWidth === false}
+        onClick={() => column.resetSize()}
+      >
         Reset column width
       </Menu.Item>
       <Menu.Item
@@ -515,38 +564,37 @@ function MenuColumnActions({
         Hide column
       </Menu.Item>
     </>
-  );
+  )
 }
 
 function ContextMoveActions({
   columnId,
   onMove,
 }: {
-  columnId: string;
-  onMove: (columnId: string, direction: ColumnMoveDirection) => void;
+  columnId: string
+  onMove: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
   return (
     <ContextMenu.SubmenuRoot>
       <ContextMenu.SubmenuTrigger>Move</ContextMenu.SubmenuTrigger>
-      <ContextMenu.Content side="right" align="start">
-        <ContextMenu.Item onClick={() => onMove(columnId, "left")}>
+      <ContextMenu.Content
+        side="right"
+        align="start"
+      >
+        <ContextMenu.Item onClick={() => onMove(columnId, 'left')}>
           Move left
           <ContextMenu.Shortcut hotkey={appHotkeys.moveTableColumnLeft} />
         </ContextMenu.Item>
-        <ContextMenu.Item onClick={() => onMove(columnId, "right")}>
+        <ContextMenu.Item onClick={() => onMove(columnId, 'right')}>
           Move right
           <ContextMenu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </ContextMenu.Item>
         <ContextMenu.Separator />
-        <ContextMenu.Item onClick={() => onMove(columnId, "start")}>
-          Move to start
-        </ContextMenu.Item>
-        <ContextMenu.Item onClick={() => onMove(columnId, "end")}>
-          Move to end
-        </ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, 'start')}>Move to start</ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, 'end')}>Move to end</ContextMenu.Item>
       </ContextMenu.Content>
     </ContextMenu.SubmenuRoot>
-  );
+  )
 }
 
 function ContextColumnActions({
@@ -554,12 +602,12 @@ function ContextColumnActions({
   defaultColumnOrder,
   onMove,
 }: {
-  column: Column<DataGridFeatures, DynamicTableRow, unknown>;
-  defaultColumnOrder: readonly string[];
-  onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>
+  defaultColumnOrder: readonly string[]
+  onMove?: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
-  const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder);
-  const canResetColumnWidth = column.getSize() !== column.columnDef.size;
+  const canResetColumnOrder = hasCustomColumnOrder(column, defaultColumnOrder)
+  const canResetColumnWidth = column.getSize() !== column.columnDef.size
 
   return (
     <>
@@ -578,7 +626,10 @@ function ContextColumnActions({
       {onMove === undefined ? null : (
         <>
           <ContextMenu.Separator />
-          <ContextMoveActions columnId={column.id} onMove={onMove} />
+          <ContextMoveActions
+            columnId={column.id}
+            onMove={onMove}
+          />
         </>
       )}
       <ContextMenu.Separator />
@@ -588,7 +639,10 @@ function ContextColumnActions({
       >
         Reset column order
       </ContextMenu.Item>
-      <ContextMenu.Item disabled={canResetColumnWidth === false} onClick={() => column.resetSize()}>
+      <ContextMenu.Item
+        disabled={canResetColumnWidth === false}
+        onClick={() => column.resetSize()}
+      >
         Reset column width
       </ContextMenu.Item>
       <ContextMenu.Item
@@ -598,7 +652,7 @@ function ContextColumnActions({
         Hide column
       </ContextMenu.Item>
     </>
-  );
+  )
 }
 
 function ColumnHeader({
@@ -609,18 +663,18 @@ function ColumnHeader({
   onMenuOpen,
   onMove,
 }: {
-  column: Column<DataGridFeatures, DynamicTableRow, unknown>;
-  defaultColumnOrder: readonly string[];
-  label: string;
-  marker: ColumnTypeMarkerModel;
-  onMenuOpen?: (columnId: string) => void;
-  onMove?: (columnId: string, direction: ColumnMoveDirection) => void;
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>
+  defaultColumnOrder: readonly string[]
+  label: string
+  marker: ColumnTypeMarkerModel
+  onMenuOpen?: (columnId: string) => void
+  onMove?: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
   const handleOpenChange = (open: boolean) => {
     if (open === true) {
-      onMenuOpen?.(column.id);
+      onMenuOpen?.(column.id)
     }
-  };
+  }
 
   return (
     <ContextMenu.Root onOpenChange={handleOpenChange}>
@@ -637,9 +691,20 @@ function ColumnHeader({
           />
         }
       >
-        <Box as="span" alignItems="center" display="flex" flex={1} gap="xs" minWidth={0}>
+        <Box
+          as="span"
+          alignItems="center"
+          display="flex"
+          flex={1}
+          gap="xs"
+          minWidth={0}
+        >
           <ColumnTypeMarker marker={marker} />
-          <Text as="span" truncate variant="caption">
+          <Text
+            as="span"
+            truncate
+            variant="caption"
+          >
             {label}
           </Text>
         </Box>
@@ -654,10 +719,13 @@ function ColumnHeader({
                 size="xs"
                 variant="ghost"
                 onClick={(event) => {
-                  event.stopPropagation();
+                  event.stopPropagation()
                 }}
               >
-                <Text as="span" color="muted">
+                <Text
+                  as="span"
+                  color="muted"
+                >
                   <Button.Glyph artwork={ChevronDown} />
                 </Text>
               </Button>
@@ -693,7 +761,7 @@ function ColumnHeader({
         />
       </ContextMenu.Content>
     </ContextMenu.Root>
-  );
+  )
 }
 
 export function buildDataGridColumns({
@@ -704,7 +772,7 @@ export function buildDataGridColumns({
   onUndoRowDeletions,
   stagedValuesByRowId = {},
 }: BuildDataGridColumnsOptions): ColumnDef<DataGridFeatures, DynamicTableRow, unknown>[] {
-  const defaultColumnOrder = columns.map((column) => column.id);
+  const defaultColumnOrder = columns.map((column) => column.id)
   const selectionColumn: ColumnDef<DataGridFeatures, DynamicTableRow, unknown> = {
     id: tableGridSelectionColumnId,
     size: 36,
@@ -715,22 +783,26 @@ export function buildDataGridColumns({
     enableResizing: false,
     enableSorting: false,
     header: ({ table }) => {
-      const isAllSelected = table.getIsAllPageRowsSelected();
-      const isSomeSelected = table.getIsSomePageRowsSelected();
-      const pageRows = table.getRowModel().rows;
+      const isAllSelected = table.getIsAllPageRowsSelected()
+      const isSomeSelected = table.getIsSomePageRowsSelected()
+      const pageRows = table.getRowModel().rows
       const allRowsDeleted =
         pageRows.length > 0 &&
         onUndoRowDeletions !== undefined &&
-        pageRows.every((row) => row.getCanSelect() === false);
+        pageRows.every((row) => row.getCanSelect() === false)
 
       return (
-        <Box alignItems="center" justifyContent="center" width="full">
+        <Box
+          alignItems="center"
+          justifyContent="center"
+          width="full"
+        >
           <PageSelectionControl
             allRowsDeleted={allRowsDeleted}
             checked={isAllSelected}
             indeterminate={isSomeSelected === true && isAllSelected === false}
             onCheckedChange={(value) => {
-              table.toggleAllPageRowsSelected(value);
+              table.toggleAllPageRowsSelected(value)
             }}
             onUndoDeletions={
               onUndoRowDeletions === undefined
@@ -739,11 +811,15 @@ export function buildDataGridColumns({
             }
           />
         </Box>
-      );
+      )
     },
     cell: ({ row }) => {
       return (
-        <Box alignItems="center" justifyContent="center" width="full">
+        <Box
+          alignItems="center"
+          justifyContent="center"
+          width="full"
+        >
           <RowSelectionControl
             canSelect={row.getCanSelect()}
             checked={row.getIsSelected()}
@@ -758,22 +834,22 @@ export function buildDataGridColumns({
                 checked: value,
                 rowId: String(row.original.id),
                 shiftKey,
-              });
+              })
               row.getToggleSelectedHandler({ selectChildren: false })({
                 shiftKey,
                 target: { checked: value },
-              });
+              })
             }}
           />
         </Box>
-      );
+      )
     },
-  };
+  }
 
   const dataColumns = columns.map<ColumnDef<DataGridFeatures, DynamicTableRow, unknown>>(
     (column) => {
-      const marker = getColumnTypeMarker(column);
-      const sizing = getColumnSizing(column);
+      const marker = getColumnTypeMarker(column)
+      const sizing = getColumnSizing(column)
 
       return {
         id: column.id,
@@ -781,7 +857,7 @@ export function buildDataGridColumns({
         minSize: sizing.minSize,
         maxSize: sizing.maxSize,
         accessorFn: (row) => row[column.accessorKey],
-        enableHiding: column.id !== "id",
+        enableHiding: column.id !== 'id',
         enableSorting: column.isSortable,
         header: ({ column: tableColumn }) => (
           <ColumnHeader
@@ -794,23 +870,23 @@ export function buildDataGridColumns({
           />
         ),
         cell: ({ row }) => {
-          const stagedRowValues = stagedValuesByRowId[row.id];
+          const stagedRowValues = stagedValuesByRowId[row.id]
           const rawValue =
             stagedRowValues !== undefined && Object.hasOwn(stagedRowValues, column.accessorKey)
               ? stagedRowValues[column.accessorKey]
-              : row.original[column.accessorKey];
-          const presentation = classifySchemaValue(rawValue, column.column);
+              : row.original[column.accessorKey]
+          const presentation = classifySchemaValue(rawValue, column.column)
 
           return (
             <CompactCellValue
-              isRowId={column.id === "id" && column.column === null}
+              isRowId={column.id === 'id' && column.column === null}
               presentation={presentation}
             />
-          );
+          )
         },
-      };
+      }
     },
-  );
+  )
 
-  return [selectionColumn, ...dataColumns];
+  return [selectionColumn, ...dataColumns]
 }

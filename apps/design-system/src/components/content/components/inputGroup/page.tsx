@@ -1,28 +1,28 @@
-import { type ReactElement } from "react";
+import { type ReactElement } from 'react'
 
-import { Example } from "@/components/docs/example";
-import { PropsTable } from "@/components/docs/propsTable";
-import { Section } from "@/components/docs/section";
-import { getGeneratedProps } from "@/lib/propsData";
+import { Example } from '@/components/docs/example'
+import { PropsTable } from '@/components/docs/propsTable'
+import { Section } from '@/components/docs/section'
+import { getGeneratedProps } from '@/lib/propsData'
 
-import BasicExample from "./basicExample";
-import basicSource from "./basicExample.tsx?raw";
-import NullableExample from "./nullableExample";
-import nullableSource from "./nullableExample.tsx?raw";
-import { InputGroupPlayground } from "./playground";
+import BasicExample from './basicExample'
+import basicSource from './basicExample.tsx?raw'
+import NullableExample from './nullableExample'
+import nullableSource from './nullableExample.tsx?raw'
+import { InputGroupPlayground } from './playground'
 import {
   inputGroupActionPropNames,
   inputGroupCheckboxPropNames,
   inputGroupPrefixPropNames,
   inputGroupRootPropNames,
   inputGroupSuffixPropNames,
-} from "./props";
+} from './props'
 
-const rootProps = getGeneratedProps("inputGroup.root", inputGroupRootPropNames);
-const prefixProps = getGeneratedProps("inputGroup.prefix", inputGroupPrefixPropNames);
-const suffixProps = getGeneratedProps("inputGroup.suffix", inputGroupSuffixPropNames);
-const actionProps = getGeneratedProps("inputGroup.action", inputGroupActionPropNames);
-const checkboxProps = getGeneratedProps("inputGroup.checkbox", inputGroupCheckboxPropNames);
+const rootProps = getGeneratedProps('inputGroup.root', inputGroupRootPropNames)
+const prefixProps = getGeneratedProps('inputGroup.prefix', inputGroupPrefixPropNames)
+const suffixProps = getGeneratedProps('inputGroup.suffix', inputGroupSuffixPropNames)
+const actionProps = getGeneratedProps('inputGroup.action', inputGroupActionPropNames)
+const checkboxProps = getGeneratedProps('inputGroup.checkbox', inputGroupCheckboxPropNames)
 
 export function InputGroupPage(): ReactElement {
   return (
@@ -61,5 +61,5 @@ export function InputGroupPage(): ReactElement {
         <PropsTable rows={checkboxProps} />
       </Section>
     </InputGroupPlayground>
-  );
+  )
 }

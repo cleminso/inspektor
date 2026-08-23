@@ -1,13 +1,16 @@
 <!-- intent-skills:start -->
+
 ## Skill Loading
 
 Before editing files for a substantial task involving a TanStack package:
+
 - Run `pnpm dlx @tanstack/intent@latest list` from the workspace root to see available local skills.
 - If a listed skill matches the task, run `pnpm dlx @tanstack/intent@latest load <package>#<skill>` before changing files.
 - Use the loaded `SKILL.md` guidance while making the change.
 - Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
 - Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
 - Do not run the intent skill check for work unrelated to TanStack packages.
+
 <!-- intent-skills:end -->
 
 # Agent Notes
@@ -110,6 +113,7 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 ## Editing and validation
 
 - Preserve existing file formatting and exclude unrelated formatting churn from behavioral changes.
+- After editing, run `pnpm -r --if-present format`, affected-package lint, and affected-package typecheck before considering the work complete.
 - After a multi-hunk or replacement patch, inspect the resulting file or semantic diff before running tests.
 - Validate in order: focused test, changed-file lint, browser behavior when applicable, affected-package typecheck and build, then one package-wide test pass.
 - Run StyleX lint immediately after editing styles; follow a nearby passing property order instead of guessing or alphabetizing it.
