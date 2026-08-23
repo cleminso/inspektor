@@ -1,7 +1,4 @@
-import type {
-  QuerySubscriptionPropagation,
-  QuerySubscriptionRow,
-} from "@queries/telemetry/types";
+import type { IntrospectionSubscriptionGroup, QueryPropagation } from "jazz-tools";
 
 export function filterQuerySubscriptionTableNames(
   tableNames: string[],
@@ -17,15 +14,15 @@ export function filterQuerySubscriptionTableNames(
 }
 
 interface QuerySubscriptionFilters {
-  selectedPropagations: QuerySubscriptionPropagation[];
+  selectedPropagations: QueryPropagation[];
   selectedTableName: string | null;
 }
 
 export function filterQuerySubscriptionRows(
-  rows: QuerySubscriptionRow[],
+  rows: IntrospectionSubscriptionGroup[],
   filters: QuerySubscriptionFilters,
-): QuerySubscriptionRow[] {
-  const selectedPropagations = new Set<string>(filters.selectedPropagations);
+): IntrospectionSubscriptionGroup[] {
+  const selectedPropagations = new Set(filters.selectedPropagations);
 
   return rows.filter((row) => {
     if (filters.selectedTableName !== null && row.table !== filters.selectedTableName) {

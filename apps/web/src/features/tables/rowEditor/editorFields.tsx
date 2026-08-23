@@ -5,7 +5,7 @@
  * dirty comparison and patch construction remain in the shared mutation
  * modules so an inline editor can reuse them without rendering this pane form.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEventHandler } from "react";
 
 import type { ColumnDescriptor } from "jazz-tools";
 
@@ -24,8 +24,6 @@ export interface FieldState {
   isOmitted: boolean;
   text: string;
 }
-type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
-
 interface UseRowEditorFieldsOptions {
   draftController: RowDraftController;
   mode: DetailPaneMode;
@@ -46,7 +44,7 @@ interface UseRowEditorFieldsResult {
   setFieldNull: (columnName: string, isNull: boolean) => void;
   setFieldOmitted: (columnName: string, isOmitted: boolean) => void;
   setFieldText: (columnName: string, text: string) => void;
-  submit: FormSubmitHandler;
+  submit: FormEventHandler<HTMLFormElement>;
 }
 
 interface RowEditorFieldsProps {
@@ -141,7 +139,7 @@ export function useRowEditorFields({
     );
   };
 
-  const submit: FormSubmitHandler = async (event) => {
+  const submit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     // React state cannot reject two submit events dispatched before the next render.
     if (isSavingRef.current === true) {

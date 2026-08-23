@@ -1,13 +1,12 @@
 import { describe, expect, it } from "vitest";
-
-import type { QuerySubscriptionRow } from "@queries/telemetry/types";
+import type { IntrospectionSubscriptionGroup } from "jazz-tools";
 
 import {
   filterQuerySubscriptionRows,
   filterQuerySubscriptionTableNames,
 } from "./subscriptionFilters";
 
-const rows: QuerySubscriptionRow[] = [
+const rows: IntrospectionSubscriptionGroup[] = [
   {
     branches: ["main"],
     count: 2,

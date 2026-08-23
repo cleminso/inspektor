@@ -1,3 +1,5 @@
+import type { ConnectionCredentials } from "./connections";
+
 export type ConnectionField = "serverUrl" | "appId" | "adminSecret";
 
 export interface ConnectionError {
@@ -6,14 +8,8 @@ export interface ConnectionError {
   field?: ConnectionField;
 }
 
-interface ConnectionInput {
-  serverUrl: string;
-  appId: string;
-  adminSecret: string;
-}
-
 type ConnectionValidationResult =
-  | { valid: true; value: ConnectionInput }
+  | { valid: true; value: ConnectionCredentials }
   | { valid: false; error: ConnectionError };
 
 export const EMPTY_SCHEMA_ERROR: ConnectionError = {
@@ -41,7 +37,7 @@ const INVALID_SERVER_URL_ERROR: ConnectionError = {
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function validateConnectionInput(input: ConnectionInput): ConnectionValidationResult {
+export function validateConnectionInput(input: ConnectionCredentials): ConnectionValidationResult {
   const serverUrl = input.serverUrl.trim();
   const appId = input.appId.trim();
   const adminSecret = input.adminSecret.trim();

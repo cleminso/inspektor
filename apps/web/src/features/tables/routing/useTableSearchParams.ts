@@ -16,21 +16,10 @@ import type {
   TableExplorerSearchState,
   TableExplorerView,
   TablePageSize,
+  TableRouteSearch,
   TableRowId,
   TableSortDirection,
 } from '@tables/tableTypes'
-
-interface SearchValues {
-  dir?: string
-  filters?: string
-  mode?: string | null
-  page?: number
-  pageSize?: TablePageSize
-  rowId?: string | null
-  sort?: string
-  tab?: string
-  view?: string
-}
 
 interface UpdateSearchOptions {
   replace?: boolean
@@ -78,7 +67,7 @@ function parseRowId(value: string | null | undefined): TableRowId | null {
  */
 export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResult {
   const navigate = useNavigate({ from: '/conn/$connectionId/tables/$tableName/' })
-  const search = useSearch({ strict: false }) as SearchValues
+  const search = useSearch({ from: '/conn/$connectionId/tables/$tableName/' })
   const searchDirection = search.dir
   const serializedFilters = search.filters
   const sortColumn = search.sort
@@ -138,10 +127,10 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
   }, [filters, search.mode, search.rowId, search.view, tableRowsSearch])
 
   const createNextSearch = (
-    baseSearch: SearchValues,
-    updates: Partial<SearchValues>,
-  ): SearchValues => {
-    const nextSearch: SearchValues = {
+    baseSearch: TableRouteSearch,
+    updates: Partial<TableRouteSearch>,
+  ): TableRouteSearch => {
+    const nextSearch: TableRouteSearch = {
       ...baseSearch,
       ...updates,
     }
@@ -187,12 +176,12 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
   }
 
   const updateSearch = async (
-    updates: Partial<SearchValues>,
+    updates: Partial<TableRouteSearch>,
     options?: UpdateSearchOptions,
   ): Promise<void> => {
     await navigate({
       replace: options?.replace ?? true,
-      search: (currentSearch) => createNextSearch(currentSearch as SearchValues, updates),
+      search: (currentSearch) => createNextSearch(currentSearch, updates),
     })
   }
 

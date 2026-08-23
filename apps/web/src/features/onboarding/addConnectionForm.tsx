@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type FormEventHandler } from "react";
 
 import { Box, Button, Text, TextField } from "@inspector/ds";
 
@@ -6,14 +6,12 @@ import type { ConnectionError } from "@app/connections/connectionValidation";
 
 import type { AddConnectionFormValues } from "./connectionFormTypes";
 
-type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
-
 interface AddConnectionFormProps {
   error: ConnectionError | null;
   formValues: AddConnectionFormValues;
   isSubmitting: boolean;
   onCancel: () => void;
-  onSubmit: FormSubmitHandler;
+  onSubmit: FormEventHandler<HTMLFormElement>;
   onUpdateField: (field: keyof AddConnectionFormValues, value: string) => void;
 }
 

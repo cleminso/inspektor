@@ -4,6 +4,24 @@ import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const PORT = Number.parseInt(process.env.PORT ?? "1356", 10);
+// Avoid running the StyleX transform hook for every dependency module in the documentation build.
+const stylexSourceId = /\/(?:apps|packages)\/design-system\/src\/.*\.tsx?(?:\?.*)?$/;
+
+const stylexPlugin = stylex.vite();
+const transform = stylexPlugin.transform;
+
+if (typeof transform !== "function") {
+  throw new TypeError("Expected the StyleX Vite plugin to expose a transform hook");
+}
+
+stylexPlugin.transform = {
+  filter: {
+    id: {
+      include: [stylexSourceId],
+    },
+  },
+  handler: transform,
+};
 
 export default defineConfig({
   resolve: {
@@ -14,7 +32,7 @@ export default defineConfig({
     exclude: ["@inspector/ds"],
   },
   plugins: [
-    stylex.vite(),
+    stylexPlugin,
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,

@@ -6,43 +6,25 @@
  * context for which tables and queries the sync server is currently tracking.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { fetchServerSubscriptions } from "jazz-tools";
+import { fetchServerSubscriptions, type IntrospectionSubscriptionGroup } from "jazz-tools";
 
 import { useInspectorSessionState } from "@app/providers/inspectorProvider";
-import type { QuerySubscriptionRow } from "@queries/telemetry/types";
 
 const LIVE_QUERY_POLL_MS = 20_000;
-
-interface QuerySubscriptionTelemetryCacheEntry {
-  generatedAt: number | null;
-  rows: QuerySubscriptionRow[];
-}
-
-// Module-level cache prevents empty flashes when navigating away from and back to telemetry.
-const QuerySubscriptionTelemetryCache = new Map<string, QuerySubscriptionTelemetryCacheEntry>();
 
 export interface UseSubscriptionTelemetryResult {
   error: string | null;
   generatedAt: number | null;
   isInitialLoading: boolean;
   isRefreshing: boolean;
-  rows: QuerySubscriptionRow[];
+  rows: IntrospectionSubscriptionGroup[];
 }
 
-interface QuerySubscriptionConnectionConfig {
-  adminSecret: string;
-  appId: string;
-  connectionKey: string;
-  serverUrl: string;
-}
-
-interface QuerySubscriptionTelemetryState {
-  error: string | null;
-  generatedAt: number | null;
-  isInitialLoading: boolean;
-  isRefreshing: boolean;
-  rows: QuerySubscriptionRow[];
-}
+// Module-level cache prevents empty flashes when navigating away from and back to telemetry.
+const QuerySubscriptionTelemetryCache = new Map<
+  string,
+  Pick<UseSubscriptionTelemetryResult, "generatedAt" | "rows">
+>();
 
 /**
  * Loads query subscription telemetry for the active Inspector connection.
@@ -53,7 +35,7 @@ interface QuerySubscriptionTelemetryState {
  */
 export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
   const { activeConnection } = useInspectorSessionState();
-  const connectionConfig = useMemo<QuerySubscriptionConnectionConfig | null>(() => {
+  const connectionConfig = useMemo(() => {
     if (
       activeConnection === null ||
       activeConnection === undefined ||
@@ -83,7 +65,7 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
   );
   // Prevent overlapping telemetry requests when a refresh is still resolving.
   const isFetchingRef = useRef(false);
-  const [state, setState] = useState<QuerySubscriptionTelemetryState>(() => ({
+  const [state, setState] = useState<UseSubscriptionTelemetryResult>(() => ({
     rows: cachedTelemetry?.rows ?? [],
     generatedAt: cachedTelemetry?.generatedAt ?? null,
     error: connectionConfig === null ? "No connection selected." : null,
@@ -196,11 +178,5 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
     };
   }, [connectionConfig]);
 
-  return {
-    rows: state.rows,
-    generatedAt: state.generatedAt,
-    error: state.error,
-    isInitialLoading: state.isInitialLoading,
-    isRefreshing: state.isRefreshing,
-  };
+  return state;
 }

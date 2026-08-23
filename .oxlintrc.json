@@ -13,6 +13,10 @@
     {
       "name": "@stylexjs",
       "specifier": "@stylexjs/eslint-plugin"
+    },
+    {
+      "name": "anti-slop",
+      "specifier": "./tools/oxlint/antiSlop/index.ts"
     }
   ],
   "categories": {
@@ -31,6 +35,11 @@
     }
   },
   "rules": {
+    "anti-slop/no-chained-type-assertions": "warn",
+    "anti-slop/no-conditional-empty-object-spread": "warn",
+    "anti-slop/no-reflect-apply": "error",
+    "anti-slop/no-reflect-get": "error",
+    "anti-slop/no-shape-in-symbol-names": "error",
     "jsx-a11y/no-autofocus": "warn",
     "jsx-a11y/prefer-tag-over-role": "off"
   },
@@ -102,6 +111,7 @@
     {
       "files": ["**/*.test.ts", "**/*.test.tsx"],
       "rules": {
+        "anti-slop/no-chained-type-assertions": "off",
         "jsx-a11y/anchor-has-content": "off",
         "jsx-a11y/anchor-is-valid": "off",
         "jsx-a11y/control-has-associated-label": "off",
@@ -134,6 +144,7 @@
   "ignorePatterns": [
     "**/dist/**",
     "**/node_modules/**",
-    "packages/jazz-dev-tools/**"
+    "packages/jazz-dev-tools/**",
+    "tools/oxlint/antiSlop/**"
   ]
 }

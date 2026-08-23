@@ -11,12 +11,16 @@ export const CONNECTIONS_STORAGE_KEY = "regarde-inspector-connections";
 export const DEFAULT_SERVER_URL = "https://v2.sync.jazz.tools/";
 export const DEFAULT_BRANCH_NAME = "main";
 
-/** Connection values before the Inspector assigns its local profile ID. */
-export interface ConnectionDraft {
-  name: string;
+/** Jazz admin credentials shared by validation, persistence, and runtime clients. */
+export interface ConnectionCredentials {
   serverUrl: string;
   appId: string;
   adminSecret: string;
+}
+
+/** Connection values before the Inspector assigns its local profile ID. */
+export interface ConnectionDraft extends ConnectionCredentials {
+  name: string;
   env: string;
 }
 

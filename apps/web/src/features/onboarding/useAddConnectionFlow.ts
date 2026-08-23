@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEventHandler } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { fetchSchemaHashes } from "jazz-tools";
@@ -22,15 +22,13 @@ import {
   type AddConnectionStep,
 } from "./connectionFormTypes";
 
-type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
-
 interface UseAddConnectionFlowResult {
   error: ConnectionError | null;
   formValues: AddConnectionFormValues;
   isSubmitting: boolean;
   schemaHashes: string[];
   step: AddConnectionStep;
-  fetchSchemas: FormSubmitHandler;
+  fetchSchemas: FormEventHandler<HTMLFormElement>;
   goBackToForm: () => void;
   selectSchema: (schemaHash: string) => Promise<void>;
   updateField: (field: keyof AddConnectionFormValues, value: string) => void;
@@ -86,7 +84,7 @@ export function useAddConnectionFlow(): UseAddConnectionFlowResult {
     }
   };
 
-  const fetchSchemas: FormSubmitHandler = async (event) => {
+  const fetchSchemas: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     if (canSubmit === false || isSubmittingRef.current === true) {
