@@ -13,6 +13,24 @@
 
 [24/08/26]
 
+- [x] Document the connection lifecycle and its session intent, route resolution, runtime connectivity, and workspace presentation boundaries in architecture guidance and source JSDoc.
+
+[24/08/26]
+
+- [x] Block browser-history and router navigation that starts while mutations are pending, and keep the runtime unmounted until route and session context agree.
+
+[24/08/26]
+
+- [x] Remove the saved-connection pass-through hook and consume the session `openConnection` command directly from connection entry surfaces.
+- [x] Move connected route entry to one route-owned schema-catalogue loader and remove the prepared-target handoff.
+- [x] Preserve Jazz schema publication metadata, order schemas newest-first with deterministic unpublished fallback ordering, and retain an available remembered selection.
+- [x] Project the ordered schema catalogue through runtime state so the schema switcher renders route-owned order without rediscovery.
+- [x] Replace first-request-wins coordination with router navigation, explicit blocked outcomes, router-derived pending identity, and route-owned pending and error presentation.
+- [x] Keep add and edit validation inline while converging their persisted profiles on the authoritative connection route loader.
+- [x] Remove saved-open validation toasts, obsolete navigation-error contracts, and the connection-open coordinator.
+
+[24/08/26]
+
 - [x] Cap the saved-connection results viewport at five complete items, including list gaps and viewport padding.
 
 [24/08/26]
@@ -85,6 +103,19 @@
 
 ## Open product work
 
+[24/08/26]
+
+- [ ] Prevent new mutations during an accepted connection navigation or revalidate the runtime-scope guard at route commit without unmounting the existing ledger.
+
+[24/08/26]
+
+- [ ] Experiment with non-speculative Jazz WASM preparation after an accepted connection intent.
+  - Start one memoized, deferred `loadWasmModule()` promise after the exit guard accepts the connection and before navigation begins, in parallel with route loading and schema-catalogue discovery.
+  - Do not preload WASM from hover, focus, viewport presence, application startup, or merely rendering saved connections.
+  - Do not create a Jazz client before the route-owned `JazzProvider`; client acquisition, registry reuse, and shutdown remain provider responsibilities.
+  - Keep the preparation only if a production trace proves one WASM request, earlier compilation completion, reuse by `createDb`, earlier client readiness, and no retained work after blocked intent.
+  - Remove the preparation if it only duplicates initialization, shifts work without improving row readiness, or increases abandoned CPU and network work.
+
 [22/08/26]
 
 - [ ] Measure pre-navigation schema-hash discovery separately from runtime startup and evaluate short-lived, runtime-profile-keyed metadata reuse only if discovery remains perceptible.
@@ -99,12 +130,34 @@
 
 ## Work outside the foundation scope
 
+[24/08/26]
+
+- Automatically switching away from an available remembered schema when a newer schema is published is outside this refactor; catalogue order does not change selection identity.
+- Schema-catalogue caches, automatic retries, caller-owned metadata fetch replacements, and upstream Jazz `AbortSignal` support remain outside scope until production evidence shows repeated remote work or abandoned requests are material.
+- Keeping multiple Jazz clients warm is outside scope; the registry-backed route runtime remains the only client owner.
+- Hover, focus, viewport, render, and application-start WASM preloading are outside scope because they can spend network and compilation work without accepted connection intent.
+- Removing the first-table route transition is outside scope because doing so would move selected-schema loading into the blocking route loader without evidence of a net benefit.
+- Development-only Vite module waterfalls and StrictMode metadata duplication are not production optimization targets.
+
 [07/08/26]
 
 - Do not infer credential failure from an opaque browser `TypeError`; invalid credentials, CORS rejection, and connectivity failures can share that surface.
 - Do not apply Jazz Cloud identifier constraints to self-hosted servers.
 
 ## Settled interaction decisions
+
+[24/08/26]
+
+- Schema catalogue order is newest publication first and oldest publication last. Ordering uses Jazz `publishedAt` metadata rather than hash-array position.
+- Schema ordering does not force schema selection. An explicit or remembered schema remains selected while available; fallback selection uses the first ordered schema.
+- Connection entry and refresh fetch the schema catalogue so Inspector can discover migrations published outside Inspector.
+- The connection route loader owns remote schema-catalogue resolution for connected route entry and returns the runtime target for saved selection, direct entry, and refresh; add and edit retain separate inline credential validation before persistence.
+- TanStack Router owns pending, superseding, loader error, and committed route state. A newer accepted connection intent supersedes an older pending intent.
+- The session boundary owns saved profiles and runtime-scope exit policy but does not own remote route-loader progress or duplicate it into a second opening state machine.
+- Runtime-scope blocking is an explicit blocked outcome and never a resolved no-op presented as successful connection opening.
+- Connection-route pending UI owns loader feedback; runtime UI owns selected-schema and Jazz initialization feedback; table UI owns row-query feedback.
+- Jazz WASM preparation may begin only after connection intent is accepted. Jazz client creation and shutdown remain inside the registry-backed route runtime.
+- These decisions supersede the request-level no-decoration, private in-flight identity, first-request-wins, and explicit prepared-target decisions recorded below.
 
 [24/08/26]
 
@@ -168,6 +221,26 @@
 - None.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Cover schema records retaining `publishedAt`, newest-first ordering, deterministic placement of missing publication metadata, and hash-array order having no chronological meaning.
+- [x] Cover explicit and remembered schema retention, unavailable-schema fallback to the newest ordered schema, and schema-switcher rendering that does not change the selected hash.
+- [ ] Cover one connection-route loader policy across saved selection, switcher selection, direct entry, refresh, add, and edit.
+- [ ] Cover removal of the prepared-target map without adding a duplicate schema-catalogue request to one accepted route transition.
+- [ ] Cover latest accepted connection intent winning while an older loader result cannot persist context or mount a runtime.
+- [ ] Cover repeated selection of the same connection joining or preserving one router transition without duplicate user-visible errors.
+- [x] Cover runtime-scope blocking without navigation, popup dismissal, false success, or credentialed network work.
+- [x] Cover connection-route pending presentation, terminal loader errors, remembered-schema fallback when catalogue discovery is unavailable, and runtime retry when selected-schema or Jazz initialization fails.
+- [x] Cover add and edit preserving inline validation while sharing route-owned schema selection after profile persistence.
+- [x] Cover that permissions remain non-blocking and that selected-schema loading and Jazz client creation remain parallel.
+- [x] Cover the application-root and connection-switcher import boundaries after moving route resolution.
+- [ ] If WASM preparation is implemented, cover one shared promise, no preparation for blocked intent, no early Jazz client, and safe rejection handling without a toast or unhandled promise.
+- [ ] Verify with the isolated Inspector Test fixture that saved selection, direct refresh, add, edit, schema switching, connection superseding, and failure recovery reach the expected route and rows.
+- [ ] Capture production traces for connection activation, catalogue completion, route commit, selected-schema verification, WASM completion, Jazz WebSocket readiness, first table selection, and first rows.
+- [ ] Compare production traces with and without WASM preparation and retain it only when it advances client and row readiness without duplicate WASM work.
+- [x] Run focused connection, routing, runtime, schema-switcher, add, and edit tests before Inspector lint, typecheck, production build, package-wide tests, and workspace formatting.
+- [x] Supersede historical saved-open toast, request-lock, pending-control, prepared-target, and navigation-error checks with the route-owned loading coverage above.
 
 [24/08/26]
 

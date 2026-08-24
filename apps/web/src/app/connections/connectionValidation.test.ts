@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  ConnectionNavigationError,
-  NoStoredSchemasError,
-  normalizeConnectionOpenError,
-  normalizeSchemaFetchError,
-  validateConnectionInput,
-} from './connectionValidation'
+import { normalizeSchemaFetchError, validateConnectionInput } from './connectionValidation'
 
 const validInput = {
   serverUrl: 'https://self-hosted.example.com',
@@ -135,13 +129,6 @@ describe('normalizeSchemaFetchError', () => {
     })
   })
 
-  it('normalizes a saved connection without stored schemas', () => {
-    expect(normalizeSchemaFetchError(new NoStoredSchemasError())).toEqual({
-      title: 'No stored schemas found',
-      description: 'This app has no published schema.',
-    })
-  })
-
   it('normalizes URL construction failures separately from network failures', () => {
     expect(normalizeSchemaFetchError(new TypeError('Invalid URL'))).toEqual({
       title: 'Invalid server URL',
@@ -167,15 +154,6 @@ describe('normalizeSchemaFetchError', () => {
     expect(normalizeSchemaFetchError({ adminSecret: 'must-not-leak' })).toEqual({
       title: "Couldn't validate this connection",
       description: 'Check the server URL, app ID, and admin secret.',
-    })
-  })
-})
-
-describe('normalizeConnectionOpenError', () => {
-  it('distinguishes navigation failures from connection validation failures', () => {
-    expect(normalizeConnectionOpenError(new ConnectionNavigationError())).toEqual({
-      title: "Couldn't open this connection",
-      description: 'Try again.',
     })
   })
 })

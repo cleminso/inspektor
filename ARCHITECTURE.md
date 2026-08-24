@@ -6,6 +6,7 @@
 - [Workspace map](#workspace-map)
 - [Ownership boundaries](#ownership-boundaries)
 - [Browser-to-feature execution flow](#browser-to-feature-execution-flow)
+- [Connection lifecycle](#connection-lifecycle)
 - [Design-system package contract](#design-system-package-contract)
 - [How workspace applications resolve the design system](#how-workspace-applications-resolve-the-design-system)
 - [Vite configuration](#vite-configuration)
@@ -78,13 +79,38 @@ The normal Inspector path is:
 
 1. The browser loads the HTML entry produced by Vite for `apps/web`.
 2. The entry module mounts React and creates the TanStack Router.
-3. The root route mounts `InspectorSessionProvider`. It can read local connection and route state without creating a Jazz client.
-4. TanStack Router loads route modules according to the current URL. It can preload a route when user intent suggests navigation.
-5. The connection route resolves its saved branch and schema-hash preferences, then mounts `InspectorProvider`.
-6. `InspectorProvider` creates the Inspector runtime and provides the Jazz client to its descendants.
-7. Product feature routes compose `@inspector/ds` components with product data and callbacks.
+3. The root route mounts `InspectorSessionProvider`. It accepts connection **intent**, enforces runtime-scope exit policy, and reads persisted selection without creating a Jazz client.
+4. TanStack Router loads route modules according to the current URL. The connection route **resolves** a connection ID into a concrete branch, schema hash, and ordered schema catalogue
+5. `InspectorRuntimeBoundary` synchronizes that resolved target into session state and withholds **runtime**-dependent children until both identities agree.
+6. `InspectorProvider` starts runtime metadata and Jazz client initialization. Its children mount with nullable runtime projections; verified client publication remains gated by stored schema verification.
+7. Product feature routes render their loading, error, and connected states by composing those projections with `@inspector/ds` components.
 
-This separation is intentional. Connection setup and onboarding do not need a Jazz runtime. Table and query-subscription descendants do need one shared runtime, so it is mounted at their common route boundary.
+This separation is intentional. Connection setup and onboarding do not need a Jazz runtime. Connection-scoped routes share one runtime boundary.
+
+## Connection lifecycle
+
+Connected entry follows four stages with one primary owner per stage:
+
+| Stage        | Primary owner                                                              | Input and output                                                                        |
+| ------------ | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Intent       | `InspectorSessionProvider`                                                 | Accept UI intent, enforce exit blocking, dispatch navigation, and delegate persistence  |
+| Resolution   | `/conn/$connectionId` and `inspectorNavigation.ts`                         | Resolve a connection ID into a branch, schema hash, and ordered schema catalogue        |
+| Runtime      | `InspectorRuntimeBoundary`, `InspectorProvider`, and `useInspectorRuntime` | Synchronize the resolved target, load stored metadata, and publish a usable Jazz client |
+| Presentation | Connection-scoped feature routes                                           | Turn session identity and runtime projections into connected feature UI                 |
+
+The boundaries matter because each stage has a different failure contract:
+
+- Session may reject intent while pending mutations make a runtime-scope exit unsafe. It requests connection navigation but does not perform connection-entry discovery.
+- The connection route is the authoritative bootstrap path for saved clicks, direct URLs, and refreshes. It owns connection-entry schema-catalogue discovery and resolution pending or error UI, but does not create a Jazz client.
+- Runtime accepts only a complete resolved target. It owns stored schema verification, permissions, Jazz client lifecycle, runtime errors, and retry.
+- Workspace code consumes session and runtime projections. It owns connected-content selection, row queries, tabs, and mutation presentation, but not connection bootstrap.
+
+Two flows intentionally cross these boundaries:
+
+- Add and edit forms validate credentials and discover schemas to provide inline form feedback. They persist the profile and navigate to the same connection route, whose loader remains authoritative for connected entry.
+- Branch and schema switches update the active connection's persisted runtime selection without re-entering the connection loader. Branch switching reuses the runtime catalogue when available and may otherwise discover schemas through the shared resolver. The runtime is replaced for the resulting selection, while the route continues to own initial connection entry.
+
+Workspace mutation state publishes an exit blocker upward. Session enforces that blocker for connection, branch, schema, and router-history exits. `InspectorRuntimeBoundary` is a final invariant: route-owned children stay unmounted until the resolved route target and persisted session target match.
 
 ## Design-system package contract
 
@@ -188,7 +214,9 @@ Dynamic imports are not always beneficial. Do not defer a dependency that is req
 
 `InspectorSessionProvider` is mounted at the root route and handles session state, route parameters, connection selection, and navigation. It does not import the Jazz React runtime.
 
-`InspectorProvider` is mounted by `/conn/:connectionId` after the route validates the saved branch and schema-hash preferences for that connection. It imports `JazzClientProvider`, creates the runtime through `useInspectorRuntime`, and makes it available to child routes. This keeps Jazz work out of onboarding and connection-management paths while preserving one runtime for table and query descendants.
+`InspectorRuntimeBoundary` receives the connection route's resolved target and synchronizes it with persisted session selection. It withholds connection-scoped children while those identities differ, preventing a route from mounting against another connection's runtime.
+
+`InspectorProvider` mounts below that handoff. It creates runtime projections through `useInspectorRuntime`, configures `JazzProvider`, and publishes the Jazz client only after stored schema verification succeeds. Workspace children mount with nullable projections so they can present runtime loading and error states. This keeps active-runtime work out of onboarding and connection-management paths while preserving one boundary for connection-scoped descendants.
 
 ### Code editor
 
@@ -249,7 +277,7 @@ Use validation that matches the boundary changed:
 
 | Change                                  | Evidence to collect                                                                                      |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| DS component or export                  | DS tests, typecheck, lint, TSDown build, and documentation prop generation when applicable                                 |
+| DS component or export                  | DS tests, typecheck, lint, TSDown build, and documentation prop generation when applicable               |
 | Vite resolution or StyleX configuration | Both application builds and source-consumption behavior                                                  |
 | Deferred dependency                     | Static-import regression test, fallback behavior test, focus/state test, and production chunk inspection |
 | Route boundary                          | Route behavior test and product build output inspection                                                  |

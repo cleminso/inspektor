@@ -17,18 +17,6 @@ export const EMPTY_SCHEMA_ERROR: ConnectionError = {
   description: 'This app has no published schema.',
 }
 
-export class NoStoredSchemasError extends Error {
-  override name = 'NoStoredSchemasError'
-}
-
-export class ConnectionNavigationError extends Error {
-  override name = 'ConnectionNavigationError'
-
-  constructor() {
-    super('Connection navigation failed')
-  }
-}
-
 const INVALID_SERVER_URL_ERROR: ConnectionError = {
   title: 'Invalid server URL',
   description: 'Enter a valid HTTP or HTTPS URL.',
@@ -94,10 +82,6 @@ export function validateConnectionInput(input: ConnectionCredentials): Connectio
 }
 
 export function normalizeSchemaFetchError(error: unknown): ConnectionError {
-  if (error instanceof NoStoredSchemasError) {
-    return EMPTY_SCHEMA_ERROR
-  }
-
   const status = getErrorStatus(error)
 
   if (status === 401 || status === 403) {
@@ -125,31 +109,10 @@ export function normalizeSchemaFetchError(error: unknown): ConnectionError {
     return INVALID_SERVER_URL_ERROR
   }
 
-  if (
-    error instanceof TypeError ||
-    (error instanceof Error && error.message.toLowerCase().includes('failed to fetch'))
-  ) {
-    return {
-      title: "Couldn't validate this connection",
-      description: 'Check the server URL, app ID, and admin secret.',
-    }
-  }
-
   return {
     title: "Couldn't validate this connection",
     description: 'Check the server URL, app ID, and admin secret.',
   }
-}
-
-export function normalizeConnectionOpenError(error: unknown): ConnectionError {
-  if (error instanceof ConnectionNavigationError) {
-    return {
-      title: "Couldn't open this connection",
-      description: 'Try again.',
-    }
-  }
-
-  return normalizeSchemaFetchError(error)
 }
 
 function invalidServerUrl(): ConnectionValidationResult {

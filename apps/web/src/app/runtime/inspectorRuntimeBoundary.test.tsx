@@ -11,7 +11,7 @@ const session = vi.hoisted(() => ({
 }))
 
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
-  useInspectorSessionContext: () => session,
+  useInspectorSessionContext: () => ({ ...session }),
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -25,9 +25,9 @@ vi.mock('@app/providers/inspectorProvider', () => ({
 }))
 
 const target = {
-  availableSchemaHashes: ['schema-1'],
   branch: 'main',
   connectionId: 'connection-1',
+  schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
   schemaHash: 'schema-1',
 }
 
@@ -76,5 +76,22 @@ describe('InspectorRuntimeBoundary', () => {
 
     expect(session.setConnectionContext).not.toHaveBeenCalled()
     expect(screen.getByText('Runtime content')).toBeTruthy()
+  })
+
+  it('does not mount the runtime when context synchronization is rejected', () => {
+    const { rerender } = render(
+      <InspectorRuntimeBoundary target={target}>
+        <div>Runtime content</div>
+      </InspectorRuntimeBoundary>,
+    )
+
+    rerender(
+      <InspectorRuntimeBoundary target={target}>
+        <div>Runtime content</div>
+      </InspectorRuntimeBoundary>,
+    )
+
+    expect(session.setConnectionContext).toHaveBeenCalledOnce()
+    expect(screen.queryByText('Runtime content')).toBeNull()
   })
 })

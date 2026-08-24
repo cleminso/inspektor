@@ -1,9 +1,9 @@
 /**
  * Resolves partial Inspector navigation into concrete Jazz runtime targets.
  *
- * Entry routes may only know the connection. These helpers combine stored Inspector
- * preferences with Jazz schema-hash metadata so table and query-subscriptions routes can bootstrap
- * the same runtime context after direct navigation, refresh, or redirect.
+ * Entry routes may only know the connection. These helpers combine stored Inspector preferences
+ * with Jazz schema-hash metadata so every connection-scoped route can bootstrap the same runtime
+ * after a saved click, direct navigation, or refresh.
  */
 import { redirect } from '@tanstack/react-router'
 
@@ -19,12 +19,22 @@ import {
 
 import { appRoutes } from './appRoutes'
 
-/** Internal values that identify one inspectable Jazz runtime context. */
+/** Resolved connection-entry or branch-selection result, including its available schema catalogue. */
 export interface ResolvedTablesNavigationTarget {
   connectionId: string
   branch: string
   schemaHash: string
-  availableSchemaHashes: readonly string[]
+  schemaCatalogue: readonly SchemaCatalogueRecord[]
+}
+
+export interface SchemaCatalogueRecord {
+  hash: string
+  publishedAt: number | null
+}
+
+interface SchemaCatalogueResponse {
+  hashes: readonly string[]
+  schemas: readonly SchemaCatalogueRecord[]
 }
 
 interface ResolveTablesNavigationTargetOptions {
@@ -35,11 +45,10 @@ interface ResolveTablesNavigationTargetOptions {
   resolveBranch: (connectionId: string, branchOverride?: string | null) => string
   resolveSchemaHash: (
     connectionId: string,
-    availableSchemaHashes: readonly string[],
+    schemaCatalogue: readonly SchemaCatalogueRecord[],
     schemaHashOverride?: string | null,
   ) => string | null
   knownSchemaHashes?: readonly string[]
-  schemaFetchError?: 'ignore' | 'throw'
 }
 
 interface ResolveStoredTablesNavigationTargetOptions {
@@ -49,85 +58,51 @@ interface ResolveStoredTablesNavigationTargetOptions {
   store?: StoredConnectionsStore
 }
 
-interface PreparedTablesNavigationTarget {
-  connection: StoredConnection
-  target: ResolvedTablesNavigationTarget
-}
-
-const preparedTablesNavigationTargets = new Map<string, PreparedTablesNavigationTarget>()
-
-function hasSameRuntimeProfile(left: StoredConnection, right: StoredConnection): boolean {
-  return (
-    left.id === right.id &&
-    left.serverUrl === right.serverUrl &&
-    left.appId === right.appId &&
-    left.adminSecret === right.adminSecret &&
-    left.env === right.env
-  )
-}
-
-export function prepareStoredTablesNavigationTarget(
-  connection: StoredConnection,
-  target: ResolvedTablesNavigationTarget,
-): () => void {
-  const preparedTarget = { connection, target }
-  preparedTablesNavigationTargets.set(connection.id, preparedTarget)
-
-  return () => {
-    if (preparedTablesNavigationTargets.get(connection.id) === preparedTarget) {
-      preparedTablesNavigationTargets.delete(connection.id)
+function orderSchemaCatalogue(records: readonly SchemaCatalogueRecord[]): SchemaCatalogueRecord[] {
+  return [...records].sort((left, right) => {
+    if (left.publishedAt === null) {
+      if (right.publishedAt !== null) {
+        return 1
+      }
+    } else if (right.publishedAt === null) {
+      return -1
+    } else if (left.publishedAt !== right.publishedAt) {
+      return right.publishedAt - left.publishedAt
     }
-  }
+
+    return left.hash < right.hash ? -1 : left.hash > right.hash ? 1 : 0
+  })
 }
 
-function consumePreparedTablesNavigationTarget(
-  connection: StoredConnection,
-  store: StoredConnectionsStore,
-  branchOverride?: string | null,
-  schemaHashOverride?: string | null,
-): ResolvedTablesNavigationTarget | null {
-  const preparedTarget = preparedTablesNavigationTargets.get(connection.id)
-  if (preparedTarget === undefined) {
-    return null
-  }
-  preparedTablesNavigationTargets.delete(connection.id)
-
-  if (hasSameRuntimeProfile(preparedTarget.connection, connection) === false) {
-    return null
-  }
-
-  const expectedBranch = resolveDefaultBranch(store, connection.id, branchOverride)
-  const expectedSchemaHash = resolveDefaultSchemaHash(
-    store,
-    connection.id,
-    preparedTarget.target.availableSchemaHashes,
-    schemaHashOverride,
+/** Preserves every advertised hash, enriches known publication metadata, and orders the result. */
+export function createSchemaCatalogue({
+  hashes,
+  schemas,
+}: SchemaCatalogueResponse): SchemaCatalogueRecord[] {
+  const publishedAtByHash = new Map(schemas.map(({ hash, publishedAt }) => [hash, publishedAt]))
+  return orderSchemaCatalogue(
+    hashes.map((hash) => ({ hash, publishedAt: publishedAtByHash.get(hash) ?? null })),
   )
-  return preparedTarget.target.branch === expectedBranch &&
-    preparedTarget.target.schemaHash === expectedSchemaHash
-    ? preparedTarget.target
-    : null
 }
 
-async function fetchConnectionSchemaHashes(
+async function fetchConnectionSchemaCatalogue(
   connection: StoredConnection,
-): Promise<readonly string[]> {
+): Promise<readonly SchemaCatalogueRecord[]> {
   const { fetchSchemaHashes } = await import('jazz-tools')
-  return (
-    await fetchSchemaHashes(connection.serverUrl, {
-      appId: connection.appId,
-      adminSecret: connection.adminSecret,
-    })
-  ).hashes
+  const response = await fetchSchemaHashes(connection.serverUrl, {
+    appId: connection.appId,
+    adminSecret: connection.adminSecret,
+  })
+  return createSchemaCatalogue(response)
 }
 
 /**
- * Resolves a connection into branch and schema-hash route params without requiring a mounted Jazz
+ * Resolves a connection into a complete runtime selection without requiring a mounted Jazz
  * provider.
  *
- * The Jazz metadata import stays inside this user-triggered navigation path so onboarding does not
- * make it part of the application-root graph. `knownSchemaHashes` prevents refetching when the
- * mounted runtime already has the hash list.
+ * Session uses this path for branch switching inside a mounted connection. The Jazz metadata import
+ * stays outside the application-root graph, while `knownSchemaHashes` lets the mounted runtime avoid
+ * repeating schema discovery.
  */
 export async function resolveTablesNavigationTarget({
   connectionId,
@@ -137,7 +112,6 @@ export async function resolveTablesNavigationTarget({
   resolveBranch,
   resolveSchemaHash,
   knownSchemaHashes,
-  schemaFetchError = 'ignore',
 }: ResolveTablesNavigationTargetOptions): Promise<ResolvedTablesNavigationTarget | null> {
   const connection = getConnection(connectionId)
   if (connection === null) {
@@ -145,21 +119,18 @@ export async function resolveTablesNavigationTarget({
   }
 
   const branch = resolveBranch(connectionId, branchOverride)
-  let availableSchemaHashes: readonly string[]
+  let schemaCatalogue: readonly SchemaCatalogueRecord[]
   if (knownSchemaHashes !== undefined && knownSchemaHashes.length > 0) {
-    availableSchemaHashes = knownSchemaHashes
+    schemaCatalogue = knownSchemaHashes.map((hash) => ({ hash, publishedAt: null }))
   } else {
     try {
-      availableSchemaHashes = await fetchConnectionSchemaHashes(connection)
-    } catch (error) {
-      if (schemaFetchError === 'throw') {
-        throw error
-      }
-      availableSchemaHashes = []
+      schemaCatalogue = await fetchConnectionSchemaCatalogue(connection)
+    } catch {
+      schemaCatalogue = []
     }
   }
 
-  const schemaHash = resolveSchemaHash(connectionId, availableSchemaHashes, schemaHashOverride)
+  const schemaHash = resolveSchemaHash(connectionId, schemaCatalogue, schemaHashOverride)
   if (schemaHash === null) {
     return null
   }
@@ -168,11 +139,17 @@ export async function resolveTablesNavigationTarget({
     connectionId,
     branch,
     schemaHash,
-    availableSchemaHashes,
+    schemaCatalogue,
   }
 }
 
-/** Uses persisted Inspector connections when loaders need a complete runtime route. */
+/**
+ * Resolves the authoritative connection-entry target from persisted Inspector state.
+ *
+ * The parent connection loader uses this path for saved clicks, direct URLs, and refreshes. A
+ * remembered schema remains usable when discovery fails; without one, the loader preserves the
+ * discovery error for route-owned error presentation.
+ */
 export async function resolveStoredTablesNavigationTarget({
   connectionId,
   branchOverride,
@@ -187,19 +164,9 @@ export async function resolveStoredTablesNavigationTarget({
   const branch = resolveDefaultBranch(resolvedStore, connectionId, branchOverride)
   const preferredSchemaHash =
     schemaHashOverride ?? getConnectionPreferences(resolvedStore, connectionId).lastSchemaHash
-  const preparedTarget = consumePreparedTablesNavigationTarget(
-    connection,
-    resolvedStore,
-    branchOverride,
-    schemaHashOverride,
-  )
-  if (preparedTarget !== null) {
-    return preparedTarget
-  }
-
-  let availableSchemaHashes: readonly string[]
+  let schemaCatalogue: readonly SchemaCatalogueRecord[]
   try {
-    availableSchemaHashes = await fetchConnectionSchemaHashes(connection)
+    schemaCatalogue = await fetchConnectionSchemaCatalogue(connection)
   } catch (error) {
     if (preferredSchemaHash === null) {
       throw error
@@ -209,17 +176,17 @@ export async function resolveStoredTablesNavigationTarget({
       connectionId,
       branch,
       schemaHash: preferredSchemaHash,
-      availableSchemaHashes: [],
+      schemaCatalogue: [],
     }
   }
 
   const schemaHash = resolveDefaultSchemaHash(
     resolvedStore,
     connectionId,
-    availableSchemaHashes,
+    schemaCatalogue,
     schemaHashOverride,
   )
-  return schemaHash === null ? null : { connectionId, branch, schemaHash, availableSchemaHashes }
+  return schemaHash === null ? null : { connectionId, branch, schemaHash, schemaCatalogue }
 }
 
 /** Sends users back to connection setup when a Jazz runtime target is unavailable. */

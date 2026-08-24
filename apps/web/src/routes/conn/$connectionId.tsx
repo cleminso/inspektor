@@ -6,6 +6,15 @@ import {
 } from '@app/routing/inspectorNavigation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 
+import { ConnectionRouteError, ConnectionRoutePending } from './-connectionRouteStatus'
+
+/**
+ * Authoritative connection-entry boundary shared by every connection-scoped child route.
+ *
+ * The loader resolves the route-selected saved connection into a complete runtime target. Pending
+ * and terminal resolution states stay route-owned; Jazz client creation starts only below
+ * `InspectorRuntimeBoundary`.
+ */
 export const Route = createFileRoute('/conn/$connectionId')({
   gcTime: 0,
   shouldReload: false,
@@ -19,6 +28,8 @@ export const Route = createFileRoute('/conn/$connectionId')({
 
     return target
   },
+  pendingComponent: ConnectionRoutePending,
+  errorComponent: ConnectionRouteError,
   component: InspectorRuntimeRoute,
 })
 

@@ -113,6 +113,7 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 ## Editing and validation
 
 - Preserve existing file formatting and exclude unrelated formatting churn from behavioral changes.
+- Substantial refactors require a fresh whole-diff simplification pass across staged and unstaged changes. Search for newly single-use helpers, obsolete compatibility paths, dead mocks, redundant effects, and comments that only narrate visible code. Preserve local comments that encode ownership boundaries, invariants, failure contracts, or architectural reasoning, even when broader documentation covers the same system. Continue until a fresh pass finds no meaningful reduction; skip this gate for small isolated changes.
 - After editing, run `pnpm -r --if-present format`, affected-package lint, and affected-package typecheck before considering the work complete.
 - After a multi-hunk or replacement patch, inspect the resulting file or semantic diff before running tests.
 - Validate in order: focused test, changed-file lint, browser behavior when applicable, affected-package typecheck and build, then one package-wide test pass.

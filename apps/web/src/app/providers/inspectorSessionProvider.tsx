@@ -1,17 +1,9 @@
 import { createContext, useCallback, useContext, useMemo, type PropsWithChildren } from 'react'
-import { useNavigate, useParams } from '@tanstack/react-router'
+import { useBlocker, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 
 import { getConnectionDisplayName, type StoredConnection } from '@app/connections/connections'
-import {
-  ConnectionNavigationError,
-  NoStoredSchemasError,
-} from '@app/connections/connectionValidation'
-import { useConnectionOpenCoordinator } from '@app/connections/useConnectionOpenCoordinator'
 import { appRoutes } from '@app/routing/appRoutes'
-import {
-  prepareStoredTablesNavigationTarget,
-  resolveTablesNavigationTarget,
-} from '@app/routing/inspectorNavigation'
+import { resolveTablesNavigationTarget } from '@app/routing/inspectorNavigation'
 import { useInspectorSession } from '@app/session/useInspectorSession'
 import {
   RuntimeScopeExitGuardProvider,
@@ -19,10 +11,12 @@ import {
 } from '@app/providers/runtimeScopeExitGuard'
 
 /**
- * Connection and route state that is safe to use before a Jazz client exists.
+ * Accepted connection intent and persisted runtime selection that are safe to use before a Jazz
+ * client exists.
  *
- * Root-level screens use this context for onboarding and navigation. Connection-scoped consumers
- * use the session and runtime projections exposed by `InspectorProvider`.
+ * UI components originate intent. This boundary decides whether a runtime-scope change is safe,
+ * requests connection navigation, and persists branch or schema selection. Connection-entry
+ * discovery belongs to the route loader; active connectivity belongs to `InspectorProvider`.
  */
 export interface InspectorSessionContextValue {
   connections: StoredConnection[]
@@ -31,12 +25,16 @@ export interface InspectorSessionContextValue {
   currentBranch: string | null
   currentSchemaHash: string | null
   currentTableName: string | null
+  pendingConnectionId: string | null
   runtimeScopeExitBlocked: boolean
   connectionLabel: string | null
   rememberedBranches: string[]
-  openConnection: (connectionId: string, knownSchemaHashes?: readonly string[]) => Promise<void>
+  /** Requests the canonical connection route without resolving or persisting its runtime target. */
+  openConnection: (connectionId: string) => ConnectionOpenResult
+  /** Resolves and persists a branch selection for the mounted connection without route entry. */
   switchBranch: (branch: string, knownSchemaHashes?: readonly string[]) => Promise<void>
-  switchSchema: (schemaHash: string) => Promise<void>
+  /** Persists a caller-selected schema without repeating discovery. */
+  switchSchema: (schemaHash: string) => void
   saveConnection: ReturnType<typeof useInspectorSession>['saveConnection']
   deleteConnection: ReturnType<typeof useInspectorSession>['deleteConnection']
   getConnectionPreferences: ReturnType<typeof useInspectorSession>['getConnectionPreferences']
@@ -44,12 +42,16 @@ export interface InspectorSessionContextValue {
   prefill: ReturnType<typeof useInspectorSession>['prefill']
 }
 
+type ConnectionOpenResult = 'accepted' | 'blocked'
+
 const InspectorSessionContext = createContext<InspectorSessionContextValue | null>(null)
 
 /**
- * Provides persisted connection state and route-derived navigation without importing Jazz runtime
- * code. It stays at the root route so connection setup can render independently of a complete
- * connection, branch, and schema-hash identity.
+ * Owns accepted connection intent, persisted selection, and runtime-scope exit policy.
+ *
+ * It stays above every route so onboarding can run without Jazz and so TanStack Router history
+ * navigation cannot bypass workspace-owned mutation blockers. Remote connection-entry resolution
+ * remains in the connection route loader.
  */
 export function InspectorSessionProvider({ children }: PropsWithChildren): React.ReactElement {
   return (
@@ -59,11 +61,24 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
   )
 }
 
+/** Projects route identity and pending matches into persisted, router-blocked session commands. */
 function InspectorSessionProviderValue({ children }: PropsWithChildren): React.ReactElement {
   const session = useInspectorSession()
   const runtimeScopeExitGuard = useRuntimeScopeExitGuard()
   const navigate = useNavigate()
   const routeParams = useParams({ strict: false })
+  const pendingConnectionId = useRouterState({
+    select: (state) => {
+      const match = state.matches.find(
+        (candidate) =>
+          candidate.routeId === '/conn/$connectionId' &&
+          (candidate.status === 'pending' || candidate.isFetching === 'loader'),
+      )
+      return match !== undefined && 'connectionId' in match.params
+        ? match.params.connectionId
+        : null
+    },
+  })
 
   const routeConnectionId = routeParams.connectionId ?? null
   const currentConnectionId = routeConnectionId ?? session.activeConnectionId
@@ -75,51 +90,31 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   const currentBranch = connectionPreferences?.lastBranch ?? null
   const currentSchemaHash = connectionPreferences?.lastSchemaHash ?? null
 
-  const performConnectionOpen = useCallback(
-    async (connectionId: string, knownSchemaHashes?: readonly string[]) => {
-      const nextTarget = await resolveTablesNavigationTarget({
-        connectionId,
-        getConnection: (nextConnectionId) => session.getConnection(nextConnectionId),
-        resolveBranch: (nextConnectionId, branchOverride) =>
-          session.resolveBranch(nextConnectionId, branchOverride),
-        resolveSchemaHash: (nextConnectionId, availableSchemaHashes, schemaHashOverride) =>
-          session.resolveSchemaHash(nextConnectionId, availableSchemaHashes, schemaHashOverride),
-        knownSchemaHashes,
-        schemaFetchError: 'throw',
-      })
-      if (nextTarget === null) {
-        throw new NoStoredSchemasError()
-      }
-      const connection = session.getConnection(connectionId)
-      if (connection === null) {
-        throw new NoStoredSchemasError()
-      }
-
-      session.setConnectionContext(connectionId, nextTarget.branch, nextTarget.schemaHash)
-      const clearPreparedTarget = prepareStoredTablesNavigationTarget(connection, nextTarget)
-
-      try {
-        await navigate({
-          to: appRoutes.tables,
-          params: { connectionId },
-        })
-      } catch {
-        throw new ConnectionNavigationError()
-      } finally {
-        clearPreparedTarget()
-      }
+  useBlocker({
+    enableBeforeUnload: false,
+    shouldBlockFn: ({ next }) => {
+      const nextConnectionId = 'connectionId' in next.params ? next.params.connectionId : null
+      return (
+        runtimeScopeExitGuard.isBlocked() === true &&
+        (nextConnectionId !== currentConnectionId ||
+          next.fullPath.startsWith(appRoutes.tables) === false)
+      )
     },
-    [navigate, session],
-  )
-  const openCoordinatedConnection = useConnectionOpenCoordinator(performConnectionOpen)
+  })
+
   const openConnection = useCallback(
-    (connectionId: string, knownSchemaHashes?: readonly string[]) => {
+    (connectionId: string): ConnectionOpenResult => {
       if (connectionId !== currentConnectionId && runtimeScopeExitGuard.isBlocked() === true) {
-        return Promise.resolve()
+        return 'blocked'
       }
-      return openCoordinatedConnection(connectionId, knownSchemaHashes)
+
+      void navigate({
+        to: appRoutes.tables,
+        params: { connectionId },
+      })
+      return 'accepted'
     },
-    [currentConnectionId, openCoordinatedConnection, runtimeScopeExitGuard],
+    [currentConnectionId, navigate, runtimeScopeExitGuard],
   )
 
   const switchBranch = useCallback(
@@ -136,11 +131,9 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         connectionId: activeConnection.id,
         branchOverride: branch,
         schemaHashOverride: currentSchemaHash,
-        getConnection: (nextConnectionId) => session.getConnection(nextConnectionId),
-        resolveBranch: (nextConnectionId, branchOverride) =>
-          session.resolveBranch(nextConnectionId, branchOverride),
-        resolveSchemaHash: (nextConnectionId, availableSchemaHashes, schemaHashOverride) =>
-          session.resolveSchemaHash(nextConnectionId, availableSchemaHashes, schemaHashOverride),
+        getConnection: session.getConnection,
+        resolveBranch: session.resolveBranch,
+        resolveSchemaHash: session.resolveSchemaHash,
         knownSchemaHashes,
       })
       if (nextTarget === null) {
@@ -153,7 +146,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   )
 
   const switchSchema = useCallback(
-    async (schemaHash: string) => {
+    (schemaHash: string) => {
       if (
         activeConnection === null ||
         currentBranch === null ||
@@ -189,6 +182,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentBranch,
       currentSchemaHash,
       currentTableName,
+      pendingConnectionId,
       runtimeScopeExitBlocked: runtimeScopeExitGuard.isBlocked(),
       connectionLabel:
         activeConnection !== null ? getConnectionDisplayName(activeConnection) : null,
@@ -210,6 +204,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentSchemaHash,
       currentTableName,
       openConnection,
+      pendingConnectionId,
       runtimeScopeExitGuard,
       session,
       setConnectionContext,

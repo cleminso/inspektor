@@ -1,5 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { toasts } from '@inspector/ds'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { StoredConnection } from '@app/connections/connections'
@@ -9,10 +8,11 @@ import { ConnectionSwitcher } from './connectionSwitcher'
 const { deleteConnection, navigate, openConnection } = vi.hoisted(() => ({
   deleteConnection: vi.fn(),
   navigate: vi.fn(),
-  openConnection: vi.fn<() => Promise<void>>(),
+  openConnection: vi.fn<() => 'accepted' | 'blocked'>(),
 }))
 let connections: StoredConnection[] = []
 let currentConnectionId: string | null = null
+let pendingConnectionId: string | null = null
 let runtimeScopeExitBlocked = false
 
 vi.mock('@tanstack/react-router', () => ({
@@ -42,6 +42,7 @@ vi.mock('@app/providers/inspectorSessionProvider', () => ({
     currentConnectionId,
     deleteConnection,
     openConnection,
+    pendingConnectionId,
     runtimeScopeExitBlocked,
   }),
 }))
@@ -71,6 +72,7 @@ afterEach(() => {
   cleanup()
   connections = []
   currentConnectionId = null
+  pendingConnectionId = null
   runtimeScopeExitBlocked = false
   openConnection.mockReset()
   deleteConnection.mockReset()
@@ -180,27 +182,21 @@ describe('ConnectionSwitcher', () => {
     expect(screen.getByText('No matching connections.')).toBeTruthy()
   })
 
-  it('keeps the popup closed and shows a normalized toast when opening fails', async () => {
+  it('keeps the popup open when connection intent is blocked', () => {
     connections = [createConnection('one', 'First')]
-    openConnection.mockRejectedValueOnce(new TypeError('Failed to fetch'))
-    const toastError = vi.spyOn(toasts, 'error')
+    openConnection.mockReturnValueOnce('blocked')
 
     render(<ConnectionSwitcher />)
     openSwitcher()
     fireEvent.click(getConnectionOption('First'))
 
-    await waitFor(() =>
-      expect(toastError).toHaveBeenCalledWith("Couldn't validate this connection", {
-        description: 'Check the server URL, app ID, and admin secret.',
-      }),
-    )
     expect(openConnection).toHaveBeenCalledWith('one')
-    expect(screen.queryByRole('option', { name: /First/ })).toBeNull()
+    expect(screen.getByRole('option', { name: /First/ })).toBeTruthy()
   })
 
   it('closes the popup immediately when a saved connection is selected', () => {
     connections = [createConnection('one', 'First')]
-    openConnection.mockReturnValueOnce(new Promise(() => undefined))
+    openConnection.mockReturnValueOnce('accepted')
 
     render(<ConnectionSwitcher />)
     openSwitcher()
@@ -210,22 +206,15 @@ describe('ConnectionSwitcher', () => {
     expect(openConnection).toHaveBeenCalledWith('one')
   })
 
-  it('does not render pending feedback for an unresolved connection open', () => {
+  it('shows router-derived pending feedback in the trigger', () => {
     connections = [createConnection('one', 'First'), createConnection('two', 'Second')]
-    openConnection.mockReturnValueOnce(new Promise(() => undefined))
+    pendingConnectionId = 'one'
 
     render(<ConnectionSwitcher />)
-    openSwitcher()
-    fireEvent.click(getConnectionOption('First'))
-    openSwitcher()
 
-    expect(getConnectionOption('First').getAttribute('aria-disabled')).not.toBe('true')
-    expect(getConnectionOption('Second').getAttribute('aria-disabled')).not.toBe('true')
-    expect(
-      screen
-        .queryAllByRole('status')
-        .some((status) => status.textContent?.includes('Opening connection')),
-    ).toBe(false)
+    expect(screen.getByRole('combobox', { name: 'Switch connection' }).textContent).toBe(
+      'Opening First…',
+    )
   })
 
   it('blocks connection-management navigation while pending table state exists', () => {

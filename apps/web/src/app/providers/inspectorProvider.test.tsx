@@ -20,15 +20,13 @@ const jazzReactMocks = vi.hoisted(() => ({
 }))
 
 const runtime = {
-  $availableSchemaHashes: atom<string[]>([]),
   $client: atom(null),
   $error: atom<string | null>(null),
-  $isSchemaHashesLoading: atom(false),
   $isWasmSchemaLoading: atom(false),
+  $schemaCatalogue: atom<Array<{ hash: string; publishedAt: number | null }>>([]),
   $storedPermissions: atom<unknown>(null),
   $wasmSchema: atom<Record<string, { columns: [] }> | null>({ accounts: { columns: [] } }),
   clearClient: vi.fn(),
-  clearRuntime: vi.fn(),
   publishClient: vi.fn(),
   publishClientError: vi.fn(),
 }
@@ -103,7 +101,7 @@ vi.mock('jazz-tools/react', async () => {
 afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
-  runtime.$availableSchemaHashes.set([])
+  runtime.$schemaCatalogue.set([])
   runtime.$storedPermissions.set(null)
   runtime.$error.set(null)
   runtime.$wasmSchema.set({ accounts: { columns: [] } })
@@ -119,12 +117,36 @@ afterEach(() => {
   session.currentConnectionId = 'connection-1'
   session.currentBranch = 'main'
   session.currentSchemaHash = 'schema-1'
-  session.switchSchema.mockClear()
   runtimeHolder.current = runtime
   runtimeOptionsHolder.current = null
 })
 
 describe('InspectorProvider runtime projections', () => {
+  it('retains the connection catalogue after the selected schema changes', () => {
+    session.currentSchemaHash = 'schema-2'
+    const schemaCatalogue = [
+      { hash: 'schema-2', publishedAt: 2 },
+      { hash: 'schema-1', publishedAt: 1 },
+    ]
+
+    render(
+      <InspectorProvider
+        initialRuntimeTarget={{
+          connectionId: 'connection-1',
+          branch: 'main',
+          schemaHash: 'schema-1',
+          schemaCatalogue,
+        }}
+      >
+        Workspace
+      </InspectorProvider>,
+    )
+
+    expect(runtimeOptionsHolder.current).toEqual(
+      expect.objectContaining({ initialSchemaCatalogue: schemaCatalogue }),
+    )
+  })
+
   it('retries a runtime failure that appears after the document resumes', async () => {
     const visibilityState = vi.spyOn(document, 'visibilityState', 'get')
     visibilityState.mockReturnValue('hidden')
@@ -140,16 +162,6 @@ describe('InspectorProvider runtime projections', () => {
     await waitFor(() =>
       expect(runtimeOptionsHolder.current).toEqual(expect.objectContaining({ retryGeneration: 1 })),
     )
-  })
-
-  it('falls back when runtime discovery rejects the selected schema', async () => {
-    render(<InspectorProvider>Workspace</InspectorProvider>)
-
-    act(() => {
-      runtime.$availableSchemaHashes.set(['schema-2'])
-    })
-
-    await waitFor(() => expect(session.switchSchema).toHaveBeenCalledWith('schema-2'))
   })
 
   it('recovers the same client configuration through the runtime retry action', async () => {

@@ -1,10 +1,9 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { toasts } from '@inspector/ds'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ConnectionList } from './connectionList'
 
-const openConnection = vi.fn<() => Promise<void>>()
+const openConnection = vi.fn<() => 'accepted' | 'blocked'>()
 
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
@@ -49,23 +48,15 @@ describe('ConnectionList', () => {
     expect(connection.textContent).not.toContain('example.com')
   })
 
-  it('reports a saved connection failure without an unhandled rejection', async () => {
-    openConnection.mockRejectedValueOnce(new TypeError('Failed to fetch'))
-    const toastError = vi.spyOn(toasts, 'error')
+  it('sends saved connection intent to the route', () => {
     render(<ConnectionList />)
 
     fireEvent.click(screen.getByRole('button', { name: /Example/ }))
 
-    await waitFor(() =>
-      expect(toastError).toHaveBeenCalledWith("Couldn't validate this connection", {
-        description: 'Check the server URL, app ID, and admin secret.',
-      }),
-    )
     expect(openConnection).toHaveBeenCalledWith('connection-1')
   })
 
-  it('keeps connection content unchanged while an open is coordinated', () => {
-    openConnection.mockReturnValueOnce(new Promise(() => undefined))
+  it('keeps connection content unchanged after connection intent is accepted', () => {
     render(<ConnectionList />)
 
     const connection = screen.getByRole('button', { name: /Example/ })

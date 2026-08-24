@@ -17,8 +17,6 @@ import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvi
 import { getConnectionDisplayName, type StoredConnection } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
 
-import { useSavedConnectionOpen } from './useSavedConnectionOpen'
-
 interface ConnectionSwitcherProps {
   size?: ContextSwitcherTriggerSize
   triggerLabel?: string
@@ -44,9 +42,14 @@ export function ConnectionSwitcher({
   triggerLabel,
   width = 'content',
 }: ConnectionSwitcherProps = {}): React.ReactElement {
-  const { connections, currentConnectionId, deleteConnection, runtimeScopeExitBlocked } =
-    useInspectorSessionContext()
-  const openConnection = useSavedConnectionOpen()
+  const {
+    connections,
+    currentConnectionId,
+    deleteConnection,
+    openConnection,
+    pendingConnectionId,
+    runtimeScopeExitBlocked,
+  } = useInspectorSessionContext()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [connectionToRemove, setConnectionToRemove] = useState<StoredConnection | null>(null)
@@ -57,11 +60,15 @@ export function ConnectionSwitcher({
   )
   const activeConnection =
     orderedConnections.find((connection) => connection.id === currentConnectionId) ?? null
+  const pendingConnection =
+    orderedConnections.find((connection) => connection.id === pendingConnectionId) ?? null
   const resolvedTriggerLabel =
     triggerLabel ??
-    (activeConnection !== null && activeConnection.id === currentConnectionId
-      ? getConnectionDisplayName(activeConnection)
-      : 'Open connections')
+    (pendingConnection !== null
+      ? `Opening ${getConnectionDisplayName(pendingConnection)}…`
+      : activeConnection !== null
+        ? getConnectionDisplayName(activeConnection)
+        : 'Open connections')
 
   const preventBlockedNavigation = (event: React.MouseEvent) => {
     if (runtimeScopeExitBlocked === true) {
@@ -92,9 +99,8 @@ export function ConnectionSwitcher({
           setOpen(nextOpen)
         }}
         onValueChange={(connection) => {
-          if (connection !== null) {
+          if (connection !== null && openConnection(connection.id) === 'accepted') {
             setOpen(false)
-            openConnection(connection.id)
           }
         }}
       >

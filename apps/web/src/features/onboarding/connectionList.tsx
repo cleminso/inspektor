@@ -2,11 +2,9 @@ import { Box, Button, Text } from '@inspector/ds'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { getConnectionDisplayName } from '@app/connections/connections'
-import { useSavedConnectionOpen } from '@shared/connections/useSavedConnectionOpen'
 
 export function ConnectionList(): React.ReactElement {
-  const { connections } = useInspectorSessionContext()
-  const openConnection = useSavedConnectionOpen()
+  const { connections, openConnection } = useInspectorSessionContext()
 
   return (
     <Box

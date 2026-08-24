@@ -49,6 +49,7 @@ interface InspectorProviderProps extends PropsWithChildren {
   initialRuntimeTarget?: ResolvedTablesNavigationTarget
 }
 
+/** Publishes the Jazz client only after stored schema verification makes it safe for consumers. */
 function RuntimeClientProjection({ runtime }: { runtime: InspectorRuntimeStore }) {
   const client = useJazzClient()
   const isWasmSchemaLoading = useStore(runtime.$isWasmSchemaLoading)
@@ -101,31 +102,6 @@ function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void
   }, [retry, runtime])
 }
 
-function RuntimeSchemaFallback({
-  runtime,
-  schemaHash,
-  switchSchema,
-}: {
-  runtime: InspectorRuntimeStore
-  schemaHash: string | null
-  switchSchema: (schemaHash: string) => Promise<void>
-}) {
-  const availableSchemaHashes = useStore(runtime.$availableSchemaHashes)
-
-  useEffect(() => {
-    const fallbackSchemaHash = availableSchemaHashes[0]
-    if (
-      fallbackSchemaHash !== undefined &&
-      schemaHash !== null &&
-      availableSchemaHashes.includes(schemaHash) === false
-    ) {
-      void switchSchema(fallbackSchemaHash)
-    }
-  }, [availableSchemaHashes, schemaHash, switchSchema])
-
-  return null
-}
-
 interface RuntimeClientErrorBoundaryProps {
   children: ReactNode
   onError: (error: unknown) => void
@@ -157,27 +133,27 @@ class RuntimeClientErrorBoundary extends Component<
 }
 
 /**
- * Composes the route session with its Jazz client and independently subscribable runtime stores.
+ * Turns a synchronized session target into active Jazz connectivity and runtime projections.
  *
- * This provider remains below `InspectorSessionProvider`: session actions come from that outer
- * boundary, while schema, permissions, errors, and the active Jazz client are projected through a
- * separate runtime context so unrelated updates do not rerender every consumer.
+ * Route resolution must complete and `InspectorRuntimeBoundary` must synchronize session identity
+ * before this provider mounts. This boundary owns stored schema verification, permissions, Jazz
+ * client lifecycle, runtime errors, and retry. It does not resolve connection-entry intent or own
+ * workspace selection. Workspace children mount independently of client readiness and consume
+ * nullable projections for their loading and error states.
  */
 export function InspectorProvider({ children, initialRuntimeTarget }: InspectorProviderProps) {
   const session = useInspectorSessionContext()
   const [retryGeneration, retryRuntime] = useReducer((generation: number) => generation + 1, 0)
-  const initialSchemaHashes =
-    initialRuntimeTarget?.connectionId === session.currentConnectionId &&
-    initialRuntimeTarget.branch === session.currentBranch &&
-    initialRuntimeTarget.schemaHash === session.currentSchemaHash
-      ? initialRuntimeTarget.availableSchemaHashes
+  const initialSchemaCatalogue =
+    initialRuntimeTarget?.connectionId === session.currentConnectionId
+      ? initialRuntimeTarget.schemaCatalogue
       : undefined
 
   const runtime = useInspectorRuntime({
     connection: session.activeConnection,
     branch: session.currentBranch,
     schemaHash: session.currentSchemaHash,
-    initialSchemaHashes,
+    initialSchemaCatalogue,
     retryGeneration,
   })
   const runtimeContext = useMemo(() => ({ retry: retryRuntime, runtime }), [retryRuntime, runtime])
@@ -204,37 +180,25 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
           session.currentBranch,
         ])
       : null
-  const openConnection = useCallback(
-    (connectionId: string) =>
-      session.openConnection(
-        connectionId,
-        session.activeConnection?.id === connectionId
-          ? runtime.$availableSchemaHashes.get()
-          : undefined,
-      ),
-    [runtime, session],
-  )
   const switchBranch = useCallback(
-    (branch: string) => session.switchBranch(branch, runtime.$availableSchemaHashes.get()),
+    (branch: string) =>
+      session.switchBranch(
+        branch,
+        runtime.$schemaCatalogue.get().map(({ hash }) => hash),
+      ),
     [runtime, session],
   )
 
   const value = useMemo<InspectorContextValue>(
     () => ({
       ...session,
-      openConnection,
       switchBranch,
     }),
-    [openConnection, session, switchBranch],
+    [session, switchBranch],
   )
 
   return (
     <InspectorRuntimeContext.Provider value={runtimeContext}>
-      <RuntimeSchemaFallback
-        runtime={runtime}
-        schemaHash={session.currentSchemaHash}
-        switchSchema={session.switchSchema}
-      />
       {clientConfig === null ? null : (
         <RuntimeClientErrorBoundary
           key={`${clientIdentity ?? 'unknown'}:${retryGeneration}`}
@@ -283,12 +247,7 @@ export function useRuntimeSchema(): WasmSchema | null {
 
 export function useRuntimeSchemaHashes(): readonly string[] {
   const runtime = useInspectorRuntimeContext()
-  return useStore(runtime.$availableSchemaHashes)
-}
-
-export function useRuntimeSchemaHashesLoading(): boolean {
-  const runtime = useInspectorRuntimeContext()
-  return useStore(runtime.$isSchemaHashesLoading)
+  return useStore(runtime.$schemaCatalogue).map(({ hash }) => hash)
 }
 
 export function useRuntimePermissions(): StoredPermissionsResponse | null {

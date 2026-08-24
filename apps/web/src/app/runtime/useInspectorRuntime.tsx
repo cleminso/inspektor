@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react'
 import { atom, type ReadableAtom, type WritableAtom } from 'nanostores'
 
 import {
-  fetchSchemaHashes,
   fetchStoredPermissions,
   fetchStoredWasmSchema,
   type StoredPermissionsResponse,
@@ -11,6 +10,7 @@ import {
 import type { JazzClient } from 'jazz-tools/react'
 
 import type { StoredConnection } from '@app/connections/connections'
+import type { SchemaCatalogueRecord } from '@app/routing/inspectorNavigation'
 import {
   normalizeRuntimeError,
   reportRuntimeError,
@@ -19,27 +19,24 @@ import {
 import { readCachedWasmSchema, writeCachedWasmSchema } from '@app/runtime/wasmSchemaCache'
 
 export interface InspectorRuntimeStore {
-  $availableSchemaHashes: ReadableAtom<readonly string[]>
   $client: ReadableAtom<JazzClient | null>
   $error: ReadableAtom<InspectorRuntimeError | null>
-  $isSchemaHashesLoading: ReadableAtom<boolean>
   $isPermissionsLoading: ReadableAtom<boolean>
   $isWasmSchemaLoading: ReadableAtom<boolean>
+  $schemaCatalogue: ReadableAtom<readonly SchemaCatalogueRecord[]>
   $storedPermissions: ReadableAtom<StoredPermissionsResponse | null>
   $wasmSchema: ReadableAtom<WasmSchema | null>
   clearClient: (client: JazzClient) => void
-  clearRuntime: () => void
   publishClient: (client: JazzClient) => void
   publishClientError: (error: unknown) => void
 }
 
 interface MutableInspectorRuntimeStore extends InspectorRuntimeStore {
-  $availableSchemaHashes: WritableAtom<readonly string[]>
   $client: WritableAtom<JazzClient | null>
   $error: WritableAtom<InspectorRuntimeError | null>
-  $isSchemaHashesLoading: WritableAtom<boolean>
   $isPermissionsLoading: WritableAtom<boolean>
   $isWasmSchemaLoading: WritableAtom<boolean>
+  $schemaCatalogue: WritableAtom<readonly SchemaCatalogueRecord[]>
   $storedPermissions: WritableAtom<StoredPermissionsResponse | null>
   $wasmSchema: WritableAtom<WasmSchema | null>
 }
@@ -48,22 +45,20 @@ interface UseInspectorRuntimeOptions {
   connection: StoredConnection | null
   branch: string | null
   schemaHash: string | null
-  initialSchemaHashes?: readonly string[]
+  initialSchemaCatalogue?: readonly SchemaCatalogueRecord[]
   retryGeneration?: number
 }
 
 function createInspectorRuntimeStore(
   initialSchema: WasmSchema | null,
-  isSchemaHashesLoading: boolean,
   isWasmSchemaLoading: boolean,
   sensitiveValues: readonly string[],
 ): MutableInspectorRuntimeStore {
   const $client = atom<JazzClient | null>(null)
   const $wasmSchema = atom<WasmSchema | null>(initialSchema)
   const $storedPermissions = atom<StoredPermissionsResponse | null>(null)
-  const $availableSchemaHashes = atom<readonly string[]>([])
+  const $schemaCatalogue = atom<readonly SchemaCatalogueRecord[]>([])
   const $error = atom<InspectorRuntimeError | null>(null)
-  const $isSchemaHashesLoading = atom(isSchemaHashesLoading)
   const $isPermissionsLoading = atom(isWasmSchemaLoading)
   const $isWasmSchemaLoading = atom(isWasmSchemaLoading)
 
@@ -85,60 +80,50 @@ function createInspectorRuntimeStore(
     reportRuntimeError(runtimeError, sensitiveValues)
   }
 
-  const clearRuntime = () => {
-    $client.set(null)
-    $wasmSchema.set(null)
-    $storedPermissions.set(null)
-    $availableSchemaHashes.set([])
-    $isSchemaHashesLoading.set(false)
-    $isPermissionsLoading.set(false)
-    $isWasmSchemaLoading.set(false)
-    $error.set(null)
-  }
-
   return {
-    $availableSchemaHashes,
     $client,
     $error,
-    $isSchemaHashesLoading,
     $isPermissionsLoading,
     $isWasmSchemaLoading,
     $storedPermissions,
+    $schemaCatalogue,
     $wasmSchema,
     clearClient,
-    clearRuntime,
     publishClient,
     publishClientError,
   }
 }
 
-/** Synchronizes Jazz metadata into independently subscribable runtime projection stores. */
+/**
+ * Loads stored schema and permissions into independently subscribable runtime projections.
+ *
+ * The route supplies the initial schema catalogue, while `InspectorProvider` owns Jazz client
+ * creation and publishes the verified client into this store. Replacing the runtime identity or
+ * retry generation replaces the store so stale asynchronous work cannot update the active runtime.
+ */
 export function useInspectorRuntime({
   connection,
   branch,
   schemaHash,
-  initialSchemaHashes,
+  initialSchemaCatalogue,
   retryGeneration = 0,
 }: UseInspectorRuntimeOptions): InspectorRuntimeStore {
-  const shouldDiscoverSchemaHashes =
-    initialSchemaHashes === undefined || initialSchemaHashes.length === 0
   const runtime = useMemo(
     () =>
       createInspectorRuntimeStore(
         connection !== null && schemaHash !== null
+          && branch !== null
           ? readCachedWasmSchema(connection, schemaHash)
           : null,
-        connection !== null && branch !== null && schemaHash !== null && shouldDiscoverSchemaHashes,
         connection !== null && branch !== null && schemaHash !== null,
         connection === null ? [] : [connection.adminSecret],
       ),
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- Retry intentionally replaces the runtime store.
-    [branch, connection, retryGeneration, schemaHash, shouldDiscoverSchemaHashes],
+    [branch, connection, retryGeneration, schemaHash],
   )
 
   useEffect(() => {
     if (connection === null || branch === null || schemaHash === null) {
-      runtime.clearRuntime()
       return
     }
 
@@ -155,10 +140,7 @@ export function useInspectorRuntime({
 
     runtime.$isWasmSchemaLoading.set(true)
     runtime.$isPermissionsLoading.set(true)
-    runtime.$isSchemaHashesLoading.set(shouldDiscoverSchemaHashes)
-    runtime.$availableSchemaHashes.set(
-      initialSchemaHashes !== undefined ? [...initialSchemaHashes] : [],
-    )
+    runtime.$schemaCatalogue.set(initialSchemaCatalogue ?? [])
 
     const schemaRequest = fetchStoredWasmSchema(connection.serverUrl, {
       appId: connection.appId,
@@ -172,25 +154,6 @@ export function useInspectorRuntime({
       writeCachedWasmSchema(connection, schemaHash, schema)
       runtime.$isWasmSchemaLoading.set(false)
     })
-
-    if (shouldDiscoverSchemaHashes === true) {
-      void fetchSchemaHashes(connection.serverUrl, {
-        appId: connection.appId,
-        adminSecret: connection.adminSecret,
-      }).then(
-        ({ hashes }) => {
-          if (active === true) {
-            runtime.$availableSchemaHashes.set(hashes)
-            runtime.$isSchemaHashesLoading.set(false)
-          }
-        },
-        () => {
-          if (active === true) {
-            runtime.$isSchemaHashesLoading.set(false)
-          }
-        },
-      )
-    }
 
     void fetchStoredPermissions(connection.serverUrl, {
       appId: connection.appId,
@@ -214,7 +177,7 @@ export function useInspectorRuntime({
     return () => {
       active = false
     }
-  }, [branch, connection, initialSchemaHashes, runtime, schemaHash, shouldDiscoverSchemaHashes])
+  }, [branch, connection, initialSchemaCatalogue, runtime, schemaHash])
 
   return runtime
 }

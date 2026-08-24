@@ -4,7 +4,6 @@ import {
   createConnectionFromDraft,
   getActiveConnection,
   getConnectionById,
-  getConnectionDisplayName,
   getConnectionPreferences as getStoredConnectionPreferences,
   readStoredConnections,
   removeConnection,
@@ -27,13 +26,11 @@ import { readPrefillConfig, type PrefillConfig } from '@app/connections/prefill'
  * synchronized through one state boundary.
  */
 export interface UseInspectorSessionResult {
-  store: StoredConnectionsStore
   connections: StoredConnection[]
   activeConnection: StoredConnection | null
   activeConnectionId: string | null
   prefill: PrefillConfig | null
   getConnection: (connectionId: string | null | undefined) => StoredConnection | null
-  getConnectionLabel: (connectionId: string) => string | null
   getConnectionPreferences: (
     connectionId: string,
   ) => ReturnType<typeof getStoredConnectionPreferences>
@@ -41,7 +38,7 @@ export interface UseInspectorSessionResult {
   resolveBranch: (connectionId: string, branch?: string | null) => string
   resolveSchemaHash: (
     connectionId: string,
-    availableSchemaHashes: readonly string[],
+    schemaCatalogue: readonly { hash: string }[],
     schemaHash?: string | null,
   ) => string | null
   saveConnection: (draft: ConnectionDraft, connectionId?: string) => StoredConnection
@@ -111,16 +108,11 @@ export function useInspectorSession(): UseInspectorSessionResult {
   // Keep the returned session object stable for consumers that depend on it as one value.
   return useMemo(
     () => ({
-      store: state.store,
       connections: state.store.connections,
       activeConnection: getActiveConnection(state.store),
       activeConnectionId: state.store.activeConnectionId,
       prefill: state.prefill,
       getConnection,
-      getConnectionLabel: (connectionId: string) => {
-        const connection = getConnection(connectionId)
-        return connection ? getConnectionDisplayName(connection) : null
-      },
       getConnectionPreferences: (connectionId: string) =>
         getStoredConnectionPreferences(state.store, connectionId),
       getRememberedBranches: (connectionId: string) =>
@@ -129,9 +121,9 @@ export function useInspectorSession(): UseInspectorSessionResult {
         resolveDefaultBranch(state.store, connectionId, branch),
       resolveSchemaHash: (
         connectionId: string,
-        availableSchemaHashes: readonly string[],
+        schemaCatalogue: readonly { hash: string }[],
         schemaHash?: string | null,
-      ) => resolveDefaultSchemaHash(state.store, connectionId, availableSchemaHashes, schemaHash),
+      ) => resolveDefaultSchemaHash(state.store, connectionId, schemaCatalogue, schemaHash),
       saveConnection,
       deleteConnection,
       setConnectionContext,

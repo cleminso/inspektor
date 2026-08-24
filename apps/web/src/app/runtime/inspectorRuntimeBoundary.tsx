@@ -1,4 +1,4 @@
-import { useEffect, useRef, type PropsWithChildren } from 'react'
+import { useEffect, type PropsWithChildren } from 'react'
 
 import { InspectorProvider } from '@app/providers/inspectorProvider'
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
@@ -8,26 +8,31 @@ interface InspectorRuntimeBoundaryProps extends PropsWithChildren {
   target: ResolvedTablesNavigationTarget
 }
 
+/**
+ * Synchronizes a route-resolved target with session state before mounting the Jazz runtime.
+ *
+ * Route loaders and session preferences update through different mechanisms. Rendering nothing
+ * while they disagree prevents a new route from observing the previous connection's runtime. A
+ * rejected synchronization also stays unmounted instead of marking an attempted target as applied.
+ */
 export function InspectorRuntimeBoundary({
   children,
   target,
 }: InspectorRuntimeBoundaryProps): React.ReactElement | null {
-  const session = useInspectorSessionContext()
+  const { currentBranch, currentConnectionId, currentSchemaHash, setConnectionContext } =
+    useInspectorSessionContext()
   const isContextReady =
-    session.currentConnectionId === target.connectionId &&
-    session.currentBranch === target.branch &&
-    session.currentSchemaHash === target.schemaHash
-  const targetKey = `${target.connectionId}:${target.branch}:${target.schemaHash}`
-  const appliedTargetKeyRef = useRef<string | null>(isContextReady === true ? targetKey : null)
+    currentConnectionId === target.connectionId &&
+    currentBranch === target.branch &&
+    currentSchemaHash === target.schemaHash
 
   useEffect(() => {
-    if (appliedTargetKeyRef.current !== targetKey) {
-      appliedTargetKeyRef.current = targetKey
-      session.setConnectionContext(target.connectionId, target.branch, target.schemaHash)
+    if (isContextReady === false) {
+      setConnectionContext(target.connectionId, target.branch, target.schemaHash)
     }
-  }, [session, target.branch, target.connectionId, target.schemaHash, targetKey])
+  }, [isContextReady, setConnectionContext, target.branch, target.connectionId, target.schemaHash])
 
-  if (isContextReady === false && appliedTargetKeyRef.current !== targetKey) {
+  if (isContextReady === false) {
     return null
   }
 

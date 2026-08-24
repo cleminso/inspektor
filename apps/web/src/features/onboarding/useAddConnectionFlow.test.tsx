@@ -100,26 +100,6 @@ describe('useAddConnectionFlow', () => {
     )
   })
 
-  it('distinguishes navigation failures after successful validation', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce({ hashes: ['schema-1'] })
-    navigate.mockRejectedValueOnce(new Error('router failed'))
-    const { result } = renderHook(() => useAddConnectionFlow())
-
-    act(() => {
-      result.current.updateField('serverUrl', 'https://self-hosted.example.com')
-      result.current.updateField('appId', 'self-hosted-app')
-      result.current.updateField('adminSecret', 'secret')
-    })
-    await act(async () => {
-      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
-    })
-
-    expect(result.current.error).toEqual({
-      title: "Couldn't open this connection",
-      description: 'Try again.',
-    })
-  })
-
   it('clears only a matching field validation error when that field is edited', async () => {
     const { result } = renderHook(() => useAddConnectionFlow())
 
@@ -140,7 +120,10 @@ describe('useAddConnectionFlow', () => {
   })
 
   it('prefills and updates the same saved connection when editing', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce({ hashes: ['schema-1'] })
+    fetchSchemaHashes.mockResolvedValueOnce({
+      hashes: ['schema-1'],
+      schemas: [{ hash: 'schema-1', publishedAt: 1 }],
+    })
     const connection = {
       id: 'connection-2',
       name: 'Production',
@@ -202,7 +185,10 @@ describe('useAddConnectionFlow', () => {
         env: 'dev',
       },
     ]
-    fetchSchemaHashes.mockResolvedValue({ hashes: ['schema-1'] })
+    fetchSchemaHashes.mockResolvedValue({
+      hashes: ['schema-1'],
+      schemas: [{ hash: 'schema-1', publishedAt: 1 }],
+    })
     const { result } = renderHook(() => useAddConnectionFlow({ connection, branch: 'release' }))
 
     act(() => {
@@ -225,5 +211,27 @@ describe('useAddConnectionFlow', () => {
       to: '/conn/$connectionId/tables',
       params: { connectionId: 'connection-1' },
     })
+  })
+
+  it('orders schema choices by publication metadata', async () => {
+    fetchSchemaHashes.mockResolvedValueOnce({
+      hashes: ['schema-1', 'schema-2'],
+      schemas: [
+        { hash: 'schema-1', publishedAt: 1 },
+        { hash: 'schema-2', publishedAt: 2 },
+      ],
+    })
+    const { result } = renderHook(() => useAddConnectionFlow())
+
+    act(() => {
+      result.current.updateField('serverUrl', 'https://self-hosted.example.com')
+      result.current.updateField('appId', 'self-hosted-app')
+      result.current.updateField('adminSecret', 'secret')
+    })
+    await act(async () => {
+      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+    })
+
+    expect(result.current.schemaHashes).toEqual(['schema-2', 'schema-1'])
   })
 })

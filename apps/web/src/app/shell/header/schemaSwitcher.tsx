@@ -5,11 +5,7 @@ import {
   type ContextSwitcherTriggerWidth,
 } from '@inspector/ds'
 
-import {
-  useInspectorSessionState,
-  useRuntimeSchemaHashes,
-  useRuntimeSchemaHashesLoading,
-} from '@app/providers/inspectorProvider'
+import { useInspectorSessionState, useRuntimeSchemaHashes } from '@app/providers/inspectorProvider'
 
 interface SchemaSwitcherProps {
   size?: ContextSwitcherTriggerSize
@@ -37,7 +33,6 @@ export function SchemaSwitcher({
 }: SchemaSwitcherProps = {}): React.ReactElement {
   const { currentSchemaHash, switchSchema } = useInspectorSessionState()
   const availableSchemaHashes = useRuntimeSchemaHashes()
-  const isSchemaHashesLoading = useRuntimeSchemaHashesLoading()
   const triggerText = triggerLabel ?? currentSchemaHash ?? 'Select schema'
   const triggerTitle = triggerLabel ?? currentSchemaHash ?? undefined
   const shouldTruncateCurrentSchema =
@@ -50,7 +45,7 @@ export function SchemaSwitcher({
       value={currentSchemaHash}
       onValueChange={(schemaHash) => {
         if (schemaHash !== null) {
-          void switchSchema(schemaHash)
+          switchSchema(schemaHash)
         }
       }}
     >
@@ -75,29 +70,23 @@ export function SchemaSwitcher({
           placeholder="Search schemas…"
         />
         <ContextSwitcher.Viewport maxHeight="l">
-          {isSchemaHashesLoading === true ? (
-            <ContextSwitcher.Status>Loading schemas…</ContextSwitcher.Status>
-          ) : (
-            <>
-              <ContextSwitcher.Empty>No schemas available.</ContextSwitcher.Empty>
-              <ContextSwitcher.List>
-                {(schemaHash: string) => (
-                  <ContextSwitcher.Item
-                    key={schemaHash}
-                    value={schemaHash}
-                  >
-                    <Text
-                      as="span"
-                      color="inherit"
-                      translate="no"
-                    >
-                      {schemaHash}
-                    </Text>
-                  </ContextSwitcher.Item>
-                )}
-              </ContextSwitcher.List>
-            </>
-          )}
+          <ContextSwitcher.Empty>No schemas available.</ContextSwitcher.Empty>
+          <ContextSwitcher.List>
+            {(schemaHash: string) => (
+              <ContextSwitcher.Item
+                key={schemaHash}
+                value={schemaHash}
+              >
+                <Text
+                  as="span"
+                  color="inherit"
+                  translate="no"
+                >
+                  {schemaHash}
+                </Text>
+              </ContextSwitcher.Item>
+            )}
+          </ContextSwitcher.List>
         </ContextSwitcher.Viewport>
       </ContextSwitcher.Content>
     </ContextSwitcher.Root>

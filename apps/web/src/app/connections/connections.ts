@@ -104,16 +104,7 @@ export function writeStoredConnections(store: StoredConnectionsStore): void {
 
 /** Resolves the active Inspector profile, falling back when the saved ID is stale. */
 export function getActiveConnection(store: StoredConnectionsStore): StoredConnection | null {
-  if (store.activeConnectionId !== null) {
-    const activeConnection = store.connections.find(
-      (connection) => connection.id === store.activeConnectionId,
-    )
-    if (activeConnection !== undefined) {
-      return activeConnection
-    }
-  }
-
-  return store.connections[0] ?? null
+  return getConnectionById(store, store.activeConnectionId) ?? store.connections[0] ?? null
 }
 
 export function getConnectionById(
@@ -141,27 +132,21 @@ export function getConnectionPreferences(
   )
 }
 
-function setActiveConnectionId(
-  store: StoredConnectionsStore,
-  connectionId: string | null,
-): StoredConnectionsStore {
-  return {
-    ...store,
-    activeConnectionId: connectionId,
-  }
-}
-
 export function setActiveConnectionContext(
   store: StoredConnectionsStore,
   connectionId: string,
   branch: string,
   schemaHash: string,
 ): StoredConnectionsStore {
-  return updateConnectionPreferences(
-    rememberBranch(setActiveConnectionId(store, connectionId), connectionId, branch),
-    connectionId,
-    { lastSchemaHash: schemaHash },
-  )
+  const currentPreferences = getConnectionPreferences(store, connectionId)
+  return {
+    ...updateConnectionPreferences(store, connectionId, {
+      lastBranch: branch,
+      lastSchemaHash: schemaHash,
+      rememberedBranches: [branch, ...currentPreferences.rememberedBranches],
+    }),
+    activeConnectionId: connectionId,
+  }
 }
 
 /** Saves a Jazz connection profile, marks it active, and ensures it has preferences. */
@@ -228,10 +213,10 @@ function updateConnectionPreferences(
   }
 
   if (nextPreferences.rememberedBranches.includes(nextPreferences.lastBranch) === false) {
-    nextPreferences.rememberedBranches = dedupeBranches([
+    nextPreferences.rememberedBranches = [
       nextPreferences.lastBranch,
       ...nextPreferences.rememberedBranches,
-    ])
+    ]
   }
 
   return {
@@ -241,20 +226,6 @@ function updateConnectionPreferences(
       [connectionId]: nextPreferences,
     },
   }
-}
-
-function rememberBranch(
-  store: StoredConnectionsStore,
-  connectionId: string,
-  branch: string,
-): StoredConnectionsStore {
-  const currentPreferences = getConnectionPreferences(store, connectionId)
-  const normalizedBranch = normalizeBranchName(branch)
-
-  return updateConnectionPreferences(store, connectionId, {
-    lastBranch: normalizedBranch,
-    rememberedBranches: [normalizedBranch, ...currentPreferences.rememberedBranches],
-  })
 }
 
 /** Converts editable values into the saved Jazz connection shape used by runtime hooks. */
@@ -312,16 +283,18 @@ export function resolveDefaultBranch(
 export function resolveDefaultSchemaHash(
   store: StoredConnectionsStore,
   connectionId: string,
-  availableSchemaHashes: readonly string[],
+  schemaCatalogue: readonly { hash: string }[],
   schemaHash?: string | null,
 ): string | null {
   const nextSchemaHash = schemaHash ?? getConnectionPreferences(store, connectionId).lastSchemaHash
-  if (nextSchemaHash !== null && availableSchemaHashes.includes(nextSchemaHash) === true) {
+  if (
+    nextSchemaHash !== null &&
+    schemaCatalogue.some(({ hash }) => hash === nextSchemaHash) === true
+  ) {
     return nextSchemaHash
   }
 
-  // TODO: Replace this fallback with an explicit schema selection policy once schema metadata/UI is defined.
-  return availableSchemaHashes[0] ?? null
+  return schemaCatalogue[0]?.hash ?? null
 }
 
 /** Migrates recognized Inspector localStorage shapes into store version 3. */

@@ -12,14 +12,13 @@ import {
   type StoredConnection,
 } from '@app/connections/connections'
 import {
-  ConnectionNavigationError,
   EMPTY_SCHEMA_ERROR,
-  normalizeConnectionOpenError,
   normalizeSchemaFetchError,
   validateConnectionInput,
   type ConnectionError,
 } from '@app/connections/connectionValidation'
 import { appRoutes } from '@app/routing/appRoutes'
+import { createSchemaCatalogue } from '@app/routing/inspectorNavigation'
 
 import {
   createInitialFormValues,
@@ -44,6 +43,13 @@ interface UseAddConnectionFlowOptions {
   connection: StoredConnection
 }
 
+/**
+ * Validates and persists add or edit form input before entering the canonical connection route.
+ *
+ * Schema discovery here exists for inline credential feedback and explicit schema choice. It does
+ * not replace route-owned connection entry: the saved profile still navigates through the parent
+ * connection loader before a runtime mounts.
+ */
 export function useAddConnectionFlow(
   options?: UseAddConnectionFlowOptions,
 ): UseAddConnectionFlowResult {
@@ -100,16 +106,12 @@ export function useAddConnectionFlow(
 
     setConnectionContext(connection.id, branch, schemaHash)
 
-    try {
-      await navigate({
-        to: appRoutes.tables,
-        params: {
-          connectionId: connection.id,
-        },
-      })
-    } catch {
-      throw new ConnectionNavigationError()
-    }
+    void navigate({
+      to: appRoutes.tables,
+      params: {
+        connectionId: connection.id,
+      },
+    })
   }
 
   const fetchSchemas: FormEventHandler<HTMLFormElement> = async (event) => {
@@ -141,22 +143,23 @@ export function useAddConnectionFlow(
         return
       }
 
-      if (response.hashes.length === 0) {
+      const schemaHashes = createSchemaCatalogue(response).map(({ hash }) => hash)
+      if (schemaHashes.length === 0) {
         setError(EMPTY_SCHEMA_ERROR)
         setSchemaHashes([])
         setStep('form')
         return
       }
 
-      if (response.hashes.length === 1) {
-        await openResolvedConnection(response.hashes[0])
+      if (schemaHashes.length === 1) {
+        await openResolvedConnection(schemaHashes[0])
         return
       }
 
-      setSchemaHashes(response.hashes)
+      setSchemaHashes(schemaHashes)
       setStep('schema')
     } catch (error) {
-      setError(normalizeConnectionOpenError(error))
+      setError(normalizeSchemaFetchError(error))
     } finally {
       isSubmittingRef.current = false
       setIsSubmitting(false)
@@ -175,7 +178,7 @@ export function useAddConnectionFlow(
     try {
       await openResolvedConnection(schemaHash)
     } catch (error) {
-      setError(normalizeConnectionOpenError(error))
+      setError(normalizeSchemaFetchError(error))
     } finally {
       isSubmittingRef.current = false
       setIsSubmitting(false)

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -9,13 +10,21 @@ import { useRegisterRuntimeScopeExitBlocker } from '@app/providers/runtimeScopeE
 
 const navigate = vi.fn()
 const setConnectionContext = vi.fn()
-const navigationMocks = vi.hoisted(() => {
-  const clearPreparedTarget = vi.fn()
-  return {
-    clearPreparedTarget,
-    prepareStoredTablesNavigationTarget: vi.fn(() => clearPreparedTarget),
-  }
-})
+interface BlockerLocation {
+  fullPath: string
+  params: Record<string, string>
+}
+interface BlockerOptions {
+  enableBeforeUnload: boolean
+  shouldBlockFn: (options: { current: BlockerLocation; next: BlockerLocation }) => boolean
+}
+let blockerOptions: BlockerOptions | null = null
+let routerMatches: Array<{
+  isFetching: false | 'beforeLoad' | 'loader'
+  params: Record<string, string>
+  routeId: string
+  status: 'pending' | 'success' | 'error' | 'notFound'
+}> = []
 const connections = {
   'connection-1': {
     id: 'connection-1',
@@ -47,7 +56,7 @@ const session = {
   prefill: null,
   resolveBranch: vi.fn((_connectionId: string, branch?: string | null) => branch ?? 'main'),
   resolveSchemaHash: vi.fn(
-    (_connectionId: string, _hashes: readonly string[], schemaHash?: string | null) =>
+    (_connectionId: string, _schemas: readonly { hash: string }[], schemaHash?: string | null) =>
       schemaHash ?? 'schema-1',
   ),
   saveConnection: vi.fn(),
@@ -55,24 +64,20 @@ const session = {
 }
 
 vi.mock('@tanstack/react-router', () => ({
+  useBlocker: (options: BlockerOptions) => {
+    blockerOptions = options
+  },
   useNavigate: () => navigate,
   useParams: () => ({ connectionId: 'connection-1' }),
+  useRouterState: ({ select }: { select: (state: { matches: typeof routerMatches }) => unknown }) =>
+    select({ matches: routerMatches }),
 }))
 
 vi.mock('@app/session/useInspectorSession', () => ({
   useInspectorSession: () => session,
 }))
 
-vi.mock('@app/connections/useConnectionOpenCoordinator', () => ({
-  useConnectionOpenCoordinator:
-    (performOpen: (connectionId: string, knownSchemaHashes?: readonly string[]) => Promise<void>) =>
-    async (connectionId: string, knownSchemaHashes?: readonly string[]) => {
-      await performOpen(connectionId, knownSchemaHashes)
-    },
-}))
-
 vi.mock('@app/routing/inspectorNavigation', () => ({
-  prepareStoredTablesNavigationTarget: navigationMocks.prepareStoredTablesNavigationTarget,
   resolveTablesNavigationTarget: async ({
     branchOverride,
     connectionId,
@@ -82,9 +87,9 @@ vi.mock('@app/routing/inspectorNavigation', () => ({
     connectionId: string
     schemaHashOverride?: string | null
   }) => ({
-    availableSchemaHashes: ['schema-1'],
     branch: branchOverride ?? 'main',
     connectionId,
+    schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
     schemaHash: schemaHashOverride ?? 'schema-1',
   }),
 }))
@@ -92,21 +97,31 @@ vi.mock('@app/routing/inspectorNavigation', () => ({
 afterEach(() => {
   cleanup()
   navigate.mockReset()
+  blockerOptions = null
+  routerMatches = []
   setConnectionContext.mockReset()
-  navigationMocks.clearPreparedTarget.mockReset()
-  navigationMocks.prepareStoredTablesNavigationTarget.mockClear()
 })
 
 function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
   useRegisterRuntimeScopeExitBlocker(blocked)
   const inspectorSession = useInspectorSessionContext()
+  const [openResult, setOpenResult] = useState('none')
 
   return (
     <>
       <output aria-label="Runtime scope blocked">
         {String(inspectorSession.runtimeScopeExitBlocked)}
       </output>
-      <button type="button" onClick={() => void inspectorSession.openConnection('connection-2')}>
+      <output aria-label="Connection open result">{openResult}</output>
+      <output aria-label="Pending connection">
+        {inspectorSession.pendingConnectionId ?? 'none'}
+      </output>
+      <button
+        type="button"
+        onClick={() => {
+          setOpenResult(inspectorSession.openConnection('connection-2'))
+        }}
+      >
         Switch connection
       </button>
       <button type="button" onClick={() => void inspectorSession.switchBranch('feature')}>
@@ -143,6 +158,49 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
     expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe('true')
+    expect(screen.getByRole('status', { name: 'Connection open result' }).textContent).toBe(
+      'blocked',
+    )
+  })
+
+  it('blocks route exits while allowing navigation inside the active table workspace', async () => {
+    render(
+      <InspectorSessionProvider>
+        <SessionActions blocked />
+      </InspectorSessionProvider>,
+    )
+    await screen.findByText('true', { selector: '[aria-label="Runtime scope blocked"]' })
+
+    const current = {
+      fullPath: '/conn/$connectionId/tables/$tableName',
+      params: { connectionId: 'connection-1', tableName: 'accounts' },
+    }
+
+    expect(blockerOptions?.enableBeforeUnload).toBe(false)
+    expect(
+      blockerOptions?.shouldBlockFn({
+        current,
+        next: {
+          fullPath: '/conn/$connectionId/tables/$tableName',
+          params: { connectionId: 'connection-1', tableName: 'profiles' },
+        },
+      }),
+    ).toBe(false)
+    expect(
+      blockerOptions?.shouldBlockFn({
+        current,
+        next: {
+          fullPath: '/conn/$connectionId/tables',
+          params: { connectionId: 'connection-2' },
+        },
+      }),
+    ).toBe(true)
+    expect(
+      blockerOptions?.shouldBlockFn({
+        current,
+        next: { fullPath: '/conn/$connectionId/queries', params: { connectionId: 'connection-1' } },
+      }),
+    ).toBe(true)
   })
 
   it('allows runtime-scope changes after pending state clears', async () => {
@@ -160,7 +218,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe('false')
   })
 
-  it('hands the resolved target to the route loader before navigation', async () => {
+  it('accepts connection intent without resolving or persisting route data', async () => {
     render(
       <InspectorSessionProvider>
         <SessionActions blocked={false} />
@@ -171,18 +229,47 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
     })
 
-    expect(navigationMocks.prepareStoredTablesNavigationTarget).toHaveBeenCalledWith(
-      connections['connection-2'],
-      {
-        availableSchemaHashes: ['schema-1'],
-        branch: 'main',
-        connectionId: 'connection-2',
-        schemaHash: 'schema-1',
-      },
+    expect(navigate).toHaveBeenCalledWith({
+      to: '/conn/$connectionId/tables',
+      params: { connectionId: 'connection-2' },
+    })
+    expect(setConnectionContext).not.toHaveBeenCalled()
+    expect(screen.getByRole('status', { name: 'Connection open result' }).textContent).toBe(
+      'accepted',
     )
-    expect(navigate).toHaveBeenCalledOnce()
-    expect(navigationMocks.prepareStoredTablesNavigationTarget).toHaveBeenCalledBefore(navigate)
-    expect(navigationMocks.clearPreparedTarget).toHaveBeenCalledOnce()
-    expect(navigationMocks.clearPreparedTarget).toHaveBeenCalledAfter(navigate)
+  })
+
+  it('forwards repeated accepted connection intent', () => {
+    render(
+      <InspectorSessionProvider>
+        <SessionActions blocked={false} />
+      </InspectorSessionProvider>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
+
+    expect(navigate).toHaveBeenCalledTimes(2)
+  })
+
+  it('derives the pending connection from the router match', () => {
+    routerMatches = [
+      {
+        isFetching: 'loader',
+        params: { connectionId: 'connection-2' },
+        routeId: '/conn/$connectionId',
+        status: 'pending',
+      },
+    ]
+
+    render(
+      <InspectorSessionProvider>
+        <SessionActions blocked={false} />
+      </InspectorSessionProvider>,
+    )
+
+    expect(screen.getByRole('status', { name: 'Pending connection' }).textContent).toBe(
+      'connection-2',
+    )
   })
 })

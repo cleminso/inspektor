@@ -48,7 +48,6 @@ describe('useInspectorRuntime', () => {
       .mockRejectedValueOnce(schemaError)
       .mockResolvedValueOnce({ schema: { accounts: { columns: [] } } })
     jazzMocks.fetchStoredPermissions.mockResolvedValue(null)
-    jazzMocks.fetchSchemaHashes.mockResolvedValue({ hashes: ['schema-1'] })
     const connection = {
       id: 'connection-1',
       name: 'Local app',
@@ -97,7 +96,6 @@ describe('useInspectorRuntime', () => {
     writeCachedWasmSchema(connection, 'schema-1', { accounts: { columns: [] } })
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-    jazzMocks.fetchSchemaHashes.mockReturnValue(new Promise(() => undefined))
 
     const { result } = renderHook(() =>
       useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
@@ -123,7 +121,6 @@ describe('useInspectorRuntime', () => {
       }),
     )
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-    jazzMocks.fetchSchemaHashes.mockReturnValue(new Promise(() => undefined))
 
     const { result } = renderHook(() =>
       useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
@@ -150,7 +147,6 @@ describe('useInspectorRuntime', () => {
     writeCachedWasmSchema(connection, 'schema-1', { accounts: { columns: [] } })
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-    jazzMocks.fetchSchemaHashes.mockReturnValue(new Promise(() => undefined))
 
     const { result, rerender } = renderHook(
       ({ branch }: { branch: string }) =>
@@ -178,7 +174,6 @@ describe('useInspectorRuntime', () => {
     } as const
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-    jazzMocks.fetchSchemaHashes.mockReturnValue(new Promise(() => undefined))
     const { result } = renderHook(() =>
       useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
     )
@@ -197,7 +192,6 @@ describe('useInspectorRuntime', () => {
       schema: { accounts: { columns: [] } },
     })
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-    jazzMocks.fetchSchemaHashes.mockReturnValue(new Promise(() => undefined))
 
     const { result } = renderHook(() =>
       useInspectorRuntime({
@@ -227,7 +221,6 @@ describe('useInspectorRuntime', () => {
 
   it('does not let optional permissions block the usable runtime', async () => {
     jazzMocks.fetchStoredWasmSchema.mockResolvedValue({ schema: { tables: {} } })
-    jazzMocks.fetchSchemaHashes.mockResolvedValue({ hashes: ['schema-1'] })
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
 
     const { result } = renderHook(() =>
@@ -250,15 +243,9 @@ describe('useInspectorRuntime', () => {
     expect(result.current.$storedPermissions.get()).toBeNull()
   })
 
-  it('tracks schema-hash discovery independently from workspace readiness', async () => {
-    let resolveSchemaHashes!: (value: { hashes: string[] }) => void
+  it('does not repeat schema discovery when the route catalogue is unavailable', async () => {
     jazzMocks.fetchStoredWasmSchema.mockResolvedValue({ schema: { tables: {} } })
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-    jazzMocks.fetchSchemaHashes.mockReturnValue(
-      new Promise((resolve) => {
-        resolveSchemaHashes = resolve
-      }),
-    )
 
     const { result } = renderHook(() =>
       useInspectorRuntime({
@@ -278,12 +265,8 @@ describe('useInspectorRuntime', () => {
     result.current.publishClient({ shutdown: jazzMocks.shutdown } as unknown as JazzClient)
     await waitFor(() => expect(result.current.$wasmSchema.get()).toEqual({ tables: {} }))
 
-    expect(result.current.$isSchemaHashesLoading.get()).toBe(true)
-    expect(result.current.$availableSchemaHashes.get()).toEqual([])
-
-    resolveSchemaHashes({ hashes: ['schema-1'] })
-    await waitFor(() => expect(result.current.$isSchemaHashesLoading.get()).toBe(false))
-    expect(result.current.$availableSchemaHashes.get()).toEqual(['schema-1'])
+    expect(result.current.$schemaCatalogue.get()).toEqual([])
+    expect(jazzMocks.fetchSchemaHashes).not.toHaveBeenCalled()
   })
 
   it('reuses schema hashes resolved by the connection loader', async () => {
@@ -302,11 +285,17 @@ describe('useInspectorRuntime', () => {
         },
         branch: 'main',
         schemaHash: 'schema-1',
-        initialSchemaHashes: ['schema-1', 'schema-2'],
+        initialSchemaCatalogue: [
+          { hash: 'schema-1', publishedAt: 1 },
+          { hash: 'schema-2', publishedAt: 2 },
+        ],
       }),
     )
 
-    expect(result.current.$availableSchemaHashes.get()).toEqual(['schema-1', 'schema-2'])
+    expect(result.current.$schemaCatalogue.get()).toEqual([
+      { hash: 'schema-1', publishedAt: 1 },
+      { hash: 'schema-2', publishedAt: 2 },
+    ])
     expect(jazzMocks.fetchSchemaHashes).not.toHaveBeenCalled()
   })
 })

@@ -100,41 +100,43 @@ flowchart TD
       Prefill --> UrlHash["URL hash/search prefill"]
 
       SessionProvider --> ConnectionRoute["/conn/:connectionId"]
-      ConnectionRoute --> InspectorProvider["InspectorProvider"]
+      ConnectionRoute --> TargetResolver["resolveStoredTablesNavigationTarget"]
+      TargetResolver --> SchemaHashes["fetchSchemaHashes"]
+      ConnectionRoute --> RuntimeBoundary["InspectorRuntimeBoundary"]
+      RuntimeBoundary -->|setConnectionContext| SessionProvider
+      RuntimeBoundary --> InspectorProvider["InspectorProvider"]
       InspectorProvider --> Runtime["useInspectorRuntime"]
-      Runtime --> Client["createJazzClient driver memory"]
       Runtime --> StoredSchema["fetchStoredWasmSchema"]
       Runtime --> StoredPermissions["fetchStoredPermissions"]
-      Runtime --> SchemaHashes["fetchSchemaHashes"]
-      Client --> JazzProvider["JazzClientProvider"]
+      InspectorProvider --> JazzProvider["JazzProvider"]
+      JazzProvider --> Client["Jazz client"]
+      Client --> RuntimeProjection["RuntimeClientProjection"]
+      RuntimeProjection --> Runtime
     end
 
-    JazzProvider --> Workbench["Inspector workbench"]
+    InspectorProvider --> Workbench["Inspector workbench"]
 
     subgraph RoutesGroup["Local-context routes"]
       SessionProvider --> Connections["/conn and /conn/new"]
-      Connections --> AddConnection["AddConnectionPane"]
+      Connections --> AddConnection["AddConnectionView"]
       AddConnection --> AddConnectionFlow["useAddConnectionFlow"]
+      AddConnectionFlow --> FormSchemaDiscovery["fetchSchemaHashes for form validation"]
+      AddConnectionFlow -->|saveConnection and setConnectionContext| SessionProvider
+      AddConnectionFlow --> ConnectionRoute
 
       Workbench --> TablesRoute["/conn/:connectionId/tables/:tableName"]
-      Workbench --> SchemaRoute["/conn/:connectionId/tables/:tableName/schema"]
-      Workbench --> QueryRoute["/conn/:connectionId/queries/:queryId"]
+      Workbench --> QueryRoute["/conn/:connectionId/queries"]
     end
 
     subgraph WorkbenchFlow["Workbench"]
       Workbench --> Header["Header: connection branch schema"]
-      Workbench --> LeftDock["Left dock selector"]
-      LeftDock --> TablesNavigator["Tables navigator"]
-      LeftDock --> QueriesNavigator["Queries navigator"]
-      Workbench --> Workspace["Main workspace"]
-      Workspace --> PaneGroup["Pane group"]
-      PaneGroup --> WorkspaceItems["Workspace items and tabs"]
-      WorkspaceItems --> DataItem["Table Data item"]
-      WorkspaceItems --> SchemaItem["Table Schema item"]
-      WorkspaceItems --> QueryItem["Query item"]
+      TablesRoute --> TableExplorer["TableExplorerScreen"]
+      TableExplorer --> TablesNavigator["Table list"]
+      TableExplorer --> WorkspaceItems["Table workspace tabs"]
+      WorkspaceItems --> DataItem["Table data view"]
+      WorkspaceItems --> SchemaItem["Table schema view"]
       WorkspaceItems --> WorkspaceStorage["localStorage: scoped workspace state"]
       TablesNavigator --> WorkspaceItems
-      QueriesNavigator --> WorkspaceItems
     end
 
     subgraph TableExplorerFlow["Table Data item"]
@@ -378,9 +380,9 @@ items can be viewed side by side.
 
 Inspector routes describe the active content inside one saved local connection:
 
-- `/conn/:connectionId/tables/:tableName` opens the Data representation.
-- `/conn/:connectionId/tables/:tableName/schema` opens the Schema representation.
-- `/conn/:connectionId/queries/:queryId` opens a Query representation.
+- `/conn/:connectionId/tables` opens the table workspace and selects an available table when needed.
+- `/conn/:connectionId/tables/:tableName` opens the selected table. `view=schema` selects its Schema representation.
+- `/conn/:connectionId/queries` opens the connection-scoped query placeholder.
 
 Data is the default table representation, so the route omits `/data`. Filters and sorting remain search parameters of the
 active Data item. Routes do not expose tabs, pane positions, open item order, branch, or schema hash.
