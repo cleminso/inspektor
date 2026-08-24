@@ -6,13 +6,13 @@ interface PlaygroundControlBase<TState extends PlaygroundState> {
   label: string
 }
 
-export interface PlaygroundBooleanControl<
+interface PlaygroundBooleanControl<
   TState extends PlaygroundState,
 > extends PlaygroundControlBase<TState> {
   kind: 'boolean'
 }
 
-export interface PlaygroundSelectControl<
+interface PlaygroundSelectControl<
   TState extends PlaygroundState,
 > extends PlaygroundControlBase<TState> {
   kind: 'select'

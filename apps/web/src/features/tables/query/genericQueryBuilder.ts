@@ -7,7 +7,7 @@
  */
 import type { DynamicTableRow, QueryBuilder, WasmSchema } from 'jazz-tools'
 
-export type GenericWhereValue = unknown | { [op: string]: unknown }
+type GenericWhereValue = unknown | { [op: string]: unknown }
 
 export type GenericWhereInput = Record<string, GenericWhereValue>
 

@@ -20,7 +20,7 @@ export type PseudoState = 'hover' | 'focus' | 'active' | 'focusVisible' | 'focus
 
 export type ResponsiveValue<T> = T | Partial<Record<'base' | BreakpointKey | PseudoState, T>>
 
-export interface SpacingProps {
+interface SpacingProps {
   padding?: ResponsiveValue<SpacingToken>
   paddingTop?: ResponsiveValue<SpacingToken>
   paddingRight?: ResponsiveValue<SpacingToken>
@@ -57,13 +57,13 @@ export interface SpacingProps {
   g?: ResponsiveValue<SpacingToken>
 }
 
-export interface ColorProps {
+interface ColorProps {
   backgroundColor?: ResponsiveValue<BackgroundColorToken>
   color?: ResponsiveValue<TextColorToken>
   borderColor?: ResponsiveValue<BorderColorToken>
 }
 
-export interface BorderProps {
+interface BorderProps {
   borderRadius?: ResponsiveValue<BorderRadiusToken>
   borderTopLeftRadius?: ResponsiveValue<BorderRadiusToken>
   borderTopRightRadius?: ResponsiveValue<BorderRadiusToken>
@@ -77,11 +77,11 @@ export interface BorderProps {
   borderStyle?: ResponsiveValue<'solid' | 'dashed' | 'dotted' | 'none'>
 }
 
-export interface ShadowProps {
+interface ShadowProps {
   boxShadow?: ResponsiveValue<ShadowToken>
 }
 
-export interface LayoutProps {
+interface LayoutProps {
   display?: ResponsiveValue<
     | 'flex'
     | 'grid'
@@ -105,7 +105,7 @@ export interface LayoutProps {
   aspectRatio?: ResponsiveValue<'square' | 'landscape' | 'portrait' | 'video'>
 }
 
-export interface FlexProps {
+interface FlexProps {
   flex?: ResponsiveValue<0 | 1 | 'none'>
   flexDirection?: ResponsiveValue<'row' | 'column' | 'row-reverse' | 'column-reverse'>
   flexWrap?: ResponsiveValue<'wrap' | 'nowrap' | 'wrap-reverse'>
@@ -120,7 +120,7 @@ export interface FlexProps {
   >
 }
 
-export interface GridProps {
+interface GridProps {
   gridTemplateColumns?: ResponsiveValue<
     'one' | 'two' | 'three' | 'four' | 'three-one' | 'auto-fit-s' | 'auto-fit-m' | 'label-content'
   >
@@ -130,7 +130,7 @@ export interface GridProps {
   gridAutoFlow?: ResponsiveValue<'row' | 'column' | 'dense' | 'row-dense' | 'column-dense'>
 }
 
-export interface PositionProps {
+interface PositionProps {
   position?: ResponsiveValue<'relative' | 'absolute' | 'fixed' | 'sticky' | 'static'>
   top?: ResponsiveValue<SpacingToken>
   right?: ResponsiveValue<SpacingToken>
@@ -140,7 +140,7 @@ export interface PositionProps {
   zIndex?: ResponsiveValue<LayerIndex>
 }
 
-export interface VisualProps {
+interface VisualProps {
   opacity?: ResponsiveValue<0 | 1>
   cursor?: ResponsiveValue<
     'pointer' | 'default' | 'not-allowed' | 'grab' | 'grabbing' | 'text' | 'move' | 'wait'

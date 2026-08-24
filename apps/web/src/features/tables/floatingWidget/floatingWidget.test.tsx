@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
 import { InspectorDockCenterProvider } from '@app/shell/dock/centerSlot'
 import { InspectorDock } from '@app/shell/dock/view'
-import { FieldEditorMutationWidget } from '@tables/floatingWidget/fieldEditorMutationWidget'
+import FieldEditorMutationWidget from '@tables/floatingWidget/fieldEditorMutationWidget'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import {
   TableMutationLedgerProvider,

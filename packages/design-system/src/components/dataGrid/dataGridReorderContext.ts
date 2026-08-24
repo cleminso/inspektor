@@ -1,6 +1,6 @@
 import { createContext, use, type ComponentType, type ReactNode } from 'react'
 
-export interface DataGridHeaderSortableState {
+interface DataGridHeaderSortableState {
   isDragSource: boolean
   isDropping: boolean
   setReorderRef: (element: HTMLTableCellElement | null) => void

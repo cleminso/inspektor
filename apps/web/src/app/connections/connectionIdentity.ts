@@ -22,7 +22,7 @@ function normalizeCredentialField(value: string): string {
  * Name, env, branch, and schema hash are excluded because they describe Inspector
  * display or runtime view state, not the Jazz admin connection itself.
  */
-export function matchesConnectionCredentials(
+function matchesConnectionCredentials(
   connection: ConnectionCredentials,
   draft: ConnectionCredentials,
 ): boolean {

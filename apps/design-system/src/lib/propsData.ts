@@ -13,9 +13,9 @@ export interface GeneratedPropItem {
   }
 }
 
-export type GeneratedPropsByComponentId = Record<string, GeneratedPropItem[]>
+type GeneratedPropsByComponentId = Record<string, GeneratedPropItem[]>
 
-export const propsByComponentId = generatedProps as GeneratedPropsByComponentId
+const propsByComponentId = generatedProps as GeneratedPropsByComponentId
 
 export function getGeneratedProps(
   componentId: string,

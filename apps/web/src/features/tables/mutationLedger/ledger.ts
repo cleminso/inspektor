@@ -26,7 +26,7 @@ interface TableDeleteMutationEntry {
 
 export type TableMutationEntry = TableUpdateMutationEntry | TableDeleteMutationEntry
 
-export interface TableDeletionOperation {
+interface TableDeletionOperation {
   operationId: DeletionOperationId
   rowIds: readonly TableRowId[]
 }
@@ -85,22 +85,6 @@ export type TableMutationStateAction =
   | { operationId: DeletionOperationId; rowId: TableRowId; type: 'undoDeletionTarget' }
   | { operationId: TableMutationReviewOperation['operationId']; type: 'undoReviewOperation' }
   | { type: 'discardAll' }
-
-export interface TableMutationCounts {
-  delete: number
-  total: number
-  update: number
-}
-
-export interface AffectedTableRows {
-  deletes: readonly { entryId: TableDeleteMutationEntry['entryId']; rowId: TableRowId }[]
-  updates: readonly {
-    entryId: TableUpdateMutationEntry['entryId']
-    fieldCount: number
-    fieldNames: readonly string[]
-    rowId: TableRowId
-  }[]
-}
 
 export function createTableMutationState(): TableMutationState {
   return { deletionOperations: [], draftsByRowId: {}, nextDeletionOperationId: 0 }
@@ -293,31 +277,4 @@ export function selectTableMutationProjection(
     stagedFieldsByRowId,
     stagedValuesByRowId,
   }
-}
-
-export function selectTableMutationCounts(ledger: TableMutationLedger): TableMutationCounts {
-  const counts = { delete: 0, total: ledger.entries.length, update: 0 }
-  for (const entry of ledger.entries) {
-    counts[entry.kind] += 1
-  }
-  return counts
-}
-
-export function selectAffectedRows(ledger: TableMutationLedger): AffectedTableRows {
-  const updates: AffectedTableRows['updates'][number][] = []
-  const deletes: AffectedTableRows['deletes'][number][] = []
-  for (const entry of ledger.entries) {
-    if (entry.kind === 'delete') {
-      deletes.push({ entryId: entry.entryId, rowId: entry.rowId })
-    } else {
-      const fieldNames = Object.keys(entry.fields).sort()
-      updates.push({
-        entryId: entry.entryId,
-        fieldCount: fieldNames.length,
-        fieldNames,
-        rowId: entry.rowId,
-      })
-    }
-  }
-  return { deletes, updates }
 }

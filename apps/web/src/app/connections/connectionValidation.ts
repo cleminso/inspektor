@@ -1,6 +1,6 @@
 import type { ConnectionCredentials } from './connections'
 
-export type ConnectionField = 'serverUrl' | 'appId' | 'adminSecret'
+type ConnectionField = 'serverUrl' | 'appId' | 'adminSecret'
 
 export interface ConnectionError {
   title: string

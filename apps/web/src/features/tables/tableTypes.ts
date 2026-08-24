@@ -56,18 +56,6 @@ export interface TableExplorerSearchState {
 /** Per-table visibility map keyed by rendered column ID, including synthetic columns. */
 export type TableColumnVisibilityState = Record<string, boolean>
 
-/** Mutually exclusive row editor states for closed, insert, and selected-row edit flows. */
-export type InspectorRowEditorState =
-  | { kind: 'closed' }
-  | { kind: 'insert' }
-  | {
-      kind: 'edit'
-      editedRowIds: TableRowId[]
-      activeRowIndex: number
-    }
-
-export type InspectorRowEditorMode = InspectorRowEditorState['kind']
-
 /** Column render metadata derived from Jazz schema descriptors plus Inspector columns. */
 export interface TableColumnMeta {
   id: string

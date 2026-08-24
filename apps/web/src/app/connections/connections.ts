@@ -7,7 +7,7 @@
  * From the Inspector side, the same store keeps UI session preferences separate from
  * credentials so branch/schema selection can change without rewriting connection data.
  */
-export const CONNECTIONS_STORAGE_KEY = 'regarde-inspector-connections'
+const CONNECTIONS_STORAGE_KEY = 'regarde-inspector-connections'
 export const DEFAULT_SERVER_URL = 'https://v2.sync.jazz.tools/'
 export const DEFAULT_BRANCH_NAME = 'main'
 
@@ -140,7 +140,7 @@ export function getConnectionPreferences(
   )
 }
 
-export function setActiveConnectionId(
+function setActiveConnectionId(
   store: StoredConnectionsStore,
   connectionId: string | null,
 ): StoredConnectionsStore {
@@ -209,7 +209,7 @@ export function removeConnection(
  * Branch and schema hash are Jazz runtime context, but the Inspector stores them as
  * preferences because they describe the selected view of a saved connection.
  */
-export function updateConnectionPreferences(
+function updateConnectionPreferences(
   store: StoredConnectionsStore,
   connectionId: string,
   updates: Partial<ConnectionPreferences>,
@@ -242,7 +242,7 @@ export function updateConnectionPreferences(
   }
 }
 
-export function rememberBranch(
+function rememberBranch(
   store: StoredConnectionsStore,
   connectionId: string,
   branch: string,
@@ -271,7 +271,7 @@ export function createConnectionFromDraft(
   }
 }
 
-export function createConnectionId(): string {
+function createConnectionId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
   }
@@ -279,9 +279,7 @@ export function createConnectionId(): string {
   return `connection-${Math.random().toString(36).slice(2, 10)}`
 }
 
-export function deriveConnectionName(
-  connection: Pick<ConnectionDraft, 'serverUrl' | 'appId'>,
-): string {
+function deriveConnectionName(connection: Pick<ConnectionDraft, 'serverUrl' | 'appId'>): string {
   try {
     const host = new URL(connection.serverUrl).host
     return host.length > 0 ? `${connection.appId} @ ${host}` : connection.appId
@@ -293,14 +291,6 @@ export function deriveConnectionName(
 export function getConnectionDisplayName(connection: StoredConnection): string {
   const name = connection.name.trim()
   return name.length > 0 ? name : deriveConnectionName(connection)
-}
-
-export function getConnectionSecondaryLabel(connection: StoredConnection): string {
-  try {
-    return `${connection.appId} @ ${new URL(connection.serverUrl).host}`
-  } catch {
-    return `${connection.appId} @ ${connection.serverUrl}`
-  }
 }
 
 export function normalizeBranchName(branch: string | null | undefined): string {

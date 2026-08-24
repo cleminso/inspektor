@@ -38,7 +38,7 @@ import {
   type RowDraftController,
 } from '@tables/rowEditor/mutation/useRowDraftController'
 
-export interface TableMutationExecutionState {
+interface TableMutationExecutionState {
   error: string | null
   status: 'applying' | 'failed' | 'idle'
 }

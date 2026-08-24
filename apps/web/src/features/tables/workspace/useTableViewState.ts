@@ -76,7 +76,7 @@ interface TableViewRowEditorState {
   openInsert: () => void
 }
 
-export type TableViewDetailPaneMode = 'closed' | 'insert' | 'rows'
+type TableViewDetailPaneMode = 'closed' | 'insert' | 'rows'
 
 interface UseTableViewStateResult {
   activeColumnId: string | null

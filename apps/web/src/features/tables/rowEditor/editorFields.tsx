@@ -19,7 +19,7 @@ import type { DetailPaneMode } from '@tables/tableTypes'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 
 /** Renderable field state derived from a `MutationFieldInput`. */
-export interface FieldState {
+interface FieldState {
   isNull: boolean
   isOmitted: boolean
   text: string

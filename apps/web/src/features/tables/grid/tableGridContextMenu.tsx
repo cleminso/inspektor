@@ -29,7 +29,7 @@ interface GridContextTarget {
   rowId: string
 }
 
-export interface TableGridContextMenuRenderProps {
+interface TableGridContextMenuRenderProps {
   composeViewport: (viewport: ReactElement<DataGridViewportProps>) => ReactElement
   onCellContextMenu: DataGridCellContextMenuHandler
   onCellContextMenuTouchStart: DataGridCellContextMenuTouchStartHandler
@@ -50,7 +50,7 @@ interface TableGridContextMenuProps {
   stagedFieldsByRowId: Readonly<Record<string, ReadonlySet<string>>>
 }
 
-export interface TableGridCellActions {
+interface TableGridCellActions {
   canCopy: boolean
   canEdit: boolean
   canFilterBy: boolean

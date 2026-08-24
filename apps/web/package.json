@@ -4,8 +4,8 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev": "concurrently \"PORTLESS_PORT=1355 PORTLESS_HTTPS=1 portless inspector --force vite\" \"agentation-mcp server\" --names \"vite,agentation\" --prefix-colors \"cyan,magenta\"",
-    "dev:vite": "concurrently \"vite\" \"agentation-mcp server\" --names \"vite,agentation\" --prefix-colors \"cyan,magenta\"",
+    "dev": "PORTLESS_PORT=1355 PORTLESS_HTTPS=1 portless inspector --force vite",
+    "dev:vite": "vite",
     "portless:proxy": "portless proxy start --port 1355 --https",
     "build": "vite build && tsc -p tsconfig.app.json --noEmit",
     "lint": "oxlint .",
@@ -14,7 +14,6 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit"
   },
   "dependencies": {
-    "@base-ui/react": "catalog:",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
     "@inspector/ds": "workspace:*",
@@ -26,7 +25,6 @@
     "@tanstack/react-router-devtools": "catalog:",
     "@tanstack/react-table": "catalog:",
     "@tanstack/router-plugin": "catalog:",
-    "agentation-mcp": "^1.2.0",
     "jazz-tools": "catalog:",
     "lucide-react": "catalog:",
     "nanostores": "^1.4.2",
@@ -42,8 +40,6 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
-    "agentation": "^3.0.2",
-    "concurrently": "^9.2.1",
     "jsdom": "catalog:",
     "portless": "^0.15.0",
     "typescript": "catalog:",

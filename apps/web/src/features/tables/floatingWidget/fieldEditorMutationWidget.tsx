@@ -17,14 +17,14 @@ import {
   isStructuredColumn,
 } from '@tables/rowEditor/values/fieldPresentation'
 
-export interface FieldEditorMutationWidgetProps {
+interface FieldEditorMutationWidgetProps {
   column: ColumnDescriptor
   controller: TableMutationEditorController
   onClose: () => void
   onComplete: (direction: SpreadsheetCompletionDirection) => void
 }
 
-export function FieldEditorMutationWidget({
+function FieldEditorMutationWidget({
   column,
   controller,
   onClose,

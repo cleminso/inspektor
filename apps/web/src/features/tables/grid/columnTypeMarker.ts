@@ -3,7 +3,7 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { formatColumnTypeName } from '@tables/grid/columnTypePresentation'
 import type { TableColumnMeta } from '@tables/tableTypes'
 
-export type ColumnTypeMarkerIcon = 'key' | 'relation'
+type ColumnTypeMarkerIcon = 'key' | 'relation'
 
 export interface ColumnTypeMarker {
   icon: ColumnTypeMarkerIcon | null

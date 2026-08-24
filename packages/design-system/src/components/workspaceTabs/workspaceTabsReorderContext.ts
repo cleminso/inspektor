@@ -24,7 +24,7 @@ export function getReorderedWorkspaceTabsValues(
   return reorderedValues
 }
 
-export interface WorkspaceTabsSortableState {
+interface WorkspaceTabsSortableState {
   isDragSource: boolean
   setReorderRef: (element: HTMLDivElement | null) => void
 }

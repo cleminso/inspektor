@@ -227,7 +227,7 @@ function structured(
   }
 }
 
-export function isSchemaCompatibleRowTuple(
+function isSchemaCompatibleRowTuple(
   value: readonly unknown[],
   columns: readonly ColumnDescriptor[],
 ): boolean {

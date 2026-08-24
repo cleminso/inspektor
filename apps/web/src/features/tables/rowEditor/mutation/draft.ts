@@ -212,11 +212,7 @@ function normalizeTimestamp(value: unknown): number | null {
   return null
 }
 
-export function areMutationValuesEqual(
-  columnType: ColumnType,
-  left: unknown,
-  right: unknown,
-): boolean {
+function areMutationValuesEqual(columnType: ColumnType, left: unknown, right: unknown): boolean {
   if (left === null || left === undefined || right === null || right === undefined) {
     return (left === null || left === undefined) && (right === null || right === undefined)
   }

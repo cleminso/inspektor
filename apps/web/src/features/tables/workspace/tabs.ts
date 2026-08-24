@@ -20,7 +20,7 @@ export interface TableDataTab {
   search: TableTabSearch
 }
 
-export interface NewViewTab {
+interface NewViewTab {
   kind: 'newView'
   id: typeof NEW_VIEW_TAB_ID
 }

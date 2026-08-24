@@ -52,13 +52,6 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: PORT,
     host: true,
-    proxy: {
-      '/agentation': {
-        target: 'http://localhost:4747',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/agentation/, ''),
-      },
-    },
   },
   build: {
     outDir: 'dist',

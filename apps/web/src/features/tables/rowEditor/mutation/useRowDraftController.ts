@@ -27,12 +27,12 @@ export interface RowDraftBinding {
   setDraft: Dispatch<SetStateAction<RowMutationDraft>>
 }
 
-export interface RowDraftControllerState {
+interface RowDraftControllerState {
   draft: RowMutationDraft
   isDirty: boolean
 }
 
-export interface RowDraftControllerActions {
+interface RowDraftControllerActions {
   buildSubmission: () => RowMutationSubmission
   reset: () => void
   setFieldNull: (columnName: string, isNull: boolean) => void
@@ -40,7 +40,7 @@ export interface RowDraftControllerActions {
   setFieldText: (columnName: string, text: string) => void
 }
 
-export interface RowDraftControllerMeta {
+interface RowDraftControllerMeta {
   mode: DetailPaneMode
   schemaColumns: readonly ColumnDescriptor[]
 }

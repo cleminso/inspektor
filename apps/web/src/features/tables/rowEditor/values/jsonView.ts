@@ -1,6 +1,6 @@
 import type { ColumnDescriptor, ColumnType } from 'jazz-tools'
 
-export type InspectorJsonPrimitive = null | boolean | number | string
+type InspectorJsonPrimitive = null | boolean | number | string
 export type InspectorJsonObject = { readonly [key: string]: InspectorJsonValue }
 export type InspectorJsonValue = InspectorJsonPrimitive | InspectorJsonValue[] | InspectorJsonObject
 

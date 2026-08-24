@@ -257,5 +257,3 @@ const Text = TextBase as <E extends TextTag = 'p'>(
 export function createText() {
   return Text
 }
-
-export { Text }

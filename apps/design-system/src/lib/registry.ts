@@ -42,7 +42,7 @@ export const typographyFoundationItem = {
   },
 } satisfies NavItem
 
-export const foundationItems: NavItem[] = [colorsFoundationItem, typographyFoundationItem]
+const foundationItems: NavItem[] = [colorsFoundationItem, typographyFoundationItem]
 
 export const buttonItem = {
   title: 'Button',
@@ -58,7 +58,7 @@ export const buttonItem = {
   componentId: 'button',
 } satisfies NavItem
 
-export const alertDialogItem = {
+const alertDialogItem = {
   title: 'Alert Dialog',
   slug: 'alert-dialog',
   href: '/components/alert-dialog',
@@ -623,7 +623,7 @@ export const textFieldItem = {
   componentId: 'textField',
 } satisfies NavItem
 
-export const componentItems: NavItem[] = [
+const componentItems: NavItem[] = [
   accordionItem,
   actionListItem,
   alertDialogItem,
@@ -700,7 +700,3 @@ export const navSections: NavSection[] = [
 ]
 
 export const navigationItems = navSections.flatMap((section) => section.items)
-
-export function findNavItem(slug: string, items: NavItem[]): NavItem | undefined {
-  return items.find((item) => item.slug === slug)
-}
