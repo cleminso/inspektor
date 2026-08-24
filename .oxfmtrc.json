@@ -4,7 +4,7 @@
   "singleQuote": true,
   "singleAttributePerLine": true,
   "ignorePatterns": [
-    "apps/my-jazz-app/**",
+    "apps/inspector-test/**",
     "packages/jazz-dev-tools/**",
     "tools/oxlint/antiSlop/**"
   ],

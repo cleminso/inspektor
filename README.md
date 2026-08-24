@@ -44,7 +44,7 @@ Agentation is enabled in development and syncs annotations with the local MCP se
 
 ## Option 2: add your Jazz app inside this workspace
 
-You can also clone your Jazz app into the `apps/` directory. Or see `apps/my-jazz-app` example.
+You can also clone your Jazz app into the `apps/` directory.
 
 1. Add the local dev tools package to your app dependencies:
    `"@regarde/jazz-dev-tools@workspace:*"`

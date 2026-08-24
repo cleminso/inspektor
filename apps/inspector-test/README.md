@@ -16,7 +16,7 @@ Inspector Test is a curated Jazz app for exercising Inspector schema, permission
 
 ## Purpose
 
-Inspector Test keeps supported UI cases discoverable and deterministic. It is not a product application or a scratch database.
+Inspector Test keeps supported UI cases discoverable and deterministic. It is a schema, permissions, and fixture package, not a web application or scratch database.
 
 Use focused tables instead of adding every case to one table. Stable row IDs make seeding idempotent and keep browser checks comparable.
 
@@ -24,7 +24,7 @@ Use focused tables instead of adding every case to one table. Stable row IDs mak
 
 ### Shared cloud app
 
-The cloud app provides one shared connection for manual exploration and browser verification. Its credentials belong in `apps/my-jazz-app/.env.local` and must not be committed or printed.
+The cloud app provides one shared connection for manual exploration and browser verification. Its credentials belong in `apps/inspector-test/.env.local` and must not be committed or printed.
 
 Copy `.env.example` to `.env.local` and set the values issued by Jazz Cloud:
 
@@ -47,12 +47,12 @@ The isolated fixture uses `jazz-tools/testing` to create an in-memory local serv
 | `contentEdgeCases` | Empty, whitespace, long, multiline, Unicode, bidirectional, nested JSON, and byte values |
 | `creatorManagedRecords` | Creator-managed permissions |
 | `emptyRecords` | A valid table with no seeded rows |
-| `projects` | A compact referenced table used by the sample app |
+| `projects` | A compact referenced table used by relation scenarios |
 | `publicEditableRecords` | Public read, insert, update, and delete permissions |
 | `publicReadOnlyRecords` | Public reads with denied mutations |
 | `relationParents` | Relation targets |
 | `relationChildren` | Required, populated optional, and null optional relations |
-| `todos` | Conditional update and delete permissions used by the sample app |
+| `todos` | Self-relations plus conditional update and delete permissions |
 | `wideRecords` | Horizontal overflow, long headers, mixed types, and optional-value pairs |
 
 ## Cloud app setup

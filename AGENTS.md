@@ -40,18 +40,18 @@ Implementation work is limited to these directories:
 - `packages/design-system`: reusable `@inspector/ds` components, primitives, and tokens.
 - `apps/design-system`: documentation, examples, generated API metadata, and design-system validation.
 - `apps/web`: Inspector product application consuming `@inspector/ds`.
-- `apps/my-jazz-app`: Inspector Test schema, deterministic data, cloud deployment tooling, and isolated Jazz fixtures.
+- `apps/inspector-test`: Inspector Test schema, deterministic data, cloud deployment tooling, and isolated Jazz fixtures.
 
 Other workspace packages are outside the replacement UI architecture. Do not modify them unless the user explicitly requests work in them.
 
 ## Inspector Test
 
-Use `apps/my-jazz-app` as the curated test app for Inspector behavior. Read its `README.md` before changing its schema, permissions, seeded data, or fixture tooling.
+Use `apps/inspector-test` as the curated test app for Inspector behavior. Read its `README.md` before changing its schema, permissions, seeded data, or fixture tooling.
 
 - Use `pnpm inspector-test:fixture` for automated, isolated, or destructive browser checks.
 - Use the shared cloud app only when the task requires shared-network or manual browser verification.
 - Do not deploy or seed the cloud app unless the task explicitly requires changing shared fixture state.
-- Never print or commit cloud credentials from `apps/my-jazz-app/.env.local`.
+- Never print or commit cloud credentials from `apps/inspector-test/.env.local`.
 - Keep seeded rows deterministic and replaceable by stable ID.
 
 ## Implementation checklists

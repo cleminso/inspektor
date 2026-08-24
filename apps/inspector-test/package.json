@@ -4,32 +4,22 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
     "cloud:deploy": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/deployInspectorTest.ts",
     "cloud:initialize": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/initializeInspectorTest.ts",
     "cloud:seed": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/seedInspectorTest.ts",
     "cloud:validate": "jazz-tools validate",
     "fixture:start": "tsx scripts/startInspectorTestFixture.ts",
     "lint": "oxlint .",
-    "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.inspectorTest.json --noEmit && tsc -b"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@regarde/jazz-dev-tools": "workspace:*",
-    "jazz-tools": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "jazz-tools": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "catalog:",
     "tsx": "^4.23.12",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }
