@@ -4,6 +4,7 @@ import {
   ContextMenu,
   Icon,
   KeyboardInput,
+  Spinner,
   Text,
   WorkspaceTabs,
   Tooltip,
@@ -32,6 +33,7 @@ import { useTableNavigationControls } from '@tables/workspace/navigationHistory'
 
 interface TableTabsViewProps {
   tableName: string | null
+  view?: 'data' | 'schema'
 }
 
 function RuntimeErrorStatus(): React.ReactElement {
@@ -70,7 +72,10 @@ function RuntimeErrorStatus(): React.ReactElement {
   )
 }
 
-export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactElement {
+export function TableTabsView({
+  tableName,
+  view = 'data',
+}: TableTabsViewProps): React.ReactElement {
   const {
     activeTabId,
     activateTab,
@@ -86,6 +91,10 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
   const runtimeError = useRuntimeError()
   const wasmSchema = useRuntimeSchema()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
+  const isTableIdentityReady =
+    activeTab?.kind === 'table' &&
+    activeTab.tableName === tableName &&
+    (activeTab.search.view === 'schema') === (view === 'schema')
   const pointerIntentTabIdRef = useRef<string | null>(null)
   const focusedIntentTabIdRef = useRef<string | null>(null)
   const prefetchIntent = useTableRowsPrefetchIntent({
@@ -359,6 +368,15 @@ export function TableTabsView({ tableName }: TableTabsViewProps): React.ReactEle
       </Box>
       {runtimeError !== null ? (
         <RuntimeErrorStatus />
+      ) : tableName !== null && isTableIdentityReady === false ? (
+        <Box
+          minHeight={0}
+          flex={1}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Spinner label="Opening table" />
+        </Box>
       ) : activeTab?.kind === 'table' && tableName !== null ? (
         <WorkspaceTabs.Panel value={activeTab.id}>
           <SelectedTableView tableName={tableName} />

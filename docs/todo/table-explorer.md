@@ -19,6 +19,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Mount a route-reconciled table without forcing an intermediate opening frame.
+- [x] Keep the `Opening table` status for route and active-tab mismatches and center it within the workspace panel.
+- [x] Let the table-owned toolbar remain visible while the Data Grid presents its centered row-loading state.
+
 [22/08/26]
 
 - [x] Use the table name alone for schema workspace tabs while retaining the schema-specific icon and workspace identity.
@@ -1095,6 +1101,14 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Cover immediate reconciled-table mounting and mismatch feedback with focused workspace tests.
+- [x] Verify connected table switches keep the toolbar and Data Grid mounted, avoid the opening flash, and center row loading within the grid viewport.
+- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
+- [x] Profile opening the wide-table fixture after removing synchronous middle-truncation measurement and painting reconciliation feedback: INP reduced from 1877ms to 618ms.
+- [x] Re-profile wide-table closing against a connected Inspector Test fixture: INP reduced from 1460ms to 523ms.
 
 [22/08/26]
 

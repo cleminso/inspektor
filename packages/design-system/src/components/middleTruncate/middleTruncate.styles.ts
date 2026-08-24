@@ -3,25 +3,31 @@ import * as stylex from '@stylexjs/stylex'
 export const middleTruncateStyles = stylex.create({
   root: {
     overflow: 'hidden',
-    display: 'block',
+    display: 'flex',
     position: 'relative',
     whiteSpace: 'nowrap',
     minWidth: 0,
     width: '100%',
   },
-  preview: {
+  leading: {
     overflow: 'hidden',
     display: 'block',
+    flexShrink: 1,
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    width: '100%',
+    minWidth: 0,
   },
-  measurement: {
-    pointerEvents: 'none',
-    position: 'absolute',
-    visibility: 'hidden',
-    whiteSpace: 'nowrap',
-    width: 'max-content',
+  trailingViewport: {
+    overflow: 'hidden',
+    display: 'flex',
+    flexGrow: 0,
+    flexShrink: 1,
+    justifyContent: 'flex-end',
+    minWidth: 0,
+  },
+  trailing: {
+    display: 'block',
+    flexShrink: 0,
   },
   visuallyHidden: {
     padding: 0,

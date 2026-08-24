@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import { useSearch } from '@tanstack/react-router'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import {
@@ -20,6 +21,8 @@ import { TableTabsView } from '@tables/workspace/tabsView'
 export function TableExplorerScreen(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
     useInspectorSessionState()
+  const routeSearch = useSearch({ strict: false })
+  const currentView = routeSearch.view === 'schema' ? 'schema' : 'data'
   const scope = `${currentConnectionId ?? 'none'}:${currentBranch ?? 'none'}:${currentSchemaHash ?? 'none'}`
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set())
   const [pinnedTableNames, setPinnedTableNames] = useState<ReadonlySet<string>>(() =>
@@ -115,7 +118,10 @@ export function TableExplorerScreen(): React.ReactElement {
         />
       </SidePanelLayout.Panel>
       <SidePanelLayout.Content>
-        <TableTabsView tableName={currentTableName} />
+        <TableTabsView
+          tableName={currentTableName}
+          view={currentView}
+        />
       </SidePanelLayout.Content>
     </SidePanelLayout>
   )

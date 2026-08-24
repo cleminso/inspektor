@@ -737,6 +737,22 @@ describe('DataGrid', () => {
     expect(reorderedHeader.hasAttribute('data-reorderable')).toBe(true)
   })
 
+  it('reuses loaded reorder behavior when another grid mounts', async () => {
+    const firstGrid = render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />)
+    await waitFor(() => {
+      expect(
+        screen.getByRole('columnheader', { name: 'Name' }).hasAttribute('data-reorderable'),
+      ).toBe(true)
+    })
+    firstGrid.unmount()
+
+    render(<ReorderableDataGrid onColumnOrderChange={() => undefined} />)
+
+    expect(
+      screen.getByRole('columnheader', { name: 'Name' }).hasAttribute('data-reorderable'),
+    ).toBe(true)
+  })
+
   it('renders semantic headers, rows, and visible cells from TanStack state', () => {
     render(<TestDataGrid />)
 

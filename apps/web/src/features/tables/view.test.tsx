@@ -6,9 +6,18 @@ import { TableExplorerScreen } from '@tables/view'
 import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const mocks = vi.hoisted(() => ({
+  routeSearch: {} as { view?: string },
   tableListPaneProps: null as null | {
     tableSearchByName: ReadonlyMap<string, TableTabSearch>
   },
+  tableTabsViewProps: null as null | {
+    tableName: string | null
+    view?: 'data' | 'schema'
+  },
+}))
+
+vi.mock('@tanstack/react-router', () => ({
+  useSearch: () => mocks.routeSearch,
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -69,13 +78,18 @@ vi.mock('@tables/workspace/tabsProvider', () => ({
 }))
 
 vi.mock('@tables/workspace/tabsView', () => ({
-  TableTabsView: () => null,
+  TableTabsView: (props: { tableName: string | null; view?: 'data' | 'schema' }) => {
+    mocks.tableTabsViewProps = props
+    return null
+  },
 }))
 
 afterEach(cleanup)
 
 beforeEach(() => {
+  mocks.routeSearch = {}
   mocks.tableListPaneProps = null
+  mocks.tableTabsViewProps = null
 })
 
 describe('TableExplorerScreen', () => {
@@ -89,5 +103,13 @@ describe('TableExplorerScreen', () => {
       sort: 'createdAt',
     })
     expect(mocks.tableListPaneProps?.tableSearchByName.has('profiles')).toBe(false)
+  })
+
+  it('forwards schema route identity to the tabs view', () => {
+    mocks.routeSearch = { view: 'schema' }
+
+    render(<TableExplorerScreen />)
+
+    expect(mocks.tableTabsViewProps).toMatchObject({ tableName: 'accounts', view: 'schema' })
   })
 })

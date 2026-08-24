@@ -14,6 +14,10 @@
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Reuse an already loaded column-reorder component across later Data Grid mounts instead of repeating the deferred remount.
+
 [21/08/26]
 
 - [x] Forward composed behavior and refs from `DataGrid.Viewport` to its scroll viewport so body-cell context-menu triggers receive the native event.
@@ -353,6 +357,11 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Cover reorder-component reuse across sequential Data Grid mounts.
+- [x] Verify design-system lint, typecheck, build, and package tests.
 
 [21/08/26]
 

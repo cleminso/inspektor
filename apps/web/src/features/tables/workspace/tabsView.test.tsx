@@ -117,6 +117,53 @@ it('shows safe runtime recovery with or without a selected table', () => {
 })
 
 describe('TableTabsView', () => {
+  it('paints a lightweight status while route and active-tab identities reconcile', () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: {},
+      },
+    ]
+
+    render(<TableTabsView tableName="profiles" />)
+
+    expect(screen.getByRole('status', { name: 'Opening table' })).toBeTruthy()
+    expect(screen.queryByText('Selected table: profiles')).toBeNull()
+  })
+
+  it('does not flash the new view while a table route reconciles', () => {
+    mocks.state.activeTabId = 'new-view'
+    mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]
+
+    render(<TableTabsView tableName="profiles" />)
+
+    expect(screen.getByRole('status', { name: 'Opening table' })).toBeTruthy()
+    expect(screen.queryByText('New table view content')).toBeNull()
+  })
+
+  it('waits for data and schema tab identities to reconcile', () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [{ kind: 'table', id: 'table:accounts', tableName: 'accounts', search: {} }]
+
+    render(<TableTabsView tableName="accounts" view="schema" />)
+
+    expect(screen.getByRole('status', { name: 'Opening table' })).toBeTruthy()
+    expect(screen.queryByText('Selected table: accounts')).toBeNull()
+  })
+
+  it('keeps the new view visible while a cleared route reconciles', () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [{ kind: 'table', id: 'table:accounts', tableName: 'accounts', search: {} }]
+
+    render(<TableTabsView tableName={null} />)
+
+    expect(screen.getByText('New table view content')).toBeTruthy()
+    expect(screen.queryByText('Selected table:')).toBeNull()
+  })
+
   it('exposes discoverable disabled Tables navigation controls at the history boundary', () => {
     render(<TableTabsView tableName={null} />)
 

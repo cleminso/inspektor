@@ -10,7 +10,7 @@
 const CONNECTIONS_STORAGE_KEY = 'regarde-inspector-connections'
 export const DEFAULT_SERVER_URL = 'https://v2.sync.jazz.tools/'
 export const DEFAULT_BRANCH_NAME = 'main'
-export const DEFAULT_CONNECTION_NAME = 'my Jazz app'
+const DEFAULT_CONNECTION_NAME = 'my Jazz app'
 
 /** Jazz admin credentials shared by validation, persistence, and runtime clients. */
 export interface ConnectionCredentials {

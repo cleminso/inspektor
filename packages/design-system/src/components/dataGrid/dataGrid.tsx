@@ -48,18 +48,24 @@ const keyboardColumnResizeStep = 10
  * How: the DND implementation loads after mount and wraps the table. Its context supplies small
  * components that attach `useSortable` directly to each owning header ref.
  *
- * What: the first render stays static, then the table remounts once with reorder behavior. The
- * focused column is recorded and restored after that remount.
+ * What: the first configured grid stays static, then remounts once with reorder behavior. Later
+ * grids reuse the loaded component immediately and avoid repeating that remount.
  */
 type DataGridReorderModule = typeof import('./dataGridReorder')
 
 let dataGridReorderModule: Promise<DataGridReorderModule> | undefined
+let loadedDataGridReorder: DataGridReorderModule['DataGridReorder'] | null = null
 
 function loadDataGridReorder(): Promise<DataGridReorderModule> {
-  dataGridReorderModule ??= import('./dataGridReorder').catch((error: unknown) => {
-    dataGridReorderModule = undefined
-    throw error
-  })
+  dataGridReorderModule ??= import('./dataGridReorder')
+    .then((module) => {
+      loadedDataGridReorder = module.DataGridReorder
+      return module
+    })
+    .catch((error: unknown) => {
+      dataGridReorderModule = undefined
+      throw error
+    })
   return dataGridReorderModule
 }
 
@@ -373,7 +379,7 @@ function DataGridRoot<TData extends RowData>({
   const onColumnActivateRef = useRef(onColumnActivate)
   const [ReorderComponent, setReorderComponent] = useState<
     DataGridReorderModule['DataGridReorder'] | null
-  >(null)
+  >(() => loadedDataGridReorder)
   const reorderableColumnIdSet = useMemo(
     () => new Set(reorderableColumnIds ?? []),
     [reorderableColumnIds],

@@ -1,43 +1,13 @@
 import * as stylex from '@stylexjs/stylex'
-import { useLayoutEffect, useRef, useState } from 'react'
 
 import { middleTruncateStyles } from './middleTruncate.styles'
-import { getMiddleTruncatePreview } from './middleTruncateValue'
 
-const measurementSubscriptions = new Map<Element, () => void>()
-let resizeObserver: ResizeObserver | null = null
-let observedFontSet: FontFaceSet | null = null
+const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
 
-function updateMeasurements(): void {
-  for (const updateMeasurement of measurementSubscriptions.values()) {
-    updateMeasurement()
-  }
-}
-
-function observeMeasurementChanges(element: Element, updateMeasurement: () => void): () => void {
-  resizeObserver ??= new ResizeObserver((entries) => {
-    for (const entry of entries) {
-      measurementSubscriptions.get(entry.target)?.()
-    }
-  })
-
-  measurementSubscriptions.set(element, updateMeasurement)
-  resizeObserver.observe(element)
-  if (measurementSubscriptions.size === 1) {
-    observedFontSet = document.fonts
-    observedFontSet?.addEventListener('loadingdone', updateMeasurements)
-  }
-
-  return () => {
-    measurementSubscriptions.delete(element)
-    resizeObserver?.unobserve(element)
-    if (measurementSubscriptions.size === 0) {
-      resizeObserver?.disconnect()
-      resizeObserver = null
-      observedFontSet?.removeEventListener('loadingdone', updateMeasurements)
-      observedFontSet = null
-    }
-  }
+function splitValue(value: string): readonly [leading: string, trailing: string] {
+  const graphemes = Array.from(graphemeSegmenter.segment(value), ({ segment }) => segment)
+  const middleIndex = Math.ceil(graphemes.length / 2)
+  return [graphemes.slice(0, middleIndex).join(''), graphemes.slice(middleIndex).join('')]
 }
 
 export interface MiddleTruncateProps {
@@ -46,53 +16,31 @@ export interface MiddleTruncateProps {
 }
 
 export function MiddleTruncate({ value }: MiddleTruncateProps) {
-  const [preview, setPreview] = useState(value)
-  const rootRef = useRef<HTMLSpanElement>(null)
-  const measurementRef = useRef<HTMLSpanElement>(null)
-
-  useLayoutEffect(() => {
-    const root = rootRef.current
-    const measurement = measurementRef.current
-    if (root === null || measurement === null) {
-      return
-    }
-
-    const updatePreview = () => {
-      const availableWidth = root.getBoundingClientRect().width
-      if (availableWidth <= 0) {
-        setPreview('')
-        return
-      }
-      const nextPreview = getMiddleTruncatePreview(value, availableWidth, (candidate) => {
-        measurement.textContent = candidate
-        return measurement.getBoundingClientRect().width
-      })
-      setPreview(nextPreview)
-    }
-
-    updatePreview()
-    return observeMeasurementChanges(root, updatePreview)
-  }, [value])
+  const [leading, trailing] = splitValue(value)
 
   return (
     <span
-      ref={rootRef}
       {...stylex.props(middleTruncateStyles.root)}
       data-slot="middle-truncate"
     >
       <span
-        {...stylex.props(middleTruncateStyles.preview)}
+        {...stylex.props(middleTruncateStyles.leading)}
         aria-hidden="true"
-        data-slot="middle-truncate-preview"
+        data-slot="middle-truncate-leading"
       >
-        {preview}
+        {leading}
       </span>
       <span
-        ref={measurementRef}
-        {...stylex.props(middleTruncateStyles.measurement)}
+        {...stylex.props(middleTruncateStyles.trailingViewport)}
         aria-hidden="true"
-        data-slot="middle-truncate-measurement"
-      />
+      >
+        <span
+          {...stylex.props(middleTruncateStyles.trailing)}
+          data-slot="middle-truncate-trailing"
+        >
+          {trailing}
+        </span>
+      </span>
       <span
         {...stylex.props(middleTruncateStyles.visuallyHidden)}
         data-slot="middle-truncate-accessible-value"

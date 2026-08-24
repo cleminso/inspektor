@@ -16,6 +16,11 @@ This checklist tracks responsive middle truncation for identity-bearing strings.
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Replace resize and font measurement with a CSS-owned leading ellipsis and trailing viewport.
+- [x] Split values at a grapheme boundary once during render while keeping the complete accessible value.
+
 [21/08/26]
 
 - [x] Reduce preview state to one rendered string and share one measurement invalidation path for resize and font changes.
@@ -55,6 +60,12 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[24/08/26]
+
+- [x] Supersede rendered-width measurement with browser-owned clipping so large grids do not synchronously measure every identity value.
+- [x] Accept browser clipping at arbitrary glyph boundaries; the grapheme-safe split only protects the fixed midpoint.
+- [x] Keep the browser-clipped preview at widths narrower than an ellipsis instead of measuring and hiding it.
+
 [21/08/26]
 
 - [x] Retain rendered-width measurement because truncation must never expose part of a grapheme.
@@ -80,6 +91,12 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Cover complete accessible output, grapheme-safe midpoint splitting, and the absence of layout measurement with focused tests.
+- [x] Verify constrained clipping and complete accessible output in the production documentation build.
+- [x] Verify design-system lint, typecheck, build, package tests, and generated documentation metadata.
 
 [21/08/26]
 
