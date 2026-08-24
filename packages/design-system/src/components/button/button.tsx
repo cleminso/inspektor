@@ -33,7 +33,7 @@ interface ButtonSharedProps {
   variant?: ButtonVariant
   /** Controls the button height and horizontal padding. */
   size?: ButtonSize
-  /** Shows a leading spinner, preserves the label, and blocks interaction. */
+  /** Shows a centered spinner, preserves the button dimensions, and blocks interaction. */
   loading?: boolean
   /** Selects a design-system corner radius. */
   radius?: ButtonRadius
@@ -111,7 +111,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
       stacked: layout === 'stacked',
       orientation: buttonGroupOrientation,
       disabled: state.disabled,
-      hasPrefix: loading === true || prefix !== undefined,
+      hasPrefix: prefix !== undefined,
       hasSuffix: suffix !== undefined,
     }),
   )

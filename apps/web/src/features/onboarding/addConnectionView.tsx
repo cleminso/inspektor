@@ -1,6 +1,7 @@
 import { Box, Button, TextLink } from '@inspector/ds'
 import { Link, useNavigate } from '@tanstack/react-router'
 
+import type { StoredConnection } from '@app/connections/connections'
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 
@@ -19,19 +20,23 @@ export function AddConnectionView(): React.ReactElement {
   }
 
   return (
-    <AddConnectionViewContent
+    <ConnectionFormView
       key={prefillKey}
       onClose={closeView}
     />
   )
 }
 
-interface AddConnectionViewContentProps {
+interface ConnectionFormViewProps {
+  edit?: {
+    branch: string
+    connection: StoredConnection
+  }
   onClose: () => void
 }
 
-function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): React.ReactElement {
-  const flow = useAddConnectionFlow()
+export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): React.ReactElement {
+  const flow = useAddConnectionFlow(edit)
   const isFormStep = flow.step === 'form'
 
   return (
@@ -67,6 +72,7 @@ function AddConnectionViewContent({ onClose }: AddConnectionViewContentProps): R
           error={flow.error}
           formValues={flow.formValues}
           isSubmitting={flow.isSubmitting}
+          mode={edit === undefined ? 'add' : 'edit'}
           onCancel={onClose}
           onSubmit={flow.fetchSchemas}
           onUpdateField={flow.updateField}

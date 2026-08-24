@@ -12,6 +12,10 @@
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Center the loading spinner while visually hiding the normal content and preserving its intrinsic button width.
+
 [15/08/26]
 
 - [x] Keep expanded ghost Button text neutral by default so consumers opt into accent text only when the product meaning requires it.
@@ -101,6 +105,10 @@
 
 ## Settled interaction decisions
 
+[24/08/26]
+
+- Loading keeps the normal content in layout and the accessibility tree while an overlaid spinner replaces it visually.
+
 [11/08/26]
 
 - A composed design-system control owns its visual treatment; Menu Trigger contributes behavior and semantic state instead of a second presentation layer.
@@ -137,6 +145,10 @@
 - None.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Verify loading content preserves the accessible label and intrinsic width while the spinner is centered independently.
 
 [11/08/26]
 

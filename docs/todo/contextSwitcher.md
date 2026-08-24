@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Add a constrained five-item viewport height that includes two-line item content, list gaps, and viewport padding.
+
 [22/08/26]
 
 - [x] Delegate saved-connection selection and normalized failure presentation to the shared saved-connection opener.
@@ -60,6 +64,14 @@
 
 ## Settled interaction decisions
 
+[24/08/26]
+
+- Consumers may select the five-item viewport cap when result count should not grow the popup beyond five two-line context items.
+
+[24/08/26]
+
+- Search visibility is consumer-owned; connection-count thresholds belong to the connection feature rather than the shared Context Switcher.
+
 [22/08/26]
 
 - Connection selection dismisses the popup immediately and leaves in-flight coordination to the session boundary. This supersedes the switcher-specific pending presentation from [09/08/26].
@@ -94,6 +106,10 @@
 - None.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Verify the connection switcher selects the constrained five-item viewport above its search threshold.
 
 [22/08/26]
 

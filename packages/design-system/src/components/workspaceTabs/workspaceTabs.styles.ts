@@ -4,6 +4,7 @@ import { borderColors, spatial, surfaceColors } from '../../tokens/semantics.sty
 import { layerIndexes } from '../../tokens/layers.stylex'
 import {
   borderRadii,
+  dimensions,
   fontFamilies,
   fontSizes,
   fontWeights,
@@ -107,13 +108,10 @@ export const workspaceTabsStyles = stylex.create({
     alignItems: 'center',
     backgroundColor: workspaceTabsVars.background,
     display: 'flex',
-    flexBasis: 'auto',
-    flexGrow: 0,
     flexShrink: 0,
     position: 'relative',
     height: spatial['tab-height'],
-    minWidth: spacing['5xl'],
-    width: 'max-content',
+    width: dimensions[160],
     '::after': {
       inset: `calc(${spatial['focus-ring-width']} / 2)`,
       borderColor: workspaceTabsColors.focusRing,
@@ -174,7 +172,7 @@ export const workspaceTabsStyles = stylex.create({
     height: '100%',
     minWidth: 0,
     paddingLeft: spacing.xs,
-    width: 'auto',
+    width: '100%',
   },
   tabActive: {
     color: workspaceTabsColors.selectedText,
@@ -202,9 +200,11 @@ export const workspaceTabsStyles = stylex.create({
     width: spatial['icon-size-m'],
   },
   title: {
+    overflow: 'hidden',
     display: 'block',
-    flexShrink: 0,
+    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    minWidth: 0,
   },
   titleReplaceable: {
     fontStyle: 'italic',

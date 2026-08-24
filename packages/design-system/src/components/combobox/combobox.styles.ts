@@ -12,6 +12,7 @@ import {
 } from '../../tokens/semantics.stylex'
 import {
   borderRadii,
+  dimensions,
   fontFamilies,
   fontSizes,
   fontWeights,
@@ -248,6 +249,7 @@ export const comboboxStyles = stylex.create({
   viewportHeightS: { maxHeight: spatial['viewport-height-s'] },
   viewportHeightM: { maxHeight: spatial['viewport-height-m'] },
   viewportHeightL: { maxHeight: spatial['viewport-height-l'] },
+  viewportHeightFiveItems: { maxHeight: `calc(${dimensions[180]} + ${spacing.l})` },
   viewportHeightAvailable: { maxHeight: 'var(--available-height)' },
   list: {
     gap: spacing.xxs,

@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Redirect the application root to the connections route.
+
 [22/08/26]
 
 - [x] Retry runtime initialization once when a failure follows a hidden-to-visible document transition.
@@ -157,6 +161,11 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Cover root entry redirecting to the connections route.
+- [x] Verify the focused redirect test, Inspector lint, browser redirect, typecheck, production build, and package-wide tests.
 
 [22/08/26]
 

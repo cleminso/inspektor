@@ -187,6 +187,16 @@ export const buttonStyles = stylex.create({
     flexDirection: 'column',
     width: '100%',
   },
+  loadingContent: {
+    opacity: 0,
+  },
+  loadingIndicator: {
+    inset: 0,
+    alignItems: 'center',
+    display: 'inline-flex',
+    justifyContent: 'center',
+    position: 'absolute',
+  },
   iconSlot: {
     alignItems: 'center',
     display: 'inline-flex',

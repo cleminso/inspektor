@@ -17,8 +17,22 @@ const navigationMocks = vi.hoisted(() => {
   }
 })
 const connections = {
-  'connection-1': { id: 'connection-1', name: 'Connection 1' },
-  'connection-2': { id: 'connection-2', name: 'Connection 2' },
+  'connection-1': {
+    id: 'connection-1',
+    name: 'Connection 1',
+    serverUrl: 'https://sync.example.com',
+    appId: 'app-1',
+    adminSecret: 'secret-1',
+    env: 'dev',
+  },
+  'connection-2': {
+    id: 'connection-2',
+    name: 'Connection 2',
+    serverUrl: 'https://sync.example.com',
+    appId: 'app-2',
+    adminSecret: 'secret-2',
+    env: 'dev',
+  },
 } as const
 const session = {
   activeConnectionId: 'connection-1',
@@ -89,6 +103,9 @@ function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
 
   return (
     <>
+      <output aria-label="Runtime scope blocked">
+        {String(inspectorSession.runtimeScopeExitBlocked)}
+      </output>
       <button type="button" onClick={() => void inspectorSession.openConnection('connection-2')}>
         Switch connection
       </button>
@@ -125,6 +142,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
 
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
+    expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe('true')
   })
 
   it('allows runtime-scope changes after pending state clears', async () => {
@@ -139,6 +157,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     })
 
     expect(setConnectionContext).toHaveBeenCalledWith('connection-1', 'feature', 'schema-1')
+    expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe('false')
   })
 
   it('hands the resolved target to the route loader before navigation', async () => {

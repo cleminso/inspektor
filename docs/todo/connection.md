@@ -11,6 +11,28 @@
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Cap the saved-connection results viewport at five complete items, including list gaps and viewport padding.
+
+[24/08/26]
+
+- [x] Open an existing saved profile when submitted credentials match it instead of showing a duplicate-connection toast.
+
+[24/08/26]
+
+- [x] Separate active-connection management from the add action in the switcher footer.
+- [x] Show a duplicate-connection toast whose `Go` action opens the existing saved connection for editing.
+
+[24/08/26]
+
+- [x] Give unnamed saved connections the stable `my Jazz app` label while keeping the app ID as secondary identification.
+- [x] Reuse connection validation and schema selection to edit a saved profile in place through `/conn/edit/$connectionId`.
+- [x] Keep connection options as semantic listbox options and place management actions in the active-connection footer.
+- [x] Show connection search only when more than five saved connections make filtering useful.
+- [x] Confirm removal before deleting the local profile and its saved branch and schema preferences.
+- [x] Block add, edit, and removal actions while pending table state prevents leaving the runtime scope.
+
 [22/08/26]
 
 - [x] Route context-switcher and recent-connection selections through one shared saved-connection opener with normalized toast handling.
@@ -84,6 +106,26 @@
 
 ## Settled interaction decisions
 
+[24/08/26]
+
+- Above five saved connections, search remains fixed while the five-item results viewport scrolls.
+
+[24/08/26]
+
+- Matching saved credentials open the existing profile after schema resolution. This supersedes the duplicate-edit toast decision below.
+
+[24/08/26]
+
+- Active-connection edit and remove actions form one footer group; adding a connection remains a separate action group.
+- Editing credentials to match another saved connection does not overwrite either profile; a toast links to the existing profile.
+
+[24/08/26]
+
+- Unnamed connections use one readable deterministic fallback instead of generated random names or repeated app IDs.
+- Connection rows remain listbox options. Edit and remove apply to the active connection from separate footer actions instead of nesting controls inside an option. This supersedes the directional-arrow treatment from [22/08/26].
+- Connection search appears above five saved connections. This supersedes the multiple-item threshold from [07/08/26].
+- Removing a connection affects only this browser's saved profile and preferences; it does not modify the Jazz app.
+
 [22/08/26]
 
 - Saved-connection entry surfaces do not present request-level pending decoration; the destination workspace owns schema, runtime, and row-loading feedback.
@@ -126,6 +168,29 @@
 - None.
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Verify six saved connections render in a five-item scrolling viewport.
+
+[24/08/26]
+
+- [x] Verify matching saved credentials reuse and open the existing profile without saving a duplicate.
+
+[24/08/26]
+
+- [x] Verify the add action is separated from active-connection management.
+- [x] Verify duplicate edits show `Go` and route to the existing saved connection.
+
+[24/08/26]
+
+- [x] Verify unnamed connection creation stores the readable fallback label.
+- [x] Verify editing prefills the saved profile, preserves its local ID, and revalidates its schema target before opening it.
+- [x] Verify removal requires confirmation, clears local profile preferences, and returns an active workspace to Connections.
+- [x] Verify connection choices remain semantic options and management actions do not nest interactive controls inside them.
+- [x] Verify five connections omit search and six expose name and app-ID filtering.
+- [x] Verify runtime-scope blockers prevent add, edit, and removal actions.
+- [x] Supersede the earlier directional-arrow checks with semantic option and footer-action coverage.
 
 [22/08/26]
 

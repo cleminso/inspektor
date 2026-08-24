@@ -1,37 +1,40 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { StoredConnection } from '@app/connections/connections'
+
 import { useAddConnectionFlow } from './useAddConnectionFlow'
 
-const { fetchSchemaHashes, navigate, saveConnection } = vi.hoisted(() => ({
+const { fetchSchemaHashes, navigate, saveConnection, setConnectionContext } = vi.hoisted(() => ({
   fetchSchemaHashes: vi.fn(),
   navigate: vi.fn(),
-  saveConnection: vi.fn(() => ({
-    id: 'connection-1',
-    name: 'Example',
-    serverUrl: 'https://self-hosted.example.com',
-    appId: 'self-hosted-app',
-    adminSecret: 'secret',
-    env: 'dev',
+  saveConnection: vi.fn((draft, connectionId = 'connection-1') => ({
+    ...draft,
+    id: connectionId,
   })),
+  setConnectionContext: vi.fn(),
 }))
+let connections: StoredConnection[] = []
 
 vi.mock('jazz-tools', () => ({ fetchSchemaHashes }))
 vi.mock('@tanstack/react-router', () => ({ useNavigate: () => navigate }))
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
-    connections: [],
+    connections,
     prefill: null,
     saveConnection,
-    setConnectionContext: vi.fn(),
+    setConnectionContext,
   }),
 }))
 
 afterEach(() => {
   cleanup()
+  connections = []
   fetchSchemaHashes.mockReset()
   navigate.mockReset()
   saveConnection.mockClear()
+  setConnectionContext.mockReset()
+  vi.restoreAllMocks()
 })
 
 describe('useAddConnectionFlow', () => {
@@ -134,5 +137,93 @@ describe('useAddConnectionFlow', () => {
 
     act(() => result.current.updateField('serverUrl', 'https://example.com'))
     expect(result.current.error).toBeNull()
+  })
+
+  it('prefills and updates the same saved connection when editing', async () => {
+    fetchSchemaHashes.mockResolvedValueOnce({ hashes: ['schema-1'] })
+    const connection = {
+      id: 'connection-2',
+      name: 'Production',
+      serverUrl: 'https://self-hosted.example.com',
+      appId: 'production-app',
+      adminSecret: 'production-secret',
+      env: 'prod',
+    }
+    const { result } = renderHook(() => useAddConnectionFlow({ connection, branch: 'release' }))
+
+    expect(result.current.formValues).toEqual({
+      name: 'Production',
+      serverUrl: 'https://self-hosted.example.com',
+      appId: 'production-app',
+      adminSecret: 'production-secret',
+      env: 'prod',
+      branch: 'release',
+    })
+
+    act(() => result.current.updateField('name', 'Production app'))
+    await act(async () => {
+      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+    })
+
+    expect(saveConnection).toHaveBeenCalledWith(
+      {
+        name: 'Production app',
+        serverUrl: 'https://self-hosted.example.com',
+        appId: 'production-app',
+        adminSecret: 'production-secret',
+        env: 'prod',
+      },
+      'connection-2',
+    )
+    expect(setConnectionContext).toHaveBeenCalledWith('connection-2', 'release', 'schema-1')
+    expect(navigate).toHaveBeenCalledWith({
+      to: '/conn/$connectionId/tables',
+      params: { connectionId: 'connection-2' },
+    })
+  })
+
+  it('opens an existing saved connection when edited credentials match it', async () => {
+    const connection = {
+      id: 'connection-2',
+      name: 'Production',
+      serverUrl: 'https://self-hosted.example.com',
+      appId: 'production-app',
+      adminSecret: 'production-secret',
+      env: 'prod',
+    }
+    connections = [
+      connection,
+      {
+        id: 'connection-1',
+        name: 'Existing',
+        serverUrl: 'https://existing.example.com',
+        appId: 'existing-app',
+        adminSecret: 'existing-secret',
+        env: 'dev',
+      },
+    ]
+    fetchSchemaHashes.mockResolvedValue({ hashes: ['schema-1'] })
+    const { result } = renderHook(() => useAddConnectionFlow({ connection, branch: 'release' }))
+
+    act(() => {
+      result.current.updateField('serverUrl', 'https://existing.example.com')
+      result.current.updateField('appId', 'existing-app')
+      result.current.updateField('adminSecret', 'existing-secret')
+    })
+    await act(async () => {
+      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+    })
+
+    expect(result.current.error).toBeNull()
+    expect(fetchSchemaHashes).toHaveBeenCalledWith('https://existing.example.com', {
+      appId: 'existing-app',
+      adminSecret: 'existing-secret',
+    })
+    expect(saveConnection).not.toHaveBeenCalled()
+    expect(setConnectionContext).toHaveBeenCalledWith('connection-1', 'release', 'schema-1')
+    expect(navigate).toHaveBeenCalledWith({
+      to: '/conn/$connectionId/tables',
+      params: { connectionId: 'connection-1' },
+    })
   })
 })

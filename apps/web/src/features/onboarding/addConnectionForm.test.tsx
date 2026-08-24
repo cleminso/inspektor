@@ -117,4 +117,20 @@ describe('AddConnectionForm', () => {
     expect(adminSecret.getAttribute('autocomplete')).toBe('off')
     expect(adminSecret.getAttribute('type')).toBe('password')
   })
+
+  it('uses edit action copy when editing a saved connection', () => {
+    render(
+      <AddConnectionForm
+        error={null}
+        formValues={formValues}
+        isSubmitting={false}
+        mode="edit"
+        onCancel={vi.fn()}
+        onSubmit={vi.fn()}
+        onUpdateField={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Save connection' })).toBeTruthy()
+  })
 })

@@ -335,7 +335,7 @@
       "type": "false | true",
       "required": false,
       "defaultValue": "false",
-      "description": "Shows a leading spinner, preserves the label, and blocks interaction.",
+      "description": "Shows a centered spinner, preserves the button dimensions, and blocks interaction.",
       "source": {
         "path": "packages/design-system/src/components/button/button.tsx",
         "line": 37
@@ -6667,7 +6667,7 @@
   "combobox.viewport": [
     {
       "name": "maxHeight",
-      "type": "\"s\" | \"m\" | \"l\" | \"available\"",
+      "type": "\"s\" | \"m\" | \"l\" | \"fiveItems\" | \"available\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the maximum height of the scrolling results region.",
@@ -7046,7 +7046,7 @@
   "contextSwitcher.viewport": [
     {
       "name": "maxHeight",
-      "type": "\"s\" | \"m\" | \"l\" | \"available\"",
+      "type": "\"s\" | \"m\" | \"l\" | \"fiveItems\" | \"available\"",
       "required": false,
       "defaultValue": "\"m\"",
       "description": "Controls the maximum height of the scrolling results region.",

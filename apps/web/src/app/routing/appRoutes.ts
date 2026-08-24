@@ -7,6 +7,7 @@
 export const appRoutes = {
   connections: '/conn',
   newConnection: '/conn/new',
+  editConnection: '/conn/edit/$connectionId',
   connection: '/conn/$connectionId',
   tables: '/conn/$connectionId/tables',
   queries: '/conn/$connectionId/queries',

@@ -10,6 +10,7 @@ interface AddConnectionFormProps {
   error: ConnectionError | null
   formValues: AddConnectionFormValues
   isSubmitting: boolean
+  mode?: 'add' | 'edit'
   onCancel: () => void
   onSubmit: FormEventHandler<HTMLFormElement>
   onUpdateField: (field: keyof AddConnectionFormValues, value: string) => void
@@ -19,6 +20,7 @@ export function AddConnectionForm({
   error,
   formValues,
   isSubmitting,
+  mode = 'add',
   onCancel,
   onSubmit,
   onUpdateField,
@@ -61,7 +63,7 @@ export function AddConnectionForm({
           onValueChange={(value) => {
             onUpdateField('name', value)
           }}
-          placeholder="My Jazz app…"
+          placeholder="my Jazz app…"
         />
         <TextField
           id="connection-server-url"
@@ -166,7 +168,7 @@ export function AddConnectionForm({
           disabled={isSubmitting === true}
           loading={isSubmitting === true}
         >
-          Add connection
+          {mode === 'edit' ? 'Save connection' : 'Add connection'}
         </Button>
         <Button
           type="button"

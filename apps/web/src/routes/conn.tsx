@@ -15,15 +15,25 @@ function ConnRoute(): React.ReactElement {
   const location = useLocation()
   const isConnectionsRoute = location.pathname === appRoutes.connections
   const isNewConnectionRoute = location.pathname === appRoutes.newConnection
-  const isOnboardingRoute = isConnectionsRoute === true || isNewConnectionRoute === true
+  const isEditConnectionRoute = location.pathname.startsWith('/conn/edit/')
+  const isOnboardingRoute =
+    isConnectionsRoute === true || isNewConnectionRoute === true || isEditConnectionRoute === true
 
   if (isOnboardingRoute === false) {
     return <Outlet />
   }
 
   return (
-    <ConnectionsLayout pageTitle={isNewConnectionRoute === true ? 'Add connection' : 'Connections'}>
-      {isNewConnectionRoute === true ? <Outlet /> : <ConnectionsView />}
+    <ConnectionsLayout
+      pageTitle={
+        isNewConnectionRoute === true
+          ? 'Add connection'
+          : isEditConnectionRoute === true
+            ? 'Edit connection'
+            : 'Connections'
+      }
+    >
+      {isConnectionsRoute === true ? <ConnectionsView /> : <Outlet />}
     </ConnectionsLayout>
   )
 }

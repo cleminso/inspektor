@@ -10,6 +10,7 @@
 const CONNECTIONS_STORAGE_KEY = 'regarde-inspector-connections'
 export const DEFAULT_SERVER_URL = 'https://v2.sync.jazz.tools/'
 export const DEFAULT_BRANCH_NAME = 'main'
+export const DEFAULT_CONNECTION_NAME = 'my Jazz app'
 
 /** Jazz admin credentials shared by validation, persistence, and runtime clients. */
 export interface ConnectionCredentials {
@@ -263,7 +264,7 @@ export function createConnectionFromDraft(
 ): StoredConnection {
   return {
     id: connectionId,
-    name: draft.name.trim() || deriveConnectionName(draft),
+    name: draft.name.trim() || DEFAULT_CONNECTION_NAME,
     serverUrl: draft.serverUrl.trim(),
     appId: draft.appId.trim(),
     adminSecret: draft.adminSecret.trim(),
@@ -279,18 +280,9 @@ function createConnectionId(): string {
   return `connection-${Math.random().toString(36).slice(2, 10)}`
 }
 
-function deriveConnectionName(connection: Pick<ConnectionDraft, 'serverUrl' | 'appId'>): string {
-  try {
-    const host = new URL(connection.serverUrl).host
-    return host.length > 0 ? `${connection.appId} @ ${host}` : connection.appId
-  } catch {
-    return connection.appId.length > 0 ? connection.appId : 'Jazz connection'
-  }
-}
-
 export function getConnectionDisplayName(connection: StoredConnection): string {
   const name = connection.name.trim()
-  return name.length > 0 ? name : deriveConnectionName(connection)
+  return name.length > 0 ? name : DEFAULT_CONNECTION_NAME
 }
 
 export function normalizeBranchName(branch: string | null | undefined): string {
@@ -383,7 +375,7 @@ function migrateStoredConnections(parsed: unknown): StoredConnectionsStore | nul
   if (isLegacyStoredConfig(parsed) === true) {
     const connection = createConnectionFromDraft(
       {
-        name: deriveConnectionName(parsed),
+        name: DEFAULT_CONNECTION_NAME,
         serverUrl: parsed.serverUrl,
         appId: parsed.appId,
         adminSecret: parsed.adminSecret,

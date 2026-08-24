@@ -139,7 +139,7 @@ describe('Button', () => {
     expect(prefix).toBeDefined()
   })
 
-  it('uses disabled button semantics while loading and prevents activation', () => {
+  it('centers the loading indicator while preserving the hidden label width', () => {
     let activationCount = 0
 
     render(
@@ -154,8 +154,22 @@ describe('Button', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Save changes' })
+    const content = button.querySelector('[data-slot="button-content"]')
+    const indicator = button.querySelector('[data-slot="button-loading-indicator"]')
+    const loadingContentClassName = stylex.props(buttonStyles.loadingContent).className
+    const loadingIndicatorClassName = stylex.props(buttonStyles.loadingIndicator).className
     fireEvent.click(button)
 
+    expect(content?.textContent).toBe('Save changes')
+    expect(loadingContentClassName).toBeDefined()
+    expect(loadingIndicatorClassName).toBeDefined()
+    if (loadingContentClassName !== undefined && loadingIndicatorClassName !== undefined) {
+      expect(content?.classList.contains(loadingContentClassName)).toBe(true)
+      for (const className of loadingIndicatorClassName.split(' ')) {
+        expect(indicator?.classList.contains(className)).toBe(true)
+      }
+    }
+    expect(indicator?.querySelector('[data-slot="spinner"]')).not.toBeNull()
     expect(button.getAttribute('data-disabled')).toBe('')
     expect(button.getAttribute('aria-busy')).toBe('true')
     expect(button.getAttribute('aria-disabled')).toBe('true')

@@ -159,7 +159,7 @@ export interface ComboboxPopupFooterProps extends Omit<
   'className' | 'render' | 'style'
 > {}
 
-export type ComboboxViewportHeight = 's' | 'm' | 'l' | 'available'
+export type ComboboxViewportHeight = 's' | 'm' | 'l' | 'fiveItems' | 'available'
 
 export interface ComboboxViewportProps extends Omit<
   useRender.ComponentProps<'div'>,
@@ -614,6 +614,7 @@ const viewportHeightStyles = {
   s: comboboxStyles.viewportHeightS,
   m: comboboxStyles.viewportHeightM,
   l: comboboxStyles.viewportHeightL,
+  fiveItems: comboboxStyles.viewportHeightFiveItems,
   available: comboboxStyles.viewportHeightAvailable,
 } satisfies Record<ComboboxViewportHeight, unknown>
 
@@ -626,6 +627,7 @@ const ComboboxViewport = forwardRef<HTMLDivElement, ComboboxViewportProps>(
     )
     const defaultProps = {
       ...styles,
+      'data-max-height': maxHeight,
       'data-scrollbar': 'standard',
       'data-slot': 'combobox-viewport',
     } as useRender.ComponentProps<'div'>

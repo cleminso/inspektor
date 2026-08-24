@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[24/08/26]
+
+- [x] Keep each horizontal workspace tab at the shared fixed tab width instead of allowing flex sizing to distort it.
+
 [20/08/26]
 
 - [x] Accept an optional canonical close hotkey and display it with Keyboard Input in the close-action tooltip.
@@ -180,6 +184,10 @@
 
 ## Settled interaction decisions
 
+[24/08/26]
+
+- [x] Use one fixed shared tab width and end ellipsis. This supersedes intrinsic full-title widths and non-ellipsis overflow from [12/08/26].
+
 [20/08/26]
 
 - [x] Use an italic title to distinguish a replaceable tab without changing its accessible name.
@@ -280,6 +288,10 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[24/08/26]
+
+- [x] Run StyleX lint, design-system typecheck, build, and package tests for the fixed-width tab change.
 
 [20/08/26]
 

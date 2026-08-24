@@ -9,16 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConnRouteImport } from './routes/conn'
 import { Route as ConnConnectionIdRouteImport } from './routes/conn/$connectionId'
 import { Route as ConnNewRouteImport } from './routes/conn/new'
 import { Route as ConnConnectionIdIndexRouteImport } from './routes/conn/$connectionId/index'
 import { Route as ConnConnectionIdQueriesRouteImport } from './routes/conn/$connectionId/queries'
 import { Route as ConnConnectionIdTablesRouteImport } from './routes/conn/$connectionId/tables'
+import { Route as ConnEditConnectionIdRouteImport } from './routes/conn/edit/$connectionId'
 import { Route as ConnConnectionIdQueriesIndexRouteImport } from './routes/conn/$connectionId/queries/index'
 import { Route as ConnConnectionIdTablesIndexRouteImport } from './routes/conn/$connectionId/tables/index'
 import { Route as ConnConnectionIdTablesTableNameIndexRouteImport } from './routes/conn/$connectionId/tables/$tableName/index'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConnRoute = ConnRouteImport.update({
   id: '/conn',
   path: '/conn',
@@ -49,6 +56,11 @@ const ConnConnectionIdTablesRoute = ConnConnectionIdTablesRouteImport.update({
   path: '/tables',
   getParentRoute: () => ConnConnectionIdRoute,
 } as any)
+const ConnEditConnectionIdRoute = ConnEditConnectionIdRouteImport.update({
+  id: '/edit/$connectionId',
+  path: '/edit/$connectionId',
+  getParentRoute: () => ConnRoute,
+} as any)
 const ConnConnectionIdQueriesIndexRoute =
   ConnConnectionIdQueriesIndexRouteImport.update({
     id: '/',
@@ -69,19 +81,23 @@ const ConnConnectionIdTablesTableNameIndexRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/conn': typeof ConnRouteWithChildren
   '/conn/$connectionId': typeof ConnConnectionIdRouteWithChildren
   '/conn/new': typeof ConnNewRoute
   '/conn/$connectionId/queries': typeof ConnConnectionIdQueriesRouteWithChildren
   '/conn/$connectionId/tables': typeof ConnConnectionIdTablesRouteWithChildren
+  '/conn/edit/$connectionId': typeof ConnEditConnectionIdRoute
   '/conn/$connectionId/': typeof ConnConnectionIdIndexRoute
   '/conn/$connectionId/queries/': typeof ConnConnectionIdQueriesIndexRoute
   '/conn/$connectionId/tables/': typeof ConnConnectionIdTablesIndexRoute
   '/conn/$connectionId/tables/$tableName/': typeof ConnConnectionIdTablesTableNameIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/conn': typeof ConnRouteWithChildren
   '/conn/new': typeof ConnNewRoute
+  '/conn/edit/$connectionId': typeof ConnEditConnectionIdRoute
   '/conn/$connectionId': typeof ConnConnectionIdIndexRoute
   '/conn/$connectionId/queries': typeof ConnConnectionIdQueriesIndexRoute
   '/conn/$connectionId/tables': typeof ConnConnectionIdTablesIndexRoute
@@ -89,11 +105,13 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/conn': typeof ConnRouteWithChildren
   '/conn/$connectionId': typeof ConnConnectionIdRouteWithChildren
   '/conn/new': typeof ConnNewRoute
   '/conn/$connectionId/queries': typeof ConnConnectionIdQueriesRouteWithChildren
   '/conn/$connectionId/tables': typeof ConnConnectionIdTablesRouteWithChildren
+  '/conn/edit/$connectionId': typeof ConnEditConnectionIdRoute
   '/conn/$connectionId/': typeof ConnConnectionIdIndexRoute
   '/conn/$connectionId/queries/': typeof ConnConnectionIdQueriesIndexRoute
   '/conn/$connectionId/tables/': typeof ConnConnectionIdTablesIndexRoute
@@ -102,30 +120,36 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/conn'
     | '/conn/$connectionId'
     | '/conn/new'
     | '/conn/$connectionId/queries'
     | '/conn/$connectionId/tables'
+    | '/conn/edit/$connectionId'
     | '/conn/$connectionId/'
     | '/conn/$connectionId/queries/'
     | '/conn/$connectionId/tables/'
     | '/conn/$connectionId/tables/$tableName/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/conn'
     | '/conn/new'
+    | '/conn/edit/$connectionId'
     | '/conn/$connectionId'
     | '/conn/$connectionId/queries'
     | '/conn/$connectionId/tables'
     | '/conn/$connectionId/tables/$tableName'
   id:
     | '__root__'
+    | '/'
     | '/conn'
     | '/conn/$connectionId'
     | '/conn/new'
     | '/conn/$connectionId/queries'
     | '/conn/$connectionId/tables'
+    | '/conn/edit/$connectionId'
     | '/conn/$connectionId/'
     | '/conn/$connectionId/queries/'
     | '/conn/$connectionId/tables/'
@@ -133,11 +157,19 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   ConnRoute: typeof ConnRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/conn': {
       id: '/conn'
       path: '/conn'
@@ -179,6 +211,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/conn/$connectionId/tables'
       preLoaderRoute: typeof ConnConnectionIdTablesRouteImport
       parentRoute: typeof ConnConnectionIdRoute
+    }
+    '/conn/edit/$connectionId': {
+      id: '/conn/edit/$connectionId'
+      path: '/edit/$connectionId'
+      fullPath: '/conn/edit/$connectionId'
+      preLoaderRoute: typeof ConnEditConnectionIdRouteImport
+      parentRoute: typeof ConnRoute
     }
     '/conn/$connectionId/queries/': {
       id: '/conn/$connectionId/queries/'
@@ -253,16 +292,19 @@ const ConnConnectionIdRouteWithChildren =
 interface ConnRouteChildren {
   ConnConnectionIdRoute: typeof ConnConnectionIdRouteWithChildren
   ConnNewRoute: typeof ConnNewRoute
+  ConnEditConnectionIdRoute: typeof ConnEditConnectionIdRoute
 }
 
 const ConnRouteChildren: ConnRouteChildren = {
   ConnConnectionIdRoute: ConnConnectionIdRouteWithChildren,
   ConnNewRoute: ConnNewRoute,
+  ConnEditConnectionIdRoute: ConnEditConnectionIdRoute,
 }
 
 const ConnRouteWithChildren = ConnRoute._addFileChildren(ConnRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   ConnRoute: ConnRouteWithChildren,
 }
 export const routeTree = rootRouteImport

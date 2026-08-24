@@ -31,6 +31,7 @@ export interface InspectorSessionContextValue {
   currentBranch: string | null
   currentSchemaHash: string | null
   currentTableName: string | null
+  runtimeScopeExitBlocked: boolean
   connectionLabel: string | null
   rememberedBranches: string[]
   openConnection: (connectionId: string, knownSchemaHashes?: readonly string[]) => Promise<void>
@@ -38,6 +39,7 @@ export interface InspectorSessionContextValue {
   switchSchema: (schemaHash: string) => Promise<void>
   saveConnection: ReturnType<typeof useInspectorSession>['saveConnection']
   deleteConnection: ReturnType<typeof useInspectorSession>['deleteConnection']
+  getConnectionPreferences: ReturnType<typeof useInspectorSession>['getConnectionPreferences']
   setConnectionContext: ReturnType<typeof useInspectorSession>['setConnectionContext']
   prefill: ReturnType<typeof useInspectorSession>['prefill']
 }
@@ -187,6 +189,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentBranch,
       currentSchemaHash,
       currentTableName,
+      runtimeScopeExitBlocked: runtimeScopeExitGuard.isBlocked(),
       connectionLabel:
         activeConnection !== null ? getConnectionDisplayName(activeConnection) : null,
       rememberedBranches:
@@ -196,6 +199,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       switchSchema,
       saveConnection: session.saveConnection,
       deleteConnection: session.deleteConnection,
+      getConnectionPreferences: session.getConnectionPreferences,
       setConnectionContext,
       prefill: session.prefill,
     }),
@@ -206,6 +210,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentSchemaHash,
       currentTableName,
       openConnection,
+      runtimeScopeExitGuard,
       session,
       setConnectionContext,
       switchBranch,

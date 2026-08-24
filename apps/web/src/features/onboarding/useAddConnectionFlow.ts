@@ -5,7 +5,12 @@ import { fetchSchemaHashes } from 'jazz-tools'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { findConnectionByCredentials } from '@app/connections/connectionIdentity'
-import { normalizeBranchName, normalizeEnvName } from '@app/connections/connections'
+import {
+  getConnectionDisplayName,
+  normalizeBranchName,
+  normalizeEnvName,
+  type StoredConnection,
+} from '@app/connections/connections'
 import {
   ConnectionNavigationError,
   EMPTY_SCHEMA_ERROR,
@@ -34,13 +39,29 @@ interface UseAddConnectionFlowResult {
   updateField: (field: keyof AddConnectionFormValues, value: string) => void
 }
 
-export function useAddConnectionFlow(): UseAddConnectionFlowResult {
+interface UseAddConnectionFlowOptions {
+  branch: string
+  connection: StoredConnection
+}
+
+export function useAddConnectionFlow(
+  options?: UseAddConnectionFlowOptions,
+): UseAddConnectionFlowResult {
   const { connections, prefill, saveConnection, setConnectionContext } =
     useInspectorSessionContext()
   const navigate = useNavigate()
   const [step, setStep] = useState<AddConnectionStep>('form')
   const [formValues, setFormValues] = useState<AddConnectionFormValues>(() =>
-    createInitialFormValues(prefill),
+    options === undefined
+      ? createInitialFormValues(prefill)
+      : {
+          name: getConnectionDisplayName(options.connection),
+          serverUrl: options.connection.serverUrl,
+          appId: options.connection.appId,
+          adminSecret: options.connection.adminSecret,
+          env: options.connection.env,
+          branch: options.branch,
+        },
   )
   const [schemaHashes, setSchemaHashes] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -70,7 +91,12 @@ export function useAddConnectionFlow(): UseAddConnectionFlowResult {
       env: normalizeEnvName(formValues.env),
     }
     const existingConnection = findConnectionByCredentials(connections, draft)
-    const connection = existingConnection ?? saveConnection(draft)
+    const connection =
+      existingConnection !== null && existingConnection.id !== options?.connection.id
+        ? existingConnection
+        : options === undefined
+          ? saveConnection(draft)
+          : saveConnection(draft, options.connection.id)
 
     setConnectionContext(connection.id, branch, schemaHash)
 
