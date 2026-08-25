@@ -136,22 +136,18 @@ describe('TableTabsProvider', () => {
     routeSearch.filters = 'active-filter'
     schemaState.isSchemaReady = false
     window.localStorage.setItem(
-      'regarde-inspector-tabs',
+      'inspektor-tabs:scope',
       JSON.stringify({
-        version: 2,
-        scopes: {
-          scope: {
-            recentViews: [],
-            tabs: [
-              {
-                id: 'view:accounts-filtered',
-                kind: 'table',
-                search: { filters: 'active-filter' },
-                tableName: 'accounts',
-              },
-            ],
+        version: 1,
+        recentViews: [],
+        tabs: [
+          {
+            id: 'view:accounts-filtered',
+            kind: 'table',
+            search: { filters: 'active-filter' },
+            tableName: 'accounts',
           },
-        },
+        ],
       }),
     )
 
@@ -163,11 +159,11 @@ describe('TableTabsProvider', () => {
     expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none')
     await waitFor(() => {
       const storedState = JSON.parse(
-        window.localStorage.getItem('regarde-inspector-tabs') ?? 'null',
+        window.localStorage.getItem('inspektor-tabs:scope') ?? 'null',
       ) as {
-        scopes: { scope: { tabs: Array<{ search: { filters?: string } }> } }
+        tabs: Array<{ search: { filters?: string } }>
       }
-      expect(storedState.scopes.scope.tabs[0]?.search.filters).toBe('active-filter')
+      expect(storedState.tabs[0]?.search.filters).toBe('active-filter')
     })
   })
 
@@ -198,23 +194,19 @@ describe('TableTabsProvider', () => {
 
   it('closes a non-final table view without discarding staged changes', async () => {
     window.localStorage.setItem(
-      'regarde-inspector-tabs',
+      'inspektor-tabs:scope',
       JSON.stringify({
-        version: 2,
-        scopes: {
-          scope: {
-            recentViews: [],
-            tabs: [
-              { id: 'table:accounts', kind: 'table', search: {}, tableName: 'accounts' },
-              {
-                id: 'schema:accounts',
-                kind: 'table',
-                search: { view: 'schema' },
-                tableName: 'accounts',
-              },
-            ],
+        version: 1,
+        recentViews: [],
+        tabs: [
+          { id: 'table:accounts', kind: 'table', search: {}, tableName: 'accounts' },
+          {
+            id: 'schema:accounts',
+            kind: 'table',
+            search: { view: 'schema' },
+            tableName: 'accounts',
           },
-        },
+        ],
       }),
     )
     render(<Harness />)

@@ -1,38 +1,35 @@
-const TABLE_PINS_STORAGE_KEY = 'regarde-inspector-table-pins'
+const TABLE_PINS_STORAGE_KEY_PREFIX = 'inspektor-table-pins:'
 
-interface StoredTablePins {
-  version: 1
-  scopes: Record<string, string[]>
+function getStorageKey(scope: string): string {
+  return `${TABLE_PINS_STORAGE_KEY_PREFIX}${encodeURIComponent(scope)}`
 }
 
-function readStoredScopes(): Record<string, string[]> {
+function readStoredTableNames(scope: string): string[] {
   if (typeof window === 'undefined') {
-    return {}
+    return []
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(TABLE_PINS_STORAGE_KEY) ?? 'null') as {
+    const parsed = JSON.parse(window.localStorage.getItem(getStorageKey(scope)) ?? 'null') as {
       version?: unknown
-      scopes?: unknown
+      tableNames?: unknown
     } | null
-    if (parsed?.version !== 1 || typeof parsed.scopes !== 'object' || parsed.scopes === null) {
-      return {}
+    if (
+      parsed?.version !== 1 ||
+      Array.isArray(parsed.tableNames) === false ||
+      parsed.tableNames.every((entry) => typeof entry === 'string') === false
+    ) {
+      return []
     }
 
-    const scopes: Record<string, string[]> = {}
-    for (const [scope, value] of Object.entries(parsed.scopes)) {
-      if (Array.isArray(value) === true && value.every((entry) => typeof entry === 'string')) {
-        scopes[scope] = value
-      }
-    }
-    return scopes
+    return parsed.tableNames
   } catch {
-    return {}
+    return []
   }
 }
 
 export function loadPinnedTableNames(scope: string): ReadonlySet<string> {
-  return new Set(readStoredScopes()[scope] ?? [])
+  return new Set(readStoredTableNames(scope))
 }
 
 export function updatePinnedTableNames(
@@ -57,9 +54,9 @@ export function savePinnedTableNames(scope: string, tableNames: ReadonlySet<stri
   }
 
   try {
-    const scopes = readStoredScopes()
-    scopes[scope] = [...tableNames]
-    const value: StoredTablePins = { version: 1, scopes }
-    window.localStorage.setItem(TABLE_PINS_STORAGE_KEY, JSON.stringify(value))
+    window.localStorage.setItem(
+      getStorageKey(scope),
+      JSON.stringify({ version: 1, tableNames: [...tableNames] }),
+    )
   } catch {}
 }

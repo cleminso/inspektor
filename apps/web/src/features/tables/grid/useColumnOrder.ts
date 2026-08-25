@@ -1,16 +1,3 @@
-import type { ColumnOrderState, OnChangeFn } from '@tanstack/react-table'
-import { useCallback, useRef, useState } from 'react'
-
-interface UseColumnOrderOptions {
-  columnIds: string[]
-  tableKey: string
-}
-
-interface UseColumnOrderResult {
-  columnOrder: string[]
-  setColumnOrder: OnChangeFn<ColumnOrderState>
-}
-
 export type ColumnMoveDirection = 'end' | 'left' | 'right' | 'start'
 
 export function moveColumnInOrder(
@@ -48,10 +35,6 @@ export function moveColumnInOrder(
   return nextColumnOrder
 }
 
-function areColumnOrdersEqual(left: readonly string[], right: readonly string[]): boolean {
-  return left.length === right.length && left.every((columnId, index) => columnId === right[index])
-}
-
 export function normalizeColumnOrder(
   candidateColumnIds: readonly string[],
   knownColumnIds: readonly string[],
@@ -75,56 +58,4 @@ export function normalizeColumnOrder(
   }
 
   return normalizedColumnIds
-}
-
-function readColumnOrder(storageKey: string, columnIds: string[]): string[] {
-  try {
-    const storedValue = window.localStorage.getItem(storageKey)
-    if (storedValue === null) {
-      return [...columnIds]
-    }
-
-    const parsedValue = JSON.parse(storedValue) as unknown
-    return Array.isArray(parsedValue) === true &&
-      parsedValue.every((value) => typeof value === 'string')
-      ? normalizeColumnOrder(parsedValue, columnIds)
-      : [...columnIds]
-  } catch {
-    return [...columnIds]
-  }
-}
-
-export function useColumnOrder({
-  columnIds,
-  tableKey,
-}: UseColumnOrderOptions): UseColumnOrderResult {
-  const storageKey = `inspector:column-order:${tableKey}`
-  // Use lazy initialization to expose persisted order directly, without an effect-synchronized intermediate state.
-  const [columnOrder, setColumnOrderState] = useState<string[]>(() =>
-    readColumnOrder(storageKey, columnIds),
-  )
-  const columnOrderRef = useRef(columnOrder)
-  columnOrderRef.current = columnOrder
-
-  const setColumnOrder = useCallback(
-    (updater: ColumnOrderState | ((current: ColumnOrderState) => ColumnOrderState)) => {
-      const currentColumnOrder = columnOrderRef.current
-      const nextColumnIds = typeof updater === 'function' ? updater(currentColumnOrder) : updater
-      const nextColumnOrder = normalizeColumnOrder(nextColumnIds, columnIds)
-      if (areColumnOrdersEqual(currentColumnOrder, nextColumnOrder) === true) {
-        return
-      }
-
-      columnOrderRef.current = nextColumnOrder
-      setColumnOrderState(nextColumnOrder)
-      try {
-        window.localStorage.setItem(storageKey, JSON.stringify(nextColumnOrder))
-      } catch {
-        return
-      }
-    },
-    [columnIds, storageKey],
-  )
-
-  return { columnOrder, setColumnOrder }
 }

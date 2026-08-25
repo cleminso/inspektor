@@ -60,7 +60,7 @@ interface OpenBaseTableTabsResult {
   tabs: TableTab[]
 }
 
-const TABLE_TABS_STORAGE_KEY = 'regarde-inspector-tabs'
+const TABLE_TABS_STORAGE_KEY_PREFIX = 'inspektor-tabs:'
 const MAX_RECENT_VIEWS = 5
 export const NEW_VIEW_TAB_ID = 'new-view' as const
 
@@ -443,44 +443,36 @@ function parseRecentViews(values: unknown): TableDataTab[] {
     .slice(0, MAX_RECENT_VIEWS)
 }
 
-function readStoredScopes(): Record<string, TableTabsState> {
+function getStorageKey(scope: string): string {
+  return `${TABLE_TABS_STORAGE_KEY_PREFIX}${encodeURIComponent(scope)}`
+}
+
+function readStoredState(scope: string): TableTabsState | null {
   if (typeof window === 'undefined') {
-    return {}
+    return null
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(TABLE_TABS_STORAGE_KEY) ?? 'null') as {
+    const parsed = JSON.parse(window.localStorage.getItem(getStorageKey(scope)) ?? 'null') as {
       version?: unknown
-      scopes?: unknown
+      tabs?: unknown
+      recentViews?: unknown
     } | null
-    if (typeof parsed?.scopes !== 'object' || parsed.scopes === null) {
-      return {}
+    if (parsed?.version !== 1) {
+      return null
     }
 
-    const scopes: Record<string, TableTabsState> = {}
-    for (const [scope, value] of Object.entries(parsed.scopes)) {
-      if (parsed.version === 1) {
-        scopes[scope] = { tabs: parseTabs(value), recentViews: [] }
-        continue
-      }
-      if (parsed.version !== 2 || typeof value !== 'object' || value === null) {
-        continue
-      }
-
-      const storedState = value as Partial<TableTabsState>
-      scopes[scope] = {
-        tabs: parseTabs(storedState.tabs),
-        recentViews: parseRecentViews(storedState.recentViews),
-      }
+    return {
+      tabs: parseTabs(parsed.tabs),
+      recentViews: parseRecentViews(parsed.recentViews),
     }
-    return scopes
   } catch {
-    return {}
+    return null
   }
 }
 
 export function loadTableTabsState(scope: string): TableTabsState {
-  const state = readStoredScopes()[scope] ?? emptyTableTabsState()
+  const state = readStoredState(scope) ?? emptyTableTabsState()
   return state.tabs.length === 0 ? { ...state, tabs: [createNewViewTab()] } : state
 }
 
@@ -490,8 +482,6 @@ export function saveTableTabsState(scope: string, state: TableTabsState): void {
   }
 
   try {
-    const scopes = readStoredScopes()
-    scopes[scope] = state
-    window.localStorage.setItem(TABLE_TABS_STORAGE_KEY, JSON.stringify({ version: 2, scopes }))
+    window.localStorage.setItem(getStorageKey(scope), JSON.stringify({ version: 1, ...state }))
   } catch {}
 }

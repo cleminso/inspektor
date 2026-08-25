@@ -11,6 +11,18 @@
 
 ## Implemented foundation
 
+[25/08/26]
+
+- [x] Reset the namespaced connection envelope to version 1 because `inspektor-connections` has no legacy payloads.
+
+[25/08/26]
+
+- [x] Use the `inspektor-` localStorage namespace for saved connection profiles.
+
+[25/08/26]
+
+- [x] Keep the validated version 3 connection envelope while removing compatibility with disposable version 2 and unversioned local profiles.
+
 [24/08/26]
 
 - [x] Document the connection lifecycle and its session intent, route resolution, runtime connectivity, and workspace presentation boundaries in architecture guidance and source JSDoc.

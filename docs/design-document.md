@@ -95,7 +95,7 @@ flowchart TD
     subgraph SessionRuntime["Connection session and Jazz runtime"]
       SessionProvider --> Session["useInspectorSession"]
       Session --> ConnectionStore["connections.ts"]
-      ConnectionStore --> ConnectionsStorage["localStorage: regarde-inspector-connections"]
+      ConnectionStore --> ConnectionsStorage["localStorage: inspektor-connections"]
       Session --> Prefill["readPrefillConfig"]
       Prefill --> UrlHash["URL hash/search prefill"]
 
@@ -212,7 +212,7 @@ runtime local and non-durable, so inspected data is not persisted by the Inspect
 
 From a user perspective, a connection is a persisted admin session configuration with app credentials. It lets the inspector
 introspect a remote server and fetch schema hashes, query subscriptions, and table data. Connections are stored in local
-storage under `regarde-inspector-connections`
+storage under `inspektor-connections`
 
 From Jazz's perspective, a connection is a single active WebSocket transport link between client and server.
 
@@ -387,7 +387,7 @@ Inspector routes describe the active content inside one saved local connection:
 Data is the default table representation, so the route omits `/data`. Filters and sorting remain search parameters of the
 active Data item. Routes do not expose tabs, pane positions, open item order, branch, or schema hash.
 
-The connection id resolves one profile from `regarde-inspector-connections`. Branch and schema hash are workspace preferences
+The connection id resolves one profile from `inspektor-connections`. Branch and schema hash are workspace preferences
 selected in the header and restored for that connection. Copied content URLs reopen inside this local context rather than
 acting as portable credentials or complete remote-admin links.
 
@@ -445,7 +445,7 @@ This flow **must answer**:
 
 From a user perspective, a connection is a persisted admin session configuration with app credentials. It lets the inspector
 introspect a remote server and fetch schema hashes, query subscriptions, and table data. Connections are stored in local
-storage under `regarde-inspector-connections`.
+storage under `inspektor-connections`.
 
 From Jazz's perspective, a connection is a single active WebSocket transport link between client and server.
 

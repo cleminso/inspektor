@@ -7,7 +7,7 @@
  * From the Inspector side, the same store keeps UI session preferences separate from
  * credentials so branch/schema selection can change without rewriting connection data.
  */
-const CONNECTIONS_STORAGE_KEY = 'regarde-inspector-connections'
+const CONNECTIONS_STORAGE_KEY = 'inspektor-connections'
 export const DEFAULT_SERVER_URL = 'https://v2.sync.jazz.tools/'
 export const DEFAULT_BRANCH_NAME = 'main'
 const DEFAULT_CONNECTION_NAME = 'my Jazz app'
@@ -37,32 +37,18 @@ export interface ConnectionPreferences {
   rememberedBranches: string[]
 }
 
-/** Version 3 localStorage schema for Jazz credentials and Inspector preferences. */
+/** Version 1 localStorage schema for Jazz credentials and Inspector preferences. */
 export interface StoredConnectionsStore {
-  version: 3
+  version: 1
   activeConnectionId: string | null
   connections: StoredConnection[]
   preferencesByConnectionId: Record<string, ConnectionPreferences>
 }
 
-interface LegacyStoredConnection extends ConnectionDraft {
-  id: string
-  branch: string
-  schemaHash: string
-}
-
-interface LegacyStoredConnectionsStore {
-  version: 2
-  activeConnectionId: string | null
-  connections: LegacyStoredConnection[]
-}
-
-type LegacyStoredConfig = Omit<LegacyStoredConnection, 'id' | 'name'>
-
 /** Creates the empty Inspector connection store used when persisted data is unavailable. */
 export function createEmptyConnectionStore(): StoredConnectionsStore {
   return {
-    version: 3,
+    version: 1,
     activeConnectionId: null,
     connections: [],
     preferencesByConnectionId: {},
@@ -87,7 +73,7 @@ export function readStoredConnections(): StoredConnectionsStore {
     }
 
     const parsed = JSON.parse(raw) as unknown
-    return migrateStoredConnections(parsed) ?? createEmptyConnectionStore()
+    return parseStoredConnections(parsed) ?? createEmptyConnectionStore()
   } catch {
     return createEmptyConnectionStore()
   }
@@ -297,11 +283,10 @@ export function resolveDefaultSchemaHash(
   return schemaCatalogue[0]?.hash ?? null
 }
 
-/** Migrates recognized Inspector localStorage shapes into store version 3. */
-function migrateStoredConnections(parsed: unknown): StoredConnectionsStore | null {
+function parseStoredConnections(parsed: unknown): StoredConnectionsStore | null {
   if (isStoredConnectionsStore(parsed) === true) {
     return {
-      version: 3,
+      version: 1,
       activeConnectionId: parsed.activeConnectionId,
       connections: parsed.connections.map((connection) => ({
         ...connection,
@@ -320,57 +305,6 @@ function migrateStoredConnections(parsed: unknown): StoredConnectionsStore | nul
     }
   }
 
-  if (isLegacyStoredConnectionsStore(parsed) === true) {
-    return {
-      version: 3,
-      activeConnectionId: parsed.activeConnectionId,
-      connections: parsed.connections.map((connection) => ({
-        id: connection.id,
-        name: connection.name,
-        serverUrl: connection.serverUrl,
-        appId: connection.appId,
-        adminSecret: connection.adminSecret,
-        env: normalizeEnvName(connection.env),
-      })),
-      preferencesByConnectionId: Object.fromEntries(
-        parsed.connections.map((connection) => [
-          connection.id,
-          {
-            lastBranch: normalizeBranchName(connection.branch),
-            lastSchemaHash: connection.schemaHash,
-            rememberedBranches: dedupeBranches([connection.branch]),
-          },
-        ]),
-      ),
-    }
-  }
-
-  if (isLegacyStoredConfig(parsed) === true) {
-    const connection = createConnectionFromDraft(
-      {
-        name: DEFAULT_CONNECTION_NAME,
-        serverUrl: parsed.serverUrl,
-        appId: parsed.appId,
-        adminSecret: parsed.adminSecret,
-        env: normalizeEnvName(parsed.env),
-      },
-      createConnectionId(),
-    )
-
-    return {
-      version: 3,
-      activeConnectionId: connection.id,
-      connections: [connection],
-      preferencesByConnectionId: {
-        [connection.id]: {
-          lastBranch: normalizeBranchName(parsed.branch),
-          lastSchemaHash: parsed.schemaHash,
-          rememberedBranches: dedupeBranches([parsed.branch]),
-        },
-      },
-    }
-  }
-
   return null
 }
 
@@ -381,27 +315,13 @@ function isStoredConnectionsStore(value: unknown): value is StoredConnectionsSto
 
   const candidate = value as StoredConnectionsStore
   return (
-    candidate.version === 3 &&
+    candidate.version === 1 &&
     (candidate.activeConnectionId === null || typeof candidate.activeConnectionId === 'string') &&
     Array.isArray(candidate.connections) === true &&
     candidate.connections.every(isStoredConnection) === true &&
     typeof candidate.preferencesByConnectionId === 'object' &&
     candidate.preferencesByConnectionId !== null &&
     Object.values(candidate.preferencesByConnectionId).every(isConnectionPreferences) === true
-  )
-}
-
-function isLegacyStoredConnectionsStore(value: unknown): value is LegacyStoredConnectionsStore {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-
-  const candidate = value as LegacyStoredConnectionsStore
-  return (
-    candidate.version === 2 &&
-    (candidate.activeConnectionId === null || typeof candidate.activeConnectionId === 'string') &&
-    Array.isArray(candidate.connections) === true &&
-    candidate.connections.every(isLegacyStoredConnection) === true
   )
 }
 
@@ -418,30 +338,6 @@ function isStoredConnection(value: unknown): value is StoredConnection {
     typeof candidate.appId === 'string' &&
     typeof candidate.adminSecret === 'string' &&
     typeof candidate.env === 'string'
-  )
-}
-
-function isLegacyStoredConnection(value: unknown): value is LegacyStoredConnection {
-  return (
-    isStoredConnection(value) === true &&
-    'branch' in value &&
-    typeof value.branch === 'string' &&
-    'schemaHash' in value &&
-    typeof value.schemaHash === 'string'
-  )
-}
-
-function isLegacyStoredConfig(value: unknown): value is LegacyStoredConfig {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-
-  const candidate = value as LegacyStoredConfig
-  return (
-    typeof candidate.serverUrl === 'string' &&
-    typeof candidate.appId === 'string' &&
-    typeof candidate.adminSecret === 'string' &&
-    typeof candidate.schemaHash === 'string'
   )
 }
 

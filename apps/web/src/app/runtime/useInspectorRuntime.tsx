@@ -16,7 +16,6 @@ import {
   reportRuntimeError,
   type InspectorRuntimeError,
 } from '@app/runtime/runtimeError'
-import { readCachedWasmSchema, writeCachedWasmSchema } from '@app/runtime/wasmSchemaCache'
 
 export interface InspectorRuntimeStore {
   $client: ReadableAtom<JazzClient | null>
@@ -50,12 +49,11 @@ interface UseInspectorRuntimeOptions {
 }
 
 function createInspectorRuntimeStore(
-  initialSchema: WasmSchema | null,
   isWasmSchemaLoading: boolean,
   sensitiveValues: readonly string[],
 ): MutableInspectorRuntimeStore {
   const $client = atom<JazzClient | null>(null)
-  const $wasmSchema = atom<WasmSchema | null>(initialSchema)
+  const $wasmSchema = atom<WasmSchema | null>(null)
   const $storedPermissions = atom<StoredPermissionsResponse | null>(null)
   const $schemaCatalogue = atom<readonly SchemaCatalogueRecord[]>([])
   const $error = atom<InspectorRuntimeError | null>(null)
@@ -111,10 +109,6 @@ export function useInspectorRuntime({
   const runtime = useMemo(
     () =>
       createInspectorRuntimeStore(
-        connection !== null && schemaHash !== null
-          && branch !== null
-          ? readCachedWasmSchema(connection, schemaHash)
-          : null,
         connection !== null && branch !== null && schemaHash !== null,
         connection === null ? [] : [connection.adminSecret],
       ),
@@ -151,7 +145,6 @@ export function useInspectorRuntime({
         return
       }
       runtime.$wasmSchema.set(schema)
-      writeCachedWasmSchema(connection, schemaHash, schema)
       runtime.$isWasmSchemaLoading.set(false)
     })
 

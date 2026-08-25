@@ -26,12 +26,22 @@ describe('table pins', () => {
 
     expect([...loadPinnedTableNames('connection:main:schema-a')]).toEqual(['accounts', 'users'])
     expect([...loadPinnedTableNames('connection:branch:schema-b')]).toEqual(['sessions'])
+    expect(window.localStorage.getItem('inspektor-table-pins')).toBeNull()
   })
 
   it('ignores invalid persisted pin data', () => {
     window.localStorage.setItem(
-      'regarde-inspector-table-pins',
-      JSON.stringify({ version: 1, scopes: { inspector: ['accounts', 42] } }),
+      'inspektor-table-pins:inspector',
+      JSON.stringify({ version: 1, tableNames: ['accounts', 42] }),
+    )
+
+    expect([...loadPinnedTableNames('inspector')]).toEqual([])
+  })
+
+  it('discards unsupported pin versions', () => {
+    window.localStorage.setItem(
+      'inspektor-table-pins:inspector',
+      JSON.stringify({ version: 2, tableNames: ['accounts'] }),
     )
 
     expect([...loadPinnedTableNames('inspector')]).toEqual([])

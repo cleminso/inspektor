@@ -1,9 +1,8 @@
 import { cleanup, renderHook, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { JazzClient } from 'jazz-tools/react'
 
 import { useInspectorRuntime } from '@app/runtime/useInspectorRuntime'
-import { resetWasmSchemaCacheForTests, writeCachedWasmSchema } from '@app/runtime/wasmSchemaCache'
 
 const jazzMocks = vi.hoisted(() => ({
   fetchSchemaHashes: vi.fn(),
@@ -21,24 +20,6 @@ vi.mock('jazz-tools', () => ({
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
-})
-
-beforeEach(() => {
-  resetWasmSchemaCacheForTests()
-  const values = new Map<string, string>()
-  Object.defineProperty(window, 'localStorage', {
-    configurable: true,
-    value: {
-      clear: () => values.clear(),
-      getItem: (key: string) => values.get(key) ?? null,
-      key: (index: number) => [...values.keys()][index] ?? null,
-      get length() {
-        return values.size
-      },
-      removeItem: (key: string) => values.delete(key),
-      setItem: (key: string, value: string) => values.set(key, value),
-    } satisfies Storage,
-  })
 })
 
 describe('useInspectorRuntime', () => {
@@ -84,7 +65,7 @@ describe('useInspectorRuntime', () => {
     expect(jazzMocks.fetchStoredWasmSchema).toHaveBeenCalledTimes(2)
   })
 
-  it('hydrates the schema projection from the saved runtime target', () => {
+  it('waits for the verified stored schema instead of restoring a local projection', () => {
     const connection = {
       id: 'connection-1',
       name: 'Local app',
@@ -93,7 +74,13 @@ describe('useInspectorRuntime', () => {
       adminSecret: 'secret',
       env: 'dev',
     } as const
-    writeCachedWasmSchema(connection, 'schema-1', { accounts: { columns: [] } })
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem: () =>
+          JSON.stringify({ version: 1, entries: { stale: { schema: { stale: { columns: [] } } } } }),
+      },
+    })
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
 
@@ -101,41 +88,11 @@ describe('useInspectorRuntime', () => {
       useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
     )
 
-    expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } })
-  })
-
-  it('keeps a cached schema unverified until the stored schema resolves', async () => {
-    const connection = {
-      id: 'connection-1',
-      name: 'Local app',
-      serverUrl: 'https://example.com',
-      appId: 'app-1',
-      adminSecret: 'secret',
-      env: 'dev',
-    } as const
-    writeCachedWasmSchema(connection, 'schema-1', { stale: { columns: [] } })
-    let resolveStoredSchema!: (value: { schema: { accounts: { columns: [] } } }) => void
-    jazzMocks.fetchStoredWasmSchema.mockReturnValue(
-      new Promise((resolve) => {
-        resolveStoredSchema = resolve
-      }),
-    )
-    jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-
-    const { result } = renderHook(() =>
-      useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
-    )
-
-    expect(result.current.$wasmSchema.get()).toEqual({ stale: { columns: [] } })
+    expect(result.current.$wasmSchema.get()).toBeNull()
     expect(result.current.$isWasmSchemaLoading.get()).toBe(true)
-
-    resolveStoredSchema({ schema: { accounts: { columns: [] } } })
-
-    await waitFor(() => expect(result.current.$isWasmSchemaLoading.get()).toBe(false))
-    expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } })
   })
 
-  it('exposes a fresh client projection when the branch changes while preserving cached schema', () => {
+  it('exposes a fresh client projection when the branch changes', () => {
     const connection = {
       id: 'connection-1',
       name: 'Local app',
@@ -144,7 +101,6 @@ describe('useInspectorRuntime', () => {
       adminSecret: 'secret',
       env: 'dev',
     } as const
-    writeCachedWasmSchema(connection, 'schema-1', { accounts: { columns: [] } })
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
 
@@ -160,7 +116,7 @@ describe('useInspectorRuntime', () => {
 
     expect(result.current).not.toBe(mainRuntime)
     expect(result.current.$client.get()).toBeNull()
-    expect(result.current.$wasmSchema.get()).toEqual({ accounts: { columns: [] } })
+    expect(result.current.$wasmSchema.get()).toBeNull()
   })
 
   it('does not let stale provider cleanup clear a replacement client', () => {

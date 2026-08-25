@@ -16,10 +16,12 @@ const resetPage = vi.fn()
 const { focusRowEditorField } = vi.hoisted(() => ({ focusRowEditorField: vi.fn() }))
 const columnOrderState = {
   columnOrder: ['id', 'name'],
+  columnVisibility: { id: true, name: true },
   setColumnOrder: vi.fn((updater: string[] | ((current: string[]) => string[])) => {
     columnOrderState.columnOrder =
       typeof updater === 'function' ? updater(columnOrderState.columnOrder) : updater
   }),
+  setColumnVisibility: vi.fn(),
 }
 const searchState = {
   editorMode: null as 'edit' | 'insert' | null,
@@ -75,13 +77,6 @@ vi.mock('@app/providers/inspectorProvider', () => ({
   useRuntimeSchema: () => runtimeState.schema,
 }))
 
-vi.mock('@tables/grid/useColumnVisibility', () => ({
-  useColumnVisibility: () => ({
-    columnVisibility: { id: true },
-    setColumnVisibility: vi.fn(),
-  }),
-}))
-
 vi.mock('@tables/grid/useColumnOrder', () => ({
   moveColumnInOrder: (
     columnOrder: string[],
@@ -104,7 +99,10 @@ vi.mock('@tables/grid/useColumnOrder', () => ({
     }
     return nextColumnOrder
   },
-  useColumnOrder: () => columnOrderState,
+}))
+
+vi.mock('@tables/grid/useTablePreferences', () => ({
+  useTablePreferences: () => columnOrderState,
 }))
 
 vi.mock('@tables/routing/useTableSearchParams', () => ({

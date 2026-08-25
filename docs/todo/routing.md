@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[25/08/26]
+
+- [x] Supersede cached schema hydration with a null schema projection until the selected stored schema is verified.
+
 [24/08/26]
 
 - [x] Redirect the application root to the connections route.
@@ -116,6 +120,10 @@
 
 ## Settled interaction decisions
 
+[25/08/26]
+
+- Runtime schema projection remains empty until Jazz verifies the selected stored schema. This supersedes branch-independent cached-schema hydration.
+
 [22/08/26]
 
 - Direct connection entry validates its remembered schema when hash discovery is available and otherwise delegates verification to the recoverable runtime boundary.
@@ -161,6 +169,11 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover runtime replacement without cached schema hydration.
+- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
 
 [24/08/26]
 

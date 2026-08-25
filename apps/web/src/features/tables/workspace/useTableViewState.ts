@@ -16,13 +16,9 @@ import {
   useRuntimeClient,
   useRuntimeSchema,
 } from '@app/providers/inspectorProvider'
-import { useColumnVisibility } from '@tables/grid/useColumnVisibility'
 import type { RowSelectionRequest } from '@tables/grid/buildColumns'
-import {
-  moveColumnInOrder,
-  useColumnOrder,
-  type ColumnMoveDirection,
-} from '@tables/grid/useColumnOrder'
+import { moveColumnInOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
+import { useTablePreferences } from '@tables/grid/useTablePreferences'
 import { useTableGrid } from '@tables/grid/useTableGrid'
 import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
@@ -240,11 +236,7 @@ export function useTableViewState({
   const mutations = useTableMutations({ client, tableName, wasmSchema })
   const tableKey = `${currentConnectionId ?? 'unknown'}:${currentBranch ?? 'unknown'}:${currentSchemaHash ?? 'unknown'}:${tableName}`
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
-  const visibility = useColumnVisibility({
-    tableKey,
-    columnIds,
-  })
-  const order = useColumnOrder({
+  const tablePreferences = useTablePreferences({
     tableKey,
     columnIds,
   })
@@ -396,7 +388,7 @@ export function useTableViewState({
   }
 
   const handleColumnVisibilityChange = (nextVisibility: Record<string, boolean>) => {
-    visibility.setColumnVisibility(nextVisibility)
+    tablePreferences.setColumnVisibility(nextVisibility)
     if (activeColumnId !== null && nextVisibility[activeColumnId] === false) {
       setActiveColumnId(null)
     }
@@ -408,9 +400,9 @@ export function useTableViewState({
     }
     setActiveColumnId(columnId)
   }, [])
-  const setColumnOrder = order.setColumnOrder
-  const columnVisibilityRef = useRef(visibility.columnVisibility)
-  columnVisibilityRef.current = visibility.columnVisibility
+  const setColumnOrder = tablePreferences.setColumnOrder
+  const columnVisibilityRef = useRef(tablePreferences.columnVisibility)
+  columnVisibilityRef.current = tablePreferences.columnVisibility
   const handleColumnMove = useCallback(
     (columnId: string, direction: ColumnMoveDirection) => {
       setColumnOrder((currentColumnOrder) => {
@@ -425,7 +417,7 @@ export function useTableViewState({
 
   const table = useTableGrid({
     cellSelection,
-    columnOrder: order.columnOrder,
+    columnOrder: tablePreferences.columnOrder,
     disabledRowIds,
     rows: query.rows,
     columns: query.columns,
@@ -433,7 +425,7 @@ export function useTableViewState({
     sortDirection: searchState.sortDirection,
     stagedValuesByRowId,
     selectedRowIds: visibleSelectedRowIds,
-    columnVisibility: visibility.columnVisibility,
+    columnVisibility: tablePreferences.columnVisibility,
     onSortChange: handleSortChange,
     onUndoRowDeletions,
     onSelectedRowIdsChange: handleSelectedRowIdsChange,
@@ -450,8 +442,8 @@ export function useTableViewState({
   const activeColumnNumber =
     selectedColumnId === null
       ? 0
-      : order.columnOrder
-          .filter((columnId) => visibility.columnVisibility[columnId] !== false)
+      : tablePreferences.columnOrder
+          .filter((columnId) => tablePreferences.columnVisibility[columnId] !== false)
           .indexOf(selectedColumnId) + 1
   const selectedRow = useMemo(() => {
     const visibleSelectedRow = query.rows.find((row) => String(row.id) === activeRowId) ?? null

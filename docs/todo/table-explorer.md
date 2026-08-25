@@ -19,6 +19,16 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[25/08/26]
+
+- [x] Use the `inspektor-` localStorage namespace for table preferences, pins, and workspace tabs.
+
+[25/08/26]
+
+- [x] Supersede persisted schema projections with verified Jazz schema loading as the only runtime schema source.
+- [x] Persist column order and hidden column IDs together in one versioned per-table preference record.
+- [x] Persist pinned tables and tabs with recent views in independent versioned records per workspace instead of rewriting shared multi-workspace objects.
+
 [24/08/26]
 
 - [x] Mount a route-reconciled table without forcing an intermediate opening frame.
@@ -957,6 +967,10 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[25/08/26]
+
+- Structural rendering, editor warming, queries, and mutations wait for the selected stored schema fetched from Jazz. This supersedes cached-schema availability decisions.
+
 [21/08/26]
 
 - Binary cell menus name the copied encoding explicitly; `Mod+C` maps to the direct Hex action.
@@ -1101,6 +1115,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover verified-schema-only runtime initialization and remove schema-cache identity, hydration, and browser-storage tests.
+- [x] Cover combined table preferences, per-workspace pins, tabs, and recent views with version rejection, scope isolation, and unavailable storage.
+- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
 
 [24/08/26]
 

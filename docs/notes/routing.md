@@ -44,7 +44,7 @@ segment instead of `view=schema` search state.
 
 ## Context ownership
 
-`connectionId` remains in the path because it resolves one profile from the local `regarde-inspector-connections` store. It
+`connectionId` remains in the path because it resolves one profile from the local `inspektor-connections` store. It
 lets separate browser tabs open different saved connections and restore the intended profile after reload.
 
 Branch and schema hash do not remain in ordinary content routes. They are workspace preferences for the selected connection:

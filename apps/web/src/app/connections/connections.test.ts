@@ -61,20 +61,48 @@ describe('createConnectionFromDraft', () => {
     ).toBe('my Jazz app')
   })
 
-  it('migrates a legacy connection with the readable fallback name', () => {
+  it('discards unsupported connection store versions', () => {
     const storedValue = JSON.stringify({
-      serverUrl: 'https://sync.example.com',
-      appId: 'app-1',
-      adminSecret: 'secret',
-      env: 'dev',
-      branch: 'main',
-      schemaHash: 'schema-1',
+      version: 2,
+      activeConnectionId: 'connection-1',
+      connections: [],
     })
     vi.stubGlobal('localStorage', {
-      getItem: (key: string) => (key === 'regarde-inspector-connections' ? storedValue : null),
+      getItem: (key: string) => (key === 'inspektor-connections' ? storedValue : null),
     })
 
-    expect(readStoredConnections().connections[0]?.name).toBe('my Jazz app')
+    expect(readStoredConnections()).toEqual(createEmptyConnectionStore())
+  })
+
+  it('restores a valid version 1 connection store', () => {
+    const store = {
+      version: 1 as const,
+      activeConnectionId: 'connection-1',
+      connections: [
+        createConnectionFromDraft(
+          {
+            name: 'Local app',
+            serverUrl: 'https://sync.example.com',
+            appId: 'app-1',
+            adminSecret: 'secret',
+            env: 'dev',
+          },
+          'connection-1',
+        ),
+      ],
+      preferencesByConnectionId: {
+        'connection-1': {
+          lastBranch: 'main',
+          lastSchemaHash: 'schema-1',
+          rememberedBranches: ['main'],
+        },
+      },
+    }
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => (key === 'inspektor-connections' ? JSON.stringify(store) : null),
+    })
+
+    expect(readStoredConnections()).toEqual(store)
   })
 })
 

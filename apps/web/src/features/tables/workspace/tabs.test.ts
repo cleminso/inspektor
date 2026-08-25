@@ -475,26 +475,53 @@ describe('table tabs', () => {
     ])
   })
 
-  it('migrates stored table tabs into the view-aware storage shape', () => {
+  it('persists one versioned record per workspace scope', () => {
+    const state = {
+      tabs: [{ kind: 'table' as const, id: 'table:accounts', tableName: 'accounts', search: {} }],
+      recentViews: [],
+    }
+
+    saveTableTabsState('inspector', state)
+
+    expect(loadTableTabsState('inspector')).toEqual(state)
+    expect(window.localStorage.getItem('inspektor-tabs')).toBeNull()
+    expect(JSON.parse(window.localStorage.getItem('inspektor-tabs:inspector') ?? 'null')).toEqual({
+      version: 1,
+      ...state,
+    })
+  })
+
+  it('isolates tabs and recent views by workspace scope', () => {
+    const accounts = {
+      tabs: [{ kind: 'table' as const, id: 'table:accounts', tableName: 'accounts', search: {} }],
+      recentViews: [],
+    }
+    const users = {
+      tabs: [{ kind: 'table' as const, id: 'table:users', tableName: 'users', search: {} }],
+      recentViews: [
+        { kind: 'table' as const, id: 'table:profiles', tableName: 'profiles', search: {} },
+      ],
+    }
+
+    saveTableTabsState('connection:main:schema-a', accounts)
+    saveTableTabsState('connection:branch:schema-b', users)
+
+    expect(loadTableTabsState('connection:main:schema-a')).toEqual(accounts)
+    expect(loadTableTabsState('connection:branch:schema-b')).toEqual(users)
+  })
+
+  it('discards unsupported workspace tab versions', () => {
     window.localStorage.setItem(
-      'regarde-inspector-tabs',
+      'inspektor-tabs:inspector',
       JSON.stringify({
-        version: 1,
-        scopes: {
-          inspector: [{ id: 'table:accounts', tableName: 'accounts', search: {} }],
-        },
+        version: 2,
+        tabs: [{ id: 'table:accounts', tableName: 'accounts', search: {} }],
+        recentViews: [],
       }),
     )
 
     expect(loadTableTabsState('inspector')).toEqual({
-      tabs: [
-        {
-          kind: 'table',
-          id: 'table:accounts',
-          tableName: 'accounts',
-          search: {},
-        },
-      ],
+      tabs: [{ kind: 'newView', id: NEW_VIEW_TAB_ID }],
       recentViews: [],
     })
   })
