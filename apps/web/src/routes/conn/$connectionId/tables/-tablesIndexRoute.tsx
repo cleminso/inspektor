@@ -15,7 +15,17 @@ export function TablesIndexRoute(): null {
   const { recentViews } = useTableTabs()
 
   useEffect(() => {
-    if (search.empty === 'true' || isSchemaReady === false || tables.length === 0) {
+    if (search.empty === 'true' || isSchemaReady === false) {
+      return
+    }
+
+    if (tables.length === 0) {
+      void navigate({
+        to: appRoutes.tables,
+        params: { connectionId: params.connectionId },
+        replace: true,
+        search: { empty: 'true' },
+      })
       return
     }
 

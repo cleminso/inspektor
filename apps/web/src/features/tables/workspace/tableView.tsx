@@ -243,14 +243,11 @@ function TableViewContent({
       state.recentlyAppliedCells,
     ],
   )
-  const handleCellEditRequest = useCallback(
-    (target: { columnId: string; rowId: string }) => {
-      if (stagedDeletionRowIds.has(target.rowId) === false) {
-        state.handleCellEditRequest(target)
-      }
-    },
-    [stagedDeletionRowIds, state],
-  )
+  const handleCellEditRequest = (target: { columnId: string; rowId: string }) => {
+    if (stagedDeletionRowIds.has(target.rowId) === false) {
+      state.handleCellEditRequest(target)
+    }
+  }
   const resolveCellAction = useCallback(
     (target: DataGridCellTarget) => {
       const columnMeta = state.tableColumns.find((column) => column.id === target.columnId)
@@ -312,22 +309,19 @@ function TableViewContent({
     },
     [resolveCellAction, state.tableKey],
   )
-  const handleFilterByCell = useCallback(
-    (target: DataGridCellTarget) => {
-      const resolvedCell = resolveCellAction(target)
-      if (resolvedCell === null) {
-        return
-      }
-      const clause = createTableFilterClauseFromValue(
-        resolvedCell.columnMeta.column ?? tableIdFilterColumn,
-        resolvedCell.value,
-      )
-      if (clause !== null) {
-        void state.setFilters([...state.filters, clause])
-      }
-    },
-    [resolveCellAction, state],
-  )
+  const handleFilterByCell = (target: DataGridCellTarget) => {
+    const resolvedCell = resolveCellAction(target)
+    if (resolvedCell === null) {
+      return
+    }
+    const clause = createTableFilterClauseFromValue(
+      resolvedCell.columnMeta.column ?? tableIdFilterColumn,
+      resolvedCell.value,
+    )
+    if (clause !== null) {
+      void state.setFilters([...state.filters, clause])
+    }
+  }
   const handleTouchCellContextMenuOpen = useCallback(
     (target: DataGridCellTarget) => {
       const row = state.table.getRowModel().rows.find((candidate) => candidate.id === target.rowId)

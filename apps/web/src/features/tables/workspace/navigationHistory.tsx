@@ -16,7 +16,6 @@ interface TableNavigationHistoryState {
 }
 
 type TableNavigationHistoryAction =
-  | { type: 'move'; index: number }
   | { type: 'push'; href: string }
   | { type: 'reconcile'; direction: 'back' | 'forward' | 'unknown'; href: string }
   | { type: 'replace'; href: string }
@@ -30,10 +29,6 @@ interface TableNavigationControlsContextValue {
 
 interface TableNavigationHistoryProviderProps {
   children: ReactNode
-}
-
-interface TableNavigationReplayState {
-  __inspectorTablesNavigationIndex?: number
 }
 
 const TableNavigationControlsContext = createContext<TableNavigationControlsContextValue | null>(
@@ -66,13 +61,6 @@ export function reduceTableNavigationHistory(
   state: TableNavigationHistoryState,
   action: TableNavigationHistoryAction,
 ): TableNavigationHistoryState {
-  if (action.type === 'move') {
-    if (action.index < 0 || action.index >= state.entries.length || action.index === state.index) {
-      return state
-    }
-    return { ...state, index: action.index }
-  }
-
   if (action.type === 'reconcile') {
     const matchingIndex =
       action.direction === 'back'
@@ -104,54 +92,48 @@ export function TableNavigationHistoryProvider({
   const historyRef = useRef(history)
   historyRef.current = history
 
-  useEffect(
-    () =>
-      router.history.subscribe(({ action, location }) => {
-        if (action.type !== 'PUSH' && action.type !== 'REPLACE') {
-          setHistory((currentHistory) =>
-            reduceTableNavigationHistory(currentHistory, {
-              type: 'reconcile',
-              direction:
-                action.type === 'BACK' ? 'back' : action.type === 'FORWARD' ? 'forward' : 'unknown',
-              href: location.href,
-            }),
-          )
-          return
-        }
-
-        const replayIndex = (location.state as TableNavigationReplayState)
-          .__inspectorTablesNavigationIndex
-        if (replayIndex !== undefined) {
-          setHistory((currentHistory) =>
-            reduceTableNavigationHistory(currentHistory, { type: 'move', index: replayIndex }),
-          )
-          return
-        }
-
+  useEffect(() => {
+    const unsubscribe = router.history.subscribe(({ action, location }) => {
+      if (action.type !== 'PUSH' && action.type !== 'REPLACE') {
         setHistory((currentHistory) =>
           reduceTableNavigationHistory(currentHistory, {
-            type: action.type === 'REPLACE' ? 'replace' : 'push',
+            type: 'reconcile',
+            direction:
+              action.type === 'BACK' || (action.type === 'GO' && action.index < 0)
+                ? 'back'
+                : action.type === 'FORWARD' || (action.type === 'GO' && action.index > 0)
+                  ? 'forward'
+                  : 'unknown',
             href: location.href,
           }),
         )
+        return
+      }
+
+      setHistory((currentHistory) =>
+        reduceTableNavigationHistory(currentHistory, {
+          type: action.type === 'REPLACE' ? 'replace' : 'push',
+          href: location.href,
+        }),
+      )
+    })
+    setHistory((currentHistory) =>
+      reduceTableNavigationHistory(currentHistory, {
+        type: 'replace',
+        href: router.history.location.href,
       }),
-    [router],
-  )
+    )
+    return unsubscribe
+  }, [router])
 
   const moveTo = useCallback(
     (index: number) => {
-      const href = historyRef.current.entries[index]
-      if (href === undefined) {
-        return
-      }
-      if (href === router.latestLocation.href) {
-        setHistory((currentHistory) =>
-          reduceTableNavigationHistory(currentHistory, { type: 'move', index }),
-        )
+      const currentHistory = historyRef.current
+      if (index < 0 || index >= currentHistory.entries.length || index === currentHistory.index) {
         return
       }
 
-      router.history.push(href, { __inspectorTablesNavigationIndex: index })
+      router.history.go(index - currentHistory.index)
     },
     [router],
   )

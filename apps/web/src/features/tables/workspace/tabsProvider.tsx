@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -15,6 +16,7 @@ import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
   createBaseTableTabId,
+  createRouteTableTabId,
   createTableTabRouteSearch,
   createSchemaTableTabId,
   getFinalTableTabName,
@@ -27,6 +29,7 @@ import {
   replaceNewViewTab,
   saveTableTabsState,
   sanitizeTableTabsState,
+  tableTabStatesMatch,
   type TableDataTab,
   type TableTab,
   type TableTabSearch,
@@ -56,41 +59,12 @@ interface TableTabsContextValue {
 
 const TableTabsContext = createContext<TableTabsContextValue | null>(null)
 
-function searchesMatch(left: TableTabSearch, right: TableTabSearch): boolean {
-  return (
-    left.dir === right.dir &&
-    left.filters === right.filters &&
-    left.page === right.page &&
-    left.pageSize === right.pageSize &&
-    left.sort === right.sort &&
-    left.view === right.view
-  )
-}
-
-function tabsMatch(left: readonly TableTab[], right: readonly TableTab[]): boolean {
-  return (
-    left.length === right.length &&
-    left.every((tab, index) => {
-      const candidate = right[index]
-      if (candidate === undefined || tab.kind !== candidate.kind || tab.id !== candidate.id) {
-        return false
-      }
-      if (tab.kind === 'newView' || candidate.kind === 'newView') {
-        return true
-      }
-
-      return tab.tableName === candidate.tableName && searchesMatch(tab.search, candidate.search)
-    })
-  )
-}
-
 interface TableTabsProviderProps {
   children: ReactNode
   scope: string
 }
 
 interface TableTabsProviderState extends TableTabsState {
-  activeTabId: string | null
   replaceableTabId: string | null
 }
 
@@ -108,7 +82,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const [pendingTabClose, setPendingTabClose] = useState<PendingTabClose | null>(null)
   const [state, setState] = useState<TableTabsProviderState>(() => ({
     ...loadTableTabsState(scope),
-    activeTabId: null,
     replaceableTabId: null,
   }))
   const currentSearch = useMemo<TableTabSearch>(
@@ -129,6 +102,8 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       routeSearch.view,
     ],
   )
+  const activeTabId = createRouteTableTabId(currentTableName, routeSearch)
+  const previousActiveTabIdRef = useRef(activeTabId)
   useEffect(() => {
     saveTableTabsState(scope, {
       tabs: state.tabs.filter((tab) => tab.id !== state.replaceableTabId),
@@ -137,6 +112,8 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   }, [scope, state.recentViews, state.replaceableTabId, state.tabs])
 
   useEffect(() => {
+    const sourceTabId = previousActiveTabIdRef.current
+    previousActiveTabIdRef.current = activeTabId
     setState((currentState) => {
       const sanitizedTabsState =
         isSchemaReady === true
@@ -147,7 +124,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
           ? currentState
           : {
               ...sanitizedTabsState,
-              activeTabId: currentState.activeTabId,
               replaceableTabId:
                 sanitizedTabsState.tabs.some((tab) => tab.id === currentState.replaceableTabId) ===
                 true
@@ -156,31 +132,25 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
             }
       if (currentTableName === null) {
         if (routeSearch.empty === 'true') {
-          const result = openNewViewTab(sanitizedState.tabs)
-          if (
-            tabsMatch(result.tabs, sanitizedState.tabs) === true &&
-            sanitizedState.activeTabId === NEW_VIEW_TAB_ID
-          ) {
+          const tabs = openNewViewTab(sanitizedState.tabs)
+          if (tableTabStatesMatch(tabs, sanitizedState.tabs) === true) {
             return sanitizedState
           }
 
-          return { ...sanitizedState, tabs: result.tabs, activeTabId: NEW_VIEW_TAB_ID }
+          return { ...sanitizedState, tabs }
         }
 
-        return sanitizedState.activeTabId === null
-          ? sanitizedState
-          : { ...sanitizedState, activeTabId: null }
+        return sanitizedState
       }
 
       if (isSchemaReady === true && availableTables.includes(currentTableName) === false) {
-        const result = openNewViewTab(sanitizedState.tabs)
-        return { ...sanitizedState, tabs: result.tabs, activeTabId: NEW_VIEW_TAB_ID }
+        return sanitizedState
       }
 
       const result = reconcileTableTab({
-        activeTabId: sanitizedState.activeTabId,
         replaceableTabId: sanitizedState.replaceableTabId,
         search: currentSearch,
+        sourceTabId,
         tableName: currentTableName,
         tabs: sanitizedState.tabs,
       })
@@ -191,20 +161,21 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
           (tab.search.view === 'schema') === (currentSearch.view === 'schema'),
       )
       const replaceableTabId =
-        currentSearch.view === 'schema' || destinationWasOpen === true
+        sourceTabId === NEW_VIEW_TAB_ID ||
+        currentSearch.view === 'schema' ||
+        destinationWasOpen === true
           ? sanitizedState.replaceableTabId
-          : result.activeTabId
+          : result.destinationTabId
       const activeTableTab = result.tabs.find(
-        (tab): tab is TableDataTab => tab.kind === 'table' && tab.id === result.activeTabId,
+        (tab): tab is TableDataTab => tab.kind === 'table' && tab.id === result.destinationTabId,
       )
       const recentViews =
         activeTableTab === undefined
           ? sanitizedState.recentViews
           : recordRecentTableView(sanitizedState.recentViews, activeTableTab)
       if (
-        tabsMatch(result.tabs, sanitizedState.tabs) === true &&
-        tabsMatch(recentViews, sanitizedState.recentViews) === true &&
-        sanitizedState.activeTabId === result.activeTabId &&
+        tableTabStatesMatch(result.tabs, sanitizedState.tabs) === true &&
+        tableTabStatesMatch(recentViews, sanitizedState.recentViews) === true &&
         sanitizedState.replaceableTabId === replaceableTabId
       ) {
         return sanitizedState
@@ -213,11 +184,17 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       return {
         tabs: result.tabs,
         recentViews,
-        activeTabId: result.activeTabId,
         replaceableTabId,
       }
     })
-  }, [availableTables, currentSearch, currentTableName, isSchemaReady, routeSearch.empty])
+  }, [
+    activeTabId,
+    availableTables,
+    currentSearch,
+    currentTableName,
+    isSchemaReady,
+    routeSearch.empty,
+  ])
 
   useEffect(() => {
     if (
@@ -281,23 +258,16 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const closeTabWithoutConfirmation = useCallback(
     (tabId: string) => {
       const result = closeTableTab(state.tabs, tabId)
-      if (tabId !== state.activeTabId) {
-        setState((currentState) => ({
-          ...currentState,
-          tabs: result.tabs,
-          replaceableTabId:
-            currentState.replaceableTabId === tabId ? null : currentState.replaceableTabId,
-        }))
-        return
-      }
-
       setState((currentState) => ({
         ...currentState,
         tabs: result.tabs,
-        activeTabId: result.nextActiveTab?.id ?? null,
         replaceableTabId:
           currentState.replaceableTabId === tabId ? null : currentState.replaceableTabId,
       }))
+      if (tabId !== activeTabId) {
+        return
+      }
+
       if (result.nextActiveTab !== null) {
         navigateToTab(result.nextActiveTab)
         return
@@ -313,7 +283,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
         })
       }
     },
-    [currentConnectionId, navigate, navigateToTab, state.activeTabId, state.tabs],
+    [activeTabId, currentConnectionId, navigate, navigateToTab, state.tabs],
   )
 
   const closeTab = useCallback(
@@ -322,10 +292,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       if (finalTableName !== null) {
         const scopeKey = createTableScope(scope, finalTableName)
         if (mutationWorkspace.hasPendingChanges(scopeKey) === true) {
-          const tab = state.tabs.find((candidate) => candidate.id === tabId)
-          if (tab !== undefined && tabId !== state.activeTabId) {
-            navigateToTab(tab)
-          }
           setPendingTabClose({
             tableName: finalTableName,
             tabId,
@@ -335,14 +301,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       }
       closeTabWithoutConfirmation(tabId)
     },
-    [
-      closeTabWithoutConfirmation,
-      mutationWorkspace,
-      navigateToTab,
-      scope,
-      state.activeTabId,
-      state.tabs,
-    ],
+    [closeTabWithoutConfirmation, mutationWorkspace, scope, state.tabs],
   )
 
   const discardPendingChangesAndCloseTab = useCallback(() => {
@@ -361,11 +320,10 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   }, [closeTabWithoutConfirmation, mutationWorkspace, pendingTabClose, scope])
 
   const openNewView = useCallback(() => {
-    const result = openNewViewTab(state.tabs)
+    const tabs = openNewViewTab(state.tabs)
     setState((currentState) => ({
       ...currentState,
-      tabs: result.tabs,
-      activeTabId: result.activeTabId,
+      tabs,
     }))
     navigateToTab({ kind: 'newView', id: NEW_VIEW_TAB_ID })
   }, [navigateToTab, state.tabs])
@@ -373,7 +331,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
   const openBaseTabs = useCallback(
     (orderedTableNames: readonly string[]) => {
       const sourceTabs =
-        state.activeTabId === NEW_VIEW_TAB_ID
+        activeTabId === NEW_VIEW_TAB_ID
           ? state.tabs.filter((tab) => tab.kind !== 'newView')
           : state.tabs
       const result = openBaseTableTabs(sourceTabs, orderedTableNames)
@@ -389,7 +347,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       setState((currentState) => ({
         ...currentState,
         tabs: result.tabs,
-        activeTabId: result.activeTabId,
         replaceableTabId:
           orderedTableNames.some(
             (tableName) => createBaseTableTabId(tableName) === currentState.replaceableTabId,
@@ -399,7 +356,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       }))
       navigateToTab(activeTab)
     },
-    [navigateToTab, state.activeTabId, state.tabs],
+    [activeTabId, navigateToTab, state.tabs],
   )
 
   const openRecentView = useCallback(
@@ -408,7 +365,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       setState({
         tabs,
         recentViews: recordRecentTableView(state.recentViews, view),
-        activeTabId: view.id,
         replaceableTabId: state.replaceableTabId === view.id ? null : state.replaceableTabId,
       })
       navigateToTab(view)
@@ -444,34 +400,36 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     )
   }, [])
 
-  const persistTable = useCallback((tableName: string) => {
-    const tabId = createBaseTableTabId(tableName)
-    setState((currentState) => {
-      if (currentState.tabs.some((tab) => tab.id === tabId)) {
-        return currentState.replaceableTabId === tabId
-          ? { ...currentState, replaceableTabId: null }
-          : currentState
-      }
+  const persistTable = useCallback(
+    (tableName: string) => {
+      const tabId = createBaseTableTabId(tableName)
+      setState((currentState) => {
+        if (currentState.tabs.some((tab) => tab.id === tabId)) {
+          return currentState.replaceableTabId === tabId
+            ? { ...currentState, replaceableTabId: null }
+            : currentState
+        }
 
-      const result = reconcileTableTab({
-        activeTabId: currentState.activeTabId,
-        replaceableTabId: currentState.replaceableTabId,
-        search: {},
-        tableName,
-        tabs: currentState.tabs,
+        const result = reconcileTableTab({
+          replaceableTabId: currentState.replaceableTabId,
+          search: {},
+          sourceTabId: activeTabId,
+          tableName,
+          tabs: currentState.tabs,
+        })
+        return {
+          ...currentState,
+          tabs: result.tabs,
+          replaceableTabId: null,
+        }
       })
-      return {
-        ...currentState,
-        activeTabId: result.activeTabId,
-        tabs: result.tabs,
-        replaceableTabId: null,
-      }
-    })
-  }, [])
+    },
+    [activeTabId],
+  )
 
   const value = useMemo<TableTabsContextValue>(
     () => ({
-      activeTabId: state.activeTabId,
+      activeTabId,
       recentViews: state.recentViews,
       replaceableTabId: state.replaceableTabId,
       tabs: state.tabs,
@@ -495,6 +453,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       persistTab,
       persistTable,
       reorderTabs,
+      activeTabId,
       state,
     ],
   )

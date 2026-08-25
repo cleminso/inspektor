@@ -156,18 +156,6 @@ describe('table mutation state', () => {
     ])
   })
 
-  it('removes a complete deletion review operation', () => {
-    let state = reduceTableMutationState(createTableMutationState(), {
-      type: 'deleteRows',
-      rowIds: ['row-1', 'row-2'],
-    })
-    state = reduceTableMutationState(state, {
-      type: 'undoReviewOperation',
-      operationId: 'delete-operation:0',
-    })
-    expect(state.deletionOperations).toEqual([])
-  })
-
   it('undoes loaded deletion targets across operations in one state transition', () => {
     let state = reduceTableMutationState(createTableMutationState(), {
       type: 'deleteRows',

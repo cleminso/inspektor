@@ -560,6 +560,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Workspace tabs
 
+[25/08/26]
+
+- [x] Keep route-derived active tab identity read-only while retaining previous-route provenance for New view replacement.
+- [x] Preserve another replaceable table when a destination replaces the active New view.
+- [x] Traverse native browser history for Tables-local Back and Forward replay instead of appending replay entries.
+
 [20/08/26]
 
 - [x] Keep one canonical Data tab per table and store its current filter, sort, and pagination route state on that tab.

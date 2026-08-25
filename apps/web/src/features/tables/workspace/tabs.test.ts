@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import {
   NEW_VIEW_TAB_ID,
   closeTableTab,
-  createBaseTableTabId,
+  createRouteTableTabId,
   createTableTabRouteSearch,
   getFinalTableTabName,
   loadTableTabsState,
@@ -38,8 +38,11 @@ describe('table tabs', () => {
     })
   })
 
-  it('uses one deterministic base tab per table', () => {
-    expect(createBaseTableTabId('better_auth_account')).toBe('table:better_auth_account')
+  it('derives active tab identity from the committed route', () => {
+    expect(createRouteTableTabId('accounts', {})).toBe('table:accounts')
+    expect(createRouteTableTabId('accounts', { view: 'schema' })).toBe('schema:accounts')
+    expect(createRouteTableTabId(null, { empty: 'true' })).toBe(NEW_VIEW_TAB_ID)
+    expect(createRouteTableTabId(null, {})).toBeNull()
   })
 
   it('keeps internal tab identity out of route search parameters', () => {
@@ -107,13 +110,13 @@ describe('table tabs', () => {
     ]
 
     const result = reconcileTableTab({
-      activeTabId: 'table:accounts',
       search: { filters: 'active-filter', sort: 'createdAt', dir: 'desc' },
+      sourceTabId: 'table:accounts',
       tableName: 'accounts',
       tabs,
     })
 
-    expect(result.activeTabId).toBe('table:accounts')
+    expect(result.destinationTabId).toBe('table:accounts')
     expect(result.tabs).toHaveLength(1)
     expect(result.tabs[0]?.kind === 'table' ? result.tabs[0].search : null).toEqual({
       filters: 'active-filter',
@@ -131,47 +134,18 @@ describe('table tabs', () => {
     }
 
     const result = reconcileTableTab({
-      activeTabId: baseTab.id,
       search: { page: 2, pageSize: 500 },
+      sourceTabId: baseTab.id,
       tableName: 'accounts',
       tabs: [baseTab],
     })
 
     expect(result).toEqual({
-      activeTabId: 'table:accounts',
+      destinationTabId: 'table:accounts',
       tabs: [
         {
           ...baseTab,
           search: { page: 2, pageSize: 500 },
-        },
-      ],
-    })
-  })
-
-  it('opens schema in a separate tab while preserving the base data tab', () => {
-    const baseTab: TableDataTab = {
-      kind: 'table',
-      id: 'table:accounts',
-      tableName: 'accounts',
-      search: {},
-    }
-
-    const result = reconcileTableTab({
-      activeTabId: baseTab.id,
-      search: { view: 'schema' },
-      tableName: 'accounts',
-      tabs: [baseTab],
-    })
-
-    expect(result).toEqual({
-      activeTabId: 'schema:accounts',
-      tabs: [
-        baseTab,
-        {
-          kind: 'table',
-          id: 'schema:accounts',
-          tableName: 'accounts',
-          search: { view: 'schema' },
         },
       ],
     })
@@ -186,14 +160,14 @@ describe('table tabs', () => {
     }
 
     const result = reconcileTableTab({
-      activeTabId: filteredTab.id,
       search: { filters: 'active-filter', sort: 'createdAt', dir: 'desc', view: 'schema' },
+      sourceTabId: filteredTab.id,
       tableName: 'accounts',
       tabs: [filteredTab],
     })
 
     expect(result).toEqual({
-      activeTabId: 'schema:accounts',
+      destinationTabId: 'schema:accounts',
       tabs: [
         filteredTab,
         {
@@ -215,13 +189,13 @@ describe('table tabs', () => {
     }
 
     const result = reconcileTableTab({
-      activeTabId: 'table:accounts',
       search: { filters: 'ignored-filter', sort: 'ignored-sort', view: 'schema' },
+      sourceTabId: 'table:accounts',
       tableName: 'accounts',
       tabs: [{ kind: 'table', id: 'table:accounts', tableName: 'accounts', search: {} }, schemaTab],
     })
 
-    expect(result.activeTabId).toBe(schemaTab.id)
+    expect(result.destinationTabId).toBe(schemaTab.id)
     expect(result.tabs).toHaveLength(2)
     expect(result.tabs[1]).toEqual(schemaTab)
   })
@@ -236,8 +210,8 @@ describe('table tabs', () => {
     }
 
     const result = reconcileTableTab({
-      activeTabId: NEW_VIEW_TAB_ID,
       search: {},
+      sourceTabId: NEW_VIEW_TAB_ID,
       tableName: 'accounts',
       tabs: [existingTab, newViewTab],
     })
@@ -258,8 +232,8 @@ describe('table tabs', () => {
     }
 
     const result = reconcileTableTab({
-      activeTabId: NEW_VIEW_TAB_ID,
       search: {},
+      sourceTabId: NEW_VIEW_TAB_ID,
       tableName: 'accounts',
       tabs: [existingTab, newViewTab],
     })
@@ -269,9 +243,9 @@ describe('table tabs', () => {
 
   it('replaces the current replaceable data tab when another table opens', () => {
     const result = reconcileTableTab({
-      activeTabId: 'table:accounts',
       replaceableTabId: 'table:accounts',
       search: {},
+      sourceTabId: 'table:accounts',
       tableName: 'profiles',
       tabs: [
         { kind: 'table', id: 'table:users', tableName: 'users', search: {} },
@@ -280,9 +254,34 @@ describe('table tabs', () => {
     })
 
     expect(result).toEqual({
-      activeTabId: 'table:profiles',
+      destinationTabId: 'table:profiles',
       tabs: [
         { kind: 'table', id: 'table:users', tableName: 'users', search: {} },
+        { kind: 'table', id: 'table:profiles', tableName: 'profiles', search: {} },
+      ],
+    })
+  })
+
+  it('replaces an active New view without removing another replaceable tab', () => {
+    const replaceableTab: TableDataTab = {
+      kind: 'table',
+      id: 'table:accounts',
+      tableName: 'accounts',
+      search: {},
+    }
+
+    expect(
+      reconcileTableTab({
+        replaceableTabId: replaceableTab.id,
+        search: {},
+        sourceTabId: NEW_VIEW_TAB_ID,
+        tableName: 'profiles',
+        tabs: [replaceableTab, { kind: 'newView', id: NEW_VIEW_TAB_ID }],
+      }),
+    ).toEqual({
+      destinationTabId: 'table:profiles',
+      tabs: [
+        replaceableTab,
         { kind: 'table', id: 'table:profiles', tableName: 'profiles', search: {} },
       ],
     })
@@ -296,13 +295,13 @@ describe('table tabs', () => {
 
     expect(
       reconcileTableTab({
-        activeTabId: 'table:accounts',
         replaceableTabId: 'table:accounts',
         search: {},
+        sourceTabId: 'table:accounts',
         tableName: 'users',
         tabs,
       }),
-    ).toEqual({ activeTabId: 'table:users', tabs })
+    ).toEqual({ destinationTabId: 'table:users', tabs })
   })
 
   it('selects the tab to the right when the active tab closes', () => {
@@ -360,10 +359,10 @@ describe('table tabs', () => {
 
   it('keeps one new-view placeholder tab', () => {
     const firstResult = openNewViewTab([])
-    const secondResult = openNewViewTab(firstResult.tabs)
+    const secondResult = openNewViewTab(firstResult)
 
-    expect(firstResult.activeTabId).toBe(NEW_VIEW_TAB_ID)
-    expect(secondResult.tabs).toEqual(firstResult.tabs)
+    expect(firstResult).toEqual([{ kind: 'newView', id: NEW_VIEW_TAB_ID }])
+    expect(secondResult).toEqual(firstResult)
   })
 
   it('replaces a sole New view when base tabs open', () => {
@@ -467,7 +466,7 @@ describe('table tabs', () => {
   })
 
   it('replaces the new-view placeholder with a selected table view', () => {
-    const newViewTabs = openNewViewTab([]).tabs
+    const newViewTabs = openNewViewTab([])
     const selectedView = {
       kind: 'table' as const,
       id: 'table:accounts',

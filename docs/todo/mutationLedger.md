@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+### [25/08/26] Integration review
+
+- [x] Keep the active route unchanged while confirming closure of an inactive table's final view.
+- [x] Remove duplicated tab-close state updates.
+- [x] Remove callback memoization that was invalidated by the complete table-view state object.
+
 ### [25/08/26] React component boundary review
 
 - [x] Compute each scoped ledger projection once in its provider.
@@ -61,6 +67,13 @@
 - [ ] Choose last-write-wins, conflict presentation, or draft rebasing for remote source changes.
 
 ## Validation checklist
+
+### [25/08/26] Integration review commands
+
+- [x] Run focused mutation-ledger and integration tests.
+- [x] Run the Inspector lint and typecheck.
+- [x] Build the Inspector application.
+- [x] Run the Inspector test suite.
 
 ### [25/08/26] Commands
 

@@ -33,26 +33,21 @@ export interface TableTabsState {
 }
 
 interface ReconcileTableTabInput {
-  activeTabId: string | null
   replaceableTabId?: string | null
   search: TableTabSearch
+  sourceTabId: string | null
   tableName: string
   tabs: readonly TableTab[]
 }
 
 interface ReconcileTableTabResult {
-  activeTabId: string
+  destinationTabId: string
   tabs: TableTab[]
 }
 
 interface CloseTableTabResult {
   tabs: TableTab[]
   nextActiveTab: TableTab | null
-}
-
-interface OpenNewViewTabResult {
-  activeTabId: typeof NEW_VIEW_TAB_ID
-  tabs: TableTab[]
 }
 
 interface OpenBaseTableTabsResult {
@@ -80,6 +75,19 @@ export function createBaseTableTabId(tableName: string): string {
 
 export function createSchemaTableTabId(tableName: string): string {
   return `schema:${encodeURIComponent(tableName)}`
+}
+
+export function createRouteTableTabId(
+  tableName: string | null,
+  search: TableTabsRouteSearch,
+): string | null {
+  if (tableName === null) {
+    return search.empty === 'true' ? NEW_VIEW_TAB_ID : null
+  }
+
+  return search.view === 'schema'
+    ? createSchemaTableTabId(tableName)
+    : createBaseTableTabId(tableName)
 }
 
 export function createTableTabRouteSearch(tab: TableTab): TableTabsRouteSearch {
@@ -197,7 +205,10 @@ function tableViewsMatch(left: TableDataTab, right: TableDataTab): boolean {
   )
 }
 
-function tabStatesMatch(left: readonly TableTab[], right: readonly TableTab[]): boolean {
+export function tableTabStatesMatch(
+  left: readonly TableTab[],
+  right: readonly TableTab[],
+): boolean {
   return (
     left.length === right.length &&
     left.every((tab, index) => {
@@ -223,9 +234,9 @@ function tabStatesMatch(left: readonly TableTab[], right: readonly TableTab[]): 
 }
 
 export function reconcileTableTab({
-  activeTabId: currentActiveTabId,
   replaceableTabId = null,
   search,
+  sourceTabId,
   tableName,
   tabs,
 }: ReconcileTableTabInput): ReconcileTableTabResult {
@@ -237,7 +248,7 @@ export function reconcileTableTab({
       : createBaseTableTabId(tableName)
   const existingView = normalizedTabs.find((tab) => tab.id === activeTabId)
   const reconciledTabs =
-    currentActiveTabId === NEW_VIEW_TAB_ID && existingView === undefined
+    sourceTabId === NEW_VIEW_TAB_ID && existingView === undefined
       ? normalizedTabs.filter((tab) => tab.kind !== 'newView')
       : removeSoleNewViewTab(normalizedTabs)
   const nextTab: TableDataTab = {
@@ -250,24 +261,24 @@ export function reconcileTableTab({
 
   if (existingIndex === -1) {
     const replaceableIndex =
-      isSchemaSearch(canonicalSearch) === false
+      sourceTabId !== NEW_VIEW_TAB_ID && isSchemaSearch(canonicalSearch) === false
         ? reconciledTabs.findIndex((tab) => tab.id === replaceableTabId)
         : -1
     if (replaceableIndex >= 0) {
       return {
-        activeTabId,
+        destinationTabId: activeTabId,
         tabs: reconciledTabs.map((tab, index) => (index === replaceableIndex ? nextTab : tab)),
       }
     }
 
     return {
-      activeTabId,
+      destinationTabId: activeTabId,
       tabs: [...reconciledTabs, nextTab],
     }
   }
 
   return {
-    activeTabId,
+    destinationTabId: activeTabId,
     tabs: reconciledTabs.map((tab, index) => (index === existingIndex ? nextTab : tab)),
   }
 }
@@ -293,8 +304,8 @@ export function sanitizeTableTabsState(
   const nextTabs = tabs.length === 0 ? [createNewViewTab()] : tabs
 
   if (
-    tabStatesMatch(nextTabs, state.tabs) === true &&
-    tabStatesMatch(recentViews, state.recentViews) === true
+    tableTabStatesMatch(nextTabs, state.tabs) === true &&
+    tableTabStatesMatch(recentViews, state.recentViews) === true
   ) {
     return state
   }
@@ -305,15 +316,12 @@ export function sanitizeTableTabsState(
   }
 }
 
-export function openNewViewTab(tabs: readonly TableTab[]): OpenNewViewTabResult {
+export function openNewViewTab(tabs: readonly TableTab[]): TableTab[] {
   if (tabs.some((tab) => tab.kind === 'newView')) {
-    return { activeTabId: NEW_VIEW_TAB_ID, tabs: [...tabs] }
+    return [...tabs]
   }
 
-  return {
-    activeTabId: NEW_VIEW_TAB_ID,
-    tabs: [...tabs, createNewViewTab()],
-  }
+  return [...tabs, createNewViewTab()]
 }
 
 export function replaceNewViewTab(

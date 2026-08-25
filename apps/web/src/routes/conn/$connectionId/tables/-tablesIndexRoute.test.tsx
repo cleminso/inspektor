@@ -88,6 +88,13 @@ describe('tables index route', () => {
     routeState.search = {}
     routeState.tables = []
     rerender(<TablesIndexRoute />)
-    expect(navigate).not.toHaveBeenCalled()
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith({
+        to: '/conn/$connectionId/tables',
+        params: { connectionId: 'connection-1' },
+        replace: true,
+        search: { empty: 'true' },
+      }),
+    )
   })
 })

@@ -11,7 +11,14 @@ import { TableTabsProvider, useTableTabs } from '@tables/workspace/tabsProvider'
 import { createTableScope } from '@tables/workspace/scope'
 
 const navigate = vi.hoisted(() => vi.fn())
-const routeSearch = vi.hoisted(() => ({ filters: undefined as string | undefined }))
+const routeSearch = vi.hoisted(() => ({
+  empty: undefined as string | undefined,
+  filters: undefined as string | undefined,
+}))
+const sessionState = vi.hoisted(() => ({
+  currentConnectionId: 'connection' as string | null,
+  currentTableName: 'accounts' as string | null,
+}))
 const schemaState = vi.hoisted(() => ({
   isSchemaReady: true,
   tables: ['accounts', 'profiles'],
@@ -24,10 +31,7 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspectorSessionState: () => ({
-    currentConnectionId: 'connection',
-    currentTableName: 'accounts',
-  }),
+  useInspectorSessionState: () => sessionState,
 }))
 
 vi.mock('@tables/schema/useAvailableTables', () => ({
@@ -38,7 +42,10 @@ afterEach(cleanup)
 
 beforeEach(() => {
   navigate.mockReset()
+  routeSearch.empty = undefined
   routeSearch.filters = undefined
+  sessionState.currentConnectionId = 'connection'
+  sessionState.currentTableName = 'accounts'
   schemaState.isSchemaReady = true
   schemaState.tables = ['accounts', 'profiles']
   const values = new Map<string, string>()
@@ -68,9 +75,11 @@ function MutationActions(): React.ReactElement {
 }
 
 function TabActions(): React.ReactElement {
-  const { closeTab, openBaseTabs, persistTable, replaceableTabId, tabs } = useTableTabs()
+  const { activeTabId, closeTab, openBaseTabs, openNewView, persistTable, replaceableTabId, tabs } =
+    useTableTabs()
   return (
     <>
+      <output aria-label="Active tab">{activeTabId ?? 'none'}</output>
       <output aria-label="Open tabs">{tabs.map((tab) => tab.id).join(',')}</output>
       <output aria-label="Replaceable tab">{replaceableTabId ?? 'none'}</output>
       <button type="button" onClick={() => closeTab('table:accounts')}>
@@ -81,6 +90,9 @@ function TabActions(): React.ReactElement {
       </button>
       <button type="button" onClick={() => persistTable('profiles')}>
         Keep profiles open
+      </button>
+      <button type="button" onClick={openNewView}>
+        Open New view
       </button>
     </>
   )
@@ -124,6 +136,29 @@ describe('TableTabsProvider', () => {
 
     await waitFor(() => expect(screen.getByLabelText('Replaceable tab').textContent).toBe('none'))
     expect(screen.getByLabelText('Open tabs').textContent).toBe('table:profiles')
+  })
+
+  it('derives selection from the route and preserves another replaceable tab from New view', async () => {
+    const { rerender } = render(<Harness />)
+    await waitFor(() =>
+      expect(screen.getByLabelText('Replaceable tab').textContent).toBe('table:accounts'),
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open New view' }))
+    sessionState.currentTableName = null
+    routeSearch.empty = 'true'
+    rerender(<Harness />)
+    expect(screen.getByLabelText('Active tab').textContent).toBe('new-view')
+
+    sessionState.currentTableName = 'profiles'
+    routeSearch.empty = undefined
+    rerender(<Harness />)
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts,table:profiles'),
+    )
+    expect(screen.getByLabelText('Active tab').textContent).toBe('table:profiles')
+    expect(screen.getByLabelText('Replaceable tab').textContent).toBe('table:accounts')
   })
 
   it('retains a legacy routed data tab while schema metadata is loading', async () => {
@@ -183,6 +218,32 @@ describe('TableTabsProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Discard and close' }))
     await waitFor(() => expect(screen.getByLabelText('Staged changes').textContent).toBe('0'))
     await waitFor(() => expect(screen.getByLabelText('Open tabs').textContent).toBe('new-view'))
+  })
+
+  it('keeps the active route while confirming an inactive final table tab close', async () => {
+    sessionState.currentTableName = 'profiles'
+    window.localStorage.setItem(
+      'inspektor-tabs:scope',
+      JSON.stringify({
+        version: 1,
+        recentViews: [],
+        tabs: [
+          { id: 'table:accounts', kind: 'table', search: {}, tableName: 'accounts' },
+          { id: 'table:profiles', kind: 'table', search: {}, tableName: 'profiles' },
+        ],
+      }),
+    )
+    render(<Harness />)
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts,table:profiles'),
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
+
+    expect(screen.getByRole('alertdialog', { name: 'Discard staged changes?' })).toBeDefined()
+    expect(screen.getByLabelText('Active tab').textContent).toBe('table:profiles')
+    expect(navigate).not.toHaveBeenCalled()
   })
 
   it('closes a non-final table view without discarding staged changes', async () => {

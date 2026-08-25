@@ -13,6 +13,11 @@
 
 [25/08/26]
 
+- [x] Derive active workspace-tab identity from committed table route params and search instead of duplicating it in provider state.
+- [x] Canonicalize a verified schema with no tables to the explicit New view route.
+
+[25/08/26]
+
 - [x] Canonicalize route and persisted-tab search through one raw-to-resolved contract while omitting semantic defaults from URLs.
 - [x] Keep row-query execution independent of TanStack Router and validate runtime sort columns against the selected schema.
 - [x] Use collision-safe workspace and table scope serialization across tabs, preferences, selection, and staged mutations.
