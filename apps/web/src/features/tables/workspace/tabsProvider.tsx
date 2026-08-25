@@ -38,10 +38,6 @@ import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { useTableMutationWorkspace } from '@tables/mutationLedger/provider'
 import { createTableScope } from '@tables/workspace/scope'
 
-interface RouteSearch extends TableTabsRouteSearch {
-  tab?: string
-}
-
 interface TableTabsContextValue {
   activeTabId: string | null
   recentViews: readonly TableDataTab[]
@@ -107,7 +103,7 @@ interface PendingTabClose {
 export function TableTabsProvider({ children, scope }: TableTabsProviderProps): React.ReactElement {
   const { currentConnectionId, currentTableName } = useInspectorSessionState()
   const navigate = useNavigate({ from: appRoutes.tables })
-  const routeSearch = useSearch({ strict: false }) as RouteSearch
+  const routeSearch = useSearch({ strict: false }) as TableTabsRouteSearch
   const { isSchemaReady, tables: availableTables } = useAvailableTables()
   const mutationWorkspace = useTableMutationWorkspace()
   const [pendingTabClose, setPendingTabClose] = useState<PendingTabClose | null>(null)
@@ -140,21 +136,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       recentViews: state.recentViews,
     })
   }, [scope, state.recentViews, state.replaceableTabId, state.tabs])
-
-  useEffect(() => {
-    if (routeSearch.tab === undefined) {
-      return
-    }
-
-    void navigate({
-      replace: true,
-      search: (search) => {
-        const nextSearch = { ...search } as RouteSearch
-        delete nextSearch.tab
-        return nextSearch
-      },
-    })
-  }, [navigate, routeSearch.tab])
 
   useEffect(() => {
     setState((currentState) => {

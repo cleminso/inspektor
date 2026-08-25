@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parsePositiveInteger } from './tables'
+import { parsePositiveInteger } from '@tables/routing/tableRowsSearch'
 
 describe('parsePositiveInteger', () => {
   it('rejects integers that cannot produce precise pagination offsets', () => {

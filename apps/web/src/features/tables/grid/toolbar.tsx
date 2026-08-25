@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { Box, Button, Select, Text, Tooltip } from '@inspector/ds'
 
-import { TABLE_PAGE_SIZE_OPTIONS } from '@tables/query/tableRowsQuery'
+import { TABLE_PAGE_SIZE_OPTIONS } from '@tables/tableTypes'
 import type { TablePageSize } from '@tables/tableTypes'
 
 const pageSizeItems = TABLE_PAGE_SIZE_OPTIONS.map((value) => ({

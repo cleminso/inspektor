@@ -3,10 +3,8 @@ import type { QueryOptions, WasmSchema } from 'jazz-tools'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import { filterTableFilterClauses } from '@tables/filters/filterParsing'
 import { GenericQueryBuilder } from '@tables/query/genericQueryBuilder'
+import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TablePageSize, TableSortDirection } from '@tables/tableTypes'
-
-export const TABLE_PAGE_SIZE_OPTIONS = [100, 500, 1000] as const satisfies readonly TablePageSize[]
-export const DEFAULT_TABLE_PAGE_SIZE: TablePageSize = 100
 
 /**
  * Query options shared by prefetch and React subscriptions.
@@ -29,6 +27,37 @@ interface BuildTableRowsQueryOptions {
   tableName: string
 }
 
+/** Returns whether Jazz can order rows by one runtime schema column. */
+export function isTableColumnSortable(
+  columnType: ReturnType<typeof getTableColumns>[number]['column_type'],
+): boolean {
+  switch (columnType.type) {
+    case 'Integer':
+    case 'BigInt':
+    case 'Double':
+    case 'Boolean':
+    case 'Text':
+    case 'Enum':
+    case 'Timestamp':
+    case 'Uuid':
+      return true
+    default:
+      return false
+  }
+}
+
+export function resolveTableSortColumn(
+  columns: ReturnType<typeof getTableColumns>,
+  sortColumn: string,
+): string {
+  return sortColumn === 'id' ||
+    columns.some(
+      (column) => column.name === sortColumn && isTableColumnSortable(column.column_type),
+    )
+    ? sortColumn
+    : 'id'
+}
+
 /**
  * Builds a schema-driven Jazz query for an arbitrary inspected table.
  *
@@ -45,6 +74,9 @@ export function buildTableRowsQuery({
   tableName,
 }: BuildTableRowsQueryOptions): GenericQueryBuilder {
   const applicableFilters = filterTableFilterClauses({ filters, schema, tableName })
+  const resolvedSortColumn = resolveTableSortColumn(getTableColumns(schema, tableName), sortColumn)
+  const resolvedSortDirection =
+    resolvedSortColumn === 'id' && sortColumn !== 'id' ? 'asc' : sortDirection
   let builder = new GenericQueryBuilder(tableName, schema)
   for (const filter of applicableFilters) {
     if (filter.operator === 'eq') {
@@ -58,44 +90,10 @@ export function buildTableRowsQuery({
     }
   }
 
-  builder = builder.orderBy(sortColumn, sortDirection)
-  if (sortColumn !== 'id') {
+  builder = builder.orderBy(resolvedSortColumn, resolvedSortDirection)
+  if (resolvedSortColumn !== 'id') {
     builder = builder.orderBy('id', 'asc')
   }
 
   return builder.limit(pageSize + 1).offset((page - 1) * pageSize)
-}
-
-/**
- * Builds the initial row window started from navigation intent.
- *
- * Omitted search inputs produce the base table query. Table tabs can provide their stored filters
- * and sorting so destination rendering produces the same Jazz cache key.
- */
-export function buildInitialTableRowsQuery({
-  filters = [],
-  page = 1,
-  pageSize = DEFAULT_TABLE_PAGE_SIZE,
-  schema,
-  sortColumn = 'id',
-  sortDirection = 'asc',
-  tableName,
-}: {
-  filters?: readonly TableFilterClause[]
-  page?: number
-  pageSize?: TablePageSize
-  schema: WasmSchema
-  sortColumn?: string
-  sortDirection?: TableSortDirection
-  tableName: string
-}): GenericQueryBuilder {
-  return buildTableRowsQuery({
-    filters,
-    page,
-    pageSize,
-    schema,
-    sortColumn,
-    sortDirection,
-    tableName,
-  })
 }

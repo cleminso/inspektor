@@ -21,24 +21,6 @@ let runtimeSchema: Record<string, unknown> | null
 const setPage = vi.fn()
 const setPageSize = vi.fn()
 
-vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspectorSessionState: () => ({ currentSchemaHash: 'schema-1' }),
-  useRuntimeClient: () => runtimeClient,
-  useRuntimeSchema: () => runtimeSchema,
-}))
-
-vi.mock('@tables/routing/useTableSearchParams', () => ({
-  useTableExplorerSearchParams: () => ({
-    filters,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
-    sortColumn,
-    sortDirection,
-  }),
-}))
-
 vi.mock('@tables/schema/tableSchema', () => ({ getTableColumns: () => [] }))
 
 vi.mock('@tables/query/genericQueryBuilder', () => ({
@@ -66,6 +48,21 @@ vi.mock('@tables/query/genericQueryBuilder', () => ({
 vi.mock('@tables/query/useJazzQueryState', () => ({
   useJazzQueryState: useJazzQueryStateMock,
 }))
+
+function useTestTableRows(options: Omit<Parameters<typeof useTableRows>[0], 'search'>) {
+  return useTableRows({
+    ...options,
+    search: {
+      filters: filters as never,
+      page,
+      pageSize,
+      setPage,
+      setPageSize,
+      sortColumn,
+      sortDirection,
+    },
+  })
+}
 
 beforeEach(() => {
   queryRows = undefined
@@ -107,7 +104,7 @@ describe('useTableRows', () => {
     runtimeSchema = null
 
     const { result } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -126,7 +123,7 @@ describe('useTableRows', () => {
       { id: 'row-3', name: 'Linus' } as DynamicTableRow,
     ]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -146,7 +143,7 @@ describe('useTableRows', () => {
       { id: 'row-2', name: 'Grace' } as DynamicTableRow,
     ]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -173,7 +170,7 @@ describe('useTableRows', () => {
       { id: 'row-2', name: 'Grace' } as DynamicTableRow,
     ]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -206,7 +203,7 @@ describe('useTableRows', () => {
   ])('does not preserve resolved rows when the $name scope changes', ({ replaceScope }) => {
     queryRows = [{ id: 'row-1', name: 'Ada' } as DynamicTableRow]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash,
         tableName: 'users',
@@ -227,7 +224,7 @@ describe('useTableRows', () => {
     let tableName = 'users'
     queryRows = [{ id: 'row-1', name: 'Ada' } as DynamicTableRow]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash,
         tableName,
@@ -249,7 +246,7 @@ describe('useTableRows', () => {
     let suspend = false
     queryRows = undefined
     const { result, rerender } = renderHook(() => {
-      const tableRows = useTableRows({
+      const tableRows = useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -276,7 +273,7 @@ describe('useTableRows', () => {
     queryError = new Error('Unable to load rows')
 
     const { result } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -295,7 +292,7 @@ describe('useTableRows', () => {
       { id: 'row-2', name: 'Grace' } as DynamicTableRow,
     ]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -321,7 +318,7 @@ describe('useTableRows', () => {
     })) as DynamicTableRow[]
 
     const { result } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -342,7 +339,7 @@ describe('useTableRows', () => {
       id: `row-${index + 1}`,
     })) as DynamicTableRow[]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -375,7 +372,7 @@ describe('useTableRows', () => {
       id: `row-${index + 1}`,
     })) as DynamicTableRow[]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -406,7 +403,7 @@ describe('useTableRows', () => {
       id: `row-${index + 1}`,
     })) as DynamicTableRow[]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -430,7 +427,7 @@ describe('useTableRows', () => {
       id: `row-${index + 1}`,
     })) as DynamicTableRow[]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -461,7 +458,7 @@ describe('useTableRows', () => {
       id: `row-${index + 1}`,
     })) as DynamicTableRow[]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -493,7 +490,7 @@ describe('useTableRows', () => {
       id: `row-${index + 1}`,
     })) as DynamicTableRow[]
     const { result, rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -520,7 +517,7 @@ describe('useTableRows', () => {
     page = 2
     queryRows = [{ id: 'row-101' } as DynamicTableRow]
     const { result } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -542,7 +539,7 @@ describe('useTableRows', () => {
     queryRows = []
 
     renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',
@@ -559,7 +556,7 @@ describe('useTableRows', () => {
     page = 2
     queryRows = []
     const { rerender } = renderHook(() =>
-      useTableRows({
+      useTestTableRows({
         client: runtimeClient as never,
         currentSchemaHash: 'schema-1',
         tableName: 'users',

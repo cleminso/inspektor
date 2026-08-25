@@ -549,6 +549,35 @@ describe('table tabs', () => {
     })
   })
 
+  it('canonicalizes untrusted stored tab search', () => {
+    window.localStorage.setItem(
+      'inspektor-tabs:inspector',
+      JSON.stringify({
+        version: 1,
+        tabs: [
+          {
+            id: 'table:accounts',
+            kind: 'table',
+            tableName: 'accounts',
+            search: {
+              custom: 'drop',
+              dir: 'sideways',
+              filters: '{invalid',
+              page: -1,
+              pageSize: 250,
+              view: 'unknown',
+            },
+          },
+        ],
+        recentViews: [],
+      }),
+    )
+
+    expect(loadTableTabsState('inspector').tabs).toEqual([
+      { id: 'table:accounts', kind: 'table', tableName: 'accounts', search: {} },
+    ])
+  })
+
   it('keeps in-memory tabs usable when storage persistence fails', () => {
     Object.defineProperty(window.localStorage, 'setItem', {
       configurable: true,

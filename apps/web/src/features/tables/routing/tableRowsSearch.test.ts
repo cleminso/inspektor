@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
+import {
+  canonicalizeTableRouteSearch,
+  resolveTableRowsSearch,
+} from '@tables/routing/tableRowsSearch'
 
 describe('resolveTableRowsSearch', () => {
   it('resolves stored tab filters and descending sorting like the destination route', () => {
@@ -46,5 +49,48 @@ describe('resolveTableRowsSearch', () => {
       { id: 'range', column: 'age', operator: 'gte', value: 18 },
       { id: 'range', column: 'age', operator: 'lte', value: 65 },
     ])
+  })
+
+  it('rejects pages whose offset cannot be represented safely', () => {
+    const unsafePage = Math.floor(Number.MAX_SAFE_INTEGER / 100) + 2
+
+    expect(resolveTableRowsSearch({ page: unsafePage, pageSize: 100 }).page).toBe(1)
+  })
+
+  it('keeps only canonical declared route search', () => {
+    expect(
+      canonicalizeTableRouteSearch({
+        custom: 'drop',
+        dir: 'sideways',
+        filters: '{invalid',
+        mode: 'edit',
+        page: 1,
+        pageSize: 100,
+        rowId: ' ',
+        sort: 'id',
+        tab: 'legacy',
+        view: 'unknown',
+      }),
+    ).toEqual({
+      dir: undefined,
+      empty: undefined,
+      filters: undefined,
+      mode: undefined,
+      page: undefined,
+      pageSize: undefined,
+      rowId: undefined,
+      sort: undefined,
+      view: undefined,
+    })
+  })
+
+  it('canonicalizes row editors to the data view', () => {
+    expect(
+      canonicalizeTableRouteSearch({ mode: 'edit', rowId: 'row-1', view: 'schema' }),
+    ).toMatchObject({ mode: 'edit', rowId: 'row-1', view: undefined })
+    expect(canonicalizeTableRouteSearch({ mode: 'insert', view: 'schema' })).toMatchObject({
+      mode: 'insert',
+      view: undefined,
+    })
   })
 })

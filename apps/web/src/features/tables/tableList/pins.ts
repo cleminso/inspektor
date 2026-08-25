@@ -1,8 +1,7 @@
-import { getConnectionScopedStorageKey } from '@app/storage/connectionScopedStorage'
-
-function getStorageKey(scope: string): string {
-  return getConnectionScopedStorageKey('tablePins', scope)
-}
+import {
+  getConnectionScopedStorageKey,
+  getConnectionScopedStorageValue,
+} from '@app/storage/connectionScopedStorage'
 
 function readStoredTableNames(scope: string): string[] {
   if (typeof window === 'undefined') {
@@ -10,7 +9,8 @@ function readStoredTableNames(scope: string): string[] {
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(getStorageKey(scope)) ?? 'null') as {
+    const storedValue = getConnectionScopedStorageValue('tablePins', scope)
+    const parsed = JSON.parse(storedValue ?? 'null') as {
       version?: unknown
       tableNames?: unknown
     } | null
@@ -55,7 +55,7 @@ export function savePinnedTableNames(scope: string, tableNames: ReadonlySet<stri
 
   try {
     window.localStorage.setItem(
-      getStorageKey(scope),
+      getConnectionScopedStorageKey('tablePins', scope),
       JSON.stringify({ version: 1, tableNames: [...tableNames] }),
     )
   } catch {}

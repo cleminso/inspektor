@@ -1,18 +1,17 @@
-import { getConnectionScopedStorageKey } from '@app/storage/connectionScopedStorage'
-import type { TablePageSize } from '@tables/tableTypes'
+/**
+ * Ownership: the tabs provider owns open tabs and recent views; the route owns the active view.
+ * Projections: pure transitions reconcile route identity, tab identity, and stored tab snapshots.
+ * Persistence: versioned workspace-scoped tabs and recent views are stored in localStorage.
+ * Reset boundary: workspace scope changes reload state; schema changes sanitize unavailable tables.
+ */
+import {
+  getConnectionScopedStorageKey,
+  getConnectionScopedStorageValue,
+} from '@app/storage/connectionScopedStorage'
+import { toTableTabSearch } from '@tables/routing/tableRowsSearch'
+import type { TableTabSearch, TableTabsRouteSearch } from '@tables/tableTypes'
 
-export interface TableTabSearch {
-  dir?: string
-  filters?: string
-  page?: number
-  pageSize?: TablePageSize
-  sort?: string
-  view?: string
-}
-
-export interface TableTabsRouteSearch extends TableTabSearch {
-  empty?: 'true'
-}
+export type { TableTabSearch, TableTabsRouteSearch } from '@tables/tableTypes'
 
 export interface TableDataTab {
   kind: 'table'
@@ -378,22 +377,7 @@ export function getFinalTableTabName(tabs: readonly TableTab[], tabId: string): 
 }
 
 function isTableTabSearch(value: unknown): value is TableTabSearch {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-
-  const search = value as TableTabSearch
-  return (
-    (search.dir === undefined || typeof search.dir === 'string') &&
-    (search.filters === undefined || typeof search.filters === 'string') &&
-    (search.page === undefined || (Number.isInteger(search.page) && search.page > 0)) &&
-    (search.pageSize === undefined ||
-      search.pageSize === 100 ||
-      search.pageSize === 500 ||
-      search.pageSize === 1000) &&
-    (search.sort === undefined || typeof search.sort === 'string') &&
-    (search.view === undefined || typeof search.view === 'string')
-  )
+  return typeof value === 'object' && value !== null
 }
 
 function parseTableDataTab(value: unknown): TableDataTab | null {
@@ -415,7 +399,7 @@ function parseTableDataTab(value: unknown): TableDataTab | null {
     kind: 'table',
     id: tab.id,
     tableName: tab.tableName,
-    search: tab.search,
+    search: toTableTabSearch(tab.search),
   }
 }
 
@@ -458,17 +442,14 @@ function parseRecentViews(values: unknown): TableDataTab[] {
     .slice(0, MAX_RECENT_VIEWS)
 }
 
-function getStorageKey(scope: string): string {
-  return getConnectionScopedStorageKey('tabs', scope)
-}
-
 function readStoredState(scope: string): TableTabsState | null {
   if (typeof window === 'undefined') {
     return null
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(getStorageKey(scope)) ?? 'null') as {
+    const storedValue = getConnectionScopedStorageValue('tabs', scope)
+    const parsed = JSON.parse(storedValue ?? 'null') as {
       version?: unknown
       tabs?: unknown
       recentViews?: unknown
@@ -497,6 +478,9 @@ export function saveTableTabsState(scope: string, state: TableTabsState): void {
   }
 
   try {
-    window.localStorage.setItem(getStorageKey(scope), JSON.stringify({ version: 1, ...state }))
+    window.localStorage.setItem(
+      getConnectionScopedStorageKey('tabs', scope),
+      JSON.stringify({ version: 1, ...state }),
+    )
   } catch {}
 }

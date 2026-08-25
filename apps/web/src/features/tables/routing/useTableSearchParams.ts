@@ -1,8 +1,8 @@
 /**
- * Synchronizes data-explorer UI state with the table route search params.
- *
- * Filters, sorting, selected row editor mode, and schema/data view are encoded in the URL
- * so Inspector links can restore a specific view into a Jazz table.
+ * Ownership: the active table route owns shareable explorer and row-editor state.
+ * Projections: canonical route search becomes resolved UI state plus route-writing commands.
+ * Persistence: TanStack Router stores the state in URL search and browser history.
+ * Reset boundary: table-route navigation or a search command replaces the affected projection.
  */
 import { useMemo } from 'react'
 
@@ -10,7 +10,10 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 
 import { serializeFiltersToSearchParam } from '@tables/filters/filterParsing'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
-import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
+import {
+  canonicalizeTableRouteSearch,
+  resolveTableRowsSearch,
+} from '@tables/routing/tableRowsSearch'
 import type {
   DetailPaneMode,
   TableExplorerSearchState,
@@ -126,62 +129,13 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     }
   }, [filters, search.mode, search.rowId, search.view, tableRowsSearch])
 
-  const createNextSearch = (
-    baseSearch: TableRouteSearch,
-    updates: Partial<TableRouteSearch>,
-  ): TableRouteSearch => {
-    const nextSearch: TableRouteSearch = {
-      ...baseSearch,
-      ...updates,
-    }
-
-    // Remove default values so generated URLs stay readable and shareable.
-    delete nextSearch.tab
-    if (nextSearch.view === 'data' || nextSearch.view === undefined) {
-      delete nextSearch.view
-    }
-    if (nextSearch.sort === 'id' || nextSearch.sort === undefined) {
-      delete nextSearch.sort
-    }
-    if (nextSearch.dir === 'asc' || nextSearch.dir === undefined) {
-      delete nextSearch.dir
-    }
-    if (nextSearch.filters === null || nextSearch.filters === undefined) {
-      delete nextSearch.filters
-    }
-    if (nextSearch.page === 1 || nextSearch.page === undefined) {
-      delete nextSearch.page
-    }
-    if (nextSearch.pageSize === 100 || nextSearch.pageSize === undefined) {
-      delete nextSearch.pageSize
-    }
-    if (nextSearch.mode !== 'edit' && nextSearch.mode !== 'insert') {
-      delete nextSearch.mode
-      delete nextSearch.rowId
-    }
-    if (nextSearch.mode === 'insert') {
-      delete nextSearch.rowId
-    }
-    if (nextSearch.mode === 'edit') {
-      const rowId = parseRowId(nextSearch.rowId)
-      if (rowId === null) {
-        delete nextSearch.mode
-        delete nextSearch.rowId
-      } else {
-        nextSearch.rowId = rowId
-      }
-    }
-
-    return nextSearch
-  }
-
   const updateSearch = async (
     updates: Partial<TableRouteSearch>,
     options?: UpdateSearchOptions,
   ): Promise<void> => {
     await navigate({
       replace: options?.replace ?? true,
-      search: (currentSearch) => createNextSearch(currentSearch, updates),
+      search: (currentSearch) => canonicalizeTableRouteSearch({ ...currentSearch, ...updates }),
     })
   }
 

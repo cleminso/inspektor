@@ -1,13 +1,8 @@
 import type { WasmSchema } from 'jazz-tools'
 import { describe, expect, it } from 'vitest'
 
-import {
-  buildInitialTableRowsQuery,
-  buildTableRowsQuery,
-  DEFAULT_TABLE_PAGE_SIZE,
-  TABLE_PAGE_SIZE_OPTIONS,
-  TABLE_ROWS_QUERY_OPTIONS,
-} from '@tables/query/tableRowsQuery'
+import { buildTableRowsQuery, TABLE_ROWS_QUERY_OPTIONS } from '@tables/query/tableRowsQuery'
+import { DEFAULT_TABLE_PAGE_SIZE, TABLE_PAGE_SIZE_OPTIONS } from '@tables/tableTypes'
 
 const schema = {
   users: {
@@ -28,7 +23,15 @@ const schema = {
 
 describe('tableRowsQuery', () => {
   it('builds the exact base query shared by table intent and the destination grid', () => {
-    const query = buildInitialTableRowsQuery({ schema, tableName: 'users' })
+    const query = buildTableRowsQuery({
+      filters: [],
+      page: 1,
+      pageSize: 100,
+      schema,
+      sortColumn: 'id',
+      sortDirection: 'asc',
+      tableName: 'users',
+    })
 
     expect(JSON.parse(query._build())).toEqual({
       table: 'users',
@@ -100,11 +103,28 @@ describe('tableRowsQuery', () => {
     ])
   })
 
+  it('falls back to row identity for missing sort columns', () => {
+    const query = buildTableRowsQuery({
+      filters: [],
+      page: 1,
+      pageSize: 100,
+      schema,
+      sortColumn: 'missing',
+      sortDirection: 'desc',
+      tableName: 'users',
+    })
+
+    expect(JSON.parse(query._build()).orderBy).toEqual([['id', 'asc']])
+  })
+
   it('prefetches the exact stored destination page', () => {
-    const query = buildInitialTableRowsQuery({
+    const query = buildTableRowsQuery({
+      filters: [],
       page: 2,
       pageSize: 1000,
       schema,
+      sortColumn: 'id',
+      sortDirection: 'asc',
       tableName: 'users',
     })
 

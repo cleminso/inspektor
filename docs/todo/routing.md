@@ -13,6 +13,13 @@
 
 [25/08/26]
 
+- [x] Canonicalize route and persisted-tab search through one raw-to-resolved contract while omitting semantic defaults from URLs.
+- [x] Keep row-query execution independent of TanStack Router and validate runtime sort columns against the selected schema.
+- [x] Use collision-safe workspace and table scope serialization across tabs, preferences, selection, and staged mutations.
+- [x] Reject pagination whose derived Jazz offset exceeds safe integer precision.
+
+[25/08/26]
+
 - [x] Restore the most recent table view that remains valid in the selected schema when entering a connection, falling back to the first available table.
 
 [25/08/26]
@@ -177,6 +184,11 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover canonical route and stored-tab search, collision-safe scopes, schema-aware sorting, and safe pagination offsets.
+- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
 
 [25/08/26]
 

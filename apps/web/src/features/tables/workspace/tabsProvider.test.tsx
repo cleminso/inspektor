@@ -9,6 +9,7 @@ import {
   useTableMutationWorkspace,
 } from '@tables/mutationLedger/provider'
 import { TableTabsProvider, useTableTabs } from '@tables/workspace/tabsProvider'
+import { createTableScope } from '@tables/workspace/scope'
 
 const navigate = vi.hoisted(() => vi.fn())
 const routeSearch = vi.hoisted(() => ({ filters: undefined as string | undefined }))
@@ -16,6 +17,7 @@ const schemaState = vi.hoisted(() => ({
   isSchemaReady: true,
   tables: ['accounts', 'profiles'],
 }))
+const tableScope = createTableScope('scope', 'accounts')
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigate,
@@ -77,7 +79,7 @@ function TabActions(): React.ReactElement {
       <output aria-label="Open tabs">{tabs.map((tab) => tab.id).join(',')}</output>
       <output aria-label="Replaceable tab">{replaceableTabId ?? 'none'}</output>
       <output aria-label="Workspace pending">
-        {String(mutationWorkspace.hasPendingChanges('scope:accounts'))}
+        {String(mutationWorkspace.hasPendingChanges(tableScope))}
       </output>
       <button type="button" onClick={() => closeTab('table:accounts')}>
         Close accounts
@@ -97,7 +99,7 @@ function Harness(): React.ReactElement {
     <RuntimeScopeExitGuardProvider>
       <TableMutationLedgerWorkspaceProvider>
         <TableTabsProvider scope="scope">
-          <TableMutationLedgerProvider schemaColumns={[]} scopeKey="scope:accounts">
+          <TableMutationLedgerProvider schemaColumns={[]} scopeKey={tableScope}>
             <MutationActions />
           </TableMutationLedgerProvider>
           <TabActions />

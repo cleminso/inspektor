@@ -4,41 +4,29 @@
  * The hook turns route search state into a generic Jazz query, derives render columns from
  * stored schema metadata, and loads one URL-backed page without app-generated table types.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { type DynamicTableRow, type WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 
-import { buildTableRowsQuery, TABLE_ROWS_QUERY_OPTIONS } from '@tables/query/tableRowsQuery'
+import {
+  buildTableRowsQuery,
+  isTableColumnSortable,
+  TABLE_ROWS_QUERY_OPTIONS,
+} from '@tables/query/tableRowsQuery'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
-import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { getTableColumns } from '@tables/schema/tableSchema'
-import type { TableColumnMeta, TablePageSize } from '@tables/tableTypes'
+import type { TableColumnMeta, TablePageSize, TableRowsSearchState } from '@tables/tableTypes'
 
 const EMPTY_ROWS: DynamicTableRow[] = []
-
-/** Returns whether the generic query builder can sort this Jazz column type. */
-function isColumnSortable(
-  columnType: ReturnType<typeof getTableColumns>[number]['column_type'],
-): boolean {
-  switch (columnType.type) {
-    case 'Integer':
-    case 'BigInt':
-    case 'Double':
-    case 'Boolean':
-    case 'Text':
-    case 'Enum':
-    case 'Timestamp':
-    case 'Uuid':
-      return true
-    default:
-      return false
-  }
-}
 
 interface UseTableRowsOptions {
   client: JazzClient | null
   currentSchemaHash: string | null
+  search: TableRowsSearchState & {
+    setPage: (page: number) => Promise<void>
+    setPageSize: (pageSize: TablePageSize) => Promise<void>
+  }
   tableName: string | null
   wasmSchema: WasmSchema | null
 }
@@ -156,11 +144,11 @@ function projectRowsWindow(
 export function useTableRows({
   client,
   currentSchemaHash,
+  search,
   tableName,
   wasmSchema,
 }: UseTableRowsOptions): UseTableRowsResult {
-  const { filters, page, pageSize, setPage, setPageSize, sortColumn, sortDirection } =
-    useTableExplorerSearchParams()
+  const { filters, page, pageSize, setPage, setPageSize, sortColumn, sortDirection } = search
   const queryKey = JSON.stringify({
     currentSchemaHash,
     filters,
@@ -201,7 +189,7 @@ export function useTableRows({
         label: column.name,
         accessorKey: column.name,
         column,
-        isSortable: isColumnSortable(column.column_type),
+        isSortable: isTableColumnSortable(column.column_type),
       })),
     ]
   }, [schemaColumns])
@@ -309,6 +297,8 @@ export function useTableRows({
       ? queryKey
       : null
   const resetPageKeyRef = useRef<string | null>(null)
+  // Query state schedules correction; the latest router command should not make the effect reactive.
+  const resetPage = useEffectEvent(() => setPage(1))
   useEffect(() => {
     if (outOfRangePageKey === null) {
       resetPageKeyRef.current = null
@@ -319,8 +309,8 @@ export function useTableRows({
     }
 
     resetPageKeyRef.current = outOfRangePageKey
-    void setPage(1)
-  }, [outOfRangePageKey, setPage])
+    void resetPage()
+  }, [outOfRangePageKey])
 
   return {
     columns,

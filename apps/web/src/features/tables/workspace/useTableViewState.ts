@@ -5,7 +5,7 @@
  * and checkbox selection. The table mutation provider owns edit drafts. This hook connects those
  * systems without duplicating parsing, dirty comparison, or Jazz mutation rules.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 
 import type { DataGridCellTarget, DataGridFocusRequest, DataGridTable } from '@inspector/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
@@ -28,6 +28,7 @@ import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchPara
 import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
+import { resolveTableSortColumn } from '@tables/query/tableRowsQuery'
 import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
 import type {
   TableFieldsByRowId,
@@ -150,11 +151,29 @@ export function useTableViewState({
   const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
   const searchState = useTableExplorerSearchParams()
-  const query = useTableRows({ client, currentSchemaHash, tableName, wasmSchema })
   const schemaColumns = useMemo(
     () => getTableColumns(wasmSchema, tableName),
     [tableName, wasmSchema],
   )
+  const sortColumn =
+    wasmSchema === null
+      ? searchState.sortColumn
+      : resolveTableSortColumn(schemaColumns, searchState.sortColumn)
+  const sortDirection = sortColumn === searchState.sortColumn ? searchState.sortDirection : 'asc'
+  // Sort values schedule canonicalization; router command identity is not part of that condition.
+  const setCanonicalSorting = useEffectEvent(searchState.setSorting)
+  const query = useTableRows({
+    client,
+    currentSchemaHash,
+    search: { ...searchState, sortColumn, sortDirection },
+    tableName,
+    wasmSchema,
+  })
+  useEffect(() => {
+    if (wasmSchema !== null && sortColumn !== searchState.sortColumn) {
+      void setCanonicalSorting(sortColumn, sortDirection)
+    }
+  }, [searchState.sortColumn, sortColumn, sortDirection, wasmSchema])
   const editorMode = searchState.editorMode ?? 'closed'
   const activeRowId = searchState.editorMode === 'edit' ? searchState.rowId : null
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
@@ -257,16 +276,16 @@ export function useTableViewState({
         filters: searchState.filters,
         page: searchState.page,
         pageSize: searchState.pageSize,
-        sortColumn: searchState.sortColumn,
-        sortDirection: searchState.sortDirection,
+        sortColumn,
+        sortDirection,
         tableKey,
       }),
     [
       searchState.filters,
       searchState.page,
       searchState.pageSize,
-      searchState.sortColumn,
-      searchState.sortDirection,
+      sortColumn,
+      sortDirection,
       tableKey,
     ],
   )
@@ -429,8 +448,8 @@ export function useTableViewState({
     disabledRowIds,
     rows: query.rows,
     columns: query.columns,
-    sortColumn: searchState.sortColumn,
-    sortDirection: searchState.sortDirection,
+    sortColumn,
+    sortDirection,
     stagedValuesByRowId,
     selectedRowIds: visibleSelectedRowIds,
     columnVisibility: tablePreferences.columnVisibility,
@@ -642,8 +661,8 @@ export function useTableViewState({
         filters,
         page: 1,
         pageSize: searchState.pageSize,
-        sortColumn: searchState.sortColumn,
-        sortDirection: searchState.sortDirection,
+        sortColumn,
+        sortDirection,
         tableKey,
       })
       resetSelection()

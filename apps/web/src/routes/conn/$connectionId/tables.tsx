@@ -9,38 +9,14 @@ import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHist
 import { createTableWorkspaceScope } from '@tables/workspace/scope'
 import { TableMutationLedgerWorkspaceProvider } from '@tables/mutationLedger/provider'
 import { TableExplorerScreen } from '@tables/view'
-import type { TablePageSize, TableRouteSearch } from '@tables/tableTypes'
-
-export function parsePositiveInteger(value: unknown): number | undefined {
-  const numberValue = typeof value === 'string' ? Number(value) : value
-  return typeof numberValue === 'number' && Number.isSafeInteger(numberValue) && numberValue > 0
-    ? numberValue
-    : undefined
-}
-
-function parsePageSize(value: unknown): TablePageSize | undefined {
-  const pageSize = parsePositiveInteger(value)
-  return pageSize === 100 || pageSize === 500 || pageSize === 1000 ? pageSize : undefined
-}
+import { canonicalizeTableRouteSearch } from '@tables/routing/tableRowsSearch'
 
 export const Route = createFileRoute('/conn/$connectionId/tables')({
   head: () => ({
     meta: [{ title: 'Tables | Inspector' }],
   }),
   component: TablesLayoutRoute,
-  validateSearch: (search): TableRouteSearch => ({
-    ...search,
-    dir: typeof search.dir === 'string' ? search.dir : undefined,
-    empty: search.empty === 'true' ? 'true' : undefined,
-    filters: typeof search.filters === 'string' ? search.filters : undefined,
-    mode: typeof search.mode === 'string' ? search.mode : undefined,
-    page: parsePositiveInteger(search.page),
-    pageSize: parsePageSize(search.pageSize),
-    rowId: typeof search.rowId === 'string' ? search.rowId : undefined,
-    sort: typeof search.sort === 'string' ? search.sort : undefined,
-    tab: typeof search.tab === 'string' ? search.tab : undefined,
-    view: typeof search.view === 'string' ? search.view : undefined,
-  }),
+  validateSearch: canonicalizeTableRouteSearch,
 })
 
 function TablesLayoutRoute(): React.ReactElement {

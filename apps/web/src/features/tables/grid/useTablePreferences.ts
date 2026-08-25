@@ -1,7 +1,10 @@
 import type { ColumnOrderState, OnChangeFn } from '@tanstack/react-table'
 import { useCallback, useMemo, useRef, useState } from 'react'
 
-import { getConnectionScopedStorageKey } from '@app/storage/connectionScopedStorage'
+import {
+  getConnectionScopedStorageKey,
+  getConnectionScopedStorageValue,
+} from '@app/storage/connectionScopedStorage'
 import { normalizeColumnOrder } from '@tables/grid/useColumnOrder'
 import type { TableColumnVisibilityState } from '@tables/tableTypes'
 
@@ -22,9 +25,10 @@ interface UseTablePreferencesResult {
   setColumnVisibility: (next: TableColumnVisibilityState) => void
 }
 
-function readTablePreferences(storageKey: string, columnIds: string[]): TablePreferences {
+function readTablePreferences(tableKey: string, columnIds: string[]): TablePreferences {
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(storageKey) ?? 'null') as {
+    const storedValue = getConnectionScopedStorageValue('tablePreferences', tableKey)
+    const parsed = JSON.parse(storedValue ?? 'null') as {
       version?: unknown
       hidden?: unknown
       order?: unknown
@@ -64,7 +68,7 @@ export function useTablePreferences({
 }: UseTablePreferencesOptions): UseTablePreferencesResult {
   const storageKey = getConnectionScopedStorageKey('tablePreferences', tableKey)
   const [preferences, setPreferences] = useState<TablePreferences>(() =>
-    readTablePreferences(storageKey, columnIds),
+    readTablePreferences(tableKey, columnIds),
   )
   const preferencesRef = useRef(preferences)
   preferencesRef.current = preferences

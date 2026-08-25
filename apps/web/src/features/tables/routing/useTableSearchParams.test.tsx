@@ -88,7 +88,7 @@ describe('useTableExplorerSearchParams', () => {
     expect(navigateMock).toHaveBeenCalledWith(expect.objectContaining({ replace: true }))
   })
 
-  it('preserves unrelated search params when updating filters', async () => {
+  it('drops undeclared search params when updating filters', async () => {
     searchState.value = { tab: 'new-view', custom: 'kept' }
     const { result } = renderHook(() => useTableExplorerSearchParams())
 
@@ -105,7 +105,7 @@ describe('useTableExplorerSearchParams', () => {
       rowId: 'row-1',
     })
 
-    expect(nextSearch).toMatchObject({ custom: 'kept' })
+    expect(nextSearch.custom).toBeUndefined()
     expect(nextSearch.tab).toBeUndefined()
     expect(nextSearch.mode).toBeUndefined()
     expect(nextSearch.rowId).toBeUndefined()
@@ -118,14 +118,14 @@ describe('useTableExplorerSearchParams', () => {
       await result.current.setPage(3)
     })
 
-    expect(captureSearchUpdater()({ custom: 'kept' })).toEqual({ custom: 'kept', page: 3 })
+    expect(captureSearchUpdater()({ custom: 'kept' })).toEqual({ page: 3 })
 
     navigateMock.mockReset()
     await act(async () => {
       await result.current.setPage(1)
     })
 
-    expect(captureSearchUpdater()({ custom: 'kept', page: 3 })).toEqual({ custom: 'kept' })
+    expect(captureSearchUpdater()({ custom: 'kept', page: 3 })).toEqual({})
   })
 
   it('resets the page and stores only non-default page sizes', async () => {
