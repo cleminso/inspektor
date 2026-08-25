@@ -241,9 +241,9 @@ describe('TableMutationWidget', () => {
     const stageReview = () => {
       controller.actions.setFieldText('name', 'Grace')
       controller.actions.setFieldText('count', '2')
-      mutations.dispatch({ type: 'deleteRows', rowIds: ['row-2', 'row-3'] })
+      mutations.stageDeletions(['row-2', 'row-3'])
       for (let index = 2; index < operationCount; index += 1) {
-        mutations.dispatch({ type: 'deleteRows', rowIds: [`row-${index + 2}`] })
+        mutations.stageDeletions([`row-${index + 2}`])
       }
     }
     return (
@@ -325,10 +325,7 @@ describe('TableMutationWidget', () => {
       const mutations = useTableMutationLedger()
       return (
         <>
-          <button
-            type="button"
-            onClick={() => mutations.dispatch({ type: 'deleteRows', rowIds: ['row-1'] })}
-          >
+          <button type="button" onClick={() => mutations.stageDeletions(['row-1'])}>
             Stage deletion
           </button>
           <TableMutationWidget executor={{ deleteRow, updateRow: vi.fn() }} />

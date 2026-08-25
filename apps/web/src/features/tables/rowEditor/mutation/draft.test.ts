@@ -2,8 +2,8 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { describe, expect, it } from 'vitest'
 
 import {
-  buildRowMutationDisplayValues,
   buildRowMutationSubmission,
+  buildRowMutationValueProjection,
   createInsertRowDraft,
   createUpdateRowDraft,
   getMutationFieldError,
@@ -47,9 +47,9 @@ describe('update row drafts', () => {
     const source = { id: 'row-1', name: 'Ada', count: 1, settings: null }
     const draft = setMutationFieldText(createUpdateRowDraft(source), columns[2], '{"enabled":true}')
 
-    expect(buildRowMutationDisplayValues(draft, columns)).toEqual({
+    expect(buildRowMutationValueProjection(draft, columns)).toMatchObject({
+      displayValues: { settings: { enabled: true } },
       errors: {},
-      values: { settings: { enabled: true } },
     })
     expect(buildRowMutationSubmission(draft, columns)).toEqual({
       errors: {},

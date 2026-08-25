@@ -78,12 +78,14 @@ export type TableMutationStateAction =
       type: 'setDraft'
     }
   | { rowIds: readonly TableRowId[]; type: 'deleteRows' }
-  | { entryId: TableMutationEntry['entryId']; type: 'removeEntry' }
   | { rowIds: readonly TableRowId[]; type: 'undoDeletions' }
   | { fieldName: string; rowId: TableRowId; type: 'revertUpdateField' }
   | { rowId: TableRowId; type: 'revertRowUpdate' }
-  | { operationId: DeletionOperationId; rowId: TableRowId; type: 'undoDeletionTarget' }
   | { operationId: TableMutationReviewOperation['operationId']; type: 'undoReviewOperation' }
+  | {
+      entryIds: readonly TableMutationEntry['entryId'][]
+      type: 'acknowledgeAppliedEntries'
+    }
   | { type: 'discardAll' }
 
 export function createTableMutationState(): TableMutationState {
@@ -150,16 +152,6 @@ export function reduceTableMutationState(
         nextDeletionOperationId: state.nextDeletionOperationId + 1,
       }
     }
-    case 'removeEntry': {
-      if (action.entryId.startsWith('delete:')) {
-        const rowId = action.entryId.slice('delete:'.length)
-        return removeDeletedRows(state, new Set([rowId]))
-      }
-      const rowId = action.entryId.slice('update:'.length)
-      const draftsByRowId = { ...state.draftsByRowId }
-      delete draftsByRowId[rowId]
-      return { ...state, draftsByRowId }
-    }
     case 'undoDeletions': {
       return removeDeletedRows(state, new Set(action.rowIds))
     }
@@ -188,17 +180,6 @@ export function reduceTableMutationState(
       delete draftsByRowId[action.rowId]
       return { ...state, draftsByRowId }
     }
-    case 'undoDeletionTarget':
-      return {
-        ...state,
-        deletionOperations: state.deletionOperations
-          .map((operation) =>
-            operation.operationId === action.operationId
-              ? { ...operation, rowIds: operation.rowIds.filter((rowId) => rowId !== action.rowId) }
-              : operation,
-          )
-          .filter((operation) => operation.rowIds.length > 0),
-      }
     case 'undoReviewOperation':
       if (action.operationId.startsWith('update:')) {
         return reduceTableMutationState(state, {
@@ -212,6 +193,19 @@ export function reduceTableMutationState(
           (operation) => operation.operationId !== action.operationId,
         ),
       }
+    case 'acknowledgeAppliedEntries': {
+      const entryIds = new Set(action.entryIds)
+      const draftsByRowId = { ...state.draftsByRowId }
+      const deletedRowIds = new Set<TableRowId>()
+      for (const entryId of entryIds) {
+        if (entryId.startsWith('update:')) {
+          delete draftsByRowId[entryId.slice('update:'.length)]
+        } else {
+          deletedRowIds.add(entryId.slice('delete:'.length))
+        }
+      }
+      return removeDeletedRows({ ...state, draftsByRowId }, deletedRowIds)
+    }
     case 'discardAll':
       return createTableMutationState()
   }

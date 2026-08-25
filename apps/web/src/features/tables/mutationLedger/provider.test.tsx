@@ -10,6 +10,7 @@ import {
 import {
   TableMutationLedgerProvider,
   TableMutationLedgerWorkspaceProvider,
+  useTableMutationApplicationCommands,
   useTableMutationEditorController,
   useTableMutationLedger,
   useTableMutationWorkspace,
@@ -36,12 +37,15 @@ function TestLedgerProvider({ children }: { children: React.ReactNode }): React.
 }
 
 function EditorHarness() {
+  const [workspaceDiscarded, setWorkspaceDiscarded] = useState<boolean | null>(null)
   const controller = useTableMutationEditorController({
     initialRowValues: { id: 'row-1', name: 'Ada', age: 37 },
     rowId: 'row-1',
     schemaColumns: columns,
   })
   const mutations = useTableMutationLedger()
+  const application = useTableMutationApplicationCommands()
+  const workspace = useTableMutationWorkspace()
 
   return (
     <div>
@@ -59,41 +63,39 @@ function EditorHarness() {
       <output aria-label="Needs attention">{String(mutations.hasInvalidEditor)}</output>
       <output aria-label="Execution status">{mutations.execution.status}</output>
       <output aria-label="Review operations">{mutations.review.operations.length}</output>
+      <output aria-label="Workspace discarded">{String(workspaceDiscarded)}</output>
       <button type="button" onClick={() => controller.actions.setFieldText('name', 'Grace')}>
         Change name
       </button>
       <button type="button" onClick={() => controller.actions.setFieldText('age', 'invalid')}>
         Invalidate age
       </button>
-      <button type="button" onClick={() => mutations.removeEntry('update:row-1')}>
-        Remove update
-      </button>
       <button type="button" onClick={() => mutations.revertRowUpdate('row-1')}>
         Revert row
       </button>
-      <button
-        type="button"
-        onClick={() => mutations.dispatch({ type: 'deleteRows', rowIds: ['row-1', 'row-2'] })}
-      >
+      <button type="button" onClick={() => mutations.stageDeletions(['row-1', 'row-2'])}>
         Delete rows
-      </button>
-      <button
-        type="button"
-        onClick={() => mutations.undoDeletionTarget('delete-operation:0', 'row-1')}
-      >
-        Undo deletion target
       </button>
       <button type="button" onClick={() => mutations.undoReviewOperation('delete-operation:0')}>
         Undo deletion operation
       </button>
       <button
         type="button"
-        onClick={() => mutations.setExecution({ error: 'Rejected', status: 'failed' })}
+        onClick={() => application.setExecution({ error: 'Rejected', status: 'failed' })}
       >
         Fail apply
       </button>
       <button type="button" onClick={mutations.discardAll}>
         Discard all
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          application.setExecution({ error: null, status: 'applying' })
+          setWorkspaceDiscarded(workspace.discardPendingChanges('test:accounts'))
+        }}
+      >
+        Start apply and discard workspace
       </button>
     </div>
   )
@@ -172,20 +174,7 @@ describe('TableMutationLedgerProvider', () => {
     expect(screen.getByLabelText('Needs attention').textContent).toBe('true')
   })
 
-  it('removing an update resets its provider-owned draft', () => {
-    render(
-      <TestLedgerProvider>
-        <EditorHarness />
-      </TestLedgerProvider>,
-    )
-    fireEvent.click(screen.getByRole('button', { name: 'Change name' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Remove update' }))
-
-    expect(screen.getByLabelText('Draft name').textContent).toBe('Ada')
-    expect(screen.getByLabelText('Pending fields').textContent).toBe('')
-  })
-
-  it('exposes deletion target and review operation undo commands', () => {
+  it('exposes review operation undo commands', () => {
     render(
       <TestLedgerProvider>
         <EditorHarness />
@@ -194,10 +183,6 @@ describe('TableMutationLedgerProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete rows' }))
     expect(screen.getByLabelText('Review operations').textContent).toBe('1')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Fail apply' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Undo deletion target' }))
-    expect(screen.getByLabelText('Review operations').textContent).toBe('1')
-    expect(screen.getByLabelText('Execution status').textContent).toBe('idle')
     fireEvent.click(screen.getByRole('button', { name: 'Fail apply' }))
     fireEvent.click(screen.getByRole('button', { name: 'Undo deletion operation' }))
     expect(screen.getByLabelText('Review operations').textContent).toBe('0')
@@ -217,6 +202,20 @@ describe('TableMutationLedgerProvider', () => {
     expect(screen.getByLabelText('Draft name').textContent).toBe('Ada')
     expect(screen.getByLabelText('Review operations').textContent).toBe('0')
     expect(screen.getByLabelText('Execution status').textContent).toBe('idle')
+  })
+
+  it('keeps workspace state while Apply owns it', () => {
+    render(
+      <TestLedgerProvider>
+        <EditorHarness />
+      </TestLedgerProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Change name' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start apply and discard workspace' }))
+
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
+    expect(screen.getByLabelText('Execution status').textContent).toBe('applying')
+    expect(screen.getByLabelText('Workspace discarded').textContent).toBe('false')
   })
 
   it('restores each table ledger after its table view unmounts', () => {

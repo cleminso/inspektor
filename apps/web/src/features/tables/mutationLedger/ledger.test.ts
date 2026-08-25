@@ -85,7 +85,7 @@ describe('table mutation state', () => {
     ])
   })
 
-  it('removes one update or discards the complete staged state', () => {
+  it('reverts one update or discards the complete staged state', () => {
     let state = reduceTableMutationState(createTableMutationState(), {
       type: 'setDraft',
       rowId: 'row-1',
@@ -93,7 +93,7 @@ describe('table mutation state', () => {
       schemaColumns: columns,
     })
     state = reduceTableMutationState(state, { type: 'deleteRows', rowIds: ['row-2'] })
-    state = reduceTableMutationState(state, { type: 'removeEntry', entryId: 'update:row-1' })
+    state = reduceTableMutationState(state, { type: 'revertRowUpdate', rowId: 'row-1' })
 
     expect(state.draftsByRowId['row-1']).toBeUndefined()
     expect(state.deletionOperations).toEqual([
@@ -156,18 +156,11 @@ describe('table mutation state', () => {
     ])
   })
 
-  it('removes one deletion target or its complete review operation', () => {
+  it('removes a complete deletion review operation', () => {
     let state = reduceTableMutationState(createTableMutationState(), {
       type: 'deleteRows',
       rowIds: ['row-1', 'row-2'],
     })
-    state = reduceTableMutationState(state, {
-      type: 'undoDeletionTarget',
-      operationId: 'delete-operation:0',
-      rowId: 'row-1',
-    })
-    expect(state.deletionOperations[0]?.rowIds).toEqual(['row-2'])
-
     state = reduceTableMutationState(state, {
       type: 'undoReviewOperation',
       operationId: 'delete-operation:0',

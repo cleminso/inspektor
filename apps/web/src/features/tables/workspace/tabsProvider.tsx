@@ -95,7 +95,6 @@ interface TableTabsProviderState extends TableTabsState {
 }
 
 interface PendingTabClose {
-  changeCount: number
   tableName: string
   tabId: string
 }
@@ -328,7 +327,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
             navigateToTab(tab)
           }
           setPendingTabClose({
-            changeCount: mutationWorkspace.getPendingChangeCount(scopeKey),
             tableName: finalTableName,
             tabId,
           })
@@ -351,7 +349,13 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     if (pendingTabClose === null) {
       return
     }
-    mutationWorkspace.discardPendingChanges(createTableScope(scope, pendingTabClose.tableName))
+    if (
+      mutationWorkspace.discardPendingChanges(
+        createTableScope(scope, pendingTabClose.tableName),
+      ) === false
+    ) {
+      return
+    }
     closeTabWithoutConfirmation(pendingTabClose.tabId)
     setPendingTabClose(null)
   }, [closeTabWithoutConfirmation, mutationWorkspace, pendingTabClose, scope])
@@ -495,8 +499,6 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     ],
   )
 
-  const stagedChangeLabel = pendingTabClose?.changeCount === 1 ? 'change' : 'changes'
-
   return (
     <TableTabsContext.Provider value={value}>
       {children}
@@ -513,7 +515,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
           <AlertDialog.Description>
             {pendingTabClose === null
               ? null
-              : `Closing the final ${pendingTabClose.tableName} view will discard ${pendingTabClose.changeCount} staged ${stagedChangeLabel}. This cannot be undone.`}
+              : `Closing the final ${pendingTabClose.tableName} view will discard any staged changes. This cannot be undone.`}
           </AlertDialog.Description>
           <AlertDialog.Actions>
             <AlertDialog.Close>Keep editing</AlertDialog.Close>

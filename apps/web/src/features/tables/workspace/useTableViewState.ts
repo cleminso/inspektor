@@ -97,7 +97,8 @@ interface UseTableViewStateResult {
     values: Record<string, unknown>,
     options: InsertRowSaveOptions,
   ) => Promise<void>
-  handleMutationApplySuccess: (appliedUpdateFields: TableFieldsByRowId) => void
+  handleMutationApplySuccess: () => void
+  handleMutationUpdatesApplied: (appliedUpdateFields: TableFieldsByRowId) => void
   handleRowsStagedForDeletion: (rowIds: readonly TableRowId[]) => void
   handleRowEditorOpenChange: (open: boolean) => void
   handleRowEditorCancel: () => void
@@ -509,10 +510,9 @@ export function useTableViewState({
     closeDetailPane()
   }
 
-  const handleMutationApplySuccess = (appliedUpdateFields: TableFieldsByRowId) => {
+  const handleMutationApplySuccess = () => {
     resetSelection()
     closeDetailPane()
-    highlightRecentlyAppliedCells(appliedUpdateFields)
   }
 
   const handleRowsStagedForDeletion = (rowIds: readonly TableRowId[]) => {
@@ -688,6 +688,7 @@ export function useTableViewState({
     handleFieldEditorComplete,
     handleInsertSave,
     handleMutationApplySuccess,
+    handleMutationUpdatesApplied: highlightRecentlyAppliedCells,
     handleRowsStagedForDeletion,
     handleRowEditorOpenChange: (open) => {
       if (open === false) {

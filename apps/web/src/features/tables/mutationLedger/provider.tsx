@@ -3,6 +3,7 @@ import {
   use,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -17,9 +18,9 @@ import {
   createTableMutationState,
   reduceTableMutationState,
   selectTableMutationProjection,
-  type DeletionOperationId,
   type TableMutationEntry,
   type TableMutationLedger,
+  type TableMutationProjection,
   type TableMutationReview,
   type TableMutationReviewOperation,
   type TableMutationState,
@@ -34,7 +35,6 @@ import {
 import type { TableRowId, TableValuesByRowId } from '@tables/tableTypes'
 import {
   useBoundRowDraftController,
-  type RowDraftBinding,
   type RowDraftController,
 } from '@tables/rowEditor/mutation/useRowDraftController'
 
@@ -43,10 +43,13 @@ interface TableMutationExecutionState {
   status: 'applying' | 'failed' | 'idle'
 }
 
-type PublicMutationAction = Exclude<TableMutationStateAction, { type: 'setDraft' }>
+type PublicMutationAction = Exclude<
+  TableMutationStateAction,
+  { type: 'acknowledgeAppliedEntries' } | { type: 'setDraft' }
+>
 
 type ProviderAction =
-  | PublicMutationAction
+  | Exclude<TableMutationStateAction, { type: 'setDraft' }>
   | {
       initialDraft: RowMutationDraft
       rowId: string
@@ -58,7 +61,7 @@ type ProviderAction =
 interface TableMutationLedgerContextValue {
   dispatch: Dispatch<ProviderAction>
   execution: TableMutationExecutionState
-  schemaColumns: readonly ColumnDescriptor[]
+  projection: TableMutationProjection
   setExecution: Dispatch<SetStateAction<TableMutationExecutionState>>
   state: TableMutationState
 }
@@ -95,9 +98,8 @@ function createStoredTableMutationState(): StoredTableMutationState {
 const emptyStoredTableMutationState = createStoredTableMutationState()
 
 interface TableMutationLedgerWorkspaceContextValue {
-  discardPendingChanges: (scopeKey: string) => void
+  discardPendingChanges: (scopeKey: string) => boolean
   dispatch: (scopeKey: string, action: ProviderAction) => void
-  getPendingChangeCount: (scopeKey: string) => number
   hasPendingChanges: (scopeKey: string) => boolean
   setExecution: (scopeKey: string, update: SetStateAction<TableMutationExecutionState>) => void
 }
@@ -131,7 +133,10 @@ export function TableMutationLedgerWorkspaceProvider({
     Readonly<Record<string, StoredTableMutationState>>
   >({})
   const entriesByScopeRef = useRef(entriesByScope)
-  entriesByScopeRef.current = entriesByScope
+  const applyingScopesRef = useRef(new Set<string>())
+  useLayoutEffect(() => {
+    entriesByScopeRef.current = entriesByScope
+  }, [entriesByScope])
   const hasPending = Object.values(entriesByScope).some((entry) =>
     hasUnresolvedMutationState(entry.state),
   )
@@ -154,11 +159,20 @@ export function TableMutationLedgerWorkspaceProvider({
   const dispatch = useCallback((scopeKey: string, action: ProviderAction) => {
     setEntriesByScope((current) => {
       const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
+      if (
+        currentEntry.execution.status === 'applying' &&
+        action.type !== 'acknowledgeAppliedEntries'
+      ) {
+        return current
+      }
       const state = reduceProviderState(currentEntry.state, action)
       return { ...current, [scopeKey]: { ...currentEntry, state } }
     })
   }, [])
   const discardPendingChanges = useCallback((scopeKey: string) => {
+    if (applyingScopesRef.current.has(scopeKey)) {
+      return false
+    }
     setEntriesByScope((current) => {
       if (current[scopeKey] === undefined) {
         return current
@@ -167,9 +181,17 @@ export function TableMutationLedgerWorkspaceProvider({
       delete next[scopeKey]
       return next
     })
+    return true
   }, [])
   const setExecution = useCallback(
     (scopeKey: string, update: SetStateAction<TableMutationExecutionState>) => {
+      if (typeof update !== 'function') {
+        if (update.status === 'applying') {
+          applyingScopesRef.current.add(scopeKey)
+        } else {
+          applyingScopesRef.current.delete(scopeKey)
+        }
+      }
       setEntriesByScope((current) => {
         const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
         const execution = typeof update === 'function' ? update(currentEntry.execution) : update
@@ -182,19 +204,14 @@ export function TableMutationLedgerWorkspaceProvider({
     const entry = entriesByScopeRef.current[scopeKey]
     return entry !== undefined && hasUnresolvedMutationState(entry.state)
   }, [])
-  const getPendingChangeCount = useCallback((scopeKey: string) => {
-    const entry = entriesByScopeRef.current[scopeKey]
-    return entry === undefined ? 0 : countUnresolvedMutationState(entry.state)
-  }, [])
   const value = useMemo<TableMutationLedgerWorkspaceContextValue>(
     () => ({
       discardPendingChanges,
       dispatch,
-      getPendingChangeCount,
       hasPendingChanges,
       setExecution,
     }),
-    [discardPendingChanges, dispatch, getPendingChangeCount, hasPendingChanges, setExecution],
+    [discardPendingChanges, dispatch, hasPendingChanges, setExecution],
   )
 
   return (
@@ -207,8 +224,7 @@ export function TableMutationLedgerWorkspaceProvider({
 }
 
 export interface TableMutationWorkspace {
-  discardPendingChanges: (scopeKey: string) => void
-  getPendingChangeCount: (scopeKey: string) => number
+  discardPendingChanges: (scopeKey: string) => boolean
   hasPendingChanges: (scopeKey: string) => boolean
 }
 
@@ -245,6 +261,10 @@ export function TableMutationLedgerProvider({
   const workspaceEntry = entriesByScope[scopeKey] ?? emptyStoredTableMutationState
   const state = workspaceEntry.state
   const execution = workspaceEntry.execution
+  const projection = useMemo(
+    () => selectTableMutationProjection(state, schemaColumns),
+    [schemaColumns, state],
+  )
   const dispatch = useCallback<Dispatch<ProviderAction>>(
     (action) => {
       workspaceDispatch(scopeKey, action)
@@ -258,8 +278,8 @@ export function TableMutationLedgerProvider({
     [scopeKey, workspaceSetExecution],
   )
   const value = useMemo<TableMutationLedgerContextValue>(
-    () => ({ dispatch, execution, schemaColumns, setExecution, state }),
-    [dispatch, execution, schemaColumns, setExecution, state],
+    () => ({ dispatch, execution, projection, setExecution, state }),
+    [dispatch, execution, projection, setExecution, state],
   )
 
   return <TableMutationLedgerContext value={value}>{children}</TableMutationLedgerContext>
@@ -275,21 +295,35 @@ function useMutationContext(): TableMutationLedgerContextValue {
 
 export interface ScopedTableMutationLedger {
   discardAll: () => void
-  dispatch: (action: PublicMutationAction) => void
   execution: TableMutationExecutionState
   hasInvalidEditor: boolean
   ledger: TableMutationLedger
-  removeEntry: (entryId: TableMutationEntry['entryId']) => void
   revertField: (rowId: string, fieldName: string) => void
   revertRowUpdate: (rowId: string) => void
   review: TableMutationReview
-  setExecution: Dispatch<SetStateAction<TableMutationExecutionState>>
+  stageDeletions: (rowIds: readonly TableRowId[]) => void
   stagedFieldsByRowId: Readonly<Record<string, ReadonlySet<string>>>
   stagedValuesByRowId: TableValuesByRowId
   stagedCount: number
   undoDeletions: (rowIds: readonly TableRowId[]) => void
-  undoDeletionTarget: (operationId: DeletionOperationId, rowId: string) => void
   undoReviewOperation: (operationId: TableMutationReviewOperation['operationId']) => void
+}
+
+interface TableMutationApplicationCommands {
+  acknowledgeAppliedEntries: (entryIds: readonly TableMutationEntry['entryId'][]) => void
+  setExecution: (execution: TableMutationExecutionState) => void
+}
+
+export function useTableMutationApplicationCommands(): TableMutationApplicationCommands {
+  const context = useMutationContext()
+  const contextDispatch = context.dispatch
+  const acknowledgeAppliedEntries = useCallback(
+    (entryIds: readonly TableMutationEntry['entryId'][]) => {
+      contextDispatch({ type: 'acknowledgeAppliedEntries', entryIds })
+    },
+    [contextDispatch],
+  )
+  return { acknowledgeAppliedEntries, setExecution: context.setExecution }
 }
 
 function haveEqualStagedFields(
@@ -315,10 +349,7 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
   const context = useMutationContext()
   const contextDispatch = context.dispatch
   const setExecution = context.setExecution
-  const projection = useMemo(
-    () => selectTableMutationProjection(context.state, context.schemaColumns),
-    [context.schemaColumns, context.state],
-  )
+  const projection = context.projection
   const ledger = projection.ledger
   const review = projection.review
   const selectedStagedFields = projection.stagedFieldsByRowId
@@ -329,28 +360,14 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
   const stagedFieldsByRowId = stagedFieldsRef.current
   const stagedValuesByRowId = projection.stagedValuesByRowId
   const stagedCount = countUnresolvedMutationState(context.state)
-  const dispatch = useCallback(
-    (action: PublicMutationAction) => contextDispatch(action),
-    [contextDispatch],
-  )
-  const discardAll = useCallback(() => {
-    dispatch({ type: 'discardAll' })
-    setExecution(idleExecution)
-  }, [dispatch, setExecution])
-  const removeEntry = useCallback(
-    (entryId: TableMutationEntry['entryId']) => {
-      dispatch({ type: 'removeEntry', entryId })
-      setExecution(idleExecution)
-    },
-    [dispatch, setExecution],
-  )
   const recover = useCallback(
     (action: PublicMutationAction) => {
-      dispatch(action)
-      setExecution(idleExecution)
+      contextDispatch(action)
+      setExecution((current) => (current.status === 'applying' ? current : idleExecution))
     },
-    [dispatch, setExecution],
+    [contextDispatch, setExecution],
   )
+  const discardAll = useCallback(() => recover({ type: 'discardAll' }), [recover])
   const revertField = useCallback(
     (rowId: string, fieldName: string) => recover({ type: 'revertUpdateField', rowId, fieldName }),
     [recover],
@@ -363,9 +380,8 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
     (rowIds: readonly TableRowId[]) => recover({ type: 'undoDeletions', rowIds }),
     [recover],
   )
-  const undoDeletionTarget = useCallback(
-    (operationId: DeletionOperationId, rowId: string) =>
-      recover({ type: 'undoDeletionTarget', operationId, rowId }),
+  const stageDeletions = useCallback(
+    (rowIds: readonly TableRowId[]) => recover({ type: 'deleteRows', rowIds }),
     [recover],
   )
   const undoReviewOperation = useCallback(
@@ -374,43 +390,21 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
     [recover],
   )
 
-  return useMemo(
-    () => ({
-      discardAll,
-      dispatch,
-      execution: context.execution,
-      hasInvalidEditor: ledger.hasInvalidDraft,
-      ledger,
-      removeEntry,
-      revertField,
-      revertRowUpdate,
-      review,
-      setExecution,
-      stagedFieldsByRowId,
-      stagedValuesByRowId,
-      stagedCount,
-      undoDeletions,
-      undoDeletionTarget,
-      undoReviewOperation,
-    }),
-    [
-      context.execution,
-      discardAll,
-      dispatch,
-      ledger,
-      removeEntry,
-      revertField,
-      revertRowUpdate,
-      review,
-      setExecution,
-      stagedCount,
-      stagedFieldsByRowId,
-      stagedValuesByRowId,
-      undoDeletions,
-      undoDeletionTarget,
-      undoReviewOperation,
-    ],
-  )
+  return {
+    discardAll,
+    execution: context.execution,
+    hasInvalidEditor: ledger.hasInvalidDraft,
+    ledger,
+    revertField,
+    revertRowUpdate,
+    review,
+    stageDeletions,
+    stagedFieldsByRowId,
+    stagedValuesByRowId,
+    stagedCount,
+    undoDeletions,
+    undoReviewOperation,
+  }
 }
 
 interface UseTableMutationEditorControllerOptions {
@@ -440,10 +434,8 @@ export function useTableMutationEditorController({
     },
     [contextDispatch, initialDraft, rowId, schemaColumns, setExecution],
   )
-  const binding = useMemo<RowDraftBinding>(() => ({ draft, setDraft }), [draft, setDraft])
-
   const controller = useBoundRowDraftController({
-    binding,
+    binding: { draft, setDraft },
     initialRowValues,
     mode: 'edit',
     schemaColumns,

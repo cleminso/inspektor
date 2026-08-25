@@ -6,7 +6,6 @@ import {
   TableMutationLedgerProvider,
   TableMutationLedgerWorkspaceProvider,
   useTableMutationLedger,
-  useTableMutationWorkspace,
 } from '@tables/mutationLedger/provider'
 import { TableTabsProvider, useTableTabs } from '@tables/workspace/tabsProvider'
 import { createTableScope } from '@tables/workspace/scope'
@@ -58,10 +57,7 @@ function MutationActions(): React.ReactElement {
   return (
     <>
       <output aria-label="Staged changes">{mutations.ledger.entries.length}</output>
-      <button
-        type="button"
-        onClick={() => mutations.dispatch({ type: 'deleteRows', rowIds: ['row-1'] })}
-      >
+      <button type="button" onClick={() => mutations.stageDeletions(['row-1'])}>
         Stage deletion
       </button>
       <button type="button" onClick={mutations.discardAll}>
@@ -73,14 +69,10 @@ function MutationActions(): React.ReactElement {
 
 function TabActions(): React.ReactElement {
   const { closeTab, openBaseTabs, persistTable, replaceableTabId, tabs } = useTableTabs()
-  const mutationWorkspace = useTableMutationWorkspace()
   return (
     <>
       <output aria-label="Open tabs">{tabs.map((tab) => tab.id).join(',')}</output>
       <output aria-label="Replaceable tab">{replaceableTabId ?? 'none'}</output>
-      <output aria-label="Workspace pending">
-        {String(mutationWorkspace.hasPendingChanges(tableScope))}
-      </output>
       <button type="button" onClick={() => closeTab('table:accounts')}>
         Close accounts
       </button>
@@ -180,7 +172,7 @@ describe('TableTabsProvider', () => {
     expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts')
     expect(
       screen.getByRole('alertdialog', { name: 'Discard staged changes?' }).textContent,
-    ).toContain('Closing the final accounts view will discard 1 staged change.')
+    ).toContain('Closing the final accounts view will discard any staged changes.')
 
     fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
@@ -190,7 +182,6 @@ describe('TableTabsProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
     fireEvent.click(screen.getByRole('button', { name: 'Discard and close' }))
     await waitFor(() => expect(screen.getByLabelText('Staged changes').textContent).toBe('0'))
-    expect(screen.getByLabelText('Workspace pending').textContent).toBe('false')
     await waitFor(() => expect(screen.getByLabelText('Open tabs').textContent).toBe('new-view'))
   })
 

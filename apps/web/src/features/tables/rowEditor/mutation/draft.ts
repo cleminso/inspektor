@@ -482,15 +482,6 @@ export function buildRowMutationValueProjection(
   return { displayValues, errors, submissionValues }
 }
 
-/** Builds valid staged values in the schema representation expected by grid presentation. */
-export function buildRowMutationDisplayValues(
-  draft: RowMutationDraft,
-  columns: readonly ColumnDescriptor[],
-): RowMutationSubmission {
-  const projection = buildRowMutationValueProjection(draft, columns)
-  return { errors: projection.errors, values: projection.displayValues }
-}
-
 export function buildRowMutationSubmission(
   draft: RowMutationDraft,
   columns: readonly ColumnDescriptor[],

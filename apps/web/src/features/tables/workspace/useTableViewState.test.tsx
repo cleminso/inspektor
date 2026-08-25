@@ -254,7 +254,7 @@ describe('useTableViewState', () => {
     setRowEditor.mockClear()
 
     act(() => {
-      result.current.handleMutationApplySuccess({ 'row-1': new Set(['name']) })
+      result.current.handleMutationApplySuccess()
     })
 
     expect(result.current.selectedRowIds).toEqual([])
@@ -266,7 +266,7 @@ describe('useTableViewState', () => {
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
     act(() => {
-      result.current.handleMutationApplySuccess({ 'row-1': new Set(['name', 'email']) })
+      result.current.handleMutationUpdatesApplied({ 'row-1': new Set(['name', 'email']) })
     })
 
     expect(result.current.recentlyAppliedCells).toEqual({
@@ -285,10 +285,10 @@ describe('useTableViewState', () => {
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
     act(() => {
-      result.current.handleMutationApplySuccess({ 'row-1': new Set(['name']) })
+      result.current.handleMutationUpdatesApplied({ 'row-1': new Set(['name']) })
     })
     act(() => {
-      result.current.handleMutationApplySuccess({ 'row-2': new Set(['name']) })
+      result.current.handleMutationUpdatesApplied({ 'row-2': new Set(['name']) })
     })
 
     expect(result.current.recentlyAppliedCells).toEqual({

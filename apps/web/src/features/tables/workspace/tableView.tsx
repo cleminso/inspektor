@@ -782,7 +782,7 @@ function TableViewContent({
                 activeRowIndex={state.rowEditor.activeRowIndex}
                 onClose={state.handleRowEditorCancel}
                 onConfirmDelete={(rowIds) => {
-                  mutations.dispatch({ type: 'deleteRows', rowIds })
+                  mutations.stageDeletions(rowIds)
                   state.handleRowsStagedForDeletion(rowIds)
                 }}
                 onInsertMoreEnabledChange={setInsertMoreEnabled}
@@ -845,6 +845,7 @@ function TableViewContent({
       ) : (
         <TableMutationWidget
           executor={state.mutationExecutor}
+          onAppliedUpdates={state.handleMutationUpdatesApplied}
           onApplySuccess={state.handleMutationApplySuccess}
         />
       )}

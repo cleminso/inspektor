@@ -15,7 +15,7 @@ describe('applyTableMutationLedger', () => {
   it('applies updates before deletions', async () => {
     const calls: string[] = []
 
-    await applyTableMutationLedger(ledger, {
+    const result = await applyTableMutationLedger(ledger, {
       updateRow: async () => {
         calls.push('update')
       },
@@ -25,19 +25,33 @@ describe('applyTableMutationLedger', () => {
     })
 
     expect(calls).toEqual(['update', 'delete'])
+    expect(result).toEqual({
+      appliedEntryIds: ['update:row-1', 'delete:row-2'],
+      status: 'complete',
+    })
   })
 
-  it('rejects on the first failed operation', async () => {
-    const deleteRow = vi.fn()
+  it('reports applied, failed, and unattempted entries after partial failure', async () => {
+    const error = new Error('Delete rejected')
+    const deleteRow = vi.fn().mockRejectedValue(error)
 
-    await expect(
-      applyTableMutationLedger(ledger, {
-        updateRow: async () => {
-          throw new Error('Update rejected')
-        },
+    const result = await applyTableMutationLedger(
+      {
+        ...ledger,
+        entries: [...ledger.entries, { entryId: 'delete:row-3', kind: 'delete', rowId: 'row-3' }],
+      },
+      {
+        updateRow: vi.fn().mockResolvedValue(undefined),
         deleteRow,
-      }),
-    ).rejects.toThrow('Update rejected')
-    expect(deleteRow).not.toHaveBeenCalled()
+      },
+    )
+
+    expect(result).toEqual({
+      appliedEntryIds: ['update:row-1'],
+      error,
+      failedEntryId: 'delete:row-2',
+      status: 'failed',
+    })
+    expect(deleteRow).toHaveBeenCalledOnce()
   })
 })

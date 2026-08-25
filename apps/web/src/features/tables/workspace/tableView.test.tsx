@@ -23,6 +23,7 @@ const tableViewState = vi.hoisted(() => ({
   handleFieldEditorCancel: vi.fn(),
   handleFieldEditorComplete: vi.fn(),
   handleMutationApplySuccess: vi.fn(),
+  handleMutationUpdatesApplied: vi.fn(),
   handleRowsStagedForDeletion: vi.fn(),
   handleRowEditorCancel: vi.fn(),
   handleRowEditorOpenChange: vi.fn(),
@@ -79,7 +80,7 @@ const tableViewState = vi.hoisted(() => ({
   }>,
   tableKey: 'connection-1:main:schema-1:accounts',
 }))
-const mutationLedgerDispatch = vi.hoisted(() => vi.fn())
+const stageDeletions = vi.hoisted(() => vi.fn())
 const mutationLedgerUndoDeletions = vi.hoisted(() => vi.fn())
 const mutationLedgerRevertField = vi.hoisted(() => vi.fn())
 const mutationLedgerRevertRowUpdate = vi.hoisted(() => vi.fn())
@@ -134,7 +135,7 @@ vi.mock('@tables/workspace/tabsProvider', () => ({
 vi.mock('@tables/mutationLedger/provider', () => ({
   TableMutationLedgerProvider: ({ children }: { children: ReactNode }) => children,
   useTableMutationLedger: () => ({
-    dispatch: mutationLedgerDispatch,
+    stageDeletions,
     ledger: { entries: mutationLedgerEntries, hasInvalidDraft: false },
     undoDeletions: mutationLedgerUndoDeletions,
     revertField: mutationLedgerRevertField,
@@ -173,11 +174,19 @@ vi.mock('@tables/grid/tableGridContextMenu', () => ({
 
 vi.mock('@tables/floatingWidget/floatingWidget', () => ({
   TableMutationWidget: ({
+    onAppliedUpdates,
     onApplySuccess,
   }: {
-    onApplySuccess?: (appliedUpdateFields: Readonly<Record<string, ReadonlySet<string>>>) => void
+    onAppliedUpdates?: (appliedUpdateFields: Readonly<Record<string, ReadonlySet<string>>>) => void
+    onApplySuccess?: () => void
   }) => (
-    <button type="button" onClick={() => onApplySuccess?.({ 'row-1': new Set(['name']) })}>
+    <button
+      type="button"
+      onClick={() => {
+        onAppliedUpdates?.({ 'row-1': new Set(['name']) })
+        onApplySuccess?.()
+      }}
+    >
       Complete Apply
     </button>
   ),
@@ -480,6 +489,8 @@ afterEach(() => {
   tableViewState.setPage.mockReset()
   tableViewState.setFilters.mockReset()
   tableViewState.handleCellEditRequest.mockReset()
+  tableViewState.handleMutationApplySuccess.mockReset()
+  tableViewState.handleMutationUpdatesApplied.mockReset()
   tableViewState.handleRowEditorOpenChange.mockReset()
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
@@ -723,10 +734,7 @@ describe('TableView query status', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete checked rows' }))
 
-    expect(mutationLedgerDispatch).toHaveBeenCalledWith({
-      type: 'deleteRows',
-      rowIds: ['row-1', 'row-2'],
-    })
+    expect(stageDeletions).toHaveBeenCalledWith(['row-1', 'row-2'])
     expect(tableViewState.handleRowsStagedForDeletion).toHaveBeenCalledWith(['row-1', 'row-2'])
   })
 
@@ -892,9 +900,10 @@ describe('TableView query status', () => {
 
     expect(screen.queryByRole('dialog', { name: 'Edit name' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Complete Apply' }))
-    expect(tableViewState.handleMutationApplySuccess).toHaveBeenCalledWith({
+    expect(tableViewState.handleMutationUpdatesApplied).toHaveBeenCalledWith({
       'row-1': new Set(['name']),
     })
+    expect(tableViewState.handleMutationApplySuccess).toHaveBeenCalledOnce()
   })
 
   it('announces refresh completion and filtered emptiness', async () => {

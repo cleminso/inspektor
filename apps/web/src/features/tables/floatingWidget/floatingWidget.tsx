@@ -265,13 +265,19 @@ function DockTrigger({
 
 export function TableMutationWidget({
   executor,
+  onAppliedUpdates,
   onApplySuccess,
 }: {
   executor: TableMutationExecutor
-  onApplySuccess?: (appliedUpdateFields: TableFieldsByRowId) => void
+  onAppliedUpdates?: (appliedUpdateFields: TableFieldsByRowId) => void
+  onApplySuccess?: () => void
 }): React.ReactElement | null {
   const mutations = useTableMutationLedger()
-  const apply = useApplyTableMutationLedger({ executor, onSuccess: onApplySuccess })
+  const apply = useApplyTableMutationLedger({
+    executor,
+    onAppliedUpdates,
+    onSuccess: onApplySuccess,
+  })
   const [collapsed, setCollapsed] = useState(false)
   const [reviewExpanded, setReviewExpanded] = useState(false)
   const contentId = useId()
