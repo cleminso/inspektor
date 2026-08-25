@@ -1,3 +1,4 @@
+// The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { isRedirect } from '@tanstack/react-router'
 import { describe, expect, it } from 'vitest'
 

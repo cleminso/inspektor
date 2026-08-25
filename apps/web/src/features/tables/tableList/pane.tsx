@@ -452,14 +452,16 @@ export function TableListPane({
             <Accordion.Header level={2}>
               <Accordion.Trigger
                 suffix={
-                  <Text
-                    as="span"
-                    variant="caption"
-                    color="muted"
-                    tabularNums
-                  >
-                    {unpinnedTables.length}
-                  </Text>
+                  isSchemaReady === true ? (
+                    <Text
+                      as="span"
+                      variant="caption"
+                      color="muted"
+                      tabularNums
+                    >
+                      {unpinnedTables.length}
+                    </Text>
+                  ) : null
                 }
               >
                 TABLES

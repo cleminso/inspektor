@@ -31,6 +31,9 @@ export function TableExplorerScreen(): React.ReactElement {
   const tableSelectionAnchorRef = useRef<string | null>(null)
   const tableSelectionSectionRef = useRef<TableListSection | null>(null)
   const { isSchemaReady, tables } = useAvailableTables()
+  const connectionEntryPending =
+    isSchemaReady === false ||
+    (currentTableName === null && routeSearch.empty !== 'true' && tables.length > 0)
   const { openBaseTabs, persistTable, tabs: openTabs } = useTableTabs()
   const tableSearchByName = useMemo(
     () =>
@@ -119,6 +122,7 @@ export function TableExplorerScreen(): React.ReactElement {
       </SidePanelLayout.Panel>
       <SidePanelLayout.Content>
         <TableTabsView
+          connectionEntryPending={connectionEntryPending}
           tableName={currentTableName}
           view={currentView}
         />

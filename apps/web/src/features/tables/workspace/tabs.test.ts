@@ -14,6 +14,7 @@ import {
   reorderTableTabs,
   replaceNewViewTab,
   saveTableTabsState,
+  selectInitialTableView,
   sanitizeTableTabsState,
   type TableDataTab,
   type TableTab,
@@ -53,6 +54,28 @@ describe('table tabs', () => {
     expect(createTableTabRouteSearch({ kind: 'newView', id: NEW_VIEW_TAB_ID })).toEqual({
       empty: 'true',
     })
+  })
+
+  it('selects the most recent available table view for connection entry', () => {
+    const recentViews: TableDataTab[] = [
+      { kind: 'table', id: 'table:removed', tableName: 'removed', search: {} },
+      {
+        kind: 'table',
+        id: 'table:profiles',
+        tableName: 'profiles',
+        search: { filters: 'active', page: 2 },
+      },
+      { kind: 'table', id: 'table:accounts', tableName: 'accounts', search: {} },
+    ]
+
+    expect(selectInitialTableView(recentViews, ['accounts', 'profiles'])).toEqual(recentViews[1])
+    expect(selectInitialTableView(recentViews, ['sessions'])).toEqual({
+      kind: 'table',
+      id: 'table:sessions',
+      tableName: 'sessions',
+      search: {},
+    })
+    expect(selectInitialTableView(recentViews, [])).toBeNull()
   })
 
   it('opens missing base tabs without duplicating existing tabs', () => {

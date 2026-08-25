@@ -117,6 +117,26 @@ it('shows safe runtime recovery with or without a selected table', () => {
 })
 
 describe('TableTabsView', () => {
+  it('hides transient new-view controls and content while initial selection settles', () => {
+    mocks.state.activeTabId = 'new-view'
+    mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]
+
+    const { container, rerender } = render(
+      <TableTabsView connectionEntryPending tableName={null} />,
+    )
+
+    expect(screen.getByRole('status', { name: 'Opening connection' })).toBeTruthy()
+    expect(container.querySelector('[data-slot="table-workspace-bar-placeholder"]')).toBeTruthy()
+    expect(screen.queryByRole('tab', { name: 'New view' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'New view' })).toBeNull()
+    expect(screen.queryByText('New table view content')).toBeNull()
+
+    rerender(<TableTabsView connectionEntryPending={false} tableName={null} />)
+    expect(container.querySelector('[data-slot="table-workspace-bar-placeholder"]')).toBeNull()
+    expect(screen.getByRole('tab', { name: 'New view' })).toBeTruthy()
+    expect(screen.getByText('New table view content')).toBeTruthy()
+  })
+
   it('paints a lightweight status while route and active-tab identities reconcile', () => {
     mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [

@@ -1,3 +1,4 @@
+// The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { describe, expect, it, vi } from 'vitest'
 
 const jazzModuleLoaded = vi.hoisted(() => vi.fn())

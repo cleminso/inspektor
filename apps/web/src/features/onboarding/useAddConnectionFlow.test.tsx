@@ -55,6 +55,37 @@ describe('useAddConnectionFlow', () => {
     expect(fetchSchemaHashes).toHaveBeenCalledTimes(1)
   })
 
+  it('keeps submission pending until connection navigation settles', async () => {
+    fetchSchemaHashes.mockResolvedValueOnce({
+      hashes: ['schema-1'],
+      schemas: [{ hash: 'schema-1', publishedAt: 1 }],
+    })
+    let settleNavigation: () => void = () => undefined
+    navigate.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        settleNavigation = resolve
+      }),
+    )
+    const { result } = renderHook(() => useAddConnectionFlow())
+
+    act(() => {
+      result.current.updateField('serverUrl', 'https://self-hosted.example.com')
+      result.current.updateField('appId', 'self-hosted-app')
+      result.current.updateField('adminSecret', 'secret')
+    })
+    act(() => {
+      void result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+    })
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledOnce())
+    expect(result.current.isSubmitting).toBe(true)
+
+    act(() => {
+      settleNavigation()
+    })
+    await waitFor(() => expect(result.current.isSubmitting).toBe(false))
+  })
+
   it('reports invalid URLs on the server URL field without fetching', async () => {
     const { result } = renderHook(() => useAddConnectionFlow())
 

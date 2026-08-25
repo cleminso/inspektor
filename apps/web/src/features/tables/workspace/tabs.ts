@@ -87,6 +87,21 @@ export function createTableTabRouteSearch(tab: TableTab): TableTabsRouteSearch {
   return tab.kind === 'newView' ? { empty: 'true' } : { ...tab.search }
 }
 
+export function selectInitialTableView(
+  recentViews: readonly TableDataTab[],
+  availableTables: readonly string[],
+): TableDataTab | null {
+  const recentView = recentViews.find((view) => availableTables.includes(view.tableName))
+  if (recentView !== undefined) {
+    return recentView
+  }
+
+  const tableName = availableTables[0]
+  return tableName === undefined
+    ? null
+    : { kind: 'table', id: createBaseTableTabId(tableName), tableName, search: {} }
+}
+
 export function openBaseTableTabs(
   tabs: readonly TableTab[],
   orderedTableNames: readonly string[],

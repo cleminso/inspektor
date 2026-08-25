@@ -13,6 +13,10 @@
 
 [25/08/26]
 
+- [x] Restore the most recent table view that remains valid in the selected schema when entering a connection, falling back to the first available table.
+
+[25/08/26]
+
 - [x] Supersede cached schema hydration with a null schema projection until the selected stored schema is verified.
 
 [24/08/26]
@@ -122,6 +126,10 @@
 
 [25/08/26]
 
+- Initial table routing reuses workspace-scoped recent-view persistence and its search state instead of adding a second last-table preference.
+
+[25/08/26]
+
 - Runtime schema projection remains empty until Jazz verifies the selected stored schema. This supersedes branch-independent cached-schema hydration.
 
 [22/08/26]
@@ -169,6 +177,10 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover recent-view restoration, stale recent-table rejection, first-table fallback, and schemas without tables.
 
 [25/08/26]
 

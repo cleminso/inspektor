@@ -106,7 +106,7 @@ export function useAddConnectionFlow(
 
     setConnectionContext(connection.id, branch, schemaHash)
 
-    void navigate({
+    await navigate({
       to: appRoutes.tables,
       params: {
         connectionId: connection.id,

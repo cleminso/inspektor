@@ -21,6 +21,15 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [25/08/26]
 
+- [x] Preserve workspace-bar geometry while hiding unresolved tab controls during connection entry.
+- [x] Keep the reserved table-list area blank while schema table names load instead of presenting skeleton rows.
+
+[25/08/26]
+
+- [x] Keep one centered connection-entry status until the runtime schema is ready and the initial table route is selected.
+
+[25/08/26]
+
 - [x] Use the `inspektor-` localStorage namespace for table preferences, pins, and workspace tabs.
 
 [25/08/26]
@@ -969,6 +978,15 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [25/08/26]
 
+- Connection entry preserves workspace geometry but does not expose tab controls until the initial table route resolves.
+- The table-list pane remains blank during schema loading; the centered connection status owns loading feedback for the complete workspace. This supersedes the earlier stable loading-row decision.
+
+[25/08/26]
+
+- Connection entry does not use `NewTableView` as an initialization placeholder; the explicit New view route remains available after schema readiness.
+
+[25/08/26]
+
 - Structural rendering, editor warming, queries, and mutations wait for the selected stored schema fetched from Jazz. This supersedes cached-schema availability decisions.
 
 [21/08/26]
@@ -1115,6 +1133,11 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover connection-entry status through schema readiness and initial table-route selection while preserving explicit New view behavior.
+- [x] Cover blank table-list loading space without false rows, row actions, or empty-state copy.
 
 [25/08/26]
 

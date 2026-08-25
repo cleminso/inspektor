@@ -13,6 +13,11 @@
 
 [25/08/26]
 
+- [x] Keep the committed onboarding layout mounted while connection-route navigation is pending.
+- [x] Keep add and edit submission locked until the accepted route navigation settles.
+
+[25/08/26]
+
 - [x] Reset the namespaced connection envelope to version 1 because `inspektor-connections` has no legacy payloads.
 
 [25/08/26]
@@ -117,10 +122,6 @@
 
 [24/08/26]
 
-- [ ] Prevent new mutations during an accepted connection navigation or revalidate the runtime-scope guard at route commit without unmounting the existing ledger.
-
-[24/08/26]
-
 - [ ] Experiment with non-speculative Jazz WASM preparation after an accepted connection intent.
   - Start one memoized, deferred `loadWasmModule()` promise after the exit guard accepts the connection and before navigation begins, in parallel with route loading and schema-catalogue discovery.
   - Do not preload WASM from hover, focus, viewport presence, application startup, or merely rendering saved connections.
@@ -157,6 +158,11 @@
 - Do not apply Jazz Cloud identifier constraints to self-hosted servers.
 
 ## Settled interaction decisions
+
+[25/08/26]
+
+- Onboarding layout selection follows the last committed router location, so a pending workspace navigation cannot unwrap the current form.
+- Add and edit submission remain pending through route navigation, preventing duplicate mutations before the destination settles.
 
 [24/08/26]
 
@@ -233,6 +239,11 @@
 - None.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover onboarding layout stability during pending workspace navigation.
+- [x] Cover add submission remaining pending until navigation settles.
 
 [24/08/26]
 

@@ -12,6 +12,10 @@
 
 ## Implemented foundation
 
+[25/08/26]
+
+- [x] Keep each Button variant's visual treatment while loading blocks interaction, including consumers that also pass `disabled`.
+
 [24/08/26]
 
 - [x] Center the loading spinner while visually hiding the normal content and preserving its intrinsic button width.
@@ -105,6 +109,10 @@
 
 ## Settled interaction decisions
 
+[25/08/26]
+
+- Loading takes visual precedence over disabled because it represents an in-progress action, while retaining busy and blocked semantics.
+
 [24/08/26]
 
 - Loading keeps the normal content in layout and the accessibility tree while an overlaid spinner replaces it visually.
@@ -145,6 +153,10 @@
 - None.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Verify loading preserves the enabled variant classes when `disabled` is also present while retaining busy and activation-blocking semantics.
 
 [24/08/26]
 

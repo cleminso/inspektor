@@ -174,8 +174,8 @@ describe('TableListPane', () => {
     expect(screen.getByRole('button', { name: 'table_101' })).toBeTruthy()
   })
 
-  it('does not present schema loading as an empty table list', () => {
-    render(
+  it('keeps the table-list space blank instead of presenting false rows', () => {
+    const { container } = render(
       <TableListPane
         checkedTableNames={new Set()}
         {...defaultActionProps}
@@ -188,8 +188,11 @@ describe('TableListPane', () => {
     )
 
     expect(screen.getByText('TABLES')).toBeTruthy()
+    expect(screen.queryByRole('status', { name: 'Loading tables' })).toBeNull()
+    expect(container.querySelectorAll('[data-slot="table-list-loading-row"]')).toHaveLength(0)
     expect(screen.queryByText('No tables')).toBeNull()
     expect(screen.queryByText('No published tables found in this schema.')).toBeNull()
+    expect(screen.queryByRole('checkbox')).toBeNull()
   })
 
   it('keeps table overflow inside the expanded accordion panel', () => {

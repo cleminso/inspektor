@@ -176,6 +176,24 @@ describe('Button', () => {
     expect(activationCount).toBe(0)
   })
 
+  it('keeps its variant treatment while loading blocks interaction', () => {
+    render(
+      <>
+        <Button>Ready</Button>
+        <Button disabled loading>
+          Loading
+        </Button>
+      </>,
+    )
+
+    const readyButton = screen.getByRole('button', { name: 'Ready' })
+    const loadingButton = screen.getByRole('button', { name: 'Loading' })
+
+    expect(loadingButton.className).toBe(readyButton.className)
+    expect(loadingButton.getAttribute('aria-disabled')).toBe('true')
+    expect(loadingButton.getAttribute('aria-busy')).toBe('true')
+  })
+
   it('keeps disabled actions focusable only when their explanation must remain discoverable', () => {
     render(
       <Button disabled focusableWhenDisabled>

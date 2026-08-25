@@ -78,7 +78,10 @@ describe('useInspectorRuntime', () => {
       configurable: true,
       value: {
         getItem: () =>
-          JSON.stringify({ version: 1, entries: { stale: { schema: { stale: { columns: [] } } } } }),
+          JSON.stringify({
+            version: 1,
+            entries: { stale: { schema: { stale: { columns: [] } } } },
+          }),
       },
     })
     jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))

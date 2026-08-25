@@ -32,6 +32,7 @@ import { NEW_VIEW_TAB_ID, type TableDataTab } from '@tables/workspace/tabs'
 import { useTableNavigationControls } from '@tables/workspace/navigationHistory'
 
 interface TableTabsViewProps {
+  connectionEntryPending?: boolean
   tableName: string | null
   view?: 'data' | 'schema'
 }
@@ -73,6 +74,7 @@ function RuntimeErrorStatus(): React.ReactElement {
 }
 
 export function TableTabsView({
+  connectionEntryPending = false,
   tableName,
   view = 'data',
 }: TableTabsViewProps): React.ReactElement {
@@ -169,205 +171,224 @@ export function TableTabsView({
         overflow="hidden"
       >
         <WorkspaceTabs.Bar>
-          <WorkspaceTabs.LeadingArea aria-label="Table navigation">
-            <Tooltip.Root>
-              <Tooltip.Trigger
-                render={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="s"
-                    radius="xs"
-                    aria-label="Go Back"
-                    disabled={canGoBack === false}
-                    focusableWhenDisabled
-                    iconOnly
-                    onClick={goBack}
-                  >
-                    <Button.Glyph artwork={ArrowLeft} />
-                  </Button>
-                }
-              />
-              <Tooltip.Content>
-                Go Back{' '}
-                <KeyboardInput
-                  hotkey={appHotkeys.goBack}
-                  size="small"
-                />
-              </Tooltip.Content>
-            </Tooltip.Root>
-            <Tooltip.Root>
-              <Tooltip.Trigger
-                render={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="s"
-                    radius="xs"
-                    aria-label="Go Forward"
-                    disabled={canGoForward === false}
-                    focusableWhenDisabled
-                    iconOnly
-                    onClick={goForward}
-                  >
-                    <Button.Glyph artwork={ArrowRight} />
-                  </Button>
-                }
-              />
-              <Tooltip.Content>
-                Go Forward{' '}
-                <KeyboardInput
-                  hotkey={appHotkeys.goForward}
-                  size="small"
-                />
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </WorkspaceTabs.LeadingArea>
-          <WorkspaceTabs.List
-            aria-label="Open table views"
-            values={tabs.map((tab) => tab.id)}
-            onReorder={(orderedTabIds) => {
-              reorderTabs(
-                orderedTabIds.filter((tabId): tabId is string => typeof tabId === 'string'),
-              )
-            }}
-          >
-            {tabs.map((tab) => {
-              if (tab.kind === 'newView') {
-                const canCloseNewView = tabs.length > 1
-                return (
-                  <WorkspaceTabs.Tab
-                    key={tab.id}
-                    value={tab.id}
-                    closeHotkey={appHotkeys.closeTableView}
-                    closeLabel="Close New view"
-                    reorderLabel="Reorder New view"
-                    onClose={
-                      canCloseNewView === true
-                        ? () => {
-                            closeTab(tab.id)
-                          }
-                        : undefined
+          {connectionEntryPending === true ? (
+            <Box
+              width="full"
+              height="tab-height"
+              data-slot="table-workspace-bar-placeholder"
+            />
+          ) : (
+            <>
+              <WorkspaceTabs.LeadingArea aria-label="Table navigation">
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    render={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="s"
+                        radius="xs"
+                        aria-label="Go Back"
+                        disabled={canGoBack === false}
+                        focusableWhenDisabled
+                        iconOnly
+                        onClick={goBack}
+                      >
+                        <Button.Glyph artwork={ArrowLeft} />
+                      </Button>
                     }
-                  >
-                    New view
-                  </WorkspaceTabs.Tab>
-                )
-              }
-
-              const isSchemaTab = tab.search.view === 'schema'
-              const isReplaceable = tab.id === replaceableTabId
-              const tabLabel = tab.tableName
-              return (
-                <WorkspaceTabs.Tab
-                  key={tab.id}
-                  value={tab.id}
-                  prefix={
-                    isSchemaTab === true ? (
-                      <Icon
-                        artwork={productGlyphs.derivedView}
+                  />
+                  <Tooltip.Content>
+                    Go Back{' '}
+                    <KeyboardInput
+                      hotkey={appHotkeys.goBack}
+                      size="small"
+                    />
+                  </Tooltip.Content>
+                </Tooltip.Root>
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    render={
+                      <Button
+                        type="button"
+                        variant="ghost"
                         size="s"
-                      />
-                    ) : (
-                      <Icon
-                        artwork={productGlyphs.table}
-                        size="s"
-                      />
+                        radius="xs"
+                        aria-label="Go Forward"
+                        disabled={canGoForward === false}
+                        focusableWhenDisabled
+                        iconOnly
+                        onClick={goForward}
+                      >
+                        <Button.Glyph artwork={ArrowRight} />
+                      </Button>
+                    }
+                  />
+                  <Tooltip.Content>
+                    Go Forward{' '}
+                    <KeyboardInput
+                      hotkey={appHotkeys.goForward}
+                      size="small"
+                    />
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </WorkspaceTabs.LeadingArea>
+              <WorkspaceTabs.List
+                aria-label="Open table views"
+                values={tabs.map((tab) => tab.id)}
+                onReorder={(orderedTabIds) => {
+                  reorderTabs(
+                    orderedTabIds.filter((tabId): tabId is string => typeof tabId === 'string'),
+                  )
+                }}
+              >
+                {tabs.map((tab) => {
+                  if (tab.kind === 'newView') {
+                    const canCloseNewView = tabs.length > 1
+                    return (
+                      <WorkspaceTabs.Tab
+                        key={tab.id}
+                        value={tab.id}
+                        closeHotkey={appHotkeys.closeTableView}
+                        closeLabel="Close New view"
+                        reorderLabel="Reorder New view"
+                        onClose={
+                          canCloseNewView === true
+                            ? () => {
+                                closeTab(tab.id)
+                              }
+                            : undefined
+                        }
+                      >
+                        New view
+                      </WorkspaceTabs.Tab>
                     )
                   }
-                  retention={isReplaceable === true ? 'replaceable' : 'persistent'}
-                  closeHotkey={appHotkeys.closeTableView}
-                  closeLabel={`Close ${tabLabel}`}
-                  contextMenuItems={
-                    isReplaceable === true ? (
-                      <ContextMenu.Item
-                        onClick={() => {
-                          persistTab(tab.id)
-                        }}
-                      >
-                        Keep open
-                      </ContextMenu.Item>
-                    ) : undefined
-                  }
-                  contextMenuLabel={isReplaceable === true ? `${tabLabel} actions` : undefined}
-                  reorderLabel={`Reorder ${tabLabel}`}
-                  onBlur={() => {
-                    if (focusedIntentTabIdRef.current === tab.id) {
-                      focusedIntentTabIdRef.current = null
-                    }
-                    if (pointerIntentTabIdRef.current !== tab.id) {
-                      prefetchIntent.release(tab.id)
-                    }
-                  }}
-                  onClose={() => {
-                    prefetchIntent.cancelScheduled()
-                    prefetchIntent.release(tab.id)
-                    closeTab(tab.id)
-                  }}
-                  onFocus={() => {
-                    focusedIntentTabIdRef.current = tab.id
-                    prefetchTabRows(tab.id)
-                  }}
-                  onDoubleClick={
-                    isReplaceable === true
-                      ? () => {
-                          persistTab(tab.id)
+
+                  const isSchemaTab = tab.search.view === 'schema'
+                  const isReplaceable = tab.id === replaceableTabId
+                  const tabLabel = tab.tableName
+                  return (
+                    <WorkspaceTabs.Tab
+                      key={tab.id}
+                      value={tab.id}
+                      prefix={
+                        isSchemaTab === true ? (
+                          <Icon
+                            artwork={productGlyphs.derivedView}
+                            size="s"
+                          />
+                        ) : (
+                          <Icon
+                            artwork={productGlyphs.table}
+                            size="s"
+                          />
+                        )
+                      }
+                      retention={isReplaceable === true ? 'replaceable' : 'persistent'}
+                      closeHotkey={appHotkeys.closeTableView}
+                      closeLabel={`Close ${tabLabel}`}
+                      contextMenuItems={
+                        isReplaceable === true ? (
+                          <ContextMenu.Item
+                            onClick={() => {
+                              persistTab(tab.id)
+                            }}
+                          >
+                            Keep open
+                          </ContextMenu.Item>
+                        ) : undefined
+                      }
+                      contextMenuLabel={isReplaceable === true ? `${tabLabel} actions` : undefined}
+                      reorderLabel={`Reorder ${tabLabel}`}
+                      onBlur={() => {
+                        if (focusedIntentTabIdRef.current === tab.id) {
+                          focusedIntentTabIdRef.current = null
                         }
-                      : undefined
-                  }
-                  onPointerDown={() => {
-                    pointerIntentTabIdRef.current = tab.id
-                    prefetchTabRows(tab.id)
-                  }}
-                  onPointerEnter={() => {
-                    pointerIntentTabIdRef.current = tab.id
-                    scheduleTabRowsPrefetch(tab.id)
-                  }}
-                  onPointerLeave={() => {
-                    if (pointerIntentTabIdRef.current === tab.id) {
-                      pointerIntentTabIdRef.current = null
+                        if (pointerIntentTabIdRef.current !== tab.id) {
+                          prefetchIntent.release(tab.id)
+                        }
+                      }}
+                      onClose={() => {
+                        prefetchIntent.cancelScheduled()
+                        prefetchIntent.release(tab.id)
+                        closeTab(tab.id)
+                      }}
+                      onFocus={() => {
+                        focusedIntentTabIdRef.current = tab.id
+                        prefetchTabRows(tab.id)
+                      }}
+                      onDoubleClick={
+                        isReplaceable === true
+                          ? () => {
+                              persistTab(tab.id)
+                            }
+                          : undefined
+                      }
+                      onPointerDown={() => {
+                        pointerIntentTabIdRef.current = tab.id
+                        prefetchTabRows(tab.id)
+                      }}
+                      onPointerEnter={() => {
+                        pointerIntentTabIdRef.current = tab.id
+                        scheduleTabRowsPrefetch(tab.id)
+                      }}
+                      onPointerLeave={() => {
+                        if (pointerIntentTabIdRef.current === tab.id) {
+                          pointerIntentTabIdRef.current = null
+                        }
+                        prefetchIntent.cancelScheduled()
+                        if (focusedIntentTabIdRef.current !== tab.id) {
+                          prefetchIntent.release(tab.id)
+                        }
+                      }}
+                    >
+                      {tabLabel}
+                    </WorkspaceTabs.Tab>
+                  )
+                })}
+              </WorkspaceTabs.List>
+              <WorkspaceTabs.TrailingArea aria-label="Table view actions">
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    render={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="s"
+                        radius="xs"
+                        aria-label="New view"
+                        iconOnly
+                        onClick={openNewView}
+                      >
+                        <Button.Glyph artwork={Plus} />
+                      </Button>
                     }
-                    prefetchIntent.cancelScheduled()
-                    if (focusedIntentTabIdRef.current !== tab.id) {
-                      prefetchIntent.release(tab.id)
-                    }
-                  }}
-                >
-                  {tabLabel}
-                </WorkspaceTabs.Tab>
-              )
-            })}
-          </WorkspaceTabs.List>
-          <WorkspaceTabs.TrailingArea aria-label="Table view actions">
-            <Tooltip.Root>
-              <Tooltip.Trigger
-                render={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="s"
-                    radius="xs"
-                    aria-label="New view"
-                    iconOnly
-                    onClick={openNewView}
-                  >
-                    <Button.Glyph artwork={Plus} />
-                  </Button>
-                }
-              />
-              <Tooltip.Content>
-                New view{' '}
-                <KeyboardInput
-                  hotkey={appHotkeys.openTableView}
-                  size="small"
-                />
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </WorkspaceTabs.TrailingArea>
+                  />
+                  <Tooltip.Content>
+                    New view{' '}
+                    <KeyboardInput
+                      hotkey={appHotkeys.openTableView}
+                      size="small"
+                    />
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </WorkspaceTabs.TrailingArea>
+            </>
+          )}
         </WorkspaceTabs.Bar>
       </Box>
       {runtimeError !== null ? (
         <RuntimeErrorStatus />
+      ) : connectionEntryPending === true ? (
+        <Box
+          minHeight={0}
+          flex={1}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Spinner label="Opening connection" />
+        </Box>
       ) : tableName !== null && isTableIdentityReady === false ? (
         <Box
           minHeight={0}

@@ -98,7 +98,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
   const layoutOptions = buttonLayoutOptions[layout]
   const isDisabled = disabled === true
   const isInteractionBlocked = isDisabled === true || loading === true
-  const stateStyleProps = createStateStyleProps<BaseButton.State>((state) =>
+  const stateStyleProps = createStateStyleProps<BaseButton.State>(() =>
     getButtonVisualStyles({
       variant,
       size,
@@ -110,7 +110,7 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
       alignment: layoutOptions.alignment,
       stacked: layout === 'stacked',
       orientation: buttonGroupOrientation,
-      disabled: state.disabled,
+      disabled: isDisabled === true && loading === false,
       hasPrefix: prefix !== undefined,
       hasSuffix: suffix !== undefined,
     }),

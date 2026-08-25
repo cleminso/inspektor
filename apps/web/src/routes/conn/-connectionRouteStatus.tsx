@@ -1,3 +1,4 @@
+// The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { useRouter, type ErrorComponentProps } from '@tanstack/react-router'
 import { Box, Button, Text } from '@inspector/ds'
 

@@ -1,3 +1,4 @@
+// The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 

@@ -6,11 +6,14 @@ import { TableExplorerScreen } from '@tables/view'
 import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const mocks = vi.hoisted(() => ({
-  routeSearch: {} as { view?: string },
+  availableTables: { isSchemaReady: true, tables: ['accounts', 'profiles'] },
+  currentTableName: 'accounts' as string | null,
+  routeSearch: {} as { empty?: string; view?: string },
   tableListPaneProps: null as null | {
     tableSearchByName: ReadonlyMap<string, TableTabSearch>
   },
   tableTabsViewProps: null as null | {
+    connectionEntryPending: boolean
     tableName: string | null
     view?: 'data' | 'schema'
   },
@@ -25,12 +28,12 @@ vi.mock('@app/providers/inspectorProvider', () => ({
     currentBranch: 'main',
     currentConnectionId: 'connection',
     currentSchemaHash: 'schema',
-    currentTableName: 'accounts',
+    currentTableName: mocks.currentTableName,
   }),
 }))
 
 vi.mock('@tables/schema/useAvailableTables', () => ({
-  useAvailableTables: () => ({ isSchemaReady: true, tables: ['accounts', 'profiles'] }),
+  useAvailableTables: () => mocks.availableTables,
 }))
 
 vi.mock('@tables/tableList/pane', () => ({
@@ -78,7 +81,11 @@ vi.mock('@tables/workspace/tabsProvider', () => ({
 }))
 
 vi.mock('@tables/workspace/tabsView', () => ({
-  TableTabsView: (props: { tableName: string | null; view?: 'data' | 'schema' }) => {
+  TableTabsView: (props: {
+    connectionEntryPending: boolean
+    tableName: string | null
+    view?: 'data' | 'schema'
+  }) => {
     mocks.tableTabsViewProps = props
     return null
   },
@@ -87,6 +94,8 @@ vi.mock('@tables/workspace/tabsView', () => ({
 afterEach(cleanup)
 
 beforeEach(() => {
+  mocks.availableTables = { isSchemaReady: true, tables: ['accounts', 'profiles'] }
+  mocks.currentTableName = 'accounts'
   mocks.routeSearch = {}
   mocks.tableListPaneProps = null
   mocks.tableTabsViewProps = null
@@ -111,5 +120,31 @@ describe('TableExplorerScreen', () => {
     render(<TableExplorerScreen />)
 
     expect(mocks.tableTabsViewProps).toMatchObject({ tableName: 'accounts', view: 'schema' })
+  })
+
+  it('keeps connection entry pending until schema loading and initial table selection finish', () => {
+    mocks.availableTables = { isSchemaReady: false, tables: [] }
+    mocks.currentTableName = null
+    const { rerender } = render(<TableExplorerScreen />)
+
+    expect(mocks.tableTabsViewProps?.connectionEntryPending).toBe(true)
+
+    mocks.availableTables = { isSchemaReady: true, tables: ['accounts'] }
+    rerender(<TableExplorerScreen />)
+    expect(mocks.tableTabsViewProps?.connectionEntryPending).toBe(true)
+
+    mocks.currentTableName = 'accounts'
+    rerender(<TableExplorerScreen />)
+    expect(mocks.tableTabsViewProps?.connectionEntryPending).toBe(false)
+  })
+
+  it('keeps an explicit new view available after schema loading', () => {
+    mocks.availableTables = { isSchemaReady: true, tables: ['accounts'] }
+    mocks.currentTableName = null
+    mocks.routeSearch = { empty: 'true' }
+
+    render(<TableExplorerScreen />)
+
+    expect(mocks.tableTabsViewProps?.connectionEntryPending).toBe(false)
   })
 })
