@@ -1,7 +1,7 @@
-const TABLE_PINS_STORAGE_KEY_PREFIX = 'inspektor-table-pins:'
+import { getConnectionScopedStorageKey } from '@app/storage/connectionScopedStorage'
 
 function getStorageKey(scope: string): string {
-  return `${TABLE_PINS_STORAGE_KEY_PREFIX}${encodeURIComponent(scope)}`
+  return getConnectionScopedStorageKey('tablePins', scope)
 }
 
 function readStoredTableNames(scope: string): string[] {

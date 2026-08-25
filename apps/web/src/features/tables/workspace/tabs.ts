@@ -1,3 +1,4 @@
+import { getConnectionScopedStorageKey } from '@app/storage/connectionScopedStorage'
 import type { TablePageSize } from '@tables/tableTypes'
 
 export interface TableTabSearch {
@@ -60,7 +61,6 @@ interface OpenBaseTableTabsResult {
   tabs: TableTab[]
 }
 
-const TABLE_TABS_STORAGE_KEY_PREFIX = 'inspektor-tabs:'
 const MAX_RECENT_VIEWS = 5
 export const NEW_VIEW_TAB_ID = 'new-view' as const
 
@@ -459,7 +459,7 @@ function parseRecentViews(values: unknown): TableDataTab[] {
 }
 
 function getStorageKey(scope: string): string {
-  return `${TABLE_TABS_STORAGE_KEY_PREFIX}${encodeURIComponent(scope)}`
+  return getConnectionScopedStorageKey('tabs', scope)
 }
 
 function readStoredState(scope: string): TableTabsState | null {

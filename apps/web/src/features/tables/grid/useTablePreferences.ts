@@ -1,6 +1,7 @@
 import type { ColumnOrderState, OnChangeFn } from '@tanstack/react-table'
 import { useCallback, useMemo, useRef, useState } from 'react'
 
+import { getConnectionScopedStorageKey } from '@app/storage/connectionScopedStorage'
 import { normalizeColumnOrder } from '@tables/grid/useColumnOrder'
 import type { TableColumnVisibilityState } from '@tables/tableTypes'
 
@@ -61,7 +62,7 @@ export function useTablePreferences({
   columnIds,
   tableKey,
 }: UseTablePreferencesOptions): UseTablePreferencesResult {
-  const storageKey = `inspektor-table-preferences:${encodeURIComponent(tableKey)}`
+  const storageKey = getConnectionScopedStorageKey('tablePreferences', tableKey)
   const [preferences, setPreferences] = useState<TablePreferences>(() =>
     readTablePreferences(storageKey, columnIds),
   )

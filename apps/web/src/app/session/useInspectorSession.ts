@@ -17,6 +17,7 @@ import {
   type StoredConnectionsStore,
 } from '@app/connections/connections'
 import { readPrefillConfig, type PrefillConfig } from '@app/connections/prefill'
+import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStorage'
 
 /**
  * React-facing API for the Inspector connection session.
@@ -94,6 +95,7 @@ export function useInspectorSession(): UseInspectorSessionResult {
   const deleteConnection = useCallback(
     (connectionId: string) => {
       updateStore((store) => removeConnection(store, connectionId))
+      removeConnectionScopedStorage(connectionId)
     },
     [updateStore],
   )

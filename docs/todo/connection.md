@@ -13,6 +13,10 @@
 
 [25/08/26]
 
+- [x] Remove connection-scoped tabs, pins, and table preferences when deleting a saved connection while preserving unrelated browser storage.
+
+[25/08/26]
+
 - [x] Keep the committed onboarding layout mounted while connection-route navigation is pending.
 - [x] Keep add and edit submission locked until the accepted route navigation settles.
 
