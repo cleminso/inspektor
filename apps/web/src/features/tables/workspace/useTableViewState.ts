@@ -28,6 +28,7 @@ import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchPara
 import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
+import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
 import type {
   TableFieldsByRowId,
   TableColumnMeta,
@@ -234,7 +235,14 @@ export function useTableViewState({
     })
   }
   const mutations = useTableMutations({ client, tableName, wasmSchema })
-  const tableKey = `${currentConnectionId ?? 'unknown'}:${currentBranch ?? 'unknown'}:${currentSchemaHash ?? 'unknown'}:${tableName}`
+  const tableKey = createTableScope(
+    createTableWorkspaceScope({
+      branch: currentBranch,
+      connectionId: currentConnectionId,
+      schemaHash: currentSchemaHash,
+    }),
+    tableName,
+  )
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
   const tablePreferences = useTablePreferences({
     tableKey,

@@ -1,3 +1,4 @@
+import { StrictMode } from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -46,9 +47,11 @@ describe('InspectorRuntimeBoundary', () => {
       <InspectorRuntimeBoundary target={target}>
         <div>Runtime content</div>
       </InspectorRuntimeBoundary>,
+      { wrapper: StrictMode },
     )
 
     expect(session.setConnectionContext).toHaveBeenCalledWith('connection-1', 'main', 'schema-1')
+    expect(session.setConnectionContext).toHaveBeenCalledOnce()
     expect(screen.queryByText('Runtime content')).toBeNull()
 
     session.currentBranch = 'main'
@@ -76,6 +79,50 @@ describe('InspectorRuntimeBoundary', () => {
 
     expect(session.setConnectionContext).not.toHaveBeenCalled()
     expect(screen.getByText('Runtime content')).toBeTruthy()
+  })
+
+  it('keeps the runtime mounted after the applied session context changes', () => {
+    session.currentBranch = 'main'
+    session.currentConnectionId = 'connection-1'
+    session.currentSchemaHash = 'schema-1'
+    const { rerender } = render(
+      <InspectorRuntimeBoundary target={target}>
+        <div>Runtime content</div>
+      </InspectorRuntimeBoundary>,
+    )
+
+    session.currentBranch = 'feature'
+    session.currentSchemaHash = 'schema-2'
+    rerender(
+      <InspectorRuntimeBoundary target={target}>
+        <div>Runtime content</div>
+      </InspectorRuntimeBoundary>,
+    )
+
+    expect(session.setConnectionContext).not.toHaveBeenCalled()
+    expect(screen.getByText('Runtime content')).toBeTruthy()
+  })
+
+  it('synchronizes a new route target after the previous target was applied', () => {
+    session.currentBranch = 'main'
+    session.currentConnectionId = 'connection-1'
+    session.currentSchemaHash = 'schema-1'
+    const { rerender } = render(
+      <InspectorRuntimeBoundary target={target}>
+        <div>Runtime content</div>
+      </InspectorRuntimeBoundary>,
+    )
+
+    rerender(
+      <InspectorRuntimeBoundary
+        target={{ ...target, connectionId: 'connection-2', schemaHash: 'schema-2' }}
+      >
+        <div>Runtime content</div>
+      </InspectorRuntimeBoundary>,
+    )
+
+    expect(session.setConnectionContext).toHaveBeenCalledWith('connection-2', 'main', 'schema-2')
+    expect(screen.queryByText('Runtime content')).toBeNull()
   })
 
   it('does not mount the runtime when context synchronization is rejected', () => {

@@ -17,13 +17,18 @@ import {
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { TableTabsView } from '@tables/workspace/tabsView'
+import { createTableWorkspaceScope } from '@tables/workspace/scope'
 
 export function TableExplorerScreen(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
     useInspectorSessionState()
   const routeSearch = useSearch({ strict: false })
   const currentView = routeSearch.view === 'schema' ? 'schema' : 'data'
-  const scope = `${currentConnectionId ?? 'none'}:${currentBranch ?? 'none'}:${currentSchemaHash ?? 'none'}`
+  const scope = createTableWorkspaceScope({
+    branch: currentBranch,
+    connectionId: currentConnectionId,
+    schemaHash: currentSchemaHash,
+  })
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set())
   const [pinnedTableNames, setPinnedTableNames] = useState<ReadonlySet<string>>(() =>
     loadPinnedTableNames(scope),

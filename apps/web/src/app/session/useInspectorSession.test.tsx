@@ -9,8 +9,12 @@ import {
 } from '@app/connections/connections'
 import { useInspectorSession } from '@app/session/useInspectorSession'
 
+let entries: Map<string, string>
+let writeError: Error | null
+
 beforeEach(() => {
-  const entries = new Map<string, string>()
+  entries = new Map<string, string>()
+  writeError = null
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
     value: {
@@ -21,7 +25,12 @@ beforeEach(() => {
       getItem: (key: string) => entries.get(key) ?? null,
       key: (index: number) => [...entries.keys()][index] ?? null,
       removeItem: (key: string) => entries.delete(key),
-      setItem: (key: string, value: string) => entries.set(key, value),
+      setItem: (key: string, value: string) => {
+        if (writeError !== null) {
+          throw writeError
+        }
+        entries.set(key, value)
+      },
     } satisfies Storage,
   })
 })
@@ -62,5 +71,30 @@ describe('useInspectorSession', () => {
         'inspektor-table-preferences:connection-1%3Amain%3Aschema-1%3Aaccounts',
       ),
     ).toBeNull()
+  })
+
+  it('does not advance the session snapshot when persistence fails', () => {
+    const { result } = renderHook(() => useInspectorSession())
+    const draft = {
+      name: 'First',
+      serverUrl: 'https://sync.example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+      env: 'dev',
+    }
+    writeError = new Error('Storage unavailable')
+
+    expect(() =>
+      act(() => {
+        result.current.saveConnection(draft)
+      }),
+    ).toThrow('Storage unavailable')
+
+    writeError = null
+    act(() => {
+      result.current.saveConnection({ ...draft, name: 'Second' })
+    })
+
+    expect(result.current.connections.map(({ name }) => name)).toEqual(['Second'])
   })
 })

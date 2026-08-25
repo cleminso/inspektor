@@ -71,8 +71,8 @@ export function useInspectorSession(): UseInspectorSessionResult {
   const updateStore = useCallback(
     (update: (store: StoredConnectionsStore) => StoredConnectionsStore) => {
       const store = update(storeRef.current)
-      storeRef.current = store
       writeStoredConnections(store)
+      storeRef.current = store
       setState((currentState) => ({ ...currentState, store }))
     },
     [],

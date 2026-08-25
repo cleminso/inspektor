@@ -6,8 +6,8 @@ import { SidePanelLayoutProvider, useSidePanelLayout } from '@tables/tableList/l
 import { TableTabsProvider } from '@tables/workspace/tabsProvider'
 import { TableHotkeys } from '@tables/workspace/tableHotkeys'
 import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHistory'
+import { createTableWorkspaceScope } from '@tables/workspace/scope'
 import { TableMutationLedgerWorkspaceProvider } from '@tables/mutationLedger/provider'
-import { createTableMutationWorkspaceScope } from '@tables/mutationLedger/scope'
 import { TableExplorerScreen } from '@tables/view'
 import type { TablePageSize, TableRouteSearch } from '@tables/tableTypes'
 
@@ -61,7 +61,7 @@ function TablesLayoutRoute(): React.ReactElement {
 function TablesWorkspaceLayout(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
   const { isOpen, toggle } = useSidePanelLayout()
-  const tabScope = createTableMutationWorkspaceScope({
+  const workspaceScope = createTableWorkspaceScope({
     branch: currentBranch,
     connectionId: currentConnectionId,
     schemaHash: currentSchemaHash,
@@ -72,9 +72,9 @@ function TablesWorkspaceLayout(): React.ReactElement {
       leftDock={{ isOpen, onToggle: toggle }}
       pageTitle="Tables"
     >
-      <TableMutationLedgerWorkspaceProvider key={tabScope}>
+      <TableMutationLedgerWorkspaceProvider key={workspaceScope}>
         <TableNavigationHistoryProvider>
-          <TableTabsProvider scope={tabScope}>
+          <TableTabsProvider scope={workspaceScope}>
             <TableHotkeys />
             <TableExplorerScreen />
             <Outlet />

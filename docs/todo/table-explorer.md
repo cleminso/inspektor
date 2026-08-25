@@ -21,6 +21,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [25/08/26]
 
+- [x] Use one connection, branch, and schema workspace identity for tabs, pins, table preferences, mutation state, provider remounts, and table view resets.
+
+[25/08/26]
+
 - [x] Preserve workspace-bar geometry while hiding unresolved tab controls during connection entry.
 - [x] Keep the reserved table-list area blank while schema table names load instead of presenting skeleton rows.
 
@@ -1133,6 +1137,11 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover canonical workspace and table scope formatting, including incomplete runtime identity.
+- [x] Verify tabs, pins, preferences, mutation state, and table view composition consume the shared scope contract.
 
 [25/08/26]
 

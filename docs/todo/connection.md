@@ -13,6 +13,12 @@
 
 [25/08/26]
 
+- [x] Apply each route-resolved runtime target once so later branch and schema selections remain session-owned.
+- [x] Keep the rendered, imperative, and persisted connection snapshots aligned when browser storage rejects a write.
+- [x] Tie subscription telemetry caching to connection-profile object lifetime so deleted or replaced credentials and rows can be released.
+
+[25/08/26]
+
 - [x] Remove connection-scoped tabs, pins, and table preferences when deleting a saved connection while preserving unrelated browser storage.
 
 [25/08/26]
@@ -243,6 +249,12 @@
 - None.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover session-owned branch and schema changes after route-target synchronization.
+- [x] Cover connection persistence failure without advancing the imperative session snapshot.
+- [x] Cover replaced connection profiles starting with an empty telemetry cache.
 
 [25/08/26]
 

@@ -1,4 +1,4 @@
-import { useEffect, type PropsWithChildren } from 'react'
+import { useEffect, useRef, type PropsWithChildren } from 'react'
 
 import { InspectorProvider } from '@app/providers/inspectorProvider'
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
@@ -21,16 +21,34 @@ export function InspectorRuntimeBoundary({
 }: InspectorRuntimeBoundaryProps): React.ReactElement | null {
   const { currentBranch, currentConnectionId, currentSchemaHash, setConnectionContext } =
     useInspectorSessionContext()
-  const isContextReady =
+  const targetIdentity = JSON.stringify([target.connectionId, target.branch, target.schemaHash])
+  const appliedTargetIdentityRef = useRef<string | null>(null)
+  const attemptedTargetIdentityRef = useRef<string | null>(null)
+  const sessionMatchesTarget =
     currentConnectionId === target.connectionId &&
     currentBranch === target.branch &&
     currentSchemaHash === target.schemaHash
+  const isTargetApplied = appliedTargetIdentityRef.current === targetIdentity
+  const isContextReady = isTargetApplied || sessionMatchesTarget
 
   useEffect(() => {
-    if (isContextReady === false) {
+    if (sessionMatchesTarget === true) {
+      appliedTargetIdentityRef.current = targetIdentity
+      return
+    }
+    if (isTargetApplied === false && attemptedTargetIdentityRef.current !== targetIdentity) {
+      attemptedTargetIdentityRef.current = targetIdentity
       setConnectionContext(target.connectionId, target.branch, target.schemaHash)
     }
-  }, [isContextReady, setConnectionContext, target.branch, target.connectionId, target.schemaHash])
+  }, [
+    isTargetApplied,
+    sessionMatchesTarget,
+    setConnectionContext,
+    target.branch,
+    target.connectionId,
+    target.schemaHash,
+    targetIdentity,
+  ])
 
   if (isContextReady === false) {
     return null

@@ -3,6 +3,7 @@ import { Box, Text } from '@inspector/ds'
 import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { SchemaView } from '@tables/schema/view'
+import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
 import { TableView } from '@tables/workspace/tableView'
 
 interface SelectedTableViewProps {
@@ -54,10 +55,17 @@ export function SelectedTableView({
   }
 
   // Key the table-scoped state boundary by its complete identity so React resets interactions without synchronization effects.
-  const TableViewKey = `${currentConnectionId ?? 'unknown'}:${currentBranch ?? 'unknown'}:${currentSchemaHash ?? 'unknown'}:${tableName}`
+  const tableViewKey = createTableScope(
+    createTableWorkspaceScope({
+      branch: currentBranch,
+      connectionId: currentConnectionId,
+      schemaHash: currentSchemaHash,
+    }),
+    tableName,
+  )
   return (
     <TableView
-      key={TableViewKey}
+      key={tableViewKey}
       tableName={tableName}
     />
   )

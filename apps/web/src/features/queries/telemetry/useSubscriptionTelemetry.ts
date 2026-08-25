@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { fetchServerSubscriptions, type IntrospectionSubscriptionGroup } from 'jazz-tools'
 
+import type { StoredConnection } from '@app/connections/connections'
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 
 const LIVE_QUERY_POLL_MS = 20_000
@@ -21,8 +22,8 @@ export interface UseSubscriptionTelemetryResult {
 }
 
 // Module-level cache prevents empty flashes when navigating away from and back to telemetry.
-const QuerySubscriptionTelemetryCache = new Map<
-  string,
+const querySubscriptionTelemetryCache = new WeakMap<
+  StoredConnection,
   Pick<UseSubscriptionTelemetryResult, 'generatedAt' | 'rows'>
 >()
 
@@ -50,7 +51,7 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
     }
 
     return {
-      connectionKey: `${activeConnection.id}:${activeConnection.serverUrl}:${activeConnection.appId}:${activeConnection.adminSecret}`,
+      connection: activeConnection,
       serverUrl: activeConnection.serverUrl,
       adminSecret: activeConnection.adminSecret,
       appId: activeConnection.appId,
@@ -59,7 +60,7 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
   const cachedTelemetry = useMemo(
     () =>
       connectionConfig !== null
-        ? (QuerySubscriptionTelemetryCache.get(connectionConfig.connectionKey) ?? null)
+        ? (querySubscriptionTelemetryCache.get(connectionConfig.connection) ?? null)
         : null,
     [connectionConfig],
   )
@@ -79,7 +80,7 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
     const isCancelled = () => cancelled
     const nextCachedTelemetry =
       connectionConfig !== null
-        ? (QuerySubscriptionTelemetryCache.get(connectionConfig.connectionKey) ?? null)
+        ? (querySubscriptionTelemetryCache.get(connectionConfig.connection) ?? null)
         : null
 
     if (connectionConfig === null) {
@@ -135,7 +136,7 @@ export function useSubscriptionTelemetry(): UseSubscriptionTelemetryResult {
           return
         }
 
-        QuerySubscriptionTelemetryCache.set(connectionConfig.connectionKey, {
+        querySubscriptionTelemetryCache.set(connectionConfig.connection, {
           rows: response.queries,
           generatedAt: response.generatedAt,
         })

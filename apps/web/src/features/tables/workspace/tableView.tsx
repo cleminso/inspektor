@@ -58,10 +58,7 @@ import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import { FieldEditorMutationWidget } from '@tables/floatingWidget/fieldEditorMutationWidgetModules'
 import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
 import { getFieldReadOnlyReason } from '@tables/rowEditor/mutation/parsing'
-import {
-  createTableMutationScopeKey,
-  createTableMutationWorkspaceScope,
-} from '@tables/mutationLedger/scope'
+import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
 
 interface TableViewProps {
   tableName: string
@@ -150,8 +147,8 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
     () => getTableColumns(wasmSchema, tableName),
     [tableName, wasmSchema],
   )
-  const mutationScopeKey = createTableMutationScopeKey(
-    createTableMutationWorkspaceScope({
+  const mutationScopeKey = createTableScope(
+    createTableWorkspaceScope({
       branch: currentBranch,
       connectionId: currentConnectionId,
       schemaHash: currentSchemaHash,

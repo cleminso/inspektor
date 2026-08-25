@@ -36,7 +36,7 @@ import {
 import { appRoutes } from '@app/routing/appRoutes'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { useTableMutationWorkspace } from '@tables/mutationLedger/provider'
-import { createTableMutationScopeKey } from '@tables/mutationLedger/scope'
+import { createTableScope } from '@tables/workspace/scope'
 
 interface RouteSearch extends TableTabsRouteSearch {
   tab?: string
@@ -340,7 +340,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     (tabId: string) => {
       const finalTableName = getFinalTableTabName(state.tabs, tabId)
       if (finalTableName !== null) {
-        const scopeKey = createTableMutationScopeKey(scope, finalTableName)
+        const scopeKey = createTableScope(scope, finalTableName)
         if (mutationWorkspace.hasPendingChanges(scopeKey) === true) {
           const tab = state.tabs.find((candidate) => candidate.id === tabId)
           if (tab !== undefined && tabId !== state.activeTabId) {
@@ -370,9 +370,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     if (pendingTabClose === null) {
       return
     }
-    mutationWorkspace.discardPendingChanges(
-      createTableMutationScopeKey(scope, pendingTabClose.tableName),
-    )
+    mutationWorkspace.discardPendingChanges(createTableScope(scope, pendingTabClose.tableName))
     closeTabWithoutConfirmation(pendingTabClose.tabId)
     setPendingTabClose(null)
   }, [closeTabWithoutConfirmation, mutationWorkspace, pendingTabClose, scope])
