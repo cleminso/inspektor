@@ -39,6 +39,18 @@ describe('getInlineFieldRoute', () => {
         columnMeta({ name: 'payload', column_type: { type: 'Bytea' }, nullable: false }),
       ),
     ).toBe('rowPane')
+    expect(
+      getInlineFieldRoute(
+        columnMeta({
+          name: 'profile',
+          column_type: {
+            type: 'Row',
+            columns: [{ name: 'avatar', column_type: { type: 'Bytea' }, nullable: false }],
+          },
+          nullable: false,
+        }),
+      ),
+    ).toBe('rowPane')
   })
 
   it('defers structured fields and rejects synthetic columns', () => {

@@ -14,6 +14,20 @@
 
 ## Implemented foundation
 
+[25/08/26]
+
+- [x] Subscribe Data Grid rows and header content directly to the TanStack selection slices they render.
+- [x] Keep virtual-body scrolling subscribed only to focused-row changes while row-level subscriptions own selection presentation.
+- [x] Keep semantic focus requests pending until their row and visible column are available.
+- [x] Keep row-selection application intent free of the Shift modifier already consumed by TanStack range selection.
+- [x] Bind cell-drag completion to the body cell's owning document.
+
+[25/08/26]
+
+- [x] Reconcile URL-backed active-row replacement into checkbox selection before the editor closes.
+- [x] Invalidate row, cell, and column selection from one committed query-scope synchronization boundary.
+- [x] Keep row-selection intent contracts independent from Data Grid column presentation.
+
 [24/08/26]
 
 - [x] Reuse an already loaded column-reorder component across later Data Grid mounts instead of repeating the deferred remount.
@@ -357,6 +371,18 @@
 - [ ] Decide whether pointer resizing should gain a full-column guide after rendered and TanStack sizing geometry are aligned.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Verify internally owned row and cell selection without a root table subscription.
+- [x] Verify keyboard focus movement and delayed semantic focus requests.
+- [x] Verify additive cell selection, row range routing, bulk row selection, and progressive Escape behavior.
+- [x] Run focused tests, changed-file lint, package typechecks, production builds, and package tests.
+
+[25/08/26]
+
+- [x] Cover URL-backed row replacement, committed query-scope invalidation, and TanStack row-selection behavior.
+- [x] Verify application formatting, lint, typecheck, build, and package tests.
 
 [24/08/26]
 

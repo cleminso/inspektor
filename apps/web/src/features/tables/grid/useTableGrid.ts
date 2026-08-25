@@ -16,7 +16,6 @@ import { dataGridFeatures, type DataGridTable } from '@inspector/ds'
 import { buildDataGridColumns } from '@tables/grid/buildColumns'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import type { ColumnMoveDirection } from '@tables/grid/useColumnOrder'
-import type { RowSelectionRequest } from '@tables/grid/buildColumns'
 import type {
   TableColumnMeta,
   TableColumnVisibilityState,
@@ -36,7 +35,7 @@ interface UseTableGridOptions {
   onColumnOrderChange: OnChangeFn<ColumnOrderState>
   onColumnVisibilityChange: (next: TableColumnVisibilityState) => void
   onCellSelectionChange: OnChangeFn<CellSelectionState>
-  onSelectedRowIdsChange: (rowIds: TableRowId[], request: RowSelectionRequest | null) => void
+  onSelectedRowIdsChange: (rowIds: TableRowId[], intentRowId: TableRowId | null) => void
   onSortChange: (columnId: string, direction: TableSortDirection) => void
   onUndoRowDeletions?: (rowIds: readonly TableRowId[]) => void
   rows: DynamicTableRow[]
@@ -68,7 +67,7 @@ export function useTableGrid({
   sortDirection,
   stagedValuesByRowId,
 }: UseTableGridOptions): DataGridTable<DynamicTableRow> {
-  const rowSelectionRequestRef = useRef<RowSelectionRequest | null>(null)
+  const rowSelectionRequestRef = useRef<TableRowId | null>(null)
   const columnDefs = useMemo(
     () =>
       buildDataGridColumns({
@@ -77,8 +76,8 @@ export function useTableGrid({
         onColumnMove,
         onUndoRowDeletions,
         stagedValuesByRowId,
-        onRowSelectionRequest: (request) => {
-          rowSelectionRequestRef.current = request
+        onRowSelectionRequest: (rowId) => {
+          rowSelectionRequestRef.current = rowId
         },
       }),
     [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletions, stagedValuesByRowId],
@@ -129,10 +128,10 @@ export function useTableGrid({
         const nextSelectedRowIds = rows
           .filter((row) => nextRowSelection[String(row.id)] === true)
           .map((row) => String(row.id))
-        const request = rowSelectionRequestRef.current
+        const interaction = rowSelectionRequestRef.current
         rowSelectionRequestRef.current = null
 
-        onSelectedRowIdsChange(nextSelectedRowIds, request)
+        onSelectedRowIdsChange(nextSelectedRowIds, interaction)
       },
       onColumnVisibilityChange: (updater) => {
         const nextColumnVisibility =

@@ -10,7 +10,7 @@ import {
   getMutationFieldInput,
   type MutationFieldInput,
 } from '@tables/rowEditor/mutation/draft'
-import { getFieldReadOnlyReason } from '@tables/rowEditor/mutation/parsing'
+import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import { MutationField } from '@tables/rowEditor/mutationField'
 import {
   formatColumnNameLabel,

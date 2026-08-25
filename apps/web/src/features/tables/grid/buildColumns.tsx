@@ -31,21 +31,15 @@ import { RelationCellLink } from '@tables/grid/relationCellLink'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { classifySchemaValue, type SchemaValuePresentation } from '@tables/grid/valuePresentation'
 import type { ColumnMoveDirection } from '@tables/grid/useColumnOrder'
-import type { TableColumnMeta, TableValuesByRowId } from '@tables/tableTypes'
+import type { TableColumnMeta, TableRowId, TableValuesByRowId } from '@tables/tableTypes'
 
 interface BuildDataGridColumnsOptions {
   columns: TableColumnMeta[]
   onColumnMenuOpen?: (columnId: string) => void
   onColumnMove?: (columnId: string, direction: ColumnMoveDirection) => void
-  onRowSelectionRequest?: (request: RowSelectionRequest) => void
+  onRowSelectionRequest?: (rowId: TableRowId) => void
   onUndoRowDeletions?: (rowIds: readonly string[]) => void
   stagedValuesByRowId?: TableValuesByRowId
-}
-
-export interface RowSelectionRequest {
-  checked: boolean
-  rowId: string
-  shiftKey: boolean
 }
 
 interface ColumnSizing {
@@ -830,11 +824,7 @@ export function buildDataGridColumns({
                 : () => onUndoRowDeletions([String(row.original.id)])
             }
             onCheckedChange={(value, shiftKey) => {
-              onRowSelectionRequest?.({
-                checked: value,
-                rowId: String(row.original.id),
-                shiftKey,
-              })
+              onRowSelectionRequest?.(String(row.original.id))
               row.getToggleSelectedHandler({ selectChildren: false })({
                 shiftKey,
                 target: { checked: value },

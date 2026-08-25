@@ -87,7 +87,7 @@ function InsertRowFormFields({
               errors={rowEditor.errors}
               expandedColumnName={rowEditor.expandedColumnName}
               fieldStates={rowEditor.fieldStates}
-              formFields={rowEditor.formFields}
+              schemaColumns={schemaColumns}
               initialRowValues={rowValues}
               mode="insert"
               onFieldExpandedChange={rowEditor.setFieldExpanded}

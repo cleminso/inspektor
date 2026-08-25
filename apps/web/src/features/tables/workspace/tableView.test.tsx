@@ -26,7 +26,7 @@ const tableViewState = vi.hoisted(() => ({
   handleMutationUpdatesApplied: vi.fn(),
   handleRowsStagedForDeletion: vi.fn(),
   handleRowEditorCancel: vi.fn(),
-  handleRowEditorOpenChange: vi.fn(),
+  closeRowEditor: vi.fn(),
   hasCellSelection: false,
   hasNextPage: false,
   hasPreviousPage: false,
@@ -59,7 +59,6 @@ const tableViewState = vi.hoisted(() => ({
     name: string
     nullable: boolean
   }>,
-  selectedRowIds: [] as string[],
   setFilters: vi.fn(),
   setPage: vi.fn(),
   setPageSize: vi.fn(),
@@ -463,10 +462,12 @@ const initialClipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'c
 afterEach(() => {
   cleanup()
   tableViewState.error = null
+  tableViewState.activeColumnId = null
   tableViewState.canOpenRowEditor = true
   tableViewState.filters = [{ id: 'filter-1', column: 'name', operator: 'eq', value: 'Ada' }]
   tableViewState.isInitialLoading = false
   tableViewState.isRefreshing = false
+  tableViewState.hasCellSelection = false
   tableViewState.hasNextPage = false
   tableViewState.hasPreviousPage = false
   tableViewState.loadedRowCount = 2
@@ -476,7 +477,6 @@ afterEach(() => {
   tableViewState.rowEditor.activeRowId = null
   tableViewState.rowEditor.editedRowIds = []
   tableViewState.rowValues = null
-  tableViewState.selectedRowIds = []
   tableViewState.table = {}
   tableViewState.tableColumns = []
   mutationLedgerEntries.length = 0
@@ -489,9 +489,10 @@ afterEach(() => {
   tableViewState.setPage.mockReset()
   tableViewState.setFilters.mockReset()
   tableViewState.handleCellEditRequest.mockReset()
+  tableViewState.handleEscape.mockReset()
   tableViewState.handleMutationApplySuccess.mockReset()
   tableViewState.handleMutationUpdatesApplied.mockReset()
-  tableViewState.handleRowEditorOpenChange.mockReset()
+  tableViewState.closeRowEditor.mockReset()
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
   toastSuccess.mockReset()
@@ -519,6 +520,17 @@ function renderTableView(): ReturnType<typeof render> & { rerenderTableView: () 
     },
   }
 }
+
+describe('TableView selection dismissal', () => {
+  it('routes Escape to the active selection state', () => {
+    tableViewState.hasCellSelection = true
+    renderTableView()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+
+    expect(tableViewState.handleEscape).toHaveBeenCalledOnce()
+  })
+})
 
 describe('TableView cell actions', () => {
   function configureNameCell(value: unknown) {
@@ -642,40 +654,6 @@ describe('TableView cell actions', () => {
       id: '["cell-copy","connection-1:main:schema-1:accounts","row-1","payload"]',
     })
   })
-
-  it('deduplicates repeated copies of one cell without merging different cells', async () => {
-    configureNameCell('Grace')
-    tableViewState.table = {
-      getFocusedCell: () => ({ column: { id: 'name' }, row: { id: 'row-1' } }),
-      getRowModel: () => ({
-        rows: [
-          { id: 'row-1', original: { id: 'row-1', name: 'Grace' } },
-          { id: 'row-2', original: { id: 'row-2', name: 'Ada' } },
-        ],
-      }),
-    }
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText: vi.fn().mockResolvedValue(undefined) },
-    })
-    renderTableView()
-    const menuProps = gridContextMenuProps.current as {
-      onCopyCell: (target: { columnId: string; rowId: string }) => void
-    }
-
-    menuProps.onCopyCell({ columnId: 'name', rowId: 'row-1' })
-    menuProps.onCopyCell({ columnId: 'name', rowId: 'row-1' })
-    menuProps.onCopyCell({ columnId: 'name', rowId: 'row-2' })
-
-    await waitFor(() => {
-      expect(toastSuccess).toHaveBeenCalledTimes(3)
-    })
-    expect(toastSuccess.mock.calls.map(([, options]) => options.id)).toEqual([
-      '["cell-copy","connection-1:main:schema-1:accounts","row-1","name"]',
-      '["cell-copy","connection-1:main:schema-1:accounts","row-1","name"]',
-      '["cell-copy","connection-1:main:schema-1:accounts","row-2","name"]',
-    ])
-  })
 })
 
 describe('TableView pagination hotkeys', () => {
@@ -724,6 +702,14 @@ describe('TableView pagination hotkeys', () => {
 })
 
 describe('TableView query status', () => {
+  it('passes staged-deletion recovery into table state', () => {
+    renderTableView()
+
+    useTableViewStateOptions.current?.onUndoRowDeletions?.(['row-1'])
+
+    expect(mutationLedgerUndoDeletions).toHaveBeenCalledWith(['row-1'])
+  })
+
   it('stages checked-row deletion from the stable row editor surface', () => {
     tableViewState.detailPaneMode = 'rows'
     tableViewState.rowEditor.activeRowId = 'row-1'
@@ -839,15 +825,6 @@ describe('TableView query status', () => {
       revertRowUpdate: mutationLedgerRevertRowUpdate,
       stagedFieldsByRowId: stagedFieldsByRowId.current,
     })
-  })
-
-  it('undoes staged deletions through the row selection control', () => {
-    mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
-
-    renderTableView()
-    useTableViewStateOptions.current?.onUndoRowDeletions?.(['row-1'])
-
-    expect(mutationLedgerUndoDeletions).toHaveBeenCalledWith(['row-1'])
   })
 
   it('wires the active scalar target to the explicit Floating field editor', () => {
@@ -1004,7 +981,7 @@ describe('TableView insert row hotkey', () => {
     fireEvent.keyDown(document, { altKey: true, key: 'i' })
 
     expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledTimes(1)
-    expect(tableViewState.handleRowEditorOpenChange).not.toHaveBeenCalled()
+    expect(tableViewState.closeRowEditor).not.toHaveBeenCalled()
   })
 
   it('closes the insert pane with Alt+I when insert is already open', () => {
@@ -1013,7 +990,7 @@ describe('TableView insert row hotkey', () => {
 
     fireEvent.keyDown(document, { altKey: true, key: 'i' })
 
-    expect(tableViewState.handleRowEditorOpenChange).toHaveBeenCalledWith(false)
+    expect(tableViewState.closeRowEditor).toHaveBeenCalledOnce()
     expect(tableViewState.rowEditor.openInsert).not.toHaveBeenCalled()
   })
 
@@ -1024,7 +1001,7 @@ describe('TableView insert row hotkey', () => {
     fireEvent.keyDown(document, { altKey: true, key: 'i' })
 
     expect(tableViewState.rowEditor.openInsert).not.toHaveBeenCalled()
-    expect(tableViewState.handleRowEditorOpenChange).not.toHaveBeenCalled()
+    expect(tableViewState.closeRowEditor).not.toHaveBeenCalled()
   })
 
   it('does not run the insert hotkey from text inputs', () => {

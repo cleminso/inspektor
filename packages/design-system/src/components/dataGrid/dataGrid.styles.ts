@@ -245,9 +245,6 @@ export const dataGridStyles = stylex.create({
     backgroundColor: dataGridColors.recentlyInsertedRowBackground,
     boxShadow: recentlyInsertedRowBar,
   },
-  rowActive: {
-    boxShadow: `inset 0 ${spatial['focus-ring-width']} 0 ${dataGridColors.currentRowBorder}`,
-  },
   cell: {
     [dataGridVars.selectedRowMarker]: '0 0 0 0 transparent',
     [dataGridVars.selectionEdgeTop]: '0 0 0 0 transparent',

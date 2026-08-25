@@ -57,11 +57,12 @@ const dataGridPointerSensor = PointerSensor.configure({
     if (event.pointerType === 'touch') {
       return true
     }
-    if (!(event.target instanceof Element)) {
+    const target = event.target as Element | null
+    if (typeof target?.closest !== 'function') {
       return false
     }
     return (
-      event.target.closest(
+      target.closest(
         'a, button, input, select, textarea, [role="checkbox"], [data-slot="data-grid-resize-handle"]',
       ) !== null
     )
@@ -99,6 +100,8 @@ function areColumnOrdersEqual(left: readonly string[], right: readonly string[])
   return left.length === right.length && left.every((columnId, index) => columnId === right[index])
 }
 
+const reorderContext = { Header: DataGridSortableHeader }
+
 export function DataGridReorder({
   children,
   columnOrder,
@@ -107,7 +110,6 @@ export function DataGridReorder({
   renderOverlay,
   rootRef,
 }: DataGridReorderProps) {
-  const reorderContext = useMemo(() => ({ Header: DataGridSortableHeader }), [])
   const modifiers = useMemo(
     () => [
       RestrictToHorizontalAxis,

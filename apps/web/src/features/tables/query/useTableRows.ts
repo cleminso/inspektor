@@ -19,10 +19,8 @@ const EMPTY_ROWS: DynamicTableRow[] = []
 
 interface UseTableRowsOptions {
   client: JazzClient | null
-  search: TableRowsSearchState & {
-    setPage: (page: number) => Promise<void>
-    setPageSize: (pageSize: TablePageSize) => Promise<void>
-  }
+  onPageOutOfRange: () => void
+  search: TableRowsSearchState
   scopeKey: string | null
   tableName: string | null
   wasmSchema: WasmSchema | null
@@ -31,19 +29,10 @@ interface UseTableRowsOptions {
 interface UseTableRowsResult {
   columns: TableColumnMeta[]
   error: string | null
-  goToNextPage: () => Promise<void>
-  goToPreviousPage: () => Promise<void>
   hasNextPage: boolean
-  hasPreviousPage: boolean
   isInitialLoading: boolean
   isRefreshing: boolean
-  loadedRowCount: number
-  page: number
-  pageSize: TablePageSize
-  resetPage: () => Promise<void>
   rows: DynamicTableRow[]
-  setPage: (page: number) => Promise<void>
-  setPageSize: (pageSize: TablePageSize) => Promise<void>
 }
 
 interface ResolvedRowsState {
@@ -140,12 +129,13 @@ function projectRowsWindow(
  */
 export function useTableRows({
   client,
+  onPageOutOfRange,
   search,
   scopeKey,
   tableName,
   wasmSchema,
 }: UseTableRowsOptions): UseTableRowsResult {
-  const { filters, page, pageSize, setPage, setPageSize, sortColumn, sortDirection } = search
+  const { filters, page, pageSize, sortColumn, sortDirection } = search
   // Each key names the smallest boundary allowed to preserve rows or reuse a loaded query window.
   const baseScopeKey = JSON.stringify({ filters, scopeKey, tableName })
   const dataScopeKey = JSON.stringify([baseScopeKey, page, pageSize])
@@ -280,20 +270,20 @@ export function useTableRows({
     page > 1
       ? queryKey
       : null
-  const resetPageKeyRef = useRef<string | null>(null)
+  const pageCorrectionKeyRef = useRef<string | null>(null)
   // Query state schedules correction; the latest router command should not make the effect reactive.
-  const resetPage = useEffectEvent(() => setPage(1))
+  const correctOutOfRangePage = useEffectEvent(onPageOutOfRange)
   useEffect(() => {
     if (outOfRangePageKey === null) {
-      resetPageKeyRef.current = null
+      pageCorrectionKeyRef.current = null
       return
     }
-    if (resetPageKeyRef.current === outOfRangePageKey) {
+    if (pageCorrectionKeyRef.current === outOfRangePageKey) {
       return
     }
 
-    resetPageKeyRef.current = outOfRangePageKey
-    void resetPage()
+    pageCorrectionKeyRef.current = outOfRangePageKey
+    void correctOutOfRangePage()
   }, [outOfRangePageKey])
 
   return {
@@ -305,21 +295,8 @@ export function useTableRows({
           : String(queryState.error)
         : null,
     rows: visibleRows,
-    loadedRowCount: visibleRows.length,
-    page,
-    pageSize,
     hasNextPage,
-    hasPreviousPage: page > 1,
     isInitialLoading,
     isRefreshing,
-    goToNextPage: async () => {
-      if (hasNextPage === true) await setPage(page + 1)
-    },
-    goToPreviousPage: async () => {
-      if (page > 1) await setPage(page - 1)
-    },
-    resetPage: async () => setPage(1),
-    setPage,
-    setPageSize,
   }
 }

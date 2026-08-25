@@ -5,51 +5,9 @@
  * import that generated code, so it uses runtime `ColumnType` metadata to perform the equivalent
  * parsing and validation before calling Jazz.
  */
-import type { ColumnDescriptor, ColumnType } from 'jazz-tools'
+import type { ColumnType } from 'jazz-tools'
 
 import { parseBooleanValue } from '@tables/valueParsing'
-
-/** Reason the generic mutation form cannot safely edit a column. */
-export type MutationFieldReadOnlyReason = 'binary' | null
-
-/** Schema column plus generic-form editability metadata. */
-export interface MutationFormField {
-  column: ColumnDescriptor
-  readOnlyReason: MutationFieldReadOnlyReason
-}
-
-/**
- * Treats direct and nested Bytea values as read-only.
- *
- * Jazz can write `Uint8Array` values, but a generic text field cannot know whether text represents
- * hex, Base64, UTF-8, or raw bytes. Reading remains supported; only text-based editing is blocked.
- */
-function isBinaryColumnType(columnType: ColumnType): boolean {
-  if (columnType.type === 'Bytea') {
-    return true
-  }
-  if (columnType.type === 'Array') {
-    return isBinaryColumnType(columnType.element)
-  }
-  return false
-}
-
-/** Explains when the schema-driven form should display a value without accepting edits. */
-export function getFieldReadOnlyReason(column: ColumnDescriptor): MutationFieldReadOnlyReason {
-  if (isBinaryColumnType(column.column_type) === true) {
-    return 'binary'
-  }
-
-  return null
-}
-
-/** Pairs schema columns with the editability decisions needed by the mutation UI. */
-export function buildMutationFields(columns: ColumnDescriptor[]): MutationFormField[] {
-  return columns.map((column) => ({
-    column,
-    readOnlyReason: getFieldReadOnlyReason(column),
-  }))
-}
 
 /**
  * Converts integer input to the exact `Number` representation accepted by the installed Jazz

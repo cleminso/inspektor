@@ -12,6 +12,10 @@
 
 ## Implemented foundation
 
+[25/08/26]
+
+- [x] Share schema-owned field editability policy between inline routing and mutation parsing.
+
 [17/08/26]
 
 ### Operation review and grid recovery implementation
@@ -429,6 +433,11 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 - [x] Remove update overlays for columns that disappear from the live schema so obsolete fields cannot keep a draft dirty.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover inline routing and mutation parsing against the shared field editability policy.
+- [x] Verify application formatting, lint, typecheck, build, and package tests.
 
 [28/07/26]
 

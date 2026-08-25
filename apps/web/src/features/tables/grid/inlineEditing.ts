@@ -1,6 +1,6 @@
 import type { DataGridCellTarget } from '@inspector/ds'
 
-import { getFieldReadOnlyReason } from '@tables/rowEditor/mutation/parsing'
+import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import type { TableColumnMeta } from '@tables/tableTypes'
 
 export type InlineFieldRoute = 'readOnly' | 'rowPane' | 'scalar' | 'structured'

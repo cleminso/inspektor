@@ -12,11 +12,11 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { Box, Field, Input, Text } from '@inspector/ds'
 
 import { MutationField } from '@tables/rowEditor/mutationField'
-import { buildMutationFields, type MutationFormField } from '@tables/rowEditor/mutation/parsing'
 import { getMutationFieldInput } from '@tables/rowEditor/mutation/draft'
 import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 import type { DetailPaneMode } from '@tables/tableTypes'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
+import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 
 /** Renderable field state derived from a `MutationFieldInput`. */
 interface FieldState {
@@ -36,7 +36,6 @@ interface UseRowEditorFieldsResult {
   errors: Record<string, string>
   expandedColumnName: string | null
   fieldStates: Record<string, FieldState>
-  formFields: MutationFormField[]
   isSaving: boolean
   isDirty: boolean
   saveError: string | null
@@ -51,7 +50,7 @@ interface RowEditorFieldsProps {
   errors: Record<string, string>
   expandedColumnName: string | null
   fieldStates: Record<string, FieldState>
-  formFields: MutationFormField[]
+  schemaColumns: ColumnDescriptor[]
   initialRowValues: Record<string, unknown>
   mode: DetailPaneMode
   onFieldExpandedChange: (columnName: string, expanded: boolean) => void
@@ -82,7 +81,6 @@ export function useRowEditorFields({
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const isSavingRef = useRef(false)
-  const formFields = useMemo(() => buildMutationFields(schemaColumns), [schemaColumns])
   const fieldStates = useMemo<Record<string, FieldState>>(
     () =>
       Object.fromEntries(
@@ -152,12 +150,12 @@ export function useRowEditorFields({
     if (Object.keys(nextErrors).length > 0) {
       // Collapse expanded editors so the first invalid field can be revealed and focused.
       setExpandedColumnName(null)
-      const firstInvalidField = formFields.find(
-        (field) => nextErrors[field.column.name] !== undefined,
+      const firstInvalidField = schemaColumns.find(
+        (column) => nextErrors[column.name] !== undefined,
       )
       if (firstInvalidField !== undefined) {
         requestAnimationFrame(() => {
-          focusRowEditorField(firstInvalidField.column.name)
+          focusRowEditorField(firstInvalidField.name)
         })
       }
       return
@@ -183,7 +181,6 @@ export function useRowEditorFields({
     errors,
     expandedColumnName,
     fieldStates,
-    formFields,
     isDirty,
     isSaving,
     saveError,
@@ -200,7 +197,7 @@ export function RowEditorFields({
   errors,
   expandedColumnName,
   fieldStates,
-  formFields,
+  schemaColumns,
   initialRowValues,
   mode,
   onFieldExpandedChange,
@@ -252,12 +249,13 @@ export function RowEditorFields({
         />
       </Field.Root>
 
-      {formFields.map(({ column, readOnlyReason }) => {
+      {schemaColumns.map((column) => {
         const fieldState = fieldStates[column.name]
         if (fieldState === undefined) {
           return null
         }
         const isExpanded = expandedColumnName === column.name
+        const readOnlyReason = getFieldReadOnlyReason(column)
 
         return (
           <MutationField

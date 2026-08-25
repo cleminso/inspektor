@@ -19,7 +19,6 @@ let sortDirection: 'asc' | 'desc' = 'asc'
 let runtimeClient: { manager: Record<string, never> } | null
 let runtimeSchema: Record<string, unknown> | null
 const setPage = vi.fn()
-const setPageSize = vi.fn()
 
 vi.mock('@tables/schema/tableSchema', () => ({ getTableColumns: () => [] }))
 
@@ -49,15 +48,16 @@ vi.mock('@tables/query/useJazzQueryState', () => ({
   useJazzQueryState: useJazzQueryStateMock,
 }))
 
-function useTestTableRows(options: Omit<Parameters<typeof useTableRows>[0], 'search'>) {
+function useTestTableRows(
+  options: Omit<Parameters<typeof useTableRows>[0], 'onPageOutOfRange' | 'search'>,
+) {
   return useTableRows({
     ...options,
+    onPageOutOfRange: async () => setPage(1),
     search: {
       filters: filters as never,
       page,
       pageSize,
-      setPage,
-      setPageSize,
       sortColumn,
       sortDirection,
     },
@@ -72,7 +72,6 @@ beforeEach(() => {
   page = 1
   pageSize = 100
   setPage.mockReset()
-  setPageSize.mockReset()
   sortColumn = 'id'
   sortDirection = 'asc'
   runtimeClient = { manager: {} }
@@ -161,7 +160,6 @@ describe('useTableRows', () => {
     expect(result.current.rows.map((row) => row.id)).toEqual(['row-1', 'row-2'])
     expect(result.current.isRefreshing).toBe(true)
     expect(result.current.isInitialLoading).toBe(false)
-    expect(result.current.page).toBe(1)
   })
 
   it('drops resolved rows when Jazz resets the active query', () => {
@@ -347,9 +345,6 @@ describe('useTableRows', () => {
 
     expect(result.current.rows).toHaveLength(100)
     expect(result.current.hasNextPage).toBe(true)
-    expect(result.current.hasPreviousPage).toBe(false)
-    expect(result.current.page).toBe(1)
-    expect(result.current.pageSize).toBe(100)
   })
 
   it('reuses a fulfilled broad query for covered smaller pages', () => {
@@ -532,45 +527,6 @@ describe('useTableRows', () => {
     expect(result.current.isInitialLoading).toBe(true)
   })
 
-  it('navigates between pages and resets the page when page size changes', async () => {
-    page = 2
-    queryRows = [{ id: 'row-101' } as DynamicTableRow]
-    const { result } = renderHook(() =>
-      useTestTableRows({
-        client: runtimeClient as never,
-        scopeKey: 'schema-1',
-        tableName: 'users',
-        wasmSchema: runtimeSchema as never,
-      }),
-    )
-
-    await result.current.goToPreviousPage()
-    await result.current.setPageSize(500)
-
-    expect(setPage).toHaveBeenCalledWith(1)
-    expect(setPageSize).toHaveBeenCalledWith(500)
-    expect(result.current.hasPreviousPage).toBe(true)
-    expect(result.current.hasNextPage).toBe(false)
-  })
-
-  it('returns an empty out-of-range page to the first page', async () => {
-    page = 2
-    queryRows = []
-
-    renderHook(() =>
-      useTestTableRows({
-        client: runtimeClient as never,
-        scopeKey: 'schema-1',
-        tableName: 'users',
-        wasmSchema: runtimeSchema as never,
-      }),
-    )
-
-    await waitFor(() => {
-      expect(setPage).toHaveBeenCalledWith(1)
-    })
-  })
-
   it('returns to the first page whenever the same out-of-range page is revisited', async () => {
     page = 2
     queryRows = []
@@ -583,7 +539,7 @@ describe('useTableRows', () => {
       }),
     )
     await waitFor(() => {
-      expect(setPage).toHaveBeenCalledWith(1)
+      expect(setPage).toHaveBeenCalledOnce()
     })
 
     page = 1
@@ -596,7 +552,7 @@ describe('useTableRows', () => {
     rerender()
 
     await waitFor(() => {
-      expect(setPage).toHaveBeenCalledWith(1)
+      expect(setPage).toHaveBeenCalledOnce()
     })
   })
 })

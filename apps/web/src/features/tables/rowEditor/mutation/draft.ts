@@ -8,9 +8,9 @@ import type { ColumnDescriptor, ColumnType, Value } from 'jazz-tools'
 
 import {
   formatMutationFieldValue,
-  getFieldReadOnlyReason,
   parseMutationFieldValue,
 } from '@tables/rowEditor/mutation/parsing'
+import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 
 /** The database operation represented by one editable field. */
 export type MutationFieldMode = 'null' | 'omitted' | 'value'

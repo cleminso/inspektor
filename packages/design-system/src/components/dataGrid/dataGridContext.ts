@@ -18,7 +18,6 @@ import type { DataGridFeatures, DataGridTable } from './dataGridFeatures'
 export interface DataGridContextValue<TData extends RowData> {
   activeColumnId: string | null
   activeRowId: string | null
-  bodyCellEntryId: string | null
   density: DataGridDensity
   onCellActivate?: (target: DataGridCellTarget) => void
   onCellEditRequest?: (target: DataGridCellTarget) => void

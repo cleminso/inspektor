@@ -13,6 +13,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -241,8 +242,12 @@ export interface DataGridFooterProps {
   children: ReactNode
 }
 
+function isElementTarget(target: EventTarget | null | undefined): target is Element {
+  return typeof (target as Element | null)?.closest === 'function'
+}
+
 function isInteractiveTarget(target: EventTarget | null): boolean {
-  if (target instanceof Element === false) {
+  if (isElementTarget(target) === false) {
     return false
   }
 
@@ -254,7 +259,7 @@ function isInteractiveTarget(target: EventTarget | null): boolean {
 }
 
 function isSelectionControlTarget(target: EventTarget | null): boolean {
-  if (target instanceof Element === false) {
+  if (isElementTarget(target) === false) {
     return false
   }
 
@@ -272,15 +277,18 @@ function activateSelectionControlFromCell(event: MouseEvent<HTMLTableCellElement
   event.stopPropagation()
   if (isSelectionControlTarget(event.target) === false) {
     selectionControl.focus()
-    selectionControl.dispatchEvent(
-      new globalThis.MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        ctrlKey: event.ctrlKey,
-        metaKey: event.metaKey,
-        shiftKey: event.shiftKey,
-      }),
-    )
+    const MouseEventConstructor = event.currentTarget.ownerDocument.defaultView?.MouseEvent
+    if (MouseEventConstructor !== undefined) {
+      selectionControl.dispatchEvent(
+        new MouseEventConstructor('click', {
+          bubbles: true,
+          cancelable: true,
+          ctrlKey: event.ctrlKey,
+          metaKey: event.metaKey,
+          shiftKey: event.shiftKey,
+        }),
+      )
+    }
   }
   return true
 }
@@ -298,6 +306,27 @@ function getFirstSelectableCell<TData extends RowData>(
         return cell
       }
     }
+  }
+}
+
+function getCellSelectionRowRenderState<TData extends RowData>(
+  table: DataGridTable<TData>,
+  row: Row<DataGridFeatures, TData>,
+) {
+  const rows = table.getRowModel().rows
+  const rowIndex = row.getDisplayIndex()
+  const focusedCell = table.getFocusedCell()
+  const entryCell = focusedCell ?? getFirstSelectableCell(table)
+  const selectedCells = rows
+    .slice(Math.max(rowIndex - 1, 0), rowIndex + 2)
+    .flatMap((candidateRow) => candidateRow.getVisibleCells())
+    .map((cell) => (cell.getIsSelected() === true ? '1' : '0'))
+    .join('|')
+
+  return {
+    entryCellId: entryCell?.row.id === row.id ? entryCell.id : null,
+    hasMultiCellSelection: focusedCell?.row.id === row.id && table.getSelectedCellCount() > 1,
+    selectedCells,
   }
 }
 
@@ -373,10 +402,9 @@ function DataGridRoot<TData extends RowData>({
   const rootRef = useRef<HTMLDivElement>(null)
   const cellElementsRef = useRef(new Map<string, HTMLTableCellElement>())
   const shouldFocusFocusedCellRef = useRef(false)
-  const processedFocusRequestRef = useRef<string | null>(null)
+  const processedFocusRequestRef = useRef<DataGridFocusRequest | null>(null)
   const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null)
   const focusedColumnIdRef = useRef<string | null>(null)
-  const onColumnActivateRef = useRef(onColumnActivate)
   const [ReorderComponent, setReorderComponent] = useState<
     DataGridReorderModule['DataGridReorder'] | null
   >(() => loadedDataGridReorder)
@@ -406,10 +434,22 @@ function DataGridRoot<TData extends RowData>({
   const columnReorderConfigured = reorderableColumnIds !== undefined
   const columnReorderReady = ReorderComponent !== null
   const columnReorderEnabled = columnReorderConfigured === true && columnReorderReady === true
-  const bodyCellEntryId = table.getFocusedCell()?.id ?? getFirstSelectableCell(table)?.id ?? null
+  const canClearActiveColumn = onColumnActivate !== undefined
+  const clearActiveColumn = useEffectEvent(() => {
+    onColumnActivate?.(null)
+  })
   const focusFocusedCell = useCallback(() => {
     shouldFocusFocusedCellRef.current = true
-  }, [])
+    queueMicrotask(() => {
+      const focusedCell = table.getFocusedCell()
+      const focusedCellElement =
+        focusedCell === undefined ? undefined : cellElementsRef.current.get(focusedCell.id)
+      if (focusedCellElement !== undefined) {
+        focusedCellElement.focus()
+        shouldFocusFocusedCellRef.current = false
+      }
+    })
+  }, [table])
   const registerCellElement = useCallback(
     (cellId: string, element: HTMLTableCellElement | null) => {
       if (element === null) {
@@ -429,7 +469,6 @@ function DataGridRoot<TData extends RowData>({
       ({
         activeColumnId,
         activeRowId,
-        bodyCellEntryId,
         density,
         onCellActivate,
         onCellEditRequest,
@@ -477,7 +516,6 @@ function DataGridRoot<TData extends RowData>({
     [
       activeColumnId,
       activeRowId,
-      bodyCellEntryId,
       columnReorderEnabled,
       columnReorderIndices,
       columnOrder,
@@ -524,29 +562,27 @@ function DataGridRoot<TData extends RowData>({
     if (focusRequest === null) {
       return
     }
-    const requestKey = `${focusRequest.requestId}:${focusRequest.target.rowId}:${focusRequest.target.columnId}`
-    if (processedFocusRequestRef.current === requestKey) {
+    const processedFocusRequest = processedFocusRequestRef.current
+    if (
+      processedFocusRequest?.requestId === focusRequest.requestId &&
+      processedFocusRequest.target.rowId === focusRequest.target.rowId &&
+      processedFocusRequest.target.columnId === focusRequest.target.columnId
+    ) {
       return
     }
-    processedFocusRequestRef.current = requestKey
-    shouldFocusFocusedCellRef.current = true
-    table.setFocusedCell(focusRequest.target.rowId, focusRequest.target.columnId)
     const requestedCell = table
       .getRowModel()
       .rows.find((row) => row.id === focusRequest.target.rowId)
       ?.getVisibleCells()
       .find((cell) => cell.column.id === focusRequest.target.columnId)
-    const requestedCellElement =
-      requestedCell === undefined ? undefined : cellElementsRef.current.get(requestedCell.id)
-    if (requestedCellElement !== undefined) {
-      requestedCellElement.focus()
-      shouldFocusFocusedCellRef.current = false
+    if (requestedCell === undefined) {
+      return
     }
-  }, [focusRequest, table])
 
-  useEffect(() => {
-    onColumnActivateRef.current = onColumnActivate
-  }, [onColumnActivate])
+    processedFocusRequestRef.current = focusRequest
+    table.setFocusedCell(focusRequest.target.rowId, focusRequest.target.columnId)
+    focusFocusedCell()
+  }, [focusFocusedCell, focusRequest, table])
 
   useEffect(() => {
     if (columnReorderConfigured === false || ReorderComponent !== null) {
@@ -557,9 +593,9 @@ function DataGridRoot<TData extends RowData>({
     void loadDataGridReorder()
       .then((module) => {
         if (active === true) {
-          const activeElement = document.activeElement
+          const activeElement = rootRef.current?.ownerDocument.activeElement
           if (
-            activeElement instanceof Element &&
+            isElementTarget(activeElement) === true &&
             rootRef.current?.contains(activeElement) === true
           ) {
             focusedColumnIdRef.current =
@@ -590,31 +626,38 @@ function DataGridRoot<TData extends RowData>({
   }, [ReorderComponent])
 
   useEffect(() => {
-    if (activeColumnId === null || onColumnActivateRef.current === undefined) {
+    if (activeColumnId === null || canClearActiveColumn === false) {
       return
     }
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Node && rootRef.current?.contains(event.target) === true) {
+      if (
+        typeof (event.target as Node | null)?.nodeType === 'number' &&
+        rootRef.current?.contains(event.target as Node) === true
+      ) {
         return
       }
 
-      onColumnActivateRef.current?.(null)
+      clearActiveColumn()
     }
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onColumnActivateRef.current?.(null)
+        clearActiveColumn()
       }
     }
 
-    document.addEventListener('pointerdown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown)
+    const ownerDocument = rootRef.current?.ownerDocument
+    if (ownerDocument === undefined) {
+      return
+    }
+    ownerDocument.addEventListener('pointerdown', handlePointerDown)
+    ownerDocument.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      document.removeEventListener('pointerdown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown)
+      ownerDocument.removeEventListener('pointerdown', handlePointerDown)
+      ownerDocument.removeEventListener('keydown', handleKeyDown)
     }
-  }, [activeColumnId])
+  }, [activeColumnId, canClearActiveColumn])
 
   const root = (
     <DataGridContext.Provider value={value as DataGridContextValue<RowData>}>
@@ -883,7 +926,20 @@ function DataGridHeaderRow<TData extends RowData>({
   )
 }
 
-function DataGridHeaderCell<TData extends RowData>({
+function DataGridHeaderCell<TData extends RowData>(props: DataGridHeaderCellProps<TData>) {
+  const { table } = useDataGridContext<TData>()
+
+  return (
+    <Subscribe
+      source={table.atoms.cellSelection}
+      selector={() => table.getFocusedCell() === undefined}
+    >
+      {() => <DataGridHeaderCellImplementation {...props} />}
+    </Subscribe>
+  )
+}
+
+function DataGridHeaderCellImplementation<TData extends RowData>({
   children,
   header,
 }: DataGridHeaderCellProps<TData>) {
@@ -1014,7 +1070,11 @@ function DataGridHeaderCell<TData extends RowData>({
           aria-hidden={isDragVisual === true ? true : undefined}
           data-slot="data-grid-header-drag-source"
         >
-          {header.isPlaceholder === true ? null : (children ?? <FlexRender header={header} />)}
+          {header.isPlaceholder === true ? null : (
+            <Subscribe source={table.atoms.rowSelection}>
+              {() => children ?? <FlexRender header={header} />}
+            </Subscribe>
+          )}
         </div>
         {header.column.getCanResize() === true ? (
           <Subscribe
@@ -1124,7 +1184,7 @@ function DataGridBody({ children }: DataGridBodyProps) {
     <tbody data-slot="data-grid-body">
       {children ??
         rows.map((row) => (
-          <DataGridRow
+          <DataGridSubscribedRow
             key={row.id}
             row={row}
           />
@@ -1160,7 +1220,10 @@ function DataGridVirtualBody() {
   const { table } = useDataGridContext()
 
   return (
-    <Subscribe source={table.atoms.cellSelection}>
+    <Subscribe
+      source={table.atoms.cellSelection}
+      selector={() => table.getFocusedCell()?.row.id ?? null}
+    >
       {() => <DataGridVirtualBodyImplementation />}
     </Subscribe>
   )
@@ -1205,7 +1268,7 @@ function DataGridVirtualBodyImplementation() {
       {virtualRows.map((virtualRow) => {
         const row = rows[virtualRow.index]
         return row === undefined ? null : (
-          <DataGridRowImplementation
+          <DataGridSubscribedRow
             key={row.id}
             ariaRowIndex={virtualRow.index + table.getHeaderGroups().length + 1}
             row={row}
@@ -1221,7 +1284,29 @@ function DataGridVirtualBodyImplementation() {
 }
 
 function DataGridRow<TData extends RowData>(props: DataGridRowProps<TData>) {
-  return <DataGridRowImplementation {...props} />
+  return <DataGridSubscribedRow {...props} />
+}
+
+function DataGridSubscribedRow<TData extends RowData>(
+  props: DataGridRowProps<TData> & { ariaRowIndex?: number },
+) {
+  const { table } = useDataGridContext<TData>()
+
+  return (
+    <Subscribe
+      source={table.atoms.rowSelection}
+      selector={(rowSelection) => rowSelection[props.row.id] === true}
+    >
+      {() => (
+        <Subscribe
+          source={table.atoms.cellSelection}
+          selector={() => getCellSelectionRowRenderState(table, props.row)}
+        >
+          {() => <DataGridRowImplementation {...props} />}
+        </Subscribe>
+      )}
+    </Subscribe>
+  )
 }
 
 function DataGridRowImplementation<TData extends RowData>({
@@ -1257,7 +1342,7 @@ function DataGridRowImplementation<TData extends RowData>({
       onRowContextMenu === undefined ||
       event.defaultPrevented === true ||
       (onCellContextMenu !== undefined &&
-        event.target instanceof Element &&
+        isElementTarget(event.target) === true &&
         event.target.closest('[data-slot="data-grid-cell"]') !== null)
     ) {
       return
@@ -1271,7 +1356,7 @@ function DataGridRowImplementation<TData extends RowData>({
     if (
       onRowContextMenuTouchStart === undefined ||
       (onCellContextMenuTouchStart !== undefined &&
-        event.target instanceof Element &&
+        isElementTarget(event.target) === true &&
         event.target.closest('[data-slot="data-grid-cell"]') !== null)
     ) {
       return
@@ -1315,7 +1400,6 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   const {
     activeColumnId,
     activeRowId,
-    bodyCellEntryId,
     density,
     focusFocusedCell,
     getCellStatus,
@@ -1342,6 +1426,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
   const rowStatus = getRowStatus?.(cell.row) ?? 'default'
   const status = rowStatus === 'stagedDeletion' ? 'default' : (getCellStatus?.(cell) ?? 'default')
   const hasMultiCellSelection = table.getSelectedCellCount() > 1
+  const bodyCellEntryId = table.getFocusedCell()?.id ?? getFirstSelectableCell(table)?.id ?? null
   const tabIndex = cell.getTabIndex() === 0 || bodyCellEntryId === cell.id ? 0 : -1
   const registerCell = useCallback(
     (element: HTMLTableCellElement | null) => {
@@ -1374,13 +1459,12 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     if (
       event.defaultPrevented === true ||
       event.button !== 0 ||
-      isInteractiveTarget(event.target) === true ||
-      isSelectionControlTarget(event.target) === true
+      isInteractiveTarget(event.target) === true
     ) {
       return
     }
 
-    cell.getSelectionStartHandler()(event)
+    cell.getSelectionStartHandler(event.currentTarget.ownerDocument)(event)
   }
 
   const handleContextMenu = (event: MouseEvent<HTMLTableCellElement>) => {

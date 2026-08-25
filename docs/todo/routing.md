@@ -13,6 +13,10 @@
 
 [25/08/26]
 
+- [x] Keep pagination commands in the route owner while row queries receive resolved search state and one out-of-range correction command.
+
+[25/08/26]
+
 - [x] Derive active workspace-tab identity from committed table route params and search instead of duplicating it in provider state.
 - [x] Canonicalize a verified schema with no tables to the explicit New view route.
 
@@ -189,6 +193,11 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[25/08/26]
+
+- [x] Cover route-owned pagination and query-requested out-of-range correction.
+- [x] Verify application formatting, lint, typecheck, build, and package tests.
 
 [25/08/26]
 

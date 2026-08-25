@@ -57,7 +57,7 @@ import type { TableRowId } from '@tables/tableTypes'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import { FieldEditorMutationWidget } from '@tables/floatingWidget/fieldEditorMutationWidgetModules'
 import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
-import { getFieldReadOnlyReason } from '@tables/rowEditor/mutation/parsing'
+import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
 
 interface TableViewProps {
@@ -434,7 +434,7 @@ function TableViewContent({
       target: gridHotkeyTargetRef,
     },
   )
-  const { canOpenRowEditor, detailPaneMode, handleRowEditorOpenChange, rowEditor } = state
+  const { canOpenRowEditor, closeRowEditor, detailPaneMode, rowEditor } = state
   const { openInsert } = rowEditor
   const openInsertPane = useCallback(() => {
     setInsertMoreEnabled(false)
@@ -446,11 +446,11 @@ function TableViewContent({
     }
     if (detailPaneMode === 'insert') {
       setInsertMoreEnabled(false)
-      handleRowEditorOpenChange(false)
+      closeRowEditor()
     } else {
       openInsertPane()
     }
-  }, [canOpenRowEditor, detailPaneMode, handleRowEditorOpenChange, openInsertPane])
+  }, [canOpenRowEditor, closeRowEditor, detailPaneMode, openInsertPane])
   useHotkey(
     appHotkeys.insertRow,
     (event) => {

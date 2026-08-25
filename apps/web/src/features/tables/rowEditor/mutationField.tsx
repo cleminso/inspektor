@@ -32,7 +32,7 @@ import {
 } from '@tables/rowEditor/values/fieldPresentation'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { copyBinaryValue, downloadBinaryValue } from '@tables/rowEditor/values/binary'
-import type { MutationFieldReadOnlyReason } from '@tables/rowEditor/mutation/parsing'
+import type { FieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import { buildRelationTableLink } from '@tables/routing/buildRelationTableLink'
 import { formatColumnDefault } from '@tables/rowEditor/mutation/draft'
 
@@ -51,7 +51,7 @@ interface MutationFieldProps {
   onNullChange: (isNull: boolean) => void
   onOmittedChange: (isOmitted: boolean) => void
   onTextChange: (text: string) => void
-  readOnlyReason: MutationFieldReadOnlyReason
+  readOnlyReason: FieldReadOnlyReason
   structuredEditorLayout?: CodeEditorLayout
 }
 
