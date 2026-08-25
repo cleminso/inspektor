@@ -151,6 +151,14 @@ export function useTableViewState({
   const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
   const searchState = useTableExplorerSearchParams()
+  const tableKey = createTableScope(
+    createTableWorkspaceScope({
+      branch: currentBranch,
+      connectionId: currentConnectionId,
+      schemaHash: currentSchemaHash,
+    }),
+    tableName,
+  )
   const schemaColumns = useMemo(
     () => getTableColumns(wasmSchema, tableName),
     [tableName, wasmSchema],
@@ -164,8 +172,8 @@ export function useTableViewState({
   const setCanonicalSorting = useEffectEvent(searchState.setSorting)
   const query = useTableRows({
     client,
-    currentSchemaHash,
     search: { ...searchState, sortColumn, sortDirection },
+    scopeKey: tableKey,
     tableName,
     wasmSchema,
   })
@@ -219,7 +227,6 @@ export function useTableViewState({
     )
   }
 
-  /** Marks one inserted row for the ephemeral grid highlight, then clears the mark on expiry. */
   const highlightRecentlyInsertedRow = (rowId: TableRowId) => {
     setRecentlyInsertedRowIds((currentRowIds) => {
       if (currentRowIds.has(rowId) === true) {
@@ -242,7 +249,6 @@ export function useTableViewState({
     })
   }
 
-  /** Replaces the ephemeral grid highlight with the cells from the latest successful apply. */
   const highlightRecentlyAppliedCells = (appliedUpdateFields: TableFieldsByRowId) => {
     if (Object.keys(appliedUpdateFields).length === 0) {
       return
@@ -254,14 +260,6 @@ export function useTableViewState({
     })
   }
   const mutations = useTableMutations({ client, tableName, wasmSchema })
-  const tableKey = createTableScope(
-    createTableWorkspaceScope({
-      branch: currentBranch,
-      connectionId: currentConnectionId,
-      schemaHash: currentSchemaHash,
-    }),
-    tableName,
-  )
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
   const tablePreferences = useTablePreferences({
     tableKey,
@@ -270,25 +268,15 @@ export function useTableViewState({
 
   const detailPaneMode: TableViewDetailPaneMode = editorMode === 'edit' ? 'rows' : editorMode
   // Filters, sorting, connection, branch, schema, and table define one selection scope.
-  const selectionScopeKey = useMemo(
-    () =>
-      JSON.stringify({
-        filters: searchState.filters,
-        page: searchState.page,
-        pageSize: searchState.pageSize,
-        sortColumn,
-        sortDirection,
-        tableKey,
-      }),
-    [
-      searchState.filters,
-      searchState.page,
-      searchState.pageSize,
-      sortColumn,
-      sortDirection,
-      tableKey,
-    ],
-  )
+  const selectionScope = {
+    filters: searchState.filters,
+    page: searchState.page,
+    pageSize: searchState.pageSize,
+    sortColumn,
+    sortDirection,
+    tableKey,
+  }
+  const selectionScopeKey = JSON.stringify(selectionScope)
   const selectionScopeKeyRef = useRef(selectionScopeKey)
   const effectiveSelectedRowIds = useMemo(() => {
     if (activeRowId === null) {
@@ -309,39 +297,32 @@ export function useTableViewState({
     return effectiveSelectedRowIds.filter((rowId) => validRowIdSet.has(rowId) === true)
   }, [effectiveSelectedRowIds, validRowIds])
 
+  const activePageRowIndex =
+    activeRowId === null ? -1 : query.rows.findIndex((row) => String(row.id) === activeRowId)
+  const visibleActiveRow = activePageRowIndex < 0 ? null : (query.rows[activePageRowIndex] ?? null)
   // Keep the edited row available when filtering or pagination removes it from the visible query.
-  const activeRow = useTableRowById({ rowId: activeRowId, tableName })
+  const activeRow = useTableRowById({
+    client,
+    rowId: visibleActiveRow === null ? activeRowId : null,
+    tableName,
+    wasmSchema,
+  })
 
-  /**
-   * Applies checkbox selection and chooses the one row whose draft is shown in the pane.
-   *
-   * Replacing insert mode or active row A with row B is guarded. Checking or unchecking other rows
-   * while row A remains active does not disturb A's draft and therefore runs immediately.
-   */
+  /** Keeps the active draft while selected; otherwise routes to the requested or first selected row. */
   const openRows = (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
-    const requestedActiveRowId =
+    const resolvedActiveRowId =
       nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
         ? nextActiveRowId
         : nextSelectedRowIds[0]
-    const transition = () => {
-      const availableRowIds = nextSelectedRowIds
-      const resolvedActiveRowId =
-        requestedActiveRowId !== undefined && availableRowIds.includes(requestedActiveRowId)
-          ? requestedActiveRowId
-          : availableRowIds[0]
-      setSelectedRowIds(availableRowIds)
-      setActiveColumnId(null)
-      setActiveFieldEditorTarget(null)
+    setSelectedRowIds(nextSelectedRowIds)
+    setActiveColumnId(null)
+    setActiveFieldEditorTarget(null)
 
-      if (availableRowIds.length === 0) {
-        void searchState.setRowEditor(null, null)
-        return
-      }
-      if (resolvedActiveRowId !== undefined) {
-        void searchState.setRowEditor('edit', resolvedActiveRowId)
-      }
+    if (resolvedActiveRowId === undefined) {
+      void searchState.setRowEditor(null, null)
+      return
     }
-    transition()
+    void searchState.setRowEditor('edit', resolvedActiveRowId)
   }
 
   const handleSelectedRowIdsChange = (
@@ -393,12 +374,10 @@ export function useTableViewState({
 
   const handleSortChange = (columnId: string, direction: 'asc' | 'desc') => {
     selectionScopeKeyRef.current = JSON.stringify({
-      filters: searchState.filters,
+      ...selectionScope,
       page: 1,
-      pageSize: searchState.pageSize,
       sortColumn: columnId,
       sortDirection: direction,
-      tableKey,
     })
     resetSelection()
     void searchState.setSorting(columnId, direction)
@@ -462,8 +441,6 @@ export function useTableViewState({
     onColumnMove: handleColumnMove,
     onColumnOrderChange: setColumnOrder,
   })
-  const activePageRowIndex =
-    activeRowId === null ? -1 : query.rows.findIndex((row) => String(row.id) === activeRowId)
   const activePageRowNumber = activePageRowIndex < 0 ? null : activePageRowIndex + 1
   const selectedColumnId = cellSelection.at(-1)?.focusColumnId ?? null
   const activeColumnNumber =
@@ -472,15 +449,7 @@ export function useTableViewState({
       : tablePreferences.columnOrder
           .filter((columnId) => tablePreferences.columnVisibility[columnId] !== false)
           .indexOf(selectedColumnId) + 1
-  const selectedRow = useMemo(() => {
-    const visibleSelectedRow = query.rows.find((row) => String(row.id) === activeRowId) ?? null
-    if (visibleSelectedRow !== null) {
-      return visibleSelectedRow
-    }
-
-    // The dedicated row query is the fallback, not a second source for visible rows.
-    return activeRow
-  }, [activeRow, activeRowId, query.rows])
+  const selectedRow = visibleActiveRow ?? activeRow
   const rowValues = useMemo(() => {
     if (searchState.editorMode === 'insert') {
       return createInsertRowValues(schemaColumns)
@@ -658,12 +627,9 @@ export function useTableViewState({
     filters: searchState.filters,
     setFilters: async (filters) => {
       selectionScopeKeyRef.current = JSON.stringify({
+        ...selectionScope,
         filters,
         page: 1,
-        pageSize: searchState.pageSize,
-        sortColumn,
-        sortDirection,
-        tableKey,
       })
       resetSelection()
       await searchState.setFilters(filters)

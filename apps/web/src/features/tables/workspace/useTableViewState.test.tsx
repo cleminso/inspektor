@@ -5,6 +5,7 @@ import type { ColumnDescriptor } from 'jazz-tools'
 
 import { DataGrid } from '@inspector/ds'
 import { createInsertRowValues, useTableViewState } from '@tables/workspace/useTableViewState'
+import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
 
 const setRowEditor = vi.fn()
 const deleteRow = vi.fn()
@@ -13,7 +14,10 @@ const updateRow = vi.fn()
 const setPage = vi.fn()
 const setPageSize = vi.fn()
 const resetPage = vi.fn()
-const { focusRowEditorField } = vi.hoisted(() => ({ focusRowEditorField: vi.fn() }))
+const { focusRowEditorField, useTableRowByIdMock } = vi.hoisted(() => ({
+  focusRowEditorField: vi.fn(),
+  useTableRowByIdMock: vi.fn(),
+}))
 const columnOrderState = {
   columnOrder: ['id', 'name'],
   columnVisibility: { id: true, name: true },
@@ -37,7 +41,7 @@ const searchState = {
   sortColumn: 'id',
   sortDirection: 'asc' as const,
 }
-let activeRows: Array<Record<string, unknown>> = []
+let tableRowsOptions: unknown
 const tableColumns = [
   {
     accessorKey: 'id',
@@ -61,10 +65,6 @@ const tableColumns = [
 const runtimeState = vi.hoisted(() => ({
   client: null as object | null,
   schema: null as Record<string, unknown> | null,
-}))
-
-vi.mock('jazz-tools/react', () => ({
-  useAll: () => activeRows,
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -124,23 +124,30 @@ vi.mock('@tables/rowEditor/fieldFocus', async (importOriginal) => {
 })
 
 vi.mock('@tables/query/useTableRows', () => ({
-  useTableRows: () => ({
-    columns: tableColumns,
-    hasNextPage: false,
-    hasPreviousPage: false,
-    isInitialLoading: false,
-    isRefreshing: false,
-    loadedRowCount: 1,
-    page: searchState.page,
-    pageSize: searchState.pageSize,
-    resetPage,
-    setPage,
-    setPageSize,
-    rows: [
-      { id: 'row-1', name: 'Ada' },
-      { id: 'row-2', name: 'Grace' },
-    ],
-  }),
+  useTableRows: (options: unknown) => {
+    tableRowsOptions = options
+    return {
+      columns: tableColumns,
+      hasNextPage: false,
+      hasPreviousPage: false,
+      isInitialLoading: false,
+      isRefreshing: false,
+      loadedRowCount: 1,
+      page: searchState.page,
+      pageSize: searchState.pageSize,
+      resetPage,
+      setPage,
+      setPageSize,
+      rows: [
+        { id: 'row-1', name: 'Ada' },
+        { id: 'row-2', name: 'Grace' },
+      ],
+    }
+  },
+}))
+
+vi.mock('@tables/query/useTableRowById', () => ({
+  useTableRowById: useTableRowByIdMock,
 }))
 
 beforeEach(() => {
@@ -152,6 +159,8 @@ beforeEach(() => {
   focusRowEditorField.mockClear()
   setPage.mockReset()
   setPageSize.mockReset()
+  useTableRowByIdMock.mockReset()
+  useTableRowByIdMock.mockReturnValue(null)
   setRowEditor.mockImplementation((mode: 'edit' | 'insert' | null, rowId: string | null) => {
     searchState.editorMode = mode
     searchState.rowId = rowId
@@ -160,8 +169,8 @@ beforeEach(() => {
   searchState.rowId = null
   searchState.page = 1
   searchState.sortColumn = 'id'
+  tableRowsOptions = undefined
   columnOrderState.columnOrder = ['id', 'name']
-  activeRows = []
   tableColumns[1]!.column = {
     name: 'name',
     column_type: { type: 'Text' },
@@ -220,6 +229,21 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
+  it('scopes row queries to connection, branch, schema, and table identity', () => {
+    renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(tableRowsOptions).toMatchObject({
+      scopeKey: createTableScope(
+        createTableWorkspaceScope({
+          branch: 'main',
+          connectionId: 'connection-1',
+          schemaHash: 'schema-1',
+        }),
+        'accounts',
+      ),
+    })
+  })
+
   it('clears row selection and closes the edit pane after staged changes apply', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
@@ -583,14 +607,25 @@ describe('useTableViewState', () => {
     ).toEqual({ payload: undefined })
   })
 
-  it('ignores an active-row query result whose identity does not match the requested row', () => {
+  it('does not open a row query when the active row is visible', () => {
     searchState.editorMode = 'edit'
-    searchState.rowId = 'row-3'
-    activeRows = [{ id: 'row-previous', name: 'Previous' }]
+    searchState.rowId = 'row-1'
 
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
-    expect(result.current.rowValues).toBeNull()
+    expect(result.current.rowValues).toMatchObject({ id: 'row-1', name: 'Ada' })
+    expect(useTableRowByIdMock).toHaveBeenCalledWith(expect.objectContaining({ rowId: null }))
+  })
+
+  it('queries an active row outside the visible page', () => {
+    searchState.editorMode = 'edit'
+    searchState.rowId = 'row-3'
+    useTableRowByIdMock.mockReturnValue({ id: 'row-3', name: 'Linus' })
+
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    expect(result.current.rowValues).toEqual({ id: 'row-3', name: 'Linus' })
+    expect(useTableRowByIdMock).toHaveBeenCalledWith(expect.objectContaining({ rowId: 'row-3' }))
   })
 
   it('opens inline editing without checking the row when a focused cell is double-clicked', () => {

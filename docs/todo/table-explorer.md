@@ -21,6 +21,15 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [25/08/26]
 
+- [x] Keep query ownership, cache-key, preservation-boundary, and active-draft invariants documented beside the code that enforces them.
+
+[25/08/26]
+
+- [x] Reuse one selection-scope shape across render and route handlers and remove the obsolete guarded-transition wrapper.
+- [x] Keep fulfilled query-window state reactive so live row-count changes can immediately stop invalid page projection.
+
+[25/08/26]
+
 - [x] Use one connection, branch, and schema workspace identity for tabs, pins, table preferences, mutation state, provider remounts, and table view resets.
 
 [25/08/26]
@@ -769,7 +778,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [ ] Close a clean row pane before starting inline editing on a double-clicked cell.
 - [ ] Invoke the mutation draft guard with `The current row has staged changes.` when a dirty row pane blocks cell activation.
 - [x] Add direct contract tests around the generic Jazz mutation adapter.
-- [ ] Add direct contract tests around the generic Jazz query adapter.
+- [x] Add direct contract tests around the generic Jazz query adapter.
 
 ### Cell rendering refactor
 

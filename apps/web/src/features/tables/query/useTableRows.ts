@@ -9,11 +9,8 @@ import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState }
 import { type DynamicTableRow, type WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 
-import {
-  buildTableRowsQuery,
-  isTableColumnSortable,
-  TABLE_ROWS_QUERY_OPTIONS,
-} from '@tables/query/tableRowsQuery'
+import { buildTableRowsQuery, isTableColumnSortable } from '@tables/query/tableRowsQuery'
+import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TableColumnMeta, TablePageSize, TableRowsSearchState } from '@tables/tableTypes'
@@ -22,11 +19,11 @@ const EMPTY_ROWS: DynamicTableRow[] = []
 
 interface UseTableRowsOptions {
   client: JazzClient | null
-  currentSchemaHash: string | null
   search: TableRowsSearchState & {
     setPage: (page: number) => Promise<void>
     setPageSize: (pageSize: TablePageSize) => Promise<void>
   }
+  scopeKey: string | null
   tableName: string | null
   wasmSchema: WasmSchema | null
 }
@@ -143,29 +140,17 @@ function projectRowsWindow(
  */
 export function useTableRows({
   client,
-  currentSchemaHash,
   search,
+  scopeKey,
   tableName,
   wasmSchema,
 }: UseTableRowsOptions): UseTableRowsResult {
   const { filters, page, pageSize, setPage, setPageSize, sortColumn, sortDirection } = search
-  const queryKey = JSON.stringify({
-    currentSchemaHash,
-    filters,
-    page,
-    pageSize,
-    sortColumn,
-    sortDirection,
-    tableName,
-  })
-  const dataScopeKey = JSON.stringify({ currentSchemaHash, filters, page, pageSize, tableName })
-  const queryScopeKey = JSON.stringify({
-    currentSchemaHash,
-    filters,
-    sortColumn,
-    sortDirection,
-    tableName,
-  })
+  // Each key names the smallest boundary allowed to preserve rows or reuse a loaded query window.
+  const baseScopeKey = JSON.stringify({ filters, scopeKey, tableName })
+  const dataScopeKey = JSON.stringify([baseScopeKey, page, pageSize])
+  const queryScopeKey = JSON.stringify([baseScopeKey, sortColumn, sortDirection])
+  const queryKey = JSON.stringify([dataScopeKey, sortColumn, sortDirection])
   const requestedOffset = (page - 1) * pageSize
 
   const schemaColumns = useMemo(
@@ -224,7 +209,7 @@ export function useTableRows({
   const queryState = useJazzQueryState<DynamicTableRow>(
     manager,
     activeQueryBuilder ?? undefined,
-    TABLE_ROWS_QUERY_OPTIONS,
+    INSPECTOR_QUERY_OPTIONS,
   )
   const rows = queryState.data
   const fulfilledQueryRowCount = queryState.status === 'fulfilled' ? queryState.data.length : null
@@ -256,8 +241,7 @@ export function useTableRows({
   )
   const fulfilledRows = rowsWindowProjection.rows
   const fulfilledHasNextPage = rowsWindowProjection.hasNextPage
-  // Keep compatible visible rows during sort refreshes, but never carry them into another table,
-  // schema, filter set, page, page-size scope, or replacement Jazz manager.
+  // Sort refreshes may preserve rows; data-scope or manager changes and same-query resets may not.
   const resolvedRowsRef = useRef<ResolvedRowsState | null>(null)
   useLayoutEffect(() => {
     if (fulfilledRows === undefined) return
@@ -274,7 +258,8 @@ export function useTableRows({
   const canPreserveRows =
     queryState.status === 'pending' &&
     previousRowsState?.dataScopeKey === dataScopeKey &&
-    previousRowsState.manager === manager
+    previousRowsState.manager === manager &&
+    previousRowsState.queryKey !== queryKey
   const visibleRows =
     fulfilledRows ?? (canPreserveRows === true ? previousRowsState.rows : EMPTY_ROWS)
   const hasNextPage =
@@ -287,8 +272,7 @@ export function useTableRows({
   const isRuntimeReady = client !== null && wasmSchema !== null
   const isInitialLoading =
     isRuntimeReady === false || (isPending === true && canPreserveRows === false)
-  const isRefreshing =
-    isPending === true && canPreserveRows === true && previousRowsState.queryKey !== queryKey
+  const isRefreshing = isPending === true && canPreserveRows === true
   const outOfRangePageKey =
     queryState.status === 'fulfilled' &&
     rowsWindowProjection.isCovered === true &&

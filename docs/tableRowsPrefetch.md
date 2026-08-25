@@ -52,14 +52,14 @@ one speculative subscription is retained by each navigation surface at a time.
 
 ### 2. Build the destination query
 
-`buildInitialTableRowsQuery` delegates to the same `buildTableRowsQuery` function used by the rendered table. The table list omits
-search inputs and produces this default shape:
+`startTableRowsPrefetch` resolves the destination search state and calls the same `buildTableRowsQuery` function used by the rendered
+table. The table list omits search inputs and produces this default shape:
 
 - no filters
 - sort by `id` ascending
 - request page one with a page size of 100 rows
 - fetch one additional row so `useTableRows` can derive whether more rows are available
-- use the shared `TABLE_ROWS_QUERY_OPTIONS`
+- use the shared `INSPECTOR_QUERY_OPTIONS`
 
 An inactive table tab supplies its stored filters, sort column, sort direction, page, and page size. `resolveTableRowsSearch` applies
 the same defaults and malformed-search handling used by the destination route, so prefetch can acquire the exact page represented by
@@ -91,8 +91,8 @@ active fulfilled query already contains the complete requested page and its pagi
 - rejected query error text
 
 Resolved rows remain visible while compatible sorting work is pending. A fulfilled wider window remains the active Jazz subscription
-while smaller pages can be projected from it. Rows are not reused across a table, schema, filter, sort, or Jazz-manager change, and an
-uncovered page or page-size request starts its own bounded query.
+while smaller pages can be projected from it. Fulfilled-window reuse is invalid across table, schema, filter, sort, or Jazz-manager
+changes, and an uncovered page or page-size request starts its own bounded query.
 
 ## Query identity contract
 
@@ -108,7 +108,8 @@ Prefetch only provides reuse when both callers produce the same canonical Jazz q
 Do not duplicate the default query shape in `TableListPane`. Change defaults in `tableRowsQuery.ts` and cover both prefetch and
 rendered-query identity in tests.
 
-`TABLE_ROWS_QUERY_OPTIONS` is a module-scope constant. Its stable reference also prevents subscription churn in React dependencies.
+`queryOptions.ts` owns the shared propagation and visibility values because both prefetch and rendered subscriptions must serialize
+the same Jazz cache key.
 
 Loaded-window reuse is separate from exact prefetch identity. `useTableRows` can keep an already fulfilled broader query active while
 the route represents a contained page. The broader query remains authoritative; the Inspector does not seed or open redundant exact
@@ -173,7 +174,8 @@ scroll axes without remounting the viewport or its retained table content.
 - `apps/web/src/features/tables/tableList/pane.tsx`: navigation-intent handlers and speculative resource cleanup.
 - `apps/web/src/features/tables/workspace/tabsView.tsx`: exact inactive-tab intent, handoff, and cleanup.
 - `apps/web/src/features/tables/routing/tableRowsSearch.ts`: shared route and stored-tab query-state resolution.
-- `apps/web/src/features/tables/query/tableRowsQuery.ts`: canonical row-query construction and shared options.
+- `apps/web/src/features/tables/query/queryOptions.ts`: shared Jazz query options and cache identity.
+- `apps/web/src/features/tables/query/tableRowsQuery.ts`: canonical row-query construction.
 - `apps/web/src/features/tables/query/tableRowsPrefetch.ts`: isolated Jazz orchestrator prefetch adapter.
 - `apps/web/src/features/tables/query/useTableRowsPrefetchIntent.ts`: shared intent timer, ownership, handoff, and runtime cleanup.
 - `apps/web/src/features/tables/query/useJazzQueryState.ts`: React external-store adapter for Jazz cache entries.

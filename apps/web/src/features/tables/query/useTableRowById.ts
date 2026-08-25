@@ -1,47 +1,37 @@
-import { useMemo } from 'react'
+import type { DynamicTableRow, WasmSchema } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/react'
 
-import type { DynamicTableRow } from 'jazz-tools'
-
-import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 import type { TableRowId } from '@tables/tableTypes'
 
 import { GenericQueryBuilder } from './genericQueryBuilder'
 
 interface UseTableRowByIdOptions {
+  client: Pick<JazzClient, 'manager'> | null
   rowId: TableRowId | null
   tableName: string
+  wasmSchema: WasmSchema | null
 }
 
+/** Loads an edited row only when the visible table query does not already own it. */
 export function useTableRowById({
+  client,
   rowId,
   tableName,
+  wasmSchema,
 }: UseTableRowByIdOptions): DynamicTableRow | null {
-  const client = useRuntimeClient()
-  const wasmSchema = useRuntimeSchema()
-  const queryBuilder = useMemo(() => {
-    if (wasmSchema === null || rowId === null) {
-      return null
-    }
-
-    return new GenericQueryBuilder(tableName, wasmSchema).where({ id: rowId }).limit(1).offset(0)
-  }, [rowId, tableName, wasmSchema])
-  const queryOptions = useMemo(
-    () => ({
-      propagation: 'full' as const,
-      visibility: 'hidden_from_live_query_list' as const,
-    }),
-    [],
-  )
+  const queryBuilder =
+    wasmSchema === null || rowId === null
+      ? undefined
+      : new GenericQueryBuilder(tableName, wasmSchema).where({ id: { eq: rowId } }).limit(1)
   const queryState = useJazzQueryState<DynamicTableRow>(
     client?.manager ?? null,
-    queryBuilder ?? undefined,
-    queryOptions,
+    queryBuilder,
+    INSPECTOR_QUERY_OPTIONS,
   )
 
-  if (rowId === null) {
-    return null
-  }
-
-  return queryState.data?.find((row) => String(row.id) === rowId) ?? null
+  const row = queryState.data?.[0]
+  // This fallback owns only the requested identity; never return another row as active.
+  return row !== undefined && String(row.id) === rowId ? row : null
 }

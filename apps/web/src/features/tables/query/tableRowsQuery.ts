@@ -1,21 +1,10 @@
-import type { QueryOptions, WasmSchema } from 'jazz-tools'
+import type { WasmSchema } from 'jazz-tools'
 
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import { filterTableFilterClauses } from '@tables/filters/filterParsing'
 import { GenericQueryBuilder } from '@tables/query/genericQueryBuilder'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TablePageSize, TableSortDirection } from '@tables/tableTypes'
-
-/**
- * Query options shared by prefetch and React subscriptions.
- *
- * Keeping this object and its values identical lets Jazz produce one canonical cache key for both
- * callers. The query stays hidden from inspected applications' live-query telemetry.
- */
-export const TABLE_ROWS_QUERY_OPTIONS = {
-  propagation: 'full',
-  visibility: 'hidden_from_live_query_list',
-} as const satisfies QueryOptions
 
 interface BuildTableRowsQueryOptions {
   filters: readonly TableFilterClause[]
@@ -27,7 +16,7 @@ interface BuildTableRowsQueryOptions {
   tableName: string
 }
 
-/** Returns whether Jazz can order rows by one runtime schema column. */
+/** Restricts runtime sorting to column types supported by Jazz ordering. */
 export function isTableColumnSortable(
   columnType: ReturnType<typeof getTableColumns>[number]['column_type'],
 ): boolean {
@@ -79,15 +68,7 @@ export function buildTableRowsQuery({
     resolvedSortColumn === 'id' && sortColumn !== 'id' ? 'asc' : sortDirection
   let builder = new GenericQueryBuilder(tableName, schema)
   for (const filter of applicableFilters) {
-    if (filter.operator === 'eq') {
-      builder = builder.where({ [filter.column]: filter.value })
-    } else {
-      builder = builder.where({
-        [filter.column]: {
-          [filter.operator]: filter.value,
-        },
-      })
-    }
+    builder = builder.where({ [filter.column]: { [filter.operator]: filter.value } })
   }
 
   builder = builder.orderBy(resolvedSortColumn, resolvedSortDirection)

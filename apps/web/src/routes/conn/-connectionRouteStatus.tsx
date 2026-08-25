@@ -11,6 +11,7 @@ export function ConnectionRoutePending(): React.ReactElement {
       alignItems="center"
       justifyContent="center"
       role="status"
+      paddingTop="l"
     >
       <Text color="muted">Opening connection…</Text>
     </Box>

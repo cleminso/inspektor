@@ -2,7 +2,8 @@ import type { WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 
 import type { TableFilterClause } from '@tables/filters/tableFilters'
-import { buildTableRowsQuery, TABLE_ROWS_QUERY_OPTIONS } from '@tables/query/tableRowsQuery'
+import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { buildTableRowsQuery } from '@tables/query/tableRowsQuery'
 import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
 import type { TablePageSize, TableSortDirection } from '@tables/tableTypes'
 
@@ -50,7 +51,7 @@ export function startTableRowsPrefetch({
     sortDirection: search.sortDirection,
     tableName,
   })
-  const key = client.manager.makeQueryKey(query, TABLE_ROWS_QUERY_OPTIONS)
+  const key = client.manager.makeQueryKey(query, INSPECTOR_QUERY_OPTIONS)
   const entry = client.manager.getCacheEntry(key)
 
   return entry.subscribe({})

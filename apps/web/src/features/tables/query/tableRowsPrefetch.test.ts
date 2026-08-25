@@ -3,7 +3,7 @@ import type { DynamicTableRow, QueryBuilder, QueryOptions, WasmSchema } from 'ja
 import { describe, expect, it, vi } from 'vitest'
 
 import { startTableRowsPrefetch } from '@tables/query/tableRowsPrefetch'
-import { TABLE_ROWS_QUERY_OPTIONS } from '@tables/query/tableRowsQuery'
+import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 
 const schema = {
   users: {
@@ -41,7 +41,7 @@ describe('startTableRowsPrefetch', () => {
       limit: 101,
       offset: 0,
     })
-    expect(makeQueryKey).toHaveBeenCalledWith(query, TABLE_ROWS_QUERY_OPTIONS)
+    expect(makeQueryKey).toHaveBeenCalledWith(query, INSPECTOR_QUERY_OPTIONS)
     expect(getCacheEntry).toHaveBeenCalledWith('users-query')
     expect(subscribe).toHaveBeenCalledOnce()
 

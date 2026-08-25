@@ -10,7 +10,7 @@ const { useJazzQueryStateMock } = vi.hoisted(() => ({
 
 let queryRows: DynamicTableRow[] | undefined
 let queryError: unknown
-let currentSchemaHash = 'schema-1'
+let scopeKey = 'schema-1'
 let filters: unknown[] = []
 let page = 1
 let pageSize: 100 | 500 | 1000 = 100
@@ -67,7 +67,7 @@ function useTestTableRows(options: Omit<Parameters<typeof useTableRows>[0], 'sea
 beforeEach(() => {
   queryRows = undefined
   queryError = null
-  currentSchemaHash = 'schema-1'
+  scopeKey = 'schema-1'
   filters = []
   page = 1
   pageSize = 100
@@ -106,7 +106,7 @@ describe('useTableRows', () => {
     const { result } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -125,7 +125,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -145,7 +145,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -164,6 +164,25 @@ describe('useTableRows', () => {
     expect(result.current.page).toBe(1)
   })
 
+  it('drops resolved rows when Jazz resets the active query', () => {
+    queryRows = [{ id: 'row-1', name: 'Ada' } as DynamicTableRow]
+    const { result, rerender } = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+
+    queryRows = undefined
+    rerender()
+
+    expect(result.current.rows).toEqual([])
+    expect(result.current.isInitialLoading).toBe(true)
+    expect(result.current.isRefreshing).toBe(false)
+  })
+
   it('does not preserve resolved rows when the Jazz manager is replaced', () => {
     queryRows = [
       { id: 'row-1', name: 'Ada' } as DynamicTableRow,
@@ -172,7 +191,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -191,7 +210,7 @@ describe('useTableRows', () => {
     {
       name: 'schema',
       replaceScope: () => {
-        currentSchemaHash = 'schema-2'
+        scopeKey = 'schema-2'
       },
     },
     {
@@ -205,7 +224,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash,
+        scopeKey,
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -226,7 +245,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash,
+        scopeKey,
         tableName,
         wasmSchema: runtimeSchema as never,
       }),
@@ -248,7 +267,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() => {
       const tableRows = useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       })
@@ -275,7 +294,7 @@ describe('useTableRows', () => {
     const { result } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -294,7 +313,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -320,7 +339,7 @@ describe('useTableRows', () => {
     const { result } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -341,7 +360,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -374,7 +393,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -405,7 +424,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -429,7 +448,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -460,7 +479,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -492,7 +511,7 @@ describe('useTableRows', () => {
     const { result, rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -519,7 +538,7 @@ describe('useTableRows', () => {
     const { result } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -541,7 +560,7 @@ describe('useTableRows', () => {
     renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),
@@ -558,7 +577,7 @@ describe('useTableRows', () => {
     const { rerender } = renderHook(() =>
       useTestTableRows({
         client: runtimeClient as never,
-        currentSchemaHash: 'schema-1',
+        scopeKey: 'schema-1',
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
       }),

@@ -1,7 +1,8 @@
 import type { WasmSchema } from 'jazz-tools'
 import { describe, expect, it } from 'vitest'
 
-import { buildTableRowsQuery, TABLE_ROWS_QUERY_OPTIONS } from '@tables/query/tableRowsQuery'
+import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { buildTableRowsQuery } from '@tables/query/tableRowsQuery'
 import { DEFAULT_TABLE_PAGE_SIZE, TABLE_PAGE_SIZE_OPTIONS } from '@tables/tableTypes'
 
 const schema = {
@@ -42,7 +43,7 @@ describe('tableRowsQuery', () => {
       offset: 0,
       hops: [],
     })
-    expect(TABLE_ROWS_QUERY_OPTIONS).toEqual({
+    expect(INSPECTOR_QUERY_OPTIONS).toEqual({
       propagation: 'full',
       visibility: 'hidden_from_live_query_list',
     })

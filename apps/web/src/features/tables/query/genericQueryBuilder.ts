@@ -7,11 +7,9 @@
  */
 import type { DynamicTableRow, QueryBuilder, WasmSchema } from 'jazz-tools'
 
-type GenericWhereValue = unknown | { [op: string]: unknown }
+type GenericWhereInput = Record<string, Record<string, unknown>>
 
-export type GenericWhereInput = Record<string, GenericWhereValue>
-
-/** QueryBuilder implementation for subscriptions against runtime-selected tables. */
+/** Adapts runtime schema metadata to Jazz's generated-builder contract without app-specific types. */
 export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
   readonly _table: string
   readonly _schema: WasmSchema
@@ -28,35 +26,14 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
     this._schema = schema
   }
 
-  /** Accepts Inspector filter state as either shorthand equality or explicit Jazz operators. */
+  /** Accepts Inspector filter state as explicit Jazz operators. */
   public where(conditions: GenericWhereInput): GenericQueryBuilder {
     const clone = this.clone()
 
-    for (const [key, value] of Object.entries(conditions)) {
-      if (value === undefined) {
-        continue
+    for (const [key, operators] of Object.entries(conditions)) {
+      for (const [operator, value] of Object.entries(operators)) {
+        if (value !== undefined) clone.conditions.push({ column: key, op: operator, value })
       }
-
-      const isOperatorRecord =
-        typeof value === 'object' &&
-        value !== null &&
-        Array.isArray(value) === false &&
-        Object.getPrototypeOf(value) === Object.prototype
-
-      if (isOperatorRecord === true) {
-        const operatorRecord = value as Record<string, unknown>
-        for (const [operator, operatorValue] of Object.entries(operatorRecord)) {
-          if (operatorValue === undefined) {
-            continue
-          }
-
-          clone.conditions.push({ column: key, op: operator, value: operatorValue })
-        }
-
-        continue
-      }
-
-      clone.conditions.push({ column: key, op: 'eq', value })
     }
 
     return clone
@@ -82,15 +59,18 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
 
   /** Emits the minimal query payload Jazz needs for table rows selected at runtime. */
   public _build(): string {
-    return JSON.stringify({
-      table: this._table,
-      conditions: this.conditions,
-      includes: {},
-      orderBy: this.orderBys,
-      limit: this.limitValue,
-      offset: this.offsetValue,
-      hops: [],
-    })
+    return JSON.stringify(
+      {
+        table: this._table,
+        conditions: this.conditions,
+        includes: {},
+        orderBy: this.orderBys,
+        limit: this.limitValue,
+        offset: this.offsetValue,
+        hops: [],
+      },
+      (_key, value) => (value instanceof Uint8Array ? [...value] : value),
+    )
   }
 
   /** Matches generated builder chaining semantics by keeping every query step immutable. */
