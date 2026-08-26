@@ -77,21 +77,9 @@ describe('resolveTableRowsSearch', () => {
       dir: undefined,
       empty: undefined,
       filters: undefined,
-      mode: undefined,
       page: undefined,
       pageSize: undefined,
-      rowId: undefined,
       sort: undefined,
-      view: undefined,
-    })
-  })
-
-  it('canonicalizes row editors to the data view', () => {
-    expect(
-      canonicalizeTableRouteSearch({ mode: 'edit', rowId: 'row-1', view: 'schema' }),
-    ).toMatchObject({ mode: 'edit', rowId: 'row-1', view: undefined })
-    expect(canonicalizeTableRouteSearch({ mode: 'insert', view: 'schema' })).toMatchObject({
-      mode: 'insert',
       view: undefined,
     })
   })

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { Box, Button, Select, Text, Tooltip } from '@inspector/ds'
@@ -31,6 +31,16 @@ interface PaginationSummary {
   pageSize: TablePageSize
 }
 
+function formatRowStatus(summary: PaginationSummary): string {
+  const firstRow = summary.loadedRowCount === 0 ? 0 : (summary.page - 1) * summary.pageSize + 1
+  const lastRow = (summary.page - 1) * summary.pageSize + summary.loadedRowCount
+  const total =
+    summary.hasNextPage === true
+      ? `${rowCountFormatter.format(lastRow + 1)}+`
+      : rowCountFormatter.format(lastRow)
+  return `${rowCountFormatter.format(firstRow)}–${rowCountFormatter.format(lastRow)} of ${total}`
+}
+
 export function TablePagination({
   hasNextPage,
   hasPreviousPage,
@@ -42,20 +52,16 @@ export function TablePagination({
   onPageSizeChange,
 }: TablePaginationProps): React.ReactElement {
   const currentSummary = { hasNextPage, loadedRowCount, page, pageSize }
-  const [settledSummary, setSettledSummary] = useState<PaginationSummary>(currentSummary)
-  useEffect(() => {
+  const settledSummaryRef = useRef<PaginationSummary | null>(
+    loading === true ? null : currentSummary,
+  )
+  useLayoutEffect(() => {
     if (loading === false) {
-      setSettledSummary({ hasNextPage, loadedRowCount, page, pageSize })
+      settledSummaryRef.current = { hasNextPage, loadedRowCount, page, pageSize }
     }
   }, [hasNextPage, loadedRowCount, loading, page, pageSize])
-  const summary = loading === true ? settledSummary : currentSummary
-  const firstRow = summary.loadedRowCount === 0 ? 0 : (summary.page - 1) * summary.pageSize + 1
-  const lastRow = (summary.page - 1) * summary.pageSize + summary.loadedRowCount
-  const total =
-    summary.hasNextPage === true
-      ? `${rowCountFormatter.format(lastRow + 1)}+`
-      : rowCountFormatter.format(lastRow)
-  const rowStatus = `${rowCountFormatter.format(firstRow)}–${rowCountFormatter.format(lastRow)} of ${total}`
+  const summary = loading === true ? settledSummaryRef.current : currentSummary
+  const rowStatus = summary === null ? null : formatRowStatus(summary)
 
   return (
     <Box
@@ -116,7 +122,7 @@ export function TablePagination({
         tabularNums
         variant="caption"
       >
-        Page {summary.page}
+        Page {summary?.page ?? page}
       </Text>
       <Tooltip.Root>
         <Tooltip.Trigger

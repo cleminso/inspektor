@@ -240,4 +240,32 @@ describe('RowEditorSidePanel dirty transitions', () => {
 
     expect(onConfirmDelete).toHaveBeenCalledWith(['row-1', 'row-2', 'row-3'])
   })
+
+  it('clears pending deletion when the pane mode changes', () => {
+    const onConfirmDelete = vi.fn()
+    const renderPanel = (mode: 'edit' | 'insert', editedRowIds: string[]) => (
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        editedRowIds={editedRowIds}
+        mode={mode}
+        onClose={vi.fn()}
+        onConfirmDelete={onConfirmDelete}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>
+    )
+    const { rerender } = render(renderPanel('edit', ['row-1']))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete row' }))
+
+    rerender(renderPanel('insert', []))
+    rerender(renderPanel('edit', ['row-2']))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete row' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm delete' }))
+
+    expect(onConfirmDelete).toHaveBeenCalledWith(['row-2'])
+  })
 })

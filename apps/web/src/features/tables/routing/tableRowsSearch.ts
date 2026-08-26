@@ -47,20 +47,16 @@ export function canonicalizeTableRouteSearch(search: Record<string, unknown>): T
   const filters = serializeFiltersToSearchParam(
     parseFiltersFromSearchParam(typeof search.filters === 'string' ? search.filters : null),
   )
-  const mode = search.mode === 'edit' || search.mode === 'insert' ? search.mode : undefined
-  const rowId = parseTrimmedString(search.rowId)
   const sort = parseTrimmedString(search.sort)
 
   return {
     dir: search.dir === 'desc' ? 'desc' : undefined,
     empty: search.empty === 'true' ? 'true' : undefined,
     filters: filters ?? undefined,
-    mode: mode === 'edit' && rowId === undefined ? undefined : mode,
     page: page !== undefined && page > 1 ? page : undefined,
     pageSize: pageSize === DEFAULT_TABLE_PAGE_SIZE ? undefined : pageSize,
-    rowId: mode === 'edit' ? rowId : undefined,
     sort: sort === 'id' ? undefined : sort,
-    view: mode === undefined && search.view === 'schema' ? 'schema' : undefined,
+    view: search.view === 'schema' ? 'schema' : undefined,
   }
 }
 

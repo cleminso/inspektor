@@ -64,30 +64,6 @@ describe('useTableExplorerSearchParams', () => {
     })
   })
 
-  it('returns to the default data view when opening the row editor', async () => {
-    searchState.value = { tab: 'table:accounts', view: 'schema' }
-    const { result } = renderHook(() => useTableExplorerSearchParams())
-
-    await act(async () => {
-      await result.current.setRowEditor('insert')
-    })
-
-    const nextSearch = captureSearchUpdater()({ tab: 'table:accounts', view: 'schema' })
-
-    expect(nextSearch.tab).toBeUndefined()
-    expect(nextSearch.view).toBeUndefined()
-  })
-
-  it('replaces the current route when opening the row editor', async () => {
-    const { result } = renderHook(() => useTableExplorerSearchParams())
-
-    await act(async () => {
-      await result.current.setRowEditor('edit', 'row-1')
-    })
-
-    expect(navigateMock).toHaveBeenCalledWith(expect.objectContaining({ replace: true }))
-  })
-
   it('drops undeclared search params when updating filters', async () => {
     searchState.value = { tab: 'new-view', custom: 'kept' }
     const { result } = renderHook(() => useTableExplorerSearchParams())

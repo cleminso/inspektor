@@ -4,7 +4,6 @@ import {
   ContextMenu,
   Icon,
   KeyboardInput,
-  Spinner,
   Text,
   WorkspaceTabs,
   Tooltip,
@@ -370,24 +369,12 @@ export function TableTabsView({
       </Box>
       {runtimeError !== null ? (
         <RuntimeErrorStatus />
-      ) : connectionEntryPending === true ? (
+      ) : connectionEntryPending === true ||
+        (tableName !== null && isTableIdentityReady === false) ? (
         <Box
           minHeight={0}
           flex={1}
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Spinner label="Opening connection" />
-        </Box>
-      ) : tableName !== null && isTableIdentityReady === false ? (
-        <Box
-          minHeight={0}
-          flex={1}
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Spinner label="Opening table" />
-        </Box>
+        />
       ) : activeTab?.kind === 'table' && tableName !== null ? (
         <WorkspaceTabs.Panel value={activeTab.id}>
           <SelectedTableView tableName={tableName} />

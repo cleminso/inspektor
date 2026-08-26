@@ -87,6 +87,23 @@ describe('TablePagination', () => {
     expect(screen.getByText('0–0 of 0')).toBeTruthy()
   })
 
+  it('does not report an empty range before the first result settles', () => {
+    render(
+      <TablePagination
+        hasNextPage={false}
+        hasPreviousPage={false}
+        loadedRowCount={0}
+        loading
+        page={1}
+        pageSize={100}
+        onPageChange={() => undefined}
+        onPageSizeChange={() => undefined}
+      />,
+    )
+
+    expect(screen.queryByText('0–0 of 0')).toBeNull()
+  })
+
   it('keeps the settled range and page visible while a new page size loads', () => {
     const { rerender } = render(
       <TablePagination

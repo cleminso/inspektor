@@ -125,7 +125,7 @@ describe('TableTabsView', () => {
       <TableTabsView connectionEntryPending tableName={null} />,
     )
 
-    expect(screen.getByRole('status', { name: 'Opening connection' })).toBeTruthy()
+    expect(screen.queryByRole('status')).toBeNull()
     expect(container.querySelector('[data-slot="table-workspace-bar-placeholder"]')).toBeTruthy()
     expect(screen.queryByRole('tab', { name: 'New view' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'New view' })).toBeNull()
@@ -137,7 +137,7 @@ describe('TableTabsView', () => {
     expect(screen.getByText('New table view content')).toBeTruthy()
   })
 
-  it('paints a lightweight status while route and active-tab identities reconcile', () => {
+  it('keeps the workspace quiet while route and active-tab identities reconcile', () => {
     mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [
       {
@@ -150,7 +150,7 @@ describe('TableTabsView', () => {
 
     render(<TableTabsView tableName="profiles" />)
 
-    expect(screen.getByRole('status', { name: 'Opening table' })).toBeTruthy()
+    expect(screen.queryByRole('status')).toBeNull()
     expect(screen.queryByText('Selected table: profiles')).toBeNull()
   })
 
@@ -160,7 +160,7 @@ describe('TableTabsView', () => {
 
     render(<TableTabsView tableName="profiles" />)
 
-    expect(screen.getByRole('status', { name: 'Opening table' })).toBeTruthy()
+    expect(screen.queryByRole('status')).toBeNull()
     expect(screen.queryByText('New table view content')).toBeNull()
   })
 
@@ -170,7 +170,7 @@ describe('TableTabsView', () => {
 
     render(<TableTabsView tableName="accounts" view="schema" />)
 
-    expect(screen.getByRole('status', { name: 'Opening table' })).toBeTruthy()
+    expect(screen.queryByRole('status')).toBeNull()
     expect(screen.queryByText('Selected table: accounts')).toBeNull()
   })
 

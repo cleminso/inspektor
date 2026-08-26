@@ -45,11 +45,8 @@ import {
 import { serializeCellValueForClipboard } from '@tables/grid/cellActions'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
-import {
-  EditRowForm,
-  InsertRowForm,
-  preloadRowEditorForms,
-} from '@tables/rowEditor/rowEditorModules'
+import { EditRowForm } from '@tables/rowEditor/editForm'
+import { InsertRowForm } from '@tables/rowEditor/insertForm'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import { getTableViewportScrollResetKey } from '@tables/workspace/tableViewport'
@@ -74,11 +71,7 @@ interface TableViewProps {
   tableName: string
 }
 
-function RowEditorFormFallback({
-  label = 'Loading editor',
-}: {
-  label?: string
-}): React.ReactElement {
+function RowEditorStatus({ label }: { label: string }): React.ReactElement {
   return (
     <Box
       height="full"
@@ -487,12 +480,6 @@ function TableViewContent({
   }, [state.error, state.isInitialLoading, state.isRefreshing])
 
   useEffect(() => {
-    if (state.canOpenRowEditor === true) {
-      preloadRowEditorForms()
-    }
-  }, [state.canOpenRowEditor])
-
-  useEffect(() => {
     if (
       state.detailPaneMode === 'closed' &&
       state.activeFieldEditorTarget === null &&
@@ -742,7 +729,7 @@ function TableViewContent({
                 insertMoreEnabled={insertMoreEnabled}
                 mutationDisabled={state.canMutateRows === false || mutationApplying}
                 activeRowIndex={state.rowEditor.activeRowIndex}
-                onClose={state.handleRowEditorCancel}
+                onClose={state.closeRowEditor}
                 onConfirmDelete={(rowIds) => {
                   mutations.stageDeletions(rowIds)
                   state.handleRowsStagedForDeletion(rowIds)
@@ -751,37 +738,33 @@ function TableViewContent({
                 onNavigatePrevious={state.rowEditor.goToPreviousRow}
                 onNavigateNext={state.rowEditor.goToNextRow}
               >
-                <Suspense fallback={<RowEditorFormFallback />}>
-                  {mutationApplying ? (
-                    <RowEditorFormFallback label="Applying changes" />
-                  ) : state.detailPaneMode === 'insert' ? (
-                    <InsertRowForm
-                      rowValues={state.rowValues ?? {}}
-                      schemaColumns={schemaColumns}
-                      insertMoreEnabled={insertMoreEnabled}
-                      saveDisabled={state.canMutateRows === false}
-                      onDiscard={() => {
+                {mutationApplying ? (
+                  <RowEditorStatus label="Applying changes" />
+                ) : state.detailPaneMode === 'insert' ? (
+                  <InsertRowForm
+                    rowValues={state.rowValues ?? {}}
+                    schemaColumns={schemaColumns}
+                    insertMoreEnabled={insertMoreEnabled}
+                    saveDisabled={state.canMutateRows === false}
+                    onDiscard={() => {
+                      setInsertMoreEnabled(false)
+                      state.closeRowEditor()
+                    }}
+                    onSave={async (values, options) => {
+                      await state.handleInsertSave(values, options)
+                      if (options.keepOpen === false) {
                         setInsertMoreEnabled(false)
-                        state.handleRowEditorCancel()
-                      }}
-                      onSave={async (values, options) => {
-                        await state.handleInsertSave(values, options)
-                        if (options.keepOpen === false) {
-                          setInsertMoreEnabled(false)
-                        }
-                      }}
-                    />
-                  ) : state.rowEditor.activeRowId !== null && state.rowValues !== null ? (
-                    <StagedEditRowForm
-                      key={`${tableName}:${state.rowEditor.activeRowId}`}
-                      rowId={state.rowEditor.activeRowId}
-                      rowValues={state.rowValues}
-                      schemaColumns={schemaColumns}
-                    />
-                  ) : (
-                    <RowEditorFormFallback />
-                  )}
-                </Suspense>
+                      }
+                    }}
+                  />
+                ) : state.rowEditor.activeRowId !== null && state.rowValues !== null ? (
+                  <StagedEditRowForm
+                    key={`${tableName}:${state.rowEditor.activeRowId}`}
+                    rowId={state.rowEditor.activeRowId}
+                    rowValues={state.rowValues}
+                    schemaColumns={schemaColumns}
+                  />
+                ) : null}
               </RowEditorSidePanel>
             </ResizablePanel>
           </>
@@ -791,7 +774,7 @@ function TableViewContent({
       state.activeFieldEditorTarget !== null &&
       state.activeFieldEditorRowValues !== null &&
       activeFieldColumn !== null ? (
-        <Suspense fallback={<RowEditorFormFallback />}>
+        <Suspense fallback={null}>
           <FieldEditorMutationWidget
             key={`${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
             column={activeFieldColumn}

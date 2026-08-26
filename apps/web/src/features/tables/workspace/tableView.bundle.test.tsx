@@ -24,8 +24,8 @@ vi.mock('@tables/rowEditor/insertForm', () => {
 import './tableView'
 
 describe('TableView module boundary', () => {
-  it('does not initialize row-editor forms when the table view is imported', () => {
-    expect(rowEditorModuleLoaded).not.toHaveBeenCalled()
+  it('initializes the lightweight row forms with the table view', () => {
+    expect(rowEditorModuleLoaded).toHaveBeenCalledTimes(2)
   })
 
   it('does not initialize CodeMirror when the base table view is imported', () => {

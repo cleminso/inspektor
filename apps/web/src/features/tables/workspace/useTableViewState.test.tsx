@@ -7,7 +7,6 @@ import { DataGrid } from '@inspector/ds'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import { useTableViewState as useTableViewStateImpl } from '@tables/workspace/useTableViewState'
 
-const setRowEditor = vi.fn()
 const insertRow = vi.fn()
 const setPage = vi.fn()
 const { focusRowEditorField, useTableRowByIdMock } = vi.hoisted(() => ({
@@ -21,20 +20,18 @@ const columnOrderState = {
   setColumnVisibility: vi.fn(),
 }
 const searchState = {
-  editorMode: null as 'edit' | 'insert' | null,
   filters: [] as TableFilterClause[],
   page: 1,
   pageSize: 100 as const,
-  rowId: null as string | null,
   setFilters: vi.fn(),
   setPage,
   setPageSize: vi.fn(),
-  setRowEditor,
   setSorting: vi.fn(),
   sortColumn: 'id',
   sortDirection: 'asc' as const,
 }
 let tableRowsOptions: unknown
+let queryIsInitialLoading = false
 let queryRows = [
   { id: 'row-1', name: 'Ada' },
   { id: 'row-2', name: 'Grace' },
@@ -115,7 +112,7 @@ vi.mock('@tables/query/useTableRows', () => ({
     return {
       columns: tableColumns,
       hasNextPage: false,
-      isInitialLoading: false,
+      isInitialLoading: queryIsInitialLoading,
       isRefreshing: false,
       rows: queryRows,
     }
@@ -127,23 +124,17 @@ vi.mock('@tables/query/useTableRowById', () => ({
 }))
 
 beforeEach(() => {
-  setRowEditor.mockClear()
   insertRow.mockReset()
   focusRowEditorField.mockClear()
   setPage.mockReset()
   searchState.setFilters.mockReset()
   useTableRowByIdMock.mockReset()
   useTableRowByIdMock.mockReturnValue(null)
-  setRowEditor.mockImplementation((mode: 'edit' | 'insert' | null, rowId: string | null) => {
-    searchState.editorMode = mode
-    searchState.rowId = rowId
-  })
-  searchState.editorMode = null
   searchState.filters = []
-  searchState.rowId = null
   searchState.page = 1
   searchState.sortColumn = 'id'
   tableRowsOptions = undefined
+  queryIsInitialLoading = false
   queryRows = [
     { id: 'row-1', name: 'Ada' },
     { id: 'row-2', name: 'Grace' },
@@ -214,14 +205,13 @@ describe('useTableViewState', () => {
     })
     rerender()
     expect(result.current.table.getSelectedRowIds()).toEqual(['row-1'])
-    setRowEditor.mockClear()
 
     act(() => {
       result.current.handleMutationApplySuccess()
     })
 
     expect(result.current.table.getSelectedRowIds()).toEqual([])
-    expect(setRowEditor).toHaveBeenCalledWith(null, null)
+    expect(result.current.detailPaneMode).toBe('closed')
   })
 
   it('replaces applied-cell feedback and clears it after expiry', async () => {
@@ -260,15 +250,13 @@ describe('useTableViewState', () => {
       result.current.table.getRow('row-2').toggleSelected(true)
     })
     rerender()
-    setRowEditor.mockClear()
-
     act(() => {
       result.current.handleRowsStagedForDeletion(['row-2'])
     })
     rerender()
 
     expect(result.current.table.getSelectedRowIds()).toEqual(['row-1'])
-    expect(setRowEditor).toHaveBeenCalledWith(null, null)
+    expect(result.current.detailPaneMode).toBe('closed')
   })
 
   it('prevents staged deletion rows from being selected again', () => {
@@ -343,7 +331,8 @@ describe('useTableViewState', () => {
     })
 
     expect(result.current.activeFieldEditorTarget).toBeNull()
-    expect(setRowEditor).toHaveBeenCalledWith('edit', 'row-1')
+    expect(result.current.rowEditor.activeRowId).toBe('row-1')
+    expect(result.current.detailPaneMode).toBe('rows')
     await new Promise((resolve) => requestAnimationFrame(resolve))
     expect(focusRowEditorField).toHaveBeenCalledWith('name')
   })
@@ -390,9 +379,11 @@ describe('useTableViewState', () => {
   })
 
   it('persists an inserted row and closes the insert pane', async () => {
-    searchState.editorMode = 'insert'
     insertRow.mockResolvedValue('row-3')
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.rowEditor.openInsert()
+    })
 
     await act(async () => {
       await result.current.handleInsertSave({ name: 'Ada' }, { keepOpen: false })
@@ -400,13 +391,15 @@ describe('useTableViewState', () => {
 
     expect(insertRow).toHaveBeenCalledWith({ name: 'Ada' })
     expect(setPage).toHaveBeenCalledWith(1)
-    expect(setRowEditor).toHaveBeenLastCalledWith(null, null)
+    expect(result.current.detailPaneMode).toBe('closed')
   })
 
   it('persists an inserted row and keeps the insert pane open when Insert more is enabled', async () => {
-    searchState.editorMode = 'insert'
     insertRow.mockResolvedValue('row-3')
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.rowEditor.openInsert()
+    })
 
     await act(async () => {
       await result.current.handleInsertSave({ name: 'Ada' }, { keepOpen: true })
@@ -414,14 +407,16 @@ describe('useTableViewState', () => {
 
     expect(insertRow).toHaveBeenCalledWith({ name: 'Ada' })
     expect(setPage).not.toHaveBeenCalled()
-    expect(setRowEditor).not.toHaveBeenCalled()
+    expect(result.current.detailPaneMode).toBe('insert')
   })
 
   it('keeps each inserted row highlighted for its own expiry while Insert more repeats', async () => {
     vi.useFakeTimers()
-    searchState.editorMode = 'insert'
     insertRow.mockResolvedValueOnce('row-3').mockResolvedValueOnce('row-4')
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.rowEditor.openInsert()
+    })
 
     await act(async () => {
       await result.current.handleInsertSave({ name: 'Ada' }, { keepOpen: true })
@@ -468,24 +463,43 @@ describe('useTableViewState', () => {
   })
 
   it('does not open a row query when the active row is visible', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
 
     expect(result.current.rowValues).toMatchObject({ id: 'row-1', name: 'Ada' })
     expect(useTableRowByIdMock).toHaveBeenCalledWith(expect.objectContaining({ rowId: null }))
   })
 
-  it('queries an active row outside the visible page', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-3'
-    useTableRowByIdMock.mockReturnValue({ id: 'row-3', name: 'Linus' })
+  it('queries an active row that leaves the visible page', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    useTableRowByIdMock.mockReturnValue({ id: 'row-1', name: 'Ada' })
+    queryRows = []
+    rerender()
 
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    expect(result.current.rowValues).toEqual({ id: 'row-1', name: 'Ada' })
+    expect(useTableRowByIdMock).toHaveBeenCalledWith(expect.objectContaining({ rowId: 'row-1' }))
+  })
 
-    expect(result.current.rowValues).toEqual({ id: 'row-3', name: 'Linus' })
-    expect(useTableRowByIdMock).toHaveBeenCalledWith(expect.objectContaining({ rowId: 'row-3' }))
+  it('keeps the active row available while its visible query resets', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+
+    queryIsInitialLoading = true
+    queryRows = []
+    rerender()
+
+    expect(result.current.detailPaneMode).toBe('rows')
+    expect(result.current.rowValues).toMatchObject({ id: 'row-1', name: 'Ada' })
   })
 
   it('opens inline editing without checking the row when a focused cell is double-clicked', () => {
@@ -533,7 +547,6 @@ describe('useTableViewState', () => {
       screen.getByRole('checkbox', { name: 'Select row row-1' }).getAttribute('aria-checked'),
     ).toBe('true')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
-    expect(setRowEditor).toHaveBeenCalledWith('edit', 'row-1')
   })
 
   it('focuses the target row after Shift-selecting a range', () => {
@@ -546,7 +559,6 @@ describe('useTableViewState', () => {
 
     expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('2')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
-    expect(setRowEditor).toHaveBeenLastCalledWith('edit', 'row-2')
   })
 
   it('opens and closes row selection from the header checkbox', () => {
@@ -557,7 +569,6 @@ describe('useTableViewState', () => {
 
     expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('2')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
-    expect(setRowEditor).toHaveBeenLastCalledWith('edit', 'row-1')
 
     fireEvent.click(checkbox)
 
@@ -610,57 +621,21 @@ describe('useTableViewState', () => {
 
     expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('1')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
-    expect(setRowEditor).toHaveBeenLastCalledWith('edit', 'row-2')
-  })
-
-  it('cancels the focused row by unchecking it and focusing the nearest checked row', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-    act(() => {
-      result.current.table.getRow('row-2').toggleSelected(true)
-    })
-    rerender()
-
-    act(() => {
-      result.current.handleRowEditorCancel()
-    })
-    rerender()
-
-    expect(result.current.table.getRow('row-2').getIsSelected()).toBe(false)
-    expect(result.current.table.getRow('row-1').getIsSelected()).toBe(true)
-    expect(setRowEditor).toHaveBeenLastCalledWith('edit', 'row-1')
-  })
-
-  it('closes the row pane when cancelling its only checked row', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-
-    act(() => {
-      result.current.handleRowEditorCancel()
-    })
-    rerender()
-
-    expect(result.current.table.getRow('row-1').getIsSelected()).toBe(false)
-    expect(setRowEditor).toHaveBeenLastCalledWith(null, null)
   })
 
   it('dismisses the row pane without a single-draft transition decision', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    setRowEditor.mockClear()
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
 
     act(() => {
       result.current.closeRowEditor()
     })
 
-    expect(setRowEditor).toHaveBeenCalledWith(null, null)
+    expect(result.current.detailPaneMode).toBe('closed')
+    expect(result.current.table.getSelectedRowIds()).toEqual(['row-1'])
   })
 
   it('closes the row pane, clears its checked row, and allows reselection on Escape', () => {
@@ -716,54 +691,12 @@ describe('useTableViewState', () => {
     expect(header.hasAttribute('data-active')).toBe(false)
   })
 
-  it('restores the checked row represented by URL-backed edit state', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-2'
-
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-
-    expect(result.current.table.getRow('row-2').getIsSelected()).toBe(true)
-    expect(result.current.detailPaneMode).toBe('rows')
-  })
-
-  it('keeps replacement checkbox selection after URL-backed row changes and editor closure', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-
-    searchState.rowId = 'row-2'
-    rerender()
-
-    expect(result.current.table.getRow('row-1').getIsSelected()).toBe(false)
-    expect(result.current.table.getRow('row-2').getIsSelected()).toBe(true)
-    expect(result.current.rowEditor.editedRowIds).toEqual(['row-2'])
-
-    searchState.editorMode = null
-    searchState.rowId = null
-    rerender()
-
-    expect(result.current.table.getSelectedRowIds()).toEqual(['row-2'])
-  })
-
-  it('keeps a replacement URL-backed row when its query scope changes', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-
-    searchState.rowId = 'row-2'
-    searchState.sortColumn = 'name'
-    rerender()
-    searchState.editorMode = null
-    searchState.rowId = null
-    rerender()
-
-    expect(result.current.table.getSelectedRowIds()).toEqual(['row-2'])
-  })
-
   it('focuses the matching row-editor field when its cell is selected', async () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-1'
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
     const field = document.createElement('div')
     const input = document.createElement('input')
     field.id = 'row-editor-field-name'
@@ -783,9 +716,11 @@ describe('useTableViewState', () => {
   })
 
   it('reports the active page row and selected data-column positions', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-2'
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
+    })
+    rerender()
 
     expect(result.current.rowEditor.activePageRowNumber).toBe(2)
     expect(result.current.rowEditor.activeColumnNumber).toBe(0)
@@ -803,10 +738,13 @@ describe('useTableViewState', () => {
   })
 
   it('does not report row zero when the edited row is outside the loaded page', () => {
-    searchState.editorMode = 'edit'
-    searchState.rowId = 'row-outside-page'
-
-    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    queryRows = []
+    rerender()
 
     expect(result.current.rowEditor.activePageRowNumber).toBeNull()
   })
@@ -885,12 +823,15 @@ describe('useTableViewState', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
     act(() => {
-      result.current.table.setFocusedCell('row-1', 'name')
+      result.current.table.getRow('row-1').toggleSelected(true)
     })
+    rerender()
+    expect(result.current.detailPaneMode).toBe('rows')
+
     searchState.sortColumn = 'name'
     rerender()
 
-    expect(result.current.hasCellSelection).toBe(false)
+    expect(result.current.table.getSelectedRowIds()).toEqual([])
     expect(result.current.detailPaneMode).toBe('closed')
   })
 
@@ -911,11 +852,14 @@ describe('useTableViewState', () => {
     )
 
     act(() => {
-      result.current.table.setFocusedCell('row-1', 'name')
+      result.current.table.getRow('row-1').toggleSelected(true)
     })
+    rerender({ tableKey: 'test:accounts' })
+    expect(result.current.detailPaneMode).toBe('rows')
+
     rerender({ tableKey: 'test:profiles' })
 
-    expect(result.current.hasCellSelection).toBe(false)
+    expect(result.current.table.getSelectedRowIds()).toEqual([])
     expect(result.current.detailPaneMode).toBe('closed')
   })
 })

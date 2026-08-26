@@ -12,10 +12,8 @@ export interface TableRouteSearch {
   dir?: string
   empty?: 'true'
   filters?: string
-  mode?: string | null
   page?: number
   pageSize?: TablePageSize
-  rowId?: string | null
   sort?: string
   view?: string
 }
@@ -43,7 +41,7 @@ export type TableRowsSearchInput = Omit<
 /** Content variants available in a selected table tab. */
 export type TableExplorerView = 'data' | 'schema'
 
-/** Row detail panel modes that can be encoded in URL search params. */
+/** Row form modes used by the local editor surface. */
 export type DetailPaneMode = 'edit' | 'insert'
 
 export type TableSortDirection = 'asc' | 'desc'
@@ -51,7 +49,7 @@ export type TablePageSize = 100 | 500 | 1000
 export const TABLE_PAGE_SIZE_OPTIONS = [100, 500, 1000] as const satisfies readonly TablePageSize[]
 export const DEFAULT_TABLE_PAGE_SIZE: TablePageSize = 100
 
-/** Runtime row IDs are normalized as strings for table state and URLs. */
+/** Runtime row IDs are normalized as strings for table state. */
 export type TableRowId = string
 
 /** Sparse valid value overlays keyed by runtime row ID and schema field name. */
@@ -60,7 +58,7 @@ export type TableValuesByRowId = Readonly<Record<TableRowId, Readonly<Record<str
 /** Field-name sets keyed by runtime row ID, such as cells marked after staged updates apply. */
 export type TableFieldsByRowId = Readonly<Record<TableRowId, ReadonlySet<string>>>
 
-/** URL-safe table explorer state used to restore navigation and selected rows. */
+/** URL-safe table explorer state used to restore table query navigation. */
 export interface TableRowsSearchState {
   filters: TableFilterClause[]
   page: number
@@ -70,9 +68,7 @@ export interface TableRowsSearchState {
 }
 
 export interface TableExplorerSearchState extends TableRowsSearchState {
-  editorMode: DetailPaneMode | null
   view: TableExplorerView
-  rowId: TableRowId | null
 }
 
 /** Per-table visibility map keyed by rendered column ID, including synthetic columns. */

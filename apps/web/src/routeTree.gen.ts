@@ -61,16 +61,18 @@ const ConnEditConnectionIdRoute = ConnEditConnectionIdRouteImport.update({
   path: '/edit/$connectionId',
   getParentRoute: () => ConnRoute,
 } as any)
-const ConnConnectionIdQueriesIndexRoute = ConnConnectionIdQueriesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ConnConnectionIdQueriesRoute,
-} as any)
-const ConnConnectionIdTablesIndexRoute = ConnConnectionIdTablesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ConnConnectionIdTablesRoute,
-} as any)
+const ConnConnectionIdQueriesIndexRoute =
+  ConnConnectionIdQueriesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ConnConnectionIdQueriesRoute,
+  } as any)
+const ConnConnectionIdTablesIndexRoute =
+  ConnConnectionIdTablesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ConnConnectionIdTablesRoute,
+  } as any)
 const ConnConnectionIdTablesTableNameIndexRoute =
   ConnConnectionIdTablesTableNameIndexRouteImport.update({
     id: '/$tableName/',
@@ -245,27 +247,32 @@ interface ConnConnectionIdQueriesRouteChildren {
   ConnConnectionIdQueriesIndexRoute: typeof ConnConnectionIdQueriesIndexRoute
 }
 
-const ConnConnectionIdQueriesRouteChildren: ConnConnectionIdQueriesRouteChildren = {
-  ConnConnectionIdQueriesIndexRoute: ConnConnectionIdQueriesIndexRoute,
-}
+const ConnConnectionIdQueriesRouteChildren: ConnConnectionIdQueriesRouteChildren =
+  {
+    ConnConnectionIdQueriesIndexRoute: ConnConnectionIdQueriesIndexRoute,
+  }
 
-const ConnConnectionIdQueriesRouteWithChildren = ConnConnectionIdQueriesRoute._addFileChildren(
-  ConnConnectionIdQueriesRouteChildren,
-)
+const ConnConnectionIdQueriesRouteWithChildren =
+  ConnConnectionIdQueriesRoute._addFileChildren(
+    ConnConnectionIdQueriesRouteChildren,
+  )
 
 interface ConnConnectionIdTablesRouteChildren {
   ConnConnectionIdTablesIndexRoute: typeof ConnConnectionIdTablesIndexRoute
   ConnConnectionIdTablesTableNameIndexRoute: typeof ConnConnectionIdTablesTableNameIndexRoute
 }
 
-const ConnConnectionIdTablesRouteChildren: ConnConnectionIdTablesRouteChildren = {
-  ConnConnectionIdTablesIndexRoute: ConnConnectionIdTablesIndexRoute,
-  ConnConnectionIdTablesTableNameIndexRoute: ConnConnectionIdTablesTableNameIndexRoute,
-}
+const ConnConnectionIdTablesRouteChildren: ConnConnectionIdTablesRouteChildren =
+  {
+    ConnConnectionIdTablesIndexRoute: ConnConnectionIdTablesIndexRoute,
+    ConnConnectionIdTablesTableNameIndexRoute:
+      ConnConnectionIdTablesTableNameIndexRoute,
+  }
 
-const ConnConnectionIdTablesRouteWithChildren = ConnConnectionIdTablesRoute._addFileChildren(
-  ConnConnectionIdTablesRouteChildren,
-)
+const ConnConnectionIdTablesRouteWithChildren =
+  ConnConnectionIdTablesRoute._addFileChildren(
+    ConnConnectionIdTablesRouteChildren,
+  )
 
 interface ConnConnectionIdRouteChildren {
   ConnConnectionIdQueriesRoute: typeof ConnConnectionIdQueriesRouteWithChildren
@@ -279,9 +286,8 @@ const ConnConnectionIdRouteChildren: ConnConnectionIdRouteChildren = {
   ConnConnectionIdIndexRoute: ConnConnectionIdIndexRoute,
 }
 
-const ConnConnectionIdRouteWithChildren = ConnConnectionIdRoute._addFileChildren(
-  ConnConnectionIdRouteChildren,
-)
+const ConnConnectionIdRouteWithChildren =
+  ConnConnectionIdRoute._addFileChildren(ConnConnectionIdRouteChildren)
 
 interface ConnRouteChildren {
   ConnConnectionIdRoute: typeof ConnConnectionIdRouteWithChildren

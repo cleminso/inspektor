@@ -26,7 +26,6 @@ const tableViewState = vi.hoisted(() => ({
   handleMutationApplySuccess: vi.fn(),
   handleMutationUpdatesApplied: vi.fn(),
   handleRowsStagedForDeletion: vi.fn(),
-  handleRowEditorCancel: vi.fn(),
   closeRowEditor: vi.fn(),
   hasCellSelection: false,
   hasNextPage: false,
@@ -98,7 +97,6 @@ const gridCellContextMenu = vi.hoisted(() => vi.fn())
 const gridRowContextMenu = vi.hoisted(() => vi.fn())
 const toastError = vi.hoisted(() => vi.fn())
 const toastSuccess = vi.hoisted(() => vi.fn())
-const preloadRowEditorForms = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
   current: null as null | {
     onUndoRowDeletions?: (rowIds: readonly string[]) => void
@@ -285,7 +283,7 @@ vi.mock('@tables/grid/toolbar', () => ({
   ),
 }))
 
-vi.mock('@tables/rowEditor/rowEditorModules', () => ({
+vi.mock('@tables/rowEditor/editForm', () => ({
   EditRowForm: ({
     draftController,
     rowValues,
@@ -296,8 +294,10 @@ vi.mock('@tables/rowEditor/rowEditorModules', () => ({
     editRowFormProps.current = { draftController, rowValues }
     return <div>Edit row fields</div>
   },
+}))
+
+vi.mock('@tables/rowEditor/insertForm', () => ({
   InsertRowForm: () => null,
-  preloadRowEditorForms,
 }))
 
 vi.mock('@tables/rowEditor/sidePane', () => ({
@@ -305,15 +305,22 @@ vi.mock('@tables/rowEditor/sidePane', () => ({
     children,
     editedRowIds,
     mutationDisabled,
+    onClose,
     onConfirmDelete,
   }: {
     children: ReactNode
     editedRowIds: string[]
     mutationDisabled?: boolean
+    onClose?: () => void
     onConfirmDelete?: (rowIds: readonly string[]) => void
   }) => (
     <>
       {children}
+      {onClose === undefined ? null : (
+        <button type="button" onClick={onClose}>
+          Close row editor
+        </button>
+      )}
       {onConfirmDelete === undefined ? null : (
         <button
           type="button"
@@ -558,7 +565,6 @@ afterEach(() => {
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
   toastSuccess.mockReset()
-  preloadRowEditorForms.mockReset()
   if (initialClipboardDescriptor === undefined) {
     Reflect.deleteProperty(navigator, 'clipboard')
   } else {
@@ -591,19 +597,6 @@ function configureNameCell(value: unknown) {
     getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: value } }] }),
   }
 }
-
-describe('TableView row editor preload', () => {
-  it('starts when the row editor becomes available', () => {
-    tableViewState.canOpenRowEditor = false
-    const { rerenderTableView } = renderTableView()
-    expect(preloadRowEditorForms).not.toHaveBeenCalled()
-
-    tableViewState.canOpenRowEditor = true
-    rerenderTableView()
-
-    expect(preloadRowEditorForms).toHaveBeenCalledOnce()
-  })
-})
 
 describe('TableView selection dismissal', () => {
   it('routes Escape to the active selection state', () => {
@@ -796,6 +789,18 @@ describe('TableView query status', () => {
       draftController: mutationEditorController,
       rowValues: { id: 'row-1', name: 'Ada' },
     })
+  })
+
+  it('closes the row editor without cancelling its active selection', () => {
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.rowEditor.activeRowId = 'row-1'
+    tableViewState.rowEditor.editedRowIds = ['row-1', 'row-2']
+    tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
+
+    renderTableView()
+    fireEvent.click(screen.getByRole('button', { name: 'Close row editor' }))
+
+    expect(tableViewState.closeRowEditor).toHaveBeenCalledOnce()
   })
 
   it('blocks inline editing and marks rows while their deletion is staged', () => {

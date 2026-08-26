@@ -21,6 +21,29 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [26/08/26]
 
+### Pane mode safety
+
+- [x] Clear pending row-deletion confirmation when the detail pane changes between edit and insert modes.
+
+[26/08/26]
+
+### Row-pane stability
+
+- [x] Keep checked-row selection intact when the row pane closes.
+- [x] Keep the active row form mounted while its visible Jazz query resets.
+
+[26/08/26]
+
+### Local row forms and quiet loading
+
+- [x] Keep row insert and edit presentation in local table-view state instead of restoring transient mutation UI from URL search.
+- [x] Load the lightweight insert and edit forms with the table view while retaining the independent deferred CodeMirror boundary.
+- [x] Remove row-form preload, retry, and Suspense fallback infrastructure.
+- [x] Keep schema and table-identity reconciliation visually quiet so the Data Grid row query owns the single visible workspace loading state.
+- [x] Hide the initial zero-row pagination summary until the first query result settles.
+
+[26/08/26]
+
 ### Prefetch and deferred module ownership
 
 - [x] Prefetch the exact canonical stored table search used by table-list navigation.
@@ -1005,6 +1028,23 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[26/08/26]
+
+- Delete confirmation is scoped to the current edit-mode presentation and cannot survive an insert-mode transition.
+
+[26/08/26]
+
+- Closing the row pane hides presentation without consuming checked-row selection or provider-owned mutation drafts.
+- Insert Discard clears the unsubmitted local form; this supersedes the generic Cancel claim below.
+- A same-query reset retains the last committed active-row values until the visible query settles, preventing the form from blanking during Jazz reconciliation.
+
+[26/08/26]
+
+- Table URLs preserve shareable query context, not insert mode, edit mode, row selection, or row-editor identity.
+- Refresh with unresolved mutation state remains protected by the browser-owned unload prompt where supported; a completed refresh returns to the table without reopening a clean editor over a discarded draft.
+- Closing a row pane preserves staged mutation state, while explicit Cancel retains its stronger draft-discard behavior.
+- Connection and tab reconciliation preserve workspace geometry without presenting internal loading statuses; `Loading rows` remains the visible status for the live table query.
+
 [25/08/26]
 
 - Connection entry preserves workspace geometry but does not expose tab controls until the initial table route resolves.
@@ -1162,6 +1202,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[26/08/26]
+
+- [x] Cover canonical URL cleanup, local row-pane state, query-scope closure, eager row-form loading, quiet workspace reconciliation, and initial pagination silence with focused tests.
+- [x] Verify insert opens without an editor-loading fallback or URL mutation and a browser refresh returns to the same table with the pane closed against an isolated Inspector Test fixture.
+- [x] Verify formatting, changed-file and package lint, application typecheck and production build, focused tests, and package-wide tests.
 
 [26/08/26]
 

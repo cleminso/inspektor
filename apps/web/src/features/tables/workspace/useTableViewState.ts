@@ -1,9 +1,9 @@
 /**
  * Orchestrates the table query, selection, detail panes, row mutations, and draft transitions.
  *
- * URL search state owns query scope and row-editor identity. Local React state owns cell, column,
- * and checkbox selection. The table mutation provider owns edit drafts. This hook connects those
- * systems without duplicating parsing, dirty comparison, or Jazz mutation rules.
+ * URL search state owns query scope. Local React state owns selection and pane presentation. The
+ * table mutation provider owns edit drafts. This hook connects those systems without duplicating
+ * parsing, dirty comparison, or Jazz mutation rules.
  */
 import {
   useCallback,
@@ -17,7 +17,7 @@ import {
 
 import type { DataGridCellTarget, DataGridFocusRequest } from '@inspector/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
-import type { ColumnDescriptor } from 'jazz-tools'
+import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
 
 import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { moveColumnInOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
@@ -59,7 +59,10 @@ interface InsertRowSaveOptions {
   keepOpen: boolean
 }
 
-type TableViewDetailPaneMode = 'closed' | 'insert' | 'rows'
+type DetailPaneState =
+  | { mode: 'closed' }
+  | { mode: 'insert' }
+  | { mode: 'rows'; activeRowId: TableRowId }
 
 /**
  * Builds the state and actions consumed by `TableView` for one runtime-selected Jazz table.
@@ -129,8 +132,9 @@ export function useTableViewState({
       void setCanonicalSorting(sortColumn, sortDirection)
     }
   }, [searchState.sortColumn, sortColumn, sortDirection, wasmSchema])
-  const editorMode = searchState.editorMode ?? 'closed'
-  const activeRowId = searchState.editorMode === 'edit' ? searchState.rowId : null
+  const [detailPane, setDetailPane] = useState<DetailPaneState>({ mode: 'closed' })
+  const detailPaneMode = detailPane.mode
+  const activeRowId = detailPane.mode === 'rows' ? detailPane.activeRowId : null
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
   const [activeFieldEditor, setActiveFieldEditor] = useState<{
@@ -139,9 +143,7 @@ export function useTableViewState({
   } | null>(null)
   const activeFieldEditorTarget = activeFieldEditor?.target ?? null
   const [cellFocusRequest, setCellFocusRequest] = useState<DataGridFocusRequest | null>(null)
-  const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
-    activeRowId === null ? [] : [activeRowId],
-  )
+  const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>([])
   const [recentlyInsertedRowIds, setRecentlyInsertedRowIds] = useState<ReadonlySet<TableRowId>>(
     emptyRecentlyInsertedRowIds,
   )
@@ -215,7 +217,6 @@ export function useTableViewState({
     columnIds,
   })
 
-  const detailPaneMode: TableViewDetailPaneMode = editorMode === 'edit' ? 'rows' : editorMode
   // Filters, sorting, connection, branch, schema, and table define one selection scope.
   const selectionScopeKey = JSON.stringify({
     filters: searchState.filters,
@@ -225,7 +226,7 @@ export function useTableViewState({
     sortDirection,
     tableKey,
   })
-  const selectionRouteRef = useRef({ activeRowId, selectionScopeKey })
+  const selectionScopeRef = useRef(selectionScopeKey)
   const effectiveSelectedRowIds = useMemo(() => {
     if (activeRowId === null) {
       return selectedRowIds
@@ -256,7 +257,7 @@ export function useTableViewState({
     wasmSchema,
   })
 
-  /** Keeps the active draft while selected; otherwise routes to the requested or first selected row. */
+  /** Keeps the active draft while selected; otherwise opens the requested or first selected row. */
   const openRows = (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
     const resolvedActiveRowId =
       nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
@@ -267,10 +268,10 @@ export function useTableViewState({
     setActiveFieldEditor(null)
 
     if (resolvedActiveRowId === undefined) {
-      void searchState.setRowEditor(null, null)
+      setDetailPane({ mode: 'closed' })
       return
     }
-    void searchState.setRowEditor('edit', resolvedActiveRowId)
+    setDetailPane({ mode: 'rows', activeRowId: resolvedActiveRowId })
   }
 
   const handleSelectedRowIdsChange = (
@@ -311,18 +312,12 @@ export function useTableViewState({
   }, [])
 
   useLayoutEffect(() => {
-    const previousRoute = selectionRouteRef.current
-    selectionRouteRef.current = { activeRowId, selectionScopeKey }
-    if (previousRoute.selectionScopeKey !== selectionScopeKey) {
-      resetSelection(activeRowId === null ? [] : [activeRowId])
-      return
+    if (selectionScopeRef.current !== selectionScopeKey) {
+      selectionScopeRef.current = selectionScopeKey
+      resetSelection()
+      setDetailPane({ mode: 'closed' })
     }
-    if (activeRowId !== null && previousRoute.activeRowId !== activeRowId) {
-      setSelectedRowIds((currentRowIds) =>
-        currentRowIds.includes(activeRowId) === true ? currentRowIds : [activeRowId],
-      )
-    }
-  }, [activeRowId, resetSelection, selectionScopeKey])
+  }, [resetSelection, selectionScopeKey])
 
   const handleSortChange = (columnId: string, direction: 'asc' | 'desc') => {
     void searchState.setSorting(columnId, direction)
@@ -385,17 +380,29 @@ export function useTableViewState({
           .filter((columnId) => tablePreferences.columnVisibility[columnId] !== false)
           .indexOf(selectedColumnId) + 1
   const selectedRow = visibleActiveRow ?? activeRow
+  const settledActiveRowRef = useRef<{ row: DynamicTableRow; rowId: TableRowId } | null>(null)
+  useLayoutEffect(() => {
+    if (activeRowId === null) {
+      settledActiveRowRef.current = null
+    } else if (selectedRow !== null) {
+      settledActiveRowRef.current = { row: selectedRow, rowId: activeRowId }
+    }
+  }, [activeRowId, selectedRow])
+  const retainedActiveRow =
+    query.isInitialLoading === true && settledActiveRowRef.current?.rowId === activeRowId
+      ? settledActiveRowRef.current.row
+      : null
   const rowValues = useMemo(() => {
-    if (searchState.editorMode === 'insert') {
+    if (detailPaneMode === 'insert') {
       return {}
     }
 
-    return selectedRow
-  }, [searchState.editorMode, selectedRow])
+    return selectedRow ?? retainedActiveRow
+  }, [detailPaneMode, retainedActiveRow, selectedRow])
 
-  /** Closes presentation state without applying the stronger explicit-Cancel selection behavior. */
+  /** Closes presentation state without changing checked-row selection. */
   const closeDetailPane = () => {
-    void searchState.setRowEditor(null, null)
+    setDetailPane({ mode: 'closed' })
   }
 
   const requestCellFocus = (target: DataGridCellTarget) => {
@@ -432,7 +439,7 @@ export function useTableViewState({
 
   const openInsert = () => {
     resetSelection()
-    void searchState.setRowEditor('insert', null)
+    setDetailPane({ mode: 'insert' })
   }
 
   const handleInsertSave = async (
@@ -470,7 +477,7 @@ export function useTableViewState({
       return
     }
 
-    void searchState.setRowEditor('edit', nextActiveRowId)
+    setDetailPane({ mode: 'rows', activeRowId: nextActiveRowId })
   }
 
   const goToPreviousRow = () => {
@@ -479,28 +486,6 @@ export function useTableViewState({
 
   const goToNextRow = () => {
     goToRowIndex(Math.min(activeRowIndex + 1, editedRowIds.length - 1))
-  }
-
-  /**
-   * Performs explicit form Cancel rather than guarded pane dismissal.
-   *
-   * Insert Cancel closes the pane. Edit Cancel discards the draft, unchecks the active row, and
-   * focuses the nearest remaining checked row or closes the pane when none remain.
-   */
-  const handleRowEditorCancel = () => {
-    if (activeRowId === null) {
-      closeDetailPane()
-      return
-    }
-
-    const nextSelectedRowIds = effectiveSelectedRowIds.filter((rowId) => rowId !== activeRowId)
-    setSelectedRowIds(nextSelectedRowIds)
-    const nextActiveRowId = getNearestSelectedRowId(validRowIds, nextSelectedRowIds, activeRowId)
-    if (nextActiveRowId === null) {
-      void searchState.setRowEditor(null, null)
-      return
-    }
-    void searchState.setRowEditor('edit', nextActiveRowId)
   }
 
   const handleFieldEditorCancel = () => {
@@ -613,6 +598,5 @@ export function useTableViewState({
     handleMutationUpdatesApplied: highlightRecentlyAppliedCells,
     handleRowsStagedForDeletion,
     closeRowEditor: closeDetailPane,
-    handleRowEditorCancel,
   }
 }

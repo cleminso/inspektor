@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 
 import { Box, Button, Switch, Text } from '@inspector/ds'
@@ -40,6 +40,9 @@ export function RowEditorSidePanel({
   const [deleteConfirmationRowIds, setDeleteConfirmationRowIds] = useState<
     readonly TableRowId[] | null
   >(null)
+  useEffect(() => {
+    setDeleteConfirmationRowIds(null)
+  }, [mode])
   const hasMultipleRows = editedRowIds.length > 1
   const insertMoreFieldId = 'insert-more'
   const title =
