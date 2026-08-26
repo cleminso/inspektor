@@ -1,74 +1,86 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { SidePanelLayout, SidePanelLayoutProvider, useSidePanelLayout } from './layout'
 
-interface PanelSize {
-  asPercentage: number
-  inPixels: number
-}
-
-const panel = vi.hoisted(() => ({
-  collapse: vi.fn(),
-  expand: vi.fn(),
-}))
-
-const resizable = vi.hoisted(() => ({
-  onResize: undefined as ((size: PanelSize) => void) | undefined,
-}))
-
-vi.mock('@inspector/ds', () => ({
-  Box: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  ResizableHandle: () => <div data-testid="resize-handle" />,
-  ResizablePanel: ({
-    children,
-    onResize,
-  }: {
-    children: React.ReactNode
-    onResize?: (size: PanelSize) => void
-  }) => {
-    if (onResize !== undefined) {
-      resizable.onResize = onResize
-    }
-
-    return <div>{children}</div>
-  },
-  ResizablePanelGroup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  useResizablePanelRef: () => ({ current: panel }),
-}))
+beforeEach(() => {
+  const values = new Map<string, string>()
+  Object.defineProperty(window, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+    },
+  })
+})
 
 afterEach(() => {
   cleanup()
-  panel.collapse.mockClear()
-  panel.expand.mockClear()
-  resizable.onResize = undefined
 })
 
+function renderLayout(sibling?: React.ReactNode): ReturnType<typeof render> {
+  return render(
+    <SidePanelLayoutProvider>
+      {sibling}
+      <SidePanelLayout>
+        <SidePanelLayout.Panel>Panel</SidePanelLayout.Panel>
+        <SidePanelLayout.Content>Content</SidePanelLayout.Content>
+      </SidePanelLayout>
+    </SidePanelLayoutProvider>,
+  )
+}
+
 describe('SidePanelLayout', () => {
-  it('provides shell controls to a descendant', () => {
-    function ShellControl(): React.ReactElement {
-      const { isOpen, toggle } = useSidePanelLayout()
+  it('falls back to the open layout when storage is unavailable', () => {
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      get: () => {
+        throw new Error('Unavailable')
+      },
+    })
 
-      return (
-        <button type="button" aria-pressed={isOpen} onClick={toggle}>
-          Toggle shell dock
-        </button>
-      )
-    }
+    renderLayout()
 
-    render(
-      <SidePanelLayoutProvider>
-        <ShellControl />
-      </SidePanelLayoutProvider>,
+    expect(screen.getByRole('separator')).toBeTruthy()
+  })
+
+  it('falls back to the open layout when persisted storage is malformed', () => {
+    window.localStorage.setItem('react-resizable-panels:tables-side-panel', 'not-json')
+
+    renderLayout()
+
+    expect(screen.getByRole('separator')).toBeTruthy()
+  })
+
+  it.each([
+    ['a missing panel', JSON.stringify({ navigation: 0 })],
+    ['zero total size', JSON.stringify({ content: 0, navigation: 0 })],
+    ['a negative size', JSON.stringify({ content: 110, navigation: -10 })],
+    ['a non-finite size', '{"content":1e309,"navigation":1}'],
+    ['an overflowing total size', '{"content":1e308,"navigation":1e308}'],
+  ])('falls back to the open layout for %s', (_case, value) => {
+    window.localStorage.setItem('react-resizable-panels:tables-side-panel', value)
+
+    renderLayout()
+
+    expect(screen.getByRole('separator')).toBeTruthy()
+  })
+
+  it('restores the persisted table-list dock layout across remounts', () => {
+    const storageKey = 'react-resizable-panels:tables-side-panel'
+    window.localStorage.setItem(storageKey, JSON.stringify({ content: 100, navigation: 0 }))
+    const view = renderLayout()
+
+    expect(screen.getByText('Panel').closest('[data-panel]')?.id).toBe('navigation')
+    expect(screen.queryByRole('separator')).toBeNull()
+
+    view.unmount()
+    renderLayout()
+
+    expect(screen.queryByRole('separator')).toBeNull()
+    expect(window.localStorage.getItem(storageKey)).toBe(
+      JSON.stringify({ content: 100, navigation: 0 }),
     )
-
-    const toggle = screen.getByRole('button', { name: 'Toggle shell dock' })
-    expect(toggle.getAttribute('aria-pressed')).toBe('true')
-
-    fireEvent.click(toggle)
-
-    expect(panel.collapse).toHaveBeenCalledOnce()
-    expect(toggle.getAttribute('aria-pressed')).toBe('false')
   })
 
   it('starts open and toggles from a control outside the resizable layout', () => {
@@ -82,66 +94,20 @@ describe('SidePanelLayout', () => {
       )
     }
 
-    render(
-      <SidePanelLayoutProvider>
-        <DockToggle />
-        <SidePanelLayout>
-          <SidePanelLayout.Panel>Panel</SidePanelLayout.Panel>
-          <SidePanelLayout.Content>Content</SidePanelLayout.Content>
-        </SidePanelLayout>
-      </SidePanelLayoutProvider>,
-    )
+    renderLayout(<DockToggle />)
 
     const toggle = screen.getByRole('button', { name: 'Toggle left dock' })
     expect(toggle.getAttribute('aria-pressed')).toBe('true')
-    expect(screen.getByTestId('resize-handle')).toBeTruthy()
+    expect(screen.getByRole('separator')).toBeTruthy()
 
     fireEvent.click(toggle)
 
-    expect(panel.collapse).toHaveBeenCalledOnce()
     expect(toggle.getAttribute('aria-pressed')).toBe('false')
-    expect(screen.queryByTestId('resize-handle')).toBeNull()
+    expect(screen.queryByRole('separator')).toBeNull()
 
     fireEvent.click(toggle)
 
-    expect(panel.expand).toHaveBeenCalledOnce()
     expect(toggle.getAttribute('aria-pressed')).toBe('true')
-    expect(screen.getByTestId('resize-handle')).toBeTruthy()
-  })
-
-  it('hides the resize handle after the panel collapses during resize', () => {
-    function DockToggle(): React.ReactElement {
-      const { isOpen, toggle } = useSidePanelLayout()
-
-      return (
-        <button type="button" aria-pressed={isOpen} onClick={toggle}>
-          Toggle left dock
-        </button>
-      )
-    }
-
-    render(
-      <SidePanelLayoutProvider>
-        <DockToggle />
-        <SidePanelLayout>
-          <SidePanelLayout.Panel>Panel</SidePanelLayout.Panel>
-          <SidePanelLayout.Content>Content</SidePanelLayout.Content>
-        </SidePanelLayout>
-      </SidePanelLayoutProvider>,
-    )
-
-    act(() => {
-      resizable.onResize?.({ asPercentage: 20, inPixels: 240 })
-      resizable.onResize?.({ asPercentage: 0, inPixels: 0 })
-    })
-
-    const toggle = screen.getByRole('button', { name: 'Toggle left dock' })
-    expect(toggle.getAttribute('aria-pressed')).toBe('false')
-    expect(screen.queryByTestId('resize-handle')).toBeNull()
-
-    fireEvent.click(toggle)
-
-    expect(panel.expand).toHaveBeenCalledOnce()
-    expect(screen.getByTestId('resize-handle')).toBeTruthy()
+    expect(screen.getByRole('separator')).toBeTruthy()
   })
 })

@@ -37,6 +37,7 @@ import {
   type TableTabsRouteSearch,
 } from '@tables/workspace/tabs'
 import { appRoutes } from '@app/routing/appRoutes'
+import { toTableTabSearch } from '@tables/routing/tableRowsSearch'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { useTableMutationWorkspace } from '@tables/mutationLedger/provider'
 import { createTableScope } from '@tables/workspace/scope'
@@ -85,24 +86,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     ...loadTableTabsState(scope),
     replaceableTabId: null,
   }))
-  const currentSearch = useMemo<TableTabSearch>(
-    () => ({
-      dir: routeSearch.dir,
-      filters: routeSearch.filters,
-      page: routeSearch.page,
-      pageSize: routeSearch.pageSize,
-      sort: routeSearch.sort,
-      view: routeSearch.view,
-    }),
-    [
-      routeSearch.dir,
-      routeSearch.filters,
-      routeSearch.page,
-      routeSearch.pageSize,
-      routeSearch.sort,
-      routeSearch.view,
-    ],
-  )
+  const currentSearch = useMemo<TableTabSearch>(() => toTableTabSearch(routeSearch), [routeSearch])
   const activeTabId = createRouteTableTabId(currentTableName, routeSearch)
   const previousActiveTabIdRef = useRef(activeTabId)
   useEffect(() => {

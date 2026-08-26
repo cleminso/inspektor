@@ -164,6 +164,7 @@ function TableViewInteractionHarness(): React.ReactElement {
       <output aria-label="Selected row count">
         {state.table.getSelectedRowModel().rows.length}
       </output>
+      <output aria-label="Active row">{state.rowEditor.activeRowId ?? ''}</output>
       <output aria-label="Inline editor target">
         {state.activeFieldEditorTarget === null
           ? ''
@@ -547,6 +548,7 @@ describe('useTableViewState', () => {
       screen.getByRole('checkbox', { name: 'Select row row-1' }).getAttribute('aria-checked'),
     ).toBe('true')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
+    expect(screen.getByRole('status', { name: 'Active row' }).textContent).toBe('row-1')
   })
 
   it('focuses the target row after Shift-selecting a range', () => {
@@ -559,6 +561,7 @@ describe('useTableViewState', () => {
 
     expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('2')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
+    expect(screen.getByRole('status', { name: 'Active row' }).textContent).toBe('row-2')
   })
 
   it('opens and closes row selection from the header checkbox', () => {
@@ -621,6 +624,7 @@ describe('useTableViewState', () => {
 
     expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('1')
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('rows')
+    expect(screen.getByRole('status', { name: 'Active row' }).textContent).toBe('row-2')
   })
 
   it('dismisses the row pane without a single-draft transition decision', () => {

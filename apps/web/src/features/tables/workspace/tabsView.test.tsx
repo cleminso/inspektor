@@ -12,8 +12,6 @@ const mocks = vi.hoisted(() => ({
   persistTab: vi.fn(),
   reorderTabs: vi.fn(),
   retryRuntime: vi.fn(),
-  releasePrefetch: vi.fn(),
-  startTableRowsPrefetch: vi.fn(),
   state: {
     activeTabId: null as string | null,
     replaceableTabId: null as string | null,
@@ -28,18 +26,8 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useRuntimeClient: () => ({ manager: {} }),
   useRuntimeError: () => mocks.state.runtimeError,
   useRuntimeRetry: () => mocks.retryRuntime,
-  useRuntimeSchema: () => ({
-    accounts: { columns: [] },
-    profiles: { columns: [] },
-  }),
-}))
-
-vi.mock('@tables/query/tableRowsPrefetch', () => ({
-  TABLE_ROWS_PREFETCH_INTENT_DELAY_MS: 75,
-  startTableRowsPrefetch: mocks.startTableRowsPrefetch,
 }))
 
 vi.mock('@tables/workspace/newView', () => ({
@@ -85,9 +73,6 @@ beforeEach(() => {
   mocks.persistTab.mockReset()
   mocks.reorderTabs.mockReset()
   mocks.retryRuntime.mockReset()
-  mocks.releasePrefetch.mockReset()
-  mocks.startTableRowsPrefetch.mockReset()
-  mocks.startTableRowsPrefetch.mockReturnValue(mocks.releasePrefetch)
   mocks.state.activeTabId = null
   mocks.state.replaceableTabId = null
   mocks.state.canGoBack = false
@@ -397,7 +382,7 @@ describe('TableTabsView', () => {
     expect(mocks.reorderTabs).toHaveBeenCalledWith(['table:profiles', 'table:accounts'])
   })
 
-  it("prefetches an inactive tab's exact row query from keyboard intent", () => {
+  it('activates an inactive table tab', () => {
     mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [
       {
@@ -410,113 +395,15 @@ describe('TableTabsView', () => {
         kind: 'table',
         id: 'table:profiles',
         tableName: 'profiles',
-        search: {
-          dir: 'desc',
-          filters: JSON.stringify([
-            {
-              id: 'filter-1',
-              column: 'name',
-              operator: 'contains',
-              value: 'Ada',
-            },
-          ]),
-          page: 2,
-          pageSize: 500,
-          sort: 'name',
-        },
+        search: {},
       },
     ]
 
     render(<TableTabsView tableName="accounts" />)
 
     const profilesTab = screen.getByRole('tab', { name: 'profiles' })
-    fireEvent.focus(profilesTab)
+    fireEvent.click(profilesTab)
 
-    expect(mocks.startTableRowsPrefetch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        filters: [
-          {
-            id: 'filter-1',
-            column: 'name',
-            operator: 'contains',
-            value: 'Ada',
-          },
-        ],
-        page: 2,
-        pageSize: 500,
-        sortColumn: 'name',
-        sortDirection: 'desc',
-        tableName: 'profiles',
-      }),
-    )
-
-    fireEvent.blur(profilesTab)
-    expect(mocks.releasePrefetch).toHaveBeenCalledOnce()
-  })
-
-  it('ignores transient pointer passes over inactive tabs', () => {
-    vi.useFakeTimers()
-    mocks.state.activeTabId = 'table:accounts'
-    mocks.state.tabs = [
-      {
-        kind: 'table',
-        id: 'table:accounts',
-        tableName: 'accounts',
-        search: {},
-      },
-      {
-        kind: 'table',
-        id: 'table:profiles',
-        tableName: 'profiles',
-        search: {},
-      },
-    ]
-
-    try {
-      render(<TableTabsView tableName="accounts" />)
-      const profilesTab = screen.getByRole('tab', { name: 'profiles' })
-
-      fireEvent.pointerEnter(profilesTab)
-      fireEvent.pointerLeave(profilesTab)
-      vi.runAllTimers()
-
-      expect(mocks.startTableRowsPrefetch).not.toHaveBeenCalled()
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
-  it('prefetches after pointer intent settles and releases when intent ends', () => {
-    vi.useFakeTimers()
-    mocks.state.activeTabId = 'table:accounts'
-    mocks.state.tabs = [
-      {
-        kind: 'table',
-        id: 'table:accounts',
-        tableName: 'accounts',
-        search: {},
-      },
-      {
-        kind: 'table',
-        id: 'table:profiles',
-        tableName: 'profiles',
-        search: {},
-      },
-    ]
-
-    try {
-      render(<TableTabsView tableName="accounts" />)
-      const profilesTab = screen.getByRole('tab', { name: 'profiles' })
-
-      fireEvent.pointerEnter(profilesTab)
-      vi.advanceTimersByTime(75)
-
-      expect(mocks.startTableRowsPrefetch).toHaveBeenCalledOnce()
-
-      fireEvent.pointerLeave(profilesTab)
-      expect(mocks.releasePrefetch).toHaveBeenCalledOnce()
-    } finally {
-      vi.useRealTimers()
-    }
+    expect(mocks.activateTab).toHaveBeenCalledWith('table:profiles')
   })
 })

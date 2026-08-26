@@ -49,7 +49,6 @@ import { EditRowForm } from '@tables/rowEditor/editForm'
 import { InsertRowForm } from '@tables/rowEditor/insertForm'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import { getTableColumns } from '@tables/schema/tableSchema'
-import { getTableViewportScrollResetKey } from '@tables/workspace/tableViewport'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
 import {
@@ -306,7 +305,8 @@ function TableViewContent({
     },
     [state.table],
   )
-  const scrollResetKey = getTableViewportScrollResetKey(state)
+  // Reset on pagination start and completion so stale offsets cannot survive content-size changes.
+  const scrollResetKey = `${state.page}:${state.pageSize}:${state.isInitialLoading === true ? 'loading' : 'ready'}`
   const handleEscape = useEffectEvent(state.handleEscape)
   const refreshPendingRef = useRef(false)
   const [refreshAnnouncement, setRefreshAnnouncement] = useState('')

@@ -20,14 +20,8 @@ import {
 } from 'react'
 
 import { productGlyphs } from '@app/icons/productGlyphs'
-import {
-  useInspectorSessionState,
-  useRuntimeClient,
-  useRuntimeSchema,
-} from '@app/providers/inspectorProvider'
+import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import { appRoutes } from '@app/routing/appRoutes'
-import { useTableRowsPrefetchIntent } from '@tables/query/useTableRowsPrefetchIntent'
-import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
 import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const deferredRenderingThreshold = 50
@@ -170,32 +164,17 @@ export function TableListPane({
   onUnpinTables,
 }: TableListPaneProps): React.ReactElement {
   const { currentConnectionId } = useInspectorSessionState()
-  const client = useRuntimeClient()
-  const wasmSchema = useRuntimeSchema()
   const pinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName))
   const unpinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName) === false)
   const deferTableRendering = tables.length > deferredRenderingThreshold
   const hasCheckedTables = checkedTableNames.size > 0
   const clearSelection = useEffectEvent(onClearSelection)
   const pendingMenuActionRef = useRef<(() => void) | null>(null)
-  const focusedPrefetchKeyRef = useRef<string | null>(null)
-  const pointerPrefetchKeyRef = useRef<string | null>(null)
-  const { cancelScheduled, prefetch, release, schedule } = useTableRowsPrefetchIntent({
-    activeKey: selectedTableName,
-    availableKeys: tables,
-    client,
-    schema: wasmSchema,
-  })
 
   useEffect(() => {
     if (hasCheckedTables === false) {
       return
     }
-
-    focusedPrefetchKeyRef.current = null
-    pointerPrefetchKeyRef.current = null
-    cancelScheduled()
-    release()
 
     const handlePointerDown = (event: PointerEvent) => {
       if (isTableSelectionInteraction(event.target) === false) {
@@ -207,7 +186,7 @@ export function TableListPane({
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown, true)
     }
-  }, [cancelScheduled, hasCheckedTables, release])
+  }, [hasCheckedTables])
 
   const renderTableList = (
     section: TableListSection,
@@ -272,12 +251,6 @@ export function TableListPane({
                     tableName,
                   }
                 : null
-            const storedSearch = tableSearchByName.get(tableName) ?? {}
-            const prefetchTarget = {
-              key: tableName,
-              tableName,
-              ...resolveTableRowsSearch(storedSearch),
-            }
             const handleActionsOpenChange = (open: boolean) => {
               if (open === true && isChecked === false) {
                 onReplaceSelection(tableName, section)
@@ -308,36 +281,10 @@ export function TableListPane({
                     <Link
                       to={appRoutes.table}
                       params={tableParams}
-                      search={storedSearch}
+                      search={tableSearchByName.get(tableName) ?? {}}
                       aria-current={isActive === true ? 'page' : undefined}
-                      onBlur={() => {
-                        focusedPrefetchKeyRef.current = null
-                        if (pointerPrefetchKeyRef.current !== tableName) {
-                          cancelScheduled()
-                          release(tableName)
-                        }
-                      }}
                       onDoubleClick={() => {
                         onPersistTable(tableName)
-                      }}
-                      onFocus={() => {
-                        focusedPrefetchKeyRef.current = tableName
-                        prefetch(prefetchTarget)
-                      }}
-                      onPointerDown={() => {
-                        pointerPrefetchKeyRef.current = tableName
-                        prefetch(prefetchTarget)
-                      }}
-                      onPointerEnter={() => {
-                        pointerPrefetchKeyRef.current = tableName
-                        schedule(prefetchTarget)
-                      }}
-                      onPointerLeave={() => {
-                        pointerPrefetchKeyRef.current = null
-                        cancelScheduled()
-                        if (focusedPrefetchKeyRef.current !== tableName) {
-                          release(tableName)
-                        }
                       }}
                     />
                   }

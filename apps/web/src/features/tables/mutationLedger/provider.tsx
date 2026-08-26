@@ -314,48 +314,24 @@ function useMutationContext(): TableMutationLedgerContextValue {
   return context
 }
 
-export function useTableMutationApplicationCommands() {
+/**
+ * Returns the current table projection and the commands that mutate or apply it.
+ *
+ * Ledger state remains owned by the workspace provider, so replacing this table-scoped provider
+ * must not discard drafts when a user switches between table views.
+ */
+export function useTableMutationLedger() {
   const context = useMutationContext()
   const contextDispatch = context.dispatch
+  const setExecution = context.setExecution
+  const { ledger, reviewOperations, stagedFieldsByRowId } = context.projection
+  const stagedCount = countUnresolvedMutationState(context.state)
   const acknowledgeAppliedEntries = useCallback(
     (entryIds: readonly TableMutationEntry['entryId'][]) => {
       contextDispatch({ type: 'acknowledgeAppliedEntries', entryIds })
     },
     [contextDispatch],
   )
-  return { acknowledgeAppliedEntries, setExecution: context.setExecution }
-}
-
-function haveEqualStagedFields(
-  left: Readonly<Record<string, ReadonlySet<string>>>,
-  right: Readonly<Record<string, ReadonlySet<string>>>,
-): boolean {
-  const leftEntries = Object.entries(left)
-  const rightEntries = Object.entries(right)
-  return (
-    leftEntries.length === rightEntries.length &&
-    leftEntries.every(([rowId, fields]) => {
-      const nextFields = right[rowId]
-      return (
-        nextFields !== undefined &&
-        fields.size === nextFields.size &&
-        [...fields].every((fieldName) => nextFields.has(fieldName))
-      )
-    })
-  )
-}
-
-export function useTableMutationLedger() {
-  const context = useMutationContext()
-  const contextDispatch = context.dispatch
-  const setExecution = context.setExecution
-  const { ledger, reviewOperations, stagedFieldsByRowId: selectedStagedFields } = context.projection
-  const stagedFieldsRef = useRef(selectedStagedFields)
-  if (haveEqualStagedFields(stagedFieldsRef.current, selectedStagedFields) === false) {
-    stagedFieldsRef.current = selectedStagedFields
-  }
-  const stagedFieldsByRowId = stagedFieldsRef.current
-  const stagedCount = countUnresolvedMutationState(context.state)
   const recover = useCallback(
     (action: PublicMutationAction) => {
       contextDispatch(action)
@@ -393,6 +369,7 @@ export function useTableMutationLedger() {
   )
 
   return {
+    acknowledgeAppliedEntries,
     discardAll,
     execution: context.execution,
     ledger,
@@ -404,6 +381,7 @@ export function useTableMutationLedger() {
     stagedFieldsByRowId,
     stagedValuesByRowId: context.projection.stagedValuesByRowId,
     stagedCount,
+    setExecution,
     undoDeletions,
     undoReviewOperation,
   }

@@ -1,17 +1,9 @@
 import { Tooltip } from '@inspector/ds'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TableListPane } from './pane'
 
-const { releasePrefetch, runtimeClient, runtimeSchema, startTableRowsPrefetch } = vi.hoisted(
-  () => ({
-    releasePrefetch: vi.fn(),
-    runtimeClient: { manager: {} },
-    runtimeSchema: { users: { columns: [] } },
-    startTableRowsPrefetch: vi.fn(),
-  }),
-)
 let restoreDocumentFonts: (() => void) | null = null
 
 function mockDocumentFonts() {
@@ -71,13 +63,6 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => ({ currentConnectionId: 'connection' }),
-  useRuntimeClient: () => runtimeClient,
-  useRuntimeSchema: () => runtimeSchema,
-}))
-
-vi.mock('@tables/query/tableRowsPrefetch', () => ({
-  TABLE_ROWS_PREFETCH_INTENT_DELAY_MS: 75,
-  startTableRowsPrefetch,
 }))
 
 function mockTableNameOverflow(initialClientWidth: number, initialScrollWidth: number) {
@@ -139,12 +124,6 @@ afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
   vi.useRealTimers()
-})
-
-beforeEach(() => {
-  releasePrefetch.mockClear()
-  startTableRowsPrefetch.mockReset()
-  startTableRowsPrefetch.mockReturnValue(releasePrefetch)
 })
 
 describe('TableListPane', () => {
@@ -441,196 +420,6 @@ describe('TableListPane', () => {
     expect(screen.getByRole('button', { name: 'accounts' }).getAttribute('data-search')).toBe(
       JSON.stringify({ filters: 'active-filter', page: 2 }),
     )
-  })
-
-  it('prefetches the destination rows from pointer intent and releases ownership on exit', () => {
-    render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    const usersLink = screen.getByRole('button', { name: 'users' })
-    fireEvent.pointerEnter(usersLink)
-    fireEvent.pointerDown(usersLink)
-
-    expect(startTableRowsPrefetch).toHaveBeenCalledOnce()
-    expect(startTableRowsPrefetch).toHaveBeenCalledWith({
-      client: { manager: {} },
-      filters: [],
-      page: 1,
-      pageSize: 100,
-      schema: { users: { columns: [] } },
-      sortColumn: 'id',
-      sortDirection: 'asc',
-      tableName: 'users',
-    })
-
-    fireEvent.pointerLeave(usersLink)
-
-    expect(releasePrefetch).toHaveBeenCalledOnce()
-  })
-
-  it('prefetches the exact stored query used by the destination link', () => {
-    const filters = JSON.stringify([
-      {
-        id: 'filter-1',
-        column: 'name',
-        operator: 'contains',
-        value: 'Ada',
-      },
-    ])
-    render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tableSearchByName={new Map([['users', { dir: 'desc', filters, page: 2, sort: 'name' }]])}
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    fireEvent.focus(screen.getByRole('button', { name: 'users' }))
-
-    expect(startTableRowsPrefetch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        filters: [
-          {
-            id: 'filter-1',
-            column: 'name',
-            operator: 'contains',
-            value: 'Ada',
-          },
-        ],
-        page: 2,
-        pageSize: 100,
-        sortColumn: 'name',
-        sortDirection: 'desc',
-        tableName: 'users',
-      }),
-    )
-  })
-
-  it('retains focused prefetch ownership when pointer intent ends', () => {
-    render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    const usersLink = screen.getByRole('button', { name: 'users' })
-    fireEvent.focus(usersLink)
-    fireEvent.pointerEnter(usersLink)
-    fireEvent.pointerLeave(usersLink)
-
-    expect(releasePrefetch).not.toHaveBeenCalled()
-
-    fireEvent.blur(usersLink)
-    expect(releasePrefetch).toHaveBeenCalledOnce()
-  })
-
-  it('releases speculative ownership when the destination becomes active', () => {
-    const { rerender } = render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    fireEvent.focus(screen.getByRole('button', { name: 'users' }))
-    rerender(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName="users"
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    expect(releasePrefetch).toHaveBeenCalledOnce()
-  })
-
-  it('does not prefetch table-name buttons while bulk selection is active', () => {
-    render(
-      <TableListPane
-        checkedTableNames={new Set(['accounts'])}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['accounts', 'users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    fireEvent.pointerEnter(screen.getByRole('button', { name: 'users' }))
-
-    expect(startTableRowsPrefetch).not.toHaveBeenCalled()
-  })
-
-  it('releases prefetch when bulk selection replaces navigation links', () => {
-    const { rerender } = render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    fireEvent.focus(screen.getByRole('button', { name: 'users' }))
-    rerender(
-      <TableListPane
-        checkedTableNames={new Set(['users'])}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    expect(releasePrefetch).toHaveBeenCalledOnce()
-  })
-
-  it('does not prefetch when pointer intent leaves before settling', () => {
-    vi.useFakeTimers()
-    render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    const usersLink = screen.getByRole('button', { name: 'users' })
-    fireEvent.pointerEnter(usersLink)
-    fireEvent.pointerLeave(usersLink)
-    vi.runAllTimers()
-
-    expect(startTableRowsPrefetch).not.toHaveBeenCalled()
   })
 
   it('uses table names to extend checkbox selection while bulk selection is active', () => {

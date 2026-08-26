@@ -21,6 +21,23 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [26/08/26]
 
+### Query ownership simplification
+
+- [x] Remove speculative table-row prefetch, intent timers, unsupported Jazz cache-entry access, and navigation-surface event wiring.
+- [x] Subscribe each rendered page to its exact Jazz query instead of retaining and projecting broader query windows.
+- [x] Keep compatible rows only while sorting refreshes the same page and runtime manager.
+- [x] Document the remaining rendered query lifecycle in [Table row query lifecycle](../tableRowsQueryLifecycle.md).
+
+[26/08/26]
+
+### Refactor integration coverage
+
+- [x] Verify real row-form edits enter the workspace mutation ledger and survive table-scope remounts.
+- [x] Verify active-row identity for range selection and nearest-row fallback.
+- [x] Restore the persisted table-list layout through the real resizable-panel implementation and synchronize collapsed feature state.
+
+[26/08/26]
+
 ### Pane mode safety
 
 - [x] Clear pending row-deletion confirmation when the detail pane changes between edit and insert modes.
@@ -419,7 +436,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [06/08/26]
 
-- [x] Document the table-row prefetch, Jazz cache-entry reuse, subscription lifecycle, and grid-state projection in [Table row prefetch and query lifecycle](../tableRowsPrefetch.md).
+- [x] Document the rendered table-row subscription lifecycle and grid-state projection in [Table row query lifecycle](../tableRowsQueryLifecycle.md).
 
 [06/08/26]
 
@@ -640,6 +657,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Table-list dock
 
+[26/08/26]
+
+- [x] Restore the table-list dock's collapsed state across document reloads and reopen it at its last expanded width.
+
 [07/08/26]
 
 - [x] Keep the table workspace, tab strip, and resizable dock mounted across table and New View child-route changes.
@@ -774,6 +795,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 ## Open product work
 
 ### Table query prefetch
+
+[26/08/26]
+
+- [x] Remove table-row prefetch until measured navigation latency and query reuse justify a supported implementation.
+- [ ] Reintroduce prefetch only through a supported Jazz API after destination preparation is identified as the interaction bottleneck.
 
 [06/08/26]
 

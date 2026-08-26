@@ -10,12 +10,20 @@ import {
 import {
   TableMutationLedgerProvider,
   TableMutationLedgerWorkspaceProvider,
-  useTableMutationApplicationCommands,
   useTableMutationEditorController,
   useTableMutationLedger,
   useTableMutationWorkspace,
 } from '@tables/mutationLedger/provider'
+import { EditRowForm } from '@tables/rowEditor/editForm'
 import { getMutationFieldInput } from '@tables/rowEditor/mutation/draft'
+
+vi.mock('@app/providers/inspectorProvider', () => ({
+  useInspectorSessionState: () => ({
+    currentBranch: 'main',
+    currentConnectionId: 'connection-1',
+    currentSchemaHash: 'schema-1',
+  }),
+}))
 
 afterEach(cleanup)
 
@@ -44,7 +52,6 @@ function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof in
     rowId: 'row-1',
   })
   const mutations = useTableMutationLedger()
-  const application = useTableMutationApplicationCommands()
   const workspace = useTableMutationWorkspace()
 
   return (
@@ -71,7 +78,7 @@ function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof in
       </button>
       <button
         type="button"
-        onClick={() => application.setExecution({ error: 'Rejected', status: 'failed' })}
+        onClick={() => mutations.setExecution({ error: 'Rejected', status: 'failed' })}
       >
         Fail apply
       </button>
@@ -81,7 +88,7 @@ function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof in
       <button
         type="button"
         onClick={() => {
-          application.setExecution({ error: null, status: 'applying' })
+          mutations.setExecution({ error: null, status: 'applying' })
           setWorkspaceDiscarded(workspace.discardPendingChanges('test:accounts'))
         }}
       >
@@ -92,8 +99,10 @@ function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof in
 }
 
 function WorkspaceHarness({
+  Editor,
   onWorkspaceCommandRender,
 }: {
+  Editor?: () => React.ReactElement
   onWorkspaceCommandRender?: () => void
 } = {}): React.ReactElement {
   const [scopeKey, setScopeKey] = useState('connection:branch:schema:accounts')
@@ -111,11 +120,34 @@ function WorkspaceHarness({
           Open profiles
         </button>
         <TableMutationLedgerProvider key={scopeKey} schemaColumns={columns} scopeKey={scopeKey}>
-          <EditorHarness />
+          {Editor === undefined ? <EditorHarness /> : <Editor />}
         </TableMutationLedgerProvider>
       </TableMutationLedgerWorkspaceProvider>
       <RuntimeScopeStatus />
     </RuntimeScopeExitGuardProvider>
+  )
+}
+
+function EditRowFormHarness(): React.ReactElement {
+  const controller = useTableMutationEditorController({
+    initialRowValues,
+    rowId: 'row-1',
+  })
+  const mutations = useTableMutationLedger()
+
+  return (
+    <>
+      <EditRowForm
+        draftController={controller}
+        rowValues={initialRowValues}
+        schemaColumns={columns}
+      />
+      <output aria-label="Pending fields">
+        {mutations.ledger.entries[0]?.kind === 'update'
+          ? Object.keys(mutations.ledger.entries[0].fields).join(',')
+          : ''}
+      </output>
+    </>
   )
 }
 
@@ -250,6 +282,22 @@ describe('TableMutationLedgerProvider', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Open accounts' }))
     expect(screen.getByLabelText('Draft name').textContent).toBe('Grace')
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
+  })
+
+  it('keeps an EditRowForm field update in the workspace ledger across table-provider remounts', () => {
+    render(<WorkspaceHarness Editor={EditRowFormHarness} />)
+    fireEvent.change(screen.getByRole('textbox', { name: 'Name' }), {
+      target: { value: 'Grace' },
+    })
+
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open profiles' }))
+    expect((screen.getByRole('textbox', { name: 'Name' }) as HTMLInputElement).value).toBe('Ada')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open accounts' }))
+    expect((screen.getByRole('textbox', { name: 'Name' }) as HTMLInputElement).value).toBe('Grace')
     expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
   })
 

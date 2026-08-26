@@ -4,12 +4,15 @@ import {
   applyTableMutationLedger,
   type TableMutationExecutor,
 } from '@tables/mutationLedger/applyLedger'
-import {
-  useTableMutationApplicationCommands,
-  useTableMutationLedger,
-} from '@tables/mutationLedger/provider'
+import { useTableMutationLedger } from '@tables/mutationLedger/provider'
 import type { TableFieldsByRowId } from '@tables/tableTypes'
 
+/**
+ * Creates the guarded apply command for one table ledger.
+ *
+ * Only entries confirmed by the executor are acknowledged. UI callbacks run after acknowledgement
+ * is dispatched and only while the owning view remains mounted.
+ */
 export function useApplyTableMutationLedger({
   executor,
   mutations,
@@ -21,7 +24,6 @@ export function useApplyTableMutationLedger({
   onAppliedUpdates?: (appliedUpdateFields: TableFieldsByRowId) => void
   onSuccess?: () => void
 }): () => Promise<void> {
-  const application = useTableMutationApplicationCommands()
   const applyingRef = useRef(false)
   const mountedRef = useRef(false)
   useEffect(() => {
@@ -42,7 +44,7 @@ export function useApplyTableMutationLedger({
     }
 
     applyingRef.current = true
-    application.setExecution({ error: null, status: 'applying' })
+    mutations.setExecution({ error: null, status: 'applying' })
     try {
       const result = await applyTableMutationLedger(mutations.ledger, executor)
       const appliedEntryIds = new Set(result.appliedEntryIds)
@@ -52,14 +54,14 @@ export function useApplyTableMutationLedger({
           appliedUpdateFields[entry.rowId] = new Set(Object.keys(entry.fields))
         }
       }
-      application.acknowledgeAppliedEntries(result.appliedEntryIds)
+      mutations.acknowledgeAppliedEntries(result.appliedEntryIds)
       if (result.status === 'failed') {
-        application.setExecution({
+        mutations.setExecution({
           error: result.error instanceof Error ? result.error.message : String(result.error),
           status: 'failed',
         })
       } else {
-        application.setExecution({ error: null, status: 'idle' })
+        mutations.setExecution({ error: null, status: 'idle' })
       }
       if (mountedRef.current === false) {
         return

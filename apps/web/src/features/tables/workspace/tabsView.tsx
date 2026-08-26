@@ -9,22 +9,14 @@ import {
   Tooltip,
 } from '@inspector/ds'
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
-import { useRef } from 'react'
 
-import {
-  useRuntimeClient,
-  useRuntimeError,
-  useRuntimeRetry,
-  useRuntimeSchema,
-} from '@app/providers/inspectorProvider'
+import { useRuntimeError, useRuntimeRetry } from '@app/providers/inspectorProvider'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
-import { useTableRowsPrefetchIntent } from '@tables/query/useTableRowsPrefetchIntent'
-import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { NewTableView } from '@tables/workspace/newView'
 import { SelectedTableView } from '@tables/workspace/selectedView'
-import { NEW_VIEW_TAB_ID, type TableDataTab } from '@tables/workspace/tabs'
+import { NEW_VIEW_TAB_ID } from '@tables/workspace/tabs'
 import { useTableNavigationControls } from '@tables/workspace/navigationHistory'
 
 interface TableTabsViewProps {
@@ -85,66 +77,18 @@ export function TableTabsView({
     tabs,
   } = useTableTabs()
   const { canGoBack, canGoForward, goBack, goForward } = useTableNavigationControls()
-  const client = useRuntimeClient()
   const runtimeError = useRuntimeError()
-  const wasmSchema = useRuntimeSchema()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
   const isTableIdentityReady =
     activeTab?.kind === 'table' &&
     activeTab.tableName === tableName &&
     (activeTab.search.view === 'schema') === (view === 'schema')
-  const pointerIntentTabIdRef = useRef<string | null>(null)
-  const focusedIntentTabIdRef = useRef<string | null>(null)
-  const prefetchIntent = useTableRowsPrefetchIntent({
-    activeKey: activeTabId,
-    availableKeys: tabs.flatMap((tab) => (tab.kind === 'table' ? [tab.id] : [])),
-    client,
-    schema: wasmSchema,
-  })
-
-  const getPrefetchTarget = (tabId: string) => {
-    const tab = tabs.find(
-      (candidate): candidate is TableDataTab =>
-        candidate.kind === 'table' && candidate.id === tabId,
-    )
-    if (
-      tab === undefined ||
-      tab.id === activeTabId ||
-      tab.search.view === 'schema' ||
-      wasmSchema === null ||
-      Object.hasOwn(wasmSchema, tab.tableName) === false
-    ) {
-      return null
-    }
-
-    return {
-      key: tab.id,
-      tableName: tab.tableName,
-      ...resolveTableRowsSearch(tab.search),
-    }
-  }
-
-  const prefetchTabRows = (tabId: string) => {
-    const target = getPrefetchTarget(tabId)
-    if (target !== null) {
-      prefetchIntent.prefetch(target)
-    }
-  }
-
-  const scheduleTabRowsPrefetch = (tabId: string) => {
-    const target = getPrefetchTarget(tabId)
-    if (target !== null) {
-      prefetchIntent.schedule(target)
-    }
-  }
-
   return (
     <WorkspaceTabs.Root
       value={activeTabId}
       onValueChange={(value) => {
         if (value !== null) {
           const tabId = String(value)
-          prefetchTabRows(tabId)
           activateTab(tabId)
         }
       }}
@@ -290,22 +234,8 @@ export function TableTabsView({
                       }
                       contextMenuLabel={isReplaceable === true ? `${tabLabel} actions` : undefined}
                       reorderLabel={`Reorder ${tabLabel}`}
-                      onBlur={() => {
-                        if (focusedIntentTabIdRef.current === tab.id) {
-                          focusedIntentTabIdRef.current = null
-                        }
-                        if (pointerIntentTabIdRef.current !== tab.id) {
-                          prefetchIntent.release(tab.id)
-                        }
-                      }}
                       onClose={() => {
-                        prefetchIntent.cancelScheduled()
-                        prefetchIntent.release(tab.id)
                         closeTab(tab.id)
-                      }}
-                      onFocus={() => {
-                        focusedIntentTabIdRef.current = tab.id
-                        prefetchTabRows(tab.id)
                       }}
                       onDoubleClick={
                         isReplaceable === true
@@ -314,23 +244,6 @@ export function TableTabsView({
                             }
                           : undefined
                       }
-                      onPointerDown={() => {
-                        pointerIntentTabIdRef.current = tab.id
-                        prefetchTabRows(tab.id)
-                      }}
-                      onPointerEnter={() => {
-                        pointerIntentTabIdRef.current = tab.id
-                        scheduleTabRowsPrefetch(tab.id)
-                      }}
-                      onPointerLeave={() => {
-                        if (pointerIntentTabIdRef.current === tab.id) {
-                          pointerIntentTabIdRef.current = null
-                        }
-                        prefetchIntent.cancelScheduled()
-                        if (focusedIntentTabIdRef.current !== tab.id) {
-                          prefetchIntent.release(tab.id)
-                        }
-                      }}
                     >
                       {tabLabel}
                     </WorkspaceTabs.Tab>

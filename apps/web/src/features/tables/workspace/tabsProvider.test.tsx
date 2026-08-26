@@ -12,9 +12,14 @@ import { createTableScope } from '@tables/workspace/scope'
 
 const navigate = vi.hoisted(() => vi.fn())
 const routeSearch = vi.hoisted(() => ({
-  empty: undefined as string | undefined,
-  filters: undefined as string | undefined,
+  current: {
+    empty: undefined as string | undefined,
+    filters: undefined as string | undefined,
+  },
 }))
+const activeFilterSearch = JSON.stringify([
+  { id: 'active', column: 'status', operator: 'eq', value: 'active' },
+])
 const sessionState = vi.hoisted(() => ({
   currentConnectionId: 'connection' as string | null,
   currentTableName: 'accounts' as string | null,
@@ -27,7 +32,7 @@ const tableScope = createTableScope('scope', 'accounts')
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigate,
-  useSearch: () => routeSearch,
+  useSearch: () => routeSearch.current,
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -42,8 +47,7 @@ afterEach(cleanup)
 
 beforeEach(() => {
   navigate.mockReset()
-  routeSearch.empty = undefined
-  routeSearch.filters = undefined
+  routeSearch.current = { empty: undefined, filters: undefined }
   sessionState.currentConnectionId = 'connection'
   sessionState.currentTableName = 'accounts'
   schemaState.isSchemaReady = true
@@ -156,12 +160,12 @@ describe('TableTabsProvider', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Open New view' }))
     sessionState.currentTableName = null
-    routeSearch.empty = 'true'
+    routeSearch.current = { ...routeSearch.current, empty: 'true' }
     rerender(<Harness />)
     expect(screen.getByLabelText('Active tab').textContent).toBe('new-view')
 
     sessionState.currentTableName = 'profiles'
-    routeSearch.empty = undefined
+    routeSearch.current = { ...routeSearch.current, empty: undefined }
     rerender(<Harness />)
 
     await waitFor(() =>
@@ -172,7 +176,7 @@ describe('TableTabsProvider', () => {
   })
 
   it('retains a legacy routed data tab while schema metadata is loading', async () => {
-    routeSearch.filters = 'active-filter'
+    routeSearch.current = { ...routeSearch.current, filters: activeFilterSearch }
     schemaState.isSchemaReady = false
     window.localStorage.setItem(
       'inspektor-tabs:scope',
@@ -183,7 +187,7 @@ describe('TableTabsProvider', () => {
           {
             id: 'view:accounts-filtered',
             kind: 'table',
-            search: { filters: 'active-filter' },
+            search: { filters: activeFilterSearch },
             tableName: 'accounts',
           },
         ],
@@ -202,7 +206,7 @@ describe('TableTabsProvider', () => {
       ) as {
         tabs: Array<{ search: { filters?: string } }>
       }
-      expect(storedState.tabs[0]?.search.filters).toBe('active-filter')
+      expect(storedState.tabs[0]?.search.filters).toBe(activeFilterSearch)
     })
   })
 

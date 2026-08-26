@@ -23,7 +23,7 @@ import type {
 } from '@tables/tableTypes'
 
 /** Parsed table explorer URL state plus setters that write back to route search params. */
-export interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
+interface UseTableExplorerSearchParamsResult extends TableExplorerSearchState {
   setFilters: (filters: TableFilterClause[]) => Promise<void>
   setPage: (page: number) => Promise<void>
   setPageSize: (pageSize: TablePageSize) => Promise<void>
@@ -71,6 +71,7 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
   )
 
   const updateSearch = async (updates: Partial<TableRouteSearch>): Promise<void> => {
+    // Grid refinements replace the current history entry; table and tab navigation own history steps.
     await navigate({
       replace: true,
       search: (currentSearch) => canonicalizeTableRouteSearch({ ...currentSearch, ...updates }),
