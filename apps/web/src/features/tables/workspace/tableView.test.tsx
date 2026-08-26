@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { forwardRef, type ReactElement, type ReactNode } from 'react'
+import { forwardRef, useState, type ReactElement, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
@@ -51,7 +51,10 @@ const tableViewState = vi.hoisted(() => ({
     openInsert: vi.fn(),
   },
   rowValues: null as Record<string, unknown> | null,
+  rowEditorQueryError: null as string | null,
+  rowEditorQueryLoading: false,
   rows: [{ id: 'row-1' }, { id: 'row-2' }] as Array<Record<string, unknown>>,
+  scrollResetKey: JSON.stringify({ filters: [] }),
   setFilters: vi.fn(),
   setPage: vi.fn(),
   setPageSize: vi.fn(),
@@ -297,7 +300,20 @@ vi.mock('@tables/rowEditor/editForm', () => ({
 }))
 
 vi.mock('@tables/rowEditor/insertForm', () => ({
-  InsertRowForm: () => null,
+  InsertRowForm: function InsertRowForm({ saveDisabled }: { saveDisabled?: boolean }) {
+    const [draft, setDraft] = useState('')
+    return (
+      <label>
+        Insert row fields
+        <input
+          aria-label="Insert row fields"
+          disabled={saveDisabled}
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+        />
+      </label>
+    )
+  },
 }))
 
 vi.mock('@tables/rowEditor/sidePane', () => ({
@@ -944,6 +960,40 @@ describe('TableView query status', () => {
     expect(
       (screen.getByRole('button', { name: 'Delete checked rows' }) as HTMLButtonElement).disabled,
     ).toBe(true)
+  })
+
+  it('keeps an insert draft mounted while unrelated staged changes apply', () => {
+    tableViewState.detailPaneMode = 'insert'
+    const { rerenderTableView } = renderTableView()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Insert row fields' }), {
+      target: { value: 'Unsubmitted value' },
+    })
+
+    mutationExecution.current = { error: null, status: 'applying' }
+    rerenderTableView()
+
+    const draft = screen.getByRole('textbox', { name: 'Insert row fields' }) as HTMLInputElement
+    expect(draft.value).toBe('Unsubmitted value')
+    expect(draft.disabled).toBe(true)
+    expect((screen.getByRole('button', { name: 'Insert row' }) as HTMLButtonElement).disabled).toBe(
+      true,
+    )
+    expect(screen.queryByText('Applying changes')).toBeNull()
+  })
+
+  it('renders fallback-row loading and failure states in the open row pane', () => {
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.rowEditor.activeRowId = 'row-1'
+    tableViewState.rowEditorQueryLoading = true
+    const { rerenderTableView } = renderTableView()
+
+    expect(screen.getByText('Loading row')).toBeTruthy()
+
+    tableViewState.rowEditorQueryLoading = false
+    tableViewState.rowEditorQueryError = 'Unable to load row'
+    rerenderTableView()
+
+    expect(screen.getByRole('alert').textContent).toBe('Unable to load row')
   })
 
   it('passes one table scope and schema projection through the composition root', () => {

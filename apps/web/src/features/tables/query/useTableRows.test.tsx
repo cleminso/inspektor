@@ -345,6 +345,23 @@ describe('useTableRows', () => {
     expect(result.current.hasNextPage).toBe(true)
   })
 
+  it('preserves the fulfilled page projection across unrelated renders', () => {
+    queryRows = [{ id: 'row-1' } as DynamicTableRow]
+    const { result, rerender } = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+    const rows = result.current.rows
+
+    rerender()
+
+    expect(result.current.rows).toBe(rows)
+  })
+
   it('subscribes with the requested page query when pagination changes', () => {
     pageSize = 500
     queryRows = Array.from({ length: 501 }, (_, index) => ({

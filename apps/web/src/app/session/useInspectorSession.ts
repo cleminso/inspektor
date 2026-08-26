@@ -85,8 +85,17 @@ export function useInspectorSession(): UseInspectorSessionResult {
 
   const saveConnection = useCallback(
     (draft: ConnectionDraft, connectionId?: string) => {
+      const existingConnection = getConnectionById(storeRef.current, connectionId)
       const connection = createConnectionFromDraft(draft, connectionId)
       updateStore((store) => upsertConnection(store, connection))
+      if (
+        existingConnection !== null &&
+        (existingConnection.appId !== connection.appId ||
+          existingConnection.env !== connection.env ||
+          existingConnection.serverUrl !== connection.serverUrl)
+      ) {
+        removeConnectionScopedStorage(connection.id)
+      }
       return connection
     },
     [updateStore],

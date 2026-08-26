@@ -74,7 +74,10 @@ function parseScalarValue(columnType: ColumnType, value: string): unknown {
     }
     case 'Integer': {
       const parsedValue = Number(trimmedValue)
-      if (Number.isInteger(parsedValue) === false) {
+      if (Number.isSafeInteger(parsedValue) === false) {
+        if (Number.isInteger(parsedValue) === true) {
+          throw new Error('Integer values must be within JavaScript safe integer range.')
+        }
         throw new Error('Integer values must be integers.')
       }
 
@@ -254,7 +257,9 @@ function getTableFilterPredicateFromValue(
     case 'Boolean':
       return typeof value === 'boolean' ? { operator: 'eq', value } : null
     case 'Integer':
-      return typeof value === 'number' && Number.isInteger(value) ? { operator: 'eq', value } : null
+      return typeof value === 'number' && Number.isSafeInteger(value)
+        ? { operator: 'eq', value }
+        : null
     case 'Double':
       return typeof value === 'number' && Number.isFinite(value) ? { operator: 'eq', value } : null
     case 'Timestamp': {

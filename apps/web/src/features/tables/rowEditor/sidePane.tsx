@@ -168,6 +168,7 @@ export function RowEditorSidePanel({
                 id={insertMoreFieldId}
                 aria-labelledby={`${insertMoreFieldId}-label`}
                 checked={insertMoreEnabled}
+                disabled={mutationDisabled === true}
                 size="s"
                 onCheckedChange={(checked) => {
                   onInsertMoreEnabledChange(checked === true)

@@ -20,7 +20,10 @@ export function useTableRowById({
   rowId,
   tableName,
   wasmSchema,
-}: UseTableRowByIdOptions): DynamicTableRow | null {
+}: UseTableRowByIdOptions):
+  | { status: 'idle' | 'pending'; row: null }
+  | { status: 'fulfilled'; row: DynamicTableRow | null }
+  | { status: 'rejected'; error: string; row: null } {
   const queryBuilder =
     wasmSchema === null || rowId === null
       ? undefined
@@ -31,7 +34,25 @@ export function useTableRowById({
     INSPECTOR_QUERY_OPTIONS,
   )
 
-  const row = queryState.data?.[0]
+  if (rowId === null) {
+    return { status: 'idle', row: null }
+  }
+  if (queryState.status === 'rejected') {
+    return {
+      status: 'rejected',
+      error:
+        queryState.error instanceof Error ? queryState.error.message : String(queryState.error),
+      row: null,
+    }
+  }
+  if (queryState.status !== 'fulfilled') {
+    return { status: 'pending', row: null }
+  }
+
+  const row = queryState.data[0]
   // This fallback owns only the requested identity; never return another row as active.
-  return row !== undefined && String(row.id) === rowId ? row : null
+  return {
+    status: 'fulfilled',
+    row: row !== undefined && String(row.id) === rowId ? row : null,
+  }
 }

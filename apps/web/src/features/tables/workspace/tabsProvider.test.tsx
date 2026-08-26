@@ -84,6 +84,7 @@ function TabActions(): React.ReactElement {
     closeTab,
     openBaseTabs,
     openNewView,
+    openSchemaView,
     persistTable,
     replaceableTabId,
     scope,
@@ -106,6 +107,9 @@ function TabActions(): React.ReactElement {
       </button>
       <button type="button" onClick={openNewView}>
         Open New view
+      </button>
+      <button type="button" onClick={() => openSchemaView('accounts')}>
+        Open accounts schema
       </button>
     </>
   )
@@ -286,6 +290,28 @@ describe('TableTabsProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
 
     expect(screen.queryByRole('alertdialog')).toBeNull()
+    expect(screen.getByLabelText('Staged changes').textContent).toBe('1')
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('schema:accounts'),
+    )
+  })
+
+  it('rechecks final-view ownership before confirming a staged-change discard', async () => {
+    const view = render(<Harness />)
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts'),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
+
+    fireEvent.click(screen.getByText('Open accounts schema'))
+    routeSearch.current = { ...routeSearch.current, view: 'schema' } as never
+    view.rerender(<Harness />)
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toContain('schema:accounts'),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Discard and close' }))
+
     expect(screen.getByLabelText('Staged changes').textContent).toBe('1')
     await waitFor(() =>
       expect(screen.getByLabelText('Open tabs').textContent).toBe('schema:accounts'),

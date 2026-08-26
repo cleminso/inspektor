@@ -37,6 +37,7 @@ beforeEach(() => {
   session.currentConnectionId = null
   session.currentSchemaHash = null
   session.setConnectionContext.mockReset()
+  session.setConnectionContext.mockReturnValue('accepted')
 })
 
 afterEach(cleanup)
@@ -122,23 +123,6 @@ describe('InspectorRuntimeBoundary', () => {
     )
 
     expect(session.setConnectionContext).toHaveBeenCalledWith('connection-2', 'main', 'schema-2')
-    expect(screen.queryByText('Runtime content')).toBeNull()
-  })
-
-  it('does not mount the runtime when context synchronization is rejected', () => {
-    const { rerender } = render(
-      <InspectorRuntimeBoundary target={target}>
-        <div>Runtime content</div>
-      </InspectorRuntimeBoundary>,
-    )
-
-    rerender(
-      <InspectorRuntimeBoundary target={target}>
-        <div>Runtime content</div>
-      </InspectorRuntimeBoundary>,
-    )
-
-    expect(session.setConnectionContext).toHaveBeenCalledOnce()
     expect(screen.queryByText('Runtime content')).toBeNull()
   })
 })

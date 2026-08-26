@@ -51,11 +51,13 @@ describe('resolveTableRowsSearch', () => {
     ])
   })
 
-  it('rejects pages whose offset cannot be represented safely', () => {
-    const unsafePage = Math.floor(Number.MAX_SAFE_INTEGER / 100) + 2
+  it('rejects pages whose offset cannot be represented by the Jazz runtime', () => {
+    const largestPage = Math.floor(0xffff_ffff / 100) + 1
+    const unsupportedPage = largestPage + 1
 
-    expect(resolveTableRowsSearch({ page: unsafePage, pageSize: 100 }).page).toBe(1)
-    expect(canonicalizeTableRouteSearch({ page: String(unsafePage) }).page).toBeUndefined()
+    expect(resolveTableRowsSearch({ page: largestPage, pageSize: 100 }).page).toBe(largestPage)
+    expect(resolveTableRowsSearch({ page: unsupportedPage, pageSize: 100 }).page).toBe(1)
+    expect(canonicalizeTableRouteSearch({ page: String(unsupportedPage) }).page).toBeUndefined()
     expect(canonicalizeTableRouteSearch({ page: '2' }).page).toBe(2)
   })
 

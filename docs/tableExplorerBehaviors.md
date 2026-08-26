@@ -254,8 +254,10 @@ isolated staged updates and deletions. Review remains available while the pane i
 checked row and `Delete N checked rows` for multiple checked rows as a full-width footer action. Activating it replaces the action
 with a 75/25 `Confirm delete` and `Cancel` row. Confirmation snapshots that checked scope, stages the deletions, closes the pane,
 and unchecks the affected rows. The pane's `Close` action remains at the right side of its header. `Apply changes` is the persistence
-boundary for staged updates and deletions; complete-row inserts persist directly from the insert pane. A successful Apply clears
-selection, closes the pane, and removes the widget.
+boundary for staged updates and deletions; complete-row inserts persist directly from the insert pane. A successful Apply clears row
+selection and closes an open row pane. It does not close or reset an unrelated insert draft.
+While Apply owns the mutation state, the insert toolbar action, direct Insert action, and `Insert more` switch are disabled. An
+already-open insert draft remains mounted so Apply cannot erase its local values.
 
 Rows staged for deletion remain visible with a danger-tinted, struck-through grid treatment until Apply. Their selection checkbox
 becomes an `Undo deletion` icon action, so they cannot be selected into the row pane again. Their cells cannot open inline editors or

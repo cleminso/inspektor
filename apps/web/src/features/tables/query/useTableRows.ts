@@ -107,9 +107,14 @@ export function useTableRows({
     requestedQueryBuilder ?? undefined,
     INSPECTOR_QUERY_OPTIONS,
   )
-  const rows = queryState.data
-  const fulfilledRows = rows?.slice(0, pageSize)
-  const fulfilledHasNextPage = rows !== undefined && rows.length > pageSize
+  const fulfilledPage = useMemo(() => {
+    const rows = queryState.data
+    return rows === undefined
+      ? undefined
+      : { hasNextPage: rows.length > pageSize, rows: rows.slice(0, pageSize) }
+  }, [pageSize, queryState.data])
+  const fulfilledRows = fulfilledPage?.rows
+  const fulfilledHasNextPage = fulfilledPage?.hasNextPage ?? false
   // Sort refreshes may preserve rows; data-scope or manager changes and same-query resets may not.
   const resolvedRowsRef = useRef<ResolvedRowsState | null>(null)
   useLayoutEffect(() => {

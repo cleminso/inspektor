@@ -52,6 +52,12 @@ describe('scalar in token parsing', () => {
     expect(() => parseFilterTokens(timestampColumn, ['not-a-date'])).toThrow('timestamp')
   })
 
+  it('rejects Integer tokens that JavaScript cannot represent exactly', () => {
+    expect(() => parseFilterTokens(integerColumn, ['9007199254740993'])).toThrow(
+      'safe integer range',
+    )
+  })
+
   it('excludes invalid values and normalizes valid values for query execution', () => {
     const schema = {
       people: { columns: [integerColumn] },
@@ -93,7 +99,7 @@ describe('cell value filter clauses', () => {
     })
   })
 
-  it('rejects invalid enum and imprecise BigInt runtime values', () => {
+  it('rejects invalid enum and unsafe integer runtime values', () => {
     const enumColumn = {
       name: 'status',
       column_type: { type: 'Enum', variants: ['active', 'paused'] },
@@ -106,6 +112,7 @@ describe('cell value filter clauses', () => {
     } as ColumnDescriptor
 
     expect(createTableFilterClauseFromValue(enumColumn, 'archived')).toBeNull()
+    expect(createTableFilterClauseFromValue(integerColumn, Number.MAX_SAFE_INTEGER + 1)).toBeNull()
     expect(createTableFilterClauseFromValue(bigIntColumn, Number.MAX_SAFE_INTEGER + 1)).toBeNull()
   })
 

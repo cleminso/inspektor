@@ -306,7 +306,12 @@ export function TableMutationWidget({
                 {mutations.ledger.hasInvalidDraft === true ? (
                   <Text color="error">Correct invalid input before applying.</Text>
                 ) : mutations.execution.error === null ? null : (
-                  <Text color="error">{mutations.execution.error}</Text>
+                  <Text
+                    color="error"
+                    role="alert"
+                  >
+                    {mutations.execution.error}
+                  </Text>
                 )}
               </Box>
               <FloatingPanel.Actions>

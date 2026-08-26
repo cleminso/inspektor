@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useMemo, type PropsWithChildren } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  type PropsWithChildren,
+} from 'react'
 import { useBlocker, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 
 import { getConnectionDisplayName, type StoredConnection } from '@app/connections/connections'
@@ -38,7 +45,11 @@ export interface InspectorSessionContextValue {
   saveConnection: ReturnType<typeof useInspectorSession>['saveConnection']
   deleteConnection: ReturnType<typeof useInspectorSession>['deleteConnection']
   getConnectionPreferences: ReturnType<typeof useInspectorSession>['getConnectionPreferences']
-  setConnectionContext: ReturnType<typeof useInspectorSession>['setConnectionContext']
+  setConnectionContext: (
+    connectionId: string,
+    branch: string,
+    schemaHash: string,
+  ) => ConnectionOpenResult
   prefill: ReturnType<typeof useInspectorSession>['prefill']
 }
 
@@ -65,6 +76,8 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
 function InspectorSessionProviderValue({ children }: PropsWithChildren): React.ReactElement {
   const session = useInspectorSession()
   const runtimeScopeExitGuard = useRuntimeScopeExitGuard()
+  const runtimeScopeExitGuardRef = useRef(runtimeScopeExitGuard)
+  runtimeScopeExitGuardRef.current = runtimeScopeExitGuard
   const navigate = useNavigate()
   const routeParams = useParams({ strict: false })
   const pendingConnectionId = useRouterState({
@@ -85,10 +98,17 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   const currentTableName = routeParams.tableName ?? null
   const activeConnection =
     routeConnectionId !== null ? session.getConnection(routeConnectionId) : session.activeConnection
+  const activeConnectionIdRef = useRef(activeConnection?.id ?? null)
+  activeConnectionIdRef.current = activeConnection?.id ?? null
+  const branchRequestRef = useRef(0)
   const connectionPreferences =
     activeConnection === null ? null : session.getConnectionPreferences(activeConnection.id)
   const currentBranch = connectionPreferences?.lastBranch ?? null
   const currentSchemaHash = connectionPreferences?.lastSchemaHash ?? null
+  const currentBranchRef = useRef(currentBranch)
+  const currentSchemaHashRef = useRef(currentSchemaHash)
+  currentBranchRef.current = currentBranch
+  currentSchemaHashRef.current = currentSchemaHash
 
   useBlocker({
     enableBeforeUnload: false,
@@ -122,11 +142,13 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       if (
         activeConnection === null ||
         branch === currentBranch ||
-        runtimeScopeExitGuard.isBlocked() === true
+        runtimeScopeExitGuardRef.current.isBlocked() === true
       ) {
         return
       }
 
+      const requestId = branchRequestRef.current + 1
+      branchRequestRef.current = requestId
       const nextTarget = await resolveTablesNavigationTarget({
         connectionId: activeConnection.id,
         branchOverride: branch,
@@ -136,13 +158,20 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         resolveSchemaHash: session.resolveSchemaHash,
         knownSchemaHashes,
       })
-      if (nextTarget === null) {
+      if (
+        nextTarget === null ||
+        branchRequestRef.current !== requestId ||
+        activeConnectionIdRef.current !== activeConnection.id ||
+        currentBranchRef.current !== currentBranch ||
+        currentSchemaHashRef.current !== currentSchemaHash ||
+        runtimeScopeExitGuardRef.current.isBlocked() === true
+      ) {
         return
       }
 
       session.setConnectionContext(activeConnection.id, nextTarget.branch, nextTarget.schemaHash)
     },
-    [activeConnection, currentBranch, currentSchemaHash, runtimeScopeExitGuard, session],
+    [activeConnection, currentBranch, currentSchemaHash, session],
   )
 
   const switchSchema = useCallback(
@@ -167,9 +196,10 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         branch !== currentBranch ||
         schemaHash !== currentSchemaHash
       if (changesRuntimeScope === true && runtimeScopeExitGuard.isBlocked() === true) {
-        return
+        return 'blocked'
       }
       session.setConnectionContext(connectionId, branch, schemaHash)
+      return 'accepted'
     },
     [currentBranch, currentConnectionId, currentSchemaHash, runtimeScopeExitGuard, session],
   )

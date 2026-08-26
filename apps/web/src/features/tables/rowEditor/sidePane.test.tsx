@@ -105,6 +105,28 @@ describe('RowEditorSidePanel dirty transitions', () => {
     expect(onInsertMoreEnabledChange).toHaveBeenCalledWith(true)
   })
 
+  it('disables Insert more while table mutations are applying', () => {
+    render(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={null}
+        activeRowIndex={0}
+        editedRowIds={[]}
+        mode="insert"
+        mutationDisabled
+        onInsertMoreEnabledChange={vi.fn()}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    )
+
+    expect(screen.getByRole('switch', { name: 'Insert more' }).getAttribute('aria-disabled')).toBe(
+      'true',
+    )
+  })
+
   it('confirms deletion of the focused row from the edit surface', () => {
     const onConfirmDelete = vi.fn()
     render(

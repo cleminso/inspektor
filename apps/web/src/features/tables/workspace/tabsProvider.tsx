@@ -293,6 +293,11 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     if (pendingTabClose === null) {
       return
     }
+    if (getFinalTableTabName(state.tabs, pendingTabClose.tabId) === null) {
+      closeTabWithoutConfirmation(pendingTabClose.tabId)
+      setPendingTabClose(null)
+      return
+    }
     if (
       mutationWorkspace.discardPendingChanges(
         createTableScope(scope, pendingTabClose.tableName),
@@ -302,7 +307,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
     }
     closeTabWithoutConfirmation(pendingTabClose.tabId)
     setPendingTabClose(null)
-  }, [closeTabWithoutConfirmation, mutationWorkspace, pendingTabClose, scope])
+  }, [closeTabWithoutConfirmation, mutationWorkspace, pendingTabClose, scope, state.tabs])
 
   const openNewView = useCallback(() => {
     const tabs = openNewViewTab(state.tabs)

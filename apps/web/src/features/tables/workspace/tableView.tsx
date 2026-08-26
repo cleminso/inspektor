@@ -84,6 +84,19 @@ function RowEditorStatus({ label }: { label: string }): React.ReactElement {
   )
 }
 
+function RowEditorError({ message }: { message: string }): React.ReactElement {
+  return (
+    <Box
+      height="full"
+      alignItems="center"
+      justifyContent="center"
+      role="alert"
+    >
+      <Text color="error">{message}</Text>
+    </Box>
+  )
+}
+
 interface StagedEditRowFormProps {
   rowId: TableRowId
   rowValues: Record<string, unknown>
@@ -162,6 +175,7 @@ function TableViewContent({
   const { openSchemaView } = useTableTabs()
   const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)
   const mutationApplying = mutations.execution.status === 'applying'
+  const canOpenInsert = state.canOpenRowEditor === true && mutationApplying === false
   useEffect(() => {
     rebaseRows(state.rows)
   }, [mutationApplying, rebaseRows, state.rows])
@@ -306,7 +320,7 @@ function TableViewContent({
     [state.table],
   )
   // Reset on pagination start and completion so stale offsets cannot survive content-size changes.
-  const scrollResetKey = `${state.page}:${state.pageSize}:${state.isInitialLoading === true ? 'loading' : 'ready'}`
+  const scrollResetKey = `${state.scrollResetKey}:${state.isInitialLoading === true ? 'loading' : 'ready'}`
   const handleEscape = useEffectEvent(state.handleEscape)
   const refreshPendingRef = useRef(false)
   const [refreshAnnouncement, setRefreshAnnouncement] = useState('')
@@ -403,7 +417,7 @@ function TableViewContent({
     openInsert()
   }, [openInsert])
   const toggleInsertPane = useCallback(() => {
-    if (canOpenRowEditor === false) {
+    if (canOpenRowEditor === false || mutationApplying === true) {
       return
     }
     if (detailPaneMode === 'insert') {
@@ -412,7 +426,7 @@ function TableViewContent({
     } else {
       openInsertPane()
     }
-  }, [canOpenRowEditor, closeRowEditor, detailPaneMode, openInsertPane])
+  }, [canOpenRowEditor, closeRowEditor, detailPaneMode, mutationApplying, openInsertPane])
   useHotkey(
     appHotkeys.insertRow,
     (event) => {
@@ -439,12 +453,12 @@ function TableViewContent({
       {
         id: 'tables.insertRow',
         label: 'Insert row',
-        disabled: state.canOpenRowEditor === false,
+        disabled: canOpenInsert === false,
         hotkey: appHotkeys.insertRow,
         perform: toggleInsertPane,
       },
     ],
-    [state.canOpenRowEditor, toggleInsertPane],
+    [canOpenInsert, toggleInsertPane],
   )
   useAppCommands(commands)
   const queryStatus =
@@ -548,7 +562,7 @@ function TableViewContent({
                           type="button"
                           variant="primary"
                           size="s"
-                          disabled={state.canOpenRowEditor === false}
+                          disabled={canOpenInsert === false}
                           focusableWhenDisabled
                           onClick={toggleInsertPane}
                         >
@@ -677,7 +691,7 @@ function TableViewContent({
                                       type="button"
                                       size="s"
                                       variant="primary"
-                                      disabled={state.canOpenRowEditor === false}
+                                      disabled={canOpenInsert === false}
                                       onClick={openInsertPane}
                                     >
                                       Insert row
@@ -738,14 +752,14 @@ function TableViewContent({
                 onNavigatePrevious={state.rowEditor.goToPreviousRow}
                 onNavigateNext={state.rowEditor.goToNextRow}
               >
-                {mutationApplying ? (
+                {mutationApplying && state.detailPaneMode !== 'insert' ? (
                   <RowEditorStatus label="Applying changes" />
                 ) : state.detailPaneMode === 'insert' ? (
                   <InsertRowForm
                     rowValues={state.rowValues ?? {}}
                     schemaColumns={schemaColumns}
                     insertMoreEnabled={insertMoreEnabled}
-                    saveDisabled={state.canMutateRows === false}
+                    saveDisabled={state.canMutateRows === false || mutationApplying}
                     onDiscard={() => {
                       setInsertMoreEnabled(false)
                       state.closeRowEditor()
@@ -764,6 +778,10 @@ function TableViewContent({
                     rowValues={state.rowValues}
                     schemaColumns={schemaColumns}
                   />
+                ) : state.rowEditorQueryError !== null ? (
+                  <RowEditorError message={state.rowEditorQueryError} />
+                ) : state.rowEditorQueryLoading ? (
+                  <RowEditorStatus label="Loading row" />
                 ) : null}
               </RowEditorSidePanel>
             </ResizablePanel>

@@ -17,6 +17,8 @@ import {
   type TableTabSearch,
 } from '@tables/tableTypes'
 
+const maximumJazzQueryOffset = 0xffff_ffff
+
 function parsePositiveInteger(value: unknown): number | undefined {
   const numberValue = typeof value === 'string' ? Number(value) : value
   return typeof numberValue === 'number' && Number.isSafeInteger(numberValue) && numberValue > 0
@@ -31,7 +33,7 @@ function parsePageSize(value: unknown): TablePageSize | undefined {
 
 function parsePage(value: unknown, pageSize: TablePageSize): number | undefined {
   const page = parsePositiveInteger(value)
-  return page !== undefined && (page - 1) * pageSize <= Number.MAX_SAFE_INTEGER ? page : undefined
+  return page !== undefined && (page - 1) * pageSize <= maximumJazzQueryOffset ? page : undefined
 }
 
 function parseTrimmedString(value: unknown): string | undefined {

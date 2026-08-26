@@ -21,6 +21,17 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [26/08/26]
 
+### Implementation review corrections
+
+- [x] Reject route pages whose Jazz query offset exceeds the runtime integer boundary.
+- [x] Reject integer filters that JavaScript cannot represent exactly.
+- [x] Reset grid scroll for filter and sort scope changes.
+- [x] Announce failed Apply operations.
+- [x] Retry route-to-runtime synchronization after a blocked attempt and reject stale branch resolutions after the runtime context changes.
+- [x] Clear table-scoped persisted state when an edited connection changes server, app, or environment while preserving credential rotation.
+
+[26/08/26]
+
 ### Query ownership simplification
 
 - [x] Remove speculative table-row prefetch, intent timers, unsupported Jazz cache-entry access, and navigation-surface event wiring.
@@ -1053,6 +1064,12 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[26/08/26]
+
+- A fulfilled active-row lookup that no longer contains the selected row removes that stale row selection and closes or retargets the row pane. This supersedes the earlier exclusion of a missing-row state.
+- Applying staged updates or deletions does not consume an unrelated local insert draft. Insert controls remain disabled until Apply settles.
+- A tab-close confirmation discards table mutations only if the tab remains the final representation when the user confirms.
 
 [26/08/26]
 

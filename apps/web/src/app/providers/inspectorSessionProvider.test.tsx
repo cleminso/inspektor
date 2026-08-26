@@ -1,15 +1,40 @@
-import { useState } from 'react'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { useState, type PropsWithChildren } from 'react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   InspectorSessionProvider,
   useInspectorSessionContext,
 } from '@app/providers/inspectorSessionProvider'
+import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { useRegisterRuntimeScopeExitBlocker } from '@app/providers/runtimeScopeExitGuard'
+import type { ResolvedTablesNavigationTarget } from '@app/routing/inspectorNavigation'
 
 const navigate = vi.fn()
 const setConnectionContext = vi.fn()
+const resolveTablesNavigationTarget = vi.hoisted(() => vi.fn())
+const connectionPreferences = {
+  lastBranch: 'main',
+  lastSchemaHash: 'schema-1',
+}
+const createTarget = (
+  branch: string,
+  schemaHash = 'schema-1',
+  connectionId = 'connection-1',
+): ResolvedTablesNavigationTarget => ({
+  branch,
+  connectionId,
+  schemaCatalogue: [{ hash: schemaHash, publishedAt: 1 }],
+  schemaHash,
+})
+
+function deferNavigationTarget(): (target: ResolvedTablesNavigationTarget) => void {
+  let resolve!: (target: ResolvedTablesNavigationTarget) => void
+  resolveTablesNavigationTarget.mockImplementationOnce(
+    () => new Promise((next) => (resolve = next)),
+  )
+  return (target) => resolve(target)
+}
 interface BlockerLocation {
   fullPath: string
   params: Record<string, string>
@@ -19,6 +44,7 @@ interface BlockerOptions {
   shouldBlockFn: (options: { current: BlockerLocation; next: BlockerLocation }) => boolean
 }
 let blockerOptions: BlockerOptions | null = null
+let routeConnectionId = 'connection-1'
 let routerMatches: Array<{
   isFetching: false | 'beforeLoad' | 'loader'
   params: Record<string, string>
@@ -48,10 +74,7 @@ const session = {
   connections: [],
   deleteConnection: vi.fn(),
   getConnection: vi.fn((connectionId: keyof typeof connections) => connections[connectionId]),
-  getConnectionPreferences: vi.fn(() => ({
-    lastBranch: 'main',
-    lastSchemaHash: 'schema-1',
-  })),
+  getConnectionPreferences: vi.fn(() => connectionPreferences),
   getRememberedBranches: vi.fn(() => ['main', 'feature']),
   prefill: null,
   resolveBranch: vi.fn((_connectionId: string, branch?: string | null) => branch ?? 'main'),
@@ -68,7 +91,7 @@ vi.mock('@tanstack/react-router', () => ({
     blockerOptions = options
   },
   useNavigate: () => navigate,
-  useParams: () => ({ connectionId: 'connection-1' }),
+  useParams: () => ({ connectionId: routeConnectionId }),
   useRouterState: ({ select }: { select: (state: { matches: typeof routerMatches }) => unknown }) =>
     select({ matches: routerMatches }),
 }))
@@ -77,22 +100,36 @@ vi.mock('@app/session/useInspectorSession', () => ({
   useInspectorSession: () => session,
 }))
 
-vi.mock('@app/routing/inspectorNavigation', () => ({
-  resolveTablesNavigationTarget: async ({
-    branchOverride,
-    connectionId,
-    schemaHashOverride,
-  }: {
-    branchOverride?: string
-    connectionId: string
-    schemaHashOverride?: string | null
-  }) => ({
-    branch: branchOverride ?? 'main',
-    connectionId,
-    schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
-    schemaHash: schemaHashOverride ?? 'schema-1',
-  }),
+vi.mock('@app/providers/inspectorProvider', () => ({
+  InspectorProvider: ({ children }: { children: React.ReactNode }) => children,
 }))
+
+vi.mock('@app/routing/inspectorNavigation', () => ({
+  resolveTablesNavigationTarget,
+}))
+
+beforeEach(() => {
+  session.activeConnectionId = 'connection-1'
+  routeConnectionId = 'connection-1'
+  connectionPreferences.lastBranch = 'main'
+  connectionPreferences.lastSchemaHash = 'schema-1'
+  resolveTablesNavigationTarget.mockImplementation(
+    async ({
+      branchOverride,
+      connectionId,
+      schemaHashOverride,
+    }: {
+      branchOverride?: string
+      connectionId: string
+      schemaHashOverride?: string | null
+    }) => ({
+      branch: branchOverride ?? 'main',
+      connectionId,
+      schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
+      schemaHash: schemaHashOverride ?? 'schema-1',
+    }),
+  )
+})
 
 afterEach(() => {
   cleanup()
@@ -127,6 +164,9 @@ function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
       <button type="button" onClick={() => void inspectorSession.switchBranch('feature')}>
         Switch branch
       </button>
+      <button type="button" onClick={() => void inspectorSession.switchBranch('release')}>
+        Switch release branch
+      </button>
       <button type="button" onClick={() => void inspectorSession.switchSchema('schema-2')}>
         Switch schema
       </button>
@@ -140,13 +180,21 @@ function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
   )
 }
 
+function TestSession({
+  blocked,
+  children,
+}: PropsWithChildren<{ blocked: boolean }>): React.ReactElement {
+  return (
+    <InspectorSessionProvider>
+      <SessionActions blocked={blocked} />
+      {children}
+    </InspectorSessionProvider>
+  )
+}
+
 describe('InspectorSessionProvider runtime-scope exit policy', () => {
   it('blocks connection, branch, and schema changes while pending table state exists', async () => {
-    render(
-      <InspectorSessionProvider>
-        <SessionActions blocked />
-      </InspectorSessionProvider>,
-    )
+    render(<TestSession blocked />)
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
@@ -164,11 +212,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
   })
 
   it('blocks route exits while allowing navigation inside the active table workspace', async () => {
-    render(
-      <InspectorSessionProvider>
-        <SessionActions blocked />
-      </InspectorSessionProvider>,
-    )
+    render(<TestSession blocked />)
     await screen.findByText('true', { selector: '[aria-label="Runtime scope blocked"]' })
 
     const current = {
@@ -204,11 +248,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
   })
 
   it('allows runtime-scope changes after pending state clears', async () => {
-    render(
-      <InspectorSessionProvider>
-        <SessionActions blocked={false} />
-      </InspectorSessionProvider>,
-    )
+    render(<TestSession blocked={false} />)
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Switch branch' }))
@@ -218,12 +258,112 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe('false')
   })
 
-  it('accepts connection intent without resolving or persisting route data', async () => {
-    render(
-      <InspectorSessionProvider>
-        <SessionActions blocked={false} />
-      </InspectorSessionProvider>,
+  it('does not commit a branch resolution after pending table state appears', async () => {
+    const resolveTarget = deferNavigationTarget()
+    const view = render(<TestSession blocked={false} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Switch branch' }))
+
+    view.rerender(<TestSession blocked />)
+    await waitFor(() =>
+      expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe(
+        'true',
+      ),
     )
+    await act(async () => {
+      resolveTarget(createTarget('feature'))
+    })
+
+    expect(setConnectionContext).not.toHaveBeenCalled()
+  })
+
+  it('does not overwrite a schema selected while branch resolution is pending', async () => {
+    const resolveTarget = deferNavigationTarget()
+    const view = render(<TestSession blocked={false} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Switch branch' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Switch schema' }))
+    connectionPreferences.lastSchemaHash = 'schema-2'
+    view.rerender(<TestSession blocked={false} />)
+    setConnectionContext.mockClear()
+
+    await act(async () => {
+      resolveTarget(createTarget('feature'))
+    })
+
+    expect(setConnectionContext).not.toHaveBeenCalled()
+  })
+
+  it('commits only the latest overlapping branch request', async () => {
+    const resolvers = new Map<string, (target: ResolvedTablesNavigationTarget) => void>()
+    resolveTablesNavigationTarget.mockImplementation(
+      ({ branchOverride }: { branchOverride: string }) =>
+        new Promise((resolve) => resolvers.set(branchOverride, resolve)),
+    )
+    render(<TestSession blocked={false} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Switch branch' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Switch release branch' }))
+
+    await act(async () => {
+      resolvers.get('feature')?.(createTarget('feature'))
+    })
+    expect(setConnectionContext).not.toHaveBeenCalled()
+
+    await act(async () => {
+      resolvers.get('release')?.(createTarget('release'))
+    })
+    expect(setConnectionContext).toHaveBeenCalledWith('connection-1', 'release', 'schema-1')
+  })
+
+  it('does not overwrite a branch selected while branch resolution is pending', async () => {
+    const resolveTarget = deferNavigationTarget()
+    const view = render(<TestSession blocked={false} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Switch branch' }))
+    connectionPreferences.lastBranch = 'release'
+    view.rerender(<TestSession blocked={false} />)
+
+    await act(async () => {
+      resolveTarget(createTarget('feature'))
+    })
+
+    expect(setConnectionContext).not.toHaveBeenCalled()
+  })
+
+  it('does not commit branch resolution after the active connection changes', async () => {
+    const resolveTarget = deferNavigationTarget()
+    const view = render(<TestSession blocked={false} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Switch branch' }))
+    routeConnectionId = 'connection-2'
+    view.rerender(<TestSession blocked={false} />)
+
+    await act(async () => {
+      resolveTarget(createTarget('feature'))
+    })
+
+    expect(setConnectionContext).not.toHaveBeenCalled()
+  })
+
+  it('retries route runtime synchronization after pending state clears', async () => {
+    const target = createTarget('main', 'schema-2')
+    const view = render(<TestSession blocked />)
+    view.rerender(
+      <TestSession blocked>
+        <InspectorRuntimeBoundary target={target}>Runtime content</InspectorRuntimeBoundary>
+      </TestSession>,
+    )
+    expect(setConnectionContext).not.toHaveBeenCalled()
+
+    view.rerender(
+      <TestSession blocked={false}>
+        <InspectorRuntimeBoundary target={target}>Runtime content</InspectorRuntimeBoundary>
+      </TestSession>,
+    )
+
+    await waitFor(() =>
+      expect(setConnectionContext).toHaveBeenCalledWith('connection-1', 'main', 'schema-2'),
+    )
+  })
+
+  it('accepts connection intent without resolving or persisting route data', async () => {
+    render(<TestSession blocked={false} />)
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
@@ -240,11 +380,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
   })
 
   it('forwards repeated accepted connection intent', () => {
-    render(
-      <InspectorSessionProvider>
-        <SessionActions blocked={false} />
-      </InspectorSessionProvider>,
-    )
+    render(<TestSession blocked={false} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
     fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
@@ -262,11 +398,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
       },
     ]
 
-    render(
-      <InspectorSessionProvider>
-        <SessionActions blocked={false} />
-      </InspectorSessionProvider>,
-    )
+    render(<TestSession blocked={false} />)
 
     expect(screen.getByRole('status', { name: 'Pending connection' }).textContent).toBe(
       'connection-2',

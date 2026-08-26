@@ -23,25 +23,24 @@ export function InspectorRuntimeBoundary({
     useInspectorSessionContext()
   const targetIdentity = JSON.stringify([target.connectionId, target.branch, target.schemaHash])
   const appliedTargetIdentityRef = useRef<string | null>(null)
-  const attemptedTargetIdentityRef = useRef<string | null>(null)
   const sessionMatchesTarget =
     currentConnectionId === target.connectionId &&
     currentBranch === target.branch &&
     currentSchemaHash === target.schemaHash
-  const isTargetApplied = appliedTargetIdentityRef.current === targetIdentity
-  const isContextReady = isTargetApplied || sessionMatchesTarget
+  const isContextReady = appliedTargetIdentityRef.current === targetIdentity || sessionMatchesTarget
 
   useEffect(() => {
     if (sessionMatchesTarget === true) {
       appliedTargetIdentityRef.current = targetIdentity
       return
     }
-    if (isTargetApplied === false && attemptedTargetIdentityRef.current !== targetIdentity) {
-      attemptedTargetIdentityRef.current = targetIdentity
-      setConnectionContext(target.connectionId, target.branch, target.schemaHash)
+    if (
+      appliedTargetIdentityRef.current !== targetIdentity &&
+      setConnectionContext(target.connectionId, target.branch, target.schemaHash) === 'accepted'
+    ) {
+      appliedTargetIdentityRef.current = targetIdentity
     }
   }, [
-    isTargetApplied,
     sessionMatchesTarget,
     setConnectionContext,
     target.branch,

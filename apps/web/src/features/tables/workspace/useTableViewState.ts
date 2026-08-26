@@ -250,29 +250,58 @@ export function useTableViewState({
     activeRowId === null ? -1 : rows.findIndex((row) => String(row.id) === activeRowId)
   const visibleActiveRow = activePageRowIndex < 0 ? null : (rows[activePageRowIndex] ?? null)
   // Keep the edited row available when filtering or pagination removes it from the visible query.
-  const activeRow = useTableRowById({
+  const activeRowQuery = useTableRowById({
     client,
     rowId: visibleActiveRow === null ? activeRowId : null,
     tableName,
     wasmSchema,
   })
+  const activeRowQueryStatus = activeRowQuery.status
+  const activeRow = activeRowQuery.row
 
   /** Keeps the active draft while selected; otherwise opens the requested or first selected row. */
-  const openRows = (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
-    const resolvedActiveRowId =
-      nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
-        ? nextActiveRowId
-        : nextSelectedRowIds[0]
-    setSelectedRowIds(nextSelectedRowIds)
-    setActiveColumnId(null)
-    setActiveFieldEditor(null)
+  const openRows = useCallback(
+    (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
+      const resolvedActiveRowId =
+        nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
+          ? nextActiveRowId
+          : nextSelectedRowIds[0]
+      setSelectedRowIds(nextSelectedRowIds)
+      setActiveColumnId(null)
+      setActiveFieldEditor(null)
 
-    if (resolvedActiveRowId === undefined) {
-      setDetailPane({ mode: 'closed' })
+      if (resolvedActiveRowId === undefined) {
+        setDetailPane({ mode: 'closed' })
+        return
+      }
+      setDetailPane({ mode: 'rows', activeRowId: resolvedActiveRowId })
+    },
+    [],
+  )
+
+  useLayoutEffect(() => {
+    if (
+      activeRowId === null ||
+      visibleActiveRow !== null ||
+      activeRowQueryStatus !== 'fulfilled' ||
+      activeRow !== null
+    ) {
       return
     }
-    setDetailPane({ mode: 'rows', activeRowId: resolvedActiveRowId })
-  }
+    const nextSelectedRowIds = selectedRowIds.filter((rowId) => rowId !== activeRowId)
+    openRows(
+      nextSelectedRowIds,
+      getNearestSelectedRowId(validRowIds, nextSelectedRowIds, activeRowId),
+    )
+  }, [
+    activeRow,
+    activeRowId,
+    activeRowQueryStatus,
+    openRows,
+    selectedRowIds,
+    validRowIds,
+    visibleActiveRow,
+  ])
 
   const handleSelectedRowIdsChange = (
     nextSelectedRowIds: TableRowId[],
@@ -456,6 +485,9 @@ export function useTableViewState({
   }
 
   const handleMutationApplySuccess = () => {
+    if (detailPaneMode === 'insert') {
+      return
+    }
     resetSelection()
     closeDetailPane()
   }
@@ -537,12 +569,16 @@ export function useTableViewState({
     hasCellSelection: cellSelection.length > 0,
     isInitialLoading: query.isInitialLoading,
     isRefreshing: query.isRefreshing,
+    scrollResetKey: selectionScopeKey,
     setPage: searchState.setPage,
     setPageSize: searchState.setPageSize,
     filters: searchState.filters,
     setFilters: searchState.setFilters,
     tableColumns: query.columns,
     rowValues,
+    rowEditorQueryError: activeRowQueryStatus === 'rejected' ? activeRowQuery.error : null,
+    rowEditorQueryLoading:
+      activeRowId !== null && visibleActiveRow === null && activeRowQueryStatus === 'pending',
     rowEditor: {
       activeColumnNumber,
       activePageRowNumber,

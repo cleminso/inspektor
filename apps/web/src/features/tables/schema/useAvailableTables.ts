@@ -11,7 +11,6 @@ import { getTableNames } from '@tables/schema/tableSchema'
 
 interface UseAvailableTablesResult {
   tables: string[]
-  hasTables: boolean
   isSchemaReady: boolean
 }
 
@@ -30,7 +29,6 @@ export function useAvailableTables(): UseAvailableTablesResult {
 
     return {
       tables,
-      hasTables: tables.length > 0,
       // Distinguishes "schema still loading" from "schema loaded but contains no tables".
       isSchemaReady: wasmSchema !== null,
     }

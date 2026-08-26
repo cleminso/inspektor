@@ -93,8 +93,8 @@ page exists, the row status uses a lower bound such as `1-100 of 101+`. The fina
 the toolbar keeps the last settled range and page visible while disabling page navigation.
 
 `DataGrid.Content` renders the default 100-row page directly. Larger row models use TanStack Virtual while spacer rows preserve the
-scroll range inside the same semantic table, `colgroup`, sticky header, and scroll viewport. Page changes reset both scroll axes without
-remounting the viewport.
+scroll range inside the same semantic table, `colgroup`, sticky header, and scroll viewport. Page, page-size, filter, and sort scope
+changes reset both scroll axes without remounting the viewport.
 
 ## Implementation map
 

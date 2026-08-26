@@ -32,7 +32,6 @@ export function useApplyTableMutationLedger({
       mountedRef.current = false
     }
   }, [])
-
   return async () => {
     if (
       applyingRef.current === true ||

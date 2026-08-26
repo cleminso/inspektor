@@ -166,7 +166,6 @@ export function TableMutationLedgerWorkspaceProvider({
     }
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault()
-      event.returnValue = true
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => {
@@ -186,6 +185,11 @@ export function TableMutationLedgerWorkspaceProvider({
       const state = reduceProviderState(currentEntry.state, action)
       if (state === currentEntry.state) {
         return current
+      }
+      if (currentEntry.execution.status === 'idle' && hasUnresolvedMutationState(state) === false) {
+        const next = { ...current }
+        delete next[scopeKey]
+        return next
       }
       return { ...current, [scopeKey]: { ...currentEntry, state } }
     })
@@ -216,6 +220,17 @@ export function TableMutationLedgerWorkspaceProvider({
       setEntriesByScope((current) => {
         const currentEntry = current[scopeKey] ?? createStoredTableMutationState()
         const execution = typeof update === 'function' ? update(currentEntry.execution) : update
+        if (
+          execution.status === 'idle' &&
+          hasUnresolvedMutationState(currentEntry.state) === false
+        ) {
+          if (current[scopeKey] === undefined) {
+            return current
+          }
+          const next = { ...current }
+          delete next[scopeKey]
+          return next
+        }
         return { ...current, [scopeKey]: { ...currentEntry, execution } }
       })
     },

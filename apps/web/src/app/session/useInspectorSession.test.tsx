@@ -11,6 +11,23 @@ import { useInspectorSession } from '@app/session/useInspectorSession'
 
 let entries: Map<string, string>
 let writeError: Error | null
+const tabsKey = 'inspektor-tabs:connection-1%3Amain%3Aschema-1'
+
+function renderStoredSession(adminSecret = 'secret') {
+  const connection = createConnectionFromDraft(
+    {
+      name: 'Local app',
+      serverUrl: 'https://sync.example.com',
+      appId: 'app-1',
+      adminSecret,
+      env: 'dev',
+    },
+    'connection-1',
+  )
+  writeStoredConnections(upsertConnection(createEmptyConnectionStore(), connection))
+  window.localStorage.setItem(tabsKey, '{}')
+  return { connection, ...renderHook(() => useInspectorSession()) }
+}
 
 beforeEach(() => {
   entries = new Map<string, string>()
@@ -96,5 +113,29 @@ describe('useInspectorSession', () => {
     })
 
     expect(result.current.connections.map(({ name }) => name)).toEqual(['Second'])
+  })
+
+  it.each([
+    ['appId', 'app-2'],
+    ['env', 'prod'],
+    ['serverUrl', 'https://other.example.com'],
+  ] as const)('clears table preferences when connection %s changes', (field, value) => {
+    const { connection, result } = renderStoredSession()
+
+    act(() => {
+      result.current.saveConnection({ ...connection, [field]: value }, connection.id)
+    })
+
+    expect(window.localStorage.getItem(tabsKey)).toBeNull()
+  })
+
+  it('preserves table preferences across a credential rotation for the same runtime', () => {
+    const { connection, result } = renderStoredSession('secret-1')
+
+    act(() => {
+      result.current.saveConnection({ ...connection, adminSecret: 'secret-2' }, connection.id)
+    })
+
+    expect(window.localStorage.getItem(tabsKey)).toBe('{}')
   })
 })

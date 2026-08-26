@@ -129,7 +129,7 @@ beforeEach(() => {
   setPage.mockReset()
   searchState.setFilters.mockReset()
   useTableRowByIdMock.mockReset()
-  useTableRowByIdMock.mockReturnValue(null)
+  useTableRowByIdMock.mockReturnValue({ status: 'idle', row: null })
   searchState.filters = []
   searchState.page = 1
   searchState.sortColumn = 'id'
@@ -213,6 +213,15 @@ describe('useTableViewState', () => {
 
     expect(result.current.table.getSelectedRowIds()).toEqual([])
     expect(result.current.detailPaneMode).toBe('closed')
+  })
+
+  it('preserves an unrelated insert pane after staged changes apply', () => {
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => result.current.rowEditor.openInsert())
+
+    act(() => result.current.handleMutationApplySuccess())
+
+    expect(result.current.detailPaneMode).toBe('insert')
   })
 
   it('replaces applied-cell feedback and clears it after expiry', async () => {
@@ -480,12 +489,28 @@ describe('useTableViewState', () => {
       result.current.table.getRow('row-1').toggleSelected(true)
     })
     rerender()
-    useTableRowByIdMock.mockReturnValue({ id: 'row-1', name: 'Ada' })
+    useTableRowByIdMock.mockReturnValue({
+      status: 'fulfilled',
+      row: { id: 'row-1', name: 'Ada' },
+    })
     queryRows = []
     rerender()
 
     expect(result.current.rowValues).toEqual({ id: 'row-1', name: 'Ada' })
     expect(useTableRowByIdMock).toHaveBeenCalledWith(expect.objectContaining({ rowId: 'row-1' }))
+  })
+
+  it('closes the row pane when the fallback query confirms the active row is gone', () => {
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => result.current.table.getRow('row-1').toggleSelected(true))
+    rerender()
+
+    queryRows = []
+    useTableRowByIdMock.mockReturnValue({ status: 'fulfilled', row: null })
+    rerender()
+
+    expect(result.current.detailPaneMode).toBe('closed')
+    expect(result.current.table.getSelectedRowIds()).toEqual([])
   })
 
   it('keeps the active row available while its visible query resets', () => {
@@ -773,6 +798,7 @@ describe('useTableViewState', () => {
 
   it('clears selections when committed filters change', async () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    const initialScrollResetKey = result.current.scrollResetKey
 
     act(() => {
       result.current.table.setFocusedCell('row-1', 'name')
@@ -792,6 +818,7 @@ describe('useTableViewState', () => {
     expect(result.current.hasCellSelection).toBe(false)
     expect(result.current.detailPaneMode).toBe('closed')
     expect(result.current.activeFieldEditorTarget).toBeNull()
+    expect(result.current.scrollResetKey).not.toBe(initialScrollResetKey)
   })
 
   it('clears row and column selection only after filters commit', async () => {

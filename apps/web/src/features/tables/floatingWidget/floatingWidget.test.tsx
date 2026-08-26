@@ -319,8 +319,11 @@ describe('TableMutationWidget', () => {
     expect(screen.queryByRole('button', { name: 'Undo: row-103' })).toBeNull()
   })
 
-  it('projects and applies deletions staged outside the widget', async () => {
-    const deleteRow = vi.fn().mockResolvedValue(undefined)
+  it('projects deletions and retries after an announced Apply failure', async () => {
+    const deleteRow = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('Delete rejected'))
+      .mockResolvedValue(undefined)
     function DeletionHarness(): React.ReactElement {
       const mutations = useTableMutationLedger()
       return (
@@ -359,6 +362,10 @@ describe('TableMutationWidget', () => {
     expect(screen.getByRole('region', { name: 'Affected rows' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Apply changes' }))
 
-    await waitFor(() => expect(deleteRow).toHaveBeenCalledWith('row-1'))
+    expect((await screen.findByRole('alert')).textContent).toContain('Delete rejected')
+    fireEvent.click(screen.getByRole('button', { name: 'Apply changes' }))
+
+    await waitFor(() => expect(deleteRow).toHaveBeenCalledTimes(2))
+    expect(deleteRow).toHaveBeenNthCalledWith(2, 'row-1')
   })
 })
