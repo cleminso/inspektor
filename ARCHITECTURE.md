@@ -232,7 +232,7 @@ The bridge must not use DOM discovery, positional matching, `MutationObserver`, 
 
 ### Row editor forms
 
-Insert and edit row forms are deferred behind the detail-pane boundary. The table view does not load their form behavior until the user opens the relevant pane.
+Insert and edit row forms remain outside the static table-view graph. Schema readiness starts shared import promises so a likely interaction can warm both modules. A failed speculative import resets its promise for another request; a failure consumed by `React.lazy` remains an error-boundary failure. The detail pane owns explicit Suspense presentation until the requested form is ready.
 
 ## Dependency roles
 

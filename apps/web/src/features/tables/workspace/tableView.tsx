@@ -32,7 +32,7 @@ import {
 } from '@app/hotkeys/appHotkeys'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
-import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import { useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
@@ -64,7 +64,7 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import type { TableRowId } from '@tables/tableTypes'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
-import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
+import { createTableScope } from '@tables/workspace/scope'
 
 const FieldEditorMutationWidget = lazy(
   () => import('@tables/floatingWidget/fieldEditorMutationWidget'),
@@ -118,20 +118,13 @@ function StagedEditRowForm({
 }
 
 export function TableView({ tableName }: TableViewProps): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
   const wasmSchema = useRuntimeSchema()
+  const { scope } = useTableTabs()
   const schemaColumns = useMemo(
     () => getTableColumns(wasmSchema, tableName),
     [tableName, wasmSchema],
   )
-  const mutationScopeKey = createTableScope(
-    createTableWorkspaceScope({
-      branch: currentBranch,
-      connectionId: currentConnectionId,
-      schemaHash: currentSchemaHash,
-    }),
-    tableName,
-  )
+  const mutationScopeKey = createTableScope(scope, tableName)
 
   return (
     <TableMutationLedgerProvider
@@ -611,7 +604,6 @@ function TableViewContent({
               minHeight={0}
               flex={1}
               overflow="hidden"
-              data-hotkey-scope="table-grid"
             >
               <TableGridContextMenu
                 getCellActions={getCellActions}
@@ -764,7 +756,6 @@ function TableViewContent({
                     <RowEditorFormFallback label="Applying changes" />
                   ) : state.detailPaneMode === 'insert' ? (
                     <InsertRowForm
-                      key={`${tableName}:insert`}
                       rowValues={state.rowValues ?? {}}
                       schemaColumns={schemaColumns}
                       insertMoreEnabled={insertMoreEnabled}

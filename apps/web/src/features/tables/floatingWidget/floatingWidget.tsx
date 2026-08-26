@@ -10,28 +10,31 @@ import { useTableMutationLedger } from '@tables/mutationLedger/provider'
 import { useApplyTableMutationLedger } from '@tables/mutationLedger/useApplyTableMutationLedger'
 import type { TableFieldsByRowId } from '@tables/tableTypes'
 
-function formatOperationSummary(operation: TableMutationReviewOperation): string {
-  if (operation.kind === 'delete') {
-    return operation.rowIds.length === 1
-      ? (operation.rowIds[0] ?? '')
-      : `${operation.rowIds.length} selected rows`
-  }
-  return operation.rowId
-}
+const operationBatchSize = 50
 
 function OperationRow({
+  position,
   operation,
   onUndo,
+  total,
 }: {
+  position: number
   operation: TableMutationReviewOperation
   onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
+  total: number
 }): React.ReactElement {
-  const summary = formatOperationSummary(operation)
+  const summary =
+    operation.kind === 'update'
+      ? operation.rowId
+      : operation.rowIds.length === 1
+        ? (operation.rowIds[0] ?? '')
+        : `${operation.rowIds.length} selected rows`
   return (
     <Box
       as="li"
       alignItems="center"
-      data-operation-row
+      aria-posinset={position}
+      aria-setsize={total}
       display="flex"
       gap="s"
       height="collection-row-height-xl"
@@ -83,11 +86,11 @@ function OperationList({
   onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
 }): React.ReactElement {
   const scrollable = operations.length > 10
+  const [visibleCount, setVisibleCount] = useState(operationBatchSize)
   return (
     <Box
       as="section"
       aria-label={label}
-      data-scrollable={scrollable}
       maxHeight={scrollable === true ? 'viewport-height-l' : undefined}
       overflowY={scrollable === true ? 'auto' : 'visible'}
       width="full"
@@ -97,14 +100,26 @@ function OperationList({
         flexDirection="column"
         width="full"
       >
-        {operations.map((operation) => (
+        {operations.slice(0, visibleCount).map((operation, index) => (
           <OperationRow
             key={operation.operationId}
             operation={operation}
+            position={index + 1}
+            total={operations.length}
             onUndo={onUndo}
           />
         ))}
       </Box>
+      {visibleCount < operations.length ? (
+        <Button
+          aria-label={`Show more ${label.toLowerCase()}`}
+          size="s"
+          variant="ghost"
+          onClick={() => setVisibleCount((current) => current + operationBatchSize)}
+        >
+          Show more
+        </Button>
+      ) : null}
     </Box>
   )
 }
@@ -197,45 +212,6 @@ function OperationReview({
   )
 }
 
-function DockTrigger({
-  contentId,
-  count,
-  expanded,
-  label,
-  onToggle,
-}: {
-  contentId: string
-  count: number
-  expanded: boolean
-  label: string
-  onToggle: () => void
-}): React.ReactElement {
-  return (
-    <InspectorDockCenterPortal>
-      <Button
-        aria-controls={contentId}
-        aria-expanded={expanded}
-        aria-pressed={expanded}
-        prefix={
-          <Text
-            as="span"
-            tabularNums
-            variant="caption"
-          >
-            {count}
-          </Text>
-        }
-        suffix={<Button.Glyph artwork={expanded === true ? ChevronUp : ChevronRight} />}
-        size="s"
-        variant="ghost"
-        onClick={onToggle}
-      >
-        {label}
-      </Button>
-    </InspectorDockCenterPortal>
-  )
-}
-
 export function TableMutationWidget({
   executor,
   onAppliedUpdates,
@@ -272,13 +248,28 @@ export function TableMutationWidget({
 
   return (
     <>
-      <DockTrigger
-        contentId={contentId}
-        count={mutations.stagedCount}
-        expanded={expanded}
-        label={label}
-        onToggle={() => setExpanded((current) => current === false)}
-      />
+      <InspectorDockCenterPortal>
+        <Button
+          aria-controls={contentId}
+          aria-expanded={expanded}
+          aria-pressed={expanded}
+          prefix={
+            <Text
+              as="span"
+              tabularNums
+              variant="caption"
+            >
+              {mutations.stagedCount}
+            </Text>
+          }
+          suffix={<Button.Glyph artwork={expanded === true ? ChevronUp : ChevronRight} />}
+          size="s"
+          variant="ghost"
+          onClick={() => setExpanded((current) => current === false)}
+        >
+          {label}
+        </Button>
+      </InspectorDockCenterPortal>
       {expanded === false ? null : (
         <FloatingPanel.Root aria-label="Staged changes">
           <FloatingPanel.Content

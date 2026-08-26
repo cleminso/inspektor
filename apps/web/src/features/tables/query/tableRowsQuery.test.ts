@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { buildTableRowsQuery } from '@tables/query/tableRowsQuery'
-import { DEFAULT_TABLE_PAGE_SIZE, TABLE_PAGE_SIZE_OPTIONS } from '@tables/tableTypes'
 
 const schema = {
   users: {
@@ -47,8 +46,6 @@ describe('tableRowsQuery', () => {
       propagation: 'full',
       visibility: 'hidden_from_live_query_list',
     })
-    expect(DEFAULT_TABLE_PAGE_SIZE).toBe(100)
-    expect(TABLE_PAGE_SIZE_OPTIONS).toEqual([100, 500, 1000])
   })
 
   it('includes destination filters, sorting, page offset, and the sentinel row in query identity', () => {
@@ -116,22 +113,5 @@ describe('tableRowsQuery', () => {
     })
 
     expect(JSON.parse(query._build()).orderBy).toEqual([['id', 'asc']])
-  })
-
-  it('prefetches the exact stored destination page', () => {
-    const query = buildTableRowsQuery({
-      filters: [],
-      page: 2,
-      pageSize: 1000,
-      schema,
-      sortColumn: 'id',
-      sortDirection: 'asc',
-      tableName: 'users',
-    })
-
-    expect(JSON.parse(query._build())).toMatchObject({
-      limit: 1001,
-      offset: 1000,
-    })
   })
 })

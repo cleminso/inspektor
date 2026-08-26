@@ -55,6 +55,8 @@ describe('resolveTableRowsSearch', () => {
     const unsafePage = Math.floor(Number.MAX_SAFE_INTEGER / 100) + 2
 
     expect(resolveTableRowsSearch({ page: unsafePage, pageSize: 100 }).page).toBe(1)
+    expect(canonicalizeTableRouteSearch({ page: String(unsafePage) }).page).toBeUndefined()
+    expect(canonicalizeTableRouteSearch({ page: '2' }).page).toBe(2)
   })
 
   it('keeps only canonical declared route search', () => {

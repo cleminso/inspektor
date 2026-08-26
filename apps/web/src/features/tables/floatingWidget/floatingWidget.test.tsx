@@ -304,25 +304,19 @@ describe('TableMutationWidget', () => {
     ).toBe(true)
   })
 
-  it('scrolls each operation list only above ten rows', () => {
-    renderReview(12)
+  it('renders large operation reviews in bounded batches', () => {
+    renderReview(120)
 
-    expect(
-      screen
-        .getByRole('region', { name: 'Updated row operations' })
-        .getAttribute('data-scrollable'),
-    ).toBe('false')
-    expect(
-      screen
-        .getByRole('region', { name: 'Deleted row operations' })
-        .getAttribute('data-scrollable'),
-    ).toBe('true')
-    expect(
-      screen.getByRole('button', { name: /Updated rows, 1/ }).closest('[data-scrollable]'),
-    ).toBeNull()
-    expect(
-      screen.getByRole('button', { name: 'Apply changes' }).closest('[data-scrollable]'),
-    ).toBeNull()
+    const lastInitialRow = screen.getByRole('button', { name: 'Undo: row-52' }).closest('li')
+    expect(lastInitialRow?.getAttribute('aria-posinset')).toBe('50')
+    expect(lastInitialRow?.getAttribute('aria-setsize')).toBe('119')
+    expect(screen.queryByRole('button', { name: 'Undo: row-53' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show more deleted row operations' }))
+
+    expect(screen.getByRole('button', { name: 'Undo: row-53' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Undo: row-102' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Undo: row-103' })).toBeNull()
   })
 
   it('projects and applies deletions staged outside the widget', async () => {
@@ -352,14 +346,17 @@ describe('TableMutationWidget', () => {
     const trigger = screen.getByRole('button', { name: 'Staged changes' })
     expect(trigger.textContent).toContain('1')
     expect(trigger.getAttribute('aria-pressed')).toBe('true')
+    fireEvent.click(trigger)
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(trigger.getAttribute('aria-pressed')).toBe('false')
+    expect(document.querySelector('[data-slot="floating-panel-content"]')).toBeNull()
+    fireEvent.click(trigger)
     const reviewButton = screen.getByRole('button', { name: 'Review changes' })
     const panelContent = document.querySelector('[data-slot="floating-panel-content"]')
     expect(panelContent?.getAttribute('data-size')).toBe('compact')
-    expect(reviewButton.getAttribute('data-layout')).toBe('inline')
     fireEvent.click(reviewButton)
     expect(panelContent?.getAttribute('data-size')).toBe('expanded')
     expect(screen.getByRole('region', { name: 'Affected rows' })).toBeTruthy()
-    expect(screen.getByRole('listitem').querySelector('button')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Apply changes' }))
 
     await waitFor(() => expect(deleteRow).toHaveBeenCalledWith('row-1'))

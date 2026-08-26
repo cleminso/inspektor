@@ -7,16 +7,12 @@ import { SelectedTableView } from '@tables/workspace/selectedView'
 
 let mountCount = 0
 const inspectorState = {
-  currentBranch: 'main',
-  currentConnectionId: 'connection-1',
-  currentSchemaHash: 'schema-1',
   runtime: {
     wasmSchema: null as Record<string, unknown> | null,
   },
 }
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspectorSessionState: () => inspectorState,
   useRuntimeSchema: () => inspectorState.runtime.wasmSchema,
 }))
 

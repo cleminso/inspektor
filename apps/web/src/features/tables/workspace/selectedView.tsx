@@ -1,45 +1,15 @@
 import { Box, Text } from '@inspector/ds'
 
-import { useInspectorSessionState, useRuntimeSchema } from '@app/providers/inspectorProvider'
+import { useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { SchemaView } from '@tables/schema/view'
-import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
 import { TableView } from '@tables/workspace/tableView'
-
-interface SelectedTableViewProps {
-  tableName: string | null
-}
-
-function SchemaLoadingStatus(): React.ReactElement {
-  return (
-    <Box
-      flex={1}
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="surface-background"
-      role="status"
-      aria-live="polite"
-    >
-      <Box
-        flexDirection="column"
-        alignItems="center"
-        gap="xs"
-      >
-        <Text
-          variant="label"
-          color="muted"
-        >
-          Loading schema
-        </Text>
-      </Box>
-    </Box>
-  )
-}
 
 export function SelectedTableView({
   tableName,
-}: SelectedTableViewProps): React.ReactElement | null {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
+}: {
+  tableName: string | null
+}): React.ReactElement | null {
   const wasmSchema = useRuntimeSchema()
   const searchState = useTableExplorerSearchParams()
 
@@ -49,23 +19,30 @@ export function SelectedTableView({
 
   if (searchState.view === 'schema') {
     if (wasmSchema === null) {
-      return <SchemaLoadingStatus />
+      return (
+        <Box
+          flex={1}
+          alignItems="center"
+          justifyContent="center"
+          backgroundColor="surface-background"
+          role="status"
+          aria-live="polite"
+        >
+          <Text
+            variant="label"
+            color="muted"
+          >
+            Loading schema
+          </Text>
+        </Box>
+      )
     }
     return <SchemaView tableName={tableName} />
   }
 
-  // Key the table-scoped state boundary by its complete identity so React resets interactions without synchronization effects.
-  const tableViewKey = createTableScope(
-    createTableWorkspaceScope({
-      branch: currentBranch,
-      connectionId: currentConnectionId,
-      schemaHash: currentSchemaHash,
-    }),
-    tableName,
-  )
   return (
     <TableView
-      key={tableViewKey}
+      key={tableName}
       tableName={tableName}
     />
   )

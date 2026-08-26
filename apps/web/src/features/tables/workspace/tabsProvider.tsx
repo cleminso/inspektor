@@ -45,6 +45,7 @@ interface TableTabsContextValue {
   activeTabId: string | null
   recentViews: readonly TableDataTab[]
   replaceableTabId: string | null
+  scope: string
   tabs: readonly TableTab[]
   activateTab: (tabId: string) => void
   closeTab: (tabId: string) => void
@@ -432,6 +433,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       activeTabId,
       recentViews: state.recentViews,
       replaceableTabId: state.replaceableTabId,
+      scope,
       tabs: state.tabs,
       activateTab,
       closeTab,
@@ -454,6 +456,7 @@ export function TableTabsProvider({ children, scope }: TableTabsProviderProps): 
       persistTable,
       reorderTabs,
       activeTabId,
+      scope,
       state,
     ],
   )

@@ -17,7 +17,7 @@ import {
   type TableTabSearch,
 } from '@tables/tableTypes'
 
-export function parsePositiveInteger(value: unknown): number | undefined {
+function parsePositiveInteger(value: unknown): number | undefined {
   const numberValue = typeof value === 'string' ? Number(value) : value
   return typeof numberValue === 'number' && Number.isSafeInteger(numberValue) && numberValue > 0
     ? numberValue

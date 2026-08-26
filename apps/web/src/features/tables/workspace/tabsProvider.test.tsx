@@ -75,13 +75,22 @@ function MutationActions(): React.ReactElement {
 }
 
 function TabActions(): React.ReactElement {
-  const { activeTabId, closeTab, openBaseTabs, openNewView, persistTable, replaceableTabId, tabs } =
-    useTableTabs()
+  const {
+    activeTabId,
+    closeTab,
+    openBaseTabs,
+    openNewView,
+    persistTable,
+    replaceableTabId,
+    scope,
+    tabs,
+  } = useTableTabs()
   return (
     <>
       <output aria-label="Active tab">{activeTabId ?? 'none'}</output>
       <output aria-label="Open tabs">{tabs.map((tab) => tab.id).join(',')}</output>
       <output aria-label="Replaceable tab">{replaceableTabId ?? 'none'}</output>
+      <output aria-label="Workspace scope">{scope}</output>
       <button type="button" onClick={() => closeTab('table:accounts')}>
         Close accounts
       </button>
@@ -117,6 +126,7 @@ describe('TableTabsProvider', () => {
   it('opens a missing routed table as replaceable and persists it through bulk open', async () => {
     render(<Harness />)
 
+    expect(screen.getByLabelText('Workspace scope').textContent).toBe('scope')
     await waitFor(() =>
       expect(screen.getByLabelText('Replaceable tab').textContent).toBe('table:accounts'),
     )

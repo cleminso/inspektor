@@ -52,18 +52,9 @@ one speculative subscription is retained by each navigation surface at a time.
 
 ### 2. Build the destination query
 
-`startTableRowsPrefetch` resolves the destination search state and calls the same `buildTableRowsQuery` function used by the rendered
-table. The table list omits search inputs and produces this default shape:
-
-- no filters
-- sort by `id` ascending
-- request page one with a page size of 100 rows
-- fetch one additional row so `useTableRows` can derive whether more rows are available
-- use the shared `INSPECTOR_QUERY_OPTIONS`
-
-An inactive table tab supplies its stored filters, sort column, sort direction, page, and page size. `resolveTableRowsSearch` applies
-the same defaults and malformed-search handling used by the destination route, so prefetch can acquire the exact page represented by
-the tab.
+Both navigation surfaces pass the destination's stored search through `resolveTableRowsSearch`, which applies the route's defaults and
+malformed-search handling. `startTableRowsPrefetch` then calls the same `buildTableRowsQuery` function and uses the same
+`INSPECTOR_QUERY_OPTIONS` as the rendered table, including the pagination probe used to determine whether more rows are available.
 
 ### 3. Acquire the Jazz cache entry
 
@@ -105,8 +96,9 @@ Prefetch only provides reuse when both callers produce the same canonical Jazz q
 - extra-row pagination probe
 - propagation and visibility options
 
-Do not duplicate the default query shape in `TableListPane`. Change defaults in `tableRowsQuery.ts` and cover both prefetch and
-rendered-query identity in tests.
+`TableListPane` and `TableTabsView` resolve stored route state through `resolveTableRowsSearch` before prefetching. Do not duplicate
+query defaults in either navigation surface. Change defaults in `tableRowsSearch.ts` or `tableRowsQuery.ts` and cover prefetch and
+rendered-query identity together in tests.
 
 `queryOptions.ts` owns the shared propagation and visibility values because both prefetch and rendered subscriptions must serialize
 the same Jazz cache key.
@@ -118,9 +110,13 @@ page subscriptions for contained rows.
 ## Subscription lifecycle
 
 `useTableRowsPrefetchIntent` stores timeout and release handles in refs because they are transient resources and do not affect rendered
-output. The table list and tabs view share this owner. Cleanup runs when intent moves to another target, pointer and keyboard intent end,
-the target closes, the runtime changes, or the owning surface unmounts. Prefetch is released after the target becomes active; React
-effects run after the destination render, allowing its subscription to join the cache entry first.
+output. The table list and tabs view share this owner. Scheduled work is cancelled before starting when its target becomes active or
+unavailable. Active cleanup runs when intent moves to another target, pointer and keyboard intent end, the target closes, the runtime
+changes, or the owning surface unmounts. Prefetch is released after the target becomes active; React effects run after the destination
+render, allowing its subscription to join the cache entry first.
+
+Pointer and focus intent retain the same target together so one modality ending does not release the other's work. A newer target owns
+the sole speculative subscription; ending it does not resume an older target without another intent event.
 
 The destination table owns an independent subscription through `useSyncExternalStore`. React calls the returned cleanup when the
 active query entry changes or the component unmounts. A contained pagination change keeps the broader entry active. `useTableRows`

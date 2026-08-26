@@ -24,8 +24,6 @@ explicit `Apply changes` action.
 
 Complete-row insertion remains an immediate mutation owned by `InsertRowForm`.
 
-The implementation sequence is recorded in [Floating mutation widget implementation tasks](./tasks.md).
-
 ## Scope
 
 The Tables workspace owns independent staged mutation states. Each state is identified by its
@@ -47,7 +45,8 @@ native unload warning, but each browser controls whether it appears and its disp
 
 ## State model
 
-`TableMutationLedgerProvider` owns:
+`TableMutationLedgerWorkspaceProvider` owns the table-scoped state registry. `TableMutationLedgerProvider` selects one scope and
+projects its schema-aware mutation state:
 
 - one raw `RowMutationDraft` per edited row;
 - staged deletion operations that retain the row IDs captured by each confirmed deletion;
@@ -187,7 +186,8 @@ The accordion root and operation triggers do not scroll. Each expanded operation
 scroll viewport while the summary, Apply, and Discard controls remain fixed.
 
 - Ten operation items or fewer fit their content without scrolling.
-- More than ten operation items expose ten compact rows and scroll the remainder.
+- More than ten operation items use a bounded scroll viewport.
+- At most 50 operations mount initially in each list; `Show more` adds another 50.
 - Operation rows use constrained geometry so the ten-row boundary is deterministic.
 A bulk operation remains one review item regardless of target count. A target preview, if introduced,
 owns separate bounded rendering and is not required by this implementation.

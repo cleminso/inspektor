@@ -9,7 +9,7 @@ import {
 } from '@tables/query/tableRowsPrefetch'
 import type { TablePageSize, TableSortDirection } from '@tables/tableTypes'
 
-export interface TableRowsPrefetchTarget {
+interface TableRowsPrefetchTarget {
   filters?: readonly TableFilterClause[]
   key: string
   page?: number
@@ -26,33 +26,41 @@ interface UseTableRowsPrefetchIntentOptions {
   schema: WasmSchema | null
 }
 
-interface TableRowsPrefetchIntent {
-  cancelScheduled: () => void
-  prefetch: (target: TableRowsPrefetchTarget) => void
-  release: (key?: string) => void
-  schedule: (target: TableRowsPrefetchTarget) => void
+function getTargetIdentity(target: TableRowsPrefetchTarget): string {
+  return JSON.stringify([
+    target.tableName,
+    target.filters ?? null,
+    target.page ?? null,
+    target.pageSize ?? null,
+    target.sortColumn ?? null,
+    target.sortDirection ?? null,
+  ])
 }
 
-/** Owns one speculative table-row subscription across pointer and keyboard intent. */
+/** Owns one speculative table-row subscription for a navigation surface. */
 export function useTableRowsPrefetchIntent({
   activeKey,
   availableKeys,
   client,
   schema,
-}: UseTableRowsPrefetchIntentOptions): TableRowsPrefetchIntent {
+}: UseTableRowsPrefetchIntentOptions) {
   const runtimeRef = useRef({ client, schema })
   runtimeRef.current = { client, schema }
   const activeKeyRef = useRef(activeKey)
   activeKeyRef.current = activeKey
-  const activePrefetchRef = useRef<{ key: string; release: () => void } | null>(null)
-  const timeoutRef = useRef<number | null>(null)
+  const activePrefetchRef = useRef<{
+    key: string
+    release: () => void
+    targetIdentity: string
+  } | null>(null)
+  const timeoutRef = useRef<{ key: string; timeoutId: number } | null>(null)
 
   const cancelScheduled = useCallback(() => {
     if (timeoutRef.current === null) {
       return
     }
 
-    window.clearTimeout(timeoutRef.current)
+    window.clearTimeout(timeoutRef.current.timeoutId)
     timeoutRef.current = null
   }, [])
 
@@ -70,9 +78,14 @@ export function useTableRowsPrefetchIntent({
     (target: TableRowsPrefetchTarget) => {
       cancelScheduled()
       const runtime = runtimeRef.current
+      const targetIdentity = getTargetIdentity(target)
+      const activePrefetch = activePrefetchRef.current
+      if (activePrefetch?.targetIdentity === targetIdentity) {
+        activePrefetch.key = target.key
+        return
+      }
       if (
         target.key === activeKeyRef.current ||
-        activePrefetchRef.current?.key === target.key ||
         runtime.client === null ||
         runtime.schema === null
       ) {
@@ -92,6 +105,7 @@ export function useTableRowsPrefetchIntent({
           sortDirection: target.sortDirection,
           tableName: target.tableName,
         }),
+        targetIdentity,
       }
     },
     [cancelScheduled, release],
@@ -99,15 +113,18 @@ export function useTableRowsPrefetchIntent({
 
   const schedule = useCallback(
     (target: TableRowsPrefetchTarget) => {
-      if (activePrefetchRef.current?.key === target.key) {
+      cancelScheduled()
+      const activePrefetch = activePrefetchRef.current
+      if (activePrefetch?.targetIdentity === getTargetIdentity(target)) {
+        activePrefetch.key = target.key
         return
       }
 
-      cancelScheduled()
-      timeoutRef.current = window.setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         timeoutRef.current = null
         prefetch(target)
       }, TABLE_ROWS_PREFETCH_INTENT_DELAY_MS)
+      timeoutRef.current = { key: target.key, timeoutId }
     },
     [cancelScheduled, prefetch],
   )
@@ -121,15 +138,22 @@ export function useTableRowsPrefetchIntent({
   )
 
   useEffect(() => {
+    const scheduledPrefetch = timeoutRef.current
+    if (
+      scheduledPrefetch !== null &&
+      (scheduledPrefetch.key === activeKey ||
+        availableKeys.includes(scheduledPrefetch.key) === false)
+    ) {
+      cancelScheduled()
+    }
     const activePrefetch = activePrefetchRef.current
     if (
       activePrefetch !== null &&
       (activePrefetch.key === activeKey || availableKeys.includes(activePrefetch.key) === false)
     ) {
-      activePrefetchRef.current = null
-      activePrefetch.release()
+      release(activePrefetch.key)
     }
-  }, [activeKey, availableKeys])
+  }, [activeKey, availableKeys, cancelScheduled, release])
 
   return { cancelScheduled, prefetch, release, schedule }
 }

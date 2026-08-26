@@ -20,10 +20,7 @@ import {
 } from '@app/providers/inspectorProvider'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
-import {
-  type TableRowsPrefetchTarget,
-  useTableRowsPrefetchIntent,
-} from '@tables/query/useTableRowsPrefetchIntent'
+import { useTableRowsPrefetchIntent } from '@tables/query/useTableRowsPrefetchIntent'
 import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { NewTableView } from '@tables/workspace/newView'
@@ -106,7 +103,7 @@ export function TableTabsView({
     schema: wasmSchema,
   })
 
-  const getPrefetchTarget = (tabId: string): TableRowsPrefetchTarget | null => {
+  const getPrefetchTarget = (tabId: string) => {
     const tab = tabs.find(
       (candidate): candidate is TableDataTab =>
         candidate.kind === 'table' && candidate.id === tabId,
@@ -121,15 +118,10 @@ export function TableTabsView({
       return null
     }
 
-    const search = resolveTableRowsSearch(tab.search)
     return {
       key: tab.id,
-      filters: search.filters,
-      page: search.page,
-      pageSize: search.pageSize,
-      sortColumn: search.sortColumn,
-      sortDirection: search.sortDirection,
       tableName: tab.tableName,
+      ...resolveTableRowsSearch(tab.search),
     }
   }
 
@@ -244,7 +236,6 @@ export function TableTabsView({
               >
                 {tabs.map((tab) => {
                   if (tab.kind === 'newView') {
-                    const canCloseNewView = tabs.length > 1
                     return (
                       <WorkspaceTabs.Tab
                         key={tab.id}
@@ -253,7 +244,7 @@ export function TableTabsView({
                         closeLabel="Close New view"
                         reorderLabel="Reorder New view"
                         onClose={
-                          canCloseNewView === true
+                          tabs.length > 1
                             ? () => {
                                 closeTab(tab.id)
                               }
@@ -265,7 +256,6 @@ export function TableTabsView({
                     )
                   }
 
-                  const isSchemaTab = tab.search.view === 'schema'
                   const isReplaceable = tab.id === replaceableTabId
                   const tabLabel = tab.tableName
                   return (
@@ -273,7 +263,7 @@ export function TableTabsView({
                       key={tab.id}
                       value={tab.id}
                       prefix={
-                        isSchemaTab === true ? (
+                        tab.search.view === 'schema' ? (
                           <Icon
                             artwork={productGlyphs.derivedView}
                             size="s"

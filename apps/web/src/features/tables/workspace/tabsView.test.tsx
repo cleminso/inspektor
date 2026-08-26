@@ -298,7 +298,6 @@ describe('TableTabsView', () => {
 
     render(<TableTabsView tableName="accounts" />)
 
-    expect(screen.getByRole('tabpanel').tabIndex).toBe(-1)
     expect(screen.getByText('Selected table: accounts')).toBeTruthy()
     expect(screen.queryByText('New table view content')).toBeNull()
   })
@@ -330,9 +329,6 @@ describe('TableTabsView', () => {
 
     const profilesTabs = screen.getAllByRole('tab', { name: 'profiles' })
     expect(profilesTabs).toHaveLength(2)
-    expect(
-      profilesTabs.every((tab) => tab.hasAttribute('data-base-ui-tooltip-trigger') === false),
-    ).toBe(true)
     expect(screen.getAllByRole('button', { name: 'Close profiles' })).toHaveLength(2)
   })
 

@@ -14,6 +14,14 @@
 
 [26/08/26]
 
+### Operation review rendering
+
+- [x] Keep the mutation ledger's complete review projection independent from viewport presentation.
+- [x] Bound each expanded operation list to 50 rendered rows and expose further operations in explicit batches.
+- [x] Preserve complete list position and size semantics for assistive technology while rendering a partial batch.
+
+[26/08/26]
+
 ### Deletion Apply presentation
 
 - [x] Keep staged deletion rows visible while Apply is unresolved.
@@ -288,19 +296,6 @@ This block supersedes the earlier pending-copy, immediate-delete, and review-sup
 
 ## Open product work
 
-[17/08/26]
-
-### Operation review and grid recovery
-
-- [ ] Complete the approved [Floating mutation widget implementation plan](../specs/floatingMutationWidget/tasks.md).
-- [ ] Replace affected-row and field-count review rows with plain-language operation summaries.
-- [ ] Preserve confirmed deletion batches as review operations while deriving row deletions for Apply.
-- [ ] Highlight valid staged-update cells with a dedicated warm amber pending-change treatment.
-- [ ] Add `Revert this change` and row-scoped `Revert staged changes` to the shared grid context menu.
-- [ ] Keep operation-level Undo in review and complete-ledger Discard in the Floating widget.
-- [ ] Keep accordion triggers fixed, fit up to ten operation rows, and scroll only each expanded operation list beyond that boundary.
-- [ ] Add bounded incremental or virtual rendering for large operation lists without virtualizing the accordion structure.
-
 [14/08/26]
 
 The older blocks below record the superseded single-row draft design and are retained as implementation history. They are not
@@ -465,6 +460,11 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 - [x] Remove update overlays for columns that disappear from the live schema so obsolete fields cannot keep a draft dirty.
 
 ## Validation checklist
+
+[26/08/26]
+
+- [x] Cover 50-row operation batches and explicit access to the next batch while preserving independent list scrolling.
+- [x] Verify focused tests, changed-file lint, application typecheck and build, and package-wide tests.
 
 [25/08/26]
 

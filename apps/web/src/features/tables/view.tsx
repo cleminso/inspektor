@@ -17,18 +17,12 @@ import {
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { TableTabsView } from '@tables/workspace/tabsView'
-import { createTableWorkspaceScope } from '@tables/workspace/scope'
 
 export function TableExplorerScreen(): React.ReactElement {
-  const { currentBranch, currentConnectionId, currentSchemaHash, currentTableName } =
-    useInspectorSessionState()
+  const { currentTableName } = useInspectorSessionState()
   const routeSearch = useSearch({ strict: false })
   const currentView = routeSearch.view === 'schema' ? 'schema' : 'data'
-  const scope = createTableWorkspaceScope({
-    branch: currentBranch,
-    connectionId: currentConnectionId,
-    schemaHash: currentSchemaHash,
-  })
+  const { openBaseTabs, persistTable, scope, tabs: openTabs } = useTableTabs()
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set())
   const [pinnedTableNames, setPinnedTableNames] = useState<ReadonlySet<string>>(() =>
     loadPinnedTableNames(scope),
@@ -39,7 +33,6 @@ export function TableExplorerScreen(): React.ReactElement {
   const connectionEntryPending =
     isSchemaReady === false ||
     (currentTableName === null && routeSearch.empty !== 'true' && tables.length > 0)
-  const { openBaseTabs, persistTable, tabs: openTabs } = useTableTabs()
   const tableSearchByName = useMemo(
     () =>
       new Map(

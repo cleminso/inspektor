@@ -19,7 +19,6 @@ import {
   reduceTableMutationState,
   selectTableMutationProjection,
   type TableMutationEntry,
-  type TableMutationLedger,
   type TableMutationProjection,
   type TableMutationReviewOperation,
   type TableMutationState,
@@ -32,11 +31,8 @@ import {
   type MutationFieldInput,
   type RowMutationDraft,
 } from '@tables/rowEditor/mutation/draft'
-import type { TableRowId, TableValuesByRowId } from '@tables/tableTypes'
-import {
-  useBoundRowDraftController,
-  type RowDraftController,
-} from '@tables/rowEditor/mutation/useRowDraftController'
+import type { TableRowId } from '@tables/tableTypes'
+import { useBoundRowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 
 interface TableMutationExecutionState {
   error: string | null
@@ -318,28 +314,7 @@ function useMutationContext(): TableMutationLedgerContextValue {
   return context
 }
 
-interface ScopedTableMutationLedger {
-  discardAll: () => void
-  execution: TableMutationExecutionState
-  ledger: TableMutationLedger
-  rebaseRows: (rows: readonly (Record<string, unknown> & { id: string })[]) => void
-  revertField: (rowId: string, fieldName: string) => void
-  revertRowUpdate: (rowId: string) => void
-  reviewOperations: readonly TableMutationReviewOperation[]
-  stageDeletions: (rowIds: readonly TableRowId[]) => void
-  stagedFieldsByRowId: Readonly<Record<string, ReadonlySet<string>>>
-  stagedValuesByRowId: TableValuesByRowId
-  stagedCount: number
-  undoDeletions: (rowIds: readonly TableRowId[]) => void
-  undoReviewOperation: (operationId: TableMutationReviewOperation['operationId']) => void
-}
-
-interface TableMutationApplicationCommands {
-  acknowledgeAppliedEntries: (entryIds: readonly TableMutationEntry['entryId'][]) => void
-  setExecution: (execution: TableMutationExecutionState) => void
-}
-
-export function useTableMutationApplicationCommands(): TableMutationApplicationCommands {
+export function useTableMutationApplicationCommands() {
   const context = useMutationContext()
   const contextDispatch = context.dispatch
   const acknowledgeAppliedEntries = useCallback(
@@ -370,20 +345,16 @@ function haveEqualStagedFields(
   )
 }
 
-export function useTableMutationLedger(): ScopedTableMutationLedger {
+export function useTableMutationLedger() {
   const context = useMutationContext()
   const contextDispatch = context.dispatch
   const setExecution = context.setExecution
-  const projection = context.projection
-  const ledger = projection.ledger
-  const reviewOperations = projection.reviewOperations
-  const selectedStagedFields = projection.stagedFieldsByRowId
+  const { ledger, reviewOperations, stagedFieldsByRowId: selectedStagedFields } = context.projection
   const stagedFieldsRef = useRef(selectedStagedFields)
   if (haveEqualStagedFields(stagedFieldsRef.current, selectedStagedFields) === false) {
     stagedFieldsRef.current = selectedStagedFields
   }
   const stagedFieldsByRowId = stagedFieldsRef.current
-  const stagedValuesByRowId = projection.stagedValuesByRowId
   const stagedCount = countUnresolvedMutationState(context.state)
   const recover = useCallback(
     (action: PublicMutationAction) => {
@@ -431,7 +402,7 @@ export function useTableMutationLedger(): ScopedTableMutationLedger {
     reviewOperations,
     stageDeletions,
     stagedFieldsByRowId,
-    stagedValuesByRowId,
+    stagedValuesByRowId: context.projection.stagedValuesByRowId,
     stagedCount,
     undoDeletions,
     undoReviewOperation,
@@ -443,14 +414,10 @@ interface UseTableMutationEditorControllerOptions {
   rowId: string
 }
 
-interface TableMutationEditorController extends RowDraftController {
-  commitFieldInput: (columnName: string, input: MutationFieldInput) => void
-}
-
 export function useTableMutationEditorController({
   initialRowValues,
   rowId,
-}: UseTableMutationEditorControllerOptions): TableMutationEditorController {
+}: UseTableMutationEditorControllerOptions) {
   const context = useMutationContext()
   const contextDispatch = context.dispatch
   const schemaColumns = context.schemaColumns

@@ -27,6 +27,7 @@ import {
 } from '@app/providers/inspectorProvider'
 import { appRoutes } from '@app/routing/appRoutes'
 import { useTableRowsPrefetchIntent } from '@tables/query/useTableRowsPrefetchIntent'
+import { resolveTableRowsSearch } from '@tables/routing/tableRowsSearch'
 import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const deferredRenderingThreshold = 50
@@ -135,10 +136,6 @@ interface TableListPaneProps {
   onUnpinTables: (tableNames: readonly string[]) => void
 }
 
-function hasShiftKey(event: Event): boolean {
-  return 'shiftKey' in event && event.shiftKey === true
-}
-
 function getActionLabel(action: 'Open' | 'Pin' | 'Unpin', count: number): string {
   return `${action} ${count} ${count === 1 ? 'table' : 'tables'}`
 }
@@ -175,14 +172,15 @@ export function TableListPane({
   const { currentConnectionId } = useInspectorSessionState()
   const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
-  const canBuildHref = currentConnectionId !== null
   const pinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName))
   const unpinnedTables = tables.filter((tableName) => pinnedTableNames.has(tableName) === false)
   const deferTableRendering = tables.length > deferredRenderingThreshold
   const hasCheckedTables = checkedTableNames.size > 0
   const clearSelection = useEffectEvent(onClearSelection)
   const pendingMenuActionRef = useRef<(() => void) | null>(null)
-  const prefetchIntent = useTableRowsPrefetchIntent({
+  const focusedPrefetchKeyRef = useRef<string | null>(null)
+  const pointerPrefetchKeyRef = useRef<string | null>(null)
+  const { cancelScheduled, prefetch, release, schedule } = useTableRowsPrefetchIntent({
     activeKey: selectedTableName,
     availableKeys: tables,
     client,
@@ -194,6 +192,11 @@ export function TableListPane({
       return
     }
 
+    focusedPrefetchKeyRef.current = null
+    pointerPrefetchKeyRef.current = null
+    cancelScheduled()
+    release()
+
     const handlePointerDown = (event: PointerEvent) => {
       if (isTableSelectionInteraction(event.target) === false) {
         clearSelection()
@@ -204,7 +207,7 @@ export function TableListPane({
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown, true)
     }
-  }, [hasCheckedTables])
+  }, [cancelScheduled, hasCheckedTables, release])
 
   const renderTableList = (
     section: TableListSection,
@@ -263,12 +266,18 @@ export function TableListPane({
             const isActive = selectedTableName === tableName
             const isChecked = checkedTableNames.has(tableName)
             const tableParams =
-              canBuildHref === true
+              currentConnectionId !== null
                 ? {
                     connectionId: currentConnectionId,
                     tableName,
                   }
                 : null
+            const storedSearch = tableSearchByName.get(tableName) ?? {}
+            const prefetchTarget = {
+              key: tableName,
+              tableName,
+              ...resolveTableRowsSearch(storedSearch),
+            }
             const handleActionsOpenChange = (open: boolean) => {
               if (open === true && isChecked === false) {
                 onReplaceSelection(tableName, section)
@@ -276,7 +285,7 @@ export function TableListPane({
             }
             const changeChecked = (checked: boolean, event: Event) => {
               onTableCheckedChange(tableName, checked, {
-                extendRange: hasShiftKey(event),
+                extendRange: 'shiftKey' in event && event.shiftKey === true,
                 orderedTableNames: sectionTables,
                 section,
               })
@@ -299,21 +308,36 @@ export function TableListPane({
                     <Link
                       to={appRoutes.table}
                       params={tableParams}
-                      search={tableSearchByName.get(tableName) ?? {}}
+                      search={storedSearch}
                       aria-current={isActive === true ? 'page' : undefined}
                       onBlur={() => {
-                        prefetchIntent.cancelScheduled()
-                        prefetchIntent.release(tableName)
+                        focusedPrefetchKeyRef.current = null
+                        if (pointerPrefetchKeyRef.current !== tableName) {
+                          cancelScheduled()
+                          release(tableName)
+                        }
                       }}
                       onDoubleClick={() => {
                         onPersistTable(tableName)
                       }}
-                      onFocus={() => prefetchIntent.prefetch({ key: tableName, tableName })}
-                      onPointerDown={() => prefetchIntent.prefetch({ key: tableName, tableName })}
-                      onPointerEnter={() => prefetchIntent.schedule({ key: tableName, tableName })}
+                      onFocus={() => {
+                        focusedPrefetchKeyRef.current = tableName
+                        prefetch(prefetchTarget)
+                      }}
+                      onPointerDown={() => {
+                        pointerPrefetchKeyRef.current = tableName
+                        prefetch(prefetchTarget)
+                      }}
+                      onPointerEnter={() => {
+                        pointerPrefetchKeyRef.current = tableName
+                        schedule(prefetchTarget)
+                      }}
                       onPointerLeave={() => {
-                        prefetchIntent.cancelScheduled()
-                        prefetchIntent.release(tableName)
+                        pointerPrefetchKeyRef.current = null
+                        cancelScheduled()
+                        if (focusedPrefetchKeyRef.current !== tableName) {
+                          release(tableName)
+                        }
                       }}
                     />
                   }

@@ -19,6 +19,16 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[26/08/26]
+
+### Prefetch and deferred module ownership
+
+- [x] Prefetch the exact canonical stored table search used by table-list navigation.
+- [x] Cancel delayed intent when its target becomes active or unavailable and replace work when one UI key resolves to another query.
+- [x] Preserve focus-owned table-list prefetch while pointer intent enters and leaves the same target.
+- [x] Replace the custom preloadable-component lifecycle with shared import promises and `React.lazy` while retaining speculative retry, explicit Suspense, render-failure propagation, and static bundle boundaries.
+- [x] Supersede synchronous completed-preload rendering as a required contract; the row-editor Suspense boundary owns deferred readiness presentation.
+
 [25/08/26]
 
 - [x] Keep query ownership, cache-key, preservation-boundary, and active-draft invariants documented beside the code that enforces them.
@@ -1152,6 +1162,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[26/08/26]
+
+- [x] Reproduce stored-search mismatch, stale delayed intent, changed-query reuse, and mixed pointer and focus ownership with focused prefetch tests.
+- [x] Verify the row-editor static boundary and separate edit and insert production chunks after removing the custom preloadable component.
+- [x] Verify focused tests, changed-file lint, application typecheck and build, and package-wide tests.
 
 [25/08/26]
 

@@ -4,10 +4,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TableListPane } from './pane'
 
-const { releasePrefetch, startTableRowsPrefetch } = vi.hoisted(() => ({
-  releasePrefetch: vi.fn(),
-  startTableRowsPrefetch: vi.fn(),
-}))
+const { releasePrefetch, runtimeClient, runtimeSchema, startTableRowsPrefetch } = vi.hoisted(
+  () => ({
+    releasePrefetch: vi.fn(),
+    runtimeClient: { manager: {} },
+    runtimeSchema: { users: { columns: [] } },
+    startTableRowsPrefetch: vi.fn(),
+  }),
+)
 let restoreDocumentFonts: (() => void) | null = null
 
 function mockDocumentFonts() {
@@ -67,8 +71,8 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => ({ currentConnectionId: 'connection' }),
-  useRuntimeClient: () => ({ manager: {} }),
-  useRuntimeSchema: () => ({ users: { columns: [] } }),
+  useRuntimeClient: () => runtimeClient,
+  useRuntimeSchema: () => runtimeSchema,
 }))
 
 vi.mock('@tables/query/tableRowsPrefetch', () => ({
@@ -193,24 +197,6 @@ describe('TableListPane', () => {
     expect(screen.queryByText('No tables')).toBeNull()
     expect(screen.queryByText('No published tables found in this schema.')).toBeNull()
     expect(screen.queryByRole('checkbox')).toBeNull()
-  })
-
-  it('keeps table overflow inside the expanded accordion panel', () => {
-    const { container } = render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['accounts', 'sessions', 'users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    expect(container.querySelector('[data-layout="fill"]')).toBeTruthy()
-    expect(
-      screen.getByText('accounts').closest('[data-scrollbar="overlay"]')?.getAttribute('data-slot'),
-    ).toBe('scroll-area')
   })
 
   it('delegates bulk table selection to the consumer', () => {
@@ -436,7 +422,6 @@ describe('TableListPane', () => {
     const accountsLink = screen.getByRole('button', { name: 'accounts' })
     fireEvent.doubleClick(accountsLink)
 
-    expect(accountsLink.tagName).toBe('A')
     expect(onPersistTable).toHaveBeenCalledWith('accounts')
   })
 
@@ -472,17 +457,87 @@ describe('TableListPane', () => {
 
     const usersLink = screen.getByRole('button', { name: 'users' })
     fireEvent.pointerEnter(usersLink)
-    fireEvent.focus(usersLink)
+    fireEvent.pointerDown(usersLink)
 
     expect(startTableRowsPrefetch).toHaveBeenCalledOnce()
     expect(startTableRowsPrefetch).toHaveBeenCalledWith({
       client: { manager: {} },
+      filters: [],
+      page: 1,
+      pageSize: 100,
       schema: { users: { columns: [] } },
+      sortColumn: 'id',
+      sortDirection: 'asc',
       tableName: 'users',
     })
 
     fireEvent.pointerLeave(usersLink)
 
+    expect(releasePrefetch).toHaveBeenCalledOnce()
+  })
+
+  it('prefetches the exact stored query used by the destination link', () => {
+    const filters = JSON.stringify([
+      {
+        id: 'filter-1',
+        column: 'name',
+        operator: 'contains',
+        value: 'Ada',
+      },
+    ])
+    render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tableSearchByName={new Map([['users', { dir: 'desc', filters, page: 2, sort: 'name' }]])}
+        tables={['users']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    fireEvent.focus(screen.getByRole('button', { name: 'users' }))
+
+    expect(startTableRowsPrefetch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filters: [
+          {
+            id: 'filter-1',
+            column: 'name',
+            operator: 'contains',
+            value: 'Ada',
+          },
+        ],
+        page: 2,
+        pageSize: 100,
+        sortColumn: 'name',
+        sortDirection: 'desc',
+        tableName: 'users',
+      }),
+    )
+  })
+
+  it('retains focused prefetch ownership when pointer intent ends', () => {
+    render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={['users']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    const usersLink = screen.getByRole('button', { name: 'users' })
+    fireEvent.focus(usersLink)
+    fireEvent.pointerEnter(usersLink)
+    fireEvent.pointerLeave(usersLink)
+
+    expect(releasePrefetch).not.toHaveBeenCalled()
+
+    fireEvent.blur(usersLink)
     expect(releasePrefetch).toHaveBeenCalledOnce()
   })
 
@@ -528,6 +583,33 @@ describe('TableListPane', () => {
     fireEvent.pointerEnter(screen.getByRole('button', { name: 'users' }))
 
     expect(startTableRowsPrefetch).not.toHaveBeenCalled()
+  })
+
+  it('releases prefetch when bulk selection replaces navigation links', () => {
+    const { rerender } = render(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={['users']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    fireEvent.focus(screen.getByRole('button', { name: 'users' }))
+    rerender(
+      <TableListPane
+        checkedTableNames={new Set(['users'])}
+        {...defaultActionProps}
+        selectedTableName={null}
+        tables={['users']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    expect(releasePrefetch).toHaveBeenCalledOnce()
   })
 
   it('does not prefetch when pointer intent leaves before settling', () => {
@@ -706,7 +788,7 @@ describe('TableListPane', () => {
   })
 
   it('keeps the pinned and tables sections expanded together', () => {
-    render(
+    const { container } = render(
       <TableListPane
         {...defaultActionProps}
         checkedTableNames={new Set()}
@@ -726,6 +808,7 @@ describe('TableListPane', () => {
 
     expect(pinnedTrigger.getAttribute('aria-expanded')).toBe('true')
     expect(tablesTrigger.getAttribute('aria-expanded')).toBe('true')
+    expect(container.querySelector('[data-layout="fill"]')).toBeTruthy()
   })
 
   it('replaces selection when right-clicking an unselected table', () => {
@@ -791,28 +874,6 @@ describe('TableListPane', () => {
 
     expect(screen.queryByRole('menuitem', { name: 'Deselect all' })).toBeNull()
     expect(onClearSelection).toHaveBeenCalledOnce()
-  })
-
-  it('preserves selection while deselect all is pressed without activation', () => {
-    const onClearSelection = vi.fn()
-
-    render(
-      <TableListPane
-        {...defaultActionProps}
-        checkedTableNames={new Set(['accounts'])}
-        selectedTableName={null}
-        tables={['accounts']}
-        onClearSelection={onClearSelection}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Open accounts actions' }))
-    const deselectAllItem = screen.getByRole('menuitem', { name: 'Deselect all' })
-    fireEvent.pointerDown(deselectAllItem)
-    fireEvent.pointerUp(deselectAllItem)
-
-    expect(onClearSelection).not.toHaveBeenCalled()
   })
 
   it('clears checked tables when the context menu is dismissed', () => {

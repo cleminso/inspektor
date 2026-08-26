@@ -98,6 +98,7 @@ const gridCellContextMenu = vi.hoisted(() => vi.fn())
 const gridRowContextMenu = vi.hoisted(() => vi.fn())
 const toastError = vi.hoisted(() => vi.fn())
 const toastSuccess = vi.hoisted(() => vi.fn())
+const preloadRowEditorForms = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
   current: null as null | {
     onUndoRowDeletions?: (rowIds: readonly string[]) => void
@@ -139,11 +140,6 @@ vi.mock('@tables/workspace/useTableViewState', () => ({
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspectorSessionState: () => ({
-    currentBranch: 'main',
-    currentConnectionId: 'connection-1',
-    currentSchemaHash: 'schema-1',
-  }),
   useRuntimeSchema: () => null,
 }))
 
@@ -152,7 +148,7 @@ vi.mock('@tables/schema/tableSchema', () => ({
 }))
 
 vi.mock('@tables/workspace/tabsProvider', () => ({
-  useTableTabs: () => ({ openSchemaView: vi.fn() }),
+  useTableTabs: () => ({ openSchemaView: vi.fn(), scope: 'connection-1:main:schema-1' }),
 }))
 
 vi.mock('@tables/mutationLedger/provider', () => ({
@@ -301,7 +297,7 @@ vi.mock('@tables/rowEditor/rowEditorModules', () => ({
     return <div>Edit row fields</div>
   },
   InsertRowForm: () => null,
-  preloadRowEditorForms: vi.fn(),
+  preloadRowEditorForms,
 }))
 
 vi.mock('@tables/rowEditor/sidePane', () => ({
@@ -334,18 +330,17 @@ vi.mock('@tables/rowEditor/sidePane', () => ({
 vi.mock('@inspector/ds', () => {
   interface ContainerProps {
     'aria-live'?: 'polite'
-    'data-hotkey-scope'?: string
     children?: ReactNode
     render?: ReactElement
     role?: string
   }
 
   const Container = forwardRef<HTMLDivElement, ContainerProps>(function Container(
-    { 'aria-live': ariaLive, 'data-hotkey-scope': hotkeyScope, children, render, role },
+    { 'aria-live': ariaLive, children, render, role },
     ref,
   ) {
     return (
-      <div ref={ref} aria-live={ariaLive} data-hotkey-scope={hotkeyScope} role={role}>
+      <div ref={ref} aria-live={ariaLive} role={role}>
         {render}
         {children}
       </div>
@@ -563,6 +558,7 @@ afterEach(() => {
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
   toastSuccess.mockReset()
+  preloadRowEditorForms.mockReset()
   if (initialClipboardDescriptor === undefined) {
     Reflect.deleteProperty(navigator, 'clipboard')
   } else {
@@ -595,6 +591,19 @@ function configureNameCell(value: unknown) {
     getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: value } }] }),
   }
 }
+
+describe('TableView row editor preload', () => {
+  it('starts when the row editor becomes available', () => {
+    tableViewState.canOpenRowEditor = false
+    const { rerenderTableView } = renderTableView()
+    expect(preloadRowEditorForms).not.toHaveBeenCalled()
+
+    tableViewState.canOpenRowEditor = true
+    rerenderTableView()
+
+    expect(preloadRowEditorForms).toHaveBeenCalledOnce()
+  })
+})
 
 describe('TableView selection dismissal', () => {
   it('routes Escape to the active selection state', () => {

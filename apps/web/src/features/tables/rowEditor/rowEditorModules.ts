@@ -1,18 +1,26 @@
-import { createPreloadableComponent } from './preloadableComponent'
+import { lazy } from 'react'
 
-const editRowForm = createPreloadableComponent(async () => {
-  const module = await import('./editForm')
-  return { default: module.EditRowForm }
-})
+function createRetryableLoader<T>(load: () => Promise<T>): () => Promise<T> {
+  let promise: Promise<T> | null = null
+  return () => {
+    promise ??= load().catch((error: unknown) => {
+      promise = null
+      throw error
+    })
+    return promise
+  }
+}
 
-const insertRowForm = createPreloadableComponent(async () => {
-  const module = await import('./insertForm')
-  return { default: module.InsertRowForm }
-})
+const loadEditRowForm = createRetryableLoader(() =>
+  import('./editForm').then(({ EditRowForm }) => ({ default: EditRowForm })),
+)
+const loadInsertRowForm = createRetryableLoader(() =>
+  import('./insertForm').then(({ InsertRowForm }) => ({ default: InsertRowForm })),
+)
 
-export const EditRowForm = editRowForm.Component
-export const InsertRowForm = insertRowForm.Component
+export const EditRowForm = lazy(loadEditRowForm)
+export const InsertRowForm = lazy(loadInsertRowForm)
 
 export function preloadRowEditorForms(): void {
-  void Promise.allSettled([editRowForm.preload(), insertRowForm.preload()])
+  void Promise.allSettled([loadEditRowForm(), loadInsertRowForm()])
 }
