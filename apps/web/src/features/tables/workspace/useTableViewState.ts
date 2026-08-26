@@ -15,15 +15,11 @@ import {
   useState,
 } from 'react'
 
-import type { DataGridCellTarget, DataGridFocusRequest, DataGridTable } from '@inspector/ds'
+import type { DataGridCellTarget, DataGridFocusRequest } from '@inspector/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
-import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
+import type { ColumnDescriptor } from 'jazz-tools'
 
-import {
-  useInspectorSessionState,
-  useRuntimeClient,
-  useRuntimeSchema,
-} from '@app/providers/inspectorProvider'
+import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { moveColumnInOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
 import { useTablePreferences } from '@tables/grid/useTablePreferences'
 import { useTableGrid } from '@tables/grid/useTableGrid'
@@ -32,18 +28,8 @@ import { useTableRowById } from '@tables/query/useTableRowById'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { useTableMutations } from '@tables/rowEditor/mutation/useTableMutation'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
-import { getTableColumns } from '@tables/schema/tableSchema'
-import type { TableFilterClause } from '@tables/filters/tableFilters'
-import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
 import { resolveTableSortColumn } from '@tables/query/tableRowsQuery'
-import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
-import type {
-  TableFieldsByRowId,
-  TableColumnMeta,
-  TablePageSize,
-  TableRowId,
-  TableValuesByRowId,
-} from '@tables/tableTypes'
+import type { TableFieldsByRowId, TableRowId, TableValuesByRowId } from '@tables/tableTypes'
 import { getNearestSelectedRowId } from '@tables/grid/rowSelectionFocus'
 import {
   getInlineFieldRoute,
@@ -54,7 +40,10 @@ import {
 interface UseTableViewStateOptions {
   disabledRowIds?: ReadonlySet<TableRowId>
   onUndoRowDeletions?: (rowIds: readonly TableRowId[]) => void
+  retainDisabledRows?: boolean
+  schemaColumns: ColumnDescriptor[]
   stagedValuesByRowId?: TableValuesByRowId
+  tableKey: string
   tableName: string
 }
 
@@ -70,67 +59,7 @@ interface InsertRowSaveOptions {
   keepOpen: boolean
 }
 
-interface TableViewRowEditorState {
-  activeColumnNumber: number
-  activePageRowNumber: number | null
-  activeRowId: TableRowId | null
-  activeRowIndex: number
-  editedRowIds: TableRowId[]
-  goToNextRow: () => void
-  goToPreviousRow: () => void
-  openInsert: () => void
-}
-
 type TableViewDetailPaneMode = 'closed' | 'insert' | 'rows'
-
-interface UseTableViewStateResult {
-  activeColumnId: string | null
-  activeFieldEditorTarget: DataGridCellTarget | null
-  canInspectSchema: boolean
-  canMutateRows: boolean
-  canOpenRowEditor: boolean
-  cellFocusRequest: DataGridFocusRequest | null
-  reorderableColumnIds: readonly string[]
-  detailPaneMode: TableViewDetailPaneMode
-  error: string | null
-  filters: TableFilterClause[]
-  handleEscape: () => void
-  handleCellActivate: (target: DataGridCellTarget) => void
-  handleCellEditRequest: (target: DataGridCellTarget) => void
-  handleColumnActivate: (columnId: string | null) => void
-  handleFieldEditorCancel: () => void
-  handleFieldEditorComplete: (direction: SpreadsheetCompletionDirection) => void
-  handleInsertSave: (
-    values: Record<string, unknown>,
-    options: InsertRowSaveOptions,
-  ) => Promise<void>
-  handleMutationApplySuccess: () => void
-  handleMutationUpdatesApplied: (appliedUpdateFields: TableFieldsByRowId) => void
-  handleRowsStagedForDeletion: (rowIds: readonly TableRowId[]) => void
-  closeRowEditor: () => void
-  handleRowEditorCancel: () => void
-  hasNextPage: boolean
-  hasPreviousPage: boolean
-  hasCellSelection: boolean
-  isInitialLoading: boolean
-  isRefreshing: boolean
-  loadedRowCount: number
-  mutationExecutor: TableMutationExecutor
-  page: number
-  pageSize: TablePageSize
-  recentlyAppliedCells: TableFieldsByRowId
-  recentlyInsertedRowIds: ReadonlySet<TableRowId>
-  rowEditor: TableViewRowEditorState
-  rows: DynamicTableRow[]
-  rowValues: Record<string, unknown> | null
-  schemaColumns: ColumnDescriptor[]
-  setFilters: (filters: TableFilterClause[]) => Promise<void>
-  setPage: (page: number) => void
-  setPageSize: (pageSize: TablePageSize) => void
-  table: DataGridTable<DynamicTableRow>
-  tableColumns: TableColumnMeta[]
-  tableKey: string
-}
 
 /**
  * Builds the state and actions consumed by `TableView` for one runtime-selected Jazz table.
@@ -141,25 +70,15 @@ interface UseTableViewStateResult {
 export function useTableViewState({
   disabledRowIds = emptyDisabledRowIds,
   onUndoRowDeletions,
+  retainDisabledRows = false,
+  schemaColumns,
   stagedValuesByRowId = emptyStagedValuesByRowId,
+  tableKey,
   tableName,
-}: UseTableViewStateOptions): UseTableViewStateResult {
-  const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
+}: UseTableViewStateOptions) {
   const client = useRuntimeClient()
   const wasmSchema = useRuntimeSchema()
   const searchState = useTableExplorerSearchParams()
-  const tableKey = createTableScope(
-    createTableWorkspaceScope({
-      branch: currentBranch,
-      connectionId: currentConnectionId,
-      schemaHash: currentSchemaHash,
-    }),
-    tableName,
-  )
-  const schemaColumns = useMemo(
-    () => getTableColumns(wasmSchema, tableName),
-    [tableName, wasmSchema],
-  )
   const sortColumn =
     wasmSchema === null
       ? searchState.sortColumn
@@ -177,10 +96,34 @@ export function useTableViewState({
       sortColumn,
       sortDirection,
     },
+    schemaColumns,
     scopeKey: tableKey,
     tableName,
     wasmSchema,
   })
+  const settledRowsRef = useRef(query.rows)
+  useLayoutEffect(() => {
+    if (retainDisabledRows === false) {
+      settledRowsRef.current = query.rows
+    }
+  }, [query.rows, retainDisabledRows])
+  const rows = useMemo(() => {
+    if (retainDisabledRows === false) {
+      return query.rows
+    }
+
+    const currentRowsById = new Map(query.rows.map((row) => [String(row.id), row]))
+    const retainedRows = settledRowsRef.current.flatMap((row) => {
+      const rowId = String(row.id)
+      const currentRow = currentRowsById.get(rowId)
+      if (currentRow !== undefined) {
+        currentRowsById.delete(rowId)
+        return currentRow
+      }
+      return disabledRowIds.has(rowId) ? row : []
+    })
+    return [...retainedRows, ...currentRowsById.values()]
+  }, [disabledRowIds, query.rows, retainDisabledRows])
   useEffect(() => {
     if (wasmSchema !== null && sortColumn !== searchState.sortColumn) {
       void setCanonicalSorting(sortColumn, sortDirection)
@@ -190,9 +133,11 @@ export function useTableViewState({
   const activeRowId = searchState.editorMode === 'edit' ? searchState.rowId : null
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
-  const [activeFieldEditorTarget, setActiveFieldEditorTarget] = useState<DataGridCellTarget | null>(
-    null,
-  )
+  const [activeFieldEditor, setActiveFieldEditor] = useState<{
+    rowValues: Record<string, unknown>
+    target: DataGridCellTarget
+  } | null>(null)
+  const activeFieldEditorTarget = activeFieldEditor?.target ?? null
   const [cellFocusRequest, setCellFocusRequest] = useState<DataGridFocusRequest | null>(null)
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>(() =>
     activeRowId === null ? [] : [activeRowId],
@@ -294,15 +239,15 @@ export function useTableViewState({
   }, [activeRowId, selectedRowIds])
   const editedRowIds = activeRowId === null ? [] : effectiveSelectedRowIds
   const activeRowIndex = activeRowId === null ? 0 : Math.max(editedRowIds.indexOf(activeRowId), 0)
-  const validRowIds = useMemo(() => query.rows.map((row) => String(row.id)), [query.rows])
+  const validRowIds = useMemo(() => rows.map((row) => String(row.id)), [rows])
   const visibleSelectedRowIds = useMemo(() => {
     const validRowIdSet = new Set(validRowIds)
     return effectiveSelectedRowIds.filter((rowId) => validRowIdSet.has(rowId) === true)
   }, [effectiveSelectedRowIds, validRowIds])
 
   const activePageRowIndex =
-    activeRowId === null ? -1 : query.rows.findIndex((row) => String(row.id) === activeRowId)
-  const visibleActiveRow = activePageRowIndex < 0 ? null : (query.rows[activePageRowIndex] ?? null)
+    activeRowId === null ? -1 : rows.findIndex((row) => String(row.id) === activeRowId)
+  const visibleActiveRow = activePageRowIndex < 0 ? null : (rows[activePageRowIndex] ?? null)
   // Keep the edited row available when filtering or pagination removes it from the visible query.
   const activeRow = useTableRowById({
     client,
@@ -319,7 +264,7 @@ export function useTableViewState({
         : nextSelectedRowIds[0]
     setSelectedRowIds(nextSelectedRowIds)
     setActiveColumnId(null)
-    setActiveFieldEditorTarget(null)
+    setActiveFieldEditor(null)
 
     if (resolvedActiveRowId === undefined) {
       void searchState.setRowEditor(null, null)
@@ -362,7 +307,7 @@ export function useTableViewState({
     setSelectedRowIds(nextSelectedRowIds)
     setCellSelection([])
     setActiveColumnId(null)
-    setActiveFieldEditorTarget(null)
+    setActiveFieldEditor(null)
   }, [])
 
   useLayoutEffect(() => {
@@ -415,7 +360,7 @@ export function useTableViewState({
     cellSelection,
     columnOrder: tablePreferences.columnOrder,
     disabledRowIds,
-    rows: query.rows,
+    rows,
     columns: query.columns,
     sortColumn,
     sortDirection,
@@ -462,7 +407,7 @@ export function useTableViewState({
 
   const handleEscape = () => {
     if (activeFieldEditorTarget !== null) {
-      setActiveFieldEditorTarget(null)
+      setActiveFieldEditor(null)
       requestCellFocus(activeFieldEditorTarget)
       return
     }
@@ -515,7 +460,7 @@ export function useTableViewState({
     )
     setCellSelection([])
     setActiveColumnId(null)
-    setActiveFieldEditorTarget(null)
+    setActiveFieldEditor(null)
     closeDetailPane()
   }
 
@@ -562,7 +507,7 @@ export function useTableViewState({
     if (activeFieldEditorTarget === null) {
       return
     }
-    setActiveFieldEditorTarget(null)
+    setActiveFieldEditor(null)
     requestCellFocus(activeFieldEditorTarget)
   }
 
@@ -581,13 +526,14 @@ export function useTableViewState({
       activeFieldEditorTarget,
       direction,
     )
-    setActiveFieldEditorTarget(null)
+    setActiveFieldEditor(null)
     requestCellFocus(target)
   }
 
   return {
     activeColumnId,
     activeFieldEditorTarget,
+    activeFieldEditorRowValues: activeFieldEditor?.rowValues ?? null,
     canInspectSchema: wasmSchema !== null,
     canMutateRows: client !== null && wasmSchema !== null,
     canOpenRowEditor: wasmSchema !== null,
@@ -598,13 +544,11 @@ export function useTableViewState({
     detailPaneMode,
     error: query.error,
     table,
-    loadedRowCount: query.rows.length,
-    rows: query.rows,
+    rows,
     mutationExecutor: mutations,
     page: searchState.page,
     pageSize: searchState.pageSize,
     hasNextPage: query.hasNextPage,
-    hasPreviousPage: searchState.page > 1,
     hasCellSelection: cellSelection.length > 0,
     isInitialLoading: query.isInitialLoading,
     isRefreshing: query.isRefreshing,
@@ -612,21 +556,19 @@ export function useTableViewState({
     setPageSize: searchState.setPageSize,
     filters: searchState.filters,
     setFilters: searchState.setFilters,
-    schemaColumns,
     tableColumns: query.columns,
-    tableKey,
     rowValues,
     rowEditor: {
       activeColumnNumber,
       activePageRowNumber,
-      activeRowId: detailPaneMode === 'rows' ? activeRowId : null,
+      activeRowId,
       activeRowIndex,
       editedRowIds,
       goToNextRow,
       goToPreviousRow,
       openInsert,
     },
-    handleCellActivate: (target) => {
+    handleCellActivate: (target: DataGridCellTarget) => {
       setActiveColumnId(null)
       if (detailPaneMode === 'rows' && target.rowId === activeRowId) {
         requestAnimationFrame(() => {
@@ -634,7 +576,7 @@ export function useTableViewState({
         })
       }
     },
-    handleCellEditRequest: (target) => {
+    handleCellEditRequest: (target: DataGridCellTarget) => {
       if (detailPaneMode !== 'closed') {
         return
       }
@@ -657,7 +599,10 @@ export function useTableViewState({
         return
       }
       setActiveColumnId(null)
-      setActiveFieldEditorTarget(target)
+      const row = rows.find((candidate) => String(candidate.id) === target.rowId)
+      if (row !== undefined) {
+        setActiveFieldEditor({ rowValues: { ...row }, target })
+      }
     },
     handleEscape,
     handleColumnActivate,

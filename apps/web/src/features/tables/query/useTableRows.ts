@@ -6,13 +6,12 @@
  */
 import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
-import { type DynamicTableRow, type WasmSchema } from 'jazz-tools'
+import { type ColumnDescriptor, type DynamicTableRow, type WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 
 import { buildTableRowsQuery, isTableColumnSortable } from '@tables/query/tableRowsQuery'
 import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
-import { getTableColumns } from '@tables/schema/tableSchema'
 import type { TableColumnMeta, TablePageSize, TableRowsSearchState } from '@tables/tableTypes'
 
 const EMPTY_ROWS: DynamicTableRow[] = []
@@ -21,8 +20,9 @@ interface UseTableRowsOptions {
   client: JazzClient | null
   onPageOutOfRange: () => void
   search: TableRowsSearchState
-  scopeKey: string | null
-  tableName: string | null
+  schemaColumns: readonly ColumnDescriptor[]
+  scopeKey: string
+  tableName: string
   wasmSchema: WasmSchema | null
 }
 
@@ -131,6 +131,7 @@ export function useTableRows({
   client,
   onPageOutOfRange,
   search,
+  schemaColumns,
   scopeKey,
   tableName,
   wasmSchema,
@@ -142,11 +143,6 @@ export function useTableRows({
   const queryScopeKey = JSON.stringify([baseScopeKey, sortColumn, sortDirection])
   const queryKey = JSON.stringify([dataScopeKey, sortColumn, sortDirection])
   const requestedOffset = (page - 1) * pageSize
-
-  const schemaColumns = useMemo(
-    () => getTableColumns(wasmSchema, tableName),
-    [tableName, wasmSchema],
-  )
 
   const columns = useMemo<TableColumnMeta[]>(() => {
     const idColumn: TableColumnMeta = {
@@ -170,7 +166,7 @@ export function useTableRows({
   }, [schemaColumns])
 
   const requestedQueryBuilder = useMemo(() => {
-    if (wasmSchema === null || tableName === null) {
+    if (wasmSchema === null) {
       return null
     }
 

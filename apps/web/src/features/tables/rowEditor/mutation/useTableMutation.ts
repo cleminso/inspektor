@@ -4,32 +4,13 @@
  * The Inspector builds a dynamic table proxy from stored schema metadata, then uses Jazz's
  * mutation runtime to insert, update, and delete rows without app-generated table code.
  */
-import { useMemo } from 'react'
-import type { WasmSchema } from 'jazz-tools'
+import type { DynamicTableRow, TableProxy, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
-
-import { createTableProxy } from '@tables/rowEditor/mutation/tableProxy'
 
 interface UseTableMutationsOptions {
   client: JazzClient | null
   tableName: string
   wasmSchema: WasmSchema | null
-}
-
-interface UseTableMutationsResult {
-  deleteRow: (rowId: string) => Promise<void>
-  insertRow: (values: Record<string, unknown>) => Promise<string>
-  updateRow: (rowId: string, values: Record<string, unknown>) => Promise<void>
-}
-
-/**
- * Drops `undefined` properties defensively before the Jazz boundary.
- *
- * Jazz also omits top-level `undefined` fields. Explicit `null` is retained because it represents
- * SQL NULL, while an absent property lets inserts use a stored default and leaves updates untouched.
- */
-function omitUndefinedValues(values: Record<string, unknown>): Record<string, unknown> {
-  return Object.fromEntries(Object.entries(values).filter(([, value]) => value !== undefined))
 }
 
 /**
@@ -39,48 +20,40 @@ function omitUndefinedValues(values: Record<string, unknown>): Record<string, un
  * exposes mutation commands. For example, an update `{ name: "Grace" }` reaches Jazz as a
  * one-column patch; this hook never reconstructs the rest of the row.
  */
-export function useTableMutations({
-  client,
-  tableName,
-  wasmSchema,
-}: UseTableMutationsOptions): UseTableMutationsResult {
-  const tableProxy = useMemo(() => {
-    if (wasmSchema === null) {
-      return null
+export function useTableMutations({ client, tableName, wasmSchema }: UseTableMutationsOptions) {
+  const tableProxy =
+    wasmSchema === null
+      ? null
+      : ({
+          _table: tableName,
+          _schema: wasmSchema,
+          // oxlint-disable-next-line anti-slop/no-chained-type-assertions -- Jazz requires a type-only row marker with no runtime value.
+          _rowType: undefined as unknown as DynamicTableRow,
+          // oxlint-disable-next-line anti-slop/no-chained-type-assertions -- Jazz requires a type-only insert marker with no runtime value.
+          _initType: undefined as unknown as Record<string, unknown>,
+        } as TableProxy<DynamicTableRow, Record<string, unknown>>)
+  const getRuntime = () => {
+    if (tableProxy === null || client === null) {
+      throw new Error('Table runtime is not loaded.')
     }
+    return { client, tableProxy }
+  }
 
-    return createTableProxy(tableName, wasmSchema)
-  }, [tableName, wasmSchema])
-
-  return useMemo(
-    () => ({
-      insertRow: async (values: Record<string, unknown>) => {
-        if (tableProxy === null || client === null) {
-          throw new Error('Table runtime is not loaded.')
-        }
-
-        const insertedRow = await client.db
-          .insert(tableProxy, omitUndefinedValues(values))
-          .wait({ tier: 'edge' })
-        return insertedRow.id
-      },
-      updateRow: async (rowId: string, values: Record<string, unknown>) => {
-        if (tableProxy === null || client === null) {
-          throw new Error('Table runtime is not loaded.')
-        }
-
-        await client.db
-          .update(tableProxy, rowId, omitUndefinedValues(values))
-          .wait({ tier: 'edge' })
-      },
-      deleteRow: async (rowId: string) => {
-        if (tableProxy === null || client === null) {
-          throw new Error('Table runtime is not loaded.')
-        }
-
-        await client.db.delete(tableProxy, rowId).wait({ tier: 'edge' })
-      },
-    }),
-    [client, tableProxy],
-  )
+  return {
+    insertRow: async (values: Record<string, unknown>) => {
+      const runtime = getRuntime()
+      const insertedRow = await runtime.client.db
+        .insert(runtime.tableProxy, values)
+        .wait({ tier: 'edge' })
+      return insertedRow.id
+    },
+    updateRow: async (rowId: string, values: Record<string, unknown>) => {
+      const runtime = getRuntime()
+      await runtime.client.db.update(runtime.tableProxy, rowId, values).wait({ tier: 'edge' })
+    },
+    deleteRow: async (rowId: string) => {
+      const runtime = getRuntime()
+      await runtime.client.db.delete(runtime.tableProxy, rowId).wait({ tier: 'edge' })
+    },
+  }
 }

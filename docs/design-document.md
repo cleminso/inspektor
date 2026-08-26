@@ -261,8 +261,9 @@ surfaces. They project the same table mutation state rather than owning independ
 
 **Staged change**
 
-A valid local update or confirmed deletion that has not been persisted to Jazz. Valid edits become staged automatically after
-field validation. A staged change can be reviewed, removed, discarded, or persisted through Apply changes.
+A valid local update or confirmed deletion that has not been persisted to Jazz. Row-pane edits update the staged draft directly;
+floating field edits become staged when the field is saved or completed. A staged change can be reviewed, removed, discarded, or
+persisted through Apply changes.
 
 **Mutation ledger**
 
@@ -814,8 +815,8 @@ for relation and binary fields. Both surfaces use the same parsing, validation, 
 Apply, and Discard behavior through the table mutation ledger.
 
 Scalar field completion follows spreadsheet navigation. Enter moves focus down in the same visible column. Tab and Shift+Tab move
-horizontally and wrap across rows. Completion closes the editor without opening the next cell; Escape preserves the draft and
-returns focus to the originating cell.
+horizontally and wrap across rows. Completion saves the field and closes the editor without opening the next cell. Escape discards
+the uncommitted field input, preserves any previously staged value, and returns focus to the originating cell.
 
 Columns use schema-aware initial widths rather than one width for every value. Boolean and numeric columns start narrow; ids,
 relations, timestamps, text, and structured values receive progressively wider defaults. Header resize handles update TanStack
@@ -1191,8 +1192,8 @@ trigger remains fixed. Review uses plain-language operation summaries, distingui
 does not enumerate every bulk target. Operation undo resets the corresponding form projection. Visible staged-update cells use a
 dedicated warm amber pending-change treatment and expose cell- and row-scoped revert commands through grid context menus.
 
-Apply uses direct Jazz writes in deterministic update, then deletion groups. The client clears staged state only when every request
-succeeds. A rejection preserves the complete client-side state and displays the error without implying rollback or atomicity.
+Apply uses direct Jazz writes in deterministic update, then deletion groups. The client acknowledges successful entries as they
+complete. A rejection preserves failed and unattempted entries and displays the error without implying rollback or atomicity.
 
 Installed Jazz supports authority-validated `db.transaction(...)`, but the initial ledger Apply path intentionally preserves the
 existing direct generic mutation boundary. Inspector does not promise atomic Apply behavior.

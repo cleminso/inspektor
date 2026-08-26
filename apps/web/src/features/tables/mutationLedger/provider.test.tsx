@@ -1,6 +1,6 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ColumnDescriptor } from 'jazz-tools'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -23,6 +23,7 @@ const columns = [
   { name: 'name', column_type: { type: 'Text' }, nullable: false },
   { name: 'age', column_type: { type: 'Integer' }, nullable: false },
 ] satisfies ColumnDescriptor[]
+const initialRowValues = { id: 'row-1', name: 'Ada', age: 37 }
 
 function TestLedgerProvider({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
@@ -36,12 +37,11 @@ function TestLedgerProvider({ children }: { children: React.ReactNode }): React.
   )
 }
 
-function EditorHarness() {
+function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof initialRowValues }) {
   const [workspaceDiscarded, setWorkspaceDiscarded] = useState<boolean | null>(null)
   const controller = useTableMutationEditorController({
-    initialRowValues: { id: 'row-1', name: 'Ada', age: 37 },
+    initialRowValues: rowValues,
     rowId: 'row-1',
-    schemaColumns: columns,
   })
   const mutations = useTableMutationLedger()
   const application = useTableMutationApplicationCommands()
@@ -60,24 +60,14 @@ function EditorHarness() {
           ? Object.keys(mutations.ledger.entries[0].fields).sort().join(',')
           : ''}
       </output>
-      <output aria-label="Needs attention">{String(mutations.hasInvalidEditor)}</output>
       <output aria-label="Execution status">{mutations.execution.status}</output>
-      <output aria-label="Review operations">{mutations.review.operations.length}</output>
+      <output aria-label="Review operations">{mutations.reviewOperations.length}</output>
       <output aria-label="Workspace discarded">{String(workspaceDiscarded)}</output>
       <button type="button" onClick={() => controller.actions.setFieldText('name', 'Grace')}>
         Change name
       </button>
-      <button type="button" onClick={() => controller.actions.setFieldText('age', 'invalid')}>
-        Invalidate age
-      </button>
       <button type="button" onClick={() => mutations.revertRowUpdate('row-1')}>
         Revert row
-      </button>
-      <button type="button" onClick={() => mutations.stageDeletions(['row-1', 'row-2'])}>
-        Delete rows
-      </button>
-      <button type="button" onClick={() => mutations.undoReviewOperation('delete-operation:0')}>
-        Undo deletion operation
       </button>
       <button
         type="button"
@@ -129,6 +119,13 @@ function WorkspaceHarness({
   )
 }
 
+function RebaseHarness({ rows }: { rows: Array<typeof initialRowValues> }): React.ReactElement {
+  const mutations = useTableMutationLedger()
+  const { rebaseRows } = mutations
+  useEffect(() => rebaseRows(rows), [rebaseRows, rows])
+  return <output aria-label="Pending fields">{mutations.ledger.entries.length}</output>
+}
+
 function WorkspaceCommandConsumer({ onRender }: { onRender: () => void }): null {
   useTableMutationWorkspace()
   onRender()
@@ -159,34 +156,39 @@ describe('TableMutationLedgerProvider', () => {
     expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
   })
 
-  it('preserves invalid raw input and blocks Apply', () => {
-    render(
+  it('preserves staged fields while rebasing live values after the editor unmounts', async () => {
+    const { rerender } = render(
       <TestLedgerProvider>
         <EditorHarness />
       </TestLedgerProvider>,
     )
-
     fireEvent.click(screen.getByRole('button', { name: 'Change name' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Invalidate age' }))
 
-    expect(screen.getByLabelText('Draft age').textContent).toBe('invalid')
-    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
-    expect(screen.getByLabelText('Needs attention').textContent).toBe('true')
-  })
-
-  it('exposes review operation undo commands', () => {
-    render(
+    rerender(
       <TestLedgerProvider>
-        <EditorHarness />
+        <RebaseHarness rows={[{ ...initialRowValues, age: 38 }]} />
       </TestLedgerProvider>,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Delete rows' }))
-    expect(screen.getByLabelText('Review operations').textContent).toBe('1')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Fail apply' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Undo deletion operation' }))
-    expect(screen.getByLabelText('Review operations').textContent).toBe('0')
-    expect(screen.getByLabelText('Execution status').textContent).toBe('idle')
+    await waitFor(() => expect(screen.getByLabelText('Pending fields').textContent).toBe('1'))
+
+    rerender(
+      <TestLedgerProvider>
+        <EditorHarness rowValues={{ ...initialRowValues, age: 38 }} />
+      </TestLedgerProvider>,
+    )
+
+    expect(screen.getByLabelText('Draft name').textContent).toBe('Grace')
+    expect(screen.getByLabelText('Draft age').textContent).toBe('38')
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
+
+    rerender(
+      <TestLedgerProvider>
+        <RebaseHarness rows={[{ ...initialRowValues, name: 'Grace', age: 38 }]} />
+      </TestLedgerProvider>,
+    )
+
+    await waitFor(() => expect(screen.getByLabelText('Pending fields').textContent).toBe('0'))
   })
 
   it('reverts a complete row update and resets failed Apply state', () => {
@@ -216,6 +218,26 @@ describe('TableMutationLedgerProvider', () => {
     expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
     expect(screen.getByLabelText('Execution status').textContent).toBe('applying')
     expect(screen.getByLabelText('Workspace discarded').textContent).toBe('false')
+  })
+
+  it('retries live-row rebasing after Apply releases the ledger', async () => {
+    const { rerender } = render(
+      <TestLedgerProvider>
+        <EditorHarness />
+      </TestLedgerProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Change name' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start apply and discard workspace' }))
+
+    rerender(
+      <TestLedgerProvider>
+        <EditorHarness rowValues={{ ...initialRowValues, name: 'Grace' }} />
+      </TestLedgerProvider>,
+    )
+    expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Fail apply' }))
+    await waitFor(() => expect(screen.getByLabelText('Pending fields').textContent).toBe(''))
   })
 
   it('restores each table ledger after its table view unmounts', () => {

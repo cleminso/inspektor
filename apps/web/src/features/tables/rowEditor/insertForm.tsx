@@ -9,7 +9,6 @@ import { useRowDraftController } from '@tables/rowEditor/mutation/useRowDraftCon
 interface InsertRowFormProps {
   insertMoreEnabled?: boolean
   onDiscard?: () => void
-  onDirtyChange?: (isDirty: boolean) => void
   onSave: (values: Record<string, unknown>, options: { keepOpen: boolean }) => Promise<void> | void
   rowValues: Record<string, unknown>
   saveDisabled?: boolean
@@ -24,7 +23,6 @@ interface InsertRowFormFieldsProps extends InsertRowFormProps {
 function InsertRowFormFields({
   insertMoreEnabled,
   onDiscard,
-  onDirtyChange,
   onInserted,
   onSave,
   rowValues,
@@ -39,7 +37,6 @@ function InsertRowFormFields({
   const rowEditor = useRowEditorFields({
     draftController,
     mode: 'insert',
-    onDirtyChange,
     onSubmit: async (values) => {
       await onSave(values, { keepOpen: insertMoreEnabled })
       if (insertMoreEnabled === true) {

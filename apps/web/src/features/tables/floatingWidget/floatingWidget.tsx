@@ -1,23 +1,20 @@
-import { useId, useState, type UIEvent } from 'react'
+import { useId, useState } from 'react'
 import { ChevronRight, ChevronUp } from 'lucide-react'
 
 import { Accordion, Box, Button, FloatingPanel, Text } from '@inspector/ds'
 
 import { InspectorDockCenterPortal } from '@app/shell/dock/centerSlot'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
-import {
-  type TableMutationReview,
-  type TableMutationReviewOperation,
-} from '@tables/mutationLedger/ledger'
+import type { TableMutationReviewOperation } from '@tables/mutationLedger/ledger'
 import { useTableMutationLedger } from '@tables/mutationLedger/provider'
 import { useApplyTableMutationLedger } from '@tables/mutationLedger/useApplyTableMutationLedger'
 import type { TableFieldsByRowId } from '@tables/tableTypes'
 
 function formatOperationSummary(operation: TableMutationReviewOperation): string {
   if (operation.kind === 'delete') {
-    return operation.affectedRowCount === 1
+    return operation.rowIds.length === 1
       ? (operation.rowIds[0] ?? '')
-      : `${operation.affectedRowCount} selected rows`
+      : `${operation.rowIds.length} selected rows`
   }
   return operation.rowId
 }
@@ -76,9 +73,6 @@ function OperationRow({
   )
 }
 
-const directRenderLimit = 100
-const windowSize = 12
-
 function OperationList({
   label,
   operations,
@@ -88,39 +82,22 @@ function OperationList({
   operations: readonly TableMutationReviewOperation[]
   onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
 }): React.ReactElement {
-  const virtualized = operations.length > directRenderLimit
-  const [windowStart, setWindowStart] = useState(0)
-  const boundedStart = Math.min(windowStart, Math.max(0, operations.length - windowSize))
-  const visibleOperations =
-    virtualized === true ? operations.slice(boundedStart, boundedStart + windowSize) : operations
   const scrollable = operations.length > 10
-  const handleScroll = (event: UIEvent<HTMLElement>) => {
-    if (virtualized === false) return
-    const viewport = event.currentTarget
-    if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 1) {
-      setWindowStart((current) => Math.min(current + 10, operations.length - windowSize))
-      viewport.scrollTop = 1
-    } else if (viewport.scrollTop === 0) {
-      setWindowStart((current) => Math.max(0, current - 10))
-    }
-  }
   return (
     <Box
       as="section"
       aria-label={label}
       data-scrollable={scrollable}
-      data-virtualized={virtualized}
       maxHeight={scrollable === true ? 'viewport-height-l' : undefined}
       overflowY={scrollable === true ? 'auto' : 'visible'}
       width="full"
-      onScroll={handleScroll}
     >
       <Box
         as="ul"
         flexDirection="column"
         width="full"
       >
-        {visibleOperations.map((operation) => (
+        {operations.map((operation) => (
           <OperationRow
             key={operation.operationId}
             operation={operation}
@@ -133,13 +110,11 @@ function OperationList({
 }
 
 function ReviewSection({
-  count,
   label,
   operations,
   onUndo,
   value,
 }: {
-  count: number
   label: string
   operations: readonly TableMutationReviewOperation[]
   onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
@@ -149,7 +124,7 @@ function ReviewSection({
     <Accordion.Item value={value}>
       <Accordion.Header level={2}>
         <Accordion.Trigger
-          aria-label={`${label}, ${count}`}
+          aria-label={`${label}, ${operations.length}`}
           suffix={
             <Text
               as="span"
@@ -157,7 +132,7 @@ function ReviewSection({
               tabularNums
               variant="caption"
             >
-              {count}
+              {operations.length}
             </Text>
           }
         >
@@ -177,15 +152,15 @@ function ReviewSection({
 
 function OperationReview({
   id,
-  review,
+  operations,
   onUndo,
 }: {
   id: string
-  review: TableMutationReview
+  operations: readonly TableMutationReviewOperation[]
   onUndo: (operationId: TableMutationReviewOperation['operationId']) => void
 }): React.ReactElement {
-  const updates = review.operations.filter((operation) => operation.kind === 'update')
-  const deletions = review.operations.filter((operation) => operation.kind === 'delete')
+  const updates = operations.filter((operation) => operation.kind === 'update')
+  const deletions = operations.filter((operation) => operation.kind === 'delete')
   return (
     <Box
       as="section"
@@ -203,7 +178,6 @@ function OperationReview({
       >
         {updates.length === 0 ? null : (
           <ReviewSection
-            count={updates.length}
             label="Updated rows"
             operations={updates}
             value="updates"
@@ -212,7 +186,6 @@ function OperationReview({
         )}
         {deletions.length === 0 ? null : (
           <ReviewSection
-            count={deletions.length}
             label="Deleted rows"
             operations={deletions}
             value="deletions"
@@ -275,24 +248,25 @@ export function TableMutationWidget({
   const mutations = useTableMutationLedger()
   const apply = useApplyTableMutationLedger({
     executor,
+    mutations,
     onAppliedUpdates,
     onSuccess: onApplySuccess,
   })
-  const [collapsed, setCollapsed] = useState(false)
+  const [expanded, setExpanded] = useState(true)
   const [reviewExpanded, setReviewExpanded] = useState(false)
   const contentId = useId()
   const reviewId = useId()
-  const hasPending = mutations.ledger.entries.length > 0 || mutations.hasInvalidEditor === true
+  const hasPending =
+    mutations.ledger.entries.length > 0 || mutations.ledger.hasInvalidDraft === true
 
   if (hasPending === false) {
     return null
   }
 
-  const expanded = collapsed === false
   const label =
     mutations.execution.status === 'applying'
       ? 'Applying changes'
-      : mutations.execution.status === 'failed' || mutations.hasInvalidEditor === true
+      : mutations.execution.status === 'failed' || mutations.ledger.hasInvalidDraft === true
         ? 'Needs attention'
         : 'Staged changes'
 
@@ -303,7 +277,7 @@ export function TableMutationWidget({
         count={mutations.stagedCount}
         expanded={expanded}
         label={label}
-        onToggle={() => setCollapsed(expanded)}
+        onToggle={() => setExpanded((current) => current === false)}
       />
       {expanded === false ? null : (
         <FloatingPanel.Root aria-label="Staged changes">
@@ -314,7 +288,7 @@ export function TableMutationWidget({
             <FloatingPanel.Details open={reviewExpanded}>
               <OperationReview
                 id={reviewId}
-                review={mutations.review}
+                operations={mutations.reviewOperations}
                 onUndo={mutations.undoReviewOperation}
               />
             </FloatingPanel.Details>
@@ -338,7 +312,7 @@ export function TableMutationWidget({
                 >
                   Review changes
                 </Button>
-                {mutations.hasInvalidEditor === true ? (
+                {mutations.ledger.hasInvalidDraft === true ? (
                   <Text color="error">Correct invalid input before applying.</Text>
                 ) : mutations.execution.error === null ? null : (
                   <Text color="error">{mutations.execution.error}</Text>
@@ -357,7 +331,7 @@ export function TableMutationWidget({
                       Discard
                     </Button>
                     <Button
-                      disabled={mutations.hasInvalidEditor === true}
+                      disabled={mutations.ledger.hasInvalidDraft === true}
                       size="s"
                       onClick={() => void apply()}
                     >

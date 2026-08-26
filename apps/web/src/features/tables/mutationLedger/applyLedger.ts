@@ -9,7 +9,7 @@ export interface TableMutationExecutor {
   updateRow: (rowId: string, fields: TableMutationFields) => Promise<void>
 }
 
-export type TableMutationApplyResult =
+type TableMutationApplyResult =
   | {
       appliedEntryIds: readonly TableMutationEntry['entryId'][]
       status: 'complete'
@@ -17,7 +17,6 @@ export type TableMutationApplyResult =
   | {
       appliedEntryIds: readonly TableMutationEntry['entryId'][]
       error: unknown
-      failedEntryId: TableMutationEntry['entryId']
       status: 'failed'
     }
 
@@ -41,7 +40,7 @@ export async function applyTableMutationLedger(
       }
       appliedEntryIds.push(entry.entryId)
     } catch (error) {
-      return { appliedEntryIds, error, failedEntryId: entry.entryId, status: 'failed' }
+      return { appliedEntryIds, error, status: 'failed' }
     }
   }
 

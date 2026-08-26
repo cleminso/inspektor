@@ -2,14 +2,13 @@ import type { ColumnDescriptor } from 'jazz-tools'
 
 import {
   buildRowMutationValueProjection,
-  isRowMutationDraftDirty,
   revertMutationField,
   type RowMutationDraft,
 } from '@tables/rowEditor/mutation/draft'
 import type { TableRowId, TableValuesByRowId } from '@tables/tableTypes'
 
 export type TableMutationFields = Readonly<Record<string, unknown>>
-export type DeletionOperationId = `delete-operation:${number}`
+type DeletionOperationId = `delete-operation:${number}`
 
 interface TableUpdateMutationEntry {
   entryId: `update:${string}`
@@ -44,28 +43,20 @@ export interface TableMutationLedger {
 
 export type TableMutationReviewOperation =
   | {
-      affectedRowCount: 1
       fieldNames: readonly string[]
       kind: 'update'
       operationId: `update:${string}`
       rowId: TableRowId
     }
   | {
-      affectedRowCount: number
       kind: 'delete'
       operationId: DeletionOperationId
       rowIds: readonly TableRowId[]
     }
 
-export interface TableMutationReview {
-  affectedRowCount: number
-  operationCount: number
-  operations: readonly TableMutationReviewOperation[]
-}
-
 export interface TableMutationProjection {
   ledger: TableMutationLedger
-  review: TableMutationReview
+  reviewOperations: readonly TableMutationReviewOperation[]
   stagedFieldsByRowId: Readonly<Record<TableRowId, ReadonlySet<string>>>
   stagedValuesByRowId: TableValuesByRowId
 }
@@ -74,7 +65,6 @@ export type TableMutationStateAction =
   | {
       draft: RowMutationDraft
       rowId: TableRowId
-      schemaColumns: readonly ColumnDescriptor[]
       type: 'setDraft'
     }
   | { rowIds: readonly TableRowId[]; type: 'deleteRows' }
@@ -124,7 +114,10 @@ export function reduceTableMutationState(
         return state
       }
       const draftsByRowId = { ...state.draftsByRowId }
-      if (isRowMutationDraftDirty(action.draft, action.schemaColumns) === true) {
+      if (action.draft.kind === 'update' && Object.keys(action.draft.fieldInputs).length > 0) {
+        if (draftsByRowId[action.rowId] === action.draft) {
+          return state
+        }
         draftsByRowId[action.rowId] = action.draft
       } else {
         delete draftsByRowId[action.rowId]
@@ -236,7 +229,6 @@ export function selectTableMutationProjection(
       rowId,
     })
     operations.push({
-      affectedRowCount: 1,
       fieldNames,
       kind: 'update',
       operationId: `update:${rowId}`,
@@ -248,7 +240,6 @@ export function selectTableMutationProjection(
 
   for (const operation of state.deletionOperations) {
     operations.push({
-      affectedRowCount: operation.rowIds.length,
       kind: 'delete',
       operationId: operation.operationId,
       rowIds: operation.rowIds,
@@ -260,14 +251,7 @@ export function selectTableMutationProjection(
 
   return {
     ledger: { entries, hasInvalidDraft },
-    review: {
-      affectedRowCount: operations.reduce(
-        (count, operation) => count + operation.affectedRowCount,
-        0,
-      ),
-      operationCount: operations.length,
-      operations,
-    },
+    reviewOperations: operations,
     stagedFieldsByRowId,
     stagedValuesByRowId,
   }

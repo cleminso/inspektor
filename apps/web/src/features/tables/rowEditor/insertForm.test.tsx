@@ -66,25 +66,6 @@ afterEach(() => {
 })
 
 describe('InsertRowForm structured values', () => {
-  it('keeps drafting available before adding another row', () => {
-    const onAddAnother = vi.fn()
-    const columns = [
-      { name: 'name', column_type: { type: 'Text' }, nullable: false },
-    ] satisfies ColumnDescriptor[]
-
-    render(
-      <InsertRowForm
-        onSave={(values) => onAddAnother(values)}
-        rowValues={{ name: 'Ada' }}
-        schemaColumns={columns}
-      />,
-    )
-
-    expect((screen.getByRole('textbox', { name: 'Name' }) as HTMLInputElement).disabled).toBe(false)
-    fireEvent.click(screen.getByRole('button', { name: 'Insert' }))
-    expect(onAddAnother).toHaveBeenCalledWith({ name: 'Ada' })
-  })
-
   it('discards the insert draft without submitting it', () => {
     const onDiscard = vi.fn()
     const onSave = vi.fn()

@@ -1,4 +1,4 @@
-import { createElement, type ComponentType, type ReactElement } from 'react'
+import { createElement, lazy, type ComponentType, type ReactElement } from 'react'
 
 interface ComponentModule<Props extends object> {
   default: ComponentType<Props>
@@ -9,42 +9,31 @@ export function createPreloadableComponent<Props extends object>(
 ) {
   let loadedModule: ComponentModule<Props> | null = null
   let loadPromise: Promise<ComponentModule<Props>> | null = null
-  let renderFailure: { value: unknown } | null = null
-  let requestedByRender = false
 
   const preload = () => {
     if (loadPromise !== null) {
       return loadPromise
     }
 
-    const request = loadModule().then(
-      (module) => {
+    loadPromise = loadModule().then(
+      (module): ComponentModule<Props> => {
         loadedModule = module
         return module
       },
       (error: unknown) => {
-        if (requestedByRender === true) {
-          renderFailure = { value: error }
-        } else {
-          loadPromise = null
-        }
+        loadPromise = null
         throw error
       },
     )
-    loadPromise = request
-    return request
+    return loadPromise
   }
+  const LazyComponent = lazy(preload)
 
   const Component = (props: Props): ReactElement => {
     if (loadedModule !== null) {
       return createElement(loadedModule.default, props)
     }
-    if (renderFailure !== null) {
-      throw renderFailure.value
-    }
-
-    requestedByRender = true
-    throw preload()
+    return createElement(LazyComponent, props)
   }
 
   return { Component, preload }

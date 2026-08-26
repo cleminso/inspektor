@@ -8,7 +8,6 @@ import {
   createUpdateRowDraft,
   getMutationFieldError,
   getMutationFieldInput,
-  isRowMutationDraftDirty,
   revertMutationField,
   setMutationFieldMode,
   setMutationFieldText,
@@ -28,7 +27,6 @@ describe('update row drafts', () => {
     const restored = setMutationFieldText(changed, columns[0], 'Ada')
 
     expect(restored.fieldInputs.name).toBeUndefined()
-    expect(isRowMutationDraftDirty(restored, columns)).toBe(false)
     expect(buildRowMutationSubmission(restored, columns)).toEqual({ errors: {}, values: {} })
   })
 
@@ -40,7 +38,6 @@ describe('update row drafts', () => {
       errors: {},
       values: { name: 'Grace' },
     })
-    expect(isRowMutationDraftDirty(draft, columns)).toBe(true)
   })
 
   it('keeps staged display values in their decoded schema representation', () => {
@@ -140,7 +137,6 @@ describe('update row drafts', () => {
       errors: {},
       values: {},
     })
-    expect(isRowMutationDraftDirty(draft, [bigintColumn])).toBe(false)
   })
 })
 
@@ -187,29 +183,6 @@ describe('insert row drafts', () => {
     expect(buildRowMutationSubmission(valueDraft, [nullableDefaultColumn]).values).toEqual({
       status: 'archived',
     })
-    expect(isRowMutationDraftDirty(initialDraft, [nullableDefaultColumn])).toBe(false)
-    expect(isRowMutationDraftDirty(nullDraft, [nullableDefaultColumn])).toBe(true)
-  })
-
-  it('returns restored NULL and DEFAULT fields to a clean insert draft', () => {
-    const nullableColumn = insertColumns[2]
-    const defaultColumn = insertColumns[1]
-    const initialDraft = createInsertRowDraft({}, [nullableColumn, defaultColumn])
-    const restoredNullDraft = setMutationFieldMode(
-      setMutationFieldText(initialDraft, nullableColumn, 'draft note'),
-      nullableColumn,
-      'null',
-    )
-    const restoredDefaultDraft = setMutationFieldMode(
-      setMutationFieldText(restoredNullDraft, defaultColumn, 'archived'),
-      defaultColumn,
-      'omitted',
-    )
-
-    expect(isRowMutationDraftDirty(restoredNullDraft, [nullableColumn, defaultColumn])).toBe(false)
-    expect(isRowMutationDraftDirty(restoredDefaultDraft, [nullableColumn, defaultColumn])).toBe(
-      false,
-    )
   })
 
   it('reports required omitted values that have no default', () => {

@@ -5,7 +5,7 @@
  * dirty comparison and patch construction remain in the shared mutation
  * modules so an inline editor can reuse them without rendering this pane form.
  */
-import { useEffect, useMemo, useRef, useState, type FormEventHandler } from 'react'
+import { useMemo, useRef, useState, type FormEventHandler } from 'react'
 
 import type { ColumnDescriptor } from 'jazz-tools'
 
@@ -27,23 +27,8 @@ interface FieldState {
 interface UseRowEditorFieldsOptions {
   draftController: RowDraftController
   mode: DetailPaneMode
-  onDirtyChange?: (isDirty: boolean) => void
   onSubmit: (values: Record<string, unknown>) => Promise<void> | void
   schemaColumns: ColumnDescriptor[]
-}
-
-interface UseRowEditorFieldsResult {
-  errors: Record<string, string>
-  expandedColumnName: string | null
-  fieldStates: Record<string, FieldState>
-  isSaving: boolean
-  isDirty: boolean
-  saveError: string | null
-  setFieldExpanded: (columnName: string, expanded: boolean) => void
-  setFieldNull: (columnName: string, isNull: boolean) => void
-  setFieldOmitted: (columnName: string, isOmitted: boolean) => void
-  setFieldText: (columnName: string, text: string) => void
-  submit: FormEventHandler<HTMLFormElement>
 }
 
 interface RowEditorFieldsProps {
@@ -70,12 +55,10 @@ interface RowEditorFieldsProps {
 export function useRowEditorFields({
   draftController,
   mode,
-  onDirtyChange,
   onSubmit,
   schemaColumns,
-}: UseRowEditorFieldsOptions): UseRowEditorFieldsResult {
-  const controller = draftController
-  const { draft, isDirty } = controller.state
+}: UseRowEditorFieldsOptions) {
+  const { draft } = draftController.state
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [expandedColumnName, setExpandedColumnName] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -99,25 +82,13 @@ export function useRowEditorFields({
     [draft, schemaColumns],
   )
 
-  useEffect(() => {
-    onDirtyChange?.(isDirty)
-  }, [isDirty, onDirtyChange])
-
-  useEffect(
-    () => () => {
-      // The mounted form owns the dirty report; release it when this draft leaves the tree.
-      onDirtyChange?.(false)
-    },
-    [onDirtyChange],
-  )
-
   const setFieldText = (columnName: string, text: string) => {
-    controller.actions.setFieldText(columnName, text)
+    draftController.actions.setFieldText(columnName, text)
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: '' }))
   }
 
   const setFieldNull = (columnName: string, isNull: boolean) => {
-    controller.actions.setFieldNull(columnName, isNull)
+    draftController.actions.setFieldNull(columnName, isNull)
     if (isNull === true) {
       setExpandedColumnName((currentColumnName) =>
         currentColumnName === columnName ? null : currentColumnName,
@@ -127,7 +98,7 @@ export function useRowEditorFields({
   }
 
   const setFieldOmitted = (columnName: string, isOmitted: boolean) => {
-    controller.actions.setFieldOmitted(columnName, isOmitted)
+    draftController.actions.setFieldOmitted(columnName, isOmitted)
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: '' }))
   }
 
@@ -143,7 +114,7 @@ export function useRowEditorFields({
     if (isSavingRef.current === true) {
       return
     }
-    const submission = controller.actions.buildSubmission()
+    const submission = draftController.actions.buildSubmission()
     const nextErrors = submission.errors
 
     setErrors(nextErrors)
@@ -181,7 +152,6 @@ export function useRowEditorFields({
     errors,
     expandedColumnName,
     fieldStates,
-    isDirty,
     isSaving,
     saveError,
     setFieldExpanded,

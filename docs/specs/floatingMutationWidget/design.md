@@ -78,8 +78,9 @@ explicit bulk-operation identity.
 ### Inline field editor
 
 - Double-clicking an editable scalar or structured cell opens its explicit editor.
-- Typing updates the same provider-owned row draft used by the pane.
-- Close and Escape preserve the entered value, including invalid text.
+- Typing remains local to the field editor until Save or keyboard completion commits the field to the provider-owned row draft.
+- Close and Escape discard the uncommitted field input while preserving any previously staged field value.
+- A transient reset of the backing query rows does not close the active editor or discard its local input.
 - Enter and Tab complete valid scalar editing and move focus according to spreadsheet navigation.
 - Invalid input remains open with field feedback.
 
@@ -188,9 +189,6 @@ scroll viewport while the summary, Apply, and Discard controls remain fixed.
 - Ten operation items or fewer fit their content without scrolling.
 - More than ten operation items expose ten compact rows and scroll the remainder.
 - Operation rows use constrained geometry so the ten-row boundary is deterministic.
-- Lists with more than 100 operation items use virtual rendering inside the list viewport; the
-  accordion structure itself is never virtualized.
-
 A bulk operation remains one review item regardless of target count. A target preview, if introduced,
 owns separate bounded rendering and is not required by this implementation.
 
@@ -201,11 +199,16 @@ Apply is available when staged work exists, no draft is invalid, and no Apply is
 The client sends valid sparse updates followed by deletions. This ordering is explicit but is not a
 transaction or rollback promise.
 
-The UI clears staged state only after every request succeeds. If a request fails, the complete
-client-side staged state remains available and the widget displays the error. A following Apply
-attempt submits the retained state again.
+The UI acknowledges each successful entry. If a later request fails, the failed and unattempted
+entries remain available and the widget displays the error. A following Apply attempt submits only
+that unresolved state.
 
 Duplicate Apply is blocked synchronously.
+Mutation surfaces do not accept new inline edits while Apply is running. If the initiating table
+surface unmounts, ledger acknowledgement still completes without invoking its stale presentation callbacks.
+Rows staged for deletion remain visible with their staged treatment while Apply is unresolved. A
+successful deletion removes the row and its widget operation together; a failed deletion keeps both
+available for review and retry.
 
 ## Component boundaries
 
@@ -223,9 +226,8 @@ Duplicate Apply is blocked synchronously.
 ## Non-goals
 
 - Database-level transactions or rollback.
-- Partial acknowledgement bookkeeping or retrying only an unattempted suffix.
 - Continuous hidden queries for staged rows.
-- Reconciliation against live row or schema changes.
+- Reconciliation against schema changes.
 - Missing-row detection before Apply.
 - Persisting mutation ledgers across browser unload or runtime scopes.
 - Generated table-specific mutation forms.
@@ -246,7 +248,7 @@ Duplicate Apply is blocked synchronously.
 - Grid context-menu recovery restores focus to its originating target when it remains mounted.
 - Discard clears valid drafts, invalid drafts, and deletions.
 - Apply submits all derived updates and deletions once.
-- Apply success clears the mounted state; failure retains it.
+- Apply success clears the mounted state; failure retains only failed and unattempted entries.
 - Switching tables and workspace tabs preserves each table's state.
 - Returning to a table restores valid drafts, invalid input, deletions, and Apply failures.
 - Closing the final tab for a table presents `Keep editing` and `Discard and close` before unresolved state can be discarded.

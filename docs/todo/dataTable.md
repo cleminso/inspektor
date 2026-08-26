@@ -14,6 +14,11 @@
 
 ## Implemented foundation
 
+[26/08/26]
+
+- [x] Derive table scope and schema columns once at the Table View composition root for query, preferences, and mutation state.
+- [x] Preserve an active Floating field editor and its uncommitted input through transient query-row resets.
+
 [25/08/26]
 
 - [x] Subscribe Data Grid rows and header content directly to the TanStack selection slices they render.

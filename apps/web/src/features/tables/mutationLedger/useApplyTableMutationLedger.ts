@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import {
   applyTableMutationLedger,
@@ -12,22 +12,30 @@ import type { TableFieldsByRowId } from '@tables/tableTypes'
 
 export function useApplyTableMutationLedger({
   executor,
+  mutations,
   onAppliedUpdates,
   onSuccess,
 }: {
   executor: TableMutationExecutor
+  mutations: ReturnType<typeof useTableMutationLedger>
   onAppliedUpdates?: (appliedUpdateFields: TableFieldsByRowId) => void
   onSuccess?: () => void
 }): () => Promise<void> {
-  const mutations = useTableMutationLedger()
   const application = useTableMutationApplicationCommands()
   const applyingRef = useRef(false)
+  const mountedRef = useRef(false)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
 
   return async () => {
     if (
       applyingRef.current === true ||
       mutations.execution.status === 'applying' ||
-      mutations.hasInvalidEditor === true ||
+      mutations.ledger.hasInvalidDraft === true ||
       mutations.ledger.entries.length === 0
     ) {
       return
@@ -52,6 +60,9 @@ export function useApplyTableMutationLedger({
         })
       } else {
         application.setExecution({ error: null, status: 'idle' })
+      }
+      if (mountedRef.current === false) {
+        return
       }
       if (Object.keys(appliedUpdateFields).length > 0) {
         onAppliedUpdates?.(appliedUpdateFields)

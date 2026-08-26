@@ -1,10 +1,14 @@
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { CodeEditorProps } from '@inspector/ds'
 import type { ColumnDescriptor } from 'jazz-tools'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { EditRowForm, focusRowEditorField } from '@tables/rowEditor/editForm'
-import { useRowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
+import { EditRowForm as ControlledEditRowForm } from '@tables/rowEditor/editForm'
+import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
+import {
+  useRowDraftController,
+  type RowDraftController,
+} from '@tables/rowEditor/mutation/useRowDraftController'
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: React.ComponentProps<'a'>) => <a href="/relation">{children}</a>,
@@ -79,21 +83,23 @@ const schemaColumns = [
   { name: 'active', column_type: { type: 'Boolean' }, nullable: false },
 ] satisfies ColumnDescriptor[]
 
-describe('EditRowForm loading state', () => {
-  it('identifies a requested row as loading while its live query reconnects', () => {
-    render(
-      <EditRowForm
-        onSave={vi.fn()}
-        rowValues={null}
-        schemaColumns={schemaColumns}
-        targetRowId="row-1"
-      />,
-    )
+type EditRowFormProps = Omit<
+  React.ComponentProps<typeof ControlledEditRowForm>,
+  'draftController'
+> & {
+  draftController?: RowDraftController
+}
 
-    expect(screen.getByRole('status').textContent).toContain('Loading row')
-    expect(screen.queryByText('Select a row from the data table to edit it.')).toBeNull()
+function EditRowForm({ draftController, ...props }: EditRowFormProps): React.ReactElement {
+  const ownedDraftController = useRowDraftController({
+    initialRowValues: props.rowValues,
+    mode: 'edit',
+    schemaColumns: props.schemaColumns,
   })
-})
+  return (
+    <ControlledEditRowForm {...props} draftController={draftController ?? ownedDraftController} />
+  )
+}
 
 const rowValues = {
   active: true,
@@ -102,14 +108,7 @@ const rowValues = {
 }
 
 function renderEditRowForm() {
-  return render(
-    <EditRowForm
-      onSave={() => undefined}
-      rowValues={rowValues}
-      schemaColumns={schemaColumns}
-      targetRowId="person-1"
-    />,
-  )
+  return render(<EditRowForm rowValues={rowValues} schemaColumns={schemaColumns} />)
 }
 
 function submitEditRowForm(): void {
@@ -118,24 +117,6 @@ function submitEditRowForm(): void {
     throw new Error('Expected the edit row form to be rendered')
   }
   fireEvent.submit(form)
-}
-
-function ExternallyOwnedEditDraft({ visible }: { visible: boolean }): React.ReactElement | null {
-  const controller = useRowDraftController({
-    initialRowValues: rowValues,
-    mode: 'edit',
-    schemaColumns,
-  })
-
-  return visible === true ? (
-    <EditRowForm
-      draftController={controller}
-      onSave={() => undefined}
-      rowValues={rowValues}
-      schemaColumns={schemaColumns}
-      targetRowId="person-1"
-    />
-  ) : null
 }
 
 afterEach(() => {
@@ -209,23 +190,6 @@ describe('focusRowEditorField', () => {
 })
 
 describe('EditRowForm Details and JSON views', () => {
-  it('does not expose a mutation-specific deletion confirmation', () => {
-    renderEditRowForm()
-
-    expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Confirm delete' })).toBeNull()
-  })
-
-  it('uses an externally owned draft across form remounts', () => {
-    const { rerender } = render(<ExternallyOwnedEditDraft visible />)
-
-    fireEvent.change(screen.getByLabelText('DisplayName'), { target: { value: 'Grace' } })
-    rerender(<ExternallyOwnedEditDraft visible={false} />)
-    rerender(<ExternallyOwnedEditDraft visible />)
-
-    expect((screen.getByLabelText('DisplayName') as HTMLInputElement).value).toBe('Grace')
-  })
-
   it('uses monospace typography for the synthetic row ID value', () => {
     renderEditRowForm()
 
@@ -282,7 +246,6 @@ describe('EditRowForm Details and JSON views', () => {
     expect(screen.getByRole('button', { name: 'Next match' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Copy JSON' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull()
     expect(screen.queryByRole('textbox', { name: 'DisplayName' })).toBeNull()
     expect(
       screen.getByRole('tree', { name: 'Row JSON' }).closest('[data-scrollbar="overlay"]'),
@@ -313,122 +276,11 @@ describe('EditRowForm Details and JSON views', () => {
     expect((screen.getByLabelText('DisplayName') as HTMLInputElement).value).toBe('Grace Hopper')
   })
 
-  it('submits only fields changed from the latest live source row', async () => {
-    const onSave = vi.fn()
+  it('retains invalid raw input and reports its error', async () => {
     render(
       <EditRowForm
-        onSave={onSave}
         rowValues={{ id: 'person-1', displayName: 'Ada', age: 37, active: true }}
         schemaColumns={schemaColumns}
-        targetRowId="person-1"
-      />,
-    )
-
-    fireEvent.change(screen.getByLabelText('DisplayName'), { target: { value: 'Grace' } })
-    submitEditRowForm()
-
-    await waitFor(() => expect(onSave).toHaveBeenCalledWith({ displayName: 'Grace' }))
-  })
-
-  it('reports dirty state and returns to clean when a field matches the live source', async () => {
-    const onDirtyChange = vi.fn()
-    render(
-      <EditRowForm
-        onDirtyChange={onDirtyChange}
-        onSave={() => undefined}
-        rowValues={{ id: 'person-1', displayName: 'Ada', age: 37, active: true }}
-        schemaColumns={schemaColumns}
-        targetRowId="person-1"
-      />,
-    )
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false))
-
-    fireEvent.change(screen.getByLabelText('DisplayName'), { target: { value: 'Grace' } })
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true))
-
-    fireEvent.change(screen.getByLabelText('DisplayName'), { target: { value: 'Ada' } })
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false))
-  })
-
-  it('returns to clean when edited JSON is restored to its source NULL value', async () => {
-    const onDirtyChange = vi.fn()
-    const columns = [
-      { name: 'settings', column_type: { type: 'Json' }, nullable: true },
-    ] satisfies ColumnDescriptor[]
-    render(
-      <EditRowForm
-        onDirtyChange={onDirtyChange}
-        onSave={() => undefined}
-        rowValues={{ id: 'profile-1', settings: null }}
-        schemaColumns={columns}
-        targetRowId="profile-1"
-      />,
-    )
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false))
-
-    const nullToggle = screen.getByRole('button', { name: 'NULL' })
-    fireEvent.click(screen.getByRole('button', { name: 'Value' }))
-    const editor = await screen.findByRole('textbox', { name: 'Settings' })
-    fireEvent.input(editor, { target: { textContent: '{"enabled":true}' } })
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true))
-
-    fireEvent.click(nullToggle)
-    fireEvent.input(editor, { target: { textContent: '{"enabled":true}' } })
-
-    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(false))
-  })
-
-  it('applies a changed timestamp before saving', async () => {
-    const onSave = vi.fn()
-    const initialTimestamp = new Date(2026, 7, 13, 9, 10, 11, 120)
-    const columns = [
-      { name: 'publishedAt', column_type: { type: 'Timestamp' }, nullable: true },
-    ] satisfies ColumnDescriptor[]
-    render(
-      <EditRowForm
-        onSave={onSave}
-        rowValues={{ id: 'post-1', publishedAt: initialTimestamp.getTime() }}
-        schemaColumns={columns}
-        targetRowId="post-1"
-      />,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'PublishedAt' }))
-    fireEvent.click(screen.getByRole('button', { name: /Friday, August 14th, 2026/i }))
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
-    submitEditRowForm()
-
-    await waitFor(() =>
-      expect(onSave).toHaveBeenCalledWith({
-        publishedAt: new Date(2026, 7, 14, 9, 10, 11, 120).getTime(),
-      }),
-    )
-  })
-
-  it('does not submit a clean row', () => {
-    const onSave = vi.fn()
-    render(
-      <EditRowForm
-        onSave={onSave}
-        rowValues={{ id: 'person-1', displayName: 'Ada', age: 37, active: true }}
-        schemaColumns={schemaColumns}
-        targetRowId="person-1"
-      />,
-    )
-
-    submitEditRowForm()
-
-    expect(onSave).not.toHaveBeenCalled()
-  })
-
-  it('retains invalid raw input and does not submit it', async () => {
-    const onSave = vi.fn()
-    render(
-      <EditRowForm
-        onSave={onSave}
-        rowValues={{ id: 'person-1', displayName: 'Ada', age: 37, active: true }}
-        schemaColumns={schemaColumns}
-        targetRowId="person-1"
       />,
     )
     const age = screen.getByLabelText('Age') as HTMLInputElement
@@ -438,27 +290,6 @@ describe('EditRowForm Details and JSON views', () => {
 
     expect(await screen.findByText('Value must be an integer.')).toBeTruthy()
     expect(age.value).toBe('not-a-number')
-    expect(onSave).not.toHaveBeenCalled()
-  })
-
-  it('submits an explicit NULL as a sparse update', async () => {
-    const onSave = vi.fn()
-    const columns = [
-      { name: 'note', column_type: { type: 'Text' }, nullable: true },
-    ] satisfies ColumnDescriptor[]
-    render(
-      <EditRowForm
-        onSave={onSave}
-        rowValues={{ id: 'person-1', note: 'Draft' }}
-        schemaColumns={columns}
-        targetRowId="person-1"
-      />,
-    )
-
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Set Note to NULL' }))
-    submitEditRowForm()
-
-    await waitFor(() => expect(onSave).toHaveBeenCalledWith({ note: null }))
   })
 
   it('highlights and reports a literal JSON find query', async () => {
@@ -536,10 +367,8 @@ describe('EditRowForm Details and JSON views', () => {
     ] satisfies ColumnDescriptor[]
     render(
       <EditRowForm
-        onSave={() => undefined}
         rowValues={{ id: 'file-1', payloads: [new Uint8Array([0, 1, 2])] }}
         schemaColumns={binaryArrayColumns}
-        targetRowId="file-1"
       />,
     )
 
@@ -550,8 +379,7 @@ describe('EditRowForm Details and JSON views', () => {
     expect(screen.queryByRole('tree', { name: 'Payloads value' })).toBeNull()
   })
 
-  it('disables a NULL relation control and submits an edit after switching back to a value', async () => {
-    const onSave = vi.fn()
+  it('enables a NULL relation control after switching back to a value', () => {
     const columns = [
       {
         name: 'accountId',
@@ -560,14 +388,7 @@ describe('EditRowForm Details and JSON views', () => {
         references: 'accounts',
       },
     ] satisfies ColumnDescriptor[]
-    render(
-      <EditRowForm
-        onSave={onSave}
-        rowValues={{ id: 'profile-1', accountId: null }}
-        schemaColumns={columns}
-        targetRowId="profile-1"
-      />,
-    )
+    render(<EditRowForm rowValues={{ id: 'profile-1', accountId: null }} schemaColumns={columns} />)
 
     const input = screen.getByLabelText('AccountId') as HTMLInputElement
     expect(input.disabled).toBe(true)
@@ -575,9 +396,7 @@ describe('EditRowForm Details and JSON views', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: 'Set AccountId to NULL' }))
     expect(input.disabled).toBe(false)
     fireEvent.change(input, { target: { value: 'account-2' } })
-    submitEditRowForm()
-
-    await vi.waitFor(() => expect(onSave).toHaveBeenCalledWith({ accountId: 'account-2' }))
+    expect(input.value).toBe('account-2')
   })
 
   it('uses CodeEditor for an editable JSON field', async () => {
@@ -586,10 +405,8 @@ describe('EditRowForm Details and JSON views', () => {
     ] satisfies ColumnDescriptor[]
     render(
       <EditRowForm
-        onSave={() => undefined}
         rowValues={{ id: 'profile-1', settings: { enabled: true } }}
         schemaColumns={jsonColumns}
-        targetRowId="profile-1"
       />,
     )
 
@@ -610,10 +427,8 @@ describe('EditRowForm Details and JSON views', () => {
     ] satisfies ColumnDescriptor[]
     const { container } = render(
       <EditRowForm
-        onSave={() => undefined}
         rowValues={{ id: 'profile-1', title: 'Profile', settings: {}, metadata: {} }}
         schemaColumns={columns}
-        targetRowId="profile-1"
       />,
     )
     const settingsEditor = await screen.findByRole('textbox', { name: 'Settings' })
@@ -653,14 +468,7 @@ describe('EditRowForm Details and JSON views', () => {
     const columns = [
       { name: 'settings', column_type: { type: 'Json' }, nullable: true },
     ] satisfies ColumnDescriptor[]
-    render(
-      <EditRowForm
-        onSave={() => undefined}
-        rowValues={{ id: 'profile-1', settings: {} }}
-        schemaColumns={columns}
-        targetRowId="profile-1"
-      />,
-    )
+    render(<EditRowForm rowValues={{ id: 'profile-1', settings: {} }} schemaColumns={columns} />)
     const editor = await screen.findByRole('textbox', { name: 'Settings' })
 
     fireEvent.click(screen.getByText('Settings'))
@@ -672,14 +480,7 @@ describe('EditRowForm Details and JSON views', () => {
     const columns = [
       { name: 'settings', column_type: { type: 'Json' }, nullable: true },
     ] satisfies ColumnDescriptor[]
-    render(
-      <EditRowForm
-        onSave={() => undefined}
-        rowValues={{ id: 'profile-1', settings: null }}
-        schemaColumns={columns}
-        targetRowId="profile-1"
-      />,
-    )
+    render(<EditRowForm rowValues={{ id: 'profile-1', settings: null }} schemaColumns={columns} />)
     const valueModeControl = screen.getByRole('button', { name: 'NULL' })
 
     fireEvent.click(screen.getByText('Settings'))
@@ -693,10 +494,8 @@ describe('EditRowForm Details and JSON views', () => {
     ] satisfies ColumnDescriptor[]
     render(
       <EditRowForm
-        onSave={() => undefined}
         rowValues={{ id: 'profile-1', settings: { enabled: true } }}
         schemaColumns={jsonColumns}
-        targetRowId="profile-1"
       />,
     )
     const editor = await screen.findByRole('textbox', { name: 'Settings' })
@@ -712,10 +511,8 @@ describe('EditRowForm Details and JSON views', () => {
     ] satisfies ColumnDescriptor[]
     const { container } = render(
       <EditRowForm
-        onSave={() => undefined}
         rowValues={{ id: 'profile-1', settings: { enabled: true } }}
         schemaColumns={jsonColumns}
-        targetRowId="profile-1"
       />,
     )
 
@@ -750,12 +547,7 @@ describe('EditRowForm Details and JSON views', () => {
       },
     ] satisfies ColumnDescriptor[]
     const { container } = render(
-      <EditRowForm
-        onSave={() => undefined}
-        rowValues={{ id: 'row-1', items: [] }}
-        schemaColumns={columns}
-        targetRowId="row-1"
-      />,
+      <EditRowForm rowValues={{ id: 'row-1', items: [] }} schemaColumns={columns} />,
     )
     const field = container.querySelector<HTMLElement>('#row-editor-field-items')
     Object.defineProperty(field, 'scrollIntoView', { configurable: true, value: scrollIntoView })
@@ -779,10 +571,8 @@ describe('EditRowForm Details and JSON views', () => {
     ] satisfies ColumnDescriptor[]
     render(
       <EditRowForm
-        onSave={() => undefined}
         rowValues={{ id: 'profile-1', age: 37, settings: { enabled: true } }}
         schemaColumns={columns}
-        targetRowId="profile-1"
       />,
     )
     const age = screen.getByLabelText('Age')
@@ -806,60 +596,5 @@ describe('EditRowForm Details and JSON views', () => {
     expect(settings.closest('[data-slot="code-editor"]')?.getAttribute('data-expanded')).toBe(
       'false',
     )
-  })
-
-  it('retains the dirty patch after a save error so it can be retried', async () => {
-    const onSave = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('Save failed'))
-      .mockResolvedValueOnce(undefined)
-    render(
-      <EditRowForm
-        onSave={onSave}
-        rowValues={{ ...rowValues, age: 42 }}
-        schemaColumns={schemaColumns}
-        targetRowId="person-1"
-      />,
-    )
-
-    const displayName = screen.getByLabelText('DisplayName') as HTMLInputElement
-    fireEvent.change(displayName, { target: { value: 'Grace' } })
-    submitEditRowForm()
-
-    expect((await screen.findByRole('alert')).textContent).toBe('Save failed')
-    expect(displayName.value).toBe('Grace')
-
-    submitEditRowForm()
-
-    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2))
-    expect(onSave).toHaveBeenNthCalledWith(1, { displayName: 'Grace' })
-    expect(onSave).toHaveBeenNthCalledWith(2, { displayName: 'Grace' })
-  })
-
-  it('does not submit the same dirty patch twice while a save is pending', async () => {
-    let resolveSave: (() => void) | undefined
-    const onSave = vi.fn(
-      () =>
-        new Promise<void>((resolve) => {
-          resolveSave = resolve
-        }),
-    )
-    render(
-      <EditRowForm
-        onSave={onSave}
-        rowValues={{ ...rowValues, age: 42 }}
-        schemaColumns={schemaColumns}
-        targetRowId="person-1"
-      />,
-    )
-    fireEvent.change(screen.getByLabelText('DisplayName'), { target: { value: 'Grace' } })
-
-    submitEditRowForm()
-    submitEditRowForm()
-
-    expect(onSave).toHaveBeenCalledOnce()
-    await act(async () => {
-      resolveSave?.()
-    })
   })
 })

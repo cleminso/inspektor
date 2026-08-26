@@ -28,12 +28,10 @@ export interface MutationFieldInput {
  * A single row's mutation intent over its latest Jazz source values.
  *
  * Updates use `fieldInputs` as a sparse dirty overlay: missing keys are untouched and only
- * present keys can enter the patch. Inserts store every field and compare them with the
- * schema-derived `initialFieldInputs` baseline.
+ * present keys can enter the patch. Inserts store every field.
  */
 export interface RowMutationDraft {
   fieldInputs: Readonly<Record<string, MutationFieldInput>>
-  initialFieldInputs: Readonly<Record<string, MutationFieldInput>>
   kind: 'insert' | 'update'
   sourceValues: Readonly<Record<string, unknown>>
 }
@@ -44,15 +42,10 @@ export interface RowMutationSubmission {
   values: Record<string, unknown>
 }
 
-export interface RowMutationValueProjection {
+interface RowMutationValueProjection {
   displayValues: Record<string, unknown>
   errors: Record<string, string>
   submissionValues: Record<string, unknown>
-}
-
-function areMutationFieldInputsEqual(left: MutationFieldInput, right: MutationFieldInput): boolean {
-  // NULL and DEFAULT ignore retained text so hidden values can be restored without staying dirty.
-  return left.mode === right.mode && (left.mode !== 'value' || left.text === right.text)
 }
 
 function createValueInput(value: unknown, column: ColumnDescriptor): MutationFieldInput {
@@ -110,7 +103,7 @@ export function formatColumnDefault(column: ColumnDescriptor): string {
 export function createUpdateRowDraft(
   sourceValues: Readonly<Record<string, unknown>>,
 ): RowMutationDraft {
-  return { fieldInputs: {}, initialFieldInputs: {}, kind: 'update', sourceValues }
+  return { fieldInputs: {}, kind: 'update', sourceValues }
 }
 
 /**
@@ -151,7 +144,7 @@ export function createInsertRowDraft(
     }),
   )
 
-  return { fieldInputs, initialFieldInputs: fieldInputs, kind: 'insert', sourceValues }
+  return { fieldInputs, kind: 'insert', sourceValues }
 }
 
 export function getMutationFieldInput(
@@ -369,6 +362,36 @@ export function setMutationFieldInput(
   return removeCleanUpdateInput(nextDraft, column, input)
 }
 
+export function rebaseUpdateRowDraft(
+  draft: RowMutationDraft,
+  sourceValues: Readonly<Record<string, unknown>>,
+  columns: readonly ColumnDescriptor[],
+): RowMutationDraft {
+  if (draft.kind !== 'update') {
+    return draft
+  }
+  const sourceUnchanged =
+    Object.is(draft.sourceValues.id, sourceValues.id) &&
+    columns.every((column) =>
+      areMutationValuesEqual(
+        column.column_type,
+        draft.sourceValues[column.name],
+        sourceValues[column.name],
+      ),
+    )
+  if (sourceUnchanged) {
+    return draft
+  }
+  let rebasedDraft: RowMutationDraft = { ...draft, sourceValues }
+  for (const column of columns) {
+    const input = rebasedDraft.fieldInputs[column.name]
+    if (input !== undefined) {
+      rebasedDraft = removeCleanUpdateInput(rebasedDraft, column, input)
+    }
+  }
+  return rebasedDraft
+}
+
 export function setMutationFieldText(
   draft: RowMutationDraft,
   column: ColumnDescriptor,
@@ -393,37 +416,6 @@ export function revertMutationField(draft: RowMutationDraft, fieldName: string):
   const { [fieldName]: removedInput, ...fieldInputs } = draft.fieldInputs
   void removedInput
   return { ...draft, fieldInputs }
-}
-
-export function isRowMutationDraftDirty(
-  draft: RowMutationDraft,
-  columns: readonly ColumnDescriptor[],
-): boolean {
-  if (draft.kind === 'update') {
-    const columnsByName = new Map(columns.map((column) => [column.name, column]))
-    return Object.entries(draft.fieldInputs).some(([columnName, input]) => {
-      const column = columnsByName.get(columnName)
-      if (column === undefined) {
-        return false
-      }
-      const resolved = resolveMutationField(draft, column, input)
-      const sourceValue = draft.sourceValues[columnName]
-      return !(
-        (resolved.kind === 'null' && (sourceValue === null || sourceValue === undefined)) ||
-        (resolved.kind === 'valid' &&
-          areMutationValuesEqual(column.column_type, resolved.value, sourceValue) === true)
-      )
-    })
-  }
-
-  return columns.some((column) => {
-    const currentInput = getMutationFieldInput(draft, column)
-    const initialInput = draft.initialFieldInputs[column.name]
-    if (initialInput === undefined) {
-      return true
-    }
-    return areMutationFieldInputsEqual(currentInput, initialInput) === false
-  })
 }
 
 /**

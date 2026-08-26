@@ -215,7 +215,8 @@ Both surfaces consume the same provider-owned per-row draft, parsing, validation
   from row checkbox selection.
 - Scalar Enter completes and moves down; Tab and Shift+Tab complete and move horizontally with row wrapping.
 - Structured Enter inserts a newline, Tab and Shift+Tab indent or outdent, Cmd/Ctrl+Enter completes, and Escape closes.
-- Completion and closure restore semantic grid focus without automatically opening another editor or discarding input.
+- Completion saves the field and restores semantic grid focus without automatically opening another editor. Close or Escape
+  discards the uncommitted field input while preserving any previously staged value.
 - Relation and binary activation opens the complete-row pane and focuses the corresponding field.
 - Generated and unsupported read-only fields do not open a mutation surface.
 
@@ -268,7 +269,7 @@ deletion takes precedence over staged-update presentation.
 Review presents each mutation kind as an accordion trigger and renders plain-language operation summaries rather than an exhaustive
 affected-row inventory. Every expanded operation section contains a semantic list with its own scroll area, while the staged summary
 and Apply controls remain fixed below the review. Lists fit up to ten operation rows and scroll beyond that boundary. Each operation
-can be undone from review; lists above 100 operations are virtualized; `Discard` clears the complete table ledger.
+can be undone from review; long lists scroll within their section; `Discard` clears the complete table ledger.
 
 ## Column selection and bulk editing
 

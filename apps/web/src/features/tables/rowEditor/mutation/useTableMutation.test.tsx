@@ -3,25 +3,26 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { useTableMutations } from './useTableMutation'
 
-const { deleteRow, deleteWait, insert, tableProxy, update, updateWait, wait } = vi.hoisted(() => ({
+const { deleteRow, deleteWait, insert, update, updateWait, wait } = vi.hoisted(() => ({
   deleteRow: vi.fn(),
   deleteWait: vi.fn().mockResolvedValue(undefined),
   insert: vi.fn(),
-  tableProxy: { name: 'users' },
   update: vi.fn(),
   updateWait: vi.fn().mockResolvedValue(undefined),
   wait: vi.fn().mockResolvedValue({ id: 'row-1' }),
 }))
 const runtimeClient = { db: { delete: deleteRow, insert, update } }
 const runtimeSchema = { tables: {} }
+const tableProxy = {
+  _initType: undefined,
+  _rowType: undefined,
+  _schema: runtimeSchema,
+  _table: 'users',
+}
 
 insert.mockReturnValue({ wait })
 update.mockReturnValue({ wait: updateWait })
 deleteRow.mockReturnValue({ wait: deleteWait })
-
-vi.mock('@tables/rowEditor/mutation/tableProxy', () => ({
-  createTableProxy: () => tableProxy,
-}))
 
 describe('useTableMutations', () => {
   it('uses the runtime client directly without a Jazz React provider', async () => {
@@ -35,7 +36,7 @@ describe('useTableMutations', () => {
 
     let insertedRowId: string | undefined
     await act(async () => {
-      insertedRowId = await result.current.insertRow({ name: 'Ada', omitted: undefined })
+      insertedRowId = await result.current.insertRow({ name: 'Ada' })
     })
 
     expect(insert).toHaveBeenCalledWith(tableProxy, { name: 'Ada' })
@@ -53,7 +54,7 @@ describe('useTableMutations', () => {
     )
 
     await act(async () => {
-      await result.current.updateRow('row-1', { name: 'Grace', omitted: undefined })
+      await result.current.updateRow('row-1', { name: 'Grace' })
       await result.current.deleteRow('row-2')
     })
 

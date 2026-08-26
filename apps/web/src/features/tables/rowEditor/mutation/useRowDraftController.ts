@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useDeferredValue,
-  useMemo,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from 'react'
+import { useCallback, useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 
 import type { ColumnDescriptor } from 'jazz-tools'
 
@@ -14,7 +7,6 @@ import {
   createInsertRowDraft,
   createUpdateRowDraft,
   getMutationFieldInput,
-  isRowMutationDraftDirty,
   setMutationFieldMode,
   setMutationFieldText,
   type RowMutationDraft,
@@ -22,32 +14,24 @@ import {
 } from '@tables/rowEditor/mutation/draft'
 import type { DetailPaneMode } from '@tables/tableTypes'
 
-export interface RowDraftBinding {
+interface RowDraftBinding {
   draft: RowMutationDraft
   setDraft: Dispatch<SetStateAction<RowMutationDraft>>
 }
 
 interface RowDraftControllerState {
   draft: RowMutationDraft
-  isDirty: boolean
 }
 
 interface RowDraftControllerActions {
   buildSubmission: () => RowMutationSubmission
-  reset: () => void
   setFieldNull: (columnName: string, isNull: boolean) => void
   setFieldOmitted: (columnName: string, isOmitted: boolean) => void
   setFieldText: (columnName: string, text: string) => void
 }
 
-interface RowDraftControllerMeta {
-  mode: DetailPaneMode
-  schemaColumns: readonly ColumnDescriptor[]
-}
-
 export interface RowDraftController {
   actions: RowDraftControllerActions
-  meta: RowDraftControllerMeta
   state: RowDraftControllerState
 }
 
@@ -57,8 +41,9 @@ interface UseRowDraftControllerOptions {
   schemaColumns: readonly ColumnDescriptor[]
 }
 
-interface UseBoundRowDraftControllerOptions extends UseRowDraftControllerOptions {
+interface UseBoundRowDraftControllerOptions {
   binding: RowDraftBinding
+  schemaColumns: readonly ColumnDescriptor[]
 }
 
 function createInitialDraft(
@@ -90,33 +75,15 @@ export function useRowDraftController({
 
   return useBoundRowDraftController({
     binding: { draft: ownedDraft, setDraft: setOwnedDraft },
-    initialRowValues,
-    mode,
     schemaColumns,
   })
 }
 
 export function useBoundRowDraftController({
   binding,
-  initialRowValues,
-  mode,
   schemaColumns,
 }: UseBoundRowDraftControllerOptions): RowDraftController {
   const { draft, setDraft } = binding
-  const deferredDraft = useDeferredValue(draft)
-  const deferredIsDirty = useMemo(
-    () => isRowMutationDraftDirty(deferredDraft, schemaColumns),
-    [deferredDraft, schemaColumns],
-  )
-  const urgentIsDirty =
-    draft.kind === 'update'
-      ? Object.keys(draft.fieldInputs).length > 0
-      : isRowMutationDraftDirty(draft, schemaColumns)
-  const isDirty = draft === deferredDraft ? deferredIsDirty : urgentIsDirty
-
-  const reset = useCallback(() => {
-    setDraft(createInitialDraft(mode, initialRowValues, schemaColumns))
-  }, [initialRowValues, mode, schemaColumns, setDraft])
 
   const setFieldText = useCallback(
     (columnName: string, text: string) => {
@@ -179,24 +146,12 @@ export function useBoundRowDraftController({
     () => ({
       actions: {
         buildSubmission,
-        reset,
         setFieldNull,
         setFieldOmitted,
         setFieldText,
       },
-      meta: { mode, schemaColumns },
-      state: { draft, isDirty },
+      state: { draft },
     }),
-    [
-      buildSubmission,
-      draft,
-      isDirty,
-      mode,
-      reset,
-      schemaColumns,
-      setFieldNull,
-      setFieldOmitted,
-      setFieldText,
-    ],
+    [buildSubmission, draft, setFieldNull, setFieldOmitted, setFieldText],
   )
 }

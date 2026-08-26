@@ -15,90 +15,13 @@ import {
 } from '@inspector/ds'
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
-import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
-import {
-  useRowDraftController,
-  type RowDraftController,
-} from '@tables/rowEditor/mutation/useRowDraftController'
+import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 import { createRowJsonViewValue } from '@tables/rowEditor/values/jsonView'
 
 interface EditRowFormProps {
-  draftController?: RowDraftController
-  onDirtyChange?: (isDirty: boolean) => void
-  onSave?: (values: Record<string, unknown>) => Promise<void> | void
-  rowValues: Record<string, unknown> | null
-  schemaColumns: ColumnDescriptor[]
-  targetRowId: string | null
-}
-
-export { focusRowEditorField }
-
-export function EditRowForm({
-  draftController,
-  onDirtyChange,
-  onSave,
-  rowValues,
-  schemaColumns,
-  targetRowId,
-}: EditRowFormProps): React.ReactElement {
-  if (rowValues === null) {
-    return (
-      <Box
-        height="full"
-        alignItems="center"
-        justifyContent="center"
-        role="status"
-        aria-live="polite"
-      >
-        <Text color="muted">Loading row</Text>
-      </Box>
-    )
-  }
-
-  const loadedProps = {
-    onDirtyChange,
-    onSave,
-    rowValues,
-    schemaColumns,
-  }
-
-  return draftController === undefined ? (
-    <OwnedLoadedEditRowForm
-      key={targetRowId ?? 'unknown-row'}
-      {...loadedProps}
-    />
-  ) : (
-    <LoadedEditRowForm
-      key={targetRowId ?? 'unknown-row'}
-      {...loadedProps}
-      draftController={draftController}
-    />
-  )
-}
-
-interface LoadedEditRowFormProps extends Omit<
-  EditRowFormProps,
-  'draftController' | 'rowValues' | 'targetRowId'
-> {
   draftController: RowDraftController
   rowValues: Record<string, unknown>
-}
-
-type OwnedLoadedEditRowFormProps = Omit<LoadedEditRowFormProps, 'draftController'>
-
-function OwnedLoadedEditRowForm(props: OwnedLoadedEditRowFormProps): React.ReactElement {
-  const draftController = useRowDraftController({
-    initialRowValues: props.rowValues,
-    mode: 'edit',
-    schemaColumns: props.schemaColumns,
-  })
-
-  return (
-    <LoadedEditRowForm
-      {...props}
-      draftController={draftController}
-    />
-  )
+  schemaColumns: ColumnDescriptor[]
 }
 
 type RowRepresentation = 'details' | 'json'
@@ -112,7 +35,7 @@ const defaultFindOptions: FindBarSearchOptions = {
 function RowJsonRepresentation({
   rowValues,
   schemaColumns,
-}: Pick<LoadedEditRowFormProps, 'rowValues' | 'schemaColumns'>): React.ReactElement {
+}: Pick<EditRowFormProps, 'rowValues' | 'schemaColumns'>): React.ReactElement {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOptions, setSearchOptions] = useState(defaultFindOptions)
   const [activeMatchIndex, setActiveMatchIndex] = useState(0)
@@ -194,19 +117,16 @@ function RowJsonRepresentation({
   )
 }
 
-function LoadedEditRowForm({
+export function EditRowForm({
   draftController,
-  onDirtyChange,
-  onSave,
   rowValues,
   schemaColumns,
-}: LoadedEditRowFormProps): React.ReactElement {
+}: EditRowFormProps): React.ReactElement {
   const [representation, setRepresentation] = useState<RowRepresentation>('details')
   const rowEditor = useRowEditorFields({
     draftController,
     mode: 'edit',
-    onDirtyChange,
-    onSubmit: onSave ?? (() => undefined),
+    onSubmit: () => undefined,
     schemaColumns,
   })
 

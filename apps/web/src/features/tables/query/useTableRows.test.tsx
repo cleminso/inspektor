@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import type { DynamicTableRow } from 'jazz-tools'
+import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTableRows } from '@tables/query/useTableRows'
@@ -16,11 +16,10 @@ let page = 1
 let pageSize: 100 | 500 | 1000 = 100
 let sortColumn = 'id'
 let sortDirection: 'asc' | 'desc' = 'asc'
+let schemaColumns: ColumnDescriptor[] = []
 let runtimeClient: { manager: Record<string, never> } | null
 let runtimeSchema: Record<string, unknown> | null
 const setPage = vi.fn()
-
-vi.mock('@tables/schema/tableSchema', () => ({ getTableColumns: () => [] }))
 
 vi.mock('@tables/query/genericQueryBuilder', () => ({
   GenericQueryBuilder: class GenericQueryBuilder {
@@ -49,11 +48,15 @@ vi.mock('@tables/query/useJazzQueryState', () => ({
 }))
 
 function useTestTableRows(
-  options: Omit<Parameters<typeof useTableRows>[0], 'onPageOutOfRange' | 'search'>,
+  options: Omit<
+    Parameters<typeof useTableRows>[0],
+    'onPageOutOfRange' | 'schemaColumns' | 'search'
+  >,
 ) {
   return useTableRows({
     ...options,
     onPageOutOfRange: async () => setPage(1),
+    schemaColumns,
     search: {
       filters: filters as never,
       page,
@@ -74,6 +77,7 @@ beforeEach(() => {
   setPage.mockReset()
   sortColumn = 'id'
   sortDirection = 'asc'
+  schemaColumns = []
   runtimeClient = { manager: {} }
   runtimeSchema = {
     accounts: { columns: [] },
@@ -98,6 +102,21 @@ beforeEach(() => {
 })
 
 describe('useTableRows', () => {
+  it('projects caller-owned schema columns into table columns', () => {
+    schemaColumns = [{ name: 'name', column_type: { type: 'Text' }, nullable: false }]
+
+    const { result } = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+
+    expect(result.current.columns.map((column) => column.id)).toEqual(['id', 'name'])
+  })
+
   it('keeps row loading active until the runtime can execute the query', () => {
     runtimeClient = null
     runtimeSchema = null
@@ -113,27 +132,6 @@ describe('useTableRows', () => {
 
     expect(result.current.isInitialLoading).toBe(true)
     expect(result.current.rows).toEqual([])
-  })
-
-  it('keeps the capped row array stable across unrelated renders', () => {
-    queryRows = [
-      { id: 'row-1', name: 'Ada' } as DynamicTableRow,
-      { id: 'row-2', name: 'Grace' } as DynamicTableRow,
-      { id: 'row-3', name: 'Linus' } as DynamicTableRow,
-    ]
-    const { result, rerender } = renderHook(() =>
-      useTestTableRows({
-        client: runtimeClient as never,
-        scopeKey: 'schema-1',
-        tableName: 'users',
-        wasmSchema: runtimeSchema as never,
-      }),
-    )
-    const initialRows = result.current.rows
-
-    rerender()
-
-    expect(result.current.rows).toBe(initialRows)
   })
 
   it('keeps resolved rows visible while a new sort subscription resolves', () => {

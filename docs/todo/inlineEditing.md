@@ -12,6 +12,38 @@
 
 ## Implemented foundation
 
+[26/08/26]
+
+### Deletion Apply presentation
+
+- [x] Keep staged deletion rows visible while Apply is unresolved.
+- [x] Remove a successfully deleted row and its widget operation in the same resolved presentation.
+- [x] Retain failed deletions with their staged treatment for review and retry.
+
+[26/08/26]
+
+### Shared draft lifecycle simplification
+
+- [x] Rebase staged drafts from loaded live rows even while their editor surfaces are unmounted.
+- [x] Preserve staged fields during rebasing, update untouched fields, and remove overlays that become equal to live values.
+- [x] Disable complete-row mutation controls and an open deletion confirmation while Apply owns the ledger.
+- [x] Require provider-owned controllers for edit forms and remove the unused form-local save path.
+
+[26/08/26]
+
+### Apply lifecycle hardening
+
+- [x] Complete ledger acknowledgement and execution state after the initiating table surface unmounts without invoking stale presentation callbacks.
+- [x] Block inline field-editor activation and edit affordances while Apply is running.
+
+[26/08/26]
+
+- [x] Keep the active field target and its source-row snapshot under one table-state owner until completion or cancellation.
+- [x] Make the table mutation provider's schema projection authoritative for every row mutation controller.
+- [x] Preserve local uncommitted field input through transient query-row resets while explicit Close and Escape still discard it.
+- [x] Supersede earlier field-preservation wording: only saved provider state survives explicit field-editor dismissal.
+- [x] Supersede complete-state Apply failure wording with entry-level acknowledgement and unresolved-only retry.
+
 [25/08/26]
 
 - [x] Share schema-owned field editability policy between inline routing and mutation parsing.

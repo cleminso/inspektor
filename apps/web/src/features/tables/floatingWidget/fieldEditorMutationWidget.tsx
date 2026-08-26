@@ -4,7 +4,7 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { Box, Button, FloatingPanel } from '@inspector/ds'
 
 import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
-import type { TableMutationEditorController } from '@tables/mutationLedger/provider'
+import { useTableMutationEditorController } from '@tables/mutationLedger/provider'
 import {
   getMutationFieldError,
   getMutationFieldInput,
@@ -19,17 +19,20 @@ import {
 
 interface FieldEditorMutationWidgetProps {
   column: ColumnDescriptor
-  controller: TableMutationEditorController
   onClose: () => void
   onComplete: (direction: SpreadsheetCompletionDirection) => void
+  rowId: string
+  rowValues: Record<string, unknown>
 }
 
 function FieldEditorMutationWidget({
   column,
-  controller,
   onClose,
   onComplete,
+  rowId,
+  rowValues,
 }: FieldEditorMutationWidgetProps): React.ReactElement {
+  const controller = useTableMutationEditorController({ initialRowValues: rowValues, rowId })
   const isStructured = isStructuredColumn(column)
   const [input, setInput] = useState<MutationFieldInput>(() =>
     getMutationFieldInput(controller.state.draft, column),

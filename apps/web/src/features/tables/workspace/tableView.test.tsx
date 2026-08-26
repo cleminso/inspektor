@@ -9,6 +9,7 @@ import { TableView } from '@tables/workspace/tableView'
 const tableViewState = vi.hoisted(() => ({
   activeColumnId: null,
   activeFieldEditorTarget: null as { columnId: string; rowId: string } | null,
+  activeFieldEditorRowValues: null as Record<string, unknown> | null,
   canInspectSchema: true,
   canMutateRows: true,
   canOpenRowEditor: true,
@@ -29,13 +30,10 @@ const tableViewState = vi.hoisted(() => ({
   closeRowEditor: vi.fn(),
   hasCellSelection: false,
   hasNextPage: false,
-  hasPreviousPage: false,
   isInitialLoading: false,
   isRefreshing: false,
-  loadedRowCount: 2,
   mutationExecutor: {
     deleteRow: vi.fn(),
-    insertRow: vi.fn(),
     updateRow: vi.fn(),
   },
   page: 1,
@@ -54,11 +52,7 @@ const tableViewState = vi.hoisted(() => ({
     openInsert: vi.fn(),
   },
   rowValues: null as Record<string, unknown> | null,
-  schemaColumns: [] as Array<{
-    column_type: { type: 'Text' }
-    name: string
-    nullable: boolean
-  }>,
+  rows: [{ id: 'row-1' }, { id: 'row-2' }] as Array<Record<string, unknown>>,
   setFilters: vi.fn(),
   setPage: vi.fn(),
   setPageSize: vi.fn(),
@@ -77,17 +71,27 @@ const tableViewState = vi.hoisted(() => ({
     isSortable: boolean
     label: string
   }>,
-  tableKey: 'connection-1:main:schema-1:accounts',
 }))
 const stageDeletions = vi.hoisted(() => vi.fn())
 const mutationLedgerUndoDeletions = vi.hoisted(() => vi.fn())
 const mutationLedgerRevertField = vi.hoisted(() => vi.fn())
 const mutationLedgerRevertRowUpdate = vi.hoisted(() => vi.fn())
+const mutationLedgerRebaseRows = vi.hoisted(() => vi.fn())
+const mutationEditorController = vi.hoisted(() => ({ actions: {}, state: { draft: {} } }))
+const mutationEditorOptions = vi.hoisted(() => ({
+  current: null as null | { initialRowValues: Record<string, unknown>; rowId: string },
+}))
+const editRowFormProps = vi.hoisted(() => ({
+  current: null as null | { draftController: unknown; rowValues: Record<string, unknown> },
+}))
 const stagedFieldsByRowId = vi.hoisted(() => ({
   current: {} as Readonly<Record<string, ReadonlySet<string>>>,
 }))
 const stagedValuesByRowId = vi.hoisted(() => ({
   current: {} as Readonly<Record<string, Readonly<Record<string, unknown>>>>,
+}))
+const mutationExecution = vi.hoisted(() => ({
+  current: { error: null as string | null, status: 'idle' as 'applying' | 'failed' | 'idle' },
 }))
 const gridContextMenuProps = vi.hoisted(() => ({ current: null as null | Record<string, unknown> }))
 const gridCellContextMenu = vi.hoisted(() => vi.fn())
@@ -97,9 +101,27 @@ const toastSuccess = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
   current: null as null | {
     onUndoRowDeletions?: (rowIds: readonly string[]) => void
+    schemaColumns?: readonly unknown[]
     stagedValuesByRowId?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
+    tableKey?: string
   },
 }))
+const mutationLedgerProviderProps = vi.hoisted(() => ({
+  current: null as null | { schemaColumns: readonly unknown[]; scopeKey: string },
+}))
+const fieldEditorProps = vi.hoisted(() => ({
+  current: null as null | { rowId: string; rowValues: Record<string, unknown> },
+}))
+const schemaColumns = vi.hoisted(() => [
+  { name: 'name', column_type: { type: 'Text' as const }, nullable: false },
+])
+const nameTableColumn = {
+  accessorKey: 'name',
+  id: 'name',
+  isSortable: true,
+  label: 'Name',
+  column: schemaColumns[0]!,
+}
 const mutationLedgerEntries = vi.hoisted(
   () => [] as Array<{ entryId: `delete:${string}`; kind: 'delete'; rowId: string }>,
 )
@@ -107,7 +129,9 @@ const mutationLedgerEntries = vi.hoisted(
 vi.mock('@tables/workspace/useTableViewState', () => ({
   useTableViewState: (options: {
     onUndoRowDeletions?: (rowIds: readonly string[]) => void
+    schemaColumns?: readonly unknown[]
     stagedValuesByRowId?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
+    tableKey?: string
   }) => {
     useTableViewStateOptions.current = options
     return tableViewState
@@ -124,7 +148,7 @@ vi.mock('@app/providers/inspectorProvider', () => ({
 }))
 
 vi.mock('@tables/schema/tableSchema', () => ({
-  getTableColumns: () => [],
+  getTableColumns: () => schemaColumns,
 }))
 
 vi.mock('@tables/workspace/tabsProvider', () => ({
@@ -132,8 +156,21 @@ vi.mock('@tables/workspace/tabsProvider', () => ({
 }))
 
 vi.mock('@tables/mutationLedger/provider', () => ({
-  TableMutationLedgerProvider: ({ children }: { children: ReactNode }) => children,
+  TableMutationLedgerProvider: ({
+    children,
+    schemaColumns,
+    scopeKey,
+  }: {
+    children: ReactNode
+    schemaColumns: readonly unknown[]
+    scopeKey: string
+  }) => {
+    mutationLedgerProviderProps.current = { schemaColumns, scopeKey }
+    return children
+  },
   useTableMutationLedger: () => ({
+    execution: mutationExecution.current,
+    rebaseRows: mutationLedgerRebaseRows,
     stageDeletions,
     ledger: { entries: mutationLedgerEntries, hasInvalidDraft: false },
     undoDeletions: mutationLedgerUndoDeletions,
@@ -142,11 +179,13 @@ vi.mock('@tables/mutationLedger/provider', () => ({
     stagedFieldsByRowId: stagedFieldsByRowId.current,
     stagedValuesByRowId: stagedValuesByRowId.current,
   }),
-  useTableMutationEditorController: () => ({
-    actions: {},
-    meta: {},
-    state: { draft: { sourceValues: {} } },
-  }),
+  useTableMutationEditorController: (options: {
+    initialRowValues: Record<string, unknown>
+    rowId: string
+  }) => {
+    mutationEditorOptions.current = options
+    return mutationEditorController
+  },
 }))
 
 vi.mock('@tables/grid/tableGridContextMenu', () => ({
@@ -191,25 +230,32 @@ vi.mock('@tables/floatingWidget/floatingWidget', () => ({
   ),
 }))
 
-vi.mock('@tables/floatingWidget/fieldEditorMutationWidgetModules', () => ({
-  FieldEditorMutationWidget: ({
+vi.mock('@tables/floatingWidget/fieldEditorMutationWidget', () => ({
+  default: ({
     column,
     onClose,
     onComplete,
+    rowId,
+    rowValues,
   }: {
     column: { name: string }
     onClose: () => void
     onComplete: (direction: string) => void
-  }) => (
-    <div role="dialog" aria-label={`Edit ${column.name}`}>
-      <button type="button" onClick={onClose}>
-        Close field
-      </button>
-      <button type="button" onClick={() => onComplete('enter')}>
-        Complete field
-      </button>
-    </div>
-  ),
+    rowId: string
+    rowValues: Record<string, unknown>
+  }) => {
+    fieldEditorProps.current = { rowId, rowValues }
+    return (
+      <div role="dialog" aria-label={`Edit ${column.name}`}>
+        <button type="button" onClick={onClose}>
+          Close field
+        </button>
+        <button type="button" onClick={() => onComplete('enter')}>
+          Complete field
+        </button>
+      </div>
+    )
+  },
 }))
 
 vi.mock('@tables/grid/buildColumns', () => ({
@@ -244,7 +290,16 @@ vi.mock('@tables/grid/toolbar', () => ({
 }))
 
 vi.mock('@tables/rowEditor/rowEditorModules', () => ({
-  EditRowForm: () => <div>Edit row fields</div>,
+  EditRowForm: ({
+    draftController,
+    rowValues,
+  }: {
+    draftController: unknown
+    rowValues: Record<string, unknown>
+  }) => {
+    editRowFormProps.current = { draftController, rowValues }
+    return <div>Edit row fields</div>
+  },
   InsertRowForm: () => null,
   preloadRowEditorForms: vi.fn(),
 }))
@@ -253,16 +308,22 @@ vi.mock('@tables/rowEditor/sidePane', () => ({
   RowEditorSidePanel: ({
     children,
     editedRowIds,
+    mutationDisabled,
     onConfirmDelete,
   }: {
     children: ReactNode
     editedRowIds: string[]
+    mutationDisabled?: boolean
     onConfirmDelete?: (rowIds: readonly string[]) => void
   }) => (
     <>
       {children}
       {onConfirmDelete === undefined ? null : (
-        <button type="button" onClick={() => onConfirmDelete(editedRowIds)}>
+        <button
+          type="button"
+          disabled={mutationDisabled}
+          onClick={() => onConfirmDelete(editedRowIds)}
+        >
           Delete checked rows
         </button>
       )}
@@ -316,7 +377,7 @@ vi.mock('@inspector/ds', () => {
     loading: boolean
   }) => (
     <div data-loading={String(loading)}>
-      {tableViewState.loadedRowCount === 0 ? emptyContent : null}
+      {tableViewState.rows.length === 0 ? emptyContent : null}
     </div>
   )
   const DataGridRoot = ({
@@ -469,10 +530,10 @@ afterEach(() => {
   tableViewState.isRefreshing = false
   tableViewState.hasCellSelection = false
   tableViewState.hasNextPage = false
-  tableViewState.hasPreviousPage = false
-  tableViewState.loadedRowCount = 2
+  tableViewState.rows = [{ id: 'row-1' }, { id: 'row-2' }]
   tableViewState.page = 1
   tableViewState.activeFieldEditorTarget = null
+  tableViewState.activeFieldEditorRowValues = null
   tableViewState.detailPaneMode = 'closed'
   tableViewState.rowEditor.activeRowId = null
   tableViewState.rowEditor.editedRowIds = []
@@ -484,8 +545,14 @@ afterEach(() => {
   tableViewState.recentlyInsertedRowIds = new Set()
   stagedFieldsByRowId.current = {}
   stagedValuesByRowId.current = {}
+  mutationExecution.current = { error: null, status: 'idle' }
   gridContextMenuProps.current = null
   useTableViewStateOptions.current = null
+  mutationLedgerProviderProps.current = null
+  fieldEditorProps.current = null
+  mutationEditorOptions.current = null
+  editRowFormProps.current = null
+  mutationLedgerRebaseRows.mockReset()
   tableViewState.setPage.mockReset()
   tableViewState.setFilters.mockReset()
   tableViewState.handleCellEditRequest.mockReset()
@@ -521,6 +588,14 @@ function renderTableView(): ReturnType<typeof render> & { rerenderTableView: () 
   }
 }
 
+function configureNameCell(value: unknown) {
+  tableViewState.tableColumns = [nameTableColumn]
+  tableViewState.table = {
+    getFocusedCell: () => ({ column: { id: 'name' }, row: { id: 'row-1' } }),
+    getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: value } }] }),
+  }
+}
+
 describe('TableView selection dismissal', () => {
   it('routes Escape to the active selection state', () => {
     tableViewState.hasCellSelection = true
@@ -533,22 +608,6 @@ describe('TableView selection dismissal', () => {
 })
 
 describe('TableView cell actions', () => {
-  function configureNameCell(value: unknown) {
-    tableViewState.tableColumns = [
-      {
-        accessorKey: 'name',
-        column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
-        id: 'name',
-        isSortable: true,
-        label: 'Name',
-      },
-    ]
-    tableViewState.table = {
-      getFocusedCell: () => ({ column: { id: 'name' }, row: { id: 'row-1' } }),
-      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: value } }] }),
-    }
-  }
-
   it('edits and filters by the displayed staged value through the shared context actions', () => {
     configureNameCell('Grace')
     stagedValuesByRowId.current = { 'row-1': { name: 'Katherine' } }
@@ -659,7 +718,6 @@ describe('TableView cell actions', () => {
 describe('TableView pagination hotkeys', () => {
   it('changes page only while focus is within the grid scope', () => {
     tableViewState.hasNextPage = true
-    tableViewState.hasPreviousPage = true
     tableViewState.page = 2
 
     renderTableView()
@@ -682,7 +740,6 @@ describe('TableView pagination hotkeys', () => {
 
   it('does not paginate through unavailable or loading pages', () => {
     tableViewState.hasNextPage = false
-    tableViewState.hasPreviousPage = false
     tableViewState.isInitialLoading = true
     tableViewState.page = 2
 
@@ -722,6 +779,14 @@ describe('TableView query status', () => {
 
     expect(stageDeletions).toHaveBeenCalledWith(['row-1', 'row-2'])
     expect(tableViewState.handleRowsStagedForDeletion).toHaveBeenCalledWith(['row-1', 'row-2'])
+    expect(mutationEditorOptions.current).toEqual({
+      initialRowValues: { id: 'row-1', name: 'Ada' },
+      rowId: 'row-1',
+    })
+    expect(editRowFormProps.current).toEqual({
+      draftController: mutationEditorController,
+      rowValues: { id: 'row-1', name: 'Ada' },
+    })
   })
 
   it('blocks inline editing and marks rows while their deletion is staged', () => {
@@ -792,7 +857,6 @@ describe('TableView query status', () => {
   it('uses the editing treatment after a staged cell opens its inline editor', () => {
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
     tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
-    tableViewState.table = { getRowModel: () => ({ rows: [] }) }
 
     renderTableView()
 
@@ -827,51 +891,65 @@ describe('TableView query status', () => {
     })
   })
 
-  it('wires the active scalar target to the explicit Floating field editor', () => {
+  it('wires the active scalar target to the explicit Floating field editor', async () => {
     tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
-    tableViewState.table = {
-      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: 'Ada' } }] }),
-    }
-    tableViewState.tableColumns = [
-      {
-        accessorKey: 'name',
-        id: 'name',
-        isSortable: true,
-        label: 'Name',
-        column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
-      },
-    ]
-    tableViewState.schemaColumns = [
-      { name: 'name', column_type: { type: 'Text' }, nullable: false },
-    ]
+    tableViewState.activeFieldEditorRowValues = { id: 'row-1', name: 'Ada' }
+    tableViewState.tableColumns = [nameTableColumn]
 
     renderTableView()
 
-    expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeTruthy()
+    expect(await screen.findByRole('dialog', { name: 'Edit name' })).toBeTruthy()
+    expect(fieldEditorProps.current).toEqual({
+      rowId: 'row-1',
+      rowValues: { id: 'row-1', name: 'Ada' },
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Close field' }))
     fireEvent.click(screen.getByRole('button', { name: 'Complete field' }))
     expect(tableViewState.handleFieldEditorCancel).toHaveBeenCalledOnce()
     expect(tableViewState.handleFieldEditorComplete).toHaveBeenCalledWith('enter')
   })
 
+  it('blocks inline editing while Apply is running', () => {
+    mutationExecution.current = { error: null, status: 'applying' }
+    tableViewState.detailPaneMode = 'rows'
+    configureNameCell('Ada')
+
+    renderTableView()
+    fireEvent.click(screen.getByRole('button', { name: 'Edit row 1' }))
+
+    expect(tableViewState.handleCellEditRequest).not.toHaveBeenCalled()
+    expect(
+      (
+        gridContextMenuProps.current as {
+          getCellActions: (target: { columnId: string; rowId: string }) => { canEdit: boolean }
+        }
+      ).getCellActions({ columnId: 'name', rowId: 'row-1' }).canEdit,
+    ).toBe(false)
+    expect(screen.getByText('Applying changes')).toBeTruthy()
+    expect(screen.queryByText('Edit row fields')).toBeNull()
+    expect(
+      (screen.getByRole('button', { name: 'Delete checked rows' }) as HTMLButtonElement).disabled,
+    ).toBe(true)
+  })
+
+  it('passes one table scope and schema projection through the composition root', () => {
+    renderTableView()
+
+    expect(useTableViewStateOptions.current).toMatchObject({
+      schemaColumns,
+      tableKey: 'connection-1:main:schema-1:accounts',
+    })
+    expect(mutationLedgerProviderProps.current).toEqual({
+      schemaColumns,
+      scopeKey: 'connection-1:main:schema-1:accounts',
+    })
+  })
+
   it('suppresses inline editing while keeping the staged widget available beside the row pane', () => {
     tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
+    tableViewState.activeFieldEditorRowValues = { id: 'row-1', name: 'Ada' }
     tableViewState.detailPaneMode = 'rows'
-    tableViewState.table = {
-      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', name: 'Ada' } }] }),
-    }
-    tableViewState.tableColumns = [
-      {
-        accessorKey: 'name',
-        id: 'name',
-        isSortable: true,
-        label: 'Name',
-        column: { name: 'name', column_type: { type: 'Text' }, nullable: false },
-      },
-    ]
-    tableViewState.schemaColumns = [
-      { name: 'name', column_type: { type: 'Text' }, nullable: false },
-    ]
+    tableViewState.tableColumns = [nameTableColumn]
 
     renderTableView()
 
@@ -897,7 +975,7 @@ describe('TableView query status', () => {
     expect(document.querySelector('[data-loading="false"]')).not.toBeNull()
 
     tableViewState.isRefreshing = false
-    tableViewState.loadedRowCount = 0
+    tableViewState.rows = []
     rerenderTableView()
 
     await waitFor(() => {
@@ -910,7 +988,7 @@ describe('TableView query status', () => {
   })
 
   it('clears filters from the filtered-empty state', () => {
-    tableViewState.loadedRowCount = 0
+    tableViewState.rows = []
 
     renderTableView()
 
@@ -922,7 +1000,7 @@ describe('TableView query status', () => {
 
   it('offers row insertion from an unfiltered empty table', () => {
     tableViewState.filters = []
-    tableViewState.loadedRowCount = 0
+    tableViewState.rows = []
 
     renderTableView()
 
@@ -930,24 +1008,14 @@ describe('TableView query status', () => {
     expect(screen.getByRole('status').textContent).toBe('This table is empty')
     const table = screen.getByRole('table', { name: 'accounts rows' })
     const contextualInsert = within(table).getByRole('button', { name: 'Insert row' })
-    const toolbarInsert = screen
-      .getAllByRole('button', { name: 'Insert row' })
-      .find((button) => button !== contextualInsert)
-    if (toolbarInsert === undefined) {
-      throw new Error('Expected the toolbar insert action')
-    }
 
     fireEvent.click(contextualInsert)
-    expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledOnce()
-
-    tableViewState.rowEditor.openInsert.mockClear()
-    fireEvent.click(toolbarInsert)
     expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledOnce()
   })
 
   it('does not present a later empty page as an empty table', () => {
     tableViewState.filters = []
-    tableViewState.loadedRowCount = 0
+    tableViewState.rows = []
     tableViewState.page = 2
 
     renderTableView()
@@ -963,7 +1031,7 @@ describe('TableView query status', () => {
   it('presents query failures as alerts with corrective reload guidance', () => {
     tableViewState.error = 'Network request failed'
     tableViewState.filters = []
-    tableViewState.loadedRowCount = 0
+    tableViewState.rows = []
 
     renderTableView()
 

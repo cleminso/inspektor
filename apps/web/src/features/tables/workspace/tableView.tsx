@@ -1,4 +1,13 @@
-import { Suspense, useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import {
   Box,
@@ -50,21 +59,26 @@ import {
   TableMutationLedgerProvider,
   useTableMutationEditorController,
   useTableMutationLedger,
-  type ScopedTableMutationLedger,
 } from '@tables/mutationLedger/provider'
 import type { ColumnDescriptor } from 'jazz-tools'
 import type { TableRowId } from '@tables/tableTypes'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
-import { FieldEditorMutationWidget } from '@tables/floatingWidget/fieldEditorMutationWidgetModules'
-import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
+
+const FieldEditorMutationWidget = lazy(
+  () => import('@tables/floatingWidget/fieldEditorMutationWidget'),
+)
 
 interface TableViewProps {
   tableName: string
 }
 
-function RowEditorFormFallback(): React.ReactElement {
+function RowEditorFormFallback({
+  label = 'Loading editor',
+}: {
+  label?: string
+}): React.ReactElement {
   return (
     <Box
       height="full"
@@ -73,7 +87,7 @@ function RowEditorFormFallback(): React.ReactElement {
       role="status"
       aria-live="polite"
     >
-      <Text color="muted">Loading editor</Text>
+      <Text color="muted">{label}</Text>
     </Box>
   )
 }
@@ -92,7 +106,6 @@ function StagedEditRowForm({
   const draftController = useTableMutationEditorController({
     initialRowValues: rowValues,
     rowId,
-    schemaColumns,
   })
 
   return (
@@ -100,43 +113,7 @@ function StagedEditRowForm({
       draftController={draftController}
       rowValues={rowValues}
       schemaColumns={schemaColumns}
-      targetRowId={rowId}
     />
-  )
-}
-
-interface StagedFieldEditorMutationWidgetProps {
-  column: ColumnDescriptor
-  onCancel: () => void
-  onComplete: (direction: SpreadsheetCompletionDirection) => void
-  rowId: TableRowId
-  rowValues: Record<string, unknown>
-  schemaColumns: ColumnDescriptor[]
-}
-
-function StagedFieldEditorMutationWidget({
-  column,
-  onCancel,
-  onComplete,
-  rowId,
-  rowValues,
-  schemaColumns,
-}: StagedFieldEditorMutationWidgetProps): React.ReactElement {
-  const controller = useTableMutationEditorController({
-    initialRowValues: rowValues,
-    rowId,
-    schemaColumns,
-  })
-
-  return (
-    <Suspense fallback={<RowEditorFormFallback />}>
-      <FieldEditorMutationWidget
-        column={column}
-        controller={controller}
-        onClose={onCancel}
-        onComplete={onComplete}
-      />
-    </Suspense>
   )
 }
 
@@ -161,14 +138,25 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
       schemaColumns={schemaColumns}
       scopeKey={mutationScopeKey}
     >
-      <TableViewStatefulContent tableName={tableName} />
+      <TableViewContent
+        schemaColumns={schemaColumns}
+        tableKey={mutationScopeKey}
+        tableName={tableName}
+      />
     </TableMutationLedgerProvider>
   )
 }
 
-function TableViewStatefulContent({ tableName }: TableViewProps): React.ReactElement {
+function TableViewContent({
+  schemaColumns,
+  tableKey,
+  tableName,
+}: TableViewProps & {
+  schemaColumns: ColumnDescriptor[]
+  tableKey: string
+}): React.ReactElement {
   const mutations = useTableMutationLedger()
-  const { ledger, undoDeletions } = mutations
+  const { ledger, rebaseRows, undoDeletions } = mutations
   const stagedDeletionRowIds = useMemo(
     () =>
       new Set(
@@ -179,33 +167,19 @@ function TableViewStatefulContent({ tableName }: TableViewProps): React.ReactEle
   const state = useTableViewState({
     disabledRowIds: stagedDeletionRowIds,
     onUndoRowDeletions: undoDeletions,
+    retainDisabledRows: mutations.execution.status === 'applying',
+    schemaColumns,
     stagedValuesByRowId: mutations.stagedValuesByRowId,
+    tableKey,
     tableName,
   })
 
-  return (
-    <TableViewContent
-      mutations={mutations}
-      stagedDeletionRowIds={stagedDeletionRowIds}
-      state={state}
-      tableName={tableName}
-    />
-  )
-}
-
-function TableViewContent({
-  mutations,
-  stagedDeletionRowIds,
-  state,
-  tableName,
-}: {
-  mutations: ScopedTableMutationLedger
-  stagedDeletionRowIds: ReadonlySet<TableRowId>
-  state: ReturnType<typeof useTableViewState>
-  tableName: string
-}): React.ReactElement {
   const { openSchemaView } = useTableTabs()
   const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)
+  const mutationApplying = mutations.execution.status === 'applying'
+  useEffect(() => {
+    rebaseRows(state.rows)
+  }, [mutationApplying, rebaseRows, state.rows])
   const getRowStatus = useCallback(
     (row: { id: string }) =>
       stagedDeletionRowIds.has(row.id)
@@ -244,7 +218,7 @@ function TableViewContent({
     ],
   )
   const handleCellEditRequest = (target: { columnId: string; rowId: string }) => {
-    if (stagedDeletionRowIds.has(target.rowId) === false) {
+    if (mutationApplying === false && stagedDeletionRowIds.has(target.rowId) === false) {
       state.handleCellEditRequest(target)
     }
   }
@@ -275,6 +249,7 @@ function TableViewContent({
       const canEdit =
         state.detailPaneMode === 'closed' &&
         state.canMutateRows === true &&
+        mutationApplying === false &&
         stagedDeletionRowIds.has(target.rowId) === false &&
         columnMeta.column !== null &&
         getFieldReadOnlyReason(columnMeta.column) === null
@@ -285,7 +260,13 @@ function TableViewContent({
         copyAs: value instanceof Uint8Array ? (['hex', 'base64'] as const) : [],
       }
     },
-    [resolveCellAction, stagedDeletionRowIds, state.canMutateRows, state.detailPaneMode],
+    [
+      mutationApplying,
+      resolveCellAction,
+      stagedDeletionRowIds,
+      state.canMutateRows,
+      state.detailPaneMode,
+    ],
   )
   const handleCopyCell = useCallback(
     async (target: DataGridCellTarget, format?: BinaryCopyFormat) => {
@@ -301,13 +282,13 @@ function TableViewContent({
         await navigator.clipboard.writeText(serializedValue.text)
         toasts.success(serializedValue.toast, {
           duration: 'brief',
-          id: JSON.stringify(['cell-copy', state.tableKey, target.rowId, target.columnId]),
+          id: JSON.stringify(['cell-copy', tableKey, target.rowId, target.columnId]),
         })
       } catch {
         toasts.error("Couldn't copy value")
       }
     },
-    [resolveCellAction, state.tableKey],
+    [resolveCellAction, tableKey],
   )
   const handleFilterByCell = (target: DataGridCellTarget) => {
     const resolvedCell = resolveCellAction(target)
@@ -344,12 +325,6 @@ function TableViewContent({
   const refreshPendingRef = useRef(false)
   const [refreshAnnouncement, setRefreshAnnouncement] = useState('')
   const [insertMoreEnabled, setInsertMoreEnabled] = useState(false)
-  const activeFieldRow =
-    state.activeFieldEditorTarget === null
-      ? undefined
-      : state.table
-          .getRowModel()
-          .rows.find((row) => row.id === state.activeFieldEditorTarget?.rowId)
   const activeFieldColumn =
     state.activeFieldEditorTarget === null
       ? null
@@ -359,17 +334,18 @@ function TableViewContent({
     state.error === null &&
     state.isInitialLoading === false &&
     state.isRefreshing === false &&
-    state.loadedRowCount === 0 &&
+    state.rows.length === 0 &&
     state.filters.length > 0
   const unfilteredEmpty =
     state.error === null &&
     state.isInitialLoading === false &&
     state.isRefreshing === false &&
-    state.loadedRowCount === 0 &&
+    state.rows.length === 0 &&
     state.page === 1 &&
     state.filters.length === 0
   const { page, setPage } = state
-  const canGoToPreviousPage = state.isInitialLoading === false && state.hasPreviousPage === true
+  const hasPreviousPage = state.page > 1
+  const canGoToPreviousPage = state.isInitialLoading === false && hasPreviousPage === true
   const canGoToNextPage = state.isInitialLoading === false && state.hasNextPage === true
   useHotkey(
     appHotkeys.copyCell,
@@ -613,8 +589,8 @@ function TableViewContent({
               pagination={
                 <TablePagination
                   hasNextPage={state.hasNextPage}
-                  hasPreviousPage={state.hasPreviousPage}
-                  loadedRowCount={state.loadedRowCount}
+                  hasPreviousPage={hasPreviousPage}
+                  loadedRowCount={state.rows.length}
                   loading={state.isInitialLoading}
                   page={state.page}
                   pageSize={state.pageSize}
@@ -624,7 +600,7 @@ function TableViewContent({
               }
             >
               <DataGridFilterBuilder
-                columns={state.schemaColumns}
+                columns={schemaColumns}
                 filters={state.filters}
                 rows={state.rows}
                 onFiltersChange={state.setFilters}
@@ -772,7 +748,7 @@ function TableViewContent({
                 mode={state.detailPaneMode === 'insert' ? 'insert' : 'edit'}
                 editedRowIds={state.rowEditor.editedRowIds}
                 insertMoreEnabled={insertMoreEnabled}
-                mutationDisabled={state.canMutateRows === false}
+                mutationDisabled={state.canMutateRows === false || mutationApplying}
                 activeRowIndex={state.rowEditor.activeRowIndex}
                 onClose={state.handleRowEditorCancel}
                 onConfirmDelete={(rowIds) => {
@@ -784,11 +760,13 @@ function TableViewContent({
                 onNavigateNext={state.rowEditor.goToNextRow}
               >
                 <Suspense fallback={<RowEditorFormFallback />}>
-                  {state.detailPaneMode === 'insert' ? (
+                  {mutationApplying ? (
+                    <RowEditorFormFallback label="Applying changes" />
+                  ) : state.detailPaneMode === 'insert' ? (
                     <InsertRowForm
                       key={`${tableName}:insert`}
                       rowValues={state.rowValues ?? {}}
-                      schemaColumns={state.schemaColumns}
+                      schemaColumns={schemaColumns}
                       insertMoreEnabled={insertMoreEnabled}
                       saveDisabled={state.canMutateRows === false}
                       onDiscard={() => {
@@ -807,15 +785,10 @@ function TableViewContent({
                       key={`${tableName}:${state.rowEditor.activeRowId}`}
                       rowId={state.rowEditor.activeRowId}
                       rowValues={state.rowValues}
-                      schemaColumns={state.schemaColumns}
+                      schemaColumns={schemaColumns}
                     />
                   ) : (
-                    <EditRowForm
-                      key={`${tableName}:${state.rowEditor.activeRowId ?? 'none'}`}
-                      rowValues={state.rowValues}
-                      schemaColumns={state.schemaColumns}
-                      targetRowId={state.rowEditor.activeRowId}
-                    />
+                    <RowEditorFormFallback />
                   )}
                 </Suspense>
               </RowEditorSidePanel>
@@ -825,17 +798,18 @@ function TableViewContent({
       </ResizablePanelGroup>
       {state.detailPaneMode === 'closed' &&
       state.activeFieldEditorTarget !== null &&
-      activeFieldRow !== undefined &&
+      state.activeFieldEditorRowValues !== null &&
       activeFieldColumn !== null ? (
-        <StagedFieldEditorMutationWidget
-          key={`${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
-          column={activeFieldColumn}
-          rowId={state.activeFieldEditorTarget.rowId}
-          rowValues={activeFieldRow.original}
-          schemaColumns={state.schemaColumns}
-          onCancel={state.handleFieldEditorCancel}
-          onComplete={state.handleFieldEditorComplete}
-        />
+        <Suspense fallback={<RowEditorFormFallback />}>
+          <FieldEditorMutationWidget
+            key={`${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
+            column={activeFieldColumn}
+            rowId={state.activeFieldEditorTarget.rowId}
+            rowValues={state.activeFieldEditorRowValues}
+            onClose={state.handleFieldEditorCancel}
+            onComplete={state.handleFieldEditorComplete}
+          />
+        </Suspense>
       ) : (
         <TableMutationWidget
           executor={state.mutationExecutor}

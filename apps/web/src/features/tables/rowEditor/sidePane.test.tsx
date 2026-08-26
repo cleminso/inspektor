@@ -209,6 +209,7 @@ describe('RowEditorSidePanel dirty transitions', () => {
         activeRowIndex={0}
         editedRowIds={['row-1']}
         mode="edit"
+        mutationDisabled
         onClose={vi.fn()}
         onConfirmDelete={onConfirmDelete}
         onNavigateNext={() => undefined}
@@ -217,7 +218,25 @@ describe('RowEditorSidePanel dirty transitions', () => {
         <div />
       </RowEditorSidePanel>,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm delete' }))
+    const confirmDelete = screen.getByRole('button', { name: 'Confirm delete' })
+    expect((confirmDelete as HTMLButtonElement).disabled).toBe(true)
+
+    rerender(
+      <RowEditorSidePanel
+        activeColumnNumber={0}
+        activePageRowNumber={1}
+        activeRowIndex={0}
+        editedRowIds={['row-1']}
+        mode="edit"
+        onClose={vi.fn()}
+        onConfirmDelete={onConfirmDelete}
+        onNavigateNext={() => undefined}
+        onNavigatePrevious={() => undefined}
+      >
+        <div />
+      </RowEditorSidePanel>,
+    )
+    fireEvent.click(confirmDelete)
 
     expect(onConfirmDelete).toHaveBeenCalledWith(['row-1', 'row-2', 'row-3'])
   })

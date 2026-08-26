@@ -101,6 +101,7 @@ export function RowEditorSidePanel({
           <>
             <Button
               type="button"
+              disabled={mutationDisabled === true}
               layout="fill"
               size="s"
               variant="danger"

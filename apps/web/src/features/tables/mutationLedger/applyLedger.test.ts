@@ -49,7 +49,6 @@ describe('applyTableMutationLedger', () => {
     expect(result).toEqual({
       appliedEntryIds: ['update:row-1'],
       error,
-      failedEntryId: 'delete:row-2',
       status: 'failed',
     })
     expect(deleteRow).toHaveBeenCalledOnce()

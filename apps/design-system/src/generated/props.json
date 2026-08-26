@@ -3485,7 +3485,7 @@
       "description": "Column highlighted across the header and visible rows.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 107
+        "line": 108
       }
     },
     {
@@ -3496,7 +3496,7 @@
       "description": "Row currently targeted for inspection.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 109
+        "line": 110
       }
     },
     {
@@ -3506,7 +3506,7 @@
       "description": "Data-table regions and companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 111
+        "line": 112
       }
     },
     {
@@ -3517,7 +3517,7 @@
       "description": "Controls table row and cell spacing.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 113
+        "line": 114
       }
     },
     {
@@ -3528,7 +3528,7 @@
       "description": "Requests semantic body-cell focus, including after virtual remounts.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 115
+        "line": 116
       }
     },
     {
@@ -3538,7 +3538,7 @@
       "description": "Selects a constrained semantic status for each rendered body cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 117
+        "line": 118
       }
     },
     {
@@ -3548,7 +3548,7 @@
       "description": "Selects a constrained semantic status for each rendered row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 119
+        "line": 120
       }
     },
     {
@@ -3558,7 +3558,7 @@
       "description": "Runs when a non-interactive cell is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 121
+        "line": 122
       }
     },
     {
@@ -3568,7 +3568,7 @@
       "description": "Runs when a non-interactive cell requests editing through double-click or Enter.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 123
+        "line": 124
       }
     },
     {
@@ -3578,7 +3578,7 @@
       "description": "Runs when a cell context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 125
+        "line": 126
       }
     },
     {
@@ -3588,7 +3588,7 @@
       "description": "Records the semantic cell targeted by a possible touch context-menu gesture.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 127
+        "line": 128
       }
     },
     {
@@ -3598,7 +3598,7 @@
       "description": "Runs when a column header is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 129
+        "line": 130
       }
     },
     {
@@ -3608,7 +3608,7 @@
       "description": "Runs when a column-header context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 131
+        "line": 132
       }
     },
     {
@@ -3618,7 +3618,7 @@
       "description": "Runs when a non-interactive row is activated.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 133
+        "line": 134
       }
     },
     {
@@ -3628,7 +3628,7 @@
       "description": "Runs when a row context menu is requested.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 135
+        "line": 136
       }
     },
     {
@@ -3638,7 +3638,7 @@
       "description": "Records the semantic row targeted by a possible touch context-menu gesture.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 137
+        "line": 138
       }
     },
     {
@@ -3648,7 +3648,7 @@
       "description": "Controlled TanStack table instance rendered by the compound parts.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 139
+        "line": 140
       }
     },
     {
@@ -3658,7 +3658,7 @@
       "description": "Renders the inert visual shown while a column header is dragged.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 144
+        "line": 145
       }
     },
     {
@@ -3668,7 +3668,7 @@
       "description": "Leaf column ids that can be reordered. TanStack table state owns their current order.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 146
+        "line": 147
       }
     }
   ],
@@ -3680,7 +3680,7 @@
       "description": "Table or custom viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 162
+        "line": 163
       }
     },
     {
@@ -3690,7 +3690,7 @@
       "description": "Changing this value resets both scroll axes without remounting the viewport content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 164
+        "line": 165
       }
     }
   ],
@@ -3702,7 +3702,7 @@
       "description": "Whether the table is updating while its settled rows remain available.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 169
+        "line": 170
       }
     },
     {
@@ -3712,7 +3712,7 @@
       "description": "Accessible name for the table.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 171
+        "line": 172
       }
     },
     {
@@ -3722,7 +3722,7 @@
       "description": "Header and body composition.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 173
+        "line": 174
       }
     },
     {
@@ -3732,7 +3732,7 @@
       "description": "Polite announcement rendered in a stable, visually hidden status region.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 175
+        "line": 176
       }
     }
   ],
@@ -3745,7 +3745,7 @@
       "description": "Content shown when the table has no rows. Pass `null` to render only the header.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 180
+        "line": 181
       }
     },
     {
@@ -3756,7 +3756,7 @@
       "description": "Whether loading content replaces the current row model.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 182
+        "line": 183
       }
     },
     {
@@ -3767,7 +3767,7 @@
       "description": "Content shown while rows are loading.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 184
+        "line": 185
       }
     },
     {
@@ -3778,7 +3778,7 @@
       "description": "Controls whether all rows render directly or larger row models use a virtual window.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 186
+        "line": 187
       }
     }
   ],
@@ -3790,7 +3790,7 @@
       "description": "Custom header rows. TanStack header groups render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 191
+        "line": 192
       }
     }
   ],
@@ -3802,7 +3802,7 @@
       "description": "Custom header cells. TanStack headers render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 196
+        "line": 197
       }
     },
     {
@@ -3812,7 +3812,7 @@
       "description": "TanStack header group represented by this row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 198
+        "line": 199
       }
     }
   ],
@@ -3824,7 +3824,7 @@
       "description": "Custom header content. The column header definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 203
+        "line": 204
       }
     },
     {
@@ -3834,7 +3834,7 @@
       "description": "TanStack header represented by this cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 205
+        "line": 206
       }
     }
   ],
@@ -3846,7 +3846,7 @@
       "description": "Custom rows. TanStack rows render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 210
+        "line": 211
       }
     }
   ],
@@ -3858,7 +3858,7 @@
       "description": "Custom cells. Visible TanStack cells render when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 215
+        "line": 216
       }
     },
     {
@@ -3868,7 +3868,7 @@
       "description": "TanStack row represented by this table row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 217
+        "line": 218
       }
     }
   ],
@@ -3880,7 +3880,7 @@
       "description": "Custom cell content. The column cell definition renders when omitted.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 222
+        "line": 223
       }
     },
     {
@@ -3890,7 +3890,7 @@
       "description": "TanStack cell represented by this table cell.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 224
+        "line": 225
       }
     }
   ],
@@ -3902,7 +3902,7 @@
       "description": "Expanded content associated with the row.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 229
+        "line": 230
       }
     },
     {
@@ -3912,7 +3912,7 @@
       "description": "TanStack row represented by this expanded region.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 231
+        "line": 232
       }
     }
   ],
@@ -3924,7 +3924,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 236
+        "line": 237
       }
     }
   ],
@@ -3936,7 +3936,7 @@
       "description": "Loading or empty-state content.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 236
+        "line": 237
       }
     }
   ],
@@ -3948,7 +3948,7 @@
       "description": "Status and table companion controls.",
       "source": {
         "path": "packages/design-system/src/components/dataGrid/dataGrid.tsx",
-        "line": 241
+        "line": 242
       }
     }
   ],

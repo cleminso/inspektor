@@ -31,13 +31,11 @@ describe('table mutation state', () => {
       type: 'setDraft',
       rowId: 'row-1',
       draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Grace' }),
-      schemaColumns: columns,
     })
     state = reduceTableMutationState(state, {
       type: 'setDraft',
       rowId: 'row-2',
       draft: createDraft({ id: 'row-2', name: 'Lin', age: 42 }, { age: '43' }),
-      schemaColumns: columns,
     })
 
     expect(selectTableMutationProjection(state, columns).ledger).toMatchObject({
@@ -54,7 +52,6 @@ describe('table mutation state', () => {
       type: 'setDraft',
       rowId: 'row-1',
       draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Grace', age: 'invalid' }),
-      schemaColumns: columns,
     })
 
     expect(state.draftsByRowId['row-1']?.fieldInputs.age?.text).toBe('invalid')
@@ -69,14 +66,12 @@ describe('table mutation state', () => {
       type: 'setDraft',
       rowId: 'row-1',
       draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Grace' }),
-      schemaColumns: columns,
     })
     state = reduceTableMutationState(state, { type: 'deleteRows', rowIds: ['row-1'] })
     state = reduceTableMutationState(state, {
       type: 'setDraft',
       rowId: 'row-1',
       draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Katherine' }),
-      schemaColumns: columns,
     })
 
     expect(state.draftsByRowId['row-1']).toBeUndefined()
@@ -90,7 +85,6 @@ describe('table mutation state', () => {
       type: 'setDraft',
       rowId: 'row-1',
       draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Grace' }),
-      schemaColumns: columns,
     })
     state = reduceTableMutationState(state, { type: 'deleteRows', rowIds: ['row-2'] })
     state = reduceTableMutationState(state, { type: 'revertRowUpdate', rowId: 'row-1' })
@@ -109,7 +103,6 @@ describe('table mutation state', () => {
       type: 'setDraft',
       rowId: 'row-1',
       draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Grace', age: 'invalid' }),
-      schemaColumns: columns,
     })
 
     state = reduceTableMutationState(state, {
@@ -135,15 +128,13 @@ describe('table mutation state', () => {
       rowIds: ['row-3', 'row-2'],
     })
 
-    expect(selectTableMutationProjection(state, columns).review.operations).toEqual([
+    expect(selectTableMutationProjection(state, columns).reviewOperations).toEqual([
       {
-        affectedRowCount: 2,
         kind: 'delete',
         operationId: 'delete-operation:0',
         rowIds: ['row-2', 'row-1'],
       },
       {
-        affectedRowCount: 1,
         kind: 'delete',
         operationId: 'delete-operation:1',
         rowIds: ['row-3'],
@@ -181,24 +172,18 @@ describe('table mutation state', () => {
       type: 'setDraft',
       rowId: 'row-1',
       draft: createDraft({ id: 'row-1', name: 'Ada', age: 37 }, { name: 'Grace', age: 'invalid' }),
-      schemaColumns: columns,
     })
 
     const projection = selectTableMutationProjection(state, columns)
 
-    expect(projection.review).toEqual({
-      affectedRowCount: 1,
-      operationCount: 1,
-      operations: [
-        {
-          affectedRowCount: 1,
-          fieldNames: ['name'],
-          kind: 'update',
-          operationId: 'update:row-1',
-          rowId: 'row-1',
-        },
-      ],
-    })
+    expect(projection.reviewOperations).toEqual([
+      {
+        fieldNames: ['name'],
+        kind: 'update',
+        operationId: 'update:row-1',
+        rowId: 'row-1',
+      },
+    ])
     expect(projection.stagedFieldsByRowId['row-1']).toEqual(new Set(['name']))
     expect(projection.stagedValuesByRowId).toEqual({
       'row-1': { name: 'Grace' },

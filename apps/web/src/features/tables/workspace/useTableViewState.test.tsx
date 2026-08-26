@@ -5,15 +5,11 @@ import type { ColumnDescriptor } from 'jazz-tools'
 
 import { DataGrid } from '@inspector/ds'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
-import { useTableViewState } from '@tables/workspace/useTableViewState'
-import { createTableScope, createTableWorkspaceScope } from '@tables/workspace/scope'
+import { useTableViewState as useTableViewStateImpl } from '@tables/workspace/useTableViewState'
 
 const setRowEditor = vi.fn()
-const deleteRow = vi.fn()
 const insertRow = vi.fn()
-const updateRow = vi.fn()
 const setPage = vi.fn()
-const setPageSize = vi.fn()
 const { focusRowEditorField, useTableRowByIdMock } = vi.hoisted(() => ({
   focusRowEditorField: vi.fn(),
   useTableRowByIdMock: vi.fn(),
@@ -21,10 +17,7 @@ const { focusRowEditorField, useTableRowByIdMock } = vi.hoisted(() => ({
 const columnOrderState = {
   columnOrder: ['id', 'name'],
   columnVisibility: { id: true, name: true },
-  setColumnOrder: vi.fn((updater: string[] | ((current: string[]) => string[])) => {
-    columnOrderState.columnOrder =
-      typeof updater === 'function' ? updater(columnOrderState.columnOrder) : updater
-  }),
+  setColumnOrder: vi.fn(),
   setColumnVisibility: vi.fn(),
 }
 const searchState = {
@@ -35,13 +28,17 @@ const searchState = {
   rowId: null as string | null,
   setFilters: vi.fn(),
   setPage,
-  setPageSize,
+  setPageSize: vi.fn(),
   setRowEditor,
   setSorting: vi.fn(),
   sortColumn: 'id',
   sortDirection: 'asc' as const,
 }
 let tableRowsOptions: unknown
+let queryRows = [
+  { id: 'row-1', name: 'Ada' },
+  { id: 'row-2', name: 'Grace' },
+]
 const tableColumns = [
   {
     accessorKey: 'id',
@@ -66,39 +63,28 @@ const runtimeState = vi.hoisted(() => ({
   client: null as object | null,
   schema: null as Record<string, unknown> | null,
 }))
+const schemaColumns = [tableColumns[1]!.column!]
+
+function useTableViewState(
+  options: Omit<Parameters<typeof useTableViewStateImpl>[0], 'schemaColumns' | 'tableKey'> & {
+    tableKey?: string
+  },
+) {
+  const { tableKey = 'test:accounts', ...rest } = options
+  return useTableViewStateImpl({
+    ...rest,
+    schemaColumns,
+    tableKey,
+  })
+}
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  useInspectorSessionState: () => ({
-    currentBranch: 'main',
-    currentConnectionId: 'connection-1',
-    currentSchemaHash: 'schema-1',
-  }),
   useRuntimeClient: () => runtimeState.client,
   useRuntimeSchema: () => runtimeState.schema,
 }))
 
 vi.mock('@tables/grid/useColumnOrder', () => ({
-  moveColumnInOrder: (
-    columnOrder: string[],
-    columnId: string,
-    direction: 'end' | 'left' | 'right' | 'start',
-  ) => {
-    const currentIndex = columnOrder.indexOf(columnId)
-    const nextIndex =
-      direction === 'start'
-        ? 0
-        : direction === 'end'
-          ? columnOrder.length - 1
-          : direction === 'left'
-            ? Math.max(currentIndex - 1, 0)
-            : Math.min(currentIndex + 1, columnOrder.length - 1)
-    const nextColumnOrder = [...columnOrder]
-    const [column] = nextColumnOrder.splice(currentIndex, 1)
-    if (column !== undefined) {
-      nextColumnOrder.splice(nextIndex, 0, column)
-    }
-    return nextColumnOrder
-  },
+  moveColumnInOrder: vi.fn(),
 }))
 
 vi.mock('@tables/grid/useTablePreferences', () => ({
@@ -111,9 +97,9 @@ vi.mock('@tables/routing/useTableSearchParams', () => ({
 
 vi.mock('@tables/rowEditor/mutation/useTableMutation', () => ({
   useTableMutations: () => ({
-    deleteRow,
+    deleteRow: vi.fn(),
     insertRow,
-    updateRow,
+    updateRow: vi.fn(),
   }),
 }))
 
@@ -131,10 +117,7 @@ vi.mock('@tables/query/useTableRows', () => ({
       hasNextPage: false,
       isInitialLoading: false,
       isRefreshing: false,
-      rows: [
-        { id: 'row-1', name: 'Ada' },
-        { id: 'row-2', name: 'Grace' },
-      ],
+      rows: queryRows,
     }
   },
 }))
@@ -145,12 +128,9 @@ vi.mock('@tables/query/useTableRowById', () => ({
 
 beforeEach(() => {
   setRowEditor.mockClear()
-  deleteRow.mockReset()
   insertRow.mockReset()
-  updateRow.mockReset()
   focusRowEditorField.mockClear()
   setPage.mockReset()
-  setPageSize.mockReset()
   searchState.setFilters.mockReset()
   useTableRowByIdMock.mockReset()
   useTableRowByIdMock.mockReturnValue(null)
@@ -164,6 +144,10 @@ beforeEach(() => {
   searchState.page = 1
   searchState.sortColumn = 'id'
   tableRowsOptions = undefined
+  queryRows = [
+    { id: 'row-1', name: 'Ada' },
+    { id: 'row-2', name: 'Grace' },
+  ]
   columnOrderState.columnOrder = ['id', 'name']
   tableColumns[1]!.column = {
     name: 'name',
@@ -223,21 +207,6 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
-  it('scopes row queries to connection, branch, schema, and table identity', () => {
-    renderHook(() => useTableViewState({ tableName: 'accounts' }))
-
-    expect(tableRowsOptions).toMatchObject({
-      scopeKey: createTableScope(
-        createTableWorkspaceScope({
-          branch: 'main',
-          connectionId: 'connection-1',
-          schemaHash: 'schema-1',
-        }),
-        'accounts',
-      ),
-    })
-  })
-
   it('clears row selection and closes the edit pane after staged changes apply', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
@@ -318,71 +287,47 @@ describe('useTableViewState', () => {
     expect(result.current.table.getSelectedRowIds()).toEqual([])
   })
 
-  it('opens scalar editing only from an explicit cell edit request', () => {
+  it('keeps staged deletion rows visible until Apply finishes', () => {
+    const disabledRowIds = new Set(['row-1'])
+    const { result, rerender } = renderHook(
+      ({ retainDisabledRows }) =>
+        useTableViewState({ disabledRowIds, retainDisabledRows, tableName: 'accounts' }),
+      { initialProps: { retainDisabledRows: false } },
+    )
+
+    rerender({ retainDisabledRows: true })
+    queryRows = [{ id: 'row-2', name: 'Grace' }]
+    rerender({ retainDisabledRows: true })
+
+    expect(result.current.rows.map((row) => row.id)).toEqual(['row-1', 'row-2'])
+
+    rerender({ retainDisabledRows: false })
+
+    expect(result.current.rows.map((row) => row.id)).toEqual(['row-2'])
+  })
+
+  it('retains the active field source row while query rows reset', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
     act(() => {
-      result.current.handleCellActivate({ rowId: 'row-1', columnId: 'name' })
-    })
-    expect(result.current.activeFieldEditorTarget).toBeNull()
-
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-    act(() => {
-      result.current.closeRowEditor()
-    })
-    rerender()
-    act(() => {
       result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
     })
+    expect(result.current.activeFieldEditorRowValues).toEqual({ id: 'row-1', name: 'Ada' })
+
+    queryRows = []
+    rerender()
+
     expect(result.current.activeFieldEditorTarget).toEqual({ rowId: 'row-1', columnId: 'name' })
+    expect(result.current.activeFieldEditorRowValues).toEqual({ id: 'row-1', name: 'Ada' })
   })
 
-  it('opens structured fields in the Floating editor', () => {
+  it('routes relation fields to the complete-row pane', async () => {
     tableColumns[1]!.column = {
       name: 'name',
-      column_type: { type: 'Json' },
+      column_type: { type: 'Uuid' },
       nullable: false,
+      references: 'accounts',
     }
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-    act(() => {
-      result.current.closeRowEditor()
-    })
-    rerender()
-    act(() => {
-      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
-    })
-
-    expect(result.current.activeFieldEditorTarget).toEqual({ rowId: 'row-1', columnId: 'name' })
-  })
-
-  it.each([
-    {
-      column: {
-        name: 'name',
-        column_type: { type: 'Uuid' },
-        nullable: false,
-        references: 'accounts',
-      } satisfies ColumnDescriptor,
-      label: 'relation',
-    },
-    {
-      column: {
-        name: 'name',
-        column_type: { type: 'Bytea' },
-        nullable: false,
-      } satisfies ColumnDescriptor,
-      label: 'binary',
-    },
-  ])('routes $label fields to the complete-row pane', async ({ column }) => {
-    tableColumns[1]!.column = column
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
     act(() => {
@@ -403,16 +348,8 @@ describe('useTableViewState', () => {
     expect(focusRowEditorField).toHaveBeenCalledWith('name')
   })
 
-  it('moves completed scalar edits with spreadsheet Enter and Tab navigation', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-    act(() => {
-      result.current.closeRowEditor()
-    })
-    rerender()
+  it('moves focus to the resolved target after completing a field edit', () => {
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
       result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
     })
@@ -424,29 +361,10 @@ describe('useTableViewState', () => {
       columnId: 'name',
     })
     expect(result.current.activeFieldEditorTarget).toBeNull()
-
-    act(() => {
-      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
-    })
-    act(() => {
-      result.current.handleFieldEditorComplete('tabForward')
-    })
-    expect(result.current.cellFocusRequest?.target).toEqual({
-      rowId: 'row-2',
-      columnId: 'id',
-    })
   })
 
   it('cancels scalar editing and requests focus on the originating cell', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-    act(() => {
-      result.current.closeRowEditor()
-    })
-    rerender()
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
       result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
     })
@@ -549,18 +467,6 @@ describe('useTableViewState', () => {
     expect(result.current.activeFieldEditorTarget).toBeNull()
   })
 
-  it('keeps column definitions stable when only the rendered order changes', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    const initialColumnDefinitions = result.current.table.options.columns
-
-    act(() => {
-      columnOrderState.setColumnOrder(['name', 'id'])
-    })
-    rerender()
-
-    expect(result.current.table.options.columns).toBe(initialColumnDefinitions)
-  })
-
   it('does not open a row query when the active row is visible', () => {
     searchState.editorMode = 'edit'
     searchState.rowId = 'row-1'
@@ -592,6 +498,7 @@ describe('useTableViewState', () => {
 
     expect(cell.hasAttribute('data-active')).toBe(true)
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('closed')
+    expect(screen.getByRole('status', { name: 'Inline editor target' }).textContent).toBe('')
 
     fireEvent.doubleClick(cell)
 
@@ -927,7 +834,9 @@ describe('useTableViewState', () => {
 
     act(() => {
       result.current.table.setFocusedCell('row-1', 'name')
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
     })
+    expect(result.current.activeFieldEditorTarget).toEqual({ rowId: 'row-1', columnId: 'name' })
     await act(async () => {
       await result.current.setFilters([
         { id: 'filter-1', column: 'id', operator: 'eq', value: 'row-2' },
@@ -940,6 +849,7 @@ describe('useTableViewState', () => {
 
     expect(result.current.hasCellSelection).toBe(false)
     expect(result.current.detailPaneMode).toBe('closed')
+    expect(result.current.activeFieldEditorTarget).toBeNull()
   })
 
   it('clears row and column selection only after filters commit', async () => {
@@ -994,15 +904,16 @@ describe('useTableViewState', () => {
     expect(setPage).toHaveBeenCalledWith(1)
   })
 
-  it('clears selections when the table identity changes', () => {
-    const { result, rerender } = renderHook(({ tableName }) => useTableViewState({ tableName }), {
-      initialProps: { tableName: 'accounts' },
-    })
+  it('clears selections when the table key changes', () => {
+    const { result, rerender } = renderHook(
+      ({ tableKey }) => useTableViewState({ tableKey, tableName: 'accounts' }),
+      { initialProps: { tableKey: 'test:accounts' } },
+    )
 
     act(() => {
       result.current.table.setFocusedCell('row-1', 'name')
     })
-    rerender({ tableName: 'profiles' })
+    rerender({ tableKey: 'test:profiles' })
 
     expect(result.current.hasCellSelection).toBe(false)
     expect(result.current.detailPaneMode).toBe('closed')

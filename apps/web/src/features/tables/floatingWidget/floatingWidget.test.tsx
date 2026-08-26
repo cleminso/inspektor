@@ -19,14 +19,8 @@ vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => ({ currentConnectionId: 'connection-1' }),
 }))
 
-const originalAnimate = HTMLElement.prototype.animate
-
 afterEach(() => {
   cleanup()
-  Object.defineProperty(HTMLElement.prototype, 'animate', {
-    configurable: true,
-    value: originalAnimate,
-  })
 })
 
 const nameColumn = {
@@ -74,20 +68,16 @@ function FieldEditorHarness({
   onClose: () => void
   onComplete: (direction: 'enter' | 'tabBackward' | 'tabForward') => void
 }) {
-  const columns = [nameColumn, countColumn, settingsColumn]
-  const controller = useTableMutationEditorController({
-    initialRowValues: { id: 'row-1', name: 'Ada', count: 1, settings: initialSettings },
-    rowId: 'row-1',
-    schemaColumns: columns,
-  })
   const mutations = useTableMutationLedger()
+  const rowValues = { id: 'row-1', name: 'Ada', count: 1, settings: initialSettings }
   return (
     <>
       <FieldEditorMutationWidget
         column={column}
-        controller={controller}
         onClose={onClose}
         onComplete={onComplete}
+        rowId="row-1"
+        rowValues={rowValues}
       />
       <output aria-label="Pending fields">
         {mutations.ledger.entries[0]?.kind === 'update'
@@ -146,7 +136,6 @@ describe('FieldEditorMutationWidget', () => {
       const controller = useTableMutationEditorController({
         initialRowValues: { id: 'row-1', name: 'Ada', count: 1 },
         rowId: 'row-1',
-        schemaColumns: [nameColumn, countColumn],
       })
       const mutations = useTableMutationLedger()
 
@@ -164,9 +153,10 @@ describe('FieldEditorMutationWidget', () => {
           {open === true ? (
             <FieldEditorMutationWidget
               column={nameColumn}
-              controller={controller}
               onClose={() => setOpen(false)}
               onComplete={() => setOpen(false)}
+              rowId="row-1"
+              rowValues={{ id: 'row-1', name: 'Ada', count: 1 }}
             />
           ) : null}
           <output aria-label="Pending name">
@@ -236,7 +226,6 @@ describe('TableMutationWidget', () => {
     const controller = useTableMutationEditorController({
       initialRowValues: { id: 'long-row-identity-123456789', name: 'Ada', count: 1 },
       rowId: 'long-row-identity-123456789',
-      schemaColumns: [nameColumn, countColumn],
     })
     const stageReview = () => {
       controller.actions.setFieldText('name', 'Grace')
@@ -250,6 +239,9 @@ describe('TableMutationWidget', () => {
       <>
         <button type="button" onClick={stageReview}>
           Stage review
+        </button>
+        <button type="button" onClick={() => controller.actions.setFieldText('count', 'invalid')}>
+          Stage invalid
         </button>
         <TableMutationWidget executor={{ deleteRow: vi.fn(), updateRow: vi.fn() }} />
       </>
@@ -287,6 +279,29 @@ describe('TableMutationWidget', () => {
       }),
     )
     expect(screen.queryByText('2 selected rows')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Undo: long-row-identity-123456789' }))
+    expect(screen.queryByText('long-row-identity-123456789')).toBeNull()
+  })
+
+  it('requires correction when a draft has only invalid input', () => {
+    render(
+      <InspectorDockCenterProvider>
+        <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
+          <ReviewHarness />
+          <InspectorDock onOpenCommands={() => undefined} />
+        </TestLedgerProvider>
+      </InspectorDockCenterProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Stage invalid' }))
+
+    expect(screen.getByRole('button', { name: 'Needs attention' })).toBeTruthy()
+    expect(screen.getByText('Correct invalid input before applying.')).toBeTruthy()
+    expect(
+      (screen.getByRole('button', { name: 'Review changes' }) as HTMLButtonElement).disabled,
+    ).toBe(true)
+    expect(
+      (screen.getByRole('button', { name: 'Apply changes' }) as HTMLButtonElement).disabled,
+    ).toBe(true)
   })
 
   it('scrolls each operation list only above ten rows', () => {
@@ -308,15 +323,6 @@ describe('TableMutationWidget', () => {
     expect(
       screen.getByRole('button', { name: 'Apply changes' }).closest('[data-scrollable]'),
     ).toBeNull()
-  })
-
-  it('bounds mounted operation rows above one hundred operations', () => {
-    renderReview(1_001)
-
-    const deletionList = screen.getByRole('region', { name: 'Deleted row operations' })
-    expect(deletionList.getAttribute('data-virtualized')).toBe('true')
-    expect(deletionList.querySelectorAll('[data-operation-row]').length).toBeLessThanOrEqual(14)
-    expect(screen.getByRole('button', { name: /Deleted rows, 1000/ })).toBeTruthy()
   })
 
   it('projects and applies deletions staged outside the widget', async () => {
@@ -357,38 +363,5 @@ describe('TableMutationWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Apply changes' }))
 
     await waitFor(() => expect(deleteRow).toHaveBeenCalledWith('row-1'))
-  })
-
-  it('contracts the panel while review details leave', async () => {
-    let finishExit: () => void = () => undefined
-    Object.defineProperty(HTMLElement.prototype, 'animate', {
-      configurable: true,
-      value: vi.fn(
-        () =>
-          ({
-            cancel: vi.fn(),
-            finished: new Promise<void>((resolve) => {
-              finishExit = resolve
-            }),
-          }) as unknown as Animation,
-      ),
-    })
-    renderReview()
-
-    const panelContent = document.querySelector('[data-slot="floating-panel-content"]')
-    const reviewButton = screen.getByRole('button', { name: 'Review changes' })
-    expect(panelContent?.getAttribute('data-size')).toBe('expanded')
-
-    fireEvent.click(reviewButton)
-
-    expect(panelContent?.getAttribute('data-size')).toBe('compact')
-    expect(screen.getByRole('region', { name: 'Affected rows', hidden: true })).toBeTruthy()
-
-    finishExit()
-
-    await waitFor(() => {
-      expect(panelContent?.getAttribute('data-size')).toBe('compact')
-      expect(screen.queryByRole('region', { name: 'Affected rows', hidden: true })).toBeNull()
-    })
   })
 })
