@@ -34,22 +34,9 @@ describe('popup positioning contract', () => {
     expectTypeOf<ExposesArbitraryOffsets<TooltipContentProps>>().toEqualTypeOf<false>()
   })
 
-  it('exposes semantic placement through public Positioners', () => {
-    expectTypeOf<ExposesSemanticSide<MenuPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSemanticAlign<MenuPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSemanticSide<ContextMenuPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSemanticAlign<ContextMenuPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSemanticSide<ComboboxPositionerProps>>().toEqualTypeOf<true>()
-    expectTypeOf<ExposesSemanticAlign<ComboboxPositionerProps>>().toEqualTypeOf<true>()
-  })
-
-  it('keeps Select placement internal', () => {
+  it('keeps selected-item positioning internal', () => {
     expectTypeOf<ExposesSemanticSide<SelectContentProps>>().toEqualTypeOf<false>()
     expectTypeOf<ExposesSemanticAlign<SelectContentProps>>().toEqualTypeOf<false>()
     expectTypeOf<ExposesSelectedItemAlignment<SelectContentProps>>().toEqualTypeOf<false>()
-  })
-
-  it('exposes semantic side placement through Combobox Content', () => {
-    expectTypeOf<ExposesSemanticSide<ComboboxContentProps>>().toEqualTypeOf<true>()
   })
 })

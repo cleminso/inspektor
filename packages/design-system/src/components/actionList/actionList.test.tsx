@@ -1,49 +1,13 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ActionList } from './actionList'
-import { actionListStyles } from './actionList.styles'
-import { ContextMenu } from '../contextMenu/contextMenu'
 import { Menu } from '../menu/menu'
-
-const normalizationContractStyles = stylex.create({
-  root: {
-    margin: 0,
-    padding: 0,
-    listStyle: 'none',
-  },
-  trigger: {
-    margin: 0,
-    paddingBlock: 0,
-    textDecoration: 'none',
-  },
-})
-
-function expectStyleClasses(element: Element, className: string | undefined) {
-  for (const atomicClassName of className?.split(' ') ?? []) {
-    expect(element.className).toContain(atomicClassName)
-  }
-}
 
 afterEach(cleanup)
 
 describe('ActionList', () => {
-  it('keeps the primary trigger separate from the trailing action', () => {
-    render(
-      <ActionList>
-        <ActionList.Item active>
-          <ActionList.Trigger prefix="Icon">accounts</ActionList.Trigger>
-          <ActionList.Action aria-label="Open account actions">Actions</ActionList.Action>
-        </ActionList.Item>
-      </ActionList>,
-    )
-
-    expect(screen.getByRole('button', { name: 'accounts' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Open account actions' })).toBeTruthy()
-  })
-
-  it('keeps bulk selection separate from the primary trigger', () => {
+  it('keeps selection and trailing actions separate from the primary trigger', () => {
     const onCheckedChange = vi.fn()
 
     render(
@@ -56,39 +20,23 @@ describe('ActionList', () => {
             onCheckedChange={onCheckedChange}
           />
           <ActionList.Trigger>accounts</ActionList.Trigger>
+          <ActionList.Action aria-label="Open account actions">Actions</ActionList.Action>
         </ActionList.Item>
       </ActionList>,
     )
 
     const checkbox = screen.getByRole('checkbox', { name: 'Select accounts' })
     const trigger = screen.getByRole('button', { name: 'accounts' })
+    const action = screen.getByRole('button', { name: 'Open account actions' })
 
     expect(trigger.contains(checkbox)).toBe(false)
+    expect(trigger.contains(action)).toBe(false)
     expect(trigger.closest('[data-slot="action-list-item"]')?.hasAttribute('data-checked')).toBe(
       true,
     )
 
     fireEvent.click(checkbox)
     expect(onCheckedChange).toHaveBeenCalledWith(true, expect.anything())
-  })
-
-  it('preserves item semantics when context-menu behavior is composed onto the item', () => {
-    render(
-      <ActionList>
-        <ContextMenu.Root>
-          <ContextMenu.Trigger render={<ActionList.Item />}>
-            <ActionList.Trigger>accounts</ActionList.Trigger>
-          </ContextMenu.Trigger>
-          <ContextMenu.Content>
-            <ContextMenu.Item>Open</ContextMenu.Item>
-          </ContextMenu.Content>
-        </ContextMenu.Root>
-      </ActionList>,
-    )
-
-    expect(
-      screen.getByRole('button', { name: 'accounts' }).closest('[data-slot="action-list-item"]'),
-    ).toBeTruthy()
   })
 
   it('retains the trailing action open state while its menu is portaled', () => {
@@ -115,7 +63,7 @@ describe('ActionList', () => {
     expect(screen.getByRole('menuitem', { name: 'Open' })).toBeTruthy()
   })
 
-  it('normalizes native list and composed button presentation', () => {
+  it('preserves list semantics when its trigger is composed onto a button', () => {
     render(
       <ActionList aria-label="Accounts">
         <ActionList.Item>
@@ -130,61 +78,72 @@ describe('ActionList', () => {
     const trigger = screen.getByRole('button', { name: 'accounts' })
 
     expect(trigger.getAttribute('data-composed')).toBe('')
-    expectStyleClasses(list, stylex.props(normalizationContractStyles.root).className)
-    expectStyleClasses(trigger, stylex.props(normalizationContractStyles.trigger).className)
-    expectStyleClasses(trigger, stylex.props(actionListStyles.trigger).className)
+    expect(list.contains(trigger)).toBe(true)
   })
 
-  it('delegates Escape from a descendant to the consumer', () => {
-    const onEscapeKeyDown = vi.fn()
+  it.each([
+    {
+      consumerPrevents: false,
+      descendantPrevents: false,
+      expectedCalls: 1,
+      fromSelectionControl: false,
+      name: 'delegated',
+    },
+    {
+      consumerPrevents: false,
+      descendantPrevents: true,
+      expectedCalls: 0,
+      fromSelectionControl: false,
+      name: 'descendant-prevented',
+    },
+    {
+      consumerPrevents: true,
+      descendantPrevents: false,
+      expectedCalls: 1,
+      fromSelectionControl: true,
+      name: 'consumer-handled',
+    },
+  ])(
+    'applies the $name Escape policy',
+    ({ consumerPrevents, descendantPrevents, expectedCalls, fromSelectionControl }) => {
+      const onEscapeKeyDown = vi.fn()
 
-    render(
-      <ActionList onEscapeKeyDown={onEscapeKeyDown}>
-        <ActionList.Item>
-          <ActionList.Trigger>accounts</ActionList.Trigger>
-        </ActionList.Item>
-      </ActionList>,
-    )
+      render(
+        <ActionList
+          onEscapeKeyDown={(event) => {
+            onEscapeKeyDown()
+            if (consumerPrevents === true) {
+              event.preventDefault()
+            }
+          }}
+        >
+          <ActionList.Item>
+            {fromSelectionControl === true ? (
+              <ActionList.SelectionControl aria-label="Select accounts" checked icon="Icon" />
+            ) : null}
+            <ActionList.Trigger
+              onKeyDown={(event) => {
+                if (descendantPrevents === true) {
+                  event.preventDefault()
+                }
+              }}
+            >
+              accounts
+            </ActionList.Trigger>
+          </ActionList.Item>
+        </ActionList>,
+      )
 
-    fireEvent.keyDown(screen.getByRole('button', { name: 'accounts' }), { key: 'Escape' })
+      const trigger = screen.getByRole('button', { name: 'accounts' })
+      const target =
+        fromSelectionControl === true
+          ? screen.getByRole('checkbox', { name: 'Select accounts' })
+          : trigger
+      target.focus()
+      fireEvent.keyDown(target, { key: 'Escape' })
 
-    expect(onEscapeKeyDown).toHaveBeenCalledOnce()
-  })
-
-  it('ignores Escape prevented by a descendant', () => {
-    const onEscapeKeyDown = vi.fn()
-
-    render(
-      <ActionList onEscapeKeyDown={onEscapeKeyDown}>
-        <ActionList.Item>
-          <ActionList.Trigger onKeyDown={(event) => event.preventDefault()}>
-            accounts
-          </ActionList.Trigger>
-        </ActionList.Item>
-      </ActionList>,
-    )
-
-    fireEvent.keyDown(screen.getByRole('button', { name: 'accounts' }), { key: 'Escape' })
-
-    expect(onEscapeKeyDown).not.toHaveBeenCalled()
-  })
-
-  it('moves focus to the item trigger after Escape is handled', () => {
-    render(
-      <ActionList onEscapeKeyDown={(event) => event.preventDefault()}>
-        <ActionList.Item>
-          <ActionList.SelectionControl aria-label="Select accounts" checked icon="Icon" />
-          <ActionList.Trigger>accounts</ActionList.Trigger>
-        </ActionList.Item>
-      </ActionList>,
-    )
-
-    const checkbox = screen.getByRole('checkbox', { name: 'Select accounts' })
-    const trigger = screen.getByRole('button', { name: 'accounts' })
-    checkbox.focus()
-
-    fireEvent.keyDown(checkbox, { key: 'Escape' })
-
-    expect(document.activeElement).toBe(trigger)
-  })
+      expect(onEscapeKeyDown).toHaveBeenCalledTimes(expectedCalls)
+      expect(document.activeElement).toBe(trigger)
+    },
+  )
 })

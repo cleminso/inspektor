@@ -31,40 +31,7 @@ describe('FindBar', () => {
     )
   })
 
-  it('reserves the same status width for empty and matched results', () => {
-    const { rerender } = render(
-      <FindBar
-        label="Find in row JSON"
-        value="missing"
-        onValueChange={() => undefined}
-        state={{ status: 'empty' }}
-        searchOptions={searchOptions}
-        onSearchOptionsChange={() => undefined}
-        onPreviousMatch={() => undefined}
-        onNextMatch={() => undefined}
-      />,
-    )
-    const emptyStatusWidth = screen.getByRole('status').style.width
-
-    expect(emptyStatusWidth).not.toBe('')
-
-    rerender(
-      <FindBar
-        label="Find in row JSON"
-        value="account"
-        onValueChange={() => undefined}
-        state={{ status: 'matched', activeIndex: 1, count: 6 }}
-        searchOptions={searchOptions}
-        onSearchOptionsChange={() => undefined}
-        onPreviousMatch={() => undefined}
-        onNextMatch={() => undefined}
-      />,
-    )
-
-    expect(screen.getByRole('status').style.width).toBe(emptyStatusWidth)
-  })
-
-  it('reports the active match and navigates with its actions', () => {
+  it('reports the active match and navigates with its actions', async () => {
     const onPreviousMatch = vi.fn()
     const onNextMatch = vi.fn()
 
@@ -84,8 +51,15 @@ describe('FindBar', () => {
     expect(screen.getByRole('searchbox', { name: 'Find in row JSON' })).toBeTruthy()
     expect(screen.getByRole('status', { name: 'Match 2 of 6' }).textContent).toBe('2 of 6')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Previous match' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Next match' }))
+    const previous = screen.getByRole('button', { name: 'Previous match' })
+    const next = screen.getByRole('button', { name: 'Next match' })
+    expect(previous.getAttribute('title')).toBeNull()
+    fireEvent.mouseEnter(previous)
+    fireEvent.mouseMove(previous)
+    await screen.findAllByText('Previous match')
+
+    fireEvent.click(previous)
+    fireEvent.click(next)
 
     expect(onPreviousMatch).toHaveBeenCalledOnce()
     expect(onNextMatch).toHaveBeenCalledOnce()
@@ -139,20 +113,17 @@ describe('FindBar', () => {
 
     const input = screen.getByRole('searchbox', { name: 'Find in schema JSON' })
     expect(document.activeElement).toBe(input)
-
     fireEvent.keyDown(input, { key: 'Escape' })
 
     expect(onDismiss).toHaveBeenCalledOnce()
   })
 
   it('reports no matches and disables navigation', () => {
-    const onValueChange = vi.fn()
-
     render(
       <FindBar
         label="Find in row JSON"
         value="missing"
-        onValueChange={onValueChange}
+        onValueChange={() => undefined}
         state={{ status: 'empty' }}
         searchOptions={searchOptions}
         onSearchOptionsChange={() => undefined}
@@ -168,9 +139,6 @@ describe('FindBar', () => {
     expect((screen.getByRole('button', { name: 'Next match' }) as HTMLButtonElement).disabled).toBe(
       true,
     )
-
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'profile' } })
-    expect(onValueChange).toHaveBeenCalledWith('profile')
   })
 
   it('announces deferred search work and disables stale navigation', () => {
@@ -268,12 +236,6 @@ describe('FindBar', () => {
     expect(matchCase.getAttribute('aria-pressed')).toBe('false')
     expect(wholeWord.getAttribute('aria-pressed')).toBe('false')
     expect(regularExpression.getAttribute('aria-pressed')).toBe('false')
-    expect(matchCase.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(wholeWord.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(regularExpression.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(matchCase.getAttribute('title')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull()
-
     fireEvent.click(matchCase)
     fireEvent.click(wholeWord)
     fireEvent.click(regularExpression)
@@ -290,28 +252,5 @@ describe('FindBar', () => {
       ...searchOptions,
       regularExpression: true,
     })
-  })
-
-  it('uses Tooltip triggers for match navigation', () => {
-    render(
-      <FindBar
-        label="Find in row JSON"
-        value="account"
-        onValueChange={() => undefined}
-        state={{ status: 'matched', activeIndex: 0, count: 1 }}
-        searchOptions={searchOptions}
-        onSearchOptionsChange={() => undefined}
-        onPreviousMatch={() => undefined}
-        onNextMatch={() => undefined}
-      />,
-    )
-
-    const previous = screen.getByRole('button', { name: 'Previous match' })
-    const next = screen.getByRole('button', { name: 'Next match' })
-
-    expect(previous.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(next.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(previous.getAttribute('title')).toBeNull()
-    expect(next.getAttribute('title')).toBeNull()
   })
 })

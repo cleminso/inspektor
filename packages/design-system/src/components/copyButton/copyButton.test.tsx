@@ -9,17 +9,6 @@ afterEach(() => {
 })
 
 describe('CopyButton', () => {
-  it('uses the general 24-unit outline weight', () => {
-    render(<CopyButton label="Copy query" copiedLabel="Query copied" textToCopy="select *" />)
-
-    expect(
-      screen
-        .getByRole('button', { name: 'Copy query' })
-        .querySelector('[data-slot="icon"]')
-        ?.getAttribute('stroke-width'),
-    ).toBe('2')
-  })
-
   it('copies text and reports successful feedback', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     const onCopy = vi.fn()
@@ -39,5 +28,28 @@ describe('CopyButton', () => {
     await waitFor(() => expect(writeText).toHaveBeenCalledWith('select *'))
     expect(onCopy).toHaveBeenCalledOnce()
     expect(screen.getByText('Query copied').getAttribute('aria-live')).toBe('polite')
+  })
+
+  it('reports clipboard failures without reporting success', async () => {
+    const error = new Error('Clipboard denied')
+    const onCopy = vi.fn()
+    const onCopyError = vi.fn()
+    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockRejectedValue(error) } })
+
+    render(
+      <CopyButton
+        label="Copy query"
+        errorLabel="Could not copy query"
+        onCopy={onCopy}
+        onCopyError={onCopyError}
+        textToCopy="select *"
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copy query' }))
+
+    await waitFor(() => expect(onCopyError).toHaveBeenCalledWith(error))
+    expect(onCopy).not.toHaveBeenCalled()
+    expect(screen.getByText('Could not copy query')).toBeTruthy()
   })
 })

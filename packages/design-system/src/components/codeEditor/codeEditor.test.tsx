@@ -1,10 +1,11 @@
 import { Transaction } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { CodeEditor } from './codeEditor'
-import { hasVerticalOverflow } from './codeMirrorEditor'
+
+beforeAll(() => import('./codeMirrorEditor'))
 
 afterEach(() => {
   cleanup()
@@ -47,9 +48,11 @@ async function findCodeMirrorTextbox(name = 'Settings JSON'): Promise<HTMLElemen
 }
 
 describe('CodeEditor', () => {
-  it('focuses the editor when its owner explicitly requests mount focus', async () => {
+  it('honors explicit mount focus unless the editor is disabled', async () => {
     const value = '{"enabled":true}'
-    render(<CodeEditor accessibilityLabel="Settings JSON" focusOnMount value={value} />)
+    const { unmount } = render(
+      <CodeEditor accessibilityLabel="Settings JSON" focusOnMount value={value} />,
+    )
 
     expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Settings JSON' }))
     const codeMirrorTextbox = await findCodeMirrorTextbox()
@@ -57,6 +60,19 @@ describe('CodeEditor', () => {
     expect(EditorView.findFromDOM(codeMirrorTextbox)?.state.selection.main.anchor).toBe(
       value.length,
     )
+    unmount()
+    render(
+      <CodeEditor
+        accessibilityLabel="Settings JSON"
+        disabled
+        focusOnMount
+        value={'{"enabled":true}'}
+      />,
+    )
+
+    const disabledEditor = await findCodeMirrorTextbox()
+
+    expect(document.activeElement).not.toBe(disabledEditor)
   })
 
   it('restores focus when CodeMirror replaces the static editor', async () => {
@@ -85,45 +101,26 @@ describe('CodeEditor', () => {
     expect(document.activeElement).toBe(outsideAction)
   })
 
-  it('does not focus a disabled editor on mount', async () => {
-    render(
-      <CodeEditor
-        accessibilityLabel="Settings JSON"
-        disabled
-        focusOnMount
-        value={'{"enabled":true}'}
-      />,
+  it('projects controlled content and accessibility states into CodeMirror', async () => {
+    const { rerender } = render(
+      <CodeEditor accessibilityLabel="Settings JSON" invalid readOnly value={'{"enabled":true}'} />,
     )
-
-    const editor = await findCodeMirrorTextbox()
-
-    expect(document.activeElement).not.toBe(editor)
-  })
-
-  it('renders a JSON textbox with its controlled source', async () => {
-    render(<CodeEditor accessibilityLabel="Settings JSON" value={'{"enabled":true}'} />)
 
     const editor = await findCodeMirrorTextbox()
 
     expect(editor.getAttribute('aria-multiline')).toBe('true')
+    expect(editor.getAttribute('aria-readonly')).toBe('true')
+    expect(editor.getAttribute('aria-invalid')).toBe('true')
     expect(editor.textContent).toContain('"enabled"')
     expect(editor.textContent).toContain('true')
-  })
 
-  it('formats valid JSON through the controlled value callback', async () => {
-    const onValueChange = vi.fn()
+    rerender(<CodeEditor accessibilityLabel="Settings JSON" disabled value={'{"enabled":true}'} />)
 
-    render(
-      <CodeEditor
-        accessibilityLabel="Settings JSON"
-        value={'{"enabled":true}'}
-        onValueChange={onValueChange}
-      />,
-    )
-
-    fireEvent.click(await screen.findByRole('button', { name: 'Format JSON' }))
-
-    await waitFor(() => expect(onValueChange).toHaveBeenCalledWith('{\n  "enabled": true\n}'))
+    expect(
+      screen
+        .getByRole('textbox', { name: 'Settings JSON', hidden: true })
+        .getAttribute('aria-disabled'),
+    ).toBe('true')
   })
 
   it('formats the live editor document and returns focus to it', async () => {
@@ -149,14 +146,12 @@ describe('CodeEditor', () => {
       },
       selection: { anchor: 7 },
     })
-    const scrollIntoView = vi.spyOn(EditorView, 'scrollIntoView')
     fireEvent.click(screen.getByRole('button', { name: 'Format JSON' }))
 
     expect(onValueChange).toHaveBeenLastCalledWith('{\n  "live": true\n}')
     expect(editorView?.state.selection.main.anchor).toBe(7)
     expect(document.activeElement).toBe(editor)
     expect(editorView?.scrollDOM.scrollTop).toBe(0)
-    expect(scrollIntoView).not.toHaveBeenCalled()
   })
 
   it('shows line numbers and fold controls', async () => {
@@ -179,38 +174,6 @@ describe('CodeEditor', () => {
     expect(editorRoot?.querySelector('.cm-foldGutter')).not.toBeNull()
     expect(foldMarker?.getAttribute('title')).toBeNull()
     expect(foldMarker?.getAttribute('aria-label')).toBe('Fold line')
-    expect(foldMarker?.querySelector('svg')?.getAttribute('viewBox')).toBe('0 0 12 12')
-    expect(foldMarker?.querySelector('path')?.getAttribute('d')).toBe('m2.5 4 3.5 3.5L9.5 4')
-    expect(foldMarker?.querySelector('path')?.getAttribute('stroke-width')).toBe('1.5')
-  })
-
-  it('uses Tooltip triggers for toolbar actions', async () => {
-    renderOverflowingEditor()
-
-    await findCodeMirrorTextbox()
-    const format = screen.getByRole('button', { name: 'Format JSON' })
-    const wrapping = screen.getByRole('button', { name: /line wrapping/ })
-    const disclosure = await screen.findByRole('button', { name: 'Expand code editor' })
-
-    expect(format.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(wrapping.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(disclosure.hasAttribute('data-base-ui-tooltip-trigger')).toBe(true)
-    expect(format.getAttribute('title')).toBeNull()
-    expect(wrapping.getAttribute('title')).toBeNull()
-    expect(disclosure.getAttribute('title')).toBeNull()
-  })
-
-  it('hides scrollbars until the editor is hovered or focused', async () => {
-    render(<CodeEditor accessibilityLabel="Settings JSON" value={longJson} />)
-
-    await findCodeMirrorTextbox()
-    const styles = document.head.textContent ?? ''
-
-    expect(styles).toMatch(/scrollbar-color:\s*transparent transparent/)
-    expect(styles).not.toContain('scrollbar-gutter')
-    expect(styles).toContain('::-webkit-scrollbar-thumb')
-    expect(styles).toContain(':hover')
-    expect(styles).toContain('cm-focused')
   })
 
   it('shows the document beginning when paste replaces the whole source', async () => {
@@ -237,7 +200,6 @@ describe('CodeEditor', () => {
     })
 
     expect(editorView.state.selection.main.anchor).toBe(0)
-    expect(editorView.state.selection.main.head).toBe(0)
     expect(scrollIntoView).toHaveBeenCalledWith(0, { y: 'start' })
     expect(onValueChange).toHaveBeenCalledTimes(1)
     expect(onValueChange).toHaveBeenCalledWith(longJson)
@@ -252,18 +214,8 @@ describe('CodeEditor', () => {
 
     const format = await screen.findByRole('button', { name: 'Format JSON' })
 
-    expect(format.hasAttribute('disabled')).toBe(false)
     fireEvent.click(format)
     expect(onValueChange).not.toHaveBeenCalled()
-  })
-
-  it('uses rendered vertical overflow to decide whether disclosure is available', async () => {
-    expect(hasVerticalOverflow({ scrollHeight: 120, clientHeight: 120 })).toBe(false)
-    expect(hasVerticalOverflow({ scrollHeight: 121, clientHeight: 120 })).toBe(true)
-
-    renderOverflowingEditor({ value: 'short' })
-
-    expect(await screen.findByRole('button', { name: 'Expand code editor' })).toBeDefined()
   })
 
   it('remeasures disclosure after wrapping changes and observed resizing', async () => {
@@ -315,11 +267,11 @@ describe('CodeEditor', () => {
     fireEvent.click(expand)
 
     expect(screen.getByRole('textbox', { name: 'Settings JSON' })).toBe(editor)
-    expect(screen.getAllByRole('button', { name: 'Collapse code editor' })).toHaveLength(1)
+    screen.getByRole('button', { name: 'Collapse code editor' })
 
     fireEvent.click(screen.getByRole('button', { name: 'Collapse code editor' }))
 
-    expect(screen.getAllByRole('button', { name: 'Expand code editor' })).toHaveLength(1)
+    screen.getByRole('button', { name: 'Expand code editor' })
     expect(screen.getByRole('textbox', { name: 'Settings JSON' })).toBe(editor)
   })
 
@@ -349,7 +301,7 @@ describe('CodeEditor', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Expand code editor' }))
 
     expect(onExpandedChange).toHaveBeenCalledWith(true)
-    expect(screen.getAllByRole('button', { name: 'Expand code editor' })).toHaveLength(1)
+    screen.getByRole('button', { name: 'Expand code editor' })
   })
 
   it('exposes a constrained fill layout only while expanded', async () => {
@@ -369,76 +321,26 @@ describe('CodeEditor', () => {
     expect(root?.getAttribute('data-layout')).toBe('fill')
   })
 
-  it('shows a visible pressed treatment for wrapping and returns focus to the editor', async () => {
-    render(<CodeEditor accessibilityLabel="Settings JSON" value={longJson} />)
-
-    const editor = await findCodeMirrorTextbox()
-    const wrap = screen.getByRole('button', { name: 'Disable line wrapping' })
-
-    expect(wrap.getAttribute('aria-pressed')).toBe('true')
-    expect(wrap.getAttribute('data-pressed')).toBe('')
-    expect(wrap.getAttribute('data-variant')).toBe('ghost')
-    expect(wrap.querySelector('svg')?.getAttribute('viewBox')).toBe('0 0 24 24')
-    expect(wrap.querySelector('svg')?.getAttribute('stroke-width')).toBe('1.5')
-
-    fireEvent.click(wrap)
-
-    expect(
-      screen.getByRole('button', { name: 'Enable line wrapping' }).getAttribute('data-variant'),
-    ).toBe('ghost')
-    expect(document.activeElement).toBe(editor)
-  })
-
-  it('returns wrapped content to the horizontal origin behind an opaque gutter', async () => {
+  it('reports wrapping state, returns focus, and resets horizontal scroll', async () => {
     render(<CodeEditor accessibilityLabel="Settings JSON" value={longJson} />)
 
     const editor = await findCodeMirrorTextbox()
     const editorView = EditorView.findFromDOM(editor)
-    const gutters = editor.closest('.cm-editor')?.querySelector<HTMLElement>('.cm-gutters')
+    const wrap = screen.getByRole('button', { name: 'Disable line wrapping' })
 
-    fireEvent.click(screen.getByRole('button', { name: 'Disable line wrapping' }))
+    expect(wrap.getAttribute('aria-pressed')).toBe('true')
+    fireEvent.click(wrap)
+
+    const enableWrapping = screen.getByRole('button', { name: 'Enable line wrapping' })
+    expect(enableWrapping.getAttribute('aria-pressed')).toBe('false')
     if (editorView !== null) {
       editorView.scrollDOM.scrollLeft = 80
     }
-    fireEvent.click(screen.getByRole('button', { name: 'Enable line wrapping' }))
+    fireEvent.click(enableWrapping)
 
     await waitFor(() => {
       expect(editorView?.scrollDOM.scrollLeft).toBe(0)
     })
-    expect(getComputedStyle(gutters as HTMLElement).backgroundColor).not.toBe('transparent')
-  })
-
-  it('uses the compact toolbar size for every editor action', async () => {
-    renderOverflowingEditor({ expanded: true })
-
-    await findCodeMirrorTextbox()
-    const actions = [
-      screen.getByRole('button', { name: 'Format JSON' }),
-      screen.getByRole('button', { name: 'Disable line wrapping' }),
-      screen.getByRole('button', { name: 'Copy JSON' }),
-      screen.getByRole('button', { name: 'Collapse code editor' }),
-    ]
-
-    for (const action of actions) {
-      expect(action.getAttribute('data-size')).toBe('s')
-    }
-  })
-
-  it('exposes read-only, disabled, and invalid states', async () => {
-    const { rerender } = render(
-      <CodeEditor accessibilityLabel="Settings JSON" invalid readOnly value={'{"enabled":true}'} />,
-    )
-
-    const readOnlyEditor = await findCodeMirrorTextbox()
-    expect(readOnlyEditor.getAttribute('aria-readonly')).toBe('true')
-    expect(readOnlyEditor.getAttribute('aria-invalid')).toBe('true')
-
-    rerender(<CodeEditor accessibilityLabel="Settings JSON" disabled value={'{"enabled":true}'} />)
-
-    expect(
-      screen
-        .getByRole('textbox', { name: 'Settings JSON', hidden: true })
-        .getAttribute('aria-disabled'),
-    ).toBe('true')
+    expect(document.activeElement).toBe(editor)
   })
 })

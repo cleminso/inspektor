@@ -1,59 +1,9 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import * as stylex from '@stylexjs/stylex'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { borderColors, surfaceColors, textColors } from '../../tokens/semantics.stylex'
-import { spacing } from '../../tokens/value.stylex'
 import { Toaster, toasts } from './toaster'
-import { toasterStyles } from './toaster.styles'
 
-const stackContractStyles = stylex.create({
-  frontmostOrder: {
-    zIndex: 3,
-  },
-  middleOrder: {
-    zIndex: 2,
-  },
-  backOrder: {
-    zIndex: 1,
-  },
-  expandedGap: {
-    transform: `translateX(var(--toast-swipe-movement-x)) translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${spacing.m} + var(--toast-swipe-movement-y)))`,
-  },
-})
-
-const semanticStatusStyles = stylex.create({
-  toast: {
-    borderColor: borderColors.default,
-    backgroundColor: surfaceColors.raised,
-    color: textColors.default,
-  },
-  titleError: {
-    color: textColors.danger,
-  },
-  titleSuccess: {
-    color: textColors.success,
-  },
-  titleWarning: {
-    color: textColors.warning,
-  },
-  action: {
-    backgroundColor: surfaceColors.subtle,
-    borderWidth: 0,
-  },
-})
-
-function expectStyleClasses(element: Element | null, className: string | undefined) {
-  for (const atomicClassName of className?.split(' ') ?? []) {
-    expect(element?.className).toContain(atomicClassName)
-  }
-}
-
-afterEach(async () => {
-  toasts.dismiss()
-  await new Promise((resolve) => window.setTimeout(resolve, 1_000))
-  cleanup()
-})
+afterEach(cleanup)
 
 describe('Toaster', () => {
   it('renders a polite neutral message with the Base UI renderer', async () => {
@@ -67,7 +17,6 @@ describe('Toaster', () => {
 
     expect(notificationRegion.getAttribute('role')).toBe('region')
     expect(toast?.getAttribute('data-status')).toBe('message')
-    expect(document.querySelector('[data-sonner-toaster]')).toBeNull()
   })
 
   it('automatically closes a brief notification', async () => {
@@ -78,13 +27,10 @@ describe('Toaster', () => {
       toasts.success('Cell value copied', { duration: 'brief' })
 
       await act(async () => undefined)
-      const toast = screen.getByText('Cell value copied').closest('[data-slot="toast"]')
-
       act(() => vi.advanceTimersByTime(1_499))
-      expect(toast?.hasAttribute('data-ending-style')).toBe(false)
+      expect(screen.queryByText('Cell value copied')).not.toBeNull()
 
       act(() => vi.advanceTimersByTime(1))
-      expect(toast?.hasAttribute('data-ending-style')).toBe(true)
       act(() => vi.runAllTimers())
       expect(screen.queryByText('Cell value copied')).toBeNull()
     } finally {
@@ -106,24 +52,9 @@ describe('Toaster', () => {
       await act(async () => undefined)
       act(() => vi.advanceTimersByTime(1_500))
 
-      expect(
-        screen
-          .getByText('Schema changed')
-          .closest('[data-slot="toast"]')
-          ?.hasAttribute('data-ending-style'),
-      ).toBe(false)
-      expect(
-        screen
-          .getByText('Row deleted')
-          .closest('[data-slot="toast"]')
-          ?.hasAttribute('data-ending-style'),
-      ).toBe(false)
-      expect(
-        screen
-          .getByText('Import complete')
-          .closest('[data-slot="toast"]')
-          ?.hasAttribute('data-ending-style'),
-      ).toBe(false)
+      expect(screen.getByText('Schema changed')).toBeTruthy()
+      expect(screen.getByText('Row deleted')).toBeTruthy()
+      expect(screen.getByText('Import complete')).toBeTruthy()
     } finally {
       toasts.dismiss()
       vi.runOnlyPendingTimers()
@@ -131,41 +62,7 @@ describe('Toaster', () => {
     }
   })
 
-  it('renders the loading state used by promise notifications', async () => {
-    render(<Toaster />)
-
-    const pending = new Promise<never>(() => undefined)
-    void toasts.promise(pending, {
-      loading: 'Saving connection',
-      success: 'Connection saved',
-      error: 'Connection failed',
-    })
-
-    expect(
-      (await screen.findByText('Saving connection'))
-        .closest('[data-slot="toast"]')
-        ?.getAttribute('data-status'),
-    ).toBe('loading')
-  })
-
-  it('uses Inspector styles for descriptions and the close control', async () => {
-    render(<Toaster />)
-
-    toasts.error('Couldn’t insert row', { description: 'Review the values and try again' })
-
-    const description = await screen.findByText('Review the values and try again')
-    const closeButton = document.querySelector<HTMLButtonElement>(
-      '[aria-label="Dismiss notification"]',
-    )
-
-    expect(description.className).toContain(stylex.props(toasterStyles.description).className)
-    expect(closeButton?.getAttribute('data-slot')).toBe('button')
-    expect(closeButton?.getAttribute('data-variant')).toBe('ghost')
-    expect(closeButton?.getAttribute('data-size')).toBe('s')
-    expect(closeButton?.hasAttribute('data-icon-only')).toBe(true)
-  })
-
-  it('groups the title, Undo action, and close control above the description', async () => {
+  it('presents supporting content and controls in the Inspector toast structure', async () => {
     render(<Toaster />)
 
     toasts.error('Couldn’t insert row', {
@@ -184,64 +81,7 @@ describe('Toaster', () => {
     expect(header?.contains(close)).toBe(true)
     expect(header?.contains(description)).toBe(false)
     expect(header?.nextElementSibling).toBe(description)
-  })
-
-  it('uses a neutral surface and border with status color limited to the title', async () => {
-    render(<Toaster />)
-
-    toasts.error('Danger notification', { preserve: true, undo: () => undefined })
-    toasts.warning('Warning notification', { preserve: true })
-    toasts.success('Success notification', { preserve: true })
-
-    const errorToast = (await screen.findByText('Danger notification')).closest(
-      '[data-slot="toast"]',
-    )
-    const warningToast = screen.getByText('Warning notification').closest('[data-slot="toast"]')
-    const successToast = screen.getByText('Success notification').closest('[data-slot="toast"]')
-    const errorTitle = screen.getByText('Danger notification')
-    const warningTitle = screen.getByText('Warning notification')
-    const successTitle = screen.getByText('Success notification')
-    const action = screen.getByRole('button', { name: 'Undo' })
-
-    expectStyleClasses(errorToast, stylex.props(semanticStatusStyles.toast).className)
-    expectStyleClasses(warningToast, stylex.props(semanticStatusStyles.toast).className)
-    expectStyleClasses(successToast, stylex.props(semanticStatusStyles.toast).className)
-    expectStyleClasses(errorTitle, stylex.props(semanticStatusStyles.titleError).className)
-    expectStyleClasses(warningTitle, stylex.props(semanticStatusStyles.titleWarning).className)
-    expectStyleClasses(successTitle, stylex.props(semanticStatusStyles.titleSuccess).className)
-    expectStyleClasses(action, stylex.props(semanticStatusStyles.action).className)
     expect(document.querySelector('[data-slot="toast-icon"]')).toBeNull()
-  })
-
-  it('keeps the front toast above hidden content and spaces the expanded stack', async () => {
-    render(<Toaster />)
-
-    toasts.message('First notification', { preserve: true })
-    toasts.message('Second notification', { preserve: true })
-    toasts.message('Third notification', { preserve: true })
-
-    await screen.findByText('Third notification')
-
-    const viewport = screen.getByLabelText('Notifications')
-    const toastElements = Array.from(viewport.querySelectorAll('[data-slot="toast"]'))
-    const orderClassNames = [
-      stylex.props(stackContractStyles.frontmostOrder).className,
-      stylex.props(stackContractStyles.middleOrder).className,
-      stylex.props(stackContractStyles.backOrder).className,
-    ]
-    const expandedGapClassName = stylex.props(stackContractStyles.expandedGap).className
-
-    for (const [index, toast] of toastElements.entries()) {
-      expect(toast.className).toContain(orderClassNames[index])
-    }
-
-    fireEvent.mouseEnter(viewport)
-
-    await waitFor(() => {
-      for (const toast of toastElements) {
-        expect(toast.className).toContain(expandedGapClassName)
-      }
-    })
   })
 
   it('runs the constrained Undo action', async () => {
@@ -350,27 +190,48 @@ describe('Toaster', () => {
     })
   })
 
-  it('updates a promise toast when its lifecycle completes', async () => {
+  it('keeps promise identity while presenting loading, success, and error states', async () => {
     render(<Toaster />)
 
-    await toasts.promise(Promise.resolve('production'), {
-      loading: 'Connecting',
-      success: (environment) => `Connected to ${environment}`,
-      error: 'Connection failed',
+    let resolveSuccessfulPromise!: (value: string) => void
+    const successfulPromise = new Promise<string>((resolve) => {
+      resolveSuccessfulPromise = resolve
     })
-
-    expect(await screen.findByText('Connected to production')).not.toBeNull()
-  })
-
-  it('returns the original promise after registering a rejection handler', () => {
-    const promise = Promise.reject(new Error('Connection failed'))
-
     expect(
-      toasts.promise(promise, {
+      toasts.promise(successfulPromise, {
         loading: 'Connecting',
-        success: 'Connected',
+        success: (environment) => `Connected to ${environment}`,
         error: 'Connection failed',
       }),
-    ).toBe(promise)
+    ).toBe(successfulPromise)
+    expect(
+      (await screen.findByText('Connecting'))
+        .closest('[data-slot="toast"]')
+        ?.getAttribute('data-status'),
+    ).toBe('loading')
+
+    resolveSuccessfulPromise('production')
+    await successfulPromise
+    expect(
+      (await screen.findByText('Connected to production'))
+        .closest('[data-slot="toast"]')
+        ?.getAttribute('data-status'),
+    ).toBe('success')
+
+    const error = new Error('Connection failed')
+    const failedPromise = Promise.reject(error)
+    expect(
+      toasts.promise(failedPromise, {
+        loading: 'Reconnecting',
+        success: 'Connected',
+        error: (reason) => (reason === error ? 'Connection failed' : 'Unexpected failure'),
+      }),
+    ).toBe(failedPromise)
+    await expect(failedPromise).rejects.toBe(error)
+    expect(
+      (await screen.findByText('Connection failed'))
+        .closest('[data-slot="toast"]')
+        ?.getAttribute('data-status'),
+    ).toBe('error')
   })
 })

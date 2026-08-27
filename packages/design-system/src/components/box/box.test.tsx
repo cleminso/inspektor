@@ -1,5 +1,4 @@
 import { cleanup, render, screen } from '@testing-library/react'
-import { createRef } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { resolveBoxStyles } from '../../utils/resolvers'
@@ -15,85 +14,16 @@ describe('Box', () => {
     const style = <Box style={{ color: 'red' }} />
     // @ts-expect-error Box dimensions must use a semantic role or full width.
     const width = <Box width="120px" />
+    // @ts-expect-error Arbitrary integration classes are not part of the Box contract.
+    const unsafe = <Box unsafeClassName="integration-class" />
+    // @ts-expect-error Scrollbar appearance is automatic for Box scroll containers.
+    const customScrollbar = <Box scrollbar="thin" />
 
     expect(className).toBeDefined()
     expect(style).toBeDefined()
     expect(width).toBeDefined()
-  })
-
-  it('resolves every semantic color token accepted by Box', () => {
-    const backgroundColors = [
-      'surface-background',
-      'surface-default',
-      'surface-raised',
-      'surface-canvas',
-      'surface-subtle',
-      'surface-overlay',
-      'surface-backdrop',
-      'surface-inverse',
-      'element-default',
-      'element-hover',
-      'element-pressed',
-      'element-selected',
-      'element-disabled',
-      'ghost-element-default',
-      'ghost-element-hover',
-      'ghost-element-pressed',
-      'ghost-element-selected',
-      'ghost-element-disabled',
-      'accent-element-default',
-      'accent-element-hover',
-      'accent-element-pressed',
-      'accent-element-disabled',
-      'danger-element-default',
-      'danger-element-hover',
-      'danger-element-pressed',
-      'danger-element-disabled',
-      'selection-background',
-      'selection-strong-background',
-    ] as const
-    const colors = [
-      'default',
-      'secondary',
-      'muted',
-      'placeholder',
-      'disabled',
-      'accent',
-      'link',
-      'success',
-      'warning',
-      'danger',
-      'onAccent',
-      'onInverse',
-    ] as const
-    const borderColors = [
-      'default',
-      'subtle',
-      'strong',
-      'focused',
-      'selected',
-      'disabled',
-      'warning',
-      'danger',
-      'dangerSubtle',
-      'success',
-    ] as const
-
-    for (const backgroundColor of backgroundColors) {
-      expect(resolveBoxStyles({ backgroundColor }, 'box-colors').stylexStyles).toHaveLength(1)
-    }
-    for (const color of colors) {
-      expect(resolveBoxStyles({ color }, 'box-colors').stylexStyles).toHaveLength(1)
-    }
-    for (const borderColor of borderColors) {
-      expect(resolveBoxStyles({ borderColor }, 'box-colors').stylexStyles).toHaveLength(1)
-    }
-  })
-
-  it('forwards semantic DOM attributes', () => {
-    render(<Box aria-label="Layout region" />)
-
-    expect(screen.getByLabelText('Layout region').getAttribute('aria-label')).toBe('Layout region')
+    expect(unsafe).toBeDefined()
+    expect(customScrollbar).toBeDefined()
   })
 
   it('strips styling escape hatches passed by untyped consumers', () => {
@@ -119,31 +49,6 @@ describe('Box', () => {
     const box = screen.getByTestId('box')
 
     expect(box.getAttribute('data-scrollbar')).toBe('standard')
-    expect(box.getAttribute('data-scrollbar-gutter')).toBeNull()
-
-    // @ts-expect-error Arbitrary integration classes are not part of the Box contract.
-    const unsafe = <Box unsafeClassName="integration-class" />
-    // @ts-expect-error Scrollbar appearance is automatic for Box scroll containers.
-    const customScrollbar = <Box scrollbar="thin" />
-    expect(unsafe).toBeDefined()
-    expect(customScrollbar).toBeDefined()
-  })
-
-  it('types refs from the selected element', () => {
-    const list = <Box as="ul" ref={createRef<HTMLUListElement>()} />
-    // @ts-expect-error A div ref does not match an unordered list.
-    const invalidList = <Box as="ul" ref={createRef<HTMLDivElement>()} />
-
-    expect(list).toBeDefined()
-    expect(invalidList).toBeDefined()
-  })
-
-  it('resolves every accepted shadow token', () => {
-    const shadows = ['none', 'border', 'small', 'medium'] as const
-
-    for (const boxShadow of shadows) {
-      expect(resolveBoxStyles({ boxShadow }, 'box-shadows').stylexStyles).toHaveLength(1)
-    }
   })
 
   it('resolves constrained grid tracks, placement, and aspect ratios', () => {

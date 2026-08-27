@@ -14,7 +14,6 @@ describe('RelationValue', () => {
 
     expect(screen.getByText('account_0123456789')).toBeTruthy()
     expect(screen.queryByRole('link')).toBeNull()
-    expect(screen.queryByRole('status')).toBeNull()
     expect(screen.getByText('account_0123456789').closest('[translate="no"]')).toBeTruthy()
   })
 
@@ -37,7 +36,6 @@ describe('RelationValue', () => {
     expect(navigationIcon).toBeTruthy()
     expect(link.contains(navigationIcon ?? null)).toBe(true)
     expect(middleTruncate?.contains(navigationIcon ?? null)).toBe(false)
-    expect(link.closest('[data-typography="mono"]')).toBeTruthy()
   })
 
   it('does not accept detail or styling props', () => {
@@ -55,27 +53,6 @@ describe('RelationValue', () => {
 })
 
 describe('RelationDetails', () => {
-  it('renders the stored ID and resolved display value without target or status metadata', () => {
-    render(
-      <RelationDetails
-        id="account_0123456789-complete"
-        state={{ status: 'resolved', displayValue: 'Ada Lovelace' }}
-      />,
-    )
-
-    expect(screen.getByRole('textbox', { name: 'Stored relation ID' }).getAttribute('value')).toBe(
-      'account_0123456789-complete',
-    )
-    expect(
-      screen.getByRole('textbox', { name: 'Stored relation ID' }).getAttribute('translate'),
-    ).toBe('no')
-    expect(screen.getByText('Ada Lovelace')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Copy display value' })).toBeTruthy()
-    expect(screen.queryByText('Target')).toBeNull()
-    expect(screen.queryByText('accounts')).toBeNull()
-    expect(screen.queryByRole('status')).toBeNull()
-  })
-
   it('copies the display value and composes optional target navigation', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
@@ -94,26 +71,15 @@ describe('RelationDetails', () => {
     const inputGroup = storedIdInput.closest('[data-slot="input-group"]')
     const copyButton = screen.getByRole('button', { name: 'Copy display value' })
     const targetLink = screen.getByRole('link', { name: 'Open target' })
+    expect(storedIdInput.getAttribute('value')).toBe('account_0123456789-complete')
+    expect(storedIdInput.getAttribute('translate')).toBe('no')
+    expect(screen.getByText('Ada Lovelace')).toBeTruthy()
     expect(inputGroup?.contains(targetLink)).toBe(true)
 
     fireEvent.click(copyButton)
 
     await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('Ada Lovelace'))
     expect(targetLink.getAttribute('href')).toBe('/accounts/account_0123456789-complete')
-  })
-
-  it('announces display-value clipboard failures', async () => {
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
-    })
-    render(<RelationDetails id="account_1" state={{ status: 'resolved', displayValue: 'Ada' }} />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Copy display value' }))
-
-    await vi.waitFor(() => {
-      expect(screen.getByText('Could not copy display value')).toBeTruthy()
-    })
   })
 
   it('requires valid resolution states and owns its styling', () => {

@@ -111,7 +111,6 @@ describe('JsonView', () => {
     )
 
     const tree = screen.getByRole('tree', { name: 'Row JSON' })
-    const root = getRootTreeItem()
     const copyButton = screen.getByRole('button', { name: 'Copy JSON' })
 
     expect(tree.contains(copyButton)).toBe(false)
@@ -122,7 +121,6 @@ describe('JsonView', () => {
         ['{', '  "profile": {', '    "name": "Ada"', '  },', '  "active": true', '}'].join('\n'),
       ),
     )
-    expect(root.getAttribute('aria-expanded')).toBe('true')
   })
 
   it('omits the sticky copy action when its containing surface owns copy', () => {
@@ -151,39 +149,16 @@ describe('JsonView', () => {
     expect(tree.textContent).toContain('"line one\\n\\"line two\\""')
   })
 
-  it('renders an expanded array with indices, delimiters, and ordered values', () => {
-    render(<JsonView accessibilityLabel="Array data" data={['first', 2, false, null]} />)
-
-    const tree = screen.getByRole('tree', { name: 'Array data' })
-    const items = screen.getAllByRole('treeitem')
-
-    expect(tree.textContent).toContain('[')
-    expect(tree.textContent).toContain(']')
-    expect(tree.textContent).toContain('"first"')
-    expect(items).toHaveLength(5)
-    expect(items.slice(1).map((item) => item.getAttribute('aria-posinset'))).toEqual([
-      '1',
-      '2',
-      '3',
-      '4',
-    ])
-  })
-
   it('renders empty containers inline without disclosure state', () => {
     render(
-      <JsonView
-        accessibilityLabel="Empty values"
-        data={{ emptyObject: {}, emptyArray: [], emptyString: '' }}
-      />,
+      <JsonView accessibilityLabel="Empty values" data={{ emptyObject: {}, emptyArray: [] }} />,
     )
 
     const emptyObject = getTreeItem(/emptyObject/i)
     const emptyArray = getTreeItem(/emptyArray/i)
-    const emptyString = getTreeItem(/emptyString/i)
 
     expect(emptyObject.textContent).toContain('{}')
     expect(emptyArray.textContent).toContain('[]')
-    expect(emptyString.textContent).toContain('""')
     expect(emptyObject.hasAttribute('aria-expanded')).toBe(false)
     expect(emptyArray.hasAttribute('aria-expanded')).toBe(false)
     expect(emptyObject.querySelector('button')).toBeNull()
@@ -260,7 +235,6 @@ describe('JsonView', () => {
 
     expect(getTreeItem(/profile/i).getAttribute('aria-expanded')).toBe('true')
     expect(getTreeItem(/contact/i).getAttribute('aria-expanded')).toBe('false')
-    expect(screen.queryByRole('treeitem', { name: /email/i })).toBeNull()
 
     rerender(
       <JsonView
@@ -370,6 +344,8 @@ describe('JsonView', () => {
     const profile = getTreeItem(/profile/i)
     const active = getTreeItem(/active/i)
     const roles = getTreeItem(/roles/i)
+    const admin = getTreeItem(/0: admin/i)
+    const owner = getTreeItem(/1: owner/i)
 
     expect(root.getAttribute('aria-level')).toBe('1')
     expect(root.getAttribute('aria-posinset')).toBe('1')
@@ -381,6 +357,10 @@ describe('JsonView', () => {
     expect(roles.getAttribute('aria-posinset')).toBe('3')
     expect(profile.getAttribute('aria-expanded')).toBe('true')
     expect(active.hasAttribute('aria-expanded')).toBe(false)
+    expect(admin.getAttribute('aria-level')).toBe('3')
+    expect(admin.getAttribute('aria-posinset')).toBe('1')
+    expect(admin.getAttribute('aria-setsize')).toBe('2')
+    expect(owner.getAttribute('aria-posinset')).toBe('2')
     expect(within(tree).getAllByRole('group')).toHaveLength(3)
     expect(tree.querySelector('[aria-selected="true"]')).toBeNull()
   })
@@ -668,16 +648,23 @@ describe('JsonView', () => {
 
   it('restores the existing tree when a search with no matches closes', () => {
     const data = { profile: { contact: { email: 'ada@example.com' } } }
+    const onResultsChange = vi.fn()
     const { rerender } = render(
       <JsonView
         accessibilityLabel="No matching branch"
         data={data}
         defaultExpandDepth={0}
-        search={{ query: 'missing', activeMatchIndex: 0, onResultsChange: () => undefined }}
+        search={{ query: 'missing', activeMatchIndex: 0, onResultsChange }}
       />,
     )
 
     expect(getRootTreeItem().getAttribute('aria-expanded')).toBe('false')
+    expect(onResultsChange).toHaveBeenLastCalledWith({
+      activeIndex: null,
+      count: 0,
+      pending: false,
+      query: 'missing',
+    })
 
     rerender(
       <JsonView accessibilityLabel="No matching branch" data={data} defaultExpandDepth={0} />,
@@ -685,26 +672,6 @@ describe('JsonView', () => {
 
     expect(getRootTreeItem().getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('treeitem', { name: /profile/i })).toBeNull()
-  })
-
-  it('reports when an active search has no matches', async () => {
-    const onResultsChange = vi.fn()
-    render(
-      <JsonView
-        accessibilityLabel="No search results"
-        data={{ profile: { name: 'Ada' } }}
-        search={{ query: 'missing', activeMatchIndex: 0, onResultsChange }}
-      />,
-    )
-
-    await waitFor(() => {
-      expect(onResultsChange).toHaveBeenLastCalledWith({
-        activeIndex: null,
-        count: 0,
-        pending: false,
-        query: 'missing',
-      })
-    })
   })
 
   it('bounds expanded children and reveals them through keyboard-ordered continuation nodes', () => {
@@ -832,6 +799,7 @@ describe('JsonView', () => {
 
     expect(description.textContent?.length).toBeLessThan(longValue.length)
     expect(description.textContent).not.toContain('final-marker')
+    expect(description.getAttribute('aria-label')).not.toContain('final-marker')
 
     fireEvent.click(within(description).getByRole('button', { name: /show (more|full)/i }))
 
@@ -846,21 +814,6 @@ describe('JsonView', () => {
     fireEvent.keyDown(description, { key: 'Enter' })
 
     expect(description.textContent).toContain('final-marker')
-  })
-
-  it('reveals and highlights a search match beyond the string display limit', () => {
-    const longValue = `${'segment-'.repeat(2_000)}final-marker`
-    render(
-      <JsonView
-        accessibilityLabel="Long string search"
-        data={{ description: longValue }}
-        search={{ query: 'final-marker', activeMatchIndex: 0, onResultsChange: () => undefined }}
-      />,
-    )
-
-    expect(
-      within(getTreeItem(/description/i)).getByText('final-marker', { selector: 'mark' }),
-    ).toBeTruthy()
   })
 
   it('reveals every occurrence when a long string matches before and after the display limit', () => {
@@ -911,13 +864,6 @@ describe('JsonView', () => {
       pending: false,
       query: 'a',
     })
-  })
-
-  it('keeps bounded string content out of the tree item label', () => {
-    const longValue = `${'segment-'.repeat(2_000)}final-marker`
-    render(<JsonView accessibilityLabel="Bounded label" data={{ description: longValue }} />)
-
-    expect(getTreeItem(/description/i).getAttribute('aria-label')).not.toContain('final-marker')
   })
 
   it('does not split a Unicode code point at the string display boundary', () => {

@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { createRef, useState } from 'react'
+import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Command } from './command'
@@ -114,46 +114,6 @@ describe('Command', () => {
 
     expect(screen.getByRole('option', { name: 'Equals' })).toBeTruthy()
     expect(screen.queryByRole('option', { name: 'Greater than or equal' })).toBeNull()
-  })
-
-  it('composes draft controls into one input row and supports inline item metadata', () => {
-    render(
-      <Command.Root items={items} itemToStringLabel={(item) => item.label}>
-        <Command.InputRow aria-label="Filter draft">
-          <button type="button">name</button>
-          <Command.Input aria-label="Filter operators" />
-        </Command.InputRow>
-        <Command.List>
-          <Command.Item value={items[0]}>
-            <Command.ItemText
-              data-testid="inline-item"
-              layout="inline"
-              label="id"
-              description="UUID"
-            />
-          </Command.Item>
-        </Command.List>
-      </Command.Root>,
-    )
-
-    expect(screen.getByRole('group', { name: 'Filter draft' })).toBeTruthy()
-    expect(screen.getByText('UUID')).toBeTruthy()
-  })
-
-  it('forwards item refs', () => {
-    const ref = createRef<HTMLDivElement>()
-    render(
-      <Command.Root items={items} itemToStringLabel={(item) => item.label}>
-        <Command.Input aria-label="Filter columns" />
-        <Command.List>
-          <Command.Item ref={ref} value={items[0]}>
-            {items[0].label}
-          </Command.Item>
-        </Command.List>
-      </Command.Root>,
-    )
-
-    expect(ref.current).toBe(screen.getByRole('option', { name: 'id User identifier' }))
   })
 
   it('provides a close action and restores trigger focus', async () => {

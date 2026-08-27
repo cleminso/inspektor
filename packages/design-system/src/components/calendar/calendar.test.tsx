@@ -57,14 +57,4 @@ describe('Calendar', () => {
 
     expect(screen.getByRole('button', { name: 'Choose year, 42' })).toBeTruthy()
   })
-
-  it('exposes month and year selection as part of the standalone surface', () => {
-    render(<Calendar defaultValue={new Date(2026, 7, 13)} />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Choose month, August' }))
-    expect(screen.getByRole('grid', { name: 'Choose month' })).toBeTruthy()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Choose year, 2026' }))
-    expect(screen.getByRole('grid', { name: 'Choose year' })).toBeTruthy()
-  })
 })

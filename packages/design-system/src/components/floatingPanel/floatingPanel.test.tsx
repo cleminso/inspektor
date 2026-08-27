@@ -1,9 +1,7 @@
-import * as stylex from '@stylexjs/stylex'
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { FloatingPanel } from './floatingPanel'
-import { floatingPanelStyles } from './floatingPanel.styles'
 
 const originalAnimate = HTMLElement.prototype.animate
 
@@ -27,34 +25,21 @@ describe('FloatingPanel', () => {
     const panel = screen.getByRole('complementary', { name: 'Pending changes' })
     expect(document.body.contains(panel)).toBe(true)
     expect(container.contains(panel)).toBe(false)
-    expect(panel.getAttribute('role')).toBeNull()
     expect(document.querySelector("[data-slot='floating-panel-backdrop']")).toBeNull()
   })
 
-  it('uses the compact content width by default', () => {
+  it.each([
+    { expectedSize: 'compact', size: undefined },
+    { expectedSize: 'expanded', size: 'expanded' as const },
+  ])('projects the $expectedSize content size', ({ expectedSize, size }) => {
     render(
       <FloatingPanel.Root aria-label="Pending changes">
-        <FloatingPanel.Content>Review</FloatingPanel.Content>
+        <FloatingPanel.Content size={size}>Review</FloatingPanel.Content>
       </FloatingPanel.Root>,
     )
 
     const content = document.querySelector("[data-slot='floating-panel-content']")
-    expect(content?.getAttribute('data-size')).toBe('compact')
-    expect(content?.className).toContain(stylex.props(floatingPanelStyles.contentCompact).className)
-  })
-
-  it('supports an expanded content width', () => {
-    render(
-      <FloatingPanel.Root aria-label="Pending changes">
-        <FloatingPanel.Content size="expanded">Review</FloatingPanel.Content>
-      </FloatingPanel.Root>,
-    )
-
-    const content = document.querySelector("[data-slot='floating-panel-content']")
-    expect(content?.getAttribute('data-size')).toBe('expanded')
-    expect(content?.className).toContain(
-      stylex.props(floatingPanelStyles.contentExpanded).className,
-    )
+    expect(content?.getAttribute('data-size')).toBe(expectedSize)
   })
 
   it('keeps closing details mounted until their exit motion completes', async () => {

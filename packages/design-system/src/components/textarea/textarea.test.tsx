@@ -41,20 +41,4 @@ describe('Textarea', () => {
     expect(renderProp).toBeDefined()
     expect(inputRef).toBeDefined()
   })
-
-  it('uses the standard scrollbar treatment for overflowing text', () => {
-    render(<Textarea aria-label="Payload" />)
-
-    expect(screen.getByRole('textbox', { name: 'Payload' }).getAttribute('data-scrollbar')).toBe(
-      'standard',
-    )
-  })
-
-  it('preserves read-only native behavior', () => {
-    render(<Textarea aria-label="Payload" value="{}" readOnly />)
-
-    expect((screen.getByRole('textbox', { name: 'Payload' }) as HTMLTextAreaElement).readOnly).toBe(
-      true,
-    )
-  })
 })

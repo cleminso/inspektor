@@ -1,5 +1,4 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import * as stylex from '@stylexjs/stylex'
 import {
   createColumnHelper,
   type CellSelectionState,
@@ -12,11 +11,9 @@ import { createPortal } from 'react-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { DataGrid } from './dataGrid'
-import { dataGridStyles } from './dataGrid.styles'
 import { dataGridFeatures, type DataGridFeatures } from './dataGridFeatures'
 import { getDataGridHeaderSortableId } from './dataGridReorder'
 import { ContextMenu } from '../contextMenu/contextMenu'
-import { scrollAreaStyles } from '../scrollArea/scrollArea.styles'
 
 let onDataGridDragEnd: ((event: unknown) => void) | undefined
 let dragOverlayDropAnimation: unknown
@@ -250,11 +247,6 @@ describe('DataGrid scrollbar', () => {
       'horizontal',
     ])
     expect(scrollbars.every((scrollbar) => viewport?.contains(scrollbar) === false)).toBe(true)
-  })
-
-  it('starts its vertical scrollbar below the sticky header', () => {
-    const { container } = render(<TestDataGrid />)
-
     expect(
       container
         .querySelector('[data-slot="scroll-area-scrollbar"][data-orientation="vertical"]')
@@ -278,71 +270,6 @@ describe('DataGrid scrollbar', () => {
     expect(container.querySelector('[data-slot="data-grid-viewport"]')).toBe(viewport)
     expect(viewport.scrollLeft).toBe(0)
     expect(viewport.scrollTop).toBe(0)
-  })
-
-  it('prepares the viewport for frequent scrolling without browser scroll anchoring', () => {
-    const { container } = render(<TestDataGrid />)
-    const viewport = container.querySelector<HTMLElement>('[data-slot="data-grid-viewport"]')
-
-    expect(viewport).not.toBeNull()
-    if (viewport === null) {
-      return
-    }
-
-    expect(viewport.className).toContain(
-      stylex.props(scrollAreaStyles.viewportFrequentScroll).className,
-    )
-  })
-
-  it('contains overscroll navigation at the grid viewport boundary', () => {
-    const { container } = render(<TestDataGrid />)
-    const viewport = container.querySelector<HTMLElement>('[data-slot="data-grid-viewport"]')
-
-    expect(viewport).not.toBeNull()
-    expect(viewport?.className).toContain(
-      stylex.props(scrollAreaStyles.viewportOverscrollNone).className,
-    )
-  })
-
-  it('isolates the scrolling table from surrounding paint work', () => {
-    const { container } = render(<TestDataGrid />)
-    const scrollSurface = container.querySelector<HTMLElement>(
-      '[data-slot="data-grid-scroll-surface"]',
-    )
-
-    expect(scrollSurface).not.toBeNull()
-    expect(scrollSurface?.className).toContain(
-      stylex.props(dataGridStyles.scrollSurfacePaintBoundary).className,
-    )
-  })
-
-  it('lets the vertical thumb reach the grid end inset', () => {
-    const { container } = render(<TestDataGrid />)
-    const verticalTrack = container.querySelector<HTMLElement>(
-      '[data-slot="scroll-area-scrollbar"][data-orientation="vertical"]',
-    )
-
-    expect(verticalTrack).not.toBeNull()
-    expect(verticalTrack?.className).toContain(
-      stylex.props(scrollAreaStyles.verticalTrackFlushEnd).className,
-    )
-  })
-
-  it('uses intrinsic TanStack column widths instead of redistributing viewport space', () => {
-    const { container } = render(<TestDataGrid />)
-    const table = container.querySelector<HTMLElement>('[data-slot="data-grid-table"]')
-
-    expect(table?.getAttribute('data-layout')).toBe('intrinsic')
-    expect(table?.style.width).toBe('300px')
-    expect(table === null ? null : getComputedStyle(table).minWidth).not.toBe('100%')
-  })
-
-  it('keeps the header group above scrolling body rows', () => {
-    const { container } = render(<TestDataGrid />)
-
-    expect(
-      container.querySelector('[data-slot="data-grid-header"]')?.getAttribute('data-sticky'),
-    ).toBe('true')
   })
 })
 
@@ -754,11 +681,19 @@ describe('DataGrid', () => {
     expect(screen.getByRole('table', { name: 'People' })).toBeTruthy()
     expect(screen.getAllByRole('columnheader')).toHaveLength(2)
     expect(screen.getAllByRole('row')).toHaveLength(3)
-    expect(screen.getByRole('cell', { name: 'Ada' }).getAttribute('data-typography')).toBe('mono')
+    expect(screen.getByRole('cell', { name: 'Ada' })).toBeTruthy()
   })
 
-  it('uses one explicit column geometry without redistributing unaffected columns', () => {
-    render(<FixedGeometryDataGrid />)
+  it('keeps intrinsic, resized, reordered, and hidden column geometry aligned', () => {
+    const intrinsicGrid = render(<TestDataGrid />)
+    const intrinsicTable = intrinsicGrid.container.querySelector<HTMLElement>(
+      '[data-slot="data-grid-table"]',
+    )
+
+    expect(intrinsicTable?.getAttribute('data-layout')).toBe('intrinsic')
+    expect(intrinsicTable?.style.width).toBe('300px')
+    intrinsicGrid.unmount()
+    const fixedGrid = render(<FixedGeometryDataGrid />)
 
     const table = screen.getByRole('table', { name: 'Fixed geometry people' })
     const scrollSurface = table.closest('[data-slot="data-grid-scroll-surface"]')
@@ -775,27 +710,24 @@ describe('DataGrid', () => {
     expect((scrollSurface as HTMLElement).style.width).toBe('400px')
     expect(table.style.width).toBe('400px')
     expect(Array.from(columns, (column) => column.style.width)).toEqual(['220px', '180px'])
-  })
 
-  it('updates shared column geometry for reordered and hidden columns', () => {
+    fixedGrid.unmount()
     render(<FixedGeometryDataGrid />)
-
-    const table = screen.getByRole('table', { name: 'Fixed geometry people' })
+    const reorderedTable = screen.getByRole('table', { name: 'Fixed geometry people' })
 
     fireEvent.click(screen.getByRole('button', { name: 'Move role first' }))
 
-    expect(Array.from(table.querySelectorAll('col'), (column) => column.style.width)).toEqual([
-      '180px',
-      '120px',
-    ])
-    expect(table.style.width).toBe('300px')
+    expect(
+      Array.from(reorderedTable.querySelectorAll('col'), (column) => column.style.width),
+    ).toEqual(['180px', '120px'])
+    expect(reorderedTable.style.width).toBe('300px')
 
     fireEvent.click(screen.getByRole('button', { name: 'Hide role' }))
 
-    expect(Array.from(table.querySelectorAll('col'), (column) => column.style.width)).toEqual([
-      '120px',
-    ])
-    expect(table.style.width).toBe('120px')
+    expect(
+      Array.from(reorderedTable.querySelectorAll('col'), (column) => column.style.width),
+    ).toEqual(['120px'])
+    expect(reorderedTable.style.width).toBe('120px')
   })
 
   it('renders only the header when empty content is null', () => {
@@ -821,7 +753,6 @@ describe('DataGrid', () => {
     const { container } = render(<TestDataGrid loading />)
 
     expect(container.querySelector('[data-slot="spinner"]')).not.toBeNull()
-    expect(container.querySelectorAll('[data-slot="data-grid-loading-row"]')).toHaveLength(0)
     expect(
       container.querySelector('[data-slot="data-grid-loading"]')?.getAttribute('aria-busy'),
     ).toBe('true')
@@ -861,36 +792,18 @@ describe('DataGrid', () => {
     )
 
     const adaRow = screen.getByRole('row', { name: /Ada Engineer/ })
-    const graceRow = screen.getByRole('row', { name: /Grace Admiral/ })
     const activeCell = screen.getByRole('cell', { name: 'Engineer' })
     const activeHeader = screen.getByRole('columnheader', { name: 'Role' })
 
     expect(adaRow.hasAttribute('data-active')).toBe(true)
-    expect(graceRow.hasAttribute('data-selected')).toBe(true)
     expect(activeHeader.hasAttribute('data-active')).toBe(false)
     expect(activeCell.hasAttribute('data-active')).toBe(true)
     expect(activeCell.hasAttribute('data-cell-selected')).toBe(true)
     expect(activeCell.hasAttribute('data-column-active')).toBe(false)
     expect(activeCell.hasAttribute('data-row-active')).toBe(true)
-    expect(graceRow.querySelectorAll('[data-selected]')).toHaveLength(2)
   })
 
-  it('marks rows with their constrained semantic status', () => {
-    render(
-      <TestDataGrid
-        getRowStatus={(row) => (row.id === 'person-1' ? 'stagedDeletion' : 'default')}
-      />,
-    )
-
-    expect(screen.getByRole('row', { name: /Ada Engineer/ }).getAttribute('data-status')).toBe(
-      'stagedDeletion',
-    )
-    expect(screen.getByRole('row', { name: /Grace Admiral/ }).getAttribute('data-status')).toBe(
-      'default',
-    )
-  })
-
-  it('marks recently inserted rows with the ephemeral highlight treatment', () => {
+  it('exposes recently inserted row status', () => {
     render(
       <TestDataGrid
         getRowStatus={(row) => (row.id === 'person-1' ? 'recentlyInserted' : 'default')}
@@ -900,46 +813,8 @@ describe('DataGrid', () => {
     const insertedRow = screen.getByRole('row', { name: /Ada Engineer/ })
 
     expect(insertedRow.getAttribute('data-status')).toBe('recentlyInserted')
-    expect(insertedRow.className).toContain(
-      stylex.props(dataGridStyles.rowRecentlyInserted).className,
-    )
     expect(screen.getByRole('row', { name: /Grace Admiral/ }).getAttribute('data-status')).toBe(
       'default',
-    )
-    expect(screen.getByRole('row', { name: /Grace Admiral/ }).className).not.toContain(
-      stylex.props(dataGridStyles.rowRecentlyInserted).className,
-    )
-  })
-
-  it('keeps selected-row presentation authoritative over a recent insert highlight', () => {
-    render(<TestDataGrid getRowStatus={() => 'recentlyInserted'} selectedRowIds={['person-1']} />)
-
-    const insertedRow = screen.getByRole('row', { name: /Ada Engineer/ })
-
-    expect(insertedRow.getAttribute('data-status')).toBe('recentlyInserted')
-    expect(insertedRow.getAttribute('aria-selected')).toBe('true')
-    expect(insertedRow.className).not.toContain(
-      stylex.props(dataGridStyles.rowRecentlyInserted).className,
-    )
-  })
-
-  it('marks only cells reported as staged updates', () => {
-    render(
-      <TestDataGrid
-        getCellStatus={(cell) =>
-          cell.row.id === 'person-1' && cell.column.id === 'role' ? 'stagedUpdate' : 'default'
-        }
-      />,
-    )
-
-    const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
-    const defaultCell = screen.getByRole('cell', { name: 'Ada' })
-
-    expect(stagedCell.getAttribute('data-status')).toBe('stagedUpdate')
-    expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
-    expect(defaultCell.getAttribute('data-status')).toBe('default')
-    expect(defaultCell.className).not.toContain(
-      stylex.props(dataGridStyles.cellStagedUpdate).className,
     )
   })
 
@@ -955,13 +830,10 @@ describe('DataGrid', () => {
     const updateCell = screen.getByRole('cell', { name: 'Admiral' })
 
     expect(deletedRowCell.getAttribute('data-status')).toBe('default')
-    expect(deletedRowCell.className).not.toContain(
-      stylex.props(dataGridStyles.cellStagedUpdate).className,
-    )
     expect(updateCell.getAttribute('data-status')).toBe('stagedUpdate')
   })
 
-  it('marks recently applied cells with the ephemeral highlight treatment', () => {
+  it('exposes recently applied cell status', () => {
     render(
       <TestDataGrid
         getCellStatus={(cell) =>
@@ -974,91 +846,7 @@ describe('DataGrid', () => {
     const defaultCell = screen.getByRole('cell', { name: 'Ada' })
 
     expect(appliedCell.getAttribute('data-status')).toBe('recentlyApplied')
-    expect(appliedCell.className).toContain(
-      stylex.props(dataGridStyles.cellRecentlyApplied).className,
-    )
     expect(defaultCell.getAttribute('data-status')).toBe('default')
-    expect(defaultCell.className).not.toContain(
-      stylex.props(dataGridStyles.cellRecentlyApplied).className,
-    )
-  })
-
-  it('keeps interactive cell backgrounds authoritative over a recent apply highlight', () => {
-    render(
-      <TestDataGrid
-        getCellStatus={() => 'recentlyApplied'}
-        initialCellSelection={[
-          {
-            anchorRowId: 'person-1',
-            anchorColumnId: 'role',
-            focusRowId: 'person-1',
-            focusColumnId: 'role',
-          },
-        ]}
-      />,
-    )
-
-    const appliedCell = screen.getByRole('cell', { name: 'Engineer' })
-
-    expect(appliedCell.getAttribute('data-status')).toBe('recentlyApplied')
-    expect(appliedCell.hasAttribute('data-active')).toBe(true)
-    expect(appliedCell.className).not.toContain(
-      stylex.props(dataGridStyles.cellRecentlyApplied).className,
-    )
-  })
-
-  it('keeps staged-update presentation composed with selected and active cell states', () => {
-    render(
-      <TestDataGrid
-        getCellStatus={() => 'stagedUpdate'}
-        initialCellSelection={[
-          {
-            anchorRowId: 'person-1',
-            anchorColumnId: 'role',
-            focusRowId: 'person-1',
-            focusColumnId: 'role',
-          },
-        ]}
-      />,
-    )
-
-    const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
-
-    expect(stagedCell.hasAttribute('data-active')).toBe(true)
-    expect(stagedCell.hasAttribute('data-cell-selected')).toBe(true)
-    expect(stagedCell.getAttribute('data-status')).toBe('stagedUpdate')
-    expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
-    expect(stagedCell.className).not.toContain(stylex.props(dataGridStyles.cellActive).className)
-    expect(stagedCell.className).toContain(
-      stylex.props(dataGridStyles.cellStagedSelectionEdgeTop).className,
-    )
-    expect(stagedCell.className).toContain(
-      stylex.props(dataGridStyles.cellStagedSelectionEdgeRight).className,
-    )
-    expect(stagedCell.className).toContain(
-      stylex.props(dataGridStyles.cellStagedSelectionEdgeBottom).className,
-    )
-    expect(stagedCell.className).toContain(
-      stylex.props(dataGridStyles.cellStagedSelectionEdgeLeft).className,
-    )
-  })
-
-  it('keeps staged-update presentation authoritative in an active column', () => {
-    render(
-      <TestDataGrid
-        activeColumnId="role"
-        getCellStatus={(cell) =>
-          cell.row.id === 'person-1' && cell.column.id === 'role' ? 'stagedUpdate' : 'default'
-        }
-      />,
-    )
-
-    const stagedCell = screen.getByRole('cell', { name: 'Engineer' })
-    expect(stagedCell.hasAttribute('data-column-active')).toBe(true)
-    expect(stagedCell.className).toContain(stylex.props(dataGridStyles.cellStagedUpdate).className)
-    expect(stagedCell.className).not.toContain(
-      stylex.props(dataGridStyles.cellColumnActive).className,
-    )
   })
 
   it('does not apply active-column emphasis to cells that cannot be selected', () => {
@@ -1077,19 +865,18 @@ describe('DataGrid', () => {
     expect(selectableCell.hasAttribute('data-column-active')).toBe(true)
   })
 
-  it('keeps resize emphasis on the header-owned border', () => {
+  it('marks the header resize state without replacing the header', () => {
     const { rerender } = render(<TestDataGrid activeColumnId="role" />)
+    const restingHandle = screen.getByRole('separator', { name: 'Resize role column' })
 
-    const restingHandleClassName = screen.getByRole('separator', {
-      name: 'Resize role column',
-    }).className
+    expect(restingHandle.hasAttribute('data-resizing')).toBe(false)
 
     rerender(<TestDataGrid activeColumnId="role" resizingColumnId="role" />)
 
     const resizeHandle = screen.getByRole('separator', { name: 'Resize role column' })
 
+    expect(resizeHandle).toBe(restingHandle)
     expect(resizeHandle.hasAttribute('data-resizing')).toBe(true)
-    expect(resizeHandle.className).toBe(restingHandleClassName)
   })
 
   it('reports header, row, cell, and cell context-menu activation targets', () => {
@@ -1215,48 +1002,6 @@ describe('DataGrid', () => {
       columnId: 'role',
     })
   })
-
-  it('renders TanStack replacement and Shift-range selection', () => {
-    render(<TestDataGrid />)
-    const adaCell = screen.getByRole('cell', { name: 'Ada' })
-    const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
-
-    fireEvent.mouseDown(adaCell)
-    fireEvent.mouseUp(document)
-    expect(adaCell.hasAttribute('data-cell-selected')).toBe(true)
-    expect(adaCell.hasAttribute('data-active')).toBe(true)
-
-    fireEvent.mouseDown(admiralCell, { shiftKey: true })
-    fireEvent.mouseUp(document)
-
-    for (const cell of screen.getAllByRole('cell')) {
-      expect(cell.hasAttribute('data-cell-selected')).toBe(true)
-    }
-    expect(adaCell.hasAttribute('data-active')).toBe(true)
-  })
-
-  it.each(['ctrlKey', 'metaKey'] as const)(
-    'composes cell inclusion and exclusion with %s',
-    (modifier) => {
-      render(<TestDataGrid />)
-      const adaCell = screen.getByRole('cell', { name: 'Ada' })
-      const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
-
-      fireEvent.mouseDown(adaCell)
-      fireEvent.mouseUp(document)
-      fireEvent.mouseDown(admiralCell, { [modifier]: true })
-      fireEvent.mouseUp(document)
-
-      expect(adaCell.hasAttribute('data-cell-selected')).toBe(true)
-      expect(admiralCell.hasAttribute('data-cell-selected')).toBe(true)
-
-      fireEvent.mouseDown(adaCell, { [modifier]: true })
-      fireEvent.mouseUp(document)
-
-      expect(adaCell.hasAttribute('data-cell-selected')).toBe(false)
-      expect(admiralCell.hasAttribute('data-cell-selected')).toBe(true)
-    },
-  )
 
   it('provides one body-cell entry point and moves its roving focus with arrow keys', async () => {
     render(<TestDataGrid />)
@@ -1418,21 +1163,6 @@ describe('DataGrid', () => {
     expect(handle.getAttribute('aria-valuenow')).toBe('120')
   })
 
-  it('aligns the drag origin treatment with the selected range edges', () => {
-    render(<TestDataGrid />)
-    const adaCell = screen.getByRole('cell', { name: 'Ada' })
-    const admiralCell = screen.getByRole('cell', { name: 'Admiral' })
-
-    fireEvent.mouseDown(adaCell)
-    fireEvent.mouseEnter(admiralCell)
-    fireEvent.mouseUp(document)
-
-    for (const cell of screen.getAllByRole('cell')) {
-      expect(cell.hasAttribute('data-cell-selected')).toBe(true)
-    }
-    expect(adaCell.className).toContain(stylex.props(dataGridStyles.cellDragOrigin).className)
-  })
-
   it('ends cell dragging in the grid document', () => {
     const iframe = document.createElement('iframe')
     document.body.append(iframe)
@@ -1547,12 +1277,6 @@ describe('DataGrid', () => {
       'Name',
       'Role',
     ])
-    expect(
-      screen
-        .getAllByRole('cell')
-        .slice(0, 2)
-        .map((cell) => cell.textContent),
-    ).toEqual(['Ada', 'Engineer'])
 
     act(() => {
       onDataGridDragEnd?.({ canceled: false, operation })

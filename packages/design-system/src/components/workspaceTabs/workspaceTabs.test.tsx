@@ -1,59 +1,10 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import * as stylex from '@stylexjs/stylex'
 import { useState, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Tooltip } from '../tooltip/tooltip'
 import { ContextMenu } from '../contextMenu/contextMenu'
 import { WorkspaceTabs } from './workspaceTabs'
-import { workspaceTabsStyles } from './workspaceTabs.styles'
-import { workspaceTabsColors } from './workspaceTabsColors.stylex'
-import { workspaceTabsVars } from './workspaceTabsVars.stylex'
-import {
-  accentElementColors,
-  borderColors,
-  dangerElementColors,
-  elementColors,
-  focusColors,
-  ghostElementColors,
-  selectionColors,
-  surfaceColors,
-  textColors,
-} from '../../tokens/semantics.stylex'
-
-describe('WorkspaceTabs color contract', () => {
-  it('defines tab states without adding tab roles to global colors', () => {
-    expect(workspaceTabsColors).toMatchObject({
-      background: expect.any(String),
-      hoverBackground: expect.any(String),
-      selectedBackground: expect.any(String),
-      disabledBackground: expect.any(String),
-      text: expect.any(String),
-      hoverText: expect.any(String),
-      selectedText: expect.any(String),
-      disabledText: expect.any(String),
-      closeBackdrop: expect.any(String),
-      closeIcon: expect.any(String),
-      closeIconHover: expect.any(String),
-      focusRing: expect.any(String),
-    })
-    expect(workspaceTabsVars.closeIconColor).toEqual(expect.any(String))
-    expect(workspaceTabsVars.tabTextColor).toEqual(expect.any(String))
-
-    const globalKeys = [
-      ...Object.keys(surfaceColors),
-      ...Object.keys(elementColors),
-      ...Object.keys(ghostElementColors),
-      ...Object.keys(accentElementColors),
-      ...Object.keys(dangerElementColors),
-      ...Object.keys(selectionColors),
-      ...Object.keys(borderColors),
-      ...Object.keys(textColors),
-      ...Object.keys(focusColors),
-    ]
-    expect(globalKeys.some((key) => /tab/i.test(key))).toBe(false)
-  })
-})
 
 let onDragEnd: ((event: unknown) => void) | undefined
 const sortableRefs = new Map<string | number, ReturnType<typeof vi.fn>>()
@@ -169,8 +120,9 @@ describe('WorkspaceTabs', () => {
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' })
   })
 
-  it('forwards navigation-intent events from the tab without including its close action', () => {
+  it('forwards tab events without including its close action', () => {
     const onBlur = vi.fn()
+    const onDoubleClick = vi.fn()
     const onFocus = vi.fn()
     const onPointerDown = vi.fn()
     const onPointerEnter = vi.fn()
@@ -184,6 +136,7 @@ describe('WorkspaceTabs', () => {
             closeLabel="Close All accounts"
             onBlur={onBlur}
             onClose={() => undefined}
+            onDoubleClick={onDoubleClick}
             onFocus={onFocus}
             onPointerDown={onPointerDown}
             onPointerEnter={onPointerEnter}
@@ -201,42 +154,22 @@ describe('WorkspaceTabs', () => {
     fireEvent.pointerDown(tab)
     fireEvent.pointerLeave(tab)
     fireEvent.blur(tab)
+    fireEvent.doubleClick(tab)
 
     expect(onPointerEnter).toHaveBeenCalledOnce()
     expect(onFocus).toHaveBeenCalledOnce()
     expect(onPointerDown).toHaveBeenCalledOnce()
     expect(onPointerLeave).toHaveBeenCalledOnce()
     expect(onBlur).toHaveBeenCalledOnce()
+    expect(onDoubleClick).toHaveBeenCalledOnce()
 
     const closeButton = screen.getByRole('button', { name: 'Close All accounts' })
     fireEvent.pointerEnter(closeButton)
     fireEvent.focus(closeButton)
+    fireEvent.doubleClick(closeButton)
 
     expect(onPointerEnter).toHaveBeenCalledOnce()
     expect(onFocus).toHaveBeenCalledOnce()
-  })
-
-  it('forwards double click from the tab without including its close action', () => {
-    const onDoubleClick = vi.fn()
-
-    render(
-      <WorkspaceTabs.Root defaultValue="all">
-        <WorkspaceTabs.List aria-label="Table views">
-          <WorkspaceTabs.Tab
-            value="all"
-            closeLabel="Close All accounts"
-            onClose={() => undefined}
-            onDoubleClick={onDoubleClick}
-          >
-            All accounts
-          </WorkspaceTabs.Tab>
-        </WorkspaceTabs.List>
-      </WorkspaceTabs.Root>,
-    )
-
-    fireEvent.doubleClick(screen.getByRole('tab', { name: 'All accounts' }))
-    fireEvent.doubleClick(screen.getByRole('button', { name: 'Close All accounts' }))
-
     expect(onDoubleClick).toHaveBeenCalledOnce()
   })
 
@@ -272,7 +205,7 @@ describe('WorkspaceTabs', () => {
     expect(onKeepOpen).toHaveBeenCalledOnce()
   })
 
-  it('marks replaceable tab title presentation without changing its accessible name', () => {
+  it('marks replaceable tabs without changing their accessible name', () => {
     render(
       <WorkspaceTabs.Root defaultValue="active">
         <WorkspaceTabs.List aria-label="Table views">
@@ -286,9 +219,6 @@ describe('WorkspaceTabs', () => {
     const tab = screen.getByRole('tab', { name: 'Active accounts' })
     expect(tab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-retention')).toBe(
       'replaceable',
-    )
-    expect(tab.querySelector('[data-slot="workspace-tabs-title"]')?.className).toContain(
-      stylex.props(workspaceTabsStyles.titleReplaceable).className,
     )
   })
 
@@ -408,8 +338,6 @@ describe('WorkspaceTabs', () => {
     expect(
       activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
     ).toBeNull()
-    expect(screen.getByText('All account rows').hasAttribute('hidden')).toBe(false)
-    expect(screen.getByText('Active account rows').hasAttribute('hidden')).toBe(true)
 
     act(() => {
       onDragEnd?.({
@@ -427,7 +355,6 @@ describe('WorkspaceTabs', () => {
     })
 
     expect(activeTab.getAttribute('aria-selected')).toBe('true')
-    expect(screen.getByText('Active account rows').hasAttribute('hidden')).toBe(false)
   })
 
   it('preserves the active view when a drag is canceled', async () => {
@@ -453,8 +380,6 @@ describe('WorkspaceTabs', () => {
     expect(
       activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
     ).toBeNull()
-    expect(screen.getByText('All account rows').hasAttribute('hidden')).toBe(false)
-    expect(screen.getByText('Active account rows').hasAttribute('hidden')).toBe(true)
 
     act(() => {
       onDragEnd?.({
@@ -477,8 +402,6 @@ describe('WorkspaceTabs', () => {
     expect(
       activeTab.closest('[data-slot="workspace-tabs-item"]')?.getAttribute('data-active'),
     ).toBeNull()
-    expect(screen.getByText('All account rows').hasAttribute('hidden')).toBe(false)
-    expect(screen.getByText('Active account rows').hasAttribute('hidden')).toBe(true)
   })
 
   it('activates an inactive view immediately when it is clicked without dragging', async () => {
@@ -575,6 +498,7 @@ describe('WorkspaceTabs', () => {
   it.each([
     { key: 'F10', shiftKey: true },
     { key: 'ContextMenu', shiftKey: false },
+    { key: 'Enter', shiftKey: false },
   ])('opens reorder actions from the focused tab with $key', async ({ key, shiftKey }) => {
     render(
       <WorkspaceTabs.Root defaultValue="active">
@@ -599,14 +523,28 @@ describe('WorkspaceTabs', () => {
       ).toBeTruthy()
     })
     const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
+    vi.spyOn(activeTab, 'getBoundingClientRect').mockReturnValue({
+      bottom: 76,
+      height: 26,
+      left: 100,
+      right: 180,
+      top: 50,
+      width: 80,
+      x: 100,
+      y: 50,
+      toJSON: () => undefined,
+    })
     const onContextMenu = vi.fn()
     activeTab.addEventListener('contextmenu', onContextMenu)
     activeTab.focus()
     fireEvent.keyDown(activeTab, { key, shiftKey })
 
-    await waitFor(() => {
-      expect(onContextMenu).toHaveBeenCalledOnce()
-    })
+    expect(await screen.findByRole('menu', { name: 'Reorder Active accounts' })).toBeTruthy()
+    expect(onContextMenu).toHaveBeenCalledOnce()
+
+    if (key === 'Enter') {
+      expect(onContextMenu.mock.calls[0]?.[0]).toMatchObject({ clientX: 100, clientY: 76 })
+    }
   })
 
   it('supports keyboard reordering before pointer drag behavior loads', () => {
@@ -702,28 +640,6 @@ describe('WorkspaceTabs', () => {
     expect(screen.getByRole('menuitem', { name: 'Move right' }).hasAttribute('aria-disabled')).toBe(
       false,
     )
-  })
-
-  it('switches the active view and its associated panel', () => {
-    render(
-      <WorkspaceTabs.Root defaultValue="all">
-        <WorkspaceTabs.List aria-label="Table views">
-          <WorkspaceTabs.Tab value="all">All accounts</WorkspaceTabs.Tab>
-          <WorkspaceTabs.Tab value="active">Active accounts</WorkspaceTabs.Tab>
-        </WorkspaceTabs.List>
-        <WorkspaceTabs.Panel value="all">All account rows</WorkspaceTabs.Panel>
-        <WorkspaceTabs.Panel value="active">Active account rows</WorkspaceTabs.Panel>
-      </WorkspaceTabs.Root>,
-    )
-
-    fireEvent.click(screen.getByRole('tab', { name: 'Active accounts' }))
-
-    expect(screen.getByRole('tab', { name: 'Active accounts' }).getAttribute('data-active')).toBe(
-      '',
-    )
-    expect(screen.getByRole('tabpanel').tabIndex).toBe(-1)
-    expect(screen.getByText('Active account rows')).toBeTruthy()
-    expect(screen.queryByText('All account rows')).toBeNull()
   })
 
   it('keeps Base and Inspector active state aligned when a value change is canceled', () => {
@@ -844,56 +760,11 @@ describe('WorkspaceTabs', () => {
     activeTab.focus()
 
     expect(activeTab.getAttribute('aria-selected')).toBe('false')
-    expect(screen.getByText('All account rows')).toBeTruthy()
-    expect(screen.queryByText('Active account rows')).toBeNull()
 
     fireEvent.keyDown(allTab, { key: 'ArrowRight' })
 
     expect(document.activeElement).toBe(activeTab)
     expect(activeTab.getAttribute('aria-selected')).toBe('false')
-  })
-
-  it('opens reorder actions with Enter on a focused tab', async () => {
-    render(
-      <WorkspaceTabs.Root defaultValue="active">
-        <WorkspaceTabs.List
-          aria-label="Table views"
-          values={['all', 'active']}
-          onReorder={() => undefined}
-        >
-          <WorkspaceTabs.Tab value="all" reorderLabel="Reorder All accounts">
-            All accounts
-          </WorkspaceTabs.Tab>
-          <WorkspaceTabs.Tab value="active" reorderLabel="Reorder Active accounts">
-            Active accounts
-          </WorkspaceTabs.Tab>
-        </WorkspaceTabs.List>
-      </WorkspaceTabs.Root>,
-    )
-
-    const activeTab = screen.getByRole('tab', { name: 'Active accounts' })
-    vi.spyOn(activeTab, 'getBoundingClientRect').mockReturnValue({
-      bottom: 76,
-      height: 26,
-      left: 100,
-      right: 180,
-      top: 50,
-      width: 80,
-      x: 100,
-      y: 50,
-      toJSON: () => undefined,
-    })
-    const onContextMenu = vi.fn()
-    activeTab.addEventListener('contextmenu', onContextMenu)
-    activeTab.focus()
-    fireEvent.keyDown(activeTab, { key: 'Enter' })
-
-    expect(await screen.findByRole('menu', { name: 'Reorder Active accounts' })).toBeTruthy()
-    expect(onContextMenu).toHaveBeenCalledOnce()
-    expect(onContextMenu.mock.calls[0]?.[0]).toMatchObject({
-      clientX: 100,
-      clientY: 76,
-    })
   })
 
   it('describes the close action with a tooltip', async () => {
@@ -968,11 +839,8 @@ describe('WorkspaceTabs', () => {
     )
 
     const archivedTab = screen.getByRole('tab', { name: 'Archived accounts' })
-    fireEvent.click(archivedTab)
     fireEvent.keyDown(archivedTab, { key: 'Delete' })
 
-    expect(archivedTab.getAttribute('data-disabled')).toBe('')
-    expect(archivedTab.getAttribute('data-active')).toBeNull()
     expect(closeCount).toBe(0)
   })
 
@@ -1000,7 +868,6 @@ describe('WorkspaceTabs', () => {
     })
     const closableItem = closableTab.closest('[data-slot="workspace-tabs-item"]')
 
-    expect(closableItem?.hasAttribute('data-closable')).toBe(false)
     expect(closableTab.querySelector('[data-slot="workspace-tabs-title"]')?.textContent).toBe(
       'Active accounts sorted by creation date',
     )
@@ -1008,16 +875,9 @@ describe('WorkspaceTabs', () => {
     const closeContainer = closableItem?.lastElementChild
     expect(closeContainer?.getAttribute('data-slot')).toBe('workspace-tabs-close')
     expect(
-      closeContainer?.querySelector('[data-slot="button"]')?.getAttribute('data-variant'),
-    ).toBe('ghost')
-    expect(
       closeContainer === undefined ||
         closeContainer === null ||
         closableTab.contains(closeContainer),
     ).toBe(false)
-    expect(closableTab.className).toContain(stylex.props(workspaceTabsStyles.tabClosable).className)
-    expect(closableItem?.className).toContain(
-      stylex.props(workspaceTabsStyles.itemClosable).className,
-    )
   })
 })

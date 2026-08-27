@@ -12,6 +12,7 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 - [Public contract](#public-contract)
 - [StyleX workflow](#stylex-workflow)
 - [Compound components](#compound-components)
+- [Component tests](#component-tests)
 - [Specialized recipes](#specialized-recipes)
 - [Validation](#validation)
 
@@ -71,6 +72,14 @@ For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nest
 - Export part props needed by consumers.
 - Prefer separate semantic parts such as `Item` and `LinkItem` over unconstrained polymorphism.
 - Add extractor support and tests if the public export shape is not a function declaration.
+
+## Component tests
+
+- Follow [testingMatrix.md](references/testingMatrix.md) before adding or retaining a component test.
+- Test Inspector-owned behavior and integration boundaries, not behavior already owned by Base UI, React, the browser, or another dependency.
+- Keep one assembly smoke test when wrapper wiring could break an upstream contract. Do not reproduce the dependency's state, keyboard, focus, dismissal, or ARIA matrix.
+- Consolidate tests that reach the same production branch. Delete assertions that only mirror StyleX classes, SVG paths, static lookup records, forwarded native props, or TypeScript inference.
+- Every retained test must fail for a specific Inspector regression at an identified production branch.
 
 ## Specialized recipes
 

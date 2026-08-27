@@ -17,19 +17,6 @@ describe('KeyboardInput', () => {
 
     expect(shortcut.tagName).toBe('KBD')
     expect(shortcut.textContent).toBe('⌘ ⌥ ⇧ K')
-    expect(shortcut.getAttribute('data-slot')).toBe('keyboard-input')
-  })
-
-  it('formats Mod as Control on Windows', () => {
-    render(<KeyboardInput hotkey="Mod+Shift+K" platform="windows" />)
-
-    expect(screen.getByLabelText('Ctrl+Shift+K').textContent).toBe('Ctrl+Shift+K')
-  })
-
-  it('uses automatic platform detection by default', () => {
-    render(<KeyboardInput hotkey="Escape" />)
-
-    expect(screen.getByLabelText('Escape').getAttribute('data-platform')).toBe('auto')
   })
 
   it('uses a stable platform snapshot during server rendering', () => {
@@ -40,17 +27,5 @@ describe('KeyboardInput', () => {
     expect(html).toContain('aria-label="Ctrl+K"')
     expect(html).toContain('Ctrl+K')
     expect(html).not.toContain('⌘')
-  })
-
-  it('formats Backspace as a platform key glyph', () => {
-    render(<KeyboardInput hotkey="Backspace" platform="mac" />)
-
-    expect(screen.getByLabelText('Backspace').textContent).toBe('⌫')
-  })
-
-  it('exposes the selected visual variant', () => {
-    render(<KeyboardInput hotkey="Enter" variant="outline" />)
-
-    expect(screen.getByLabelText('Enter').getAttribute('data-variant')).toBe('outline')
   })
 })

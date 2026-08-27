@@ -33,15 +33,12 @@ afterEach(() => {
 })
 
 describe('ResizablePanel', () => {
-  it('opens collapsible panels at 200 pixels by default', () => {
-    render(<ResizablePanel collapsible />)
+  it.each([
+    { collapsible: true, defaultSize: 200, name: 'collapsible' },
+    { collapsible: false, defaultSize: undefined, name: 'non-collapsible' },
+  ])('projects the $name panel default size', ({ collapsible, defaultSize }) => {
+    render(<ResizablePanel collapsible={collapsible} />)
 
-    expect(upstream.defaultSize).toBe(200)
-  })
-
-  it('leaves non-collapsible panel sizing to the group', () => {
-    render(<ResizablePanel />)
-
-    expect(upstream.defaultSize).toBeUndefined()
+    expect(upstream.defaultSize).toBe(defaultSize)
   })
 })

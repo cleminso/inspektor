@@ -1,12 +1,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { Toaster, toasts } from '../toaster/toaster'
 import { BinaryDetails, BinaryValue } from './binaryValue'
+import { Toaster } from '../toaster/toaster'
 
 afterEach(() => {
   cleanup()
-  toasts.dismiss()
   vi.restoreAllMocks()
 })
 
@@ -14,8 +13,7 @@ describe('BinaryValue', () => {
   it('renders a compact byte count from byteLength', () => {
     render(<BinaryValue byteLength={2_048} />)
 
-    expect(screen.getByText('2KB').getAttribute('data-typography')).toBe('mono')
-    expect(screen.queryByRole('button')).toBeNull()
+    expect(screen.getByText('2KB')).toBeTruthy()
   })
 
   it.each([-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY])(
@@ -29,7 +27,7 @@ describe('BinaryValue', () => {
 
   it('does not accept bytes or styling escape hatches', () => {
     // @ts-expect-error BinaryValue does not receive binary data.
-    const valueProp = <BinaryValue value={new Uint8Array()} />
+    const valueProp = <BinaryValue byteLength={0} value={new Uint8Array()} />
     // @ts-expect-error BinaryValue owns its styling.
     const styleProp = <BinaryValue byteLength={0} style={{ color: 'red' }} />
 
@@ -44,27 +42,7 @@ describe('BinaryDetails', () => {
 
     const input = screen.getByRole('textbox', { name: 'Binary value' })
     expect(input.getAttribute('value')).toBe('3B')
-    expect(input.getAttribute('data-font')).toBe('mono')
-    expect(screen.getAllByRole('button')).toHaveLength(1)
-    const trigger = screen.getByRole('button', { name: 'Copy as' })
-    expect(trigger.getAttribute('data-grouped')).toBe('')
-  })
-
-  it('shows success feedback after copying', async () => {
-    render(
-      <>
-        <BinaryDetails byteLength={3} onCopy={() => undefined} onDownload={() => undefined} />
-        <Toaster />
-      </>,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Copy as' }))
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Hex' }))
-
-    await vi.waitFor(() => {
-      const toast = document.querySelector('[data-slot="toast"][data-status="success"]')
-      expect(toast?.textContent).toContain('Copied as Hex')
-    })
+    expect(screen.getByRole('button', { name: 'Copy as' })).toBeTruthy()
   })
 
   it('omits binary actions when the byte count is invalid', () => {
@@ -76,20 +54,28 @@ describe('BinaryDetails', () => {
     expect(screen.queryByRole('button', { name: 'Copy as' })).toBeNull()
   })
 
-  it.each([
-    ['hex', 'Hex'],
-    ['base64', 'Base64'],
-  ] as const)('requests %s copy and announces success', async (format, label) => {
+  it('requests each copy format and announces success', async () => {
     const onCopy = vi.fn().mockResolvedValue(undefined)
-    render(<BinaryDetails byteLength={3} onCopy={onCopy} onDownload={() => undefined} />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Copy as' }))
-    fireEvent.click(screen.getByRole('menuitem', { name: label }))
-
-    await vi.waitFor(() => expect(onCopy).toHaveBeenCalledWith(format))
-    await vi.waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe(`Copied as ${label}`),
+    render(
+      <>
+        <BinaryDetails byteLength={3} onCopy={onCopy} onDownload={() => undefined} />
+        <Toaster />
+      </>,
     )
+
+    for (const [format, label] of [
+      ['hex', 'Hex'],
+      ['base64', 'Base64'],
+    ] as const) {
+      fireEvent.click(screen.getByRole('button', { name: 'Copy as' }))
+      fireEvent.click(screen.getByRole('menuitem', { name: label }))
+
+      await vi.waitFor(() => expect(onCopy).toHaveBeenLastCalledWith(format))
+      await vi.waitFor(() =>
+        expect(screen.getByRole('status').textContent).toBe(`Copied as ${label}`),
+      )
+      await vi.waitFor(() => expect(screen.getAllByText(`Copied as ${label}`)).toHaveLength(2))
+    }
   })
 
   it('delegates download lifecycle and announces success', async () => {

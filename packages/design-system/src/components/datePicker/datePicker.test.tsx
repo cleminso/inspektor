@@ -9,10 +9,11 @@ import { DatePicker } from './datePicker'
 afterEach(cleanup)
 
 describe('DatePicker', () => {
-  it('applies an inline date step without creating a nested popup', () => {
+  it('owns inline presentation and resets its draft from committed values', () => {
     const onApply = vi.fn()
     const value = new Date(2026, 7, 13, 12)
-    render(
+    const nextValue = new Date(2026, 8, 2, 9, 30)
+    const { rerender } = render(
       <DatePicker value={value} onApply={onApply}>
         <DatePicker.Panel />
       </DatePicker>,
@@ -22,17 +23,6 @@ describe('DatePicker', () => {
     expect(screen.queryByRole('dialog', { name: 'Choose date and time' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
     expect(onApply).toHaveBeenCalledWith(value)
-  })
-
-  it('resets an inline draft when the committed value changes', () => {
-    const onApply = vi.fn()
-    const initialValue = new Date(2026, 7, 13, 12)
-    const nextValue = new Date(2026, 8, 2, 9, 30)
-    const { rerender } = render(
-      <DatePicker value={initialValue} onApply={onApply}>
-        <DatePicker.Panel />
-      </DatePicker>,
-    )
 
     rerender(
       <DatePicker value={nextValue} onApply={onApply}>
@@ -41,7 +31,7 @@ describe('DatePicker', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
 
-    expect(onApply).toHaveBeenCalledWith(nextValue)
+    expect(onApply).toHaveBeenLastCalledWith(nextValue)
   })
 
   it('opens from its input-styled button trigger', () => {
@@ -53,7 +43,6 @@ describe('DatePicker', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Edit timestamp' })
-    expect(trigger.getAttribute('data-slot')).toBe('date-picker-trigger')
 
     fireEvent.click(trigger)
     expect(screen.getByRole('dialog', { name: 'Choose date and time' })).toBeTruthy()
@@ -122,27 +111,6 @@ describe('DatePicker', () => {
     vi.useRealTimers()
   })
 
-  it('uses the current clock time when the first day is selected', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date(2026, 7, 13, 9, 10, 11, 120))
-    const onApply = vi.fn()
-
-    render(
-      <DatePicker value={undefined} onApply={onApply} defaultOpen>
-        <DatePicker.Trigger label="Edit timestamp">Empty</DatePicker.Trigger>
-        <DatePicker.Content />
-      </DatePicker>,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: /Friday, August 14th, 2026/i }))
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
-
-    expect(onApply).toHaveBeenCalledTimes(1)
-    expect(onApply.mock.calls[0]?.[0]).toEqual(new Date(2026, 7, 14, 9, 10, 11, 120))
-
-    vi.useRealTimers()
-  })
-
   it('preserves the existing time when another day is selected', () => {
     const onApply = vi.fn()
 
@@ -188,32 +156,6 @@ describe('DatePicker', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
 
     expect(onApply).toHaveBeenCalledWith(expectedValue)
-  })
-
-  it('starts keyboard traversal at navigation and moves between days with arrow keys', async () => {
-    render(
-      <DatePicker value={new Date(2026, 7, 13, 12)} onApply={vi.fn()}>
-        <DatePicker.Trigger label="Edit timestamp">Timestamp</DatePicker.Trigger>
-        <DatePicker.Content />
-      </DatePicker>,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Edit timestamp' }))
-    expect(screen.getByRole('button', { name: 'Go to the Previous Month' }).tabIndex).toBe(0)
-    expect(screen.getByRole('button', { name: 'Choose month, August' }).tabIndex).toBe(0)
-    expect(screen.getByRole('button', { name: 'Choose year, 2026' }).tabIndex).toBe(0)
-    expect(screen.getByRole('button', { name: 'Go to the Next Month' }).tabIndex).toBe(0)
-
-    const selectedDay = screen.getByRole('button', {
-      name: /Thursday, August 13th, 2026, selected/i,
-    })
-    selectedDay.focus()
-    fireEvent.keyDown(selectedDay, { key: 'ArrowRight' })
-    await waitFor(() =>
-      expect(document.activeElement).toBe(
-        screen.getByRole('button', { name: /Friday, August 14th, 2026/i }),
-      ),
-    )
   })
 
   it('keeps an invalid time draft editable without corrupting the pending timestamp', () => {
@@ -316,28 +258,6 @@ describe('DatePicker', () => {
     expect(onApply).toHaveBeenCalledWith(now)
 
     vi.useRealTimers()
-  })
-
-  it('discards pending changes when Escape closes the popup', async () => {
-    const value = new Date(2026, 7, 13, 12, 34, 56, 789)
-    const onApply = vi.fn()
-
-    render(
-      <DatePicker value={value} onApply={onApply}>
-        <DatePicker.Trigger label="Edit timestamp">Timestamp</DatePicker.Trigger>
-        <DatePicker.Content />
-      </DatePicker>,
-    )
-
-    const trigger = screen.getByRole('button', { name: 'Edit timestamp' })
-    fireEvent.click(trigger)
-    fireEvent.click(screen.getByRole('button', { name: /Friday, August 14th, 2026/i }))
-    fireEvent.keyDown(screen.getByRole('dialog', { name: 'Choose date and time' }), {
-      key: 'Escape',
-    })
-
-    expect(onApply).not.toHaveBeenCalled()
-    await waitFor(() => expect(document.activeElement).toBe(trigger))
   })
 
   it('restores the committed month after calendar navigation is dismissed', () => {

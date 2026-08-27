@@ -88,8 +88,13 @@ describe('StructuredValuePreview', () => {
   })
 
   it('rejects raw data and styling escape hatches', () => {
-    // @ts-expect-error StructuredValuePreview accepts only normalized models.
-    const dataProp = <StructuredValuePreview data={{ secret: 'value' }} />
+    const dataProp = (
+      <StructuredValuePreview
+        // @ts-expect-error StructuredValuePreview accepts only normalized models.
+        data={{ secret: 'value' }}
+        model={{ kind: 'scalar', label: 'null', continuation: 'complete' }}
+      />
+    )
     const classNameProp = (
       <StructuredValuePreview
         // @ts-expect-error StructuredValuePreview owns its presentation.

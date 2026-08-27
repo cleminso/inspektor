@@ -1,18 +1,12 @@
 import { cleanup, render } from '@testing-library/react'
-import * as stylex from '@stylexjs/stylex'
 import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { Icon } from './icon'
-import { iconStyles } from './icon.styles'
 
 const TestArtwork = forwardRef<SVGSVGElement, ComponentPropsWithoutRef<'svg'>>(
   function TestArtwork(props, ref) {
-    return (
-      <svg {...props} ref={ref} viewBox="0 0 16 16">
-        <path d="m3 8 3 3 7-7" />
-      </svg>
-    )
+    return <svg {...props} ref={ref} viewBox="0 0 16 16" />
   },
 )
 
@@ -23,51 +17,21 @@ function PlainArtwork(props: ComponentPropsWithoutRef<'svg'>) {
 afterEach(cleanup)
 
 describe('Icon', () => {
-  it('renders imported SVG artwork with decorative semantics', () => {
-    render(<Icon artwork={TestArtwork} size="xs" />)
+  it('owns decorative semantics and the default semantic size', () => {
+    const props = {
+      artwork: TestArtwork,
+      'aria-label': 'Completed',
+      role: 'img',
+    }
+    render(<Icon {...props} />)
 
-    const icon = document.querySelector('[data-slot="icon"]')
+    const icon = document.querySelector('svg')
 
-    expect(icon?.tagName.toLowerCase()).toBe('svg')
     expect(icon?.getAttribute('aria-hidden')).toBe('true')
     expect(icon?.getAttribute('focusable')).toBe('false')
-    expect(icon?.getAttribute('data-size')).toBe('xs')
-  })
-
-  it('uses the semantic small size by default', () => {
-    render(<Icon artwork={TestArtwork} />)
-
-    expect(document.querySelector('[data-slot="icon"]')?.getAttribute('data-size')).toBe('s')
-  })
-
-  it('maps every semantic size to its design-system style', () => {
-    const sizes = [
-      ['xs', iconStyles.xs],
-      ['s', iconStyles.s],
-      ['m', iconStyles.m],
-    ] as const
-
-    for (const [size, expectedStyle] of sizes) {
-      const { unmount } = render(<Icon artwork={TestArtwork} size={size} />)
-      const icon = document.querySelector('[data-slot="icon"]')
-      const expectedClassName = stylex.props(expectedStyle).className
-
-      expect(expectedClassName).toBeDefined()
-      if (expectedClassName !== undefined) {
-        for (const className of expectedClassName.split(' ')) {
-          expect(icon?.classList.contains(className)).toBe(true)
-        }
-      }
-      unmount()
-    }
-  })
-
-  it('forwards a ref to the rendered SVG', () => {
-    const ref = { current: null as SVGSVGElement | null }
-
-    render(<Icon artwork={TestArtwork} ref={ref} />)
-
-    expect(ref.current?.tagName.toLowerCase()).toBe('svg')
+    expect(icon?.getAttribute('data-size')).toBe('s')
+    expect(icon?.getAttribute('aria-label')).toBeNull()
+    expect(icon?.getAttribute('role')).toBeNull()
   })
 
   it('accepts an SVG component rather than configured artwork or a render callback', () => {
@@ -100,20 +64,5 @@ describe('Icon', () => {
     expect(style).toBeDefined()
     expect(width).toBeDefined()
     expect(stroke).toBeDefined()
-  })
-
-  it('does not forward unsupported accessibility attributes', () => {
-    const props = {
-      artwork: TestArtwork,
-      'aria-label': 'Completed',
-      role: 'img',
-    }
-
-    render(<Icon {...props} />)
-
-    const icon = document.querySelector('[data-slot="icon"]')
-    expect(icon?.getAttribute('aria-hidden')).toBe('true')
-    expect(icon?.getAttribute('aria-label')).toBeNull()
-    expect(icon?.getAttribute('role')).toBeNull()
   })
 })
