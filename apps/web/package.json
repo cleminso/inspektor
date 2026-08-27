@@ -11,9 +11,11 @@
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
+    "test:jsdom": "vitest run --project jsdom",
+    "test:node": "vitest run --project node",
     "test:browser": "playwright test",
     "test:browser:install": "playwright install chromium",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.e2e.json --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.e2e.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@fontsource-variable/geist": "catalog:",

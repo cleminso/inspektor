@@ -30,10 +30,12 @@ function deferred<T>() {
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('useInspectorRuntime', () => {
   it('reruns runtime metadata when the retry generation changes', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     const schemaError = new Error('Failed once')
     jazzMocks.fetchStoredWasmSchema
       .mockRejectedValueOnce(schemaError)
@@ -61,6 +63,10 @@ describe('useInspectorRuntime', () => {
 
     await waitFor(() =>
       expect(result.current.$error.get()).toEqual({ source: 'schema', error: schemaError }),
+    )
+    expect(consoleError).toHaveBeenCalledWith(
+      'Inspector runtime failure',
+      expect.objectContaining({ source: 'schema' }),
     )
 
     const failedRuntime = result.current

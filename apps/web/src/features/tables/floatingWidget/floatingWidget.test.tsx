@@ -305,11 +305,11 @@ describe('TableMutationWidget', () => {
   })
 
   it('renders large operation reviews in bounded batches', () => {
-    renderReview(120)
+    renderReview(102)
 
     const lastInitialRow = screen.getByRole('button', { name: 'Undo: row-52' }).closest('li')
     expect(lastInitialRow?.getAttribute('aria-posinset')).toBe('50')
-    expect(lastInitialRow?.getAttribute('aria-setsize')).toBe('119')
+    expect(lastInitialRow?.getAttribute('aria-setsize')).toBe('101')
     expect(screen.queryByRole('button', { name: 'Undo: row-53' })).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: 'Show more deleted row operations' }))

@@ -1,7 +1,7 @@
 import stylex from '@stylexjs/unplugin'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 const PORT = Number.parseInt(process.env.PORT ?? '1356', 10)
 // Avoid running the StyleX transform hook for every dependency module in the documentation build.

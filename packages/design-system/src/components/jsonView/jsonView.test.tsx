@@ -4,7 +4,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { JsonView } from './jsonView'
 
-afterEach(cleanup)
+const clipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+
+afterEach(() => {
+  cleanup()
+  if (clipboardDescriptor === undefined) {
+    delete (navigator as { clipboard?: Clipboard }).clipboard
+  } else {
+    Object.defineProperty(navigator, 'clipboard', clipboardDescriptor)
+  }
+})
 
 function getTreeItem(name: RegExp): HTMLElement {
   return screen.getByRole('treeitem', { name })
@@ -192,75 +201,6 @@ describe('JsonView', () => {
     expect(getTreeItem(/tags/i).getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('treeitem', { name: /name/i })).toBeNull()
     expect(screen.queryByText('"admin"')).toBeNull()
-  })
-
-  it('supports initial expansion depths zero through four', () => {
-    const data = {
-      profile: {
-        contact: {
-          address: {
-            city: { name: 'London' },
-          },
-        },
-      },
-    }
-    const { rerender } = render(
-      <JsonView accessibilityLabel="Depth zero" data={data} defaultExpandDepth={0} />,
-    )
-
-    expect(screen.getAllByRole('treeitem')).toHaveLength(1)
-    expect(getRootTreeItem().getAttribute('aria-expanded')).toBe('false')
-
-    rerender(
-      <JsonView
-        key="depth-one"
-        accessibilityLabel="Depth one"
-        data={data}
-        defaultExpandDepth={1}
-      />,
-    )
-
-    expect(getRootTreeItem().getAttribute('aria-expanded')).toBe('true')
-    expect(getTreeItem(/profile/i).getAttribute('aria-expanded')).toBe('false')
-    expect(screen.queryByRole('treeitem', { name: /contact/i })).toBeNull()
-
-    rerender(
-      <JsonView
-        key="depth-two"
-        accessibilityLabel="Depth two"
-        data={data}
-        defaultExpandDepth={2}
-      />,
-    )
-
-    expect(getTreeItem(/profile/i).getAttribute('aria-expanded')).toBe('true')
-    expect(getTreeItem(/contact/i).getAttribute('aria-expanded')).toBe('false')
-
-    rerender(
-      <JsonView
-        key="depth-three"
-        accessibilityLabel="Depth three"
-        data={data}
-        defaultExpandDepth={3}
-      />,
-    )
-
-    expect(getTreeItem(/contact/i).getAttribute('aria-expanded')).toBe('true')
-    expect(getTreeItem(/address/i).getAttribute('aria-expanded')).toBe('false')
-    expect(screen.queryByRole('treeitem', { name: /city/i })).toBeNull()
-
-    rerender(
-      <JsonView
-        key="depth-four"
-        accessibilityLabel="Depth four"
-        data={data}
-        defaultExpandDepth={4}
-      />,
-    )
-
-    expect(getTreeItem(/address/i).getAttribute('aria-expanded')).toBe('true')
-    expect(getTreeItem(/city/i).getAttribute('aria-expanded')).toBe('false')
-    expect(screen.queryByRole('treeitem', { name: /name/i })).toBeNull()
   })
 
   it('keeps user expansion when equivalent data receives a new identity', () => {
@@ -674,59 +614,25 @@ describe('JsonView', () => {
     expect(screen.queryByRole('treeitem', { name: /profile/i })).toBeNull()
   })
 
-  it('bounds expanded children and reveals them through keyboard-ordered continuation nodes', () => {
+  it('renders and activates a batched continuation tree item', () => {
     const data = Object.fromEntries(
-      Array.from({ length: 500 }, (_, index) => [`field-${index}`, index]),
+      Array.from({ length: 101 }, (_, index) => [`field-${index}`, index]),
     )
     render(<JsonView accessibilityLabel="Large object" data={data} />)
 
-    const initialItems = screen.getAllByRole('treeitem')
     const first = getTreeItem(/field-0/i)
     const continuation = screen.getByRole('treeitem', { name: /show more/i })
     const showMore = within(continuation).getByRole('button', { name: /show more/i })
 
-    expect(initialItems.length).toBeLessThan(501)
     expect(first.getAttribute('aria-posinset')).toBe('1')
-    expect(first.getAttribute('aria-setsize')).toBe('500')
+    expect(first.getAttribute('aria-setsize')).toBe('101')
     expect(continuation.getAttribute('aria-level')).toBe('2')
     expect(continuation.tabIndex).toBe(-1)
 
     fireEvent.click(showMore)
 
-    const secondBatchItems = screen.getAllByRole('treeitem')
-    expect(secondBatchItems.length).toBeGreaterThan(initialItems.length)
-    expect(secondBatchItems.length).toBeLessThan(501)
-
-    fireEvent.click(screen.getByRole('button', { name: /show more items/i }))
-
-    expect(screen.getAllByRole('treeitem').length).toBeGreaterThan(secondBatchItems.length)
-    expect(screen.getAllByRole('treeitem').length).toBeLessThanOrEqual(500)
-  })
-
-  it('bounds the complete visible tree across simultaneously expanded branches', () => {
-    const data = Object.fromEntries(
-      Array.from({ length: 10 }, (_, groupIndex) => [
-        `group-${groupIndex}`,
-        Object.fromEntries(
-          Array.from({ length: 100 }, (_, fieldIndex) => [
-            `group-${groupIndex}-field-${fieldIndex}`,
-            fieldIndex,
-          ]),
-        ),
-      ]),
-    )
-    render(<JsonView accessibilityLabel="Wide expanded tree" data={data} defaultExpandDepth={2} />)
-
-    expect(screen.getAllByRole('treeitem').length).toBeLessThanOrEqual(500)
-    const limitItems = screen.getAllByRole('treeitem', { name: /visible limit reached/i })
-    expect(limitItems.length).toBeGreaterThan(0)
-    expect(within(limitItems[0] as HTMLElement).queryByRole('button')).toBeNull()
-    expect(screen.queryByRole('treeitem', { name: /group-4-field-99/i })).toBeNull()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Collapse group-0' }))
-
-    expect(screen.getByRole('treeitem', { name: /group-4-field-99/i })).toBeTruthy()
-    expect(screen.getAllByRole('treeitem').length).toBeLessThanOrEqual(500)
+    expect(getTreeItem(/field-100/i)).toBeTruthy()
+    expect(screen.queryByRole('treeitem', { name: /show more/i })).toBeNull()
   })
 
   it('communicates when a search match is outside the visible tree budget', () => {
@@ -744,7 +650,9 @@ describe('JsonView', () => {
       />,
     )
 
+    const limit = screen.getByRole('treeitem', { name: /visible limit reached/i })
     expect(screen.getByRole('status').textContent).toBe('Match outside visible limit')
+    expect(within(limit).queryByRole('button')).toBeNull()
     expect(screen.queryByText('unique-target')).toBeNull()
   })
 

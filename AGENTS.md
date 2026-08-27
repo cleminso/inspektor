@@ -96,6 +96,15 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 
 - `pnpm dev` runs every workspace `dev` script.
 - `pnpm dev:web` starts the Inspector application.
+- Fast test feedback:
+  - `pnpm test:web:node` runs the web Node project.
+  - `pnpm test:web:jsdom` runs the isolated web jsdom project.
+  - `pnpm test:design-system:node` runs the design-system Node allowlist.
+  - `pnpm --filter @inspector/ds test:json-view` runs the focused JSON View tests.
+- Affected-package validation:
+  - `pnpm test:web` runs the complete Inspector package suite.
+  - `pnpm test:design-system` runs the complete design-system package suite.
+- Run `pnpm test` only when a change crosses package boundaries or requires complete workspace coverage.
 - Inspector application:
   - `pnpm --filter regarde.inspector dev`
   - `pnpm --filter regarde.inspector dev:vite`

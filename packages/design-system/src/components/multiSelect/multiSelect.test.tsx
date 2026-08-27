@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createRef, useState } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
@@ -40,8 +40,15 @@ describe('MultiSelect', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Choose large collection' }))
 
     const rows = container.ownerDocument.querySelectorAll('[data-slot="multi-select-row"]')
-    const firstCheckbox = screen.getByRole('checkbox', { name: 'Select Option 1' })
-    const lastCheckbox = screen.getByRole('checkbox', { name: 'Select Option 101' })
+    const firstRow = rows[0]
+    const lastRow = rows[100]
+
+    if (!(firstRow instanceof HTMLElement) || !(lastRow instanceof HTMLElement)) {
+      throw new Error('Expected the first and last multi-select rows')
+    }
+
+    const firstCheckbox = within(firstRow).getByRole('checkbox', { name: 'Select Option 1' })
+    const lastCheckbox = within(lastRow).getByRole('checkbox', { name: 'Select Option 101' })
 
     expect(rows).toHaveLength(101)
     expect(rows[0]?.getAttribute('data-rendering')).toBe('deferred')

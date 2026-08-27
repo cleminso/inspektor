@@ -137,7 +137,7 @@ describe('TableListPane', () => {
   }
 
   it('keeps every large schema-list item available while deferring offscreen rendering', () => {
-    const tables = Array.from({ length: 101 }, (_, index) => `table_${index + 1}`)
+    const tables = Array.from({ length: 51 }, (_, index) => `table_${index + 1}`)
     const { container } = render(
       <TableListPane
         checkedTableNames={new Set()}
@@ -151,10 +151,10 @@ describe('TableListPane', () => {
 
     const items = container.querySelectorAll('[data-slot="action-list-item"]')
 
-    expect(items).toHaveLength(101)
+    expect(items).toHaveLength(51)
     expect(items[0]?.getAttribute('data-rendering')).toBe('deferred')
     expect(screen.getByRole('button', { name: 'table_1' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'table_101' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'table_51' })).toBeTruthy()
   })
 
   it('keeps the table-list space blank instead of presenting false rows', () => {

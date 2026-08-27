@@ -319,7 +319,8 @@ describe('useTableViewState', () => {
     expect(result.current.activeFieldEditorRowValues).toEqual({ id: 'row-1', name: 'Ada' })
   })
 
-  it('routes relation fields to the complete-row pane', async () => {
+  it('routes relation fields to the complete-row pane', () => {
+    vi.useFakeTimers()
     tableColumns[1]!.column = {
       name: 'name',
       column_type: { type: 'Uuid' },
@@ -343,7 +344,7 @@ describe('useTableViewState', () => {
     expect(result.current.activeFieldEditorTarget).toBeNull()
     expect(result.current.rowEditor.activeRowId).toBe('row-1')
     expect(result.current.detailPaneMode).toBe('rows')
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    act(() => vi.advanceTimersToNextFrame())
     expect(focusRowEditorField).toHaveBeenCalledWith('name')
   })
 
@@ -706,7 +707,8 @@ describe('useTableViewState', () => {
     expect(header.hasAttribute('data-active')).toBe(false)
   })
 
-  it('focuses the matching row-editor field when its cell is selected', async () => {
+  it('focuses the matching row-editor field when its cell is selected', () => {
+    vi.useFakeTimers()
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
       result.current.table.getRow('row-1').toggleSelected(true)
@@ -722,9 +724,7 @@ describe('useTableViewState', () => {
       result.current.table.setFocusedCell('row-1', 'name')
       result.current.handleCellActivate({ columnId: 'name', rowId: 'row-1' })
     })
-    await act(async () => {
-      await new Promise((resolve) => requestAnimationFrame(resolve))
-    })
+    act(() => vi.advanceTimersToNextFrame())
 
     expect(document.activeElement).toBe(input)
     field.remove()

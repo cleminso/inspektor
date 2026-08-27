@@ -164,6 +164,7 @@ describe('InspectorProvider runtime projections', () => {
   })
 
   it('recovers the same client configuration through the runtime retry action', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     session.activeConnection = {
       id: 'connection-1',
       name: 'Local app',
@@ -187,6 +188,7 @@ describe('InspectorProvider runtime projections', () => {
       </InspectorProvider>,
     )
     await waitFor(() => expect(runtime.publishClientError).toHaveBeenCalledWith(clientError))
+    expect(consoleError).toHaveBeenCalled()
 
     jazzReactMocks.errors.delete('app-1:main:secret')
     fireEvent.click(screen.getByRole('button', { name: 'Retry runtime' }))

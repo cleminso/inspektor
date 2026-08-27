@@ -4205,7 +4205,7 @@
       "description": "Contextual label for the JSON tree.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 54
+        "line": 64
       }
     },
     {
@@ -4215,7 +4215,7 @@
       "description": "JSON-compatible object or array to inspect.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 56
+        "line": 66
       }
     },
     {
@@ -4226,7 +4226,7 @@
       "description": "Number of container levels expanded initially, or every level within the safe render budget.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 58
+        "line": 68
       }
     },
     {
@@ -4237,7 +4237,7 @@
       "description": "Whether to show the sticky copy action.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 60
+        "line": 70
       }
     },
     {
@@ -4247,7 +4247,7 @@
       "description": "Controls occurrence highlighting and active-match navigation.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 62
+        "line": 72
       }
     }
   ],

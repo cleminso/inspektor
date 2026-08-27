@@ -6,7 +6,10 @@ import { Button } from '../button/button'
 import { InputGroup } from '../inputGroup/inputGroup'
 import { DatePicker } from './datePicker'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.useRealTimers()
+})
 
 describe('DatePicker', () => {
   it('owns inline presentation and resets its draft from committed values', () => {
@@ -107,8 +110,6 @@ describe('DatePicker', () => {
     expect(screen.getByRole('button', { name: 'Apply' }).hasAttribute('disabled')).toBe(false)
     expect(screen.queryByRole('textbox', { name: 'Date' })).toBeNull()
     expect(screen.getByLabelText('Time').getAttribute('value')).toBe('09:10:11')
-
-    vi.useRealTimers()
   })
 
   it('preserves the existing time when another day is selected', () => {
@@ -256,8 +257,6 @@ describe('DatePicker', () => {
     expect(onApply).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
     expect(onApply).toHaveBeenCalledWith(now)
-
-    vi.useRealTimers()
   })
 
   it('restores the committed month after calendar navigation is dismissed', () => {

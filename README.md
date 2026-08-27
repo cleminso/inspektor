@@ -75,18 +75,8 @@ You can also clone your Jazz app into the `apps/` directory.
 
 6. Open the inspector link printed in your app's dev server logs.
 
-## Explication
+## Project documentation
 
-### UX questions & improvements
-
-I consider the current version as an MVP. There is severals missing pattern and to UI polish.
-
-Next:
-
-[ ] add a filter view inside `tableListPane` as a tree system. Users can apply filter tables and "save" several filtered view, while leaving the original view intact
-
-[ ] think about the UX for relations tables <> tables (custom cell + UX with view? navigation?)
-
-[ ] add a proper textarea component to support code syntax highlighting and formatting
-
-[ ] add hotkeys
+- [Architecture](./ARCHITECTURE.md)
+- [Frontend structure](./docs/frontendStructure.md)
+- [Implementation checklists](./docs/todo/)

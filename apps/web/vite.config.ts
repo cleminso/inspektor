@@ -2,11 +2,19 @@ import stylex from '@stylexjs/unplugin'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 // Explicitly use PORT from portless
 const PORT = parseInt(process.env.PORT || '5173')
 const designSystemSourceId = /\/packages\/design-system\/src\/.*\.[cm]?[jt]sx?(?:\?.*)?$/
+const jsdomTypeScriptTests = [
+  'src/app/storage/connectionScopedStorage.test.ts',
+  'src/features/tables/grid/useTablePreferences.test.ts',
+  'src/features/tables/tableList/pins.test.ts',
+  'src/features/tables/workspace/navigationHistory.test.ts',
+  'src/features/tables/workspace/tabs.test.ts',
+  'src/routes/-metadata.test.ts',
+]
 
 const createStylexPlugin = () => {
   const plugin = stylex.vite({
@@ -42,10 +50,12 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     mode === 'test' ? null : devtools(),
-    tanstackRouter({
-      target: 'react',
-      autoCodeSplitting: true,
-    }),
+    mode === 'test'
+      ? null
+      : tanstackRouter({
+          target: 'react',
+          autoCodeSplitting: true,
+        }),
     createStylexPlugin(),
     viteReact(),
   ],
@@ -65,8 +75,26 @@ export default defineConfig(({ mode }) => ({
     },
   },
   test: {
-    environment: 'jsdom',
     exclude: ['e2e/**', 'node_modules/**'],
-    setupFiles: ['./src/__test__/setup.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          environment: 'node',
+          include: ['src/**/*.test.ts'],
+          exclude: jsdomTypeScriptTests,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom',
+          environment: 'jsdom',
+          include: ['src/**/*.test.tsx', ...jsdomTypeScriptTests],
+          setupFiles: ['./src/__test__/setup.ts'],
+        },
+      },
+    ],
   },
 }))

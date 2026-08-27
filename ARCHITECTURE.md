@@ -185,7 +185,6 @@ This means the design-system TSDown build verifies artifact generation, while `a
 
 `apps/web` also uses:
 
-- `tailwindcss()` because the application has Tailwind processing in addition to the StyleX-based DS architecture.
 - `@tanstack/devtools-vite` outside test mode for router-development tooling.
 - a dynamic development-only StyleX runtime import.
 - `defaultPreload: "intent"`, which lets the router preload route work after a user shows intent to navigate. Preloading is not the same as making the route part of the HTML entry closure.
@@ -238,18 +237,18 @@ Insert and edit row forms remain outside the static table-view graph. Schema rea
 
 Dependencies are selected for a role and an owning layer, not simply because they are available in the workspace.
 
-| Dependency group      | Examples                                 | Owner and implications                                                          |
-| --------------------- | ---------------------------------------- | ------------------------------------------------------------------------------- |
-| React runtime         | `react`, `react-dom`                     | Applications provide the shared runtime; DS declares peers                      |
-| Component behavior    | `@base-ui/react`                         | DS wraps primitives to constrain APIs and preserve accessible behavior          |
-| Styling               | `@stylexjs/stylex`, `@stylexjs/unplugin` | DS styles are transformed by consuming Vite applications                        |
-| Product data runtime  | `jazz-tools`                             | Web application only; keep behind connection-required boundaries                |
-| Routing               | `@tanstack/react-router`, router plugin  | Web and documentation apps own their route trees                                |
-| Optional interactions | CodeMirror, DnD Kit                      | DS may own reusable integration, but imports must remain deferred when optional |
-| Product data display  | `@tanstack/react-table`                  | Used where product or DS table responsibilities require it                      |
-| Documentation         | Shiki, generated prop extraction tooling | Documentation app only; not a DS runtime concern                                |
-| Build output          | Vite, tsup, TypeScript                   | Vite builds applications; tsup emits package artifacts and declarations         |
-| Testing               | Vitest, Testing Library, JSDOM           | Verify component behavior, application behavior, and boundaries                 |
+| Dependency group      | Examples                                   | Owner and implications                                                                            |
+| --------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| React runtime         | `react`, `react-dom`                       | Applications provide the shared runtime; DS declares peers                                        |
+| Component behavior    | `@base-ui/react`                           | DS wraps primitives to constrain APIs and preserve accessible behavior                            |
+| Styling               | `@stylexjs/stylex`, `@stylexjs/unplugin`   | DS styles are transformed by consuming Vite applications                                          |
+| Product data runtime  | `jazz-tools`                               | Web application only; keep behind connection-required boundaries                                  |
+| Routing               | `@tanstack/react-router`, router plugin    | Web and documentation apps own their route trees                                                  |
+| Optional interactions | CodeMirror, DnD Kit                        | DS may own reusable integration, but imports must remain deferred when optional                   |
+| Product data display  | `@tanstack/react-table`                    | Used where product or DS table responsibilities require it                                        |
+| Documentation         | Shiki, generated prop extraction tooling   | Documentation app only; not a DS runtime concern                                                  |
+| Build output          | Vite, TSDown, tsup, TypeScript             | Vite builds applications; TSDown emits design-system artifacts; tsup emits Jazz tooling artifacts |
+| Testing               | Vitest, Testing Library, JSDOM, Playwright | Verify logic, component and application behavior, boundaries, and browser workflows               |
 
 ## Adding a dependency or export
 

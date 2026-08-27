@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, expectTypeOf, it } from 'vitest'
 
 import type { ComboboxContentProps, ComboboxPositionerProps } from '../components/combobox/combobox'

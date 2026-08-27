@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[27/08/26]
+
+- [x] Isolate complete-tree render planning from React and jsdom while preserving package-private ownership.
+- [x] Cover expansion depth, child batching, complete-tree limits, and budget reallocation in Node.
+- [x] Keep focused jsdom coverage for continuation wiring, visible-limit communication, accessibility, and focus recovery.
+
 [12/08/26]
 
 - [x] Preserve the active match's ancestor branch when a successful search closes.
@@ -107,6 +113,11 @@
 - [ ] Decide the accessible naming and visual representation of root-array indices.
 
 ## Validation checklist
+
+[27/08/26]
+
+- [x] Render-plan Node tests and focused JSON View integration tests pass.
+- [x] Design-system and web lint, typecheck, build, and complete workspace tests pass.
 
 [24/07/26]
 

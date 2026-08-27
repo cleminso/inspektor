@@ -248,28 +248,33 @@ describe('InsertRowForm structured values', () => {
     expect(onAddAnother).toHaveBeenCalledWith({ settings: '{"enabled":true}' })
   })
 
-  it.each([
-    ['Json', '{}'],
-    ['Array', '[]'],
-    ['Row', '{}'],
-  ] as const)('seeds an empty %s field when switching to Value', async (type, seed) => {
+  it('seeds empty structured fields when switching to Value', async () => {
     const columns = [
       {
-        name: 'payload',
-        column_type:
-          type === 'Array'
-            ? { type, element: { type: 'Text' } as const }
-            : type === 'Row'
-              ? { type, columns: [] }
-              : { type },
+        name: 'jsonPayload',
+        column_type: { type: 'Json' },
+        nullable: true,
+      },
+      {
+        name: 'arrayPayload',
+        column_type: { type: 'Array', element: { type: 'Text' } },
+        nullable: true,
+      },
+      {
+        name: 'rowPayload',
+        column_type: { type: 'Row', columns: [] },
         nullable: true,
       },
     ] satisfies ColumnDescriptor[]
     render(<InsertRowForm onSave={() => undefined} rowValues={{}} schemaColumns={columns} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Value' }))
+    for (const toggle of screen.getAllByRole('button', { name: 'Value' })) {
+      fireEvent.click(toggle)
+    }
 
-    expect((await screen.findByRole('textbox', { name: 'Payload' })).textContent).toBe(seed)
+    expect((await screen.findByRole('textbox', { name: 'JsonPayload' })).textContent).toBe('{}')
+    expect(screen.getByRole('textbox', { name: 'ArrayPayload' }).textContent).toBe('[]')
+    expect(screen.getByRole('textbox', { name: 'RowPayload' }).textContent).toBe('{}')
   })
 
   it('disables NULL primitive and enum controls and submits values after they are enabled', async () => {

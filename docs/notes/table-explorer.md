@@ -1,5 +1,7 @@
 # Table Explorer Research
 
+This is a historical research note. Its implementation paths may no longer exist; use [Frontend Structure](../frontendStructure.md) and the current source tree when locating code.
+
 ## Purpose
 
 This document captures the current understanding of Jazz table exploration and how Regarde should reason about it in the v1 inspector.

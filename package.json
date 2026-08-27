@@ -9,8 +9,7 @@
   },
   "workspaces": [
     "packages/*",
-    "apps/*",
-    "e2e"
+    "apps/*"
   ],
   "scripts": {
     "dev": "pnpm -r dev",
@@ -24,9 +23,14 @@
     "inspector-test:validate": "pnpm --filter inspector-test cloud:validate",
     "test:browser": "pnpm --filter regarde.inspector test:browser",
     "test:browser:install": "pnpm --filter regarde.inspector test:browser:install",
+    "test:design-system": "pnpm --filter @inspector/ds test",
+    "test:design-system:node": "pnpm --filter @inspector/ds test:node",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
+    "test": "pnpm -r --workspace-concurrency=1 --if-present test && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
     "test:handles": "pnpm --filter @inspector/ds exec vitest run src/tokens/tokens.stylex.test.ts --reporter=default --reporter=hanging-process",
+    "test:web": "pnpm --filter regarde.inspector test",
+    "test:web:jsdom": "pnpm --filter regarde.inspector test:jsdom",
+    "test:web:node": "pnpm --filter regarde.inspector test:node",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "engines": {

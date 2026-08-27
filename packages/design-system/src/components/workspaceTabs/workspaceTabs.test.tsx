@@ -8,6 +8,10 @@ import { WorkspaceTabs } from './workspaceTabs'
 
 let onDragEnd: ((event: unknown) => void) | undefined
 const sortableRefs = new Map<string | number, ReturnType<typeof vi.fn>>()
+const scrollIntoViewDescriptor = Object.getOwnPropertyDescriptor(
+  HTMLElement.prototype,
+  'scrollIntoView',
+)
 
 vi.mock('@dnd-kit/react', () => ({
   DragDropProvider: ({
@@ -58,6 +62,11 @@ afterEach(() => {
   cleanup()
   onDragEnd = undefined
   sortableRefs.clear()
+  if (scrollIntoViewDescriptor === undefined) {
+    delete (HTMLElement.prototype as { scrollIntoView?: Element['scrollIntoView'] }).scrollIntoView
+  } else {
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', scrollIntoViewDescriptor)
+  }
 })
 
 function WorkspaceTabsSelectionHarness() {
