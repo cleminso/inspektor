@@ -28,3 +28,8 @@ dist-extension
 .zed*
 .vercel
 .tanstack
+
+# Browser test artifacts
+playwright-report/
+test-results/
+blob-report/

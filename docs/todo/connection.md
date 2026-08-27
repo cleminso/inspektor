@@ -251,6 +251,11 @@
 
 ## Validation checklist
 
+[27/08/26]
+
+- [x] Cover isolated-fixture connection entry, browser persistence, schema permissions, real row queries, filtering, sorting, mutation persistence, and relation navigation in Playwright.
+- [x] Keep automated browser tests on direct loopback HTTP with fresh browser contexts and ephemeral Inspector Test credentials.
+
 [25/08/26]
 
 - [x] Cover session-owned branch and schema changes after route-target synchronization.

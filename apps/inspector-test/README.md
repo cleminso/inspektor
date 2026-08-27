@@ -78,6 +78,8 @@ The command prints readiness text followed by one JSON object containing the con
 
 Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, repeatable seeding, and server disposal.
 
+Inspector browser acceptance tests run with `pnpm test:browser`. Playwright owns a direct loopback Vite server and an ephemeral Inspector Test fixture; it never uses the shared cloud connection.
+
 ## Commands
 
 | Command | Action |
@@ -88,6 +90,7 @@ Automated tests can import `createInspectorTestFixture()` from `inspectorTestFix
 | `pnpm inspector-test:seed` | Upsert deterministic cloud rows |
 | `pnpm inspector-test:fixture` | Start an isolated local app |
 | `pnpm --filter inspector-test test` | Test schema metadata, serialized data, relations, repeatable seeding, and fixture disposal |
+| `pnpm test:browser` | Run Inspector browser acceptance tests against an isolated fixture |
 
 ## Dependency security
 

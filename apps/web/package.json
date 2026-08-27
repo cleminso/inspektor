@@ -11,7 +11,9 @@
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit"
+    "test:browser": "playwright test",
+    "test:browser:install": "playwright install chromium",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.e2e.json --noEmit"
   },
   "dependencies": {
     "@fontsource-variable/geist": "catalog:",
@@ -33,6 +35,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@stylexjs/unplugin": "catalog:",
     "@tanstack/devtools-vite": "^0.7.0",
     "@testing-library/react": "catalog:",
