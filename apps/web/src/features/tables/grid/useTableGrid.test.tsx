@@ -1,5 +1,3 @@
-// @vitest-environment jsdom
-
 import { act, renderHook } from '@testing-library/react'
 import type { ColumnOrderState, OnChangeFn, SortingState } from '@tanstack/react-table'
 import { describe, expect, it, vi } from 'vitest'

@@ -7,14 +7,6 @@ import { defineConfig } from 'vitest/config'
 // Explicitly use PORT from portless
 const PORT = parseInt(process.env.PORT || '5173')
 const designSystemSourceId = /\/packages\/design-system\/src\/.*\.[cm]?[jt]sx?(?:\?.*)?$/
-const jsdomTypeScriptTests = [
-  'src/app/storage/connectionScopedStorage.test.ts',
-  'src/features/tables/grid/useTablePreferences.test.ts',
-  'src/features/tables/tableList/pins.test.ts',
-  'src/features/tables/workspace/navigationHistory.test.ts',
-  'src/features/tables/workspace/tabs.test.ts',
-  'src/routes/-metadata.test.ts',
-]
 
 const createStylexPlugin = () => {
   const plugin = stylex.vite({
@@ -83,7 +75,7 @@ export default defineConfig(({ mode }) => ({
           name: 'node',
           environment: 'node',
           include: ['src/**/*.test.ts'],
-          exclude: jsdomTypeScriptTests,
+          exclude: ['src/**/*.jsdom.test.ts'],
         },
       },
       {
@@ -91,7 +83,7 @@ export default defineConfig(({ mode }) => ({
         test: {
           name: 'jsdom',
           environment: 'jsdom',
-          include: ['src/**/*.test.tsx', ...jsdomTypeScriptTests],
+          include: ['src/**/*.test.tsx', 'src/**/*.jsdom.test.ts'],
           setupFiles: ['./src/__test__/setup.ts'],
         },
       },
