@@ -49,8 +49,8 @@ export const buttonStyles = stylex.create({
   primary: {
     backgroundColor: {
       default: accentElementColors.default,
-      ':hover': accentElementColors.hover,
-      ':active': accentElementColors.pressed,
+      ':active:not([data-disabled])': accentElementColors.pressed,
+      ':hover:not([data-disabled]):not(:active)': accentElementColors.hover,
     },
     color: textColors.onAccent,
   },
@@ -58,24 +58,24 @@ export const buttonStyles = stylex.create({
     borderColor: borderColors.default,
     backgroundColor: {
       default: null,
-      ':hover': elementColors.hover,
-      ':active': ghostElementColors.pressed,
+      ':active:not([data-disabled])': ghostElementColors.pressed,
+      ':hover:not([data-disabled]):not(:active)': elementColors.hover,
     },
     color: textColors.default,
   },
   danger: {
     backgroundColor: {
       default: dangerElementColors.default,
-      ':hover': dangerElementColors.hover,
-      ':active': dangerElementColors.pressed,
+      ':active:not([data-disabled])': dangerElementColors.pressed,
+      ':hover:not([data-disabled]):not(:active)': dangerElementColors.hover,
     },
     color: textColors.onDanger,
   },
   ghost: {
     backgroundColor: {
       default: 'transparent',
-      ':hover': ghostElementColors.hover,
-      ':active': ghostElementColors.pressed,
+      ':active:not([data-disabled])': ghostElementColors.pressed,
+      ':hover:not([data-disabled]):not(:active)': ghostElementColors.hover,
     },
     color: textColors.default,
   },
@@ -85,7 +85,7 @@ export const buttonStyles = stylex.create({
     color: textColors.link,
     textDecorationLine: {
       default: 'none',
-      ':hover': 'underline',
+      ':hover:not([data-disabled])': 'underline',
     },
     textUnderlineOffset: `calc(${spacing.s} / 2)`,
   },
@@ -154,24 +154,8 @@ export const buttonStyles = stylex.create({
     minHeight: spatial['control-height-m'],
   },
   disabled: {
-    borderColor: 'transparent',
-    backgroundColor: {
-      default: elementColors.disabled,
-      ':hover': elementColors.disabled,
-      ':active': elementColors.disabled,
-    },
-    color: textColors.disabled,
     cursor: 'not-allowed',
-  },
-  disabledBare: {
-    borderColor: 'transparent',
-    backgroundColor: {
-      default: 'transparent',
-      ':hover': 'transparent',
-      ':active': 'transparent',
-    },
-    color: textColors.disabled,
-    cursor: 'not-allowed',
+    opacity: 0.6,
   },
   content: {
     gap: spacing.s,

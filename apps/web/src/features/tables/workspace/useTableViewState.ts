@@ -429,9 +429,15 @@ export function useTableViewState({
     return selectedRow ?? retainedActiveRow
   }, [detailPaneMode, retainedActiveRow, selectedRow])
 
-  /** Closes presentation state without changing checked-row selection. */
   const closeDetailPane = () => {
     setDetailPane({ mode: 'closed' })
+  }
+
+  const closeRowEditor = () => {
+    if (activeRowId !== null) {
+      setSelectedRowIds((currentRowIds) => currentRowIds.filter((rowId) => rowId !== activeRowId))
+    }
+    closeDetailPane()
   }
 
   const requestCellFocus = (target: DataGridCellTarget) => {
@@ -448,10 +454,7 @@ export function useTableViewState({
       return
     }
     if (detailPaneMode !== 'closed') {
-      if (activeRowId !== null) {
-        setSelectedRowIds((currentRowIds) => currentRowIds.filter((rowId) => rowId !== activeRowId))
-      }
-      closeDetailPane()
+      closeRowEditor()
       return
     }
 
@@ -633,6 +636,6 @@ export function useTableViewState({
     handleMutationApplySuccess,
     handleMutationUpdatesApplied: highlightRecentlyAppliedCells,
     handleRowsStagedForDeletion,
-    closeRowEditor: closeDetailPane,
+    closeRowEditor,
   }
 }

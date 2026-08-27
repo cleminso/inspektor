@@ -22,6 +22,7 @@ Before editing files for a substantial task involving a TanStack package:
 - [Implementation checklists](#implementation-checklists)
 - [Commands](#commands)
 - [Debugging workflow](#debugging-workflow)
+- [Performance optimization workflow](#performance-optimization-workflow)
 - [Editing and validation](#editing-and-validation)
 - [Architecture](#architecture)
 - [Import boundaries](#import-boundaries)
@@ -109,6 +110,16 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 - For rendering or performance defects, inspect runtime structure, computed styles, render fan-out, observers, layout reads, and DOM writes before changing global infrastructure.
 - Do not change font loading, network hints, compositor hints, virtualization settings, or application bootstrap behavior without evidence that subsystem causes the defect.
 - Confirm a regression test fails for the reported behavior, not because its fixture or test harness is incorrect.
+
+## Performance optimization workflow
+
+- Classify affected interactions as primary or optional before introducing lazy loading. Do not defer code required by a primary interaction without explicit approval.
+- Define the user-visible performance invariant before optimizing bundle size. Preserve instant first interaction when the product must not expose loading feedback.
+- Treat prefetch effectiveness as a hypothesis. Prove that the deferred boundary does not commit a fallback instead of assuming a fetched module renders synchronously.
+- Prefer deferring heavy internals within a primary surface instead of deferring the surface itself.
+- When bundle size and interaction immediacy conflict, present the measured trade-off before implementation.
+- Validate cold first-use behavior in a production browser build. A performance change is incomplete until both bundle impact and interaction behavior are verified.
+- Add a regression test for the user-visible invariant, including the absence of loading feedback when that absence is required.
 
 ## Editing and validation
 

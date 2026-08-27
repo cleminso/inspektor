@@ -134,11 +134,12 @@ const ComponentsContextMenuRoute = ComponentsContextMenuRouteImport.update({
   path: '/components/context-menu',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsContextSwitcherRoute = ComponentsContextSwitcherRouteImport.update({
-  id: '/components/context-switcher',
-  path: '/components/context-switcher',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ComponentsContextSwitcherRoute =
+  ComponentsContextSwitcherRouteImport.update({
+    id: '/components/context-switcher',
+    path: '/components/context-switcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsCopyButtonRoute = ComponentsCopyButtonRouteImport.update({
   id: '/components/copy-button',
   path: '/components/copy-button',
@@ -149,11 +150,12 @@ const ComponentsDataGridRoute = ComponentsDataGridRouteImport.update({
   path: '/components/data-grid',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsDataGridFilterClauseRoute = ComponentsDataGridFilterClauseRouteImport.update({
-  id: '/components/data-grid-filter-clause',
-  path: '/components/data-grid-filter-clause',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ComponentsDataGridFilterClauseRoute =
+  ComponentsDataGridFilterClauseRouteImport.update({
+    id: '/components/data-grid-filter-clause',
+    path: '/components/data-grid-filter-clause',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsDatePickerRoute = ComponentsDatePickerRouteImport.update({
   id: '/components/date-picker',
   path: '/components/date-picker',
@@ -219,11 +221,12 @@ const ComponentsRelationValueRoute = ComponentsRelationValueRouteImport.update({
   path: '/components/relation-value',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsResizablePanelRoute = ComponentsResizablePanelRouteImport.update({
-  id: '/components/resizable-panel',
-  path: '/components/resizable-panel',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ComponentsResizablePanelRoute =
+  ComponentsResizablePanelRouteImport.update({
+    id: '/components/resizable-panel',
+    path: '/components/resizable-panel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsScrollAreaRoute = ComponentsScrollAreaRouteImport.update({
   id: '/components/scroll-area',
   path: '/components/scroll-area',
@@ -244,11 +247,12 @@ const ComponentsSpinnerRoute = ComponentsSpinnerRouteImport.update({
   path: '/components/spinner',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsStructuredValuePreviewRoute = ComponentsStructuredValuePreviewRouteImport.update({
-  id: '/components/structured-value-preview',
-  path: '/components/structured-value-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ComponentsStructuredValuePreviewRoute =
+  ComponentsStructuredValuePreviewRouteImport.update({
+    id: '/components/structured-value-preview',
+    path: '/components/structured-value-preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
   id: '/components/switch',
   path: '/components/switch',
@@ -269,11 +273,12 @@ const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
   path: '/components/textarea',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsTimestampValueRoute = ComponentsTimestampValueRouteImport.update({
-  id: '/components/timestamp-value',
-  path: '/components/timestamp-value',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ComponentsTimestampValueRoute =
+  ComponentsTimestampValueRouteImport.update({
+    id: '/components/timestamp-value',
+    path: '/components/timestamp-value',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsToastRoute = ComponentsToastRouteImport.update({
   id: '/components/toast',
   path: '/components/toast',

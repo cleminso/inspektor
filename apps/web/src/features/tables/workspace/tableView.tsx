@@ -760,7 +760,7 @@ function TableViewContent({
                     schemaColumns={schemaColumns}
                     insertMoreEnabled={insertMoreEnabled}
                     saveDisabled={state.canMutateRows === false || mutationApplying}
-                    onDiscard={() => {
+                    onClose={() => {
                       setInsertMoreEnabled(false)
                       state.closeRowEditor()
                     }}

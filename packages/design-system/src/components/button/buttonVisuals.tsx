@@ -130,10 +130,7 @@ export function getButtonVisualStyles({
     fill === true && buttonStyles.fill,
     alignment === 'start' && buttonStyles.alignStart,
     stacked === true && buttonStyles.stacked,
-    disabled === true &&
-      (variant === 'ghost' || variant === 'link'
-        ? buttonStyles.disabledBare
-        : buttonStyles.disabled),
+    disabled === true && buttonStyles.disabled,
   ]
 }
 

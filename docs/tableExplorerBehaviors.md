@@ -220,16 +220,16 @@ Both surfaces consume the same provider-owned per-row draft, parsing, validation
 - Relation and binary activation opens the complete-row pane and focuses the corresponding field.
 - Generated and unsupported read-only fields do not open a mutation surface.
 
-Pressing Escape follows progressive dismissal:
+The footer `Close` action and Escape use the same row-pane dismissal behavior:
 
-- with a row pane open, Escape closes the pane and unchecks its active row while preserving other checked rows
+- with a row pane open, dismissal closes the pane and unchecks its active row while preserving other checked rows
 - clearing the final checked row closes selection-only widget state; staged changes keep the mutation widget available
 - without a pane open, Escape clears cell selection, cell focus, and column focus
 
 After the row pane closes, each remaining checked row stays individually toggleable through its own checkbox. The header checkbox is the
 bulk clear control; it is not the only route to unchecking rows.
 
-Pane dismissal preserves valid staged fields and recoverable invalid input while clearing the active checked row. Staged changes
+Row-pane dismissal preserves valid staged fields and recoverable invalid input while clearing the active checked row. Staged changes
 are removed only through entry removal or the table-scoped `Discard` action.
 
 ## Mutation draft behavior

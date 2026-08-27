@@ -169,12 +169,6 @@ describe('Box', () => {
     })
   })
 
-  it('resolves a three-to-one grid track ratio', () => {
-    const resolved = resolveBoxStyles({ gridTemplateColumns: 'three-one' }, 'box-grid-three-one')
-
-    expect(resolved.inlineStyle.gridTemplateColumns).toBe('minmax(0, 3fr) minmax(0, 1fr)')
-  })
-
   it('does not allow border style to activate the browser medium border width', () => {
     const resolved = resolveBoxStyles(
       { borderColor: 'default', borderStyle: 'solid' },

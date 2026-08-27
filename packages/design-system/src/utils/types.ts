@@ -122,7 +122,7 @@ interface FlexProps {
 
 interface GridProps {
   gridTemplateColumns?: ResponsiveValue<
-    'one' | 'two' | 'three' | 'four' | 'three-one' | 'auto-fit-s' | 'auto-fit-m' | 'label-content'
+    'one' | 'two' | 'three' | 'four' | 'auto-fit-s' | 'auto-fit-m' | 'label-content'
   >
   gridTemplateRows?: ResponsiveValue<'one' | 'two' | 'three' | 'four'>
   gridColumn?: ResponsiveValue<'auto' | 'span-1' | 'span-2' | 'span-3' | 'span-4' | 'full'>

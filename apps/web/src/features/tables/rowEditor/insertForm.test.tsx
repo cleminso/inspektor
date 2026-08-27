@@ -66,15 +66,15 @@ afterEach(() => {
 })
 
 describe('InsertRowForm structured values', () => {
-  it('discards the insert draft without submitting it', () => {
-    const onDiscard = vi.fn()
+  it('closes the insert form without submitting it', () => {
+    const onClose = vi.fn()
     const onSave = vi.fn()
     const columns = [
       { name: 'name', column_type: { type: 'Text' }, nullable: false },
     ] satisfies ColumnDescriptor[]
     render(
       <InsertRowForm
-        onDiscard={onDiscard}
+        onClose={onClose}
         onSave={onSave}
         rowValues={{ name: 'Ada' }}
         schemaColumns={columns}
@@ -84,9 +84,9 @@ describe('InsertRowForm structured values', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Name' }), {
       target: { value: 'Grace' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Discard' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
 
-    expect(onDiscard).toHaveBeenCalledOnce()
+    expect(onClose).toHaveBeenCalledOnce()
     expect(onSave).not.toHaveBeenCalled()
   })
 

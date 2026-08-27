@@ -17,9 +17,9 @@ const TestArtwork = forwardRef<SVGSVGElement, ComponentPropsWithoutRef<'svg'>>(
 afterEach(cleanup)
 
 describe('Button', () => {
-  it('does not give disabled ghost actions a filled surface', () => {
+  it.each(['ghost', 'link'] as const)('keeps the %s treatment when disabled', (variant) => {
     const visualStyles = getButtonVisualStyles({
-      variant: 'ghost',
+      variant,
       size: 'xs',
       square: true,
       pressed: false,
@@ -32,7 +32,8 @@ describe('Button', () => {
       hasSuffix: false,
     })
 
-    expect(visualStyles).not.toContain(buttonStyles.disabled)
+    expect(visualStyles).toContain(buttonStyles[variant])
+    expect(visualStyles).toContain(buttonStyles.disabled)
   })
 
   it('renders an accessible square button for icon-only actions', () => {

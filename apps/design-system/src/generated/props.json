@@ -1421,7 +1421,7 @@
     },
     {
       "name": "gridTemplateColumns",
-      "type": "\"one\" | \"two\" | \"three\" | \"four\" | \"three-one\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"one\" | \"two\" | \"three\" | \"four\" | \"three-one\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\">>",
+      "type": "\"one\" | \"two\" | \"three\" | \"four\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\" | Partial<Record<\"base\" | \"sm\" | \"md\" | \"lg\" | \"xl\" | PseudoState, \"one\" | \"two\" | \"three\" | \"four\" | \"auto-fit-s\" | \"auto-fit-m\" | \"label-content\">>",
       "required": false,
       "description": "",
       "source": {

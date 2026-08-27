@@ -8,7 +8,7 @@ import { useRowDraftController } from '@tables/rowEditor/mutation/useRowDraftCon
 
 interface InsertRowFormProps {
   insertMoreEnabled?: boolean
-  onDiscard?: () => void
+  onClose?: () => void
   onSave: (values: Record<string, unknown>, options: { keepOpen: boolean }) => Promise<void> | void
   rowValues: Record<string, unknown>
   saveDisabled?: boolean
@@ -22,7 +22,7 @@ interface InsertRowFormFieldsProps extends InsertRowFormProps {
 
 function InsertRowFormFields({
   insertMoreEnabled,
-  onDiscard,
+  onClose,
   onInserted,
   onSave,
   rowValues,
@@ -129,17 +129,17 @@ function InsertRowFormFields({
             Insert
           </Button>
         </Box>
-        {onDiscard === undefined ? null : (
+        {onClose === undefined ? null : (
           <Box flex={1}>
             <Button
               type="button"
               variant="secondary"
               size="s"
               layout="fill"
-              onClick={onDiscard}
+              onClick={onClose}
               disabled={rowEditor.isSaving === true}
             >
-              Discard
+              Close
             </Button>
           </Box>
         )}

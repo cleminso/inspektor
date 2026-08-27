@@ -12,6 +12,11 @@
 
 ## Implemented foundation
 
+[27/08/26]
+
+- [x] Preserve each Button variant's background, border, and foreground when disabled while reducing the whole control to 60% opacity.
+- [x] Use one disabled visual rule for filled and bare variants.
+
 [25/08/26]
 
 - [x] Keep each Button variant's visual treatment while loading blocks interaction, including consumers that also pass `disabled`.
@@ -109,6 +114,10 @@
 
 ## Settled interaction decisions
 
+[27/08/26]
+
+- Disabled Buttons retain their variant identity and use component opacity for reduced emphasis instead of replacing every variant with one neutral surface.
+
 [25/08/26]
 
 - Loading takes visual precedence over disabled because it represents an in-progress action, while retaining busy and blocked semantics.
@@ -153,6 +162,10 @@
 - None.
 
 ## Validation checklist
+
+[27/08/26]
+
+- [x] Verify every disabled Button variant in both color schemes and run focused tests, lint, typecheck, build, and package-wide tests.
 
 [25/08/26]
 

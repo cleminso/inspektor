@@ -1219,8 +1219,8 @@ The grid and complete-row pane answer different editing needs without creating s
 field-focused edits. The pane provides complete-row context and fields that need more space or richer controls. The Floating
 widget owns the shared operation state and the final Apply boundary.
 
-Closing the pane through Escape does not discard valid edits. It unchecks the active row while preserving other checked rows,
-staged changes, and recoverable invalid input. A developer can stage several valid fields without confirming each field or form.
+Closing the pane through its footer action or Escape does not discard valid edits. It unchecks the active row while preserving
+other checked rows, staged changes, and recoverable invalid input. A developer can stage several valid fields without confirming each field or form.
 Review remains available while the pane is open. Invalid editor input survives widget collapse but remains outside the staged
 ledger until corrected.
 

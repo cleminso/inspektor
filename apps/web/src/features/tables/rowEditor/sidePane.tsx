@@ -54,18 +54,14 @@ export function RowEditorSidePanel({
   const deleteRowIds = deleteConfirmationRowIds ?? editedRowIds
   const deleteLabel =
     deleteRowIds.length === 1 ? 'Delete row' : `Delete ${deleteRowIds.length} checked rows`
-  const hasTwoFooterActions =
-    deleteConfirmationRowIds !== null || (onConfirmDelete !== undefined && onClose !== undefined)
   const footer =
     mode === 'edit' && (onConfirmDelete !== undefined || onClose !== undefined) ? (
       <Box
         as="footer"
         data-slot="row-editor-footer"
-        display={hasTwoFooterActions === true ? 'grid' : 'flex'}
         flexShrink={0}
         alignItems="center"
         gap="xs"
-        gridTemplateColumns={hasTwoFooterActions === true ? 'three-one' : undefined}
         borderTopWidth={1}
         borderColor="default"
         borderStyle="solid"
@@ -77,54 +73,62 @@ export function RowEditorSidePanel({
         {deleteConfirmationRowIds === null || onConfirmDelete === undefined ? (
           <>
             {onConfirmDelete === undefined ? null : (
+              <Box flex={1}>
+                <Button
+                  type="button"
+                  disabled={mutationDisabled === true || editedRowIds.length === 0}
+                  layout="fill"
+                  size="s"
+                  variant="danger"
+                  onClick={() => setDeleteConfirmationRowIds([...editedRowIds])}
+                >
+                  {deleteLabel}
+                </Button>
+              </Box>
+            )}
+            {onClose === undefined ? null : (
+              <Box flex={1}>
+                <Button
+                  type="button"
+                  layout="fill"
+                  size="s"
+                  variant="secondary"
+                  onClick={onClose}
+                >
+                  Close
+                </Button>
+              </Box>
+            )}
+          </>
+        ) : (
+          <>
+            <Box flex={1}>
               <Button
                 type="button"
-                disabled={mutationDisabled === true || editedRowIds.length === 0}
+                disabled={mutationDisabled === true}
                 layout="fill"
                 size="s"
                 variant="danger"
-                onClick={() => setDeleteConfirmationRowIds([...editedRowIds])}
+                onClick={() => {
+                  const confirmedRowIds = deleteConfirmationRowIds
+                  setDeleteConfirmationRowIds(null)
+                  onConfirmDelete(confirmedRowIds)
+                }}
               >
-                {deleteLabel}
+                Confirm delete
               </Button>
-            )}
-            {onClose === undefined ? null : (
+            </Box>
+            <Box flex={1}>
               <Button
                 type="button"
                 layout="fill"
                 size="s"
                 variant="secondary"
-                onClick={onClose}
+                onClick={() => setDeleteConfirmationRowIds(null)}
               >
-                Close
+                Cancel delete
               </Button>
-            )}
-          </>
-        ) : (
-          <>
-            <Button
-              type="button"
-              disabled={mutationDisabled === true}
-              layout="fill"
-              size="s"
-              variant="danger"
-              onClick={() => {
-                const confirmedRowIds = deleteConfirmationRowIds
-                setDeleteConfirmationRowIds(null)
-                onConfirmDelete(confirmedRowIds)
-              }}
-            >
-              Confirm delete
-            </Button>
-            <Button
-              type="button"
-              layout="fill"
-              size="s"
-              variant="secondary"
-              onClick={() => setDeleteConfirmationRowIds(null)}
-            >
-              Cancel
-            </Button>
+            </Box>
           </>
         )}
       </Box>

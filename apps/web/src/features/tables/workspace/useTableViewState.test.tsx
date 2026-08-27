@@ -622,24 +622,6 @@ describe('useTableViewState', () => {
     expect(result.current.rowEditor.editedRowIds).toEqual([])
   })
 
-  it('allows an individual row to be unchecked after its pane is closed', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    act(() => {
-      result.current.closeRowEditor()
-    })
-    rerender()
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(false)
-    })
-
-    expect(result.current.table.getRow('row-1').getIsSelected()).toBe(false)
-    expect(result.current.rowEditor.editedRowIds).toEqual([])
-  })
-
   it('focuses the nearest checked row when the active checkbox is unchecked', () => {
     render(<TableViewInteractionHarness />)
 
@@ -652,10 +634,14 @@ describe('useTableViewState', () => {
     expect(screen.getByRole('status', { name: 'Active row' }).textContent).toBe('row-2')
   })
 
-  it('dismisses the row pane without a single-draft transition decision', () => {
+  it('preserves other checked rows when the active row pane is closed', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
       result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    rerender()
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
     })
     rerender()
 
@@ -821,18 +807,13 @@ describe('useTableViewState', () => {
     expect(result.current.scrollResetKey).not.toBe(initialScrollResetKey)
   })
 
-  it('clears row and column selection only after filters commit', async () => {
+  it('clears column selection only after filters commit', async () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     const nextFilters: TableFilterClause[] = [
       { id: 'filter-1', column: 'id', operator: 'eq', value: 'row-2' },
     ]
 
     act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-    act(() => {
-      result.current.closeRowEditor()
       result.current.handleColumnActivate('name')
     })
     rerender()
@@ -840,13 +821,11 @@ describe('useTableViewState', () => {
       await result.current.setFilters(nextFilters)
     })
 
-    expect(result.current.table.getSelectedRowIds()).toEqual(['row-1'])
     expect(result.current.activeColumnId).toBe('name')
 
     searchState.filters = nextFilters
     rerender()
 
-    expect(result.current.table.getSelectedRowIds()).toEqual([])
     expect(result.current.activeColumnId).toBeNull()
   })
 

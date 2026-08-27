@@ -146,6 +146,7 @@ describe('RowEditorSidePanel dirty transitions', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete row' }))
+    expect(screen.getByRole('button', { name: 'Cancel delete' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Confirm delete' }))
 
     expect(onConfirmDelete).toHaveBeenCalledWith(['row-1'])

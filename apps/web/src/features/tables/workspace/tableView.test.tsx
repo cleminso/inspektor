@@ -807,7 +807,7 @@ describe('TableView query status', () => {
     })
   })
 
-  it('closes the row editor without cancelling its active selection', () => {
+  it('forwards the row editor close action', () => {
     tableViewState.detailPaneMode = 'rows'
     tableViewState.rowEditor.activeRowId = 'row-1'
     tableViewState.rowEditor.editedRowIds = ['row-1', 'row-2']

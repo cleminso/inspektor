@@ -19,6 +19,35 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[27/08/26]
+
+### Row-form footer composition
+
+- [x] Compose each edit-form footer action inside an equal flex item instead of deriving grid layout from the action count.
+- [x] Remove the unused three-to-one Box grid track option.
+
+[27/08/26]
+
+### Row-form footer consistency
+
+- [x] Name insert-form dismissal `Close` in its copy and callback.
+- [x] Name the delete-confirmation escape action `Cancel delete`.
+- [x] Give paired edit-form footer actions equal width like the insert form.
+
+[27/08/26]
+
+### Row-pane dismissal consistency
+
+- [x] Make the footer Close action uncheck the active row like Escape while preserving other checked rows and mutation drafts.
+
+[27/08/26]
+
+### Immediate row-editor forms
+
+- [x] Load the lightweight edit and insert form shells with the table view so both editors render without module-loading feedback.
+- [x] Remove the row-form Suspense fallback after confirming that prefetching still produces a fallback commit when `React.lazy` initializes.
+- [x] Preserve the independent deferred CodeMirror and inline field-editor boundaries.
+
 [26/08/26]
 
 ### Implementation review corrections
@@ -1065,6 +1094,10 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[27/08/26]
+
+- The footer Close action and Escape both uncheck the active row while preserving other checked rows and mutation drafts. This supersedes preserving the active checked row after footer dismissal.
+
 [26/08/26]
 
 - A fulfilled active-row lookup that no longer contains the selected row removes that stale row selection and closes or retargets the row pane. This supersedes the earlier exclusion of a missing-row state.
@@ -1245,6 +1278,16 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[27/08/26]
+
+- [x] Verify row-editor footer composition with focused tests, Inspector lint, typecheck, build, and package-wide tests.
+
+[27/08/26]
+
+- [x] Verify both row forms render without editor-module loading feedback while CodeMirror remains outside the base table-view boundary.
+- [ ] Verify first edit and insert interactions do not present the editor-loading status in the production browser flow.
+- [x] Verify focused tests, Inspector formatting, lint and typecheck, the production build, and package-wide tests.
 
 [26/08/26]
 
