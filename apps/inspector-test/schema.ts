@@ -42,6 +42,9 @@ const schema = {
   emptyRecords: s.table({
     label: s.string(),
   }),
+  paginationRecords: s.table({
+    label: s.string(),
+  }),
   publicEditableRecords: s.table({
     label: s.string(),
     enabled: s.boolean(),

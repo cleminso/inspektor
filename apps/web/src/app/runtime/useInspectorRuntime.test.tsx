@@ -255,6 +255,31 @@ describe('useInspectorRuntime', () => {
     expect(result.current.$storedPermissions.get()).toBeNull()
   })
 
+  it('keeps the runtime usable when optional permissions fail', async () => {
+    jazzMocks.fetchStoredWasmSchema.mockResolvedValue({ schema: { tables: {} } })
+    jazzMocks.fetchStoredPermissions.mockRejectedValue(new Error('Permissions unavailable'))
+
+    const { result } = renderHook(() =>
+      useInspectorRuntime({
+        connection: {
+          id: 'connection-1',
+          name: 'Local app',
+          serverUrl: 'https://example.com',
+          appId: 'app-1',
+          adminSecret: 'secret',
+          env: 'dev',
+        },
+        branch: 'main',
+        schemaHash: 'schema-1',
+      }),
+    )
+
+    await waitFor(() => expect(result.current.$isPermissionsLoading.get()).toBe(false))
+    expect(result.current.$wasmSchema.get()).toEqual({ tables: {} })
+    expect(result.current.$storedPermissions.get()).toBeNull()
+    expect(result.current.$error.get()).toBeNull()
+  })
+
   it('does not repeat schema discovery when the route catalogue is unavailable', async () => {
     jazzMocks.fetchStoredWasmSchema.mockResolvedValue({ schema: { tables: {} } })
     jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))

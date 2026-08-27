@@ -47,6 +47,7 @@ The isolated fixture uses `jazz-tools/testing` to create an in-memory local serv
 | `contentEdgeCases` | Empty, whitespace, long, multiline, Unicode, bidirectional, nested JSON, and byte values |
 | `creatorManagedRecords` | Creator-managed permissions |
 | `emptyRecords` | A valid table with no seeded rows |
+| `paginationRecords` | Enough deterministic rows to cross the first page boundary |
 | `projects` | A compact referenced table used by relation scenarios |
 | `publicEditableRecords` | Public read, insert, update, and delete permissions |
 | `publicReadOnlyRecords` | Public reads with denied mutations |
@@ -76,7 +77,7 @@ pnpm inspector-test:fixture
 
 The command prints readiness text followed by one JSON object containing the connection name, server URL, app ID, admin secret, environment, and branch. Use those values in Inspector. Press Ctrl+C to stop the fixture.
 
-Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, repeatable seeding, and server disposal.
+Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, permission enforcement, repeatable seeding, and server disposal.
 
 Inspector browser acceptance tests run with `pnpm test:browser`. Playwright owns a direct loopback Vite server and an ephemeral Inspector Test fixture; it never uses the shared cloud connection.
 
@@ -89,7 +90,7 @@ Inspector browser acceptance tests run with `pnpm test:browser`. Playwright owns
 | `pnpm inspector-test:deploy` | Publish the cloud schema and permissions |
 | `pnpm inspector-test:seed` | Upsert deterministic cloud rows |
 | `pnpm inspector-test:fixture` | Start an isolated local app |
-| `pnpm --filter inspector-test test` | Test schema metadata, serialized data, relations, repeatable seeding, and fixture disposal |
+| `pnpm --filter inspector-test test` | Test schema metadata, serialized data, relations, permission enforcement, repeatable seeding, and fixture disposal |
 | `pnpm test:browser` | Run Inspector browser acceptance tests against an isolated fixture |
 
 ## Dependency security

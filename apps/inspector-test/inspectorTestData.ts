@@ -93,6 +93,14 @@ export const inspectorTestRows = {
       notes: "The creator can read and mutate this row.",
     },
   ],
+  paginationRecords: Array.from({ length: 101 }, (_, index) => {
+    const rowNumber = index + 1;
+
+    return {
+      id: `90000000-0000-4000-8000-${String(rowNumber).padStart(12, "0")}`,
+      label: `Pagination row ${String(rowNumber).padStart(3, "0")}`,
+    };
+  }),
   publicEditableRecords: [
     {
       id: "50000000-0000-4000-8000-000000000001",

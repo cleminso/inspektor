@@ -13,6 +13,15 @@
 
 [27/08/26]
 
+- [x] Verify connection setup retains its form state after an empty schema catalogue and succeeds when the user retries.
+
+[27/08/26]
+
+- [x] Verify URL-fragment connection prefill through the parser and built application without placing the admin secret in query parameters.
+- [x] Verify failed optional permission metadata does not block a usable schema runtime.
+
+[27/08/26]
+
 - [x] Guard and persist a connection profile plus its branch and schema context as one atomic session update.
 - [x] Keep blocked connection setup from saving a profile, changing runtime context, or navigating.
 - [x] Cover empty, single-schema, and explicit schema-choice connection entry through the onboarding owner.

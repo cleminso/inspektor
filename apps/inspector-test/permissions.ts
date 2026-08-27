@@ -22,6 +22,11 @@ export default s.definePermissions(app, ({ policy }) => {
   policy.emptyRecords.allowUpdate.always();
   policy.emptyRecords.allowDelete.always();
 
+  policy.paginationRecords.allowRead.always();
+  policy.paginationRecords.allowInsert.never();
+  policy.paginationRecords.allowUpdate.never();
+  policy.paginationRecords.allowDelete.never();
+
   policy.publicEditableRecords.allowRead.always();
   policy.publicEditableRecords.allowInsert.always();
   policy.publicEditableRecords.allowUpdate.always();

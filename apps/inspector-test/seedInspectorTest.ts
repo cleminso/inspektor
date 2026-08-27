@@ -48,6 +48,9 @@ export async function seedInspectorTest(connection: InspectorTestConnection): Pr
     for (const { id, ...values } of inspectorTestRows.creatorManagedRecords) {
       writes.push(db.upsert(app.creatorManagedRecords, values, { id }));
     }
+    for (const { id, ...values } of inspectorTestRows.paginationRecords) {
+      writes.push(db.upsert(app.paginationRecords, values, { id }));
+    }
     for (const { id, ...values } of inspectorTestRows.publicEditableRecords) {
       writes.push(db.upsert(app.publicEditableRecords, values, { id }));
     }

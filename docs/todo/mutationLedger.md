@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+### [27/08/26] Browser persistence coverage
+
+- [x] Verify discarding a staged row edit restores the Jazz value and does not persist the draft.
+- [x] Verify a staged Boolean edit persists through the real Jazz fixture and browser reload.
+
 ### [25/08/26] Integration review
 
 - [x] Keep the active route unchanged while confirming closure of an inactive table's final view.

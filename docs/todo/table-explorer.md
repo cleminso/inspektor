@@ -21,6 +21,19 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [27/08/26]
 
+### Fixture permission enforcement
+
+- [x] Verify an ordinary Jazz client can update a publicly editable row and cannot update a read-only row.
+
+[27/08/26]
+
+### Real-query pagination coverage
+
+- [x] Seed a focused deterministic table across the first page boundary.
+- [x] Verify next-page routing, range presentation, and row projection against the real Jazz fixture.
+
+[27/08/26]
+
 ### Test-suite review corrections
 
 - [x] Reload table preferences when the workspace table key changes instead of carrying the previous table's state into the new storage scope.

@@ -11,6 +11,7 @@ describe("Inspector Test schema", () => {
         "contentEdgeCases",
         "creatorManagedRecords",
         "emptyRecords",
+        "paginationRecords",
         "publicEditableRecords",
         "publicReadOnlyRecords",
         "relationParents",

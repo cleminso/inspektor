@@ -20,4 +20,16 @@ describe("Inspector Test data", () => {
     expect(edgeCase?.rightToLeftText).toContain("مرحبا");
     expect(edgeCase?.longText.length).toBeGreaterThan(1_000);
   });
+
+  it("crosses the first pagination boundary with stable rows", () => {
+    expect(inspectorTestRows.paginationRecords).toHaveLength(101);
+    expect(inspectorTestRows.paginationRecords[0]).toEqual({
+      id: "90000000-0000-4000-8000-000000000001",
+      label: "Pagination row 001",
+    });
+    expect(inspectorTestRows.paginationRecords[100]).toEqual({
+      id: "90000000-0000-4000-8000-000000000101",
+      label: "Pagination row 101",
+    });
+  });
 });
