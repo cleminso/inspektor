@@ -117,11 +117,11 @@ Important distinction:
 Confirmed:
 
 - The standalone Jazz inspector polls the admin introspection endpoint.
-- Inspector currently follows the same standalone model.
+- Inspector does not currently implement telemetry polling.
 - The server endpoint returns a current snapshot, not a pushed event stream.
 - A server snapshot is the grouped active subscription state returned by one HTTP request to the admin introspection endpoint.
 - The snapshot is generated when the endpoint handles that request and is marked with `generatedAt`.
-- Inspector's polling interval is client-owned. The current Inspector hook polls every 20s.
+- A future standalone implementation would own its polling interval.
 - The official extension inspector has a different path that can receive active subscription changes from the DevTools bridge.
 
 Inferred:
@@ -164,7 +164,7 @@ Confirmed from `fetchServerSubscriptions(...)`:
 - Malformed response data is normalized by the client fetch helper.
 - The response includes `generatedAt` as the server snapshot marker.
 
-Confirmed in Inspector:
+Confirmed in the prior Inspector prototype:
 
 - `useQuerySubscriptionsTelemetry(...)` prevents overlapping requests.
 - It keeps the last successful rows when a later refresh fails.
@@ -180,47 +180,7 @@ UI implication:
 
 ## Current Inspector implementation
 
-Current fetch behavior:
-
-- `apps/web/src/hooks/useQuerySubscriptionsTelemetry.ts` fetches through `fetchServerSubscriptions(...)`.
-- It starts with cached rows when available.
-- It polls using a fixed interval.
-- It avoids overlapping fetches with `isFetchingRef`.
-
-Current cache behavior:
-
-- Inspector stores a module-level cache in a `Map`.
-- The cache key includes connection id, server URL, app id, and admin secret.
-- Cache is overwritten after a successful fetch.
-- Cache is not persisted across page reloads.
-- Cache has no explicit freshness limit.
-- Cache invalidates when the connection key changes.
-
-Current UI behavior:
-
-- Left pane lists tables and subscription counts.
-- Main grid shows table, propagation, and count.
-- Expanded row shows formatted query JSON.
-- Expanded row can copy raw query JSON.
-- Expanded row can link to the Data Explorer.
-- Link building tries to recover supported filters from the serialized query JSON.
-
-Current hidden reads:
-
-- Inspector hides its own inspector reads using `visibility: "hidden_from_live_query_list"` in table and relation queries.
-- This hides inspector-originated active subscription traces from local active subscription lists.
-- It is not a server telemetry field.
-
-Evidence:
-
-- `apps/web/src/hooks/useQuerySubscriptionsTelemetry.ts`
-- `apps/web/src/components/query-subscriptions/dataGrid.tsx`
-- `apps/web/src/components/query-subscriptions/actionsBar.tsx`
-- `apps/web/src/components/query-subscriptions/expandedRow.tsx`
-- `apps/web/src/lib/query-subscriptions/buildExplorerUrl.ts`
-- `apps/web/src/lib/query-subscriptions/extractFiltersFromIR.ts`
-- `apps/web/src/hooks/useTableRows.ts`
-- `apps/web/src/hooks/useRelationRow.ts`
+The Query subscriptions route currently presents a placeholder. The telemetry fetch, cache, grid, and Table Explorer link prototype described by earlier research is not part of the application.
 
 ## Official Jazz inspector comparison
 

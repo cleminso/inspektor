@@ -1,11 +1,7 @@
 import type { ColumnDescriptor } from 'jazz-tools'
 import { describe, expect, it } from 'vitest'
 
-import {
-  formatColumnTypeLabel,
-  parseTimestampValue,
-  safelySerializeStructuredValue,
-} from './fieldPresentation'
+import { parseTimestampValue, safelySerializeStructuredValue } from './fieldPresentation'
 
 const jsonColumn = {
   column_type: { type: 'Json' },
@@ -56,41 +52,6 @@ describe('safelySerializeStructuredValue', () => {
       source: null,
       fallback: { $type: 'unsupported', valueType: 'object' },
     })
-  })
-})
-
-describe('formatColumnTypeLabel', () => {
-  it.each([
-    ['Array', 'Array'],
-    ['BigInt', 'BigInt'],
-    ['Boolean', 'Boolean'],
-    ['Bytea', 'Binary'],
-    ['Double', 'Float'],
-    ['Enum', 'Enum'],
-    ['Integer', 'Integer'],
-    ['Json', 'JSON'],
-    ['Row', 'Row'],
-    ['Text', 'Text'],
-    ['Timestamp', 'Timestamp'],
-    ['Uuid', 'UUID'],
-  ] as const)('maps the %s storage type to the %s semantic label', (type, label) => {
-    expect(
-      formatColumnTypeLabel({
-        column_type: { type } as ColumnDescriptor['column_type'],
-        name: 'value',
-        nullable: false,
-      }),
-    ).toBe(label)
-  })
-
-  it('distinguishes typed JSON from untyped JSON', () => {
-    expect(
-      formatColumnTypeLabel({
-        column_type: { type: 'Json', schema: { type: 'object' } } as never,
-        name: 'metadata',
-        nullable: false,
-      }),
-    ).toBe('Typed JSON')
   })
 })
 

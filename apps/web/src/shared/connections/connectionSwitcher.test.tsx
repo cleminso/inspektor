@@ -99,15 +99,28 @@ describe('ConnectionSwitcher', () => {
     openSwitcher()
 
     expect(screen.queryByRole('combobox', { name: 'Search connections' })).toBeNull()
-    const connectionOption = getConnectionOption('First')
-    expect(connectionOption.textContent).toContain('one-app')
-    expect(connectionOption.textContent).not.toContain('self-hosted.example.com')
     expect(screen.getByRole('link', { name: 'Edit connection' }).getAttribute('href')).toBe(
       '/conn/edit/one',
     )
     expect(screen.getByRole('button', { name: 'Remove connection' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Add new connection' })).toBeTruthy()
     expect(document.querySelectorAll('[data-slot="combobox-popup-footer"]')).toHaveLength(2)
+  })
+
+  it('shows the active connection first and uses its name in the trigger', () => {
+    connections = [createConnection('one', 'First'), createConnection('two', 'Second')]
+    currentConnectionId = 'two'
+
+    render(<ConnectionSwitcher />)
+
+    expect(screen.getByRole('combobox', { name: 'Switch connection' }).textContent).toBe('Second')
+
+    openSwitcher()
+
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Secondtwo-app',
+      'Firstone-app',
+    ])
   })
 
   it('removes the active saved connection only after confirmation', () => {

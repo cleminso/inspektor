@@ -17,6 +17,16 @@ vi.mock('jazz-tools', () => ({
   fetchStoredWasmSchema: jazzMocks.fetchStoredWasmSchema,
 }))
 
+function deferred<T>() {
+  let resolve!: (value: T) => void
+  let reject!: (reason: unknown) => void
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise
+    reject = rejectPromise
+  })
+  return { promise, reject, resolve }
+}
+
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
@@ -65,36 +75,6 @@ describe('useInspectorRuntime', () => {
     expect(jazzMocks.fetchStoredWasmSchema).toHaveBeenCalledTimes(2)
   })
 
-  it('waits for the verified stored schema instead of restoring a local projection', () => {
-    const connection = {
-      id: 'connection-1',
-      name: 'Local app',
-      serverUrl: 'https://example.com',
-      appId: 'app-1',
-      adminSecret: 'secret',
-      env: 'dev',
-    } as const
-    Object.defineProperty(window, 'localStorage', {
-      configurable: true,
-      value: {
-        getItem: () =>
-          JSON.stringify({
-            version: 1,
-            entries: { stale: { schema: { stale: { columns: [] } } } },
-          }),
-      },
-    })
-    jazzMocks.fetchStoredWasmSchema.mockReturnValue(new Promise(() => undefined))
-    jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
-
-    const { result } = renderHook(() =>
-      useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
-    )
-
-    expect(result.current.$wasmSchema.get()).toBeNull()
-    expect(result.current.$isWasmSchemaLoading.get()).toBe(true)
-  })
-
   it('exposes a fresh client projection when the branch changes', () => {
     const connection = {
       id: 'connection-1',
@@ -120,6 +100,73 @@ describe('useInspectorRuntime', () => {
     expect(result.current).not.toBe(mainRuntime)
     expect(result.current.$client.get()).toBeNull()
     expect(result.current.$wasmSchema.get()).toBeNull()
+  })
+
+  it('does not publish stale schema or permission results into a replacement runtime', async () => {
+    const staleSchema = deferred<{ schema: { stale: { columns: never[] } } }>()
+    const stalePermissions = deferred<{ stale: true }>()
+    jazzMocks.fetchStoredWasmSchema
+      .mockReturnValueOnce(staleSchema.promise)
+      .mockReturnValueOnce(new Promise(() => undefined))
+    jazzMocks.fetchStoredPermissions
+      .mockReturnValueOnce(stalePermissions.promise)
+      .mockReturnValueOnce(new Promise(() => undefined))
+    const connection = {
+      id: 'connection-1',
+      name: 'Local app',
+      serverUrl: 'https://example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+      env: 'dev',
+    } as const
+    const { result, rerender } = renderHook(
+      ({ schemaHash }: { schemaHash: string }) =>
+        useInspectorRuntime({ connection, branch: 'main', schemaHash }),
+      { initialProps: { schemaHash: 'schema-1' } },
+    )
+
+    rerender({ schemaHash: 'schema-2' })
+    staleSchema.resolve({ schema: { stale: { columns: [] } } })
+    stalePermissions.resolve({ stale: true })
+    await Promise.all([staleSchema.promise, stalePermissions.promise])
+
+    expect(result.current.$wasmSchema.get()).toBeNull()
+    expect(result.current.$storedPermissions.get()).toBeNull()
+    expect(result.current.$isWasmSchemaLoading.get()).toBe(true)
+    expect(result.current.$isPermissionsLoading.get()).toBe(true)
+  })
+
+  it('does not publish stale schema or permission failures into a replacement runtime', async () => {
+    const staleSchema = deferred<never>()
+    const stalePermissions = deferred<never>()
+    jazzMocks.fetchStoredWasmSchema
+      .mockReturnValueOnce(staleSchema.promise)
+      .mockReturnValueOnce(new Promise(() => undefined))
+    jazzMocks.fetchStoredPermissions
+      .mockReturnValueOnce(stalePermissions.promise)
+      .mockReturnValueOnce(new Promise(() => undefined))
+    const connection = {
+      id: 'connection-1',
+      name: 'Local app',
+      serverUrl: 'https://example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+      env: 'dev',
+    } as const
+    const { result, rerender } = renderHook(
+      ({ schemaHash }: { schemaHash: string }) =>
+        useInspectorRuntime({ connection, branch: 'main', schemaHash }),
+      { initialProps: { schemaHash: 'schema-1' } },
+    )
+
+    rerender({ schemaHash: 'schema-2' })
+    staleSchema.reject(new Error('Stale schema failure'))
+    stalePermissions.reject(new Error('Stale permissions failure'))
+    await Promise.allSettled([staleSchema.promise, stalePermissions.promise])
+
+    expect(result.current.$error.get()).toBeNull()
+    expect(result.current.$isWasmSchemaLoading.get()).toBe(true)
+    expect(result.current.$isPermissionsLoading.get()).toBe(true)
   })
 
   it('does not let stale provider cleanup clear a replacement client', () => {

@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[27/08/26]
+
+- [x] Reconcile unknown, duplicate, blocked, and multi-entry browser traversals without losing the Table workspace forward branch.
+- [x] Retain route pushes that occur before the Table navigation-history subscription commits.
+
 [25/08/26]
 
 - [x] Keep pagination commands in the route owner while row queries receive resolved search state and one out-of-range correction command.

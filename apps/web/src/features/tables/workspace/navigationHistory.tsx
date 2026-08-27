@@ -11,14 +11,19 @@ import {
 } from 'react'
 
 interface TableNavigationHistoryState {
-  entries: readonly string[]
+  entries: readonly TableNavigationHistoryEntry[]
   index: number
 }
 
+interface TableNavigationHistoryEntry {
+  browserIndex: number | null
+  href: string
+}
+
 type TableNavigationHistoryAction =
-  | { type: 'push'; href: string }
-  | { type: 'reconcile'; direction: 'back' | 'forward' | 'unknown'; href: string }
-  | { type: 'replace'; href: string }
+  | { type: 'push'; browserIndex: number | null; href: string }
+  | { type: 'reconcile'; browserIndex: number | null; href: string; offset: number | null }
+  | { type: 'replace'; browserIndex: number | null; href: string }
 
 interface TableNavigationControlsContextValue {
   canGoBack: boolean
@@ -35,26 +40,54 @@ const TableNavigationControlsContext = createContext<TableNavigationControlsCont
   null,
 )
 
-function appendHref(state: TableNavigationHistoryState, href: string): TableNavigationHistoryState {
-  const entries = [...state.entries.slice(0, state.index + 1), href]
+function appendEntry(
+  state: TableNavigationHistoryState,
+  entry: TableNavigationHistoryEntry,
+): TableNavigationHistoryState {
+  const entries = [...state.entries.slice(0, state.index + 1), entry]
   return { entries, index: entries.length - 1 }
 }
 
 function findPreviousHrefIndex(
-  entries: readonly string[],
+  entries: readonly TableNavigationHistoryEntry[],
   currentIndex: number,
   href: string,
 ): number {
   for (let index = currentIndex - 1; index >= 0; index -= 1) {
-    if (entries[index] === href) {
+    if (entries[index]?.href === href) {
       return index
     }
   }
   return -1
 }
 
-export function createTableNavigationHistory(href: string): TableNavigationHistoryState {
-  return { entries: [href], index: 0 }
+function getHistoryIndex(location: { state: unknown }): number | null {
+  if (location.state === null || typeof location.state !== 'object') {
+    return null
+  }
+  const index = (location.state as { __TSR_index?: unknown }).__TSR_index
+  return typeof index === 'number' && Number.isInteger(index) ? index : null
+}
+
+function getTableWorkspacePath(href: string): string | null {
+  const pathname = new URL(href, window.location.origin).pathname
+  const markerIndex = pathname.indexOf('/tables')
+  return markerIndex === -1 ? null : pathname.slice(0, markerIndex + '/tables'.length)
+}
+
+function isTableWorkspaceHref(href: string, workspacePath: string | null): boolean {
+  if (workspacePath === null) {
+    return false
+  }
+  const pathname = new URL(href, window.location.origin).pathname
+  return pathname === workspacePath || pathname.startsWith(`${workspacePath}/`)
+}
+
+export function createTableNavigationHistory(
+  href: string,
+  browserIndex: number | null = 0,
+): TableNavigationHistoryState {
+  return { entries: [{ browserIndex, href }], index: 0 }
 }
 
 export function reduceTableNavigationHistory(
@@ -62,24 +95,66 @@ export function reduceTableNavigationHistory(
   action: TableNavigationHistoryAction,
 ): TableNavigationHistoryState {
   if (action.type === 'reconcile') {
-    const matchingIndex =
-      action.direction === 'back'
-        ? findPreviousHrefIndex(state.entries, state.index, action.href)
-        : action.direction === 'forward'
-          ? state.entries.findIndex((href, index) => index > state.index && href === action.href)
-          : state.entries.findIndex((href) => href === action.href)
-    return matchingIndex === -1
-      ? appendHref(state, action.href)
-      : { ...state, index: matchingIndex }
+    const entry = { browserIndex: action.browserIndex, href: action.href }
+    if (action.browserIndex !== null) {
+      const matchingIndex = state.entries.findIndex(
+        (candidate, index) =>
+          index !== state.index && candidate.browserIndex === action.browserIndex,
+      )
+      if (matchingIndex !== -1) {
+        const entries = [...state.entries]
+        entries[matchingIndex] = entry
+        return { entries, index: matchingIndex }
+      }
+    }
+
+    if (action.offset !== null) {
+      const targetIndex = state.index + action.offset
+      if (targetIndex >= 0 && targetIndex < state.entries.length) {
+        const entries = [...state.entries]
+        entries[targetIndex] = entry
+        return { entries, index: targetIndex }
+      }
+
+      const matchingIndex =
+        action.browserIndex === null
+          ? action.offset < 0
+            ? findPreviousHrefIndex(state.entries, state.index, action.href)
+            : state.entries.findIndex(
+                (candidate, index) => index > state.index && candidate.href === action.href,
+              )
+          : -1
+      if (matchingIndex !== -1) {
+        return { ...state, index: matchingIndex }
+      }
+      if (targetIndex < 0) {
+        return { entries: [entry, ...state.entries], index: 0 }
+      }
+      return appendEntry(state, entry)
+    }
+
+    const matchingIndex = state.entries.findIndex((candidate) => candidate.href === action.href)
+    if (matchingIndex !== -1) {
+      return { ...state, index: matchingIndex }
+    }
+    return appendEntry(state, entry)
   }
 
   if (action.type === 'replace') {
+    const currentEntry = state.entries[state.index]
+    const browserIndex = action.browserIndex ?? currentEntry?.browserIndex ?? null
+    if (currentEntry?.href === action.href && currentEntry.browserIndex === browserIndex) {
+      return state
+    }
     const entries = [...state.entries]
-    entries[state.index] = action.href
+    entries[state.index] = {
+      browserIndex,
+      href: action.href,
+    }
     return { entries, index: state.index }
   }
 
-  return state.entries[state.index] === action.href ? state : appendHref(state, action.href)
+  return appendEntry(state, { browserIndex: action.browserIndex, href: action.href })
 }
 
 export function TableNavigationHistoryProvider({
@@ -87,42 +162,88 @@ export function TableNavigationHistoryProvider({
 }: TableNavigationHistoryProviderProps): React.ReactElement {
   const router = useRouter()
   const [history, setHistory] = useState(() =>
-    createTableNavigationHistory(router.latestLocation.href),
+    createTableNavigationHistory(
+      router.latestLocation.href,
+      getHistoryIndex(router.latestLocation),
+    ),
   )
   const historyRef = useRef(history)
+  const browserIndexRef = useRef(getHistoryIndex(router.latestLocation))
+  const pendingOffsetRef = useRef<number | null>(null)
   historyRef.current = history
 
   useEffect(() => {
+    const workspacePath = getTableWorkspacePath(router.latestLocation.href)
+    const updateHistory = (action: TableNavigationHistoryAction) => {
+      const nextHistory = reduceTableNavigationHistory(historyRef.current, action)
+      historyRef.current = nextHistory
+      setHistory(nextHistory)
+    }
     const unsubscribe = router.history.subscribe(({ action, location }) => {
+      if (isTableWorkspaceHref(location.href, workspacePath) === false) {
+        return
+      }
+      const browserIndex = getHistoryIndex(location)
+      if (
+        action.type !== 'PUSH' &&
+        action.type !== 'REPLACE' &&
+        browserIndex !== null &&
+        browserIndex === browserIndexRef.current &&
+        location.href === historyRef.current.entries[historyRef.current.index]?.href
+      ) {
+        return
+      }
+      browserIndexRef.current = browserIndex
       if (action.type !== 'PUSH' && action.type !== 'REPLACE') {
-        setHistory((currentHistory) =>
-          reduceTableNavigationHistory(currentHistory, {
-            type: 'reconcile',
-            direction:
-              action.type === 'BACK' || (action.type === 'GO' && action.index < 0)
-                ? 'back'
-                : action.type === 'FORWARD' || (action.type === 'GO' && action.index > 0)
-                  ? 'forward'
-                  : 'unknown',
-            href: location.href,
-          }),
-        )
+        const offset =
+          action.type === 'BACK'
+            ? -1
+            : action.type === 'FORWARD'
+              ? 1
+              : action.type === 'GO' && action.index !== 0
+                ? action.index
+                : (pendingOffsetRef.current ??
+                  (historyRef.current.entries[historyRef.current.index - 1]?.href === location.href
+                    ? -1
+                    : historyRef.current.entries[historyRef.current.index + 1]?.href ===
+                        location.href
+                      ? 1
+                      : -1))
+        pendingOffsetRef.current = null
+        updateHistory({
+          type: 'reconcile',
+          browserIndex,
+          href: location.href,
+          offset,
+        })
         return
       }
 
-      setHistory((currentHistory) =>
-        reduceTableNavigationHistory(currentHistory, {
-          type: action.type === 'REPLACE' ? 'replace' : 'push',
-          href: location.href,
-        }),
-      )
+      updateHistory({
+        type: action.type === 'REPLACE' ? 'replace' : 'push',
+        browserIndex,
+        href: location.href,
+      })
     })
-    setHistory((currentHistory) =>
-      reduceTableNavigationHistory(currentHistory, {
-        type: 'replace',
-        href: router.history.location.href,
-      }),
-    )
+    if (isTableWorkspaceHref(router.history.location.href, workspacePath) === true) {
+      const latestIndex = getHistoryIndex(router.latestLocation)
+      const historyIndex = getHistoryIndex(router.history.location)
+      browserIndexRef.current = historyIndex
+      updateHistory(
+        latestIndex !== null && historyIndex !== null && latestIndex !== historyIndex
+          ? {
+              type: 'reconcile',
+              browserIndex: historyIndex,
+              href: router.history.location.href,
+              offset: historyIndex - latestIndex,
+            }
+          : {
+              type: 'replace',
+              browserIndex: historyIndex,
+              href: router.history.location.href,
+            },
+      )
+    }
     return unsubscribe
   }, [router])
 
@@ -133,7 +254,18 @@ export function TableNavigationHistoryProvider({
         return
       }
 
-      router.history.go(index - currentHistory.index)
+      const currentBrowserIndex = currentHistory.entries[currentHistory.index]?.browserIndex
+      const targetBrowserIndex = currentHistory.entries[index]?.browserIndex
+      const browserOffset =
+        currentBrowserIndex !== null &&
+        currentBrowserIndex !== undefined &&
+        targetBrowserIndex !== null &&
+        targetBrowserIndex !== undefined
+          ? targetBrowserIndex - currentBrowserIndex
+          : 0
+      const offset = browserOffset === 0 ? index - currentHistory.index : browserOffset
+      pendingOffsetRef.current = offset
+      router.history.go(offset)
     },
     [router],
   )

@@ -15,6 +15,7 @@ const routeSearch = vi.hoisted(() => ({
   current: {
     empty: undefined as string | undefined,
     filters: undefined as string | undefined,
+    view: undefined as string | undefined,
   },
 }))
 const activeFilterSearch = JSON.stringify([
@@ -47,7 +48,7 @@ afterEach(cleanup)
 
 beforeEach(() => {
   navigate.mockReset()
-  routeSearch.current = { empty: undefined, filters: undefined }
+  routeSearch.current = { empty: undefined, filters: undefined, view: undefined }
   sessionState.currentConnectionId = 'connection'
   sessionState.currentTableName = 'accounts'
   schemaState.isSchemaReady = true
@@ -73,6 +74,12 @@ function MutationActions(): React.ReactElement {
       </button>
       <button type="button" onClick={mutations.discardAll}>
         Discard changes
+      </button>
+      <button
+        type="button"
+        onClick={() => mutations.setExecution({ error: null, status: 'applying' })}
+      >
+        Start applying
       </button>
     </>
   )
@@ -177,6 +184,57 @@ describe('TableTabsProvider', () => {
     )
     expect(screen.getByLabelText('Active tab').textContent).toBe('table:profiles')
     expect(screen.getByLabelText('Replaceable tab').textContent).toBe('table:accounts')
+  })
+
+  it('navigates to the adjacent tab with its stored search when the active tab closes', async () => {
+    window.localStorage.setItem(
+      'inspektor-tabs:scope',
+      JSON.stringify({
+        version: 1,
+        recentViews: [],
+        tabs: [
+          { id: 'table:accounts', kind: 'table', search: {}, tableName: 'accounts' },
+          {
+            id: 'table:profiles',
+            kind: 'table',
+            search: { filters: activeFilterSearch },
+            tableName: 'profiles',
+          },
+        ],
+      }),
+    )
+    render(<Harness />)
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts,table:profiles'),
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
+
+    expect(navigate).toHaveBeenLastCalledWith({
+      to: '/conn/$connectionId/tables/$tableName',
+      params: { connectionId: 'connection', tableName: 'profiles' },
+      search: { filters: activeFilterSearch },
+    })
+  })
+
+  it('activates New view after replacing an invalid routed table', async () => {
+    sessionState.currentTableName = 'removed'
+    const view = render(<Harness />)
+
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith({
+        to: '/conn/$connectionId/tables',
+        params: { connectionId: 'connection' },
+        replace: true,
+        search: { empty: 'true' },
+      }),
+    )
+    sessionState.currentTableName = null
+    routeSearch.current = { ...routeSearch.current, empty: 'true' }
+    view.rerender(<Harness />)
+
+    await waitFor(() => expect(screen.getByLabelText('Active tab').textContent).toBe('new-view'))
+    expect(screen.getByLabelText('Open tabs').textContent).toBe('new-view')
   })
 
   it('retains a legacy routed data tab while schema metadata is loading', async () => {
@@ -305,7 +363,7 @@ describe('TableTabsProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
 
     fireEvent.click(screen.getByText('Open accounts schema'))
-    routeSearch.current = { ...routeSearch.current, view: 'schema' } as never
+    routeSearch.current = { ...routeSearch.current, view: 'schema' }
     view.rerender(<Harness />)
     await waitFor(() =>
       expect(screen.getByLabelText('Open tabs').textContent).toContain('schema:accounts'),
@@ -316,5 +374,22 @@ describe('TableTabsProvider', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Open tabs').textContent).toBe('schema:accounts'),
     )
+  })
+
+  it('does not discard an applying ledger when its final tab closes', async () => {
+    render(<Harness />)
+    await waitFor(() =>
+      expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts'),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start applying' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close accounts' }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Discard and close' }))
+
+    expect(screen.getByRole('alertdialog', { name: 'Discard staged changes?' })).toBeDefined()
+    expect(screen.getByLabelText('Staged changes').textContent).toBe('1')
+    expect(screen.getByLabelText('Open tabs').textContent).toBe('table:accounts')
+    expect(navigate).not.toHaveBeenCalled()
   })
 })

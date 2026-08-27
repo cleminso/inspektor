@@ -214,7 +214,7 @@ export function parseFiltersFromSearchParam(value: string | null): TableFilterCl
   }
 }
 
-/** Serializes table filters so telemetry and relation links can open the same explorer state. */
+/** Serializes table filters so links can open the same explorer state. */
 export function serializeFiltersToSearchParam(filters: TableFilterClause[]): string | null {
   if (filters.length === 0) {
     return null
@@ -316,7 +316,7 @@ export function createTableFilterClauseFromValue(
   }
 }
 
-/** Keeps URL or telemetry clauses that can target the selected runtime table. */
+/** Keeps incoming clauses that can target the selected runtime table. */
 export function filterTableFilterClauses({
   filters,
   schema,

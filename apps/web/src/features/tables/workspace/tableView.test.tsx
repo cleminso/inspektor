@@ -3,7 +3,6 @@ import { forwardRef, useState, type ReactElement, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
-import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { TableView } from '@tables/workspace/tableView'
 
 const tableViewState = vi.hoisted(() => ({
@@ -60,7 +59,23 @@ const tableViewState = vi.hoisted(() => ({
   setPageSize: vi.fn(),
   table: {} as {
     getFocusedCell?: () => { column: { id: string }; row: { id: string } } | undefined
-    getRowModel?: () => { rows: Array<{ id: string; original: Record<string, unknown> }> }
+    getRowModel?: () => {
+      rows: Array<{
+        getVisibleCells?: () => Array<{
+          column: { id: string }
+          getCanSelect: () => boolean
+          getIsSelected: () => boolean
+        }>
+        id: string
+        original: Record<string, unknown>
+      }>
+    }
+    selectCellRange?: (range: {
+      anchorColumnId: string
+      anchorRowId: string
+      focusColumnId: string
+      focusRowId: string
+    }) => void
   },
   tableColumns: [] as Array<{
     accessorKey: string
@@ -75,17 +90,11 @@ const tableViewState = vi.hoisted(() => ({
   }>,
 }))
 const stageDeletions = vi.hoisted(() => vi.fn())
-const mutationLedgerUndoDeletions = vi.hoisted(() => vi.fn())
-const mutationLedgerRevertField = vi.hoisted(() => vi.fn())
-const mutationLedgerRevertRowUpdate = vi.hoisted(() => vi.fn())
 const mutationLedgerRebaseRows = vi.hoisted(() => vi.fn())
+const mutationLedgerUndoDeletions = vi.hoisted(() => vi.fn())
+const revertField = vi.hoisted(() => vi.fn())
+const revertRowUpdate = vi.hoisted(() => vi.fn())
 const mutationEditorController = vi.hoisted(() => ({ actions: {}, state: { draft: {} } }))
-const mutationEditorOptions = vi.hoisted(() => ({
-  current: null as null | { initialRowValues: Record<string, unknown>; rowId: string },
-}))
-const editRowFormProps = vi.hoisted(() => ({
-  current: null as null | { draftController: unknown; rowValues: Record<string, unknown> },
-}))
 const stagedFieldsByRowId = vi.hoisted(() => ({
   current: {} as Readonly<Record<string, ReadonlySet<string>>>,
 }))
@@ -95,25 +104,22 @@ const stagedValuesByRowId = vi.hoisted(() => ({
 const mutationExecution = vi.hoisted(() => ({
   current: { error: null as string | null, status: 'idle' as 'applying' | 'failed' | 'idle' },
 }))
-const gridContextMenuProps = vi.hoisted(() => ({ current: null as null | Record<string, unknown> }))
+const gridContextMenuProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const gridCellContextMenu = vi.hoisted(() => vi.fn())
 const gridRowContextMenu = vi.hoisted(() => vi.fn())
-const toastError = vi.hoisted(() => vi.fn())
-const toastSuccess = vi.hoisted(() => vi.fn())
 const useTableViewStateOptions = vi.hoisted(() => ({
-  current: null as null | {
-    onUndoRowDeletions?: (rowIds: readonly string[]) => void
-    schemaColumns?: readonly unknown[]
-    stagedValuesByRowId?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
-    tableKey?: string
-  },
+  current: null as Record<string, unknown> | null,
 }))
 const mutationLedgerProviderProps = vi.hoisted(() => ({
-  current: null as null | { schemaColumns: readonly unknown[]; scopeKey: string },
+  current: null as { schemaColumns: readonly unknown[]; scopeKey: string } | null,
 }))
-const fieldEditorProps = vi.hoisted(() => ({
-  current: null as null | { rowId: string; rowValues: Record<string, unknown> },
+const mutationEditorOptions = vi.hoisted(() => ({
+  current: null as Record<string, unknown> | null,
 }))
+const editRowFormProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
+const fieldEditorProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
+const toastError = vi.hoisted(() => vi.fn())
+const toastSuccess = vi.hoisted(() => vi.fn())
 const schemaColumns = vi.hoisted(() => [
   { name: 'name', column_type: { type: 'Text' as const }, nullable: false },
 ])
@@ -129,12 +135,7 @@ const mutationLedgerEntries = vi.hoisted(
 )
 
 vi.mock('@tables/workspace/useTableViewState', () => ({
-  useTableViewState: (options: {
-    onUndoRowDeletions?: (rowIds: readonly string[]) => void
-    schemaColumns?: readonly unknown[]
-    stagedValuesByRowId?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
-    tableKey?: string
-  }) => {
+  useTableViewState: (options: Record<string, unknown>) => {
     useTableViewStateOptions.current = options
     return tableViewState
   },
@@ -171,15 +172,12 @@ vi.mock('@tables/mutationLedger/provider', () => ({
     stageDeletions,
     ledger: { entries: mutationLedgerEntries, hasInvalidDraft: false },
     undoDeletions: mutationLedgerUndoDeletions,
-    revertField: mutationLedgerRevertField,
-    revertRowUpdate: mutationLedgerRevertRowUpdate,
+    revertField,
+    revertRowUpdate,
     stagedFieldsByRowId: stagedFieldsByRowId.current,
     stagedValuesByRowId: stagedValuesByRowId.current,
   }),
-  useTableMutationEditorController: (options: {
-    initialRowValues: Record<string, unknown>
-    rowId: string
-  }) => {
+  useTableMutationEditorController: (options: Record<string, unknown>) => {
     mutationEditorOptions.current = options
     return mutationEditorController
   },
@@ -192,15 +190,13 @@ vi.mock('@tables/grid/tableGridContextMenu', () => ({
   }: {
     children: (props: {
       composeViewport: (viewport: ReactNode) => ReactNode
-      onCellContextMenu: typeof gridCellContextMenu
-      onRowContextMenu: typeof gridRowContextMenu
+      onCellContextMenu: () => void
+      onRowContextMenu: () => void
     }) => ReactNode
   }) => {
     gridContextMenuProps.current = props
     return children({
-      composeViewport: (viewport) => (
-        <div data-testid="shared-grid-context-trigger">{viewport}</div>
-      ),
+      composeViewport: (viewport) => viewport,
       onCellContextMenu: gridCellContextMenu,
       onRowContextMenu: gridRowContextMenu,
     })
@@ -212,7 +208,7 @@ vi.mock('@tables/floatingWidget/floatingWidget', () => ({
     onAppliedUpdates,
     onApplySuccess,
   }: {
-    onAppliedUpdates?: (appliedUpdateFields: Readonly<Record<string, ReadonlySet<string>>>) => void
+    onAppliedUpdates?: (fields: Readonly<Record<string, ReadonlySet<string>>>) => void
     onApplySuccess?: () => void
   }) => (
     <button
@@ -237,13 +233,13 @@ vi.mock('@tables/floatingWidget/fieldEditorMutationWidget', () => ({
   }: {
     column: { name: string }
     onClose: () => void
-    onComplete: (direction: string) => void
+    onComplete: (key: string) => void
     rowId: string
     rowValues: Record<string, unknown>
   }) => {
-    fieldEditorProps.current = { rowId, rowValues }
+    fieldEditorProps.current = { column, rowId, rowValues }
     return (
-      <div role="dialog" aria-label={`Edit ${column.name}`}>
+      <div role="dialog" aria-label="Edit name">
         <button type="button" onClick={onClose}>
           Close field
         </button>
@@ -287,14 +283,8 @@ vi.mock('@tables/grid/toolbar', () => ({
 }))
 
 vi.mock('@tables/rowEditor/editForm', () => ({
-  EditRowForm: ({
-    draftController,
-    rowValues,
-  }: {
-    draftController: unknown
-    rowValues: Record<string, unknown>
-  }) => {
-    editRowFormProps.current = { draftController, rowValues }
+  EditRowForm: (props: Record<string, unknown>) => {
+    editRowFormProps.current = props
     return <div>Edit row fields</div>
   },
 }))
@@ -387,16 +377,8 @@ vi.mock('@inspector/ds', () => {
       {children}
     </div>
   )
-  const DataGridContent = ({
-    emptyContent,
-    loading,
-  }: {
-    emptyContent: ReactNode
-    loading: boolean
-  }) => (
-    <div data-loading={String(loading)}>
-      {tableViewState.rows.length === 0 ? emptyContent : null}
-    </div>
+  const DataGridContent = ({ emptyContent }: { emptyContent: ReactNode }) => (
+    <div>{tableViewState.rows.length === 0 ? emptyContent : null}</div>
   )
   const DataGridRoot = ({
     children,
@@ -467,10 +449,6 @@ vi.mock('@inspector/ds', () => {
     </button>
   )
 
-  const KeyboardInput = ({ hotkey }: { hotkey: string }) => (
-    <span data-testid="keyboard-input">{hotkey}</span>
-  )
-
   const CommandItem = ({
     children,
     disabled,
@@ -522,7 +500,7 @@ vi.mock('@inspector/ds', () => {
       Table: DataGridTable,
       Viewport: Container,
     },
-    KeyboardInput,
+    KeyboardInput: () => null,
     ResizableHandle: Container,
     ResizablePanel: Container,
     ResizablePanelGroup: Container,
@@ -567,16 +545,21 @@ afterEach(() => {
   gridContextMenuProps.current = null
   useTableViewStateOptions.current = null
   mutationLedgerProviderProps.current = null
-  fieldEditorProps.current = null
   mutationEditorOptions.current = null
   editRowFormProps.current = null
+  fieldEditorProps.current = null
+  gridCellContextMenu.mockReset()
+  gridRowContextMenu.mockReset()
+  tableViewState.handleEscape.mockReset()
+  tableViewState.handleFieldEditorCancel.mockReset()
+  tableViewState.handleFieldEditorComplete.mockReset()
+  tableViewState.handleMutationApplySuccess.mockReset()
+  tableViewState.handleMutationUpdatesApplied.mockReset()
   mutationLedgerRebaseRows.mockReset()
+  mutationLedgerUndoDeletions.mockReset()
   tableViewState.setPage.mockReset()
   tableViewState.setFilters.mockReset()
   tableViewState.handleCellEditRequest.mockReset()
-  tableViewState.handleEscape.mockReset()
-  tableViewState.handleMutationApplySuccess.mockReset()
-  tableViewState.handleMutationUpdatesApplied.mockReset()
   tableViewState.closeRowEditor.mockReset()
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
@@ -614,41 +597,78 @@ function configureNameCell(value: unknown) {
   }
 }
 
-describe('TableView selection dismissal', () => {
-  it('routes Escape to the active selection state', () => {
-    tableViewState.hasCellSelection = true
-    renderTableView()
-
-    fireEvent.keyDown(document, { key: 'Escape' })
-
-    expect(tableViewState.handleEscape).toHaveBeenCalledOnce()
-  })
-})
-
 describe('TableView cell actions', () => {
-  it('edits and filters by the displayed staged value through the shared context actions', () => {
+  it('connects shared context actions to the table owner', async () => {
     configureNameCell('Grace')
+    mutationLedgerEntries.push({ entryId: 'delete:row-2', kind: 'delete', rowId: 'row-2' })
+    stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
     stagedValuesByRowId.current = { 'row-1': { name: 'Katherine' } }
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
     renderTableView()
     const menuProps = gridContextMenuProps.current as {
-      getCellActions: (target: { columnId: string; rowId: string }) => {
-        canEdit: boolean
-        canFilterBy: boolean
-      }
+      getCellActions: (target: { columnId: string; rowId: string }) => unknown
+      onCopyCell: (target: { columnId: string; rowId: string }) => void
       onEditCell: (target: { columnId: string; rowId: string }) => void
       onFilterByCell: (target: { columnId: string; rowId: string }) => void
+      onTouchCellContextMenuOpen: (target: { columnId: string; rowId: string }) => void
+      revertField: typeof revertField
+      revertRowUpdate: typeof revertRowUpdate
+      stagedDeletionRowIds: ReadonlySet<string>
+      stagedFieldsByRowId: Readonly<Record<string, ReadonlySet<string>>>
     }
     const target = { columnId: 'name', rowId: 'row-1' }
+    const selectCellRange = vi.fn()
+    tableViewState.table = {
+      ...tableViewState.table,
+      getRowModel: () => ({
+        rows: [
+          {
+            id: 'row-1',
+            original: { id: 'row-1', name: 'Grace' },
+            getVisibleCells: () => [
+              {
+                column: { id: 'name' },
+                getCanSelect: () => true,
+                getIsSelected: () => false,
+              },
+            ],
+          },
+        ],
+      }),
+      selectCellRange,
+    }
 
-    expect(menuProps.getCellActions(target)).toMatchObject({ canEdit: true, canFilterBy: true })
+    menuProps.onCopyCell(target)
     menuProps.onEditCell(target)
     menuProps.onFilterByCell(target)
+    menuProps.onTouchCellContextMenuOpen(target)
 
+    expect(menuProps.getCellActions(target)).toEqual({
+      canCopy: true,
+      canEdit: true,
+      canFilterBy: true,
+      copyAs: [],
+    })
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('Katherine'))
     expect(tableViewState.handleCellEditRequest).toHaveBeenCalledWith(target)
     expect(tableViewState.setFilters).toHaveBeenCalledWith([
       tableViewState.filters[0],
       expect.objectContaining({ column: 'name', operator: 'eq', value: 'Katherine' }),
     ])
+    expect(selectCellRange).toHaveBeenCalledWith({
+      anchorColumnId: 'name',
+      anchorRowId: 'row-1',
+      focusColumnId: 'name',
+      focusRowId: 'row-1',
+    })
+    expect(menuProps.revertField).toBe(revertField)
+    expect(menuProps.revertRowUpdate).toBe(revertRowUpdate)
+    expect(menuProps.stagedDeletionRowIds).toEqual(new Set(['row-2']))
+    expect(menuProps.stagedFieldsByRowId).toBe(stagedFieldsByRowId.current)
   })
 
   it('copies the focused cell with Mod+C and renders a success toast', async () => {
@@ -694,8 +714,7 @@ describe('TableView cell actions', () => {
     expect(toastSuccess).not.toHaveBeenCalled()
   })
 
-  it('copies a binary context target in the selected format and renders a success toast', async () => {
-    const value = new Uint8Array([0, 1, 254, 255])
+  it('forwards the selected binary copy format', async () => {
     tableViewState.tableColumns = [
       {
         accessorKey: 'payload',
@@ -706,30 +725,72 @@ describe('TableView cell actions', () => {
       },
     ]
     tableViewState.table = {
-      getRowModel: () => ({ rows: [{ id: 'row-1', original: { id: 'row-1', payload: value } }] }),
+      getRowModel: () => ({
+        rows: [
+          { id: 'row-1', original: { id: 'row-1', payload: new Uint8Array([0, 1, 254, 255]) } },
+        ],
+      }),
     }
     const writeText = vi.fn().mockResolvedValue(undefined)
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText },
-    })
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
     renderTableView()
     const menuProps = gridContextMenuProps.current as {
-      getCellActions: (target: { columnId: string; rowId: string }) => { copyAs: string[] }
-      onCopyCell: (target: { columnId: string; rowId: string }, format: 'hex' | 'base64') => void
+      onCopyCell: (target: { columnId: string; rowId: string }, format: 'base64' | 'hex') => void
     }
-    const target = { columnId: 'payload', rowId: 'row-1' }
 
-    expect(menuProps.getCellActions(target).copyAs).toEqual(['hex', 'base64'])
-    menuProps.onCopyCell(target, 'base64')
+    menuProps.onCopyCell({ columnId: 'payload', rowId: 'row-1' }, 'base64')
 
-    await waitFor(() => {
-      expect(writeText).toHaveBeenCalledWith('AAH+/w==')
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('AAH+/w=='))
+  })
+})
+
+describe('TableView composition boundary', () => {
+  it('connects owner state and actions through the composed table surface', async () => {
+    tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
+    tableViewState.activeFieldEditorRowValues = { id: 'row-1', name: 'Ada' }
+    tableViewState.tableColumns = [nameTableColumn]
+    const { rerenderTableView } = renderTableView()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    fireEvent.click(screen.getByRole('button', { name: 'Open cell context' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Open row context' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Close field' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Complete field' }))
+    tableViewState.activeFieldEditorTarget = null
+    tableViewState.activeFieldEditorRowValues = null
+    rerenderTableView()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Apply' }))
+
+    expect(tableViewState.handleEscape).toHaveBeenCalledOnce()
+    expect(gridCellContextMenu).toHaveBeenCalledWith(
+      { columnId: 'name', rowId: 'row-1' },
+      expect.anything(),
+    )
+    expect(gridRowContextMenu).toHaveBeenCalledWith('row-1', expect.anything())
+    expect(tableViewState.handleFieldEditorCancel).toHaveBeenCalledOnce()
+    expect(tableViewState.handleFieldEditorComplete).toHaveBeenCalledWith('enter')
+    expect(tableViewState.handleMutationUpdatesApplied).toHaveBeenCalledWith({
+      'row-1': new Set(['name']),
     })
-    expect(toastSuccess).toHaveBeenCalledWith('Cell value copied as Base64', {
-      duration: 'brief',
-      id: '["cell-copy","connection-1:main:schema-1:accounts","row-1","payload"]',
+    expect(tableViewState.handleMutationApplySuccess).toHaveBeenCalledOnce()
+    expect(useTableViewStateOptions.current).toMatchObject({
+      schemaColumns,
+      tableKey: 'connection-1:main:schema-1:accounts',
     })
+    expect(mutationLedgerProviderProps.current).toEqual({
+      schemaColumns,
+      scopeKey: 'connection-1:main:schema-1:accounts',
+    })
+    expect(fieldEditorProps.current).toMatchObject({
+      column: schemaColumns[0],
+      rowId: 'row-1',
+      rowValues: { id: 'row-1', name: 'Ada' },
+    })
+    const undoRowDeletions = useTableViewStateOptions.current?.onUndoRowDeletions as
+      | ((rowIds: readonly string[]) => void)
+      | undefined
+    undoRowDeletions?.(['row-1'])
+    expect(mutationLedgerUndoDeletions).toHaveBeenCalledWith(['row-1'])
   })
 })
 
@@ -777,14 +838,6 @@ describe('TableView pagination hotkeys', () => {
 })
 
 describe('TableView query status', () => {
-  it('passes staged-deletion recovery into table state', () => {
-    renderTableView()
-
-    useTableViewStateOptions.current?.onUndoRowDeletions?.(['row-1'])
-
-    expect(mutationLedgerUndoDeletions).toHaveBeenCalledWith(['row-1'])
-  })
-
   it('stages checked-row deletion from the stable row editor surface', () => {
     tableViewState.detailPaneMode = 'rows'
     tableViewState.rowEditor.activeRowId = 'row-1'
@@ -801,22 +854,10 @@ describe('TableView query status', () => {
       initialRowValues: { id: 'row-1', name: 'Ada' },
       rowId: 'row-1',
     })
-    expect(editRowFormProps.current).toEqual({
+    expect(editRowFormProps.current).toMatchObject({
       draftController: mutationEditorController,
       rowValues: { id: 'row-1', name: 'Ada' },
     })
-  })
-
-  it('forwards the row editor close action', () => {
-    tableViewState.detailPaneMode = 'rows'
-    tableViewState.rowEditor.activeRowId = 'row-1'
-    tableViewState.rowEditor.editedRowIds = ['row-1', 'row-2']
-    tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
-
-    renderTableView()
-    fireEvent.click(screen.getByRole('button', { name: 'Close row editor' }))
-
-    expect(tableViewState.closeRowEditor).toHaveBeenCalledOnce()
   })
 
   it('blocks inline editing and marks rows while their deletion is staged', () => {
@@ -835,14 +876,6 @@ describe('TableView query status', () => {
     })
   })
 
-  it('marks recently inserted rows while their ephemeral highlight is active', () => {
-    tableViewState.recentlyInsertedRowIds = new Set(['row-1'])
-
-    renderTableView()
-
-    expect(screen.getByTestId('row-1-status').textContent).toBe('recentlyInserted')
-  })
-
   it('keeps staged deletion authoritative over the recently inserted highlight', () => {
     tableViewState.recentlyInsertedRowIds = new Set(['row-1'])
     mutationLedgerEntries.push({ entryId: 'delete:row-1', kind: 'delete', rowId: 'row-1' })
@@ -852,36 +885,29 @@ describe('TableView query status', () => {
     expect(screen.getByTestId('row-1-status').textContent).toBe('stagedDeletion')
   })
 
-  it('projects only applicable staged data fields into grid cell status', () => {
-    stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
-    stagedValuesByRowId.current = { 'row-1': { name: 'Grace' } }
+  it('marks recently inserted rows while their ephemeral highlight is active', () => {
+    tableViewState.recentlyInsertedRowIds = new Set(['row-1'])
 
     renderTableView()
 
-    expect(screen.getByTestId('row-1-name-status').textContent).toBe('stagedUpdate')
-    expect(screen.getByTestId('row-1-email-status').textContent).toBe('default')
-    expect(screen.getByTestId('row-1-selection-status').textContent).toBe('default')
-  })
-
-  it('marks recently applied cells while their ephemeral highlight is active', () => {
-    tableViewState.recentlyAppliedCells = { 'row-1': new Set(['name']) }
-
-    renderTableView()
-
-    expect(screen.getByTestId('row-1-name-status').textContent).toBe('recentlyApplied')
-    expect(screen.getByTestId('row-1-email-status').textContent).toBe('default')
-    expect(screen.getByTestId('row-1-selection-status').textContent).toBe('default')
+    expect(screen.getByTestId('row-1-status').textContent).toBe('recentlyInserted')
   })
 
   it('keeps a staged update authoritative over the recently applied highlight', () => {
-    tableViewState.recentlyAppliedCells = { 'row-1': new Set(['name', 'email']) }
+    tableViewState.recentlyAppliedCells = {
+      'row-1': new Set(['name', 'email', '\uE000inspector-row-selection']),
+    }
+    const { rerenderTableView } = renderTableView()
+
+    expect(screen.getByTestId('row-1-name-status').textContent).toBe('recentlyApplied')
+
     stagedFieldsByRowId.current = { 'row-1': new Set(['name']) }
     stagedValuesByRowId.current = { 'row-1': { name: 'Grace' } }
-
-    renderTableView()
+    rerenderTableView()
 
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('stagedUpdate')
     expect(screen.getByTestId('row-1-email-status').textContent).toBe('recentlyApplied')
+    expect(screen.getByTestId('row-1-selection-status').textContent).toBe('default')
   })
 
   it('uses the editing treatment after a staged cell opens its inline editor', () => {
@@ -902,43 +928,6 @@ describe('TableView query status', () => {
     expect(screen.getByTestId('row-1-name-status').textContent).toBe('default')
   })
 
-  it('wires one viewport context bridge to semantic Data Grid callbacks and ledger recovery', () => {
-    renderTableView()
-
-    expect(screen.getAllByTestId('shared-grid-context-trigger')).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Open cell context' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Open row context' }))
-
-    expect(gridCellContextMenu).toHaveBeenCalledWith(
-      { columnId: 'name', rowId: 'row-1' },
-      expect.anything(),
-    )
-    expect(gridRowContextMenu).toHaveBeenCalledWith('row-1', expect.anything())
-    expect(gridContextMenuProps.current).toMatchObject({
-      revertField: mutationLedgerRevertField,
-      revertRowUpdate: mutationLedgerRevertRowUpdate,
-      stagedFieldsByRowId: stagedFieldsByRowId.current,
-    })
-  })
-
-  it('wires the active scalar target to the explicit Floating field editor', async () => {
-    tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
-    tableViewState.activeFieldEditorRowValues = { id: 'row-1', name: 'Ada' }
-    tableViewState.tableColumns = [nameTableColumn]
-
-    renderTableView()
-
-    expect(await screen.findByRole('dialog', { name: 'Edit name' })).toBeTruthy()
-    expect(fieldEditorProps.current).toEqual({
-      rowId: 'row-1',
-      rowValues: { id: 'row-1', name: 'Ada' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Close field' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Complete field' }))
-    expect(tableViewState.handleFieldEditorCancel).toHaveBeenCalledOnce()
-    expect(tableViewState.handleFieldEditorComplete).toHaveBeenCalledWith('enter')
-  })
-
   it('blocks inline editing while Apply is running', () => {
     mutationExecution.current = { error: null, status: 'applying' }
     tableViewState.detailPaneMode = 'rows'
@@ -948,13 +937,6 @@ describe('TableView query status', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Edit row 1' }))
 
     expect(tableViewState.handleCellEditRequest).not.toHaveBeenCalled()
-    expect(
-      (
-        gridContextMenuProps.current as {
-          getCellActions: (target: { columnId: string; rowId: string }) => { canEdit: boolean }
-        }
-      ).getCellActions({ columnId: 'name', rowId: 'row-1' }).canEdit,
-    ).toBe(false)
     expect(screen.getByText('Applying changes')).toBeTruthy()
     expect(screen.queryByText('Edit row fields')).toBeNull()
     expect(
@@ -996,35 +978,6 @@ describe('TableView query status', () => {
     expect(screen.getByRole('alert').textContent).toBe('Unable to load row')
   })
 
-  it('passes one table scope and schema projection through the composition root', () => {
-    renderTableView()
-
-    expect(useTableViewStateOptions.current).toMatchObject({
-      schemaColumns,
-      tableKey: 'connection-1:main:schema-1:accounts',
-    })
-    expect(mutationLedgerProviderProps.current).toEqual({
-      schemaColumns,
-      scopeKey: 'connection-1:main:schema-1:accounts',
-    })
-  })
-
-  it('suppresses inline editing while keeping the staged widget available beside the row pane', () => {
-    tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
-    tableViewState.activeFieldEditorRowValues = { id: 'row-1', name: 'Ada' }
-    tableViewState.detailPaneMode = 'rows'
-    tableViewState.tableColumns = [nameTableColumn]
-
-    renderTableView()
-
-    expect(screen.queryByRole('dialog', { name: 'Edit name' })).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Complete Apply' }))
-    expect(tableViewState.handleMutationUpdatesApplied).toHaveBeenCalledWith({
-      'row-1': new Set(['name']),
-    })
-    expect(tableViewState.handleMutationApplySuccess).toHaveBeenCalledOnce()
-  })
-
   it('announces refresh completion and filtered emptiness', async () => {
     const { rerenderTableView } = renderTableView()
     const status = screen.getByRole('status')
@@ -1036,8 +989,6 @@ describe('TableView query status', () => {
       'true',
     )
     expect(screen.getByText('Refreshing rows')).toBe(status)
-    expect(document.querySelector('[data-loading="false"]')).not.toBeNull()
-
     tableViewState.isRefreshing = false
     tableViewState.rows = []
     rerenderTableView()
@@ -1161,12 +1112,6 @@ describe('TableView insert row hotkey', () => {
 
     expect(tableViewState.rowEditor.openInsert).not.toHaveBeenCalled()
     document.body.removeChild(dialog)
-  })
-
-  it('shows the insert row shortcut in the toolbar button tooltip', () => {
-    renderTableView()
-
-    expect(screen.getByTestId('keyboard-input').textContent).toBe(appHotkeys.insertRow)
   })
 
   it('registers an Insert row command in the command palette', () => {

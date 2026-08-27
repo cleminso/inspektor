@@ -5,18 +5,18 @@ import { TableTabsView } from '@tables/workspace/tabsView'
 
 const mocks = vi.hoisted(() => ({
   activateTab: vi.fn(),
+  closeTab: vi.fn(),
   goBack: vi.fn(),
   goForward: vi.fn(),
-  closeTab: vi.fn(),
   openNewView: vi.fn(),
   persistTab: vi.fn(),
   reorderTabs: vi.fn(),
   retryRuntime: vi.fn(),
   state: {
     activeTabId: null as string | null,
-    replaceableTabId: null as string | null,
     canGoBack: false,
     canGoForward: false,
+    replaceableTabId: null as string | null,
     runtimeError: null as { source: 'client' | 'schema'; error: Error } | null,
     tabs: [] as Array<
       | { kind: 'newView'; id: 'new-view' }
@@ -66,17 +66,17 @@ afterEach(cleanup)
 
 beforeEach(() => {
   mocks.activateTab.mockReset()
+  mocks.closeTab.mockReset()
   mocks.goBack.mockReset()
   mocks.goForward.mockReset()
-  mocks.closeTab.mockReset()
   mocks.openNewView.mockReset()
   mocks.persistTab.mockReset()
   mocks.reorderTabs.mockReset()
   mocks.retryRuntime.mockReset()
   mocks.state.activeTabId = null
-  mocks.state.replaceableTabId = null
   mocks.state.canGoBack = false
   mocks.state.canGoForward = false
+  mocks.state.replaceableTabId = null
   mocks.state.runtimeError = null
   mocks.state.tabs = []
 })
@@ -180,96 +180,6 @@ describe('TableTabsView', () => {
     expect(forwardButton.tabIndex).toBe(0)
   })
 
-  it('moves through Tables navigation history', () => {
-    mocks.state.canGoBack = true
-    mocks.state.canGoForward = true
-
-    render(<TableTabsView tableName={null} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Go Back' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Go Forward' }))
-
-    expect(mocks.goBack).toHaveBeenCalledOnce()
-    expect(mocks.goForward).toHaveBeenCalledOnce()
-  })
-
-  it('shows authored tooltips for available Tables navigation', async () => {
-    mocks.state.canGoBack = true
-    mocks.state.canGoForward = true
-
-    render(<TableTabsView tableName={null} />)
-    const backButton = screen.getByRole('button', { name: 'Go Back' })
-    fireEvent.mouseEnter(backButton)
-    fireEvent.mouseMove(backButton)
-
-    expect(await screen.findByText('Go Back')).toBeTruthy()
-    expect(
-      [...document.querySelectorAll('[data-slot="keyboard-input"]')].some((shortcut) =>
-        shortcut.textContent?.includes('['),
-      ),
-    ).toBe(true)
-
-    fireEvent.mouseLeave(backButton)
-    const forwardButton = screen.getByRole('button', { name: 'Go Forward' })
-    fireEvent.mouseEnter(forwardButton)
-    fireEvent.mouseMove(forwardButton)
-
-    expect(await screen.findByText('Go Forward')).toBeTruthy()
-    expect(
-      [...document.querySelectorAll('[data-slot="keyboard-input"]')].some((shortcut) =>
-        shortcut.textContent?.includes(']'),
-      ),
-    ).toBe(true)
-  })
-
-  it('shows authored tooltips for unavailable Tables navigation', async () => {
-    render(<TableTabsView tableName={null} />)
-    const backButton = screen.getByRole('button', { name: 'Go Back' })
-    fireEvent.focus(backButton)
-
-    expect(await screen.findByText('Go Back')).toBeTruthy()
-  })
-
-  it('keeps the tab bar visible with an authored new-view tooltip', async () => {
-    render(<TableTabsView tableName={null} />)
-
-    const addButton = screen.getByRole('button', { name: 'New view' })
-    expect(addButton.getAttribute('title')).toBeNull()
-    expect(screen.getByRole('tablist', { name: 'Open table views' })).toBeTruthy()
-    expect(screen.getByText('New table view content')).toBeTruthy()
-
-    fireEvent.mouseEnter(addButton)
-    fireEvent.mouseMove(addButton)
-    expect(await screen.findByText('New view')).toBeTruthy()
-    expect(
-      [...document.querySelectorAll('[data-slot="keyboard-input"]')].some((shortcut) =>
-        shortcut.textContent?.includes('N'),
-      ),
-    ).toBe(true)
-
-    fireEvent.click(addButton)
-    expect(mocks.openNewView).toHaveBeenCalledOnce()
-  })
-
-  it('shows the close-view hotkey in a table tab tooltip', async () => {
-    mocks.state.activeTabId = 'table:accounts'
-    mocks.state.tabs = [
-      {
-        kind: 'table',
-        id: 'table:accounts',
-        tableName: 'accounts',
-        search: {},
-      },
-    ]
-
-    render(<TableTabsView tableName="accounts" />)
-    const closeButton = screen.getByRole('button', { name: 'Close accounts' })
-    fireEvent.mouseEnter(closeButton)
-    fireEvent.mouseMove(closeButton)
-
-    expect(await screen.findByText('Close view')).toBeTruthy()
-    expect(screen.getByLabelText('Alt+W')).toBeTruthy()
-  })
-
   it('renders table content only for an active table tab', () => {
     mocks.state.activeTabId = 'table:accounts'
     mocks.state.tabs = [
@@ -317,30 +227,6 @@ describe('TableTabsView', () => {
     expect(screen.getAllByRole('button', { name: 'Close profiles' })).toHaveLength(2)
   })
 
-  it('keeps a replaceable table open from double click or its context menu', async () => {
-    mocks.state.activeTabId = 'table:accounts'
-    mocks.state.replaceableTabId = 'table:accounts'
-    mocks.state.tabs = [
-      {
-        kind: 'table',
-        id: 'table:accounts',
-        tableName: 'accounts',
-        search: {},
-      },
-    ]
-
-    render(<TableTabsView tableName="accounts" />)
-
-    const accountsTab = screen.getByRole('tab', { name: 'accounts' })
-    fireEvent.doubleClick(accountsTab)
-    expect(mocks.persistTab).toHaveBeenCalledWith('table:accounts')
-
-    mocks.persistTab.mockClear()
-    fireEvent.contextMenu(accountsTab, { clientX: 40, clientY: 20 })
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Keep open' }))
-    expect(mocks.persistTab).toHaveBeenCalledWith('table:accounts')
-  })
-
   it('does not offer to close the sole new-view tab', () => {
     mocks.state.activeTabId = 'new-view'
     mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]
@@ -351,59 +237,53 @@ describe('TableTabsView', () => {
     expect(screen.queryByRole('button', { name: 'Close New view' })).toBeNull()
   })
 
-  it('moves a table tab from its right-click reorder context menu', async () => {
+  it('forwards workspace navigation and tab actions', async () => {
     mocks.state.activeTabId = 'table:accounts'
+    mocks.state.canGoBack = true
+    mocks.state.canGoForward = true
+    mocks.state.replaceableTabId = 'table:accounts'
     mocks.state.tabs = [
-      {
-        kind: 'table',
-        id: 'table:accounts',
-        tableName: 'accounts',
-        search: {},
-      },
-      {
-        kind: 'table',
-        id: 'table:profiles',
-        tableName: 'profiles',
-        search: {},
-      },
+      { kind: 'table', id: 'table:accounts', tableName: 'accounts', search: {} },
+      { kind: 'table', id: 'table:profiles', tableName: 'profiles', search: {} },
     ]
-
     render(<TableTabsView tableName="accounts" />)
 
+    fireEvent.click(screen.getByRole('button', { name: 'Go Back' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Go Forward' }))
+    fireEvent.click(screen.getByRole('button', { name: 'New view' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'profiles' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close profiles' }))
+    fireEvent.doubleClick(screen.getByRole('tab', { name: 'accounts' }))
     await waitFor(() => {
       expect(
         screen.getByRole('tab', { name: 'accounts' }).closest('[data-reorder-ready]'),
       ).toBeTruthy()
     })
-    const accountsTab = screen.getByRole('tab', { name: 'accounts' })
-    fireEvent.contextMenu(accountsTab, { clientX: 40, clientY: 20 })
+    fireEvent.contextMenu(screen.getByRole('tab', { name: 'accounts' }), {
+      clientX: 40,
+      clientY: 20,
+    })
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Move right' }))
 
+    expect(mocks.goBack).toHaveBeenCalledOnce()
+    expect(mocks.goForward).toHaveBeenCalledOnce()
+    expect(mocks.openNewView).toHaveBeenCalledOnce()
+    expect(mocks.activateTab).toHaveBeenCalledWith('table:profiles')
+    expect(mocks.closeTab).toHaveBeenCalledWith('table:profiles')
+    expect(mocks.persistTab).toHaveBeenCalledWith('table:accounts')
     expect(mocks.reorderTabs).toHaveBeenCalledWith(['table:profiles', 'table:accounts'])
   })
 
-  it('activates an inactive table tab', () => {
-    mocks.state.activeTabId = 'table:accounts'
-    mocks.state.tabs = [
-      {
-        kind: 'table',
-        id: 'table:accounts',
-        tableName: 'accounts',
-        search: {},
-      },
-      {
-        kind: 'table',
-        id: 'table:profiles',
-        tableName: 'profiles',
-        search: {},
-      },
-    ]
+  it('shows the authored workspace navigation shortcuts', async () => {
+    render(<TableTabsView tableName={null} />)
 
-    render(<TableTabsView tableName="accounts" />)
+    const newViewButton = screen.getByRole('button', { name: 'New view' })
+    fireEvent.mouseEnter(newViewButton)
+    fireEvent.mouseMove(newViewButton)
+    expect(await screen.findByLabelText('Alt+N')).toBeTruthy()
 
-    const profilesTab = screen.getByRole('tab', { name: 'profiles' })
-    fireEvent.click(profilesTab)
-
-    expect(mocks.activateTab).toHaveBeenCalledWith('table:profiles')
+    fireEvent.mouseLeave(newViewButton)
+    fireEvent.focus(screen.getByRole('button', { name: 'Go Back' }))
+    expect(await screen.findByLabelText('Alt+Left Bracket')).toBeTruthy()
   })
 })

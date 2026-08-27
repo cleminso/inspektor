@@ -21,6 +21,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [27/08/26]
 
+### Test-suite review corrections
+
+- [x] Reload table preferences when the workspace table key changes instead of carrying the previous table's state into the new storage scope.
+- [x] Prune removed tables and invalid anchors from the stateful Table List selection owner.
+
+[27/08/26]
+
 ### Row-form footer composition
 
 - [x] Compose each edit-form footer action inside an equal flex item instead of deriving grid layout from the action count.

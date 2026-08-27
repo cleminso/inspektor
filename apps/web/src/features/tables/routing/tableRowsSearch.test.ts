@@ -37,6 +37,28 @@ describe('resolveTableRowsSearch', () => {
     })
   })
 
+  it.each([
+    [{}, { page: undefined, pageSize: undefined }, { page: 1, pageSize: 100 }],
+    [
+      { page: 1, pageSize: 100 },
+      { page: undefined, pageSize: undefined },
+      { page: 1, pageSize: 100 },
+    ],
+    [
+      { page: 3, pageSize: 500 },
+      { page: 3, pageSize: 500 },
+      { page: 3, pageSize: 500 },
+    ],
+    [
+      { page: -2, pageSize: 250 },
+      { page: undefined, pageSize: undefined },
+      { page: 1, pageSize: 100 },
+    ],
+  ])('canonicalizes and resolves pagination search %#', (search, canonical, resolved) => {
+    expect(canonicalizeTableRouteSearch(search)).toMatchObject(canonical)
+    expect(resolveTableRowsSearch(search)).toMatchObject(resolved)
+  })
+
   it('discards malformed clauses without removing repeated predicates', () => {
     const filters = [
       { id: 'range', column: 'age', operator: 'gte', value: 18 },
@@ -51,15 +73,22 @@ describe('resolveTableRowsSearch', () => {
     ])
   })
 
-  it('rejects pages whose offset cannot be represented by the Jazz runtime', () => {
-    const largestPage = Math.floor(0xffff_ffff / 100) + 1
-    const unsupportedPage = largestPage + 1
+  it.each([100, 500, 1000] as const)(
+    'rejects page offsets beyond the Jazz runtime limit for page size %i',
+    (pageSize) => {
+      const largestPage = Math.floor(0xffff_ffff / pageSize) + 1
+      const unsupportedPage = largestPage + 1
 
-    expect(resolveTableRowsSearch({ page: largestPage, pageSize: 100 }).page).toBe(largestPage)
-    expect(resolveTableRowsSearch({ page: unsupportedPage, pageSize: 100 }).page).toBe(1)
-    expect(canonicalizeTableRouteSearch({ page: String(unsupportedPage) }).page).toBeUndefined()
-    expect(canonicalizeTableRouteSearch({ page: '2' }).page).toBe(2)
-  })
+      expect(resolveTableRowsSearch({ page: largestPage, pageSize }).page).toBe(largestPage)
+      expect(resolveTableRowsSearch({ page: unsupportedPage, pageSize }).page).toBe(1)
+      expect(canonicalizeTableRouteSearch({ page: String(largestPage), pageSize }).page).toBe(
+        largestPage,
+      )
+      expect(
+        canonicalizeTableRouteSearch({ page: String(unsupportedPage), pageSize }).page,
+      ).toBeUndefined()
+    },
+  )
 
   it('keeps only canonical declared route search', () => {
     expect(

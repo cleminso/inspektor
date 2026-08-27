@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearch } from '@tanstack/react-router'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
@@ -30,6 +30,23 @@ export function TableExplorerScreen(): React.ReactElement {
   const tableSelectionAnchorRef = useRef<string | null>(null)
   const tableSelectionSectionRef = useRef<TableListSection | null>(null)
   const { isSchemaReady, tables } = useAvailableTables()
+  useEffect(() => {
+    const availableTableNames = new Set(tables)
+    if (
+      tableSelectionAnchorRef.current !== null &&
+      availableTableNames.has(tableSelectionAnchorRef.current) === false
+    ) {
+      tableSelectionAnchorRef.current = null
+    }
+    setCheckedTableNames((currentCheckedTableNames) => {
+      const nextCheckedTableNames = new Set(
+        [...currentCheckedTableNames].filter((tableName) => availableTableNames.has(tableName)),
+      )
+      return nextCheckedTableNames.size === currentCheckedTableNames.size
+        ? currentCheckedTableNames
+        : nextCheckedTableNames
+    })
+  }, [tables])
   const connectionEntryPending =
     isSchemaReady === false ||
     (currentTableName === null && routeSearch.empty !== 'true' && tables.length > 0)

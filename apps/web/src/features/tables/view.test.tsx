@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TableExplorerScreen } from '@tables/view'
+import type { TableCheckedChangeOptions } from '@tables/tableList/pane'
 import type { TableTabSearch } from '@tables/workspace/tabs'
 
 const mocks = vi.hoisted(() => ({
@@ -10,7 +11,13 @@ const mocks = vi.hoisted(() => ({
   currentTableName: 'accounts' as string | null,
   routeSearch: {} as { empty?: string; view?: string },
   tableListPaneProps: null as null | {
+    checkedTableNames: ReadonlySet<string>
     onPinTables: (tableNames: readonly string[]) => void
+    onTableCheckedChange: (
+      tableName: string,
+      checked: boolean,
+      options: TableCheckedChangeOptions,
+    ) => void
     tableSearchByName: ReadonlyMap<string, TableTabSearch>
   },
   tableTabsViewProps: null as null | {
@@ -38,7 +45,13 @@ vi.mock('@tables/schema/useAvailableTables', () => ({
 
 vi.mock('@tables/tableList/pane', () => ({
   TableListPane: (props: {
+    checkedTableNames: ReadonlySet<string>
     onPinTables: (tableNames: readonly string[]) => void
+    onTableCheckedChange: (
+      tableName: string,
+      checked: boolean,
+      options: TableCheckedChangeOptions,
+    ) => void
     tableSearchByName: ReadonlyMap<string, TableTabSearch>
   }) => {
     mocks.tableListPaneProps = props
@@ -59,8 +72,8 @@ vi.mock('@tables/tableList/layout', () => {
 vi.mock('@tables/tableList/pins', () => ({
   loadPinnedTableNames,
   savePinnedTableNames,
-  updatePinnedTableNames: (_current: ReadonlySet<string>, tableNames: readonly string[]) =>
-    new Set(tableNames),
+  updatePinnedTableNames: (current: ReadonlySet<string>, tableNames: readonly string[]) =>
+    new Set([...current, ...tableNames]),
 }))
 
 vi.mock('@tables/workspace/tabsProvider', () => ({
@@ -115,6 +128,82 @@ describe('TableExplorerScreen', () => {
     expect(loadPinnedTableNames).toHaveBeenCalledWith('workspace-scope')
     act(() => mocks.tableListPaneProps?.onPinTables(['accounts']))
     expect(savePinnedTableNames).toHaveBeenCalledWith('workspace-scope', expect.any(Set))
+  })
+
+  it('starts a new selection instead of extending a range across table sections', () => {
+    loadPinnedTableNames.mockReturnValueOnce(new Set(['accounts']))
+    mocks.availableTables = {
+      isSchemaReady: true,
+      tables: ['accounts', 'profiles', 'sessions', 'users'],
+    }
+    render(<TableExplorerScreen />)
+
+    act(() => {
+      mocks.tableListPaneProps?.onTableCheckedChange('accounts', true, {
+        extendRange: false,
+        orderedTableNames: ['accounts'],
+        section: 'pinned',
+      })
+    })
+    act(() => {
+      mocks.tableListPaneProps?.onTableCheckedChange('users', true, {
+        extendRange: true,
+        orderedTableNames: ['profiles', 'sessions', 'users'],
+        section: 'tables',
+      })
+    })
+
+    expect([...mocks.tableListPaneProps!.checkedTableNames]).toEqual(['users'])
+  })
+
+  it('replaces the range anchor after pinning moves a table to another section', () => {
+    loadPinnedTableNames.mockReturnValueOnce(new Set(['profiles']))
+    mocks.availableTables = { isSchemaReady: true, tables: ['accounts', 'profiles', 'users'] }
+    render(<TableExplorerScreen />)
+
+    act(() => {
+      mocks.tableListPaneProps?.onTableCheckedChange('accounts', true, {
+        extendRange: false,
+        orderedTableNames: ['accounts', 'users'],
+        section: 'tables',
+      })
+    })
+    act(() => mocks.tableListPaneProps?.onPinTables(['accounts']))
+    act(() => {
+      mocks.tableListPaneProps?.onTableCheckedChange('profiles', true, {
+        extendRange: true,
+        orderedTableNames: ['accounts', 'profiles'],
+        section: 'pinned',
+      })
+    })
+
+    expect([...mocks.tableListPaneProps!.checkedTableNames]).toEqual(['profiles'])
+
+    act(() => {
+      mocks.tableListPaneProps?.onTableCheckedChange('accounts', true, {
+        extendRange: true,
+        orderedTableNames: ['accounts', 'profiles'],
+        section: 'pinned',
+      })
+    })
+
+    expect([...mocks.tableListPaneProps!.checkedTableNames]).toEqual(['profiles', 'accounts'])
+  })
+
+  it('drops checked tables that disappear from the available table list', () => {
+    const { rerender } = render(<TableExplorerScreen />)
+    act(() => {
+      mocks.tableListPaneProps?.onTableCheckedChange('accounts', true, {
+        extendRange: false,
+        orderedTableNames: ['accounts', 'profiles'],
+        section: 'tables',
+      })
+    })
+
+    mocks.availableTables = { isSchemaReady: true, tables: ['profiles'] }
+    rerender(<TableExplorerScreen />)
+
+    expect([...mocks.tableListPaneProps!.checkedTableNames]).toEqual([])
   })
 
   it('routes table-list links to each open data tab search state', () => {

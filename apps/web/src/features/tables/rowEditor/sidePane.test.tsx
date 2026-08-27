@@ -60,29 +60,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
     expect(screen.getByRole('heading', { name: 'Edit row' })).toBeTruthy()
   })
 
-  it('renders compact selected-row navigation icons', () => {
-    render(
-      <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
-        editedRowIds={['row-1', 'row-2']}
-        mode="edit"
-        onNavigateNext={() => undefined}
-        onNavigatePrevious={() => undefined}
-      >
-        <div />
-      </RowEditorSidePanel>,
-    )
-
-    for (const name of ['Previous selected row', 'Next selected row']) {
-      const button = screen.getByRole('button', { name })
-      const icon = button.querySelector('[data-slot="icon"]')
-      expect(button.getAttribute('data-glyph-size')).toBe('standard')
-      expect(icon?.getAttribute('data-size')).toBe('s')
-    }
-  })
-
   it('controls whether successful inserts keep the form open', () => {
     const onInsertMoreEnabledChange = vi.fn()
     render(

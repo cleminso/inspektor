@@ -8,7 +8,11 @@ import {
 } from 'react'
 import { useBlocker, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 
-import { getConnectionDisplayName, type StoredConnection } from '@app/connections/connections'
+import {
+  getConnectionDisplayName,
+  type ConnectionDraft,
+  type StoredConnection,
+} from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
 import { resolveTablesNavigationTarget } from '@app/routing/inspectorNavigation'
 import { useInspectorSession } from '@app/session/useInspectorSession'
@@ -42,7 +46,12 @@ export interface InspectorSessionContextValue {
   switchBranch: (branch: string, knownSchemaHashes?: readonly string[]) => Promise<void>
   /** Persists a caller-selected schema without repeating discovery. */
   switchSchema: (schemaHash: string) => void
-  saveConnection: ReturnType<typeof useInspectorSession>['saveConnection']
+  saveConnectionWithContext: (
+    draft: ConnectionDraft,
+    connectionId: string,
+    branch: string,
+    schemaHash: string,
+  ) => ConnectionOpenResult
   deleteConnection: ReturnType<typeof useInspectorSession>['deleteConnection']
   getConnectionPreferences: ReturnType<typeof useInspectorSession>['getConnectionPreferences']
   setConnectionContext: (
@@ -203,6 +212,16 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
     },
     [currentBranch, currentConnectionId, currentSchemaHash, runtimeScopeExitGuard, session],
   )
+  const saveConnectionWithContext = useCallback(
+    (draft: ConnectionDraft, connectionId: string, branch: string, schemaHash: string) => {
+      if (runtimeScopeExitGuard.isBlocked() === true) {
+        return 'blocked'
+      }
+      session.saveConnectionWithContext(draft, connectionId, branch, schemaHash)
+      return 'accepted'
+    },
+    [runtimeScopeExitGuard, session],
+  )
 
   const value = useMemo<InspectorSessionContextValue>(
     () => ({
@@ -221,7 +240,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       openConnection,
       switchBranch,
       switchSchema,
-      saveConnection: session.saveConnection,
+      saveConnectionWithContext,
       deleteConnection: session.deleteConnection,
       getConnectionPreferences: session.getConnectionPreferences,
       setConnectionContext,
@@ -237,6 +256,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       pendingConnectionId,
       runtimeScopeExitGuard,
       session,
+      saveConnectionWithContext,
       setConnectionContext,
       switchBranch,
       switchSchema,

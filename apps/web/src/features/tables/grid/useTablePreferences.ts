@@ -67,9 +67,17 @@ export function useTablePreferences({
   tableKey,
 }: UseTablePreferencesOptions): UseTablePreferencesResult {
   const storageKey = getConnectionScopedStorageKey('tablePreferences', tableKey)
-  const [preferences, setPreferences] = useState<TablePreferences>(() =>
-    readTablePreferences(tableKey, columnIds),
-  )
+  const [preferenceState, setPreferenceState] = useState(() => ({
+    tableKey,
+    preferences: readTablePreferences(tableKey, columnIds),
+  }))
+  const preferences =
+    preferenceState.tableKey === tableKey
+      ? preferenceState.preferences
+      : readTablePreferences(tableKey, columnIds)
+  if (preferenceState.tableKey !== tableKey) {
+    setPreferenceState({ tableKey, preferences })
+  }
   const preferencesRef = useRef(preferences)
   preferencesRef.current = preferences
   const columnOrder = useMemo(
@@ -94,10 +102,10 @@ export function useTablePreferences({
 
       const next = { ...current, order: storedOrder }
       preferencesRef.current = next
-      setPreferences(next)
+      setPreferenceState({ tableKey, preferences: next })
       writeTablePreferences(storageKey, next)
     },
-    [columnIds, storageKey],
+    [columnIds, storageKey, tableKey],
   )
 
   const setColumnVisibility = useCallback(
@@ -114,10 +122,10 @@ export function useTablePreferences({
 
       const next = { ...current, hidden }
       preferencesRef.current = next
-      setPreferences(next)
+      setPreferenceState({ tableKey, preferences: next })
       writeTablePreferences(storageKey, next)
     },
-    [columnIds, storageKey],
+    [columnIds, storageKey, tableKey],
   )
 
   const columnVisibility = useMemo(

@@ -58,6 +58,37 @@ describe('useTablePreferences', () => {
     expect(result.current.columnVisibility).toEqual({ id: true, name: true, role: false })
   })
 
+  it('loads preferences for a new table scope without carrying over the previous table', () => {
+    window.localStorage.setItem(
+      'inspektor-table-preferences:connection%3Aaccounts',
+      JSON.stringify({ version: 1, order: ['name', 'id'], hidden: ['name'] }),
+    )
+    window.localStorage.setItem(
+      'inspektor-table-preferences:connection%3Aprojects',
+      JSON.stringify({ version: 1, order: ['status', 'id'], hidden: [] }),
+    )
+    const { result, rerender } = renderHook(
+      ({ tableKey }: { tableKey: string }) =>
+        useTablePreferences({ columnIds: ['id', 'name', 'status'], tableKey }),
+      { initialProps: { tableKey: 'connection:accounts' } },
+    )
+
+    rerender({ tableKey: 'connection:projects' })
+
+    expect(result.current.columnOrder).toEqual(['status', 'id', 'name'])
+    expect(result.current.columnVisibility).toEqual({ id: true, name: true, status: true })
+
+    act(() => {
+      result.current.setColumnVisibility({ id: false, name: true, status: true })
+    })
+
+    expect(
+      JSON.parse(
+        window.localStorage.getItem('inspektor-table-preferences:connection%3Aprojects') ?? 'null',
+      ),
+    ).toEqual({ version: 1, order: ['status', 'id'], hidden: ['id'] })
+  })
+
   it('persists order and hidden column changes without separate legacy keys', () => {
     const { result } = renderHook(() =>
       useTablePreferences({

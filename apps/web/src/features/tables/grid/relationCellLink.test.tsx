@@ -4,8 +4,25 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { RelationCellLink } from '@tables/grid/relationCellLink'
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: { children?: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
+  Link: ({
+    children,
+    params,
+    search,
+    to,
+  }: {
+    children?: React.ReactNode
+    params: { connectionId: string; tableName: string }
+    search: Record<string, unknown>
+    to: string
+  }) => (
+    <a
+      data-search={JSON.stringify(search)}
+      href={to
+        .replace('$connectionId', params.connectionId)
+        .replace('$tableName', params.tableName)}
+    >
+      {children}
+    </a>
   ),
 }))
 
@@ -20,17 +37,11 @@ vi.mock('@app/providers/inspectorProvider', () => ({
 afterEach(cleanup)
 
 describe('RelationCellLink', () => {
-  it('renders the stored ID with a trailing arrow and keeps relation navigation', () => {
+  it('links the stored ID to its related table', () => {
     render(<RelationCellLink relationTable="accounts" relationId="account_0123456789" />)
 
     const link = screen.getByRole('link', { name: 'account_0123456789' })
-    expect(link.getAttribute('href')).toBe('/conn/$connectionId/tables/$tableName')
-    expect(link.querySelector('[data-slot="middle-truncate"]')).toBeTruthy()
-    expect(
-      link
-        .closest('[data-slot="relation-value"]')
-        ?.querySelector('[data-slot="relation-value-navigation-icon"]'),
-    ).toBeTruthy()
-    expect(link.getAttribute('title')).toBeNull()
+    expect(link.getAttribute('href')).toBe('/conn/connection-1/tables/accounts')
+    expect(link.getAttribute('data-search')).toBe('{}')
   })
 })

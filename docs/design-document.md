@@ -168,24 +168,10 @@ flowchart TD
       SchemaItem --> StoredPermissions
     end
 
-    subgraph QuerySubscriptionsFlow["Query Subscriptions"]
-      QueriesNavigator --> QueryState["useQuerySubscriptionsState"]
-      QueryState --> Telemetry["useQuerySubscriptionsTelemetry"]
-      Telemetry --> FetchSubscriptions["fetchServerSubscriptions"]
-      Telemetry --> SnapshotCache["module memory snapshot cache"]
-      QueryState --> QueryList["Grouped subscription navigator"]
-      QueryList --> QueryItem
-      QueryItem --> QueryOverview["Overview and Raw JSON"]
-      QueryOverview --> buildTableExplorerLink["buildTableExplorerLink"]
-      buildTableExplorerLink --> ExtractFilters["extractFiltersFromIR"]
-      buildTableExplorerLink --> WorkspaceItems
-    end
-
     subgraph JazzServer["Jazz sync server and APIs"]
       SchemaHashes --> AdminEndpoints["Sync server admin endpoints"]
       StoredSchema --> AdminEndpoints
       StoredPermissions --> AdminEndpoints
-      FetchSubscriptions --> AdminEndpoints
       ReactiveRuntime --> SyncRuntime["Sync/query runtime"]
       MutationRuntime --> SyncRuntime
     end
@@ -502,7 +488,7 @@ Saved connections persist credentials and preferences in local storage. They do 
 server's schema hash list.
 
 Opening a saved connection still needs the Jazz server at `serverUrl` to be reachable when Inspector resolves schema hashes,
-fetches the selected stored schema, creates the admin client, and loads query subscription telemetry.
+fetches the selected stored schema, and creates the admin client.
 
 If the app dev server only produced the inspector link but the Jazz server is remote and still reachable, the saved connection
 can open without the app dev server. If the app dev server owns the managed local Jazz runtime, stopping it makes the saved
@@ -1356,27 +1342,9 @@ This flow **must answer**:
 
 #### Data source in Inspector
 
-Inspector gets Query Subscriptions data from the Jazz server introspection endpoint through `fetchServerSubscriptions(...)` from `Jazz-tools`.
+The planned data source is the Jazz server introspection endpoint exposed by `fetchServerSubscriptions(...)` from `Jazz-tools`.
 
-Current code path:
-
-1. `useQuerySubscriptionsTelemetry(...)` reads the active inspector connection.
-2. It calls `fetchServerSubscriptions(serverUrl, { adminSecret, appId })`.
-3. The server returns a snapshot with `generatedAt` and `queries`.
-4. Inspector stores the last successful snapshot in module memory to avoid empty flashes during navigation.
-5. `useQuerySubscriptionsState(...)` derives table counts, selected table filtering, and data-grid rows.
-6. `expandedRow.tsx` and query-subscription helpers parse the serialized query JSON when building the Data Explorer link.
-
-Relevant files:
-
-- `apps/web/src/hooks/useQuerySubscriptionsTelemetry.ts`
-- `apps/web/src/components/query-subscriptions/useQuerySubscriptionsState.ts`
-- `apps/web/src/components/query-subscriptions/dataGrid.tsx`
-- `apps/web/src/components/query-subscriptions/expandedRow.tsx`
-- `apps/web/src/lib/query-subscriptions/buildExplorerUrl.ts`
-- `apps/web/src/lib/query-subscriptions/extractFiltersFromIR.ts`
-
-The server response is a current snapshot, not logs. Inspector should not persist it across reloads. It can keep short-lived in-memory cache for navigation and mark stale data when refresh fails.
+The Query subscriptions route currently presents a placeholder. Telemetry fetching, caching, and Table Explorer links are not implemented.
 
 #### Table and query relationship
 

@@ -74,7 +74,7 @@ Run:
 pnpm inspector-test:fixture
 ```
 
-The command prints one JSON object containing the connection name, server URL, app ID, admin secret, environment, and branch. Use those values in Inspector. Press Ctrl+C to stop the fixture.
+The command prints readiness text followed by one JSON object containing the connection name, server URL, app ID, admin secret, environment, and branch. Use those values in Inspector. Press Ctrl+C to stop the fixture.
 
 Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, repeatable seeding, and server disposal.
 

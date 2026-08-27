@@ -61,58 +61,130 @@ function Harness(): React.ReactElement {
       <button type="button" onClick={() => void search.setSorting('name', 'desc')}>
         Sort by name
       </button>
+      <button
+        type="button"
+        onClick={() =>
+          void search.setFilters([{ id: 'filter-1', column: 'id', operator: 'eq', value: 'row-1' }])
+        }
+      >
+        Filter row
+      </button>
+      <button type="button" onClick={() => void search.setPage(3)}>
+        Page 3
+      </button>
+      <button type="button" onClick={() => void search.setPage(1)}>
+        Page 1
+      </button>
+      <button type="button" onClick={() => void search.setPageSize(500)}>
+        Show 500
+      </button>
+      <button type="button" onClick={() => void search.setPageSize(100)}>
+        Show 100
+      </button>
     </>
   )
 }
 
-describe('table route search ownership', () => {
-  it('commits canonical search and derives the active tab from route identity', async () => {
-    const rootRoute = createRootRoute({ component: Outlet })
-    const connectionRoute = createRoute({
-      getParentRoute: () => rootRoute,
-      path: 'conn/$connectionId',
-    })
-    const tablesRoute = createRoute({
-      component: Providers,
-      getParentRoute: () => connectionRoute,
-      path: 'tables',
-      validateSearch: canonicalizeTableRouteSearch,
-    })
-    const tableRoute = createRoute({
-      getParentRoute: () => tablesRoute,
-      path: '$tableName',
-    })
-    const tableIndexRoute = createRoute({
-      component: Harness,
-      getParentRoute: () => tableRoute,
-      path: '/',
-    })
-    const router = createRouter({
-      history: createMemoryHistory({
-        initialEntries: ['/conn/connection/tables/accounts?page=3&custom=discarded'],
-      }),
-      routeTree: rootRoute.addChildren([
-        connectionRoute.addChildren([
-          tablesRoute.addChildren([tableRoute.addChildren([tableIndexRoute])]),
-        ]),
+function createTestRouter(initialEntry: string) {
+  const rootRoute = createRootRoute({ component: Outlet })
+  const connectionRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: 'conn/$connectionId',
+  })
+  const tablesRoute = createRoute({
+    component: Providers,
+    getParentRoute: () => connectionRoute,
+    path: 'tables',
+    validateSearch: canonicalizeTableRouteSearch,
+  })
+  const tableRoute = createRoute({
+    getParentRoute: () => tablesRoute,
+    path: '$tableName',
+  })
+  const tableIndexRoute = createRoute({
+    component: Harness,
+    getParentRoute: () => tableRoute,
+    path: '/',
+  })
+
+  return createRouter({
+    history: createMemoryHistory({ initialEntries: [initialEntry] }),
+    routeTree: rootRoute.addChildren([
+      connectionRoute.addChildren([
+        tablesRoute.addChildren([tableRoute.addChildren([tableIndexRoute])]),
       ]),
-    })
+    ]),
+  })
+}
+
+describe('table route search ownership', () => {
+  it('commits setter updates through the active route and replaces grid history', async () => {
+    const router = createTestRouter(
+      '/conn/connection/tables/accounts?page=4&pageSize=500&custom=discarded',
+    )
+    const filters = JSON.stringify([
+      { id: 'filter-1', column: 'id', operator: 'eq', value: 'row-1' },
+    ])
 
     render(<RouterProvider router={router} />)
-    await screen.findByRole('button', { name: 'Sort by name' })
-    fireEvent.click(screen.getByRole('button', { name: 'Sort by name' }))
+    await screen.findByRole('button', { name: 'Filter row' })
 
+    fireEvent.click(screen.getByRole('button', { name: 'Filter row' }))
+    await waitFor(() => expect(router.state.location.search).toEqual({ filters, pageSize: 500 }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Page 3' }))
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ filters, page: 3, pageSize: 500 }),
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Page 1' }))
+    await waitFor(() => expect(router.state.location.search).toEqual({ filters, pageSize: 500 }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Page 3' }))
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ filters, page: 3, pageSize: 500 }),
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show 100' }))
+    await waitFor(() => expect(router.state.location.search).toEqual({ filters }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show 500' }))
+    await waitFor(() => expect(router.state.location.search).toEqual({ filters, pageSize: 500 }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Page 3' }))
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ filters, page: 3, pageSize: 500 }),
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Sort by name' }))
     await waitFor(() =>
       expect(screen.getByLabelText('Route search').textContent).toBe('name:desc:1'),
     )
-    expect(router.state.location.href).toBe('/conn/connection/tables/accounts?dir=desc&sort=name')
+    expect(router.state.location.search).toEqual({
+      dir: 'desc',
+      filters,
+      pageSize: 500,
+      sort: 'name',
+    })
     await waitFor(() =>
       expect(screen.getByLabelText('Active tab search').textContent).toBe(
-        JSON.stringify({ dir: 'desc', sort: 'name' }),
+        JSON.stringify({ dir: 'desc', filters, pageSize: 500, sort: 'name' }),
       ),
     )
     await act(() => router.history.back())
-    expect(router.state.location.href).toBe('/conn/connection/tables/accounts?dir=desc&sort=name')
+    expect(router.state.location.search).toEqual({
+      dir: 'desc',
+      filters,
+      pageSize: 500,
+      sort: 'name',
+    })
+  })
+
+  it('derives the active tab and its search from route navigation', async () => {
+    const router = createTestRouter('/conn/connection/tables/accounts')
+
+    render(<RouterProvider router={router} />)
+    await screen.findByRole('button', { name: 'Sort by name' })
 
     await act(() =>
       router.navigate({

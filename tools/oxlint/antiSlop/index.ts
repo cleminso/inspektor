@@ -2,6 +2,7 @@ import { eslintCompatPlugin } from '@oxlint/plugins'
 
 import { noChainedTypeAssertionsRule } from './rules/noChainedTypeAssertions.ts'
 import { noConditionalEmptyObjectSpreadRule } from './rules/noConditionalEmptyObjectSpread.ts'
+import { noDirectLucideJsxRule } from './rules/noDirectLucideJsx.ts'
 import { noReflectApplyRule } from './rules/noReflectApply.ts'
 import { noReflectGetRule } from './rules/noReflectGet.ts'
 import { noForbiddenTermInSymbolNamesRule } from './rules/noShapeInSymbolNames.ts'
@@ -12,6 +13,7 @@ const antiSlopPlugin = eslintCompatPlugin({
   rules: {
     'no-chained-type-assertions': noChainedTypeAssertionsRule,
     'no-conditional-empty-object-spread': noConditionalEmptyObjectSpreadRule,
+    'no-direct-lucide-jsx': noDirectLucideJsxRule,
     'no-reflect-apply': noReflectApplyRule,
     'no-reflect-get': noReflectGetRule,
     'no-shape-in-symbol-names': noForbiddenTermInSymbolNamesRule,

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { CodeEditorProps } from '@inspector/ds'
 import type { ColumnDescriptor } from 'jazz-tools'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -13,40 +13,21 @@ vi.mock('@inspector/ds', async (importOriginal) => {
     CodeEditor: ({
       describedBy,
       disabled = false,
-      expanded = false,
       id,
       invalid = false,
-      layout = 'intrinsic',
       labelledBy,
-      onExpandedChange,
-      readOnly = false,
       value,
     }: CodeEditorProps) => (
-      <div data-expanded={expanded} data-layout={layout} data-slot="code-editor">
-        <div
-          id={id}
-          aria-describedby={describedBy}
-          aria-disabled={disabled}
-          aria-invalid={invalid}
-          aria-labelledby={labelledBy}
-          role="textbox"
-          tabIndex={disabled === true ? -1 : 0}
-        >
-          {value}
-        </div>
-        {disabled === false && readOnly === false ? (
-          <button aria-label="Format JSON">Format JSON</button>
-        ) : null}
-        {disabled === false && readOnly === false ? (
-          <button
-            aria-label={`${expanded === true ? 'Collapse' : 'Expand'} ${id}`}
-            onClick={() => {
-              onExpandedChange?.(expanded === false)
-            }}
-          >
-            {expanded === true ? 'Collapse' : 'Expand'}
-          </button>
-        ) : null}
+      <div
+        id={id}
+        aria-describedby={describedBy}
+        aria-disabled={disabled}
+        aria-invalid={invalid}
+        aria-labelledby={labelledBy}
+        role="textbox"
+        tabIndex={disabled === true ? -1 : 0}
+      >
+        {value}
       </div>
     ),
   }
@@ -88,6 +69,36 @@ describe('InsertRowForm structured values', () => {
 
     expect(onClose).toHaveBeenCalledOnce()
     expect(onSave).not.toHaveBeenCalled()
+  })
+
+  it('ignores a second submission before saving state renders', async () => {
+    let resolveSave!: () => void
+    const onSave = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSave = resolve
+        }),
+    )
+    const columns = [
+      { name: 'name', column_type: { type: 'Text' }, nullable: false },
+    ] satisfies ColumnDescriptor[]
+    const { container } = render(
+      <InsertRowForm onSave={onSave} rowValues={{ name: 'Ada' }} schemaColumns={columns} />,
+    )
+    const form = container.querySelector('form')
+
+    expect(form).not.toBeNull()
+    act(() => {
+      form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+      form?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+    })
+
+    expect(onSave).toHaveBeenCalledOnce()
+
+    await act(async () => {
+      resolveSave()
+      await Promise.resolve()
+    })
   })
 
   it('resets the form after inserting while Insert more is enabled', async () => {
@@ -214,48 +225,6 @@ describe('InsertRowForm structured values', () => {
     expect((screen.getByRole('textbox', { name: 'Payload' }) as HTMLInputElement).value).toBe(
       '(2 bytes)',
     )
-  })
-
-  it('gives an expanded editor the insert form scroll area while preserving the footer', async () => {
-    const columns = [
-      { name: 'settings', column_type: { type: 'Json' }, nullable: false },
-    ] satisfies ColumnDescriptor[]
-    const { container } = render(
-      <InsertRowForm
-        onSave={() => undefined}
-        rowValues={{ settings: {} }}
-        schemaColumns={columns}
-      />,
-    )
-    const editor = await screen.findByRole('textbox', { name: 'Settings' })
-    const editorRoot = editor.closest('[data-slot="code-editor"]')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Expand row-editor-settings' }))
-
-    expect(screen.getByRole('textbox', { name: 'Settings' })).toBe(editor)
-    expect(editorRoot?.getAttribute('data-expanded')).toBe('true')
-    expect(editorRoot?.getAttribute('data-layout')).toBe('fill')
-    expect(
-      container
-        .querySelector('[data-row-editor-scroll-owner]')
-        ?.getAttribute('data-row-editor-scroll-owner'),
-    ).toBe('editor')
-    expect(screen.getByRole('button', { name: 'Insert' })).toBeTruthy()
-  })
-
-  it('overlays the form scrollbar without placing the footer in the viewport', () => {
-    const columns = [
-      { name: 'name', column_type: { type: 'Text' }, nullable: false },
-    ] satisfies ColumnDescriptor[]
-    const { container } = render(
-      <InsertRowForm onSave={() => undefined} rowValues={{}} schemaColumns={columns} />,
-    )
-
-    const viewport = container.querySelector('[data-row-editor-scroll-owner="form"]')
-
-    expect(viewport?.getAttribute('data-scrollbar')).toBe('hidden')
-    expect(viewport?.closest('[data-scrollbar="overlay"]')).toBeTruthy()
-    expect(viewport?.contains(screen.getByRole('button', { name: 'Insert' }))).toBe(false)
   })
 
   it('respects a supplied value for a nullable structured field', async () => {

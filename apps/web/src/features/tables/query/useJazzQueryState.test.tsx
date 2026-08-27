@@ -96,6 +96,32 @@ describe('useJazzQueryState', () => {
     })
   })
 
+  it('accepts an onDelta update after the query is fulfilled', () => {
+    entry.state = {
+      status: 'fulfilled',
+      data: [{ id: 'user-1', name: 'Ada' } as DynamicTableRow],
+      error: null,
+    }
+    const { result } = renderHook(() => useJazzQueryState(queryManager, query))
+
+    act(() => {
+      entry.state = {
+        status: 'fulfilled',
+        data: [{ id: 'user-1', name: 'Grace' } as DynamicTableRow],
+        error: null,
+      }
+      for (const listener of listeners) {
+        listener.onDelta?.()
+      }
+    })
+
+    expect(result.current).toMatchObject({
+      status: 'fulfilled',
+      data: [{ id: 'user-1', name: 'Grace' }],
+      error: null,
+    })
+  })
+
   it('exposes rejected query state instead of leaving the consumer loading', () => {
     const { result } = renderHook(() => useJazzQueryState(queryManager, query))
     const error = new Error('Query unavailable')

@@ -1,15 +1,22 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SchemaView } from '@tables/schema/view'
 
-const runtime = {
+const permissions = {
   permissions: {
-    permissions: {
-      profiles: { anyone: ['read'] },
-      rooms: { anyone: ['read', 'write'] },
-    },
+    profiles: { anyone: ['read'] },
+    rooms: { anyone: ['read', 'write'] },
   },
+}
+
+const runtime: {
+  isPermissionsLoading: boolean
+  permissions: typeof permissions | null
+  schema: Record<string, unknown>
+} = {
+  isPermissionsLoading: false,
+  permissions,
   schema: {
     profiles: {
       columns: [],
@@ -24,11 +31,15 @@ const runtime = {
 
 vi.mock('@app/providers/inspectorProvider', () => ({
   useRuntimePermissions: () => runtime.permissions,
-  useRuntimePermissionsLoading: () => false,
+  useRuntimePermissionsLoading: () => runtime.isPermissionsLoading,
   useRuntimeSchema: () => runtime.schema,
 }))
 
 afterEach(cleanup)
+beforeEach(() => {
+  runtime.isPermissionsLoading = false
+  runtime.permissions = permissions
+})
 
 describe('SchemaView', () => {
   it('renders independently searchable schema and permissions documents', () => {
@@ -46,6 +57,25 @@ describe('SchemaView', () => {
     expect(
       within(schema).getByRole('button', { name: 'Find schema JSON' }).getAttribute('aria-pressed'),
     ).toBe('true')
+  })
+
+  it('replaces permissions loading state with the loaded document', () => {
+    runtime.isPermissionsLoading = true
+    runtime.permissions = null
+    const { rerender } = render(<SchemaView tableName="profiles" />)
+
+    const loadingPermissions = screen.getByRole('region', { name: 'Permissions' })
+    expect(within(loadingPermissions).getByText('Loading permissions…')).toBeTruthy()
+    expect(within(loadingPermissions).queryByRole('tree')).toBeNull()
+
+    runtime.isPermissionsLoading = false
+    runtime.permissions = permissions
+    rerender(<SchemaView tableName="profiles" />)
+
+    const loadedPermissions = screen.getByRole('region', { name: 'Permissions' })
+    expect(within(loadedPermissions).queryByText('Loading permissions…')).toBeNull()
+    expect(within(loadedPermissions).getByRole('tree', { name: 'Permissions JSON' })).toBeTruthy()
+    expect(within(loadedPermissions).getByRole('treeitem', { name: /anyone/i })).toBeTruthy()
   })
 
   it('clears and closes only the focused search with Escape', () => {

@@ -23,7 +23,7 @@
     "inspector-test:seed": "pnpm --filter inspector-test cloud:seed",
     "inspector-test:validate": "pnpm --filter inspector-test cloud:validate",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
+    "test": "pnpm -r --if-present test && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
     "test:handles": "pnpm --filter @inspector/ds exec vitest run src/tokens/tokens.stylex.test.ts --reporter=default --reporter=hanging-process",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },

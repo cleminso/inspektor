@@ -90,7 +90,7 @@ describe('useInspectorSession', () => {
     ).toBeNull()
   })
 
-  it('does not advance the session snapshot when persistence fails', () => {
+  it('does not save a profile or its context when their persistence fails', () => {
     const { result } = renderHook(() => useInspectorSession())
     const draft = {
       name: 'First',
@@ -103,16 +103,25 @@ describe('useInspectorSession', () => {
 
     expect(() =>
       act(() => {
-        result.current.saveConnection(draft)
+        result.current.saveConnectionWithContext(draft, 'connection-1', 'feature', 'schema-1')
       }),
     ).toThrow('Storage unavailable')
 
+    expect(result.current.connections).toEqual([])
+    expect(result.current.activeConnectionId).toBeNull()
+    expect(window.localStorage.getItem('inspektor-connections')).toBeNull()
+
     writeError = null
     act(() => {
-      result.current.saveConnection({ ...draft, name: 'Second' })
+      result.current.saveConnectionWithContext(
+        { ...draft, name: 'Second' },
+        'connection-1',
+        'feature',
+        'schema-1',
+      )
     })
-
     expect(result.current.connections.map(({ name }) => name)).toEqual(['Second'])
+    expect(result.current.activeConnectionId).toBe('connection-1')
   })
 
   it.each([
@@ -123,7 +132,12 @@ describe('useInspectorSession', () => {
     const { connection, result } = renderStoredSession()
 
     act(() => {
-      result.current.saveConnection({ ...connection, [field]: value }, connection.id)
+      result.current.saveConnectionWithContext(
+        { ...connection, [field]: value },
+        connection.id,
+        'main',
+        'schema-1',
+      )
     })
 
     expect(window.localStorage.getItem(tabsKey)).toBeNull()
@@ -133,7 +147,12 @@ describe('useInspectorSession', () => {
     const { connection, result } = renderStoredSession('secret-1')
 
     act(() => {
-      result.current.saveConnection({ ...connection, adminSecret: 'secret-2' }, connection.id)
+      result.current.saveConnectionWithContext(
+        { ...connection, adminSecret: 'secret-2' },
+        connection.id,
+        'main',
+        'schema-1',
+      )
     })
 
     expect(window.localStorage.getItem(tabsKey)).toBe('{}')

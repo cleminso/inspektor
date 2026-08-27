@@ -110,6 +110,24 @@ describe('classifySchemaValue', () => {
     },
   )
 
+  it.each([
+    [{ type: 'Text' }, 42, 'text'],
+    [{ type: 'Uuid' }, {}, 'text'],
+    [{ type: 'Integer' }, 1.5, 'an integer'],
+    [{ type: 'Double' }, Number.POSITIVE_INFINITY, 'a finite number'],
+    [{ type: 'Boolean' }, 'true', 'a boolean'],
+    [{ type: 'Bytea' }, [1, 2], 'a Uint8Array'],
+  ] satisfies readonly [ColumnType, unknown, string][])(
+    'rejects invalid %s scalar runtime values',
+    (columnType, rawValue, expectation) => {
+      expect(classifySchemaValue(rawValue, column(columnType))).toMatchObject({
+        kind: 'invalid',
+        rawValue,
+        expectation,
+      })
+    },
+  )
+
   it('represents bytes by count without serializing indexed values', () => {
     const rawValue = new Uint8Array(2_000)
     const presentation = classifySchemaValue(rawValue, column({ type: 'Bytea' }))

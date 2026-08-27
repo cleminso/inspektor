@@ -12,6 +12,7 @@ import type { ResolvedTablesNavigationTarget } from '@app/routing/inspectorNavig
 
 const navigate = vi.fn()
 const setConnectionContext = vi.fn()
+const saveConnectionWithContext = vi.fn()
 const resolveTablesNavigationTarget = vi.hoisted(() => vi.fn())
 const connectionPreferences = {
   lastBranch: 'main',
@@ -82,7 +83,7 @@ const session = {
     (_connectionId: string, _schemas: readonly { hash: string }[], schemaHash?: string | null) =>
       schemaHash ?? 'schema-1',
   ),
-  saveConnection: vi.fn(),
+  saveConnectionWithContext,
   setConnectionContext,
 }
 
@@ -137,6 +138,7 @@ afterEach(() => {
   blockerOptions = null
   routerMatches = []
   setConnectionContext.mockReset()
+  saveConnectionWithContext.mockReset()
 })
 
 function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
@@ -176,6 +178,32 @@ function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
       >
         Set runtime scope
       </button>
+      <button
+        type="button"
+        onClick={() =>
+          inspectorSession.saveConnectionWithContext(
+            connections['connection-2'],
+            'connection-2',
+            'feature',
+            'schema-2',
+          )
+        }
+      >
+        Save and set runtime scope
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          inspectorSession.saveConnectionWithContext(
+            connections['connection-1'],
+            'connection-1',
+            'main',
+            'schema-1',
+          )
+        }
+      >
+        Save active connection
+      </button>
     </>
   )
 }
@@ -201,13 +229,29 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Switch branch' }))
       fireEvent.click(screen.getByRole('button', { name: 'Switch schema' }))
       fireEvent.click(screen.getByRole('button', { name: 'Set runtime scope' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Save and set runtime scope' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Save active connection' }))
     })
 
     expect(setConnectionContext).not.toHaveBeenCalled()
+    expect(saveConnectionWithContext).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
     expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe('true')
     expect(screen.getByRole('status', { name: 'Connection open result' }).textContent).toBe(
       'blocked',
+    )
+  })
+
+  it('saves a connection and its context after the runtime-scope guard accepts the change', () => {
+    render(<TestSession blocked={false} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save and set runtime scope' }))
+
+    expect(saveConnectionWithContext).toHaveBeenCalledWith(
+      connections['connection-2'],
+      'connection-2',
+      'feature',
+      'schema-2',
     )
   })
 
@@ -377,15 +421,6 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     expect(screen.getByRole('status', { name: 'Connection open result' }).textContent).toBe(
       'accepted',
     )
-  })
-
-  it('forwards repeated accepted connection intent', () => {
-    render(<TestSession blocked={false} />)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
-
-    expect(navigate).toHaveBeenCalledTimes(2)
   })
 
   it('derives the pending connection from the router match', () => {

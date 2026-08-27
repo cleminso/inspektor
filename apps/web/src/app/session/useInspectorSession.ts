@@ -42,7 +42,12 @@ export interface UseInspectorSessionResult {
     schemaCatalogue: readonly { hash: string }[],
     schemaHash?: string | null,
   ) => string | null
-  saveConnection: (draft: ConnectionDraft, connectionId?: string) => StoredConnection
+  saveConnectionWithContext: (
+    draft: ConnectionDraft,
+    connectionId: string,
+    branch: string,
+    schemaHash: string,
+  ) => StoredConnection
   deleteConnection: (connectionId: string) => void
   setConnectionContext: (connectionId: string, branch: string, schemaHash: string) => void
 }
@@ -83,11 +88,26 @@ export function useInspectorSession(): UseInspectorSessionResult {
     [state.store],
   )
 
-  const saveConnection = useCallback(
-    (draft: ConnectionDraft, connectionId?: string) => {
+  const deleteConnection = useCallback(
+    (connectionId: string) => {
+      updateStore((store) => removeConnection(store, connectionId))
+      removeConnectionScopedStorage(connectionId)
+    },
+    [updateStore],
+  )
+
+  const saveConnectionWithContext = useCallback(
+    (draft: ConnectionDraft, connectionId: string, branch: string, schemaHash: string) => {
       const existingConnection = getConnectionById(storeRef.current, connectionId)
       const connection = createConnectionFromDraft(draft, connectionId)
-      updateStore((store) => upsertConnection(store, connection))
+      updateStore((store) =>
+        setActiveConnectionContext(
+          upsertConnection(store, connection),
+          connectionId,
+          branch,
+          schemaHash,
+        ),
+      )
       if (
         existingConnection !== null &&
         (existingConnection.appId !== connection.appId ||
@@ -97,14 +117,6 @@ export function useInspectorSession(): UseInspectorSessionResult {
         removeConnectionScopedStorage(connection.id)
       }
       return connection
-    },
-    [updateStore],
-  )
-
-  const deleteConnection = useCallback(
-    (connectionId: string) => {
-      updateStore((store) => removeConnection(store, connectionId))
-      removeConnectionScopedStorage(connectionId)
     },
     [updateStore],
   )
@@ -135,14 +147,14 @@ export function useInspectorSession(): UseInspectorSessionResult {
         schemaCatalogue: readonly { hash: string }[],
         schemaHash?: string | null,
       ) => resolveDefaultSchemaHash(state.store, connectionId, schemaCatalogue, schemaHash),
-      saveConnection,
+      saveConnectionWithContext,
       deleteConnection,
       setConnectionContext,
     }),
     [
       deleteConnection,
       getConnection,
-      saveConnection,
+      saveConnectionWithContext,
       setConnectionContext,
       state.prefill,
       state.store,

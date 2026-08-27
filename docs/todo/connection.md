@@ -11,11 +11,16 @@
 
 ## Implemented foundation
 
+[27/08/26]
+
+- [x] Guard and persist a connection profile plus its branch and schema context as one atomic session update.
+- [x] Keep blocked connection setup from saving a profile, changing runtime context, or navigating.
+- [x] Cover empty, single-schema, and explicit schema-choice connection entry through the onboarding owner.
+
 [25/08/26]
 
 - [x] Apply each route-resolved runtime target once so later branch and schema selections remain session-owned.
 - [x] Keep the rendered, imperative, and persisted connection snapshots aligned when browser storage rejects a write.
-- [x] Tie subscription telemetry caching to connection-profile object lifetime so deleted or replaced credentials and rows can be released.
 
 [25/08/26]
 
@@ -33,10 +38,6 @@
 [25/08/26]
 
 - [x] Use the `inspektor-` localStorage namespace for saved connection profiles.
-
-[25/08/26]
-
-- [x] Keep the validated version 3 connection envelope while removing compatibility with disposable version 2 and unversioned local profiles.
 
 [24/08/26]
 
@@ -254,7 +255,6 @@
 
 - [x] Cover session-owned branch and schema changes after route-target synchronization.
 - [x] Cover connection persistence failure without advancing the imperative session snapshot.
-- [x] Cover replaced connection profiles starting with an empty telemetry cache.
 
 [25/08/26]
 

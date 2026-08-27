@@ -6,6 +6,7 @@ import { fetchSchemaHashes } from 'jazz-tools'
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { findConnectionByCredentials } from '@app/connections/connectionIdentity'
 import {
+  createConnectionFromDraft,
   getConnectionDisplayName,
   normalizeBranchName,
   normalizeEnvName,
@@ -53,7 +54,7 @@ interface UseAddConnectionFlowOptions {
 export function useAddConnectionFlow(
   options?: UseAddConnectionFlowOptions,
 ): UseAddConnectionFlowResult {
-  const { connections, prefill, saveConnection, setConnectionContext } =
+  const { connections, prefill, saveConnectionWithContext, setConnectionContext } =
     useInspectorSessionContext()
   const navigate = useNavigate()
   const [step, setStep] = useState<AddConnectionStep>('form')
@@ -97,19 +98,23 @@ export function useAddConnectionFlow(
       env: normalizeEnvName(formValues.env),
     }
     const existingConnection = findConnectionByCredentials(connections, draft)
-    const connection =
+    const opensExistingConnection =
       existingConnection !== null && existingConnection.id !== options?.connection.id
-        ? existingConnection
-        : options === undefined
-          ? saveConnection(draft)
-          : saveConnection(draft, options.connection.id)
+    const connectionId = opensExistingConnection
+      ? existingConnection.id
+      : (options?.connection.id ?? createConnectionFromDraft(draft).id)
 
-    setConnectionContext(connection.id, branch, schemaHash)
+    const result = opensExistingConnection
+      ? setConnectionContext(connectionId, branch, schemaHash)
+      : saveConnectionWithContext(draft, connectionId, branch, schemaHash)
+    if (result === 'blocked') {
+      return
+    }
 
     await navigate({
       to: appRoutes.tables,
       params: {
-        connectionId: connection.id,
+        connectionId,
       },
     })
   }

@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[27/08/26]
+
+- [x] Replace the regex application icon tripwire with an Oxlint AST rule covering named, aliased, and namespace Lucide JSX.
+- [x] Keep Lucide artwork values valid when they pass through constrained design-system component props.
+
 [11/08/26]
 
 - [x] Accept namespace-imported Lucide artwork when it passes through the constrained Icon boundary.
@@ -48,12 +53,6 @@
 
 ## Open product work
 
-[11/08/26]
-
-- [x] Restrict `IconArtwork` to ref-forwarding SVG components while documenting root shape, prop forwarding, and color behavior as a trusted artwork protocol.
-- [x] Add type coverage that rejects plain function artwork and preserve React 18-compatible ref forwarding in fixtures.
-- [x] Rename the application Lucide policy assertion as a direct-rendering tripwire and cover aliased named imports without claiming complete data-flow enforcement.
-
 [31/07/26]
 
 - None.
@@ -77,7 +76,7 @@
 - General outlines use 2-unit strokes in a 24-unit viewBox, compact disclosures use 1.5 in 16, selection indicators use 2 in 16, and micro-navigation uses approximately 1.25 in 12.
 - Icon does not force one raw stroke width because artwork viewBox scale and fill category determine optical weight.
 - Dock Buttons retain the compact 12px glyph treatment inside their 20px control frames.
-- The application policy check detects direct named Lucide JSX rendering and does not claim complete data-flow enforcement.
+- The application policy check detects direct named, aliased, and namespace Lucide JSX rendering while allowing artwork passed to constrained components.
 
 [11/08/26]
 

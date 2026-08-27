@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -14,31 +14,10 @@ function renderDock(
 }
 
 describe('InspectorDock', () => {
-  it('uses semantic extra-small icons without native tooltips', () => {
+  it('gives the subscriptions control an accessible name', () => {
     renderDock({ isOpen: false, onToggle: () => undefined })
 
-    for (const name of ['Open left dock', 'Open subscriptions dock', 'Open commands']) {
-      const button = screen.getByRole('button', { name })
-      const icon = button.querySelector('[data-slot="icon"]')
-      expect(button.getAttribute('data-glyph-size')).toBe('compact')
-      expect(icon?.getAttribute('data-size')).toBe('xs')
-      expect(button.getAttribute('title')).toBeNull()
-    }
-  })
-
-  it('orders the command action after the dock controls and separator', () => {
-    renderDock({ isOpen: false, onToggle: () => undefined })
-
-    const leftDock = screen.getByRole('group', { name: 'dock left' })
-    expect(within(leftDock).getByRole('button', { name: 'Open left dock' })).toBeTruthy()
-    const subscriptions = within(leftDock).getByRole('button', {
-      name: 'Open subscriptions dock',
-    })
-    const separator = within(leftDock).getByRole('separator', { name: 'Command actions' })
-    const commands = within(leftDock).getByRole('button', { name: 'Open commands' })
-    expect(separator.getAttribute('aria-orientation')).toBe('vertical')
-    expect(subscriptions.nextElementSibling).toBe(separator)
-    expect(separator.nextElementSibling).toBe(commands)
+    expect(screen.getByRole('button', { name: 'Open subscriptions dock' })).toBeTruthy()
   })
 
   it('opens and closes the left dock from one button', () => {

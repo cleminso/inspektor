@@ -50,7 +50,26 @@ describe('serializeCellValueForClipboard', () => {
     })
   })
 
-  it('rejects unavailable values', () => {
-    expect(() => serializeCellValueForClipboard(undefined)).toThrow('Cell value is unavailable.')
+  it.each([
+    ['an unavailable value', undefined],
+    ['an invalid Date', new Date(Number.NaN)],
+    [
+      'a circular object',
+      (() => {
+        const value: { self?: unknown } = {}
+        value.self = value
+        return value
+      })(),
+    ],
+    [
+      'an object with a throwing JSON serializer',
+      {
+        toJSON: () => {
+          throw new Error('failure')
+        },
+      },
+    ],
+  ])('rejects %s', (_name, value) => {
+    expect(() => serializeCellValueForClipboard(value)).toThrow('Cell value is unavailable.')
   })
 })

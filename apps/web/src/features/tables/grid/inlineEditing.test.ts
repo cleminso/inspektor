@@ -98,4 +98,31 @@ describe('resolveSpreadsheetCompletionTarget', () => {
       resolveSpreadsheetCompletionTarget(rows, { rowId: 'row-1', columnId: 'name' }, 'tabBackward'),
     ).toEqual({ rowId: 'row-1', columnId: 'name' })
   })
+
+  it.each([
+    ['enter', { rowId: 'row-1', columnId: 'role' }],
+    ['tabForward', { rowId: 'row-2', columnId: 'name' }],
+    ['tabBackward', { rowId: 'row-1', columnId: 'role' }],
+  ] as const)('handles ragged rows for %s completion', (direction, expected) => {
+    const raggedRows = [rows[0] ?? [], [{ rowId: 'row-2', columnId: 'name' }]]
+
+    expect(
+      resolveSpreadsheetCompletionTarget(
+        raggedRows,
+        direction === 'tabBackward'
+          ? { rowId: 'row-2', columnId: 'name' }
+          : { rowId: 'row-1', columnId: 'role' },
+        direction,
+      ),
+    ).toEqual(expected)
+  })
+
+  it.each(['enter', 'tabForward', 'tabBackward'] as const)(
+    'keeps an unknown origin for %s completion',
+    (direction) => {
+      const origin = { rowId: 'unknown', columnId: 'name' }
+
+      expect(resolveSpreadsheetCompletionTarget(rows, origin, direction)).toBe(origin)
+    },
+  )
 })

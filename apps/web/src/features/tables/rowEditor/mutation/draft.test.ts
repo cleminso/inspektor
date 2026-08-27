@@ -8,6 +8,7 @@ import {
   createUpdateRowDraft,
   getMutationFieldError,
   getMutationFieldInput,
+  rebaseUpdateRowDraft,
   revertMutationField,
   setMutationFieldMode,
   setMutationFieldText,
@@ -60,6 +61,42 @@ describe('update row drafts', () => {
 
     expect(getMutationFieldInput(draft, columns[1])).toEqual({ mode: 'value', text: 'one' })
     expect(buildRowMutationSubmission(draft, columns)).toEqual({
+      errors: { count: 'Value must be an integer.' },
+      values: {},
+    })
+  })
+
+  it('preserves local edits when an unrelated source field changes', () => {
+    const source = { id: 'row-1', name: 'Ada', count: 1, settings: null }
+    const draft = setMutationFieldText(createUpdateRowDraft(source), columns[0], 'Grace')
+
+    const rebased = rebaseUpdateRowDraft(draft, { ...source, count: 2 }, columns)
+
+    expect(rebased.sourceValues.count).toBe(2)
+    expect(buildRowMutationSubmission(rebased, columns)).toEqual({
+      errors: {},
+      values: { name: 'Grace' },
+    })
+  })
+
+  it('clears a sparse overlay when the source converges on the local value', () => {
+    const source = { id: 'row-1', name: 'Ada', count: 1, settings: null }
+    const draft = setMutationFieldText(createUpdateRowDraft(source), columns[0], 'Grace')
+
+    const rebased = rebaseUpdateRowDraft(draft, { ...source, name: 'Grace' }, columns)
+
+    expect(rebased.fieldInputs.name).toBeUndefined()
+    expect(buildRowMutationSubmission(rebased, columns)).toEqual({ errors: {}, values: {} })
+  })
+
+  it('preserves invalid raw input when the source changes', () => {
+    const source = { id: 'row-1', name: 'Ada', count: 1, settings: null }
+    const draft = setMutationFieldText(createUpdateRowDraft(source), columns[1], 'one')
+
+    const rebased = rebaseUpdateRowDraft(draft, { ...source, name: 'Grace' }, columns)
+
+    expect(getMutationFieldInput(rebased, columns[1])).toEqual({ mode: 'value', text: 'one' })
+    expect(buildRowMutationSubmission(rebased, columns)).toEqual({
       errors: { count: 'Value must be an integer.' },
       values: {},
     })

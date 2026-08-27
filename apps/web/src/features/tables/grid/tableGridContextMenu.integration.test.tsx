@@ -3,7 +3,14 @@ import { createColumnHelper, type CellSelectionState, useTable } from '@tanstack
 import { useEffect, useRef, useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { DataGrid, dataGridFeatures, type DataGridFeatures } from '@inspector/ds'
+import {
+  DataGrid,
+  dataGridFeatures,
+  type BinaryCopyFormat,
+  type DataGridCellTarget,
+  type DataGridFeatures,
+} from '@inspector/ds'
+import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
 
 afterEach(() => {
@@ -12,19 +19,33 @@ afterEach(() => {
 })
 
 interface TestRow {
+  email: string
   id: string
   name: string
 }
 
-const rows: TestRow[] = [{ id: 'row-1', name: 'Ada' }]
+const rows: TestRow[] = [{ id: 'row-1', name: 'Ada', email: 'ada@example.com' }]
 const columnHelper = createColumnHelper<DataGridFeatures, TestRow>()
-const columns = columnHelper.columns([columnHelper.accessor('name', { header: 'Name' })])
+const columns = columnHelper.columns([
+  columnHelper.display({
+    id: tableGridSelectionColumnId,
+    cell: () => 'Select',
+  }),
+  columnHelper.accessor('name', { header: 'Name' }),
+  columnHelper.accessor('email', { header: 'Email' }),
+])
 
 function ContextMenuHarness({
   actions,
   binary = false,
+  onCopyCell = vi.fn(),
+  onEditCell = vi.fn(),
   onFilterByCell = vi.fn(),
   onTouchCellContextMenuOpen = vi.fn(),
+  revertField = vi.fn(),
+  revertRowUpdate = vi.fn(),
+  stagedDeletionRowIds = new Set<string>(),
+  stagedFieldsByRowId = {},
 }: {
   actions?: {
     canCopy: boolean
@@ -33,8 +54,14 @@ function ContextMenuHarness({
     copyAs: readonly ('hex' | 'base64')[]
   }
   binary?: boolean
-  onFilterByCell?: () => void
-  onTouchCellContextMenuOpen?: (target: { columnId: string; rowId: string }) => void
+  onCopyCell?: (target: DataGridCellTarget, format?: BinaryCopyFormat) => void
+  onEditCell?: (target: DataGridCellTarget) => void
+  onFilterByCell?: (target: DataGridCellTarget) => void
+  onTouchCellContextMenuOpen?: (target: DataGridCellTarget) => void
+  revertField?: (rowId: string, fieldName: string) => void
+  revertRowUpdate?: (rowId: string) => void
+  stagedDeletionRowIds?: ReadonlySet<string>
+  stagedFieldsByRowId?: Readonly<Record<string, ReadonlySet<string>>>
 }) {
   const [editing, setEditing] = useState(false)
   const [cellSelection, setCellSelection] = useState<CellSelectionState>([])
@@ -63,12 +90,15 @@ function ContextMenuHarness({
           canFilterBy: actions?.canFilterBy ?? true,
           copyAs: actions?.copyAs ?? (binary === true ? ['hex', 'base64'] : []),
         })}
-        stagedDeletionRowIds={new Set()}
-        stagedFieldsByRowId={{}}
-        revertField={vi.fn()}
-        revertRowUpdate={vi.fn()}
-        onCopyCell={vi.fn()}
-        onEditCell={() => setEditing(true)}
+        stagedDeletionRowIds={stagedDeletionRowIds}
+        stagedFieldsByRowId={stagedFieldsByRowId}
+        revertField={revertField}
+        revertRowUpdate={revertRowUpdate}
+        onCopyCell={onCopyCell}
+        onEditCell={(target) => {
+          onEditCell(target)
+          setEditing(true)
+        }}
         onFilterByCell={onFilterByCell}
         onTouchCellContextMenuOpen={onTouchCellContextMenuOpen}
       >
@@ -103,11 +133,13 @@ function ContextMenuHarness({
 
 describe('TableGridContextMenu integration', () => {
   it('opens through the real context-menu trigger and preserves editor focus after Edit', async () => {
-    render(<ContextMenuHarness />)
+    const onEditCell = vi.fn()
+    render(<ContextMenuHarness onEditCell={onEditCell} />)
 
     expect(fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))).toBe(false)
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }))
 
+    expect(onEditCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
     await waitFor(() => {
       expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Cell editor' }))
     })
@@ -122,7 +154,7 @@ describe('TableGridContextMenu integration', () => {
     fireEvent.contextMenu(cell)
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Filter by' }))
 
-    expect(onFilterByCell).toHaveBeenCalledOnce()
+    expect(onFilterByCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
     await waitFor(() => {
       expect(document.activeElement).toBe(cell)
     })
@@ -143,14 +175,85 @@ describe('TableGridContextMenu integration', () => {
   })
 
   it('offers binary copy formats directly without a nested menu', async () => {
-    render(<ContextMenuHarness binary />)
+    const onCopyCell = vi.fn()
+    render(<ContextMenuHarness binary onCopyCell={onCopyCell} />)
+    const cell = screen.getByRole('cell', { name: 'Ada' })
 
-    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))
+    fireEvent.contextMenu(cell)
 
     expect(await screen.findByRole('menuitem', { name: /^Copy as Hex/ })).toBeTruthy()
     expect(screen.getByRole('menuitem', { name: 'Copy as Base64' })).toBeTruthy()
+    expect(screen.queryByRole('menuitem', { name: 'Copy' })).toBeNull()
     expect(screen.queryByRole('menuitem', { name: 'Copy as' })).toBeNull()
     expect(screen.getAllByRole('menu')).toHaveLength(1)
+
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Copy as Hex/ }))
+    fireEvent.contextMenu(cell)
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Copy as Base64' }))
+    expect(onCopyCell.mock.calls).toEqual([
+      [{ columnId: 'name', rowId: 'row-1' }, 'hex'],
+      [{ columnId: 'name', rowId: 'row-1' }, 'base64'],
+    ])
+  })
+
+  it('offers cell recovery before row recovery for staged fields', async () => {
+    const onCopyCell = vi.fn()
+    const revertField = vi.fn()
+    const revertRowUpdate = vi.fn()
+    render(
+      <ContextMenuHarness
+        onCopyCell={onCopyCell}
+        stagedFieldsByRowId={{ 'row-1': new Set(['name', 'settings']) }}
+        revertField={revertField}
+        revertRowUpdate={revertRowUpdate}
+      />,
+    )
+    const nameCell = screen.getByRole('cell', { name: 'Ada' })
+
+    fireEvent.contextMenu(nameCell)
+    expect(
+      (await screen.findAllByRole('menuitem')).map((item) =>
+        item.textContent?.startsWith('Copy') === true ? 'Copy' : item.textContent,
+      ),
+    ).toEqual(['Edit', 'Filter by', 'Copy', 'Revert this change', 'Revert staged changes'])
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Copy/ }))
+    expect(onCopyCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
+
+    fireEvent.contextMenu(nameCell)
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Revert this change' }))
+    expect(revertField).toHaveBeenCalledWith('row-1', 'name')
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'ada@example.com' }))
+    expect(screen.queryByRole('menuitem', { name: 'Revert this change' })).toBeNull()
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Revert staged changes' }))
+    expect(revertRowUpdate).toHaveBeenCalledWith('row-1')
+
+    fireEvent.contextMenu(nameCell.closest('tr') as HTMLTableRowElement)
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Revert staged changes' }))
+    expect(revertRowUpdate).toHaveBeenNthCalledWith(2, 'row-1')
+  })
+
+  it('suppresses recovery for selection cells and staged-deletion rows', () => {
+    const noActions = { canCopy: false, canEdit: false, canFilterBy: false, copyAs: [] } as const
+    const view = render(
+      <ContextMenuHarness
+        actions={noActions}
+        stagedFieldsByRowId={{ 'row-1': new Set([tableGridSelectionColumnId]) }}
+      />,
+    )
+
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Select' }))
+    expect(screen.queryByRole('menu')).toBeNull()
+
+    view.rerender(
+      <ContextMenuHarness
+        actions={noActions}
+        stagedDeletionRowIds={new Set(['row-1'])}
+        stagedFieldsByRowId={{ 'row-1': new Set(['name']) }}
+      />,
+    )
+    fireEvent.contextMenu(screen.getByRole('cell', { name: 'Ada' }))
+    expect(screen.queryByRole('menu')).toBeNull()
   })
 
   it('does not open the cell menu from a non-row part of the viewport', () => {

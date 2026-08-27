@@ -104,6 +104,50 @@ describe('createConnectionFromDraft', () => {
 
     expect(readStoredConnections()).toEqual(store)
   })
+
+  it.each([
+    ['malformed JSON', '{"adminSecret":"credential-marker"'],
+    [
+      'invalid connection value',
+      JSON.stringify({
+        version: 1,
+        activeConnectionId: 'connection-1',
+        connections: [
+          {
+            id: 'connection-1',
+            name: 'Local app',
+            serverUrl: 'https://sync.example.com',
+            appId: 'app-1',
+            adminSecret: 'credential-marker',
+            env: null,
+          },
+        ],
+        preferencesByConnectionId: {},
+      }),
+    ],
+    [
+      'invalid preference value',
+      JSON.stringify({
+        version: 1,
+        activeConnectionId: null,
+        connections: [],
+        preferencesByConnectionId: {
+          'connection-1': {
+            lastBranch: 'main',
+            lastSchemaHash: null,
+            rememberedBranches: ['main', { adminSecret: 'credential-marker' }],
+          },
+        },
+      }),
+    ],
+  ])('returns the safe default for %s', (_case, storedValue) => {
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => (key === 'inspektor-connections' ? storedValue : null),
+    })
+
+    expect(readStoredConnections()).toEqual(createEmptyConnectionStore())
+    expect(JSON.stringify(readStoredConnections())).not.toContain('credential-marker')
+  })
 })
 
 describe('setActiveConnectionContext', () => {

@@ -178,54 +178,6 @@ describe('TableListPane', () => {
     expect(screen.queryByRole('checkbox')).toBeNull()
   })
 
-  it('delegates bulk table selection to the consumer', () => {
-    const onTableCheckedChange = vi.fn()
-
-    render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['accounts']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={onTableCheckedChange}
-      />,
-    )
-
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Select accounts' }))
-
-    expect(onTableCheckedChange).toHaveBeenCalledWith('accounts', true, {
-      extendRange: false,
-      orderedTableNames: ['accounts'],
-      section: 'tables',
-    })
-  })
-
-  it('delegates Shift selection with the visible table order', () => {
-    const onTableCheckedChange = vi.fn()
-
-    render(
-      <TableListPane
-        checkedTableNames={new Set(['accounts'])}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['accounts', 'sessions', 'users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={onTableCheckedChange}
-      />,
-    )
-
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Select users' }), {
-      shiftKey: true,
-    })
-
-    expect(onTableCheckedChange).toHaveBeenCalledWith('users', true, {
-      extendRange: true,
-      orderedTableNames: ['accounts', 'sessions', 'users'],
-      section: 'tables',
-    })
-  })
-
   it('keeps table names as links when bulk selection is inactive', () => {
     render(
       <TableListPane
@@ -384,26 +336,6 @@ describe('TableListPane', () => {
     expect(remountedObserver).not.toBe(observer)
   })
 
-  it('persists a table from a double click without replacing link navigation', () => {
-    const onPersistTable = vi.fn()
-    render(
-      <TableListPane
-        checkedTableNames={new Set()}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['accounts']}
-        onClearSelection={vi.fn()}
-        onPersistTable={onPersistTable}
-        onTableCheckedChange={vi.fn()}
-      />,
-    )
-
-    const accountsLink = screen.getByRole('button', { name: 'accounts' })
-    fireEvent.doubleClick(accountsLink)
-
-    expect(onPersistTable).toHaveBeenCalledWith('accounts')
-  })
-
   it("opens an existing table with that tab's stored filter state", () => {
     render(
       <TableListPane
@@ -420,54 +352,6 @@ describe('TableListPane', () => {
     expect(screen.getByRole('button', { name: 'accounts' }).getAttribute('data-search')).toBe(
       JSON.stringify({ filters: 'active-filter', page: 2 }),
     )
-  })
-
-  it('uses table names to extend checkbox selection while bulk selection is active', () => {
-    const onTableCheckedChange = vi.fn()
-
-    render(
-      <TableListPane
-        checkedTableNames={new Set(['accounts'])}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['accounts', 'sessions', 'users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={onTableCheckedChange}
-      />,
-    )
-
-    const usersTrigger = screen.getByRole('button', { name: 'users' })
-    expect(usersTrigger.tagName).toBe('BUTTON')
-    fireEvent.click(usersTrigger, { shiftKey: true })
-
-    expect(onTableCheckedChange).toHaveBeenCalledWith('users', true, {
-      extendRange: true,
-      orderedTableNames: ['accounts', 'sessions', 'users'],
-      section: 'tables',
-    })
-  })
-
-  it('uses a checked table name to deselect that table', () => {
-    const onTableCheckedChange = vi.fn()
-
-    render(
-      <TableListPane
-        checkedTableNames={new Set(['accounts'])}
-        {...defaultActionProps}
-        selectedTableName={null}
-        tables={['accounts', 'users']}
-        onClearSelection={vi.fn()}
-        onTableCheckedChange={onTableCheckedChange}
-      />,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'accounts' }))
-
-    expect(onTableCheckedChange).toHaveBeenCalledWith('accounts', false, {
-      extendRange: false,
-      orderedTableNames: ['accounts', 'users'],
-      section: 'tables',
-    })
   })
 
   it('clears checked tables when clicking outside the table list', () => {

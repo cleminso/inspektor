@@ -44,7 +44,6 @@ const session = {
   openConnection: vi.fn(),
   switchBranch: vi.fn(),
   switchSchema: vi.fn(),
-  saveConnection: vi.fn(),
   deleteConnection: vi.fn(),
   setConnectionContext: vi.fn(),
   prefill: null,

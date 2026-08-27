@@ -15,19 +15,23 @@ const binaryFormatLabels = {
 } satisfies Record<BinaryCopyFormat, string>
 
 function stringifyStructuredCellValue(value: object): string {
-  const serializedValue = JSON.stringify(value, (_key, nestedValue: unknown) => {
-    if (typeof nestedValue === 'bigint') {
-      return String(nestedValue)
+  try {
+    const serializedValue = JSON.stringify(value, (_key, nestedValue: unknown) => {
+      if (typeof nestedValue === 'bigint') {
+        return String(nestedValue)
+      }
+      if (nestedValue instanceof Uint8Array) {
+        return Array.from(nestedValue)
+      }
+      return nestedValue
+    })
+    if (serializedValue === undefined) {
+      throw new Error('Cell value is unavailable.')
     }
-    if (nestedValue instanceof Uint8Array) {
-      return Array.from(nestedValue)
-    }
-    return nestedValue
-  })
-  if (serializedValue === undefined) {
+    return serializedValue
+  } catch {
     throw new Error('Cell value is unavailable.')
   }
-  return serializedValue
 }
 
 /** Converts a raw runtime cell value into the text placed on the system clipboard. */

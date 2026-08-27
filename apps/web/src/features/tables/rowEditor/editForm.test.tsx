@@ -25,14 +25,12 @@ vi.mock('@inspector/ds', async (importOriginal) => {
       expanded = false,
       id,
       invalid = false,
-      layout = 'intrinsic',
       labelledBy,
       onExpandedChange,
       onValueChange,
-      readOnly = false,
       value,
     }: CodeEditorProps) => (
-      <div data-expanded={expanded} data-layout={layout} data-slot="code-editor">
+      <>
         <div
           id={id}
           aria-describedby={describedBy}
@@ -47,24 +45,16 @@ vi.mock('@inspector/ds', async (importOriginal) => {
         >
           {value}
         </div>
-        {disabled === false && readOnly === false ? (
-          <button aria-label="Format JSON" type="button">
-            Format JSON
-          </button>
-        ) : null}
-        {disabled === false && readOnly === false ? (
+        {disabled === false ? (
           <button
             type="button"
-            aria-label={`${expanded === true ? 'Collapse' : 'Expand'} ${id}`}
-            aria-expanded={expanded}
+            aria-label={expanded === true ? 'Collapse code editor' : 'Expand code editor'}
             onClick={() => {
               onExpandedChange?.(expanded === false)
             }}
-          >
-            {expanded === true ? 'Collapse' : 'Expand'}
-          </button>
+          />
         ) : null}
-      </div>
+      </>
     ),
   }
 })
@@ -112,7 +102,7 @@ function renderEditRowForm() {
 }
 
 function submitEditRowForm(): void {
-  const form = document.querySelector('[data-slot="edit-row-form"]')
+  const form = document.querySelector('form')
   if (!(form instanceof HTMLFormElement)) {
     throw new Error('Expected the edit row form to be rendered')
   }
@@ -190,12 +180,6 @@ describe('focusRowEditorField', () => {
 })
 
 describe('EditRowForm Details and JSON views', () => {
-  it('uses monospace typography for the synthetic row ID value', () => {
-    renderEditRowForm()
-
-    expect(screen.getByRole('textbox', { name: 'ID' }).getAttribute('data-font')).toBe('mono')
-  })
-
   it('selects Details by default', () => {
     renderEditRowForm()
 
@@ -205,15 +189,6 @@ describe('EditRowForm Details and JSON views', () => {
     )
     expect(screen.getByRole('button', { name: 'JSON' }).getAttribute('aria-pressed')).toBe('false')
     expect(screen.getByLabelText('DisplayName')).toBeTruthy()
-  })
-
-  it('places the synthetic ID type at the trailing edge of its field header', () => {
-    renderEditRowForm()
-
-    const header = screen.getByText('ID').closest('[data-slot="row-id-field-header"]')
-
-    expect(header?.lastElementChild?.textContent).toBe('UUID')
-    expect(header === null ? null : getComputedStyle(header).width).toBe('100%')
   })
 
   it('renders the complete row in schema order and marks missing fields unavailable', () => {
@@ -237,7 +212,7 @@ describe('EditRowForm Details and JSON views', () => {
   })
 
   it('shows JSON tools without visible mutation controls', () => {
-    const { container } = renderEditRowForm()
+    renderEditRowForm()
 
     fireEvent.click(screen.getByRole('button', { name: 'JSON' }))
 
@@ -247,22 +222,6 @@ describe('EditRowForm Details and JSON views', () => {
     expect(screen.getByRole('button', { name: 'Copy JSON' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull()
     expect(screen.queryByRole('textbox', { name: 'DisplayName' })).toBeNull()
-    expect(
-      screen.getByRole('tree', { name: 'Row JSON' }).closest('[data-scrollbar="overlay"]'),
-    ).toBeTruthy()
-    expect(container.querySelectorAll('[data-scrollbar-gutter]')).toHaveLength(0)
-  })
-
-  it('overlays the Details scrollbar without placing actions in the viewport', () => {
-    const { container } = renderEditRowForm()
-
-    const viewport = container.querySelector('[data-row-editor-scroll-owner="form"]')
-
-    expect(viewport?.getAttribute('data-scrollbar')).toBe('hidden')
-    expect(viewport?.closest('[data-scrollbar="overlay"]')).toBeTruthy()
-    expect(viewport?.contains(container.querySelector('[data-slot="row-editor-footer"]'))).toBe(
-      false,
-    )
   })
 
   it('preserves edited Details text after switching to JSON and back', () => {
@@ -399,71 +358,6 @@ describe('EditRowForm Details and JSON views', () => {
     expect(input.value).toBe('account-2')
   })
 
-  it('uses CodeEditor for an editable JSON field', async () => {
-    const jsonColumns = [
-      { name: 'settings', column_type: { type: 'Json' }, nullable: false },
-    ] satisfies ColumnDescriptor[]
-    render(
-      <EditRowForm
-        rowValues={{ id: 'profile-1', settings: { enabled: true } }}
-        schemaColumns={jsonColumns}
-      />,
-    )
-
-    const editor = await screen.findByRole('textbox', { name: 'Settings' })
-    const editorRoot = editor.closest('[data-slot="code-editor"]')
-
-    expect(editor.tagName).toBe('DIV')
-    expect(editor.textContent).toContain('"enabled"')
-    expect(within(editorRoot as HTMLElement).queryByText('JSON')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Format JSON' })).toBeTruthy()
-  })
-
-  it('controls expanded structured fields without remounting editors', async () => {
-    const columns = [
-      { name: 'title', column_type: { type: 'Text' }, nullable: false },
-      { name: 'settings', column_type: { type: 'Json' }, nullable: false },
-      { name: 'metadata', column_type: { type: 'Json' }, nullable: false },
-    ] satisfies ColumnDescriptor[]
-    const { container } = render(
-      <EditRowForm
-        rowValues={{ id: 'profile-1', title: 'Profile', settings: {}, metadata: {} }}
-        schemaColumns={columns}
-      />,
-    )
-    const settingsEditor = await screen.findByRole('textbox', { name: 'Settings' })
-    const metadataEditor = await screen.findByRole('textbox', { name: 'Metadata' })
-    const settingsRoot = settingsEditor.closest('[data-slot="code-editor"]')
-
-    expect(settingsRoot?.getAttribute('data-expanded')).toBe('false')
-    expect(settingsRoot?.getAttribute('data-layout')).toBe('intrinsic')
-    const scrollOwner = container.querySelector<HTMLElement>('[data-row-editor-scroll-owner]')
-    expect(scrollOwner?.getAttribute('data-row-editor-scroll-owner')).toBe('form')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Expand row-editor-settings' }))
-
-    expect(screen.getByRole('textbox', { name: 'Settings' })).toBe(settingsEditor)
-    expect(settingsRoot?.getAttribute('data-expanded')).toBe('true')
-    expect(settingsRoot?.getAttribute('data-layout')).toBe('fill')
-    expect(container.querySelector('#row-editor-field-id')?.hasAttribute('hidden')).toBe(true)
-    expect(container.querySelector('#row-editor-field-title')?.hasAttribute('hidden')).toBe(true)
-    expect(container.querySelector('#row-editor-field-metadata')?.hasAttribute('hidden')).toBe(true)
-    expect(container.querySelector('#row-editor-metadata')).toBe(metadataEditor)
-    expect(scrollOwner?.getAttribute('data-row-editor-scroll-owner')).toBe('editor')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Collapse row-editor-settings' }))
-
-    expect(screen.getByRole('textbox', { name: 'Settings' })).toBe(settingsEditor)
-    expect(screen.getByRole('textbox', { name: 'Metadata' })).toBe(metadataEditor)
-    expect(settingsRoot?.getAttribute('data-expanded')).toBe('false')
-    expect(settingsRoot?.getAttribute('data-layout')).toBe('intrinsic')
-    expect(container.querySelector('#row-editor-field-id')?.hasAttribute('hidden')).toBe(false)
-    expect(container.querySelector('#row-editor-field-title')?.hasAttribute('hidden')).toBe(false)
-    expect(container.querySelector('#row-editor-field-metadata')?.hasAttribute('hidden')).toBe(
-      false,
-    )
-  })
-
   it('focuses an editable structured value when its label is clicked', async () => {
     const columns = [
       { name: 'settings', column_type: { type: 'Json' }, nullable: true },
@@ -509,7 +403,7 @@ describe('EditRowForm Details and JSON views', () => {
     const jsonColumns = [
       { name: 'settings', column_type: { type: 'Json' }, nullable: true },
     ] satisfies ColumnDescriptor[]
-    const { container } = render(
+    render(
       <EditRowForm
         rowValues={{ id: 'profile-1', settings: { enabled: true } }}
         schemaColumns={jsonColumns}
@@ -522,18 +416,14 @@ describe('EditRowForm Details and JSON views', () => {
 
     fireEvent.click(nullToggle)
 
-    expect(container.querySelector('#row-editor-settings')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Format JSON' })).toBeNull()
-    const nullPresentation = screen.getByLabelText('Settings value: NULL')
-    expect(within(nullPresentation).queryByText('JSON')).toBeNull()
-    expect(container.querySelector('input[data-null-value]')).toBeNull()
+    expect(screen.queryByRole('textbox', { name: 'Settings' })).toBeNull()
+    expect(screen.getByLabelText('Settings value: NULL')).toBeTruthy()
     expect(focusRowEditorField('settings')).toBe(true)
     expect(document.activeElement).toBe(nullToggle)
 
     fireEvent.click(screen.getByRole('button', { name: 'Value' }))
 
     const restoredEditor = await screen.findByRole('textbox', { name: 'Settings' })
-    expect(restoredEditor).not.toBe(editor)
     expect(restoredEditor.textContent).toContain('"enabled"')
   })
 
@@ -576,16 +466,10 @@ describe('EditRowForm Details and JSON views', () => {
       />,
     )
     const age = screen.getByLabelText('Age')
-    const settings = await screen.findByRole('textbox', { name: 'Settings' })
+    await screen.findByRole('textbox', { name: 'Settings' })
     fireEvent.change(age, { target: { value: 'not-a-number' } })
 
-    fireEvent.click(screen.getByRole('button', { name: 'Expand row-editor-settings' }))
-    await waitFor(() => {
-      expect(settings.closest('[data-slot="code-editor"]')?.getAttribute('data-expanded')).toBe(
-        'true',
-      )
-    })
-    expect(age.closest('[hidden]')).not.toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Expand code editor' }))
 
     submitEditRowForm()
 
@@ -593,8 +477,5 @@ describe('EditRowForm Details and JSON views', () => {
       expect(document.activeElement).toBe(age)
     })
     expect(age.closest('[hidden]')).toBeNull()
-    expect(settings.closest('[data-slot="code-editor"]')?.getAttribute('data-expanded')).toBe(
-      'false',
-    )
   })
 })

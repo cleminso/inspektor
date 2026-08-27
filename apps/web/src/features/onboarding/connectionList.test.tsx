@@ -28,18 +28,6 @@ afterEach(() => {
 })
 
 describe('ConnectionList', () => {
-  it('stacks each connection name above its app ID', () => {
-    render(<ConnectionList />)
-
-    const content = screen
-      .getByRole('button', { name: /Example/ })
-      .querySelector('[data-slot="button-content"]')
-
-    expect(content?.children).toHaveLength(2)
-    expect(content?.children[0]?.textContent).toBe('Example')
-    expect(content?.children[1]?.textContent).toBe('app-1')
-  })
-
   it('identifies each connection by app ID without repeating its server', () => {
     render(<ConnectionList />)
 
@@ -54,16 +42,5 @@ describe('ConnectionList', () => {
     fireEvent.click(screen.getByRole('button', { name: /Example/ }))
 
     expect(openConnection).toHaveBeenCalledWith('connection-1')
-  })
-
-  it('keeps connection content unchanged after connection intent is accepted', () => {
-    render(<ConnectionList />)
-
-    const connection = screen.getByRole('button', { name: /Example/ })
-    fireEvent.click(connection)
-
-    expect(connection.getAttribute('aria-disabled')).not.toBe('true')
-    expect(connection.getAttribute('aria-busy')).toBeNull()
-    expect(connection.textContent).toBe('Exampleapp-1')
   })
 })

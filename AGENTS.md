@@ -19,6 +19,7 @@ Before editing files for a substantial task involving a TanStack package:
 
 - [Active workspace](#active-workspace)
 - [Inspector Test](#inspector-test)
+- [Browser verification](#browser-verification)
 - [Implementation checklists](#implementation-checklists)
 - [Commands](#commands)
 - [Debugging workflow](#debugging-workflow)
@@ -54,6 +55,16 @@ Use `apps/inspector-test` as the curated test app for Inspector behavior. Read i
 - Do not deploy or seed the cloud app unless the task explicitly requires changing shared fixture state.
 - Never print or commit cloud credentials from `apps/inspector-test/.env.local`.
 - Keep seeded rows deterministic and replaceable by stable ID.
+
+## Browser verification
+
+- Start Inspector from the workspace root with `pnpm dev:web`.
+- Run the Inspector and fixture as owned persistent processes. Record their process IDs, confirm both are reachable before opening the browser, and stop only those processes when verification is complete.
+- Use `pnpm inspector-test:fixture` for automated, isolated, or destructive checks. Keep its generated credentials out of responses, screenshots, and committed artifacts.
+- When the fixture uses an `http://` or `ws://` endpoint, open the direct HTTP Vite URL reported by `pnpm dev:web` instead of the Portless HTTPS URL to avoid mixed-content blocking.
+- Use a fresh Chrome isolated context for each fixture check. Do not rely on state from the persistent Chrome profile.
+- Reserve the persistent Chrome profile and any saved cloud connection for explicit shared-cloud exploration. Treat its user-data directory as a credential store: do not commit, copy, upload, or expose it to test artifacts.
+- Close pages created for the check and stop the owned fixture and Inspector processes. Do not terminate unrelated development processes.
 
 ## Implementation checklists
 
@@ -132,6 +143,7 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 - Prefer contract invariants over manually calculated expectations for long identifiers, Unicode strings, ranges, and offsets.
 - Stabilize source APIs before regenerating metadata, and commit generated output with its source change.
 - Do not modify the Git index unless the user requests it; inspect cached and working-tree diffs separately when changes are already staged.
+- Before reporting a change as commit-ready, inspect `git status --short` and reject staged deletions whose replacement paths are untracked or unstaged.
 
 ## Architecture
 
