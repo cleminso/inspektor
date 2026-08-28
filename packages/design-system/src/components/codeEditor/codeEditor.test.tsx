@@ -101,6 +101,32 @@ describe('CodeEditor', () => {
     expect(document.activeElement).toBe(outsideAction)
   })
 
+  it('starts later mounts from the resolved CodeMirror implementation', async () => {
+    const first = render(
+      <CodeEditor accessibilityLabel="Settings JSON" value={'{"enabled":true}'} />,
+    )
+    await findCodeMirrorTextbox()
+    first.unmount()
+
+    render(
+      <CodeEditor accessibilityLabel="Settings JSON" focusOnMount value={'{"enabled":true}'} />,
+    )
+
+    const editor = screen.getByRole('textbox', { name: 'Settings JSON' })
+    expect(EditorView.findFromDOM(editor)).not.toBeNull()
+    expect(document.activeElement).toBe(editor)
+  })
+
+  it('focuses long expanded intrinsic content from the start', async () => {
+    const value = Array.from({ length: 20 }, (_, index) => `line ${index}`).join('\n')
+
+    render(<CodeEditor accessibilityLabel="Settings JSON" expanded focusOnMount value={value} />)
+
+    const editor = await findCodeMirrorTextbox()
+
+    expect(EditorView.findFromDOM(editor)?.state.selection.main.anchor).toBe(0)
+  })
+
   it('projects controlled content and accessibility states into CodeMirror', async () => {
     const { rerender } = render(
       <CodeEditor accessibilityLabel="Settings JSON" invalid readOnly value={'{"enabled":true}'} />,

@@ -403,7 +403,7 @@ describe('EditRowForm Details and JSON views', () => {
     const jsonColumns = [
       { name: 'settings', column_type: { type: 'Json' }, nullable: true },
     ] satisfies ColumnDescriptor[]
-    render(
+    const { container } = render(
       <EditRowForm
         rowValues={{ id: 'profile-1', settings: { enabled: true } }}
         schemaColumns={jsonColumns}
@@ -416,7 +416,7 @@ describe('EditRowForm Details and JSON views', () => {
 
     fireEvent.click(nullToggle)
 
-    expect(screen.queryByRole('textbox', { name: 'Settings' })).toBeNull()
+    expect(container.contains(editor)).toBe(false)
     expect(screen.getByLabelText('Settings value: NULL')).toBeTruthy()
     expect(focusRowEditorField('settings')).toBe(true)
     expect(document.activeElement).toBe(nullToggle)

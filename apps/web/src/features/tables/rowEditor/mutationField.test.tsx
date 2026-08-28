@@ -189,7 +189,10 @@ describe('MutationField', () => {
     expect(screen.getByRole('button', { name: 'NULL' }).getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByRole('button', { name: 'Value' }).getAttribute('aria-pressed')).toBe('false')
     expect(screen.queryByRole('checkbox', { name: /settings/i })).toBeNull()
-    expect(screen.getByLabelText('Settings value: NULL')).toBeTruthy()
+    const nullValue = screen.getByLabelText('Settings value: NULL')
+    expect(nullValue.tagName).toBe('INPUT')
+    expect(nullValue.getAttribute('data-size')).toBe('l')
+    expect(nullValue.getAttribute('readonly')).not.toBeNull()
     expect(screen.queryByText('JSON')).toBeNull()
     expect(container.querySelector('#row-editor-settings')).toBeNull()
 
@@ -247,7 +250,9 @@ describe('MutationField', () => {
     expect(screen.getByRole('button', { name: 'Default' }).getAttribute('aria-pressed')).toBe(
       'true',
     )
-    expect(screen.getByLabelText('Settings value: default').textContent).toContain('enabled')
+    expect((screen.getByLabelText('Settings value: default') as HTMLInputElement).value).toContain(
+      'enabled',
+    )
 
     fireEvent.click(screen.getByRole('button', { name: 'Value' }))
     expect(onOmittedChange).toHaveBeenCalledWith(false)

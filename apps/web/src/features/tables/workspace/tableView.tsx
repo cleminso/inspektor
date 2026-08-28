@@ -1,13 +1,4 @@
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 
 import {
   Box,
@@ -19,6 +10,7 @@ import {
   ResizablePanelGroup,
   Text,
   Tooltip,
+  preloadCodeEditor,
   toasts,
   type BinaryCopyFormat,
   type DataGridCellTarget,
@@ -48,6 +40,7 @@ import { TablePagination, Toolbar } from '@tables/grid/toolbar'
 import { EditRowForm } from '@tables/rowEditor/editForm'
 import { InsertRowForm } from '@tables/rowEditor/insertForm'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
+import { isStructuredColumn } from '@tables/rowEditor/values/fieldPresentation'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
@@ -59,12 +52,9 @@ import {
 import type { ColumnDescriptor } from 'jazz-tools'
 import type { TableRowId } from '@tables/tableTypes'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
+import FieldEditorMutationWidget from '@tables/floatingWidget/fieldEditorMutationWidget'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import { createTableScope } from '@tables/workspace/scope'
-
-const FieldEditorMutationWidget = lazy(
-  () => import('@tables/floatingWidget/fieldEditorMutationWidget'),
-)
 
 interface TableViewProps {
   tableName: string
@@ -130,6 +120,12 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
     [tableName, wasmSchema],
   )
   const mutationScopeKey = createTableScope(scope, tableName)
+
+  useEffect(() => {
+    if (schemaColumns.some(isStructuredColumn)) {
+      void preloadCodeEditor()
+    }
+  }, [schemaColumns])
 
   return (
     <TableMutationLedgerProvider
@@ -792,16 +788,14 @@ function TableViewContent({
       state.activeFieldEditorTarget !== null &&
       state.activeFieldEditorRowValues !== null &&
       activeFieldColumn !== null ? (
-        <Suspense fallback={null}>
-          <FieldEditorMutationWidget
-            key={`${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
-            column={activeFieldColumn}
-            rowId={state.activeFieldEditorTarget.rowId}
-            rowValues={state.activeFieldEditorRowValues}
-            onClose={state.handleFieldEditorCancel}
-            onComplete={state.handleFieldEditorComplete}
-          />
-        </Suspense>
+        <FieldEditorMutationWidget
+          key={`${state.activeFieldEditorTarget.rowId}:${state.activeFieldEditorTarget.columnId}`}
+          column={activeFieldColumn}
+          rowId={state.activeFieldEditorTarget.rowId}
+          rowValues={state.activeFieldEditorRowValues}
+          onClose={state.handleFieldEditorCancel}
+          onComplete={state.handleFieldEditorComplete}
+        />
       ) : (
         <TableMutationWidget
           executor={state.mutationExecutor}

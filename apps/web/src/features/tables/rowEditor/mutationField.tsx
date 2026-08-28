@@ -124,28 +124,13 @@ function StructuredValuePresentation({
   value,
 }: StructuredValuePresentationProps): React.ReactElement {
   return (
-    <Box
+    <Input
       aria-label={accessibilityLabel}
-      backgroundColor="surface-default"
-      borderColor="default"
-      borderRadius="xs"
-      borderStyle="solid"
-      borderWidth={1}
-      data-slot="structured-value-presentation"
-      flexDirection="column"
-      overflow="hidden"
-      role="group"
-      width="full"
-    >
-      <Box padding="m">
-        <Text
-          as="span"
-          monospace
-        >
-          {value}
-        </Text>
-      </Box>
-    </Box>
+      font="mono"
+      fullWidth
+      readOnly
+      value={value}
+    />
   )
 }
 

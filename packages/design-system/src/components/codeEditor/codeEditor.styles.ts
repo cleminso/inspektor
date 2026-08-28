@@ -75,6 +75,7 @@ export const codeEditorStyles = stylex.create({
     padding: spacing.m,
     borderWidth: 0,
     backgroundColor: 'transparent',
+    boxSizing: 'border-box',
     color: 'inherit',
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[1],
@@ -83,6 +84,20 @@ export const codeEditorStyles = stylex.create({
     resize: 'none',
     minHeight: spatial['viewport-height-s'],
     width: '100%',
+  },
+  fallbackInputExpanded: {
+    minHeight: 0,
+    paddingBottom: spacing.l,
+    paddingTop: spacing.l,
+  },
+  fallbackInputExpandedFill: {
+    height: '100%',
+  },
+  fallbackInputExpandedIntrinsic: {
+    maxHeight: spatial['viewport-height-l'],
+  },
+  fallbackInputExpandedCapped: {
+    height: spatial['viewport-height-l'],
   },
   loadError: {
     padding: spacing.xs,
@@ -104,6 +119,7 @@ export const codeEditorStyles = stylex.create({
     display: 'flex',
     justifyContent: 'flex-end',
     borderTopWidth: 1,
+    minHeight: spatial['control-height-s'],
   },
   icon: {
     fill: 'none',

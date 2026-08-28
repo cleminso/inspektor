@@ -120,9 +120,14 @@ const editRowFormProps = vi.hoisted(() => ({ current: null as Record<string, unk
 const fieldEditorProps = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const toastError = vi.hoisted(() => vi.fn())
 const toastSuccess = vi.hoisted(() => vi.fn())
-const schemaColumns = vi.hoisted(() => [
-  { name: 'name', column_type: { type: 'Text' as const }, nullable: false },
-])
+const preloadCodeEditor = vi.hoisted(() => vi.fn())
+const schemaColumns = vi.hoisted(
+  (): Array<{
+    name: string
+    column_type: { type: 'Json' | 'Text' }
+    nullable: boolean
+  }> => [{ name: 'name', column_type: { type: 'Text' }, nullable: false }],
+)
 const nameTableColumn = {
   accessorKey: 'name',
   id: 'name',
@@ -501,6 +506,7 @@ vi.mock('@inspector/ds', () => {
       Viewport: Container,
     },
     KeyboardInput: () => null,
+    preloadCodeEditor,
     ResizableHandle: Container,
     ResizablePanel: Container,
     ResizablePanelGroup: Container,
@@ -564,6 +570,8 @@ afterEach(() => {
   tableViewState.rowEditor.openInsert.mockReset()
   toastError.mockReset()
   toastSuccess.mockReset()
+  preloadCodeEditor.mockReset()
+  schemaColumns.splice(1)
   if (initialClipboardDescriptor === undefined) {
     Reflect.deleteProperty(navigator, 'clipboard')
   } else {
@@ -745,6 +753,20 @@ describe('TableView cell actions', () => {
 })
 
 describe('TableView composition boundary', () => {
+  it('keeps CodeMirror deferred for tables without structured fields', () => {
+    renderTableView()
+
+    expect(preloadCodeEditor).not.toHaveBeenCalled()
+  })
+
+  it('preloads CodeMirror for tables with structured fields', () => {
+    schemaColumns.push({ name: 'metadata', column_type: { type: 'Json' }, nullable: false })
+
+    renderTableView()
+
+    expect(preloadCodeEditor).toHaveBeenCalledOnce()
+  })
+
   it('connects owner state and actions through the composed table surface', async () => {
     tableViewState.activeFieldEditorTarget = { rowId: 'row-1', columnId: 'name' }
     tableViewState.activeFieldEditorRowValues = { id: 'row-1', name: 'Ada' }

@@ -19,6 +19,20 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[28/08/26]
+
+### Structured editor preload
+
+- [x] Preload the separate CodeMirror chunk when the active table schema contains a structured field.
+- [x] Match the capped cold fallback viewport to the resolved editor viewport.
+
+[28/08/26]
+
+### Immediate inline structured editor
+
+- [x] Remove the blank Suspense boundary from the primary inline field-editor interaction.
+- [x] Preserve a usable deferred CodeMirror fallback without exposing its loading geometry in the Floating Panel.
+
 [27/08/26]
 
 ### Fixture permission enforcement
@@ -1114,6 +1128,16 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[28/08/26]
+
+- Structured editor network work starts at table mount rather than edit activation.
+- CodeMirror remains outside the static table chunk; the loading fallback remains the immediate-path safeguard.
+
+[28/08/26]
+
+- Inline field-editor presentation loads with the table view; only the CodeMirror engine remains deferred.
+- A cold structured edit preserves one stable Floating Panel footprint from activation through CodeMirror readiness.
+
 [27/08/26]
 
 - The footer Close action and Escape both uncheck the active row while preserving other checked rows and mutation drafts. This supersedes preserving the active checked row after footer dismissal.
@@ -1298,6 +1322,11 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [ ] Verify the first structured inline edit has no blank surface, empty editor frame, or panel geometry shift in a production browser build.
+- [x] Verify affected tests, lint, typechecks, builds, and package-wide suites.
 
 [27/08/26]
 

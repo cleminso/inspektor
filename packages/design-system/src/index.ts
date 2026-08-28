@@ -242,7 +242,7 @@ export type {
   RelationValueProps,
   RelationValueState,
 } from './components/relationValue/relationValue'
-export { CodeEditor } from './components/codeEditor/codeEditor'
+export { CodeEditor, preloadCodeEditor } from './components/codeEditor/codeEditor'
 export type { CodeEditorLayout, CodeEditorProps } from './components/codeEditor/codeEditor'
 export {
   ButtonGroup,

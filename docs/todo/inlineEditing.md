@@ -12,6 +12,27 @@
 
 ## Implemented foundation
 
+[28/08/26]
+
+### Structured editor preload
+
+- [x] Start loading CodeMirror when a table with structured columns mounts rather than after inline edit activation.
+- [x] Keep the long cold fallback footprint equal to the final capped CodeMirror footprint.
+
+[28/08/26]
+
+### Compact structured non-value modes
+
+- [x] Present structured NULL and default values with the standard read-only input height instead of a padded editor-like surface.
+
+[28/08/26]
+
+### Immediate structured field editor
+
+- [x] Load the lightweight inline field-editor composition with the table view instead of exposing a blank deferred boundary after edit activation.
+- [x] Keep CodeMirror deferred while preserving the expanded editor structure and geometry through its usable textarea fallback.
+- [x] Initialize the imperative CodeMirror view before paint and reuse the resolved implementation on later mounts.
+
 [26/08/26]
 
 ### Operation review rendering
@@ -376,6 +397,21 @@ mutation widget specification.
 
 ## Settled interaction decisions
 
+[28/08/26]
+
+- Structured tables preload the deferred CodeMirror chunk in the background before the first edit.
+- An interaction that wins the preload race still opens the usable textarea fallback without changing the panel's capped geometry.
+
+[28/08/26]
+
+- Structured NULL and default modes use the same control height as ordinary field inputs; only an editable structured value opens the code editor surface.
+
+[28/08/26]
+
+- The inline field-editor composition is part of the primary table interaction and loads with the table view.
+- CodeMirror remains deferred, but loading must not introduce an empty editor frame or change the floating panel's external geometry.
+- Loading-state height changes are fixed at their source rather than animated by the Floating Panel.
+
 [17/08/26]
 
 - [x] Treat staged deletion as a complete-row state and staged update as a sparse cell state.
@@ -460,6 +496,16 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 - [x] Remove update overlays for columns that disappear from the live schema so obsolete fields cannot keep a draft dirty.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Cover the structured NULL presentation with the standard input-size contract.
+- [ ] Verify the compact structured NULL mode in the inline field editor.
+
+[28/08/26]
+
+- [ ] Verify the cold structured editor opens with stable geometry in the production browser flow.
+- [x] Run focused Code Editor and Table View tests, changed-file lint, affected-package typechecks, builds, and package-wide tests.
 
 [26/08/26]
 

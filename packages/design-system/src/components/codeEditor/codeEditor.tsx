@@ -6,16 +6,30 @@ import { codeEditorStyles } from './codeEditor.styles'
 type CodeMirrorEditorModule = typeof import('./codeMirrorEditor')
 
 let codeMirrorEditorPromise: Promise<CodeMirrorEditorModule> | null = null
+let loadedCodeMirrorEditor: CodeMirrorEditorModule | null = null
 
 // Keep CodeMirror outside the static package graph. The controlled textarea remains usable while
 // loading, and the promise resets after failure so another mount can retry the optional engine.
 function loadCodeMirrorEditor(): Promise<CodeMirrorEditorModule> {
-  codeMirrorEditorPromise ??= import('./codeMirrorEditor').catch((error: unknown) => {
-    codeMirrorEditorPromise = null
-    throw new Error('CodeEditor failed to load CodeMirror', { cause: error })
-  })
+  codeMirrorEditorPromise ??= import('./codeMirrorEditor')
+    .then((module) => {
+      loadedCodeMirrorEditor = module
+      return module
+    })
+    .catch((error: unknown) => {
+      codeMirrorEditorPromise = null
+      throw new Error('CodeEditor failed to load CodeMirror', { cause: error })
+    })
 
   return codeMirrorEditorPromise
+}
+
+/** Loads the deferred editor engine before an interaction needs it. */
+export function preloadCodeEditor(): Promise<void> {
+  return loadCodeMirrorEditor().then(
+    () => undefined,
+    () => undefined,
+  )
 }
 
 export type CodeEditorLayout = 'fill' | 'intrinsic'
@@ -61,20 +75,32 @@ export function CodeEditor({
   ...props
 }: CodeEditorProps) {
   const fallbackExpanded = props.expanded ?? defaultExpanded
+  const fallbackLineCount = props.value.split('\n').length
+  const fallbackRows = fallbackExpanded === true ? Math.min(fallbackLineCount, 18) : undefined
+  const fallbackIsCapped =
+    fallbackExpanded === true && layout === 'intrinsic' && fallbackLineCount > 18
   const fallbackRef = useRef<HTMLTextAreaElement>(null)
+  const fallbackSelectionAnchorRef = useRef(fallbackIsCapped ? 0 : props.value.length)
   const restoreFocusRef = useRef(false)
-  const [implementation, setImplementation] = useState<CodeMirrorEditorModule | null>(null)
+  const [implementation, setImplementation] = useState<CodeMirrorEditorModule | null>(
+    loadedCodeMirrorEditor,
+  )
   const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
     if (focusOnMount === true) {
       const fallback = fallbackRef.current
+      const anchor = fallbackSelectionAnchorRef.current
       fallback?.focus()
-      fallback?.setSelectionRange(fallback.value.length, fallback.value.length)
+      fallback?.setSelectionRange(anchor, anchor)
     }
   }, [focusOnMount])
 
   useEffect(() => {
+    if (implementation !== null) {
+      return
+    }
+
     let active = true
 
     void loadCodeMirrorEditor()
@@ -97,7 +123,7 @@ export function CodeEditor({
     return () => {
       active = false
     }
-  }, [])
+  }, [implementation])
 
   if (implementation !== null) {
     const CodeMirrorEditor = implementation.CodeMirrorEditor
@@ -126,22 +152,49 @@ export function CodeEditor({
         readOnly === true && codeEditorStyles.readOnly,
       )}
       aria-busy={loadError === null}
-      data-slot="code-editor-loading"
+      data-expanded={fallbackExpanded === true ? '' : undefined}
+      data-layout={layout === 'fill' && fallbackExpanded === true ? 'fill' : 'intrinsic'}
+      data-slot="code-editor"
     >
-      <textarea
-        {...stylex.props(codeEditorStyles.fallbackInput)}
-        ref={fallbackRef}
-        id={props.id}
-        value={props.value}
-        aria-label={props.accessibilityLabel}
-        aria-labelledby={props.labelledBy}
-        aria-describedby={props.describedBy}
-        aria-invalid={invalid === true ? true : undefined}
-        disabled={disabled}
-        readOnly={readOnly}
-        onChange={(event) => {
-          props.onValueChange?.(event.currentTarget.value)
-        }}
+      <div
+        {...stylex.props(
+          codeEditorStyles.viewport,
+          fallbackExpanded === true && layout === 'fill' && codeEditorStyles.viewportExpandedFill,
+        )}
+        data-slot="code-editor-viewport"
+      >
+        <textarea
+          {...stylex.props(
+            codeEditorStyles.fallbackInput,
+            fallbackExpanded === true && codeEditorStyles.fallbackInputExpanded,
+            fallbackExpanded === true &&
+              layout === 'intrinsic' &&
+              codeEditorStyles.fallbackInputExpandedIntrinsic,
+            fallbackIsCapped && codeEditorStyles.fallbackInputExpandedCapped,
+            fallbackExpanded === true &&
+              layout === 'fill' &&
+              codeEditorStyles.fallbackInputExpandedFill,
+          )}
+          ref={fallbackRef}
+          id={props.id}
+          value={props.value}
+          aria-label={props.accessibilityLabel}
+          aria-labelledby={props.labelledBy}
+          aria-describedby={props.describedBy}
+          aria-invalid={invalid === true ? true : undefined}
+          disabled={disabled}
+          readOnly={readOnly}
+          rows={fallbackRows}
+          data-viewport-capped={fallbackIsCapped === true ? '' : undefined}
+          onChange={(event) => {
+            props.onValueChange?.(event.currentTarget.value)
+          }}
+        />
+      </div>
+      <div
+        {...stylex.props(codeEditorStyles.toolbar)}
+        aria-hidden="true"
+        data-slot="code-editor-toolbar"
       />
       {loadError !== null ? (
         <span

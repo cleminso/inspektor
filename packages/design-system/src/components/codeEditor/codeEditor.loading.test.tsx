@@ -26,4 +26,32 @@ describe('CodeEditor loading boundary', () => {
 
     expect(onValueChange).toHaveBeenCalledWith('{"enabled":false}')
   })
+
+  it('reserves the expanded intrinsic presentation while CodeMirror loads', () => {
+    const value = Array.from({ length: 20 }, (_, index) => `line ${index}`).join('\n')
+
+    render(<CodeEditor accessibilityLabel="Settings JSON" expanded value={value} />)
+
+    const editor = screen.getByRole('textbox', { name: 'Settings JSON' })
+    const root = editor.closest('[data-slot="code-editor"]')
+
+    expect(root?.getAttribute('data-expanded')).toBe('')
+    expect(root?.getAttribute('data-layout')).toBe('intrinsic')
+    expect(root?.querySelector('[data-slot="code-editor-viewport"]')).toContain(editor)
+    expect(root?.querySelector('[data-slot="code-editor-toolbar"]')).toBeTruthy()
+    expect((editor as HTMLTextAreaElement).rows).toBe(18)
+    expect(editor.getAttribute('data-viewport-capped')).toBe('')
+  })
+
+  it('fills its parent instead of applying the intrinsic viewport cap', () => {
+    const value = Array.from({ length: 20 }, (_, index) => `line ${index}`).join('\n')
+
+    render(<CodeEditor accessibilityLabel="Settings JSON" expanded layout="fill" value={value} />)
+
+    const editor = screen.getByRole('textbox', { name: 'Settings JSON' })
+    const root = editor.closest('[data-slot="code-editor"]')
+
+    expect(root?.getAttribute('data-layout')).toBe('fill')
+    expect(editor.getAttribute('data-viewport-capped')).toBeNull()
+  })
 })

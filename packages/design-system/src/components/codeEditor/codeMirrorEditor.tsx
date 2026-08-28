@@ -20,7 +20,7 @@ import {
 import { EditorView, keymap, lineNumbers } from '@codemirror/view'
 import { tags } from '@lezer/highlight'
 import * as stylex from '@stylexjs/stylex'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 
 import {
   borderColors,
@@ -412,6 +412,8 @@ export function CodeMirrorEditor({
     presentation: new Compartment(),
   }))
   const isExpanded = expanded ?? uncontrolledExpanded
+  const shouldFocusFromStart =
+    isExpanded === true && layout === 'intrinsic' && value.split('\n').length > 18
   const isExpandedRef = useRef(isExpanded)
   const previousExpandedRef = useRef(isExpanded)
   const hasDisclosure = isExpanded === true || verticalOverflow === true
@@ -420,7 +422,7 @@ export function CodeMirrorEditor({
   isExpandedRef.current = isExpanded
 
   /* oxlint-disable react-hooks/exhaustive-deps -- This effect owns one EditorView lifetime. The effects below synchronize changing inputs through compartments. */
-  useEffect(() => {
+  useLayoutEffect(() => {
     const parent = editorParentRef.current
 
     if (parent === null) {
@@ -499,10 +501,12 @@ export function CodeMirrorEditor({
     })
 
     editorViewRef.current = editorView
-    if (restoreFocus === true) {
-      if (focusOnMount === true) {
-        editorView.dispatch({ selection: { anchor: editorView.state.doc.length } })
-      }
+    if (focusOnMount === true) {
+      editorView.dispatch({
+        selection: { anchor: shouldFocusFromStart ? 0 : editorView.state.doc.length },
+      })
+    }
+    if (restoreFocus === true || (focusOnMount === true && disabled === false)) {
       editorView.focus()
     }
     const resizeObserver = new ResizeObserver(() => {
@@ -696,10 +700,14 @@ export function CodeMirrorEditor({
           codeEditorStyles.viewport,
           isExpanded === true && layout === 'fill' && codeEditorStyles.viewportExpandedFill,
         )}
+        data-slot="code-editor-viewport"
         ref={editorParentRef}
       />
 
-      <div {...stylex.props(codeEditorStyles.toolbar)}>
+      <div
+        {...stylex.props(codeEditorStyles.toolbar)}
+        data-slot="code-editor-toolbar"
+      >
         <Tooltip.Root disabled={readOnly === true || disabled === true}>
           <Tooltip.Trigger
             render={

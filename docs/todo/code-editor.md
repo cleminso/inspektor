@@ -11,6 +11,21 @@
 
 ## Implemented foundation
 
+[28/08/26]
+
+- [x] Keep long expanded intrinsic editors at the top when mount focus would otherwise scroll the end selection into view.
+
+[28/08/26]
+
+- [x] Expose an explicit preload boundary that resolves the deferred CodeMirror engine without merging it into the static component graph.
+- [x] Pin long expanded textarea fallbacks to the same capped viewport height as CodeMirror.
+
+[28/08/26]
+
+- [x] Give the deferred textarea fallback the same expanded presentation structure as the CodeMirror implementation.
+- [x] Reserve the editor toolbar and derive the intrinsic fallback viewport from the bounded source line count.
+- [x] Create the CodeMirror view before paint and start later mounts from the resolved implementation cache.
+
 [06/08/26]
 
 - [x] Replace native browser titles on editor toolbar actions with shared Tooltip composition.
@@ -94,6 +109,16 @@
 
 ## Settled interaction decisions
 
+[28/08/26]
+
+- Product owners may preload CodeMirror before a primary interaction while retaining the separate production chunk.
+- Expanded intrinsic fallback content beyond the line cap uses the large editor viewport height; fill layouts continue to follow their parent.
+
+[28/08/26]
+
+- The deferred textarea and CodeMirror implementations preserve one external editor structure and presentation geometry.
+- CodeMirror's imperative DOM must be ready before its host can become visible as an empty editor frame.
+
 [24/07/26]
 
 - `CodeEditor` edits source text; `CodeBlock` presents read-only highlighted source.
@@ -125,6 +150,11 @@
 - [x] Keep capped content internal to `CodeEditor` until another product surface establishes a reusable contract.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Cover loading structure, focus transfer, bounded fallback sizing, and resolved-module reuse.
+- [x] Run focused tests, changed-file StyleX lint, package typecheck, build, and package-wide tests.
 
 [06/08/26]
 
