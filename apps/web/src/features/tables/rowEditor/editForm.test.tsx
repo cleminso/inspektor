@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { CodeEditorProps } from '@inspector/ds'
 import type { ColumnDescriptor } from 'jazz-tools'
+import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { EditRowForm as ControlledEditRowForm } from '@tables/rowEditor/editForm'
@@ -75,19 +76,25 @@ const schemaColumns = [
 
 type EditRowFormProps = Omit<
   React.ComponentProps<typeof ControlledEditRowForm>,
-  'draftController'
+  'draftController' | 'onRepresentationChange' | 'representation'
 > & {
   draftController?: RowDraftController
 }
 
 function EditRowForm({ draftController, ...props }: EditRowFormProps): React.ReactElement {
+  const [representation, setRepresentation] = useState<'details' | 'json'>('details')
   const ownedDraftController = useRowDraftController({
     initialRowValues: props.rowValues,
     mode: 'edit',
     schemaColumns: props.schemaColumns,
   })
   return (
-    <ControlledEditRowForm {...props} draftController={draftController ?? ownedDraftController} />
+    <ControlledEditRowForm
+      {...props}
+      draftController={draftController ?? ownedDraftController}
+      onRepresentationChange={setRepresentation}
+      representation={representation}
+    />
   )
 }
 

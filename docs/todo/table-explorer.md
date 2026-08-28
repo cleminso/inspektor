@@ -21,6 +21,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [28/08/26]
 
+### Row-pane representation context
+
+- [x] Preserve the active Details or JSON representation while navigating checked rows.
+- [x] Keep row-specific form, validation, expansion, and JSON search state scoped to each active row.
+- [x] Reset the representation to Details after the row pane closes.
+
+[28/08/26]
+
 ### Structured editor preload
 
 - [x] Preload the separate CodeMirror chunk when the active table schema contains a structured field.
@@ -1127,6 +1135,11 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[28/08/26]
+
+- Details or JSON is pane-session context: it survives checked-row navigation but not pane closure.
+- Row navigation remounts the row-specific editor while preserving only the representation context.
 
 [28/08/26]
 

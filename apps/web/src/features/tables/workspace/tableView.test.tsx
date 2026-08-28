@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { forwardRef, useState, type ReactElement, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -860,6 +860,23 @@ describe('TableView pagination hotkeys', () => {
 })
 
 describe('TableView query status', () => {
+  it('keeps the row representation while navigating selected rows', () => {
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.rowEditor.activeRowId = 'row-1'
+    tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
+    const { rerenderTableView } = renderTableView()
+
+    const onRepresentationChange = editRowFormProps.current?.onRepresentationChange as
+      | ((value: 'json') => void)
+      | undefined
+    act(() => onRepresentationChange?.('json'))
+    tableViewState.rowEditor.activeRowId = 'row-2'
+    tableViewState.rowValues = { id: 'row-2', name: 'Grace' }
+    rerenderTableView()
+
+    expect(editRowFormProps.current?.representation).toBe('json')
+  })
+
   it('stages checked-row deletion from the stable row editor surface', () => {
     tableViewState.detailPaneMode = 'rows'
     tableViewState.rowEditor.activeRowId = 'row-1'

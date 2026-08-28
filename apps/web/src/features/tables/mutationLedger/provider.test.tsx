@@ -139,6 +139,8 @@ function EditRowFormHarness(): React.ReactElement {
     <>
       <EditRowForm
         draftController={controller}
+        onRepresentationChange={() => undefined}
+        representation="details"
         rowValues={initialRowValues}
         schemaColumns={columns}
       />

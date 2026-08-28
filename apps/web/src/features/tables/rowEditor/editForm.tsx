@@ -20,11 +20,13 @@ import { createRowJsonViewValue } from '@tables/rowEditor/values/jsonView'
 
 interface EditRowFormProps {
   draftController: RowDraftController
+  onRepresentationChange: (representation: RowRepresentation) => void
+  representation: RowRepresentation
   rowValues: Record<string, unknown>
   schemaColumns: ColumnDescriptor[]
 }
 
-type RowRepresentation = 'details' | 'json'
+export type RowRepresentation = 'details' | 'json'
 
 const defaultFindOptions: FindBarSearchOptions = {
   caseSensitive: false,
@@ -119,10 +121,11 @@ function RowJsonRepresentation({
 
 export function EditRowForm({
   draftController,
+  onRepresentationChange,
+  representation,
   rowValues,
   schemaColumns,
 }: EditRowFormProps): React.ReactElement {
-  const [representation, setRepresentation] = useState<RowRepresentation>('details')
   const rowEditor = useRowEditorFields({
     draftController,
     mode: 'edit',
@@ -149,7 +152,7 @@ export function EditRowForm({
           onValueChange={(values) => {
             const nextRepresentation = values[0]
             if (nextRepresentation !== undefined) {
-              setRepresentation(nextRepresentation)
+              onRepresentationChange(nextRepresentation)
             }
           }}
         >

@@ -37,7 +37,7 @@ import {
 import { serializeCellValueForClipboard } from '@tables/grid/cellActions'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
-import { EditRowForm } from '@tables/rowEditor/editForm'
+import { EditRowForm, type RowRepresentation } from '@tables/rowEditor/editForm'
 import { InsertRowForm } from '@tables/rowEditor/insertForm'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 import { isStructuredColumn } from '@tables/rowEditor/values/fieldPresentation'
@@ -88,12 +88,16 @@ function RowEditorError({ message }: { message: string }): React.ReactElement {
 }
 
 interface StagedEditRowFormProps {
+  onRepresentationChange: (representation: RowRepresentation) => void
+  representation: RowRepresentation
   rowId: TableRowId
   rowValues: Record<string, unknown>
   schemaColumns: ColumnDescriptor[]
 }
 
 function StagedEditRowForm({
+  onRepresentationChange,
+  representation,
   rowId,
   rowValues,
   schemaColumns,
@@ -106,6 +110,33 @@ function StagedEditRowForm({
   return (
     <EditRowForm
       draftController={draftController}
+      onRepresentationChange={onRepresentationChange}
+      representation={representation}
+      rowValues={rowValues}
+      schemaColumns={schemaColumns}
+    />
+  )
+}
+
+interface StagedEditRowPaneProps {
+  rowId: TableRowId
+  rowValues: Record<string, unknown>
+  schemaColumns: ColumnDescriptor[]
+}
+
+function StagedEditRowPane({
+  rowId,
+  rowValues,
+  schemaColumns,
+}: StagedEditRowPaneProps): React.ReactElement {
+  const [representation, setRepresentation] = useState<RowRepresentation>('details')
+
+  return (
+    <StagedEditRowForm
+      key={rowId}
+      onRepresentationChange={setRepresentation}
+      representation={representation}
+      rowId={rowId}
       rowValues={rowValues}
       schemaColumns={schemaColumns}
     />
@@ -768,8 +799,8 @@ function TableViewContent({
                     }}
                   />
                 ) : state.rowEditor.activeRowId !== null && state.rowValues !== null ? (
-                  <StagedEditRowForm
-                    key={`${tableName}:${state.rowEditor.activeRowId}`}
+                  <StagedEditRowPane
+                    key={tableKey}
                     rowId={state.rowEditor.activeRowId}
                     rowValues={state.rowValues}
                     schemaColumns={schemaColumns}
