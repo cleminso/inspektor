@@ -12,18 +12,12 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { Box, Field, Input, Text } from '@inspector/ds'
 
 import { MutationField } from '@tables/rowEditor/mutationField'
-import { getMutationFieldInput } from '@tables/rowEditor/mutation/draft'
+import { getMutationFieldInput, type MutationFieldInput } from '@tables/rowEditor/mutation/draft'
 import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 import type { DetailPaneMode } from '@tables/tableTypes'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 
-/** Renderable field state derived from a `MutationFieldInput`. */
-interface FieldState {
-  isNull: boolean
-  isOmitted: boolean
-  text: string
-}
 interface UseRowEditorFieldsOptions {
   draftController: RowDraftController
   mode: DetailPaneMode
@@ -34,14 +28,12 @@ interface UseRowEditorFieldsOptions {
 interface RowEditorFieldsProps {
   errors: Record<string, string>
   expandedColumnName: string | null
-  fieldStates: Record<string, FieldState>
+  fieldStates: Record<string, MutationFieldInput>
   schemaColumns: ColumnDescriptor[]
   initialRowValues: Record<string, unknown>
   mode: DetailPaneMode
   onFieldExpandedChange: (columnName: string, expanded: boolean) => void
-  onFieldNullChange: (columnName: string, isNull: boolean) => void
-  onFieldOmittedChange: (columnName: string, isOmitted: boolean) => void
-  onFieldTextChange: (columnName: string, text: string) => void
+  onFieldInputChange: (columnName: string, input: MutationFieldInput) => void
 }
 
 /**
@@ -64,41 +56,21 @@ export function useRowEditorFields({
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const isSavingRef = useRef(false)
-  const fieldStates = useMemo<Record<string, FieldState>>(
+  const fieldStates = useMemo<Record<string, MutationFieldInput>>(
     () =>
       Object.fromEntries(
-        schemaColumns.map((column) => {
-          const input = getMutationFieldInput(draft, column)
-          return [
-            column.name,
-            {
-              isNull: input.mode === 'null',
-              isOmitted: input.mode === 'omitted',
-              text: input.text,
-            },
-          ]
-        }),
+        schemaColumns.map((column) => [column.name, getMutationFieldInput(draft, column)]),
       ),
     [draft, schemaColumns],
   )
 
-  const setFieldText = (columnName: string, text: string) => {
-    draftController.actions.setFieldText(columnName, text)
-    setErrors((currentErrors) => ({ ...currentErrors, [columnName]: '' }))
-  }
-
-  const setFieldNull = (columnName: string, isNull: boolean) => {
-    draftController.actions.setFieldNull(columnName, isNull)
-    if (isNull === true) {
+  const setFieldInput = (columnName: string, input: MutationFieldInput) => {
+    draftController.actions.setFieldInput(columnName, input)
+    if (input.mode === 'null') {
       setExpandedColumnName((currentColumnName) =>
         currentColumnName === columnName ? null : currentColumnName,
       )
     }
-    setErrors((currentErrors) => ({ ...currentErrors, [columnName]: '' }))
-  }
-
-  const setFieldOmitted = (columnName: string, isOmitted: boolean) => {
-    draftController.actions.setFieldOmitted(columnName, isOmitted)
     setErrors((currentErrors) => ({ ...currentErrors, [columnName]: '' }))
   }
 
@@ -155,9 +127,7 @@ export function useRowEditorFields({
     isSaving,
     saveError,
     setFieldExpanded,
-    setFieldNull,
-    setFieldOmitted,
-    setFieldText,
+    setFieldInput,
     submit,
   }
 }
@@ -171,9 +141,7 @@ export function RowEditorFields({
   initialRowValues,
   mode,
   onFieldExpandedChange,
-  onFieldNullChange,
-  onFieldOmittedChange,
-  onFieldTextChange,
+  onFieldInputChange,
 }: RowEditorFieldsProps): React.ReactElement {
   return (
     <Box
@@ -232,15 +200,14 @@ export function RowEditorFields({
             column={column}
             error={errors[column.name]}
             expanded={isExpanded}
-            fieldState={fieldState}
+            input={fieldState}
             hidden={expandedColumnName !== null && isExpanded === false}
             initialValue={initialRowValues[column.name]}
             onExpandedChange={(expanded) => onFieldExpandedChange(column.name, expanded)}
-            onNullChange={(isNull) => onFieldNullChange(column.name, isNull)}
-            onOmittedChange={(isOmitted) => onFieldOmittedChange(column.name, isOmitted)}
-            onTextChange={(text) => onFieldTextChange(column.name, text)}
+            onInputChange={(input) => onFieldInputChange(column.name, input)}
             canOmit={mode === 'insert' && column.default !== undefined && readOnlyReason === null}
             readOnlyReason={readOnlyReason}
+            sourceUnavailable={mode === 'edit' && initialRowValues[column.name] === undefined}
             key={column.name}
           />
         )

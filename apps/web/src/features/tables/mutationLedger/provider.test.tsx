@@ -70,7 +70,10 @@ function EditorHarness({ rowValues = initialRowValues }: { rowValues?: typeof in
       <output aria-label="Execution status">{mutations.execution.status}</output>
       <output aria-label="Review operations">{mutations.reviewOperations.length}</output>
       <output aria-label="Workspace discarded">{String(workspaceDiscarded)}</output>
-      <button type="button" onClick={() => controller.actions.setFieldText('name', 'Grace')}>
+      <button
+        type="button"
+        onClick={() => controller.actions.setFieldInput('name', { mode: 'value', text: 'Grace' })}
+      >
         Change name
       </button>
       <button type="button" onClick={() => mutations.revertRowUpdate('row-1')}>

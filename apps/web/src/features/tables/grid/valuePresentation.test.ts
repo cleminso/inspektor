@@ -64,6 +64,10 @@ describe('classifySchemaValue', () => {
       kind: 'timestamp',
       epochMilliseconds: rawValue.getTime(),
     })
+    expect(classifySchemaValue(1.5, column({ type: 'Timestamp' }))).toMatchObject({
+      kind: 'timestamp',
+      epochMilliseconds: 1,
+    })
   })
 
   it('keeps malformed timestamp raw values in an invalid state', () => {
@@ -109,6 +113,28 @@ describe('classifySchemaValue', () => {
       })
     },
   )
+
+  it('validates Row objects against descriptor fields', () => {
+    const rowColumn = column({
+      type: 'Row',
+      columns: [
+        { name: 'name', column_type: { type: 'Text' }, nullable: false },
+        { name: 'age', column_type: { type: 'Integer' }, nullable: true },
+      ],
+    })
+
+    expect(classifySchemaValue({ name: 'Ada', age: 37 }, rowColumn)).toMatchObject({
+      kind: 'structured',
+    })
+    expect(classifySchemaValue({ name: 'Ada' }, rowColumn)).toMatchObject({ kind: 'structured' })
+    expect(classifySchemaValue({ age: 37 }, rowColumn)).toMatchObject({ kind: 'invalid' })
+    expect(classifySchemaValue({ name: 'Ada', extra: true }, rowColumn)).toMatchObject({
+      kind: 'invalid',
+    })
+    expect(classifySchemaValue({ name: 'Ada', age: '37' }, rowColumn)).toMatchObject({
+      kind: 'invalid',
+    })
+  })
 
   it.each([
     [{ type: 'Text' }, 42, 'text'],

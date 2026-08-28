@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 import { seedInspectorTest } from '../../inspector-test/seedInspectorTest.js'
 
@@ -146,9 +146,11 @@ test('keeps nullable Enum selection and NULL intent in one field control', async
   await connectToFixture(page)
   await openTable(page, 'columnTypeShowcase')
 
-  await page
-    .getByRole('checkbox', { name: 'Select row 30000000-0000-4000-8000-000000000002' })
-    .click()
+  const row = page.getByRole('row', {
+    name: /Select row 30000000-0000-4000-8000-000000000002/u,
+  })
+  const cell = await getCellByColumn(page, row, 'optionalEnumValue')
+  await cell.dblclick()
 
   const select = page.getByRole('combobox', { name: 'OptionalEnumValue' })
   const nullControl = page.getByRole('checkbox', { name: 'Set OptionalEnumValue to NULL' })
@@ -165,10 +167,31 @@ test('keeps nullable Enum selection and NULL intent in one field control', async
   await expect(page.getByRole('listbox')).toBeVisible()
   await expect(page.getByText('Expected one of: active, archived, draft')).not.toBeVisible()
 
-  await page.keyboard.press('Escape')
+  await select.click()
+  await expect(page.getByRole('listbox')).not.toBeVisible()
   await page.getByRole('button', { name: 'Save' }).click()
 
   await expect(page.getByText('Choose a value or select NULL.')).toBeVisible()
+})
+
+test('stages a structured inline edit through the production editor', async ({ page }) => {
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+
+  const row = page.getByRole('row', {
+    name: /Select row 30000000-0000-4000-8000-000000000001/u,
+  })
+  const cell = await getCellByColumn(page, row, 'jsonValue')
+  await cell.dblclick()
+
+  const editor = page.getByRole('textbox', { name: 'JsonValue' })
+  await expect(editor).toContainText('"nested"')
+  await editor.fill('{"reviewed":true}')
+  await page.getByRole('button', { name: 'Save' }).click()
+
+  await expect(editor).not.toBeVisible()
+  await cell.dblclick()
+  await expect(page.getByRole('textbox', { name: 'JsonValue' })).toContainText('{"reviewed":true}')
 })
 
 test('loads the deferred calendar for a timestamp filter', async ({ page }) => {
@@ -348,4 +371,12 @@ async function fillConnectionForm(page: Page): Promise<void> {
 async function openTable(page: Page, tableName: string): Promise<void> {
   await page.getByRole('button', { name: tableName, exact: true }).click()
   await expect(page.getByRole('table', { name: `${tableName} rows` })).toBeVisible()
+}
+
+async function getCellByColumn(page: Page, row: Locator, columnName: string): Promise<Locator> {
+  const columnIndex = (await page.getByRole('columnheader').allTextContents()).findIndex((label) =>
+    label.includes(columnName),
+  )
+  expect(columnIndex, `column ${columnName}`).toBeGreaterThanOrEqual(0)
+  return row.getByRole('cell').nth(columnIndex)
 }

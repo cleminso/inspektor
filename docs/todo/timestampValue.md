@@ -16,6 +16,12 @@ This checklist tracks the reusable compact timestamp value component.
 
 ## Implemented foundation
 
+[28/08/26]
+
+- [x] Normalize timestamp dates, numbers, and accepted text through one Date-range rule before mutation, filtering, equality, field, or grid projection.
+- [x] Preserve caller-specific trust boundaries: runtime cells accept Date or number while text forms may parse date text.
+- [x] Reject out-of-range and empty nested timestamps, canonicalize fractional milliseconds, and keep malformed values unequal during rebasing.
+
 [21/08/26]
 
 - [x] Reuse `TimestampValue` for valid row-editor timestamp triggers so table cells and form fields share one browser-local visible representation and exact ISO semantics.
@@ -66,6 +72,11 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Cover shared Date-range normalization across mutation, nested mutation, dirty equality, filters, field parsing, and compact grid presentation.
+- [x] Verify Inspector formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
 
 [21/08/26]
 

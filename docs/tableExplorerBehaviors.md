@@ -231,6 +231,8 @@ are removed only through entry removal or the table-scoped `Discard` action.
 
 ## Mutation draft behavior
 
+The [verified Jazz field representation contracts](./notes/jazzAlignmentAndInspectorPolicies.md#verified-field-representation-contracts) define omission, SQL NULL, empty and invalid values, nested Row normalization, structured draft formatting, and verification scope.
+
 Pane and inline editors consume the same per-row mutation model:
 
 - The source row captured when editing starts is stored separately from sparse field overlays.

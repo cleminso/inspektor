@@ -72,16 +72,27 @@ function Harness({
           ? Object.keys(mutations.ledger.entries[0].fields).sort().join(',')
           : ''}
       </output>
-      <button type="button" onClick={() => controller.actions.setFieldText('name', 'Grace')}>
+      <button
+        type="button"
+        onClick={() => controller.actions.setFieldInput('name', { mode: 'value', text: 'Grace' })}
+      >
         Change
       </button>
       <button
         type="button"
-        onClick={() => controller.actions.setFieldText('email', 'grace@example.com')}
+        onClick={() =>
+          controller.actions.setFieldInput('email', {
+            mode: 'value',
+            text: 'grace@example.com',
+          })
+        }
       >
         Change email
       </button>
-      <button type="button" onClick={() => controller.actions.setFieldText('age', 'invalid')}>
+      <button
+        type="button"
+        onClick={() => controller.actions.setFieldInput('age', { mode: 'value', text: 'invalid' })}
+      >
         Invalidate age
       </button>
       <button type="button" onClick={() => mutations.stageDeletions(['row-2', 'row-3'])}>

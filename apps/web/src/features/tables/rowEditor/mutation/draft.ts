@@ -10,7 +10,9 @@ import {
   formatMutationFieldValue,
   parseMutationFieldValue,
 } from '@tables/rowEditor/mutation/parsing'
+import { getEmptyStructuredValueText, isStructuredColumnType } from '@tables/schema/fieldType'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
+import { normalizeTimestampValue } from '@tables/valueParsing'
 
 /** The database operation represented by one editable field. */
 export type MutationFieldMode = 'null' | 'omitted' | 'value'
@@ -50,9 +52,33 @@ interface RowMutationValueProjection {
 
 function createValueInput(value: unknown, column: ColumnDescriptor): MutationFieldInput {
   return {
-    mode: value === null || value === undefined ? 'null' : 'value',
+    mode: value === null ? 'null' : 'value',
     text: formatMutationFieldValue(value, column.column_type),
   }
+}
+
+export function setMutationFieldInputMode(
+  input: MutationFieldInput,
+  column: ColumnDescriptor,
+  mode: MutationFieldMode,
+): MutationFieldInput {
+  const shouldSeedStructuredValue =
+    mode === 'value' &&
+    input.text.length === 0 &&
+    isStructuredColumnType(column.column_type) === true
+  const emptyStructuredValue = getEmptyStructuredValueText(column.column_type)
+
+  return {
+    mode,
+    text: shouldSeedStructuredValue === true ? (emptyStructuredValue ?? input.text) : input.text,
+  }
+}
+
+export function setMutationFieldInputText(
+  input: MutationFieldInput,
+  text: string,
+): MutationFieldInput {
+  return input.mode === 'value' ? { ...input, text } : input
 }
 
 function decodeColumnDefault(value: Value, columnType: ColumnType): unknown {
@@ -186,33 +212,21 @@ function deepEqual(left: unknown, right: unknown, compared: WeakMap<object, obje
   return leftKeys.every((key) => deepEqual(leftRecord[key], rightRecord[key], compared))
 }
 
-function normalizeTimestamp(value: unknown): number | null {
-  if (value instanceof Date) {
-    const timestamp = value.getTime()
-    return Number.isFinite(timestamp) === true ? timestamp : null
-  }
-  if (typeof value === 'number') {
-    return Number.isFinite(value) === true ? value : null
-  }
-  if (typeof value === 'string' && value.trim().length > 0) {
-    const numericValue = Number(value)
-    if (Number.isFinite(numericValue) === true) {
-      return numericValue
-    }
-    const parsedValue = Date.parse(value)
-    return Number.isFinite(parsedValue) === true ? parsedValue : null
-  }
-  return null
-}
-
 function areMutationValuesEqual(columnType: ColumnType, left: unknown, right: unknown): boolean {
   if (left === null || left === undefined || right === null || right === undefined) {
-    return (left === null || left === undefined) && (right === null || right === undefined)
+    return Object.is(left, right)
   }
 
   switch (columnType.type) {
     case 'Timestamp':
-      return normalizeTimestamp(left) === normalizeTimestamp(right)
+      if (
+        !(left instanceof Date || typeof left === 'number' || typeof left === 'string') ||
+        !(right instanceof Date || typeof right === 'number' || typeof right === 'string')
+      ) {
+        return false
+      }
+      const leftTimestamp = normalizeTimestampValue(left)
+      return leftTimestamp !== null && leftTimestamp === normalizeTimestampValue(right)
     case 'BigInt':
       try {
         return BigInt(String(left)) === BigInt(String(right))
@@ -338,7 +352,7 @@ function removeCleanUpdateInput(
   const resolved = resolveMutationField(draft, column, input)
   const sourceValue = draft.sourceValues[column.name]
   const isClean =
-    (resolved.kind === 'null' && (sourceValue === null || sourceValue === undefined)) ||
+    (resolved.kind === 'null' && sourceValue === null) ||
     (resolved.kind === 'valid' &&
       areMutationValuesEqual(column.column_type, resolved.value, sourceValue) === true)
   if (isClean === false) {
@@ -409,7 +423,7 @@ export function setMutationFieldMode(
   mode: MutationFieldMode,
 ): RowMutationDraft {
   const currentInput = getMutationFieldInput(draft, column)
-  return setMutationFieldInput(draft, column, { ...currentInput, mode })
+  return setMutationFieldInput(draft, column, setMutationFieldInputMode(currentInput, column, mode))
 }
 
 export function revertMutationField(draft: RowMutationDraft, fieldName: string): RowMutationDraft {
@@ -449,10 +463,7 @@ export function buildRowMutationValueProjection(
     if (resolved.kind === 'invalid') {
       errors[column.name] = resolved.error
     } else if (resolved.kind === 'null') {
-      if (
-        draft.kind !== 'update' ||
-        (draft.sourceValues[column.name] !== null && draft.sourceValues[column.name] !== undefined)
-      ) {
+      if (draft.kind !== 'update' || draft.sourceValues[column.name] !== null) {
         displayValues[column.name] = null
         submissionValues[column.name] = null
       }

@@ -1,4 +1,4 @@
-import { useMemo, type RefCallback } from 'react'
+import { useMemo, useState, type RefCallback } from 'react'
 
 import { Link } from '@tanstack/react-router'
 import type { ColumnDescriptor } from 'jazz-tools'
@@ -6,7 +6,6 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import {
   BinaryDetails,
   Box,
-  Checkbox,
   CodeEditor,
   DatePicker,
   Field,
@@ -25,16 +24,21 @@ import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import {
   formatColumnNameLabel,
   formatColumnTypeLabel,
-  getBooleanFieldValue,
-  isStructuredColumn,
   parseTimestampValue,
   safelySerializeStructuredValue,
 } from '@tables/rowEditor/values/fieldPresentation'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { copyBinaryValue, downloadBinaryValue } from '@tables/rowEditor/values/binary'
 import type { FieldReadOnlyReason } from '@tables/schema/fieldEditability'
+import { isStructuredColumnType } from '@tables/schema/fieldType'
 import { buildRelationTableLink } from '@tables/routing/buildRelationTableLink'
-import { formatColumnDefault } from '@tables/rowEditor/mutation/draft'
+import {
+  formatColumnDefault,
+  setMutationFieldInputMode,
+  setMutationFieldInputText,
+  type MutationFieldInput,
+  type MutationFieldMode,
+} from '@tables/rowEditor/mutation/draft'
 
 interface MutationFieldProps {
   canOmit: boolean
@@ -42,18 +46,15 @@ interface MutationFieldProps {
   controlRef?: RefCallback<HTMLElement>
   error: string | undefined
   expanded: boolean
-  fieldState: { isNull: boolean; isOmitted: boolean; text: string }
+  input: MutationFieldInput
   focusOnMount?: boolean
   hidden: boolean
   idPrefix?: string
   initialValue: unknown
   onExpandedChange: (expanded: boolean) => void
-  onSelectOpenChange?: (open: boolean) => void
-  onNullChange: (isNull: boolean) => void
-  onOmittedChange: (isOmitted: boolean) => void
-  onTextChange: (text: string) => void
+  onInputChange: (input: MutationFieldInput) => void
   readOnlyReason: FieldReadOnlyReason
-  selectOpen?: boolean
+  sourceUnavailable?: boolean
   structuredEditorLayout?: CodeEditorLayout
 }
 
@@ -159,56 +160,50 @@ export function MutationField({
   controlRef,
   error,
   expanded,
-  fieldState,
+  input,
   focusOnMount = false,
   hidden,
   idPrefix = 'row-editor',
   initialValue,
   onExpandedChange,
-  onSelectOpenChange,
-  onNullChange,
-  onOmittedChange,
-  onTextChange,
+  onInputChange,
   readOnlyReason,
-  selectOpen,
+  sourceUnavailable = false,
   structuredEditorLayout = 'fill',
 }: MutationFieldProps): React.ReactElement {
   const { currentConnectionId } = useInspectorSessionState()
+  const [enumSelectOpen, setEnumSelectOpen] = useState(false)
   const label = formatColumnNameLabel(column.name)
   const fieldId = `${idPrefix}-${column.name}`
   const fieldLabelId = `${fieldId}-label`
   const isBooleanColumn = column.column_type.type === 'Boolean'
   const isBinaryColumn = column.column_type.type === 'Bytea'
   const isEnumColumn = column.column_type.type === 'Enum'
-  const isStructuredColumnType = isStructuredColumn(column)
+  const isStructured = isStructuredColumnType(column.column_type)
   const isTimestampColumn = column.column_type.type === 'Timestamp'
   const isReadOnly = readOnlyReason !== null
-  const isEditableStructuredColumn = isStructuredColumnType === true && isReadOnly === false
+  const isEditableStructuredColumn = isStructured === true && isReadOnly === false
   const hasFieldError = error !== undefined && error.length > 0
   const structuredPresentation = useMemo(
     () =>
-      isStructuredColumnType === true && fieldState.isNull === false && readOnlyReason !== null
+      isStructured === true && input.mode !== 'null' && readOnlyReason !== null
         ? safelySerializeStructuredValue(initialValue, column)
         : null,
-    [column, fieldState.isNull, initialValue, isStructuredColumnType, readOnlyReason],
+    [column, initialValue, input.mode, isStructured, readOnlyReason],
   )
   const usesJsonView = structuredPresentation?.fallback != null
   const usesNonNativeControl =
-    fieldState.isOmitted === false &&
+    input.mode !== 'omitted' &&
     (isBooleanColumn === true ||
       isBinaryColumn === true ||
       isEnumColumn === true ||
-      isStructuredColumnType === true ||
-      usesJsonView)
+      isStructured === true)
   const relationTarget =
-    column.references !== undefined &&
-    fieldState.isNull === false &&
-    fieldState.text.trim().length > 0
-      ? fieldState.text.trim()
+    column.references !== undefined && input.mode !== 'null' && input.text.trim().length > 0
+      ? input.text.trim()
       : null
-  const timestampValue =
-    isTimestampColumn === true ? parseTimestampValue(fieldState.text) : undefined
-  const timestampTextIsEmpty = fieldState.text.trim().length === 0
+  const timestampValue = isTimestampColumn === true ? parseTimestampValue(input.text) : undefined
+  const timestampTextIsEmpty = input.text.trim().length === 0
   const formattedDefault = column.default === undefined ? '' : formatColumnDefault(column)
   const defaultValue =
     column.default?.type === 'Null'
@@ -224,26 +219,28 @@ export function MutationField({
           column.column_type.type === 'Enum'
         ? JSON.stringify(defaultValue)
         : defaultValue
-  const structuredValueMode: StructuredValueMode =
-    fieldState.isOmitted === true ? 'default' : fieldState.isNull === true ? 'null' : 'value'
+  const structuredValueMode: StructuredValueMode = input.mode === 'omitted' ? 'default' : input.mode
   const structuredValueModes: readonly StructuredValueMode[] = [
     'value',
     ...(canOmit === true ? (['default'] as const) : []),
     ...(column.nullable === true ? (['null'] as const) : []),
   ]
+  const setInputMode = (mode: MutationFieldMode) => {
+    onInputChange(setMutationFieldInputMode(input, column, mode))
+  }
   const defaultCheckbox =
-    canOmit === true && isStructuredColumnType === false ? (
+    canOmit === true && isStructured === false ? (
       <InputGroup.Checkbox
         label={`Use default for ${label}`}
-        checked={fieldState.isOmitted}
+        checked={input.mode === 'omitted'}
         tooltip={`Create this row with the default value: ${defaultDescriptionValue}. Turn off DEFAULT to enter a different value.`}
-        onCheckedChange={(nextChecked) => onOmittedChange(nextChecked === true)}
+        onCheckedChange={(nextChecked) => setInputMode(nextChecked === true ? 'omitted' : 'value')}
       >
         DEFAULT
       </InputGroup.Checkbox>
     ) : null
   const defaultRestoreControl =
-    canOmit === true && fieldState.isOmitted === false && isStructuredColumnType === false ? (
+    canOmit === true && input.mode !== 'omitted' && isStructured === false ? (
       <InputGroup fullWidth>
         <Input
           aria-label={`${label} schema default`}
@@ -258,10 +255,10 @@ export function MutationField({
   return (
     <Field.Root
       data-value-mode={
-        fieldState.isOmitted === true
+        input.mode === 'omitted'
           ? 'omitted'
           : isEditableStructuredColumn === true
-            ? fieldState.isNull === true
+            ? input.mode === 'null'
               ? 'null'
               : 'value'
             : undefined
@@ -316,33 +313,8 @@ export function MutationField({
             label={label}
             mode={structuredValueMode}
             modes={structuredValueModes}
-            onModeChange={(nextMode) => {
-              if (nextMode === 'default') {
-                onOmittedChange(true)
-              } else if (nextMode === 'null') {
-                onNullChange(true)
-              } else if (fieldState.isOmitted === true) {
-                onOmittedChange(false)
-              } else {
-                onNullChange(false)
-              }
-            }}
+            onModeChange={(nextMode) => setInputMode(nextMode === 'default' ? 'omitted' : nextMode)}
           />
-        ) : null}
-        {fieldState.isOmitted === false &&
-        column.nullable === true &&
-        readOnlyReason === null &&
-        isBooleanColumn === false &&
-        isBinaryColumn === true ? (
-          <Checkbox.Label>
-            <Checkbox
-              data-value-mode-control={isStructuredColumnType === true ? '' : undefined}
-              aria-label={`Set ${label} to NULL`}
-              checked={fieldState.isNull}
-              onCheckedChange={(nextChecked) => onNullChange(nextChecked === true)}
-            />
-            <Text as="span">NULL</Text>
-          </Checkbox.Label>
         ) : null}
         {isEditableStructuredColumn === false ? (
           <Text
@@ -355,8 +327,8 @@ export function MutationField({
         ) : null}
       </Box>
 
-      {fieldState.isOmitted === true ? (
-        isStructuredColumnType === true ? (
+      {input.mode === 'omitted' ? (
+        isStructured === true ? (
           <StructuredValuePresentation
             accessibilityLabel={`${label} value: default`}
             value={defaultValue}
@@ -375,16 +347,21 @@ export function MutationField({
         )
       ) : isBooleanColumn === true ? (
         <ToggleGroup
-          value={[getBooleanFieldValue(fieldState)]}
+          value={
+            input.mode === 'null'
+              ? ['null']
+              : input.text === 'true' || input.text === 'false'
+                ? [input.text]
+                : []
+          }
           onValueChange={(values) => {
             const nextValue = values[0]
             if (nextValue === 'true' || nextValue === 'false') {
-              onNullChange(false)
-              onTextChange(nextValue)
+              onInputChange({ mode: 'value', text: nextValue })
             } else if (nextValue === 'null') {
-              onNullChange(true)
+              setInputMode('null')
             } else if (nextValue === 'default') {
-              onOmittedChange(true)
+              setInputMode('omitted')
             }
           }}
           width="full"
@@ -407,19 +384,19 @@ export function MutationField({
           gap="s"
         >
           <Select.Root
-            disabled={fieldState.isNull === true}
-            open={selectOpen}
+            disabled={input.mode === 'null'}
+            open={enumSelectOpen}
             items={column.column_type.variants.map((variant) => ({
               label: variant,
               value: variant,
             }))}
-            value={fieldState.text.length === 0 ? null : fieldState.text}
+            value={input.text.length === 0 ? null : input.text}
             onValueChange={(nextValue) => {
               if (typeof nextValue === 'string') {
-                onTextChange(nextValue)
+                onInputChange(setMutationFieldInputText(input, nextValue))
               }
             }}
-            onOpenChange={onSelectOpenChange}
+            onOpenChange={setEnumSelectOpen}
           >
             <InputGroup fullWidth>
               <Select.Trigger
@@ -431,8 +408,13 @@ export function MutationField({
               {column.nullable === true && readOnlyReason === null ? (
                 <NullInputGroupCheckbox
                   label={label}
-                  checked={fieldState.isNull}
-                  onCheckedChange={onNullChange}
+                  checked={input.mode === 'null'}
+                  onCheckedChange={(checked) => {
+                    setInputMode(checked === true ? 'null' : 'value')
+                    if (checked === false) {
+                      setEnumSelectOpen(true)
+                    }
+                  }}
                 />
               ) : null}
             </InputGroup>
@@ -454,9 +436,9 @@ export function MutationField({
           accessibilityLabel={`${label} value`}
           data={structuredPresentation.fallback}
         />
-      ) : isStructuredColumnType === true ? (
+      ) : isStructured === true ? (
         <>
-          {fieldState.isNull === true ? (
+          {input.mode === 'null' ? (
             <StructuredValuePresentation
               accessibilityLabel={`${label} value: NULL`}
               value="NULL"
@@ -478,8 +460,8 @@ export function MutationField({
                 layout={expanded === true ? structuredEditorLayout : 'intrinsic'}
                 readOnly={isReadOnly}
                 onExpandedChange={onExpandedChange}
-                value={structuredPresentation?.source ?? fieldState.text}
-                onValueChange={onTextChange}
+                value={structuredPresentation?.source ?? input.text}
+                onValueChange={(text) => onInputChange(setMutationFieldInputText(input, text))}
               />
             </Box>
           )}
@@ -494,7 +476,7 @@ export function MutationField({
       ) : isTimestampColumn === true &&
         (timestampValue !== undefined || timestampTextIsEmpty === true) ? (
         <InputGroup fullWidth>
-          {fieldState.isNull === true ? (
+          {input.mode === 'null' ? (
             <Input
               id={fieldId}
               aria-label={label}
@@ -506,7 +488,9 @@ export function MutationField({
             <DatePicker
               disabled={isReadOnly === true}
               value={timestampValue}
-              onApply={(nextValue) => onTextChange(nextValue.toISOString())}
+              onApply={(nextValue) =>
+                onInputChange(setMutationFieldInputText(input, nextValue.toISOString()))
+              }
             >
               <DatePicker.Trigger
                 ref={controlRef}
@@ -525,8 +509,8 @@ export function MutationField({
           {column.nullable === true && readOnlyReason === null ? (
             <NullInputGroupCheckbox
               label={label}
-              checked={fieldState.isNull}
-              onCheckedChange={onNullChange}
+              checked={input.mode === 'null'}
+              onCheckedChange={(checked) => setInputMode(checked === true ? 'null' : 'value')}
             />
           ) : null}
           {defaultCheckbox}
@@ -541,16 +525,16 @@ export function MutationField({
               ref={controlRef}
               id={fieldId}
               font="mono"
-              value={fieldState.text}
-              disabled={fieldState.isNull === true}
+              value={input.text}
+              disabled={input.mode === 'null'}
               readOnly={isReadOnly === true || isBinaryColumn === true}
-              onValueChange={onTextChange}
+              onValueChange={(text) => onInputChange(setMutationFieldInputText(input, text))}
             />
             {column.nullable === true && readOnlyReason === null ? (
               <NullInputGroupCheckbox
                 label={label}
-                checked={fieldState.isNull}
-                onCheckedChange={onNullChange}
+                checked={input.mode === 'null'}
+                onCheckedChange={(checked) => setInputMode(checked === true ? 'null' : 'value')}
               />
             ) : null}
             {defaultCheckbox}
@@ -579,10 +563,13 @@ export function MutationField({
       {readOnlyReason === 'binary' ? (
         <Field.Description>Read-only: binary field</Field.Description>
       ) : null}
-      {column.default !== undefined && fieldState.isOmitted === false ? (
+      {sourceUnavailable === true && input.mode === 'value' && input.text.length === 0 ? (
+        <Field.Description>Unavailable source value.</Field.Description>
+      ) : null}
+      {column.default !== undefined && input.mode !== 'omitted' ? (
         <Field.Description>
           {canOmit === true
-            ? fieldState.isNull === true
+            ? input.mode === 'null'
               ? `NULL overrides the schema default: ${defaultDescriptionValue}.`
               : `Entered values override the schema default: ${defaultDescriptionValue}.`
             : `Schema default for new rows: ${defaultDescriptionValue}. Editing this field changes this row only.`}

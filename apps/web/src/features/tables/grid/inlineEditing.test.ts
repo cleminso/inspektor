@@ -15,12 +15,17 @@ function columnMeta(column: ColumnDescriptor | null): TableColumnMeta {
 }
 
 describe('getInlineFieldRoute', () => {
-  it('opens scalar columns in the Floating widget', () => {
+  it('routes scalar and structured columns to the field editor', () => {
     expect(
       getInlineFieldRoute(
         columnMeta({ name: 'count', column_type: { type: 'Integer' }, nullable: false }),
       ),
-    ).toBe('scalar')
+    ).toBe('fieldEditor')
+    expect(
+      getInlineFieldRoute(
+        columnMeta({ name: 'settings', column_type: { type: 'Json' }, nullable: false }),
+      ),
+    ).toBe('fieldEditor')
   })
 
   it('routes relation and binary fields to the complete-row pane', () => {
@@ -53,12 +58,7 @@ describe('getInlineFieldRoute', () => {
     ).toBe('rowPane')
   })
 
-  it('defers structured fields and rejects synthetic columns', () => {
-    expect(
-      getInlineFieldRoute(
-        columnMeta({ name: 'settings', column_type: { type: 'Json' }, nullable: false }),
-      ),
-    ).toBe('structured')
+  it('rejects synthetic columns', () => {
     expect(getInlineFieldRoute(columnMeta(null))).toBe('readOnly')
   })
 })

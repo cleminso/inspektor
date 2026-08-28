@@ -703,6 +703,24 @@ describe('TableView cell actions', () => {
     })
   })
 
+  it('copies an explicit staged null instead of the source value', async () => {
+    configureNameCell('Grace')
+    stagedValuesByRowId.current = { 'row-1': { name: null } }
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    renderTableView()
+    const menuProps = gridContextMenuProps.current as {
+      onCopyCell: (target: { columnId: string; rowId: string }) => void
+    }
+
+    menuProps.onCopyCell({ columnId: 'name', rowId: 'row-1' })
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('NULL'))
+  })
+
   it('renders an error toast when the clipboard write fails', async () => {
     configureNameCell('Grace')
     Object.defineProperty(navigator, 'clipboard', {

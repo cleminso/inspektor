@@ -12,10 +12,8 @@ import {
 } from '@tables/rowEditor/mutation/draft'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import { MutationField } from '@tables/rowEditor/mutationField'
-import {
-  formatColumnNameLabel,
-  isStructuredColumn,
-} from '@tables/rowEditor/values/fieldPresentation'
+import { formatColumnNameLabel } from '@tables/rowEditor/values/fieldPresentation'
+import { isStructuredColumnType } from '@tables/schema/fieldType'
 
 interface FieldEditorMutationWidgetProps {
   column: ColumnDescriptor
@@ -33,13 +31,12 @@ function FieldEditorMutationWidget({
   rowValues,
 }: FieldEditorMutationWidgetProps): React.ReactElement {
   const controller = useTableMutationEditorController({ initialRowValues: rowValues, rowId })
-  const isStructured = isStructuredColumn(column)
+  const isStructured = isStructuredColumnType(column.column_type)
   const [input, setInput] = useState<MutationFieldInput>(() =>
     getMutationFieldInput(controller.state.draft, column),
   )
   const [editorExpanded, setEditorExpanded] = useState(isStructured)
   const [showValidation, setShowValidation] = useState(false)
-  const [selectOpen, setSelectOpen] = useState(false)
   const controlElementRef = useRef<HTMLElement | null>(null)
   const setControlElement = useCallback((element: HTMLElement | null) => {
     controlElementRef.current = element
@@ -51,7 +48,7 @@ function FieldEditorMutationWidget({
       setShowValidation(true)
       return false
     }
-    controller.commitFieldInput(column.name, input)
+    controller.actions.setFieldInput(column.name, input)
     onComplete(direction)
     return true
   }
@@ -105,42 +102,15 @@ function FieldEditorMutationWidget({
             controlRef={setControlElement}
             error={showValidation === true ? error : undefined}
             expanded={isStructured === true && editorExpanded === true}
-            fieldState={{
-              isNull: input.mode === 'null',
-              isOmitted: input.mode === 'omitted',
-              text: input.text,
-            }}
+            input={input}
             focusOnMount={isStructured}
             hidden={false}
             idPrefix="field-editor"
             initialValue={controller.state.draft.sourceValues[column.name]}
             onExpandedChange={setEditorExpanded}
-            onSelectOpenChange={setSelectOpen}
-            onNullChange={(isNull) => {
-              setInput((current) => ({
-                mode: isNull === true ? 'null' : 'value',
-                text:
-                  isNull === false && current.text.length === 0 && isStructured === true
-                    ? column.column_type.type === 'Array'
-                      ? '[]'
-                      : '{}'
-                    : current.text,
-              }))
-              if (isNull === false && column.column_type.type === 'Enum') {
-                requestAnimationFrame(() => setSelectOpen(true))
-              }
-            }}
-            onOmittedChange={(isOmitted) => {
-              setInput((current) => ({
-                ...current,
-                mode: isOmitted === true ? 'omitted' : 'value',
-              }))
-            }}
-            onTextChange={(text) => {
-              setInput((current) => (current.mode === 'value' ? { ...current, text } : current))
-            }}
+            onInputChange={setInput}
             readOnlyReason={getFieldReadOnlyReason(column)}
-            selectOpen={selectOpen}
+            sourceUnavailable={rowValues[column.name] === undefined}
             structuredEditorLayout="intrinsic"
           />
           <FloatingPanel.Actions>

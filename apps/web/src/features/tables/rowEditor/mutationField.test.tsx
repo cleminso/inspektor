@@ -1,8 +1,10 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { ColumnDescriptor } from 'jazz-tools'
+import { useState, type ComponentProps } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { MutationField } from '@tables/rowEditor/mutationField'
+import type { MutationFieldInput } from '@tables/rowEditor/mutation/draft'
 
 vi.mock('@app/providers/inspectorProvider', () => ({
   useInspectorSessionState: () => ({
@@ -26,24 +28,33 @@ function column(
   return { column_type: columnType, name, nullable: false, ...options } as ColumnDescriptor
 }
 
+type MutationFieldProps = ComponentProps<typeof MutationField>
+
+function renderMutationField(
+  props: Pick<MutationFieldProps, 'column' | 'input'> & Partial<MutationFieldProps>,
+) {
+  return render(
+    <MutationField
+      canOmit={false}
+      error={undefined}
+      expanded={false}
+      hidden={false}
+      initialValue={undefined}
+      onExpandedChange={() => undefined}
+      onInputChange={() => undefined}
+      readOnlyReason={null}
+      {...props}
+    />,
+  )
+}
+
 describe('MutationField', () => {
   it('places the column type at the trailing edge of the field header', () => {
-    render(
-      <MutationField
-        canOmit={false}
-        column={column('roomId', { type: 'Uuid' }, { references: 'rooms' })}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: false, isOmitted: false, text: 'room-1' }}
-        hidden={false}
-        initialValue="room-1"
-        onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    renderMutationField({
+      column: column('roomId', { type: 'Uuid' }, { references: 'rooms' }),
+      input: { mode: 'value', text: 'room-1' },
+      initialValue: 'room-1',
+    })
 
     const type = screen.getByText('UUID')
     const header = type.closest('[data-slot="mutation-field-header"]')
@@ -53,22 +64,11 @@ describe('MutationField', () => {
   })
 
   it('keeps relation navigation inside the value input group', () => {
-    render(
-      <MutationField
-        canOmit={false}
-        column={column('roomId', { type: 'Uuid' }, { references: 'rooms' })}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: false, isOmitted: false, text: 'room-1' }}
-        hidden={false}
-        initialValue="room-1"
-        onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    renderMutationField({
+      column: column('roomId', { type: 'Uuid' }, { references: 'rooms' }),
+      input: { mode: 'value', text: 'room-1' },
+      initialValue: 'room-1',
+    })
 
     const input = screen.getByRole('textbox', { name: 'RoomId' })
     const targetLink = screen.getByRole('link', { name: 'Open target' })
@@ -80,22 +80,12 @@ describe('MutationField', () => {
   it('shows the concrete schema default with its control inside the input group', () => {
     const onOmittedChange = vi.fn()
 
-    render(
-      <MutationField
-        canOmit
-        column={column('origin', { type: 'Text' }, { default: { type: 'Text', value: 'web' } })}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: false, isOmitted: true, text: 'custom value retained while omitted' }}
-        hidden={false}
-        initialValue={undefined}
-        onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={onOmittedChange}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    renderMutationField({
+      canOmit: true,
+      column: column('origin', { type: 'Text' }, { default: { type: 'Text', value: 'web' } }),
+      input: { mode: 'omitted', text: 'custom value retained while omitted' },
+      onInputChange: (input) => onOmittedChange(input.mode === 'omitted'),
+    })
 
     const input = screen.getByRole('textbox', { name: 'Origin' }) as HTMLInputElement
     const defaultControl = screen.getByRole('checkbox', { name: 'Use default for Origin' })
@@ -109,22 +99,11 @@ describe('MutationField', () => {
   })
 
   it('explains that DEFAULT uses the schema default', () => {
-    render(
-      <MutationField
-        canOmit
-        column={column('origin', { type: 'Text' }, { default: { type: 'Text', value: 'web' } })}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: false, isOmitted: true, text: 'web' }}
-        hidden={false}
-        initialValue={undefined}
-        onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    renderMutationField({
+      canOmit: true,
+      column: column('origin', { type: 'Text' }, { default: { type: 'Text', value: 'web' } }),
+      input: { mode: 'omitted', text: 'web' },
+    })
 
     const defaultControl = screen
       .getByRole('checkbox', { name: 'Use default for Origin' })
@@ -136,26 +115,15 @@ describe('MutationField', () => {
   })
 
   it('explains that NULL bypasses the schema default', () => {
-    render(
-      <MutationField
-        canOmit={false}
-        column={column(
-          'origin',
-          { type: 'Text' },
-          { nullable: true, default: { type: 'Text', value: 'web' } },
-        )}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: true, isOmitted: false, text: '' }}
-        hidden={false}
-        initialValue={null}
-        onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    renderMutationField({
+      column: column(
+        'origin',
+        { type: 'Text' },
+        { nullable: true, default: { type: 'Text', value: 'web' } },
+      ),
+      input: { mode: 'null', text: '' },
+      initialValue: null,
+    })
 
     const nullControl = screen
       .getByRole('checkbox', { name: 'Set Origin to NULL' })
@@ -169,22 +137,12 @@ describe('MutationField', () => {
   it('presents nullable structured fields as exclusive Value and NULL modes', () => {
     const onNullChange = vi.fn()
 
-    const { container } = render(
-      <MutationField
-        canOmit={false}
-        column={column('settings', { type: 'Json' }, { nullable: true })}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: true, isOmitted: false, text: '{"enabled":true}' }}
-        hidden={false}
-        initialValue={null}
-        onExpandedChange={vi.fn()}
-        onNullChange={onNullChange}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    const { container } = renderMutationField({
+      column: column('settings', { type: 'Json' }, { nullable: true }),
+      input: { mode: 'null', text: '{"enabled":true}' },
+      initialValue: null,
+      onInputChange: (input) => onNullChange(input.mode === 'null'),
+    })
 
     expect(screen.getByRole('button', { name: 'NULL' }).getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByRole('button', { name: 'Value' }).getAttribute('aria-pressed')).toBe('false')
@@ -201,22 +159,11 @@ describe('MutationField', () => {
   })
 
   it('replaces a nullable array editor with its NULL presentation', () => {
-    const { container } = render(
-      <MutationField
-        canOmit={false}
-        column={column('items', { type: 'Array', element: { type: 'Text' } }, { nullable: true })}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: true, isOmitted: false, text: '["first"]' }}
-        hidden={false}
-        initialValue={null}
-        onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    const { container } = renderMutationField({
+      column: column('items', { type: 'Array', element: { type: 'Text' } }, { nullable: true }),
+      input: { mode: 'null', text: '["first"]' },
+      initialValue: null,
+    })
 
     expect(container.querySelector('#row-editor-items')).toBeNull()
     expect(screen.getByLabelText('Items value: NULL')).toBeTruthy()
@@ -226,26 +173,16 @@ describe('MutationField', () => {
   it('adds Default to the structured value-mode selector when an insert can omit the field', () => {
     const onOmittedChange = vi.fn()
 
-    render(
-      <MutationField
-        canOmit
-        column={column(
-          'settings',
-          { type: 'Json' },
-          { nullable: true, default: { type: 'Text', value: '{"enabled":true}' } },
-        )}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: false, isOmitted: true, text: '{}' }}
-        hidden={false}
-        initialValue={undefined}
-        onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={onOmittedChange}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    renderMutationField({
+      canOmit: true,
+      column: column(
+        'settings',
+        { type: 'Json' },
+        { nullable: true, default: { type: 'Text', value: '{"enabled":true}' } },
+      ),
+      input: { mode: 'omitted', text: '{}' },
+      onInputChange: (input) => onOmittedChange(input.mode === 'omitted'),
+    })
 
     expect(screen.getByRole('button', { name: 'Default' }).getAttribute('aria-pressed')).toBe(
       'true',
@@ -269,13 +206,11 @@ describe('MutationField', () => {
         )}
         error={undefined}
         expanded={false}
-        fieldState={{ isNull: false, isOmitted: false, text: 'imported' }}
+        input={{ mode: 'value', text: 'imported' }}
         hidden={false}
         initialValue="imported"
         onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
+        onInputChange={vi.fn()}
         readOnlyReason={null}
       />,
     )
@@ -298,13 +233,14 @@ describe('MutationField', () => {
         column={column('active', { type: 'Boolean' }, { nullable: true })}
         error={undefined}
         expanded={false}
-        fieldState={{ isNull: true, isOmitted: false, text: '' }}
+        input={{ mode: 'null', text: '' }}
         hidden={false}
         initialValue={null}
         onExpandedChange={vi.fn()}
-        onNullChange={onNullChange}
-        onOmittedChange={vi.fn()}
-        onTextChange={onTextChange}
+        onInputChange={(input) => {
+          onNullChange(input.mode === 'null')
+          onTextChange(input.text)
+        }}
         readOnlyReason={null}
       />,
     )
@@ -316,28 +252,29 @@ describe('MutationField', () => {
   })
 
   it('keeps a nullable Enum select and NULL control in one input group', () => {
-    const onNullChange = vi.fn()
+    function EnumField(): React.ReactElement {
+      const [input, setInput] = useState<MutationFieldInput>({ mode: 'null', text: '' })
+      return (
+        <MutationField
+          canOmit={false}
+          column={column(
+            'status',
+            { type: 'Enum', variants: ['active', 'archived'] },
+            { nullable: true },
+          )}
+          error={undefined}
+          expanded={false}
+          input={input}
+          hidden={false}
+          initialValue={null}
+          onExpandedChange={vi.fn()}
+          onInputChange={setInput}
+          readOnlyReason={null}
+        />
+      )
+    }
 
-    render(
-      <MutationField
-        canOmit={false}
-        column={column(
-          'status',
-          { type: 'Enum', variants: ['active', 'archived'] },
-          { nullable: true },
-        )}
-        error={undefined}
-        expanded={false}
-        fieldState={{ isNull: true, isOmitted: false, text: '' }}
-        hidden={false}
-        initialValue={null}
-        onExpandedChange={vi.fn()}
-        onNullChange={onNullChange}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
-        readOnlyReason={null}
-      />,
-    )
+    render(<EnumField />)
 
     const select = screen.getByRole('combobox', { name: 'Status' }) as HTMLButtonElement
     const nullControl = screen.getByRole('checkbox', { name: 'Set Status to NULL' })
@@ -347,7 +284,8 @@ describe('MutationField', () => {
     expect(inputGroup?.contains(nullControl)).toBe(true)
 
     fireEvent.click(nullControl)
-    expect(onNullChange).toHaveBeenCalledWith(false)
+    expect(select.disabled).toBe(false)
+    expect(select.getAttribute('aria-expanded')).toBe('true')
   })
 
   it('presents timestamps with the shared calendar picker', async () => {
@@ -360,13 +298,11 @@ describe('MutationField', () => {
         column={column('createdAt', { type: 'Timestamp' })}
         error={undefined}
         expanded={false}
-        fieldState={{ isNull: false, isOmitted: false, text: String(initialDate.getTime()) }}
+        input={{ mode: 'value', text: String(initialDate.getTime()) }}
         hidden={false}
         initialValue={initialDate.getTime()}
         onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={onTextChange}
+        onInputChange={(input) => onTextChange(input.text)}
         readOnlyReason={null}
       />,
     )
@@ -395,13 +331,11 @@ describe('MutationField', () => {
         column={column('publishedAt', { type: 'Timestamp' }, { nullable: true })}
         error={undefined}
         expanded={false}
-        fieldState={{ isNull: true, isOmitted: false, text: '' }}
+        input={{ mode: 'null', text: '' }}
         hidden={false}
         initialValue={null}
         onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
+        onInputChange={vi.fn()}
         readOnlyReason={null}
       />,
     )
@@ -420,13 +354,11 @@ describe('MutationField', () => {
         column={column('state', { type: 'Bytea' })}
         error={undefined}
         expanded={false}
-        fieldState={{ isNull: false, isOmitted: false, text: '(3 bytes)' }}
+        input={{ mode: 'value', text: '(3 bytes)' }}
         hidden={false}
         initialValue={new Uint8Array([1, 2, 3])}
         onExpandedChange={vi.fn()}
-        onNullChange={vi.fn()}
-        onOmittedChange={vi.fn()}
-        onTextChange={vi.fn()}
+        onInputChange={vi.fn()}
         readOnlyReason="binary"
       />,
     )
@@ -435,5 +367,25 @@ describe('MutationField', () => {
     expect(input.value).toBe('3B')
     expect(input.getAttribute('data-font')).toBe('mono')
     expect(screen.getByRole('button', { name: 'Copy as' })).toBeTruthy()
+  })
+
+  it('leaves an empty required Boolean input unselected', () => {
+    render(
+      <MutationField
+        canOmit={false}
+        column={column('active', { type: 'Boolean' })}
+        error={undefined}
+        expanded={false}
+        input={{ mode: 'value', text: '' }}
+        hidden={false}
+        initialValue={undefined}
+        onExpandedChange={vi.fn()}
+        onInputChange={vi.fn()}
+        readOnlyReason={null}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'True' }).getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByRole('button', { name: 'False' }).getAttribute('aria-pressed')).toBe('false')
   })
 })

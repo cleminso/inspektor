@@ -16,6 +16,7 @@ import {
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
 import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
+import { buildRowMutationValueProjection } from '@tables/rowEditor/mutation/draft'
 import { createRowJsonViewValue } from '@tables/rowEditor/values/jsonView'
 
 interface EditRowFormProps {
@@ -35,9 +36,10 @@ const defaultFindOptions: FindBarSearchOptions = {
 }
 
 function RowJsonRepresentation({
+  draftController,
   rowValues,
   schemaColumns,
-}: Pick<EditRowFormProps, 'rowValues' | 'schemaColumns'>): React.ReactElement {
+}: Pick<EditRowFormProps, 'draftController' | 'rowValues' | 'schemaColumns'>): React.ReactElement {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOptions, setSearchOptions] = useState(defaultFindOptions)
   const [activeMatchIndex, setActiveMatchIndex] = useState(0)
@@ -47,10 +49,10 @@ function RowJsonRepresentation({
     pending: false,
     query: '',
   })
-  const value = useMemo(
-    () => createRowJsonViewValue(rowValues, schemaColumns),
-    [rowValues, schemaColumns],
-  )
+  const value = useMemo(() => {
+    const projection = buildRowMutationValueProjection(draftController.state.draft, schemaColumns)
+    return createRowJsonViewValue({ ...rowValues, ...projection.displayValues }, schemaColumns)
+  }, [draftController.state.draft, rowValues, schemaColumns])
   const findState: FindBarState =
     searchQuery.length === 0
       ? { status: 'idle' }
@@ -198,9 +200,7 @@ export function EditRowForm({
                   initialRowValues={rowValues}
                   mode="edit"
                   onFieldExpandedChange={rowEditor.setFieldExpanded}
-                  onFieldNullChange={rowEditor.setFieldNull}
-                  onFieldOmittedChange={rowEditor.setFieldOmitted}
-                  onFieldTextChange={rowEditor.setFieldText}
+                  onFieldInputChange={rowEditor.setFieldInput}
                 />
 
                 {rowEditor.saveError !== null ? (
@@ -217,6 +217,7 @@ export function EditRowForm({
         </Box>
       ) : (
         <RowJsonRepresentation
+          draftController={draftController}
           rowValues={rowValues}
           schemaColumns={schemaColumns}
         />

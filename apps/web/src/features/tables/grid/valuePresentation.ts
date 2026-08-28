@@ -1,6 +1,8 @@
 import type { StructuredValuePreviewModel, StructuredValuePreviewVariant } from '@inspector/ds'
 import type { ColumnDescriptor } from 'jazz-tools'
 
+import { normalizeTimestampValue } from '@tables/valueParsing'
+
 const MAX_STRUCTURED_ITEMS = 3
 const MAX_SUMMARY_VALUE_LENGTH = 24
 const MAX_FALLBACK_LENGTH = 80
@@ -249,6 +251,26 @@ function isSchemaCompatibleRowTuple(
   })
 }
 
+function isSchemaCompatibleRowRecord(value: object, columns: readonly ColumnDescriptor[]): boolean {
+  const record = value as Record<string, unknown>
+  const columnNames = new Set(columns.map((column) => column.name))
+  if (Object.keys(record).some((key) => columnNames.has(key) === false)) {
+    return false
+  }
+
+  return columns.every((column) => {
+    const fieldValue = record[column.name]
+    if (fieldValue === null) {
+      return column.nullable === true
+    }
+    if (fieldValue === undefined) {
+      return column.nullable === true
+    }
+    const presentation = classifySchemaValue(fieldValue, column)
+    return presentation.kind !== 'invalid' && presentation.kind !== 'unsupported'
+  })
+}
+
 export function classifySchemaValue(
   rawValue: unknown,
   column: ColumnDescriptor | null,
@@ -302,12 +324,11 @@ export function classifySchemaValue(
         ? { kind: 'boolean', rawValue, value: rawValue }
         : invalid(rawValue, 'a boolean')
     case 'Timestamp': {
-      const epochMilliseconds = rawValue instanceof Date ? rawValue.getTime() : rawValue
-      const isValid =
-        typeof epochMilliseconds === 'number' &&
-        Number.isFinite(epochMilliseconds) === true &&
-        Number.isNaN(new Date(epochMilliseconds).getTime()) === false
-      return isValid === true
+      const epochMilliseconds =
+        rawValue instanceof Date || typeof rawValue === 'number'
+          ? normalizeTimestampValue(rawValue)
+          : null
+      return epochMilliseconds !== null
         ? { kind: 'timestamp', rawValue, epochMilliseconds }
         : invalid(rawValue, 'a valid Date or epoch milliseconds', 'Invalid timestamp')
     }
@@ -329,7 +350,8 @@ export function classifySchemaValue(
       }
     case 'Row':
       try {
-        return isSupportedRecord(rawValue) === true ||
+        return (isSupportedRecord(rawValue) === true &&
+          isSchemaCompatibleRowRecord(rawValue, column.column_type.columns) === true) ||
           (Array.isArray(rawValue) === true &&
             isSchemaCompatibleRowTuple(rawValue, column.column_type.columns) === true)
           ? structured(rawValue, 'json', 'a Row object or descriptor-compatible tuple')

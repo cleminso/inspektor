@@ -1,5 +1,7 @@
 import type { BinaryCopyFormat } from '@inspector/ds'
 
+import { encodeBase64 } from '@tables/rowEditor/values/byteBase64'
+
 interface ClipboardWriter {
   writeText: (value: string) => Promise<void>
 }
@@ -16,29 +18,12 @@ interface BinaryDownloadEnvironment {
   revokeObjectURL: (url: string) => void
 }
 
-const base64Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 const MAX_BINARY_TEXT_COPY_BYTES = 1_048_576
 
 function copyToArrayBuffer(value: Uint8Array): ArrayBuffer {
   const buffer = new ArrayBuffer(value.byteLength)
   new Uint8Array(buffer).set(value)
   return buffer
-}
-
-function encodeBase64(value: Uint8Array): string {
-  let encoded = ''
-  for (let index = 0; index < value.length; index += 3) {
-    const first = value[index] ?? 0
-    const second = value[index + 1] ?? 0
-    const third = value[index + 2] ?? 0
-    const chunk = (first << 16) | (second << 8) | third
-
-    encoded += base64Alphabet[(chunk >> 18) & 63]
-    encoded += base64Alphabet[(chunk >> 12) & 63]
-    encoded += index + 1 < value.length ? base64Alphabet[(chunk >> 6) & 63] : '='
-    encoded += index + 2 < value.length ? base64Alphabet[chunk & 63] : '='
-  }
-  return encoded
 }
 
 export function encodeBinaryValue(value: Uint8Array, format: BinaryCopyFormat): string {

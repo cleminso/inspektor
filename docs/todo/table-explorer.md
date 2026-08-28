@@ -936,6 +936,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Cell rendering refactor
 
+[28/08/26]
+
+- [x] Keep unavailable source values distinct from SQL NULL mutation intent in complete-row fields.
+- [x] Project valid staged Details values into the complete-row JSON representation.
+- [x] Validate Row objects and tuples against their runtime descriptors before compact presentation.
+- [x] Keep malformed structured runtime values representable instead of throwing during draft formatting.
+- [x] Share application-owned Base64 encoding while retaining separate clipboard size and JSON normalization policies.
+
 [28/07/26]
 
 - [x] Define the compact table-cell representation for every supported schema type.
@@ -1346,6 +1354,15 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Verify a structured cell opens, edits, saves, and reopens its staged value through the production CodeMirror boundary in the isolated browser fixture.
+
+[28/08/26]
+
+- [x] Cover unavailable Details values, staged JSON projection, Row object validation, guarded structured formatting, and shared Base64 encoding with focused tests.
+- [x] Verify Inspector formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
 
 [28/08/26]
 

@@ -7,24 +7,15 @@ import {
   type InspectorJsonObject,
   type InspectorJsonValue,
 } from '@tables/rowEditor/values/jsonView'
-
-export type BooleanFieldValue = 'true' | 'false' | 'null'
+import { normalizeTimestampValue } from '@tables/valueParsing'
 
 export function formatColumnTypeLabel(column: ColumnDescriptor | null): string | null {
   return column === null ? null : formatColumnTypeName(column.column_type)
 }
 
 export function parseTimestampValue(valueText: string): Date | undefined {
-  const trimmedValue = valueText.trim()
-  if (trimmedValue.length === 0) {
-    return undefined
-  }
-
-  const epochMilliseconds = Number(trimmedValue)
-  const parsedValue = Number.isFinite(epochMilliseconds)
-    ? epochMilliseconds
-    : Date.parse(trimmedValue)
-  return Number.isFinite(parsedValue) ? new Date(parsedValue) : undefined
+  const epochMilliseconds = normalizeTimestampValue(valueText)
+  return epochMilliseconds === null ? undefined : new Date(epochMilliseconds)
 }
 
 export function formatColumnNameLabel(columnName: string): string {
@@ -33,25 +24,6 @@ export function formatColumnNameLabel(columnName: string): string {
   }
 
   return `${columnName.slice(0, 1).toUpperCase()}${columnName.slice(1)}`
-}
-
-export function isStructuredColumn(column: ColumnDescriptor | null): boolean {
-  return (
-    column?.column_type.type === 'Json' ||
-    column?.column_type.type === 'Array' ||
-    column?.column_type.type === 'Row'
-  )
-}
-
-export function getBooleanFieldValue(fieldState: {
-  isNull: boolean
-  text: string
-}): BooleanFieldValue {
-  if (fieldState.isNull === true) {
-    return 'null'
-  }
-
-  return fieldState.text === 'true' ? 'true' : 'false'
 }
 
 export function safelySerializeStructuredValue(

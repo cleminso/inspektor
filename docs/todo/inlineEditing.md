@@ -14,6 +14,16 @@
 
 [28/08/26]
 
+### Shared field semantics
+
+- [x] Pass canonical `MutationFieldInput` values through pane and Floating field editors without parallel nullable and omitted booleans.
+- [x] Share pure field-mode and text transitions while retaining local Floating editor input until Save.
+- [x] Leave required Boolean inserts unselected until the user chooses a valid value.
+- [x] Collapse scalar and structured edit routing into one field-editor route; the shared field renderer owns control selection.
+- [x] Resolve staged-over-source values through one helper for compact cells and cell actions.
+
+[28/08/26]
+
 ### Enum NULL validation
 
 - [x] Open the Enum selector when leaving NULL mode.
@@ -510,6 +520,15 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 - [x] Remove update overlays for columns that disappear from the live schema so obsolete fields cannot keep a draft dirty.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Verify a structured cell opens, edits, saves, and reopens its staged value through the production CodeMirror boundary in the isolated browser fixture.
+
+[28/08/26]
+
+- [x] Cover canonical field input, route collapse, staged value resolution, Boolean empty state, Enum NULL recovery, and input transitions with focused tests.
+- [x] Verify Inspector formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
 
 [28/08/26]
 

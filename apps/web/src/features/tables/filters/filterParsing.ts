@@ -18,7 +18,7 @@ import {
   type TableFilterClause,
   type TableFilterOperator,
 } from '@tables/filters/tableFilters'
-import { parseBooleanValue } from '@tables/valueParsing'
+import { normalizeTimestampValue, parseBooleanValue } from '@tables/valueParsing'
 
 export const tableIdFilterColumn = {
   name: 'id',
@@ -100,10 +100,8 @@ function parseScalarValue(columnType: ColumnType, value: string): unknown {
       }
     }
     case 'Timestamp': {
-      const numericValue = Number(trimmedValue)
-      if (Number.isFinite(numericValue) === true) return numericValue
-      const parsedValue = Date.parse(trimmedValue)
-      if (Number.isFinite(parsedValue) === false) {
+      const parsedValue = normalizeTimestampValue(trimmedValue)
+      if (parsedValue === null) {
         throw new Error('Value must be a timestamp.')
       }
       return parsedValue
@@ -263,11 +261,11 @@ function getTableFilterPredicateFromValue(
     case 'Double':
       return typeof value === 'number' && Number.isFinite(value) ? { operator: 'eq', value } : null
     case 'Timestamp': {
-      const epochMilliseconds = value instanceof Date ? value.getTime() : value
-      return typeof epochMilliseconds === 'number' &&
-        Number.isFinite(new Date(epochMilliseconds).getTime())
-        ? { operator: 'eq', value: epochMilliseconds }
-        : null
+      if (!(value instanceof Date) && typeof value !== 'number') {
+        return null
+      }
+      const epochMilliseconds = normalizeTimestampValue(value)
+      return epochMilliseconds === null ? null : { operator: 'eq', value: epochMilliseconds }
     }
     case 'BigInt':
       if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'bigint') {

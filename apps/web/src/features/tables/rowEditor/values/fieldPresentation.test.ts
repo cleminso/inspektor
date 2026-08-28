@@ -65,5 +65,7 @@ describe('parseTimestampValue', () => {
       new Date('2024-01-02T03:04:05.678Z'),
     )
     expect(parseTimestampValue('not-a-timestamp')).toBeUndefined()
+    expect(parseTimestampValue('8640000000000001')).toBeUndefined()
+    expect(parseTimestampValue('1.5')).toEqual(new Date(1))
   })
 })

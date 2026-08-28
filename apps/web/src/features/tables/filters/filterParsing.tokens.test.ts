@@ -50,6 +50,8 @@ describe('scalar in token parsing', () => {
     } as ColumnDescriptor
     expect(() => parseFilterTokens(integerColumn, ['1.5'])).toThrow('integers')
     expect(() => parseFilterTokens(timestampColumn, ['not-a-date'])).toThrow('timestamp')
+    expect(() => parseFilterTokens(timestampColumn, ['8640000000000001'])).toThrow('timestamp')
+    expect(parseFilterTokens(timestampColumn, ['1.5'])).toEqual([1])
   })
 
   it('rejects Integer tokens that JavaScript cannot represent exactly', () => {

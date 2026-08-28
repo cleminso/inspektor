@@ -88,9 +88,7 @@ function InsertRowFormFields({
               initialRowValues={rowValues}
               mode="insert"
               onFieldExpandedChange={rowEditor.setFieldExpanded}
-              onFieldNullChange={rowEditor.setFieldNull}
-              onFieldOmittedChange={rowEditor.setFieldOmitted}
-              onFieldTextChange={rowEditor.setFieldText}
+              onFieldInputChange={rowEditor.setFieldInput}
             />
             {rowEditor.saveError === null ? null : (
               <Text

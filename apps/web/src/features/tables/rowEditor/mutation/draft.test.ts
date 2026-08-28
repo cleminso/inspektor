@@ -10,6 +10,8 @@ import {
   getMutationFieldInput,
   rebaseUpdateRowDraft,
   revertMutationField,
+  setMutationFieldInputMode,
+  setMutationFieldInputText,
   setMutationFieldMode,
   setMutationFieldText,
 } from '@tables/rowEditor/mutation/draft'
@@ -21,6 +23,22 @@ const columns = [
 ] satisfies ColumnDescriptor[]
 
 describe('update row drafts', () => {
+  it('keeps unavailable source data separate from NULL mutation intent', () => {
+    const draft = createUpdateRowDraft({ id: 'row-1' })
+
+    expect(getMutationFieldInput(draft, columns[0])).toEqual({ mode: 'value', text: '' })
+  })
+
+  it('stages explicit NULL intent when nullable source data is unavailable', () => {
+    const draft = setMutationFieldMode(createUpdateRowDraft({ id: 'row-1' }), columns[2], 'null')
+
+    expect(getMutationFieldInput(draft, columns[2])).toEqual({ mode: 'null', text: '' })
+    expect(buildRowMutationSubmission(draft, columns)).toEqual({
+      errors: {},
+      values: { settings: null },
+    })
+  })
+
   it('removes a field overlay when text returns to the source value', () => {
     const source = { id: 'row-1', name: 'Ada', count: 1, settings: null }
     const changed = setMutationFieldText(createUpdateRowDraft(source), columns[0], 'Grace')
@@ -175,6 +193,37 @@ describe('update row drafts', () => {
       values: {},
     })
   })
+
+  it('uses canonical Date milliseconds when removing a timestamp overlay', () => {
+    const timestampColumn = {
+      name: 'createdAt',
+      column_type: { type: 'Timestamp' },
+      nullable: false,
+    } satisfies ColumnDescriptor
+    const draft = setMutationFieldText(
+      createUpdateRowDraft({ createdAt: new Date(1.5) }),
+      timestampColumn,
+      '1.5',
+    )
+
+    expect(buildRowMutationSubmission(draft, [timestampColumn])).toEqual({ errors: {}, values: {} })
+  })
+
+  it('does not treat distinct malformed timestamps as equal while rebasing', () => {
+    const timestampColumn = {
+      name: 'createdAt',
+      column_type: { type: 'Timestamp' },
+      nullable: false,
+    } satisfies ColumnDescriptor
+    const draft = createUpdateRowDraft({ createdAt: 'not-a-date' })
+
+    const rebased = rebaseUpdateRowDraft(draft, { createdAt: 'still-not-a-date' }, [
+      timestampColumn,
+    ])
+
+    expect(rebased.sourceValues.createdAt).toBe('still-not-a-date')
+    expect(rebased).not.toBe(draft)
+  })
 })
 
 describe('insert row drafts', () => {
@@ -243,6 +292,33 @@ describe('insert row drafts', () => {
     expect(buildRowMutationSubmission(draft, [payloadColumn])).toEqual({
       errors: { payload: 'This read-only column requires a value.' },
       values: {},
+    })
+  })
+})
+
+describe('mutation field input transitions', () => {
+  it('seeds an empty structured input when entering value mode', () => {
+    expect(setMutationFieldInputMode({ mode: 'null', text: '' }, columns[2], 'value')).toEqual({
+      mode: 'value',
+      text: '{}',
+    })
+  })
+
+  it('retains text while changing mutation intent', () => {
+    expect(setMutationFieldInputMode({ mode: 'value', text: 'Ada' }, columns[0], 'null')).toEqual({
+      mode: 'null',
+      text: 'Ada',
+    })
+  })
+
+  it('changes text only in value mode', () => {
+    expect(setMutationFieldInputText({ mode: 'value', text: 'Ada' }, 'Grace')).toEqual({
+      mode: 'value',
+      text: 'Grace',
+    })
+    expect(setMutationFieldInputText({ mode: 'null', text: 'Ada' }, 'Grace')).toEqual({
+      mode: 'null',
+      text: 'Ada',
     })
   })
 })

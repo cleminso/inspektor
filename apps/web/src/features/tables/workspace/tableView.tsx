@@ -35,12 +35,13 @@ import {
   tableIdFilterColumn,
 } from '@tables/filters/filterParsing'
 import { serializeCellValueForClipboard } from '@tables/grid/cellActions'
+import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TablePagination, Toolbar } from '@tables/grid/toolbar'
 import { EditRowForm, type RowRepresentation } from '@tables/rowEditor/editForm'
 import { InsertRowForm } from '@tables/rowEditor/insertForm'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
-import { isStructuredColumn } from '@tables/rowEditor/values/fieldPresentation'
+import { isStructuredColumnType } from '@tables/schema/fieldType'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
@@ -153,7 +154,7 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
   const mutationScopeKey = createTableScope(scope, tableName)
 
   useEffect(() => {
-    if (schemaColumns.some(isStructuredColumn)) {
+    if (schemaColumns.some((column) => isStructuredColumnType(column.column_type))) {
       void preloadCodeEditor()
     }
   }, [schemaColumns])
@@ -255,11 +256,11 @@ function TableViewContent({
       if (columnMeta === undefined || row === undefined) {
         return null
       }
-      const stagedRowValues = mutations.stagedValuesByRowId[target.rowId]
-      const value =
-        stagedRowValues !== undefined && Object.hasOwn(stagedRowValues, columnMeta.accessorKey)
-          ? stagedRowValues[columnMeta.accessorKey]
-          : row.original[columnMeta.accessorKey]
+      const value = resolveStagedFieldValue(
+        row.original,
+        mutations.stagedValuesByRowId[target.rowId],
+        columnMeta.accessorKey,
+      )
       return { columnMeta, value }
     },
     [mutations.stagedValuesByRowId, state.table, state.tableColumns],

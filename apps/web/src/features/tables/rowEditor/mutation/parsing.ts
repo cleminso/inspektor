@@ -7,7 +7,7 @@
  */
 import type { ColumnType } from 'jazz-tools'
 
-import { parseBooleanValue } from '@tables/valueParsing'
+import { normalizeTimestampValue, parseBooleanValue } from '@tables/valueParsing'
 
 /**
  * Converts integer input to the exact `Number` representation accepted by the installed Jazz
@@ -60,7 +60,7 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
       if (typeof value !== 'boolean') throw new Error('Expected a boolean value.')
       return value
     case 'Integer':
-      if (typeof value !== 'number' || Number.isInteger(value) === false) {
+      if (typeof value !== 'number' || Number.isSafeInteger(value) === false) {
         throw new Error('Expected an integer value.')
       }
       return value
@@ -75,15 +75,8 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
       if (typeof value !== 'number' && typeof value !== 'string') {
         throw new Error('Expected a timestamp value.')
       }
-      const numericValue = Number(value)
-      if (Number.isFinite(numericValue) === true) {
-        return numericValue
-      }
-      if (typeof value !== 'string') {
-        throw new Error('Expected a timestamp value.')
-      }
-      const parsedValue = Date.parse(value)
-      if (Number.isFinite(parsedValue) === false) {
+      const parsedValue = normalizeTimestampValue(value)
+      if (parsedValue === null) {
         throw new Error('Expected a timestamp value.')
       }
       return parsedValue
@@ -158,7 +151,10 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
         throw new Error('Value is required.')
       }
       const parsedValue = Number(trimmedValue)
-      if (Number.isInteger(parsedValue) === false) {
+      if (Number.isSafeInteger(parsedValue) === false) {
+        if (Number.isInteger(parsedValue) === true) {
+          throw new Error('Value must be within JavaScript safe integer range.')
+        }
         throw new Error('Value must be an integer.')
       }
       return parsedValue
@@ -190,13 +186,9 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
       if (trimmedValue.length === 0) {
         throw new Error('Timestamp is required.')
       }
-      const parsedAsNumber = Number(trimmedValue)
-      if (Number.isFinite(parsedAsNumber) === true) {
-        return parsedAsNumber
-      }
-      const parsedAsDate = Date.parse(trimmedValue)
-      if (Number.isFinite(parsedAsDate) === true) {
-        return parsedAsDate
+      const parsedValue = normalizeTimestampValue(trimmedValue)
+      if (parsedValue !== null) {
+        return parsedValue
       }
       throw new Error('Timestamp must be milliseconds or an ISO date string.')
     }
@@ -263,7 +255,15 @@ export function formatMutationFieldValue(value: unknown, columnType: ColumnType)
     return `(${value.length} bytes)`
   }
   if (columnType.type === 'Json' || columnType.type === 'Array' || columnType.type === 'Row') {
-    return JSON.stringify(value, null, 2)
+    try {
+      return JSON.stringify(value, null, 2) ?? ''
+    } catch {
+      try {
+        return String(value)
+      } catch {
+        return ''
+      }
+    }
   }
   return String(value)
 }

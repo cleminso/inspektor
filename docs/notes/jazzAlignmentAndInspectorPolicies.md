@@ -1,4 +1,4 @@
-# Official Jazz Inspector comparison
+# Jazz alignment and Inspector policies
 
 ## Table of contents
 
@@ -7,6 +7,12 @@
 - [Inspector strengths](#inspector-strengths)
 - [Patterns to adopt](#patterns-to-adopt)
 - [Patterns not to copy](#patterns-not-to-copy)
+- [Verified field representation contracts](#verified-field-representation-contracts)
+- [Mutation state table](#mutation-state-table)
+- [Nested Row fields](#nested-row-fields)
+- [Deliberate Inspector policy differences](#deliberate-inspector-policy-differences)
+- [Structured draft formatting](#structured-draft-formatting)
+- [Verification scope](#verification-scope)
 - [Interaction decisions](#interaction-decisions)
 - [Editing surfaces](#editing-surfaces)
 - [Pane editing](#pane-editing)
@@ -79,6 +85,76 @@ Keep the current Inspector direction:
 - Permissive nested array, row, UUID, or relation parsing.
 - Concurrent batch mutation retry semantics that can repeat partially successful work.
 - Separate mutation rules for each editing surface.
+
+## Verified field representation contracts
+
+These contracts are derived from the Jazz mutation converter and the official Inspector. They are the default answers for future field-editing work unless an upstream Jazz change requires another review.
+
+### Mutation state table
+
+| Inspector concept  | Jazz input                                       | Jazz behavior                                                                                  | Inspector policy                                                                                        |
+| ------------------ | ------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Unavailable source | Not a mutation input                             | Jazz has no unavailable mutation value.                                                        | Keep source unavailability distinct in presentation and prevent it from becoming a mutation implicitly. |
+| Omitted            | Property absent or `undefined`                   | `toWriteRecord` skips the field. Insert defaults may apply; updates leave the field unchanged. | Represent omission explicitly and leave the property out of the payload.                                |
+| SQL NULL           | `null`                                           | Converts to Jazz `Null` for nullable columns and fails for required columns.                   | Use an explicit nullable-only `null` mode rather than inferring NULL from empty text.                   |
+| Empty              | A present empty value such as `""` or `[]`       | Remains a value when valid for the column type.                                                | Keep empty values distinct from omission and SQL NULL; validate them by column type.                    |
+| Valid              | A present non-null value                         | Converts according to the column descriptor.                                                   | Parse and validate before adding the value to a mutation payload.                                       |
+| Invalid            | A value rejected by Inspector or Jazz validation | Must not produce a write record.                                                               | Retain raw input and its error, but exclude it from mutation payloads.                                  |
+
+Jazz evidence:
+
+- `packages/jazz-tools/src/runtime/value-converter.ts` documents and implements top-level `undefined` omission in `toWriteRecord`.
+- `packages/jazz-tools/src/runtime/value-converter.test.ts` covers explicit nullable `null`, skipped `undefined`, unknown columns, required-field `null`, and JSON-schema failures.
+- `packages/inspector/src/components/data-explorer/TableDataGrid.test.tsx` covers omitted insert defaults and explicit nullable values.
+
+Omission is operation-dependent: it requests the stored default during insert and means unchanged during update. Unavailable source data is presentation state, not another spelling of omission.
+
+### Nested Row fields
+
+Jazz's TypeScript `Row` converter reads declared fields from an object in descriptor order. Missing and explicit `undefined` members both reach `toValue(undefined)` and become Jazz `Null`. The native encoder accepts that value for nullable members and rejects it for required members. Unknown object keys are ignored because Jazz projects declared keys rather than enumerating input keys.
+
+Inspector follows the compatible part of that behavior and adds earlier validation:
+
+- An absent or explicit `undefined` nullable member normalizes to `null`.
+- An absent, explicit `undefined`, or explicit `null` required member is invalid.
+- Named Row objects reject unknown fields instead of relying on Jazz to ignore them.
+- Positional Row tuples must be complete and are converted to named records in descriptor order.
+- Nested members are recursively validated before the mutation reaches Jazz.
+
+The upstream behavior is implemented in `packages/jazz-tools/src/runtime/value-converter.ts`. Inspector's stricter checks are product validation, not a different storage meaning.
+
+### Deliberate Inspector policy differences
+
+Strict Row validation and JSON-null rejection are deliberate Inspector policies layered above Jazz's permissive converter:
+
+- Inspector rejects unknown Row fields, incomplete tuples, and missing required members before invoking Jazz. Jazz's TypeScript converter projects known Row fields, ignores unknown keys, and defers required-member rejection to native encoding.
+- Inspector rejects JSON text that parses to JavaScript `null`. Jazz's top-level converter treats that value as SQL NULL rather than preserving a distinguishable JSON null, so Inspector requires the explicit SQL-NULL field mode where the column is nullable.
+
+These checks provide earlier errors and preserve visible mutation intent. Do not relax them merely to mirror the converter unless Jazz introduces distinct JSON-null storage semantics or stricter public Row validation.
+
+### Structured draft formatting
+
+The official Inspector formats a source object with `JSON.stringify` when editing begins, stores subsequent edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft. See `packages/inspector/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
+
+Inspector uses the same ownership rule:
+
+- Source-derived structured values may be formatted when an editor draft is created.
+- User-edited structured text is preserved exactly while staged and when the editor reopens.
+- Validation parses the text without replacing it with canonical output.
+- Canonical formatting requires an explicit user action; Save, staging, rebasing, and reopening do not format implicitly.
+
+### Verification scope
+
+The official Inspector separates focused component coverage from browser acceptance. Component tests cover Enum editor activation, NULL actions, insert omission/default behavior, queued overlays, and live-source reconciliation. Browser tests cover opening the real inline editor, local staging and Discard, Save, and persistence after navigation or refresh.
+
+Inspector follows this acceptance split:
+
+- Pure tests cover state transitions, parsing, nested Row validation, omission, NULL, dirty equality, and payload construction.
+- Component tests cover control composition, validation timing, focus, keyboard behavior, and local draft preservation.
+- Browser tests cover production-only boundaries: route activation, the real deferred structured editor, local staging or discard, and a representative persisted mutation observed after reload.
+- Browser tests do not repeat every column type when focused tests exercise the same mutation contract. Add a type-specific browser case only when that type crosses a distinct browser, deferred-module, focus, or runtime serialization boundary.
+
+For structured inline editing, routing alone is insufficient because it can pass while the production editor boundary is broken. Opening the real editor and recovering its staged text is the minimum browser contract. A separate representative Apply-and-reload test owns general persistence.
 
 ## Interaction decisions
 

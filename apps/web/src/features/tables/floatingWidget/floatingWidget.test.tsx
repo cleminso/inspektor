@@ -155,7 +155,7 @@ describe('FieldEditorMutationWidget', () => {
           <button
             type="button"
             onClick={() => {
-              controller.actions.setFieldText('name', 'Grace')
+              controller.actions.setFieldInput('name', { mode: 'value', text: 'Grace' })
               setOpen(true)
             }}
           >
@@ -259,8 +259,8 @@ describe('TableMutationWidget', () => {
       rowId: 'long-row-identity-123456789',
     })
     const stageReview = () => {
-      controller.actions.setFieldText('name', 'Grace')
-      controller.actions.setFieldText('count', '2')
+      controller.actions.setFieldInput('name', { mode: 'value', text: 'Grace' })
+      controller.actions.setFieldInput('count', { mode: 'value', text: '2' })
       mutations.stageDeletions(['row-2', 'row-3'])
       for (let index = 2; index < operationCount; index += 1) {
         mutations.stageDeletions([`row-${index + 2}`])
@@ -271,7 +271,12 @@ describe('TableMutationWidget', () => {
         <button type="button" onClick={stageReview}>
           Stage review
         </button>
-        <button type="button" onClick={() => controller.actions.setFieldText('count', 'invalid')}>
+        <button
+          type="button"
+          onClick={() =>
+            controller.actions.setFieldInput('count', { mode: 'value', text: 'invalid' })
+          }
+        >
           Stage invalid
         </button>
         <TableMutationWidget executor={{ deleteRow: vi.fn(), updateRow: vi.fn() }} />

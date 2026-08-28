@@ -3,7 +3,7 @@ import type { DataGridCellTarget } from '@inspector/ds'
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import type { TableColumnMeta } from '@tables/tableTypes'
 
-export type InlineFieldRoute = 'readOnly' | 'rowPane' | 'scalar' | 'structured'
+export type InlineFieldRoute = 'readOnly' | 'rowPane' | 'fieldEditor'
 export type SpreadsheetCompletionDirection = 'enter' | 'tabBackward' | 'tabForward'
 
 export function getInlineFieldRoute(columnMeta: TableColumnMeta): InlineFieldRoute {
@@ -14,14 +14,7 @@ export function getInlineFieldRoute(columnMeta: TableColumnMeta): InlineFieldRou
   if (column.references !== undefined || getFieldReadOnlyReason(column) === 'binary') {
     return 'rowPane'
   }
-  if (
-    column.column_type.type === 'Array' ||
-    column.column_type.type === 'Json' ||
-    column.column_type.type === 'Row'
-  ) {
-    return 'structured'
-  }
-  return 'scalar'
+  return 'fieldEditor'
 }
 
 export function resolveSpreadsheetCompletionTarget(

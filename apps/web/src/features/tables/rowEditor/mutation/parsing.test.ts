@@ -29,6 +29,13 @@ describe('formatMutationFieldValue', () => {
   it('does not format ordinary text', () => {
     expect(formatMutationFieldValue('{"enabled":true}', { type: 'Text' })).toBe('{"enabled":true}')
   })
+
+  it('keeps malformed structured runtime values representable', () => {
+    const cyclic: Record<string, unknown> = {}
+    cyclic.self = cyclic
+
+    expect(formatMutationFieldValue(cyclic, { type: 'Json' })).toBe('[object Object]')
+  })
 })
 
 describe('parseMutationFieldValue', () => {
@@ -57,10 +64,41 @@ describe('parseMutationFieldValue', () => {
     ).toEqual([1704164645000, 1704164645000])
   })
 
+  it('uses one valid Date range for top-level and nested timestamps', () => {
+    expect(parseMutationFieldValue({ type: 'Timestamp' }, '1.5')).toBe(1)
+    expect(
+      parseMutationFieldValue({ type: 'Array', element: { type: 'Timestamp' } }, '[1.5]'),
+    ).toEqual([1])
+    expect(() => parseMutationFieldValue({ type: 'Timestamp' }, '8640000000000001')).toThrow(
+      'Timestamp must be milliseconds or an ISO date string.',
+    )
+    expect(() =>
+      parseMutationFieldValue(
+        { type: 'Array', element: { type: 'Timestamp' } },
+        '[8640000000000001]',
+      ),
+    ).toThrow('Array must be valid JSON array.')
+    expect(() =>
+      parseMutationFieldValue({ type: 'Array', element: { type: 'Timestamp' } }, '[""]'),
+    ).toThrow('Array must be valid JSON array.')
+  })
+
   it('returns safe BigInt values as the number representation accepted by Jazz', () => {
     expect(parseMutationFieldValue({ type: 'BigInt' }, '9007199254740991')).toBe(
       Number.MAX_SAFE_INTEGER,
     )
+  })
+
+  it('rejects Integer values that JavaScript cannot preserve exactly', () => {
+    expect(() => parseMutationFieldValue({ type: 'Integer' }, '9007199254740993')).toThrow(
+      'Value must be within JavaScript safe integer range.',
+    )
+    expect(() =>
+      parseMutationFieldValue(
+        { type: 'Array', element: { type: 'Integer' } },
+        '[9007199254740993]',
+      ),
+    ).toThrow('Array must be valid JSON array.')
   })
 
   it('rejects BigInt values that the Jazz number boundary cannot preserve', () => {

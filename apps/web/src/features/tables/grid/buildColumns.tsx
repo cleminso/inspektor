@@ -28,6 +28,7 @@ import {
   type ColumnTypeMarker as ColumnTypeMarkerModel,
 } from '@tables/grid/columnTypeMarker'
 import { RelationCellLink } from '@tables/grid/relationCellLink'
+import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { classifySchemaValue, type SchemaValuePresentation } from '@tables/grid/valuePresentation'
 import type { ColumnMoveDirection } from '@tables/grid/useColumnOrder'
@@ -860,11 +861,11 @@ export function buildDataGridColumns({
           />
         ),
         cell: ({ row }) => {
-          const stagedRowValues = stagedValuesByRowId[row.id]
-          const rawValue =
-            stagedRowValues !== undefined && Object.hasOwn(stagedRowValues, column.accessorKey)
-              ? stagedRowValues[column.accessorKey]
-              : row.original[column.accessorKey]
+          const rawValue = resolveStagedFieldValue(
+            row.original,
+            stagedValuesByRowId[row.id],
+            column.accessorKey,
+          )
           const presentation = classifySchemaValue(rawValue, column.column)
 
           return (

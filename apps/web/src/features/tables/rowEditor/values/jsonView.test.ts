@@ -1,7 +1,7 @@
 import type { ColumnDescriptor } from 'jazz-tools'
 import { describe, expect, it } from 'vitest'
 
-import { createRowJsonViewValue } from './jsonView'
+import { createColumnJsonViewValue, createRowJsonViewValue } from './jsonView'
 
 const scalarColumns = [
   { name: 'name', column_type: { type: 'Text' }, nullable: false },
@@ -71,6 +71,27 @@ describe('createRowJsonViewValue', () => {
       payload: { $type: 'bytes', encoding: 'base64', value: 'AAH+/w==' },
     })
     expect(value.payload).not.toHaveProperty('0')
+  })
+
+  it('encodes bytes above the clipboard limit', () => {
+    const value = new Uint8Array(1_048_577)
+    value[0] = 255
+
+    const normalized = createColumnJsonViewValue(value, { type: 'Bytea' })
+
+    if (
+      normalized === null ||
+      typeof normalized !== 'object' ||
+      Array.isArray(normalized) === true
+    ) {
+      throw new Error('Expected normalized bytes')
+    }
+    expect(normalized).toMatchObject({ $type: 'bytes', encoding: 'base64' })
+    if (typeof normalized.value !== 'string') {
+      throw new Error('Expected normalized base64 bytes')
+    }
+    expect(normalized.value).toHaveLength(1_398_104)
+    expect(normalized.value).toMatch(/^\/wAA/)
   })
 
   it('preserves stored reference IDs', () => {

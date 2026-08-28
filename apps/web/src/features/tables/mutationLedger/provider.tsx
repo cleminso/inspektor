@@ -27,8 +27,6 @@ import {
 import {
   createUpdateRowDraft,
   rebaseUpdateRowDraft,
-  setMutationFieldInput,
-  type MutationFieldInput,
   type RowMutationDraft,
 } from '@tables/rowEditor/mutation/draft'
 import type { TableRowId } from '@tables/tableTypes'
@@ -450,20 +448,8 @@ export function useTableMutationEditorController({
     schemaColumns,
     storedDraft,
   ])
-  const controller = useBoundRowDraftController({
+  return useBoundRowDraftController({
     binding: { draft, setDraft },
     schemaColumns,
   })
-  const commitFieldInput = useCallback(
-    (columnName: string, input: MutationFieldInput) => {
-      const column = schemaColumns.find((candidate) => candidate.name === columnName)
-      if (column === undefined) {
-        return
-      }
-      setDraft((currentDraft) => setMutationFieldInput(currentDraft, column, input))
-    },
-    [schemaColumns, setDraft],
-  )
-
-  return useMemo(() => ({ ...controller, commitFieldInput }), [commitFieldInput, controller])
 }

@@ -617,7 +617,7 @@ export function useTableViewState({
         })
         return
       }
-      if (route === 'readOnly') {
+      if (route !== 'fieldEditor') {
         return
       }
       setActiveColumnId(null)

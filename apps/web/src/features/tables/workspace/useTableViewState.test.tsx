@@ -348,6 +348,22 @@ describe('useTableViewState', () => {
     expect(focusRowEditorField).toHaveBeenCalledWith('name')
   })
 
+  it('routes structured fields to the field editor', () => {
+    tableColumns[1]!.column = {
+      name: 'name',
+      column_type: { type: 'Json' },
+      nullable: false,
+    }
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+
+    act(() => {
+      result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })
+    })
+
+    expect(result.current.activeFieldEditorTarget).toEqual({ rowId: 'row-1', columnId: 'name' })
+    expect(result.current.detailPaneMode).toBe('closed')
+  })
+
   it('moves focus to the resolved target after completing a field edit', () => {
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
@@ -363,7 +379,7 @@ describe('useTableViewState', () => {
     expect(result.current.activeFieldEditorTarget).toBeNull()
   })
 
-  it('cancels scalar editing and requests focus on the originating cell', () => {
+  it('cancels field editing and requests focus on the originating cell', () => {
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
       result.current.handleCellEditRequest({ rowId: 'row-1', columnId: 'name' })

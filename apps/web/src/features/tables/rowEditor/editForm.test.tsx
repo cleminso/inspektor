@@ -218,6 +218,15 @@ describe('EditRowForm Details and JSON views', () => {
     expect(within(json).getByRole('treeitem', { name: '$type: unavailable' })).toBeTruthy()
   })
 
+  it('marks a missing Details value unavailable without turning it into NULL intent', () => {
+    renderEditRowForm()
+
+    expect(screen.getByText('Unavailable source value.')).toBeTruthy()
+    const age = screen.getByLabelText('Age') as HTMLInputElement
+    expect(age.disabled).toBe(false)
+    expect(age.value).toBe('')
+  })
+
   it('shows JSON tools without visible mutation controls', () => {
     renderEditRowForm()
 
@@ -240,6 +249,15 @@ describe('EditRowForm Details and JSON views', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Details' }))
 
     expect((screen.getByLabelText('DisplayName') as HTMLInputElement).value).toBe('Grace Hopper')
+  })
+
+  it('projects valid staged Details values into the JSON representation', () => {
+    renderEditRowForm()
+    fireEvent.change(screen.getByLabelText('DisplayName'), { target: { value: 'Grace Hopper' } })
+
+    fireEvent.click(screen.getByRole('button', { name: 'JSON' }))
+
+    expect(screen.getByRole('treeitem', { name: 'displayName: Grace Hopper' })).toBeTruthy()
   })
 
   it('retains invalid raw input and reports its error', async () => {
