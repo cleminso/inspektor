@@ -78,7 +78,7 @@ export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(func
     sizeStyles[effectiveSize],
     fontStyles[font],
     fullWidth === true && inputStyles.fullWidth,
-    inputGroup !== null && inputStyles.grouped,
+    inputGroup !== null && editableControlStyles.groupedMember,
     state.disabled === true && inputStyles.disabled,
     readOnly === true && inputStyles.readOnly,
     (effectiveInvalid === true || state.valid === false) && inputStyles.invalid,

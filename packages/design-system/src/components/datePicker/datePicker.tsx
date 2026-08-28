@@ -212,7 +212,7 @@ const DatePickerTrigger = forwardRef<
   const triggerStyles = createStateStyleProps<BasePopover.Trigger.State>((state) => [
     render === undefined && datePickerStyles.trigger,
     render === undefined && editableControlStyles.focusVisible,
-    render === undefined && inputGroup !== null && datePickerStyles.triggerGrouped,
+    render === undefined && inputGroup !== null && editableControlStyles.groupedMember,
     state.open === true && datePickerStyles.triggerOpen,
     state.open === false && datePickerStyles.triggerClosed,
     state.disabled === true && datePickerStyles.triggerDisabled,

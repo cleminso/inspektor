@@ -62,6 +62,9 @@ export const selectStyles = stylex.create({
   sizeL: { height: spatial['control-height-l'], paddingInline: spacing.l },
   triggerWidthContent: { width: 'max-content' },
   triggerWidthFull: { justifyContent: 'space-between', width: '100%' },
+  triggerGrouped: {
+    paddingInline: spacing.xs,
+  },
   triggerOpen: { backgroundColor: ghostElementColors.selected },
   triggerPressed: {},
   triggerReadOnly: {},

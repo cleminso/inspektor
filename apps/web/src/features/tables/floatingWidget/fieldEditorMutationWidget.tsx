@@ -38,6 +38,8 @@ function FieldEditorMutationWidget({
     getMutationFieldInput(controller.state.draft, column),
   )
   const [editorExpanded, setEditorExpanded] = useState(isStructured)
+  const [showValidation, setShowValidation] = useState(false)
+  const [selectOpen, setSelectOpen] = useState(false)
   const controlElementRef = useRef<HTMLElement | null>(null)
   const setControlElement = useCallback((element: HTMLElement | null) => {
     controlElementRef.current = element
@@ -46,6 +48,7 @@ function FieldEditorMutationWidget({
   const label = formatColumnNameLabel(column.name)
   const complete = (direction: SpreadsheetCompletionDirection): boolean => {
     if (error !== undefined) {
+      setShowValidation(true)
       return false
     }
     controller.commitFieldInput(column.name, input)
@@ -100,7 +103,7 @@ function FieldEditorMutationWidget({
             canOmit={false}
             column={column}
             controlRef={setControlElement}
-            error={error}
+            error={showValidation === true ? error : undefined}
             expanded={isStructured === true && editorExpanded === true}
             fieldState={{
               isNull: input.mode === 'null',
@@ -112,6 +115,7 @@ function FieldEditorMutationWidget({
             idPrefix="field-editor"
             initialValue={controller.state.draft.sourceValues[column.name]}
             onExpandedChange={setEditorExpanded}
+            onSelectOpenChange={setSelectOpen}
             onNullChange={(isNull) => {
               setInput((current) => ({
                 mode: isNull === true ? 'null' : 'value',
@@ -122,6 +126,9 @@ function FieldEditorMutationWidget({
                       : '{}'
                     : current.text,
               }))
+              if (isNull === false && column.column_type.type === 'Enum') {
+                requestAnimationFrame(() => setSelectOpen(true))
+              }
             }}
             onOmittedChange={(isOmitted) => {
               setInput((current) => ({
@@ -133,6 +140,7 @@ function FieldEditorMutationWidget({
               setInput((current) => (current.mode === 'value' ? { ...current, text } : current))
             }}
             readOnlyReason={getFieldReadOnlyReason(column)}
+            selectOpen={selectOpen}
             structuredEditorLayout="intrinsic"
           />
           <FloatingPanel.Actions>

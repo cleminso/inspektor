@@ -64,17 +64,6 @@ export const inputStyles = stylex.create({
   fullWidth: {
     width: '100%',
   },
-  grouped: {
-    borderColor: 'transparent',
-    borderRadius: 0,
-    borderWidth: 0,
-    flexBasis: '0%',
-    flexGrow: '1',
-    flexShrink: '1',
-    outlineWidth: 0,
-    height: '100%',
-    minWidth: 0,
-  },
   disabled: {
     backgroundColor: {
       default: elementColors.disabled,

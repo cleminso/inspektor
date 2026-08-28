@@ -14,6 +14,20 @@
 
 [28/08/26]
 
+### Enum NULL validation
+
+- [x] Open the Enum selector when leaving NULL mode.
+- [x] Delay empty Enum validation until save and explain how to resolve it without exposing parser output.
+
+[28/08/26]
+
+### Enum NULL presentation
+
+- [x] Keep nullable Enum selection and explicit NULL intent in one compound input row.
+- [x] Disable only the Enum value trigger while NULL is active so the inline NULL control remains available.
+
+[28/08/26]
+
 ### Structured editor preload
 
 - [x] Start loading CodeMirror when a table with structured columns mounts rather than after inline edit activation.
@@ -496,6 +510,14 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 - [x] Remove update overlays for columns that disappear from the live schema so obsolete fields cannot keep a draft dirty.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Verify nullable Enum validation timing, recovery guidance, and selector opening with a focused widget test.
+
+[28/08/26]
+
+- [x] Verify nullable Enum value and NULL modes with focused mutation-field and browser tests.
 
 [28/08/26]
 

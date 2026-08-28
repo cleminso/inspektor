@@ -48,10 +48,12 @@ interface MutationFieldProps {
   idPrefix?: string
   initialValue: unknown
   onExpandedChange: (expanded: boolean) => void
+  onSelectOpenChange?: (open: boolean) => void
   onNullChange: (isNull: boolean) => void
   onOmittedChange: (isOmitted: boolean) => void
   onTextChange: (text: string) => void
   readOnlyReason: FieldReadOnlyReason
+  selectOpen?: boolean
   structuredEditorLayout?: CodeEditorLayout
 }
 
@@ -163,10 +165,12 @@ export function MutationField({
   idPrefix = 'row-editor',
   initialValue,
   onExpandedChange,
+  onSelectOpenChange,
   onNullChange,
   onOmittedChange,
   onTextChange,
   readOnlyReason,
+  selectOpen,
   structuredEditorLayout = 'fill',
 }: MutationFieldProps): React.ReactElement {
   const { currentConnectionId } = useInspectorSessionState()
@@ -329,7 +333,7 @@ export function MutationField({
         column.nullable === true &&
         readOnlyReason === null &&
         isBooleanColumn === false &&
-        (isEnumColumn === true || isBinaryColumn === true) ? (
+        isBinaryColumn === true ? (
           <Checkbox.Label>
             <Checkbox
               data-value-mode-control={isStructuredColumnType === true ? '' : undefined}
@@ -404,6 +408,7 @@ export function MutationField({
         >
           <Select.Root
             disabled={fieldState.isNull === true}
+            open={selectOpen}
             items={column.column_type.variants.map((variant) => ({
               label: variant,
               value: variant,
@@ -414,13 +419,23 @@ export function MutationField({
                 onTextChange(nextValue)
               }
             }}
+            onOpenChange={onSelectOpenChange}
           >
-            <Select.Trigger
-              ref={controlRef}
-              id={fieldId}
-              placeholder="Select value…"
-              width="full"
-            />
+            <InputGroup fullWidth>
+              <Select.Trigger
+                ref={controlRef}
+                id={fieldId}
+                placeholder="Select value…"
+                width="full"
+              />
+              {column.nullable === true && readOnlyReason === null ? (
+                <NullInputGroupCheckbox
+                  label={label}
+                  checked={fieldState.isNull}
+                  onCheckedChange={onNullChange}
+                />
+              ) : null}
+            </InputGroup>
             <Select.Content>
               {column.column_type.variants.map((variant) => (
                 <Select.Item

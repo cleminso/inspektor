@@ -142,6 +142,35 @@ test('filters and sorts real fixture rows', async ({ page }) => {
   await expect(table).not.toContainText('Optional values null')
 })
 
+test('keeps nullable Enum selection and NULL intent in one field control', async ({ page }) => {
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+
+  await page
+    .getByRole('checkbox', { name: 'Select row 30000000-0000-4000-8000-000000000002' })
+    .click()
+
+  const select = page.getByRole('combobox', { name: 'OptionalEnumValue' })
+  const nullControl = page.getByRole('checkbox', { name: 'Set OptionalEnumValue to NULL' })
+  const inputGroup = select.locator('xpath=ancestor::*[@data-slot="input-group"]')
+
+  await expect(inputGroup).toContainText('NULL')
+  await expect(nullControl).toBeChecked()
+  await expect(select).toBeDisabled()
+
+  await nullControl.click()
+
+  await expect(nullControl).not.toBeChecked()
+  await expect(select).toBeEnabled()
+  await expect(page.getByRole('listbox')).toBeVisible()
+  await expect(page.getByText('Expected one of: active, archived, draft')).not.toBeVisible()
+
+  await page.keyboard.press('Escape')
+  await page.getByRole('button', { name: 'Save' }).click()
+
+  await expect(page.getByText('Choose a value or select NULL.')).toBeVisible()
+})
+
 test('loads the deferred calendar for a timestamp filter', async ({ page }) => {
   let releaseCalendar: () => void = () => undefined
   const calendarBlocked = new Promise<void>((resolve) => {

@@ -45,15 +45,6 @@ export const datePickerStyles = stylex.create({
     minWidth: 0,
     width: '100%',
   },
-  triggerGrouped: {
-    borderRadius: 0,
-    borderWidth: 0,
-    flexBasis: '0%',
-    flexGrow: 1,
-    flexShrink: 1,
-    outlineWidth: 0,
-    height: '100%',
-  },
   triggerOpen: { backgroundColor: ghostElementColors.selected },
   triggerClosed: {},
   triggerDisabled: {

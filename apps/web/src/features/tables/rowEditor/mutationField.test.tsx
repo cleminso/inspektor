@@ -315,6 +315,41 @@ describe('MutationField', () => {
     expect(onTextChange).toHaveBeenCalledWith('true')
   })
 
+  it('keeps a nullable Enum select and NULL control in one input group', () => {
+    const onNullChange = vi.fn()
+
+    render(
+      <MutationField
+        canOmit={false}
+        column={column(
+          'status',
+          { type: 'Enum', variants: ['active', 'archived'] },
+          { nullable: true },
+        )}
+        error={undefined}
+        expanded={false}
+        fieldState={{ isNull: true, isOmitted: false, text: '' }}
+        hidden={false}
+        initialValue={null}
+        onExpandedChange={vi.fn()}
+        onNullChange={onNullChange}
+        onOmittedChange={vi.fn()}
+        onTextChange={vi.fn()}
+        readOnlyReason={null}
+      />,
+    )
+
+    const select = screen.getByRole('combobox', { name: 'Status' }) as HTMLButtonElement
+    const nullControl = screen.getByRole('checkbox', { name: 'Set Status to NULL' })
+    const inputGroup = select.closest('[data-slot="input-group"]')
+
+    expect(select.disabled).toBe(true)
+    expect(inputGroup?.contains(nullControl)).toBe(true)
+
+    fireEvent.click(nullControl)
+    expect(onNullChange).toHaveBeenCalledWith(false)
+  })
+
   it('presents timestamps with the shared calendar picker', async () => {
     const onTextChange = vi.fn()
     const initialDate = new Date(2024, 0, 2, 3, 4, 5, 678)

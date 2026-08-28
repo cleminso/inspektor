@@ -8,6 +8,7 @@ import { popupPositioning } from '../../primitives/popupPositioning'
 import { scrollbarStyles } from '../../styles/scrollbar.styles'
 import type { FormControlSize } from '../../utils/formControlSize'
 import { CheckGlyph, ChevronDownGlyph } from '../icon/iconArtwork'
+import { InputGroupContext } from '../inputGroup/inputGroupContext'
 import { selectStyles } from './select.styles'
 
 type WithoutStyles<Props> = Omit<Props, 'className' | 'style' | 'render'>
@@ -110,11 +111,15 @@ const SelectTrigger = React.forwardRef<
   { placeholder, size = 'l', width = 'content', ...props }: SelectTriggerProps,
   ref,
 ) {
+  const inputGroup = React.useContext(InputGroupContext)
+  const effectiveSize = inputGroup?.size ?? size
   const stateStyles = createStateStyleProps<BaseSelect.Trigger.State>((state) => [
     selectStyles.trigger,
     editableControlStyles.focusVisible,
-    sizeStyles[size],
+    sizeStyles[effectiveSize],
     widthStyles[width],
+    inputGroup !== null && editableControlStyles.groupedMember,
+    inputGroup !== null && selectStyles.triggerGrouped,
     state.open === true && selectStyles.triggerOpen,
     state.open === true && selectStyles.triggerPressed,
     state.valid === false && selectStyles.triggerInvalid,
@@ -139,8 +144,11 @@ const SelectTrigger = React.forwardRef<
       {...props}
       ref={ref}
       nativeButton
+      disabled={inputGroup?.disabled}
+      aria-invalid={inputGroup?.invalid === true ? true : props['aria-invalid']}
       {...stateStyles}
-      data-size={size}
+      data-size={effectiveSize}
+      data-grouped={inputGroup !== null ? '' : undefined}
       data-slot="select-trigger"
       data-width={width}
     >

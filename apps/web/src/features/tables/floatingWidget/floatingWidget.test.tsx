@@ -38,6 +38,11 @@ const settingsColumn = {
   column_type: { type: 'Json' },
   nullable: true,
 } satisfies ColumnDescriptor
+const statusColumn = {
+  name: 'status',
+  column_type: { type: 'Enum', variants: ['active', 'archived', 'draft'] },
+  nullable: true,
+} satisfies ColumnDescriptor
 
 function TestLedgerProvider({
   children,
@@ -69,7 +74,13 @@ function FieldEditorHarness({
   onComplete: (direction: 'enter' | 'tabBackward' | 'tabForward') => void
 }) {
   const mutations = useTableMutationLedger()
-  const rowValues = { id: 'row-1', name: 'Ada', count: 1, settings: initialSettings }
+  const rowValues = {
+    id: 'row-1',
+    name: 'Ada',
+    count: 1,
+    settings: initialSettings,
+    status: null,
+  }
   return (
     <>
       <FieldEditorMutationWidget
@@ -196,6 +207,26 @@ describe('FieldEditorMutationWidget', () => {
 
     expect(await screen.findByText('Value must be an integer.')).toBeTruthy()
     expect(onComplete).not.toHaveBeenCalled()
+  })
+
+  it('waits until Save to explain an empty nullable Enum value', async () => {
+    render(
+      <TestLedgerProvider schemaColumns={[statusColumn]}>
+        <FieldEditorHarness column={statusColumn} onClose={vi.fn()} onComplete={vi.fn()} />
+      </TestLedgerProvider>,
+    )
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Set Status to NULL' }))
+
+    expect(screen.queryByText('Choose a value or select NULL.')).toBeNull()
+    await waitFor(() =>
+      expect(screen.getByRole('combobox', { name: 'Status' }).getAttribute('aria-expanded')).toBe(
+        'true',
+      ),
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(screen.getByText('Choose a value or select NULL.')).toBeTruthy()
   })
 
   it('opens a NULL JSON value with an empty object focused editor', async () => {

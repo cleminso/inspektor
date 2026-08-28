@@ -8,6 +8,11 @@
 
 ## Implemented foundation
 
+[28/08/26]
+
+- [x] Let `Select.Trigger` join `InputGroup` as the editable member while preserving Base UI trigger semantics.
+- [x] Project the input group's size, disabled, invalid, focus, and grouped-control presentation onto the trigger.
+
 [07/08/26]
 
 - [x] Map trigger sizes to the shared control-height scale.
@@ -49,6 +54,7 @@
 
 ## Validation checklist
 
+- [x] Verify Select input-group composition with focused component tests, lint, typecheck, and build.
 - [x] Verify compact-width triggers use the fixed compact width in the Select documentation fixture.
 - [x] Verify content-width triggers in the Select documentation fixture.
 - [x] Run Select component tests and type validation.

@@ -276,6 +276,9 @@ function resolveMutationField(
       ? { kind: 'invalid', error: 'This read-only column requires a value.' }
       : { kind: 'valid', value: sourceValue }
   }
+  if (column.column_type.type === 'Enum' && column.nullable === true && input.text.length === 0) {
+    return { kind: 'invalid', error: 'Choose a value or select NULL.' }
+  }
 
   try {
     return { kind: 'valid', value: parseMutationFieldValue(column.column_type, input.text) }
