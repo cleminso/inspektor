@@ -14,6 +14,7 @@ const navigate = vi.fn()
 const setConnectionContext = vi.fn()
 const saveConnectionWithContext = vi.fn()
 const resolveTablesNavigationTarget = vi.hoisted(() => vi.fn())
+const prepareJazzWasm = vi.hoisted(() => vi.fn())
 const connectionPreferences = {
   lastBranch: 'main',
   lastSchemaHash: 'schema-1',
@@ -109,6 +110,8 @@ vi.mock('@app/routing/inspectorNavigation', () => ({
   resolveTablesNavigationTarget,
 }))
 
+vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
+
 beforeEach(() => {
   session.activeConnectionId = 'connection-1'
   routeConnectionId = 'connection-1'
@@ -139,6 +142,7 @@ afterEach(() => {
   routerMatches = []
   setConnectionContext.mockReset()
   saveConnectionWithContext.mockReset()
+  prepareJazzWasm.mockReset()
 })
 
 function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
@@ -236,6 +240,7 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(saveConnectionWithContext).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
+    expect(prepareJazzWasm).not.toHaveBeenCalled()
     expect(screen.getByRole('status', { name: 'Runtime scope blocked' }).textContent).toBe('true')
     expect(screen.getByRole('status', { name: 'Connection open result' }).textContent).toBe(
       'blocked',
@@ -253,6 +258,27 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
       'feature',
       'schema-2',
     )
+    expect(prepareJazzWasm).toHaveBeenCalledOnce()
+  })
+
+  it('starts WASM preparation after accepting connection intent and before navigation', () => {
+    render(<TestSession blocked={false} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch connection' }))
+
+    expect(prepareJazzWasm).toHaveBeenCalledOnce()
+    expect(prepareJazzWasm.mock.invocationCallOrder[0]).toBeLessThan(
+      navigate.mock.invocationCallOrder[0]!,
+    )
+  })
+
+  it('does not prepare WASM while synchronizing a route-owned runtime target', () => {
+    render(<TestSession blocked={false} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Set runtime scope' }))
+
+    expect(setConnectionContext).toHaveBeenCalledOnce()
+    expect(prepareJazzWasm).not.toHaveBeenCalled()
   })
 
   it('blocks route exits while allowing navigation inside the active table workspace', async () => {

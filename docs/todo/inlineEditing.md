@@ -14,6 +14,13 @@
 
 [28/08/26]
 
+### Interaction-owned structured editor loading
+
+- [x] Remove table-schema-driven CodeMirror preparation and begin loading only when a rendered structured editor needs the engine.
+- [x] Preserve immediate textarea editing, focus handoff, and Floating Panel geometry while the production CodeMirror chunk is blocked.
+
+[28/08/26]
+
 ### Shared field semantics
 
 - [x] Pass canonical `MutationFieldInput` values through pane and Floating field editors without parallel nullable and omitted booleans.
@@ -420,6 +427,11 @@ mutation widget specification.
 - [ ] Cell hover cards are not introduced as part of inline editing.
 
 ## Settled interaction decisions
+
+[28/08/26]
+
+- A structured edit starts CodeMirror loading from the rendered editor rather than from table mount. This supersedes the structured-table preload decision below.
+- The textarea fallback remains the primary cold-interaction safeguard and must preserve editing, focus, and external panel geometry through the CodeMirror handoff.
 
 [28/08/26]
 

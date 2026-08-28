@@ -11,6 +11,23 @@
 
 ## Implemented foundation
 
+[28/08/26]
+
+### Production-build preparation boundary
+
+- [x] Compare the baseline and prepared builds in both execution orders with seven fresh browser contexts per path.
+- [x] Retain preparation for accepted pre-navigation connection intent after reducing median click-to-rows readiness by 140–149 ms.
+- [x] Exclude route-owned context synchronization from preparation so direct navigation remains at baseline readiness instead of adding a serial provider gate.
+- [x] Preserve existing-connection form intent by starting preparation after context acceptance and before navigation.
+
+[28/08/26]
+
+### Accepted-intent Jazz WASM preparation
+
+- [x] Start one deferred, memoized Jazz WASM preparation after the runtime-scope guard accepts connection intent and before navigation or persisted context changes.
+- [x] Keep the application root free of static Jazz runtime imports and leave client creation, publication, retry, and shutdown inside the route-owned provider.
+- [x] Delay the provider while preparation is pending and let a failed early attempt settle without a toast or unhandled rejection so normal provider error ownership remains intact.
+
 [27/08/26]
 
 - [x] Verify connection setup retains its form state after an empty schema catalogue and succeeds when the user retries.
@@ -140,9 +157,16 @@
 
 ## Open product work
 
+[28/08/26]
+
+- [ ] Define and verify the deployed Jazz WASM asset contract.
+  - Serve the hashed WASM asset with `Content-Type: application/wasm`, Brotli or gzip compression, and immutable caching.
+  - Revalidate HTML separately so deployments can reference a new hashed asset without leaving stale entry documents behind.
+  - Confirm one WASM transfer, streaming instantiation, the expected content encoding, and cache reuse in a deployed production trace.
+
 [24/08/26]
 
-- [ ] Experiment with non-speculative Jazz WASM preparation after an accepted connection intent.
+- [x] Experiment with non-speculative Jazz WASM preparation after an accepted connection intent.
   - Start one memoized, deferred `loadWasmModule()` promise after the exit guard accepts the connection and before navigation begins, in parallel with route loading and schema-catalogue discovery.
   - Do not preload WASM from hover, focus, viewport presence, application startup, or merely rendering saved connections.
   - Do not create a Jazz client before the route-owned `JazzProvider`; client acquisition, registry reuse, and shutdown remain provider responsibilities.
@@ -288,7 +312,7 @@
 - [x] Cover add and edit preserving inline validation while sharing route-owned schema selection after profile persistence.
 - [x] Cover that permissions remain non-blocking and that selected-schema loading and Jazz client creation remain parallel.
 - [x] Cover the application-root and connection-switcher import boundaries after moving route resolution.
-- [ ] If WASM preparation is implemented, cover one shared promise, no preparation for blocked intent, no early Jazz client, and safe rejection handling without a toast or unhandled promise.
+- [x] If WASM preparation is implemented, cover one shared promise, no preparation for blocked intent, no early Jazz client, and safe rejection handling without a toast or unhandled promise.
 - [ ] Verify with the isolated Inspector Test fixture that saved selection, direct refresh, add, edit, schema switching, connection superseding, and failure recovery reach the expected route and rows.
 - [ ] Capture production traces for connection activation, catalogue completion, route commit, selected-schema verification, WASM completion, Jazz WebSocket readiness, first table selection, and first rows.
 - [ ] Compare production traces with and without WASM preparation and retain it only when it advances client and row readiness without duplicate WASM work.

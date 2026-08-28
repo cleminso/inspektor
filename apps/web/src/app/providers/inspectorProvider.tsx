@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useState,
   type PropsWithChildren,
   type ReactNode,
 } from 'react'
@@ -17,6 +18,7 @@ import { JazzProvider, useJazzClient, type JazzClient } from 'jazz-tools/react'
 import { useInspectorRuntime, type InspectorRuntimeStore } from '@app/runtime/useInspectorRuntime'
 import type { InspectorRuntimeError } from '@app/runtime/runtimeError'
 import type { ResolvedTablesNavigationTarget } from '@app/routing/inspectorNavigation'
+import { getJazzWasmPreparation } from '@app/runtime/jazzWasmPreparation'
 import {
   useInspectorSessionContext,
   type InspectorSessionContextValue,
@@ -144,6 +146,25 @@ class RuntimeClientErrorBoundary extends Component<
 export function InspectorProvider({ children, initialRuntimeTarget }: InspectorProviderProps) {
   const session = useInspectorSessionContext()
   const [retryGeneration, retryRuntime] = useReducer((generation: number) => generation + 1, 0)
+  const wasmPreparation = getJazzWasmPreparation()
+  const [settledWasmPreparation, setSettledWasmPreparation] = useState<Promise<void> | null>(null)
+  const canStartJazzProvider =
+    wasmPreparation === null || settledWasmPreparation === wasmPreparation
+  useEffect(() => {
+    if (wasmPreparation === null) {
+      return
+    }
+
+    let active = true
+    void wasmPreparation.then(() => {
+      if (active === true) {
+        setSettledWasmPreparation(wasmPreparation)
+      }
+    })
+    return () => {
+      active = false
+    }
+  }, [wasmPreparation])
   const initialSchemaCatalogue =
     initialRuntimeTarget?.connectionId === session.currentConnectionId
       ? initialRuntimeTarget.schemaCatalogue
@@ -199,7 +220,7 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
 
   return (
     <InspectorRuntimeContext.Provider value={runtimeContext}>
-      {clientConfig === null ? null : (
+      {clientConfig === null || canStartJazzProvider === false ? null : (
         <RuntimeClientErrorBoundary
           key={`${clientIdentity ?? 'unknown'}:${retryGeneration}`}
           onError={runtime.publishClientError}

@@ -12,6 +12,7 @@ import type { StoredConnection } from '@app/connections/connections'
 const runtimeHolder = vi.hoisted(() => ({ current: null as unknown }))
 const runtimeOptionsHolder = vi.hoisted(() => ({ current: null as unknown }))
 const sessionHolder = vi.hoisted(() => ({ current: null as unknown }))
+const wasmPreparationHolder = vi.hoisted(() => ({ current: null as Promise<void> | null }))
 const jazzReactMocks = vi.hoisted(() => ({
   clients: new Map<string, { manager: object }>(),
   errors: new Map<string, Error>(),
@@ -59,6 +60,10 @@ vi.mock('@app/runtime/useInspectorRuntime', () => ({
 
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => sessionHolder.current,
+}))
+
+vi.mock('@app/runtime/jazzWasmPreparation', () => ({
+  getJazzWasmPreparation: () => wasmPreparationHolder.current,
 }))
 
 vi.mock('jazz-tools/react', async () => {
@@ -118,9 +123,31 @@ afterEach(() => {
   session.currentSchemaHash = 'schema-1'
   runtimeHolder.current = runtime
   runtimeOptionsHolder.current = null
+  wasmPreparationHolder.current = null
 })
 
 describe('InspectorProvider runtime projections', () => {
+  it('does not start the Jazz provider until accepted-intent WASM preparation settles', async () => {
+    let settlePreparation!: () => void
+    wasmPreparationHolder.current = new Promise((resolve) => {
+      settlePreparation = resolve
+    })
+    session.activeConnection = {
+      id: 'connection-1',
+      name: 'Local app',
+      serverUrl: 'https://example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+      env: 'dev',
+    }
+
+    render(<InspectorProvider>Workspace</InspectorProvider>)
+
+    expect(jazzReactMocks.provider).not.toHaveBeenCalled()
+    act(settlePreparation)
+    await waitFor(() => expect(jazzReactMocks.provider).toHaveBeenCalledOnce())
+  })
+
   it('retains the connection catalogue after the selected schema changes', () => {
     session.currentSchemaHash = 'schema-2'
     const schemaCatalogue = [

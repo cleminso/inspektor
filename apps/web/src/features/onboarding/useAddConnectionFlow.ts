@@ -20,6 +20,7 @@ import {
 } from '@app/connections/connectionValidation'
 import { appRoutes } from '@app/routing/appRoutes'
 import { createSchemaCatalogue } from '@app/routing/inspectorNavigation'
+import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 
 import {
   createInitialFormValues,
@@ -109,6 +110,9 @@ export function useAddConnectionFlow(
       : saveConnectionWithContext(draft, connectionId, branch, schemaHash)
     if (result === 'blocked') {
       return
+    }
+    if (opensExistingConnection === true) {
+      void prepareJazzWasm()
     }
 
     await navigate({

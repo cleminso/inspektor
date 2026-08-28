@@ -5,14 +5,19 @@ import type { StoredConnection } from '@app/connections/connections'
 
 import { useAddConnectionFlow } from './useAddConnectionFlow'
 
-const { fetchSchemaHashes, navigate, saveConnectionWithContext, setConnectionContext } = vi.hoisted(
-  () => ({
-    fetchSchemaHashes: vi.fn(),
-    navigate: vi.fn(),
-    saveConnectionWithContext: vi.fn(),
-    setConnectionContext: vi.fn(),
-  }),
-)
+const {
+  fetchSchemaHashes,
+  navigate,
+  prepareJazzWasm,
+  saveConnectionWithContext,
+  setConnectionContext,
+} = vi.hoisted(() => ({
+  fetchSchemaHashes: vi.fn(),
+  navigate: vi.fn(),
+  prepareJazzWasm: vi.fn(),
+  saveConnectionWithContext: vi.fn(),
+  setConnectionContext: vi.fn(),
+}))
 let connections: StoredConnection[] = []
 const singleSchemaResponse = {
   hashes: ['schema-1'],
@@ -28,6 +33,7 @@ const schemaChoicesResponse = {
 
 vi.mock('jazz-tools', () => ({ fetchSchemaHashes }))
 vi.mock('@tanstack/react-router', () => ({ useNavigate: () => navigate }))
+vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
     connections,
@@ -42,6 +48,7 @@ afterEach(() => {
   connections = []
   fetchSchemaHashes.mockReset()
   navigate.mockReset()
+  prepareJazzWasm.mockReset()
   saveConnectionWithContext.mockClear()
   setConnectionContext.mockReset()
   vi.restoreAllMocks()
@@ -288,6 +295,10 @@ describe('useAddConnectionFlow', () => {
     })
     expect(saveConnectionWithContext).not.toHaveBeenCalled()
     expect(setConnectionContext).toHaveBeenCalledWith('connection-1', 'release', 'schema-1')
+    expect(prepareJazzWasm).toHaveBeenCalledOnce()
+    expect(prepareJazzWasm.mock.invocationCallOrder[0]).toBeLessThan(
+      navigate.mock.invocationCallOrder[0]!,
+    )
     expect(navigate).toHaveBeenCalledWith({
       to: '/conn/$connectionId/tables',
       params: { connectionId: 'connection-1' },

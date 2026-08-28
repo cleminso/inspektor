@@ -13,6 +13,10 @@
 
 [28/08/26]
 
+- [x] Remove the native textarea baseline gap and reserve the loaded toolbar's content-box height so fallback-to-CodeMirror replacement preserves external geometry.
+
+[28/08/26]
+
 - [x] Keep long expanded intrinsic editors at the top when mount focus would otherwise scroll the end selection into view.
 
 [28/08/26]
@@ -150,6 +154,10 @@
 - [x] Keep capped content internal to `CodeEditor` until another product surface establishes a reusable contract.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Block the production CodeMirror chunk and verify immediate textarea editing, unchanged Floating Panel geometry, focused replacement, and retained input after the engine loads.
 
 [28/08/26]
 

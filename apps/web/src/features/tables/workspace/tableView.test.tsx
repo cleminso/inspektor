@@ -771,18 +771,12 @@ describe('TableView cell actions', () => {
 })
 
 describe('TableView composition boundary', () => {
-  it('keeps CodeMirror deferred for tables without structured fields', () => {
-    renderTableView()
-
-    expect(preloadCodeEditor).not.toHaveBeenCalled()
-  })
-
-  it('preloads CodeMirror for tables with structured fields', () => {
+  it('keeps CodeMirror deferred until a structured editor opens', () => {
     schemaColumns.push({ name: 'metadata', column_type: { type: 'Json' }, nullable: false })
 
     renderTableView()
 
-    expect(preloadCodeEditor).toHaveBeenCalledOnce()
+    expect(preloadCodeEditor).not.toHaveBeenCalled()
   })
 
   it('connects owner state and actions through the composed table surface', async () => {

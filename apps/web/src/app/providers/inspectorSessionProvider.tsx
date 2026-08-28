@@ -16,6 +16,7 @@ import {
 import { appRoutes } from '@app/routing/appRoutes'
 import { resolveTablesNavigationTarget } from '@app/routing/inspectorNavigation'
 import { useInspectorSession } from '@app/session/useInspectorSession'
+import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import {
   RuntimeScopeExitGuardProvider,
   useRuntimeScopeExitGuard,
@@ -137,6 +138,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         return 'blocked'
       }
 
+      void prepareJazzWasm()
       void navigate({
         to: appRoutes.tables,
         params: { connectionId },
@@ -217,6 +219,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       if (runtimeScopeExitGuard.isBlocked() === true) {
         return 'blocked'
       }
+      void prepareJazzWasm()
       session.saveConnectionWithContext(draft, connectionId, branch, schemaHash)
       return 'accepted'
     },

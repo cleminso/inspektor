@@ -21,6 +21,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [28/08/26]
 
+### Interaction-owned structured editor loading
+
+- [x] Keep CodeMirror outside table-mount network work and start its deferred import from the first rendered editor.
+- [x] Preserve a usable textarea, focused editor replacement, and stable Floating Panel geometry through cold CodeMirror loading.
+
+[28/08/26]
+
 ### Row-pane complete dismissal
 
 - [x] Clear every checked row when the footer Close action or Escape dismisses the row pane.
@@ -1150,6 +1157,11 @@ These items were identified in the behavior design but intentionally excluded fr
 - Persistent bookmarked rows and developer reference workflows.
 
 ## Settled interaction decisions
+
+[28/08/26]
+
+- Structured editor network work starts when an editor renders, not when a table schema contains structured columns. This supersedes the table-mount decision below.
+- CodeMirror remains outside the static table chunk, and the textarea fallback preserves the cold interaction until the engine is ready.
 
 [28/08/26]
 

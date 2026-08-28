@@ -10,7 +10,6 @@ import {
   ResizablePanelGroup,
   Text,
   Tooltip,
-  preloadCodeEditor,
   toasts,
   type BinaryCopyFormat,
   type DataGridCellTarget,
@@ -41,7 +40,6 @@ import { TablePagination, Toolbar } from '@tables/grid/toolbar'
 import { EditRowForm, type RowRepresentation } from '@tables/rowEditor/editForm'
 import { InsertRowForm } from '@tables/rowEditor/insertForm'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
-import { isStructuredColumnType } from '@tables/schema/fieldType'
 import { getTableColumns } from '@tables/schema/tableSchema'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useTableViewState } from '@tables/workspace/useTableViewState'
@@ -152,12 +150,6 @@ export function TableView({ tableName }: TableViewProps): React.ReactElement {
     [tableName, wasmSchema],
   )
   const mutationScopeKey = createTableScope(scope, tableName)
-
-  useEffect(() => {
-    if (schemaColumns.some((column) => isStructuredColumnType(column.column_type))) {
-      void preloadCodeEditor()
-    }
-  }, [schemaColumns])
 
   return (
     <TableMutationLedgerProvider

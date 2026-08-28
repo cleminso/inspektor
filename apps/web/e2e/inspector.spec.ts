@@ -175,8 +175,20 @@ test('keeps nullable Enum selection and NULL intent in one field control', async
 })
 
 test('stages a structured inline edit through the production editor', async ({ page }) => {
+  let releaseCodeMirror!: () => void
+  const codeMirrorBlocked = new Promise<void>((resolve) => {
+    releaseCodeMirror = resolve
+  })
+  const codeMirrorAsset = /\/assets\/codeMirrorEditor-[^/]+\.js$/
+  let codeMirrorRequested = false
+  await page.route(codeMirrorAsset, async (route) => {
+    codeMirrorRequested = true
+    await codeMirrorBlocked
+    await route.continue()
+  })
   await connectToFixture(page)
   await openTable(page, 'columnTypeShowcase')
+  expect(codeMirrorRequested).toBe(false)
 
   const row = page.getByRole('row', {
     name: /Select row 30000000-0000-4000-8000-000000000001/u,
@@ -185,7 +197,27 @@ test('stages a structured inline edit through the production editor', async ({ p
   await cell.dblclick()
 
   const editor = page.getByRole('textbox', { name: 'JsonValue' })
-  await expect(editor).toContainText('"nested"')
+  await expect.poll(() => editor.evaluate((element) => element.tagName)).toBe('TEXTAREA')
+  await expect(editor).toBeFocused()
+  const fallbackValue = await editor.inputValue()
+  expect(fallbackValue).toContain('"nested"')
+  await editor.fill(fallbackValue.replace('"nested"', '"review"'))
+  const panel = page.locator('[data-slot="floating-panel"]').filter({ has: editor })
+  const fallbackGeometry = await panel.boundingBox()
+  if (fallbackGeometry === null) throw new Error('Missing Floating Panel')
+
+  releaseCodeMirror()
+  await expect.poll(() => editor.evaluate((element) => element.tagName)).not.toBe('TEXTAREA')
+  await expect(editor).toBeFocused()
+  await expect(editor).toContainText('"review"')
+  const resolvedGeometry = await panel.boundingBox()
+  if (resolvedGeometry === null) throw new Error('Missing Floating Panel')
+  expect(
+    Math.abs(resolvedGeometry.height - fallbackGeometry.height),
+    JSON.stringify({ fallbackGeometry, resolvedGeometry }),
+  ).toBeLessThanOrEqual(1)
+  expect(Math.abs(resolvedGeometry.width - fallbackGeometry.width)).toBeLessThanOrEqual(1)
+
   await editor.fill('{"reviewed":true}')
   await page.getByRole('button', { name: 'Save' }).click()
 
