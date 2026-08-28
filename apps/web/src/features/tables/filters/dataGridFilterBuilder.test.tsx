@@ -539,7 +539,7 @@ describe('DataGridFilterBuilder', () => {
     expect(await screen.findByRole('group', { name: 'Choose date and time' })).toBeTruthy()
     expect(screen.queryByRole('dialog', { name: 'Choose date and time' })).toBeNull()
     expect(screen.queryByRole('combobox', { name: 'Filter value' })).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Apply' }))
 
     expect(onFiltersChange).not.toHaveBeenCalled()
     const pendingClause = await screen.findByRole('button', {

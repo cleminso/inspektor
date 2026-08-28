@@ -106,6 +106,12 @@ export const datePickerStyles = stylex.create({
     color: textColors.default,
     width: spatial['multi-select-width-s'],
   },
+  loading: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    minHeight: spatial['viewport-height-l'],
+  },
   popupOpen: {},
   popupClosed: {},
   popupStarting: { opacity: 0, transform: 'scale(0.98)' },

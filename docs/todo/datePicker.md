@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[28/08/26]
+
+- [x] Keep `react-day-picker` and timestamp-calendar controls in a deferred implementation module.
+- [x] Preserve the popup footprint with an accessible bounded fallback while the calendar loads.
+- [x] Cache the deferred module and allow a later mount to retry after a load failure.
+
 [20/08/26]
 
 - [x] Keep the popup on its initially resolved side while content changes between date, month, and year views.
@@ -38,6 +44,11 @@
 
 ## Settled interaction decisions
 
+[28/08/26]
+
+- [x] Defer only DatePicker calendar internals; keep the field-editor interaction loaded immediately.
+- [x] Keep bundle assignment automatic instead of adding `manualChunks` or suppressing the chunk warning.
+
 [20/08/26]
 
 - [x] Popup collision measurement reserves the full picker footprint while the visible popup remains compact.
@@ -53,6 +64,12 @@
 No unresolved DatePicker design decisions.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Verify the production build emits the calendar as an 80.15 kB deferred chunk and reduces the tables route chunk from 570.83 kB to 489.79 kB.
+- [x] Run DatePicker loading and behavior tests, affected web tests, package-wide tests, and the production browser timestamp-filter flow.
+- [x] Run affected lint, typecheck, and builds.
 
 [20/08/26]
 

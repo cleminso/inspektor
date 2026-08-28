@@ -18,10 +18,6 @@ import {
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { editableControlStyles } from '../../primitives/editableControl.styles'
 import { popupPositioning } from '../../primitives/popupPositioning'
-import { Button } from '../button/button'
-import { CalendarSurface, type CalendarView } from '../calendar/calendar'
-import { Field } from '../field/field'
-import { Input } from '../input/input'
 import { InputGroupContext } from '../inputGroup/inputGroupContext'
 import { datePickerStyles } from './datePicker.styles'
 
@@ -69,7 +65,7 @@ export interface DatePickerPanelProps {
   autoFocus?: boolean
 }
 
-interface DatePickerContextValue {
+export interface DatePickerContextValue {
   disabled: boolean
   maxValue: Date | undefined
   minValue: Date | undefined
@@ -78,6 +74,34 @@ interface DatePickerContextValue {
   setPendingValue: (value: Date) => void
   apply: () => void
   triggerRef: RefObject<ComponentRef<typeof BasePopover.Trigger> | null>
+}
+
+type DatePickerCalendarModule = typeof import('./datePickerCalendar')
+
+let datePickerCalendarPromise: Promise<DatePickerCalendarModule> | null = null
+let loadedDatePickerCalendar: DatePickerCalendarModule | null = null
+
+// Keep react-day-picker outside the static application graph. The bounded fallback preserves the
+// popup footprint while the optional calendar implementation loads and later mounts in its place.
+function loadDatePickerCalendar(): Promise<DatePickerCalendarModule> {
+  datePickerCalendarPromise ??= import('./datePickerCalendar')
+    .then((module) => {
+      loadedDatePickerCalendar = module
+      return module
+    })
+    .catch((error: unknown) => {
+      datePickerCalendarPromise = null
+      throw new Error('DatePicker failed to load calendar', { cause: error })
+    })
+
+  return datePickerCalendarPromise
+}
+
+export function preloadDatePickerCalendar(): Promise<void> {
+  return loadDatePickerCalendar().then(
+    () => undefined,
+    () => undefined,
+  )
 }
 
 const DatePickerContext = createContext<DatePickerContextValue | null>(null)
@@ -121,6 +145,7 @@ function DatePickerRoot({
   const handleOpenChange = useCallback<NonNullable<BasePopover.Root.Props['onOpenChange']>>(
     (nextOpen, eventDetails) => {
       if (nextOpen === true) {
+        void preloadDatePickerCalendar()
         const nextValue = cloneDate(value) ?? new Date()
         setPendingValue(nextValue)
         setResetValue(nextValue)
@@ -209,50 +234,6 @@ const DatePickerTrigger = forwardRef<
   )
 })
 
-function formatTimeInput(value: Date): string {
-  const pad = (part: number) => String(part).padStart(2, '0')
-  return `${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`
-}
-
-function parseTimeInput(
-  value: string,
-): [hours: number, minutes: number, seconds: number] | undefined {
-  const match = /^(\d{2}):(\d{2}):(\d{2})$/.exec(value)
-  if (match === null) return undefined
-  const hours = Number(match[1])
-  const minutes = Number(match[2])
-  const seconds = Number(match[3])
-  if (hours > 23 || minutes > 59 || seconds > 59) return undefined
-  return [hours, minutes, seconds]
-}
-
-function combineDayAndTime(day: Date, time: Date): Date {
-  const value = new Date(day.getTime())
-  value.setHours(time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds())
-  return value
-}
-
-function isTimestampInRange(
-  value: Date,
-  minValue: Date | undefined,
-  maxValue: Date | undefined,
-): boolean {
-  if (minValue !== undefined && value.getTime() < minValue.getTime()) return false
-  if (maxValue !== undefined && value.getTime() > maxValue.getTime()) return false
-  return true
-}
-
-function formatTimestampBoundary(value: Date): string {
-  return value.toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  })
-}
-
 function DatePickerPanelBody({
   autoFocus,
   closeOnApply,
@@ -261,126 +242,62 @@ function DatePickerPanelBody({
   closeOnApply: boolean
 }): React.ReactElement {
   const context = useDatePickerContext()
-  const [view, setView] = useState<CalendarView>('day')
-  const [timeInput, setTimeInput] = useState(() => formatTimeInput(context.pendingValue))
-  const parsedTime = parseTimeInput(timeInput)
-  useEffect(() => setTimeInput(formatTimeInput(context.resetValue)), [context.resetValue])
-  const pendingIsInRange = isTimestampInRange(
-    context.pendingValue,
-    context.minValue,
-    context.maxValue,
+  const [implementation, setImplementation] = useState<DatePickerCalendarModule | null>(
+    loadedDatePickerCalendar,
   )
-  const validateTime = (): string | null => {
-    if (parsedTime === undefined) return 'Use HH:MM:SS format.'
-    if (
-      context.minValue !== undefined &&
-      context.pendingValue.getTime() < context.minValue.getTime()
-    ) {
-      return `Choose a date and time on or after ${formatTimestampBoundary(context.minValue)}.`
-    }
-    if (
-      context.maxValue !== undefined &&
-      context.pendingValue.getTime() > context.maxValue.getTime()
-    ) {
-      return `Choose a date and time on or before ${formatTimestampBoundary(context.maxValue)}.`
-    }
-    return null
-  }
-  const applyDisabled = context.disabled || parsedTime === undefined || pendingIsInRange === false
-  const applyButton = (
-    <Button
-      disabled={applyDisabled}
-      layout="fill"
-      size="s"
-      variant="secondary"
-      onClick={context.apply}
-    >
-      Apply
-    </Button>
-  )
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const loadingRef = useRef<HTMLDivElement>(null)
+  const shouldAutoFocusRef = useRef(loadedDatePickerCalendar !== null && autoFocus)
 
+  useEffect(() => {
+    if (implementation === null && autoFocus === true) loadingRef.current?.focus()
+  }, [autoFocus, implementation])
+
+  useEffect(() => {
+    if (implementation !== null) return
+    let active = true
+
+    void loadDatePickerCalendar()
+      .then((module) => {
+        if (active === true) {
+          shouldAutoFocusRef.current =
+            autoFocus === true && document.activeElement === loadingRef.current
+          setImplementation(module)
+        }
+      })
+      .catch((error: unknown) => {
+        if (active === true)
+          setLoadError(
+            error instanceof Error ? error.message : 'DatePicker failed to load calendar',
+          )
+      })
+
+    return () => {
+      active = false
+    }
+  }, [autoFocus, implementation])
+
+  if (implementation === null) {
+    return (
+      <div
+        {...stylex.props(datePickerStyles.loading)}
+        ref={loadingRef}
+        aria-label={loadError === null ? 'Loading date picker' : undefined}
+        role={loadError === null ? 'status' : 'alert'}
+        tabIndex={autoFocus === true ? -1 : undefined}
+      >
+        {loadError ?? 'Loading calendar…'}
+      </div>
+    )
+  }
+
+  const DatePickerCalendar = implementation.DatePickerCalendar
   return (
-    <>
-      <CalendarSurface
-        // oxlint-disable-next-line jsx-a11y/no-autofocus -- Explicit picker steps transfer focus into the calendar.
-        autoFocus={autoFocus}
-        disabled={context.disabled}
-        maxValue={context.maxValue}
-        minValue={context.minValue}
-        required
-        resetValue={context.resetValue}
-        value={context.pendingValue}
-        onValueChange={(day) => {
-          if (day !== undefined)
-            context.setPendingValue(combineDayAndTime(day, context.pendingValue))
-        }}
-        onViewChange={setView}
-      />
-      {view === 'day' && (
-        <div {...stylex.props(datePickerStyles.controls)}>
-          <div {...stylex.props(datePickerStyles.timeRow)}>
-            <Field.Root
-              disabled={context.disabled}
-              validationMode="onBlur"
-              validate={validateTime}
-              {...stylex.props(datePickerStyles.field)}
-            >
-              <Field.Label {...stylex.props(datePickerStyles.controlLabel)}>Time</Field.Label>
-              <Input
-                disabled={context.disabled}
-                fullWidth
-                invalid={false}
-                inputMode="numeric"
-                size="m"
-                type="text"
-                value={timeInput}
-                onValueChange={(nextInput) => {
-                  setTimeInput(nextInput)
-                  const nextParsedTime = parseTimeInput(nextInput)
-                  if (nextParsedTime === undefined) return
-                  const [hours, minutes, seconds] = nextParsedTime
-                  const nextValue = new Date(context.pendingValue.getTime())
-                  nextValue.setHours(hours, minutes, seconds, nextValue.getMilliseconds())
-                  context.setPendingValue(nextValue)
-                }}
-                render={
-                  <input
-                    aria-label="Time"
-                    {...stylex.props(datePickerStyles.input)}
-                  />
-                }
-              />
-              <Field.Error />
-            </Field.Root>
-            <div {...stylex.props(datePickerStyles.setNowAction)}>
-              <Button
-                disabled={context.disabled}
-                layout="fill"
-                size="m"
-                variant="ghost"
-                onClick={() => {
-                  const now = new Date()
-                  context.setPendingValue(now)
-                  setTimeInput(formatTimeInput(now))
-                }}
-              >
-                Set now
-              </Button>
-            </div>
-          </div>
-          <div {...stylex.props(datePickerStyles.applyAction)}>
-            {closeOnApply ? (
-              <BasePopover.Close
-                disabled={applyDisabled}
-                render={applyButton}
-              />
-            ) : (
-              applyButton
-            )}
-          </div>
-        </div>
-      )}
-    </>
+    <DatePickerCalendar
+      autoFocus={shouldAutoFocusRef.current}
+      closeOnApply={closeOnApply}
+      context={context}
+    />
   )
 }
 

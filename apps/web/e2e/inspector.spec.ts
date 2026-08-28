@@ -142,6 +142,43 @@ test('filters and sorts real fixture rows', async ({ page }) => {
   await expect(table).not.toContainText('Optional values null')
 })
 
+test('loads the deferred calendar for a timestamp filter', async ({ page }) => {
+  let releaseCalendar: () => void = () => undefined
+  const calendarBlocked = new Promise<void>((resolve) => {
+    releaseCalendar = resolve
+  })
+  const calendarAsset = /\/assets\/datePickerCalendar-[^/]+\.js$/
+  const calendarRequest = page.waitForRequest(calendarAsset)
+  let calendarRequested = false
+  await page.route(calendarAsset, async (route) => {
+    calendarRequested = true
+    await calendarBlocked
+    await route.continue()
+  })
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+
+  expect(calendarRequested).toBe(false)
+  await page.getByRole('button', { name: 'Filter table' }).click()
+  await page.getByRole('option', { name: 'timestampValue Timestamp', exact: true }).click()
+  await page.getByRole('option', { name: 'Is greater than', exact: true }).click()
+  await page.getByRole('option', { name: 'Pick a date…', exact: true }).click()
+
+  const loading = page.getByRole('status', { name: 'Loading date picker' })
+  await expect(loading).toBeVisible()
+  const picker = page.getByRole('group', { name: 'Choose date and time' })
+  const fallbackHeight = await picker.evaluate((element) => element.getBoundingClientRect().height)
+  await calendarRequest
+  releaseCalendar()
+  await expect(page.getByRole('button', { name: 'Apply' })).toBeVisible()
+  const loadedHeight = await picker.evaluate((element) => element.getBoundingClientRect().height)
+  expect(fallbackHeight).toBeGreaterThanOrEqual(loadedHeight)
+  await page.getByRole('button', { name: 'Apply' }).click()
+  await expect(
+    page.getByRole('button', { name: /Edit draft filter timestampValue is greater than/u }),
+  ).toBeVisible()
+})
+
 test('persists a row edit across reload', async ({ page }) => {
   await connectToFixture(page)
   await openTable(page, 'publicEditableRecords')

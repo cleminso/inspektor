@@ -315,7 +315,7 @@ describe('MutationField', () => {
     expect(onTextChange).toHaveBeenCalledWith('true')
   })
 
-  it('presents timestamps with the shared calendar picker', () => {
+  it('presents timestamps with the shared calendar picker', async () => {
     const onTextChange = vi.fn()
     const initialDate = new Date(2024, 0, 2, 3, 4, 5, 678)
 
@@ -349,7 +349,7 @@ describe('MutationField', () => {
     expect(trigger.contains(time)).toBe(true)
     expect(time.getAttribute('datetime')).toBe(initialDate.toISOString())
     fireEvent.click(trigger)
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Apply' }))
     expect(onTextChange).toHaveBeenCalledWith(initialDate.toISOString())
   })
 

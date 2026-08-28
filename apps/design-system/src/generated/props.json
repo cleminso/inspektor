@@ -4259,7 +4259,7 @@
       "description": "Sets the source text displayed and edited by CodeMirror.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 25
+        "line": 39
       }
     },
     {
@@ -4269,7 +4269,7 @@
       "description": "Runs when editing or formatting changes the source text.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 27
+        "line": 41
       }
     },
     {
@@ -4279,7 +4279,7 @@
       "description": "Provides an accessible name when no external label identifies the editor.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 29
+        "line": 43
       }
     },
     {
@@ -4289,7 +4289,7 @@
       "description": "Sets the editor control id used by an external label.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 31
+        "line": 45
       }
     },
     {
@@ -4299,7 +4299,7 @@
       "description": "Identifies the external element that labels the editor.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 33
+        "line": 47
       }
     },
     {
@@ -4309,7 +4309,7 @@
       "description": "Identifies external description and error elements for the editor.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 35
+        "line": 49
       }
     },
     {
@@ -4320,7 +4320,7 @@
       "description": "Prevents source changes while preserving focus, selection, and copying.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 37
+        "line": 51
       }
     },
     {
@@ -4331,7 +4331,7 @@
       "description": "Prevents editing and removes the editor from sequential keyboard focus.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 39
+        "line": 53
       }
     },
     {
@@ -4342,7 +4342,7 @@
       "description": "Marks the editor value as invalid.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 41
+        "line": 55
       }
     },
     {
@@ -4352,7 +4352,7 @@
       "description": "Controls whether the editor uses its expanded viewport.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 43
+        "line": 57
       }
     },
     {
@@ -4363,7 +4363,7 @@
       "description": "Sets the initial viewport presentation when expansion is uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 45
+        "line": 59
       }
     },
     {
@@ -4373,7 +4373,7 @@
       "description": "Runs when Expand or Collapse requests a presentation change.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 47
+        "line": 61
       }
     },
     {
@@ -4384,7 +4384,7 @@
       "description": "Uses intrinsic sizing by default or fills a constrained parent when expanded.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 49
+        "line": 63
       }
     },
     {
@@ -4395,7 +4395,7 @@
       "description": "Moves focus into the editor after an explicit owner-driven mount.",
       "source": {
         "path": "packages/design-system/src/components/codeEditor/codeEditor.tsx",
-        "line": 51
+        "line": 65
       }
     }
   ],
@@ -7369,7 +7369,7 @@
       "description": "The committed timestamp shown when the picker opens.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 32
+        "line": 28
       }
     },
     {
@@ -7379,7 +7379,7 @@
       "description": "Runs with the selected timestamp when Apply is activated.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 34
+        "line": 30
       }
     },
     {
@@ -7389,7 +7389,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 36
+        "line": 32
       }
     },
     {
@@ -7400,7 +7400,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 38
+        "line": 34
       }
     },
     {
@@ -7410,7 +7410,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 40
+        "line": 36
       }
     },
     {
@@ -7420,7 +7420,7 @@
       "description": "Earliest selectable timestamp.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 42
+        "line": 38
       }
     },
     {
@@ -7430,7 +7430,7 @@
       "description": "Latest selectable timestamp.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 44
+        "line": 40
       }
     },
     {
@@ -7441,7 +7441,7 @@
       "description": "Disables the trigger and timestamp editing.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 46
+        "line": 42
       }
     }
   ],
@@ -7453,7 +7453,7 @@
       "description": "Stable accessible name for the timestamp trigger.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 52
+        "line": 48
       }
     },
     {
@@ -7463,7 +7463,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 54
+        "line": 50
       }
     }
   ],
@@ -7476,7 +7476,7 @@
       "description": "Aligns the popup along its trigger.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 60
+        "line": 56
       }
     },
     {
@@ -7487,7 +7487,7 @@
       "description": "Moves focus to the calendar when the content mounts.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 62
+        "line": 58
       }
     },
     {
@@ -7498,7 +7498,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 64
+        "line": 60
       }
     }
   ],
@@ -7511,7 +7511,7 @@
       "description": "Moves focus to the calendar when the panel mounts.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 69
+        "line": 65
       }
     }
   ],

@@ -1,10 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createRef } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { Button } from '../button/button'
 import { InputGroup } from '../inputGroup/inputGroup'
-import { DatePicker } from './datePicker'
+import { DatePicker, preloadDatePickerCalendar } from './datePicker'
+
+beforeAll(preloadDatePickerCalendar)
 
 afterEach(() => {
   cleanup()

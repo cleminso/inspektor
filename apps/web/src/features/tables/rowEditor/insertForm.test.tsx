@@ -317,7 +317,7 @@ describe('InsertRowForm structured values', () => {
   })
 
   it('applies the current timestamp before inserting a nullable timestamp value', async () => {
-    vi.useFakeTimers()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     const now = new Date(2026, 7, 13, 9, 10, 11, 120)
     vi.setSystemTime(now)
     const onAddAnother = vi.fn()
@@ -334,7 +334,7 @@ describe('InsertRowForm structured values', () => {
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Set PublishedAt to NULL' }))
     fireEvent.click(screen.getByRole('button', { name: 'PublishedAt' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Apply' }))
     fireEvent.click(screen.getByRole('button', { name: 'Insert' }))
 
     await vi.waitFor(() =>
