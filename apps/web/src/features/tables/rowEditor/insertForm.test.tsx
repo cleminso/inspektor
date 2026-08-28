@@ -333,7 +333,6 @@ describe('InsertRowForm structured values', () => {
     )
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Set PublishedAt to NULL' }))
-    fireEvent.click(screen.getByRole('button', { name: 'PublishedAt' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Apply' }))
     fireEvent.click(screen.getByRole('button', { name: 'Insert' }))
 

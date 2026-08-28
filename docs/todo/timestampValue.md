@@ -18,6 +18,11 @@ This checklist tracks the reusable compact timestamp value component.
 
 [28/08/26]
 
+- [x] Reuse nullable Enum popup state for timestamp fields so leaving NULL mode opens the DatePicker without exposing validation.
+- [x] Keep NULL entry, initial non-NULL mounts, unrelated field types, and pre-Save validation from opening or interrupting the timestamp picker.
+
+[28/08/26]
+
 - [x] Normalize timestamp dates, numbers, and accepted text through one Date-range rule before mutation, filtering, equality, field, or grid projection.
 - [x] Preserve caller-specific trust boundaries: runtime cells accept Date or number while text forms may parse date text.
 - [x] Reject out-of-range and empty nested timestamps, canonicalize fractional milliseconds, and keep malformed values unequal during rebasing.
@@ -72,6 +77,11 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Cover NULL-to-value timestamp opening in the insert form regression test.
+- [x] Verify formatting, changed-file lint, focused tests, web typecheck, build, package tests, and the isolated browser interaction.
 
 [28/08/26]
 

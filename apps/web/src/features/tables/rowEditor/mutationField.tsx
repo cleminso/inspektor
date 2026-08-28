@@ -172,7 +172,7 @@ export function MutationField({
   structuredEditorLayout = 'fill',
 }: MutationFieldProps): React.ReactElement {
   const { currentConnectionId } = useInspectorSessionState()
-  const [enumSelectOpen, setEnumSelectOpen] = useState(false)
+  const [valuePickerOpen, setValuePickerOpen] = useState(false)
   const label = formatColumnNameLabel(column.name)
   const fieldId = `${idPrefix}-${column.name}`
   const fieldLabelId = `${fieldId}-label`
@@ -227,6 +227,10 @@ export function MutationField({
   ]
   const setInputMode = (mode: MutationFieldMode) => {
     onInputChange(setMutationFieldInputMode(input, column, mode))
+  }
+  const setNullablePickerMode = (checked: boolean) => {
+    setInputMode(checked === true ? 'null' : 'value')
+    setValuePickerOpen(checked === false)
   }
   const defaultCheckbox =
     canOmit === true && isStructured === false ? (
@@ -385,7 +389,7 @@ export function MutationField({
         >
           <Select.Root
             disabled={input.mode === 'null'}
-            open={enumSelectOpen}
+            open={valuePickerOpen}
             items={column.column_type.variants.map((variant) => ({
               label: variant,
               value: variant,
@@ -396,7 +400,7 @@ export function MutationField({
                 onInputChange(setMutationFieldInputText(input, nextValue))
               }
             }}
-            onOpenChange={setEnumSelectOpen}
+            onOpenChange={setValuePickerOpen}
           >
             <InputGroup fullWidth>
               <Select.Trigger
@@ -409,12 +413,7 @@ export function MutationField({
                 <NullInputGroupCheckbox
                   label={label}
                   checked={input.mode === 'null'}
-                  onCheckedChange={(checked) => {
-                    setInputMode(checked === true ? 'null' : 'value')
-                    if (checked === false) {
-                      setEnumSelectOpen(true)
-                    }
-                  }}
+                  onCheckedChange={setNullablePickerMode}
                 />
               ) : null}
             </InputGroup>
@@ -487,10 +486,12 @@ export function MutationField({
           ) : (
             <DatePicker
               disabled={isReadOnly === true}
+              open={valuePickerOpen}
               value={timestampValue}
               onApply={(nextValue) =>
                 onInputChange(setMutationFieldInputText(input, nextValue.toISOString()))
               }
+              onOpenChange={setValuePickerOpen}
             >
               <DatePicker.Trigger
                 ref={controlRef}
@@ -510,7 +511,7 @@ export function MutationField({
             <NullInputGroupCheckbox
               label={label}
               checked={input.mode === 'null'}
-              onCheckedChange={(checked) => setInputMode(checked === true ? 'null' : 'value')}
+              onCheckedChange={setNullablePickerMode}
             />
           ) : null}
           {defaultCheckbox}
