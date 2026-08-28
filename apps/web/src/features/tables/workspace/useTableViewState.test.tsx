@@ -635,7 +635,7 @@ describe('useTableViewState', () => {
     expect(screen.getByRole('status', { name: 'Active row' }).textContent).toBe('row-2')
   })
 
-  it('preserves other checked rows when the active row pane is closed', () => {
+  it('clears all checked rows when the row pane is closed', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
       result.current.table.getRow('row-1').toggleSelected(true)
@@ -651,7 +651,7 @@ describe('useTableViewState', () => {
     })
 
     expect(result.current.detailPaneMode).toBe('closed')
-    expect(result.current.table.getSelectedRowIds()).toEqual(['row-1'])
+    expect(result.current.table.getSelectedRowIds()).toEqual([])
   })
 
   it('closes the row pane, clears its checked row, and allows reselection on Escape', () => {
@@ -670,7 +670,7 @@ describe('useTableViewState', () => {
     expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('1')
   })
 
-  it('closes the row pane and preserves its other checked rows on Escape', () => {
+  it('closes the row pane and clears all checked rows on Escape', () => {
     render(<TableViewInteractionHarness />)
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select row row-1' }))
@@ -678,10 +678,10 @@ describe('useTableViewState', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss pane' }))
 
     expect(screen.getByRole('status', { name: 'Pane mode' }).textContent).toBe('closed')
-    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('1')
+    expect(screen.getByRole('status', { name: 'Selected row count' }).textContent).toBe('0')
     expect(
       screen.getByRole('checkbox', { name: 'Select row row-1' }).getAttribute('aria-checked'),
-    ).toBe('true')
+    ).toBe('false')
     expect(
       screen.getByRole('checkbox', { name: 'Select row row-2' }).getAttribute('aria-checked'),
     ).toBe('false')

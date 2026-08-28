@@ -434,9 +434,7 @@ export function useTableViewState({
   }
 
   const closeRowEditor = () => {
-    if (activeRowId !== null) {
-      setSelectedRowIds((currentRowIds) => currentRowIds.filter((rowId) => rowId !== activeRowId))
-    }
+    setSelectedRowIds([])
     closeDetailPane()
   }
 

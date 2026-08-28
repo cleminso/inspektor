@@ -766,16 +766,16 @@ for the checked-row set. Previous and next controls navigate checked rows in act
 to the focused row unless explicitly labelled as bulk actions.
 Insert remains a separate pane mode with direct `Insert`, `Discard`, and `Insert more` controls. Successful `Insert more` resets
 and retains the form; insert drafts never enter the pending ledger. Unless an open nested control consumes Escape first, Escape
-closes an open row pane and unchecks its active row while preserving other checked rows and staged changes. Clearing the final
-checked row closes selection-only widget state. With no pane open, Escape clears cell selection, cell focus, and column focus.
+closes an open row pane and unchecks every checked row while preserving staged changes. Clearing the checked rows closes
+selection-only widget state. With no pane open, Escape clears cell selection, cell focus, and column focus.
 
-Closing a pane through Escape unchecks its active row. Filter, sort, page, table, or schema changes clear row and cell selections. Column
+Closing a pane through Escape unchecks every checked row. Filter, sort, page, table, or schema changes clear row and cell selections. Column
 reorder preserves range corners and recomputes the rectangle in displayed order. Hidden columns contract or suspend affected
 ranges without deleting their operation state. Loading more rows preserves existing ranges because stable row IDs and explicit
 query-scope resets define the selection lifecycle.
 
-Pane dismissal and mutation discard are distinct. Escape dismisses the pane and unchecks its active row while preserving other
-checked rows and pending changes. Reverting one staged cell removes that field overlay; reverting a row update resets its
+Pane dismissal and mutation discard are distinct. Escape dismisses the pane and unchecks every checked row while preserving
+pending changes. Reverting one staged cell removes that field overlay; reverting a row update resets its
 provider-owned row form to captured source values. `Discard` belongs to the Floating widget and removes pending changes from the current
 table ledger. Numeric row and column coordinates can support developer orientation, but row IDs and column IDs remain the
 selection identity.
@@ -1205,8 +1205,8 @@ The grid and complete-row pane answer different editing needs without creating s
 field-focused edits. The pane provides complete-row context and fields that need more space or richer controls. The Floating
 widget owns the shared operation state and the final Apply boundary.
 
-Closing the pane through its footer action or Escape does not discard valid edits. It unchecks the active row while preserving
-other checked rows, staged changes, and recoverable invalid input. A developer can stage several valid fields without confirming each field or form.
+Closing the pane through its footer action or Escape does not discard valid edits. It unchecks every checked row while preserving
+staged changes and recoverable invalid input. A developer can stage several valid fields without confirming each field or form.
 Review remains available while the pane is open. Invalid editor input survives widget collapse but remains outside the staged
 ledger until corrected.
 
@@ -1610,7 +1610,7 @@ UI representation:
 These scenarios define the Floating widget states and transitions:
 
 1. **Row selected:** Checking a row opens its complete-row pane and exposes its contextual row actions.
-2. **Pane edit:** Every valid pane field becomes a staged update automatically without field or form confirmation. Escape closes the pane and unchecks its active row while preserving staged changes.
+2. **Pane edit:** Every valid pane field becomes a staged update automatically without field or form confirmation. Escape closes the pane and unchecks every checked row while preserving staged changes.
 3. **Scalar cell edit:** With the complete-row pane closed, double-clicking a supported cell or pressing Enter opens its schema-aware editor in the Floating widget without checking the row. Save stages a valid edit and returns focus according to spreadsheet navigation.
 4. **Validation feedback:** Malformed input receives immediate colocated feedback, remains available for correction, and does not enter staged changes.
 5. **Structured cell edit:** JSON, Array, and Row values use an expanded code editor with access to the complete-row pane for more context.

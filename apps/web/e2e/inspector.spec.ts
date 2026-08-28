@@ -198,6 +198,24 @@ test('persists a row edit across reload', async ({ page }) => {
   )
 })
 
+test('clears all checked rows when closing the row pane', async ({ page }) => {
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+
+  const firstRow = page.getByRole('checkbox', {
+    name: 'Select row 30000000-0000-4000-8000-000000000001',
+  })
+  const secondRow = page.getByRole('checkbox', {
+    name: 'Select row 30000000-0000-4000-8000-000000000002',
+  })
+  await firstRow.click()
+  await secondRow.click()
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
+
+  await expect(firstRow).not.toBeChecked()
+  await expect(secondRow).not.toBeChecked()
+})
+
 test('discards a row edit without persisting it', async ({ page }) => {
   await connectToFixture(page)
   await openTable(page, 'publicEditableRecords')

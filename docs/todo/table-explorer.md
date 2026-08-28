@@ -21,6 +21,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [28/08/26]
 
+### Row-pane complete dismissal
+
+- [x] Clear every checked row when the footer Close action or Escape dismisses the row pane.
+- [x] Preserve staged changes and recoverable invalid input when dismissal clears checked rows.
+
+[28/08/26]
+
 ### Row-pane representation context
 
 - [x] Preserve the active Details or JSON representation while navigating checked rows.
@@ -1138,6 +1145,10 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [28/08/26]
 
+- The footer Close action and Escape clear every checked row while preserving mutation drafts. This supersedes preserving non-active checked rows after pane dismissal.
+
+[28/08/26]
+
 - Details or JSON is pane-session context: it survives checked-row navigation but not pane closure.
 - Row navigation remounts the row-specific editor while preserving only the representation context.
 
@@ -1335,6 +1346,10 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[28/08/26]
+
+- [x] Verify complete row deselection with focused tests, Inspector lint, typecheck, build, package-wide tests, and the isolated browser fixture.
 
 [28/08/26]
 
