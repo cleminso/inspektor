@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[28/08/26]
+
+- [x] Add guard `cssCodeSplit: false` application CSS in one entry stylesheet so deferred JavaScript cannot introduce stylesheet-driven full-page recalculation.
+
 [27/08/26]
 
 - [x] Reconcile unknown, duplicate, blocked, and multi-entry browser traversals without losing the Table workspace forward branch.

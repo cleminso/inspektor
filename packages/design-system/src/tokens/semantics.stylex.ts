@@ -109,7 +109,7 @@ export const borderColors = stylex.defineVars({
 export const focusColors = stylex.defineVars({
   ring: `light-dark(${palette.blue500}, ${palette.blue500})`,
   ringSubtle: `light-dark(${palette.blue200}, ${palette.blue900})`,
-  ringDanger: `light-dark(${palette.red200}, ${palette.red900})`,
+  ringDanger: `light-dark(${palette.red300}, ${palette.red900})`,
 } as const)
 
 /** Semantic colors used by syntax-highlighted content. */

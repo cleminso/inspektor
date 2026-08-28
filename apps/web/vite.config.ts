@@ -57,6 +57,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: 'dist',
+    cssCodeSplit: false,
     sourcemap: true,
     target: 'es2022',
     rolldownOptions: {
