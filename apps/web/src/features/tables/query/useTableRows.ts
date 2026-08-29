@@ -6,7 +6,12 @@
  */
 import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef } from 'react'
 
-import { type ColumnDescriptor, type DynamicTableRow, type WasmSchema } from 'jazz-tools'
+import {
+  RowChangeKind,
+  type ColumnDescriptor,
+  type DynamicTableRow,
+  type WasmSchema,
+} from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 
 import { buildTableRowsQuery, isTableColumnSortable } from '@tables/query/tableRowsQuery'
@@ -19,6 +24,10 @@ const EMPTY_ROWS: DynamicTableRow[] = []
 interface UseTableRowsOptions {
   client: JazzClient | null
   onPageOutOfRange: () => void
+  onRowsAdded?: (rowIds: readonly string[]) => void
+  onRowsUpdated?: (
+    updates: readonly { current: DynamicTableRow; previous: DynamicTableRow }[],
+  ) => void
   search: TableRowsSearchState
   schemaColumns: readonly ColumnDescriptor[]
   scopeKey: string
@@ -52,6 +61,8 @@ interface ResolvedRowsState {
 export function useTableRows({
   client,
   onPageOutOfRange,
+  onRowsAdded,
+  onRowsUpdated,
   search,
   schemaColumns,
   scopeKey,
@@ -102,10 +113,30 @@ export function useTableRows({
   }, [filters, page, pageSize, sortColumn, sortDirection, tableName, wasmSchema])
 
   const manager = client?.manager ?? null
+  const liveRowsByIdRef = useRef(new Map<string, DynamicTableRow>())
   const queryState = useJazzQueryState<DynamicTableRow>(
     manager,
     requestedQueryBuilder ?? undefined,
     INSPECTOR_QUERY_OPTIONS,
+    (delta) => {
+      const updatedRows = delta.delta.flatMap((change) => {
+        if (change.kind !== RowChangeKind.Updated || change.item === undefined) {
+          return []
+        }
+        const previous = liveRowsByIdRef.current.get(change.id)
+        return previous === undefined ? [] : [{ current: change.item, previous }]
+      })
+      const addedRowIds = delta.delta.flatMap((change) =>
+        change.kind === RowChangeKind.Added ? [change.id] : [],
+      )
+      if (addedRowIds.length > 0) {
+        onRowsAdded?.(addedRowIds)
+      }
+      if (updatedRows.length > 0) {
+        onRowsUpdated?.(updatedRows)
+      }
+      liveRowsByIdRef.current = new Map(delta.all.slice(0, pageSize).map((row) => [row.id, row]))
+    },
   )
   const fulfilledPage = useMemo(() => {
     const rows = queryState.data
@@ -115,6 +146,9 @@ export function useTableRows({
   }, [pageSize, queryState.data])
   const fulfilledRows = fulfilledPage?.rows
   const fulfilledHasNextPage = fulfilledPage?.hasNextPage ?? false
+  useLayoutEffect(() => {
+    liveRowsByIdRef.current = new Map((fulfilledRows ?? []).map((row) => [row.id, row]))
+  }, [fulfilledRows, queryKey])
   // Sort refreshes may preserve rows; data-scope or manager changes and same-query resets may not.
   const resolvedRowsRef = useRef<ResolvedRowsState | null>(null)
   useLayoutEffect(() => {

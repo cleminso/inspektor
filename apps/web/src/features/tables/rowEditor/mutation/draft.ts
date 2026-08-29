@@ -212,7 +212,11 @@ function deepEqual(left: unknown, right: unknown, compared: WeakMap<object, obje
   return leftKeys.every((key) => deepEqual(leftRecord[key], rightRecord[key], compared))
 }
 
-function areMutationValuesEqual(columnType: ColumnType, left: unknown, right: unknown): boolean {
+export function areMutationValuesEqual(
+  columnType: ColumnType,
+  left: unknown,
+  right: unknown,
+): boolean {
   if (left === null || left === undefined || right === null || right === undefined) {
     return Object.is(left, right)
   }

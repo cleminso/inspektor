@@ -19,6 +19,16 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[29/08/26]
+
+### Live change feedback
+
+- [x] Compare updated Jazz rows against the settled live-query row values.
+- [x] Apply the existing recently applied treatment only to fields whose typed values changed.
+- [x] Forward added-row deltas from the active Jazz query into the existing recently inserted row treatment.
+- [x] Keep initial fulfillment and query resets as unhighlighted baselines.
+- [x] Preserve per-row expiry for batched live additions.
+
 [28/08/26]
 
 ### Interaction-owned structured editor loading

@@ -1,5 +1,10 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
+import {
+  RowChangeKind,
+  type ColumnDescriptor,
+  type DynamicTableRow,
+  type SubscriptionDelta,
+} from 'jazz-tools'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTableRows } from '@tables/query/useTableRows'
@@ -360,6 +365,47 @@ describe('useTableRows', () => {
     rerender()
 
     expect(result.current.rows).toBe(rows)
+  })
+
+  it('reports added and updated rows from live query deltas', () => {
+    const onRowsAdded = vi.fn()
+    const onRowsUpdated = vi.fn()
+    const previousRow = { id: 'row-1', name: 'Ada' } as DynamicTableRow
+    queryRows = [previousRow]
+    renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        onRowsAdded,
+        onRowsUpdated,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+    const onDelta = useJazzQueryStateMock.mock.lastCall?.[3] as (
+      delta: SubscriptionDelta<DynamicTableRow>,
+    ) => void
+    const addedRow = { id: 'row-3', name: 'Lin' } as DynamicTableRow
+    const updatedRow = { id: 'row-1', name: 'Ada Lovelace' } as DynamicTableRow
+
+    onDelta({
+      all: [updatedRow, addedRow],
+      delta: [
+        { id: addedRow.id, index: 0, item: addedRow, kind: RowChangeKind.Added },
+        {
+          id: 'row-1',
+          index: 1,
+          item: updatedRow,
+          kind: RowChangeKind.Updated,
+        },
+        { id: 'row-2', index: 2, kind: RowChangeKind.Removed },
+      ],
+    })
+
+    expect(onRowsAdded).toHaveBeenCalledOnce()
+    expect(onRowsAdded).toHaveBeenCalledWith(['row-3'])
+    expect(onRowsUpdated).toHaveBeenCalledOnce()
+    expect(onRowsUpdated).toHaveBeenCalledWith([{ current: updatedRow, previous: previousRow }])
   })
 
   it('subscribes with the requested page query when pagination changes', () => {

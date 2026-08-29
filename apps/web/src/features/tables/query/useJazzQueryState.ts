@@ -1,6 +1,6 @@
-import type { QueryBuilder, QueryOptions } from 'jazz-tools'
+import type { QueryBuilder, QueryOptions, SubscriptionDelta } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
-import { useCallback, useRef, useSyncExternalStore } from 'react'
+import { useCallback, useEffectEvent, useRef, useSyncExternalStore } from 'react'
 
 /** Stable state projection exposed by one Jazz orchestrator cache entry. */
 export type JazzQueryState<T> =
@@ -31,12 +31,14 @@ export function useJazzQueryState<T extends { id: string }>(
   manager: JazzQueryManager | null,
   query: QueryBuilder<T> | undefined,
   options?: QueryOptions,
+  onDelta?: (delta: SubscriptionDelta<T>) => void,
 ): JazzQueryState<T> {
   const key = manager !== null && query !== undefined ? manager.computeKey(query, options) : null
   const queryRef = useRef(query)
   queryRef.current = query
   const optionsRef = useRef(options)
   optionsRef.current = options
+  const notifyDelta = useEffectEvent((delta: SubscriptionDelta<T>) => onDelta?.(delta))
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
       const currentQuery = queryRef.current
@@ -47,7 +49,13 @@ export function useJazzQueryState<T extends { id: string }>(
       manager.makeQueryKey(currentQuery, optionsRef.current)
       const entry = manager.getCacheEntry<T>(key)
       return entry.subscribe({
-        onDelta: onStoreChange,
+        onDelta: (delta) => {
+          try {
+            notifyDelta(delta)
+          } finally {
+            onStoreChange()
+          }
+        },
         onError: onStoreChange,
         onfulfilled: onStoreChange,
         onReset: onStoreChange,

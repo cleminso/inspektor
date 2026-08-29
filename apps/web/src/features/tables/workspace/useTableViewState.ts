@@ -27,6 +27,7 @@ import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import { useTableMutations } from '@tables/rowEditor/mutation/useTableMutation'
+import { areMutationValuesEqual } from '@tables/rowEditor/mutation/draft'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { resolveTableSortColumn } from '@tables/query/tableRowsQuery'
 import type { TableFieldsByRowId, TableRowId, TableValuesByRowId } from '@tables/tableTypes'
@@ -92,6 +93,8 @@ export function useTableViewState({
   const query = useTableRows({
     client,
     onPageOutOfRange: () => searchState.setPage(1),
+    onRowsAdded: handleRowsAdded,
+    onRowsUpdated: handleRowsUpdated,
     search: {
       filters: searchState.filters,
       page: searchState.page,
@@ -198,6 +201,36 @@ export function useTableViewState({
         return nextRowIds
       })
     })
+  }
+
+  function handleRowsAdded(rowIds: readonly TableRowId[]) {
+    for (const rowId of rowIds) {
+      highlightRecentlyInsertedRow(rowId)
+    }
+  }
+
+  function handleRowsUpdated(
+    updates: readonly { current: DynamicTableRow; previous: DynamicTableRow }[],
+  ) {
+    const changedFieldsByRowId: Record<TableRowId, ReadonlySet<string>> = {}
+    for (const { current, previous } of updates) {
+      const changedFields = new Set(
+        schemaColumns
+          .filter(
+            (column) =>
+              areMutationValuesEqual(
+                column.column_type,
+                previous[column.name],
+                current[column.name],
+              ) === false,
+          )
+          .map((column) => column.name),
+      )
+      if (changedFields.size > 0) {
+        changedFieldsByRowId[current.id] = changedFields
+      }
+    }
+    highlightRecentlyAppliedCells(changedFieldsByRowId)
   }
 
   const highlightRecentlyAppliedCells = (appliedUpdateFields: TableFieldsByRowId) => {

@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import type { DynamicTableRow, QueryBuilder } from 'jazz-tools'
+import type { DynamicTableRow, QueryBuilder, SubscriptionDelta } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,7 +8,7 @@ import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 
 const { entry, listeners, manager } = vi.hoisted(() => {
   const listeners = new Set<{
-    onDelta?: () => void
+    onDelta?: (delta: SubscriptionDelta<DynamicTableRow>) => void
     onError?: () => void
     onfulfilled?: () => void
     onReset?: () => void
@@ -97,12 +97,14 @@ describe('useJazzQueryState', () => {
   })
 
   it('accepts an onDelta update after the query is fulfilled', () => {
+    const onDelta = vi.fn()
     entry.state = {
       status: 'fulfilled',
       data: [{ id: 'user-1', name: 'Ada' } as DynamicTableRow],
       error: null,
     }
-    const { result } = renderHook(() => useJazzQueryState(queryManager, query))
+    const { result } = renderHook(() => useJazzQueryState(queryManager, query, undefined, onDelta))
+    const delta: SubscriptionDelta<DynamicTableRow> = { all: [], delta: [] }
 
     act(() => {
       entry.state = {
@@ -111,10 +113,11 @@ describe('useJazzQueryState', () => {
         error: null,
       }
       for (const listener of listeners) {
-        listener.onDelta?.()
+        listener.onDelta?.(delta)
       }
     })
 
+    expect(onDelta).toHaveBeenCalledWith(delta)
     expect(result.current).toMatchObject({
       status: 'fulfilled',
       data: [{ id: 'user-1', name: 'Grace' }],

@@ -1,5 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
+import { createJazzContext } from 'jazz-tools/backend'
 
+import permissions from '../../inspector-test/permissions.js'
+import { app } from '../../inspector-test/schema.js'
 import { seedInspectorTest } from '../../inspector-test/seedInspectorTest.js'
 
 interface FixtureConnection {
@@ -280,6 +283,54 @@ test('persists a row edit across reload', async ({ page }) => {
   await expect(page.getByRole('table', { name: 'publicEditableRecords rows' })).toContainText(
     'Edited through Playwright',
   )
+})
+
+test('highlights rows and cells changed through an external live client', async ({ page }) => {
+  await connectToFixture(page)
+  await openTable(page, 'publicEditableRecords')
+  const context = createJazzContext({
+    app,
+    permissions,
+    appId: connection.appId,
+    backendSecret: connection.backendSecret,
+    driver: { type: 'memory' },
+    env: 'dev',
+    serverUrl: connection.serverUrl,
+    userBranch: 'main',
+  })
+  const db = context.asBackend()
+  let insertedRowId: string | undefined
+
+  try {
+    const insert = db.insert(app.publicEditableRecords, {
+      enabled: true,
+      label: 'Externally inserted row',
+    })
+    insertedRowId = insert.value.id
+    await insert.wait({ tier: 'global' })
+
+    const row = page.getByRole('row', { name: new RegExp(`Select row ${insertedRowId}`) })
+    await expect(row).toContainText('Externally inserted row')
+    await expect(row).toHaveAttribute('data-status', 'recentlyInserted')
+
+    await db
+      .update(app.publicEditableRecords, insertedRowId, { label: 'Externally updated row' })
+      .wait({ tier: 'global' })
+
+    const updatedCell = await getCellByColumn(page, row, 'label')
+    const unchangedCell = await getCellByColumn(page, row, 'enabled')
+    await expect(updatedCell).toContainText('Externally updated row')
+    await expect(updatedCell).toHaveAttribute('data-status', 'recentlyApplied')
+    await expect(unchangedCell).toHaveAttribute('data-status', 'default')
+  } finally {
+    try {
+      if (insertedRowId !== undefined) {
+        await db.delete(app.publicEditableRecords, insertedRowId).wait({ tier: 'global' })
+      }
+    } finally {
+      await context.shutdown()
+    }
+  }
 })
 
 test('clears all checked rows when closing the row pane', async ({ page }) => {

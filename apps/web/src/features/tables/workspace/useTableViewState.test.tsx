@@ -470,6 +470,41 @@ describe('useTableViewState', () => {
     expect(result.current.recentlyInsertedRowIds).toEqual(new Set())
   })
 
+  it('highlights rows added by the active live query', () => {
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    const onRowsAdded = (tableRowsOptions as { onRowsAdded: (rowIds: string[]) => void })
+      .onRowsAdded
+
+    act(() => onRowsAdded(['row-3', 'row-4']))
+
+    expect(result.current.recentlyInsertedRowIds).toEqual(new Set(['row-3', 'row-4']))
+  })
+
+  it('highlights cells changed by the active live query', () => {
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    const onRowsUpdated = (
+      tableRowsOptions as {
+        onRowsUpdated: (
+          updates: Array<{
+            current: { id: string; name: string }
+            previous: { id: string; name: string }
+          }>,
+        ) => void
+      }
+    ).onRowsUpdated
+
+    act(() =>
+      onRowsUpdated([
+        {
+          current: { id: 'row-1', name: 'Ada Lovelace' },
+          previous: { id: 'row-1', name: 'Ada' },
+        },
+      ]),
+    )
+
+    expect(result.current.recentlyAppliedCells).toEqual({ 'row-1': new Set(['name']) })
+  })
+
   it('opens inline editing without row selection and ignores requests while the row pane is open', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
 
