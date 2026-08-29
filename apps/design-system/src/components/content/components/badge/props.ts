@@ -1,1 +1,1 @@
-export const badgePropNames = ['children'] as const
+export const badgePropNames = ['children', 'size'] as const

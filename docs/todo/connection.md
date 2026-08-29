@@ -13,6 +13,12 @@
 
 [29/08/26]
 
+### Environment context
+
+- [x] Show each saved connection's environment as a compact badge in connection options and the active trigger.
+
+[29/08/26]
+
 ### Schema retention across child navigation
 
 - [x] Retain the selected schema search parameter when table tabs replace table-specific route search, including closing an active New view tab.

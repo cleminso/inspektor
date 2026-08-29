@@ -28,7 +28,7 @@ export function InspectorHeader(): React.ReactElement {
         alignItems="center"
         gap="xxs"
       >
-        <ConnectionSwitcher width="m" />
+        <ConnectionSwitcher />
         <Box
           minWidth={0}
           alignItems="center"

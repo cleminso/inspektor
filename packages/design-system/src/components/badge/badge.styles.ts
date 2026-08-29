@@ -14,7 +14,6 @@ import { badgeColors } from './badgeColors.stylex'
 export const badgeStyles = stylex.create({
   root: {
     borderRadius: borderRadii.xs,
-    paddingInline: spacing.xs,
     alignItems: 'center',
     backgroundColor: badgeColors.background,
     boxSizing: 'border-box',
@@ -27,6 +26,13 @@ export const badgeStyles = stylex.create({
     justifyContent: 'center',
     lineHeight: lineHeights.compact,
     whiteSpace: 'nowrap',
+  },
+  sizeXs: {
+    minHeight: dimensions[16],
+    paddingInline: spacing.xxs,
+  },
+  sizeS: {
     minHeight: dimensions[20],
+    paddingInline: spacing.xs,
   },
 })

@@ -113,14 +113,21 @@ describe('ConnectionSwitcher', () => {
 
     render(<ConnectionSwitcher />)
 
-    expect(screen.getByRole('combobox', { name: 'Switch connection' }).textContent).toBe('Second')
+    const trigger = screen.getByRole('combobox', { name: 'Switch connection' })
+    expect(trigger.textContent).toBe('Seconddev')
+    expect(trigger.querySelector('[data-slot="badge"]')?.textContent).toBe('dev')
 
     openSwitcher()
 
     expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
-      'Secondtwo-app',
-      'Firstone-app',
+      'Seconddevtwo-app',
+      'Firstdevone-app',
     ])
+    expect(
+      screen
+        .getAllByRole('option')
+        .map((option) => option.querySelector('[data-slot="badge"]')?.textContent),
+    ).toEqual(['dev', 'dev'])
   })
 
   it('removes the active saved connection only after confirmation', () => {
@@ -226,7 +233,7 @@ describe('ConnectionSwitcher', () => {
     render(<ConnectionSwitcher />)
 
     expect(screen.getByRole('combobox', { name: 'Switch connection' }).textContent).toBe(
-      'Opening First…',
+      'Opening First…dev',
     )
   })
 

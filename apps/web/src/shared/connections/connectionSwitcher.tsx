@@ -4,6 +4,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 
 import {
   AlertDialog,
+  Badge,
   Box,
   Button,
   ButtonLink,
@@ -21,6 +22,39 @@ interface ConnectionSwitcherProps {
   size?: ContextSwitcherTriggerSize
   triggerLabel?: string
   width?: ContextSwitcherTriggerWidth
+}
+
+function ConnectionLabel({
+  connection,
+  label = getConnectionDisplayName(connection),
+}: {
+  connection: StoredConnection
+  label?: string
+}): React.ReactElement {
+  return (
+    <Box
+      as="span"
+      display="inline-flex"
+      minWidth={0}
+      alignItems="center"
+      flexDirection="row"
+      gap="xxs"
+    >
+      <Text
+        as="span"
+        color="inherit"
+        truncate
+      >
+        {label}
+      </Text>
+      <Badge
+        size="xs"
+        translate="no"
+      >
+        {connection.env}
+      </Badge>
+    </Box>
+  )
 }
 
 function sortConnections(
@@ -69,6 +103,7 @@ export function ConnectionSwitcher({
       : activeConnection !== null
         ? getConnectionDisplayName(activeConnection)
         : 'Open connections')
+  const triggerConnection = pendingConnection ?? activeConnection
 
   const preventBlockedNavigation = (event: React.MouseEvent) => {
     if (runtimeScopeExitBlocked === true) {
@@ -109,13 +144,20 @@ export function ConnectionSwitcher({
           size={size}
           width={width}
         >
-          <Text
-            as="span"
-            color="inherit"
-            truncate
-          >
-            {resolvedTriggerLabel}
-          </Text>
+          {triggerConnection === null ? (
+            <Text
+              as="span"
+              color="inherit"
+              truncate
+            >
+              {resolvedTriggerLabel}
+            </Text>
+          ) : (
+            <ConnectionLabel
+              connection={triggerConnection}
+              label={resolvedTriggerLabel}
+            />
+          )}
         </ContextSwitcher.Trigger>
         <ContextSwitcher.Content>
           {orderedConnections.length > 5 ? (
@@ -137,7 +179,7 @@ export function ConnectionSwitcher({
                     indicator="none"
                   >
                     <ContextSwitcher.ItemText
-                      label={getConnectionDisplayName(connection)}
+                      label={<ConnectionLabel connection={connection} />}
                       description={connection.appId}
                     />
                   </ContextSwitcher.Item>
