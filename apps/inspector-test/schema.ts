@@ -41,6 +41,11 @@ const schema = {
   }),
   emptyRecords: s.table({
     label: s.string(),
+    migrationMarkerOne: s.string().optional(),
+    migrationMarkerTwo: s.string().optional(),
+    migrationMarkerThree: s.string().optional(),
+    migrationMarkerFour: s.string().optional(),
+    migrationMarkerFive: s.string().optional(),
   }),
   paginationRecords: s.table({
     label: s.string(),

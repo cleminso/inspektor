@@ -1,0 +1,597 @@
+{
+  "projects": {
+    "columns": [
+      {
+        "name": "name",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      }
+    ]
+  },
+  "columnTypeShowcase": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "textValue",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "booleanValue",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false
+      },
+      {
+        "name": "integerValue",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "floatValue",
+        "column_type": {
+          "type": "Double"
+        },
+        "nullable": false
+      },
+      {
+        "name": "timestampValue",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": false
+      },
+      {
+        "name": "enumValue",
+        "column_type": {
+          "type": "Enum",
+          "variants": [
+            "active",
+            "archived",
+            "draft"
+          ]
+        },
+        "nullable": false
+      },
+      {
+        "name": "jsonValue",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": false
+      },
+      {
+        "name": "stringArrayValue",
+        "column_type": {
+          "type": "Array",
+          "element": {
+            "type": "Text"
+          }
+        },
+        "nullable": false
+      },
+      {
+        "name": "bytesValue",
+        "column_type": {
+          "type": "Bytea"
+        },
+        "nullable": true
+      },
+      {
+        "name": "optionalTextValue",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "optionalBooleanValue",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": true
+      },
+      {
+        "name": "optionalEnumValue",
+        "column_type": {
+          "type": "Enum",
+          "variants": [
+            "active",
+            "archived",
+            "draft"
+          ]
+        },
+        "nullable": true
+      },
+      {
+        "name": "optionalJsonValue",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": true
+      },
+      {
+        "name": "projectId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": true,
+        "references": "projects"
+      }
+    ]
+  },
+  "contentEdgeCases": {
+    "columns": [
+      {
+        "name": "caseName",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "emptyText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "whitespaceText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "longText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "multilineText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "unicodeText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "rightToLeftText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "integerValue",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "floatValue",
+        "column_type": {
+          "type": "Double"
+        },
+        "nullable": false
+      },
+      {
+        "name": "timestampValue",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": false
+      },
+      {
+        "name": "jsonValue",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": false
+      },
+      {
+        "name": "bytesValue",
+        "column_type": {
+          "type": "Bytea"
+        },
+        "nullable": false
+      }
+    ]
+  },
+  "creatorManagedRecords": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "notes",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      }
+    ]
+  },
+  "emptyRecords": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "migrationMarkerOne",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "migrationMarkerTwo",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "migrationMarkerThree",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "migrationMarkerFour",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      }
+    ]
+  },
+  "paginationRecords": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      }
+    ]
+  },
+  "publicEditableRecords": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "enabled",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false
+      }
+    ]
+  },
+  "publicReadOnlyRecords": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "notes",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      }
+    ]
+  },
+  "relationParents": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      }
+    ]
+  },
+  "relationChildren": {
+    "columns": [
+      {
+        "name": "label",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "requiredParentId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": false,
+        "references": "relationParents"
+      },
+      {
+        "name": "optionalParentId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": true,
+        "references": "relationParents"
+      }
+    ]
+  },
+  "todos": {
+    "columns": [
+      {
+        "name": "title",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "done",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false
+      },
+      {
+        "name": "description",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "parentId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": true,
+        "references": "todos"
+      },
+      {
+        "name": "projectId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": true,
+        "references": "projects"
+      }
+    ]
+  },
+  "wideRecords": {
+    "columns": [
+      {
+        "name": "recordName",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "requiredText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalText",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredBoolean",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalBoolean",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredInteger",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalInteger",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredFloat",
+        "column_type": {
+          "type": "Double"
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalFloat",
+        "column_type": {
+          "type": "Double"
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredTimestamp",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalTimestamp",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredEnum",
+        "column_type": {
+          "type": "Enum",
+          "variants": [
+            "active",
+            "archived",
+            "draft"
+          ]
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalEnum",
+        "column_type": {
+          "type": "Enum",
+          "variants": [
+            "active",
+            "archived",
+            "draft"
+          ]
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredJson",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalJson",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredBytes",
+        "column_type": {
+          "type": "Bytea"
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalBytes",
+        "column_type": {
+          "type": "Bytea"
+        },
+        "nullable": true
+      },
+      {
+        "name": "requiredStringArray",
+        "column_type": {
+          "type": "Array",
+          "element": {
+            "type": "Text"
+          }
+        },
+        "nullable": false
+      },
+      {
+        "name": "optionalStringArray",
+        "column_type": {
+          "type": "Array",
+          "element": {
+            "type": "Text"
+          }
+        },
+        "nullable": true
+      },
+      {
+        "name": "shortHeaderWithLongContent",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "deliberatelyLongColumnNameForHeaderOverflow",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "anotherDeliberatelyLongColumnNameForHorizontalNavigation",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "relationParentId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": false,
+        "references": "relationParents"
+      },
+      {
+        "name": "optionalRelationParentId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": true,
+        "references": "relationParents"
+      }
+    ]
+  }
+}
