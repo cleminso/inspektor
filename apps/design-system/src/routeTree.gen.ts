@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsAccordionRouteImport } from './routes/components/accordion'
 import { Route as ComponentsActionListRouteImport } from './routes/components/action-list'
 import { Route as ComponentsAlertDialogRouteImport } from './routes/components/alert-dialog'
+import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 import { Route as ComponentsBinaryValueRouteImport } from './routes/components/binary-value'
 import { Route as ComponentsBoxRouteImport } from './routes/components/box'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
@@ -77,6 +78,11 @@ const ComponentsActionListRoute = ComponentsActionListRouteImport.update({
 const ComponentsAlertDialogRoute = ComponentsAlertDialogRouteImport.update({
   id: '/components/alert-dialog',
   path: '/components/alert-dialog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsBadgeRoute = ComponentsBadgeRouteImport.update({
+  id: '/components/badge',
+  path: '/components/badge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsBinaryValueRoute = ComponentsBinaryValueRouteImport.update({
@@ -315,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
   '/components/alert-dialog': typeof ComponentsAlertDialogRoute
+  '/components/badge': typeof ComponentsBadgeRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
@@ -366,6 +373,7 @@ export interface FileRoutesByTo {
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
   '/components/alert-dialog': typeof ComponentsAlertDialogRoute
+  '/components/badge': typeof ComponentsBadgeRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
@@ -418,6 +426,7 @@ export interface FileRoutesById {
   '/components/accordion': typeof ComponentsAccordionRoute
   '/components/action-list': typeof ComponentsActionListRoute
   '/components/alert-dialog': typeof ComponentsAlertDialogRoute
+  '/components/badge': typeof ComponentsBadgeRoute
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
@@ -471,6 +480,7 @@ export interface FileRouteTypes {
     | '/components/accordion'
     | '/components/action-list'
     | '/components/alert-dialog'
+    | '/components/badge'
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
@@ -522,6 +532,7 @@ export interface FileRouteTypes {
     | '/components/accordion'
     | '/components/action-list'
     | '/components/alert-dialog'
+    | '/components/badge'
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
@@ -573,6 +584,7 @@ export interface FileRouteTypes {
     | '/components/accordion'
     | '/components/action-list'
     | '/components/alert-dialog'
+    | '/components/badge'
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
@@ -625,6 +637,7 @@ export interface RootRouteChildren {
   ComponentsAccordionRoute: typeof ComponentsAccordionRoute
   ComponentsActionListRoute: typeof ComponentsActionListRoute
   ComponentsAlertDialogRoute: typeof ComponentsAlertDialogRoute
+  ComponentsBadgeRoute: typeof ComponentsBadgeRoute
   ComponentsBinaryValueRoute: typeof ComponentsBinaryValueRoute
   ComponentsBoxRoute: typeof ComponentsBoxRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
@@ -700,6 +713,13 @@ declare module '@tanstack/react-router' {
       path: '/components/alert-dialog'
       fullPath: '/components/alert-dialog'
       preLoaderRoute: typeof ComponentsAlertDialogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/badge': {
+      id: '/components/badge'
+      path: '/components/badge'
+      fullPath: '/components/badge'
+      preLoaderRoute: typeof ComponentsBadgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/binary-value': {
@@ -1025,6 +1045,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsAccordionRoute: ComponentsAccordionRoute,
   ComponentsActionListRoute: ComponentsActionListRoute,
   ComponentsAlertDialogRoute: ComponentsAlertDialogRoute,
+  ComponentsBadgeRoute: ComponentsBadgeRoute,
   ComponentsBinaryValueRoute: ComponentsBinaryValueRoute,
   ComponentsBoxRoute: ComponentsBoxRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,

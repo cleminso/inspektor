@@ -58,6 +58,19 @@ export const buttonItem = {
   componentId: 'button',
 } satisfies NavItem
 
+export const badgeItem = {
+  title: 'Badge',
+  slug: 'badge',
+  href: '/components/badge',
+  description: 'Compact text metadata for statuses and categories.',
+  importPath: '@inspector/ds',
+  source: {
+    label: 'badge.tsx',
+    path: 'packages/design-system/src/components/badge/badge.tsx',
+  },
+  componentId: 'badge',
+} satisfies NavItem
+
 const alertDialogItem = {
   title: 'Alert Dialog',
   slug: 'alert-dialog',
@@ -627,6 +640,7 @@ const componentItems: NavItem[] = [
   accordionItem,
   actionListItem,
   alertDialogItem,
+  badgeItem,
   binaryValueItem,
   boxItem,
   buttonItem,

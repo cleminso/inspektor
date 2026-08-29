@@ -13,6 +13,11 @@ const outputPath = resolve(scriptDirectory, '../src/generated/props.json')
 
 const componentEntries = [
   {
+    componentId: 'badge',
+    exportName: 'Badge',
+    inheritedProps: [],
+  },
+  {
     componentId: 'checkbox',
     exportName: 'Checkbox',
     part: 'Root',

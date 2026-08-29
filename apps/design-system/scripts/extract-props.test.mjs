@@ -361,6 +361,14 @@ test("extracts the constrained Tooltip compound API", () => {
     ["delay", "closeDelay", "timeout"],
   );
   assert.equal(
+    metadata["tooltip.provider"]?.find(({ name }) => name === "delay")?.defaultValue,
+    "500",
+  );
+  assert.equal(
+    metadata["tooltip.provider"]?.find(({ name }) => name === "closeDelay")?.defaultValue,
+    "100",
+  );
+  assert.equal(
     metadata["tooltip.provider"]?.find(({ name }) => name === "timeout")?.defaultValue,
     "400",
   );
@@ -387,7 +395,7 @@ test("extracts the constrained Tooltip compound API", () => {
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "delay")?.defaultValue,
-    "500",
+    undefined,
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
@@ -395,7 +403,7 @@ test("extracts the constrained Tooltip compound API", () => {
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "closeDelay")?.defaultValue,
-    "0",
+    undefined,
   );
   assert.deepEqual(
     metadata["tooltip.content"]?.map(({ name }) => name),
