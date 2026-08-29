@@ -364,7 +364,7 @@ export const comboboxStyles = stylex.create({
   clearStarting: {},
   clearEnding: {},
   empty: {
-    padding: { default: spacing.l, ':empty': 0 },
+    padding: { default: spacing.xs, ':empty': 0 },
     color: textColors.muted,
     display: 'block',
     fontFamily: fontFamilies.sans,

@@ -69,6 +69,8 @@ export type {
 } from './components/dataGrid/dataGrid'
 export { Box } from './components/box/box'
 export type { BoxProps } from './components/box/box'
+export { Badge } from './components/badge/badge'
+export type { BadgeProps } from './components/badge/badge'
 export { Checkbox } from './components/checkbox/checkbox'
 export type {
   CheckboxLabelLayout,

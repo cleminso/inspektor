@@ -81,8 +81,7 @@ const session = {
   prefill: null,
   resolveBranch: vi.fn((_connectionId: string, branch?: string | null) => branch ?? 'main'),
   resolveSchemaHash: vi.fn(
-    (_connectionId: string, _schemas: readonly { hash: string }[], schemaHash?: string | null) =>
-      schemaHash ?? 'schema-1',
+    (_schemas: readonly { hash: string }[], schemaHash?: string | null) => schemaHash ?? 'schema-1',
   ),
   saveConnectionWithContext,
   setConnectionContext,
@@ -442,6 +441,14 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     expect(navigate).toHaveBeenCalledWith({
       to: '/conn/$connectionId/tables',
       params: { connectionId: 'connection-2' },
+      search: expect.any(Function),
+    })
+    const updateSearch = navigate.mock.calls[0]![0].search as (
+      previous: Record<string, unknown>,
+    ) => Record<string, unknown>
+    expect(updateSearch({ filters: 'active', schema: 'schema-1' })).toEqual({
+      filters: 'active',
+      schema: undefined,
     })
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(screen.getByRole('status', { name: 'Connection open result' }).textContent).toBe(

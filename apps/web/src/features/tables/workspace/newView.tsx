@@ -11,7 +11,7 @@ export function NewTableView(): React.ReactElement {
       width="full"
       height="full"
       minHeight={0}
-      alignItems="center"
+      alignItems="start"
       justifyContent="center"
       paddingTop="5xl"
     >

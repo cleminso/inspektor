@@ -44,7 +44,7 @@ function createStore(lastSchemaHash: string | null = 'schema-1'): StoredConnecti
 }
 
 describe('resolveStoredTablesNavigationTarget', () => {
-  it('orders schemas by publication metadata without changing remembered selection', async () => {
+  it('opens the first advertised schema instead of the remembered schema', async () => {
     fetchSchemaHashes.mockResolvedValueOnce({
       hashes: ['schema-1', 'schema-2'],
       schemas: [
@@ -63,14 +63,40 @@ describe('resolveStoredTablesNavigationTarget', () => {
       branch: 'main',
       schemaHash: 'schema-1',
       schemaCatalogue: [
-        { hash: 'schema-2', publishedAt: 2 },
         { hash: 'schema-1', publishedAt: 1 },
+        { hash: 'schema-2', publishedAt: 2 },
       ],
     })
     expect(fetchSchemaHashes).toHaveBeenCalledOnce()
     expect(fetchSchemaHashes).toHaveBeenCalledWith('https://example.com', {
       appId: 'app-1',
       adminSecret: 'secret',
+    })
+  })
+
+  it('honors an explicit available schema from a deep link', async () => {
+    fetchSchemaHashes.mockResolvedValueOnce({
+      hashes: ['schema-1', 'schema-2'],
+      schemas: [
+        { hash: 'schema-1', publishedAt: 1 },
+        { hash: 'schema-2', publishedAt: 2 },
+      ],
+    })
+
+    await expect(
+      resolveStoredTablesNavigationTarget({
+        connectionId: 'connection-1',
+        schemaHashOverride: 'schema-1',
+        store: createStore(),
+      }),
+    ).resolves.toEqual({
+      connectionId: 'connection-1',
+      branch: 'main',
+      schemaHash: 'schema-1',
+      schemaCatalogue: [
+        { hash: 'schema-1', publishedAt: 1 },
+        { hash: 'schema-2', publishedAt: 2 },
+      ],
     })
   })
 
@@ -91,10 +117,10 @@ describe('resolveStoredTablesNavigationTarget', () => {
     ).resolves.toEqual({
       connectionId: 'connection-1',
       branch: 'main',
-      schemaHash: 'schema-3',
+      schemaHash: 'schema-2',
       schemaCatalogue: [
-        { hash: 'schema-3', publishedAt: 3 },
         { hash: 'schema-2', publishedAt: 2 },
+        { hash: 'schema-3', publishedAt: 3 },
       ],
     })
   })
@@ -133,10 +159,10 @@ describe('resolveStoredTablesNavigationTarget', () => {
     ).resolves.toEqual({
       connectionId: 'connection-1',
       branch: 'main',
-      schemaHash: 'schema-2',
+      schemaHash: 'schema-1',
       schemaCatalogue: [
-        { hash: 'schema-2', publishedAt: 2 },
         { hash: 'schema-1', publishedAt: 1 },
+        { hash: 'schema-2', publishedAt: 2 },
       ],
     })
   })
@@ -155,7 +181,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
 })
 
 describe('createSchemaCatalogue', () => {
-  it('places unpublished schemas last with deterministic hash ordering', () => {
+  it('preserves advertised schema order regardless of publication metadata', () => {
     expect(
       createSchemaCatalogue({
         hashes: ['schema-z', 'schema-b', 'schema-a', 'schema-y'],
@@ -167,10 +193,10 @@ describe('createSchemaCatalogue', () => {
         ],
       }),
     ).toEqual([
-      { hash: 'schema-a', publishedAt: 1 },
-      { hash: 'schema-b', publishedAt: 1 },
-      { hash: 'schema-y', publishedAt: null },
       { hash: 'schema-z', publishedAt: null },
+      { hash: 'schema-b', publishedAt: 1 },
+      { hash: 'schema-a', publishedAt: 1 },
+      { hash: 'schema-y', publishedAt: null },
     ])
   })
 
@@ -181,8 +207,8 @@ describe('createSchemaCatalogue', () => {
         schemas: [{ hash: 'schema-a', publishedAt: 1 }],
       }),
     ).toEqual([
-      { hash: 'schema-a', publishedAt: 1 },
       { hash: 'schema-z', publishedAt: null },
+      { hash: 'schema-a', publishedAt: 1 },
     ])
   })
 })

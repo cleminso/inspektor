@@ -90,6 +90,17 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   runtimeScopeExitGuardRef.current = runtimeScopeExitGuard
   const navigate = useNavigate()
   const routeParams = useParams({ strict: false })
+  const isQueriesRoute = useRouterState({
+    select: (state) =>
+      state.matches.some((candidate) => candidate.routeId === '/conn/$connectionId/queries'),
+  })
+  const schemaNavigationOrigin =
+    routeParams.tableName !== undefined
+      ? '/conn/$connectionId/tables/$tableName/'
+      : isQueriesRoute === true
+        ? appRoutes.queries
+        : appRoutes.tables
+  const navigateSchema = useNavigate({ from: schemaNavigationOrigin })
   const pendingConnectionId = useRouterState({
     select: (state) => {
       const match = state.matches.find(
@@ -142,6 +153,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       void navigate({
         to: appRoutes.tables,
         params: { connectionId },
+        search: (previous) => ({ ...previous, schema: undefined }),
       })
       return 'accepted'
     },
@@ -197,8 +209,20 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       }
 
       session.setConnectionContext(activeConnection.id, currentBranch, schemaHash)
+      void navigateSchema({
+        replace: true,
+        resetScroll: false,
+        search: (previous) => ({ ...previous, schema: schemaHash }),
+      })
     },
-    [activeConnection, currentBranch, currentSchemaHash, runtimeScopeExitGuard, session],
+    [
+      activeConnection,
+      currentBranch,
+      currentSchemaHash,
+      navigateSchema,
+      runtimeScopeExitGuard,
+      session,
+    ],
   )
   const setConnectionContext = useCallback(
     (connectionId: string, branch: string, schemaHash: string) => {

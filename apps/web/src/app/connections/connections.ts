@@ -267,17 +267,15 @@ export function resolveDefaultBranch(
  * reuses a requested or remembered hash when Jazz reports it as available.
  */
 export function resolveDefaultSchemaHash(
-  store: StoredConnectionsStore,
-  connectionId: string,
   schemaCatalogue: readonly { hash: string }[],
   schemaHash?: string | null,
 ): string | null {
-  const nextSchemaHash = schemaHash ?? getConnectionPreferences(store, connectionId).lastSchemaHash
   if (
-    nextSchemaHash !== null &&
-    schemaCatalogue.some(({ hash }) => hash === nextSchemaHash) === true
+    schemaHash !== null &&
+    schemaHash !== undefined &&
+    schemaCatalogue.some(({ hash }) => hash === schemaHash) === true
   ) {
-    return nextSchemaHash
+    return schemaHash
   }
 
   return schemaCatalogue[0]?.hash ?? null

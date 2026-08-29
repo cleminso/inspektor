@@ -106,184 +106,190 @@ export function TableTabsView({
         overflow="hidden"
       >
         <WorkspaceTabs.Bar>
-          {connectionEntryPending === true ? (
-            <Box
-              width="full"
-              height="tab-height"
-              data-slot="table-workspace-bar-placeholder"
-            />
-          ) : (
-            <>
-              <WorkspaceTabs.LeadingArea aria-label="Table navigation">
-                <Tooltip.Root>
-                  <Tooltip.Trigger
-                    render={
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="s"
-                        radius="xs"
-                        aria-label="Go Back"
-                        disabled={canGoBack === false}
-                        focusableWhenDisabled
-                        iconOnly
-                        onClick={goBack}
-                      >
-                        <Button.Glyph artwork={ArrowLeft} />
-                      </Button>
+          <WorkspaceTabs.LeadingArea aria-label="Table navigation">
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    radius="xs"
+                    aria-label="Go Back"
+                    disabled={canGoBack === false}
+                    focusableWhenDisabled
+                    iconOnly
+                    onClick={goBack}
+                  >
+                    <Button.Glyph artwork={ArrowLeft} />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>
+                Go Back{' '}
+                <KeyboardInput
+                  hotkey={appHotkeys.goBack}
+                  size="small"
+                />
+              </Tooltip.Content>
+            </Tooltip.Root>
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    radius="xs"
+                    aria-label="Go Forward"
+                    disabled={canGoForward === false}
+                    focusableWhenDisabled
+                    iconOnly
+                    onClick={goForward}
+                  >
+                    <Button.Glyph artwork={ArrowRight} />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>
+                Go Forward{' '}
+                <KeyboardInput
+                  hotkey={appHotkeys.goForward}
+                  size="small"
+                />
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </WorkspaceTabs.LeadingArea>
+          <WorkspaceTabs.List
+            aria-label="Open table views"
+            values={tabs.map((tab) => tab.id)}
+            onReorder={(orderedTabIds) => {
+              reorderTabs(
+                orderedTabIds.filter((tabId): tabId is string => typeof tabId === 'string'),
+              )
+            }}
+          >
+            {tabs.map((tab) => {
+              if (tab.kind === 'newView') {
+                return (
+                  <WorkspaceTabs.Tab
+                    key={tab.id}
+                    value={tab.id}
+                    closeHotkey={appHotkeys.closeTableView}
+                    closeLabel="Close New view"
+                    reorderLabel="Reorder New view"
+                    onClose={
+                      tabs.length > 1
+                        ? () => {
+                            closeTab(tab.id)
+                          }
+                        : undefined
                     }
-                  />
-                  <Tooltip.Content>
-                    Go Back{' '}
-                    <KeyboardInput
-                      hotkey={appHotkeys.goBack}
-                      size="small"
-                    />
-                  </Tooltip.Content>
-                </Tooltip.Root>
-                <Tooltip.Root>
-                  <Tooltip.Trigger
-                    render={
-                      <Button
-                        type="button"
-                        variant="ghost"
+                  >
+                    New view
+                  </WorkspaceTabs.Tab>
+                )
+              }
+
+              const isReplaceable = tab.id === replaceableTabId
+              const tabLabel = tab.tableName
+              return (
+                <WorkspaceTabs.Tab
+                  key={tab.id}
+                  value={tab.id}
+                  prefix={
+                    tab.search.view === 'schema' ? (
+                      <Icon
+                        artwork={productGlyphs.derivedView}
                         size="s"
-                        radius="xs"
-                        aria-label="Go Forward"
-                        disabled={canGoForward === false}
-                        focusableWhenDisabled
-                        iconOnly
-                        onClick={goForward}
-                      >
-                        <Button.Glyph artwork={ArrowRight} />
-                      </Button>
-                    }
-                  />
-                  <Tooltip.Content>
-                    Go Forward{' '}
-                    <KeyboardInput
-                      hotkey={appHotkeys.goForward}
-                      size="small"
-                    />
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </WorkspaceTabs.LeadingArea>
-              <WorkspaceTabs.List
-                aria-label="Open table views"
-                values={tabs.map((tab) => tab.id)}
-                onReorder={(orderedTabIds) => {
-                  reorderTabs(
-                    orderedTabIds.filter((tabId): tabId is string => typeof tabId === 'string'),
-                  )
-                }}
-              >
-                {tabs.map((tab) => {
-                  if (tab.kind === 'newView') {
-                    return (
-                      <WorkspaceTabs.Tab
-                        key={tab.id}
-                        value={tab.id}
-                        closeHotkey={appHotkeys.closeTableView}
-                        closeLabel="Close New view"
-                        reorderLabel="Reorder New view"
-                        onClose={
-                          tabs.length > 1
-                            ? () => {
-                                closeTab(tab.id)
-                              }
-                            : undefined
-                        }
-                      >
-                        New view
-                      </WorkspaceTabs.Tab>
+                      />
+                    ) : (
+                      <Icon
+                        artwork={productGlyphs.table}
+                        size="s"
+                      />
                     )
                   }
-
-                  const isReplaceable = tab.id === replaceableTabId
-                  const tabLabel = tab.tableName
-                  return (
-                    <WorkspaceTabs.Tab
-                      key={tab.id}
-                      value={tab.id}
-                      prefix={
-                        tab.search.view === 'schema' ? (
-                          <Icon
-                            artwork={productGlyphs.derivedView}
-                            size="s"
-                          />
-                        ) : (
-                          <Icon
-                            artwork={productGlyphs.table}
-                            size="s"
-                          />
-                        )
-                      }
-                      retention={isReplaceable === true ? 'replaceable' : 'persistent'}
-                      closeHotkey={appHotkeys.closeTableView}
-                      closeLabel={`Close ${tabLabel}`}
-                      contextMenuItems={
-                        isReplaceable === true ? (
-                          <ContextMenu.Item
-                            onClick={() => {
-                              persistTab(tab.id)
-                            }}
-                          >
-                            Keep open
-                          </ContextMenu.Item>
-                        ) : undefined
-                      }
-                      contextMenuLabel={isReplaceable === true ? `${tabLabel} actions` : undefined}
-                      reorderLabel={`Reorder ${tabLabel}`}
-                      onClose={() => {
-                        closeTab(tab.id)
-                      }}
-                      onDoubleClick={
-                        isReplaceable === true
-                          ? () => {
-                              persistTab(tab.id)
-                            }
-                          : undefined
-                      }
-                    >
-                      {tabLabel}
-                    </WorkspaceTabs.Tab>
-                  )
-                })}
-              </WorkspaceTabs.List>
-              <WorkspaceTabs.TrailingArea aria-label="Table view actions">
-                <Tooltip.Root>
-                  <Tooltip.Trigger
-                    render={
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="s"
-                        radius="xs"
-                        aria-label="New view"
-                        iconOnly
-                        onClick={openNewView}
+                  retention={isReplaceable === true ? 'replaceable' : 'persistent'}
+                  closeHotkey={appHotkeys.closeTableView}
+                  closeLabel={`Close ${tabLabel}`}
+                  contextMenuItems={
+                    isReplaceable === true ? (
+                      <ContextMenu.Item
+                        onClick={() => {
+                          persistTab(tab.id)
+                        }}
                       >
-                        <Button.Glyph artwork={Plus} />
-                      </Button>
-                    }
-                  />
-                  <Tooltip.Content>
-                    New view{' '}
-                    <KeyboardInput
-                      hotkey={appHotkeys.openTableView}
-                      size="small"
-                    />
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </WorkspaceTabs.TrailingArea>
-            </>
-          )}
+                        Keep open
+                      </ContextMenu.Item>
+                    ) : undefined
+                  }
+                  contextMenuLabel={isReplaceable === true ? `${tabLabel} actions` : undefined}
+                  reorderLabel={`Reorder ${tabLabel}`}
+                  onClose={() => {
+                    closeTab(tab.id)
+                  }}
+                  onDoubleClick={
+                    isReplaceable === true
+                      ? () => {
+                          persistTab(tab.id)
+                        }
+                      : undefined
+                  }
+                >
+                  {tabLabel}
+                </WorkspaceTabs.Tab>
+              )
+            })}
+          </WorkspaceTabs.List>
+          <WorkspaceTabs.TrailingArea aria-label="Table view actions">
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                render={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    radius="xs"
+                    aria-label="New view"
+                    iconOnly
+                    onClick={openNewView}
+                  >
+                    <Button.Glyph artwork={Plus} />
+                  </Button>
+                }
+              />
+              <Tooltip.Content>
+                New view{' '}
+                <KeyboardInput
+                  hotkey={appHotkeys.openTableView}
+                  size="small"
+                />
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </WorkspaceTabs.TrailingArea>
         </WorkspaceTabs.Bar>
       </Box>
       {runtimeError !== null ? (
         <RuntimeErrorStatus />
-      ) : connectionEntryPending === true ||
-        (tableName !== null && isTableIdentityReady === false) ? (
+      ) : connectionEntryPending === true ? (
+        <Box
+          minHeight={0}
+          flex={1}
+          alignItems="center"
+          justifyContent="center"
+          backgroundColor="surface-background"
+          role="status"
+          aria-live="polite"
+        >
+          <Text
+            variant="label"
+            color="muted"
+          >
+            Loading schema
+          </Text>
+        </Box>
+      ) : tableName !== null && isTableIdentityReady === false ? (
         <Box
           minHeight={0}
           flex={1}

@@ -44,7 +44,6 @@ interface ResolveTablesNavigationTargetOptions {
   getConnection: (connectionId: string) => StoredConnection | null
   resolveBranch: (connectionId: string, branchOverride?: string | null) => string
   resolveSchemaHash: (
-    connectionId: string,
     schemaCatalogue: readonly SchemaCatalogueRecord[],
     schemaHashOverride?: string | null,
   ) => string | null
@@ -58,31 +57,13 @@ interface ResolveStoredTablesNavigationTargetOptions {
   store?: StoredConnectionsStore
 }
 
-function orderSchemaCatalogue(records: readonly SchemaCatalogueRecord[]): SchemaCatalogueRecord[] {
-  return [...records].sort((left, right) => {
-    if (left.publishedAt === null) {
-      if (right.publishedAt !== null) {
-        return 1
-      }
-    } else if (right.publishedAt === null) {
-      return -1
-    } else if (left.publishedAt !== right.publishedAt) {
-      return right.publishedAt - left.publishedAt
-    }
-
-    return left.hash < right.hash ? -1 : left.hash > right.hash ? 1 : 0
-  })
-}
-
-/** Preserves every advertised hash, enriches known publication metadata, and orders the result. */
+/** Preserves Jazz's advertised schema order while enriching known publication metadata. */
 export function createSchemaCatalogue({
   hashes,
   schemas,
 }: SchemaCatalogueResponse): SchemaCatalogueRecord[] {
   const publishedAtByHash = new Map(schemas.map(({ hash, publishedAt }) => [hash, publishedAt]))
-  return orderSchemaCatalogue(
-    hashes.map((hash) => ({ hash, publishedAt: publishedAtByHash.get(hash) ?? null })),
-  )
+  return hashes.map((hash) => ({ hash, publishedAt: publishedAtByHash.get(hash) ?? null }))
 }
 
 async function fetchConnectionSchemaCatalogue(
@@ -130,7 +111,7 @@ export async function resolveTablesNavigationTarget({
     }
   }
 
-  const schemaHash = resolveSchemaHash(connectionId, schemaCatalogue, schemaHashOverride)
+  const schemaHash = resolveSchemaHash(schemaCatalogue, schemaHashOverride)
   if (schemaHash === null) {
     return null
   }
@@ -180,12 +161,7 @@ export async function resolveStoredTablesNavigationTarget({
     }
   }
 
-  const schemaHash = resolveDefaultSchemaHash(
-    resolvedStore,
-    connectionId,
-    schemaCatalogue,
-    schemaHashOverride,
-  )
+  const schemaHash = resolveDefaultSchemaHash(schemaCatalogue, schemaHashOverride)
   return schemaHash === null ? null : { connectionId, branch, schemaHash, schemaCatalogue }
 }
 

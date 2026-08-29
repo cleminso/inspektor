@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[29/08/26]
+
+- [x] Preserve the active Tables index, table detail, or Queries path when schema selection updates URL search state.
+
 [28/08/26]
 
 - [x] Add guard `cssCodeSplit: false` application CSS in one entry stylesheet so deferred JavaScript cannot introduce stylesheet-driven full-page recalculation.
@@ -202,6 +206,11 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[29/08/26]
+
+- [x] Cover schema switching across Tables index, table detail, and Queries with a real in-memory router.
+- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
 
 [25/08/26]
 

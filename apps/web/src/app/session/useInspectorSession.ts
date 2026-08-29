@@ -38,7 +38,6 @@ export interface UseInspectorSessionResult {
   getRememberedBranches: (connectionId: string) => string[]
   resolveBranch: (connectionId: string, branch?: string | null) => string
   resolveSchemaHash: (
-    connectionId: string,
     schemaCatalogue: readonly { hash: string }[],
     schemaHash?: string | null,
   ) => string | null
@@ -143,10 +142,9 @@ export function useInspectorSession(): UseInspectorSessionResult {
       resolveBranch: (connectionId: string, branch?: string | null) =>
         resolveDefaultBranch(state.store, connectionId, branch),
       resolveSchemaHash: (
-        connectionId: string,
         schemaCatalogue: readonly { hash: string }[],
         schemaHash?: string | null,
-      ) => resolveDefaultSchemaHash(state.store, connectionId, schemaCatalogue, schemaHash),
+      ) => resolveDefaultSchemaHash(schemaCatalogue, schemaHash),
       saveConnectionWithContext,
       deleteConnection,
       setConnectionContext,

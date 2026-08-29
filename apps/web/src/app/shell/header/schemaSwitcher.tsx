@@ -1,6 +1,9 @@
 import {
+  Badge,
+  Box,
   ContextSwitcher,
   Text,
+  Tooltip,
   type ContextSwitcherTriggerSize,
   type ContextSwitcherTriggerWidth,
 } from '@inspector/ds'
@@ -13,17 +16,8 @@ interface SchemaSwitcherProps {
   width?: ContextSwitcherTriggerWidth
 }
 
-function truncateMiddle(value: string, maxLength: number): string {
-  if (value.length <= maxLength) {
-    return value
-  }
-
-  const ellipsis = '…'
-  const remainingLength = maxLength - ellipsis.length
-  const startLength = Math.ceil(remainingLength / 2)
-  const endLength = Math.floor(remainingLength / 2)
-
-  return `${value.slice(0, startLength)}${ellipsis}${value.slice(value.length - endLength)}`
+function shortSchemaHash(hash: string): string {
+  return hash.slice(0, 12)
 }
 
 export function SchemaSwitcher({
@@ -33,62 +27,90 @@ export function SchemaSwitcher({
 }: SchemaSwitcherProps = {}): React.ReactElement {
   const { currentSchemaHash, switchSchema } = useInspectorSessionState()
   const availableSchemaHashes = useRuntimeSchemaHashes()
-  const triggerText = triggerLabel ?? currentSchemaHash ?? 'Select schema'
-  const triggerTitle = triggerLabel ?? currentSchemaHash ?? undefined
-  const shouldTruncateCurrentSchema =
-    currentSchemaHash !== null && triggerText === currentSchemaHash
+  const latestSchemaHash = availableSchemaHashes[0] ?? null
+  const isLatestSchema = currentSchemaHash === latestSchemaHash
   const displayTriggerText =
-    shouldTruncateCurrentSchema === true ? truncateMiddle(currentSchemaHash, 24) : triggerText
+    triggerLabel ??
+    (currentSchemaHash === null ? 'Select schema' : shortSchemaHash(currentSchemaHash))
   return (
-    <ContextSwitcher.Root<string>
-      items={availableSchemaHashes}
-      value={currentSchemaHash}
-      onValueChange={(schemaHash) => {
-        if (schemaHash !== null) {
-          switchSchema(schemaHash)
-        }
-      }}
+    <Box
+      minWidth={0}
+      alignItems="center"
+      gap="xxs"
     >
-      <ContextSwitcher.Trigger
-        label="Switch schema"
-        size={size}
-        width={width}
-        tooltip={triggerTitle}
+      <ContextSwitcher.Root<string>
+        items={availableSchemaHashes}
+        value={currentSchemaHash}
+        onValueChange={(schemaHash) => {
+          if (schemaHash !== null) {
+            switchSchema(schemaHash)
+          }
+        }}
       >
-        <Text
-          as="span"
-          color="inherit"
-          truncate
-          translate="no"
+        <ContextSwitcher.Trigger
+          label={
+            currentSchemaHash === null ? 'Switch schema' : `Switch schema: ${currentSchemaHash}`
+          }
+          size={size}
+          width={width}
         >
-          {displayTriggerText}
-        </Text>
-      </ContextSwitcher.Trigger>
-      <ContextSwitcher.Content width="content">
-        <ContextSwitcher.Search
-          label="Search schemas"
-          placeholder="Search schemas…"
-        />
-        <ContextSwitcher.Viewport maxHeight="l">
-          <ContextSwitcher.Empty>No schemas available.</ContextSwitcher.Empty>
-          <ContextSwitcher.List>
-            {(schemaHash: string) => (
-              <ContextSwitcher.Item
-                key={schemaHash}
-                value={schemaHash}
-              >
-                <Text
-                  as="span"
-                  color="inherit"
-                  translate="no"
-                >
-                  {schemaHash}
-                </Text>
-              </ContextSwitcher.Item>
-            )}
-          </ContextSwitcher.List>
-        </ContextSwitcher.Viewport>
-      </ContextSwitcher.Content>
-    </ContextSwitcher.Root>
+          <Text
+            as="span"
+            color="inherit"
+            truncate
+            tabularNums
+            translate="no"
+          >
+            {displayTriggerText}
+          </Text>
+        </ContextSwitcher.Trigger>
+        <ContextSwitcher.Content width="content">
+          {availableSchemaHashes.length > 10 ? (
+            <ContextSwitcher.Search
+              label="Search schemas"
+              placeholder="Search schemas…"
+            />
+          ) : null}
+          <ContextSwitcher.Viewport maxHeight="l">
+            <ContextSwitcher.Empty>No schemas available.</ContextSwitcher.Empty>
+            <ContextSwitcher.List>
+              {(schemaHash: string) => {
+                const isLatest = schemaHash === latestSchemaHash
+                const status = isLatest === true ? 'Latest' : 'Older'
+                const item = (
+                  <ContextSwitcher.Item
+                    key={schemaHash}
+                    aria-label={`${schemaHash}, ${status}`}
+                    value={schemaHash}
+                  >
+                    <Text
+                      as="span"
+                      color="inherit"
+                      tabularNums
+                      translate="no"
+                      truncate
+                    >
+                      {shortSchemaHash(schemaHash)}
+                    </Text>
+                  </ContextSwitcher.Item>
+                )
+                return (
+                  <Tooltip.Root key={schemaHash}>
+                    <Tooltip.Trigger
+                      closeDelay={100}
+                      render={item}
+                    />
+                    <Tooltip.Content side="right">{status}</Tooltip.Content>
+                  </Tooltip.Root>
+                )
+              }}
+            </ContextSwitcher.List>
+          </ContextSwitcher.Viewport>
+        </ContextSwitcher.Content>
+      </ContextSwitcher.Root>
+      {latestSchemaHash === null || currentSchemaHash === null ? null : (
+        <Badge>{isLatestSchema === true ? 'Latest' : 'Older'}</Badge>
+      )}
+    </Box>
   )
 }

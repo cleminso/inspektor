@@ -320,13 +320,13 @@ describe('useAddConnectionFlow', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  it('enters schema choice with schemas ordered by publication metadata', async () => {
+  it('enters schema choice with schemas in advertised order', async () => {
     fetchSchemaHashes.mockResolvedValueOnce(schemaChoicesResponse)
 
     const { result } = await submitValidFlow()
 
     expect(result.current.step).toBe('schema')
-    expect(result.current.schemaHashes).toEqual(['schema-2', 'schema-1'])
+    expect(result.current.schemaHashes).toEqual(['schema-1', 'schema-2'])
     expect(saveConnectionWithContext).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
   })

@@ -11,6 +11,50 @@
 
 ## Implemented foundation
 
+[29/08/26]
+
+### Schema retention across child navigation
+
+- [x] Retain the selected schema search parameter when table tabs replace table-specific route search, including closing an active New view tab.
+
+[29/08/26]
+
+### Schema switch loading and discovery
+
+- [x] Keep the workspace toolbar visible while schema-dependent content presents `Loading schema`.
+- [x] Preserve full Jazz schema hashes as option values while displaying their 12-character prefixes.
+- [x] Show schema search only above ten options and keep the existing `l` scrolling viewport.
+
+[29/08/26]
+
+### Schema option status
+
+- [x] Keep schema rows focused on their hashes and expose both `Latest` and `Older` through status tooltips instead of inline option badges.
+
+[29/08/26]
+
+### Schema switcher interaction refinement
+
+- [x] Treat Jazz's advertised schema order as the generated-schema recency source without reordering it from publication metadata.
+- [x] Keep `Latest` visible on the latest option and expose `Older` as supplementary option tooltip text.
+- [x] Remove the full-hash tooltip from the schema trigger and keep the full hash in its accessible name.
+- [x] Present schema loading feedback instead of a blank workspace during a schema switch.
+
+[29/08/26]
+
+### Schema catalogue fallback order
+
+- [x] Preserve Jazz's advertised hash order when publication timestamps are missing or equal so metadata enrichment cannot replace the server's newest candidate.
+
+[29/08/26]
+
+### Schema recency and selection
+
+- [x] Open saved connections on the newest published schema while honoring an explicit schema hash from the URL.
+- [x] Write in-session schema switches to the URL so refresh and deep links preserve the selected schema.
+- [x] Keep schema options newest-first and present short hashes with publication metadata.
+- [x] Distinguish the latest schema from the selected schema with an active-status badge, option-status tooltips, selected-item background, and the standard check indicator.
+
 [28/08/26]
 
 ### Production-build preparation boundary
@@ -203,6 +247,31 @@
 
 ## Settled interaction decisions
 
+[29/08/26]
+
+- Jazz's advertised schema order defines generated-schema recency; publication metadata does not reorder it.
+- The latest option carries a visible `Latest` badge. Older options use the supplementary `Older` tooltip and accessible name.
+- The active-schema badge uses only `Latest` or `Older`.
+- The shortened schema trigger does not show a full-hash tooltip.
+- These decisions supersede the publication-order and option-status decisions below.
+
+[29/08/26]
+
+- Schema option status moved from inline badges to `Latest` and `Older` tooltips. The full hash and status remain available to assistive technology. This supersedes the option-badge statement below.
+
+[29/08/26]
+
+- Order schemas by distinct `publishedAt` values and preserve Jazz's advertised hash order for equal or missing timestamps. This supersedes deterministic hash fallback ordering and the claim below that hash-array order has no chronological meaning.
+
+[29/08/26]
+
+- Saved connection entry selects the newest published schema instead of restoring the last locally persisted schema.
+- A valid explicit `schema` search parameter overrides the newest-schema default and remains stable across refresh.
+- Schema switching updates the current URL without adding browser-history entries or resetting scroll position.
+- The header identifies the active schema as `Latest` or `Older schema`; the newest option also carries a `Latest` badge.
+- Schema options use a short hash and publication metadata instead of an Inspector-owned version number. The selected option retains both its background and check indicator.
+- These decisions supersede the remembered-schema selection and automatic-switch exclusion recorded below.
+
 [25/08/26]
 
 - Onboarding layout selection follows the last committed router location, so a pending workspace navigation cannot unwrap the current form.
@@ -283,6 +352,16 @@
 - None.
 
 ## Validation checklist
+
+[29/08/26]
+
+- [x] Cover advertised schema order, visible latest status, older option tooltips, absent trigger tooltip, and schema-switch loading feedback.
+
+[29/08/26]
+
+- [x] Cover advertised-order fallback when publication metadata is equal or missing.
+- [x] Verify newest-schema entry, table and query schema switching, URL replacement, selection status, and refresh persistence in the browser.
+- [x] Run Inspector lint, TypeScript checks, production build, and package-wide tests.
 
 [27/08/26]
 
