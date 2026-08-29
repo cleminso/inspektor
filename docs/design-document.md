@@ -127,7 +127,7 @@ flowchart TD
       RuntimeProjection --> Runtime
     end
 
-    InspectorProvider --> Workbench["Inspector workbench"]
+    InspectorProvider --> RoutedFeatures["Routed feature content"]
 
     subgraph RoutesGroup["Local-context routes"]
       SessionProvider --> Connections["/conn and /conn/new"]
@@ -138,12 +138,12 @@ flowchart TD
       AddConnectionFlow --> AcceptedIntent
       AddConnectionFlow --> ConnectionRoute
 
-      Workbench --> TablesRoute["/conn/:connectionId/tables/:tableName"]
-      Workbench --> QueryRoute["/conn/:connectionId/queries"]
+      RoutedFeatures --> TablesRoute["/conn/:connectionId/tables/:tableName"]
+      RoutedFeatures --> QueryRoute["/conn/:connectionId/queries"]
     end
 
-    subgraph WorkbenchFlow["Workbench"]
-      Workbench --> Header["Header: connection branch schema"]
+    subgraph WorkbenchFlow["Routed feature shells"]
+      RoutedFeatures --> Header["Header: connection branch schema"]
       TablesRoute --> TableExplorer["TableExplorerScreen"]
       TableExplorer --> TablesNavigator["Table list"]
       TableExplorer --> WorkspaceItems["Table workspace tabs"]
@@ -151,11 +151,12 @@ flowchart TD
       WorkspaceItems --> SchemaItem["Table schema view"]
       WorkspaceItems --> WorkspaceStorage["localStorage: scoped workspace state"]
       TablesNavigator --> WorkspaceItems
+      QueryRoute --> QueryPlaceholder["Query subscriptions placeholder"]
     end
 
     subgraph TableExplorerFlow["Table Data item"]
       DataItem --> SearchParams["useTableExplorerSearchParams"]
-      SearchParams --> UrlSearch["URL search: filters sort row editor"]
+      SearchParams --> UrlSearch["URL search: filters sort page pageSize view"]
       SearchParams --> TableStorage["localStorage: data-grid preferences"]
 
       DataItem --> DataState["useTableViewState"]
@@ -165,7 +166,7 @@ flowchart TD
       UseAll --> ReactiveRuntime["Jazz reactive query runtime"]
 
       DataState --> DataGrid["DataGrid"]
-      DataState --> RowEditor["RowEditorSidePanel"]
+      DataState --> RowEditor["Complete-row side pane"]
       DataState --> MutationLedger["Table mutation ledger"]
       DataGrid --> MutationLedger
       RowEditor --> MutationLedger
@@ -203,7 +204,7 @@ It is not tied to Jazz Cloud only. It is not driven by generated app-specific co
 
 **In-memory Jazz admin client**
 
-A Jazz client created by the Inspector with `createJazzClient(...)`, `adminSecret`, and `driver: { type: "memory" }`.
+A Jazz client acquired and managed through `JazzProvider` with `adminSecret` and `driver: { type: "memory" }`.
 
 `adminSecret` gives the Inspector admin access to inspect schema metadata and app data. The memory driver keeps the Inspector
 runtime local and non-durable, so inspected data is not persisted by the Inspector client between sessions.
@@ -219,24 +220,24 @@ From Jazz's perspective, a connection is a single active WebSocket transport lin
 **Workspace context**
 
 The selected connection, branch, and schema hash that define one Inspector runtime. The connection id stays in the route so a
-browser tab can resolve its saved local connection. Branch and schema hash are selected in the header and restored from the
-saved preferences for that connection.
+browser tab can resolve its saved local connection. Branch is restored from the connection preferences. Schema hash is selected
+from explicit `?schema=` URL state or the first advertised schema and remains visible in the header.
 
 **Workspace item**
 
-One open piece of primary content in the main workspace. A workspace item has a stable instance identity, a resource, a
-representation, and representation-specific state. Table Data, table Schema, and Query are different item kinds. A tab is the
-visual handle for an item, not the item model itself.
+One open piece of primary content in the Tables workspace. Table Data, table Schema, and New View are explicit item kinds. Data
+and Schema use one canonical tab identity per table. A tab is the visual handle for an item, while the active route owns the
+displayed representation and search state.
 
 **Representation**
 
-The primary way a workspace item presents a resource. A table can have Data, Schema, and later Stats representations. Each
-representation opens as a distinct workspace item so it can keep its own state and later participate in split panes.
+The primary way a table workspace item presents a resource. A table has Data and Schema representations with distinct canonical
+tab identities. Data is the default representation; `view=schema` selects Schema in the route.
 
-**Left dock**
+**Application dock**
 
-The resource-navigation region beside the main workspace. Its selector switches between Tables and Queries navigator panels
-without changing the active workspace item. Selecting a resource inside the active navigator can open or focus an item.
+The application-level control region. Its Tables control opens or closes the Tables route's navigator pane. The Query
+Subscriptions control is reserved for the separate Queries route.
 
 **Query subscriptions**
 
@@ -358,24 +359,20 @@ There is the list of screen and components that constitute the Inspector interfa
 
 ### Workbench
 
-The workbench keeps connection context, resource discovery, and open content separate.
+The Inspector shell keeps connection context separate from routed feature content. The Tables route owns the implemented
+workspace model; the Queries route is separate and does not share the Tables tab provider.
 
 It follows this structure:
 
 - Header: connection, branch, schema hash, and global controls.
-- Left dock: a selector and one active resource navigator, starting with Tables and Queries.
-- Main workspace: panes containing workspace items represented by tabs.
-- Contextual panels: item-owned surfaces such as the row editor that support the active item without becoming another global
+- Application dock: controls global feature surfaces. The Tables control toggles the Tables navigator pane.
+- Tables route: owns the Tables navigator, table workspace tabs, recent table views, and table mutation ledgers.
+- Queries route: owns Query Subscriptions content independently from the Tables workspace.
+- Contextual panels: table-owned surfaces such as the complete-row pane support the active Data item without becoming another
   navigation mode.
 
-Changing the left dock panel does not change the main workspace. A developer can keep a table Data item visible, switch from
-the Tables navigator to Queries, browse grouped subscriptions, and only change main content after opening a Query item.
-
-Workspace items are generalized across the Inspector. The tab strip can contain table Data, table Schema, Query, and later
-Stats items. The item kind determines its icon and presentation. Tabs do not infer their meaning from generated ids.
-
-The first workspace uses one pane. The item model must not prevent later pane splitting, where Data, Schema, Stats, or Query
-items can be viewed side by side.
+The Tables tab strip contains canonical Data and Schema items plus New View. Query Subscriptions does not participate in this tab
+model.
 
 #### Routing and local context
 
@@ -385,15 +382,15 @@ Inspector routes describe the active content inside one saved local connection:
 - `/conn/:connectionId/tables/:tableName` opens the selected table. `view=schema` selects its Schema representation.
 - `/conn/:connectionId/queries` opens the connection-scoped query placeholder.
 
-Data is the default table representation, so the route omits `/data`. Filters and sorting remain search parameters of the
-active Data item. Routes do not expose tabs, pane positions, open item order, branch, or schema hash.
+Data is the default table representation, so the route omits `/data`. Schema representation, filters, sorting, page, page size,
+and explicit schema hash remain search parameters. Routes do not expose tabs, open item order, or branch.
 
-The connection id resolves one profile from `inspektor-connections`. Branch and schema hash are workspace preferences
-selected in the header and restored for that connection. Copied content URLs reopen inside this local context rather than
-acting as portable credentials or complete remote-admin links.
+The connection id resolves one profile from `inspektor-connections`. Branch comes from the saved connection preference. Schema
+resolution uses an explicit `?schema=` value when valid and otherwise selects the first advertised schema. Copied content URLs
+remain dependent on the locally saved connection and never carry the admin secret.
 
-Open items, item order, pane layout, and navigator state are local workspace state. The active route describes content and can
-recreate or focus an equivalent item, but it does not make the visual tab part of the route model.
+Open table items, item order, recent views, and navigator state are local workspace state. The active route describes table
+content and can recreate or focus its canonical item, but it does not make the visual tab part of the route model.
 
 The focused routing decisions and examples live in [Inspector route structure](notes/routing.md).
 
@@ -426,7 +423,7 @@ This flow **must answer**:
 1. First-time user
    - has a Jazz app
    - wants to establish a connection via the Inspector for the first time
-   - has copied credentials manually or opened a local-dev prefill link
+   - has copied credentials manually or opened a prefill link
    - needs confidence that the connection points to the intended app
    - needs to understand which schemaHash is latest
    - may need to inspect older schema
@@ -455,20 +452,19 @@ From Jazz's perspective, a connection is a single active WebSocket transport lin
 | Capability                | Notes                                            |
 | ------------------------- | ------------------------------------------------ |
 | Add connection            |                                                  |
-| Edit connection           | Revalidate and reopen on the latest schema hash  |
+| Edit connection           | Revalidate and select from the returned schemas  |
 | Browse active connections |                                                  |
 | Connection switching      |                                                  |
 | Delete connection         |                                                  |
-| Local-dev prefill         | Open inspector directly from app dev server only |
+| Connection prefill        | Populate the connection form from a URL           |
 
 Must support:
 
 - [x] add connection
-- [ ] edit connection
-- [ ] delete connection
+- [x] edit connection
+- [x] delete connection
 - [x] switch active connection
 - [x] switch schema hash within the active connection
-- [ ] keep prefill local-dev only
 
 #### First-run flow
 
@@ -483,7 +479,8 @@ Once connected the users must be able to switch to another connection from anywh
 
 #### Editing a connection
 
-Editing a connection must revalidate the updated credentials. After a successful edit, the inspector redirects to the latest generated schema hash instead of asking the user to select a schema again.
+Editing a connection revalidates the updated credentials. One returned schema opens directly. Several returned schemas keep the
+developer in the flow to select the schema before reopening the connection.
 
 The schema switcher shows which schema hash is latest.
 
@@ -491,10 +488,9 @@ If validation fails, render the validation error and keep the edit form open. If
 
 #### Prefill connection
 
-_Prefill connection is supported for local development, but is not required for production because it depends on wrapping Jazz dev internals._
-
-When user run his Jazz app, with `buildJazzInspectorLink` from `packages/jazz-dev-tools/src/dev/jazzInspectorLink.ts` print a
-direct inspector connection link to open in a browser.
+Jazz dev tooling can print a direct Inspector link with connection fields in the URL. The Inspector parses query and fragment
+parameters into the same draft used by the connection form. Fragment parameters avoid sending `adminSecret` in the Inspector
+page request; query parameters remain supported for compatibility.
 
 #### Saved connection availability
 
@@ -508,10 +504,9 @@ If the app dev server only produced the inspector link but the Jazz server is re
 can open without the app dev server. If the app dev server owns the managed local Jazz runtime, stopping it makes the saved
 connection unavailable until the runtime is running again.
 
-When resolving `/conn/:connectionId`, Inspector reads the saved branch and schema preference for that connection and fetches
-the available schema hashes. If the remembered schema is unavailable, Inspector applies the schema selection policy and keeps
-the resolved context visible in the header. Runtime bootstrap can still fail if the server cannot return the schema or create
-the admin client.
+When resolving `/conn/:connectionId`, Inspector reads the saved branch and fetches the available schema hashes. A valid explicit
+`?schema=` value wins; otherwise Inspector selects the first advertised schema. A remembered schema is used only as a fallback
+when schema discovery fails. Runtime bootstrap can still fail if the server cannot return the schema or create the admin client.
 
 UI representation:
 
@@ -617,22 +612,19 @@ This flow **must answer**:
 | Expose schema context   | Column types, references, nullable/required state, permissions display         |
 | Edit existing rows      | Side-panel edits with validation and unsupported type handling                 |
 | Insert rows             | Required fields, defaults, validation, permission hints                        |
-| Delete rows             | Destructive confirmation with immediate undo through restore                   |
-| Show live row updates   | Highlight changed cells and rows without forcing a manual refresh              |
-| Row bookmarks           | Breakpoint-like row markers that help developers keep focus inside large pages |
+| Delete rows             | Destructive confirmation with reversible staged deletion before Apply          |
+| Show live row updates   | React to Jazz row changes without forcing a manual refresh                      |
 
 #### Tables navigator
 
-The Tables navigator is the entry point into table workspace items. It occupies the left dock when the Tables selector is
-active. It helps developers find the table they want to inspect without making the navigator selection the source of main
-workspace content.
+The Tables navigator is the entry point into table workspace items. It occupies the route-owned left pane when the application
+dock's Tables control opens it. It helps developers find the table they want to inspect.
 
 It answers:
 
 - What tables exist in the selected schema?
 - Which table is currently selected?
-- Which tables match the current search?
-- Is the table list empty because the schema has no tables, or because the search hides them?
+- Does the schema contain any tables?
 
 v1 keeps this surface simple. The table list is navigation, not a full schema browser. Deeper schema details live in a table
 Schema workspace item.
@@ -652,7 +644,7 @@ Selection rules
   - Toggle only the clicked item
   - Replace the anchor with that item
 - Shift-click with a valid visible anchor:
-  - Find anchor and target indices in filteredTables
+  - Find anchor and target indices in the visible table section
   - Take the inclusive range
   - Apply the target checkbox’s new state to the complete range
   - Preserve the original anchor so another Shift-click can extend the range
@@ -660,8 +652,6 @@ Selection rules
   - Treat it as a normal click and establish a new anchor
 - Shift-unchecking:
   - Uncheck the inclusive range
-- Search filtering:
-  - Operate only on visible items. Hidden tables should not change unexpectedly
 
 A ref is suitable for the anchor because changing it does not affect rendering. Checked names remain React state because they affect the UI and bulk commands.
 
@@ -679,43 +669,38 @@ Table workspace items follow this model:
 - one tab represents one workspace-item instance
 - a workspace item has an explicit resource and representation instead of inferring its meaning from its id
 - clicking a table in the Tables navigator opens or focuses its default unfiltered Data item
-- the same table can have several Data items when their filters differ
-- each Data item keeps its own filters and sorting
+- each table has one canonical Data item; filters, sorting, page, and page size update that item's route and stored search state
 - clicking a relation opens or focuses the referenced table's default unfiltered Data item
 - the Data toolbar can open or focus a Schema item for the same table
 - Schema uses a distinct item kind and icon; it is not encoded as Data search state
-- Query items share the same workspace tab system without becoming table tabs
 - equivalent open-item requests focus the existing item instead of creating indistinguishable duplicates
 - open items and recently opened items are persisted as workspace state scoped by connection, branch, and schema hash
 - the active content route is URL-backed without exposing tab identity
-- filters and sort are URL-backed for the active Data item and also saved in workspace state
+- filters, sort, page, and page size are URL-backed for the active Data item and also saved in workspace state
 - data-grid column state is saved per table
-- page index is memory-only and resets when table, filters, or sort changes
-- if a saved item or content route references a table missing from the selected schema, Inspector renders an unavailable-table
-  empty state, does not run table queries, and lets the user close the item or switch schema hash
+- saved items for tables missing from the selected schema are removed during workspace reconciliation
+- a content route for a table missing from the selected schema opens New View instead of running a table query
 
 State split:
 
-- URL: connection id, active resource, representation, shareable filters, shareable sort
-- localStorage: connection preferences, open workspace items, recent items, item state, pane layout, navigator state, saved
-  data-grid preferences
-- memory: pagination, transient selection, live update highlights, row editor focus
+- URL: connection id, schema hash, active table, representation, filters, sort, page, and page size
+- localStorage: connection preferences, open table items, recent table views, item search state, navigator state, and saved
+  data-grid order and visibility preferences
+- memory: transient row and cell selection, mutation ledgers, mutation feedback highlights, and row editor focus
 
 Do not add sessionStorage unless a specific table state needs to survive route navigation without surviving a browser restart.
 
-Workspace-item tab context menu:
+Workspace-item tab actions:
 
 - close
-- close other
-- close to right
-- close all
+- keep open when the active item is replaceable
 
 UI representation:
 
-- Surface: Tables panel inside the left dock.
+- Surface: Tables panel inside the route-owned left pane.
 - Primary controls: table selection, pinning, and bulk open.
 - Primary content: schema table names and active item relationships.
-- States: loading schema, no tables, active table unavailable, no open workspace item.
+- States: loading schema, no tables, and no open workspace item.
 
 #### Data table
 
@@ -723,12 +708,12 @@ Detailed row selection, cell selection, side-pane, column-selection, and bulk-ed
 [Table Explorer selection and pane behavior specification](./tableExplorerBehaviors.md). This document retains the product and
 architecture summary; the focused specification owns interaction scenarios and unresolved behavior decisions.
 
-The data table is the core product surface of the Data Explorer. It is read-first and record-oriented. `DataGrid` is the
+The data table is the core product surface of the Table Explorer. It is read-first and record-oriented. `DataGrid` is the
 consistent name for the reusable design-system renderer and table surface. `DataGrid` names the spreadsheet behavior layer for
 opening complete multi-cell selections, column operations, matrix copy and paste, bulk cell editing, and complete keyboard cell
 navigation.
 
-Most Data Explorer actions converge in the data table. It brings row reading, filtering, selection, relation navigation,
+Most Table Explorer actions converge in the data table. It brings row reading, filtering, selection, relation navigation,
 schema context, and safe edits into one coherent surface.
 
 The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspector rules.
@@ -771,7 +756,6 @@ Interaction state keeps these concepts separate:
 - selected cells resolve from ordered rectangular include and exclude operations against the displayed row and column order
 - selected rows are the checkbox-controlled, page-local bulk operation set
 - the focused row is the selected row represented by the row side pane
-- bookmarked rows are persistent developer reference points
 
 Selection, inline editing, side-pane presentation, and pending mutations are independent. A cell can be focused without opening
 an editor, a multi-cell selection can be assembled before the user chooses an operation, and pending changes can remain after an
@@ -820,8 +804,8 @@ selection identity.
 
 The table mutation provider owns draft orchestration and validation. The complete-row pane owns contextual deletion initiation and
 confirmation. The Floating widget projects mutation review, Apply, Discard, deletion review, and mutation failures. The pane and
-grid are editing projections of the provider state. Several rows and columns in one table can accumulate pending changes. Changing
-the mounted table identity resets its table-local in-memory state.
+grid are editing projections of the provider state. Several rows and columns in one table can accumulate pending changes. The
+Tables workspace owns table-scoped ledgers, so switching table views preserves unresolved state for each table.
 
 A focused cell receives the selected-cell background and blue focus border without changing its whole row background. A checked
 row uses the selected-row background without an additional row border. The focused checked row adds a distinct blue focus edge.
@@ -845,7 +829,7 @@ the uncommitted field input, preserves any previously staged value, and returns 
 Columns use schema-aware initial widths rather than one width for every value. Boolean and numeric columns start narrow; ids,
 relations, timestamps, text, and structured values receive progressively wider defaults. Header resize handles update TanStack
 column-sizing state within constrained minimum and maximum widths. A double-click on the handle resets the schema-derived
-width. Column sizing preferences are scoped to the active connection, branch, schema hash, and table.
+width. Resized widths remain in the mounted TanStack table state and reset when that table state is recreated.
 
 Data columns can be reordered by dragging their header horizontally. A short movement threshold preserves normal header clicks,
 and interactive header controls such as checkboxes, resize handles, and menu actions do not start dragging. TanStack column-order
@@ -875,8 +859,8 @@ UI representation:
 
 - Surface: main center table surface.
 - Primary controls: filters, pagination, row-size selector, refresh, insert row.
-- Primary content: rows, columns, active row/column/cell state, relation cells, checkbox selection, live update highlights, row bookmarks.
-- States: loading, no open Data item, empty table, filtered-empty table, unsupported field display, changed cells, inserted row, deleted row animation, stale live data.
+- Primary content: rows, columns, active row/column/cell state, relation cells, checkbox selection, and mutation feedback highlights.
+- States: loading, no open Data item, empty table, filtered-empty table, unsupported field display, recently applied cells, recently inserted rows, and stale live data.
 
 #### Column type rendering
 
@@ -1031,22 +1015,21 @@ Controls:
 
 - previous page
 - next page
-- page number input (not supported with current Jazz API)
 - rows per page
 
 Defaults:
 
 - default page size: 100 rows
 - page size options: 100, 500, 1000
-- default sort: deterministic latest-first row order when Jazz can express it, otherwise stable `id` order
-- page index: memory-only
-- page size: saved as a data-grid preference
+- default sort: stable `id` order
+- page and non-default page size: URL-backed and saved with the canonical Data item
 
-The page number input can jump to a known page by mapping `pageIndex` to `offset`. If the requested page has no rows, Inspector falls back to the nearest page with rows.
+If a requested page has no rows, Inspector returns to the first page.
 
 Avoid exact `Page X of Y` and exact record counts for v1 unless Jazz exposes a reliable count.
 
-Side-panel row focus is row-id based and can survive page changes. Checkbox selection is page-local and can clear when page, filters, or sort changes.
+Side-panel row focus is row-id based while its query scope remains active. Checkbox selection is page-local and clears when page,
+filters, or sort changes.
 
 #### Selection and row inspection
 
@@ -1090,7 +1073,7 @@ Leaving the active mutation scope requires the developer to resolve unresolved m
 
 #### Schema context inside the explorer
 
-The Data Explorer exposes enough schema context to explain what the user is looking at without forcing them to open raw
+The Table Explorer exposes enough schema context to explain what the user is looking at without forcing them to open raw
 schema JSON.
 
 Useful context includes:
@@ -1101,8 +1084,8 @@ Useful context includes:
 - permission hints when useful
 - primary identifier fields
 
-This context supports the current task. It does not overload the data table with schema details that belong in the Schema
-Inspector.
+This context supports the active task. It does not overload the data table with schema details that belong in the table Schema
+item.
 
 #### Filter builder
 
@@ -1112,13 +1095,8 @@ It validates and parses input before clauses are applied.
 
 Since the target audience is developers, I opt for a component that handles both click selection and manual typing.
 
-v1 keeps the existing generic filter query semantics and exposes two synchronized interfaces over one controlled filter model:
-
-- `DataGridFilterBuilder` sits below the workspace-item tabs and provides a command-style, keyboard-friendly experience
-- `DataGridFilterControl` sits in the Tables navigator and provides direct field and operator controls
-
-Both interfaces read and update the same URL-backed applied clauses. Adding, editing, or removing a clause in either interface
-updates the other. Switching the left dock away from Tables does not limit filtering because the builder remains available.
+v1 keeps the existing generic filter query semantics through `DataGridFilterBuilder`, which sits below the workspace-item tabs
+and provides a command-style, keyboard-friendly interface over one controlled filter model.
 
 The filter interface is a FilterBar: one search-like input that supports both typing and selection. The user can type a column name, pick suggestions, choose an operator, enter a value, and see the applied filter rendered as a compact editable token.
 
@@ -1130,11 +1108,11 @@ Supported operators:
 
 Operators are schema-gated by column type. Filter clauses combine as a flat `AND`. Each clause becomes a generic Jazz `.where(...)` condition; `eq` uses shorthand equality and other operators use explicit operator records.
 
-Filters are serialized as URL-backed tokens: `{ id, column, operator, value }`. Advanced query shapes remain out of scope. Query Subscription links into the Data Explorer only map filters Inspector can translate safely.
+Filters are serialized as URL-backed tokens: `{ id, column, operator, value }`. Advanced query shapes remain out of scope. Query Subscription links into the Table Explorer only map filters Inspector can translate safely.
 
 Applied clauses and in-progress input are separate states. Applied clauses are URL-backed. The current column, operator, raw
 value, completion stage, and validation issue are transient memory state. Cell context actions and Query Subscription links use
-the same schema-validation and filter actions as both visible filter interfaces.
+the same schema-validation and filter actions as the builder.
 
 Jazz does not expose generic count, distinct, group-by, aggregate min/max, or facet-count queries. Filter controls may use safe
 schema metadata such as enum variants, booleans, nullability, references, and stored types, but they do not present current-page
@@ -1142,7 +1120,7 @@ counts as table-wide facets.
 
 UI representation:
 
-- Surface: builder below the workspace-item tabs and direct controls in the Tables navigator.
+- Surface: builder below the workspace-item tabs.
 - Primary controls: type filter, choose column suggestion, choose operator, enter value, remove token, add filters.
 - Primary content: compact filter tokens and a trailing `Add filters...` input.
 - States: invalid value, unsupported operator for type, no filters, unsupported query mapping.
@@ -1224,7 +1202,8 @@ existing direct generic mutation boundary. Inspector does not promise atomic App
 
 Permissions are shown as debugging hints, not guarantees. The server/runtime response is authoritative.
 
-Inspector follows Jazz runtime behavior. The form is generated from stored schema metadata and writes through the generic Jazz runtime: `db.insert(...)`, `db.update(...)`, `db.delete(...)`, and `db.restore(...)` for immediate undo when available.
+Inspector follows Jazz runtime behavior. The form is generated from stored schema metadata and writes through the generic Jazz
+runtime: `db.insert(...)`, `db.update(...)`, and `db.delete(...)`.
 
 Inspector does not disable admin insert, update, or delete only from stored permissions. If a mutation fails, preserve input and show the rejection.
 
@@ -1265,7 +1244,8 @@ The row pane snapshots the checked rows for confirmation before staging them. Th
 Apply changes, a deletion is reversible by removing it from staged changes or by discarding the ledger.
 Permission hints remain advisory, and a server rejection keeps the unresolved operation visible.
 
-Undo can call `db.restore(...)` for the deleted row. Full deleted-row browsing with `includeDeleted()` is out of scope for v1.
+Before Apply, removing a staged deletion restores normal row interaction without writing to Jazz. Full deleted-row browsing with
+`includeDeleted()` and restoring an already persisted deletion are out of scope for v1.
 
 #### Unsupported table actions
 
@@ -1277,20 +1257,21 @@ Inspector also does not aim to support every Jazz query shape in the Table Explo
 
 #### Explicit live-update UX
 
-Jazz data can change while the developer is inspecting a table, either through new rows, updated rows, deletes, or applied Inspector changes.
+Jazz data can change while the developer is inspecting a table through new rows, updated rows, deletes, or applied Inspector
+changes.
 
 v1 makes live updates visible without forcing the user to refresh and lose context.
 
 Behavior:
 
-- highlight changed cells when a visible row value changes
-- highlight inserted rows when they enter the current page
-- animate deleted rows when the user deletes from the inspector
+- update visible rows reactively through the active Jazz query
+- highlight rows inserted through Inspector
+- highlight cells after Inspector applies an update
 - preserve the selected row and side panel when possible
 - avoid jumping scroll position or replacing the visible context unexpectedly
-- use the same changed-cell highlight after Inspector applies an update
 
-Highlights are ephemeral and brief.
+Mutation feedback highlights are ephemeral and brief. External Jazz updates refresh the represented rows without receiving a
+distinct changed-cell or inserted-row highlight.
 
 Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspector can unsubscribe by skipping a query, but freezing visible rows would require an inspector-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
 
@@ -1300,32 +1281,9 @@ reconcile and highlight changes when returning to `Live`. Jazz `Db.disconnect()`
 feature because they control remote synchronization for the whole database connection rather than one visible table, do not
 freeze local subscription updates, and can leave edge-durability mutations pending.
 
-#### Row bookmarks
-
-Large table pages need a way to keep visual focus while comparing distant rows.
-
-v1 supports row bookmarks, similar to editor debugging breakpoints. A developer can mark rows from the checkbox column by using a small dot affordance in the checkbox cell.
-
-Bookmarks render as horizontal row markers. They do not draw a vertical rail between two bookmarked rows.
-
-Rules:
-
-- bookmarks are UI-only and do not write to Jazz
-- bookmarks are scoped to connection, branch, schema hash, and table
-- bookmarks attach to row ids, not visible indexes
-- if filters hide a bookmarked row, it remains in the table bookmark list but is not drawn in the visible data table
-- the active table exposes a bookmark list for that table
-- the bookmark list can jump to, rename, and delete bookmarks
-- clicking the bookmark dot on a bookmarked row removes the bookmark
-- clicking a visible bookmark scrolls to the row
-- clicking a hidden bookmark opens a Data workspace item for the same table with an `id = bookmarkedRowId` FilterBar token so
-  the row becomes visible
-- live cell highlights and bookmarks coexist
-- dedicated keyboard handling for bookmarks is out of scope for v1
-
 #### Export and advanced copy
 
-Export is useful, but it is not core to the v1 Data Explorer.
+Export is useful, but it is not core to the v1 Table Explorer.
 
 Copy behavior supports immediate inspection needs first:
 
@@ -1339,9 +1297,9 @@ Full export can be revisited once reading, filtering, relation navigation, and e
 
 ### Query subscriptions telemetry
 
-Query Subscriptions telemetry helps developers understand which live queries their Jazz app is asking the sync server to maintain. It turns server-visible subscription snapshots into a readable debugging surface and links supported query shapes back to the Data Explorer.
+Query Subscriptions telemetry helps developers understand which live queries their Jazz app is asking the sync server to maintain. It turns server-visible subscription snapshots into a readable debugging surface and links supported query shapes back to the Table Explorer.
 
-Query Subscriptions only shows server-visible subscription snapshots. Local-only queries that never reach server telemetry, short-lived reads, wrong connection context, or telemetry failure can all explain an empty view. [Learn more](specs/query-subscriptions.md)
+Query Subscriptions only shows server-visible subscription snapshots. Local-only queries that never reach server telemetry, short-lived reads, wrong connection context, or telemetry failure can all explain an empty view. [Learn more](notes/query-subscriptions.md)
 
 This flow **must answer**:
 
@@ -1350,7 +1308,7 @@ This flow **must answer**:
 - Which query shapes are active?
 - How many active subscriptions share the same query shape?
 - Which branch and propagation context did the server report?
-- Can this query be opened in the Data Explorer?
+- Can this query be opened in the Table Explorer?
   - use the subscription’s table and supported query filters to open the matching table view, so the developer can inspect the rows behind the subscription.
 - Why is this view empty?
 
@@ -1402,7 +1360,7 @@ Practical meaning:
 
 If the app changes a filter, the query shape changes. The next snapshot shows the new query shape if it is active. The old query shape only remains visible if it is still active when the server snapshot is fetched.
 
-The Query Subscriptions view does not show returned row data. To inspect data, Inspector can open the Data Explorer on the subscription table and apply supported filters recovered from the query JSON.
+The Query Subscriptions view does not show returned row data. To inspect data, Inspector can open the Table Explorer on the subscription table and apply supported filters recovered from the query JSON.
 
 **Important fields**
 
@@ -1431,7 +1389,7 @@ The Query Subscriptions view does not show returned row data. To inspect data, I
 | Explain empty states               | Explain no active queries, local-only queries, short-lived reads, mismatched connection context, hidden inspector reads, and failed telemetry. |
 | Manual refresh                     | Keep auto-refresh and let the user refresh immediately.                                                                                        |
 | Auto-refresh control               | Let the user choose auto-refresh, paused, or refresh once.                                                                                     |
-| Open in Data Explorer              | Use the subscription table and supported query filters to open matching rows.                                                                  |
+| Open in Table Explorer             | Use the subscription table and supported query filters to open matching rows.                                                                  |
 
 It shows what the server is currently tracking.
 
@@ -1453,9 +1411,12 @@ The server renders grouped query records that include:
 - `branches`
 - `query`
 
-Polls the server for grouped active subscriptions and links them back into the Data Explorer when Inspector can safely map the query filters.
+Polls the server for grouped active subscriptions and links them back into the Table Explorer when Inspector can safely map the query filters.
 
 #### Queries navigator
+
+This section defines the Query Subscriptions feature architecture that replaces the separate placeholder route and extends the
+application dock and workspace model when implemented.
 
 The Queries selector activates a navigator in the left dock. Changing to this navigator does not replace the active workspace
 item. It lets the developer browse grouped subscription records and open one deliberately.
@@ -1474,7 +1435,7 @@ Optional columns:
 
 The snapshot `generatedAt` should live in the navigator toolbar because it belongs to the fetched snapshot, not to each row.
 
-`table` and returned `propagation` values can be navigator filters. `propagation`, `branches`, and Data Explorer links also
+`table` and returned `propagation` values can be navigator filters. `propagation`, `branches`, and Table Explorer links also
 appear in the opened Query item.
 
 Branch should not be a default filter while the header already scopes the workspace to a branch. If telemetry returns multiple
@@ -1508,7 +1469,7 @@ Metadata:
 - count
 - propagation
 - branches
-- whether the query can open in the Data Explorer
+- whether the query can open in the Table Explorer
 
 Summary section:
 
@@ -1556,7 +1517,7 @@ The `Raw JSON` tab should expose the original serialized query string with copy 
 UI representation:
 
 - Surface: Query workspace item in the main workspace.
-- Primary controls: Overview tab, Raw JSON tab, copy, open in Data Explorer.
+- Primary controls: Overview tab, Raw JSON tab, copy, open in Table Explorer.
 - Primary content: metadata, generated summary, structured query tree, raw JSON.
 - States: selected subscription, no selection, unsupported translation, stale snapshot.
 
@@ -1593,19 +1554,19 @@ v1 should support these Query Subscriptions scenarios:
 3. Developer notices a high `count` and checks whether several components subscribe to the same query shape.
 4. Developer selects a subscription and reads its overview without starting from raw JSON.
 5. Developer expands nested query fields like `disjuncts` or `relation_ir` in the structured query tree.
-6. Developer opens the matching Data Explorer table when Inspector can recover supported filters from the query JSON.
+6. Developer opens the matching Table Explorer table when Inspector can recover supported filters from the query JSON.
 7. Developer sees an empty view and understands possible causes instead of assuming the app has no reads.
 8. Developer pauses auto-refresh while inspecting a selected subscription, then refreshes once when ready.
 
-### Schema inspector
+### Table Schema item
 
-The Schema Inspector displays stored schema and permissions JSON in a readable developer format.
+The table Schema item displays the selected table's stored schema and permissions JSON in a readable developer format.
 
 v1 focus on improve syntax rendering, JSON readability.
 
 This interface **must answer**:
 
-- What schema did Inspector load?
+- What schema metadata did Inspector load for this table?
 - Which columns exist for this table?
 - What raw permissions metadata is available?
 - Is permission data missing, or did loading fail?
@@ -1624,9 +1585,9 @@ Data item into Schema search state. Data and Schema keep distinct item identitie
 UI representation:
 
 - Surface: table Schema workspace item.
-- Primary controls: search JSON, copy schema, copy permissions, return to or open the related Data item.
-- Primary content: stored schema JSON and stored permissions JSON.
-- States: loading schema, missing permissions, invalid JSON display fallback.
+- Primary controls: search JSON, expand or collapse, copy schema, and copy permissions.
+- Primary content: the selected table's stored schema JSON and stored permissions JSON.
+- States: loading schema and loading or missing permissions.
 
 ## Scenarios
 
@@ -1636,12 +1597,11 @@ UI representation:
 4. Developer double-clicks or presses Enter on a supported cell to edit it through the Floating widget without checking the row; relation and binary fields route to the complete-row pane.
 5. Developer accumulates pending updates and deletions for one table, reviews them together, and persists them through one Apply action.
 6. Developer follows a relation cell to inspect linked data in another Data workspace item without losing the original table context.
-7. Developer bookmarks rows in a large table, then jumps back to them after changing page or filter context.
-8. Developer sees live row changes while browsing and keeps selection context when possible.
-9. Developer opens Query Subscriptions after using the app and sees which server-visible query shapes are active.
-10. Developer changes an app filter and verifies that the active query shape changes in the next subscription snapshot.
-11. Developer sees an empty Query Subscriptions view and understands possible causes such as local-only queries, short-lived reads, wrong connection context, or telemetry failure.
-12. Developer opens a table Schema item from the Data toolbar to read and copy stored schema and permissions JSON.
+7. Developer sees live row changes while browsing and keeps selection context when possible.
+8. Developer opens Query Subscriptions after using the app and sees which server-visible query shapes are active.
+9. Developer changes an app filter and verifies that the active query shape changes in the next subscription snapshot.
+10. Developer sees an empty Query Subscriptions view and understands possible causes such as local-only queries, short-lived reads, wrong connection context, or telemetry failure.
+11. Developer opens a table Schema item from the Data toolbar to read and copy stored schema and permissions JSON.
 
 ### Inline editing and mutation scenarios
 
@@ -1657,7 +1617,8 @@ These scenarios define the Floating widget states and transitions:
 8. **Collapse and restore:** The centered dock trigger remains visible while the Floating widget is expanded or collapsed. Staged changes and invalid editor input survive collapse and are distinguishable when restored. Expanded disclosure points up and collapsed disclosure points right.
 9. **Insert row:** Insert opens the schema-driven pane. `Insert` persists directly, `Discard` closes without persistence, and `Insert more` resets and retains the pane after success.
 10. **Apply success:** Applying all staged changes clears row selection, closes the row pane, and removes the widget. Failures remain visible for retry.
-11. **Switch table:** Changing the mounted table identity resets its table-local staged state.
+11. **Switch table:** Changing the mounted table preserves each table's staged state in the workspace-owned ledger. Returning to
+    the table restores its staged changes and recoverable invalid input.
 12. **Multi-row actions:** Checking several rows exposes actions scoped to that selection, including confirming all selected rows as staged deletions.
 
 ## Product states
@@ -1671,22 +1632,19 @@ v1 should explicitly handle or acknowledge these states:
 - no schema hashes
 - schema fetch failure
 - permissions fetch failure
-- unavailable table from stale URL or saved workspace item
+- stale table URL or saved item sanitized into an available workspace state
 - no tables
 - empty table
 - filtered-empty table
 - invalid filter value
-- stale saved workspace item
 - pending table changes
 - invalid editor input that needs attention
 - Floating widget collapsed with retained state
 - reviewing mixed mutation kinds
 - applying changes
 - unsupported field type
-- changed cells
-- inserted row
-- deleted row animation
-- row bookmarks
+- recently applied cells
+- recently inserted row
 - mutation rejected
 - missing relation target
 - query subscription empty
@@ -1701,6 +1659,7 @@ Not v1:
 - full deleted-row browsing with `includeDeleted()`
 - exact total row counts unless Jazz exposes a reliable count API
 - advanced export
+- row bookmarks
 - snapshot history
 - query playground
 - traces, logs, and metrics
@@ -1717,14 +1676,15 @@ Not v1:
 
 ## Attack surface
 
-Not sure there is any, dev must run their local environment to access the inspector db.
+Inspector is a developer tool that stores admin credentials locally and can connect to arbitrary configured Jazz servers. Its
+main risks are credential exposure in browser storage or URLs and unintended transmission outside the configured server.
 
 - adminSecret is sensitive and must not be logged.
 - Connections are stored locally.
-- Local-dev prefill can pass credentials through URL hash/search and should stay local-dev only.
+- Connection prefill can pass credentials through URL hash or query parameters; fragments avoid including them in the page request.
 - Inspector should avoid sending credentials anywhere except the configured Jazz server.
 - Saved connections do not persist schema payloads.
-- This is a developer tool, not an internet-facing admin console.
+- Inspector does not provide application authentication or hosting access control.
 
 ---
 
