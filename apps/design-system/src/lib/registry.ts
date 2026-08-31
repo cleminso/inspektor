@@ -490,6 +490,20 @@ export const dataGridItem = {
   componentId: 'dataGrid',
 } satisfies NavItem
 
+export const swimlaneTimelineItem = {
+  title: 'Swimlane Timeline',
+  slug: 'swimlane-timeline',
+  href: '/components/swimlane-timeline',
+  description:
+    'Composable activity tracks aligned to shared snapshot columns in a collapsible native table.',
+  importPath: '@inspector/ds',
+  source: {
+    label: 'swimlaneTimeline.tsx',
+    path: 'packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx',
+  },
+  componentId: 'swimlaneTimeline',
+} satisfies NavItem
+
 export const jsonViewItem = {
   title: 'JSON View',
   slug: 'json-view',
@@ -697,6 +711,7 @@ const componentItems: NavItem[] = [
   selectItem,
   spinnerItem,
   structuredValuePreviewItem,
+  swimlaneTimelineItem,
   switchItem,
   timestampValueItem,
   toastItem,

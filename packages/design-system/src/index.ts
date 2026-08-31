@@ -67,6 +67,16 @@ export type {
   DataGridTableProps,
   DataGridViewportProps,
 } from './components/dataGrid/dataGrid'
+export { SwimlaneTimeline } from './components/swimlaneTimeline/swimlaneTimeline'
+export type {
+  SwimlaneTimelineCellProps,
+  SwimlaneTimelineCellStatus,
+  SwimlaneTimelineHeaderProps,
+  SwimlaneTimelineLaneProps,
+  SwimlaneTimelineLaneTriggerProps,
+  SwimlaneTimelineRootProps,
+  SwimlaneTimelineTrackProps,
+} from './components/swimlaneTimeline/swimlaneTimeline'
 export { Box } from './components/box/box'
 export type { BoxProps } from './components/box/box'
 export { Badge } from './components/badge/badge'

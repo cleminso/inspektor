@@ -3975,6 +3975,179 @@
       }
     }
   ],
+  "swimlaneTimeline.root": [
+    {
+      "name": "aria-label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the timeline table.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 18
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Timeline header and composed lanes.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 20
+      }
+    }
+  ],
+  "swimlaneTimeline.header": [
+    {
+      "name": "label",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Heading for the fixed label column.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 25
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Snapshot headings in chronological order.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 27
+      }
+    }
+  ],
+  "swimlaneTimeline.lane": [
+    {
+      "name": "defaultExpanded",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "true",
+      "description": "Whether the lane is expanded when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "expanded",
+      "type": "false | true",
+      "required": false,
+      "description": "Controlled lane expansion state.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 34
+      }
+    },
+    {
+      "name": "onExpandedChange",
+      "type": "(expanded: boolean) => void",
+      "required": false,
+      "description": "Runs when the lane expansion state changes.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 36
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "One lane trigger followed by its tracks.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 38
+      }
+    }
+  ],
+  "swimlaneTimeline.laneTrigger": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Lane heading.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 43
+      }
+    },
+    {
+      "name": "suffix",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional metadata aligned opposite the heading.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 45
+      }
+    }
+  ],
+  "swimlaneTimeline.track": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Complete opaque identifier used for the accessible name and tooltip.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 50
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "One cell for every snapshot heading.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 52
+      }
+    }
+  ],
+  "swimlaneTimeline.cell": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible description of this snapshot cell.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 59
+      }
+    },
+    {
+      "name": "status",
+      "type": "\"active\" | \"inactive\" | \"unknown\"",
+      "required": true,
+      "description": "Marks a snapshot containing activity.\nMarks a snapshot as inactive or unavailable.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 64
+      }
+    },
+    {
+      "name": "selected",
+      "type": "false | true",
+      "required": false,
+      "description": "Marks this active snapshot as selected.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 66
+      }
+    },
+    {
+      "name": "onActivate",
+      "type": "() => void",
+      "required": false,
+      "description": "Runs when the active snapshot is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
+        "line": 68
+      }
+    }
+  ],
   "tooltip.provider": [
     {
       "name": "delay",

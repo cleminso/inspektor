@@ -182,6 +182,12 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...['Root', 'Header', 'Lane', 'LaneTrigger', 'Track', 'Cell'].map((part) => ({
+    componentId: `swimlaneTimeline.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: 'SwimlaneTimeline',
+    part,
+    inheritedProps: [],
+  })),
   ...['Provider', 'Root', 'Trigger', 'Content'].map((part) => ({
     componentId: `tooltip.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: 'Tooltip',

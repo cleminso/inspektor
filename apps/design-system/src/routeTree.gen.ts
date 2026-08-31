@@ -48,6 +48,7 @@ import { Route as ComponentsSelectRouteImport } from './routes/components/select
 import { Route as ComponentsSidePanelRouteImport } from './routes/components/side-panel'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
 import { Route as ComponentsStructuredValuePreviewRouteImport } from './routes/components/structured-value-preview'
+import { Route as ComponentsSwimlaneTimelineRouteImport } from './routes/components/swimlane-timeline'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
@@ -259,6 +260,12 @@ const ComponentsStructuredValuePreviewRoute =
     path: '/components/structured-value-preview',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ComponentsSwimlaneTimelineRoute =
+  ComponentsSwimlaneTimelineRouteImport.update({
+    id: '/components/swimlane-timeline',
+    path: '/components/swimlane-timeline',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
   id: '/components/switch',
   path: '/components/switch',
@@ -356,6 +363,7 @@ export interface FileRoutesByFullPath {
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
+  '/components/swimlane-timeline': typeof ComponentsSwimlaneTimelineRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
@@ -408,6 +416,7 @@ export interface FileRoutesByTo {
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
+  '/components/swimlane-timeline': typeof ComponentsSwimlaneTimelineRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
@@ -461,6 +470,7 @@ export interface FileRoutesById {
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
+  '/components/swimlane-timeline': typeof ComponentsSwimlaneTimelineRoute
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
@@ -515,6 +525,7 @@ export interface FileRouteTypes {
     | '/components/side-panel'
     | '/components/spinner'
     | '/components/structured-value-preview'
+    | '/components/swimlane-timeline'
     | '/components/switch'
     | '/components/text-field'
     | '/components/text-link'
@@ -567,6 +578,7 @@ export interface FileRouteTypes {
     | '/components/side-panel'
     | '/components/spinner'
     | '/components/structured-value-preview'
+    | '/components/swimlane-timeline'
     | '/components/switch'
     | '/components/text-field'
     | '/components/text-link'
@@ -619,6 +631,7 @@ export interface FileRouteTypes {
     | '/components/side-panel'
     | '/components/spinner'
     | '/components/structured-value-preview'
+    | '/components/swimlane-timeline'
     | '/components/switch'
     | '/components/text-field'
     | '/components/text-link'
@@ -672,6 +685,7 @@ export interface RootRouteChildren {
   ComponentsSidePanelRoute: typeof ComponentsSidePanelRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
   ComponentsStructuredValuePreviewRoute: typeof ComponentsStructuredValuePreviewRoute
+  ComponentsSwimlaneTimelineRoute: typeof ComponentsSwimlaneTimelineRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
@@ -960,6 +974,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsStructuredValuePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/swimlane-timeline': {
+      id: '/components/swimlane-timeline'
+      path: '/components/swimlane-timeline'
+      fullPath: '/components/swimlane-timeline'
+      preLoaderRoute: typeof ComponentsSwimlaneTimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/switch': {
       id: '/components/switch'
       path: '/components/switch'
@@ -1080,6 +1101,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsSidePanelRoute: ComponentsSidePanelRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
   ComponentsStructuredValuePreviewRoute: ComponentsStructuredValuePreviewRoute,
+  ComponentsSwimlaneTimelineRoute: ComponentsSwimlaneTimelineRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextLinkRoute: ComponentsTextLinkRoute,
