@@ -7,8 +7,10 @@ import { borderRadii, spacing } from '../../tokens/value.stylex'
 export const resizablePanelStyles = stylex.create({
   group: {
     outlineStyle: 'none',
+    height: '100%',
     minHeight: 0,
     minWidth: 0,
+    width: '100%',
   },
   panel: {
     overflow: 'hidden',
@@ -31,6 +33,11 @@ export const resizablePanelStyles = stylex.create({
       ':is([data-disabled])': textColors.disabled,
       ':not([data-disabled]):hover': borderColors.strong,
       ':not([data-disabled]):is([data-separator="active"])': borderColors.strong,
+    },
+    cursor: {
+      default: 'col-resize',
+      ':is([aria-orientation="horizontal"])': 'row-resize',
+      ':is([data-disabled])': 'default',
     },
     display: 'flex',
     justifyContent: 'center',
