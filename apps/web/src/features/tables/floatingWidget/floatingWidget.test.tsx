@@ -4,7 +4,10 @@ import { useState, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
-import { InspectorDockCenterProvider, InspectorDockCenterSlot } from '@app/shell/dock/centerSlot'
+import {
+  InspectorFooterCenterProvider,
+  InspectorFooterCenterSlot,
+} from '@app/shell/footer/centerSlot'
 import FieldEditorMutationWidget from '@tables/floatingWidget/fieldEditorMutationWidget'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import {
@@ -285,12 +288,12 @@ describe('TableMutationWidget', () => {
 
   function renderReview(operationCount?: number): void {
     render(
-      <InspectorDockCenterProvider>
+      <InspectorFooterCenterProvider>
         <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
           <ReviewHarness operationCount={operationCount} />
-          <InspectorDockCenterSlot />
+          <InspectorFooterCenterSlot />
         </TestLedgerProvider>
-      </InspectorDockCenterProvider>,
+      </InspectorFooterCenterProvider>,
     )
     fireEvent.click(screen.getByRole('button', { name: 'Stage review' }))
     fireEvent.click(screen.getByRole('button', { name: 'Review changes' }))
@@ -320,12 +323,12 @@ describe('TableMutationWidget', () => {
 
   it('requires correction when a draft has only invalid input', () => {
     render(
-      <InspectorDockCenterProvider>
+      <InspectorFooterCenterProvider>
         <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
           <ReviewHarness />
-          <InspectorDockCenterSlot />
+          <InspectorFooterCenterSlot />
         </TestLedgerProvider>
-      </InspectorDockCenterProvider>,
+      </InspectorFooterCenterProvider>,
     )
     fireEvent.click(screen.getByRole('button', { name: 'Stage invalid' }))
 
@@ -371,12 +374,12 @@ describe('TableMutationWidget', () => {
       )
     }
     render(
-      <InspectorDockCenterProvider>
+      <InspectorFooterCenterProvider>
         <TestLedgerProvider schemaColumns={[]}>
           <DeletionHarness />
-          <InspectorDockCenterSlot />
+          <InspectorFooterCenterSlot />
         </TestLedgerProvider>
-      </InspectorDockCenterProvider>,
+      </InspectorFooterCenterProvider>,
     )
 
     expect(screen.queryByRole('button', { name: 'Staged changes' })).toBeNull()

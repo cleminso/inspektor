@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react'
+import { ShellLayout } from '@inspector/ds'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
@@ -9,8 +10,8 @@ vi.mock('./header/view', () => ({
   InspectorHeader: () => <header>Header</header>,
 }))
 
-vi.mock('./dock/view', () => ({
-  InspectorDock: () => null,
+vi.mock('./footer/view', () => ({
+  InspectorFooter: () => null,
 }))
 
 afterEach(cleanup)
@@ -19,7 +20,9 @@ function renderLayout(): ReturnType<typeof render> {
   return render(
     <AppHotkeysProvider>
       <InspectorLayout pageTitle="Tables">
-        <div>Content</div>
+        <ShellLayout.Body>
+          <ShellLayout.View>Content</ShellLayout.View>
+        </ShellLayout.Body>
       </InspectorLayout>
     </AppHotkeysProvider>,
   )

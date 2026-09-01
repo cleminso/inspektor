@@ -3,7 +3,7 @@ import { ChevronRight, ChevronUp } from 'lucide-react'
 
 import { Accordion, Box, Button, FloatingPanel, Text } from '@inspector/ds'
 
-import { InspectorDockCenterPortal } from '@app/shell/dock/centerSlot'
+import { InspectorFooterCenterPortal } from '@app/shell/footer/centerSlot'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'
 import type { TableMutationReviewOperation } from '@tables/mutationLedger/ledger'
 import { useTableMutationLedger } from '@tables/mutationLedger/provider'
@@ -248,7 +248,7 @@ export function TableMutationWidget({
 
   return (
     <>
-      <InspectorDockCenterPortal>
+      <InspectorFooterCenterPortal>
         <Button
           aria-controls={contentId}
           aria-expanded={expanded}
@@ -269,7 +269,7 @@ export function TableMutationWidget({
         >
           {label}
         </Button>
-      </InspectorDockCenterPortal>
+      </InspectorFooterCenterPortal>
       {expanded === false ? null : (
         <FloatingPanel.Root aria-label="Staged changes">
           <FloatingPanel.Content

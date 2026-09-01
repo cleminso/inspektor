@@ -1,4 +1,12 @@
-import { Box, Button, ButtonLink, Icon, KeyboardInput, Tooltip } from '@inspector/ds'
+import {
+  Box,
+  Button,
+  ButtonLink,
+  Icon,
+  KeyboardInput,
+  Tooltip,
+  useShellLayout,
+} from '@inspector/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 import { Link, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 import { Rss, Search } from 'lucide-react'
@@ -7,10 +15,9 @@ import { appHotkeyOptions, runAppHotkey } from '@app/hotkeys/appHotkeys'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { appRoutes } from '@app/routing/appRoutes'
-import { useSidePanelLayout } from '@tables/tableList/layout'
-import { InspectorDockCenterSlot } from './centerSlot'
+import { InspectorFooterCenterSlot } from './centerSlot'
 
-interface InspectorDockProps {
+interface InspectorFooterProps {
   onOpenCommands: () => void
 }
 
@@ -71,10 +78,10 @@ function WorkspaceDockControl({
   )
 }
 
-export function InspectorDock({ onOpenCommands }: InspectorDockProps): React.ReactElement {
+export function InspectorFooter({ onOpenCommands }: InspectorFooterProps): React.ReactElement {
   const { connectionId } = useParams({ from: appRoutes.connection })
   const navigate = useNavigate()
-  const { isOpen, toggle } = useSidePanelLayout()
+  const { isOpen, toggle } = useShellLayout().leftDock
   const isQueriesActive = useRouterState({
     select: (state) => state.location.pathname.endsWith('/queries'),
   })
@@ -179,7 +186,7 @@ export function InspectorDock({ onOpenCommands }: InspectorDockProps): React.Rea
         alignItems="center"
         justifyContent="center"
       >
-        <InspectorDockCenterSlot />
+        <InspectorFooterCenterSlot />
       </Box>
       <Box
         minWidth={0}

@@ -1,5 +1,5 @@
 import { act, cleanup, render } from '@testing-library/react'
-import type { ReactNode } from 'react'
+import { Fragment } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TableExplorerScreen } from '@tables/view'
@@ -59,15 +59,13 @@ vi.mock('@tables/tableList/pane', () => ({
   },
 }))
 
-vi.mock('@tables/tableList/layout', () => {
-  const LayoutPart = ({ children }: { children: ReactNode }) => <>{children}</>
-  return {
-    SidePanelLayout: Object.assign(LayoutPart, {
-      Content: LayoutPart,
-      Panel: LayoutPart,
-    }),
-  }
-})
+vi.mock('@inspector/ds', () => ({
+  ShellLayout: {
+    Body: Fragment,
+    LeftDock: Fragment,
+    View: Fragment,
+  },
+}))
 
 vi.mock('@tables/tableList/pins', () => ({
   loadPinnedTableNames,

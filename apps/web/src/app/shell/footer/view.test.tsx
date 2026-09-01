@@ -12,43 +12,47 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
 
-import { InspectorDock } from './view'
+import { InspectorFooter } from './view'
 
-const sidePanel = vi.hoisted(() => ({
+const leftDock = vi.hoisted(() => ({
   isOpen: true,
   toggle: vi.fn(),
 }))
 
-vi.mock('@tables/tableList/layout', () => ({
-  useSidePanelLayout: () => sidePanel,
+vi.mock('@inspector/ds', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@inspector/ds')>()),
+  useShellLayout: () => ({
+    leftDock,
+    rightDock: { isOpen: false, toggle: vi.fn() },
+  }),
 }))
 
 afterEach(() => {
   cleanup()
-  sidePanel.isOpen = true
-  sidePanel.toggle.mockReset()
+  leftDock.isOpen = true
+  leftDock.toggle.mockReset()
 })
 
-async function renderDock(onOpenCommands = () => undefined) {
+async function renderFooter(onOpenCommands = () => undefined) {
   const rootRoute = createRootRoute({ component: Outlet })
   const connectionRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: 'conn/$connectionId',
     component: Outlet,
   })
-  const dockRoute = createRoute({
+  const tablesRoute = createRoute({
     getParentRoute: () => connectionRoute,
     path: 'tables',
-    component: () => <InspectorDock onOpenCommands={onOpenCommands} />,
+    component: () => <InspectorFooter onOpenCommands={onOpenCommands} />,
   })
   const queriesRoute = createRoute({
     getParentRoute: () => connectionRoute,
     path: 'queries',
-    component: () => <InspectorDock onOpenCommands={onOpenCommands} />,
+    component: () => <InspectorFooter onOpenCommands={onOpenCommands} />,
   })
   const router = createRouter({
     history: createMemoryHistory({ initialEntries: ['/conn/connection-1/tables'] }),
-    routeTree: rootRoute.addChildren([connectionRoute.addChildren([dockRoute, queriesRoute])]),
+    routeTree: rootRoute.addChildren([connectionRoute.addChildren([tablesRoute, queriesRoute])]),
   })
 
   await router.load()
@@ -62,9 +66,9 @@ async function renderDock(onOpenCommands = () => undefined) {
   return router
 }
 
-describe('InspectorDock', () => {
+describe('InspectorFooter', () => {
   it('switches the active dock icon without closing the left dock', async () => {
-    const router = await renderDock()
+    const router = await renderFooter()
     const tablesLink = screen.getByRole('link', { name: 'Close tables' })
     const queriesLink = screen.getByRole('link', { name: 'Open subscriptions' })
 
@@ -77,14 +81,14 @@ describe('InspectorDock', () => {
     expect(
       screen.getByRole('link', { name: 'Close subscriptions' }).getAttribute('aria-current'),
     ).toBe('page')
-    expect(sidePanel.toggle).not.toHaveBeenCalled()
+    expect(leftDock.toggle).not.toHaveBeenCalled()
   })
 
   it.each([
     ['Close tables', /B/u],
     ['Open subscriptions', /Q/u],
   ])('shows the shortcut for %s', async (label, shortcut) => {
-    await renderDock()
+    await renderFooter()
 
     fireEvent.mouseEnter(screen.getByRole('link', { name: label }))
 
@@ -96,25 +100,25 @@ describe('InspectorDock', () => {
   })
 
   it('toggles the left dock with the shared shortcut', async () => {
-    await renderDock()
+    await renderFooter()
 
     fireEvent.keyDown(document.body, { key: 'b', ctrlKey: true })
 
-    expect(sidePanel.toggle).toHaveBeenCalledOnce()
+    expect(leftDock.toggle).toHaveBeenCalledOnce()
   })
 
   it('switches dock icons with their individual shortcuts', async () => {
-    const router = await renderDock()
+    const router = await renderFooter()
 
     fireEvent.keyDown(document.body, { key: 'q', altKey: true })
 
     await expect.poll(() => router.state.location.pathname).toBe('/conn/connection-1/queries')
-    expect(sidePanel.toggle).not.toHaveBeenCalled()
+    expect(leftDock.toggle).not.toHaveBeenCalled()
   })
 
   it('opens the command palette from the command action', async () => {
     const onOpenCommands = vi.fn()
-    await renderDock(onOpenCommands)
+    await renderFooter(onOpenCommands)
 
     fireEvent.click(screen.getByRole('button', { name: 'Open commands' }))
 

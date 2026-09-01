@@ -57,6 +57,10 @@ test('opens, closes, and switches the left dock', async ({ page }) => {
   await page.getByRole('link', { name: 'Open subscriptions' }).click()
   await expect(page).toHaveURL(/\/queries$/u)
   await expect(resizeHandle).toBeVisible()
+  await resizeHandle.hover()
+  await expect
+    .poll(() => resizeHandle.evaluate((element) => getComputedStyle(element).cursor))
+    .not.toBe('auto')
   await page.getByRole('link', { name: 'Close subscriptions' }).click()
   await expect(resizeHandle).toBeHidden()
 

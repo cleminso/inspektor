@@ -12,7 +12,6 @@ import {
 } from '@app/routing/inspectorNavigation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
-import { SidePanelLayoutProvider } from '@tables/tableList/layout'
 
 import { ConnectionRouteError, ConnectionRoutePending } from './-connectionRouteStatus'
 
@@ -75,11 +74,9 @@ function InspectorRuntimeRoute(): React.ReactElement {
 
   return (
     <InspectorRuntimeBoundary target={target}>
-      <SidePanelLayoutProvider>
-        <InspectorLayout pageTitle={pageTitle}>
-          <Outlet />
-        </InspectorLayout>
-      </SidePanelLayoutProvider>
+      <InspectorLayout pageTitle={pageTitle}>
+        <Outlet />
+      </InspectorLayout>
     </InspectorRuntimeBoundary>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { ShellLayout } from '@inspector/ds'
 import { useSearch } from '@tanstack/react-router'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
@@ -7,7 +8,6 @@ import {
   type TableCheckedChangeOptions,
   type TableListSection,
 } from '@tables/tableList/pane'
-import { SidePanelLayout } from '@tables/tableList/layout'
 import { updateTableNameSelection } from '@tables/tableList/selection'
 import {
   loadPinnedTableNames,
@@ -117,8 +117,8 @@ export function TableExplorerScreen(): React.ReactElement {
   }
 
   return (
-    <SidePanelLayout>
-      <SidePanelLayout.Panel>
+    <ShellLayout.Body>
+      <ShellLayout.LeftDock>
         <TableListPane
           checkedTableNames={checkedTableNames}
           isSchemaReady={isSchemaReady}
@@ -134,14 +134,14 @@ export function TableExplorerScreen(): React.ReactElement {
           onTableCheckedChange={handleTableCheckedChange}
           onUnpinTables={(tableNames) => handlePinnedTablesChange(tableNames, false)}
         />
-      </SidePanelLayout.Panel>
-      <SidePanelLayout.Content>
+      </ShellLayout.LeftDock>
+      <ShellLayout.View>
         <TableTabsView
           connectionEntryPending={connectionEntryPending}
           tableName={currentTableName}
           view={currentView}
         />
-      </SidePanelLayout.Content>
-    </SidePanelLayout>
+      </ShellLayout.View>
+    </ShellLayout.Body>
   )
 }
