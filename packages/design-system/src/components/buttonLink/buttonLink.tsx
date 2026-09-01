@@ -74,12 +74,13 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(functio
 ) {
   const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const layoutOptions = buttonLayoutOptions[layout]
+  const isCurrent = props['aria-current'] === 'page'
   const styleProps = stylex.props(
     ...getButtonVisualStyles({
       variant,
       size,
       square: iconOnly,
-      pressed: false,
+      pressed: isCurrent,
       radius,
       fill: layoutOptions.fill,
       alignment: layoutOptions.alignment,

@@ -4,7 +4,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
 import { TableHotkeys } from '@tables/workspace/tableHotkeys'
 
-const toggle = vi.hoisted(() => vi.fn())
 const openNewView = vi.hoisted(() => vi.fn())
 const closeTab = vi.hoisted(() => vi.fn())
 const goBack = vi.hoisted(() => vi.fn())
@@ -14,10 +13,6 @@ const tableHotkeyState = vi.hoisted(() => ({
   canGoBack: true,
   canGoForward: true,
   tabs: [{ id: 'accounts', kind: 'table' }] as Array<{ id: string; kind: 'newView' | 'table' }>,
-}))
-
-vi.mock('@tables/tableList/layout', () => ({
-  useSidePanelLayout: () => ({ toggle }),
 }))
 
 vi.mock('@tables/workspace/tabsProvider', () => ({
@@ -55,13 +50,11 @@ describe('TableHotkeys', () => {
       </AppHotkeysProvider>,
     )
 
-    fireEvent.keyDown(document, { key: 'b', ctrlKey: true })
     fireEvent.keyDown(document, { altKey: true, key: 'n' })
     fireEvent.keyDown(document, { altKey: true, key: 'w' })
     fireEvent.keyDown(document, { altKey: true, key: '[' })
     fireEvent.keyDown(document, { altKey: true, key: ']' })
 
-    expect(toggle).toHaveBeenCalledTimes(1)
     expect(openNewView).toHaveBeenCalledTimes(1)
     expect(closeTab).toHaveBeenCalledWith('accounts')
     expect(goBack).toHaveBeenCalledTimes(1)
@@ -77,11 +70,9 @@ describe('TableHotkeys', () => {
     )
 
     const input = screen.getByRole('textbox', { name: 'Cell editor' })
-    fireEvent.keyDown(input, { key: 'b', ctrlKey: true })
     fireEvent.keyDown(input, { altKey: true, key: 'n' })
     fireEvent.keyDown(input, { altKey: true, key: 'w' })
 
-    expect(toggle).not.toHaveBeenCalled()
     expect(openNewView).not.toHaveBeenCalled()
     expect(closeTab).not.toHaveBeenCalled()
   })

@@ -17,7 +17,8 @@ import {
 import { useHotkey } from '@tanstack/react-hotkeys'
 
 import {
-  isAppHotkeyInteractionLayer,
+  appHotkeyOptions,
+  runAppHotkey,
   useAppCommands,
   type AppCommand,
 } from '@app/hotkeys/appHotkeys'
@@ -194,6 +195,7 @@ function TableViewContent({
 
   const { openSchemaView } = useTableTabs()
   const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)
+  const gridHotkeyOptions = { ...appHotkeyOptions, target: gridHotkeyTargetRef }
   const mutationApplying = mutations.execution.status === 'applying'
   const canOpenInsert = state.canOpenRowEditor === true && mutationApplying === false
   useEffect(() => {
@@ -385,12 +387,7 @@ function TableViewContent({
       event.stopPropagation()
       void handleCopyCell(target)
     },
-    {
-      ignoreInputs: true,
-      preventDefault: false,
-      stopPropagation: false,
-      target: gridHotkeyTargetRef,
-    },
+    gridHotkeyOptions,
   )
   useHotkey(
     appHotkeys.previousTablePage,
@@ -404,12 +401,7 @@ function TableViewContent({
         setPage(page - 1)
       }
     },
-    {
-      ignoreInputs: true,
-      preventDefault: false,
-      stopPropagation: false,
-      target: gridHotkeyTargetRef,
-    },
+    gridHotkeyOptions,
   )
   useHotkey(
     appHotkeys.nextTablePage,
@@ -423,12 +415,7 @@ function TableViewContent({
         setPage(page + 1)
       }
     },
-    {
-      ignoreInputs: true,
-      preventDefault: false,
-      stopPropagation: false,
-      target: gridHotkeyTargetRef,
-    },
+    gridHotkeyOptions,
   )
   const { canOpenRowEditor, closeRowEditor, detailPaneMode, rowEditor } = state
   const { openInsert } = rowEditor
@@ -449,24 +436,8 @@ function TableViewContent({
   }, [canOpenRowEditor, closeRowEditor, detailPaneMode, mutationApplying, openInsertPane])
   useHotkey(
     appHotkeys.insertRow,
-    (event) => {
-      if (
-        event.defaultPrevented === true ||
-        event.isComposing === true ||
-        event.repeat === true ||
-        isAppHotkeyInteractionLayer(event.target)
-      ) {
-        return
-      }
-      event.preventDefault()
-      event.stopPropagation()
-      toggleInsertPane()
-    },
-    {
-      ignoreInputs: true,
-      preventDefault: false,
-      stopPropagation: false,
-    },
+    (event) => runAppHotkey(event, toggleInsertPane),
+    appHotkeyOptions,
   )
   const commands = useMemo<readonly AppCommand[]>(
     () => [

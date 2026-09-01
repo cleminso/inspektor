@@ -9,6 +9,10 @@ vi.mock('./header/view', () => ({
   InspectorHeader: () => <header>Header</header>,
 }))
 
+vi.mock('./dock/view', () => ({
+  InspectorDock: () => null,
+}))
+
 afterEach(cleanup)
 
 function renderLayout(): ReturnType<typeof render> {

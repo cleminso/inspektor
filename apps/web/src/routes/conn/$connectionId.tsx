@@ -1,10 +1,18 @@
-import { Outlet, createFileRoute, redirect, retainSearchParams } from '@tanstack/react-router'
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  retainSearchParams,
+  useRouterState,
+} from '@tanstack/react-router'
 
 import {
   redirectToConnections,
   resolveStoredTablesNavigationTarget,
 } from '@app/routing/inspectorNavigation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
+import { InspectorLayout } from '@app/shell/layout'
+import { SidePanelLayoutProvider } from '@tables/tableList/layout'
 
 import { ConnectionRouteError, ConnectionRoutePending } from './-connectionRouteStatus'
 
@@ -60,10 +68,18 @@ export const Route = createFileRoute('/conn/$connectionId')({
 
 function InspectorRuntimeRoute(): React.ReactElement {
   const target = Route.useLoaderData()
+  const pageTitle = useRouterState({
+    select: (state) =>
+      state.location.pathname.endsWith('/queries') ? 'Query subscriptions' : 'Tables',
+  })
 
   return (
     <InspectorRuntimeBoundary target={target}>
-      <Outlet />
+      <SidePanelLayoutProvider>
+        <InspectorLayout pageTitle={pageTitle}>
+          <Outlet />
+        </InspectorLayout>
+      </SidePanelLayoutProvider>
     </InspectorRuntimeBoundary>
   )
 }

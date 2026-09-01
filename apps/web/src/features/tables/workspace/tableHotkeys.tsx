@@ -2,86 +2,55 @@ import { useHotkey } from '@tanstack/react-hotkeys'
 import { useMemo } from 'react'
 
 import {
-  isAppHotkeyInteractionLayer,
+  appHotkeyOptions,
+  runAppHotkey,
   useAppCommands,
   type AppCommand,
 } from '@app/hotkeys/appHotkeys'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
-import { useSidePanelLayout } from '@tables/tableList/layout'
 import { useTableNavigationControls } from '@tables/workspace/navigationHistory'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 
-const workspaceHotkeyOptions = {
-  ignoreInputs: true,
-  preventDefault: false,
-  stopPropagation: false,
-} as const
-
-/** Runs a one-shot workspace command only when no focused interaction owns the keyboard event. */
-function runWorkspaceHotkey(event: KeyboardEvent, command: () => void): void {
-  if (
-    event.defaultPrevented === true ||
-    event.isComposing === true ||
-    event.repeat === true ||
-    isAppHotkeyInteractionLayer(event.target)
-  ) {
-    return
-  }
-  event.preventDefault()
-  event.stopPropagation()
-  command()
-}
-
 export function TableHotkeys(): null {
-  const { toggle } = useSidePanelLayout()
   const { activeTabId, closeTab, openNewView, tabs } = useTableTabs()
   const { canGoBack, canGoForward, goBack, goForward } = useTableNavigationControls()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
   const canCloseActiveTab =
     activeTab !== undefined && (activeTab.kind !== 'newView' || tabs.length > 1)
 
-  useHotkey(
-    appHotkeys.toggleTableNavigator,
-    (event) => runWorkspaceHotkey(event, toggle),
-    workspaceHotkeyOptions,
-  )
-  useHotkey(
-    appHotkeys.openTableView,
-    (event) => runWorkspaceHotkey(event, openNewView),
-    workspaceHotkeyOptions,
-  )
+  useHotkey(appHotkeys.openTableView, (event) => runAppHotkey(event, openNewView), appHotkeyOptions)
   useHotkey(
     appHotkeys.closeTableView,
     (event) => {
-      runWorkspaceHotkey(event, () => {
+      runAppHotkey(event, () => {
         if (canCloseActiveTab === true && activeTabId !== null) {
           closeTab(activeTabId)
         }
       })
     },
-    workspaceHotkeyOptions,
+    appHotkeyOptions,
   )
   useHotkey(
     appHotkeys.goBack,
     (event) => {
-      runWorkspaceHotkey(event, () => {
+      runAppHotkey(event, () => {
         if (canGoBack === true) {
           goBack()
         }
       })
     },
-    workspaceHotkeyOptions,
+    appHotkeyOptions,
   )
   useHotkey(
     appHotkeys.goForward,
     (event) => {
-      runWorkspaceHotkey(event, () => {
+      runAppHotkey(event, () => {
         if (canGoForward === true) {
           goForward()
         }
       })
     },
-    workspaceHotkeyOptions,
+    appHotkeyOptions,
   )
 
   const commands = useMemo<readonly AppCommand[]>(

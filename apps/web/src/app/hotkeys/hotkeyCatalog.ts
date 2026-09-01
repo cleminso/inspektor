@@ -14,7 +14,9 @@ export const appHotkeys = {
   moveTableColumnRight: 'Shift+ArrowRight',
   nextTablePage: 'Mod+ArrowRight',
   openCommandPalette: 'Mod+K',
+  openQueriesDock: 'Alt+Q',
+  openTablesDock: 'Alt+T',
   openTableView: 'Alt+N',
   previousTablePage: 'Mod+ArrowLeft',
-  toggleTableNavigator: 'Mod+B',
+  toggleLeftDock: 'Mod+B',
 } as const satisfies Record<string, Hotkey>

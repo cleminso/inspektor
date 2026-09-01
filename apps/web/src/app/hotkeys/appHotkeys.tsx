@@ -57,6 +57,26 @@ export function isAppHotkeyInteractionLayer(target: EventTarget | null): boolean
   )
 }
 
+export function runAppHotkey(event: KeyboardEvent, command: () => void): void {
+  if (
+    event.defaultPrevented === true ||
+    event.isComposing === true ||
+    event.repeat === true ||
+    isAppHotkeyInteractionLayer(event.target)
+  ) {
+    return
+  }
+  event.preventDefault()
+  event.stopPropagation()
+  command()
+}
+
+export const appHotkeyOptions = {
+  ignoreInputs: true,
+  preventDefault: false,
+  stopPropagation: false,
+} as const
+
 function AppCommandPalette({
   onOpenChange,
   open,

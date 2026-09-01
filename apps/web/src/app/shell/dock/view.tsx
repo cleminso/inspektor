@@ -1,25 +1,106 @@
-import { Box, Button, KeyboardInput, Tooltip } from '@inspector/ds'
+import { Box, Button, ButtonLink, Icon, KeyboardInput, Tooltip } from '@inspector/ds'
+import { useHotkey } from '@tanstack/react-hotkeys'
+import { Link, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 import { Rss, Search } from 'lucide-react'
 
+import { appHotkeyOptions, runAppHotkey } from '@app/hotkeys/appHotkeys'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
+import { appRoutes } from '@app/routing/appRoutes'
+import { useSidePanelLayout } from '@tables/tableList/layout'
 import { InspectorDockCenterSlot } from './centerSlot'
 
-export interface InspectorLeftDockControl {
-  isOpen: boolean
-  onToggle: () => void
-}
-
 interface InspectorDockProps {
-  leftDock?: InspectorLeftDockControl
   onOpenCommands: () => void
 }
 
-export function InspectorDock({
-  leftDock,
-  onOpenCommands,
-}: InspectorDockProps): React.ReactElement {
-  const leftDockLabel = leftDock?.isOpen === true ? 'Close left dock' : 'Open left dock'
+interface WorkspaceDockControlProps {
+  artwork: React.ComponentProps<typeof Icon>['artwork']
+  connectionId: string
+  label: string
+  openHotkey: React.ComponentProps<typeof KeyboardInput>['hotkey']
+  selected: boolean
+  to: typeof appRoutes.tables | typeof appRoutes.queries
+  onClick: (event: React.MouseEvent<HTMLAnchorElement>) => void
+}
+
+function WorkspaceDockControl({
+  artwork,
+  connectionId,
+  label,
+  openHotkey,
+  selected,
+  to,
+  onClick,
+}: WorkspaceDockControlProps): React.ReactElement {
+  const actionLabel = `${selected === true ? 'Close' : 'Open'} ${label}`
+
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger
+        render={
+          <ButtonLink
+            variant="ghost"
+            size="s"
+            aria-label={actionLabel}
+            aria-current={selected === true ? 'page' : 'false'}
+            iconOnly
+            onClick={onClick}
+            render={
+              <Link
+                to={to}
+                params={{ connectionId }}
+              />
+            }
+          >
+            <Icon
+              artwork={artwork}
+              size="xs"
+            />
+          </ButtonLink>
+        }
+      />
+      <Tooltip.Content>
+        {actionLabel}{' '}
+        <KeyboardInput
+          hotkey={selected === true ? appHotkeys.toggleLeftDock : openHotkey}
+          size="small"
+        />
+      </Tooltip.Content>
+    </Tooltip.Root>
+  )
+}
+
+export function InspectorDock({ onOpenCommands }: InspectorDockProps): React.ReactElement {
+  const { connectionId } = useParams({ from: appRoutes.connection })
+  const navigate = useNavigate()
+  const { isOpen, toggle } = useSidePanelLayout()
+  const isQueriesActive = useRouterState({
+    select: (state) => state.location.pathname.endsWith('/queries'),
+  })
+
+  const isTablesSelected = isOpen === true && isQueriesActive === false
+  const isQueriesSelected = isOpen === true && isQueriesActive === true
+  const openTables = () => {
+    if (isOpen === false) toggle()
+    void navigate({ to: appRoutes.tables, params: { connectionId } })
+  }
+  const openQueries = () => {
+    if (isOpen === false) toggle()
+    void navigate({ to: appRoutes.queries, params: { connectionId } })
+  }
+  const toggleDockFromLink = (event: React.MouseEvent, selected: boolean) => {
+    if (selected === true) event.preventDefault()
+    if (selected === true || isOpen === false) toggle()
+  }
+
+  useHotkey(appHotkeys.toggleLeftDock, (event) => runAppHotkey(event, toggle), appHotkeyOptions)
+  useHotkey(appHotkeys.openTablesDock, (event) => runAppHotkey(event, openTables), appHotkeyOptions)
+  useHotkey(
+    appHotkeys.openQueriesDock,
+    (event) => runAppHotkey(event, openQueries),
+    appHotkeyOptions,
+  )
 
   return (
     <Box
@@ -39,50 +120,24 @@ export function InspectorDock({
         flex={1}
         alignItems="center"
       >
-        {leftDock !== undefined ? (
-          <Tooltip.Root>
-            <Tooltip.Trigger
-              render={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  aria-label={leftDockLabel}
-                  aria-pressed={leftDock.isOpen}
-                  glyphSize="compact"
-                  iconOnly
-                  onClick={leftDock.onToggle}
-                >
-                  <Button.Glyph artwork={productGlyphs.table} />
-                </Button>
-              }
-            />
-            <Tooltip.Content>
-              {leftDockLabel}{' '}
-              <KeyboardInput
-                hotkey={appHotkeys.toggleTableNavigator}
-                size="small"
-              />
-            </Tooltip.Content>
-          </Tooltip.Root>
-        ) : null}
-        <Tooltip.Root>
-          <Tooltip.Trigger
-            render={
-              <Button
-                type="button"
-                variant="ghost"
-                size="s"
-                aria-label="Open subscriptions dock"
-                glyphSize="compact"
-                iconOnly
-              >
-                <Button.Glyph artwork={Rss} />
-              </Button>
-            }
-          />
-          <Tooltip.Content>Open subscriptions dock</Tooltip.Content>
-        </Tooltip.Root>
+        <WorkspaceDockControl
+          artwork={productGlyphs.table}
+          connectionId={connectionId}
+          label="tables"
+          openHotkey={appHotkeys.openTablesDock}
+          selected={isTablesSelected}
+          to={appRoutes.tables}
+          onClick={(event) => toggleDockFromLink(event, isTablesSelected)}
+        />
+        <WorkspaceDockControl
+          artwork={Rss}
+          connectionId={connectionId}
+          label="subscriptions"
+          openHotkey={appHotkeys.openQueriesDock}
+          selected={isQueriesSelected}
+          to={appRoutes.queries}
+          onClick={(event) => toggleDockFromLink(event, isQueriesSelected)}
+        />
         <Box
           as="span"
           role="separator"

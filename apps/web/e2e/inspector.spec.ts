@@ -43,6 +43,28 @@ test('connects through the form and restores the connection after reload', async
   )
 })
 
+test('opens, closes, and switches the left dock', async ({ page }) => {
+  await connectToFixture(page)
+  const resizeHandle = page.locator('[data-slot="resizable-handle"]')
+
+  await expect(resizeHandle).toBeVisible()
+  await expect(page).toHaveURL(/\/tables\/[^/]+$/u)
+  const tablesUrl = page.url()
+  await page.getByRole('link', { name: 'Close tables' }).click()
+  await expect(page).toHaveURL(tablesUrl)
+  await expect(resizeHandle).toBeHidden()
+
+  await page.getByRole('link', { name: 'Open subscriptions' }).click()
+  await expect(page).toHaveURL(/\/queries$/u)
+  await expect(resizeHandle).toBeVisible()
+  await page.getByRole('link', { name: 'Close subscriptions' }).click()
+  await expect(resizeHandle).toBeHidden()
+
+  await page.getByRole('link', { name: 'Open tables' }).click()
+  await expect(page).toHaveURL(/\/tables(?:\/[^/]+)?$/u)
+  await expect(resizeHandle).toBeVisible()
+})
+
 test('recovers when connection schema validation initially finds no schemas', async ({ page }) => {
   const serverUrl = new URL(connection.serverUrl)
   const basePath = serverUrl.pathname.replace(/\/+$/, '')

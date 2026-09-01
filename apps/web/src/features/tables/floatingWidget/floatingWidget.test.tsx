@@ -4,8 +4,7 @@ import { useState, type ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
-import { InspectorDockCenterProvider } from '@app/shell/dock/centerSlot'
-import { InspectorDock } from '@app/shell/dock/view'
+import { InspectorDockCenterProvider, InspectorDockCenterSlot } from '@app/shell/dock/centerSlot'
 import FieldEditorMutationWidget from '@tables/floatingWidget/fieldEditorMutationWidget'
 import { TableMutationWidget } from '@tables/floatingWidget/floatingWidget'
 import {
@@ -289,7 +288,7 @@ describe('TableMutationWidget', () => {
       <InspectorDockCenterProvider>
         <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
           <ReviewHarness operationCount={operationCount} />
-          <InspectorDock onOpenCommands={() => undefined} />
+          <InspectorDockCenterSlot />
         </TestLedgerProvider>
       </InspectorDockCenterProvider>,
     )
@@ -324,7 +323,7 @@ describe('TableMutationWidget', () => {
       <InspectorDockCenterProvider>
         <TestLedgerProvider schemaColumns={[nameColumn, countColumn]}>
           <ReviewHarness />
-          <InspectorDock onOpenCommands={() => undefined} />
+          <InspectorDockCenterSlot />
         </TestLedgerProvider>
       </InspectorDockCenterProvider>,
     )
@@ -375,7 +374,7 @@ describe('TableMutationWidget', () => {
       <InspectorDockCenterProvider>
         <TestLedgerProvider schemaColumns={[]}>
           <DeletionHarness />
-          <InspectorDock onOpenCommands={() => undefined} />
+          <InspectorDockCenterSlot />
         </TestLedgerProvider>
       </InspectorDockCenterProvider>,
     )

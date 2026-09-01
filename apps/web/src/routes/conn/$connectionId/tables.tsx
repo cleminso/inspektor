@@ -1,8 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 
-import { InspectorLayout } from '@app/shell/layout'
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
-import { SidePanelLayoutProvider, useSidePanelLayout } from '@tables/tableList/layout'
 import { TableTabsProvider } from '@tables/workspace/tabsProvider'
 import { TableHotkeys } from '@tables/workspace/tableHotkeys'
 import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHistory'
@@ -15,17 +13,9 @@ export const Route = createFileRoute('/conn/$connectionId/tables')({
   head: () => ({
     meta: [{ title: 'Tables | Inspector' }],
   }),
-  component: TablesLayoutRoute,
+  component: TablesWorkspaceLayout,
   validateSearch: canonicalizeTableRouteSearch,
 })
-
-function TablesLayoutRoute(): React.ReactElement {
-  return (
-    <SidePanelLayoutProvider>
-      <TablesWorkspaceLayout />
-    </SidePanelLayoutProvider>
-  )
-}
 
 /**
  * Owns connected table presentation after session and runtime identity are available.
@@ -36,7 +26,6 @@ function TablesLayoutRoute(): React.ReactElement {
  */
 function TablesWorkspaceLayout(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()
-  const { isOpen, toggle } = useSidePanelLayout()
   const workspaceScope = createTableWorkspaceScope({
     branch: currentBranch,
     connectionId: currentConnectionId,
@@ -44,19 +33,14 @@ function TablesWorkspaceLayout(): React.ReactElement {
   })
 
   return (
-    <InspectorLayout
-      leftDock={{ isOpen, onToggle: toggle }}
-      pageTitle="Tables"
-    >
-      <TableMutationLedgerWorkspaceProvider key={workspaceScope}>
-        <TableNavigationHistoryProvider>
-          <TableTabsProvider scope={workspaceScope}>
-            <TableHotkeys />
-            <TableExplorerScreen />
-            <Outlet />
-          </TableTabsProvider>
-        </TableNavigationHistoryProvider>
-      </TableMutationLedgerWorkspaceProvider>
-    </InspectorLayout>
+    <TableMutationLedgerWorkspaceProvider key={workspaceScope}>
+      <TableNavigationHistoryProvider>
+        <TableTabsProvider scope={workspaceScope}>
+          <TableHotkeys />
+          <TableExplorerScreen />
+          <Outlet />
+        </TableTabsProvider>
+      </TableNavigationHistoryProvider>
+    </TableMutationLedgerWorkspaceProvider>
   )
 }

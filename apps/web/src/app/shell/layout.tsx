@@ -5,19 +5,14 @@ import { Box, ButtonLink, Text } from '@inspector/ds'
 import { useAppCommandPalette } from '@app/hotkeys/appHotkeys'
 
 import { InspectorHeader } from './header/view'
-import { InspectorDock, type InspectorLeftDockControl } from './dock/view'
+import { InspectorDock } from './dock/view'
 import { InspectorDockCenterProvider } from './dock/centerSlot'
 
 interface InspectorLayoutProps extends PropsWithChildren {
-  leftDock?: InspectorLeftDockControl
   pageTitle: string
 }
 
-export function InspectorLayout({
-  children,
-  leftDock,
-  pageTitle,
-}: InspectorLayoutProps): React.ReactElement {
+export function InspectorLayout({ children, pageTitle }: InspectorLayoutProps): React.ReactElement {
   const commandPalette = useAppCommandPalette()
 
   return (
@@ -70,10 +65,7 @@ export function InspectorLayout({
           </Box>
           {children}
         </Box>
-        <InspectorDock
-          leftDock={leftDock}
-          onOpenCommands={commandPalette.open}
-        />
+        <InspectorDock onOpenCommands={commandPalette.open} />
       </Box>
     </InspectorDockCenterProvider>
   )
