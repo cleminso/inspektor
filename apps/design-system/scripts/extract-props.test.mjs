@@ -324,6 +324,19 @@ test("extracts the constrained resizable panel APIs", () => {
   );
 });
 
+test("extracts the constrained Shell Layout compound API", () => {
+  assert.deepEqual(
+    metadata["shellLayout.root"]?.map(({ name }) => name),
+    ["persistence", "children"],
+  );
+  for (const part of ["header", "body", "leftDock", "view", "rightDock", "footer"]) {
+    assert.deepEqual(
+      metadata[`shellLayout.${part}`]?.map(({ name }) => name),
+      ["children"],
+    );
+  }
+});
+
 test("extracts the constrained Switch API", () => {
   const switchProps = metadata.switch;
 

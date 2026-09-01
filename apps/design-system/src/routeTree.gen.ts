@@ -45,6 +45,7 @@ import { Route as ComponentsRelationValueRouteImport } from './routes/components
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
 import { Route as ComponentsScrollAreaRouteImport } from './routes/components/scroll-area'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
+import { Route as ComponentsShellLayoutRouteImport } from './routes/components/shell-layout'
 import { Route as ComponentsSidePanelRouteImport } from './routes/components/side-panel'
 import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinner'
 import { Route as ComponentsStructuredValuePreviewRouteImport } from './routes/components/structured-value-preview'
@@ -244,6 +245,11 @@ const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
   path: '/components/select',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsShellLayoutRoute = ComponentsShellLayoutRouteImport.update({
+  id: '/components/shell-layout',
+  path: '/components/shell-layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsSidePanelRoute = ComponentsSidePanelRouteImport.update({
   id: '/components/side-panel',
   path: '/components/side-panel',
@@ -360,6 +366,7 @@ export interface FileRoutesByFullPath {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/scroll-area': typeof ComponentsScrollAreaRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/shell-layout': typeof ComponentsShellLayoutRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
@@ -413,6 +420,7 @@ export interface FileRoutesByTo {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/scroll-area': typeof ComponentsScrollAreaRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/shell-layout': typeof ComponentsShellLayoutRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
@@ -467,6 +475,7 @@ export interface FileRoutesById {
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
   '/components/scroll-area': typeof ComponentsScrollAreaRoute
   '/components/select': typeof ComponentsSelectRoute
+  '/components/shell-layout': typeof ComponentsShellLayoutRoute
   '/components/side-panel': typeof ComponentsSidePanelRoute
   '/components/spinner': typeof ComponentsSpinnerRoute
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
@@ -522,6 +531,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/scroll-area'
     | '/components/select'
+    | '/components/shell-layout'
     | '/components/side-panel'
     | '/components/spinner'
     | '/components/structured-value-preview'
@@ -575,6 +585,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/scroll-area'
     | '/components/select'
+    | '/components/shell-layout'
     | '/components/side-panel'
     | '/components/spinner'
     | '/components/structured-value-preview'
@@ -628,6 +639,7 @@ export interface FileRouteTypes {
     | '/components/resizable-panel'
     | '/components/scroll-area'
     | '/components/select'
+    | '/components/shell-layout'
     | '/components/side-panel'
     | '/components/spinner'
     | '/components/structured-value-preview'
@@ -682,6 +694,7 @@ export interface RootRouteChildren {
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
   ComponentsScrollAreaRoute: typeof ComponentsScrollAreaRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
+  ComponentsShellLayoutRoute: typeof ComponentsShellLayoutRoute
   ComponentsSidePanelRoute: typeof ComponentsSidePanelRoute
   ComponentsSpinnerRoute: typeof ComponentsSpinnerRoute
   ComponentsStructuredValuePreviewRoute: typeof ComponentsStructuredValuePreviewRoute
@@ -953,6 +966,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsSelectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/shell-layout': {
+      id: '/components/shell-layout'
+      path: '/components/shell-layout'
+      fullPath: '/components/shell-layout'
+      preLoaderRoute: typeof ComponentsShellLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/side-panel': {
       id: '/components/side-panel'
       path: '/components/side-panel'
@@ -1098,6 +1118,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
   ComponentsScrollAreaRoute: ComponentsScrollAreaRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
+  ComponentsShellLayoutRoute: ComponentsShellLayoutRoute,
   ComponentsSidePanelRoute: ComponentsSidePanelRoute,
   ComponentsSpinnerRoute: ComponentsSpinnerRoute,
   ComponentsStructuredValuePreviewRoute: ComponentsStructuredValuePreviewRoute,

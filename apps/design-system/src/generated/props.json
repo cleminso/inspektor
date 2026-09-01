@@ -3398,6 +3398,100 @@
       }
     }
   ],
+  "shellLayout.root": [
+    {
+      "name": "persistence",
+      "type": "ShellLayoutPersistence",
+      "required": false,
+      "description": "Enables persistence through a consumer-owned storage adapter.",
+      "source": {
+        "path": "packages/design-system/src/components/shellLayout/shellLayout.tsx",
+        "line": 50
+      }
+    },
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
+      }
+    }
+  ],
+  "shellLayout.header": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
+      }
+    }
+  ],
+  "shellLayout.body": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 1423
+      }
+    }
+  ],
+  "shellLayout.leftDock": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 1423
+      }
+    }
+  ],
+  "shellLayout.view": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 1423
+      }
+    }
+  ],
+  "shellLayout.rightDock": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 1423
+      }
+    }
+  ],
+  "shellLayout.footer": [
+    {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "",
+      "source": {
+        "path": "node_modules/.pnpm/@types+react@19.2.18/node_modules/@types/react/index.d.ts",
+        "line": 2276
+      }
+    }
+  ],
   "floatingPanel.root": [
     {
       "name": "aria-label",
@@ -3983,7 +4077,7 @@
       "description": "Accessible name for the timeline table.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 18
+        "line": 19
       }
     },
     {
@@ -3993,7 +4087,7 @@
       "description": "Timeline header and composed lanes.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 20
+        "line": 21
       }
     }
   ],
@@ -4005,7 +4099,7 @@
       "description": "Heading for the fixed label column.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 25
+        "line": 26
       }
     },
     {
@@ -4015,7 +4109,7 @@
       "description": "Snapshot headings in chronological order.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 27
+        "line": 28
       }
     }
   ],
@@ -4028,7 +4122,7 @@
       "description": "Whether the lane is expanded when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -4038,7 +4132,7 @@
       "description": "Controlled lane expansion state.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -4048,7 +4142,7 @@
       "description": "Runs when the lane expansion state changes.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -4058,7 +4152,7 @@
       "description": "One lane trigger followed by its tracks.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 38
+        "line": 39
       }
     }
   ],
@@ -4070,7 +4164,7 @@
       "description": "Lane heading.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 43
+        "line": 44
       }
     },
     {
@@ -4080,7 +4174,7 @@
       "description": "Optional metadata aligned opposite the heading.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 45
+        "line": 46
       }
     }
   ],
@@ -4092,7 +4186,7 @@
       "description": "Complete opaque identifier used for the accessible name and tooltip.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 50
+        "line": 51
       }
     },
     {
@@ -4102,7 +4196,7 @@
       "description": "One cell for every snapshot heading.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 52
+        "line": 53
       }
     }
   ],
@@ -4114,7 +4208,7 @@
       "description": "Accessible description of this snapshot cell.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 59
+        "line": 60
       }
     },
     {
@@ -4124,7 +4218,7 @@
       "description": "Marks a snapshot containing activity.\nMarks a snapshot as inactive or unavailable.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 64
+        "line": 65
       }
     },
     {
@@ -4134,7 +4228,7 @@
       "description": "Marks this active snapshot as selected.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 66
+        "line": 67
       }
     },
     {
@@ -4144,7 +4238,7 @@
       "description": "Runs when the active snapshot is activated.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 68
+        "line": 69
       }
     }
   ],

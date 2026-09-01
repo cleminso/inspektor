@@ -155,6 +155,12 @@ const componentEntries = [
     part,
     inheritedProps: ['children'],
   })),
+  ...['Root', 'Header', 'Body', 'LeftDock', 'View', 'RightDock', 'Footer'].map((part) => ({
+    componentId: `shellLayout.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: 'ShellLayout',
+    part,
+    inheritedProps: ['children'],
+  })),
   ...['Root', 'Content', 'Details', 'Summary', 'Actions'].map((part) => ({
     componentId: `floatingPanel.${part[0].toLowerCase()}${part.slice(1)}`,
     exportName: 'FloatingPanel',

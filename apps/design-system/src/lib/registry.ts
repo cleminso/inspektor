@@ -532,6 +532,20 @@ export const resizablePanelItem = {
   componentId: 'resizablePanelGroup',
 } satisfies NavItem
 
+export const shellLayoutItem = {
+  title: 'Shell Layout',
+  slug: 'shell-layout',
+  href: '/components/shell-layout',
+  description:
+    'Application shell geometry with fixed outer regions and optional resizable left and right docks.',
+  importPath: '@inspector/ds',
+  source: {
+    label: 'shellLayout.tsx',
+    path: 'packages/design-system/src/components/shellLayout/shellLayout.tsx',
+  },
+  componentId: 'shellLayout.root',
+} satisfies NavItem
+
 export const comboboxItem = {
   title: 'Combobox',
   slug: 'combobox',
@@ -707,6 +721,7 @@ const componentItems: NavItem[] = [
   relationValueItem,
   resizablePanelItem,
   scrollAreaItem,
+  shellLayoutItem,
   sidePanelItem,
   selectItem,
   spinnerItem,
