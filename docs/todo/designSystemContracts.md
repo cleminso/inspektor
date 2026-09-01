@@ -24,6 +24,11 @@
 
 ## Implemented foundation
 
+[01/09/26]
+
+- [x] Add Shell Layout as a high-level native and Resizable Panel composition with optional left and right docks.
+- [x] Keep Shell Layout persistence storage consumer-owned while centralizing dock resize, collapse, restore, gutter, and surface behavior.
+
 [05/08/26]
 
 - [x] Share form-control size ownership between Input and Select Trigger while preserving their consumer-facing type names.
@@ -93,6 +98,7 @@
 | MultiSelect | High-level Popover composition | Open state remains Base-owned; selection, filtering, and option keyboard behavior are Inspector-owned; trigger refs and disabled option behavior are preserved. |
 | RelationValue | High-level value and details composition | Navigation and copy capabilities are constrained to product semantics; unresolved pending and missing presentation is recorded separately. |
 | ResizablePanel | `react-resizable-panels` wrapper | Group, Panel, and Handle preserve imperative refs and callbacks while Inspector owns defaults and handle anatomy. Upstream focus callback behavior is recorded separately. |
+| ShellLayout | High-level native and Resizable Panel composition | Root owns shared dock controls and structural regions; Body fixes horizontal resizing; optional docks own collapse, restore, handles, and shell surfaces; persistence storage remains consumer-owned. |
 | Find Bar | High-level Input Group composition | Query options, match status, and navigation are fixed; document search results remain consumer-owned. |
 | Select | Base Select compound component | Trigger and Item preserve approved composition and refs; structural parts remain fixed; popup geometry remains constrained to semantic placement. |
 | SidePanel | Inspector native compound layout | Aside and div props, ARIA, events, and refs are preserved while layout styling remains package-owned. |

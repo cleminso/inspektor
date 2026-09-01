@@ -21,7 +21,7 @@ The frontend uses explicit ownership boundaries instead of technical root bucket
 - `routes` contain TanStack Router adapters. Routes declare loaders, search validation, and route composition, then delegate product and runtime behavior to their owners.
 - `shared` contains code with multiple existing owners. It is not a staging area for code that might become shared.
 
-The connected header and dock chrome belong to `app/shell`. The header contains connection context and theme controls; workspace navigation controls live in the bottom dock. Tables owns its left-pane visibility state and resizable layout. The Tables parent route connects that feature-owned state to the shell's constrained left-dock control, so `app` does not import Tables internals.
+The connected header and footer chrome belong to `app/shell`. The header contains connection context and theme controls; workspace navigation controls live in the footer. The design system owns generic shell geometry and dock mechanics. `app/shell` owns the universal Inspector layout preference, storage migration, and product controls. Tables and Queries compose their content into shell regions without owning shell state.
 
 ## Implemented structure
 
@@ -34,8 +34,9 @@ src/
     runtime/
     session/
     shell/
-      dock/
+      footer/
       header/
+      shellLayoutStorage.ts
   features/
     onboarding/
     queries/
@@ -65,7 +66,7 @@ The root `components`, `hooks`, `lib`, and product-wide `types` buckets are inte
 - `routing` owns Tables URL search state and relation-table links.
 - `rowEditor` owns insert and edit forms, mutation drafts, field focus, and value presentation.
 - `schema` owns stored-schema interpretation and schema presentation.
-- `tableList` owns table discovery presentation, pinning, list selection, and the Tables-specific left-dock layout and visibility state.
+- `tableList` owns table discovery presentation, pinning, and list selection inside the shell's left dock.
 - `workspace` owns open table views, workspace tabs, and table-view orchestration.
 
 Feature-root modules such as `tableTypes.ts` and `valueParsing.ts` are valid when several Tables slices use them and no narrower owner exists.
@@ -80,7 +81,7 @@ Use the narrowest owner that explains both the behavior and its consumers:
 - Code moves to `shared` only after multiple owners consume it.
 - Route-specific declarations remain in `routes`; reusable behavior invoked by a route belongs to `app` or the relevant feature.
 
-A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. The Tables left-dock layout and visibility state belong to `features/tables/tableList` while Tables is their only consumer. The application shell may render the dock control without owning that feature state.
+A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. Generic shell geometry and dock mechanics belong to `@inspector/ds`; universal Inspector persistence and controls belong to `app/shell`; feature content remains with Tables or Queries.
 
 ## Import direction
 
@@ -98,7 +99,7 @@ Additional rules:
 - Features do not import route modules.
 - One feature does not import another feature's internal modules.
 - `app` exposes infrastructure and routing contracts but does not own feature behavior.
-- Parent routes compose feature-owned state into generic application-shell controls when both owners need to participate in one interaction.
+- Application-shell controls consume generic shell state without importing feature internals.
 - Use `@app/*`, `@tables/*`, `@queries/*`, `@onboarding/*`, and `@shared/*` for cross-owner imports.
 - Prefer relative imports for modules within the same focused directory.
 - Avoid broad barrel exports that hide cross-owner dependencies.
@@ -109,5 +110,5 @@ Additional rules:
 - Keep tests beside their source.
 - Preserve provider placement and deferred import boundaries when moving modules.
 - Keep routes focused on router integration and never edit `routeTree.gen.ts` manually.
-- Generalize workspace or dock infrastructure only after another feature requires the same contract.
+- Keep reusable shell geometry in the design system and product-specific dock behavior in its application owner.
 - Update this document when ownership terminology or directory boundaries change.

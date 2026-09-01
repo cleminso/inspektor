@@ -369,6 +369,21 @@ export type {
   ResizablePanelProps,
   ResizablePanelSize,
 } from './components/resizablePanel/resizablePanel'
+export { ShellLayout, useShellLayout } from './components/shellLayout/shellLayout'
+export type {
+  ShellLayoutBodyProps,
+  ShellLayoutContextValue,
+  ShellLayoutDockController,
+  ShellLayoutDockSide,
+  ShellLayoutFooterProps,
+  ShellLayoutHeaderProps,
+  ShellLayoutLeftDockProps,
+  ShellLayoutPersistence,
+  ShellLayoutRightDockProps,
+  ShellLayoutRootProps,
+  ShellLayoutStorage,
+  ShellLayoutViewProps,
+} from './components/shellLayout/shellLayout'
 export { Select } from './components/select/select'
 export type {
   SelectContentProps,

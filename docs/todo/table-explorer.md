@@ -763,6 +763,11 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Table-list dock
 
+[01/09/26]
+
+- [x] Move resizable shell geometry and visibility state out of Tables after Queries and the application dock became consumers.
+- [x] Keep table discovery content inside the generic left dock without retaining table-owned shell storage names.
+
 [26/08/26]
 
 - [x] Restore the table-list dock's collapsed state across document reloads and reopen it at its last expanded width.
