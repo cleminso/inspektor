@@ -88,6 +88,13 @@ export type {
   CheckboxProps,
   CheckboxSize,
 } from './components/checkbox/checkbox'
+export { CheckboxGroup } from './components/checkboxGroup/checkboxGroup'
+export type {
+  CheckboxGroupItem,
+  CheckboxGroupListProps,
+  CheckboxGroupRendering,
+  CheckboxGroupRootProps,
+} from './components/checkboxGroup/checkboxGroup'
 export { Combobox } from './components/combobox/combobox'
 export type {
   ComboboxGroupLabelProps,

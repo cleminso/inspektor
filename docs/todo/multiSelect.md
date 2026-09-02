@@ -11,6 +11,14 @@
 
 ## Implemented foundation
 
+[02/09/26]
+
+- [x] Enter the contextual-action column from dialog focus with Up or Down, matching pointer activation of the row label.
+
+[02/09/26]
+
+- [x] Compose Popover and the public Checkbox Group component instead of owning selection rows and bulk actions.
+
 [11/08/26]
 
 - [x] Do not emit virtual set-position metadata for fully mounted checkbox options.
@@ -67,6 +75,11 @@
 
 ## Settled interaction decisions
 
+[02/09/26]
+
+- [x] Up and Down from initial dialog focus enter the last or first mutable row's contextual action; Left then moves to its checkbox.
+- [x] Pointer-focused contextual labels hide after pointer exit; keyboard-visible focus keeps the active label visible.
+
 [05/08/26]
 
 - [x] Keep scrollbar chrome hidden when the complete option collection fits in the viewport.
@@ -94,6 +107,12 @@
 - [ ] Decide whether large item collections require persistent action labels on touch interfaces.
 
 ## Validation checklist
+
+[02/09/26]
+
+- [x] Focused and package tests cover dialog entry into contextual actions.
+- [x] Package formatting, lint, typecheck, build, documentation build, and product column-visibility tests pass.
+- [x] Browser verification confirms Down enters the first mutable row action.
 
 [05/08/26]
 

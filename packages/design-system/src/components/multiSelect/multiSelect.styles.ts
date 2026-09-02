@@ -1,23 +1,8 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import {
-  borderColors,
-  focusColors,
-  spatial,
-  surfaceColors,
-  textColors,
-} from '../../tokens/semantics.stylex'
-import {
-  borderRadii,
-  fontFamilies,
-  fontSizes,
-  fontWeights,
-  lineHeights,
-  shadows,
-  spacing,
-} from '../../tokens/value.stylex'
-import { multiSelectVars } from './multiSelectVars.stylex'
+import { borderColors, spatial, surfaceColors, textColors } from '../../tokens/semantics.stylex'
+import { borderRadii, shadows } from '../../tokens/value.stylex'
 
 export const multiSelectStyles = stylex.create({
   triggerOpen: {},
@@ -69,76 +54,4 @@ export const multiSelectStyles = stylex.create({
   popupWidthS: { width: spatial['multi-select-width-s'] },
   popupWidthM: { width: spatial['multi-select-width-m'] },
   popupWidthL: { width: spatial['multi-select-width-l'] },
-  options: {
-    padding: spatial['popup-collection-padding'],
-    overflow: 'clip',
-    overscrollBehavior: 'contain',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  row: {
-    [multiSelectVars.actionOpacity]: {
-      default: 0,
-      ':focus-within': 1,
-      ':hover': 1,
-    },
-    [multiSelectVars.actionVisibility]: {
-      default: 'hidden',
-      ':focus-within': 'visible',
-      ':hover': 'visible',
-    },
-    borderRadius: borderRadii.xs,
-    gap: spacing.s,
-    paddingInline: spatial['popup-item-inline-padding'],
-    alignItems: 'center',
-    boxSizing: 'border-box',
-    display: 'grid',
-    fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[2],
-    fontWeight: fontWeights.regular,
-    gridTemplateColumns: `${spatial['icon-size-s']} minmax(0, 1fr)`,
-    lineHeight: lineHeights.ui,
-    userSelect: 'none',
-    minHeight: spatial['collection-row-height-s'],
-  },
-  rowDeferred: {
-    containIntrinsicBlockSize: `auto ${spatial['collection-row-height-s']}`,
-    contentVisibility: 'auto',
-  },
-  rowDisabled: { color: textColors.disabled },
-  optionButton: {
-    padding: 0,
-    borderWidth: 0,
-    overflow: 'hidden',
-    alignItems: 'center',
-    appearance: 'none',
-    backgroundColor: 'transparent',
-    color: 'inherit',
-    cursor: 'pointer',
-    display: 'flex',
-    fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[2],
-    fontWeight: fontWeights.regular,
-    lineHeight: lineHeights.ui,
-    outlineColor: focusColors.ring,
-    outlineOffset: -1,
-    outlineStyle: 'solid',
-    outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
-    userSelect: 'none',
-    minWidth: 0,
-    width: '100%',
-  },
-  optionButtonDisabled: { cursor: 'not-allowed' },
-  optionText: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  action: {
-    color: textColors.muted,
-    flexShrink: 0,
-    marginInlineStart: 'auto',
-    opacity: multiSelectVars.actionOpacity,
-    visibility: multiSelectVars.actionVisibility,
-  },
 })

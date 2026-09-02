@@ -21,6 +21,7 @@ import { Route as ComponentsButtonGroupRouteImport } from './routes/components/b
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
 import { Route as ComponentsCalendarRouteImport } from './routes/components/calendar'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
+import { Route as ComponentsCheckboxGroupRouteImport } from './routes/components/checkbox-group'
 import { Route as ComponentsCodeEditorRouteImport } from './routes/components/code-editor'
 import { Route as ComponentsComboboxRouteImport } from './routes/components/combobox'
 import { Route as ComponentsCommandRouteImport } from './routes/components/command'
@@ -120,6 +121,11 @@ const ComponentsCalendarRoute = ComponentsCalendarRouteImport.update({
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
   id: '/components/checkbox',
   path: '/components/checkbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsCheckboxGroupRoute = ComponentsCheckboxGroupRouteImport.update({
+  id: '/components/checkbox-group',
+  path: '/components/checkbox-group',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsCodeEditorRoute = ComponentsCodeEditorRouteImport.update({
@@ -342,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/checkbox-group': typeof ComponentsCheckboxGroupRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/command': typeof ComponentsCommandRoute
@@ -396,6 +403,7 @@ export interface FileRoutesByTo {
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/checkbox-group': typeof ComponentsCheckboxGroupRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/command': typeof ComponentsCommandRoute
@@ -451,6 +459,7 @@ export interface FileRoutesById {
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/checkbox-group': typeof ComponentsCheckboxGroupRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
   '/components/combobox': typeof ComponentsComboboxRoute
   '/components/command': typeof ComponentsCommandRoute
@@ -507,6 +516,7 @@ export interface FileRouteTypes {
     | '/components/button-link'
     | '/components/calendar'
     | '/components/checkbox'
+    | '/components/checkbox-group'
     | '/components/code-editor'
     | '/components/combobox'
     | '/components/command'
@@ -561,6 +571,7 @@ export interface FileRouteTypes {
     | '/components/button-link'
     | '/components/calendar'
     | '/components/checkbox'
+    | '/components/checkbox-group'
     | '/components/code-editor'
     | '/components/combobox'
     | '/components/command'
@@ -615,6 +626,7 @@ export interface FileRouteTypes {
     | '/components/button-link'
     | '/components/calendar'
     | '/components/checkbox'
+    | '/components/checkbox-group'
     | '/components/code-editor'
     | '/components/combobox'
     | '/components/command'
@@ -670,6 +682,7 @@ export interface RootRouteChildren {
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
   ComponentsCalendarRoute: typeof ComponentsCalendarRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
+  ComponentsCheckboxGroupRoute: typeof ComponentsCheckboxGroupRoute
   ComponentsCodeEditorRoute: typeof ComponentsCodeEditorRoute
   ComponentsComboboxRoute: typeof ComponentsComboboxRoute
   ComponentsCommandRoute: typeof ComponentsCommandRoute
@@ -796,6 +809,13 @@ declare module '@tanstack/react-router' {
       path: '/components/checkbox'
       fullPath: '/components/checkbox'
       preLoaderRoute: typeof ComponentsCheckboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/checkbox-group': {
+      id: '/components/checkbox-group'
+      path: '/components/checkbox-group'
+      fullPath: '/components/checkbox-group'
+      preLoaderRoute: typeof ComponentsCheckboxGroupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/code-editor': {
@@ -1094,6 +1114,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
   ComponentsCalendarRoute: ComponentsCalendarRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
+  ComponentsCheckboxGroupRoute: ComponentsCheckboxGroupRoute,
   ComponentsCodeEditorRoute: ComponentsCodeEditorRoute,
   ComponentsComboboxRoute: ComponentsComboboxRoute,
   ComponentsCommandRoute: ComponentsCommandRoute,

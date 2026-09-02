@@ -7413,7 +7413,7 @@
       "description": "Known options displayed by the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 38
+        "line": 33
       }
     },
     {
@@ -7423,7 +7423,7 @@
       "description": "Controlled selected values.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 40
+        "line": 35
       }
     },
     {
@@ -7434,7 +7434,7 @@
       "description": "Initially selected values when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 42
+        "line": 37
       }
     },
     {
@@ -7444,7 +7444,7 @@
       "description": "Runs when the selected values change.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 44
+        "line": 39
       }
     },
     {
@@ -7455,7 +7455,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 46
+        "line": 41
       }
     },
     {
@@ -7465,7 +7465,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 48
+        "line": 43
       }
     },
     {
@@ -7475,7 +7475,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 50
+        "line": 45
       }
     },
     {
@@ -7486,7 +7486,7 @@
       "description": "Disables the trigger and every mutable option.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 52
+        "line": 47
       }
     }
   ],
@@ -7498,7 +7498,7 @@
       "description": "Stable accessible name for the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 58
+        "line": 53
       }
     },
     {
@@ -7508,7 +7508,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 60
+        "line": 55
       }
     },
     {
@@ -7519,7 +7519,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 62
+        "line": 57
       }
     }
   ],
@@ -7531,7 +7531,7 @@
       "description": "Accessible name for the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 71
+        "line": 66
       }
     },
     {
@@ -7542,7 +7542,7 @@
       "description": "Controls the popup width.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 73
+        "line": 68
       }
     },
     {
@@ -7553,7 +7553,7 @@
       "description": "Controls the scrolling option-list height.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 75
+        "line": 70
       }
     },
     {
@@ -7564,7 +7564,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 77
+        "line": 72
       }
     },
     {
@@ -7575,7 +7575,84 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 79
+        "line": 74
+      }
+    }
+  ],
+  "checkboxGroup.root": [
+    {
+      "name": "items",
+      "type": "readonly CheckboxGroupItem[]",
+      "required": true,
+      "description": "Known options displayed by the checkbox group.",
+      "source": {
+        "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
+        "line": 30
+      }
+    },
+    {
+      "name": "value",
+      "type": "readonly string[]",
+      "required": false,
+      "description": "Controlled selected values.",
+      "source": {
+        "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
+        "line": 32
+      }
+    },
+    {
+      "name": "defaultValue",
+      "type": "readonly string[]",
+      "required": false,
+      "defaultValue": "[]",
+      "description": "Initially selected values when uncontrolled.",
+      "source": {
+        "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
+        "line": 34
+      }
+    },
+    {
+      "name": "onValueChange",
+      "type": "(value: string[]) => void",
+      "required": false,
+      "description": "Runs when the selected values change.",
+      "source": {
+        "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
+        "line": 36
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "false | true",
+      "required": false,
+      "defaultValue": "false",
+      "description": "Disables every mutable option.",
+      "source": {
+        "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
+        "line": 38
+      }
+    }
+  ],
+  "checkboxGroup.list": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the checkbox group.",
+      "source": {
+        "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
+        "line": 48
+      }
+    },
+    {
+      "name": "rendering",
+      "type": "\"eager\" | \"deferred\"",
+      "required": false,
+      "defaultValue": "\"eager\"",
+      "description": "Defers offscreen row layout and paint while retaining the complete collection.",
+      "source": {
+        "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
+        "line": 50
       }
     }
   ],

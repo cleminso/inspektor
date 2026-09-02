@@ -1197,6 +1197,10 @@ test("extracts the constrained MultiSelect compound API", () => {
     ],
   );
   assert.equal(
+    metadata["multiSelect.root"]?.find(({ name }) => name === "items")?.type,
+    "readonly MultiSelectItem[]",
+  );
+  assert.equal(
     metadata["multiSelect.root"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
     "false",
   );
@@ -1222,6 +1226,33 @@ test("extracts the constrained MultiSelect compound API", () => {
   );
   assert.equal(
     metadata["multiSelect.content"]?.find(({ name }) => name === "style"),
+    undefined,
+  );
+});
+
+test("extracts the constrained Checkbox Group compound API", () => {
+  assert.deepEqual(
+    metadata["checkboxGroup.root"]?.map(({ name }) => name),
+    ["items", "value", "defaultValue", "onValueChange", "disabled"],
+  );
+  assert.equal(
+    metadata["checkboxGroup.root"]?.find(({ name }) => name === "defaultValue")?.defaultValue,
+    "[]",
+  );
+  assert.equal(
+    metadata["checkboxGroup.root"]?.find(({ name }) => name === "disabled")?.defaultValue,
+    "false",
+  );
+  assert.deepEqual(
+    metadata["checkboxGroup.list"]?.map(({ name }) => name),
+    ["label", "rendering"],
+  );
+  assert.equal(
+    metadata["checkboxGroup.list"]?.find(({ name }) => name === "rendering")?.defaultValue,
+    '"eager"',
+  );
+  assert.equal(
+    metadata["checkboxGroup.list"]?.find(({ name }) => name === "className"),
     undefined,
   );
 });

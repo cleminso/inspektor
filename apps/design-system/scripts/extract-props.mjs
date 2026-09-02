@@ -439,6 +439,12 @@ const componentEntries = [
     part,
     inheritedProps: [],
   })),
+  ...['Root', 'List'].map((part) => ({
+    componentId: `checkboxGroup.${part[0].toLowerCase()}${part.slice(1)}`,
+    exportName: 'CheckboxGroup',
+    part,
+    inheritedProps: [],
+  })),
   {
     componentId: 'calendar',
     exportName: 'Calendar',

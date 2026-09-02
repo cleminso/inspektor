@@ -39,12 +39,12 @@ describe('MultiSelect', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Choose large collection' }))
 
-    const rows = container.ownerDocument.querySelectorAll('[data-slot="multi-select-row"]')
+    const rows = container.ownerDocument.querySelectorAll('[data-slot="checkbox-group-row"]')
     const firstRow = rows[0]
     const lastRow = rows[100]
 
     if (!(firstRow instanceof HTMLElement) || !(lastRow instanceof HTMLElement)) {
-      throw new Error('Expected the first and last multi-select rows')
+      throw new Error('Expected the first and last checkbox group rows')
     }
 
     const firstCheckbox = within(firstRow).getByRole('checkbox', { name: 'Select Option 1' })
@@ -89,21 +89,21 @@ describe('MultiSelect', () => {
     expect(screen.getByRole('checkbox', { name: 'Select Components' })).toBeTruthy()
   })
 
-  it('enters the first or last mutable row from dialog focus', () => {
+  it('enters the first or last mutable row action from dialog focus', () => {
     render(<TestMultiSelect />)
     fireEvent.click(screen.getByRole('button', { name: 'Choose options' }))
     const dialog = screen.getByRole('dialog', { name: 'Options' })
 
     fireEvent.keyDown(dialog, { key: 'ArrowDown' })
 
-    expect(document.activeElement).toBe(screen.getByRole('checkbox', { name: 'Select Components' }))
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'Check all from Components' }),
+    )
 
     dialog.focus()
     fireEvent.keyDown(dialog, { key: 'ArrowUp' })
 
-    expect(document.activeElement).toBe(
-      screen.getByRole('checkbox', { name: 'Select Design Tokens' }),
-    )
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Only Design Tokens' }))
   })
 
   it('toggles several values without closing', () => {
@@ -117,56 +117,6 @@ describe('MultiSelect', () => {
     expect(screen.getByRole('status', { name: 'Selected values' }).textContent).toBe(
       'design,tokens',
     )
-  })
-
-  it('offers Check all and Only actions based on selection state', () => {
-    render(<TestMultiSelect />)
-    fireEvent.click(screen.getByRole('button', { name: 'Choose options' }))
-
-    fireEvent.click(screen.getByRole('button', { name: 'Check all from Components' }))
-    expect(screen.getByRole('status', { name: 'Selected values' }).textContent).toBe(
-      'design,components,tokens',
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Only Design Tokens' }))
-    expect(screen.getByRole('status', { name: 'Selected values' }).textContent).toBe(
-      'design,tokens',
-    )
-  })
-
-  it('navigates rows and their actions with arrow keys', () => {
-    render(<TestMultiSelect />)
-    fireEvent.click(screen.getByRole('button', { name: 'Choose options' }))
-
-    fireEvent.keyDown(screen.getByRole('dialog', { name: 'Options' }), { key: 'ArrowDown' })
-    const components = screen.getByRole('checkbox', { name: 'Select Components' })
-    expect(document.activeElement).toBe(components)
-
-    fireEvent.keyDown(components, { key: 'ArrowRight' })
-    expect(document.activeElement).toBe(
-      screen.getByRole('button', { name: 'Check all from Components' }),
-    )
-
-    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowDown' })
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Only Design Tokens' }))
-
-    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowLeft' })
-    expect(document.activeElement).toBe(
-      screen.getByRole('checkbox', { name: 'Select Design Tokens' }),
-    )
-  })
-
-  it('toggles only enabled checkboxes with Enter', () => {
-    render(<TestMultiSelect />)
-    fireEvent.click(screen.getByRole('button', { name: 'Choose options' }))
-    const enabled = screen.getByRole('checkbox', { name: 'Select Components' })
-    const disabled = screen.getByRole('checkbox', { name: 'Select Design System' })
-
-    enabled.focus()
-    fireEvent.keyDown(enabled, { key: 'Enter' })
-    fireEvent.keyDown(disabled, { key: 'Enter' })
-
-    expect(screen.getByRole('status', { name: 'Selected values' }).textContent).toBe('design')
   })
 
   it('preserves the consumer Trigger ref while retaining internal focus behavior', async () => {

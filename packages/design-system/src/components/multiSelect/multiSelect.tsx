@@ -1,5 +1,4 @@
 import { Popover as BasePopover } from '@base-ui/react/popover'
-import * as stylex from '@stylexjs/stylex'
 import {
   createContext,
   forwardRef,
@@ -7,9 +6,7 @@ import {
   useContext,
   useMemo,
   useRef,
-  useState,
   type ComponentRef,
-  type KeyboardEvent,
   type PropsWithChildren,
   type RefCallback,
   type RefObject,
@@ -18,20 +15,18 @@ import {
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import { popupPositioning } from '../../primitives/popupPositioning'
 import { Button } from '../button/button'
-import { Checkbox } from '../checkbox/checkbox'
+import {
+  CheckboxGroup,
+  CheckboxGroupListPrivate,
+  useCheckboxGroupNavigation,
+  type CheckboxGroupItem,
+} from '../checkboxGroup/checkboxGroup'
 import { ScrollAreaPrivate } from '../scrollArea/scrollArea'
 import { multiSelectStyles } from './multiSelect.styles'
 
 const deferredRenderingThreshold = 50
 
-export interface MultiSelectItem {
-  /** Stable value represented by the option. */
-  value: string
-  /** Visible option label. */
-  label: string
-  /** Prevents the option from changing while keeping it visible. */
-  disabled?: boolean
-}
+export interface MultiSelectItem extends CheckboxGroupItem {}
 
 export type MultiSelectRootProps = PropsWithChildren<{
   /** Known options displayed by the popup. */
@@ -79,18 +74,10 @@ export interface MultiSelectContentProps {
   align?: BasePopover.Positioner.Props['align']
 }
 
-interface ItemControls {
-  action: HTMLButtonElement | null
-  checkbox: HTMLElement | null
-}
-
 interface MultiSelectContextValue {
   disabled: boolean
   items: readonly MultiSelectItem[]
   triggerRef: RefObject<ComponentRef<typeof BasePopover.Trigger> | null>
-  selectedValues: readonly string[]
-  setSelectedValues: (values: string[]) => void
-  controls: Map<string, ItemControls>
 }
 
 const MultiSelectContext = createContext<MultiSelectContextValue | null>(null)
@@ -114,40 +101,33 @@ function MultiSelectRoot({
   onOpenChange,
   disabled = false,
 }: MultiSelectRootProps): React.ReactElement {
-  const [uncontrolledValue, setUncontrolledValue] = useState<readonly string[]>(defaultValue)
-  const controlsRef = useRef(new Map<string, ItemControls>())
   const triggerRef = useRef<ComponentRef<typeof BasePopover.Trigger>>(null)
-  const selectedValues = value ?? uncontrolledValue
-  const setSelectedValues = useCallback(
-    (nextValue: string[]) => {
-      if (value === undefined) {
-        setUncontrolledValue(nextValue)
-      }
-      onValueChange?.(nextValue)
-    },
-    [onValueChange, value],
-  )
   const contextValue = useMemo<MultiSelectContextValue>(
     () => ({
-      controls: controlsRef.current,
       disabled,
       items,
       triggerRef,
-      selectedValues,
-      setSelectedValues,
     }),
-    [disabled, items, selectedValues, setSelectedValues],
+    [disabled, items],
   )
 
   return (
     <MultiSelectContext.Provider value={contextValue}>
-      <BasePopover.Root
-        defaultOpen={defaultOpen}
-        open={open}
-        onOpenChange={onOpenChange}
+      <CheckboxGroup.Root
+        items={items}
+        value={value}
+        defaultValue={defaultValue}
+        onValueChange={onValueChange}
+        disabled={disabled}
       >
-        {children}
-      </BasePopover.Root>
+        <BasePopover.Root
+          defaultOpen={defaultOpen}
+          open={open}
+          onOpenChange={onOpenChange}
+        >
+          {children}
+        </BasePopover.Root>
+      </CheckboxGroup.Root>
     </MultiSelectContext.Provider>
   )
 }
@@ -219,10 +199,6 @@ const popupWidthStyles = {
   l: multiSelectStyles.popupWidthL,
 } satisfies Record<MultiSelectContentWidth, unknown>
 
-function getMutableItems(items: readonly MultiSelectItem[]): readonly MultiSelectItem[] {
-  return items.filter((item) => item.disabled !== true)
-}
-
 function MultiSelectContent({
   label,
   width = 'm',
@@ -231,6 +207,7 @@ function MultiSelectContent({
   align = 'start',
 }: MultiSelectContentProps): React.ReactElement {
   const context = useMultiSelectContext()
+  const focusCheckboxGroupEdge = useCheckboxGroupNavigation()
   const popupRef = useRef<ComponentRef<typeof BasePopover.Popup>>(null)
   const positionerStyles = createStateStyleProps<BasePopover.Positioner.State>((state) => [
     multiSelectStyles.positioner,
@@ -266,22 +243,7 @@ function MultiSelectContent({
     state.align === 'center' && multiSelectStyles.popupAlignCenter,
     state.align === 'end' && multiSelectStyles.popupAlignEnd,
   ])
-  const selectedSet = useMemo(() => new Set(context.selectedValues), [context.selectedValues])
-  const mutableItems = useMemo(() => getMutableItems(context.items), [context.items])
-  const mutableItemIndices = useMemo(
-    () => new Map(mutableItems.map((item, index) => [item.value, index])),
-    [mutableItems],
-  )
-  const allMutableSelected = mutableItems.every((item) => selectedSet.has(item.value))
   const deferRendering = context.items.length > deferredRenderingThreshold
-
-  const focusControl = (itemIndex: number, control: keyof ItemControls) => {
-    const item = mutableItems[itemIndex]
-    if (item === undefined) {
-      return
-    }
-    context.controls.get(item.value)?.[control]?.focus()
-  }
 
   return (
     <BasePopover.Portal keepMounted={keepMounted}>
@@ -302,7 +264,7 @@ function MultiSelectContent({
             }
             if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
               event.preventDefault()
-              focusControl(event.key === 'ArrowDown' ? 0 : mutableItems.length - 1, 'checkbox')
+              focusCheckboxGroupEdge(event.key === 'ArrowDown' ? 'first' : 'last')
             }
           }}
           {...popupStyles}
@@ -313,190 +275,15 @@ function MultiSelectContent({
             rootSlot="multi-select-scroll-area"
             viewportSlot="multi-select-viewport"
           >
-            <div
-              aria-label={label}
-              role="group"
-              {...stylex.props(multiSelectStyles.options)}
-            >
-              {context.items.map((item) => (
-                <MultiSelectOption
-                  key={item.value}
-                  allMutableSelected={allMutableSelected}
-                  deferRendering={deferRendering}
-                  item={item}
-                  itemIndex={mutableItemIndices.get(item.value) ?? -1}
-                  mutableItems={mutableItems}
-                  selectedSet={selectedSet}
-                />
-              ))}
-            </div>
+            <CheckboxGroupListPrivate
+              label={label}
+              rendering={deferRendering === true ? 'deferred' : 'eager'}
+              tabbable={false}
+            />
           </ScrollAreaPrivate>
         </BasePopover.Popup>
       </BasePopover.Positioner>
     </BasePopover.Portal>
-  )
-}
-
-function MultiSelectOption({
-  allMutableSelected,
-  deferRendering,
-  item,
-  itemIndex,
-  mutableItems,
-  selectedSet,
-}: {
-  allMutableSelected: boolean
-  deferRendering: boolean
-  item: MultiSelectItem
-  itemIndex: number
-  mutableItems: readonly MultiSelectItem[]
-  selectedSet: ReadonlySet<string>
-}): React.ReactElement {
-  const context = useMultiSelectContext()
-  const checked = selectedSet.has(item.value)
-  const disabled = context.disabled === true || item.disabled === true
-  const actionKind = allMutableSelected === true || checked === false ? 'only' : 'all'
-  const actionLabel = actionKind === 'all' ? `Check all from ${item.label}` : `Only ${item.label}`
-
-  const setItemChecked = (nextChecked: boolean) => {
-    const nextSelected = new Set(context.selectedValues)
-    if (nextChecked === true) {
-      nextSelected.add(item.value)
-    } else {
-      nextSelected.delete(item.value)
-    }
-    context.setSelectedValues(
-      context.items
-        .filter((candidate) => nextSelected.has(candidate.value))
-        .map((candidate) => candidate.value),
-    )
-  }
-
-  const focusRelative = (offset: number, control: keyof ItemControls) => {
-    if (mutableItems.length === 0 || itemIndex < 0) {
-      return
-    }
-    const nextIndex = (itemIndex + offset + mutableItems.length) % mutableItems.length
-    const nextItem = mutableItems[nextIndex]
-    if (nextItem !== undefined) {
-      context.controls.get(nextItem.value)?.[control]?.focus()
-    }
-  }
-
-  const handleNavigation = (event: KeyboardEvent<HTMLElement>, control: keyof ItemControls) => {
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault()
-      focusRelative(event.key === 'ArrowDown' ? 1 : -1, control)
-      return
-    }
-    if (event.key === 'Home' || event.key === 'End') {
-      event.preventDefault()
-      const nextItem = event.key === 'Home' ? mutableItems[0] : mutableItems.at(-1)
-      if (nextItem !== undefined) {
-        context.controls.get(nextItem.value)?.[control]?.focus()
-      }
-    }
-  }
-
-  return (
-    <div
-      {...stylex.props(
-        multiSelectStyles.row,
-        deferRendering === true && multiSelectStyles.rowDeferred,
-        disabled === true && multiSelectStyles.rowDisabled,
-      )}
-      data-slot="multi-select-row"
-      data-rendering={deferRendering === true ? 'deferred' : undefined}
-    >
-      <Checkbox
-        ref={(element) => {
-          const controls = context.controls.get(item.value) ?? { action: null, checkbox: null }
-          controls.checkbox = element
-          context.controls.set(item.value, controls)
-        }}
-        aria-label={`Select ${item.label}`}
-        checked={checked}
-        disabled={disabled}
-        size="s"
-        tabIndex={-1}
-        onCheckedChange={(nextChecked) => setItemChecked(nextChecked === true)}
-        onKeyDown={(event) => {
-          handleNavigation(event, 'checkbox')
-          if (event.defaultPrevented === true) {
-            return
-          }
-          if (event.key === 'ArrowRight' && disabled === false) {
-            event.preventDefault()
-            context.controls.get(item.value)?.action?.focus()
-          } else if (event.key === 'Enter' && disabled === false) {
-            event.preventDefault()
-            setItemChecked(checked === false)
-          }
-        }}
-      />
-      {disabled === true ? (
-        <span
-          {...stylex.props(multiSelectStyles.optionButton, multiSelectStyles.optionButtonDisabled)}
-        >
-          <span {...stylex.props(multiSelectStyles.optionText)}>{item.label}</span>
-        </span>
-      ) : (
-        <button
-          ref={(element) => {
-            const controls = context.controls.get(item.value) ?? { action: null, checkbox: null }
-            controls.action = element
-            context.controls.set(item.value, controls)
-          }}
-          {...stylex.props(multiSelectStyles.optionButton)}
-          type="button"
-          aria-label={actionLabel}
-          tabIndex={-1}
-          onClick={() => {
-            if (actionKind === 'all') {
-              const mutableValues = new Set(
-                getMutableItems(context.items).map((candidate) => candidate.value),
-              )
-              context.setSelectedValues(
-                context.items
-                  .filter(
-                    (candidate) =>
-                      mutableValues.has(candidate.value) || selectedSet.has(candidate.value),
-                  )
-                  .map((candidate) => candidate.value),
-              )
-              return
-            }
-            context.setSelectedValues(
-              context.items
-                .filter(
-                  (candidate) =>
-                    candidate.value === item.value ||
-                    (candidate.disabled === true && selectedSet.has(candidate.value)),
-                )
-                .map((candidate) => candidate.value),
-            )
-          }}
-          onKeyDown={(event) => {
-            handleNavigation(event, 'action')
-            if (event.defaultPrevented === true) {
-              return
-            }
-            if (event.key === 'ArrowLeft') {
-              event.preventDefault()
-              context.controls.get(item.value)?.checkbox?.focus()
-            }
-          }}
-        >
-          <span {...stylex.props(multiSelectStyles.optionText)}>{item.label}</span>
-          <span
-            aria-hidden="true"
-            {...stylex.props(multiSelectStyles.action)}
-          >
-            {actionKind === 'all' ? 'Check all' : 'Only'}
-          </span>
-        </button>
-      )}
-    </div>
   )
 }
 

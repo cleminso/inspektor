@@ -176,6 +176,19 @@ export const checkboxItem = {
   componentId: 'checkbox',
 } satisfies NavItem
 
+export const checkboxGroupItem = {
+  title: 'Checkbox Group',
+  slug: 'checkbox-group',
+  href: '/components/checkbox-group',
+  description: 'Multiple selection with contextual bulk actions and disabled-item preservation.',
+  importPath: '@inspector/ds',
+  source: {
+    label: 'checkboxGroup.tsx',
+    path: 'packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx',
+  },
+  componentId: 'checkboxGroup',
+} satisfies NavItem
+
 export const switchItem = {
   title: 'Switch',
   slug: 'switch',
@@ -676,6 +689,7 @@ const componentItems: NavItem[] = [
   buttonGroupItem,
   calendarItem,
   checkboxItem,
+  checkboxGroupItem,
   codeEditorItem,
   comboboxItem,
   {

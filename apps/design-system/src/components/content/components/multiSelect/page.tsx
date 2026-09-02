@@ -34,7 +34,7 @@ export function MultiSelectPage(): ReactElement {
       </Section>
       <Section
         title="Keyboard behavior"
-        description="The popup receives initial focus. Up and Down enter and move between rows while preserving the checkbox or action column; Left and Right switch columns. Enter or Space activates the focused control, while Escape closes the popup and restores trigger focus."
+        description="The popup receives initial focus. Down enters the first row action and Up enters the last. Within the list, Up and Down preserve the focused column while Left and Right switch between the action and checkbox. Enter or Space activates the focused control, while Escape closes the popup and restores trigger focus."
       />
       <Section title="Root props">
         <PropsTable rows={rootProps} />
