@@ -294,6 +294,7 @@ const SwimlaneTimelineCell = forwardRef<HTMLTableCellElement, SwimlaneTimelineCe
           swimlaneTimelineStyles.bodyCell,
           swimlaneTimelineStyles.cell,
           status === 'active' && swimlaneTimelineStyles.cellActive,
+          isSelected === true && swimlaneTimelineStyles.cellSelected,
         )}
         aria-label={status === 'active' ? undefined : label}
         data-selected={isSelected === true ? 'true' : undefined}

@@ -11,6 +11,7 @@ interface FixtureConnection {
   appId: string
   adminSecret: string
   backendSecret: string
+  env: string
 }
 
 let browserErrors: string[] = []
@@ -73,6 +74,7 @@ test('keeps query details scrolling inside the workspace query section', async (
   const serverUrl = new URL(connection.serverUrl)
   const basePath = serverUrl.pathname.replace(/\/+$/, '')
   const subscriptionsPath = `${basePath}/apps/${encodeURIComponent(connection.appId)}/admin/introspection/subscriptions`
+  let generatedAt = 1_000
 
   await page.route(
     (url) => url.origin === serverUrl.origin && url.pathname === subscriptionsPath,
@@ -85,10 +87,17 @@ test('keeps query details scrolling inside the workspace query section', async (
       await route.fulfill({
         body: JSON.stringify({
           appId: connection.appId,
-          generatedAt: 1_000,
+          generatedAt,
           queries: [
             {
-              branches: ['main'],
+              branches: [
+                `${connection.env}-7f43cb822ba5-main`,
+                `${connection.env}-e7ebacf3577c-main`,
+                `${connection.env}-d8881b20708b-main`,
+                `${connection.env}-8b0b0be20153-main`,
+                `${connection.env}-4444a49d011b-main`,
+                `${connection.env}-69c962a1a907-main`,
+              ],
               count: 2,
               groupKey: 'accounts-by-name',
               propagation: 'full',
@@ -101,11 +110,19 @@ test('keeps query details scrolling inside the workspace query section', async (
         headers: { 'access-control-allow-origin': '*' },
         status: 200,
       })
+      generatedAt += 100
     },
   )
   await connectToFixture(page)
   await page.getByRole('link', { name: 'Open subscriptions' }).click()
-  await page.getByRole('button', { name: /Open accounts-by-name at/ }).click()
+  const refresh = page.getByRole('button', { name: 'Refresh' })
+  for (let capture = 0; capture < 8; capture += 1) {
+    await refresh.click()
+  }
+  const snapshots = page.getByRole('button', { name: /Open accounts-by-name at/ })
+  await expect(snapshots).toHaveCount(9)
+  const selectedSnapshot = snapshots.last()
+  await selectedSnapshot.click()
 
   const details = page.getByRole('complementary', { name: 'Query details' })
   const queryPanel = details.getByRole('region', { name: 'Query' })
@@ -113,7 +130,48 @@ test('keeps query details scrolling inside the workspace query section', async (
 
   await expect(page.locator('[data-slot="shell-layout-left-dock"]')).toBeVisible()
   await expect(details).toBeVisible()
+  const detailsHandle = page.locator('[data-slot="resizable-handle"]').last()
+  const detailsHandleBox = await detailsHandle.boundingBox()
+  expect(detailsHandleBox).not.toBeNull()
+  await page.mouse.move(
+    detailsHandleBox!.x + detailsHandleBox!.width / 2,
+    detailsHandleBox!.y + detailsHandleBox!.height / 2,
+  )
+  await page.mouse.down()
+  await page.mouse.move(
+    detailsHandleBox!.x - 160,
+    detailsHandleBox!.y + detailsHandleBox!.height / 2,
+  )
+  await page.mouse.up()
+  await expect
+    .poll(async () => (await detailsHandle.boundingBox())?.x ?? detailsHandleBox!.x)
+    .toBeLessThan(detailsHandleBox!.x)
+  await expect
+    .poll(() =>
+      selectedSnapshot.evaluate((element) => {
+        const cell = element.closest('td')
+        const viewport = element.closest('[data-slot="scroll-area-viewport"]')
+        if (cell === null || viewport === null) return false
+        const cellBox = cell.getBoundingClientRect()
+        const viewportBox = viewport.getBoundingClientRect()
+        return cellBox.left >= viewportBox.left - 1 && cellBox.right <= viewportBox.right + 1
+      }),
+    )
+    .toBe(true)
+  await expect
+    .poll(() =>
+      selectedSnapshot.evaluate((element) => getComputedStyle(element.closest('td')!).outlineStyle),
+    )
+    .toBe('solid')
+  const selectedOutline = await selectedSnapshot.evaluate((element) => {
+    const style = getComputedStyle(element.closest('td')!)
+    return { color: style.outlineColor, width: style.outlineWidth }
+  })
+  expect(Number.parseFloat(selectedOutline.width)).toBeGreaterThan(0)
+  expect(selectedOutline.color).not.toBe('rgba(0, 0, 0, 0)')
   await expect(details.getByText('accounts-by-…')).toBeVisible()
+  await expect(details.getByText('6 schema versions')).toBeVisible()
+  await expect(details.getByText(`${connection.env} / main`)).toBeVisible()
   await expect(details.locator('[data-slot="scroll-area"]')).toHaveCount(1)
   await expect(queryPanel.locator('[data-slot="scroll-area"]')).toHaveCount(1)
   const toolbarBox = await toolbar.boundingBox()
@@ -545,6 +603,7 @@ function fixtureConnection(): FixtureConnection {
     appId: requiredEnvironmentValue('INSPECTOR_E2E_APP_ID'),
     adminSecret: requiredEnvironmentValue('INSPECTOR_E2E_ADMIN_SECRET'),
     backendSecret: requiredEnvironmentValue('INSPECTOR_E2E_BACKEND_SECRET'),
+    env: 'dev',
   }
 }
 
@@ -560,7 +619,7 @@ async function fillConnectionForm(page: Page): Promise<void> {
   await page.getByRole('textbox', { name: 'Server URL' }).fill(connection.serverUrl)
   await page.getByRole('textbox', { name: 'App ID' }).fill(connection.appId)
   await page.getByRole('textbox', { name: 'Admin secret' }).fill(connection.adminSecret)
-  await page.getByRole('textbox', { name: 'Env' }).fill('dev')
+  await page.getByRole('textbox', { name: 'Env' }).fill(connection.env)
   await page.getByRole('textbox', { name: 'Branch' }).fill('main')
 }
 

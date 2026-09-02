@@ -15,6 +15,7 @@ import { QueriesView } from './view'
 
 const mocks = vi.hoisted(() => ({
   connection: null as StoredConnection | null,
+  panelResize: null as (() => void) | null,
   telemetry: null as QuerySubscriptionsTelemetry | null,
 }))
 const useQuerySubscriptionsTelemetry = vi.hoisted(() => vi.fn())
@@ -33,9 +34,18 @@ vi.mock('@inspector/ds', async (importOriginal) => {
   return {
     ...actual,
     ResizableHandle: () => <div role="separator" />,
-    ResizablePanel: ({ children, minSize }: { children: ReactNode; minSize?: number }) => (
-      <div data-panel-min-size={minSize}>{children}</div>
-    ),
+    ResizablePanel: ({
+      children,
+      minSize,
+      onResize,
+    }: {
+      children: ReactNode
+      minSize?: number
+      onResize?: () => void
+    }) => {
+      if (onResize !== undefined) mocks.panelResize = onResize
+      return <div data-panel-min-size={minSize}>{children}</div>
+    },
     ResizablePanelGroup: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     ShellLayout: {
       Body: Fragment,
@@ -91,6 +101,7 @@ beforeEach(() => {
     adminSecret: 'secret-1',
   }
   mocks.telemetry = telemetry([])
+  mocks.panelResize = null
   useQuerySubscriptionsTelemetry.mockImplementation(() => mocks.telemetry)
 })
 
@@ -168,6 +179,8 @@ describe('QueriesView', () => {
     expect(within(details).queryByText('accounts-by-name')).toBeNull()
     expect(within(details).getByText('Subscriptions')).toBeTruthy()
     expect(within(details).getByText('2')).toBeTruthy()
+    expect(within(details).getByText('Resolved sources')).toBeTruthy()
+    expect(within(details).getByText('main')).toBeTruthy()
     expect(within(details).getByText(/\b(?:AM|PM)$/u)).toBeTruthy()
     const queryTree = within(details).getByRole('tree', { name: 'Query JSON' })
     expect(queryTree.textContent).toContain('Ada')
@@ -175,6 +188,90 @@ describe('QueriesView', () => {
     fireEvent.click(within(details).getByRole('button', { name: 'Close' }))
     expect(document.activeElement).toBe(present)
     expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
+  })
+
+  it('presents schema-qualified branches as one resolved source scope', () => {
+    mocks.connection = { ...mocks.connection!, env: 'local-dev' }
+    const branches = [
+      'local-dev-7f43cb822ba5-main',
+      'local-dev-e7ebacf3577c-main',
+      'local-dev-d8881b20708b-main',
+    ]
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
+    render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const details = screen.getByRole('complementary', { name: 'Query details' })
+
+    expect(within(details).getByText('Resolved sources')).toBeTruthy()
+    expect(within(details).getByText('3 schema versions')).toBeTruthy()
+    expect(within(details).getByText('Scope')).toBeTruthy()
+    expect(within(details).getByText('local-dev / main')).toBeTruthy()
+    expect(within(details).getByText('Schema versions')).toBeTruthy()
+    expect(within(details).getByText('7f43cb822ba5, e7ebacf3577c, d8881b20708b')).toBeTruthy()
+    expect(within(details).queryByText('Branches')).toBeNull()
+  })
+
+  it('does not claim an unreported source scope includes every branch', () => {
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches: [] }])])
+    render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const details = screen.getByRole('complementary', { name: 'Query details' })
+
+    expect(within(details).getByText('Resolved sources')).toBeTruthy()
+    expect(within(details).getByText('Not reported')).toBeTruthy()
+    expect(within(details).queryByText('All branches')).toBeNull()
+  })
+
+  it('keeps mixed resolved source scopes explicit', () => {
+    const branches = ['test-7f43cb822ba5-main', 'test-e7ebacf3577c-feature']
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
+    render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const details = screen.getByRole('complementary', { name: 'Query details' })
+
+    expect(
+      within(details).getByText('test-7f43cb822ba5-main, test-e7ebacf3577c-feature'),
+    ).toBeTruthy()
+    expect(within(details).queryByText('2 schema versions')).toBeNull()
+  })
+
+  it('keeps the selected snapshot visible when query details open', () => {
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
+    render(<QueriesView />)
+    const cell = screen.getByRole('button', { name: /Open accounts-by-name at/ })
+    const scrollIntoView = vi.fn()
+    Object.defineProperty(cell.closest('td'), 'scrollIntoView', {
+      configurable: true,
+      value: scrollIntoView,
+    })
+
+    fireEvent.click(cell)
+
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' })
+
+    scrollIntoView.mockClear()
+    mocks.panelResize?.()
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' })
+  })
+
+  it('closes query details from the footer action and Escape', () => {
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
+    render(<QueriesView />)
+    const cell = screen.getByRole('button', { name: /Open accounts-by-name at/ })
+
+    fireEvent.click(cell)
+    const close = screen.getByRole('button', { name: 'Close' })
+    expect(close.getAttribute('aria-keyshortcuts')).toBe('Escape')
+    fireEvent.click(close)
+    expect(document.activeElement).toBe(cell)
+
+    fireEvent.click(cell)
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
+    expect(document.activeElement).toBe(cell)
   })
 
   it('keeps lane expansion presentational and selection stable as history appends', () => {

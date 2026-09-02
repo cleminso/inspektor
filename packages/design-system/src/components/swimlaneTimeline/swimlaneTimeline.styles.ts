@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex'
 import {
   borderColors,
   focusColors,
+  selectionColors,
   spatial,
   surfaceColors,
   textColors,
@@ -171,6 +172,13 @@ export const swimlaneTimelineStyles = stylex.create({
   },
   cellActive: {
     color: swimlaneTimelineColors.activityIndicator,
+  },
+  cellSelected: {
+    backgroundColor: selectionColors.background,
+    outlineColor: selectionColors.border,
+    outlineOffset: -2,
+    outlineStyle: 'solid',
+    outlineWidth: spatial['focus-ring-width'],
   },
   cellAction: {
     padding: 0,

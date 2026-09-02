@@ -1,10 +1,11 @@
-import { useEffect, useRef, type PropsWithChildren } from 'react'
+import { useEffect, useRef, type PropsWithChildren, type ReactNode } from 'react'
 
 import { InspectorProvider } from '@app/providers/inspectorProvider'
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import type { ResolvedTablesNavigationTarget } from '@app/routing/inspectorNavigation'
 
 interface InspectorRuntimeBoundaryProps extends PropsWithChildren {
+  fallback?: ReactNode
   target: ResolvedTablesNavigationTarget
 }
 
@@ -17,8 +18,9 @@ interface InspectorRuntimeBoundaryProps extends PropsWithChildren {
  */
 export function InspectorRuntimeBoundary({
   children,
+  fallback = null,
   target,
-}: InspectorRuntimeBoundaryProps): React.ReactElement | null {
+}: InspectorRuntimeBoundaryProps): React.ReactNode {
   const { currentBranch, currentConnectionId, currentSchemaHash, setConnectionContext } =
     useInspectorSessionContext()
   const targetIdentity = JSON.stringify([target.connectionId, target.branch, target.schemaHash])
@@ -50,7 +52,7 @@ export function InspectorRuntimeBoundary({
   ])
 
   if (isContextReady === false) {
-    return null
+    return fallback
   }
 
   return <InspectorProvider initialRuntimeTarget={target}>{children}</InspectorProvider>

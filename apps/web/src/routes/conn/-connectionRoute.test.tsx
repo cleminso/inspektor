@@ -10,10 +10,19 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   createFileRoute: () => (options: Record<string, unknown>) => {
     routeOptions.current = options
-    return { useLoaderData: vi.fn() }
+    return {
+      useLoaderData: () => ({
+        branch: 'main',
+        connectionId: 'connection-1',
+        schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
+        schemaHash: 'schema-1',
+      }),
+    }
   },
   Outlet: () => null,
   useRouter: () => router,
+  useRouterState: ({ select }: { select: (state: unknown) => unknown }) =>
+    select({ location: { pathname: '/conn/connection-1/queries' } }),
 }))
 
 vi.mock('@app/routing/inspectorNavigation', () => ({
@@ -22,7 +31,11 @@ vi.mock('@app/routing/inspectorNavigation', () => ({
 }))
 
 vi.mock('@app/runtime/inspectorRuntimeBoundary', () => ({
-  InspectorRuntimeBoundary: ({ children }: { children: React.ReactNode }) => children,
+  InspectorRuntimeBoundary: ({ fallback }: { fallback: React.ReactNode }) => fallback,
+}))
+
+vi.mock('@app/shell/layout', () => ({
+  InspectorLayout: ({ children }: { children: React.ReactNode }) => children,
 }))
 
 vi.mock('@inspector/ds', () => ({
@@ -138,9 +151,19 @@ describe('connection route', () => {
 
   it('registers and renders route-owned loading feedback', () => {
     expect(routeOptions.current?.pendingComponent).toBe(ConnectionRoutePending)
+    expect(routeOptions.current?.pendingMinMs).toBe(0)
+    expect(routeOptions.current?.pendingMs).toBe(0)
     expect(routeOptions.current?.errorComponent).toBeTypeOf('function')
 
     render(<ConnectionRoutePending />)
+
+    expect(screen.getByRole('status').textContent).toBe('Opening connection…')
+  })
+
+  it('renders connection feedback while the runtime boundary synchronizes', () => {
+    const RuntimeRoute = routeOptions.current?.component as () => React.ReactElement
+
+    render(<RuntimeRoute />)
 
     expect(screen.getByRole('status').textContent).toBe('Opening connection…')
   })

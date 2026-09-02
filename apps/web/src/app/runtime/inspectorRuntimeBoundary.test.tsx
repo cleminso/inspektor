@@ -45,7 +45,7 @@ afterEach(cleanup)
 describe('InspectorRuntimeBoundary', () => {
   it('synchronizes the resolved target before mounting runtime-dependent children', () => {
     const { rerender } = render(
-      <InspectorRuntimeBoundary target={target}>
+      <InspectorRuntimeBoundary fallback={<div>Opening connection</div>} target={target}>
         <div>Runtime content</div>
       </InspectorRuntimeBoundary>,
       { wrapper: StrictMode },
@@ -54,17 +54,19 @@ describe('InspectorRuntimeBoundary', () => {
     expect(session.setConnectionContext).toHaveBeenCalledWith('connection-1', 'main', 'schema-1')
     expect(session.setConnectionContext).toHaveBeenCalledOnce()
     expect(screen.queryByText('Runtime content')).toBeNull()
+    expect(screen.getByText('Opening connection')).toBeTruthy()
 
     session.currentBranch = 'main'
     session.currentConnectionId = 'connection-1'
     session.currentSchemaHash = 'schema-1'
     rerender(
-      <InspectorRuntimeBoundary target={target}>
+      <InspectorRuntimeBoundary fallback={<div>Opening connection</div>} target={target}>
         <div>Runtime content</div>
       </InspectorRuntimeBoundary>,
     )
 
     expect(screen.getByText('Runtime content')).toBeTruthy()
+    expect(screen.queryByText('Opening connection')).toBeNull()
   })
 
   it('mounts the runtime immediately when the session already matches the target', () => {

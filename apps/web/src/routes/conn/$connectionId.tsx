@@ -61,6 +61,8 @@ export const Route = createFileRoute('/conn/$connectionId')({
     return target
   },
   pendingComponent: ConnectionRoutePending,
+  pendingMinMs: 0,
+  pendingMs: 0,
   errorComponent: ConnectionRouteError,
   component: InspectorRuntimeRoute,
 })
@@ -73,7 +75,10 @@ function InspectorRuntimeRoute(): React.ReactElement {
   })
 
   return (
-    <InspectorRuntimeBoundary target={target}>
+    <InspectorRuntimeBoundary
+      fallback={<ConnectionRoutePending />}
+      target={target}
+    >
       <InspectorLayout pageTitle={pageTitle}>
         <Outlet />
       </InspectorLayout>

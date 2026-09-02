@@ -13,6 +13,18 @@
 
 [02/09/26]
 
+- [x] Present schema-qualified query branches as one resolved source scope with environment, user branch, and schema versions.
+- [x] Treat an empty resolved source list as unreported instead of claiming it covers every branch.
+
+[02/09/26]
+
+- [x] Keep the selected snapshot visible when the workspace-local details pane opens.
+- [x] Give the selected snapshot a visible treatment distinct from active unselected snapshots.
+- [x] Keep the details close action in the pane footer and support Escape with focus restoration.
+- [x] Keep connection synchronization and query loading states visible instead of rendering blank content.
+
+[02/09/26]
+
 - [x] Align the query details header and timeline toolbar to one shared control height.
 
 [02/09/26]
@@ -99,12 +111,22 @@ No open product work is recorded for the implemented foundation.
 
 [02/09/26]
 
+- Schema-qualified telemetry branches are compatibility sources for one effective query view, not independent application branches.
+- Query details label these values as resolved sources and collapse a shared environment and user branch into one scope.
+
+[02/09/26]
+
+- Query details keep the resizable split-pane model; opening the pane scrolls the selected snapshot into the nearest visible position instead of converting details to an overlay.
+- Escape and the footer close action both restore focus to the selected snapshot, or to Refresh when that snapshot is unavailable.
+
+[02/09/26]
+
 - Retain at most 60 captures while reserving room for the latest successful capture and subsequent failed attempt.
 
 [02/09/26]
 
 - Observation remains content-sized while Query owns the remaining details-pane height and vertical scrolling.
-- Table and subscription count form the observation summary; snapshot, propagation, and branches remain supporting metadata.
+- Table and subscription count form the observation summary; snapshot, propagation, and resolved source scope remain supporting metadata.
 
 [02/09/26]
 
@@ -138,6 +160,19 @@ No open product work is recorded for the implemented foundation.
 - [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[02/09/26]
+
+- [x] Focused view coverage verifies schema-source decomposition and the unreported empty state.
+- [x] Browser acceptance verifies the resolved-source summary with multiple schema versions.
+- [x] Inspector formatting, lint, typecheck, build, and package tests pass.
+
+[02/09/26]
+
+- [x] Focused view coverage verifies selected-snapshot visibility, close actions, and focus restoration.
+- [x] Focused runtime coverage verifies visible connection synchronization feedback.
+- [x] Browser acceptance verifies selected treatment, details-pane horizontal context, and footer close behavior.
+- [x] Inspector and design-system formatting, lint, typecheck, build, and affected package tests pass.
 
 [02/09/26]
 

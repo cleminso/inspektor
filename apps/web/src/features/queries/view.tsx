@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Accordion,
   Box,
@@ -87,6 +87,33 @@ function getQueryData(query: string): JsonViewObject | readonly JsonViewValue[] 
   return { value: parsed }
 }
 
+function getSchemaSourceScope(branches: readonly string[], environment: string) {
+  const environmentPrefix = `${environment}-`
+  const sources = branches.map((branch) => {
+    const match = /^([0-9a-f]{12})-(.+)$/iu.exec(
+      branch.startsWith(environmentPrefix) ? branch.slice(environmentPrefix.length) : '',
+    )
+    return match === null ? null : { schemaVersion: match[1]!, branch: match[2]! }
+  })
+  const first = sources[0]
+  if (first === undefined || first === null) {
+    return null
+  }
+
+  const schemaVersions: string[] = []
+  for (const source of sources) {
+    if (source === null || source.branch !== first.branch) {
+      return null
+    }
+    schemaVersions.push(source.schemaVersion)
+  }
+
+  return {
+    branch: first.branch,
+    schemaVersions,
+  }
+}
+
 function CenteredStatus({
   children,
   role = 'status',
@@ -99,6 +126,7 @@ function CenteredStatus({
       alignItems="center"
       backgroundColor="surface-background"
       flex={1}
+      height="full"
       justifyContent="center"
       role={role}
     >
@@ -113,7 +141,15 @@ function CenteredStatus({
   )
 }
 
-function ObservationRow({ label, value }: { label: string; value: React.ReactNode }) {
+function ObservationRow({
+  label,
+  monospace = false,
+  value,
+}: {
+  label: string
+  monospace?: boolean
+  value: React.ReactNode
+}) {
   return (
     <Box
       alignItems="baseline"
@@ -128,6 +164,7 @@ function ObservationRow({ label, value }: { label: string; value: React.ReactNod
       </Text>
       <Text
         align="right"
+        monospace={monospace}
         tabularNums
         variant="caption"
       >
@@ -139,13 +176,16 @@ function ObservationRow({ label, value }: { label: string; value: React.ReactNod
 
 function QueryDetails({
   details,
+  environment,
   onClose,
 }: {
   details: SelectedQueryDetails
+  environment: string
   onClose: () => void
 }): React.ReactElement {
   const { capture, group } = details
   const queryData = useMemo(() => getQueryData(group.query), [group.query])
+  const schemaSourceScope = getSchemaSourceScope(group.branches, environment)
   const marker = getCaptureMarker(capture)
   const groupKeyLabel =
     group.groupKey.length > 12 ? `${group.groupKey.slice(0, 12)}…` : group.groupKey
@@ -190,7 +230,7 @@ function QueryDetails({
         <Accordion defaultValue={['observation']}>
           <Accordion.Item value="observation">
             <Accordion.Header level={2}>
-              <Accordion.Trigger>Observation</Accordion.Trigger>
+              <Accordion.Trigger>OBSERVATION</Accordion.Trigger>
             </Accordion.Header>
             <Accordion.Panel>
               <Box
@@ -252,10 +292,35 @@ function QueryDetails({
                   label="Propagation"
                   value={group.propagation}
                 />
-                <ObservationRow
-                  label="Branches"
-                  value={group.branches.join(', ') || 'All branches'}
-                />
+                {group.branches.length === 0 ? (
+                  <ObservationRow
+                    label="Resolved sources"
+                    value="Not reported"
+                  />
+                ) : schemaSourceScope === null ? (
+                  <ObservationRow
+                    label="Resolved sources"
+                    monospace
+                    value={group.branches.join(', ')}
+                  />
+                ) : (
+                  <>
+                    <ObservationRow
+                      label="Resolved sources"
+                      value={`${schemaSourceScope.schemaVersions.length} schema version${schemaSourceScope.schemaVersions.length === 1 ? '' : 's'}`}
+                    />
+                    <ObservationRow
+                      label="Scope"
+                      monospace
+                      value={`${environment} / ${schemaSourceScope.branch}`}
+                    />
+                    <ObservationRow
+                      label="Schema versions"
+                      monospace
+                      value={schemaSourceScope.schemaVersions.join(', ')}
+                    />
+                  </>
+                )}
               </Box>
             </Accordion.Panel>
           </Accordion.Item>
@@ -271,7 +336,7 @@ function QueryDetails({
           >
             <Accordion.Item value="query">
               <Accordion.Header level={2}>
-                <Accordion.Trigger>Query</Accordion.Trigger>
+                <Accordion.Trigger>QUERY</Accordion.Trigger>
               </Accordion.Header>
               <Accordion.Panel>
                 <Box padding="s">
@@ -304,6 +369,7 @@ function QueryDetails({
         padding="xs"
       >
         <Button
+          aria-keyshortcuts="Escape"
           layout="fill"
           size="s"
           variant="secondary"
@@ -318,11 +384,13 @@ function QueryDetails({
 
 function QueryTimeline({
   refreshButtonRef,
+  selectedCellRef,
   selection,
   telemetry,
   onSelect,
 }: {
   refreshButtonRef: React.RefObject<HTMLButtonElement | null>
+  selectedCellRef: React.RefObject<HTMLTableCellElement | null>
   selection: QuerySelection | null
   telemetry: QuerySubscriptionsTelemetry
   onSelect: (selection: QuerySelection) => void
@@ -432,17 +500,18 @@ function QueryTimeline({
                         ? 'unknown time'
                         : captureTimeFormatter.format(getCaptureMarker(capture))
                     const labelPrefix = `${track.groupKey} at ${captureLabel}`
+                    const isSelected =
+                      selection?.captureId === cell.captureId &&
+                      selection.groupKey === track.groupKey
                     return cell.state === 'present' ? (
                       <SwimlaneTimeline.Cell
                         key={cell.captureId}
                         label={`Open ${labelPrefix}`}
+                        ref={isSelected === true ? selectedCellRef : undefined}
                         onActivate={() =>
                           onSelect({ captureId: cell.captureId, groupKey: track.groupKey })
                         }
-                        selected={
-                          selection?.captureId === cell.captureId &&
-                          selection.groupKey === track.groupKey
-                        }
+                        selected={isSelected}
                         status="active"
                       />
                     ) : (
@@ -468,10 +537,14 @@ function QueryTimeline({
 function ConnectedQueriesView({ connection }: { connection: StoredConnection }) {
   const telemetry = useQuerySubscriptionsTelemetry(connection)
   const [selection, setSelection] = useState<QuerySelection | null>(null)
-  const selectedCellRef = useRef<HTMLButtonElement | null>(null)
+  const selectedCellRef = useRef<HTMLTableCellElement | null>(null)
   const refreshButtonRef = useRef<HTMLButtonElement | null>(null)
   const selectedDetails = findSelectedDetails(telemetry.history, selection)
+  const hasSelectedDetails = selectedDetails !== null
   const isSelectionMissing = selection !== null && selectedDetails === null
+  const keepSelectedCellVisible = useCallback(() => {
+    selectedCellRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
+  }, [])
 
   useLayoutEffect(() => {
     if (isSelectionMissing === true) {
@@ -479,6 +552,12 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
       refreshButtonRef.current?.focus()
     }
   }, [isSelectionMissing])
+
+  useLayoutEffect(() => {
+    if (selection !== null) {
+      keepSelectedCellVisible()
+    }
+  }, [keepSelectedCellVisible, selection])
 
   const selectQuery = (nextSelection: QuerySelection) => {
     if (
@@ -489,20 +568,42 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
       return
     }
 
-    selectedCellRef.current =
-      document.activeElement instanceof HTMLButtonElement ? document.activeElement : null
     setSelection(nextSelection)
   }
 
-  const closeDetails = () => {
+  const closeDetails = useCallback(() => {
     const selectedCell = selectedCellRef.current
-    if (selectedCell?.isConnected === true && selectedCell.closest('[hidden]') === null) {
-      selectedCell.focus()
+    const selectedButton = selectedCell?.querySelector('button') ?? null
+    if (
+      selectedCell?.isConnected === true &&
+      selectedCell.closest('[hidden]') === null &&
+      selectedButton !== null
+    ) {
+      selectedButton.focus()
     } else {
       refreshButtonRef.current?.focus()
     }
     setSelection(null)
-  }
+  }, [])
+
+  useEffect(() => {
+    if (hasSelectedDetails === false) {
+      return
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === 'Escape' &&
+        event.defaultPrevented === false &&
+        event.isComposing === false
+      ) {
+        event.preventDefault()
+        event.stopPropagation()
+        closeDetails()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [closeDetails, hasSelectedDetails])
 
   let content: React.ReactNode
   if (telemetry.state.kind === 'initial-loading') {
@@ -530,6 +631,7 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
     content = (
       <QueryTimeline
         refreshButtonRef={refreshButtonRef}
+        selectedCellRef={selectedCellRef}
         selection={selection}
         telemetry={telemetry}
         onSelect={selectQuery}
@@ -539,7 +641,7 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
 
   return (
     <ResizablePanelGroup orientation="horizontal">
-      <ResizablePanel>{content}</ResizablePanel>
+      <ResizablePanel onResize={keepSelectedCellVisible}>{content}</ResizablePanel>
       {selectedDetails === null ? null : (
         <>
           <ResizableHandle />
@@ -549,6 +651,7 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
           >
             <QueryDetails
               details={selectedDetails}
+              environment={connection.env}
               onClose={closeDetails}
             />
           </ResizablePanel>
