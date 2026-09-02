@@ -39,13 +39,16 @@ describe('SwimlaneTimeline', () => {
     const track = screen.getByRole('rowheader', { name: opaqueTrackLabel }).closest('tr')
     const laneHeading = screen.getByRole('button', { name: /Messages/ }).closest('th')
     const laneHeadingRow = laneHeading?.closest('tr')
+    const laneHeadingContinuation = laneHeadingRow?.querySelector('td')
 
     expect(container.querySelectorAll('table')).toHaveLength(1)
     expect(directChildren).toEqual(['COLGROUP', 'THEAD', 'TBODY'])
     expect(within(table).getAllByRole('columnheader')).toHaveLength(4)
-    expect(laneHeading?.colSpan).toBe(4)
-    expect(laneHeadingRow?.children).toHaveLength(1)
-    expect(track?.children).toHaveLength(4)
+    expect(table.querySelector('colgroup')?.children).toHaveLength(5)
+    expect(laneHeading?.colSpan).toBe(1)
+    expect(laneHeadingContinuation?.colSpan).toBe(4)
+    expect(laneHeadingRow?.children).toHaveLength(2)
+    expect(track?.children).toHaveLength(5)
   })
 
   it('updates expanded state and hides only track rows when collapsed', () => {
@@ -62,6 +65,26 @@ describe('SwimlaneTimeline', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     expect(laneHeadingRow?.hidden).toBe(false)
     expect(trackRow?.hidden).toBe(true)
+  })
+
+  it('keeps structural continuation cells without snapshots', () => {
+    render(
+      <SwimlaneTimeline aria-label="Empty timeline">
+        <SwimlaneTimeline.Header label="Queries">{null}</SwimlaneTimeline.Header>
+        <SwimlaneTimeline.Lane>
+          <SwimlaneTimeline.LaneTrigger>Messages</SwimlaneTimeline.LaneTrigger>
+          <SwimlaneTimeline.Track label="group-a">{null}</SwimlaneTimeline.Track>
+        </SwimlaneTimeline.Lane>
+      </SwimlaneTimeline>,
+    )
+
+    expect(
+      screen.getByRole('columnheader', { name: 'Queries' }).closest('tr')?.children,
+    ).toHaveLength(2)
+    expect(screen.getByRole('button', { name: 'Messages' }).closest('tr')?.children).toHaveLength(2)
+    expect(screen.getByRole('rowheader', { name: 'group-a' }).closest('tr')?.children).toHaveLength(
+      2,
+    )
   })
 
   it('uses a native button for active cell activation', () => {

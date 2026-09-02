@@ -98,6 +98,10 @@
 
 ## Validation checklist
 
+[02/09/26]
+
+- [ ] The documentation test command retains the unrelated Tooltip provider-delay metadata mismatch.
+
 [20/08/26]
 
 - [x] Cover inverse shortcut context composition in focused Tooltip tests.

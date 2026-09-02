@@ -11,6 +11,58 @@
 
 ## Implemented foundation
 
+[02/09/26]
+
+- [x] Align the query details header and timeline toolbar to one shared control height.
+
+[02/09/26]
+
+- [x] Retain the latest successful capture when repeated failures exceed the 60-capture history bound.
+- [x] Recover after a successful retry without adding a second timeline column for the latest server marker.
+- [x] Classify malformed JSON transport failures as invalid responses.
+- [x] Reset query telemetry and selection through the keyed view when connection credentials change.
+- [x] Clear selection when its capture is pruned and move focus to the persistent refresh action.
+- [x] Move focus to the persistent refresh action when details close after their lane is collapsed.
+
+[02/09/26]
+
+- [x] Match the details header's query-group truncation to the timeline track label.
+- [x] Explain that each lane suffix counts unique query groups observed for that table.
+
+[02/09/26]
+
+- [x] Keep Query JSON scrolling inside the Query accordion section without shifting the complete details pane.
+- [x] Separate high-value table and subscription metadata from supporting observation context.
+- [x] Expose JSON expansion and copy actions inside the scrolling Query section.
+
+[02/09/26]
+
+- [x] Keep query details inside the Queries workspace instead of mounting them as an application-shell dock.
+- [x] Keep the bottom-controlled left dock unchanged when query details open or close.
+- [x] Give the resizable query details pane a 240px minimum width.
+
+[01/09/26]
+
+- [x] Add a persistent toolbar above the query timeline with a manual refresh action.
+- [x] Keep refreshing and retained-history feedback inside the toolbar so polling state changes do not shift the timeline.
+- [x] Separate the toolbar from the timeline with one bottom border.
+
+[01/09/26]
+
+- [x] Project validated telemetry into fresh allowed-field records so retained history cannot preserve extra response fields or later source mutations.
+- [x] Bound retained query-subscription history to 60 captures.
+- [x] Keep confirmed empty snapshots distinct from refreshing and stale empty history.
+- [x] Give timeline cells human-readable capture labels, support pressed-state toggling, and restore focus when details close.
+
+[01/09/26]
+
+- [x] Read active connection credentials from the Inspector session and collect server subscription telemetry without the Jazz runtime client.
+- [x] Render retained captures through `SwimlaneTimeline` with tables as lanes, group keys as tracks, and present, absent, and unknown cells.
+- [x] Keep lane expansion inside the presentational timeline component.
+- [x] Store selection as capture ID plus group key and derive details from retained history.
+- [x] Show selected observation metadata and parsed query JSON in a workspace-local details pane with existing design-system components.
+- [x] Cover loading, successful emptiness, initial failure, refreshing, and retained stale-history states.
+
 [31/08/26]
 
 - [x] Let each dock icon open, close, or switch the shared left dock from one state source.
@@ -25,17 +77,49 @@
 
 ## Open product work
 
-[31/08/26]
-
-- [ ] Define the subscription-query workspace content and interactions.
+No open product work is recorded for the implemented foundation.
 
 ## Work outside the foundation scope
 
+[01/09/26]
+
+- Strict rejection of malformed raw `generatedAt` and `queries` values requires a change to `fetchServerSubscriptions`, which currently coerces them before returning to Inspector.
+
+[01/09/26]
+
+- Overlay `Db` trace collection and `JazzInspectorHost` integration remain outside the standalone web application scope.
+- Query result rows, result counts, row deltas, synchronization progress, settlement, query latency, and source-code attribution are unavailable from the introspection response.
+- Query and result diffs, replacement inference, persisted history, interval controls, zoom, timeline virtualization, and general query-to-Table-Explorer translation remain separate work.
+
 [31/08/26]
 
-- Query lists, editors, results, loading states, and error states remain separate product work.
+- Query editors, query results, result loading states, and result error states remain separate product work.
 
 ## Settled interaction decisions
+
+[02/09/26]
+
+- Retain at most 60 captures while reserving room for the latest successful capture and subsequent failed attempt.
+
+[02/09/26]
+
+- Observation remains content-sized while Query owns the remaining details-pane height and vertical scrolling.
+- Table and subscription count form the observation summary; snapshot, propagation, and branches remain supporting metadata.
+
+[02/09/26]
+
+- Query selection controls a workspace-local details pane and does not control either application-shell dock.
+- Dragging the query details separator stops at 240px; closing remains an explicit cell or close-button action.
+
+[01/09/26]
+
+- The Queries feature observes standalone server telemetry through `fetchServerSubscriptions`; it does not inspect its own Jazz client or subscription store.
+- One successful response is a sampled snapshot, not a query result, sync result, lifecycle event, or server history entry.
+- Inspector retains bounded session-local history and does not persist serialized queries across reloads.
+- One table owns one lane, one observed `groupKey` owns one track, and each capture projects to present, absent, or unknown.
+- A present segment means the group was observed in that snapshot; segment length does not measure query execution duration.
+- The latest successful snapshot remains available after refresh failure while the failed capture remains an explicit unknown interval.
+- Query diffs and result diffs are excluded from the foundation.
 
 [31/08/26]
 
@@ -49,11 +133,52 @@
 
 ## Open design decisions
 
-[31/08/26]
+[01/09/26]
 
-- [ ] Define the Queries workspace information architecture.
+- [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[02/09/26]
+
+- [x] Focused view coverage verifies the truncated query-group label.
+- [x] Browser acceptance verifies matching toolbar and details-header heights.
+
+[02/09/26]
+
+- [x] Focused model coverage verifies retained-success pruning, same-marker recovery, and malformed JSON classification.
+- [x] Focused hook coverage verifies the 60-capture bound, discriminated states, and recovery after failure.
+- [x] Focused view coverage verifies keyed replacement when connection credentials change.
+- [x] Focused view coverage verifies selection invalidation and focus restoration after pruning.
+- [x] Browser acceptance verifies focus recovery when details close after their lane is collapsed.
+
+[02/09/26]
+
+- [x] Focused Queries view coverage verifies Query section scroll ownership.
+- [x] Browser acceptance verifies the left dock remains visible, Query owns the only details scroll area, and JSON expansion toggles.
+- [x] Inspector package tests, lint, typecheck, build, and browser acceptance pass.
+
+[02/09/26]
+
+- [x] Focused Queries view coverage confirms details stay outside the shell right dock and enforce a 240px minimum width.
+- [x] Inspector lint, typecheck, build, package tests, and browser acceptance suite pass.
+
+[01/09/26]
+
+- [x] Run focused model, hook, and view tests for the hardened implementation.
+- [x] Run application formatting, lint, typecheck, build, and the complete web test suite.
+- [x] Run the isolated browser acceptance suite.
+
+[01/09/26]
+
+- [x] Run focused view integration tests for loading, empty, failure, refreshing, retained history, timeline mapping, and details selection.
+- [x] Run focused hook tests for polling, refresh, connection replacement, stale completion, and cleanup.
+- [x] Run focused model tests for validation, reduction, parsing, and timeline projection.
+- [x] Run changed-file lint and application typecheck.
+
+[01/09/26]
+
+- [ ] Verify the feature against a configured deployed server without exposing credentials in output or artifacts.
 
 [31/08/26]
 

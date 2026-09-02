@@ -2,6 +2,6 @@ export const jsonViewPropNames = [
   'accessibilityLabel',
   'data',
   'defaultExpandDepth',
-  'showCopyAction',
+  'showRootActions',
   'search',
 ] as const

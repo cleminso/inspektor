@@ -82,7 +82,7 @@ export function validateConnectionInput(input: ConnectionCredentials): Connectio
 }
 
 export function normalizeSchemaFetchError(error: unknown): ConnectionError {
-  const status = getErrorStatus(error)
+  const status = getHttpErrorStatus(error)
 
   if (status === 401 || status === 403) {
     return {
@@ -122,7 +122,7 @@ function invalidServerUrl(): ConnectionValidationResult {
   }
 }
 
-function getErrorStatus(error: unknown): number | null {
+export function getHttpErrorStatus(error: unknown): number | null {
   if (error instanceof Error) {
     const statusMatch = /(?:fetch failed:|status(?: code)?)\s*(\d{3})\b/i.exec(error.message)
     if (statusMatch?.[1] !== undefined) {

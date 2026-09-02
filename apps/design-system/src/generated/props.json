@@ -4077,7 +4077,7 @@
       "description": "Accessible name for the timeline table.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 19
+        "line": 20
       }
     },
     {
@@ -4087,7 +4087,7 @@
       "description": "Timeline header and composed lanes.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 21
+        "line": 22
       }
     }
   ],
@@ -4099,7 +4099,7 @@
       "description": "Heading for the fixed label column.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 26
+        "line": 27
       }
     },
     {
@@ -4109,7 +4109,7 @@
       "description": "Snapshot headings in chronological order.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 28
+        "line": 29
       }
     }
   ],
@@ -4122,7 +4122,7 @@
       "description": "Whether the lane is expanded when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 33
+        "line": 34
       }
     },
     {
@@ -4132,7 +4132,7 @@
       "description": "Controlled lane expansion state.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 35
+        "line": 36
       }
     },
     {
@@ -4142,7 +4142,7 @@
       "description": "Runs when the lane expansion state changes.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 37
+        "line": 38
       }
     },
     {
@@ -4152,7 +4152,7 @@
       "description": "One lane trigger followed by its tracks.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 39
+        "line": 40
       }
     }
   ],
@@ -4164,7 +4164,7 @@
       "description": "Lane heading.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -4174,7 +4174,7 @@
       "description": "Optional metadata aligned opposite the heading.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 46
+        "line": 47
       }
     }
   ],
@@ -4186,7 +4186,7 @@
       "description": "Complete opaque identifier used for the accessible name and tooltip.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 51
+        "line": 52
       }
     },
     {
@@ -4196,7 +4196,7 @@
       "description": "One cell for every snapshot heading.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 53
+        "line": 54
       }
     }
   ],
@@ -4208,7 +4208,7 @@
       "description": "Accessible description of this snapshot cell.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 60
+        "line": 61
       }
     },
     {
@@ -4218,7 +4218,7 @@
       "description": "Marks a snapshot containing activity.\nMarks a snapshot as inactive or unavailable.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 65
+        "line": 66
       }
     },
     {
@@ -4228,7 +4228,7 @@
       "description": "Marks this active snapshot as selected.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 67
+        "line": 68
       }
     },
     {
@@ -4238,7 +4238,7 @@
       "description": "Runs when the active snapshot is activated.",
       "source": {
         "path": "packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx",
-        "line": 69
+        "line": 70
       }
     }
   ],
@@ -4495,7 +4495,7 @@
       "description": "Contextual label for the JSON tree.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 64
+        "line": 67
       }
     },
     {
@@ -4505,7 +4505,7 @@
       "description": "JSON-compatible object or array to inspect.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 66
+        "line": 69
       }
     },
     {
@@ -4516,18 +4516,18 @@
       "description": "Number of container levels expanded initially, or every level within the safe render budget.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 68
+        "line": 71
       }
     },
     {
-      "name": "showCopyAction",
+      "name": "showRootActions",
       "type": "false | true",
       "required": false,
       "defaultValue": "true",
-      "description": "Whether to show the sticky copy action.",
+      "description": "Whether to show the sticky expansion and copy actions.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 70
+        "line": 73
       }
     },
     {
@@ -4537,7 +4537,7 @@
       "description": "Controls occurrence highlighting and active-match navigation.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 72
+        "line": 75
       }
     }
   ],

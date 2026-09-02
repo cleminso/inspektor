@@ -5,6 +5,7 @@ import {
   focusColors,
   ghostElementColors,
   spatial,
+  surfaceColors,
   syntaxColors,
   textColors,
 } from '../../tokens/semantics.stylex'
@@ -22,18 +23,33 @@ export const jsonViewStyles = stylex.create({
     minWidth: 0,
     width: '100%',
   },
-  copyActionLayer: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    pointerEvents: 'none',
+  rootRow: {
+    backgroundColor: surfaceColors.default,
     position: 'sticky',
     zIndex: 1,
-    height: 0,
     top: 0,
     width: '100%',
   },
-  copyAction: {
-    pointerEvents: 'auto',
+  rowContentGroup: {
+    display: 'flex',
+    minWidth: 0,
+  },
+  rootTrigger: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    flexGrow: 1,
+  },
+  rowInteractiveContent: {
+    borderRadius: borderRadii.xs,
+    alignItems: 'center',
+    display: 'flex',
+    minWidth: 0,
+  },
+  rootActions: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    marginInlineStart: 'auto',
   },
   tree: {
     color: textColors.default,

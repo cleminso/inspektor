@@ -463,7 +463,7 @@ test("extracts the constrained JsonView API", () => {
 
   assert.deepEqual(
     jsonViewProps?.map(({ name }) => name),
-    ["accessibilityLabel", "data", "defaultExpandDepth", "showCopyAction", "search"],
+    ["accessibilityLabel", "data", "defaultExpandDepth", "showRootActions", "search"],
   );
   assert.equal(jsonViewProps?.find(({ name }) => name === "defaultExpandDepth")?.defaultValue, "1");
   assert.equal(

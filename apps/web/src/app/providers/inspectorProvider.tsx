@@ -36,7 +36,7 @@ const InspectorRuntimeContext = createContext<InspectorRuntimeContextValue | nul
 const connectionProfileTokens = new WeakMap<object, number>()
 let nextConnectionProfileToken = 0
 
-function getConnectionProfileToken(connection: object): number {
+export function getConnectionProfileToken(connection: object): number {
   const existingToken = connectionProfileTokens.get(connection)
   if (existingToken !== undefined) {
     return existingToken

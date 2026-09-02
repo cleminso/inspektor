@@ -10,6 +10,7 @@ import {
 } from 'react'
 
 import { spatial } from '../../tokens/semantics.stylex'
+import { dimensions } from '../../tokens/value.stylex'
 import { ChevronRightGlyph } from '../icon/iconArtwork'
 import { ScrollArea } from '../scrollArea/scrollArea'
 import { swimlaneTimelineStyles } from './swimlaneTimeline.styles'
@@ -105,7 +106,7 @@ const SwimlaneTimelineRoot = forwardRef<HTMLTableElement, SwimlaneTimelineRootPr
       header !== undefined && isValidElement<SwimlaneTimelineHeaderProps>(header)
         ? Children.toArray(header.props.children).length
         : 0
-    const timelineWidth = `calc(${spatial['grid-track-m']} + ${snapshotCount} * ${spatial['grid-track-s']})`
+    const timelineWidth = `calc(${spatial['grid-track-m']} + ${snapshotCount} * ${dimensions[100]})`
 
     return (
       <TimelineContext.Provider value={snapshotCount}>
@@ -142,11 +143,16 @@ function SwimlaneTimelineHeader({ children, label }: SwimlaneTimelineHeaderProps
             {...stylex.props(swimlaneTimelineStyles.snapshotColumn)}
           />
         ))}
+        <col />
       </colgroup>
-      <thead data-slot="swimlane-timeline-header">
+      <thead
+        {...stylex.props(swimlaneTimelineStyles.header)}
+        data-slot="swimlane-timeline-header"
+      >
         <tr>
           <th
             {...stylex.props(
+              swimlaneTimelineStyles.bodyCell,
               swimlaneTimelineStyles.headerCell,
               swimlaneTimelineStyles.labelHeaderCell,
             )}
@@ -156,12 +162,16 @@ function SwimlaneTimelineHeader({ children, label }: SwimlaneTimelineHeaderProps
           </th>
           {Children.map(headings, (heading) => (
             <th
-              {...stylex.props(swimlaneTimelineStyles.headerCell)}
+              {...stylex.props(swimlaneTimelineStyles.bodyCell, swimlaneTimelineStyles.headerCell)}
               scope="col"
             >
               {heading}
             </th>
           ))}
+          <th
+            {...stylex.props(swimlaneTimelineStyles.bodyCell, swimlaneTimelineStyles.headerCell)}
+            aria-hidden="true"
+          />
         </tr>
       </thead>
     </>
@@ -203,10 +213,12 @@ function SwimlaneTimelineLaneTrigger({ children, suffix }: SwimlaneTimelineLaneT
     throw new Error('SwimlaneTimeline parts must be rendered inside SwimlaneTimeline')
   }
   return (
-    <tr data-slot="swimlane-timeline-lane-heading">
+    <tr
+      {...stylex.props(swimlaneTimelineStyles.laneHeadingRow)}
+      data-slot="swimlane-timeline-lane-heading"
+    >
       <th
         {...stylex.props(swimlaneTimelineStyles.bodyCell, swimlaneTimelineStyles.laneHeadingCell)}
-        colSpan={snapshotCount + 1}
         scope="rowgroup"
       >
         <button
@@ -232,6 +244,14 @@ function SwimlaneTimelineLaneTrigger({ children, suffix }: SwimlaneTimelineLaneT
           )}
         </button>
       </th>
+      <td
+        {...stylex.props(
+          swimlaneTimelineStyles.bodyCell,
+          swimlaneTimelineStyles.laneHeadingContinuationCell,
+        )}
+        aria-hidden="true"
+        colSpan={snapshotCount + 1}
+      />
     </tr>
   )
 }
@@ -247,11 +267,7 @@ const SwimlaneTimelineTrack = forwardRef<HTMLTableRowElement, SwimlaneTimelineTr
         ref={forwardedRef}
       >
         <th
-          {...stylex.props(
-            swimlaneTimelineStyles.bodyCell,
-            swimlaneTimelineStyles.labelCell,
-            swimlaneTimelineStyles.trackLabel,
-          )}
+          {...stylex.props(swimlaneTimelineStyles.bodyCell, swimlaneTimelineStyles.trackLabel)}
           aria-label={label}
           scope="row"
           title={label}
@@ -259,6 +275,10 @@ const SwimlaneTimelineTrack = forwardRef<HTMLTableRowElement, SwimlaneTimelineTr
           {visibleLabel}
         </th>
         {children}
+        <td
+          {...stylex.props(swimlaneTimelineStyles.bodyCell, swimlaneTimelineStyles.cell)}
+          aria-hidden="true"
+        />
       </tr>
     )
   },

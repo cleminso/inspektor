@@ -11,6 +11,17 @@
 
 ## Implemented foundation
 
+[02/09/26]
+
+- [x] Place sticky root actions directly in the JSON root row.
+
+[02/09/26]
+
+- [x] Size sticky root actions to the compact JSON row so their hit surfaces remain unclipped.
+- [x] Add a sticky expand-all or collapse-all action immediately before Copy.
+- [x] Keep complete expansion within the existing branch and complete-tree render budgets.
+- [x] Hide both sticky root actions when a containing document surface owns its own controls.
+
 [27/08/26]
 
 - [x] Isolate complete-tree render planning from React and jsdom while preserving package-private ownership.
@@ -81,6 +92,12 @@
 
 ## Settled interaction decisions
 
+[02/09/26]
+
+- The root expansion action changes every expandable path within the safe render budget; large branch continuation remains explicit.
+- The JSON root row contains a flexible trigger group and a fixed action group; hover and focus stay on the chevron and punctuation content.
+- Root actions use pressed state to communicate complete expansion.
+
 [12/08/26]
 
 - Closing a successful search removes its highlights but preserves the active match's ancestor branch.
@@ -96,10 +113,10 @@
 - Search controls remain outside `JsonView`; the component accepts a controlled query and matching options.
 - Search navigation uses ordered textual occurrences, wraps at both ends, highlights the active occurrence, and preserves focus in
   the external Find Bar.
-- Copy remains outside the ARIA tree while aligning with the root row and staying sticky within the JSON surface.
+- Copy stays in the sticky JSON root row.
 - Copy serializes the complete input with two-space indentation, independent of disclosure, search, and rendering limits.
-- Root disclosure hover and focus treatment remains content-sized instead of extending beneath the separate copy action.
-- Large branches continue in fixed batches instead of exposing an expand-all action.
+- Root action clicks do not toggle the root disclosure.
+- Large branches continue in fixed batches even when complete expansion is requested.
 - Branch, complete-tree, and string thresholds remain fixed internal safeguards rather than consumer configuration.
 - Search reports when a real match falls outside the visible budget instead of mounting beyond the limit.
 - The application-owned row JSON scroll container uses the shared scrollbar treatment below the external Find Bar without reserving an empty inline strip.
@@ -113,6 +130,12 @@
 - [ ] Decide the accessible naming and visual representation of root-array indices.
 
 ## Validation checklist
+
+[02/09/26]
+
+- [x] Focused JSON View coverage verifies complete expansion, complete collapse, action order, and containing-surface ownership.
+- [x] Design-system package tests, lint, typecheck, and build pass.
+- [x] Documentation prop generation, prop checks, typecheck, lint, and build pass.
 
 [27/08/26]
 

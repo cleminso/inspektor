@@ -210,7 +210,7 @@ function SchemaDocumentPanel({
               data={data}
               defaultExpandDepth={isFullyExpanded === true ? 'all' : defaultExpandDepth}
               key={isFullyExpanded === true ? 'all' : defaultExpandDepth}
-              showCopyAction={false}
+              showRootActions={false}
               search={
                 isSearchOpen === true
                   ? {

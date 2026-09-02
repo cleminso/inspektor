@@ -69,6 +69,93 @@ test('opens, closes, and switches the left dock', async ({ page }) => {
   await expect(resizeHandle).toBeVisible()
 })
 
+test('keeps query details scrolling inside the workspace query section', async ({ page }) => {
+  const serverUrl = new URL(connection.serverUrl)
+  const basePath = serverUrl.pathname.replace(/\/+$/, '')
+  const subscriptionsPath = `${basePath}/apps/${encodeURIComponent(connection.appId)}/admin/introspection/subscriptions`
+
+  await page.route(
+    (url) => url.origin === serverUrl.origin && url.pathname === subscriptionsPath,
+    async (route) => {
+      if (route.request().method() !== 'GET') {
+        await route.continue()
+        return
+      }
+
+      await route.fulfill({
+        body: JSON.stringify({
+          appId: connection.appId,
+          generatedAt: 1_000,
+          queries: [
+            {
+              branches: ['main'],
+              count: 2,
+              groupKey: 'accounts-by-name',
+              propagation: 'full',
+              query: JSON.stringify({ table: 'accounts', where: { name: 'Ada' } }),
+              table: 'accounts',
+            },
+          ],
+        }),
+        contentType: 'application/json',
+        headers: { 'access-control-allow-origin': '*' },
+        status: 200,
+      })
+    },
+  )
+  await connectToFixture(page)
+  await page.getByRole('link', { name: 'Open subscriptions' }).click()
+  await page.getByRole('button', { name: /Open accounts-by-name at/ }).click()
+
+  const details = page.getByRole('complementary', { name: 'Query details' })
+  const queryPanel = details.getByRole('region', { name: 'Query' })
+  const toolbar = page.getByRole('toolbar', { name: 'Query subscription controls' })
+
+  await expect(page.locator('[data-slot="shell-layout-left-dock"]')).toBeVisible()
+  await expect(details).toBeVisible()
+  await expect(details.getByText('accounts-by-…')).toBeVisible()
+  await expect(details.locator('[data-slot="scroll-area"]')).toHaveCount(1)
+  await expect(queryPanel.locator('[data-slot="scroll-area"]')).toHaveCount(1)
+  const toolbarBox = await toolbar.boundingBox()
+  const detailsHeaderBox = await details.getByText('accounts-by-…').locator('..').boundingBox()
+  expect(toolbarBox).not.toBeNull()
+  expect(detailsHeaderBox).not.toBeNull()
+  expect(detailsHeaderBox!.height).toBeCloseTo(toolbarBox!.height, 1)
+  await expect(details.getByRole('button', { name: 'Collapse all JSON' })).toBeVisible()
+  const actionBox = await details.getByRole('button', { name: 'Collapse all JSON' }).boundingBox()
+  const disclosureBox = await details.getByRole('button', { name: 'Collapse JSON' }).boundingBox()
+  const copyBox = await details.getByRole('button', { name: 'Copy JSON' }).boundingBox()
+  expect(actionBox).not.toBeNull()
+  expect(disclosureBox).not.toBeNull()
+  expect(copyBox).not.toBeNull()
+  const disclosureCenter = disclosureBox!.y + disclosureBox!.height / 2
+  expect(actionBox!.y + actionBox!.height / 2).toBeCloseTo(disclosureCenter, 1)
+  expect(copyBox!.y + copyBox!.height / 2).toBeCloseTo(disclosureCenter, 1)
+  const rootRow = details
+    .getByRole('treeitem', { name: 'JSON object' })
+    .locator(':scope > div')
+    .first()
+  const rootTrigger = rootRow.locator(':scope > span').first()
+  const rootInteractiveContent = rootTrigger.locator(':scope > span').first()
+  const punctuationBox = await rootInteractiveContent.locator(':scope > span').nth(1).boundingBox()
+  const rootTriggerBox = await rootTrigger.boundingBox()
+  expect(punctuationBox).not.toBeNull()
+  expect(rootTriggerBox).not.toBeNull()
+  expect(punctuationBox!.y + punctuationBox!.height / 2).toBeCloseTo(disclosureCenter, 1)
+  expect(rootTriggerBox!.x + rootTriggerBox!.width).toBeCloseTo(actionBox!.x, 1)
+  await rootInteractiveContent.hover()
+  const [rowBackground, triggerBackground] = await Promise.all([
+    rootRow.evaluate((element) => getComputedStyle(element).backgroundColor),
+    rootInteractiveContent.evaluate((element) => getComputedStyle(element).backgroundColor),
+  ])
+  expect(triggerBackground).not.toBe(rowBackground)
+  await details.getByRole('button', { name: 'Collapse all JSON' }).click()
+  await expect(details.getByRole('button', { name: 'Expand all JSON' })).toBeVisible()
+  await page.getByRole('button', { name: /^accounts\s*1$/ }).click()
+  await details.getByRole('button', { name: 'Close' }).click()
+  await expect(page.getByRole('button', { name: 'Refresh' })).toBeFocused()
+})
+
 test('recovers when connection schema validation initially finds no schemas', async ({ page }) => {
   const serverUrl = new URL(connection.serverUrl)
   const basePath = serverUrl.pathname.replace(/\/+$/, '')

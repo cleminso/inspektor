@@ -1,292 +1,441 @@
-# Query Subscriptions Research
+# Jazz live-query and subscription telemetry
+
+## Table of contents
+
+- [Purpose](#purpose)
+- [Source basis](#source-basis)
+- [Terminology](#terminology)
+- [Application query APIs](#application-query-apis)
+- [Query construction](#query-construction)
+- [Query execution options](#query-execution-options)
+- [Subscription lifecycle](#subscription-lifecycle)
+- [React and framework integration](#react-and-framework-integration)
+- [Advanced binding APIs](#advanced-binding-apis)
+- [Inspector telemetry sources](#inspector-telemetry-sources)
+- [Standalone server telemetry contract](#standalone-server-telemetry-contract)
+- [Official Jazz Inspector implementation](#official-jazz-inspector-implementation)
+- [Polling and snapshot semantics](#polling-and-snapshot-semantics)
+- [Observable and unavailable information](#observable-and-unavailable-information)
+- [Security and privacy](#security-and-privacy)
+- [Inspector implications](#inspector-implications)
+- [Source references](#source-references)
 
 ## Purpose
 
-This document captures the current understanding of Jazz query subscriptions and how Inspector should reason about them.
+This note is the shared technical reference for Jazz live queries and the subscription telemetry available to Inspector.
 
-The goal is to align product language, implementation constraints, and UI direction before redesigning the Query Subscriptions view.
+It separates three related but different systems:
 
-## Short definition
+1. Application APIs that execute and subscribe to queries.
+2. Framework bindings that manage subscription state for application components.
+3. Inspector telemetry APIs that observe active subscription definitions.
 
-A Jazz query subscription is a live query registered by a Jazz client. The query tells the Jazz runtime which rows the client wants to keep visible and updated.
+Product structure and interaction decisions belong in [query-interface.md](query-interface.md). Implementation tasks belong in [subscription-query.md](../todo/subscription-query.md).
 
-When the subscription is propagated upstream, the sync server tracks the query, evaluates it against schema, permissions, branches, and policy context, then keeps sending matching row updates as data changes.
+## Source basis
 
-The Query Subscriptions view does not show returned row data. It shows active server-tracked query shapes.
+The investigation used:
 
-## Query types and subscription mechanics
+- Jazz source revision `923c6a951e528e86c043b7bb375ddf83aded6b8b`.
+- Jazz Tools package version `2.0.0-alpha.53`.
+- The installed Inspector `jazz-tools` declarations.
+- The official Jazz Inspector live-query page.
+- A deployed Jazz Inspector response containing populated server subscription groups.
 
-Jazz exposes different ways to read data:
+The deployed server and the inspected Jazz server source do not expose identical behavior. The source handler validates the request but returns an empty query list, while the deployed endpoint returns populated groups. The exported TypeScript response contract matches the deployed response. Package version alone must not be used to infer server capability.
 
-| Concept           | Public API examples                                           | Product meaning                         | Telemetry meaning                                                                        |
-| ----------------- | ------------------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| One-shot read     | `db.all(...)`, `db.one(...)`                                  | Read data once                          | Uses subscription machinery internally, then unsubscribes after the first settled result |
-| Live subscription | `useAll(...)`, `db.subscribeAll(...)`                         | Keep a query active and receive updates | Can appear in server telemetry while active and propagated                               |
-| Query composition | `where`, `orderBy`, `limit`, `offset`, relation query helpers | Shape a query                           | Appears inside the serialized query JSON                                                 |
+## Terminology
 
-Confirmed from Jazz source:
+### Query
 
-- One-shot reads are implemented internally as temporary subscriptions.
-- Live subscriptions stay active until unsubscribed.
-- Query composition is not a separate runtime mode. It describes how the query is shaped.
-- The server telemetry response does not expose a `queryType`, `kind`, or one-shot/live flag.
+A query is a serialized definition of requested rows, including its table, conditions, ordering, limits, branches, joins, and relation behavior.
 
-UI implication:
+### Subscription
 
-- Inspector should not render separate UI modes for one-shot, live, and composed queries unless Jazz exposes a stable field for that.
-- Inspector can explain that the view focuses on active server-tracked subscriptions.
-- If one-shot reads appear, they are indistinguishable from active subscriptions in the current telemetry shape.
+A subscription is a long-lived query registration. Jazz maintains its result and publishes changes until the owner unsubscribes.
 
-## Local-first and local-only
+### Query result
 
-Local-first means Jazz reads through a local runtime and syncs with other storage tiers.
+A query result is the materialized collection of matching rows delivered to application code. The standalone telemetry endpoint does not expose it.
 
-`local-only` is a propagation mode for a specific subscription. It means the subscription should not be forwarded further upstream.
+### Subscription telemetry snapshot
 
-Confirmed from Jazz source:
+A telemetry snapshot is the grouped set of server-visible subscriptions returned by one introspection request. It is not a query result, sync result, event stream, or server-provided history.
 
-- `propagation` can be `full` or `local-only`.
-- `full` can be forwarded upstream.
-- `local-only` is constrained to the local storage tier or the directly receiving tier.
-- Server telemetry can include `local-only` if a server/runtime receives that subscription, but a subscription that never reaches the server cannot appear in server telemetry.
+### Live query
 
-UI implication:
+Jazz does not export a public TypeScript function named `liveQuery`. The application APIs are `Db.subscribe`, `useAll`, `useOne`, and framework-specific equivalents. “Live Query” is documentation and Inspector terminology.
 
-- If the Query Subscriptions view is empty, Inspector should not imply the app has no queries.
-- It may mean there are no active server-visible subscriptions.
-- Local-only queries, short-lived temporary reads, app/server mismatch, hidden inspector reads, or fetch failure can all explain an empty view.
+## Application query APIs
 
-## Server telemetry response
+### One-shot reads
 
-Confirmed response shape from `fetchServerSubscriptions(...)`:
+`Db.all(query, options?)` returns `Promise<T[]>`.
 
-| Field         | Meaning                                       |
-| ------------- | --------------------------------------------- |
-| `appId`       | App id returned by the introspection endpoint |
-| `generatedAt` | Server-generated snapshot marker              |
-| `queries`     | Active grouped server subscriptions           |
+`Db.one(query, options?)` applies a limit of one and returns `Promise<T | null>`.
 
-Each item in `queries` contains:
+In the inspected Jazz source, these methods use the one-shot `client.query` path. They do not register an active `Db.subscribe` development trace.
 
-| Field         | Meaning                                            |
-| ------------- | -------------------------------------------------- |
-| `groupKey`    | Hash derived from query, branches, and propagation |
-| `count`       | Number of active server subscriptions in the group |
-| `table`       | Table targeted by the query                        |
-| `query`       | Serialized query JSON                              |
-| `branches`    | Branch context for the subscription                |
-| `propagation` | `full` or `local-only`                             |
+Sources:
 
-No other fields are currently returned by the server telemetry endpoint.
+- `packages/jazz-tools/src/runtime/db.ts:2235-2295`
 
-The endpoint is an admin introspection endpoint using `fetchServerSubscriptions(serverUrl, { appId, adminSecret })`.
+### Direct subscription
 
-Evidence:
+`Db.subscribe(query, callback, options?)` is the public imperative live-query API.
+
+Its behavior:
+
+- The callback receives the complete materialized result whenever it changes.
+- Each callback receives a newly allocated result array and transformed row objects.
+- The returned function cancels pending setup, removes the local Inspector trace, unsubscribes the native handle, and clears materialized state.
+- The public callback has no error channel.
+- Setup may fail synchronously; deferred readiness failures can surface asynchronously.
+
+Sources:
+
+- `packages/jazz-tools/src/runtime/db.ts:2298-2319`
+- `packages/jazz-tools/src/runtime/db.ts:2353-2577`
+
+### Delta subscription
+
+Jazz internally models added, removed, updated, and reset operations with `SubscriptionDelta<T>` and `RowDelta<T>`.
+
+`Db.subscribeDelta` is private. Application code using `Db.subscribe` receives complete arrays rather than deltas. Framework bindings use the internal delta surface to preserve reactive identity.
+
+Sources:
+
+- `packages/jazz-tools/src/runtime/subscription-manager.ts:17-108`
+- `packages/jazz-tools/src/runtime/db.ts:200-222`
+- `packages/jazz-tools/src/runtime/db.ts:2353-2359`
+
+## Query construction
+
+`QueryBuilder<T>` is the protocol consumed by `Db`. It exposes the table, schema, optional column transforms, serialized query builder, and a TypeScript inference brand.
+
+Typed query builders support:
+
+- `where(...)`
+- `select(...)`
+- `include(...)`
+- `requireIncludes()`
+- `orderBy(column, direction?)`
+- `limit(n)`
+- `offset(n)`
+- `includeDeleted()`
+- `hopTo(relation)`
+- `gather(...)`
+- application-level `union(...)`
+
+Important behavior:
+
+- Builder operations clone instead of mutating the existing builder.
+- Scalar conditions mean equality.
+- Multiple conditions combine as conjunctions.
+- `undefined` condition values are omitted.
+- Includes participate in subscription invalidation.
+- Ordering uses row identity as an implicit tie-breaker.
+- There is no public cursor-pagination method.
+- Serialized queries may contain application filter values.
+
+Sources:
+
+- `packages/jazz-tools/src/runtime/db.ts:171-186`
+- `packages/jazz-tools/src/typed-app.ts:1267-1384`
+
+## Query execution options
+
+Application-facing `QueryOptions` includes:
+
+| Option | Values | Meaning |
+| --- | --- | --- |
+| `tier` | `ReadTier.LocalFirst`, `Remote`, `RemoteIfPossible`, or legacy durability names | Initial read policy |
+| `localUpdates` | `immediate`, `deferred` | Visibility of local writes while the requested tier settles |
+| `propagation` | `full`, `local-only` | Whether the subscription communicates with upstream servers |
+| `visibility` | `public`, `hidden_from_live_query_list` | Visibility in the local `Db` development trace list |
+| `branch` | scalar or qualified branch | Branch head |
+| `base` | live branch or branch/snapshot pair | Optional branch base |
+
+`visibility` is local development-trace metadata. It is not encoded as an exclusion from server telemetry.
+
+`local-only` explicitly avoids upstream server communication from an application client. A subscription that never reaches the server cannot appear in standalone server telemetry.
+
+Sources:
+
+- `packages/jazz-tools/src/runtime/db.ts:188-198`
+- `packages/jazz-tools/src/runtime/client.ts:345-410`
+
+## Subscription lifecycle
+
+The execution flow is:
+
+1. A typed builder serializes through `_build()`.
+2. `Db.subscribe` delegates to the internal delta subscription.
+3. Jazz normalizes the builder JSON and resolves input and output tables.
+4. The query adapter translates it into runtime JSON.
+5. `SubscriptionManager` materializes native deltas into typed rows.
+6. `JazzClient.subscribe` opens the native stream.
+7. Rust validates the query and derives canonical shape and binding identities.
+8. The protocol registers the shape and attaches a usage-site subscription.
+9. Equivalent canonical coverage can be shared by the serving peer.
+10. View updates return resets, membership changes, terminal operations, and facts.
+11. Cleanup detaches the native and core subscription.
+
+Relevant protocol messages include `RegisterShape`, `Subscribe`, `SubscribeRejected`, `ViewUpdate`, and `Unsubscribe`.
+
+Reconnect behavior includes replaying desired subscriptions and sending known-state declarations. `ReadTier.RemoteIfPossible` uses local fallback after an explicit disconnect; an ordinary transport failure is not equivalent to that fallback.
+
+Sources:
+
+- `packages/jazz-tools/src/runtime/query-adapter.ts`
+- `packages/jazz-tools/src/runtime/native-runtime/native-runtime-adapter.ts`
+- `crates/jazz/src/protocol.rs:60-82`
+- `crates/jazz/src/db/subscriptions.rs`
+- `crates/jazz/src/db/node_runtime.rs`
+
+## React and framework integration
+
+### React
+
+`jazz-tools/react` exports:
+
+- `useAll`
+- `useAllSuspense`
+- `useOne`
+- `useOneSuspense`
+- `useDb`
+- `useJazzClient`
+- `JazzProvider`
+- `JazzClientProvider`
+
+The non-Suspense result distinguishes idle, loading, fulfilled, and rejected setup states through `{ data, isLoading, error }`.
+
+React uses `useSyncExternalStore`. Equivalent serialized queries and options share an orchestrated cache entry. Inline builder object identity alone does not cause resubscription when the serialized key remains equal.
+
+Session replacement clears the previous session’s fulfilled data, returns entries to pending, and resubscribes them.
+
+Sources:
+
+- `packages/jazz-tools/src/react-core/use-all.ts`
+- `packages/jazz-tools/src/react-core/use-one.ts`
+- `packages/jazz-tools/src/subscriptions-orchestrator.ts`
+
+### Other framework bindings
+
+- Vue exports `useAll` and `useOne`.
+- Solid exports `useAll` and `useOne`.
+- Svelte exports `QuerySubscription` and `QuerySubscriptionOne`.
+- React Native reuses the React core query hooks.
+
+These bindings use the same subscription-store concepts while adapting state delivery and cleanup to their framework.
+
+## Advanced binding APIs
+
+`jazz-tools/client` exports `getSubscriptionStore(client)` and cache-entry state types for framework authors.
+
+The store exposes keyed operations such as `computeKey`, `makeQueryKey`, `peekState`, and `getCacheEntry`.
+
+This store is not a telemetry inventory:
+
+- It cannot enumerate another application’s active subscriptions.
+- It requires a caller-supplied query key.
+- It describes the Inspector-owned client when called from Inspector.
+
+`jazz-tools/shared` exports `applyDelta` and `reconcileArray` for bindings that preserve object identity while applying subscription changes.
+
+Sources:
+
+- `packages/jazz-tools/src/client/index.ts`
+- `packages/jazz-tools/src/subscription-store-internal.ts`
+- `packages/jazz-tools/src/shared/index.ts`
+
+## Inspector telemetry sources
+
+Jazz has two different Inspector telemetry paths.
+
+### Same-origin overlay telemetry
+
+With `devMode` enabled, a `Db` records `ActiveQuerySubscriptionTrace` entries containing:
+
+- local trace id
+- serialized runtime query
+- table
+- branches
+- tier
+- propagation
+- creation marker
+- optional JavaScript stack
+
+Internal `Db` methods return the active list and subscribe to list changes. Traces with hidden visibility are filtered from the returned list.
+
+`JazzInspectorHost` exposes stack-free traces to a same-origin Inspector window and pushes replacement snapshots through `postMessage`.
+
+This path observes one inspected application runtime. It is not available to the standalone Regarde web application without a same-origin host relationship.
+
+Sources:
+
+- `packages/jazz-tools/src/runtime/db.ts:427-436`
+- `packages/jazz-tools/src/runtime/db.ts:1754-1772`
+- `packages/jazz-tools/src/runtime/db.ts:2615-2659`
+- `packages/jazz-tools/src/dev/inspector-overlay/inspector-host-types.ts`
+- `packages/jazz-tools/src/dev/inspector-overlay/host-bridge.ts`
+
+### Standalone server telemetry
+
+The standalone Inspector calls the admin introspection endpoint through `fetchServerSubscriptions`.
+
+This path observes grouped subscriptions visible to the connected server and app. It does not expose an inspected client’s local trace list or JavaScript stack.
+
+Regarde uses this path. It must not attempt to derive external telemetry from its own `Db` or subscription store.
+
+## Standalone server telemetry contract
+
+The public call is:
+
+`fetchServerSubscriptions(serverUrl, { appId, adminSecret })`
+
+The request sends the admin secret through `X-Jazz-Admin-Secret` and scopes the URL to the requested app.
+
+The response contains:
+
+| Field | Meaning |
+| --- | --- |
+| `appId` | App represented by the snapshot |
+| `generatedAt` | Server-generated snapshot marker |
+| `queries` | Grouped server-visible subscriptions |
+
+Each query group contains:
+
+| Field | Meaning |
+| --- | --- |
+| `groupKey` | Opaque server-defined group identity |
+| `count` | Number of subscriptions represented by the group |
+| `table` | Target table |
+| `query` | Serialized runtime query JSON |
+| `branches` | Branch context |
+| `propagation` | `full` or `local-only` |
+
+The API does not define result rows, result counts, query source, execution duration, latency, settlement, errors, or lifecycle events.
+
+The client helper coerces a non-number `generatedAt` to `0` and a non-array `queries` value to `[]`. Inspector validates every returned group before accepting a snapshot, but code downstream of this helper cannot distinguish those malformed top-level values from a valid zero marker or empty snapshot.
+
+Non-success responses include status, status text, and response body in the thrown error. Inspector must normalize these errors and avoid rendering arbitrary response bodies.
+
+Sources:
 
 - `packages/jazz-tools/src/runtime/introspection-fetch.ts`
-- `crates/jazz-tools/src/server/routes/http.rs`
-- `crates/jazz-tools/src/query_manager/manager.rs`
+- installed `jazz-tools/dist/runtime/introspection-fetch.d.ts`
 
-## Grouped subscriptions
+### Source and deployment discrepancy
 
-The server does not return every individual subscription separately. It groups equivalent active subscriptions.
+The inspected Jazz server handler:
 
-Grouping uses:
+- validates the admin secret
+- validates `appId`
+- returns `generatedAt`
+- returns an empty query list
 
-- serialized query JSON
-- branches
-- propagation
+Its test preserves that empty shell until core telemetry backs it.
 
-The returned `count` is the number of active subscriptions in that group.
+The deployed Jazz Inspector demonstrates populated groups using the same exported response shape. Regarde should implement against the public transport contract and verify capability against its target server rather than inferring it from the package version.
 
-Product meaning:
+Sources:
 
-- If two components subscribe to the same table with the same filters, branches, and propagation, the view shows one row with `count = 2`.
-- If a filter changes from one value to another, it becomes a different query shape.
-- If the old query is no longer active, only the new group appears in the next fetched server snapshot.
-- If both query shapes are active at the same snapshot, both groups appear.
+- `crates/jazz-server/src/server/routes/http.rs:1216-1269`
+- `crates/jazz-server/src/server/routes/mod.rs:2420-2457`
 
-Important distinction:
+## Official Jazz Inspector implementation
 
-- Subscription telemetry describes query shapes.
-- It does not describe the rows returned by those queries.
-- If row data changes but the query shape stays the same, the telemetry row may not change.
+The official page lives under `packages/inspector/src/pages/live-query/`:
 
-## Polling versus push
+- `index.tsx`
+- `index.module.css`
+- `index.test.tsx`
+- `LiveQueryFilters.tsx`
+- `LiveQueryFilters.test.tsx`
 
-Confirmed:
+The route is `/live-query`, while the navigation label is “Subscriptions.”
 
-- The standalone Jazz inspector polls the admin introspection endpoint.
-- Inspector does not currently implement telemetry polling.
-- The server endpoint returns a current snapshot, not a pushed event stream.
-- A server snapshot is the grouped active subscription state returned by one HTTP request to the admin introspection endpoint.
-- The snapshot is generated when the endpoint handles that request and is marked with `generatedAt`.
-- A future standalone implementation would own its polling interval.
-- The official extension inspector has a different path that can receive active subscription changes from the DevTools bridge.
+The page branches by runtime:
 
-Inferred:
+- Overlay mode reads same-origin host traces.
+- Standalone mode polls `fetchServerSubscriptions`.
 
-- Core Jazz subscriptions are real-time for app data.
-- Query subscription telemetry is a separate admin introspection surface.
-- Polling is likely simpler and avoids turning the admin endpoint into a persistent telemetry stream.
-- A true event stream would require server support for subscription lifecycle events, not only a current grouped snapshot.
+The standalone branch owns query groups, snapshot marker, loading, error, and table-filter state. It preserves existing groups when a refresh fails.
 
-UI implication:
+The page renders subscription definitions, not matching result rows. Its populated standalone test mocks the response and does not establish server implementation behavior.
 
-- Inspector should not present server subscription telemetry as logs.
-- It can present a current snapshot.
-- If Inspector stores snapshot history, that history is inspector-owned behavior, not server-provided logs.
+The official query-to-Data-Explorer conversion only recognizes a narrow subset of relation IR comparisons. It does not faithfully map ordinary conditions, disjunctions, negation, joins, or repeated-column clauses. Regarde must not adopt it as a general query parser.
 
-## Short-lived one-shot reads
+Sources:
 
-Confirmed:
-
-- One-shot reads use temporary subscriptions internally.
-- They unsubscribe after the first settled result.
-- Server telemetry only shows active server subscriptions in the fetched server snapshot.
-
-Inferred:
-
-- One-shot reads can be missed by the standalone polling model.
-- It is possible to catch one if it remains active when the snapshot is generated.
-- If caught, it cannot be distinguished from a live subscription using the current telemetry fields.
-
-UI implication:
-
-- Empty telemetry does not prove that the app did not perform reads.
-- It only means no matching active server-visible grouped subscriptions were present in the fetched snapshot.
-
-## Stale and failed telemetry
-
-Confirmed from `fetchServerSubscriptions(...)`:
-
-- Non-success responses throw an error containing status, status text, and response body.
-- Malformed response data is normalized by the client fetch helper.
-- The response includes `generatedAt` as the server snapshot marker.
-
-Confirmed in the prior Inspector prototype:
-
-- `useQuerySubscriptionsTelemetry(...)` prevents overlapping requests.
-- It keeps the last successful rows when a later refresh fails.
-- It exposes `isInitialLoading`, `isRefreshing`, `error`, `generatedAt`, and `rows`.
-- If there are no rows and the fetch fails, the grid shows an error state.
-- If existing rows remain and refresh fails, the actions bar shows an error badge while stale rows remain visible.
-
-UI implication:
-
-- Inspector should label stale data clearly.
-- If a refresh fails after a successful snapshot, the UI should say that it is showing the last successful snapshot.
-- `generatedAt` should be used as a snapshot marker, not as proof that the data is still current.
-
-## Current Inspector implementation
-
-The Query subscriptions route currently presents a placeholder. The telemetry fetch, cache, grid, and Table Explorer link prototype described by earlier research is not part of the application.
-
-## Official Jazz inspector comparison
-
-Standalone inspector:
-
-- Uses the same `fetchServerSubscriptions(...)` admin endpoint.
-- Polls using a fixed interval.
-- Stores telemetry in component state.
-- Keeps existing rows when a refresh fails.
-- Displays table, count, propagation, branches, and query.
-- Does not use Inspector's module-level navigation cache.
-
-Extension inspector:
-
-- Uses a DevTools bridge rather than server introspection.
-- Can receive active subscription changes from the inspected client.
-- Maintains an active subscription snapshot in the extension panel.
-- This is a different telemetry source than the standalone server endpoint.
-
-Evidence:
-
+- `packages/inspector/src/routes.tsx`
 - `packages/inspector/src/pages/live-query/index.tsx`
-- `packages/jazz-tools/src/dev-tools/extension-panel.ts`
+- `packages/inspector/src/pages/live-query/index.test.tsx`
+- `packages/inspector/src/contexts/host-link.ts`
 
-## Cache direction
+## Polling and snapshot semantics
 
-Recommended direction:
+The server does not independently create a snapshot on the official Inspector’s polling cadence. The standalone Inspector requests the endpoint on a fixed cadence, and the server returns a snapshot for that request.
 
-- Keep a short-lived in-memory snapshot cache per connection to avoid empty flashes during navigation.
-- Mark cached data as cached until a fresh fetch succeeds.
-- Keep stale rows on fetch failure, but make the stale state explicit.
-- Do not persist query subscription snapshots to durable local storage.
-- Do not build a large history into the core cache.
-- If history becomes useful, store a small in-memory ring buffer of successful snapshots per connection.
+Consequences:
 
-Why:
+- Telemetry is sampled rather than event-driven.
+- A query can appear, change, and disappear between requests without being observed.
+- Consecutive snapshots do not establish an exact transition point.
+- A failed request creates an unknown interval, not confirmed subscription absence.
+- Inspector-owned history is derived client state, not server logs.
+- Polling frequency trades freshness against admin requests and server work.
 
-- The server returns current grouped snapshots, not logs.
-- Persisting snapshots would make the inspector look like it has historical telemetry it does not actually receive from the server.
-- A small in-memory history can support UI comparison without changing the product model.
+For a query timeline, a segment means that the group was observed in a successful snapshot. Segment length does not represent query execution duration or synchronization latency.
 
-## Data Explorer mapping
+## Observable and unavailable information
 
-“Open in Data Explorer” means:
+| Information | Overlay trace | Standalone telemetry |
+| --- | --- | --- |
+| Active subscription identity | Local trace id | Group key |
+| Serialized query | Yes | Yes |
+| Table | Yes | Yes |
+| Branches | Yes | Yes |
+| Tier | Yes | No |
+| Propagation | Yes | Yes |
+| Creation stack | Captured internally, removed by host | No |
+| Grouped subscription count | No | Yes |
+| Query result rows | No | No |
+| Matching-row count | No | No |
+| Added, updated, removed rows | No | No |
+| Reset and settlement state | No | No |
+| Reconnect state | No | No |
+| Rejection or transport error | No | No |
+| Query execution latency | No | No |
+| Transaction attribution | No | No |
+| Source component or owner | No | No |
 
-1. Read the subscription row’s `table`.
-2. Parse the serialized `query` JSON.
-3. Extract supported filter expressions.
-4. Open the Data Explorer on that table.
-5. Apply recovered filters when possible.
+The standalone API can support inventory, churn, persistence, and grouped-count debugging. It cannot explain changed application rows or query performance.
 
-If Inspector cannot extract filters, it should still open the table without filters.
+## Security and privacy
 
-Example:
+- `adminSecret` must remain in the request header and must never enter route state, rendered output, logs, screenshots, or persisted telemetry.
+- Serialized query JSON can contain application filter values and must be treated as sensitive.
+- Raw query history must remain session-local unless a separate security decision permits persistence.
+- Server response bodies must not be displayed directly after failed requests.
+- `groupKey` is opaque server data. Inspector must not parse it or depend on its format.
 
-- A subscription targets `todos` with a filter equivalent to `projectId = abc`.
-- Inspector opens the `todos` table with a `projectId = abc` filter.
+## Inspector implications
 
-This feature does not show the subscribed row data inside the Query Subscriptions view. It helps the developer jump from server query shape to inspectable rows.
+- Regarde’s standalone Queries feature must use `fetchServerSubscriptions`, not `Db.subscribe`, local trace accessors, or `getSubscriptionStore`.
+- Connection identity is `serverUrl`, `appId`, and `adminSecret`.
+- Branch and schema selection do not scope the introspection request.
+- An empty successful snapshot means no server-visible groups were returned. It does not prove the application performed no reads.
+- Server grouping and `count` are authoritative. Inspector must not regroup or reinterpret them.
+- Query JSON remains the source representation. Parsing should produce a derived JSON-compatible value without replacing the raw string.
+- Query-result diffing requires another Jazz capability and is outside the standalone telemetry foundation.
+- A swimlane timeline may retain bounded session-local history, but every interval must preserve the distinction between observed presence, confirmed absence, and unknown capture failure.
 
-## UI direction for v1
+## Source references
 
-The Query Subscriptions view should explain active server-tracked queries before exposing raw JSON.
+Related Inspector references:
 
-Recommended structure:
-
-- Left panel: tables and filters.
-- Top toolbar: search, refresh, auto-refresh state, propagation filter, and snapshot marker.
-- Main grid: grouped subscription rows.
-- Bottom dock: selected subscription details.
-
-Bottom dock tabs:
-
-- `Overview`: deconstructs the query into readable fields.
-- `Raw JSON`: exposes the original serialized query JSON.
-
-Overview should include:
-
-- table
-- count
-- propagation
-- branches
-- recovered filters when available
-- whether the row can open in Data Explorer with filters
-- short explanations for fields that are easy to misread
-
-Grid columns to consider:
-
-- table
-- count
-- optional short query summary only when it stays readable
-
-The grid should stay simple. `generatedAt`, propagation, branches, and explorer-link details belong in the toolbar or selected dock because they describe the fetched snapshot or selected query, not the primary row identity.
-
-## v1 decisions
-
-- Keep only the latest successful server snapshot in the core product model.
-- Use a short-lived module-memory cache to avoid empty flashes during navigation.
-- Do not persist query subscription snapshots to durable storage.
-- Snapshot history is out of scope for v1.
-- Branch filtering is not a default control while the inspector route already scopes the user to a branch. Reconsider it only if telemetry returns multiple branch contexts inside the same session.
-- Treat `count` as the duplicate-subscription signal for equivalent query, branch, and propagation groups.
-- Show `count` in the grid and explain it in the selected dock.
-- Render a readable overview from the serialized query JSON when possible.
-- Render the complete serialized query as structured expandable key/value rows in the Overview tab, with Raw JSON as the source-of-truth fallback.
-- Treat returned `local-only` propagation as metadata. Do not show it as a warning by default.
-- Explain local-only subscriptions that never reach the server as a possible empty-state cause.
-- Keep v1 focused on standalone server introspection through `fetchServerSubscriptions(...)`.
-- Extension-style client telemetry is out of scope for v1.
+- [Query Subscriptions Interface](query-interface.md)
+- [Subscription query implementation checklist](../todo/subscription-query.md)
+- [Swimlane Timeline implementation checklist](../todo/swimlaneTimeline.md)

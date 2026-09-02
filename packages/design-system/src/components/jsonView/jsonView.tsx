@@ -10,9 +10,12 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react'
+import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 
+import { Button } from '../button/button'
 import { CopyButton } from '../copyButton/copyButton'
 import { Text } from '../text/text'
+import { Tooltip } from '../tooltip/tooltip'
 import { jsonViewStyles } from './jsonView.styles'
 import {
   childBatchSize,
@@ -66,8 +69,8 @@ export interface JsonViewProps {
   data: JsonViewObject | readonly JsonViewValue[]
   /** Number of container levels expanded initially, or every level within the safe render budget. */
   defaultExpandDepth?: 0 | 1 | 2 | 3 | 4 | 'all'
-  /** Whether to show the sticky copy action. */
-  showCopyAction?: boolean
+  /** Whether to show the sticky expansion and copy actions. */
+  showRootActions?: boolean
   /** Controls occurrence highlighting and active-match navigation. */
   search?: JsonViewSearch
 }
@@ -86,6 +89,7 @@ interface DisplayedString {
 }
 
 interface JsonNodeProps {
+  actions?: ReactNode
   activePath: string
   activeSearchMatchId: string | undefined
   expandedPaths: ReadonlySet<string>
@@ -440,6 +444,7 @@ function PrimitiveValue({
 }
 
 function JsonNode({
+  actions,
   activePath,
   activeSearchMatchId,
   expandedPaths,
@@ -585,7 +590,6 @@ function JsonNode({
       {...stylex.props(jsonViewStyles.item)}
     >
       <div
-        data-focus-visible={focusVisiblePath === path ? 'true' : undefined}
         onClick={handleRowClick}
         onMouseDown={(event) => {
           if (expandable === true) {
@@ -593,81 +597,102 @@ function JsonNode({
             onFocusedPathChange(null)
           }
         }}
-        {...stylex.props(
-          jsonViewStyles.row,
-          expandable === true && jsonViewStyles.interactiveRow,
-          focusVisiblePath === path && jsonViewStyles.focusedRow,
-        )}
+        {...stylex.props(jsonViewStyles.row, actions !== undefined && jsonViewStyles.rootRow)}
       >
-        <span {...stylex.props(jsonViewStyles.disclosureSlot)}>
-          {expandable === true ? (
-            <button
-              aria-label={`${expanded === true ? 'Collapse' : 'Expand'} ${keyName ?? 'JSON'}`}
-              onClick={(event) => {
-                event.stopPropagation()
-                const item = event.currentTarget.closest<HTMLElement>('[role="treeitem"]')
-                if (item !== null) {
-                  onActivePathChange(path)
-                  item.focus()
-                  onFocusedPathChange(null)
-                  onToggle(path, item)
-                }
-              }}
-              tabIndex={-1}
-              type="button"
-              {...stylex.props(jsonViewStyles.disclosure)}
-            >
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 12 12"
-                {...stylex.props(jsonViewStyles.disclosureIcon)}
-              >
-                <path
-                  d={expanded === true ? 'm2.5 4 3.5 3.5L9.5 4' : 'm4 2.5 3.5 3.5L4 9.5'}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          ) : null}
-        </span>
-        <span {...stylex.props(jsonViewStyles.content)}>
-          {keyName === undefined ? null : (
-            <>
-              <span {...stylex.props(jsonViewStyles.key)}>
-                &quot;
-                <HighlightedText
+        <span
+          {...stylex.props(
+            jsonViewStyles.rowContentGroup,
+            actions !== undefined && jsonViewStyles.rootTrigger,
+          )}
+        >
+          <span
+            data-focus-visible={focusVisiblePath === path ? 'true' : undefined}
+            {...stylex.props(
+              jsonViewStyles.rowInteractiveContent,
+              expandable === true && jsonViewStyles.interactiveRow,
+              focusVisiblePath === path && jsonViewStyles.focusedRow,
+            )}
+          >
+            <span {...stylex.props(jsonViewStyles.disclosureSlot)}>
+              {expandable === true ? (
+                <button
+                  aria-label={`${expanded === true ? 'Collapse' : 'Expand'} ${keyName ?? 'JSON'}`}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    const item = event.currentTarget.closest<HTMLElement>('[role="treeitem"]')
+                    if (item !== null) {
+                      onActivePathChange(path)
+                      item.focus()
+                      onFocusedPathChange(null)
+                      onToggle(path, item)
+                    }
+                  }}
+                  tabIndex={-1}
+                  type="button"
+                  {...stylex.props(jsonViewStyles.disclosure)}
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 12 12"
+                    {...stylex.props(jsonViewStyles.disclosureIcon)}
+                  >
+                    <path
+                      d={expanded === true ? 'm2.5 4 3.5 3.5L9.5 4' : 'm4 2.5 3.5 3.5L4 9.5'}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              ) : null}
+            </span>
+            <span {...stylex.props(jsonViewStyles.content)}>
+              {keyName === undefined ? null : (
+                <>
+                  <span {...stylex.props(jsonViewStyles.key)}>
+                    &quot;
+                    <HighlightedText
+                      activeSearchMatchId={activeSearchMatchId}
+                      path={path}
+                      searchPattern={searchPattern}
+                      target="key"
+                      text={escapeJsonString(keyName)}
+                    />
+                    &quot;
+                  </span>
+                  <span {...stylex.props(jsonViewStyles.punctuation)}>: </span>
+                </>
+              )}
+              {container === true ? (
+                <span {...stylex.props(jsonViewStyles.punctuation)}>
+                  {expandable === true && expanded === false
+                    ? `${containerPunctuation[0]}…${containerPunctuation[1]}`
+                    : containerPunctuation[0]}
+                  {expandable === false ? containerPunctuation[1] : null}
+                </span>
+              ) : (
+                <PrimitiveValue
                   activeSearchMatchId={activeSearchMatchId}
+                  displayedString={displayedString}
+                  onReveal={onStringReveal}
                   path={path}
                   searchPattern={searchPattern}
-                  target="key"
-                  text={escapeJsonString(keyName)}
+                  value={value}
                 />
-                &quot;
-              </span>
-              <span {...stylex.props(jsonViewStyles.punctuation)}>: </span>
-            </>
-          )}
-          {container === true ? (
-            <span {...stylex.props(jsonViewStyles.punctuation)}>
-              {expandable === true && expanded === false
-                ? `${containerPunctuation[0]}…${containerPunctuation[1]}`
-                : containerPunctuation[0]}
-              {expandable === false ? containerPunctuation[1] : null}
+              )}
             </span>
-          ) : (
-            <PrimitiveValue
-              activeSearchMatchId={activeSearchMatchId}
-              displayedString={displayedString}
-              onReveal={onStringReveal}
-              path={path}
-              searchPattern={searchPattern}
-              value={value}
-            />
-          )}
+          </span>
         </span>
+        {actions === undefined ? null : (
+          <span
+            onClick={(event) => event.stopPropagation()}
+            onMouseDown={(event) => event.stopPropagation()}
+            {...stylex.props(jsonViewStyles.rootActions)}
+          >
+            {actions}
+          </span>
+        )}
       </div>
       {container === true && expanded === true ? (
         <div
@@ -768,7 +793,7 @@ export function JsonView({
   accessibilityLabel,
   data,
   defaultExpandDepth = 1,
-  showCopyAction = true,
+  showRootActions = true,
   search,
 }: JsonViewProps) {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(() =>
@@ -784,9 +809,15 @@ export function JsonView({
   const onSearchResultsChangeRef = useRef(search?.onResultsChange)
   const retainedSearchBranchRef = useRef<RetainedSearchBranch | null>(null)
   const serializedData = useMemo(
-    () => (showCopyAction === true ? JSON.stringify(data, null, 2) : null),
-    [data, showCopyAction],
+    () => (showRootActions === true ? JSON.stringify(data, null, 2) : null),
+    [data, showRootActions],
   )
+  const fullyExpandedPaths = useMemo(
+    () => (showRootActions === true ? createInitialExpansion(data, 'all') : new Set<string>()),
+    [data, showRootActions],
+  )
+  const isFullyExpanded = Array.from(fullyExpandedPaths).every((path) => expandedPaths.has(path))
+  const expansionLabel = isFullyExpanded === true ? 'Collapse all JSON' : 'Expand all JSON'
   const searchRequest = useMemo(
     () => ({
       query: search?.query ?? '',
@@ -982,18 +1013,6 @@ export function JsonView({
           </Text>
         </div>
       ) : null}
-      {serializedData !== null ? (
-        <div {...stylex.props(jsonViewStyles.copyActionLayer)}>
-          <div {...stylex.props(jsonViewStyles.copyAction)}>
-            <CopyButton
-              label="Copy JSON"
-              size="s"
-              textToCopy={serializedData}
-              tooltipSide="bottom"
-            />
-          </div>
-        </div>
-      ) : null}
       <div
         aria-label={accessibilityLabel}
         ref={treeRef}
@@ -1001,6 +1020,44 @@ export function JsonView({
         {...stylex.props(jsonViewStyles.tree)}
       >
         <JsonNode
+          actions={
+            serializedData === null ? undefined : (
+              <>
+                {fullyExpandedPaths.size === 0 ? null : (
+                  <Tooltip.Root>
+                    <Tooltip.Trigger
+                      render={
+                        <Button
+                          aria-label={expansionLabel}
+                          aria-pressed={isFullyExpanded}
+                          glyphSize="compact"
+                          iconOnly
+                          onClick={() =>
+                            setExpandedPaths(
+                              isFullyExpanded === true ? new Set() : fullyExpandedPaths,
+                            )
+                          }
+                          size="xs"
+                          variant="ghost"
+                        >
+                          <Button.Glyph
+                            artwork={isFullyExpanded === true ? ChevronsDownUp : ChevronsUpDown}
+                          />
+                        </Button>
+                      }
+                    />
+                    <Tooltip.Content side="bottom">{expansionLabel}</Tooltip.Content>
+                  </Tooltip.Root>
+                )}
+                <CopyButton
+                  label="Copy JSON"
+                  size="xs"
+                  textToCopy={serializedData}
+                  tooltipSide="bottom"
+                />
+              </>
+            )
+          }
           activePath={activePath}
           activeSearchMatchId={activeSearchMatch?.id}
           expandedPaths={effectiveExpandedPaths}

@@ -109,7 +109,7 @@ describe('JsonView', () => {
     expect(getRootTreeItem().getAttribute('aria-expanded')).toBe('true')
   })
 
-  it('copies the complete formatted JSON from a sticky action outside the tree', async () => {
+  it('copies the complete formatted JSON from the sticky root row', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
@@ -119,10 +119,9 @@ describe('JsonView', () => {
       <JsonView accessibilityLabel="Row JSON" data={{ profile: { name: 'Ada' }, active: true }} />,
     )
 
-    const tree = screen.getByRole('tree', { name: 'Row JSON' })
     const copyButton = screen.getByRole('button', { name: 'Copy JSON' })
 
-    expect(tree.contains(copyButton)).toBe(false)
+    expect(getRootTreeItem().firstElementChild?.contains(copyButton)).toBe(true)
     fireEvent.click(copyButton)
 
     await waitFor(() =>
@@ -132,16 +131,50 @@ describe('JsonView', () => {
     )
   })
 
+  it('expands and collapses the complete safe tree from the sticky root actions', () => {
+    render(
+      <JsonView
+        accessibilityLabel="Nested JSON"
+        data={{ profile: { contact: { email: 'ada@example.com' } } }}
+      />,
+    )
+
+    const expand = screen.getByRole('button', { name: 'Expand all JSON' })
+    const copy = screen.getByRole('button', { name: 'Copy JSON' })
+    const rootRow = getRootTreeItem().firstElementChild
+
+    expect(rootRow?.lastElementChild?.contains(expand)).toBe(true)
+    expect(rootRow?.lastElementChild?.contains(copy)).toBe(true)
+    expect(expand.compareDocumentPosition(copy) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0)
+    expect(expand.dataset.size).toBe('xs')
+    expect(copy.dataset.size).toBe('xs')
+    expect(getTreeItem(/profile/i).getAttribute('aria-expanded')).toBe('false')
+
+    fireEvent.click(expand)
+
+    expect(
+      screen.getByRole('button', { name: 'Collapse all JSON' }).getAttribute('aria-pressed'),
+    ).toBe('true')
+    expect(getTreeItem(/profile/i).getAttribute('aria-expanded')).toBe('true')
+    expect(getTreeItem(/contact/i).getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse all JSON' }))
+
+    expect(getRootTreeItem().getAttribute('aria-expanded')).toBe('false')
+    expect(screen.queryByRole('treeitem', { name: /profile/i })).toBeNull()
+  })
+
   it('omits the sticky copy action when its containing surface owns copy', () => {
     render(
       <JsonView
         accessibilityLabel="Embedded JSON"
-        showCopyAction={false}
+        showRootActions={false}
         data={{ profile: { name: 'Ada' } }}
       />,
     )
 
     expect(screen.queryByRole('button', { name: 'Copy JSON' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Expand all JSON' })).toBeNull()
   })
 
   it('escapes string keys and values as valid JSON text', () => {
