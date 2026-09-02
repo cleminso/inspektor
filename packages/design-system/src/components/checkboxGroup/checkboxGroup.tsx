@@ -25,6 +25,8 @@ export interface CheckboxGroupItem {
   disabled?: boolean
 }
 
+export type CheckboxGroupValueChangeReason = 'all' | 'item' | 'only'
+
 export type CheckboxGroupRootProps = PropsWithChildren<{
   /** Known options displayed by the checkbox group. */
   items: readonly CheckboxGroupItem[]
@@ -32,8 +34,12 @@ export type CheckboxGroupRootProps = PropsWithChildren<{
   value?: readonly string[]
   /** Initially selected values when uncontrolled. */
   defaultValue?: readonly string[]
-  /** Runs when the selected values change. */
-  onValueChange?: (value: string[]) => void
+  /**
+   * Runs after an item toggle or contextual action, including actions that keep
+   * the same values. The reason is `item` for a checkbox toggle, `only` for an
+   * Only action, and `all` for a Check all action.
+   */
+  onValueChange?: (value: string[], reason: CheckboxGroupValueChangeReason) => void
   /** Disables every mutable option. */
   disabled?: boolean
 }>
@@ -64,7 +70,7 @@ interface CheckboxGroupContextValue {
   disabled: boolean
   items: readonly CheckboxGroupItem[]
   selectedValues: readonly string[]
-  setSelectedValues: (values: string[]) => void
+  setSelectedValues: (values: string[], reason: CheckboxGroupValueChangeReason) => void
 }
 
 const CheckboxGroupContext = createContext<CheckboxGroupContextValue | null>(null)
@@ -108,11 +114,11 @@ function CheckboxGroupRoot({
   const controlsRef = useRef(new Map<string, ItemControls>())
   const selectedValues = value ?? uncontrolledValue
   const setSelectedValues = useCallback(
-    (nextValue: string[]) => {
+    (nextValue: string[], reason: CheckboxGroupValueChangeReason) => {
       if (value === undefined) {
         setUncontrolledValue(nextValue)
       }
-      onValueChange?.(nextValue)
+      onValueChange?.(nextValue, reason)
     },
     [onValueChange, value],
   )
@@ -235,6 +241,7 @@ function CheckboxGroupOption({
       context.items
         .filter((candidate) => nextSelected.has(candidate.value))
         .map((candidate) => candidate.value),
+      'item',
     )
   }
 
@@ -322,6 +329,7 @@ function CheckboxGroupOption({
                       mutableValues.has(candidate.value) || selectedSet.has(candidate.value),
                   )
                   .map((candidate) => candidate.value),
+                'all',
               )
               return
             }
@@ -333,6 +341,7 @@ function CheckboxGroupOption({
                     (candidate.disabled === true && selectedSet.has(candidate.value)),
                 )
                 .map((candidate) => candidate.value),
+              'only',
             )
           }}
           onKeyDown={(event) => {

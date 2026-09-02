@@ -117,7 +117,7 @@ function MultiSelectRoot({
         items={items}
         value={value}
         defaultValue={defaultValue}
-        onValueChange={onValueChange}
+        onValueChange={(nextValue) => onValueChange?.(nextValue)}
         disabled={disabled}
       >
         <BasePopover.Root

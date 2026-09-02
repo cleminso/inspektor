@@ -13,6 +13,13 @@
 
 [02/09/26]
 
+- [x] Add Table, Branch, and Propagation filters to the Queries left dock with the shared accordion and checkbox-group components.
+- [x] Derive table and branch options from complete retained telemetry and keep unrestricted sections selected as options change.
+- [x] Filter telemetry groups by table, intersecting branch, and propagation before timeline projection.
+- [x] Preserve complete server snapshots and capture columns while showing a distinct empty filtered result.
+
+[02/09/26]
+
 - [x] Present schema-qualified query branches as one resolved source scope with environment, user branch, and schema versions.
 - [x] Treat an empty resolved source list as unreported instead of claiming it covers every branch.
 
@@ -111,6 +118,12 @@ No open product work is recorded for the implemented foundation.
 
 [02/09/26]
 
+- Query filters remain route-local presentation state and never change `fetchServerSubscriptions` requests or retained telemetry.
+- A section with every available option checked is unrestricted; “Only” creates a restriction and “Check all” removes it.
+- New telemetry options are checked automatically while a section is unrestricted and remain unchecked while an explicit restriction persists across temporarily unavailable options.
+
+[02/09/26]
+
 - Schema-qualified telemetry branches are compatibility sources for one effective query view, not independent application branches.
 - Query details label these values as resolved sources and collapse a shared environment and user branch into one scope.
 
@@ -160,6 +173,13 @@ No open product work is recorded for the implemented foundation.
 - [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[02/09/26]
+
+- [x] Focused model coverage verifies unique option derivation and combined table, branch, and propagation filtering.
+- [x] Focused view coverage verifies “Only,” “Check all,” changing telemetry options, and empty filtered results.
+- [x] Verify QueryFilter in the isolated browser fixture.
+- [x] Run Inspector formatting, lint, typecheck, build, and package tests.
 
 [02/09/26]
 

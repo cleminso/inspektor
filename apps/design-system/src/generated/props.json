@@ -7587,7 +7587,7 @@
       "description": "Known options displayed by the checkbox group.",
       "source": {
         "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
-        "line": 30
+        "line": 32
       }
     },
     {
@@ -7597,7 +7597,7 @@
       "description": "Controlled selected values.",
       "source": {
         "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
-        "line": 32
+        "line": 34
       }
     },
     {
@@ -7608,17 +7608,17 @@
       "description": "Initially selected values when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
-        "line": 34
+        "line": 36
       }
     },
     {
       "name": "onValueChange",
-      "type": "(value: string[]) => void",
+      "type": "(value: string[], reason: CheckboxGroupValueChangeReason) => void",
       "required": false,
-      "description": "Runs when the selected values change.",
+      "description": "Runs after an item toggle or contextual action, including actions that keep\nthe same values. The reason is `item` for a checkbox toggle, `only` for an\nOnly action, and `all` for a Check all action.",
       "source": {
         "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
-        "line": 36
+        "line": 42
       }
     },
     {
@@ -7629,7 +7629,7 @@
       "description": "Disables every mutable option.",
       "source": {
         "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
-        "line": 38
+        "line": 44
       }
     }
   ],
@@ -7641,7 +7641,7 @@
       "description": "Accessible name for the checkbox group.",
       "source": {
         "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
-        "line": 48
+        "line": 54
       }
     },
     {
@@ -7652,7 +7652,7 @@
       "description": "Defers offscreen row layout and paint while retaining the complete collection.",
       "source": {
         "path": "packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx",
-        "line": 50
+        "line": 56
       }
     }
   ],

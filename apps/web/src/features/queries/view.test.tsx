@@ -69,6 +69,14 @@ const accountsGroup: QuerySubscriptionGroup = {
   propagation: 'full',
 }
 
+const auditGroup: QuerySubscriptionGroup = {
+  ...accountsGroup,
+  groupKey: 'audit-recent',
+  table: 'auditLog',
+  branches: ['release'],
+  propagation: 'local-only',
+}
+
 function success(
   id: string,
   generatedAt: number,
@@ -139,6 +147,92 @@ describe('QueriesView', () => {
     expect(screen.getByRole('alert').textContent).toContain("Couldn't load query subscriptions")
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     expect(refresh).toHaveBeenCalledOnce()
+  })
+
+  it('renders query filters with Only and Check all actions', () => {
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup, auditGroup])])
+    render(<QueriesView />)
+
+    const dock = screen.getByTestId('shell-left-dock')
+    expect(within(dock).getByRole('group', { name: 'Filter by table' })).toBeTruthy()
+    expect(within(dock).getByRole('group', { name: 'Filter by branch' })).toBeTruthy()
+    expect(within(dock).getByRole('group', { name: 'Filter by propagation' })).toBeTruthy()
+
+    fireEvent.click(within(dock).getByRole('button', { name: 'Only accounts' }))
+    expect(screen.getByRole('button', { name: /^accounts\s*1$/ })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /^auditLog\s*1$/ })).toBeNull()
+
+    fireEvent.click(within(dock).getByRole('button', { name: 'Check all from accounts' }))
+    expect(screen.getByRole('button', { name: /^auditLog\s*1$/ })).toBeTruthy()
+  })
+
+  it('keeps dynamic options checked only while their section is unrestricted', () => {
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
+    const view = render(<QueriesView />)
+
+    mocks.telemetry = telemetry([
+      success('capture-1', 1_000, [accountsGroup]),
+      success('capture-2', 2_000, [accountsGroup, auditGroup]),
+    ])
+    view.rerender(<QueriesView />)
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select auditLog' }).getAttribute('aria-checked'),
+    ).toBe('true')
+    expect(
+      screen.getByRole('checkbox', { name: 'Select release' }).getAttribute('aria-checked'),
+    ).toBe('true')
+    expect(screen.getByRole('button', { name: /^auditLog\s*1$/ })).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
+    mocks.telemetry = telemetry([success('capture-3', 3_000, [accountsGroup])])
+    view.rerender(<QueriesView />)
+
+    mocks.telemetry = telemetry([
+      ...mocks.telemetry.history,
+      success('capture-4', 4_000, [
+        accountsGroup,
+        auditGroup,
+        { ...auditGroup, groupKey: 'billing-recent', table: 'billing' },
+      ]),
+    ])
+    view.rerender(<QueriesView />)
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select billing' }).getAttribute('aria-checked'),
+    ).toBe('false')
+    expect(screen.queryByRole('button', { name: /^billing\s*1$/ })).toBeNull()
+  })
+
+  it('keeps Only restrictive when its section initially has one option', () => {
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
+    const view = render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
+    mocks.telemetry = telemetry([
+      success('capture-1', 1_000, [accountsGroup]),
+      success('capture-2', 2_000, [accountsGroup, auditGroup]),
+    ])
+    view.rerender(<QueriesView />)
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select auditLog' }).getAttribute('aria-checked'),
+    ).toBe('false')
+  })
+
+  it('shows an empty filtered result without moving focus from its filter', () => {
+    const history = [success('capture-1', 1_000, [accountsGroup])]
+    mocks.telemetry = telemetry(history)
+    render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const filter = screen.getByRole('checkbox', { name: 'Select accounts' })
+    filter.focus()
+    fireEvent.click(filter)
+
+    expect(screen.getByText('No query subscriptions match filters')).toBeTruthy()
+    expect(document.activeElement).toBe(filter)
   })
 
   it('maps lanes, tracks, and present, absent, and unknown cells and derives selected details', async () => {

@@ -94,6 +94,7 @@ export type {
   CheckboxGroupListProps,
   CheckboxGroupRendering,
   CheckboxGroupRootProps,
+  CheckboxGroupValueChangeReason,
 } from './components/checkboxGroup/checkboxGroup'
 export { Combobox } from './components/combobox/combobox'
 export type {

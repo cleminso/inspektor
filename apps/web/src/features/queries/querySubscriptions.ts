@@ -48,6 +48,17 @@ export interface QuerySubscriptionsTimeline {
   latestSuccessfulCapture: SuccessfulQuerySubscriptionsCapture | null
 }
 
+export interface QueryFilterOptions {
+  tables: string[]
+  branches: string[]
+}
+
+export interface QuerySubscriptionFilters {
+  tables: readonly string[] | null
+  branches: readonly string[] | null
+  propagations: readonly QuerySubscriptionGroup['propagation'][] | null
+}
+
 const invalidResponse = {
   valid: false,
   error: { kind: 'invalid-response' },
@@ -132,6 +143,57 @@ export function reduceQuerySubscriptionsHistory(
 
   const retainedSuccess = findLatestSuccessfulCapture(nextHistory)
   return retainedSuccess === null ? boundedHistory : [retainedSuccess, ...boundedHistory.slice(1)]
+}
+
+export function parseQuerySubscriptionSource(source: string, environment: string) {
+  const environmentPrefix = `${environment}-`
+  const match = /^([0-9a-f]{12})-(.+)$/iu.exec(
+    source.startsWith(environmentPrefix) ? source.slice(environmentPrefix.length) : '',
+  )
+  return match === null ? null : { schemaVersion: match[1]!, branch: match[2]! }
+}
+
+export function deriveQueryFilterOptions(
+  history: readonly QuerySubscriptionsCapture[],
+  environment: string,
+): QueryFilterOptions {
+  const tables = new Set<string>()
+  const branches = new Set<string>()
+
+  for (const capture of history) {
+    if (capture.kind === 'failure') {
+      continue
+    }
+    for (const group of capture.groups) {
+      tables.add(group.table)
+      for (const source of group.branches) {
+        branches.add(parseQuerySubscriptionSource(source, environment)?.branch ?? source)
+      }
+    }
+  }
+
+  return {
+    tables: [...tables].sort(compareText),
+    branches: [...branches].sort(compareText),
+  }
+}
+
+export function filterQuerySubscriptionGroups(
+  groups: readonly QuerySubscriptionGroup[],
+  filters: QuerySubscriptionFilters,
+  environment: string,
+): readonly QuerySubscriptionGroup[] {
+  return groups.filter(
+    (group) =>
+      (filters.tables === null || filters.tables.includes(group.table)) &&
+      (filters.branches === null ||
+        group.branches.some((source) =>
+          filters.branches?.includes(
+            parseQuerySubscriptionSource(source, environment)?.branch ?? source,
+          ),
+        )) &&
+      (filters.propagations === null || filters.propagations.includes(group.propagation)),
+  )
 }
 
 export function projectQuerySubscriptionsTimeline(

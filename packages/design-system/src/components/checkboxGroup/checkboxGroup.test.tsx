@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { CheckboxGroup, type CheckboxGroupItem } from './checkboxGroup'
 
@@ -78,6 +78,28 @@ describe('CheckboxGroup', () => {
     expect(
       container.querySelectorAll('[data-slot="checkbox-group-row"][data-rendering="deferred"]'),
     ).toHaveLength(3)
+  })
+
+  it('reports whether values changed from an item, Only, or Check all', () => {
+    const onValueChange = vi.fn()
+    render(
+      <CheckboxGroup.Root
+        defaultValue={['name']}
+        items={items.slice(1)}
+        onValueChange={onValueChange}
+      >
+        <CheckboxGroup.List label="Visible fields" />
+      </CheckboxGroup.Root>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Check all from Name' }))
+    expect(onValueChange).toHaveBeenLastCalledWith(['name', 'role'], 'all')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Only Role' }))
+    expect(onValueChange).toHaveBeenLastCalledWith(['role'], 'only')
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select Name' }))
+    expect(onValueChange).toHaveBeenLastCalledWith(['name', 'role'], 'item')
   })
 
   it('navigates mutable rows and action columns with arrow, Home, and End keys', () => {

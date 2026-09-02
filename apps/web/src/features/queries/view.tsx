@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Accordion,
   Box,
   Button,
+  CheckboxGroup,
   JsonView,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
   ShellLayout,
+  SidePanel,
   SwimlaneTimeline,
   Text,
   Tooltip,
@@ -21,7 +23,17 @@ import {
   useInspectorSessionState,
 } from '@app/providers/inspectorProvider'
 
-import type { QuerySubscriptionGroup, QuerySubscriptionsCapture } from './querySubscriptions'
+import {
+  deriveQueryFilterOptions,
+  filterQuerySubscriptionGroups,
+  parseQuerySubscriptionSource,
+  projectQuerySubscriptionsTimeline,
+  type QueryFilterOptions,
+  type QuerySubscriptionFilters,
+  type QuerySubscriptionGroup,
+  type QuerySubscriptionsCapture,
+  type QuerySubscriptionsTimeline,
+} from './querySubscriptions'
 import {
   useQuerySubscriptionsTelemetry,
   type QuerySubscriptionsTelemetry,
@@ -36,6 +48,78 @@ interface SelectedQueryDetails {
   capture: Extract<QuerySubscriptionsCapture, { kind: 'success' }>
   group: QuerySubscriptionGroup
 }
+
+const propagationOptions = ['full', 'local-only'] as const
+
+const QueryFilter = memo(function QueryFilter({
+  filters,
+  options,
+  onChange,
+}: {
+  filters: QuerySubscriptionFilters
+  options: QueryFilterOptions
+  onChange: (filters: QuerySubscriptionFilters) => void
+}): React.ReactElement {
+  const sections = [
+    { key: 'tables', label: 'TABLE', listLabel: 'Filter by table', options: options.tables },
+    { key: 'branches', label: 'BRANCH', listLabel: 'Filter by branch', options: options.branches },
+    {
+      key: 'propagations',
+      label: 'PROPAGATION',
+      listLabel: 'Filter by propagation',
+      options: propagationOptions,
+    },
+  ] as const
+
+  return (
+    <SidePanel>
+      <SidePanel.Body>
+        <Accordion
+          defaultValue={sections.map(({ key }) => key)}
+          layout="fill"
+          multiple
+        >
+          {sections.map((section) => {
+            const items = section.options.map((value) => ({ value, label: value }))
+            return (
+              <Accordion.Item
+                key={section.key}
+                value={section.key}
+              >
+                <Accordion.Header level={2}>
+                  <Accordion.Trigger>{section.label}</Accordion.Trigger>
+                </Accordion.Header>
+                <Accordion.Panel>
+                  <Box
+                    flexDirection="column"
+                    paddingTop="xxs"
+                  >
+                    <CheckboxGroup.Root
+                      items={items}
+                      value={filters[section.key] ?? section.options}
+                      onValueChange={(value, reason) =>
+                        onChange({
+                          ...filters,
+                          [section.key]:
+                            reason === 'all' ||
+                            (reason === 'item' && value.length === section.options.length)
+                              ? null
+                              : value,
+                        })
+                      }
+                    >
+                      <CheckboxGroup.List label={section.listLabel} />
+                    </CheckboxGroup.Root>
+                  </Box>
+                </Accordion.Panel>
+              </Accordion.Item>
+            )
+          })}
+        </Accordion>
+      </SidePanel.Body>
+    </SidePanel>
+  )
+})
 
 const captureTimeFormatter = new Intl.DateTimeFormat(undefined, {
   hour: '2-digit',
@@ -88,13 +172,7 @@ function getQueryData(query: string): JsonViewObject | readonly JsonViewValue[] 
 }
 
 function getSchemaSourceScope(branches: readonly string[], environment: string) {
-  const environmentPrefix = `${environment}-`
-  const sources = branches.map((branch) => {
-    const match = /^([0-9a-f]{12})-(.+)$/iu.exec(
-      branch.startsWith(environmentPrefix) ? branch.slice(environmentPrefix.length) : '',
-    )
-    return match === null ? null : { schemaVersion: match[1]!, branch: match[2]! }
-  })
+  const sources = branches.map((branch) => parseQuerySubscriptionSource(branch, environment))
   const first = sources[0]
   if (first === undefined || first === null) {
     return null
@@ -383,19 +461,23 @@ function QueryDetails({
 }
 
 function QueryTimeline({
+  filtered,
   refreshButtonRef,
   selectedCellRef,
   selection,
   telemetry,
+  timeline,
   onSelect,
 }: {
+  filtered: boolean
   refreshButtonRef: React.RefObject<HTMLButtonElement | null>
   selectedCellRef: React.RefObject<HTMLTableCellElement | null>
   selection: QuerySelection | null
   telemetry: QuerySubscriptionsTelemetry
+  timeline: QuerySubscriptionsTimeline
   onSelect: (selection: QuerySelection) => void
 }): React.ReactElement {
-  const { history, refresh, state, timeline } = telemetry
+  const { history, refresh, state } = telemetry
   const isRefreshing = state.kind === 'refreshing'
   const staleHistory = state.kind === 'stale-history'
 
@@ -456,9 +538,11 @@ function QueryTimeline({
           role={isRefreshing === false && staleHistory === false ? 'status' : undefined}
         >
           <Text color="muted">
-            {staleHistory === true
-              ? 'Last successful snapshot contained no active query subscriptions'
-              : 'No active query subscriptions'}
+            {filtered === true
+              ? 'No query subscriptions match filters'
+              : staleHistory === true
+                ? 'Last successful snapshot contained no active query subscriptions'
+                : 'No active query subscriptions'}
           </Text>
         </Box>
       ) : (
@@ -536,10 +620,40 @@ function QueryTimeline({
 
 function ConnectedQueriesView({ connection }: { connection: StoredConnection }) {
   const telemetry = useQuerySubscriptionsTelemetry(connection)
+  const [filters, setFilters] = useState<QuerySubscriptionFilters>({
+    tables: null,
+    branches: null,
+    propagations: null,
+  })
   const [selection, setSelection] = useState<QuerySelection | null>(null)
   const selectedCellRef = useRef<HTMLTableCellElement | null>(null)
   const refreshButtonRef = useRef<HTMLButtonElement | null>(null)
-  const selectedDetails = findSelectedDetails(telemetry.history, selection)
+  const filterOptions = useMemo(
+    () => deriveQueryFilterOptions(telemetry.history, connection.env),
+    [connection.env, telemetry.history],
+  )
+  const filtered =
+    filters.tables !== null || filters.branches !== null || filters.propagations !== null
+  const filteredHistory = useMemo(
+    () =>
+      filtered === false
+        ? telemetry.history
+        : telemetry.history.map((capture) =>
+            capture.kind === 'failure'
+              ? capture
+              : {
+                  ...capture,
+                  groups: filterQuerySubscriptionGroups(capture.groups, filters, connection.env),
+                },
+          ),
+    [connection.env, filtered, filters, telemetry.history],
+  )
+  const timeline = useMemo(
+    () =>
+      filtered === false ? telemetry.timeline : projectQuerySubscriptionsTimeline(filteredHistory),
+    [filtered, filteredHistory, telemetry.timeline],
+  )
+  const selectedDetails = findSelectedDetails(filteredHistory, selection)
   const hasSelectedDetails = selectedDetails !== null
   const isSelectionMissing = selection !== null && selectedDetails === null
   const keepSelectedCellVisible = useCallback(() => {
@@ -583,6 +697,11 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
     } else {
       refreshButtonRef.current?.focus()
     }
+    setSelection(null)
+  }, [])
+
+  const changeFilters = useCallback((nextFilters: QuerySubscriptionFilters) => {
+    setFilters(nextFilters)
     setSelection(null)
   }, [])
 
@@ -630,60 +749,70 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
   } else {
     content = (
       <QueryTimeline
+        filtered={filtered}
         refreshButtonRef={refreshButtonRef}
         selectedCellRef={selectedCellRef}
         selection={selection}
         telemetry={telemetry}
+        timeline={timeline}
         onSelect={selectQuery}
       />
     )
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal">
-      <ResizablePanel onResize={keepSelectedCellVisible}>{content}</ResizablePanel>
-      {selectedDetails === null ? null : (
-        <>
-          <ResizableHandle />
-          <ResizablePanel
-            defaultSize={420}
-            minSize={240}
-          >
-            <QueryDetails
-              details={selectedDetails}
-              environment={connection.env}
-              onClose={closeDetails}
-            />
-          </ResizablePanel>
-        </>
-      )}
-    </ResizablePanelGroup>
+    <ShellLayout.Body>
+      <ShellLayout.LeftDock>
+        <QueryFilter
+          filters={filters}
+          options={filterOptions}
+          onChange={changeFilters}
+        />
+      </ShellLayout.LeftDock>
+      <ShellLayout.View>
+        <ResizablePanelGroup orientation="horizontal">
+          <ResizablePanel onResize={keepSelectedCellVisible}>{content}</ResizablePanel>
+          {selectedDetails === null ? null : (
+            <>
+              <ResizableHandle />
+              <ResizablePanel
+                defaultSize={420}
+                minSize={240}
+              >
+                <QueryDetails
+                  details={selectedDetails}
+                  environment={connection.env}
+                  onClose={closeDetails}
+                />
+              </ResizablePanel>
+            </>
+          )}
+        </ResizablePanelGroup>
+      </ShellLayout.View>
+    </ShellLayout.Body>
   )
 }
 
 export function QueriesView(): React.ReactElement {
   const { activeConnection } = useInspectorSessionState()
 
-  let content: React.ReactNode
   if (activeConnection === null) {
-    content = (
-      <CenteredStatus>
-        <Text color="muted">No active connection</Text>
-      </CenteredStatus>
-    )
-  } else {
-    content = (
-      <ConnectedQueriesView
-        connection={activeConnection}
-        key={getConnectionProfileToken(activeConnection)}
-      />
+    return (
+      <ShellLayout.Body>
+        <ShellLayout.LeftDock>{null}</ShellLayout.LeftDock>
+        <ShellLayout.View>
+          <CenteredStatus>
+            <Text color="muted">No active connection</Text>
+          </CenteredStatus>
+        </ShellLayout.View>
+      </ShellLayout.Body>
     )
   }
 
   return (
-    <ShellLayout.Body>
-      <ShellLayout.LeftDock>{null}</ShellLayout.LeftDock>
-      <ShellLayout.View>{content}</ShellLayout.View>
-    </ShellLayout.Body>
+    <ConnectedQueriesView
+      connection={activeConnection}
+      key={getConnectionProfileToken(activeConnection)}
+    />
   )
 }

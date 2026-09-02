@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  deriveQueryFilterOptions,
+  filterQuerySubscriptionGroups,
   normalizeQuerySubscriptionsError,
   projectQuerySubscriptionsTimeline,
   reduceQuerySubscriptionsHistory,
@@ -180,6 +182,63 @@ describe('reduceQuerySubscriptionsHistory', () => {
     )
 
     expect(reduced.map(({ id }) => id)).toEqual(['successful', 'failure-2', 'failure-3'])
+  })
+})
+
+describe('query subscription filters', () => {
+  const auditGroup: QuerySubscriptionGroup = {
+    groupKey: 'audit-recent',
+    count: 1,
+    table: 'auditLog',
+    query: '{}',
+    branches: ['main', 'test-7f43cb822ba5-release'],
+    propagation: 'local-only',
+  }
+
+  it('derives sorted unique table and branch options from successful telemetry', () => {
+    const history: QuerySubscriptionsCapture[] = [
+      success('capture-1', 1, [auditGroup, accountsGroup]),
+      success('capture-2', 2, [{ ...accountsGroup, branches: ['feature', 'main'] }]),
+      { kind: 'failure', id: 'capture-3', attemptedAt: 3, error: { kind: 'network' } },
+    ]
+
+    expect(deriveQueryFilterOptions(history, 'test')).toEqual({
+      tables: ['accounts', 'auditLog'],
+      branches: ['feature', 'main', 'release'],
+    })
+  })
+
+  it('keeps groups matching a checked table, branch, and propagation', () => {
+    expect(
+      filterQuerySubscriptionGroups(
+        [
+          auditGroup,
+          { ...auditGroup, groupKey: 'other-table', table: 'accounts' },
+          { ...auditGroup, groupKey: 'other-branch', branches: ['main'] },
+          { ...auditGroup, groupKey: 'other-propagation', propagation: 'full' },
+        ],
+        {
+          tables: ['auditLog'],
+          branches: ['release'],
+          propagations: ['local-only'],
+        },
+        'test',
+      ),
+    ).toEqual([auditGroup])
+  })
+
+  it('returns no groups when none match every filter section', () => {
+    expect(
+      filterQuerySubscriptionGroups(
+        [accountsGroup],
+        {
+          tables: ['accounts'],
+          branches: [],
+          propagations: ['full'],
+        },
+        'test',
+      ),
+    ).toEqual([])
   })
 })
 
