@@ -42,7 +42,7 @@ export const structuredValuePreviewStyles = stylex.create({
   value: {
     alignItems: 'baseline',
     color: syntaxColors['syntax-property'],
-    columnGap: spacing.s,
+    columnGap: spacing.xs,
     display: 'inline-flex',
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
@@ -52,7 +52,9 @@ export const structuredValuePreviewStyles = stylex.create({
   },
   markerRail: {
     overflow: 'hidden',
+    color: textColors.muted,
     flexShrink: 0,
+    fontVariantNumeric: 'tabular-nums',
     textOverflow: 'ellipsis',
     width: dimensions[32],
   },

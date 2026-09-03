@@ -19,6 +19,19 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[03/09/26]
+
+### Checked-row keyboard navigation
+
+- [x] Navigate to the previous and next checked rows with `K` and `J` from the open edit pane.
+- [x] Label the matching arrow controls with `Press K` and `Press J` tooltips.
+
+[03/09/26]
+
+### Column visibility
+
+- [x] Label the column visibility icon button with a pointer and keyboard tooltip.
+
 [29/08/26]
 
 ### Live change feedback

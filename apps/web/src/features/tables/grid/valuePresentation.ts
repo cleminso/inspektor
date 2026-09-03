@@ -4,7 +4,7 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { normalizeTimestampValue } from '@tables/valueParsing'
 
 const MAX_STRUCTURED_ITEMS = 3
-const MAX_SUMMARY_VALUE_LENGTH = 24
+const MAX_SUMMARY_VALUE_LENGTH = 80
 const MAX_FALLBACK_LENGTH = 80
 
 interface RawPresentation {
@@ -45,7 +45,7 @@ function boundText(value: string, maxLength: number): string {
     return value
   }
 
-  return `${value.slice(0, maxLength - 3)}...`
+  return `${value.slice(0, maxLength - 1)}…`
 }
 
 function formatRawFallback(value: unknown): string {
@@ -57,13 +57,13 @@ function formatRawFallback(value: unknown): string {
 }
 
 function formatBoundedJsonString(value: string): string {
-  const codePointBudget = MAX_SUMMARY_VALUE_LENGTH - 5
+  const codePointBudget = MAX_SUMMARY_VALUE_LENGTH - 3
   let preview = ''
   let codePointCount = 0
 
   for (const codePoint of value) {
     if (codePointCount === codePointBudget) {
-      return JSON.stringify(`${preview}...`)
+      return JSON.stringify(`${preview}…`)
     }
 
     preview += codePoint

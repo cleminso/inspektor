@@ -16,6 +16,12 @@ This checklist tracks the reusable compact structured-value preview component.
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Use one typographic ellipsis across bounded entries and responsive cell clipping.
+- [x] Keep standard UUID entries intact so responsive cell clipping does not stack ellipses.
+- [x] Subdue structural counts and tighten their gap without removing the shared fixed rail.
+
 [11/08/26]
 
 - [x] Mark structured technical previews as non-translatable content.
@@ -50,6 +56,10 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- [x] Keep end truncation for structured content and let responsive cell clipping own ordinary UUID overflow.
+
 [27/07/26]
 
 - [x] Use `variant="typedJson"` only for values backed by a schema-defined JSON type.
@@ -61,6 +71,11 @@ No open product work is recorded.
 No open design decisions are recorded.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Verify one responsive ellipsis for a full UUID preview and subdued fixed-rail counts in the browser.
+- [x] Run focused presentation and component tests, changed-file lint, affected-package typechecks and builds, and package test passes.
 
 [05/08/26]
 

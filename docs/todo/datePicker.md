@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Apply the branded sans font to the deferred calendar loading and error fallback.
+
 [28/08/26]
 
 - [x] Keep `react-day-picker` and timestamp-calendar controls in a deferred implementation module.
@@ -64,6 +68,10 @@
 No unresolved DatePicker design decisions.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Run focused DatePicker tests, changed-file lint, and design-system typecheck.
 
 [28/08/26]
 

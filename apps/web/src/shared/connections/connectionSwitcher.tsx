@@ -24,39 +24,6 @@ interface ConnectionSwitcherProps {
   width?: ContextSwitcherTriggerWidth
 }
 
-function ConnectionLabel({
-  connection,
-  label = getConnectionDisplayName(connection),
-}: {
-  connection: StoredConnection
-  label?: string
-}): React.ReactElement {
-  return (
-    <Box
-      as="span"
-      display="inline-flex"
-      minWidth={0}
-      alignItems="center"
-      flexDirection="row"
-      gap="xxs"
-    >
-      <Text
-        as="span"
-        color="inherit"
-        truncate
-      >
-        {label}
-      </Text>
-      <Badge
-        size="xs"
-        translate="no"
-      >
-        {connection.env}
-      </Badge>
-    </Box>
-  )
-}
-
 function sortConnections(
   connections: StoredConnection[],
   currentConnectionId: string | null,
@@ -115,36 +82,40 @@ export function ConnectionSwitcher({
 
   return (
     <>
-      <ContextSwitcher.Root<StoredConnection>
-        items={orderedConnections}
-        value={activeConnection}
-        itemToStringLabel={getConnectionDisplayName}
-        itemToStringValue={(connection) => connection.id}
-        isItemEqualToValue={(connection, selected) => connection.id === selected.id}
-        filter={(connection, query) =>
-          `${getConnectionDisplayName(connection)} ${connection.appId}`
-            .toLowerCase()
-            .includes(query.trim().toLowerCase())
-        }
-        open={open}
-        onOpenChange={(nextOpen, details) => {
-          if (nextOpen === false && details.reason === 'item-press') {
-            return
-          }
-          setOpen(nextOpen)
-        }}
-        onValueChange={(connection) => {
-          if (connection !== null && openConnection(connection.id) === 'accepted') {
-            setOpen(false)
-          }
-        }}
+      <Box
+        minWidth={0}
+        alignItems="center"
+        gap="xxs"
       >
-        <ContextSwitcher.Trigger
-          label="Switch connection"
-          size={size}
-          width={width}
+        <ContextSwitcher.Root<StoredConnection>
+          items={orderedConnections}
+          value={activeConnection}
+          itemToStringLabel={getConnectionDisplayName}
+          itemToStringValue={(connection) => connection.id}
+          isItemEqualToValue={(connection, selected) => connection.id === selected.id}
+          filter={(connection, query) =>
+            `${getConnectionDisplayName(connection)} ${connection.appId}`
+              .toLowerCase()
+              .includes(query.trim().toLowerCase())
+          }
+          open={open}
+          onOpenChange={(nextOpen, details) => {
+            if (nextOpen === false && details.reason === 'item-press') {
+              return
+            }
+            setOpen(nextOpen)
+          }}
+          onValueChange={(connection) => {
+            if (connection !== null && openConnection(connection.id) === 'accepted') {
+              setOpen(false)
+            }
+          }}
         >
-          {triggerConnection === null ? (
+          <ContextSwitcher.Trigger
+            label="Switch connection"
+            size={size}
+            width={width}
+          >
             <Text
               as="span"
               color="inherit"
@@ -152,87 +123,113 @@ export function ConnectionSwitcher({
             >
               {resolvedTriggerLabel}
             </Text>
-          ) : (
-            <ConnectionLabel
-              connection={triggerConnection}
-              label={resolvedTriggerLabel}
-            />
-          )}
-        </ContextSwitcher.Trigger>
-        <ContextSwitcher.Content>
-          {orderedConnections.length > 5 ? (
-            <ContextSwitcher.Search
-              label="Search connections"
-              placeholder="Search connections…"
-            />
-          ) : null}
-          {orderedConnections.length > 0 ? (
-            <ContextSwitcher.Viewport maxHeight="fiveItems">
-              {orderedConnections.length > 5 ? (
-                <ContextSwitcher.Empty>No matching connections.</ContextSwitcher.Empty>
-              ) : null}
-              <ContextSwitcher.List>
-                {(connection: StoredConnection) => (
-                  <ContextSwitcher.Item
-                    key={connection.id}
-                    value={connection}
-                    indicator="none"
-                  >
-                    <ContextSwitcher.ItemText
-                      label={<ConnectionLabel connection={connection} />}
-                      description={connection.appId}
-                    />
-                  </ContextSwitcher.Item>
-                )}
-              </ContextSwitcher.List>
-            </ContextSwitcher.Viewport>
-          ) : null}
-          {activeConnection !== null ? (
-            <ContextSwitcher.Footer>
-              <Box flexDirection="column">
-                <ButtonLink
-                  variant="ghost"
-                  size="s"
-                  layout="row"
-                  render={
-                    <Link
-                      to={appRoutes.editConnection}
-                      params={{ connectionId: activeConnection.id }}
-                    />
-                  }
-                  onClick={preventBlockedNavigation}
-                >
-                  Edit connection
-                </ButtonLink>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  layout="row"
-                  onClick={() => {
-                    if (runtimeScopeExitBlocked === false) {
-                      setConnectionToRemove(activeConnection)
+          </ContextSwitcher.Trigger>
+          <ContextSwitcher.Content>
+            {orderedConnections.length > 5 ? (
+              <ContextSwitcher.Search
+                label="Search connections"
+                placeholder="Search connections…"
+              />
+            ) : null}
+            {orderedConnections.length > 0 ? (
+              <ContextSwitcher.Viewport maxHeight="fiveItems">
+                {orderedConnections.length > 5 ? (
+                  <ContextSwitcher.Empty>No matching connections.</ContextSwitcher.Empty>
+                ) : null}
+                <ContextSwitcher.List>
+                  {(connection: StoredConnection) => (
+                    <ContextSwitcher.Item
+                      key={connection.id}
+                      value={connection}
+                      indicator="none"
+                    >
+                      <ContextSwitcher.ItemText
+                        label={
+                          <Box
+                            as="span"
+                            display="inline-flex"
+                            minWidth={0}
+                            alignItems="center"
+                            flexDirection="row"
+                            gap="xxs"
+                          >
+                            <Text
+                              as="span"
+                              color="inherit"
+                              truncate
+                            >
+                              {getConnectionDisplayName(connection)}
+                            </Text>
+                            <Badge
+                              size="xs"
+                              translate="no"
+                            >
+                              {connection.env}
+                            </Badge>
+                          </Box>
+                        }
+                        description={connection.appId}
+                      />
+                    </ContextSwitcher.Item>
+                  )}
+                </ContextSwitcher.List>
+              </ContextSwitcher.Viewport>
+            ) : null}
+            {activeConnection !== null ? (
+              <ContextSwitcher.Footer>
+                <Box flexDirection="column">
+                  <ButtonLink
+                    variant="ghost"
+                    size="s"
+                    layout="row"
+                    render={
+                      <Link
+                        to={appRoutes.editConnection}
+                        params={{ connectionId: activeConnection.id }}
+                      />
                     }
-                  }}
-                >
-                  Remove connection
-                </Button>
-              </Box>
+                    onClick={preventBlockedNavigation}
+                  >
+                    Edit connection
+                  </ButtonLink>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="s"
+                    layout="row"
+                    onClick={() => {
+                      if (runtimeScopeExitBlocked === false) {
+                        setConnectionToRemove(activeConnection)
+                      }
+                    }}
+                  >
+                    Remove connection
+                  </Button>
+                </Box>
+              </ContextSwitcher.Footer>
+            ) : null}
+            <ContextSwitcher.Footer>
+              <ButtonLink
+                variant="ghost"
+                size="s"
+                layout="row"
+                render={<Link to={appRoutes.newConnection} />}
+                onClick={preventBlockedNavigation}
+              >
+                Add new connection
+              </ButtonLink>
             </ContextSwitcher.Footer>
-          ) : null}
-          <ContextSwitcher.Footer>
-            <ButtonLink
-              variant="ghost"
-              size="s"
-              layout="row"
-              render={<Link to={appRoutes.newConnection} />}
-              onClick={preventBlockedNavigation}
-            >
-              Add new connection
-            </ButtonLink>
-          </ContextSwitcher.Footer>
-        </ContextSwitcher.Content>
-      </ContextSwitcher.Root>
+          </ContextSwitcher.Content>
+        </ContextSwitcher.Root>
+        {triggerConnection === null ? null : (
+          <Badge
+            size="s"
+            translate="no"
+          >
+            {triggerConnection.env}
+          </Badge>
+        )}
+      </Box>
       <AlertDialog.Root
         open={connectionToRemove !== null}
         onOpenChange={(nextOpen) => {

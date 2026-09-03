@@ -13,6 +13,12 @@
 
 [03/09/26]
 
+### Connection trigger environment
+
+- [x] Place the active or pending connection environment beside the switcher trigger, matching the schema-status treatment while keeping option environments inline with their connection names. This supersedes the earlier inline trigger treatment.
+
+[03/09/26]
+
 ### Direct workspace entry
 
 - [x] Open the workspace on the latest generated schema immediately after a connection is validated.
@@ -276,6 +282,11 @@
 
 [03/09/26]
 
+- The header presents connection environment and schema status as adjacent context rather than including either badge in its switcher trigger.
+- Connection option badges remain inline because each environment identifies its own row.
+
+[03/09/26]
+
 - The permissions-head schema defines `Latest`; the `/schemas` hash-array order does not represent schema recency.
 - When a permissions head exists in the catalogue, place it first without reordering the remaining schemas.
 - When no permissions head exists, preserve the advertised order as a compatibility fallback.
@@ -386,6 +397,12 @@
 - None.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover the active and pending connection environment beside, rather than inside, the trigger.
+- [x] Verify the connection switcher and header in the browser.
+- [x] Run Inspector formatting, lint, typecheck, build, and package-wide tests.
 
 [03/09/26]
 

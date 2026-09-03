@@ -202,6 +202,20 @@ describe('classifySchemaValue', () => {
     })
   })
 
+  it('keeps standard UUID array entries intact for responsive cell truncation', () => {
+    const rawValue = ['019f116b-c459-7070-aaaa-bbbbbbbbbbbb']
+
+    expect(
+      classifySchemaValue(rawValue, column({ type: 'Array', element: { type: 'Uuid' } })),
+    ).toMatchObject({
+      kind: 'structured',
+      model: {
+        kind: 'array',
+        entries: ['"019f116b-c459-7070-aaaa-bbbbbbbbbbbb"'],
+      },
+    })
+  })
+
   it('classifies valid and malformed enum values against schema variants', () => {
     const enumColumn = column({ type: 'Enum', variants: ['reader', 'writer'] })
 
@@ -254,15 +268,13 @@ describe('classifySchemaValue', () => {
       column({ type: 'Array', element: { type: 'Text' } }),
     )
 
-    expect(presentation).toMatchObject({
-      kind: 'structured',
-      model: {
-        kind: 'array',
-        entries: ['"line \\"one\\" line \\"on..."'],
-      },
-    })
+    if (presentation.kind !== 'structured' || presentation.model.kind !== 'array') {
+      throw new Error('Expected a structured array presentation')
+    }
+    expect(presentation.model.entries[0]).toContain('…')
+    expect(presentation.model.entries[0]).not.toContain('...')
     expect(
-      stringify.mock.calls.some(([value]) => typeof value === 'string' && value.length > 24),
+      stringify.mock.calls.some(([value]) => typeof value === 'string' && value.length > 80),
     ).toBe(false)
   })
 

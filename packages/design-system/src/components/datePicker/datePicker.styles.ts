@@ -100,6 +100,7 @@ export const datePickerStyles = stylex.create({
   loading: {
     alignItems: 'center',
     display: 'flex',
+    fontFamily: fontFamilies.sans,
     justifyContent: 'center',
     minHeight: spatial['viewport-height-l'],
   },

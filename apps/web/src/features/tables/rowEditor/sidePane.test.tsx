@@ -1,11 +1,48 @@
+import { Tooltip } from '@inspector/ds'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 
 afterEach(cleanup)
 
 describe('RowEditorSidePanel dirty transitions', () => {
+  it('navigates checked rows with K and J and labels both shortcuts', async () => {
+    const onNavigateNext = vi.fn()
+    const onNavigatePrevious = vi.fn()
+    render(
+      <Tooltip.Provider delay={0}>
+        <AppHotkeysProvider>
+          <RowEditorSidePanel
+            activeColumnNumber={3}
+            activePageRowNumber={12}
+            activeRowIndex={1}
+            editedRowIds={['row-11', 'row-12', 'row-13']}
+            mode="edit"
+            onNavigateNext={onNavigateNext}
+            onNavigatePrevious={onNavigatePrevious}
+          >
+            <input aria-label="Row value" />
+          </RowEditorSidePanel>
+        </AppHotkeysProvider>
+      </Tooltip.Provider>,
+    )
+
+    expect(fireEvent.keyDown(document, { key: 'k' })).toBe(false)
+    expect(fireEvent.keyDown(document, { key: 'j' })).toBe(false)
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Row value' }), { key: 'j' })
+
+    expect(onNavigatePrevious).toHaveBeenCalledOnce()
+    expect(onNavigateNext).toHaveBeenCalledOnce()
+
+    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Previous selected row' }))
+    expect(await screen.findByText('Press K')).toBeTruthy()
+    fireEvent.mouseLeave(screen.getByRole('button', { name: 'Previous selected row' }))
+    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Next selected row' }))
+    expect(await screen.findByText('Press J')).toBeTruthy()
+  })
+
   it('shows the active page row and selected grid column in the edit title', () => {
     render(
       <RowEditorSidePanel

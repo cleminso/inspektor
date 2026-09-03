@@ -107,15 +107,16 @@ describe('ConnectionSwitcher', () => {
     expect(document.querySelectorAll('[data-slot="combobox-popup-footer"]')).toHaveLength(2)
   })
 
-  it('shows the active connection first and uses its name in the trigger', () => {
+  it('shows the active connection first and places its environment beside the trigger', () => {
     connections = [createConnection('one', 'First'), createConnection('two', 'Second')]
     currentConnectionId = 'two'
 
     render(<ConnectionSwitcher />)
 
     const trigger = screen.getByRole('combobox', { name: 'Switch connection' })
-    expect(trigger.textContent).toBe('Seconddev')
-    expect(trigger.querySelector('[data-slot="badge"]')?.textContent).toBe('dev')
+    expect(trigger.textContent).toBe('Second')
+    expect(trigger.querySelector('[data-slot="badge"]')).toBeNull()
+    expect(trigger.parentElement?.querySelector('[data-slot="badge"]')?.textContent).toBe('dev')
 
     openSwitcher()
 
@@ -232,9 +233,9 @@ describe('ConnectionSwitcher', () => {
 
     render(<ConnectionSwitcher />)
 
-    expect(screen.getByRole('combobox', { name: 'Switch connection' }).textContent).toBe(
-      'Opening First…dev',
-    )
+    const trigger = screen.getByRole('combobox', { name: 'Switch connection' })
+    expect(trigger.textContent).toBe('Opening First…')
+    expect(trigger.parentElement?.querySelector('[data-slot="badge"]')?.textContent).toBe('dev')
   })
 
   it('blocks connection-management navigation while pending table state exists', () => {

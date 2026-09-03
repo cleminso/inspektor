@@ -16,6 +16,10 @@ This checklist tracks the reusable relation preview and detail component.
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Let navigable relation identifiers and their arrow inherit one shared hover and focus color from `TextLink`.
+
 [11/08/26]
 
 - [x] Mark stored relation identifiers as non-translatable technical content.
@@ -57,6 +61,10 @@ No open product work is recorded.
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- [x] Treat the compact relation identifier and navigation arrow as one link affordance on hover and keyboard focus.
+
 [05/08/26]
 
 - [x] Align the compact navigation indicator to the trailing cell edge so relation rows scan consistently and retain a stable target.
@@ -73,6 +81,11 @@ No open product work is recorded.
 - [ ] Decide whether `Open target` should expose the target collection as supplementary tooltip text.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Verify the compact identifier and arrow resolve to the same link color before and during hover in the browser.
+- [x] Run the focused relation test, design-system test pass, lint, typecheck, and build.
 
 [05/08/26]
 

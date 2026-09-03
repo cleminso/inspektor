@@ -4,7 +4,7 @@ import type { DynamicTableRow } from 'jazz-tools'
 import { useState } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { dataGridFeatures } from '@inspector/ds'
+import { dataGridFeatures, Tooltip } from '@inspector/ds'
 
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 
@@ -22,12 +22,24 @@ function VisibilityMenu(): React.ReactElement {
     onColumnVisibilityChange: setColumnVisibility,
   })
 
-  return <DataGridColumnVisibility table={table} />
+  return (
+    <Tooltip.Provider delay={0}>
+      <DataGridColumnVisibility table={table} />
+    </Tooltip.Provider>
+  )
 }
 
 afterEach(cleanup)
 
 describe('DataGridColumnVisibility', () => {
+  it('labels the trigger on hover', async () => {
+    render(<VisibilityMenu />)
+
+    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Choose visible columns' }))
+
+    expect(await screen.findByText('Columns visibility')).toBeTruthy()
+  })
+
   it('marks the trigger as pressed while any column is hidden', () => {
     render(<VisibilityMenu />)
 

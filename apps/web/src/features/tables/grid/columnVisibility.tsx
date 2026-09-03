@@ -1,7 +1,13 @@
 import type { DynamicTableRow } from 'jazz-tools'
 import { Settings2 } from 'lucide-react'
 
-import { Button, MultiSelect, type DataGridTable, type MultiSelectItem } from '@inspector/ds'
+import {
+  Button,
+  MultiSelect,
+  Tooltip,
+  type DataGridTable,
+  type MultiSelectItem,
+} from '@inspector/ds'
 
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 
@@ -41,21 +47,28 @@ export function DataGridColumnVisibility({
         )
       }}
     >
-      <MultiSelect.Trigger
-        label="Choose visible columns"
-        render={
-          <Button
-            type="button"
-            variant="ghost"
-            size="s"
-            aria-label="Choose visible columns"
-            aria-pressed={hasHiddenColumns}
-            iconOnly
-          />
-        }
-      >
-        <Button.Glyph artwork={Settings2} />
-      </MultiSelect.Trigger>
+      <Tooltip.Root>
+        <Tooltip.Trigger
+          render={
+            <MultiSelect.Trigger
+              label="Choose visible columns"
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="s"
+                  aria-label="Choose visible columns"
+                  aria-pressed={hasHiddenColumns}
+                  iconOnly
+                />
+              }
+            >
+              <Button.Glyph artwork={Settings2} />
+            </MultiSelect.Trigger>
+          }
+        />
+        <Tooltip.Content>Columns visibility</Tooltip.Content>
+      </Tooltip.Root>
       <MultiSelect.Content
         align="end"
         label="Visible columns"

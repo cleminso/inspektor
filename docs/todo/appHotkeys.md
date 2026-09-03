@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Navigate backward and forward through checked rows with `K` and `J` while the row editor is open.
+- [x] Keep checked-row shortcuts inactive in text-entry and overlay interaction layers.
+- [x] Expose each shortcut from its row-editor navigation arrow tooltip.
+
 [22/08/26]
 
 - [x] Add `Alt+I` to toggle the active table's insert-row pane, registered as a table-scoped command and shown in the toolbar Insert row tooltip.
@@ -97,6 +103,10 @@
 - [ ] Decide whether disabled history and pagination shortcuts should remain intercepted or fall through to browser behavior.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover checked-row keyboard navigation, text-input suppression, and arrow tooltip labels.
 
 [20/08/26]
 

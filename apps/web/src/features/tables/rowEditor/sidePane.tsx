@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 
-import { Box, Button, Switch, Text } from '@inspector/ds'
+import { Box, Button, Switch, Text, Tooltip } from '@inspector/ds'
+import { useHotkey } from '@tanstack/react-hotkeys'
 
+import { appHotkeyOptions, runAppHotkey } from '@app/hotkeys/appHotkeys'
+import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { DetailPane } from '@tables/rowEditor/detailPane'
 import type { TableRowId } from '@tables/tableTypes'
 
@@ -20,6 +23,96 @@ interface RowEditorSidePanelProps {
   onInsertMoreEnabledChange?: (enabled: boolean) => void
   onNavigateNext: () => void
   onNavigatePrevious: () => void
+}
+
+function RowNavigation({
+  activeRowIndex,
+  rowCount,
+  onNavigateNext,
+  onNavigatePrevious,
+}: {
+  activeRowIndex: number
+  rowCount: number
+  onNavigateNext: () => void
+  onNavigatePrevious: () => void
+}): React.ReactElement {
+  const canNavigatePrevious = activeRowIndex > 0
+  const canNavigateNext = activeRowIndex < rowCount - 1
+  useHotkey(
+    appHotkeys.previousSelectedRow,
+    (event) => {
+      if (canNavigatePrevious === true) {
+        runAppHotkey(event, onNavigatePrevious)
+      }
+    },
+    appHotkeyOptions,
+  )
+  useHotkey(
+    appHotkeys.nextSelectedRow,
+    (event) => {
+      if (canNavigateNext === true) {
+        runAppHotkey(event, onNavigateNext)
+      }
+    },
+    appHotkeyOptions,
+  )
+
+  return (
+    <Box
+      ml="auto"
+      flexShrink={0}
+      alignItems="center"
+      gap="xs"
+    >
+      <Text
+        as="span"
+        color="muted"
+        tabularNums
+      >
+        {activeRowIndex + 1} / {rowCount}
+      </Text>
+      <Box alignItems="center">
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="s"
+                disabled={canNavigatePrevious === false}
+                focusableWhenDisabled
+                onClick={onNavigatePrevious}
+                aria-label="Previous selected row"
+                iconOnly
+              >
+                <Button.Glyph artwork={ArrowUp} />
+              </Button>
+            }
+          />
+          <Tooltip.Content>Press {appHotkeys.previousSelectedRow}</Tooltip.Content>
+        </Tooltip.Root>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="s"
+                disabled={canNavigateNext === false}
+                focusableWhenDisabled
+                onClick={onNavigateNext}
+                aria-label="Next selected row"
+                iconOnly
+              >
+                <Button.Glyph artwork={ArrowDown} />
+              </Button>
+            }
+          />
+          <Tooltip.Content>Press {appHotkeys.nextSelectedRow}</Tooltip.Content>
+        </Tooltip.Root>
+      </Box>
+    </Box>
+  )
 }
 
 export function RowEditorSidePanel({
@@ -188,44 +281,12 @@ export function RowEditorSidePanel({
             </Box>
           ) : null}
           {hasMultipleRows === true ? (
-            <Box
-              ml="auto"
-              flexShrink={0}
-              alignItems="center"
-              gap="xs"
-            >
-              <Text
-                as="span"
-                color="muted"
-                tabularNums
-              >
-                {activeRowIndex + 1} / {editedRowIds.length}
-              </Text>
-              <Box alignItems="center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  disabled={activeRowIndex === 0}
-                  onClick={onNavigatePrevious}
-                  aria-label="Previous selected row"
-                  iconOnly
-                >
-                  <Button.Glyph artwork={ArrowUp} />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="s"
-                  disabled={activeRowIndex >= editedRowIds.length - 1}
-                  onClick={onNavigateNext}
-                  aria-label="Next selected row"
-                  iconOnly
-                >
-                  <Button.Glyph artwork={ArrowDown} />
-                </Button>
-              </Box>
-            </Box>
+            <RowNavigation
+              activeRowIndex={activeRowIndex}
+              rowCount={editedRowIds.length}
+              onNavigateNext={onNavigateNext}
+              onNavigatePrevious={onNavigatePrevious}
+            />
           ) : null}
         </Box>
       }

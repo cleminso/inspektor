@@ -13,6 +13,7 @@ export const relationValueStyles = stylex.create({
   compact: {
     gap: spacing.xs,
     alignItems: 'center',
+    color: textColors.default,
     display: 'flex',
     minWidth: 0,
     width: '100%',
@@ -24,7 +25,6 @@ export const relationValueStyles = stylex.create({
     minWidth: 0,
   },
   compactId: {
-    color: textColors.default,
     fontFamily: fontFamilies.mono,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
