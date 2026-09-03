@@ -90,15 +90,15 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   runtimeScopeExitGuardRef.current = runtimeScopeExitGuard
   const navigate = useNavigate()
   const routeParams = useParams({ strict: false })
-  const isQueriesRoute = useRouterState({
+  const isLiveQueriesRoute = useRouterState({
     select: (state) =>
-      state.matches.some((candidate) => candidate.routeId === '/conn/$connectionId/queries'),
+      state.matches.some((candidate) => candidate.routeId === '/conn/$connectionId/live-queries'),
   })
   const schemaNavigationOrigin =
     routeParams.tableName !== undefined
       ? '/conn/$connectionId/tables/$tableName/'
-      : isQueriesRoute === true
-        ? appRoutes.queries
+      : isLiveQueriesRoute === true
+        ? appRoutes.liveQueries
         : appRoutes.tables
   const navigateSchema = useNavigate({ from: schemaNavigationOrigin })
   const pendingConnectionId = useRouterState({

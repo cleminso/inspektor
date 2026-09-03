@@ -27,7 +27,7 @@ interface WorkspaceDockControlProps {
   label: string
   openHotkey: React.ComponentProps<typeof KeyboardInput>['hotkey']
   selected: boolean
-  to: typeof appRoutes.tables | typeof appRoutes.queries
+  to: typeof appRoutes.tables | typeof appRoutes.liveQueries
   onClick: (event: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
@@ -82,19 +82,19 @@ export function InspectorFooter({ onOpenCommands }: InspectorFooterProps): React
   const { connectionId } = useParams({ from: appRoutes.connection })
   const navigate = useNavigate()
   const { isOpen, toggle } = useShellLayout().leftDock
-  const isQueriesActive = useRouterState({
-    select: (state) => state.location.pathname.endsWith('/queries'),
+  const isLiveQueriesActive = useRouterState({
+    select: (state) => state.location.pathname.endsWith('/live-queries'),
   })
 
-  const isTablesSelected = isOpen === true && isQueriesActive === false
-  const isQueriesSelected = isOpen === true && isQueriesActive === true
+  const isTablesSelected = isOpen === true && isLiveQueriesActive === false
+  const isLiveQueriesSelected = isOpen === true && isLiveQueriesActive === true
   const openTables = () => {
     if (isOpen === false) toggle()
     void navigate({ to: appRoutes.tables, params: { connectionId } })
   }
-  const openQueries = () => {
+  const openLiveQueries = () => {
     if (isOpen === false) toggle()
-    void navigate({ to: appRoutes.queries, params: { connectionId } })
+    void navigate({ to: appRoutes.liveQueries, params: { connectionId } })
   }
   const toggleDockFromLink = (event: React.MouseEvent, selected: boolean) => {
     if (selected === true) event.preventDefault()
@@ -104,8 +104,8 @@ export function InspectorFooter({ onOpenCommands }: InspectorFooterProps): React
   useHotkey(appHotkeys.toggleLeftDock, (event) => runAppHotkey(event, toggle), appHotkeyOptions)
   useHotkey(appHotkeys.openTablesDock, (event) => runAppHotkey(event, openTables), appHotkeyOptions)
   useHotkey(
-    appHotkeys.openQueriesDock,
-    (event) => runAppHotkey(event, openQueries),
+    appHotkeys.openLiveQueriesDock,
+    (event) => runAppHotkey(event, openLiveQueries),
     appHotkeyOptions,
   )
 
@@ -139,11 +139,11 @@ export function InspectorFooter({ onOpenCommands }: InspectorFooterProps): React
         <WorkspaceDockControl
           artwork={Rss}
           connectionId={connectionId}
-          label="subscriptions"
-          openHotkey={appHotkeys.openQueriesDock}
-          selected={isQueriesSelected}
-          to={appRoutes.queries}
-          onClick={(event) => toggleDockFromLink(event, isQueriesSelected)}
+          label="live queries"
+          openHotkey={appHotkeys.openLiveQueriesDock}
+          selected={isLiveQueriesSelected}
+          to={appRoutes.liveQueries}
+          onClick={(event) => toggleDockFromLink(event, isLiveQueriesSelected)}
         />
         <Box
           as="span"

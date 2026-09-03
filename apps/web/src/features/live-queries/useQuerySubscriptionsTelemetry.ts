@@ -35,7 +35,7 @@ export interface QuerySubscriptionsTelemetry {
 
 /**
  * Retains history for one connection identity. History resets on connection
- * replacement are owned by the keyed `ConnectedQueriesView` mount.
+ * replacement are owned by the keyed `ConnectedLiveQueriesView` mount.
  */
 export function useQuerySubscriptionsTelemetry(
   connection: ConnectionCredentials,

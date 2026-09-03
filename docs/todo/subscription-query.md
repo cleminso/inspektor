@@ -1,4 +1,4 @@
-# Subscription query
+# Live queries
 
 ## Table of contents
 
@@ -10,6 +10,10 @@
 - [Validation checklist](#validation-checklist)
 
 ## Implemented foundation
+
+[03/09/26]
+
+- [x] Rename the product workspace from Queries to Live queries while preserving subscription terminology for server telemetry.
 
 [03/09/26]
 

@@ -182,7 +182,7 @@ Confirmed sources:
 - `packages/jazz-tools/src/runtime/db.ts`
 - `packages/jazz-tools/src/runtime/client.ts`
 - `packages/jazz-tools/src/react-core/use-all.ts`
-- Jazz docs: `reading/queries`, `reading/filters-and-sorting`, `reading/includes-and-relations`, `writing/writing-data`, `reference/durability-tiers`
+- Jazz docs: `reading/live-queries`, `reading/filters-and-sorting`, `reading/includes-and-relations`, `writing/writing-data`, `reference/durability-tiers`
 
 ## Generic query builder
 

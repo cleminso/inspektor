@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Rename the Queries workspace to Live queries and move its entry point to `/conn/:connectionId/live-queries`.
+
 [29/08/26]
 
 - [x] Preserve the active Tables index, table detail, or Queries path when schema selection updates URL search state.

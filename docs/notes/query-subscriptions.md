@@ -64,7 +64,7 @@ A telemetry snapshot is the grouped set of server-visible subscriptions returned
 
 ### Live query
 
-Jazz does not export a public TypeScript function named `liveQuery`. The application APIs are `Db.subscribe`, `useAll`, `useOne`, and framework-specific equivalents. “Live Query” is documentation and Inspector terminology.
+Jazz does not export a public TypeScript function named `liveQuery`. The application APIs are `Db.subscribe`, `useAll`, `useOne`, and framework-specific equivalents. “Live query” is Jazz documentation terminology; Inspector names the product workspace “Live queries.”
 
 ## Application query APIs
 
@@ -423,7 +423,7 @@ The standalone API can support inventory, churn, persistence, and grouped-count 
 
 ## Inspector implications
 
-- Regarde’s standalone Queries feature must use `fetchServerSubscriptions`, not `Db.subscribe`, local trace accessors, or `getSubscriptionStore`.
+- Regarde’s standalone Live queries feature must use `fetchServerSubscriptions`, not `Db.subscribe`, local trace accessors, or `getSubscriptionStore`.
 - Connection identity is `serverUrl`, `appId`, and `adminSecret`.
 - Branch and schema selection do not scope the introspection request.
 - An empty successful snapshot means no server-visible groups were returned. It does not prove the application performed no reads.
@@ -436,6 +436,6 @@ The standalone API can support inventory, churn, persistence, and grouped-count 
 
 Related Inspector references:
 
-- [Query Subscriptions Interface](query-interface.md)
+- [Live queries interface](query-interface.md)
 - [Subscription query implementation checklist](../todo/subscription-query.md)
 - [Swimlane Timeline implementation checklist](../todo/swimlaneTimeline.md)

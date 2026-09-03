@@ -47,7 +47,7 @@ async function renderFooter(onOpenCommands = () => undefined) {
   })
   const queriesRoute = createRoute({
     getParentRoute: () => connectionRoute,
-    path: 'queries',
+    path: 'live-queries',
     component: () => <InspectorFooter onOpenCommands={onOpenCommands} />,
   })
   const router = createRouter({
@@ -70,23 +70,23 @@ describe('InspectorFooter', () => {
   it('switches the active dock icon without closing the left dock', async () => {
     const router = await renderFooter()
     const tablesLink = screen.getByRole('link', { name: 'Close tables' })
-    const queriesLink = screen.getByRole('link', { name: 'Open subscriptions' })
+    const queriesLink = screen.getByRole('link', { name: 'Open live queries' })
 
     expect(tablesLink.getAttribute('aria-current')).toBe('page')
 
     fireEvent.click(queriesLink)
 
-    await expect.poll(() => router.state.location.pathname).toBe('/conn/connection-1/queries')
+    await expect.poll(() => router.state.location.pathname).toBe('/conn/connection-1/live-queries')
     expect(screen.getByRole('link', { name: 'Open tables' })).toBeTruthy()
     expect(
-      screen.getByRole('link', { name: 'Close subscriptions' }).getAttribute('aria-current'),
+      screen.getByRole('link', { name: 'Close live queries' }).getAttribute('aria-current'),
     ).toBe('page')
     expect(leftDock.toggle).not.toHaveBeenCalled()
   })
 
   it.each([
     ['Close tables', /B/u],
-    ['Open subscriptions', /Q/u],
+    ['Open live queries', /Q/u],
   ])('shows the shortcut for %s', async (label, shortcut) => {
     await renderFooter()
 
@@ -112,7 +112,7 @@ describe('InspectorFooter', () => {
 
     fireEvent.keyDown(document.body, { key: 'q', altKey: true })
 
-    await expect.poll(() => router.state.location.pathname).toBe('/conn/connection-1/queries')
+    await expect.poll(() => router.state.location.pathname).toBe('/conn/connection-1/live-queries')
     expect(leftDock.toggle).not.toHaveBeenCalled()
   })
 

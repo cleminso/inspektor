@@ -1,4 +1,4 @@
-# Query Subscriptions Interface
+# Live queries interface
 
 ## Table of contents
 
@@ -14,7 +14,7 @@
 
 ## Purpose
 
-The Query Subscriptions view helps an app developer inspect the lifecycle of active, server-visible Jazz subscriptions.
+The Live queries view helps an app developer inspect the lifecycle of active, server-visible Jazz subscriptions.
 
 I don't think a data-grid is the right representation for the query interface, since it does not capture the query lifecycle (when groups appear; remain active; or disappear).
 

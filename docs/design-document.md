@@ -70,7 +70,7 @@ Capability tables in this document define the v1 required feature set. Items not
 Make the data table the core product surface
 
 - The data table helps developers read, filter, navigate, inspect, and edit Jazz app data.
-- Redesign query subscriptions into a useful debugging surface
+- Redesign Live queries into a useful debugging surface
 - Help developers understand what the sync server is tracking, which tables are involved, and how subscriptions relate back to app data.
 - Establish durable UI and component foundations
 - Evaluate whether lower-level base/ui primitives should replace parts of the current shadcn/ui usage when direct primitive control improves composition and maintainability.
@@ -139,7 +139,7 @@ flowchart TD
       AddConnectionFlow --> ConnectionRoute
 
       RoutedFeatures --> TablesRoute["/conn/:connectionId/tables/:tableName"]
-      RoutedFeatures --> QueryRoute["/conn/:connectionId/queries"]
+      RoutedFeatures --> QueryRoute["/conn/:connectionId/live-queries"]
     end
 
     subgraph WorkbenchFlow["Routed feature shells"]
@@ -151,7 +151,7 @@ flowchart TD
       WorkspaceItems --> SchemaItem["Table schema view"]
       WorkspaceItems --> WorkspaceStorage["localStorage: scoped workspace state"]
       TablesNavigator --> WorkspaceItems
-      QueryRoute --> QueryPlaceholder["Query subscriptions placeholder"]
+      QueryRoute --> QueryPlaceholder["Live queries placeholder"]
     end
 
     subgraph TableExplorerFlow["Table Data item"]
@@ -237,9 +237,9 @@ tab identities. Data is the default representation; `view=schema` selects Schema
 **Application dock**
 
 The application-level control region. Its Tables control opens or closes the Tables route's navigator pane. The Query
-Subscriptions control is reserved for the separate Queries route.
+Subscriptions control is reserved for the separate Live queries route.
 
-**Query subscriptions**
+**Live queries**
 
 Server-side subscriptions that Jazz tracks for active queries. They describe which table/query/branch combinations the sync
 server is currently maintaining, not a local React state or a static query result.
@@ -341,7 +341,7 @@ The inspector is close to an **admin client talking to the sync system** rather 
 To me, Jazz's in-app overlay and standalone Inspector answer different problems.
 
 - The overlay joins the host application's local store and identity, which makes it useful for local and unsynced application state.
-- THe standalone Inspector keeps an independant remote-admin workflow, switching connections, branches, and schema hashes then inspecting query subscriptions.
+- THe standalone Inspector keeps an independant remote-admin workflow, switching connections, branches, and schema hashes then inspecting Live queries.
 
 Standalone Inspector behavior is my product priority here.
 
@@ -351,7 +351,7 @@ Standalone Inspector behavior is my product priority here.
 2. schema and permissions metadata loading
 3. Jazz client bootstrap
 4. schema-driven explorer
-5. query subscriptions telemetry UI
+5. Live queries telemetry UI
 
 ## User interface
 
@@ -360,18 +360,18 @@ There is the list of screen and components that constitute the Inspector interfa
 ### Workbench
 
 The Inspector shell keeps connection context separate from routed feature content. The Tables route owns the implemented
-workspace model; the Queries route is separate and does not share the Tables tab provider.
+workspace model; the Live queries route is separate and does not share the Tables tab provider.
 
 It follows this structure:
 
 - Header: connection, branch, schema hash, and global controls.
 - Application dock: controls global feature surfaces. The Tables control toggles the Tables navigator pane.
 - Tables route: owns the Tables navigator, table workspace tabs, recent table views, and table mutation ledgers.
-- Queries route: owns Query Subscriptions content independently from the Tables workspace.
+- Live queries route: owns Live queries content independently from the Tables workspace.
 - Contextual panels: table-owned surfaces such as the complete-row pane support the active Data item without becoming another
   navigation mode.
 
-The Tables tab strip contains canonical Data and Schema items plus New View. Query Subscriptions does not participate in this tab
+The Tables tab strip contains canonical Data and Schema items plus New View. The Live queries workspace does not participate in this tab
 model.
 
 #### Routing and local context
@@ -380,7 +380,7 @@ Inspector routes describe the active content inside one saved local connection:
 
 - `/conn/:connectionId/tables` opens the table workspace and selects an available table when needed.
 - `/conn/:connectionId/tables/:tableName` opens the selected table. `view=schema` selects its Schema representation.
-- `/conn/:connectionId/queries` opens the connection-scoped query placeholder.
+- `/conn/:connectionId/live-queries` opens the connection-scoped query placeholder.
 
 Data is the default table representation, so the route omits `/data`. Schema representation, filters, sorting, page, page size,
 and explicit schema hash remain search parameters. Routes do not expose tabs, open item order, or branch.
@@ -1295,11 +1295,11 @@ Copy behavior supports immediate inspection needs first:
 
 Full export can be revisited once reading, filtering, relation navigation, and editing are solid.
 
-### Query subscriptions telemetry
+### Live queries telemetry
 
-Query Subscriptions telemetry helps developers understand which live queries their Jazz app is asking the sync server to maintain. It turns server-visible subscription snapshots into a readable debugging surface and links supported query shapes back to the Table Explorer.
+Live queries telemetry helps developers understand which live queries their Jazz app is asking the sync server to maintain. It turns server-visible subscription snapshots into a readable debugging surface and links supported query shapes back to the Table Explorer.
 
-Query Subscriptions only shows server-visible subscription snapshots. Local-only queries that never reach server telemetry, short-lived reads, wrong connection context, or telemetry failure can all explain an empty view. [Learn more](notes/query-subscriptions.md)
+Live queries only shows server-visible subscription snapshots. Local-only queries that never reach server telemetry, short-lived reads, wrong connection context, or telemetry failure can all explain an empty view. [Learn more](notes/query-subscriptions.md)
 
 This flow **must answer**:
 
@@ -1340,7 +1340,7 @@ This flow **must answer**:
 
 The planned data source is the Jazz server introspection endpoint exposed by `fetchServerSubscriptions(...)` from `Jazz-tools`.
 
-The Query subscriptions route currently presents a placeholder. Telemetry fetching, caching, and Table Explorer links are not implemented.
+The Live queries route currently presents a placeholder. Telemetry fetching, caching, and Table Explorer links are not implemented.
 
 #### Table and query relationship
 
@@ -1348,7 +1348,7 @@ In Jazz, a query targets a table and describes which rows from that table the cl
 
 The table is the root of the query. The query shape can add filters, ordering, limits, offsets, relation information, selected columns, and other internal query details.
 
-The Query Subscriptions view should therefore treat `table` as the navigation anchor and `query` as the shape of the active read.
+The Live queries view should therefore treat `table` as the navigation anchor and `query` as the shape of the active read.
 
 Practical meaning:
 
@@ -1360,7 +1360,7 @@ Practical meaning:
 
 If the app changes a filter, the query shape changes. The next snapshot shows the new query shape if it is active. The old query shape only remains visible if it is still active when the server snapshot is fetched.
 
-The Query Subscriptions view does not show returned row data. To inspect data, Inspector can open the Table Explorer on the subscription table and apply supported filters recovered from the query JSON.
+The Live queries view does not show returned row data. To inspect data, Inspector can open the Table Explorer on the subscription table and apply supported filters recovered from the query JSON.
 
 **Important fields**
 
@@ -1383,8 +1383,8 @@ The Query Subscriptions view does not show returned row data. To inspect data, I
 | Capability                         | Notes                                                                                                                                          |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Show current grouped subscriptions | Show active server-visible query shapes returned by the latest snapshot.                                                                       |
-| Filter by table and propagation    | Keep table and returned propagation values in the Queries navigator.                                                                           |
-| Browse grouped subscriptions       | Start with table and count in the Queries navigator without replacing the active workspace item.                                               |
+| Filter by table and propagation    | Keep table and returned propagation values in the Live queries navigator.                                                                      |
+| Browse grouped subscriptions       | Start with table and count in the Live queries navigator without replacing the active workspace item.                                          |
 | Inspect one subscription           | Opening a grouped subscription creates or focuses a Query workspace item with Overview and Raw JSON representations.                           |
 | Explain empty states               | Explain no active queries, local-only queries, short-lived reads, mismatched connection context, hidden inspector reads, and failed telemetry. |
 | Manual refresh                     | Keep auto-refresh and let the user refresh immediately.                                                                                        |
@@ -1413,12 +1413,12 @@ The server renders grouped query records that include:
 
 Polls the server for grouped active subscriptions and links them back into the Table Explorer when Inspector can safely map the query filters.
 
-#### Queries navigator
+#### Live queries navigator
 
-This section defines the Query Subscriptions feature architecture that replaces the separate placeholder route and extends the
+This section defines the Live queries feature architecture that replaces the separate placeholder route and extends the
 application dock and workspace model when implemented.
 
-The Queries selector activates a navigator in the left dock. Changing to this navigator does not replace the active workspace
+The Live queries selector activates a navigator in the left dock. Changing to this navigator does not replace the active workspace
 item. It lets the developer browse grouped subscription records and open one deliberately.
 
 The navigator should stay simple. It should not try to render the full query shape inline because query JSON can be large and
@@ -1443,14 +1443,14 @@ branch contexts inside the same Inspector session, then branch filtering can be 
 
 UI representation:
 
-- Surface: Queries panel inside the left dock.
+- Surface: Live queries panel inside the left dock.
 - Primary controls: refresh, pause, table filter, propagation filter, open subscription.
 - Primary content: grouped subscriptions with table, count, and an optional query summary.
 - States: loading, empty, stale snapshot, failed telemetry, unsupported query mapping.
 
 #### Query workspace item
 
-Opening a subscription from the Queries navigator creates or focuses a Query workspace item. The navigator can remain visible
+Opening a subscription from the Live queries navigator creates or focuses a Query workspace item. The navigator can remain visible
 while the main workspace continues to show another item until the user opens a query.
 
 Views inside the Query item:
@@ -1536,7 +1536,7 @@ Examples:
 
 #### States
 
-When can the user open Query Subscriptions and see nothing?
+When can the user open Live queries and see nothing?
 
 - the app has no active live queries
 - the active queries are local-only
@@ -1547,7 +1547,7 @@ When can the user open Query Subscriptions and see nothing?
 
 #### Scenarios
 
-v1 should support these Query Subscriptions scenarios:
+v1 should support these Live queries scenarios:
 
 1. Developer opens a page in their Jazz app and sees which tables now have active subscriptions.
 2. Developer changes an app filter and verifies that the active query shape changed in the next snapshot.
@@ -1598,9 +1598,9 @@ UI representation:
 5. Developer accumulates pending updates and deletions for one table, reviews them together, and persists them through one Apply action.
 6. Developer follows a relation cell to inspect linked data in another Data workspace item without losing the original table context.
 7. Developer sees live row changes while browsing and keeps selection context when possible.
-8. Developer opens Query Subscriptions after using the app and sees which server-visible query shapes are active.
+8. Developer opens Live queries after using the app and sees which server-visible query shapes are active.
 9. Developer changes an app filter and verifies that the active query shape changes in the next subscription snapshot.
-10. Developer sees an empty Query Subscriptions view and understands possible causes such as local-only queries, short-lived reads, wrong connection context, or telemetry failure.
+10. Developer sees an empty Live queries view and understands possible causes such as local-only queries, short-lived reads, wrong connection context, or telemetry failure.
 11. Developer opens a table Schema item from the Data toolbar to read and copy stored schema and permissions JSON.
 
 ### Inline editing and mutation scenarios

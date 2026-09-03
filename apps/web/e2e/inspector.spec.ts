@@ -55,14 +55,14 @@ test('opens, closes, and switches the left dock', async ({ page }) => {
   await expect(page).toHaveURL(tablesUrl)
   await expect(resizeHandle).toBeHidden()
 
-  await page.getByRole('link', { name: 'Open subscriptions' }).click()
-  await expect(page).toHaveURL(/\/queries$/u)
+  await page.getByRole('link', { name: 'Open live queries' }).click()
+  await expect(page).toHaveURL(/\/live-queries$/u)
   await expect(resizeHandle).toBeVisible()
   await resizeHandle.hover()
   await expect
     .poll(() => resizeHandle.evaluate((element) => getComputedStyle(element).cursor))
     .not.toBe('auto')
-  await page.getByRole('link', { name: 'Close subscriptions' }).click()
+  await page.getByRole('link', { name: 'Close live queries' }).click()
   await expect(resizeHandle).toBeHidden()
 
   await page.getByRole('link', { name: 'Open tables' }).click()
@@ -114,8 +114,8 @@ test('keeps query details scrolling inside the workspace query section', async (
     },
   )
   await connectToFixture(page)
-  await page.getByRole('link', { name: 'Open subscriptions' }).click()
-  const refresh = page.getByRole('button', { name: 'Refresh' })
+  await page.getByRole('link', { name: 'Open live queries' }).click()
+  const refresh = page.getByRole('button', { name: 'Refresh', exact: true })
   for (let capture = 0; capture < 8; capture += 1) {
     await refresh.click()
   }
@@ -126,7 +126,7 @@ test('keeps query details scrolling inside the workspace query section', async (
 
   const details = page.getByRole('complementary', { name: 'Query details' })
   const queryPanel = details.getByRole('region', { name: 'Query' })
-  const toolbar = page.getByRole('toolbar', { name: 'Query subscription controls' })
+  const toolbar = page.getByRole('toolbar', { name: 'Live queries controls' })
 
   await expect(page.locator('[data-slot="shell-layout-left-dock"]')).toBeVisible()
   await expect(details).toBeVisible()
@@ -211,7 +211,7 @@ test('keeps query details scrolling inside the workspace query section', async (
   await expect(details.getByRole('button', { name: 'Expand all JSON' })).toBeVisible()
   await page.getByRole('button', { name: /^accounts\s*1$/ }).click()
   await details.getByRole('button', { name: 'Close' }).click()
-  await expect(page.getByRole('button', { name: 'Refresh' })).toBeFocused()
+  await expect(page.getByRole('button', { name: 'Refresh', exact: true })).toBeFocused()
 })
 
 test('recovers when connection schema validation initially finds no schemas', async ({ page }) => {

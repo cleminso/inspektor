@@ -504,7 +504,7 @@ function QueryDetails({
   )
 }
 
-function QueryTimeline({
+function LiveQueryTimeline({
   filtered,
   refreshButtonRef,
   selectedCellRef,
@@ -537,7 +537,7 @@ function QueryTimeline({
       overflow="hidden"
     >
       <Box
-        aria-label="Query subscription controls"
+        aria-label="Live queries controls"
         alignItems="center"
         backgroundColor="surface-background"
         borderBottomWidth={1}
@@ -556,9 +556,7 @@ function QueryTimeline({
         >
           {staleHistory === true ? (
             <Box role="alert">
-              <Text color="error">
-                Couldn't refresh query subscriptions. Showing retained history.
-              </Text>
+              <Text color="error">Couldn't refresh live queries. Showing retained history.</Text>
             </Box>
           ) : null}
         </Box>
@@ -588,12 +586,12 @@ function QueryTimeline({
                 variant={isPaused === true ? 'ghost' : 'primary'}
                 onClick={() => setPaused(isPaused === false)}
               >
-                Live
+                Auto-refresh
               </Button>
             }
           />
           <Tooltip.Content>
-            {isPaused === true ? 'Resume automatic refresh' : 'Pause automatic refresh'}
+            {isPaused === true ? 'Resume auto-refresh' : 'Pause auto-refresh'}
           </Tooltip.Content>
         </Tooltip.Root>
       </Box>
@@ -611,20 +609,20 @@ function QueryTimeline({
           <Text color="muted">
             {state.kind === 'cleared'
               ? state.isRefreshing === true
-                ? 'Capturing query subscriptions…'
+                ? 'Capturing live queries…'
                 : isPaused === true
                   ? 'History cleared'
                   : 'History cleared. Waiting for the next snapshot…'
               : filtered === true
-                ? 'No query subscriptions match filters'
+                ? 'No live queries match filters'
                 : staleHistory === true
-                  ? 'Last successful snapshot contained no active query subscriptions'
-                  : 'No active query subscriptions'}
+                  ? 'Last successful snapshot contained no active live queries'
+                  : 'No active live queries'}
           </Text>
         </Box>
       ) : (
-        <SwimlaneTimeline aria-label="Query subscriptions">
-          <SwimlaneTimeline.Header label="Tables / queries">
+        <SwimlaneTimeline aria-label="Live queries">
+          <SwimlaneTimeline.Header label="Tables / live queries">
             {history.map((capture) => {
               const marker = getCaptureMarker(capture)
               return (
@@ -695,7 +693,7 @@ function QueryTimeline({
   )
 }
 
-function ConnectedQueriesView({
+function ConnectedLiveQueriesView({
   connection,
   selectedSchemaHash,
 }: {
@@ -820,13 +818,13 @@ function ConnectedQueriesView({
   if (telemetry.state.kind === 'initial-loading') {
     content = (
       <CenteredStatus>
-        <Text color="muted">Loading query subscriptions…</Text>
+        <Text color="muted">Loading live queries…</Text>
       </CenteredStatus>
     )
   } else if (telemetry.state.kind === 'failed-initial-load') {
     content = (
       <CenteredStatus role="alert">
-        <Text color="error">Couldn't load query subscriptions</Text>
+        <Text color="error">Couldn't load live queries</Text>
         <Text color="muted">Check the connection and try again.</Text>
         <Button
           ref={refreshButtonRef}
@@ -840,7 +838,7 @@ function ConnectedQueriesView({
     )
   } else {
     content = (
-      <QueryTimeline
+      <LiveQueryTimeline
         filtered={filtered}
         refreshButtonRef={refreshButtonRef}
         selectedCellRef={selectedCellRef}
@@ -887,7 +885,7 @@ function ConnectedQueriesView({
   )
 }
 
-export function QueriesView(): React.ReactElement {
+export function LiveQueriesView(): React.ReactElement {
   const { activeConnection, currentSchemaHash } = useInspectorSessionState()
 
   if (activeConnection === null) {
@@ -904,7 +902,7 @@ export function QueriesView(): React.ReactElement {
   }
 
   return (
-    <ConnectedQueriesView
+    <ConnectedLiveQueriesView
       connection={activeConnection}
       key={getConnectionProfileToken(activeConnection)}
       selectedSchemaHash={currentSchemaHash}

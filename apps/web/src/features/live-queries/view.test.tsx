@@ -11,7 +11,7 @@ import {
   type QuerySubscriptionsCapture,
 } from './querySubscriptions'
 import type { QuerySubscriptionsTelemetry } from './useQuerySubscriptionsTelemetry'
-import { QueriesView } from './view'
+import { LiveQueriesView } from './view'
 
 const mocks = vi.hoisted(() => ({
   connection: null as StoredConnection | null,
@@ -130,22 +130,22 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
-describe('QueriesView', () => {
+describe('LiveQueriesView', () => {
   it('reads active connection credentials and renders initial loading', () => {
     mocks.telemetry = telemetry([], 'initial-loading')
 
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     expect(useQuerySubscriptionsTelemetry).toHaveBeenCalledWith(mocks.connection)
-    expect(screen.getByRole('status').textContent).toContain('Loading query subscriptions')
-    expect(screen.queryByRole('table', { name: 'Query subscriptions' })).toBeNull()
+    expect(screen.getByRole('status').textContent).toContain('Loading live queries')
+    expect(screen.queryByRole('table', { name: 'Live queries' })).toBeNull()
   })
 
   it('renders successful emptiness separately from initial failure', () => {
     mocks.telemetry = telemetry([success('empty', 1_000, [])])
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
-    expect(screen.getByText('No active query subscriptions')).toBeTruthy()
+    expect(screen.getByText('No active live queries')).toBeTruthy()
 
     const refresh = vi.fn()
     mocks.telemetry = {
@@ -154,16 +154,16 @@ describe('QueriesView', () => {
       ]),
       refresh,
     }
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
-    expect(screen.getByRole('alert').textContent).toContain("Couldn't load query subscriptions")
+    expect(screen.getByRole('alert').textContent).toContain("Couldn't load live queries")
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     expect(refresh).toHaveBeenCalledOnce()
   })
 
   it('renders query filters with Only and Check all actions', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup, auditGroup])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     const dock = screen.getByTestId('shell-left-dock')
     expect(within(dock).getByRole('group', { name: 'Filter by table' })).toBeTruthy()
@@ -180,13 +180,13 @@ describe('QueriesView', () => {
 
   it('keeps dynamic options checked only while their section is unrestricted', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     mocks.telemetry = telemetry([
       success('capture-1', 1_000, [accountsGroup]),
       success('capture-2', 2_000, [accountsGroup, auditGroup]),
     ])
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(
       screen.getByRole('checkbox', { name: 'Select auditLog' }).getAttribute('aria-checked'),
@@ -198,7 +198,7 @@ describe('QueriesView', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
     mocks.telemetry = telemetry([success('capture-3', 3_000, [accountsGroup])])
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     mocks.telemetry = telemetry([
       ...mocks.telemetry.history,
@@ -208,7 +208,7 @@ describe('QueriesView', () => {
         { ...auditGroup, groupKey: 'billing-recent', table: 'billing' },
       ]),
     ])
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(
       screen.getByRole('checkbox', { name: 'Select billing' }).getAttribute('aria-checked'),
@@ -218,7 +218,7 @@ describe('QueriesView', () => {
 
   it('keeps Only restrictive when its section initially has one option', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
     fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
@@ -226,7 +226,7 @@ describe('QueriesView', () => {
       success('capture-1', 1_000, [accountsGroup]),
       success('capture-2', 2_000, [accountsGroup, auditGroup]),
     ])
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(
       screen.getByRole('checkbox', { name: 'Select auditLog' }).getAttribute('aria-checked'),
@@ -236,14 +236,14 @@ describe('QueriesView', () => {
   it('shows an empty filtered result without moving focus from its filter', () => {
     const history = [success('capture-1', 1_000, [accountsGroup])]
     mocks.telemetry = telemetry(history)
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     const filter = screen.getByRole('checkbox', { name: 'Select accounts' })
     filter.focus()
     fireEvent.click(filter)
 
-    expect(screen.getByText('No query subscriptions match filters')).toBeTruthy()
+    expect(screen.getByText('No live queries match filters')).toBeTruthy()
     expect(document.activeElement).toBe(filter)
   })
 
@@ -257,11 +257,11 @@ describe('QueriesView', () => {
 
     render(
       <Tooltip.Provider delay={0}>
-        <QueriesView />
+        <LiveQueriesView />
       </Tooltip.Provider>,
     )
 
-    const table = screen.getByRole('table', { name: 'Query subscriptions' })
+    const table = screen.getByRole('table', { name: 'Live queries' })
     expect(within(table).getAllByText(/^\d{2}:\d{2}:\d{2}$/u)).toHaveLength(3)
     expect(within(table).getByRole('button', { name: /^accounts\s*1$/ })).toBeTruthy()
     expect(within(table).getByRole('rowheader', { name: 'accounts-by-name' })).toBeTruthy()
@@ -305,7 +305,7 @@ describe('QueriesView', () => {
       'local-dev-d8881b20708b-main',
     ]
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     const details = screen.getByRole('complementary', { name: 'Query details' })
@@ -325,7 +325,7 @@ describe('QueriesView', () => {
     mocks.currentSchemaHash = 'a'.repeat(64)
     const branches = ['test-7f43cb822ba5-main', 'test-e7ebacf3577c-main']
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     const details = screen.getByRole('complementary', { name: 'Query details' })
@@ -345,7 +345,7 @@ describe('QueriesView', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
     render(
       <Tooltip.Provider delay={0}>
-        <QueriesView />
+        <LiveQueriesView />
       </Tooltip.Provider>,
     )
 
@@ -369,7 +369,7 @@ describe('QueriesView', () => {
     mocks.currentSchemaHash = '7f43cb822ba5'.padEnd(64, '0')
     const branches = ['test-7f43cb822ba5-main']
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     const details = screen.getByRole('complementary', { name: 'Query details' })
@@ -385,7 +385,7 @@ describe('QueriesView', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
     render(
       <Tooltip.Provider delay={0}>
-        <QueriesView />
+        <LiveQueriesView />
       </Tooltip.Provider>,
     )
 
@@ -401,7 +401,7 @@ describe('QueriesView', () => {
 
   it('does not claim an unreported source scope includes every branch', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches: [] }])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     const details = screen.getByRole('complementary', { name: 'Query details' })
@@ -414,7 +414,7 @@ describe('QueriesView', () => {
   it('keeps mixed resolved source scopes explicit', () => {
     const branches = ['test-7f43cb822ba5-main', 'test-e7ebacf3577c-feature']
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     const details = screen.getByRole('complementary', { name: 'Query details' })
@@ -427,7 +427,7 @@ describe('QueriesView', () => {
 
   it('keeps the selected snapshot visible when query details open', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
     const cell = screen.getByRole('button', { name: /Open accounts-by-name at/ })
     const scrollIntoView = vi.fn()
     Object.defineProperty(cell.closest('td'), 'scrollIntoView', {
@@ -446,7 +446,7 @@ describe('QueriesView', () => {
 
   it('closes query details from the footer action and Escape', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
     const cell = screen.getByRole('button', { name: /Open accounts-by-name at/ })
 
     fireEvent.click(cell)
@@ -464,7 +464,7 @@ describe('QueriesView', () => {
   it('keeps lane expansion presentational and selection stable as history appends', () => {
     const initialHistory = [success('capture-1', 1_000, [accountsGroup])]
     mocks.telemetry = telemetry(initialHistory)
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     fireEvent.click(screen.getByRole('button', { name: /^accounts\s*1$/ }))
@@ -474,7 +474,7 @@ describe('QueriesView', () => {
     ).toBe(true)
 
     mocks.telemetry = telemetry([...initialHistory, success('capture-2', 2_000, [accountsGroup])])
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(screen.getByRole('complementary', { name: 'Query details' })).toBeTruthy()
     const selectedCell = screen
@@ -487,20 +487,20 @@ describe('QueriesView', () => {
     const first = success('capture-1', 1_000, [accountsGroup])
     const second = success('capture-2', 2_000, [accountsGroup])
     mocks.telemetry = telemetry([first, second], 'ready')
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     const selectedCell = screen.getAllByRole('button', { name: /Open accounts-by-name at/ })[0]!
     fireEvent.click(selectedCell)
     screen.getByRole('button', { name: 'Close' }).focus()
 
     mocks.telemetry = telemetry([second], 'ready')
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Refresh' }))
 
     mocks.telemetry = telemetry([first, second], 'ready')
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
     expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
     expect(
       screen
@@ -511,7 +511,7 @@ describe('QueriesView', () => {
 
   it('toggles selected cell details through its pressed state', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
     const cell = screen.getByRole('button', { name: /Open accounts-by-name at/ })
 
     fireEvent.click(cell)
@@ -524,7 +524,7 @@ describe('QueriesView', () => {
 
   it('moves focus to refresh when details close after collapsing the selected lane', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     fireEvent.click(screen.getByRole('button', { name: /^accounts\s*1$/ }))
@@ -535,7 +535,7 @@ describe('QueriesView', () => {
 
   it('resets selected details when stored credentials are replaced', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     mocks.connection = {
@@ -544,7 +544,7 @@ describe('QueriesView', () => {
       appId: 'app-2',
       adminSecret: 'secret-2',
     }
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
     expect(useQuerySubscriptionsTelemetry).toHaveBeenLastCalledWith(mocks.connection)
@@ -552,7 +552,7 @@ describe('QueriesView', () => {
 
   it('keeps query details inside the workspace with a 240px minimum width', () => {
     mocks.telemetry = telemetry([success('capture-1', 1_000, [accountsGroup])])
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
 
@@ -567,11 +567,11 @@ describe('QueriesView', () => {
   it('keeps routine refresh silent and stale retained history visible without replacing the timeline', () => {
     const successful = success('capture-1', 1_000, [accountsGroup])
     mocks.telemetry = telemetry([successful], 'refreshing')
-    const view = render(<QueriesView />)
-    const toolbar = screen.getByRole('toolbar', { name: 'Query subscription controls' })
+    const view = render(<LiveQueriesView />)
+    const toolbar = screen.getByRole('toolbar', { name: 'Live queries controls' })
 
-    expect(screen.queryByText(/Refreshing query subscriptions/u)).toBeNull()
-    expect(screen.getByRole('table', { name: 'Query subscriptions' })).toBeTruthy()
+    expect(screen.queryByText(/Refreshing live queries/u)).toBeNull()
+    expect(screen.getByRole('table', { name: 'Live queries' })).toBeTruthy()
 
     mocks.telemetry = telemetry(
       [
@@ -580,11 +580,11 @@ describe('QueriesView', () => {
       ],
       'stale-history',
     )
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
-    expect(screen.getByRole('toolbar', { name: 'Query subscription controls' })).toBe(toolbar)
+    expect(screen.getByRole('toolbar', { name: 'Live queries controls' })).toBe(toolbar)
     expect(within(toolbar).getByRole('alert').textContent).toContain('Showing retained history')
-    expect(screen.getByRole('table', { name: 'Query subscriptions' })).toBeTruthy()
+    expect(screen.getByRole('table', { name: 'Live queries' })).toBeTruthy()
   })
 
   it('refreshes from the persistent timeline toolbar', () => {
@@ -593,13 +593,12 @@ describe('QueriesView', () => {
       ...telemetry([success('capture-1', 1_000, [accountsGroup])]),
       refresh,
     }
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     fireEvent.click(
-      within(screen.getByRole('toolbar', { name: 'Query subscription controls' })).getByRole(
-        'button',
-        { name: 'Refresh' },
-      ),
+      within(screen.getByRole('toolbar', { name: 'Live queries controls' })).getByRole('button', {
+        name: 'Refresh',
+      }),
     )
 
     expect(refresh).toHaveBeenCalledOnce()
@@ -607,7 +606,7 @@ describe('QueriesView', () => {
 
   it('disables Clear history when there are no captures', () => {
     mocks.telemetry = telemetry([], 'ready')
-    render(<QueriesView />)
+    render(<LiveQueriesView />)
 
     expect(screen.getByRole('button', { name: 'Clear history' }).hasAttribute('disabled')).toBe(
       true,
@@ -620,7 +619,7 @@ describe('QueriesView', () => {
       ...telemetry([success('capture-1', 1_000, [accountsGroup, auditGroup])]),
       clearHistory,
     }
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
@@ -628,7 +627,7 @@ describe('QueriesView', () => {
     expect(clearHistory).toHaveBeenCalledOnce()
 
     mocks.telemetry = telemetry([], 'cleared')
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
     expect(
@@ -640,15 +639,15 @@ describe('QueriesView', () => {
     expect(screen.getByText('History cleared. Waiting for the next snapshot…')).toBeTruthy()
 
     mocks.telemetry = { ...mocks.telemetry, isPaused: true }
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
     expect(screen.getByText('History cleared')).toBeTruthy()
 
     mocks.telemetry = { ...mocks.telemetry, state: { kind: 'cleared', isRefreshing: true } }
-    view.rerender(<QueriesView />)
-    expect(screen.getByText('Capturing query subscriptions…')).toBeTruthy()
+    view.rerender(<LiveQueriesView />)
+    expect(screen.getByText('Capturing live queries…')).toBeTruthy()
   })
 
-  it('presents live polling as a persistent toggle with action guidance', async () => {
+  it('presents auto-refresh as a persistent toggle with action guidance', async () => {
     const setPaused = vi.fn()
     mocks.telemetry = {
       ...telemetry([success('capture-1', 1_000, [accountsGroup])]),
@@ -656,61 +655,61 @@ describe('QueriesView', () => {
     }
     const view = render(
       <Tooltip.Provider delay={0}>
-        <QueriesView />
+        <LiveQueriesView />
       </Tooltip.Provider>,
     )
 
-    const live = screen.getByRole('button', { name: 'Live' })
-    expect(live.getAttribute('aria-pressed')).toBe('true')
-    expect(live.getAttribute('data-variant')).toBe('primary')
-    fireEvent.mouseEnter(live)
-    expect(await screen.findByText('Pause automatic refresh')).toBeTruthy()
-    fireEvent.click(live)
+    const autoRefresh = screen.getByRole('button', { name: 'Auto-refresh' })
+    expect(autoRefresh.getAttribute('aria-pressed')).toBe('true')
+    expect(autoRefresh.getAttribute('data-variant')).toBe('primary')
+    fireEvent.mouseEnter(autoRefresh)
+    expect(await screen.findByText('Pause auto-refresh')).toBeTruthy()
+    fireEvent.click(autoRefresh)
     expect(setPaused).toHaveBeenLastCalledWith(true)
 
     mocks.telemetry = { ...mocks.telemetry, isPaused: true }
     view.rerender(
       <Tooltip.Provider delay={0}>
-        <QueriesView />
+        <LiveQueriesView />
       </Tooltip.Provider>,
     )
 
-    expect(live.getAttribute('aria-pressed')).toBe('false')
-    expect(live.getAttribute('data-variant')).toBe('ghost')
-    fireEvent.mouseEnter(live)
-    expect(await screen.findByText('Resume automatic refresh')).toBeTruthy()
-    fireEvent.click(live)
+    expect(autoRefresh.getAttribute('aria-pressed')).toBe('false')
+    expect(autoRefresh.getAttribute('data-variant')).toBe('ghost')
+    fireEvent.mouseEnter(autoRefresh)
+    expect(await screen.findByText('Resume auto-refresh')).toBeTruthy()
+    fireEvent.click(autoRefresh)
     expect(setPaused).toHaveBeenLastCalledWith(false)
   })
 
   it('keeps Refresh available while paused and disables it only during a request', () => {
     const history = [success('capture-1', 1_000, [accountsGroup])]
     mocks.telemetry = { ...telemetry(history), isPaused: true }
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     const refresh = screen.getByRole('button', { name: 'Refresh' })
     expect(refresh.hasAttribute('disabled')).toBe(false)
 
     mocks.telemetry = { ...mocks.telemetry, state: { kind: 'refreshing' } }
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
     expect(refresh.hasAttribute('disabled')).toBe(true)
   })
 
   it('keeps refreshing and failed empty snapshots distinct from confirmed emptiness', () => {
     const empty = success('capture-1', 1_000, [])
     mocks.telemetry = telemetry([empty], 'refreshing')
-    const view = render(<QueriesView />)
+    const view = render(<LiveQueriesView />)
 
     mocks.telemetry = telemetry(
       [empty, { kind: 'failure', id: 'capture-2', attemptedAt: 2_000, error: { kind: 'network' } }],
       'stale-history',
     )
-    view.rerender(<QueriesView />)
+    view.rerender(<LiveQueriesView />)
 
     expect(screen.getByRole('alert').textContent).toContain('Showing retained history')
     expect(
-      screen.getByText('Last successful snapshot contained no active query subscriptions'),
+      screen.getByText('Last successful snapshot contained no active live queries'),
     ).toBeTruthy()
-    expect(screen.queryByText('No active query subscriptions')).toBeNull()
+    expect(screen.queryByText('No active live queries')).toBeNull()
   })
 })

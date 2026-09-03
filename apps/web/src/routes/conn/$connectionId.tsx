@@ -71,7 +71,7 @@ function InspectorRuntimeRoute(): React.ReactElement {
   const target = Route.useLoaderData()
   const pageTitle = useRouterState({
     select: (state) =>
-      state.location.pathname.endsWith('/queries') ? 'Query subscriptions' : 'Tables',
+      state.location.pathname.endsWith('/live-queries') ? 'Live queries' : 'Tables',
   })
 
   return (

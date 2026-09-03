@@ -85,7 +85,7 @@ function createTestRouter(initialPath: string) {
   })
   const queriesRoute = createRoute({
     getParentRoute: () => connectionRoute,
-    path: 'queries',
+    path: 'live-queries',
   })
 
   return createRouter({
@@ -100,7 +100,7 @@ describe('InspectorSessionProvider schema navigation', () => {
   it.each([
     '/conn/connection-1/tables',
     '/conn/connection-1/tables/accounts',
-    '/conn/connection-1/queries',
+    '/conn/connection-1/live-queries',
   ])('preserves %s while changing the selected schema', async (initialPath) => {
     const router = createTestRouter(initialPath)
     render(<RouterProvider router={router} />)

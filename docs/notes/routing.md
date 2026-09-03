@@ -17,7 +17,7 @@
 The route identifies one saved local connection and the active content inside its workbench.
 
 - Header: connection, branch, schema hash, and global context controls.
-- Left dock: Tables or Queries resource navigator.
+- Left dock: Tables or Live queries resource navigator.
 - Main workspace: open workspace items represented by tabs.
 - Route: active resource, representation, and shareable representation state.
 
@@ -33,7 +33,7 @@ The route does not represent the visual tab strip, open item order, pane arrange
 │       ├── schema         → Schema representation
 │       └── stats          → later Stats representation
 └── queries/
-    ├── index              → Queries navigator entry
+    ├── index              → Live queries navigator entry
     └── :queryId           → Query workspace item
 ```
 
@@ -77,7 +77,7 @@ Opening rules:
 - the same table can have several Data items when their filters differ
 - clicking a relation opens or focuses the referenced table's default unfiltered Data item
 - clicking Schema in a Data toolbar opens or focuses the Schema item for that table
-- clicking a grouped subscription in the Queries navigator opens or focuses its Query item
+- clicking a grouped subscription in the Live queries navigator opens or focuses its query item
 
 Data, Schema, and Query items use distinct icons derived from their explicit item kind. Generated ids do not determine item
 meaning.
@@ -125,7 +125,7 @@ Do not add `sessionStorage` unless a specific state must survive navigation with
 | Give Schema its own path                     | Schema is a distinct workspace-item representation, not Data search state.               |
 | Keep tabs out of routes                      | Tabs are one presentation of workspace items and may later exist in several panes.       |
 | Keep filters in search parameters            | Filters are shareable state of a Data item.                                              |
-| Keep Tables and Queries in the left dock     | They are different resource navigators and switching them must not replace main content. |
+| Keep Tables and Live queries in the left dock | They are different resource navigators and switching them must not replace main content. |
 
 ## Browser-tab behavior
 
@@ -160,9 +160,9 @@ its workbench. Ordinary content routes never include the admin secret.
 # Table Schema representation
 /conn/local-profile-id/tables/users/schema
 
-# Queries navigator
-/conn/local-profile-id/queries
+# Live queries navigator
+/conn/local-profile-id/live-queries
 
-# Query workspace item
-/conn/local-profile-id/queries/group-key
+# Live query workspace item
+/conn/local-profile-id/live-queries/group-key
 ```
