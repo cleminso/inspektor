@@ -13,6 +13,17 @@
 
 [03/09/26]
 
+- [x] Preserve the visible filter option catalogue while query history is intentionally empty.
+- [x] Explain cleared Live, paused, and refreshing states without restoring the initial loading surface.
+
+[03/09/26]
+
+- [x] Clear successful and failed query history without resetting filters or Live state.
+- [x] Close selected query details when history is cleared and disable the action when history is empty.
+- [x] Keep intentionally cleared history distinct from initial loading while preserving subsequent polling.
+
+[03/09/26]
+
 - [x] Keep the primary Live label legible while its pressed state communicates active polling.
 
 [02/09/26]
@@ -131,6 +142,16 @@ No open product work is recorded for the implemented foundation.
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- Intentionally cleared history keeps the last-known filter catalogue visible until a completed capture replaces it.
+- Cleared-state feedback uses the persistent empty surface rather than animation or a transient notification.
+
+[03/09/26]
+
+- Clear history removes temporary captures immediately without confirmation.
+- Clearing history preserves filters and Live state; polling adds the next completed capture only while active.
+
 [02/09/26]
 
 - Live uses the selected-control accent rather than success green because it controls a polling mode instead of reporting a successful outcome.
@@ -199,6 +220,16 @@ No open product work is recorded for the implemented foundation.
 - [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Focused hook and view coverage verifies retained filter controls and cleared-state feedback.
+- [x] Inspector formatting, lint, typecheck, build, package tests, and browser acceptance pass.
+
+[03/09/26]
+
+- [x] Focused hook and view coverage verifies clear-history state, selection, filters, Live state, and polling behavior.
+- [x] Inspector formatting, lint, typecheck, build, package tests, and browser acceptance pass.
 
 [03/09/26]
 

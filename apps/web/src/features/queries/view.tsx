@@ -467,6 +467,7 @@ function QueryTimeline({
   selection,
   telemetry,
   timeline,
+  onClearHistory,
   onSelect,
 }: {
   filtered: boolean
@@ -475,10 +476,12 @@ function QueryTimeline({
   selection: QuerySelection | null
   telemetry: QuerySubscriptionsTelemetry
   timeline: QuerySubscriptionsTimeline
+  onClearHistory: () => void
   onSelect: (selection: QuerySelection) => void
 }): React.ReactElement {
   const { history, isPaused, refresh, setPaused, state } = telemetry
-  const isRefreshing = state.kind === 'refreshing'
+  const isRefreshing =
+    state.kind === 'refreshing' || (state.kind === 'cleared' && state.isRefreshing === true)
   const staleHistory = state.kind === 'stale-history'
 
   return (
@@ -516,6 +519,14 @@ function QueryTimeline({
           ) : null}
         </Box>
         <Button
+          disabled={history.length === 0}
+          size="s"
+          variant="ghost"
+          onClick={onClearHistory}
+        >
+          Clear history
+        </Button>
+        <Button
           ref={refreshButtonRef}
           disabled={isRefreshing}
           size="s"
@@ -547,14 +558,24 @@ function QueryTimeline({
           alignItems="center"
           flex={1}
           justifyContent="center"
-          role={isRefreshing === false && staleHistory === false ? 'status' : undefined}
+          role={
+            state.kind === 'cleared' || (isRefreshing === false && staleHistory === false)
+              ? 'status'
+              : undefined
+          }
         >
           <Text color="muted">
-            {filtered === true
-              ? 'No query subscriptions match filters'
-              : staleHistory === true
-                ? 'Last successful snapshot contained no active query subscriptions'
-                : 'No active query subscriptions'}
+            {state.kind === 'cleared'
+              ? state.isRefreshing === true
+                ? 'Capturing query subscriptions…'
+                : isPaused === true
+                  ? 'History cleared'
+                  : 'History cleared. Waiting for the next snapshot…'
+              : filtered === true
+                ? 'No query subscriptions match filters'
+                : staleHistory === true
+                  ? 'Last successful snapshot contained no active query subscriptions'
+                  : 'No active query subscriptions'}
           </Text>
         </Box>
       ) : (
@@ -640,10 +661,15 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
   const [selection, setSelection] = useState<QuerySelection | null>(null)
   const selectedCellRef = useRef<HTMLTableCellElement | null>(null)
   const refreshButtonRef = useRef<HTMLButtonElement | null>(null)
-  const filterOptions = useMemo(
+  const derivedFilterOptions = useMemo(
     () => deriveQueryFilterOptions(telemetry.history, connection.env),
     [connection.env, telemetry.history],
   )
+  const clearedFilterOptionsRef = useRef<QueryFilterOptions | null>(null)
+  const filterOptions =
+    telemetry.state.kind === 'cleared'
+      ? (clearedFilterOptionsRef.current ?? derivedFilterOptions)
+      : derivedFilterOptions
   const filtered =
     filters.tables !== null || filters.branches !== null || filters.propagations !== null
   const filteredHistory = useMemo(
@@ -716,6 +742,10 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
     setFilters(nextFilters)
     setSelection(null)
   }, [])
+  const clearHistory = () => {
+    clearedFilterOptionsRef.current = filterOptions
+    telemetry.clearHistory()
+  }
 
   useEffect(() => {
     if (hasSelectedDetails === false) {
@@ -767,6 +797,7 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
         selection={selection}
         telemetry={telemetry}
         timeline={timeline}
+        onClearHistory={clearHistory}
         onSelect={selectQuery}
       />
     )

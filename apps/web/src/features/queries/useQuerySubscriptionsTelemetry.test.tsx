@@ -189,6 +189,49 @@ describe('useQuerySubscriptionsTelemetry', () => {
     expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(2)
   })
 
+  it('clears completed captures without returning to initial loading and collects the next live poll', async () => {
+    jazzMocks.fetchServerSubscriptions
+      .mockResolvedValueOnce({ appId: 'app-1', generatedAt: 1, queries: [accountsGroup] })
+      .mockRejectedValueOnce(new TypeError('private network detail'))
+      .mockResolvedValueOnce({ appId: 'app-1', generatedAt: 2, queries: [] })
+    const { result } = renderHook(() => useQuerySubscriptionsTelemetry(credentials))
+    await act(async () => {})
+
+    act(() => result.current.refresh())
+    await act(async () => {})
+    expect(result.current.history.map(({ kind }) => kind)).toEqual(['success', 'failure'])
+
+    act(() => result.current.clearHistory())
+
+    expect(result.current.history).toEqual([])
+    expect(result.current.state).toEqual({ kind: 'cleared', isRefreshing: false })
+    expect(result.current.isPaused).toBe(false)
+
+    await act(async () => vi.advanceTimersByTimeAsync(20_000))
+    await act(async () => {})
+
+    expect(result.current.history).toMatchObject([{ kind: 'success', generatedAt: 2 }])
+  })
+
+  it('keeps cleared history empty while paused', async () => {
+    jazzMocks.fetchServerSubscriptions.mockResolvedValue({
+      appId: 'app-1',
+      generatedAt: 1,
+      queries: [accountsGroup],
+    })
+    const { result } = renderHook(() => useQuerySubscriptionsTelemetry(credentials))
+    await act(async () => {})
+
+    act(() => result.current.setPaused(true))
+    act(() => result.current.clearHistory())
+    await act(async () => vi.advanceTimersByTimeAsync(20_000))
+
+    expect(result.current.history).toEqual([])
+    expect(result.current.state).toEqual({ kind: 'cleared', isRefreshing: false })
+    expect(result.current.isPaused).toBe(true)
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(1)
+  })
+
   it('queues one fresh snapshot when resumed during an in-flight request', async () => {
     const first = deferred<unknown>()
     const second = deferred<unknown>()

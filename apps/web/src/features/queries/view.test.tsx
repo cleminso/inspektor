@@ -91,11 +91,16 @@ function telemetry(
 ): QuerySubscriptionsTelemetry {
   const timeline = projectQuerySubscriptionsTimeline(history)
   const inferredState = timeline.latestSuccessfulCapture === null ? 'failed-initial-load' : 'ready'
+  const telemetryState: QuerySubscriptionsTelemetry['state'] =
+    state === 'cleared'
+      ? { kind: 'cleared', isRefreshing: false }
+      : { kind: state ?? inferredState }
   return {
+    clearHistory: vi.fn(),
     history,
     isPaused: false,
     timeline,
-    state: { kind: state ?? inferredState },
+    state: telemetryState,
     refresh: vi.fn(),
     setPaused: vi.fn(),
   }
@@ -512,6 +517,49 @@ describe('QueriesView', () => {
     )
 
     expect(refresh).toHaveBeenCalledOnce()
+  })
+
+  it('disables Clear history when there are no captures', () => {
+    mocks.telemetry = telemetry([], 'ready')
+    render(<QueriesView />)
+
+    expect(screen.getByRole('button', { name: 'Clear history' }).hasAttribute('disabled')).toBe(
+      true,
+    )
+  })
+
+  it('clears selected details, keeps filters stable, and explains cleared history', () => {
+    const clearHistory = vi.fn()
+    mocks.telemetry = {
+      ...telemetry([success('capture-1', 1_000, [accountsGroup, auditGroup])]),
+      clearHistory,
+    }
+    const view = render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Only accounts' }))
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Clear history' }))
+    expect(clearHistory).toHaveBeenCalledOnce()
+
+    mocks.telemetry = telemetry([], 'cleared')
+    view.rerender(<QueriesView />)
+
+    expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
+    expect(
+      screen.getByRole('checkbox', { name: 'Select accounts' }).getAttribute('aria-checked'),
+    ).toBe('true')
+    expect(
+      screen.getByRole('checkbox', { name: 'Select auditLog' }).getAttribute('aria-checked'),
+    ).toBe('false')
+    expect(screen.getByText('History cleared. Waiting for the next snapshot…')).toBeTruthy()
+
+    mocks.telemetry = { ...mocks.telemetry, isPaused: true }
+    view.rerender(<QueriesView />)
+    expect(screen.getByText('History cleared')).toBeTruthy()
+
+    mocks.telemetry = { ...mocks.telemetry, state: { kind: 'cleared', isRefreshing: true } }
+    view.rerender(<QueriesView />)
+    expect(screen.getByText('Capturing query subscriptions…')).toBeTruthy()
   })
 
   it('presents live polling as a persistent toggle with action guidance', async () => {

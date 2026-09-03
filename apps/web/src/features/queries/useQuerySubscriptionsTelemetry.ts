@@ -21,8 +21,10 @@ export type QuerySubscriptionsTelemetryState =
   | { kind: 'refreshing' }
   | { kind: 'failed-initial-load' }
   | { kind: 'stale-history' }
+  | { kind: 'cleared'; isRefreshing: boolean }
 
 export interface QuerySubscriptionsTelemetry {
+  clearHistory: () => void
   history: readonly QuerySubscriptionsCapture[]
   isPaused: boolean
   timeline: QuerySubscriptionsTimeline
@@ -40,7 +42,7 @@ export function useQuerySubscriptionsTelemetry(
 ): QuerySubscriptionsTelemetry {
   const [history, setHistory] = useState<readonly QuerySubscriptionsCapture[]>([])
   const [latestRequestKind, setLatestRequestKind] = useState<
-    QuerySubscriptionsCapture['kind'] | null
+    QuerySubscriptionsCapture['kind'] | 'cleared' | null
   >(null)
   const [isPaused, setIsPaused] = useState(false)
   const [isRequesting, setIsRequesting] = useState(false)
@@ -50,6 +52,10 @@ export function useQuerySubscriptionsTelemetry(
 
   const refresh = useCallback(() => refreshRef.current?.(), [])
   const setPaused = useCallback((paused: boolean) => setPausedRef.current?.(paused), [])
+  const clearHistory = useCallback(() => {
+    setHistory([])
+    setLatestRequestKind('cleared')
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -181,17 +187,20 @@ export function useQuerySubscriptionsTelemetry(
 
   const timeline = useMemo(() => projectQuerySubscriptionsTimeline(history), [history])
   const state: QuerySubscriptionsTelemetryState =
-    history.length === 0 || (isRequesting === true && timeline.latestSuccessfulCapture === null)
-      ? { kind: 'initial-loading' }
-      : isRequesting === true
-        ? { kind: 'refreshing' }
-        : latestRequestKind === 'failure'
-          ? timeline.latestSuccessfulCapture === null
-            ? { kind: 'failed-initial-load' }
-            : { kind: 'stale-history' }
-          : { kind: 'ready' }
+    latestRequestKind === 'cleared'
+      ? { kind: 'cleared', isRefreshing: isRequesting }
+      : history.length === 0 || (isRequesting === true && timeline.latestSuccessfulCapture === null)
+        ? { kind: 'initial-loading' }
+        : isRequesting === true
+          ? { kind: 'refreshing' }
+          : latestRequestKind === 'failure'
+            ? timeline.latestSuccessfulCapture === null
+              ? { kind: 'failed-initial-load' }
+              : { kind: 'stale-history' }
+            : { kind: 'ready' }
 
   return {
+    clearHistory,
     history,
     isPaused,
     timeline,
