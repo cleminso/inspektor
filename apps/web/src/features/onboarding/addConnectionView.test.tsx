@@ -34,11 +34,7 @@ vi.mock('./useAddConnectionFlow', () => ({
         env: 'dev',
         branch: 'main',
       },
-      goBackToForm: vi.fn(),
       isSubmitting: false,
-      schemaHashes: [],
-      selectSchema: vi.fn(),
-      step: 'form',
       updateField: vi.fn(),
     }
   },
@@ -48,10 +44,6 @@ vi.mock('./addConnectionForm', () => ({
   AddConnectionForm: ({ formValues }: { formValues: { name: string } }) => (
     <div>{formValues.name}</div>
   ),
-}))
-
-vi.mock('./schemaSwitcher', () => ({
-  SchemaSwitcher: () => null,
 }))
 
 describe('AddConnectionView', () => {

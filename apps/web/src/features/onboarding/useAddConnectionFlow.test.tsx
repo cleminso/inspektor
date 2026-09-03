@@ -90,7 +90,6 @@ describe('useAddConnectionFlow', () => {
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(saveConnectionWithContext).toHaveBeenCalledOnce()
     expect(navigate).not.toHaveBeenCalled()
-    expect(result.current.step).toBe('form')
     expect(result.current.error).toBeNull()
   })
 
@@ -310,8 +309,6 @@ describe('useAddConnectionFlow', () => {
 
     const { result } = await submitValidFlow()
 
-    expect(result.current.step).toBe('form')
-    expect(result.current.schemaHashes).toEqual([])
     expect(result.current.error).toEqual({
       title: 'No stored schemas found',
       description: 'This app has no published schema.',
@@ -320,24 +317,10 @@ describe('useAddConnectionFlow', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  it('enters schema choice with schemas in advertised order', async () => {
+  it('opens the workspace directly when multiple schemas are available', async () => {
     fetchSchemaHashes.mockResolvedValueOnce(schemaChoicesResponse)
 
-    const { result } = await submitValidFlow()
-
-    expect(result.current.step).toBe('schema')
-    expect(result.current.schemaHashes).toEqual(['schema-1', 'schema-2'])
-    expect(saveConnectionWithContext).not.toHaveBeenCalled()
-    expect(navigate).not.toHaveBeenCalled()
-  })
-
-  it('opens the selected schema', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(schemaChoicesResponse)
-    const { result } = await submitValidFlow()
-
-    await act(async () => {
-      await result.current.selectSchema('schema-1')
-    })
+    await submitValidFlow()
 
     const connectionId = saveConnectionWithContext.mock.calls[0]?.[1]
     expect(saveConnectionWithContext).toHaveBeenCalledWith(
@@ -350,31 +333,5 @@ describe('useAddConnectionFlow', () => {
       to: '/conn/$connectionId/tables',
       params: { connectionId },
     })
-  })
-
-  it('returns from schema choice to the connection form', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(schemaChoicesResponse)
-    const { result } = await submitValidFlow()
-
-    act(() => result.current.goBackToForm())
-
-    expect(result.current.step).toBe('form')
-  })
-
-  it('reports a schema selection failure', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(schemaChoicesResponse)
-    navigate.mockRejectedValueOnce(new TypeError('Failed to fetch'))
-    const { result } = await submitValidFlow()
-
-    await act(async () => {
-      await result.current.selectSchema('schema-1')
-    })
-
-    expect(result.current.step).toBe('schema')
-    expect(result.current.error).toEqual({
-      title: "Couldn't validate this connection",
-      description: 'Check the server URL, app ID, and admin secret.',
-    })
-    expect(result.current.isSubmitting).toBe(false)
   })
 })

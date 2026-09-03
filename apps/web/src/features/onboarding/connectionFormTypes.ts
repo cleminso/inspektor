@@ -9,8 +9,6 @@ export interface AddConnectionFormValues extends ConnectionDraft {
   branch: string
 }
 
-export type AddConnectionStep = 'form' | 'schema'
-
 export function createInitialFormValues(prefill: PrefillConfig | null): AddConnectionFormValues {
   return {
     name: prefill?.name ?? '',

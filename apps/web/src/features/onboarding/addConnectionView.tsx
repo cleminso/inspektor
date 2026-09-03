@@ -1,4 +1,4 @@
-import { Box, Button, TextLink } from '@inspector/ds'
+import { Box, TextLink } from '@inspector/ds'
 import { Link, useNavigate } from '@tanstack/react-router'
 
 import type { StoredConnection } from '@app/connections/connections'
@@ -7,7 +7,6 @@ import { appRoutes } from '@app/routing/appRoutes'
 
 import { AddConnectionForm } from './addConnectionForm'
 import { getPrefillKey } from './connectionFormTypes'
-import { SchemaSwitcher } from './schemaSwitcher'
 import { useAddConnectionFlow } from './useAddConnectionFlow'
 
 export function AddConnectionView(): React.ReactElement {
@@ -37,7 +36,6 @@ interface ConnectionFormViewProps {
 
 export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): React.ReactElement {
   const flow = useAddConnectionFlow(edit)
-  const isFormStep = flow.step === 'form'
 
   return (
     <Box
@@ -47,46 +45,23 @@ export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): 
       gap="xl"
     >
       <Box justifyContent="end">
-        {isFormStep === true ? (
-          <TextLink
-            variant="caption"
-            render={<Link to={appRoutes.connections} />}
-          >
-            Back
-          </TextLink>
-        ) : (
-          <Button
-            type="button"
-            variant="link"
-            size="s"
-            onClick={flow.goBackToForm}
-            disabled={flow.isSubmitting === true}
-          >
-            Back
-          </Button>
-        )}
+        <TextLink
+          variant="caption"
+          render={<Link to={appRoutes.connections} />}
+        >
+          Back
+        </TextLink>
       </Box>
-      {isFormStep === true ? (
-        // TODO: update error message UI and copywriting
-        <AddConnectionForm
-          error={flow.error}
-          formValues={flow.formValues}
-          isSubmitting={flow.isSubmitting}
-          mode={edit === undefined ? 'add' : 'edit'}
-          onCancel={onClose}
-          onSubmit={flow.fetchSchemas}
-          onUpdateField={flow.updateField}
-        />
-      ) : (
-        <SchemaSwitcher
-          appId={flow.formValues.appId}
-          error={flow.error}
-          isSubmitting={flow.isSubmitting}
-          onCancel={onClose}
-          onSelectSchema={flow.selectSchema}
-          schemaHashes={flow.schemaHashes}
-        />
-      )}
+      {/* TODO: update error message UI and copywriting */}
+      <AddConnectionForm
+        error={flow.error}
+        formValues={flow.formValues}
+        isSubmitting={flow.isSubmitting}
+        mode={edit === undefined ? 'add' : 'edit'}
+        onCancel={onClose}
+        onSubmit={flow.fetchSchemas}
+        onUpdateField={flow.updateField}
+      />
     </Box>
   )
 }

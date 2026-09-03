@@ -22,21 +22,13 @@ import { appRoutes } from '@app/routing/appRoutes'
 import { createSchemaCatalogue } from '@app/routing/inspectorNavigation'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 
-import {
-  createInitialFormValues,
-  type AddConnectionFormValues,
-  type AddConnectionStep,
-} from './connectionFormTypes'
+import { createInitialFormValues, type AddConnectionFormValues } from './connectionFormTypes'
 
 interface UseAddConnectionFlowResult {
   error: ConnectionError | null
   formValues: AddConnectionFormValues
   isSubmitting: boolean
-  schemaHashes: string[]
-  step: AddConnectionStep
   fetchSchemas: FormEventHandler<HTMLFormElement>
-  goBackToForm: () => void
-  selectSchema: (schemaHash: string) => Promise<void>
   updateField: (field: keyof AddConnectionFormValues, value: string) => void
 }
 
@@ -48,9 +40,8 @@ interface UseAddConnectionFlowOptions {
 /**
  * Validates and persists add or edit form input before entering the canonical connection route.
  *
- * Schema discovery here exists for inline credential feedback and explicit schema choice. It does
- * not replace route-owned connection entry: the saved profile still navigates through the parent
- * connection loader before a runtime mounts.
+ * Schema discovery here provides inline credential feedback and the initial schema context. The
+ * saved profile still navigates through the parent connection loader before a runtime mounts.
  */
 export function useAddConnectionFlow(
   options?: UseAddConnectionFlowOptions,
@@ -58,7 +49,6 @@ export function useAddConnectionFlow(
   const { connections, prefill, saveConnectionWithContext, setConnectionContext } =
     useInspectorSessionContext()
   const navigate = useNavigate()
-  const [step, setStep] = useState<AddConnectionStep>('form')
   const [formValues, setFormValues] = useState<AddConnectionFormValues>(() =>
     options === undefined
       ? createInitialFormValues(prefill)
@@ -71,7 +61,6 @@ export function useAddConnectionFlow(
           branch: options.branch,
         },
   )
-  const [schemaHashes, setSchemaHashes] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<ConnectionError | null>(null)
   const isSubmittingRef = useRef(false)
@@ -152,39 +141,12 @@ export function useAddConnectionFlow(
         return
       }
 
-      const schemaHashes = createSchemaCatalogue(response).map(({ hash }) => hash)
-      if (schemaHashes.length === 0) {
+      const schemaHash = createSchemaCatalogue(response)[0]?.hash
+      if (schemaHash === undefined) {
         setError(EMPTY_SCHEMA_ERROR)
-        setSchemaHashes([])
-        setStep('form')
         return
       }
 
-      if (schemaHashes.length === 1) {
-        await openResolvedConnection(schemaHashes[0])
-        return
-      }
-
-      setSchemaHashes(schemaHashes)
-      setStep('schema')
-    } catch (error) {
-      setError(normalizeSchemaFetchError(error))
-    } finally {
-      isSubmittingRef.current = false
-      setIsSubmitting(false)
-    }
-  }
-
-  const selectSchema = async (schemaHash: string) => {
-    if (isSubmittingRef.current === true) {
-      return
-    }
-
-    isSubmittingRef.current = true
-    setIsSubmitting(true)
-    setError(null)
-
-    try {
       await openResolvedConnection(schemaHash)
     } catch (error) {
       setError(normalizeSchemaFetchError(error))
@@ -194,20 +156,11 @@ export function useAddConnectionFlow(
     }
   }
 
-  const goBackToForm = () => {
-    setError(null)
-    setStep('form')
-  }
-
   return {
     error,
     fetchSchemas,
     formValues,
-    goBackToForm,
     isSubmitting,
-    schemaHashes,
-    selectSchema,
-    step,
     updateField,
   }
 }
