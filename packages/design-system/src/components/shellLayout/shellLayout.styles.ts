@@ -5,8 +5,8 @@ import { borderRadii, spacing } from '../../tokens/value.stylex'
 
 export const shellLayoutStyles = stylex.create({
   root: {
+    padding: spacing.xs,
     gap: spacing.xs,
-    // padding: spacing.xs,
     overflow: 'hidden',
     backgroundColor: surfaceColors.canvas,
     display: 'flex',
@@ -17,6 +17,9 @@ export const shellLayoutStyles = stylex.create({
     width: '100%',
   },
   fixedRegion: {
+    borderRadius: borderRadii.xs,
+    overflow: 'hidden',
+    backgroundColor: surfaceColors.background,
     display: 'flex',
     flexShrink: 0,
     minWidth: 0,
@@ -32,14 +35,12 @@ export const shellLayoutStyles = stylex.create({
     width: '100%',
   },
   leftDock: {
-    borderBottomRightRadius: borderRadii.xs,
-    borderTopRightRadius: borderRadii.xs,
+    borderRadius: borderRadii.xs,
   },
   view: {
     borderRadius: borderRadii.xs,
   },
   rightDock: {
-    borderBottomLeftRadius: borderRadii.xs,
-    borderTopLeftRadius: borderRadii.xs,
+    borderRadius: borderRadii.xs,
   },
 })

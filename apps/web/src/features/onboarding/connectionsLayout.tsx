@@ -1,4 +1,4 @@
-import { Box, ButtonLink, Text } from '@inspector/ds'
+import { Box, ButtonLink, ShellLayout, Text } from '@inspector/ds'
 
 import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 
@@ -16,62 +16,64 @@ export function ConnectionsLayout({
       height="screen-height-small"
       minHeight={0}
       width="full"
-      flexDirection="column"
       overflow="hidden"
-      backgroundColor="surface-background"
     >
-      <Box
-        position="fixed"
-        top="xs"
-        left="xs"
-        zIndex="navigation"
-        opacity={{ base: 0, focusWithin: 1 }}
-        pointerEvents={{ base: 'none', focusWithin: 'auto' }}
-      >
-        <ButtonLink
-          href="#main-content"
-          size="s"
-        >
-          Skip to content
-        </ButtonLink>
-      </Box>
-      <Box
-        as="header"
-        width="full"
-        flexShrink={0}
-        alignItems="center"
-        paddingHorizontal="xs"
-        paddingVertical="s"
-        backgroundColor="element-default"
-        borderBottomWidth={1}
-        borderColor="subtle"
-        borderStyle="solid"
-      >
-        <ConnectionSwitcher triggerLabel="Open connection" />
-      </Box>
-      <Box
-        as="main"
-        id="main-content"
-        tabIndex={-1}
-        minHeight={0}
-        flex={1}
-        alignItems="start"
-        justifyContent="center"
-        overflowY="auto"
-        paddingTop="5xl"
-        paddingRight="2xl"
-        paddingBottom="5xl"
-        paddingLeft="2xl"
-      >
+      <ShellLayout.Root>
         <Box
-          position="absolute"
-          opacity={0}
-          pointerEvents="none"
+          position="fixed"
+          top="xs"
+          left="xs"
+          zIndex="navigation"
+          opacity={{ base: 0, focusWithin: 1 }}
+          pointerEvents={{ base: 'none', focusWithin: 'auto' }}
         >
-          <Text as="h1">{pageTitle}</Text>
+          <ButtonLink
+            href="#main-content"
+            size="s"
+          >
+            Skip to content
+          </ButtonLink>
         </Box>
-        {children}
-      </Box>
+        <ShellLayout.Header>
+          <Box
+            as="header"
+            width="full"
+            alignItems="center"
+            paddingHorizontal="xs"
+            paddingVertical="s"
+          >
+            <ConnectionSwitcher triggerLabel="Open connection" />
+          </Box>
+        </ShellLayout.Header>
+        <ShellLayout.Body>
+          <ShellLayout.View>
+            <Box
+              as="main"
+              id="main-content"
+              tabIndex={-1}
+              height="full"
+              minHeight={0}
+              width="full"
+              alignItems="start"
+              justifyContent="center"
+              overflowY="auto"
+              paddingTop="5xl"
+              paddingRight="2xl"
+              paddingBottom="5xl"
+              paddingLeft="2xl"
+            >
+              <Box
+                position="absolute"
+                opacity={0}
+                pointerEvents="none"
+              >
+                <Text as="h1">{pageTitle}</Text>
+              </Box>
+              {children}
+            </Box>
+          </ShellLayout.View>
+        </ShellLayout.Body>
+      </ShellLayout.Root>
     </Box>
   )
 }

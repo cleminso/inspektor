@@ -16,6 +16,11 @@ This checklist records the reusable application-shell geometry, dock controls, a
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Float every shell region within an extra-small canvas inset.
+- [x] Round and clip every edge of the header, footer, docks, and view.
+
 [01/09/26]
 
 - [x] Align application shell chrome under sibling `header/` and `footer/` owners.
@@ -60,6 +65,12 @@ This checklist records the reusable application-shell geometry, dock controls, a
 - None.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Shell Layout focused tests pass.
+- [x] Changed-file lint and design-system typecheck pass.
+- [x] Browser verification confirms floating header, footer, docks, and view.
 
 [01/09/26]
 

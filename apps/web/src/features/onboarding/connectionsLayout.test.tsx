@@ -24,6 +24,8 @@ describe('ConnectionsLayout', () => {
     expect(main.getAttribute('id')).toBe('main-content')
     expect(main.getAttribute('tabindex')).toBe('-1')
     expect(screen.getByRole('heading', { level: 1, name: 'Connections' })).toBeTruthy()
+    expect(main.closest('[data-slot="shell-layout-view"]')).toBeTruthy()
+    expect(screen.getByRole('banner').closest('[data-slot="shell-layout-header"]')).toBeTruthy()
     expect(skipLink.compareDocumentPosition(screen.getByRole('banner'))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )

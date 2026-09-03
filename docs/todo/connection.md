@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+### Connection route layout
+
+- [x] Present connection list, add, and edit routes in the shared floating shell with a header and centered view.
+
 [29/08/26]
 
 ### Environment context
@@ -358,6 +364,11 @@
 - None.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Verify connection list, add, and edit routes render the floating header and centered view.
+- [x] Run focused onboarding tests, changed-file lint, and Inspector typecheck.
 
 [29/08/26]
 
