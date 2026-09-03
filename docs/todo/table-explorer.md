@@ -21,6 +21,24 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [03/09/26]
 
+### Held-key row navigation
+
+- [x] Continue row navigation through native `J` and `K` key repeat.
+- [x] Present row controls in Down, Up order to match the physical `J`, `K` key order.
+- [x] Remove the redundant `Edit row N` heading while retaining the row navigation counter, superseding the earlier coordinate heading.
+- [x] Name row-navigation tooltips by action and shortcut, superseding the earlier `Press K` and `Press J` wording.
+
+[03/09/26]
+
+### Query-row pane navigation
+
+- [x] Keep Previous and Next controls visible while one row is checked.
+- [x] Move the single checked row through filtered and sorted query order and continue across page boundaries.
+- [x] Preserve the checked set while navigating between several checked rows.
+- [x] Distinguish query position from the `selected` multi-row position label.
+
+[03/09/26]
+
 ### Checked-row keyboard navigation
 
 - [x] Navigate to the previous and next checked rows with `K` and `J` from the open edit pane.
@@ -918,6 +936,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Open product work
 
+### Row navigation viewport
+
+[03/09/26]
+
+- [ ] Keep the focused checked row visible when repeated navigation moves beyond the current grid viewport.
+
 ### Table query prefetch
 
 [26/08/26]
@@ -1186,6 +1210,13 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- One checked row is browsing mode: Previous, Next, `K`, and `J` replace the checked row with the adjacent query row.
+- Several checked rows are batch mode: navigation changes the focused checked row without changing the checked set.
+- Pane-owned navigation crosses pagination boundaries; direct page changes continue to clear row and cell selection.
+- Exact final counts remain absent while another page exists; the row position uses the query's known lower bound.
+
 [28/08/26]
 
 - Structured editor network work starts when an editor renders, not when a table schema contains structured columns. This supersedes the table-mount decision below.
@@ -1394,6 +1425,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover single-row selection movement, multi-row selection preservation, page-boundary continuation, navigation bounds, and query-position labels with focused tests.
+- [x] Verify persistent controls and visible grid check movement against the isolated browser fixture.
+- [x] Verify Inspector formatting, lint, typecheck, production build, and package-wide tests.
 
 [28/08/26]
 

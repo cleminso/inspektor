@@ -57,11 +57,15 @@ export function isAppHotkeyInteractionLayer(target: EventTarget | null): boolean
   )
 }
 
-export function runAppHotkey(event: KeyboardEvent, command: () => void): void {
+export function runAppHotkey(
+  event: KeyboardEvent,
+  command: () => void,
+  repeatBehavior: 'allow' | 'ignore' = 'ignore',
+): void {
   if (
     event.defaultPrevented === true ||
     event.isComposing === true ||
-    event.repeat === true ||
+    (event.repeat === true && repeatBehavior === 'ignore') ||
     isAppHotkeyInteractionLayer(event.target)
   ) {
     return

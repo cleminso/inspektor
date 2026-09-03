@@ -10,14 +10,14 @@ import { DetailPane } from '@tables/rowEditor/detailPane'
 import type { TableRowId } from '@tables/tableTypes'
 
 interface RowEditorSidePanelProps {
-  activeColumnNumber: number
-  activePageRowNumber: number | null
-  activeRowIndex: number
+  canNavigateNext?: boolean
+  canNavigatePrevious?: boolean
   children: React.ReactNode
   editedRowIds: TableRowId[]
   insertMoreEnabled?: boolean
   mode: 'insert' | 'edit'
   mutationDisabled?: boolean
+  navigationLabel?: string | null
   onClose?: () => void
   onConfirmDelete?: (rowIds: readonly TableRowId[]) => void
   onInsertMoreEnabledChange?: (enabled: boolean) => void
@@ -26,23 +26,23 @@ interface RowEditorSidePanelProps {
 }
 
 function RowNavigation({
-  activeRowIndex,
-  rowCount,
+  canNavigateNext,
+  canNavigatePrevious,
+  navigationLabel,
   onNavigateNext,
   onNavigatePrevious,
 }: {
-  activeRowIndex: number
-  rowCount: number
+  canNavigateNext: boolean
+  canNavigatePrevious: boolean
+  navigationLabel: string | null
   onNavigateNext: () => void
   onNavigatePrevious: () => void
 }): React.ReactElement {
-  const canNavigatePrevious = activeRowIndex > 0
-  const canNavigateNext = activeRowIndex < rowCount - 1
   useHotkey(
     appHotkeys.previousSelectedRow,
     (event) => {
       if (canNavigatePrevious === true) {
-        runAppHotkey(event, onNavigatePrevious)
+        runAppHotkey(event, onNavigatePrevious, 'allow')
       }
     },
     appHotkeyOptions,
@@ -51,7 +51,7 @@ function RowNavigation({
     appHotkeys.nextSelectedRow,
     (event) => {
       if (canNavigateNext === true) {
-        runAppHotkey(event, onNavigateNext)
+        runAppHotkey(event, onNavigateNext, 'allow')
       }
     },
     appHotkeyOptions,
@@ -64,33 +64,16 @@ function RowNavigation({
       alignItems="center"
       gap="xs"
     >
-      <Text
-        as="span"
-        color="muted"
-        tabularNums
-      >
-        {activeRowIndex + 1} / {rowCount}
-      </Text>
+      {navigationLabel === null ? null : (
+        <Text
+          as="span"
+          color="muted"
+          tabularNums
+        >
+          {navigationLabel}
+        </Text>
+      )}
       <Box alignItems="center">
-        <Tooltip.Root>
-          <Tooltip.Trigger
-            render={
-              <Button
-                type="button"
-                variant="ghost"
-                size="s"
-                disabled={canNavigatePrevious === false}
-                focusableWhenDisabled
-                onClick={onNavigatePrevious}
-                aria-label="Previous selected row"
-                iconOnly
-              >
-                <Button.Glyph artwork={ArrowUp} />
-              </Button>
-            }
-          />
-          <Tooltip.Content>Press {appHotkeys.previousSelectedRow}</Tooltip.Content>
-        </Tooltip.Root>
         <Tooltip.Root>
           <Tooltip.Trigger
             render={
@@ -101,14 +84,33 @@ function RowNavigation({
                 disabled={canNavigateNext === false}
                 focusableWhenDisabled
                 onClick={onNavigateNext}
-                aria-label="Next selected row"
+                aria-label="Next row"
                 iconOnly
               >
                 <Button.Glyph artwork={ArrowDown} />
               </Button>
             }
           />
-          <Tooltip.Content>Press {appHotkeys.nextSelectedRow}</Tooltip.Content>
+          <Tooltip.Content>Next row {appHotkeys.nextSelectedRow}</Tooltip.Content>
+        </Tooltip.Root>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                type="button"
+                variant="ghost"
+                size="s"
+                disabled={canNavigatePrevious === false}
+                focusableWhenDisabled
+                onClick={onNavigatePrevious}
+                aria-label="Previous row"
+                iconOnly
+              >
+                <Button.Glyph artwork={ArrowUp} />
+              </Button>
+            }
+          />
+          <Tooltip.Content>Previous row {appHotkeys.previousSelectedRow}</Tooltip.Content>
         </Tooltip.Root>
       </Box>
     </Box>
@@ -116,14 +118,14 @@ function RowNavigation({
 }
 
 export function RowEditorSidePanel({
-  activeColumnNumber,
-  activePageRowNumber,
-  activeRowIndex,
+  canNavigateNext = false,
+  canNavigatePrevious = false,
   children,
   editedRowIds,
   insertMoreEnabled = false,
   mode,
   mutationDisabled = false,
+  navigationLabel = null,
   onClose,
   onConfirmDelete,
   onInsertMoreEnabledChange,
@@ -136,14 +138,7 @@ export function RowEditorSidePanel({
   useEffect(() => {
     setDeleteConfirmationRowIds(null)
   }, [mode])
-  const hasMultipleRows = editedRowIds.length > 1
   const insertMoreFieldId = 'insert-more'
-  const title =
-    mode === 'insert'
-      ? 'Insert row'
-      : activePageRowNumber === null
-        ? 'Edit row'
-        : `Edit row ${activePageRowNumber}:${activeColumnNumber}`
   const deleteRowIds = deleteConfirmationRowIds ?? editedRowIds
   const deleteLabel =
     deleteRowIds.length === 1 ? 'Delete row' : `Delete ${deleteRowIds.length} checked rows`
@@ -239,18 +234,20 @@ export function RowEditorSidePanel({
           alignItems="center"
           gap="l"
         >
-          <Box
-            minWidth={0}
-            flex={1}
-          >
-            <Text
-              as="h2"
-              variant="label"
-              truncate
+          {mode === 'insert' ? (
+            <Box
+              minWidth={0}
+              flex={1}
             >
-              {title}
-            </Text>
-          </Box>
+              <Text
+                as="h2"
+                variant="label"
+                truncate
+              >
+                Insert row
+              </Text>
+            </Box>
+          ) : null}
           {mode === 'insert' && onInsertMoreEnabledChange !== undefined ? (
             <Box
               as="label"
@@ -280,10 +277,11 @@ export function RowEditorSidePanel({
               </Text>
             </Box>
           ) : null}
-          {hasMultipleRows === true ? (
+          {mode === 'edit' && editedRowIds.length > 0 ? (
             <RowNavigation
-              activeRowIndex={activeRowIndex}
-              rowCount={editedRowIds.length}
+              canNavigateNext={canNavigateNext}
+              canNavigatePrevious={canNavigatePrevious}
+              navigationLabel={navigationLabel}
               onNavigateNext={onNavigateNext}
               onNavigatePrevious={onNavigatePrevious}
             />

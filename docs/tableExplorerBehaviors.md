@@ -196,9 +196,9 @@ Both surfaces consume the same provider-owned per-row draft, parsing, validation
 
 ### Row pane
 
-- The header identifies the focused row.
-- Multiple checked rows show the focused row's position and total selection, such as `2 / 4`.
-- Previous and next actions move focus through checked rows in active query order.
+- The header shows the focused row's query position without a redundant edit heading.
+- With one checked row, previous and next replace the check with the adjacent filtered and sorted query row and continue across pages.
+- With multiple checked rows, the header shows the focused row's selected position, such as `2 / 4 selected`, and navigation keeps the checked set stable.
 - The body renders all schema fields, including hidden table columns, using their field components.
 - Clicking a cell in the focused checked row moves focus to that field's first available control and leaves the row pane open.
 - Only the focused row is edited. A row action is not treated as a bulk action unless its label explicitly says so.

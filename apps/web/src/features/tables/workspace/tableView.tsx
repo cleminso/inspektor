@@ -727,13 +727,13 @@ function TableViewContent({
               maxSize={720}
             >
               <RowEditorSidePanel
-                activeColumnNumber={state.rowEditor.activeColumnNumber}
-                activePageRowNumber={state.rowEditor.activePageRowNumber}
+                canNavigateNext={state.rowEditor.canNavigateNext}
+                canNavigatePrevious={state.rowEditor.canNavigatePrevious}
                 mode={state.detailPaneMode === 'insert' ? 'insert' : 'edit'}
                 editedRowIds={state.rowEditor.editedRowIds}
                 insertMoreEnabled={insertMoreEnabled}
                 mutationDisabled={state.canMutateRows === false || mutationApplying}
-                activeRowIndex={state.rowEditor.activeRowIndex}
+                navigationLabel={state.rowEditor.navigationLabel}
                 onClose={state.closeRowEditor}
                 onConfirmDelete={(rowIds) => {
                   mutations.stageDeletions(rowIds)

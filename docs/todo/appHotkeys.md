@@ -13,6 +13,13 @@
 
 [03/09/26]
 
+- [x] Allow native key repeat for `J` and `K` row navigation without changing repeat suppression for other application hotkeys.
+- [x] Browse adjacent query rows with one checked row and preserve batch navigation with several checked rows.
+- [x] Order the visible row controls as Down then Up to mirror the keyboard's left-to-right `J`, `K` order.
+- [x] Name each row action in its tooltip alongside its unwrapped shortcut.
+
+[03/09/26]
+
 - [x] Navigate backward and forward through checked rows with `K` and `J` while the row editor is open.
 - [x] Keep checked-row shortcuts inactive in text-entry and overlay interaction layers.
 - [x] Expose each shortcut from its row-editor navigation arrow tooltip.
@@ -73,6 +80,12 @@
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- [x] Let the operating system control held-key row navigation cadence; do not add custom acceleration or timers.
+- [x] Keep repeated keydown events ignored for application hotkeys other than row navigation.
+- [x] Keep `K` and `J` bound to the row pane while changing their navigation scope with its single-row or multi-row mode.
+
 [20/08/26]
 
 - [x] Use `Alt+N`, `Alt+W`, `Alt+[`, and `Alt+]` for Tables workspace actions, superseding the single-character shortcuts that required a disable or remap control.
@@ -103,6 +116,10 @@
 - [ ] Decide whether disabled history and pagination shortcuts should remain intercepted or fall through to browser behavior.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover single-row selection movement, multi-row selection preservation, page-boundary continuation, and persistent controls.
 
 [03/09/26]
 

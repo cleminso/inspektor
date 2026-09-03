@@ -784,14 +784,18 @@ operations and do not open an inspection-only cell pane.
 
 Clicking checkboxes individually builds the checked-row set. TanStack's row-selection handler owns the checkbox anchor and selects
 the visible range when another checkbox is Shift-clicked. The application chooses the focused row and opens the complete-row editor
-for the checked-row set. Previous and next controls navigate checked rows in active query order, while edit actions remain scoped
-to the focused row unless explicitly labelled as bulk actions.
+for the checked-row set. With one checked row, persistent Previous and Next controls move through the filtered and sorted query,
+replace the checked row with the destination, and continue across page boundaries. With several checked rows, the same controls
+navigate only that stable checked set. `J` moves down, `K` moves up, and native key repeat continues navigation while either key
+is held. The visible controls follow the keyboard's left-to-right `J`, `K` order: Down, then Up. Edit actions remain scoped to the
+focused row unless explicitly labelled as bulk actions.
 Insert remains a separate pane mode with direct `Insert`, `Discard`, and `Insert more` controls. Successful `Insert more` resets
 and retains the form; insert drafts never enter the pending ledger. Unless an open nested control consumes Escape first, Escape
 closes an open row pane and unchecks every checked row while preserving staged changes. Clearing the checked rows closes
 selection-only widget state. With no pane open, Escape clears cell selection, cell focus, and column focus.
 
-Closing a pane through Escape unchecks every checked row. Filter, sort, page, table, or schema changes clear row and cell selections. Column
+Closing a pane through Escape unchecks every checked row. Filter, sort, table, schema, or direct page changes clear row and cell
+selections. Pane-owned row navigation may cross a page boundary while retaining the pane and checking the destination row. Column
 reorder preserves range corners and recomputes the rectangle in displayed order. Hidden columns contract or suspend affected
 ranges without deleting their operation state. Loading more rows preserves existing ranges because stable row IDs and explicit
 query-scope resets define the selection lifecycle.
@@ -799,8 +803,8 @@ query-scope resets define the selection lifecycle.
 Pane dismissal and mutation discard are distinct. Escape dismisses the pane and unchecks every checked row while preserving
 pending changes. Reverting one staged cell removes that field overlay; reverting a row update resets its
 provider-owned row form to captured source values. `Discard` belongs to the Floating widget and removes pending changes from the current
-table ledger. Numeric row and column coordinates can support developer orientation, but row IDs and column IDs remain the
-selection identity.
+table ledger. Row IDs and column IDs remain the selection identity. Edit mode omits a redundant pane heading; the persistent
+navigation counter provides row position.
 
 The table mutation provider owns draft orchestration and validation. The complete-row pane owns contextual deletion initiation and
 confirmation. The Floating widget projects mutation review, Apply, Discard, deletion review, and mutation failures. The pane and
@@ -1028,14 +1032,15 @@ If a requested page has no rows, Inspector returns to the first page.
 
 Avoid exact `Page X of Y` and exact record counts for v1 unless Jazz exposes a reliable count.
 
-Side-panel row focus is row-id based while its query scope remains active. Checkbox selection is page-local and clears when page,
-filters, or sort changes.
+Side-panel row focus is row-id based while its query scope remains active. Checkbox selection is page-local and clears when direct
+pagination, filters, or sort changes. Pane-owned navigation may move the checked row across pages.
 
 #### Selection and row inspection
 
-Clicking a row checkbox opens a side pane that gives the developer a focused place for reading and editing checked rows. Clicking
-additional checkboxes extends that row set, while one checked row remains focused and is represented as a position such as
-`2 / 4`. Single-clicking a data cell focuses it without opening an editor. Double-clicking starts inline editing for scalar and
+Clicking a row checkbox opens a side pane that gives the developer a focused place for reading and editing checked rows. Previous
+and Next remain visible with one checked row and move that check through the filtered and sorted query. Clicking additional
+checkboxes enters batch selection: the checked set remains stable while one checked row stays focused and is represented as a
+position such as `2 / 4 selected`. Single-clicking a data cell focuses it without opening an editor. Double-clicking starts inline editing for scalar and
 structured fields, opens the complete-row pane for relation and binary fields, and leaves unsupported read-only values unchanged.
 The focused behavior specification defines the detailed transitions and visual precedence.
 
@@ -1607,7 +1612,8 @@ UI representation:
 
 These scenarios define the Floating widget states and transitions:
 
-1. **Row selected:** Checking a row opens its complete-row pane and exposes its contextual row actions.
+1. **Row selected:** Checking a row opens its complete-row pane and exposes persistent row navigation. Navigating a single row moves
+   its check through the filtered and sorted query; navigating several checked rows keeps the checked set stable.
 2. **Pane edit:** Every valid pane field becomes a staged update automatically without field or form confirmation. Escape closes the pane and unchecks every checked row while preserving staged changes.
 3. **Scalar cell edit:** With the complete-row pane closed, double-clicking a supported cell or pressing Enter opens its schema-aware editor in the Floating widget without checking the row. Save stages a valid edit and returns focus according to spreadsheet navigation.
 4. **Validation feedback:** Malformed input receives immediate colocated feedback, remains available for correction, and does not enter staged changes.

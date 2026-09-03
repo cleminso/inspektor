@@ -8,18 +8,18 @@ import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
 afterEach(cleanup)
 
 describe('RowEditorSidePanel dirty transitions', () => {
-  it('navigates checked rows with K and J and labels both shortcuts', async () => {
+  it('orders row navigation as J then K and follows held keys in edit mode', async () => {
     const onNavigateNext = vi.fn()
     const onNavigatePrevious = vi.fn()
     render(
       <Tooltip.Provider delay={0}>
         <AppHotkeysProvider>
           <RowEditorSidePanel
-            activeColumnNumber={3}
-            activePageRowNumber={12}
-            activeRowIndex={1}
-            editedRowIds={['row-11', 'row-12', 'row-13']}
+            canNavigateNext
+            canNavigatePrevious
+            editedRowIds={['row-12']}
             mode="edit"
+            navigationLabel="12 / 101+"
             onNavigateNext={onNavigateNext}
             onNavigatePrevious={onNavigatePrevious}
           >
@@ -31,79 +31,29 @@ describe('RowEditorSidePanel dirty transitions', () => {
 
     expect(fireEvent.keyDown(document, { key: 'k' })).toBe(false)
     expect(fireEvent.keyDown(document, { key: 'j' })).toBe(false)
+    expect(fireEvent.keyDown(document, { key: 'k', repeat: true })).toBe(false)
+    expect(fireEvent.keyDown(document, { key: 'j', repeat: true })).toBe(false)
     fireEvent.keyDown(screen.getByRole('textbox', { name: 'Row value' }), { key: 'j' })
 
-    expect(onNavigatePrevious).toHaveBeenCalledOnce()
-    expect(onNavigateNext).toHaveBeenCalledOnce()
+    expect(onNavigatePrevious).toHaveBeenCalledTimes(2)
+    expect(onNavigateNext).toHaveBeenCalledTimes(2)
+    expect(
+      screen.getAllByRole('button').map((button) => button.getAttribute('aria-label')),
+    ).toEqual(['Next row', 'Previous row'])
+    expect(screen.getByText('12 / 101+')).toBeTruthy()
 
-    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Previous selected row' }))
-    expect(await screen.findByText('Press K')).toBeTruthy()
-    fireEvent.mouseLeave(screen.getByRole('button', { name: 'Previous selected row' }))
-    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Next selected row' }))
-    expect(await screen.findByText('Press J')).toBeTruthy()
-  })
-
-  it('shows the active page row and selected grid column in the edit title', () => {
-    render(
-      <RowEditorSidePanel
-        activeRowIndex={0}
-        activePageRowNumber={12}
-        activeColumnNumber={3}
-        editedRowIds={['row-12']}
-        mode="edit"
-        onNavigateNext={() => undefined}
-        onNavigatePrevious={() => undefined}
-      >
-        <div />
-      </RowEditorSidePanel>,
-    )
-
-    expect(screen.getByRole('heading', { name: 'Edit row 12:3' })).toBeTruthy()
-  })
-
-  it('shows column zero when no grid cell is selected', () => {
-    render(
-      <RowEditorSidePanel
-        activeRowIndex={0}
-        activePageRowNumber={1}
-        activeColumnNumber={0}
-        editedRowIds={['row-1']}
-        mode="edit"
-        onNavigateNext={() => undefined}
-        onNavigatePrevious={() => undefined}
-      >
-        <div />
-      </RowEditorSidePanel>,
-    )
-
-    expect(screen.getByRole('heading', { name: 'Edit row 1:0' })).toBeTruthy()
-  })
-
-  it('omits page coordinates when the edited row is outside the loaded page', () => {
-    render(
-      <RowEditorSidePanel
-        activeRowIndex={0}
-        activePageRowNumber={null}
-        activeColumnNumber={0}
-        editedRowIds={['row-outside-page']}
-        mode="edit"
-        onNavigateNext={() => undefined}
-        onNavigatePrevious={() => undefined}
-      >
-        <div />
-      </RowEditorSidePanel>,
-    )
-
-    expect(screen.getByRole('heading', { name: 'Edit row' })).toBeTruthy()
+    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Previous row' }))
+    expect(await screen.findByText('Previous row K')).toBeTruthy()
+    fireEvent.mouseLeave(screen.getByRole('button', { name: 'Previous row' }))
+    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Next row' }))
+    expect(await screen.findByText('Next row J')).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: /^Edit row/ })).toBeNull()
   })
 
   it('controls whether successful inserts keep the form open', () => {
     const onInsertMoreEnabledChange = vi.fn()
     render(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={null}
-        activeRowIndex={0}
         editedRowIds={[]}
         mode="insert"
         onInsertMoreEnabledChange={onInsertMoreEnabledChange}
@@ -122,9 +72,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
   it('disables Insert more while table mutations are applying', () => {
     render(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={null}
-        activeRowIndex={0}
         editedRowIds={[]}
         mode="insert"
         mutationDisabled
@@ -145,9 +92,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
     const onConfirmDelete = vi.fn()
     render(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
         editedRowIds={['row-1']}
         mode="edit"
         onClose={vi.fn()}
@@ -170,9 +114,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
     const onClose = vi.fn()
     render(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
         editedRowIds={['row-1']}
         mode="edit"
         onClose={onClose}
@@ -201,9 +142,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
     const onClose = vi.fn()
     render(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
         editedRowIds={['row-1']}
         mode="edit"
         onClose={onClose}
@@ -224,9 +162,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
     const onConfirmDelete = vi.fn()
     const { rerender } = render(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
         editedRowIds={['row-1', 'row-2', 'row-3']}
         mode="edit"
         onClose={vi.fn()}
@@ -241,9 +176,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete 3 checked rows' }))
     rerender(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
         editedRowIds={['row-1']}
         mode="edit"
         mutationDisabled
@@ -260,9 +192,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
 
     rerender(
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
         editedRowIds={['row-1']}
         mode="edit"
         onClose={vi.fn()}
@@ -282,9 +211,6 @@ describe('RowEditorSidePanel dirty transitions', () => {
     const onConfirmDelete = vi.fn()
     const renderPanel = (mode: 'edit' | 'insert', editedRowIds: string[]) => (
       <RowEditorSidePanel
-        activeColumnNumber={0}
-        activePageRowNumber={1}
-        activeRowIndex={0}
         editedRowIds={editedRowIds}
         mode={mode}
         onClose={vi.fn()}

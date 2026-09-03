@@ -65,6 +65,11 @@ type DetailPaneState =
   | { mode: 'insert' }
   | { mode: 'rows'; activeRowId: TableRowId }
 
+type PendingPageRowNavigation = {
+  edge: 'first' | 'last'
+  page: number
+}
+
 /**
  * Builds the state and actions consumed by `TableView` for one runtime-selected Jazz table.
  *
@@ -147,6 +152,7 @@ export function useTableViewState({
   const activeFieldEditorTarget = activeFieldEditor?.target ?? null
   const [cellFocusRequest, setCellFocusRequest] = useState<DataGridFocusRequest | null>(null)
   const [selectedRowIds, setSelectedRowIds] = useState<TableRowId[]>([])
+  const pendingPageRowNavigationRef = useRef<PendingPageRowNavigation | null>(null)
   const [recentlyInsertedRowIds, setRecentlyInsertedRowIds] = useState<ReadonlySet<TableRowId>>(
     emptyRecentlyInsertedRowIds,
   )
@@ -272,15 +278,20 @@ export function useTableViewState({
     return [activeRowId]
   }, [activeRowId, selectedRowIds])
   const editedRowIds = activeRowId === null ? [] : effectiveSelectedRowIds
-  const activeRowIndex = activeRowId === null ? 0 : Math.max(editedRowIds.indexOf(activeRowId), 0)
   const validRowIds = useMemo(() => rows.map((row) => String(row.id)), [rows])
+  const navigablePageRowIds = useMemo(
+    () => validRowIds.filter((rowId) => disabledRowIds.has(rowId) === false),
+    [disabledRowIds, validRowIds],
+  )
+  const hasMultipleEditedRows = editedRowIds.length > 1
+  const navigationRowIds = hasMultipleEditedRows === true ? editedRowIds : navigablePageRowIds
+  const activeNavigationRowIndex = activeRowId === null ? -1 : navigationRowIds.indexOf(activeRowId)
   const visibleSelectedRowIds = useMemo(() => {
     const validRowIdSet = new Set(validRowIds)
     return effectiveSelectedRowIds.filter((rowId) => validRowIdSet.has(rowId) === true)
   }, [effectiveSelectedRowIds, validRowIds])
 
-  const activePageRowIndex =
-    activeRowId === null ? -1 : rows.findIndex((row) => String(row.id) === activeRowId)
+  const activePageRowIndex = activeRowId === null ? -1 : validRowIds.indexOf(activeRowId)
   const visibleActiveRow = activePageRowIndex < 0 ? null : (rows[activePageRowIndex] ?? null)
   // Keep the edited row available when filtering or pagination removes it from the visible query.
   const activeRowQuery = useTableRowById({
@@ -295,6 +306,7 @@ export function useTableViewState({
   /** Keeps the active draft while selected; otherwise opens the requested or first selected row. */
   const openRows = useCallback(
     (nextSelectedRowIds: TableRowId[], nextActiveRowId: TableRowId | null) => {
+      pendingPageRowNavigationRef.current = null
       const resolvedActiveRowId =
         nextActiveRowId !== null && nextSelectedRowIds.includes(nextActiveRowId) === true
           ? nextActiveRowId
@@ -377,9 +389,27 @@ export function useTableViewState({
     if (selectionScopeRef.current !== selectionScopeKey) {
       selectionScopeRef.current = selectionScopeKey
       resetSelection()
-      setDetailPane({ mode: 'closed' })
+      if (pendingPageRowNavigationRef.current?.page !== searchState.page) {
+        pendingPageRowNavigationRef.current = null
+        setDetailPane({ mode: 'closed' })
+      }
     }
-  }, [resetSelection, selectionScopeKey])
+  }, [resetSelection, searchState.page, selectionScopeKey])
+
+  useLayoutEffect(() => {
+    const pendingNavigation = pendingPageRowNavigationRef.current
+    if (
+      pendingNavigation === null ||
+      pendingNavigation.page !== searchState.page ||
+      query.isInitialLoading === true
+    ) {
+      return
+    }
+
+    const targetRowId =
+      pendingNavigation.edge === 'first' ? navigablePageRowIds[0] : navigablePageRowIds.at(-1)
+    openRows(targetRowId === undefined ? [] : [targetRowId], targetRowId ?? null)
+  }, [navigablePageRowIds, openRows, query.isInitialLoading, searchState.page])
 
   const handleSortChange = (columnId: string, direction: 'asc' | 'desc') => {
     void searchState.setSorting(columnId, direction)
@@ -433,14 +463,6 @@ export function useTableViewState({
     onColumnMove: handleColumnMove,
     onColumnOrderChange: setColumnOrder,
   })
-  const activePageRowNumber = activePageRowIndex < 0 ? null : activePageRowIndex + 1
-  const selectedColumnId = cellSelection.at(-1)?.anchorColumnId ?? null
-  const activeColumnNumber =
-    selectedColumnId === null
-      ? 0
-      : tablePreferences.columnOrder
-          .filter((columnId) => tablePreferences.columnVisibility[columnId] !== false)
-          .indexOf(selectedColumnId) + 1
   const selectedRow = visibleActiveRow ?? activeRow
   const settledActiveRowRef = useRef<{ row: DynamicTableRow; rowId: TableRowId } | null>(null)
   useLayoutEffect(() => {
@@ -463,6 +485,7 @@ export function useTableViewState({
   }, [detailPaneMode, retainedActiveRow, selectedRow])
 
   const closeDetailPane = () => {
+    pendingPageRowNavigationRef.current = null
     setDetailPane({ mode: 'closed' })
   }
 
@@ -501,6 +524,7 @@ export function useTableViewState({
   }
 
   const openInsert = () => {
+    pendingPageRowNavigationRef.current = null
     resetSelection()
     setDetailPane({ mode: 'insert' })
   }
@@ -546,13 +570,57 @@ export function useTableViewState({
     setDetailPane({ mode: 'rows', activeRowId: nextActiveRowId })
   }
 
+  const goToPageEdge = (page: number, edge: PendingPageRowNavigation['edge']) => {
+    pendingPageRowNavigationRef.current = { edge, page }
+    void searchState.setPage(page)
+  }
+
   const goToPreviousRow = () => {
-    goToRowIndex(Math.max(activeRowIndex - 1, 0))
+    if (hasMultipleEditedRows === true) {
+      goToRowIndex(Math.max(activeNavigationRowIndex - 1, 0))
+      return
+    }
+    if (activeNavigationRowIndex > 0) {
+      const previousRowId = navigablePageRowIds[activeNavigationRowIndex - 1]
+      openRows(previousRowId === undefined ? [] : [previousRowId], previousRowId ?? null)
+      return
+    }
+    if (searchState.page > 1) {
+      goToPageEdge(searchState.page - 1, 'last')
+    }
   }
 
   const goToNextRow = () => {
-    goToRowIndex(Math.min(activeRowIndex + 1, editedRowIds.length - 1))
+    if (hasMultipleEditedRows === true) {
+      goToRowIndex(Math.min(activeNavigationRowIndex + 1, editedRowIds.length - 1))
+      return
+    }
+    const nextRowId = navigablePageRowIds[activeNavigationRowIndex + 1]
+    if (nextRowId !== undefined) {
+      openRows([nextRowId], nextRowId)
+      return
+    }
+    if (query.hasNextPage === true) {
+      goToPageEdge(searchState.page + 1, 'first')
+    }
   }
+
+  const canNavigatePrevious =
+    activeNavigationRowIndex > 0 ||
+    (hasMultipleEditedRows === false && activeNavigationRowIndex === 0 && searchState.page > 1)
+  const canNavigateNext =
+    activeNavigationRowIndex >= 0 &&
+    (activeNavigationRowIndex < navigationRowIds.length - 1 ||
+      (hasMultipleEditedRows === false && query.hasNextPage === true))
+  const lastLoadedRowNumber = (searchState.page - 1) * searchState.pageSize + rows.length
+  const navigationLabel =
+    activeRowId === null || activeNavigationRowIndex < 0
+      ? null
+      : hasMultipleEditedRows === true
+        ? `${activeNavigationRowIndex + 1} / ${editedRowIds.length} selected`
+        : `${(searchState.page - 1) * searchState.pageSize + activePageRowIndex + 1} / ${
+            query.hasNextPage === true ? `${lastLoadedRowNumber + 1}+` : lastLoadedRowNumber
+          }`
 
   const handleFieldEditorCancel = () => {
     if (activeFieldEditorTarget === null) {
@@ -614,13 +682,13 @@ export function useTableViewState({
     rowEditorQueryLoading:
       activeRowId !== null && visibleActiveRow === null && activeRowQueryStatus === 'pending',
     rowEditor: {
-      activeColumnNumber,
-      activePageRowNumber,
       activeRowId,
-      activeRowIndex,
+      canNavigateNext,
+      canNavigatePrevious,
       editedRowIds,
       goToNextRow,
       goToPreviousRow,
+      navigationLabel,
       openInsert,
     },
     handleCellActivate: (target: DataGridCellTarget) => {

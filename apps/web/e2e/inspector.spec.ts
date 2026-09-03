@@ -522,6 +522,29 @@ test('clears all checked rows when closing the row pane', async ({ page }) => {
   await expect(secondRow).not.toBeChecked()
 })
 
+test('moves a single checked row with the row pane navigation', async ({ page }) => {
+  await connectToFixture(page)
+  await openTable(page, 'paginationRecords')
+
+  const firstRow = page.getByRole('checkbox', {
+    name: 'Select row 90000000-0000-4000-8000-000000000001',
+  })
+  const secondRow = page.getByRole('checkbox', {
+    name: 'Select row 90000000-0000-4000-8000-000000000002',
+  })
+  await firstRow.click()
+
+  await expect(page.getByRole('heading', { name: /^Edit row/ })).toHaveCount(0)
+  await expect(page.getByText('1 / 101+')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Previous row' })).toBeDisabled()
+  await page.getByRole('button', { name: 'Next row' }).focus()
+  await page.keyboard.press('j')
+
+  await expect(firstRow).not.toBeChecked()
+  await expect(secondRow).toBeChecked()
+  await expect(page.getByText('2 / 101+')).toBeVisible()
+})
+
 test('discards a row edit without persisting it', async ({ page }) => {
   await connectToFixture(page)
   await openTable(page, 'publicEditableRecords')

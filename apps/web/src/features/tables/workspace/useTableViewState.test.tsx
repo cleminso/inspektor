@@ -31,6 +31,7 @@ const searchState = {
   sortDirection: 'asc' as const,
 }
 let tableRowsOptions: unknown
+let queryHasNextPage = false
 let queryIsInitialLoading = false
 let queryRows = [
   { id: 'row-1', name: 'Ada' },
@@ -111,7 +112,7 @@ vi.mock('@tables/query/useTableRows', () => ({
     tableRowsOptions = options
     return {
       columns: tableColumns,
-      hasNextPage: false,
+      hasNextPage: queryHasNextPage,
       isInitialLoading: queryIsInitialLoading,
       isRefreshing: false,
       rows: queryRows,
@@ -134,6 +135,7 @@ beforeEach(() => {
   searchState.page = 1
   searchState.sortColumn = 'id'
   tableRowsOptions = undefined
+  queryHasNextPage = false
   queryIsInitialLoading = false
   queryRows = [
     { id: 'row-1', name: 'Ada' },
@@ -199,6 +201,127 @@ function TableViewInteractionHarness(): React.ReactElement {
 }
 
 describe('useTableViewState', () => {
+  it('moves a single checked row through the loaded grid rows', () => {
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    expect(result.current.rowEditor.canNavigatePrevious).toBe(false)
+    expect(result.current.rowEditor.canNavigateNext).toBe(true)
+    expect(result.current.rowEditor.navigationLabel).toBe('1 / 2')
+
+    act(() => result.current.rowEditor.goToNextRow())
+    expect(result.current.table.getSelectedRowIds()).toEqual(['row-2'])
+    expect(result.current.rowEditor.activeRowId).toBe('row-2')
+    expect(result.current.rowEditor.canNavigatePrevious).toBe(true)
+    expect(result.current.rowEditor.canNavigateNext).toBe(false)
+    expect(result.current.rowEditor.navigationLabel).toBe('2 / 2')
+
+    act(() => result.current.rowEditor.goToPreviousRow())
+    expect(result.current.table.getSelectedRowIds()).toEqual(['row-1'])
+    expect(result.current.rowEditor.activeRowId).toBe('row-1')
+  })
+
+  it('keeps multiple checked rows selected while navigating between them', () => {
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-1').toggleSelected(true)
+    })
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
+    })
+
+    expect(result.current.rowEditor.navigationLabel).toBe('2 / 2 selected')
+
+    act(() => result.current.rowEditor.goToPreviousRow())
+    expect(result.current.table.getSelectedRowIds()).toEqual(['row-1', 'row-2'])
+    expect(result.current.rowEditor.activeRowId).toBe('row-1')
+    expect(result.current.rowEditor.navigationLabel).toBe('1 / 2 selected')
+  })
+
+  it('continues single-row navigation on the adjacent page', () => {
+    queryHasNextPage = true
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
+    })
+    act(() => result.current.rowEditor.goToNextRow())
+
+    expect(setPage).toHaveBeenCalledWith(2)
+
+    searchState.page = 2
+    queryRows = []
+    queryIsInitialLoading = true
+    rerender()
+
+    expect(result.current.detailPaneMode).toBe('rows')
+    expect(result.current.rowEditor.activeRowId).toBe('row-2')
+
+    queryRows = [
+      { id: 'row-3', name: 'Katherine' },
+      { id: 'row-4', name: 'Margaret' },
+    ]
+    queryHasNextPage = false
+    queryIsInitialLoading = false
+    rerender()
+
+    expect(result.current.table.getSelectedRowIds()).toEqual(['row-3'])
+    expect(result.current.rowEditor.activeRowId).toBe('row-3')
+
+    act(() => result.current.rowEditor.goToPreviousRow())
+
+    expect(setPage).toHaveBeenLastCalledWith(1)
+
+    searchState.page = 1
+    queryRows = [
+      { id: 'row-1', name: 'Ada' },
+      { id: 'row-2', name: 'Grace' },
+    ]
+    queryHasNextPage = true
+    rerender()
+
+    expect(result.current.table.getSelectedRowIds()).toEqual(['row-2'])
+    expect(result.current.rowEditor.activeRowId).toBe('row-2')
+  })
+
+  it('cancels pending page navigation when the row pane closes', () => {
+    queryHasNextPage = true
+    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
+    })
+    act(() => result.current.rowEditor.goToNextRow())
+    act(() => result.current.closeRowEditor())
+
+    searchState.page = 2
+    queryRows = [{ id: 'row-3', name: 'Katherine' }]
+    queryHasNextPage = false
+    rerender()
+
+    expect(result.current.detailPaneMode).toBe('closed')
+    expect(result.current.table.getSelectedRowIds()).toEqual([])
+  })
+
+  it('closes the row pane when a navigation destination has no available rows', () => {
+    queryHasNextPage = true
+    const disabledRowIds = new Set(['row-3'])
+    const { result, rerender } = renderHook(() =>
+      useTableViewState({ disabledRowIds, tableName: 'accounts' }),
+    )
+    act(() => {
+      result.current.table.getRow('row-2').toggleSelected(true)
+    })
+    act(() => result.current.rowEditor.goToNextRow())
+
+    searchState.page = 2
+    queryRows = [{ id: 'row-3', name: 'Katherine' }]
+    queryHasNextPage = false
+    rerender()
+
+    expect(result.current.detailPaneMode).toBe('closed')
+    expect(result.current.table.getSelectedRowIds()).toEqual([])
+  })
+
   it('clears row selection and closes the edit pane after staged changes apply', () => {
     const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     act(() => {
@@ -779,40 +902,6 @@ describe('useTableViewState', () => {
 
     expect(document.activeElement).toBe(input)
     field.remove()
-  })
-
-  it('reports the active page row and selected data-column positions', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.table.getRow('row-2').toggleSelected(true)
-    })
-    rerender()
-
-    expect(result.current.rowEditor.activePageRowNumber).toBe(2)
-    expect(result.current.rowEditor.activeColumnNumber).toBe(0)
-
-    act(() => {
-      result.current.table.selectCellRange({
-        anchorRowId: 'row-2',
-        anchorColumnId: 'name',
-        focusRowId: 'row-2',
-        focusColumnId: 'id',
-      })
-    })
-
-    expect(result.current.rowEditor.activeColumnNumber).toBe(2)
-  })
-
-  it('does not report row zero when the edited row is outside the loaded page', () => {
-    const { result, rerender } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
-    act(() => {
-      result.current.table.getRow('row-1').toggleSelected(true)
-    })
-    rerender()
-    queryRows = []
-    rerender()
-
-    expect(result.current.rowEditor.activePageRowNumber).toBeNull()
   })
 
   it('opens the row pane without clearing cell focus', () => {
