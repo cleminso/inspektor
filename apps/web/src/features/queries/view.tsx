@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Accordion,
+  Badge,
   Box,
   Button,
   CheckboxGroup,
@@ -178,17 +179,17 @@ function getSchemaSourceScope(branches: readonly string[], environment: string) 
     return null
   }
 
-  const schemaVersions: string[] = []
+  const schemaVersions = new Set<string>()
   for (const source of sources) {
     if (source === null || source.branch !== first.branch) {
       return null
     }
-    schemaVersions.push(source.schemaVersion)
+    schemaVersions.add(source.schemaVersion)
   }
 
   return {
     branch: first.branch,
-    schemaVersions,
+    schemaVersions: [...schemaVersions],
   }
 }
 
@@ -255,15 +256,24 @@ function ObservationRow({
 function QueryDetails({
   details,
   environment,
+  selectedSchemaHash,
   onClose,
 }: {
   details: SelectedQueryDetails
   environment: string
+  selectedSchemaHash: string | null
   onClose: () => void
 }): React.ReactElement {
   const { capture, group } = details
   const queryData = useMemo(() => getQueryData(group.query), [group.query])
   const schemaSourceScope = getSchemaSourceScope(group.branches, environment)
+  const schemaVersions = schemaSourceScope?.schemaVersions ?? []
+  const selectedSchemaVersion = selectedSchemaHash?.slice(0, 12)
+  const primarySchemaVersion =
+    selectedSchemaVersion !== undefined && schemaVersions.includes(selectedSchemaVersion)
+      ? selectedSchemaVersion
+      : (schemaVersions[0] ?? null)
+  const hiddenSchemaVersions = schemaVersions.filter((version) => version !== primarySchemaVersion)
   const marker = getCaptureMarker(capture)
   const groupKeyLabel =
     group.groupKey.length > 12 ? `${group.groupKey.slice(0, 12)}…` : group.groupKey
@@ -384,18 +394,52 @@ function QueryDetails({
                 ) : (
                   <>
                     <ObservationRow
-                      label="Resolved sources"
-                      value={`${schemaSourceScope.schemaVersions.length} schema version${schemaSourceScope.schemaVersions.length === 1 ? '' : 's'}`}
-                    />
-                    <ObservationRow
                       label="Scope"
                       monospace
                       value={`${environment} / ${schemaSourceScope.branch}`}
                     />
                     <ObservationRow
                       label="Schema versions"
-                      monospace
-                      value={schemaSourceScope.schemaVersions.join(', ')}
+                      value={
+                        <Box
+                          as="span"
+                          alignItems="center"
+                          display="inline-flex"
+                          gap="xxs"
+                        >
+                          <Badge translate="no">{primarySchemaVersion!}</Badge>
+                          {hiddenSchemaVersions.length === 0 ? null : (
+                            <Tooltip.Root>
+                              <Tooltip.Trigger
+                                closeOnClick={false}
+                                render={
+                                  <Button
+                                    aria-label={`${hiddenSchemaVersions.length} additional schema ${hiddenSchemaVersions.length === 1 ? 'version' : 'versions'}`}
+                                    size="xs"
+                                    variant="ghost"
+                                  >
+                                    +{hiddenSchemaVersions.length}
+                                  </Button>
+                                }
+                              />
+                              <Tooltip.Content align="end">
+                                {hiddenSchemaVersions.map((version) => (
+                                  <Text
+                                    as="div"
+                                    color="inherit"
+                                    key={version}
+                                    monospace
+                                    translate="no"
+                                    variant="caption"
+                                  >
+                                    {version}
+                                  </Text>
+                                ))}
+                              </Tooltip.Content>
+                            </Tooltip.Root>
+                          )}
+                        </Box>
+                      }
                     />
                   </>
                 )}
@@ -651,7 +695,13 @@ function QueryTimeline({
   )
 }
 
-function ConnectedQueriesView({ connection }: { connection: StoredConnection }) {
+function ConnectedQueriesView({
+  connection,
+  selectedSchemaHash,
+}: {
+  connection: StoredConnection
+  selectedSchemaHash: string | null
+}) {
   const telemetry = useQuerySubscriptionsTelemetry(connection)
   const [filters, setFilters] = useState<QuerySubscriptionFilters>({
     tables: null,
@@ -825,6 +875,7 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
                 <QueryDetails
                   details={selectedDetails}
                   environment={connection.env}
+                  selectedSchemaHash={selectedSchemaHash}
                   onClose={closeDetails}
                 />
               </ResizablePanel>
@@ -837,7 +888,7 @@ function ConnectedQueriesView({ connection }: { connection: StoredConnection }) 
 }
 
 export function QueriesView(): React.ReactElement {
-  const { activeConnection } = useInspectorSessionState()
+  const { activeConnection, currentSchemaHash } = useInspectorSessionState()
 
   if (activeConnection === null) {
     return (
@@ -856,6 +907,7 @@ export function QueriesView(): React.ReactElement {
     <ConnectedQueriesView
       connection={activeConnection}
       key={getConnectionProfileToken(activeConnection)}
+      selectedSchemaHash={currentSchemaHash}
     />
   )
 }

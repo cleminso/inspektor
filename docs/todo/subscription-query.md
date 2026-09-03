@@ -13,6 +13,12 @@
 
 [03/09/26]
 
+- [x] Summarize resolved schema versions with one reported hash and a compact additional-version control instead of a redundant resolved-source count.
+- [x] Prioritize the Inspector-selected schema only when the query reports it, and deduplicate reported versions without changing their order.
+- [x] Expose hidden schema hashes in a tooltip available from pointer hover and keyboard focus.
+
+[03/09/26]
+
 - [x] Preserve the visible filter option catalogue while query history is intentionally empty.
 - [x] Explain cleared Live, paused, and refreshing states without restoring the initial loading surface.
 
@@ -144,6 +150,15 @@ No open product work is recorded for the implemented foundation.
 
 [03/09/26]
 
+- Schema-qualified query details use the schema-version pill and `+N` control as the version summary instead of repeating a resolved-source count.
+
+[03/09/26]
+
+- Query details never inject the Inspector-selected schema into telemetry that did not report it.
+- One reported schema renders without an additional-version control; multiple schemas keep hidden hashes discoverable through the `+N` control.
+
+[03/09/26]
+
 - Intentionally cleared history keeps the last-known filter catalogue visible until a completed capture replaces it.
 - Cleared-state feedback uses the persistent empty surface rather than animation or a transient notification.
 
@@ -220,6 +235,11 @@ No open product work is recorded for the implemented foundation.
 - [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Focused Queries view coverage verifies selected-schema prioritization, absent selected schemas, deduplication, one and multiple versions, and tooltip access from hover and keyboard focus.
+- [x] Inspector formatting, lint, typecheck, and affected tests pass.
 
 [03/09/26]
 

@@ -170,7 +170,7 @@ test('keeps query details scrolling inside the workspace query section', async (
   expect(Number.parseFloat(selectedOutline.width)).toBeGreaterThan(0)
   expect(selectedOutline.color).not.toBe('rgba(0, 0, 0, 0)')
   await expect(details.getByText('accounts-by-…')).toBeVisible()
-  await expect(details.getByText('6 schema versions')).toBeVisible()
+  await expect(details.getByRole('button', { name: '5 additional schema versions' })).toBeVisible()
   await expect(details.getByText(`${connection.env} / main`)).toBeVisible()
   await expect(details.locator('[data-slot="scroll-area"]')).toHaveCount(1)
   await expect(queryPanel.locator('[data-slot="scroll-area"]')).toHaveCount(1)

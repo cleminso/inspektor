@@ -6,6 +6,7 @@ import { borderRadii, spacing } from '../../tokens/value.stylex'
 export const shellLayoutStyles = stylex.create({
   root: {
     gap: spacing.xs,
+    // padding: spacing.xs,
     overflow: 'hidden',
     backgroundColor: surfaceColors.canvas,
     display: 'flex',

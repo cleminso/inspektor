@@ -15,6 +15,7 @@ import { QueriesView } from './view'
 
 const mocks = vi.hoisted(() => ({
   connection: null as StoredConnection | null,
+  currentSchemaHash: null as string | null,
   panelResize: null as (() => void) | null,
   telemetry: null as QuerySubscriptionsTelemetry | null,
 }))
@@ -22,7 +23,10 @@ const useQuerySubscriptionsTelemetry = vi.hoisted(() => vi.fn())
 
 vi.mock('@app/providers/inspectorProvider', () => ({
   getConnectionProfileToken: (connection: StoredConnection) => JSON.stringify(connection),
-  useInspectorSessionState: () => ({ activeConnection: mocks.connection }),
+  useInspectorSessionState: () => ({
+    activeConnection: mocks.connection,
+    currentSchemaHash: mocks.currentSchemaHash,
+  }),
 }))
 
 vi.mock('./useQuerySubscriptionsTelemetry', () => ({
@@ -116,6 +120,7 @@ beforeEach(() => {
     adminSecret: 'secret-1',
   }
   mocks.telemetry = telemetry([])
+  mocks.currentSchemaHash = null
   mocks.panelResize = null
   useQuerySubscriptionsTelemetry.mockImplementation(() => mocks.telemetry)
 })
@@ -291,8 +296,9 @@ describe('QueriesView', () => {
     expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
   })
 
-  it('presents schema-qualified branches as one resolved source scope', () => {
+  it('prioritizes the Inspector-selected schema when the query reports it', () => {
     mocks.connection = { ...mocks.connection!, env: 'local-dev' }
+    mocks.currentSchemaHash = 'e7ebacf3577c'.padEnd(64, '0')
     const branches = [
       'local-dev-7f43cb822ba5-main',
       'local-dev-e7ebacf3577c-main',
@@ -304,13 +310,93 @@ describe('QueriesView', () => {
     fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
     const details = screen.getByRole('complementary', { name: 'Query details' })
 
-    expect(within(details).getByText('Resolved sources')).toBeTruthy()
-    expect(within(details).getByText('3 schema versions')).toBeTruthy()
+    expect(within(details).queryByText('Resolved sources')).toBeNull()
     expect(within(details).getByText('Scope')).toBeTruthy()
     expect(within(details).getByText('local-dev / main')).toBeTruthy()
     expect(within(details).getByText('Schema versions')).toBeTruthy()
-    expect(within(details).getByText('7f43cb822ba5, e7ebacf3577c, d8881b20708b')).toBeTruthy()
+    expect(within(details).getByText('e7ebacf3577c').closest('[data-slot="badge"]')).toBeTruthy()
+    expect(
+      within(details).getByRole('button', { name: '2 additional schema versions' }).textContent,
+    ).toBe('+2')
     expect(within(details).queryByText('Branches')).toBeNull()
+  })
+
+  it('uses the first reported schema without injecting an absent Inspector selection', () => {
+    mocks.currentSchemaHash = 'a'.repeat(64)
+    const branches = ['test-7f43cb822ba5-main', 'test-e7ebacf3577c-main']
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
+    render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const details = screen.getByRole('complementary', { name: 'Query details' })
+
+    expect(within(details).getByText('7f43cb822ba5').closest('[data-slot="badge"]')).toBeTruthy()
+    expect(within(details).queryByText('aaaaaaaaaaaa')).toBeNull()
+  })
+
+  it('deduplicates schema versions while preserving their reported order', async () => {
+    const branches = [
+      'test-7f43cb822ba5-main',
+      'test-e7ebacf3577c-main',
+      'test-7f43cb822ba5-main',
+      'test-d8881b20708b-main',
+      'test-e7ebacf3577c-main',
+    ]
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
+    render(
+      <Tooltip.Provider delay={0}>
+        <QueriesView />
+      </Tooltip.Provider>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const details = screen.getByRole('complementary', { name: 'Query details' })
+    const additionalVersions = within(details).getByRole('button', {
+      name: '2 additional schema versions',
+    })
+    fireEvent.mouseEnter(additionalVersions)
+
+    const tooltip = (await screen.findByText('e7ebacf3577c')).closest(
+      '[data-slot="tooltip-content"]',
+    )!
+    expect([...tooltip.children].map(({ textContent }) => textContent)).toEqual([
+      'e7ebacf3577c',
+      'd8881b20708b',
+    ])
+  })
+
+  it('omits the additional-version control when one schema version is reported', () => {
+    mocks.currentSchemaHash = '7f43cb822ba5'.padEnd(64, '0')
+    const branches = ['test-7f43cb822ba5-main']
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
+    render(<QueriesView />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const details = screen.getByRole('complementary', { name: 'Query details' })
+
+    expect(within(details).getByText('7f43cb822ba5').closest('[data-slot="badge"]')).toBeTruthy()
+    expect(
+      within(details).queryByRole('button', { name: /additional schema versions/iu }),
+    ).toBeNull()
+  })
+
+  it('opens the additional schema versions tooltip from keyboard focus', async () => {
+    const branches = ['test-7f43cb822ba5-main', 'test-e7ebacf3577c-main']
+    mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])
+    render(
+      <Tooltip.Provider delay={0}>
+        <QueriesView />
+      </Tooltip.Provider>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: /Open accounts-by-name at/ }))
+    const additionalVersions = screen.getByRole('button', {
+      name: '1 additional schema version',
+    })
+    fireEvent.focus(additionalVersions)
+
+    expect(additionalVersions.tabIndex).toBe(0)
+    expect(await screen.findByText('e7ebacf3577c')).toBeTruthy()
   })
 
   it('does not claim an unreported source scope includes every branch', () => {
