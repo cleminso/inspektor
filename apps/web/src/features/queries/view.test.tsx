@@ -93,9 +93,11 @@ function telemetry(
   const inferredState = timeline.latestSuccessfulCapture === null ? 'failed-initial-load' : 'ready'
   return {
     history,
+    isPaused: false,
     timeline,
     state: { kind: state ?? inferredState },
     refresh: vi.fn(),
+    setPaused: vi.fn(),
   }
 }
 
@@ -471,15 +473,13 @@ describe('QueriesView', () => {
     )
   })
 
-  it('announces refreshing and stale retained history without replacing the timeline', () => {
+  it('keeps routine refresh silent and stale retained history visible without replacing the timeline', () => {
     const successful = success('capture-1', 1_000, [accountsGroup])
     mocks.telemetry = telemetry([successful], 'refreshing')
     const view = render(<QueriesView />)
     const toolbar = screen.getByRole('toolbar', { name: 'Query subscription controls' })
 
-    expect(within(toolbar).getByRole('status').textContent).toContain(
-      'Refreshing query subscriptions',
-    )
+    expect(screen.queryByText(/Refreshing query subscriptions/u)).toBeNull()
     expect(screen.getByRole('table', { name: 'Query subscriptions' })).toBeTruthy()
 
     mocks.telemetry = telemetry(
@@ -514,12 +514,58 @@ describe('QueriesView', () => {
     expect(refresh).toHaveBeenCalledOnce()
   })
 
+  it('presents live polling as a persistent toggle with action guidance', async () => {
+    const setPaused = vi.fn()
+    mocks.telemetry = {
+      ...telemetry([success('capture-1', 1_000, [accountsGroup])]),
+      setPaused,
+    }
+    const view = render(
+      <Tooltip.Provider delay={0}>
+        <QueriesView />
+      </Tooltip.Provider>,
+    )
+
+    const live = screen.getByRole('button', { name: 'Live' })
+    expect(live.getAttribute('aria-pressed')).toBe('true')
+    expect(live.getAttribute('data-variant')).toBe('primary')
+    fireEvent.mouseEnter(live)
+    expect(await screen.findByText('Pause automatic refresh')).toBeTruthy()
+    fireEvent.click(live)
+    expect(setPaused).toHaveBeenLastCalledWith(true)
+
+    mocks.telemetry = { ...mocks.telemetry, isPaused: true }
+    view.rerender(
+      <Tooltip.Provider delay={0}>
+        <QueriesView />
+      </Tooltip.Provider>,
+    )
+
+    expect(live.getAttribute('aria-pressed')).toBe('false')
+    expect(live.getAttribute('data-variant')).toBe('ghost')
+    fireEvent.mouseEnter(live)
+    expect(await screen.findByText('Resume automatic refresh')).toBeTruthy()
+    fireEvent.click(live)
+    expect(setPaused).toHaveBeenLastCalledWith(false)
+  })
+
+  it('keeps Refresh available while paused and disables it only during a request', () => {
+    const history = [success('capture-1', 1_000, [accountsGroup])]
+    mocks.telemetry = { ...telemetry(history), isPaused: true }
+    const view = render(<QueriesView />)
+
+    const refresh = screen.getByRole('button', { name: 'Refresh' })
+    expect(refresh.hasAttribute('disabled')).toBe(false)
+
+    mocks.telemetry = { ...mocks.telemetry, state: { kind: 'refreshing' } }
+    view.rerender(<QueriesView />)
+    expect(refresh.hasAttribute('disabled')).toBe(true)
+  })
+
   it('keeps refreshing and failed empty snapshots distinct from confirmed emptiness', () => {
     const empty = success('capture-1', 1_000, [])
     mocks.telemetry = telemetry([empty], 'refreshing')
     const view = render(<QueriesView />)
-
-    expect(screen.getByRole('status').textContent).toContain('Refreshing query subscriptions')
 
     mocks.telemetry = telemetry(
       [empty, { kind: 'failure', id: 'capture-2', attemptedAt: 2_000, error: { kind: 'network' } }],

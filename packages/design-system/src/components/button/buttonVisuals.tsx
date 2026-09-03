@@ -121,7 +121,7 @@ export function getButtonVisualStyles({
     hasSuffix === true && buttonStyles.withSuffix,
     variantStyles[variant],
     square === true && buttonStyles.square,
-    pressed === true && buttonStyles.pressed,
+    pressed === true && variant !== 'primary' && buttonStyles.pressed,
     expanded === true && expandedStyles[variant],
     radiusStyles[radius],
     orientation !== null && buttonGroupStyles.member,

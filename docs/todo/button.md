@@ -12,6 +12,10 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Preserve the on-accent foreground when a primary Button exposes a persistent pressed state.
+
 [27/08/26]
 
 - [x] Preserve each Button variant's background, border, and foreground when disabled while reducing the whole control to 60% opacity.
@@ -114,6 +118,10 @@
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- Primary toggle Buttons retain their filled variant contrast instead of applying the bare selected-text treatment.
+
 [27/08/26]
 
 - Disabled Buttons retain their variant identity and use component opacity for reduced emphasis instead of replacing every variant with one neutral surface.
@@ -162,6 +170,11 @@
 - None.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Focused Button coverage verifies primary pressed and unpressed controls share the same variant presentation.
+- [x] Design-system and Inspector formatting, lint, typecheck, build, and package tests pass.
 
 [27/08/26]
 

@@ -127,6 +127,95 @@ describe('useQuerySubscriptionsTelemetry', () => {
     expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(3)
   })
 
+  it('clears scheduled polling while paused and restores it after a fresh resumed snapshot', async () => {
+    jazzMocks.fetchServerSubscriptions.mockImplementation(() =>
+      Promise.resolve({
+        appId: 'app-1',
+        generatedAt: jazzMocks.fetchServerSubscriptions.mock.calls.length,
+        queries: [],
+      }),
+    )
+
+    const { result } = renderHook(() => useQuerySubscriptionsTelemetry(credentials))
+    await act(async () => {})
+
+    expect(result.current.isPaused).toBe(false)
+    act(() => result.current.setPaused(true))
+    expect(result.current.isPaused).toBe(true)
+
+    await act(async () => vi.advanceTimersByTimeAsync(20_000))
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(1)
+
+    act(() => result.current.setPaused(false))
+    expect(result.current.isPaused).toBe(false)
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(2)
+    await act(async () => {})
+
+    await act(async () => vi.advanceTimersByTimeAsync(20_000))
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(3)
+  })
+
+  it('lets an in-flight request finish after pausing without scheduling another', async () => {
+    const request = deferred<unknown>()
+    jazzMocks.fetchServerSubscriptions.mockReturnValueOnce(request.promise)
+    const { result } = renderHook(() => useQuerySubscriptionsTelemetry(credentials))
+
+    act(() => result.current.setPaused(true))
+    await act(async () => {
+      request.resolve({ appId: 'app-1', generatedAt: 1, queries: [] })
+      await request.promise
+    })
+    await act(async () => vi.advanceTimersByTimeAsync(20_000))
+
+    expect(result.current.state.kind).toBe('ready')
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(1)
+  })
+
+  it('refreshes manually while paused without resuming automatic polling', async () => {
+    jazzMocks.fetchServerSubscriptions.mockResolvedValue({
+      appId: 'app-1',
+      generatedAt: 1,
+      queries: [],
+    })
+    const { result } = renderHook(() => useQuerySubscriptionsTelemetry(credentials))
+    await act(async () => {})
+
+    act(() => result.current.setPaused(true))
+    act(() => result.current.refresh())
+    await act(async () => {})
+    await act(async () => vi.advanceTimersByTimeAsync(20_000))
+
+    expect(result.current.isPaused).toBe(true)
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(2)
+  })
+
+  it('queues one fresh snapshot when resumed during an in-flight request', async () => {
+    const first = deferred<unknown>()
+    const second = deferred<unknown>()
+    jazzMocks.fetchServerSubscriptions
+      .mockReturnValueOnce(first.promise)
+      .mockReturnValueOnce(second.promise)
+    const { result } = renderHook(() => useQuerySubscriptionsTelemetry(credentials))
+
+    act(() => result.current.setPaused(true))
+    act(() => result.current.setPaused(false))
+    act(() => result.current.setPaused(false))
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      first.resolve({ appId: 'app-1', generatedAt: 1, queries: [] })
+      await first.promise
+    })
+
+    expect(jazzMocks.fetchServerSubscriptions).toHaveBeenCalledTimes(2)
+    expect(result.current.state.kind).toBe('refreshing')
+
+    await act(async () => {
+      second.resolve({ appId: 'app-1', generatedAt: 2, queries: [] })
+      await second.promise
+    })
+  })
+
   it('retains successful history when a manual refresh fails', async () => {
     jazzMocks.fetchServerSubscriptions
       .mockResolvedValueOnce({ appId: 'app-1', generatedAt: 10, queries: [accountsGroup] })

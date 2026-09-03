@@ -11,6 +11,21 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Keep the primary Live label legible while its pressed state communicates active polling.
+
+[02/09/26]
+
+- [x] Give active Live mode a primary treatment and paused mode a neutral ghost treatment.
+- [x] Explain the Live toggle action with pause and resume tooltips.
+
+[02/09/26]
+
+- [x] Add a view-local Live toggle for pausing and resuming automatic query-subscription polling.
+- [x] Keep manual refresh available while paused and prevent resumed polling from overlapping an active request.
+- [x] Keep routine refreshes silent while preserving visible retained-history failures.
+
 [02/09/26]
 
 - [x] Add Table, Branch, and Propagation filters to the Queries left dock with the shared accordion and checkbox-group components.
@@ -118,6 +133,17 @@ No open product work is recorded for the implemented foundation.
 
 [02/09/26]
 
+- Live uses the selected-control accent rather than success green because it controls a polling mode instead of reporting a successful outcome.
+- The Live tooltip describes the action clicking will perform without adding a separate paused-status message.
+
+[02/09/26]
+
+- Live is pressed while automatic polling is active and unpressed while polling is paused.
+- Pausing lets an active request settle without scheduling another; resuming requests a fresh snapshot before polling continues.
+- Manual refresh remains independent from Live state and does not resume automatic polling.
+
+[02/09/26]
+
 - Query filters remain route-local presentation state and never change `fetchServerSubscriptions` requests or retained telemetry.
 - A section with every available option checked is unrestricted; “Only” creates a restriction and “Check all” removes it.
 - New telemetry options are checked automatically while a section is unrestricted and remain unchecked while an explicit restriction persists across temporarily unavailable options.
@@ -173,6 +199,22 @@ No open product work is recorded for the implemented foundation.
 - [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Focused Button and Queries view coverage verifies primary Live contrast and toggle behavior.
+- [x] Design-system and Inspector formatting, lint, typecheck, build, and package tests pass.
+
+[02/09/26]
+
+- [x] Focused view coverage verifies active and paused Live treatments and dynamic action guidance.
+- [x] Inspector formatting, lint, typecheck, build, and package tests pass.
+
+[02/09/26]
+
+- [x] Focused hook coverage verifies active and paused states, in-flight pausing, paused manual refresh, resumed snapshots, and overlap prevention.
+- [x] Focused view coverage verifies Live toggle semantics, Refresh availability, retained-history failures, and silent routine refreshes.
+- [x] Inspector formatting, lint, typecheck, build, and package tests pass.
 
 [02/09/26]
 

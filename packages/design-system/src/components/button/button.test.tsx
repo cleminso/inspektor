@@ -20,6 +20,8 @@ describe('Button', () => {
         <Button iconOnly aria-label="Toggle panel" aria-pressed>
           <Button.Glyph artwork={TestArtwork} />
         </Button>
+        <Button aria-pressed>Primary toggle</Button>
+        <Button>Primary action</Button>
         <Button glyphSize="compact" iconOnly aria-label="Toggle dock" size="xs">
           <Button.Glyph artwork={TestArtwork} />
         </Button>
@@ -27,12 +29,15 @@ describe('Button', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Toggle panel' })
+    const primaryToggle = screen.getByRole('button', { name: 'Primary toggle' })
+    const primaryAction = screen.getByRole('button', { name: 'Primary action' })
     const icon = button.querySelector('[data-slot="icon"]')
     const compactButton = screen.getByRole('button', { name: 'Toggle dock' })
 
     expect(button.getAttribute('data-icon-only')).toBe('')
     expect(button.getAttribute('data-pressed')).toBe('')
     expect(button.getAttribute('aria-pressed')).toBe('true')
+    expect(primaryToggle.className).toBe(primaryAction.className)
     expect(icon?.getAttribute('data-size')).toBe('s')
     expect(icon?.parentElement?.getAttribute('aria-hidden')).toBe('true')
     expect(compactButton.getAttribute('data-glyph-size')).toBe('compact')

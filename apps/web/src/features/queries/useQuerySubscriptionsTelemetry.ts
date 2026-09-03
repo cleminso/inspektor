@@ -24,9 +24,11 @@ export type QuerySubscriptionsTelemetryState =
 
 export interface QuerySubscriptionsTelemetry {
   history: readonly QuerySubscriptionsCapture[]
+  isPaused: boolean
   timeline: QuerySubscriptionsTimeline
   state: QuerySubscriptionsTelemetryState
   refresh: () => void
+  setPaused: (paused: boolean) => void
 }
 
 /**
@@ -40,20 +42,34 @@ export function useQuerySubscriptionsTelemetry(
   const [latestRequestKind, setLatestRequestKind] = useState<
     QuerySubscriptionsCapture['kind'] | null
   >(null)
+  const [isPaused, setIsPaused] = useState(false)
   const [isRequesting, setIsRequesting] = useState(false)
   const refreshRef = useRef<(() => void) | null>(null)
+  const setPausedRef = useRef<((paused: boolean) => void) | null>(null)
   const { adminSecret, appId, serverUrl } = connection
 
   const refresh = useCallback(() => refreshRef.current?.(), [])
+  const setPaused = useCallback((paused: boolean) => setPausedRef.current?.(paused), [])
 
   useEffect(() => {
     let active = true
     let inFlight = false
+    let paused = false
+    let requestAfterFlight = false
     let requestCount = 0
     let timer: number | null = null
 
+    const clearTimer = () => {
+      if (timer !== null) {
+        window.clearTimeout(timer)
+        timer = null
+      }
+    }
+
     const schedule = () => {
-      timer = window.setTimeout(startRequest, SERVER_SUBSCRIPTIONS_POLL_MS)
+      if (paused === false) {
+        timer = window.setTimeout(startRequest, SERVER_SUBSCRIPTIONS_POLL_MS)
+      }
     }
 
     const commit = (capture: QuerySubscriptionsCapture) => {
@@ -68,10 +84,7 @@ export function useQuerySubscriptionsTelemetry(
         return
       }
 
-      if (timer !== null) {
-        window.clearTimeout(timer)
-        timer = null
-      }
+      clearTimer()
 
       inFlight = true
       requestCount += 1
@@ -124,20 +137,44 @@ export function useQuerySubscriptionsTelemetry(
 
           inFlight = false
           setIsRequesting(false)
-          schedule()
+          if (requestAfterFlight === true) {
+            requestAfterFlight = false
+            startRequest()
+          } else {
+            schedule()
+          }
         })
     }
 
+    const setPaused = (nextPaused: boolean) => {
+      if (active === false || paused === nextPaused) {
+        return
+      }
+
+      paused = nextPaused
+      setIsPaused(nextPaused)
+      if (nextPaused === true) {
+        requestAfterFlight = false
+        clearTimer()
+      } else if (inFlight === true) {
+        requestAfterFlight = true
+      } else {
+        startRequest()
+      }
+    }
+
     refreshRef.current = startRequest
+    setPausedRef.current = setPaused
     startRequest()
 
     return () => {
       active = false
-      if (timer !== null) {
-        window.clearTimeout(timer)
-      }
+      clearTimer()
       if (refreshRef.current === startRequest) {
         refreshRef.current = null
+      }
+      if (setPausedRef.current === setPaused) {
+        setPausedRef.current = null
       }
     }
   }, [adminSecret, appId, serverUrl])
@@ -156,8 +193,10 @@ export function useQuerySubscriptionsTelemetry(
 
   return {
     history,
+    isPaused,
     timeline,
     state,
     refresh,
+    setPaused,
   }
 }

@@ -477,13 +477,12 @@ function QueryTimeline({
   timeline: QuerySubscriptionsTimeline
   onSelect: (selection: QuerySelection) => void
 }): React.ReactElement {
-  const { history, refresh, state } = telemetry
+  const { history, isPaused, refresh, setPaused, state } = telemetry
   const isRefreshing = state.kind === 'refreshing'
   const staleHistory = state.kind === 'stale-history'
 
   return (
     <Box
-      aria-busy={isRefreshing}
       flex={1}
       flexDirection="column"
       height="full"
@@ -514,10 +513,6 @@ function QueryTimeline({
                 Couldn't refresh query subscriptions. Showing retained history.
               </Text>
             </Box>
-          ) : isRefreshing === true ? (
-            <Box role="status">
-              <Text color="muted">Refreshing query subscriptions…</Text>
-            </Box>
           ) : null}
         </Box>
         <Button
@@ -529,6 +524,23 @@ function QueryTimeline({
         >
           Refresh
         </Button>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={
+              <Button
+                aria-pressed={isPaused === false}
+                size="s"
+                variant={isPaused === true ? 'ghost' : 'primary'}
+                onClick={() => setPaused(isPaused === false)}
+              >
+                Live
+              </Button>
+            }
+          />
+          <Tooltip.Content>
+            {isPaused === true ? 'Resume automatic refresh' : 'Pause automatic refresh'}
+          </Tooltip.Content>
+        </Tooltip.Root>
       </Box>
       {timeline.lanes.length === 0 ? (
         <Box
