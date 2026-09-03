@@ -6,7 +6,6 @@ import {
   type ComboboxContentProps,
   type ComboboxEmptyProps,
   type ComboboxItemProps,
-  type ComboboxItemTextProps,
   type ComboboxListProps,
   type ComboboxPopupWidth,
   type ComboboxRootProps,
@@ -88,7 +87,6 @@ export type ContextSwitcherViewportProps = PropsWithChildren<{
 export type ContextSwitcherEmptyProps = ComboboxEmptyProps
 export type ContextSwitcherStatusProps = ComboboxStatusProps
 export type ContextSwitcherListProps = ComboboxListProps
-export type ContextSwitcherItemTextProps = ComboboxItemTextProps
 export type ContextSwitcherFooterProps = PropsWithChildren
 
 export type ContextSwitcherItemProps<Value> = ComboboxItemProps<Value>
@@ -244,10 +242,6 @@ function ContextSwitcherItem<Value>({
   )
 }
 
-function ContextSwitcherItemText(props: ContextSwitcherItemTextProps) {
-  return <Combobox.ItemText {...props} />
-}
-
 function ContextSwitcherFooter({ children }: ContextSwitcherFooterProps) {
   return (
     <>
@@ -268,6 +262,5 @@ export const ContextSwitcher = Object.assign(ContextSwitcherRoot, {
   Status: ContextSwitcherStatus,
   List: ContextSwitcherList,
   Item: ContextSwitcherItem,
-  ItemText: ContextSwitcherItemText,
   Footer: ContextSwitcherFooter,
 })

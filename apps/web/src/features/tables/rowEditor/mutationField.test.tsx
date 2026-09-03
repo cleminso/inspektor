@@ -105,13 +105,11 @@ describe('MutationField', () => {
       input: { mode: 'omitted', text: 'web' },
     })
 
-    const defaultControl = screen
-      .getByRole('checkbox', { name: 'Use default for Origin' })
-      .closest('[data-slot="input-group-checkbox"]')
-    if (defaultControl === null) throw new Error('Expected DEFAULT input-group control.')
-    expect(defaultControl.getAttribute('aria-description')).toBe(
-      'Create this row with the default value: "web". Turn off DEFAULT to enter a different value.',
-    )
+    screen.getByRole('checkbox', {
+      name: 'Use default for Origin',
+      description:
+        'Create this row with the default value: "web". Turn off DEFAULT to enter a different value.',
+    })
   })
 
   it('explains that NULL bypasses the schema default', () => {
@@ -125,13 +123,11 @@ describe('MutationField', () => {
       initialValue: null,
     })
 
-    const nullControl = screen
-      .getByRole('checkbox', { name: 'Set Origin to NULL' })
-      .closest('[data-slot="input-group-checkbox"]')
-    if (nullControl === null) throw new Error('Expected NULL input-group control.')
-    expect(nullControl.getAttribute('aria-description')).toBe(
-      'Save this field as NULL, even when the schema defines a default. Turn off NULL to enter a value.',
-    )
+    screen.getByRole('checkbox', {
+      name: 'Set Origin to NULL',
+      description:
+        'Schema default for new rows: "web". Editing this field changes this row only. Save this field as NULL, even when the schema defines a default. Turn off NULL to enter a value.',
+    })
   })
 
   it('presents nullable structured fields as exclusive Value and NULL modes', () => {
@@ -387,5 +383,75 @@ describe('MutationField', () => {
 
     expect(screen.getByRole('button', { name: 'True' }).getAttribute('aria-pressed')).toBe('false')
     expect(screen.getByRole('button', { name: 'False' }).getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('describes an invalid Boolean control with its rendered guidance and error', () => {
+    renderMutationField({
+      column: column('active', { type: 'Boolean' }, { default: { type: 'Boolean', value: true } }),
+      error: 'Choose a value.',
+      input: { mode: 'value', text: '' },
+      sourceUnavailable: true,
+    })
+
+    const control = screen.getByRole('group', {
+      name: 'Active',
+      description:
+        'Unavailable source value. Schema default for new rows: true. Editing this field changes this row only. Choose a value.',
+    })
+    expect(control.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('describes structured mode and editor controls with rendered guidance and errors', () => {
+    renderMutationField({
+      canOmit: true,
+      column: column('settings', { type: 'Json' }, { default: { type: 'Text', value: '{}' } }),
+      error: 'JSON value is invalid.',
+      input: { mode: 'value', text: '{' },
+    })
+
+    const modeControl = screen.getByRole('group', {
+      name: 'Settings value mode',
+      description: 'Entered values override the schema default: {}.',
+    })
+    const editor = screen.getByRole('textbox', {
+      name: 'Settings',
+      description: 'Entered values override the schema default: {}. JSON value is invalid.',
+    })
+
+    expect(modeControl.getAttribute('aria-invalid')).toBeNull()
+    expect(editor.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('describes an invalid date trigger with rendered guidance and errors', () => {
+    renderMutationField({
+      column: column(
+        'createdAt',
+        { type: 'Timestamp' },
+        { default: { type: 'Timestamp', value: 0 } },
+      ),
+      error: 'Choose a date.',
+      input: { mode: 'value', text: '0' },
+    })
+
+    const trigger = screen.getByRole('button', {
+      name: 'CreatedAt',
+      description:
+        /^Schema default for new rows: .+ Editing this field changes this row only\. Choose a date\./,
+    })
+    expect(trigger.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('describes a read-only JSON tree when fallback rendering is required', () => {
+    renderMutationField({
+      column: column('settings', { type: 'Json' }),
+      input: { mode: 'value', text: 'unavailable' },
+      initialValue: new (class UnsupportedValue {})(),
+      readOnlyReason: 'binary',
+    })
+
+    screen.getByRole('tree', {
+      name: 'Settings value',
+      description: 'Read-only: binary field',
+    })
   })
 })

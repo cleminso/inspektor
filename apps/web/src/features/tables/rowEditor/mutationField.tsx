@@ -67,6 +67,7 @@ interface NullInputGroupCheckboxProps {
 type StructuredValueMode = 'default' | 'null' | 'value'
 
 interface StructuredValueModeControlProps {
+  describedBy?: string
   label: string
   mode: StructuredValueMode
   modes: readonly StructuredValueMode[]
@@ -74,6 +75,7 @@ interface StructuredValueModeControlProps {
 }
 
 function StructuredValueModeControl({
+  describedBy,
   label,
   mode,
   modes,
@@ -81,6 +83,7 @@ function StructuredValueModeControl({
 }: StructuredValueModeControlProps): React.ReactElement {
   return (
     <ToggleGroup<StructuredValueMode>
+      aria-describedby={describedBy}
       aria-label={`${label} value mode`}
       size="s"
       value={[mode]}
@@ -184,6 +187,24 @@ export function MutationField({
   const isReadOnly = readOnlyReason !== null
   const isEditableStructuredColumn = isStructured === true && isReadOnly === false
   const hasFieldError = error !== undefined && error.length > 0
+  const showsReadOnlyDescription = readOnlyReason === 'binary'
+  const showsSourceUnavailableDescription =
+    sourceUnavailable === true && input.mode === 'value' && input.text.length === 0
+  const showsDefaultDescription = column.default !== undefined && input.mode !== 'omitted'
+  const readOnlyDescriptionId = `${fieldId}-read-only-description`
+  const sourceUnavailableDescriptionId = `${fieldId}-source-unavailable-description`
+  const defaultDescriptionId = `${fieldId}-default-description`
+  const errorId = `${fieldId}-error`
+  const descriptionIds = [
+    showsReadOnlyDescription === true ? readOnlyDescriptionId : null,
+    showsSourceUnavailableDescription === true ? sourceUnavailableDescriptionId : null,
+    showsDefaultDescription === true ? defaultDescriptionId : null,
+  ].filter((id) => id !== null)
+  const guidanceDescribedBy = descriptionIds.join(' ') || undefined
+  const describedBy =
+    [...descriptionIds, hasFieldError === true ? errorId : null]
+      .filter((id) => id !== null)
+      .join(' ') || undefined
   const structuredPresentation = useMemo(
     () =>
       isStructured === true && input.mode !== 'null' && readOnlyReason !== null
@@ -314,6 +335,7 @@ export function MutationField({
         </Box>
         {isEditableStructuredColumn === true && (canOmit === true || column.nullable === true) ? (
           <StructuredValueModeControl
+            describedBy={guidanceDescribedBy}
             label={label}
             mode={structuredValueMode}
             modes={structuredValueModes}
@@ -351,6 +373,8 @@ export function MutationField({
         )
       ) : isBooleanColumn === true ? (
         <ToggleGroup
+          aria-describedby={describedBy}
+          aria-invalid={hasFieldError === true ? true : undefined}
           value={
             input.mode === 'null'
               ? ['null']
@@ -434,6 +458,7 @@ export function MutationField({
         <JsonView
           accessibilityLabel={`${label} value`}
           data={structuredPresentation.fallback}
+          describedBy={describedBy}
         />
       ) : isStructured === true ? (
         <>
@@ -452,7 +477,7 @@ export function MutationField({
               <CodeEditor
                 id={fieldId}
                 labelledBy={fieldLabelId}
-                describedBy={hasFieldError === true ? `${fieldId}-error` : undefined}
+                describedBy={describedBy}
                 expanded={expanded}
                 focusOnMount={focusOnMount}
                 invalid={hasFieldError}
@@ -496,6 +521,8 @@ export function MutationField({
               <DatePicker.Trigger
                 ref={controlRef}
                 id={fieldId}
+                aria-describedby={describedBy}
+                aria-invalid={hasFieldError === true ? true : undefined}
                 label={label}
               >
                 {timestampValue === undefined ? (
@@ -561,14 +588,16 @@ export function MutationField({
         </Box>
       )}
 
-      {readOnlyReason === 'binary' ? (
-        <Field.Description>Read-only: binary field</Field.Description>
+      {showsReadOnlyDescription === true ? (
+        <Field.Description id={readOnlyDescriptionId}>Read-only: binary field</Field.Description>
       ) : null}
-      {sourceUnavailable === true && input.mode === 'value' && input.text.length === 0 ? (
-        <Field.Description>Unavailable source value.</Field.Description>
+      {showsSourceUnavailableDescription === true ? (
+        <Field.Description id={sourceUnavailableDescriptionId}>
+          Unavailable source value.
+        </Field.Description>
       ) : null}
-      {column.default !== undefined && input.mode !== 'omitted' ? (
-        <Field.Description>
+      {showsDefaultDescription === true ? (
+        <Field.Description id={defaultDescriptionId}>
           {canOmit === true
             ? input.mode === 'null'
               ? `NULL overrides the schema default: ${defaultDescriptionValue}.`
@@ -578,7 +607,7 @@ export function MutationField({
       ) : null}
       {hasFieldError === true ? (
         <Field.Error
-          id={`${fieldId}-error`}
+          id={errorId}
           match
         >
           {error}

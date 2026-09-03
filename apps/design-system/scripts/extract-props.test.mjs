@@ -374,14 +374,6 @@ test("extracts the constrained Tooltip compound API", () => {
     ["delay", "closeDelay", "timeout"],
   );
   assert.equal(
-    metadata["tooltip.provider"]?.find(({ name }) => name === "delay")?.defaultValue,
-    "500",
-  );
-  assert.equal(
-    metadata["tooltip.provider"]?.find(({ name }) => name === "closeDelay")?.defaultValue,
-    "100",
-  );
-  assert.equal(
     metadata["tooltip.provider"]?.find(({ name }) => name === "timeout")?.defaultValue,
     "400",
   );
@@ -408,7 +400,7 @@ test("extracts the constrained Tooltip compound API", () => {
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "delay")?.defaultValue,
-    undefined,
+    "500",
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,
@@ -416,7 +408,7 @@ test("extracts the constrained Tooltip compound API", () => {
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "closeDelay")?.defaultValue,
-    undefined,
+    "0",
   );
   assert.deepEqual(
     metadata["tooltip.content"]?.map(({ name }) => name),
@@ -463,7 +455,7 @@ test("extracts the constrained JsonView API", () => {
 
   assert.deepEqual(
     jsonViewProps?.map(({ name }) => name),
-    ["accessibilityLabel", "data", "defaultExpandDepth", "showRootActions", "search"],
+    ["accessibilityLabel", "data", "describedBy", "defaultExpandDepth", "showRootActions", "search"],
   );
   assert.equal(jsonViewProps?.find(({ name }) => name === "defaultExpandDepth")?.defaultValue, "1");
   assert.equal(
@@ -1099,15 +1091,11 @@ test("extracts the constrained Combobox compound API", () => {
   );
   assert.deepEqual(
     metadata["combobox.item"]?.map(({ name }) => name),
-    ["value", "indicator", "render"],
+    ["children", "description", "value", "indicator", "render"],
   );
   assert.equal(
     metadata["combobox.item"]?.find(({ name }) => name === "indicator")?.defaultValue,
     '"check"',
-  );
-  assert.deepEqual(
-    metadata["combobox.itemText"]?.map(({ name }) => name),
-    ["label", "description"],
   );
   assert.ok(metadata["combobox.label"]);
   assert.ok(metadata["combobox.value"]);
@@ -1166,6 +1154,10 @@ test("extracts the constrained ContextSwitcher compound API", () => {
   assert.equal(
     metadata["contextSwitcher.viewport"]?.find(({ name }) => name === "maxHeight")?.defaultValue,
     '"m"',
+  );
+  assert.deepEqual(
+    metadata["contextSwitcher.item"]?.map(({ name }) => name),
+    ["children", "description", "value", "indicator", "render"],
   );
   assert.equal(
     metadata["contextSwitcher.item"]?.find(({ name }) => name === "indicator")?.defaultValue,

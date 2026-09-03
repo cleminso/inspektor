@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Forward Combobox item label and description semantics without a separate `ItemText` part.
+
 [24/08/26]
 
 - [x] Add a constrained five-item viewport height that includes two-line item content, list gaps, and viewport padding.
@@ -64,6 +68,10 @@
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- Context Switcher uses the Combobox item content and description contract directly.
+
 [24/08/26]
 
 - Consumers may select the five-item viewport cap when result count should not grow the popup beyond five two-line context items.
@@ -106,6 +114,10 @@
 - None.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover item names and descriptions and verify generated prop metadata.
 
 [24/08/26]
 

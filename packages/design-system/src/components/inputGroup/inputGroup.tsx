@@ -236,7 +236,6 @@ function InputGroupCheckbox({
       {...fieldStyleProps}
       render={
         <label
-          aria-description={tooltip}
           aria-label={label}
           data-slot="input-group-checkbox"
         />
@@ -251,6 +250,9 @@ function InputGroupCheckbox({
         readOnly={readOnly}
       />
       <span>{children}</span>
+      {tooltip === undefined ? null : (
+        <BaseField.Description hidden>{tooltip}</BaseField.Description>
+      )}
     </BaseField.Root>
   )
 
@@ -259,7 +261,9 @@ function InputGroupCheckbox({
   ) : (
     <Tooltip.Root>
       <Tooltip.Trigger render={field} />
-      <Tooltip.Content>{tooltip}</Tooltip.Content>
+      <Tooltip.Content>
+        <span aria-hidden="true">{tooltip}</span>
+      </Tooltip.Content>
     </Tooltip.Root>
   )
 }

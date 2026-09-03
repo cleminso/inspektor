@@ -29,6 +29,11 @@ export const comboboxPopupPropNames = ['width'] as const
 export const comboboxPopupHeaderPropNames = [] as const
 export const comboboxPopupFooterPropNames = [] as const
 export const comboboxViewportPropNames = ['maxHeight'] as const
-export const comboboxItemPropNames = ['value', 'indicator', 'render'] as const
-export const comboboxItemTextPropNames = ['label', 'description'] as const
+export const comboboxItemPropNames = [
+  'children',
+  'description',
+  'value',
+  'indicator',
+  'render',
+] as const
 export const comboboxIndicatorPropNames = ['keepMounted'] as const

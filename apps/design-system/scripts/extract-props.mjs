@@ -406,7 +406,6 @@ const componentEntries = [
     'Group',
     'GroupLabel',
     'Item',
-    'ItemText',
     'ItemIndicator',
   ].map((part) => ({
     componentId: `combobox.${part[0].toLowerCase()}${part.slice(1)}`,
@@ -425,7 +424,6 @@ const componentEntries = [
     'Status',
     'List',
     'Item',
-    'ItemText',
     'Footer',
   ].map((part) => ({
     componentId: `contextSwitcher.${part[0].toLowerCase()}${part.slice(1)}`,

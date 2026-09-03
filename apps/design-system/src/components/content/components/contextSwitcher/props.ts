@@ -24,5 +24,10 @@ export const contextSwitcherTriggerPropNames = [
 export const contextSwitcherSearchPropNames = ['label', 'placeholder'] as const
 export const contextSwitcherContentPropNames = ['width', 'keepMounted', 'align'] as const
 export const contextSwitcherViewportPropNames = ['maxHeight'] as const
-export const contextSwitcherItemPropNames = ['value', 'indicator'] as const
-export const contextSwitcherItemTextPropNames = ['label', 'description'] as const
+export const contextSwitcherItemPropNames = [
+  'children',
+  'description',
+  'value',
+  'indicator',
+  'render',
+] as const

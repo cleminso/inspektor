@@ -2131,7 +2131,7 @@
       "description": "Controls whether the first matching item is highlighted while filtering.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 38
+        "line": 39
       }
     },
     {
@@ -2141,7 +2141,7 @@
       "description": "Flat collection filtered by the command query.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -2151,7 +2151,7 @@
       "description": "Controlled command query.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 42
+        "line": 43
       }
     },
     {
@@ -2162,7 +2162,7 @@
       "description": "Initial query for an uncontrolled command.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 40
+        "line": 41
       }
     },
     {
@@ -2184,7 +2184,7 @@
       "description": "Command content rendered inside the modal surface.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 51
+        "line": 52
       }
     },
     {
@@ -2195,7 +2195,7 @@
       "description": "Keeps the dialog mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 53
+        "line": 54
       }
     },
     {
@@ -2206,7 +2206,7 @@
       "description": "Determines where focus moves when the command dialog opens.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 55
+        "line": 56
       }
     },
     {
@@ -2217,7 +2217,7 @@
       "description": "Determines where focus moves after the command dialog closes.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 57
+        "line": 58
       }
     },
     {
@@ -2261,7 +2261,7 @@
       "description": "Composes input behavior onto another input component.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 66
+        "line": 67
       }
     },
     {
@@ -2272,7 +2272,7 @@
       "description": "Controls whether the input separates itself from following command content.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 68
+        "line": 69
       }
     }
   ],
@@ -2284,7 +2284,7 @@
       "description": "",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 80
+        "line": 81
       }
     },
     {
@@ -2306,7 +2306,7 @@
       "description": "Primary option label.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 87
+        "line": 88
       }
     },
     {
@@ -2316,7 +2316,7 @@
       "description": "Optional supporting description.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 89
+        "line": 90
       }
     },
     {
@@ -2327,7 +2327,7 @@
       "description": "Arranges supporting metadata beside or below the primary label.",
       "source": {
         "path": "packages/design-system/src/components/command/command.tsx",
-        "line": 91
+        "line": 92
       }
     }
   ],
@@ -4509,6 +4509,16 @@
       }
     },
     {
+      "name": "describedBy",
+      "type": "string",
+      "required": false,
+      "description": "Identifies an external element that describes the JSON tree.",
+      "source": {
+        "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
+        "line": 71
+      }
+    },
+    {
       "name": "defaultExpandDepth",
       "type": "0 | \"all\" | 1 | 2 | 3 | 4",
       "required": false,
@@ -4516,7 +4526,7 @@
       "description": "Number of container levels expanded initially, or every level within the safe render budget.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 71
+        "line": 73
       }
     },
     {
@@ -4527,7 +4537,7 @@
       "description": "Whether to show the sticky expansion and copy actions.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 73
+        "line": 75
       }
     },
     {
@@ -4537,7 +4547,7 @@
       "description": "Controls occurrence highlighting and active-match navigation.",
       "source": {
         "path": "packages/design-system/src/components/jsonView/jsonView.tsx",
-        "line": 75
+        "line": 77
       }
     }
   ],
@@ -6520,7 +6530,7 @@
       "description": "The items to be displayed in the list.\nCan be either a flat array of items or an array of groups with items.\nItems available for filtering and selection.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 28
+        "line": 29
       }
     },
     {
@@ -6530,7 +6540,7 @@
       "description": "The selected value of the combobox. Use when controlled.\nThe selected item.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 30
+        "line": 31
       }
     },
     {
@@ -6540,7 +6550,7 @@
       "description": "The uncontrolled selected value of the combobox when it's initially rendered.\n\nTo render a controlled combobox, use the `value` prop instead.\nThe initially selected item.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 32
+        "line": 33
       }
     },
     {
@@ -6550,7 +6560,7 @@
       "description": "Event handler called when the selected value of the combobox changes.\nRuns when the selected item changes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 34
+        "line": 35
       }
     },
     {
@@ -6560,7 +6570,7 @@
       "description": "The input value of the combobox. Use when controlled.\nThe current filter input value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 36
+        "line": 37
       }
     },
     {
@@ -6570,7 +6580,7 @@
       "description": "The uncontrolled input value when initially rendered.\n\nTo render a controlled input, use the `inputValue` prop instead.\nThe initial filter input value when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 38
+        "line": 39
       }
     },
     {
@@ -6580,7 +6590,7 @@
       "description": "Event handler called when the input value changes.\nRuns when the filter input value changes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 40
+        "line": 41
       }
     },
     {
@@ -6591,7 +6601,7 @@
       "description": "Whether the popup is initially open.\n\nTo render a controlled popup, use the `open` prop instead.\nWhether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 42
+        "line": 43
       }
     },
     {
@@ -6601,7 +6611,7 @@
       "description": "Whether the popup is currently open. Use when controlled.\nWhether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 44
+        "line": 45
       }
     },
     {
@@ -6611,7 +6621,7 @@
       "description": "Event handler called when the popup is opened or closed.\nRuns when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 46
+        "line": 47
       }
     },
     {
@@ -6621,7 +6631,7 @@
       "description": "Event handler called after any animations complete when the popup is opened or closed.\nRuns after an opening or closing transition completes.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 48
+        "line": 49
       }
     },
     {
@@ -6631,7 +6641,7 @@
       "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for display in the input.\nIf the shape of the object is `{ value, label }`, the label will be used automatically without needing to specify this prop.\nConverts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 50
+        "line": 51
       }
     },
     {
@@ -6641,7 +6651,7 @@
       "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for form submission.\nIf the shape of the object is `{ value, label }`, the value will be used automatically without needing to specify this prop.\nConverts an item into the value submitted with a form.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 52
+        "line": 53
       }
     },
     {
@@ -6651,7 +6661,7 @@
       "description": "Custom comparison logic used to determine if a combobox item value matches the current selected value. Useful when item values are objects without matching referentially.\nDefaults to `Object.is` comparison.\nCompares an item with the selected value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 54
+        "line": 55
       }
     },
     {
@@ -6661,7 +6671,7 @@
       "description": "Filter function used to match items vs input query.\nFilters an item against the current query.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 56
+        "line": 57
       }
     },
     {
@@ -6671,7 +6681,7 @@
       "description": "Identifies the field when a form is submitted.\nIdentifies the value when the combobox participates in form submission.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 58
+        "line": 59
       }
     },
     {
@@ -6681,7 +6691,7 @@
       "description": "Identifies the form that owns the internal input.\nUseful when the combobox is rendered outside the form.\nAssociates the combobox with a form element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 60
+        "line": 61
       }
     },
     {
@@ -6692,7 +6702,7 @@
       "description": "Whether the user must choose a value before submitting a form.\nRequires a selection before form submission.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 62
+        "line": 63
       }
     },
     {
@@ -6703,7 +6713,7 @@
       "description": "Whether the user should be unable to choose a different option from the popup.\nPrevents selection changes while preserving focus and form participation.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 64
+        "line": 65
       }
     },
     {
@@ -6714,7 +6724,7 @@
       "description": "Whether the component should ignore user interaction.\nDisables the combobox.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 66
+        "line": 67
       }
     }
   ],
@@ -6726,7 +6736,7 @@
       "description": "Composes the label onto another element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 114
+        "line": 115
       }
     }
   ],
@@ -6738,7 +6748,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 119
+        "line": 120
       }
     }
   ],
@@ -6751,7 +6761,7 @@
       "description": "Controls the input-group surface treatment.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 74
+        "line": 75
       }
     },
     {
@@ -6762,7 +6772,7 @@
       "description": "Controls whether the input group follows its content or fills its container.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 76
+        "line": 77
       }
     }
   ],
@@ -6774,7 +6784,7 @@
       "description": "Composes input behavior onto another input component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 83
+        "line": 84
       }
     }
   ],
@@ -6786,7 +6796,7 @@
       "description": "Content displayed by the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 101
+        "line": 102
       }
     },
     {
@@ -6797,7 +6807,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 103
+        "line": 104
       }
     },
     {
@@ -6808,7 +6818,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 105
+        "line": 106
       }
     },
     {
@@ -6819,7 +6829,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 107
+        "line": 108
       }
     },
     {
@@ -6829,7 +6839,7 @@
       "description": "Composes trigger behavior onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 109
+        "line": 110
       }
     }
   ],
@@ -6842,7 +6852,7 @@
       "description": "Disables the input action trigger.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 90
+        "line": 91
       }
     }
   ],
@@ -6855,7 +6865,7 @@
       "description": "Keeps the portal mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 124
+        "line": 125
       }
     }
   ],
@@ -6892,7 +6902,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 136
+        "line": 137
       }
     }
   ],
@@ -6904,7 +6914,7 @@
       "description": "Content rendered inside the positioned popup.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 141
+        "line": 142
       }
     },
     {
@@ -6915,7 +6925,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 143
+        "line": 144
       }
     },
     {
@@ -6926,7 +6936,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 145
+        "line": 146
       }
     },
     {
@@ -6937,7 +6947,7 @@
       "description": "Aligns the popup along the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 147
+        "line": 148
       }
     },
     {
@@ -6948,7 +6958,7 @@
       "description": "Places the popup on this side of the control.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 149
+        "line": 150
       }
     }
   ],
@@ -6963,7 +6973,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 169
+        "line": 170
       }
     }
   ],
@@ -6976,7 +6986,7 @@
       "description": "Accessible label for the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 184
+        "line": 185
       }
     },
     {
@@ -6987,7 +6997,7 @@
       "description": "Keeps the clear action mounted when no value is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 186
+        "line": 187
       }
     },
     {
@@ -6998,7 +7008,7 @@
       "description": "Disables the clear action.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 188
+        "line": 189
       }
     },
     {
@@ -7008,7 +7018,7 @@
       "description": "Composes clear behavior onto another button component.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 190
+        "line": 191
       }
     }
   ],
@@ -7020,13 +7030,33 @@
   "combobox.groupLabel": [],
   "combobox.item": [
     {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Primary item content and accessible label.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 199
+      }
+    },
+    {
+      "name": "description",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional secondary item content exposed as the accessible description.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 201
+      }
+    },
+    {
       "name": "value",
       "type": "Value",
       "required": true,
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 203
       }
     },
     {
@@ -7037,7 +7067,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 197
+        "line": 205
       }
     },
     {
@@ -7047,29 +7077,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 199
-      }
-    }
-  ],
-  "combobox.itemText": [
-    {
-      "name": "label",
-      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
-      "required": true,
-      "description": "Primary item text, constrained to one line.",
-      "source": {
-        "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 204
-      }
-    },
-    {
-      "name": "description",
-      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
-      "required": false,
-      "description": "Optional secondary item text, constrained to one line.",
-      "source": {
-        "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 206
+        "line": 207
       }
     }
   ],
@@ -7082,7 +7090,7 @@
       "description": "Keeps the indicator mounted while the item is not selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 214
+        "line": 215
       }
     }
   ],
@@ -7094,7 +7102,7 @@
       "description": "Items available for filtering and context selection.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 27
+        "line": 26
       }
     },
     {
@@ -7104,7 +7112,7 @@
       "description": "The active context item.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 29
+        "line": 28
       }
     },
     {
@@ -7114,7 +7122,7 @@
       "description": "The initially active context item.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 31
+        "line": 30
       }
     },
     {
@@ -7124,7 +7132,7 @@
       "description": "Runs when the active context item changes.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 33
+        "line": 32
       }
     },
     {
@@ -7135,7 +7143,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 35
+        "line": 34
       }
     },
     {
@@ -7145,7 +7153,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 37
+        "line": 36
       }
     },
     {
@@ -7155,7 +7163,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 39
+        "line": 38
       }
     },
     {
@@ -7165,7 +7173,7 @@
       "description": "Converts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 41
+        "line": 40
       }
     },
     {
@@ -7175,7 +7183,7 @@
       "description": "Converts an item into a stable string value.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 43
+        "line": 42
       }
     },
     {
@@ -7185,7 +7193,7 @@
       "description": "Compares an item with the active context value.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 45
+        "line": 44
       }
     },
     {
@@ -7195,7 +7203,7 @@
       "description": "Filters an item against the switcher query.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 47
+        "line": 46
       }
     },
     {
@@ -7206,7 +7214,7 @@
       "description": "Disables the switcher.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 49
+        "line": 48
       }
     }
   ],
@@ -7218,7 +7226,7 @@
       "description": "Accessible label that identifies the context being switched.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 56
+        "line": 55
       }
     },
     {
@@ -7229,7 +7237,7 @@
       "description": "Controls the trigger height and padding.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 58
+        "line": 57
       }
     },
     {
@@ -7240,7 +7248,7 @@
       "description": "Constrains the trigger width.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 60
+        "line": 59
       }
     },
     {
@@ -7251,7 +7259,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 62
+        "line": 61
       }
     },
     {
@@ -7261,7 +7269,7 @@
       "description": "Provides supplemental content for the trigger tooltip.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 64
+        "line": 63
       }
     }
   ],
@@ -7273,7 +7281,7 @@
       "description": "Content displayed when no item is selected.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 119
+        "line": 120
       }
     }
   ],
@@ -7285,7 +7293,7 @@
       "description": "Accessible label for the search input.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 69
+        "line": 68
       }
     },
     {
@@ -7295,7 +7303,7 @@
       "description": "Placeholder displayed while the search input is empty.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 71
+        "line": 70
       }
     }
   ],
@@ -7308,7 +7316,7 @@
       "description": "Controls the popup width using a design-system size.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 76
+        "line": 75
       }
     },
     {
@@ -7319,7 +7327,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 78
+        "line": 77
       }
     },
     {
@@ -7329,7 +7337,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 80
+        "line": 79
       }
     }
   ],
@@ -7342,7 +7350,7 @@
       "description": "Controls the maximum height of the scrolling results region.",
       "source": {
         "path": "packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx",
-        "line": 85
+        "line": 84
       }
     }
   ],
@@ -7351,13 +7359,33 @@
   "contextSwitcher.list": [],
   "contextSwitcher.item": [
     {
+      "name": "children",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": true,
+      "description": "Primary item content and accessible label.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 199
+      }
+    },
+    {
+      "name": "description",
+      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
+      "required": false,
+      "description": "Optional secondary item content exposed as the accessible description.",
+      "source": {
+        "path": "packages/design-system/src/components/combobox/combobox.tsx",
+        "line": 201
+      }
+    },
+    {
       "name": "value",
       "type": "Value",
       "required": true,
       "description": "The item represented by this option.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 195
+        "line": 203
       }
     },
     {
@@ -7368,7 +7396,7 @@
       "description": "Controls whether the standard selected indicator is displayed.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 197
+        "line": 205
       }
     },
     {
@@ -7378,29 +7406,7 @@
       "description": "Composes option behavior onto another compatible element.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 199
-      }
-    }
-  ],
-  "contextSwitcher.itemText": [
-    {
-      "name": "label",
-      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
-      "required": true,
-      "description": "Primary item text, constrained to one line.",
-      "source": {
-        "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 204
-      }
-    },
-    {
-      "name": "description",
-      "type": "null | string | number | bigint | false | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode>",
-      "required": false,
-      "description": "Optional secondary item text, constrained to one line.",
-      "source": {
-        "path": "packages/design-system/src/components/combobox/combobox.tsx",
-        "line": 206
+        "line": 207
       }
     }
   ],
@@ -7413,7 +7419,7 @@
       "description": "Known options displayed by the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 33
+        "line": 36
       }
     },
     {
@@ -7423,7 +7429,7 @@
       "description": "Controlled selected values.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 35
+        "line": 38
       }
     },
     {
@@ -7434,7 +7440,7 @@
       "description": "Initially selected values when uncontrolled.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 37
+        "line": 40
       }
     },
     {
@@ -7444,7 +7450,7 @@
       "description": "Runs when the selected values change.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 39
+        "line": 42
       }
     },
     {
@@ -7455,7 +7461,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 41
+        "line": 44
       }
     },
     {
@@ -7465,7 +7471,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 43
+        "line": 46
       }
     },
     {
@@ -7475,7 +7481,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 45
+        "line": 48
       }
     },
     {
@@ -7486,7 +7492,7 @@
       "description": "Disables the trigger and every mutable option.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 47
+        "line": 50
       }
     }
   ],
@@ -7498,7 +7504,7 @@
       "description": "Stable accessible name for the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 53
+        "line": 56
       }
     },
     {
@@ -7508,7 +7514,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 55
+        "line": 58
       }
     },
     {
@@ -7519,7 +7525,7 @@
       "description": "Disables the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 57
+        "line": 60
       }
     }
   ],
@@ -7531,7 +7537,7 @@
       "description": "Accessible name for the popup.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 66
+        "line": 69
       }
     },
     {
@@ -7542,7 +7548,7 @@
       "description": "Controls the popup width.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 68
+        "line": 71
       }
     },
     {
@@ -7553,7 +7559,7 @@
       "description": "Controls the scrolling option-list height.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 70
+        "line": 73
       }
     },
     {
@@ -7564,7 +7570,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 72
+        "line": 75
       }
     },
     {
@@ -7575,7 +7581,7 @@
       "description": "Aligns the popup along the trigger.",
       "source": {
         "path": "packages/design-system/src/components/multiSelect/multiSelect.tsx",
-        "line": 74
+        "line": 77
       }
     }
   ],
@@ -7736,7 +7742,7 @@
       "description": "The committed timestamp shown when the picker opens.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 28
+        "line": 31
       }
     },
     {
@@ -7746,7 +7752,7 @@
       "description": "Runs with the selected timestamp when Apply is activated.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 30
+        "line": 33
       }
     },
     {
@@ -7756,7 +7762,7 @@
       "description": "Whether the popup is open.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 32
+        "line": 35
       }
     },
     {
@@ -7767,7 +7773,7 @@
       "description": "Whether the popup is initially open.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 34
+        "line": 37
       }
     },
     {
@@ -7777,7 +7783,7 @@
       "description": "Runs when the popup opens or closes.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 36
+        "line": 39
       }
     },
     {
@@ -7787,7 +7793,7 @@
       "description": "Earliest selectable timestamp.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 38
+        "line": 41
       }
     },
     {
@@ -7797,7 +7803,7 @@
       "description": "Latest selectable timestamp.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 40
+        "line": 43
       }
     },
     {
@@ -7808,7 +7814,7 @@
       "description": "Disables the trigger and timestamp editing.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 42
+        "line": 45
       }
     }
   ],
@@ -7820,7 +7826,7 @@
       "description": "Stable accessible name for the timestamp trigger.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 48
+        "line": 51
       }
     },
     {
@@ -7830,7 +7836,7 @@
       "description": "Allows you to replace the component's HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.\nComposes trigger behavior onto another native button component.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 50
+        "line": 53
       }
     }
   ],
@@ -7843,7 +7849,7 @@
       "description": "Aligns the popup along its trigger.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 56
+        "line": 59
       }
     },
     {
@@ -7854,7 +7860,7 @@
       "description": "Moves focus to the calendar when the content mounts.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 58
+        "line": 61
       }
     },
     {
@@ -7865,7 +7871,7 @@
       "description": "Keeps the popup mounted while closed.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 60
+        "line": 63
       }
     }
   ],
@@ -7878,7 +7884,7 @@
       "description": "Moves focus to the calendar when the panel mounts.",
       "source": {
         "path": "packages/design-system/src/components/datePicker/datePicker.tsx",
-        "line": 65
+        "line": 68
       }
     }
   ],

@@ -8,6 +8,7 @@ import {
   type ReactElement,
   type ReactNode,
   forwardRef,
+  useId,
   useState,
 } from 'react'
 
@@ -190,20 +191,20 @@ export interface ComboboxClearProps extends Omit<
   render?: BaseCombobox.Clear.Props['render']
 }
 
-export type ComboboxItemProps<Value> = Omit<WithoutStyles<BaseCombobox.Item.Props>, 'value'> & {
+export type ComboboxItemProps<Value> = Omit<
+  WithoutStyles<BaseCombobox.Item.Props>,
+  'children' | 'value'
+> & {
+  /** Primary item content and accessible label. */
+  children: ReactNode
+  /** Optional secondary item content exposed as the accessible description. */
+  description?: ReactNode
   /** The item represented by this option. */
   value: Value
   /** Controls whether the standard selected indicator is displayed. */
   indicator?: 'check' | 'none'
   /** Composes option behavior onto another compatible element. */
   render?: BaseCombobox.Item.Props['render']
-}
-
-export interface ComboboxItemTextProps {
-  /** Primary item text, constrained to one line. */
-  label: ReactNode
-  /** Optional secondary item text, constrained to one line. */
-  description?: ReactNode
 }
 
 export interface ComboboxItemIndicatorProps extends Omit<
@@ -767,9 +768,21 @@ const ComboboxGroupLabel = forwardRef<
 })
 
 function ComboboxItemInner<Value>(
-  { value, indicator = 'check', children, ...props }: ComboboxItemProps<Value>,
+  {
+    value,
+    indicator = 'check',
+    children,
+    description,
+    'aria-label': ariaLabel,
+    'aria-describedby': describedBy,
+    'aria-labelledby': labelledBy,
+    ...props
+  }: ComboboxItemProps<Value>,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const labelId = useId()
+  const descriptionId = useId()
+  const generatedLabelId = ariaLabel === undefined && labelledBy === undefined ? labelId : undefined
   const stateStyles = createStateStyleProps<BaseCombobox.Item.State>((state) => [
     comboboxStyles.item,
     comboboxStyles.itemInteractive,
@@ -777,14 +790,38 @@ function ComboboxItemInner<Value>(
     state.selected === true && comboboxStyles.itemSelected,
     state.disabled === true && comboboxStyles.itemDisabled,
   ])
+  const descriptionIds = [describedBy, description === undefined ? undefined : descriptionId]
+    .filter(Boolean)
+    .join(' ')
+  const textStyles = stylex.props(comboboxStyles.itemText)
+  const labelStyles = stylex.props(comboboxStyles.itemLabel)
+  const descriptionStyles = stylex.props(comboboxStyles.itemDescription)
   return (
     <BaseCombobox.Item
+      aria-label={ariaLabel}
+      aria-describedby={descriptionIds || undefined}
+      aria-labelledby={labelledBy ?? generatedLabelId}
       {...props}
       ref={forwardedRef}
       value={value}
       {...stateStyles}
     >
-      {children}
+      <span {...textStyles}>
+        <span
+          id={generatedLabelId}
+          {...labelStyles}
+        >
+          {children}
+        </span>
+        {description === undefined ? null : (
+          <span
+            id={descriptionId}
+            {...descriptionStyles}
+          >
+            {description}
+          </span>
+        )}
+      </span>
       {indicator === 'check' ? <ComboboxItemIndicator /> : null}
     </BaseCombobox.Item>
   )
@@ -793,18 +830,6 @@ function ComboboxItemInner<Value>(
 const ComboboxItem = forwardRef(ComboboxItemInner) as <Value>(
   props: ComboboxItemProps<Value>,
 ) => ReactElement | null
-
-function ComboboxItemText({ label, description }: ComboboxItemTextProps) {
-  const textStyles = stylex.props(comboboxStyles.itemText)
-  const labelStyles = stylex.props(comboboxStyles.itemLabel)
-  const descriptionStyles = stylex.props(comboboxStyles.itemDescription)
-  return (
-    <span {...textStyles}>
-      <span {...labelStyles}>{label}</span>
-      {description !== undefined ? <span {...descriptionStyles}>{description}</span> : null}
-    </span>
-  )
-}
 
 const ComboboxItemIndicator = forwardRef<
   ComponentRef<typeof BaseCombobox.ItemIndicator>,
@@ -857,6 +882,5 @@ export const Combobox = Object.assign(ComboboxRoot, {
   Group: ComboboxGroup,
   GroupLabel: ComboboxGroupLabel,
   Item: ComboboxItem,
-  ItemText: ComboboxItemText,
   ItemIndicator: ComboboxItemIndicator,
 })

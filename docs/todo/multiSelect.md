@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Expose the rendered trigger summary as its accessible description while preserving consumer descriptions.
+
 [02/09/26]
 
 - [x] Enter the contextual-action column from dialog focus with Up or Down, matching pointer activation of the row label.
@@ -75,6 +79,11 @@
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- The trigger label names the action; its rendered summary describes the selected values.
+- Composed render elements retain their own description relationships.
+
 [02/09/26]
 
 - [x] Up and Down from initial dialog focus enter the last or first mutable row's contextual action; Left then moves to its checkbox.
@@ -107,6 +116,10 @@
 - [ ] Decide whether large item collections require persistent action labels on touch interfaces.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover default and composed trigger descriptions.
 
 [02/09/26]
 

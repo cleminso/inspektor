@@ -1,9 +1,12 @@
 import { Popover as BasePopover } from '@base-ui/react/popover'
 import {
+  cloneElement,
   createContext,
   forwardRef,
+  isValidElement,
   useCallback,
   useContext,
+  useId,
   useMemo,
   useRef,
   type ComponentRef,
@@ -136,10 +139,18 @@ const MultiSelectTrigger = forwardRef<
   ComponentRef<typeof BasePopover.Trigger>,
   MultiSelectTriggerProps
 >(function MultiSelectTrigger(
-  { label, children, render, disabled = false, ...props },
+  { label, children, render, disabled = false, 'aria-describedby': describedBy, ...props },
   forwardedRef,
 ): React.ReactElement {
   const context = useMultiSelectContext()
+  const summaryId = useId()
+  const renderDescription = isValidElement<{ 'aria-describedby'?: string }>(render)
+    ? render.props['aria-describedby']
+    : undefined
+  const descriptionIds = [renderDescription, describedBy, summaryId].filter(Boolean).join(' ')
+  const mergedRender = isValidElement<{ 'aria-describedby'?: string }>(render)
+    ? cloneElement(render, { 'aria-describedby': descriptionIds })
+    : render
   const triggerRef = useCallback(
     (element: ComponentRef<typeof BasePopover.Trigger> | null) => {
       context.triggerRef.current = element
@@ -175,10 +186,11 @@ const MultiSelectTrigger = forwardRef<
     <BasePopover.Trigger
       {...props}
       aria-label={label}
+      aria-describedby={descriptionIds}
       disabled={disabled === true || context.disabled === true}
       ref={triggerRef as BasePopover.Trigger.Props['ref']}
       render={
-        render ?? (
+        mergedRender ?? (
           <Button
             type="button"
             variant="secondary"
@@ -188,7 +200,7 @@ const MultiSelectTrigger = forwardRef<
       }
       {...triggerStyles}
     >
-      {children}
+      <span id={summaryId}>{children}</span>
     </BasePopover.Trigger>
   )
 })

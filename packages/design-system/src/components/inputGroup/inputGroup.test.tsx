@@ -85,11 +85,10 @@ describe('InputGroup', () => {
       </InputGroup>,
     )
 
-    expect(
-      screen
-        .getByRole('checkbox', { name: 'Set value to NULL' })
-        .parentElement?.getAttribute('aria-description'),
-    ).toBe('Insert NULL explicitly.')
+    screen.getByRole('checkbox', {
+      name: 'Set value to NULL',
+      description: 'Insert NULL explicitly.',
+    })
   })
 
   it('exposes persistent action state for toggle actions', () => {

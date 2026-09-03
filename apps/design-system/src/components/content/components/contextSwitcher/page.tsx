@@ -10,7 +10,6 @@ import connectionSource from './connectionExample.tsx?raw'
 import {
   contextSwitcherContentPropNames,
   contextSwitcherItemPropNames,
-  contextSwitcherItemTextPropNames,
   contextSwitcherRootPropNames,
   contextSwitcherSearchPropNames,
   contextSwitcherTriggerPropNames,
@@ -31,10 +30,6 @@ const viewportProps = getGeneratedProps(
   contextSwitcherViewportPropNames,
 )
 const itemProps = getGeneratedProps('contextSwitcher.item', contextSwitcherItemPropNames)
-const itemTextProps = getGeneratedProps(
-  'contextSwitcher.itemText',
-  contextSwitcherItemTextPropNames,
-)
 
 export function ContextSwitcherPage(): ReactElement {
   return (
@@ -83,9 +78,6 @@ export function ContextSwitcherPage(): ReactElement {
       </Section>
       <Section title="Item props">
         <PropsTable rows={itemProps} />
-      </Section>
-      <Section title="Item text props">
-        <PropsTable rows={itemTextProps} />
       </Section>
     </ContextSwitcherPlayground>
   )

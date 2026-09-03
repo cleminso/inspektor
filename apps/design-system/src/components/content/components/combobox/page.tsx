@@ -17,7 +17,6 @@ import {
   comboboxIndicatorPropNames,
   comboboxInputTriggerPropNames,
   comboboxItemPropNames,
-  comboboxItemTextPropNames,
   comboboxPopupFooterPropNames,
   comboboxPopupHeaderPropNames,
   comboboxPopupPropNames,
@@ -45,7 +44,6 @@ const popupHeaderProps = getGeneratedProps('combobox.popupHeader', comboboxPopup
 const popupFooterProps = getGeneratedProps('combobox.popupFooter', comboboxPopupFooterPropNames)
 const viewportProps = getGeneratedProps('combobox.viewport', comboboxViewportPropNames)
 const itemProps = getGeneratedProps('combobox.item', comboboxItemPropNames)
-const itemTextProps = getGeneratedProps('combobox.itemText', comboboxItemTextPropNames)
 const indicatorProps = getGeneratedProps('combobox.itemIndicator', comboboxIndicatorPropNames)
 
 export function ComboboxPage(): ReactElement {
@@ -149,9 +147,6 @@ export function ComboboxPage(): ReactElement {
       </Section>
       <Section title="Item props">
         <PropsTable rows={itemProps} />
-      </Section>
-      <Section title="Item text props">
-        <PropsTable rows={itemTextProps} />
       </Section>
       <Section title="Item indicator props">
         <PropsTable rows={indicatorProps} />

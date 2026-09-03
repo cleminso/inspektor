@@ -1,11 +1,14 @@
 import { Popover as BasePopover } from '@base-ui/react/popover'
 import * as stylex from '@stylexjs/stylex'
 import {
+  cloneElement,
   createContext,
   forwardRef,
+  isValidElement,
   useCallback,
   useContext,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -187,9 +190,20 @@ function DatePickerRoot({
 const DatePickerTrigger = forwardRef<
   ComponentRef<typeof BasePopover.Trigger>,
   DatePickerTriggerProps
->(function DatePickerTrigger({ label, render, children, ...props }, forwardedRef) {
+>(function DatePickerTrigger(
+  { label, render, children, 'aria-describedby': describedBy, ...props },
+  forwardedRef,
+) {
   const context = useDatePickerContext()
   const inputGroup = useContext(InputGroupContext)
+  const valueId = useId()
+  const renderDescription = isValidElement<{ 'aria-describedby'?: string }>(render)
+    ? render.props['aria-describedby']
+    : undefined
+  const descriptionIds = [renderDescription, describedBy, valueId].filter(Boolean).join(' ')
+  const mergedRender = isValidElement<{ 'aria-describedby'?: string }>(render)
+    ? cloneElement(render, { 'aria-describedby': descriptionIds })
+    : render
   const triggerRef = useCallback(
     (element: ComponentRef<typeof BasePopover.Trigger> | null) => {
       context.triggerRef.current = element
@@ -223,13 +237,14 @@ const DatePickerTrigger = forwardRef<
       {...props}
       ref={triggerRef as BasePopover.Trigger.Props['ref']}
       aria-label={label}
+      aria-describedby={descriptionIds}
       disabled={context.disabled}
-      render={render}
+      render={mergedRender}
       {...triggerStyles}
       data-slot={render === undefined ? 'date-picker-trigger' : undefined}
       data-grouped={render === undefined && inputGroup !== null ? '' : undefined}
     >
-      {children}
+      <span id={valueId}>{children}</span>
     </BasePopover.Trigger>
   )
 })

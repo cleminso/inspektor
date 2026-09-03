@@ -49,11 +49,9 @@ export default function ConnectionExample(): ReactElement {
               <ContextSwitcher.Item
                 key={item.id}
                 value={item}
+                description={item.appId}
               >
-                <ContextSwitcher.ItemText
-                  label={item.name}
-                  description={item.appId}
-                />
+                {item.name}
               </ContextSwitcher.Item>
             )}
           </ContextSwitcher.List>

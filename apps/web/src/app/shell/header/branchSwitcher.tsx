@@ -56,7 +56,7 @@ export function BranchSwitcher({
                 key={branch}
                 value={branch}
               >
-                <ContextSwitcher.ItemText label={<span translate="no">{branch}</span>} />
+                <span translate="no">{branch}</span>
               </ContextSwitcher.Item>
             )}
           </ContextSwitcher.List>

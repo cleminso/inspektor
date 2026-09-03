@@ -42,8 +42,8 @@ function Switcher({
           <ContextSwitcher.Status>Results ready.</ContextSwitcher.Status>
           <ContextSwitcher.List>
             {(item: ContextValue) => (
-              <ContextSwitcher.Item key={item.id} value={item}>
-                <ContextSwitcher.ItemText label={item.label} description={item.id} />
+              <ContextSwitcher.Item key={item.id} value={item} description={item.id}>
+                {item.label}
               </ContextSwitcher.Item>
             )}
           </ContextSwitcher.List>
@@ -91,9 +91,11 @@ describe('ContextSwitcher', () => {
       inputType: 'insertText',
     })
 
-    expect(screen.getByRole('option', { name: /Preview/ }).getAttribute('data-highlighted')).toBe(
-      '',
-    )
+    expect(
+      screen
+        .getByRole('option', { name: 'Preview', description: 'preview' })
+        .getAttribute('data-highlighted'),
+    ).toBe('')
   })
 
   it('keeps trigger content and tooltip composition on one constrained control', async () => {

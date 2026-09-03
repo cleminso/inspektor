@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { createRef, useState } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import { Button } from '../button/button'
 import { MultiSelect, type MultiSelectItem } from './multiSelect'
 
 const items: readonly MultiSelectItem[] = [
@@ -25,6 +26,48 @@ function TestMultiSelect({ initialValue = ['design', 'components'] }: { initialV
 afterEach(cleanup)
 
 describe('MultiSelect', () => {
+  it('describes the trigger with its rendered summary and preserves consumer descriptions', () => {
+    render(
+      <>
+        <span id="selection-help">Choose any matching values.</span>
+        <MultiSelect.Root items={items}>
+          <MultiSelect.Trigger aria-describedby="selection-help" label="Choose options">
+            Design System, Components
+          </MultiSelect.Trigger>
+        </MultiSelect.Root>
+      </>,
+    )
+
+    screen.getByRole('button', {
+      name: 'Choose options',
+      description: 'Choose any matching values. Design System, Components',
+    })
+  })
+
+  it('describes composed trigger summaries and merges render descriptions', () => {
+    render(
+      <>
+        <span id="selection-help">Choose any matching values.</span>
+        <span id="render-help">Selection opens in a popup.</span>
+        <MultiSelect.Root items={items}>
+          <MultiSelect.Trigger
+            aria-describedby="selection-help"
+            label="Choose options"
+            render={<Button aria-describedby="render-help" />}
+          >
+            <span>Design System, Components</span>
+          </MultiSelect.Trigger>
+        </MultiSelect.Root>
+      </>,
+    )
+
+    screen.getByRole('button', {
+      name: 'Choose options',
+      description:
+        'Selection opens in a popup. Choose any matching values. Design System, Components',
+    })
+  })
+
   it('keeps complete large-collection metadata while deferring offscreen rendering', () => {
     const largeItems = Array.from({ length: 101 }, (_, index) => ({
       label: `Option ${index + 1}`,

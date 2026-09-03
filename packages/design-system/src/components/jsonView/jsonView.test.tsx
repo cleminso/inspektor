@@ -44,6 +44,20 @@ function expectFocused(item: HTMLElement): void {
 }
 
 describe('JsonView', () => {
+  it('accepts an external description for the tree root', () => {
+    render(
+      <>
+        <span id="json-help">Use arrow keys to inspect nested values.</span>
+        <JsonView accessibilityLabel="Row data" data={{ name: 'Ada' }} describedBy="json-help" />
+      </>,
+    )
+
+    screen.getByRole('tree', {
+      name: 'Row data',
+      description: 'Use arrow keys to inspect nested values.',
+    })
+  })
+
   it('updates query text urgently while deferring search traversal', async () => {
     const onResultsChange = vi.fn()
 

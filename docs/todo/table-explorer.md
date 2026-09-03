@@ -21,6 +21,12 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [03/09/26]
 
+### Row editor descriptions
+
+- [x] Associate rendered guidance and validation errors with custom Boolean, structured, date, and read-only JSON controls.
+
+[03/09/26]
+
 ### Held-key row navigation
 
 - [x] Continue row navigation through native `J` and `K` key repeat.
@@ -1212,6 +1218,10 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [03/09/26]
 
+- Row-editor validation describes the value editor that owns the invalid state, not the structured value-mode selector.
+
+[03/09/26]
+
 - One checked row is browsing mode: Previous, Next, `K`, and `J` replace the checked row with the adjacent query row.
 - Several checked rows are batch mode: navigation changes the focused checked row without changing the checked set.
 - Pane-owned navigation crosses pagination boundaries; direct page changes continue to clear row and cell selection.
@@ -1425,6 +1435,10 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover guidance and error descriptions across custom row-editor controls.
 
 [03/09/26]
 

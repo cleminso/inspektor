@@ -67,6 +67,8 @@ export interface JsonViewProps {
   accessibilityLabel: string
   /** JSON-compatible object or array to inspect. */
   data: JsonViewObject | readonly JsonViewValue[]
+  /** Identifies an external element that describes the JSON tree. */
+  describedBy?: string
   /** Number of container levels expanded initially, or every level within the safe render budget. */
   defaultExpandDepth?: 0 | 1 | 2 | 3 | 4 | 'all'
   /** Whether to show the sticky expansion and copy actions. */
@@ -792,6 +794,7 @@ function JsonNode({
 export function JsonView({
   accessibilityLabel,
   data,
+  describedBy,
   defaultExpandDepth = 1,
   showRootActions = true,
   search,
@@ -1014,6 +1017,7 @@ export function JsonView({
         </div>
       ) : null}
       <div
+        aria-describedby={describedBy}
         aria-label={accessibilityLabel}
         ref={treeRef}
         role="tree"

@@ -141,35 +141,31 @@ export function ConnectionSwitcher({
                     <ContextSwitcher.Item
                       key={connection.id}
                       value={connection}
+                      description={connection.appId}
                       indicator="none"
                     >
-                      <ContextSwitcher.ItemText
-                        label={
-                          <Box
-                            as="span"
-                            display="inline-flex"
-                            minWidth={0}
-                            alignItems="center"
-                            flexDirection="row"
-                            gap="xxs"
-                          >
-                            <Text
-                              as="span"
-                              color="inherit"
-                              truncate
-                            >
-                              {getConnectionDisplayName(connection)}
-                            </Text>
-                            <Badge
-                              size="xs"
-                              translate="no"
-                            >
-                              {connection.env}
-                            </Badge>
-                          </Box>
-                        }
-                        description={connection.appId}
-                      />
+                      <Box
+                        as="span"
+                        display="inline-flex"
+                        minWidth={0}
+                        alignItems="center"
+                        flexDirection="row"
+                        gap="xxs"
+                      >
+                        <Text
+                          as="span"
+                          color="inherit"
+                          truncate
+                        >
+                          {getConnectionDisplayName(connection)}
+                        </Text>
+                        <Badge
+                          size="xs"
+                          translate="no"
+                        >
+                          {connection.env}
+                        </Badge>
+                      </Box>
                     </ContextSwitcher.Item>
                   )}
                 </ContextSwitcher.List>

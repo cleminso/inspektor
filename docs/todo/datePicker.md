@@ -13,6 +13,10 @@
 
 [03/09/26]
 
+- [x] Expose the rendered trigger value as its accessible description while preserving consumer descriptions.
+
+[03/09/26]
+
 - [x] Apply the branded sans font to the deferred calendar loading and error fallback.
 
 [28/08/26]
@@ -48,6 +52,11 @@
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- The trigger label names the action; its rendered value describes the selected date.
+- Composed render elements retain their own description relationships.
+
 [28/08/26]
 
 - [x] Defer only DatePicker calendar internals; keep the field-editor interaction loaded immediately.
@@ -68,6 +77,10 @@
 No unresolved DatePicker design decisions.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover default and composed trigger descriptions.
 
 [03/09/26]
 

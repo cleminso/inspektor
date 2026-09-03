@@ -113,17 +113,13 @@ export default function StatusExample(): ReactElement {
                   key={item.hash}
                   value={item}
                 >
-                  <ContextSwitcher.ItemText
-                    label={
-                      <Text
-                        as="span"
-                        color="inherit"
-                        monospace
-                      >
-                        {item.hash}
-                      </Text>
-                    }
-                  />
+                  <Text
+                    as="span"
+                    color="inherit"
+                    monospace
+                  >
+                    {item.hash}
+                  </Text>
                 </ContextSwitcher.Item>
               )}
             </ContextSwitcher.List>

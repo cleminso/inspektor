@@ -38,14 +38,13 @@ describe('AppHotkeysProvider', () => {
     fireEvent.keyDown(pageInput, { key: 'k', ctrlKey: true })
 
     expect(await screen.findByRole('dialog', { name: 'Commands' })).toBeTruthy()
-    expect(
-      screen.getByRole('option', { name: 'Run test command Verify the command palette' }),
-    ).toBeTruthy()
+    const option = screen.getByRole('option', {
+      name: 'Run test command',
+      description: 'Verify the command palette',
+    })
     expect(screen.getByLabelText('Ctrl+B').getAttribute('data-variant')).toBe('default')
 
-    fireEvent.click(
-      screen.getByRole('option', { name: 'Run test command Verify the command palette' }),
-    )
+    fireEvent.click(option)
 
     expect(perform).toHaveBeenCalledTimes(1)
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Commands' })).toBeNull())

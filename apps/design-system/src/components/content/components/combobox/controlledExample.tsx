@@ -41,11 +41,9 @@ export default function ControlledExample(): ReactElement {
                 <Combobox.Item
                   key={item.id}
                   value={item}
+                  description={item.namespace}
                 >
-                  <Combobox.ItemText
-                    label={item.name}
-                    description={item.namespace}
-                  />
+                  {item.name}
                 </Combobox.Item>
               )}
             </Combobox.List>

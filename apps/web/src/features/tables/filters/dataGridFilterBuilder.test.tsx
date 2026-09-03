@@ -64,7 +64,7 @@ describe('DataGridFilterBuilder', () => {
 
     expect(screen.getByText('Column no longer exists.')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Repair filter removed equals Ada' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /Equals/u }))
     const input = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.change(input, { target: { value: 'Grace' } })
@@ -85,7 +85,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /age Integer/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'age', description: 'Integer' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
     const valueInput = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.change(valueInput, { target: { value: '1.5' } })
@@ -114,7 +114,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /age Integer/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'age', description: 'Integer' }))
     fireEvent.click(await screen.findByRole('option', { name: /Is any of/u }))
     const input = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.paste(input, { clipboardData: { getData: () => '1\n2' } })
@@ -348,7 +348,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
 
     expect(screen.queryByText('Values')).toBeNull()
@@ -378,7 +378,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
     const valueInput = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.change(valueInput, { target: { value: 'Ada' } })
@@ -405,7 +405,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
     const valueInput = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.change(valueInput, { target: { value: 'Ada' } })
@@ -432,7 +432,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
     const valueInput = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.change(valueInput, { target: { value: 'Ada' } })
@@ -458,7 +458,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
     const valueInput = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.change(valueInput, { target: { value: 'Ada' } })
@@ -494,14 +494,14 @@ describe('DataGridFilterBuilder', () => {
     render(<ControlledExample />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
     const firstValueInput = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.change(firstValueInput, { target: { value: 'Ada' } })
     fireEvent.keyDown(firstValueInput, { key: 'Enter' })
 
     expect(await screen.findByRole('dialog', { name: 'Choose a column' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('option', { name: /age Integer/u }))
+    fireEvent.click(screen.getByRole('option', { name: 'age', description: 'Integer' }))
     await screen.findByRole('combobox', { name: 'Filter operators' })
     fireEvent.click(screen.getByRole('option', { name: 'Is greater than' }))
     const secondValueInput = await screen.findByRole('combobox', { name: 'Filter value' })
@@ -527,7 +527,9 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /createdAt Timestamp/u }))
+    fireEvent.click(
+      await screen.findByRole('option', { name: 'createdAt', description: 'Timestamp' }),
+    )
     fireEvent.click(await screen.findByRole('option', { name: 'Is greater than' }))
 
     expect(await screen.findByRole('option', { name: 'Today' })).toBeTruthy()
@@ -581,7 +583,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /status Enum/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'status', description: 'Enum' }))
     fireEvent.click(await screen.findByRole('option', { name: /^Equals/u }))
     const valueInput = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.keyDown(valueInput, { key: 'ArrowDown' })
@@ -600,7 +602,7 @@ describe('DataGridFilterBuilder', () => {
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={vi.fn()} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     fireEvent.click(await screen.findByRole('option', { name: /Equals/u }))
     const input = await screen.findByRole('combobox', { name: 'Filter value' })
     fireEvent.keyDown(input, { key: 'Backspace' })
@@ -634,7 +636,7 @@ describe('DataGridFilterBuilder', () => {
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={vi.fn()} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /name Text/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'name', description: 'Text' }))
     const operatorInput = await screen.findByRole('combobox', { name: 'Filter operators' })
     fireEvent.change(operatorInput, { target: { value: '!=' } })
     fireEvent.keyDown(operatorInput, { key: 'ArrowDown' })
@@ -652,7 +654,7 @@ describe('DataGridFilterBuilder', () => {
     )
 
     fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
-    fireEvent.click(await screen.findByRole('option', { name: /ownerId UUID/u }))
+    fireEvent.click(await screen.findByRole('option', { name: 'ownerId', description: 'UUID' }))
     fireEvent.click(await screen.findByRole('option', { name: 'Is not null' }))
     fireEvent.keyDown(await screen.findByRole('combobox', { name: 'Filter columns' }), {
       key: 'Enter',

@@ -55,6 +55,47 @@ describe('DatePicker', () => {
     expect(screen.getByRole('button', { name: 'Choose year, 2026' })).toBeTruthy()
   })
 
+  it('describes the trigger with its rendered value and preserves consumer descriptions', () => {
+    render(
+      <>
+        <span id="timestamp-help">Stored in UTC.</span>
+        <DatePicker value={new Date(2026, 7, 13, 12)} onApply={vi.fn()}>
+          <DatePicker.Trigger aria-describedby="timestamp-help" label="Edit timestamp">
+            Aug 13, 2026, 12:00 PM
+          </DatePicker.Trigger>
+        </DatePicker>
+      </>,
+    )
+
+    screen.getByRole('button', {
+      name: 'Edit timestamp',
+      description: 'Stored in UTC. Aug 13, 2026, 12:00 PM',
+    })
+  })
+
+  it('merges descriptions from a composed trigger', () => {
+    render(
+      <>
+        <span id="timestamp-help">Stored in UTC.</span>
+        <span id="render-help">Opens a date picker.</span>
+        <DatePicker value={new Date(2026, 7, 13, 12)} onApply={vi.fn()}>
+          <DatePicker.Trigger
+            aria-describedby="timestamp-help"
+            label="Edit timestamp"
+            render={<Button aria-describedby="render-help" />}
+          >
+            Aug 13, 2026, 12:00 PM
+          </DatePicker.Trigger>
+        </DatePicker>
+      </>,
+    )
+
+    screen.getByRole('button', {
+      name: 'Edit timestamp',
+      description: 'Opens a date picker. Stored in UTC. Aug 13, 2026, 12:00 PM',
+    })
+  })
+
   it('lets an InputGroup own the compound control border', () => {
     render(
       <InputGroup fullWidth>

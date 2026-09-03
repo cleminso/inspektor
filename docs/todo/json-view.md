@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[03/09/26]
+
+- [x] Allow containing fields to describe the tree root through `describedBy`.
+
 [02/09/26]
 
 - [x] Place sticky root actions directly in the JSON root row.
@@ -92,6 +96,10 @@
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- Containing field guidance is associated with the tree root rather than copied into JsonView.
+
 [02/09/26]
 
 - The root expansion action changes every expandable path within the safe render budget; large branch continuation remains explicit.
@@ -130,6 +138,10 @@
 - [ ] Decide the accessible naming and visual representation of root-array indices.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover externally described tree roots and generated prop metadata.
 
 [02/09/26]
 
