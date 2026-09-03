@@ -13,6 +13,21 @@
 
 [03/09/26]
 
+### Direct workspace entry
+
+- [x] Open the workspace on the latest generated schema immediately after a connection is validated.
+- [x] Remove the onboarding schema-selection step while keeping schema switching available in the workspace.
+
+[03/09/26]
+
+### Authoritative latest schema
+
+- [x] Use the permissions-head schema as the connection catalogue's `Latest` schema instead of trusting the advertised hash order.
+- [x] Preserve Jazz's advertised order for the remaining schemas and when no permissions head exists.
+- [x] Keep default connection entry and schema status derived from the same ordered catalogue.
+
+[03/09/26]
+
 ### Connection route layout
 
 - [x] Present connection list, add, and edit routes in the shared floating shell with a header and centered view.
@@ -259,6 +274,13 @@
 
 ## Settled interaction decisions
 
+[03/09/26]
+
+- The permissions-head schema defines `Latest`; the `/schemas` hash-array order does not represent schema recency.
+- When a permissions head exists in the catalogue, place it first without reordering the remaining schemas.
+- When no permissions head exists, preserve the advertised order as a compatibility fallback.
+- These decisions supersede the advertised-order recency decisions below.
+
 [29/08/26]
 
 - Jazz's advertised schema order defines generated-schema recency; publication metadata does not reorder it.
@@ -364,6 +386,11 @@
 - None.
 
 ## Validation checklist
+
+[03/09/26]
+
+- [x] Cover a permissions-head schema that differs from the first advertised schema.
+- [x] Run Inspector formatting, lint, typecheck, build, and package-wide tests.
 
 [03/09/26]
 

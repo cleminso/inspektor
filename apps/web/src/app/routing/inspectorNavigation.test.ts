@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   createEmptyConnectionStore,
@@ -10,11 +10,24 @@ import {
 } from '@app/routing/inspectorNavigation'
 
 const fetchSchemaHashes = vi.fn()
+const fetchPermissionsHead = vi.fn()
 
 vi.mock('jazz-tools', () => ({ fetchSchemaHashes }))
 
+beforeEach(() => {
+  fetchPermissionsHead.mockResolvedValue({
+    json: async () => ({ head: null }),
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+  })
+  vi.stubGlobal('fetch', fetchPermissionsHead)
+})
+
 afterEach(() => {
   fetchSchemaHashes.mockReset()
+  fetchPermissionsHead.mockReset()
+  vi.unstubAllGlobals()
 })
 
 function createStore(lastSchemaHash: string | null = 'schema-1'): StoredConnectionsStore {
@@ -44,13 +57,19 @@ function createStore(lastSchemaHash: string | null = 'schema-1'): StoredConnecti
 }
 
 describe('resolveStoredTablesNavigationTarget', () => {
-  it('opens the first advertised schema instead of the remembered schema', async () => {
+  it('opens the permissions-head schema instead of the first advertised schema', async () => {
     fetchSchemaHashes.mockResolvedValueOnce({
       hashes: ['schema-1', 'schema-2'],
       schemas: [
         { hash: 'schema-1', publishedAt: 1 },
         { hash: 'schema-2', publishedAt: 2 },
       ],
+    })
+    fetchPermissionsHead.mockResolvedValueOnce({
+      json: async () => ({ head: { schemaHash: 'schema-2' } }),
+      ok: true,
+      status: 200,
+      statusText: 'OK',
     })
 
     await expect(
@@ -61,10 +80,10 @@ describe('resolveStoredTablesNavigationTarget', () => {
     ).resolves.toEqual({
       connectionId: 'connection-1',
       branch: 'main',
-      schemaHash: 'schema-1',
+      schemaHash: 'schema-2',
       schemaCatalogue: [
-        { hash: 'schema-1', publishedAt: 1 },
         { hash: 'schema-2', publishedAt: 2 },
+        { hash: 'schema-1', publishedAt: 1 },
       ],
     })
     expect(fetchSchemaHashes).toHaveBeenCalledOnce()
@@ -72,6 +91,29 @@ describe('resolveStoredTablesNavigationTarget', () => {
       appId: 'app-1',
       adminSecret: 'secret',
     })
+    expect(fetchPermissionsHead).toHaveBeenCalledWith(
+      'https://example.com/apps/app-1/admin/permissions/head',
+      { headers: { 'X-Jazz-Admin-Secret': 'secret' } },
+    )
+  })
+
+  it('uses the advertised schema order when the permissions head is unavailable', async () => {
+    const schemaCatalogue = [
+      { hash: 'schema-1', publishedAt: 1 },
+      { hash: 'schema-2', publishedAt: 2 },
+    ]
+    fetchSchemaHashes.mockResolvedValueOnce({
+      hashes: ['schema-1', 'schema-2'],
+      schemas: schemaCatalogue,
+    })
+    fetchPermissionsHead.mockRejectedValueOnce(new Error('Permissions head unavailable'))
+
+    await expect(
+      resolveStoredTablesNavigationTarget({
+        connectionId: 'connection-1',
+        store: createStore(),
+      }),
+    ).resolves.toHaveProperty('schemaCatalogue', schemaCatalogue)
   })
 
   it('honors an explicit available schema from a deep link', async () => {
