@@ -46,7 +46,7 @@ Implementation work is limited to these directories:
 
 Other workspace packages are outside the replacement UI architecture. Do not modify them unless the user explicitly requests work in them.
 
-## Inspector Test
+## Inspektor Test
 
 Use `apps/inspektor-test` as the curated test app for Inspector behavior. Read its `README.md` before changing its schema, permissions, seeded data, or fixture tooling.
 

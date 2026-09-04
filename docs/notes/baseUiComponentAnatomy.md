@@ -428,7 +428,7 @@ What breaks:
 
 See [Base UI styling with data attributes](https://base-ui.com/react/handbook/styling#data-attributes) and the [v1.6.0 state-attribute implementation](https://github.com/mui/base-ui/blob/v1.6.0/packages/react/src/internals/getStateAttributesProps.ts).
 
-## TypeScript tools used by Inspector wrappers
+## TypeScript tools used by Inspektor wrappers
 
 ### Omit
 
@@ -718,7 +718,7 @@ What breaks:
 
 See [Base UI Button](https://base-ui.com/react/components/button), [`useRender` polymorphism](https://base-ui.com/react/utils/use-render#render-prop-and-polymorphism), [v1.6.0 Button source](https://github.com/mui/base-ui/blob/v1.6.0/packages/react/src/button/Button.tsx), and [v1.6.0 button behavior](https://github.com/mui/base-ui/blob/v1.6.0/packages/react/src/internals/use-button/useButton.ts).
 
-## Base UI versus Inspector ownership
+## Base UI versus Inspektor ownership
 
 | Concern             | Base UI owns                                                                                     | Inspector owns                                                                                |
 | ------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
@@ -738,7 +738,7 @@ A practical ownership test:
 
 Inspector should not query the DOM to reconstruct state Base UI already exposes. It should also not push product-specific visual policy into Base UI.
 
-## Mapped Inspector examples
+## Mapped Inspektor examples
 
 ### Button: a single-part wrapper
 
@@ -971,7 +971,7 @@ The checkbox, primary trigger, and trailing action are siblings, avoiding nested
 - [Component event details](https://github.com/mui/base-ui/blob/v1.6.0/packages/react/src/internals/createBaseUIEventDetails.ts)
 - [State attribute mapping](https://github.com/mui/base-ui/blob/v1.6.0/packages/react/src/internals/getStateAttributesProps.ts)
 
-### Local Inspector source map
+### Local Inspektor source map
 
 Paths are relative to the repository root.
 

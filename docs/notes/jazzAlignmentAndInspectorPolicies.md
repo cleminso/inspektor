@@ -30,15 +30,15 @@ This note records useful patterns from the official Jazz Inspector and settled d
 
 Official source reviewed:
 
-- `packages/inspektor/src/components/data-explorer/TableDataGrid.tsx`
-- `packages/inspektor/src/components/data-explorer/row-mutation-form.ts`
-- `packages/inspektor/src/components/data-explorer/TableFilterBuilder.tsx`
-- `packages/inspektor/src/components/data-explorer/ColumnCustomizationModal.tsx`
-- `packages/inspektor/src/utility/generic-query-builder.ts`
+- `packages/inspector/src/components/data-explorer/TableDataGrid.tsx`
+- `packages/inspector/src/components/data-explorer/row-mutation-form.ts`
+- `packages/inspector/src/components/data-explorer/TableFilterBuilder.tsx`
+- `packages/inspector/src/components/data-explorer/ColumnCustomizationModal.tsx`
+- `packages/inspector/src/utility/generic-query-builder.ts`
 
 ## Upstream findings
 
-The official inspektor is strongest in grid workflows:
+The official Inspector is strongest in grid workflows:
 
 - It separates live source rows from pending dirty cell edits.
 - It saves dirty-field patches instead of reconstructed rows.
@@ -52,7 +52,7 @@ The official inspektor is strongest in grid workflows:
 
 Its main structural weakness is that querying, rendering, selection, editing, mutations, preferences, and live animations are concentrated in one large grid component.
 
-## Inspector strengths
+## Inspektor strengths
 
 Keep the current Inspector direction:
 
@@ -105,7 +105,7 @@ Jazz evidence:
 
 - `packages/jazz-tools/src/runtime/value-converter.ts` documents and implements top-level `undefined` omission in `toWriteRecord`.
 - `packages/jazz-tools/src/runtime/value-converter.test.ts` covers explicit nullable `null`, skipped `undefined`, unknown columns, required-field `null`, and JSON-schema failures.
-- `packages/inspektor/src/components/data-explorer/TableDataGrid.test.tsx` covers omitted insert defaults and explicit nullable values.
+- `packages/inspector/src/components/data-explorer/TableDataGrid.test.tsx` covers omitted insert defaults and explicit nullable values.
 
 Omission is operation-dependent: it requests the stored default during insert and means unchanged during update. Unavailable source data is presentation state, not another spelling of omission.
 
@@ -123,7 +123,7 @@ Inspector follows the compatible part of that behavior and adds earlier validati
 
 The upstream behavior is implemented in `packages/jazz-tools/src/runtime/value-converter.ts`. Inspector's stricter checks are product validation, not a different storage meaning.
 
-### Deliberate Inspector policy differences
+### Deliberate Inspektor policy differences
 
 Strict Row validation and JSON-null rejection are deliberate Inspector policies layered above Jazz's permissive converter:
 
@@ -134,7 +134,7 @@ These checks provide earlier errors and preserve visible mutation intent. Do not
 
 ### Structured draft formatting
 
-The official Inspector formats a source object with `JSON.stringify` when editing begins, stores subsequent edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft. See `packages/inspektor/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
+The official Inspector formats a source object with `JSON.stringify` when editing begins, stores subsequent edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft. See `packages/inspector/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
 
 Inspector uses the same ownership rule:
 

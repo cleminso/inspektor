@@ -50,12 +50,12 @@ I'm using Jazz because they made my developer experience simpler to create appli
 local-first, real-time sync. But during my developer experience there is the moment to use the inspektor that I'm not
 satisfied.
 
-I found the inspektor experience quality does not represent the same quality as Jazz-tools offer.
+I found the Inspector experience quality does not represent the same quality as Jazz-tools offer.
 
 I want to build an alternative Jazz inspektor that's focus on modern UX and easier to use and it's central piece for a Jazz developer that require attention and cares.
 
 I'm making assumptions about the UX what I think is necessary for the inspektor. The "UX quality" is my own judgment. My end
-goal is to present this work to Jazz team and discuss to join them to work on the official inspektor. I see myself working on frontend part of Jazz, such as the official inspektor and Jazz dashboard.
+goal is to present this work to Jazz team and discuss to join them to work on the official Inspector. I see myself working on frontend part of Jazz, such as the official Inspector and Jazz dashboard.
 
 The direction I take for this Inspector is quite different from the official one, who is more "standalone" about the framework used (pure css). Where I'm going with modern framework choice that I'm more comfortable with, and found more ergonomic. See Architecture
 
@@ -326,7 +326,7 @@ Some of my personal pain points, mostly about the UX and navigation inside the I
   - keyboard actions
   - quick way to select and/or copy row/cell
 - lack of clarity with `live-query` page
-- official inspektor folder is quite "messy" hard to make a contribution to
+- official Inspector folder is quite "messy" hard to make a contribution to
 
 ## Inspector
 
@@ -1398,7 +1398,7 @@ The Live queries view does not show returned row data. To inspect data, Inspecto
 
 It shows what the server is currently tracking.
 
-It's server telemetry, not local client introspection. It polls like the Jazz standalone inspektor. v1 should keep automatic refresh and add a manual refresh action.
+It's server telemetry, not local client introspection. It polls like the Jazz standalone Inspector. v1 should keep automatic refresh and add a manual refresh action.
 
 The refresh control should not be labeled as a real-time stream. It controls snapshot fetching.
 

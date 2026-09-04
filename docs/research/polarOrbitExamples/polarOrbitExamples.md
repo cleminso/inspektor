@@ -42,7 +42,7 @@ No author explicitly documented this split. The best-supported inference is a re
 - Formatting and API changes must be applied twice.
 - Curated omissions can be mistaken for accidental omissions.
 
-## Recommended model for Inspector
+## Recommended model for Inspektor
 
 Do not duplicate strings. Use ordinary TSX example files imported twice:
 

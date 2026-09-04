@@ -70,19 +70,19 @@ Read a wrapper from its public boundary toward the DOM.
 
 ## Compound-part role map
 
-| Role | Base UI owns | Inspector owns | Evidence |
-| --- | --- | --- | --- |
-| `Root` | Shared context and controlled/uncontrolled state. Select and Combobox Root render no element; Accordion Root renders a container. | Modes, defaults, and public root vocabulary. | `accordion.tsx:63-77`; `select.tsx:112-114`; `combobox.tsx:213-229` |
-| `Item` | Context registration and derived open/selected/highlighted/disabled state. | Typed value, size/variant, state visuals, and standard internals. | `accordion.tsx:79-85`; `select.tsx:288-325`; `combobox.tsx:599-620` |
-| `Header` / `Label` | Semantic association and IDs. | Typography and supported composition. | `accordion.tsx:87-94`; `select.tsx:116-124` |
-| `Trigger` | Open/close behavior, button semantics, focus, and state. | Visual treatment and adornment DOM. | `accordion.tsx:96-119`; `select.tsx:141-196`; `combobox.tsx:296-367` |
-| `Portal` | Portal placement and mount coordination. | Supported mount options. | `select.tsx:223-227`; `menu.tsx:173-178` |
-| `Positioner` | Measurement, collision, side/alignment, and anchor state. | Restricted placement props and shared offset. | `select.tsx:64-67`, `229-245`; `menu.tsx:39-42`, `180-194` |
-| `Popup` | Popup/focus semantics and transition state. | Surface, width, and transition styles. | `select.tsx:247-256`; `menu.tsx:196-208` |
-| `List` | Listbox/menu and collection semantics. | Scroll and spacing treatment. | `select.tsx:258-263`; `combobox.tsx:574-582` |
-| `Value` / `ItemText` | Label resolution and semantic item text. | Placeholder/truncation styles and standard insertion. | `select.tsx:198-205`, `307-335` |
-| `Indicator` / `Icon` | Part-context state and conditional mounting. | Standard SVG and de-duplication. | `select.tsx:207-221`, `339-366` |
-| `Content` | No separate Base part in these wrappers. | A recipe composed from Portal, Positioner, Popup, and sometimes List. | `select.tsx:265-280`; `menu.tsx:210-221` |
+| Role                 | Base UI owns                                                                                                                      | Inspector owns                                                        | Evidence                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `Root`               | Shared context and controlled/uncontrolled state. Select and Combobox Root render no element; Accordion Root renders a container. | Modes, defaults, and public root vocabulary.                          | `accordion.tsx:63-77`; `select.tsx:112-114`; `combobox.tsx:213-229`  |
+| `Item`               | Context registration and derived open/selected/highlighted/disabled state.                                                        | Typed value, size/variant, state visuals, and standard internals.     | `accordion.tsx:79-85`; `select.tsx:288-325`; `combobox.tsx:599-620`  |
+| `Header` / `Label`   | Semantic association and IDs.                                                                                                     | Typography and supported composition.                                 | `accordion.tsx:87-94`; `select.tsx:116-124`                          |
+| `Trigger`            | Open/close behavior, button semantics, focus, and state.                                                                          | Visual treatment and adornment DOM.                                   | `accordion.tsx:96-119`; `select.tsx:141-196`; `combobox.tsx:296-367` |
+| `Portal`             | Portal placement and mount coordination.                                                                                          | Supported mount options.                                              | `select.tsx:223-227`; `menu.tsx:173-178`                             |
+| `Positioner`         | Measurement, collision, side/alignment, and anchor state.                                                                         | Restricted placement props and shared offset.                         | `select.tsx:64-67`, `229-245`; `menu.tsx:39-42`, `180-194`           |
+| `Popup`              | Popup/focus semantics and transition state.                                                                                       | Surface, width, and transition styles.                                | `select.tsx:247-256`; `menu.tsx:196-208`                             |
+| `List`               | Listbox/menu and collection semantics.                                                                                            | Scroll and spacing treatment.                                         | `select.tsx:258-263`; `combobox.tsx:574-582`                         |
+| `Value` / `ItemText` | Label resolution and semantic item text.                                                                                          | Placeholder/truncation styles and standard insertion.                 | `select.tsx:198-205`, `307-335`                                      |
+| `Indicator` / `Icon` | Part-context state and conditional mounting.                                                                                      | Standard SVG and de-duplication.                                      | `select.tsx:207-221`, `339-366`                                      |
+| `Content`            | No separate Base part in these wrappers.                                                                                          | A recipe composed from Portal, Positioner, Popup, and sometimes List. | `select.tsx:265-280`; `menu.tsx:210-221`                             |
 
 Role names are architectural hints, not universal DOM guarantees. `Select.Content` is an Inspector recipe; `Select.Popup` directly wraps Base UI. `Object.assign` groups both under one API without changing their ownership.
 
@@ -405,44 +405,44 @@ Combobox InputGroup combines Base validity/disabled state with local descendant 
 
 Combobox PopupHeader, PopupFooter, and Viewport use `useRender` and `mergeProps` internally while omitting public `render` (`combobox.tsx:148-166`, `457-507`). Implementation machinery and public capability are separate decisions.
 
-## Base UI versus Inspector responsibilities
+## Base UI versus Inspektor responsibilities
 
-| Concern | Base UI | Inspector |
-| --- | --- | --- |
-| State mechanics | Controlled/uncontrolled state, update details, context, item registration. | Public modes, defaults, and translation of product concepts such as loading. |
-| Accessibility | Roles, ARIA relationships, form controls, disabled/read-only semantics, focus, keyboard/pointer behavior. | Required labels in public types, default names for owned icon actions, safe composition. |
-| Derived state | `open`, `selected`, `highlighted`, `disabled`, `valid`, `placeholder`, transition status. | Visual meaning of those fields and presentation-only local state. |
-| Behavior node | Default element, internal handlers, refs, state attributes, custom `render`. | Whether `render`/`nativeButton` are public and what owned children appear. |
-| Popup | Portal, measurement, collision, placement, focus, mount, transition state. | Allowed placement, shared offsets, widths, surfaces, and standard composition. |
-| Styling | State callback extension points; primitives are unstyled. | Tokens, StyleX, variants, sizes, state visuals, data slots. |
-| Compound API | Runtime contexts and required Base relationships. | Export namespace, aliases, recipes, presentation parts, documentation. |
-| Product composition | Leaf primitives/utilities that Inspector invokes. | ActionList structure, Escape delegation, and focus-return policy. |
+| Concern             | Base UI                                                                                                   | Inspector                                                                                |
+| ------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| State mechanics     | Controlled/uncontrolled state, update details, context, item registration.                                | Public modes, defaults, and translation of product concepts such as loading.             |
+| Accessibility       | Roles, ARIA relationships, form controls, disabled/read-only semantics, focus, keyboard/pointer behavior. | Required labels in public types, default names for owned icon actions, safe composition. |
+| Derived state       | `open`, `selected`, `highlighted`, `disabled`, `valid`, `placeholder`, transition status.                 | Visual meaning of those fields and presentation-only local state.                        |
+| Behavior node       | Default element, internal handlers, refs, state attributes, custom `render`.                              | Whether `render`/`nativeButton` are public and what owned children appear.               |
+| Popup               | Portal, measurement, collision, placement, focus, mount, transition state.                                | Allowed placement, shared offsets, widths, surfaces, and standard composition.           |
+| Styling             | State callback extension points; primitives are unstyled.                                                 | Tokens, StyleX, variants, sizes, state visuals, data slots.                              |
+| Compound API        | Runtime contexts and required Base relationships.                                                         | Export namespace, aliases, recipes, presentation parts, documentation.                   |
+| Product composition | Leaf primitives/utilities that Inspector invokes.                                                         | ActionList structure, Escape delegation, and focus-return policy.                        |
 
 A practical test: if a concern requires widget interaction state or ARIA mechanics, prefer the Base part or exposed state/props. If it requires Inspector tokens, supported variants, standard child markup, or product composition, it belongs in the wrapper.
 
 ## Pattern-to-need map
 
-| Pattern | Need answered | Example |
-| --- | --- | --- |
-| `BasePart.Props` | Reuse exact native, event, ARIA, and behavior typing. | `button.tsx:23-26`; `accordion.tsx:12-61` |
-| `BasePart.State` | Style from authoritative derived behavior state. | `accordion.tsx:100-127`; `select.tsx:158-165`, `300-306` |
-| `Props['key']` | Expose one upstream capability exactly. | `button.tsx:37-40`; `select.tsx:24-31` |
-| `Omit` | Remove style escapes, unsafe modes, or owned content decisions. | `button.tsx:23-26`; `select.tsx:20-23`, `38-41`, `83-86` |
-| `Pick` | Publish a safe subset of a broad low-level API. | `select.tsx:64-67`; `menu.tsx:39-42` |
-| Discriminated union | Reject invalid accessibility/layout combinations. | `button.tsx:43-69` |
-| Union + `satisfies Record` | Couple public semantic values to exhaustive styles. | `buttonVisuals.tsx:9-51`; `select.tsx:11-18` |
-| `ComponentRef<typeof Part>` | Derive the exact component ref target. | `select.tsx:141`, `298`, `327-330` |
-| `forwardRef` | Carry a consumer ref to the behavior element. | `button.tsx:71-90`, `110-119` |
-| Generic plain Root | Preserve `Value` inference without an element ref. | `select.tsx:112-114` |
-| Generic inner + cast | Restore a call-site generic erased by `forwardRef`. | `select.tsx:288-330` |
-| `createStateStyleProps<State>` | Adapt StyleX selection to Base class/style callbacks. | `createStateStyleProps.ts:3-13` |
-| `Object.assign` | Package callable root and compound members. | `accordion.tsx:132-138` |
-| `...props` first, policy after | Make wrapper defaults/invariants win. | `button.tsx:110-129` |
-| Base `render` | Compose behavior onto a compatible target. | `button.tsx:39-40`, `110-119` |
-| `useRender.ComponentProps<Tag>` | Type native props plus composition for Inspector DOM. | `actionList.tsx:26-35` |
-| `useRender` | Render default/composed Inspector element with merged refs. | `actionList.tsx:114-142` |
-| `mergeProps<Tag>` | Preserve handlers, classes, and styles from many owners. | `actionList.tsx:118-141` |
-| Inspector `Content` | Encode a safe common popup subtree. | `select.tsx:265-280` |
+| Pattern                         | Need answered                                                   | Example                                                  |
+| ------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------- |
+| `BasePart.Props`                | Reuse exact native, event, ARIA, and behavior typing.           | `button.tsx:23-26`; `accordion.tsx:12-61`                |
+| `BasePart.State`                | Style from authoritative derived behavior state.                | `accordion.tsx:100-127`; `select.tsx:158-165`, `300-306` |
+| `Props['key']`                  | Expose one upstream capability exactly.                         | `button.tsx:37-40`; `select.tsx:24-31`                   |
+| `Omit`                          | Remove style escapes, unsafe modes, or owned content decisions. | `button.tsx:23-26`; `select.tsx:20-23`, `38-41`, `83-86` |
+| `Pick`                          | Publish a safe subset of a broad low-level API.                 | `select.tsx:64-67`; `menu.tsx:39-42`                     |
+| Discriminated union             | Reject invalid accessibility/layout combinations.               | `button.tsx:43-69`                                       |
+| Union + `satisfies Record`      | Couple public semantic values to exhaustive styles.             | `buttonVisuals.tsx:9-51`; `select.tsx:11-18`             |
+| `ComponentRef<typeof Part>`     | Derive the exact component ref target.                          | `select.tsx:141`, `298`, `327-330`                       |
+| `forwardRef`                    | Carry a consumer ref to the behavior element.                   | `button.tsx:71-90`, `110-119`                            |
+| Generic plain Root              | Preserve `Value` inference without an element ref.              | `select.tsx:112-114`                                     |
+| Generic inner + cast            | Restore a call-site generic erased by `forwardRef`.             | `select.tsx:288-330`                                     |
+| `createStateStyleProps<State>`  | Adapt StyleX selection to Base class/style callbacks.           | `createStateStyleProps.ts:3-13`                          |
+| `Object.assign`                 | Package callable root and compound members.                     | `accordion.tsx:132-138`                                  |
+| `...props` first, policy after  | Make wrapper defaults/invariants win.                           | `button.tsx:110-129`                                     |
+| Base `render`                   | Compose behavior onto a compatible target.                      | `button.tsx:39-40`, `110-119`                            |
+| `useRender.ComponentProps<Tag>` | Type native props plus composition for Inspector DOM.           | `actionList.tsx:26-35`                                   |
+| `useRender`                     | Render default/composed Inspector element with merged refs.     | `actionList.tsx:114-142`                                 |
+| `mergeProps<Tag>`               | Preserve handlers, classes, and styles from many owners.        | `actionList.tsx:118-141`                                 |
+| Inspector `Content`             | Encode a safe common popup subtree.                             | `select.tsx:265-280`                                     |
 
 ## Failure modes
 
@@ -481,74 +481,74 @@ A practical test: if a concern requires widget interaction state or ARIA mechani
 
 ## Local source map
 
-Paths are relative to `/Users/clem/projects/regarde/inspektor`.
+Paths are relative to `/Users/clem/projects/inspektor`.
 
 ### Inspector sources
 
-| File and lines | Evidence |
-| --- | --- |
-| `packages/design-system/src/components/button/button.tsx:23-69` | Base prop derivation, omissions, semantic props, discriminated union. |
-| `packages/design-system/src/components/button/button.tsx:71-108` | `forwardRef`, defaults, loading translation, state styling. |
-| `packages/design-system/src/components/button/button.tsx:110-140` | Prop order, Base boundary, metadata, content DOM. |
-| `packages/design-system/src/components/button/buttonVisuals.tsx:9-96` | Unions, exhaustive style records, visual-state selection. |
-| `packages/design-system/src/components/button/buttonVisuals.tsx:98-166` | Inspector label/icon/spinner DOM. |
-| `packages/design-system/src/components/accordion/accordion.tsx:8-61` | Per-part props and selective `render`. |
-| `packages/design-system/src/components/accordion/accordion.tsx:63-94` | Root/Item/Header refs and state style plumbing. |
-| `packages/design-system/src/components/accordion/accordion.tsx:96-130` | Trigger/Panel state and trigger internals. |
-| `packages/design-system/src/components/accordion/accordion.tsx:132-138` | Compound export. |
-| `packages/design-system/src/components/select/select.tsx:9-109` | Generic public types, omissions, picks, popup contracts. |
-| `packages/design-system/src/components/select/select.tsx:112-139` | Generic Root, Label state, exhaustive map, child detection. |
-| `packages/design-system/src/components/select/select.tsx:141-221` | `ComponentRef`, Trigger state/order, Value, Icon. |
-| `packages/design-system/src/components/select/select.tsx:223-280` | Portal, Positioner, Popup, List, Content recipe. |
-| `packages/design-system/src/components/select/select.tsx:282-330` | Generic Item, state, standard children, cast. |
-| `packages/design-system/src/components/select/select.tsx:332-405` | Remaining parts and compound export. |
-| `packages/design-system/src/components/actionList/actionList.tsx:16-74` | Native, `useRender`, Button, Checkbox public types. |
-| `packages/design-system/src/components/actionList/actionList.tsx:76-112` | List root, filtering, Escape/focus policy. |
-| `packages/design-system/src/components/actionList/actionList.tsx:114-142` | `useRender`, `mergeProps`, render target, ref. |
-| `packages/design-system/src/components/actionList/actionList.tsx:144-231` | Interactive leaves and compound export. |
-| `packages/design-system/src/components/menu/menu.tsx:12-143` | Compound prop shaping and presentation props. |
-| `packages/design-system/src/components/menu/menu.tsx:145-221` | Root through Popup and Content recipe. |
-| `packages/design-system/src/components/menu/menu.tsx:223-350` | Action/choice state and defaults. |
-| `packages/design-system/src/components/menu/menu.tsx:356-419` | Submenu, presentation parts, export. |
-| `packages/design-system/src/components/combobox/combobox.tsx:19-211` | Generic and popup/presentation public types. |
-| `packages/design-system/src/components/combobox/combobox.tsx:213-318` | Generic Root, refs, focus state, manual event composition. |
-| `packages/design-system/src/components/combobox/combobox.tsx:320-455` | Alternate Trigger and popup recipe. |
-| `packages/design-system/src/components/combobox/combobox.tsx:457-507` | Plain parts using `useRender`/`mergeProps`. |
-| `packages/design-system/src/components/combobox/combobox.tsx:599-620` | Generic Item cast. |
-| `packages/design-system/src/components/combobox/combobox.tsx:663-688` | Compound export. |
-| `packages/design-system/src/primitives/createStateStyleProps.ts:3-13` | StyleX/Base state adapter. |
-| `packages/design-system/src/primitives/popupPositioning.ts:1-4` | Shared offset policy. |
-| `packages/design-system/src/index.ts:2-18`, `50-82`, `124-131`, `227-251`, `291-310` | Public values and types. |
+| File and lines                                                                       | Evidence                                                              |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `packages/design-system/src/components/button/button.tsx:23-69`                      | Base prop derivation, omissions, semantic props, discriminated union. |
+| `packages/design-system/src/components/button/button.tsx:71-108`                     | `forwardRef`, defaults, loading translation, state styling.           |
+| `packages/design-system/src/components/button/button.tsx:110-140`                    | Prop order, Base boundary, metadata, content DOM.                     |
+| `packages/design-system/src/components/button/buttonVisuals.tsx:9-96`                | Unions, exhaustive style records, visual-state selection.             |
+| `packages/design-system/src/components/button/buttonVisuals.tsx:98-166`              | Inspector label/icon/spinner DOM.                                     |
+| `packages/design-system/src/components/accordion/accordion.tsx:8-61`                 | Per-part props and selective `render`.                                |
+| `packages/design-system/src/components/accordion/accordion.tsx:63-94`                | Root/Item/Header refs and state style plumbing.                       |
+| `packages/design-system/src/components/accordion/accordion.tsx:96-130`               | Trigger/Panel state and trigger internals.                            |
+| `packages/design-system/src/components/accordion/accordion.tsx:132-138`              | Compound export.                                                      |
+| `packages/design-system/src/components/select/select.tsx:9-109`                      | Generic public types, omissions, picks, popup contracts.              |
+| `packages/design-system/src/components/select/select.tsx:112-139`                    | Generic Root, Label state, exhaustive map, child detection.           |
+| `packages/design-system/src/components/select/select.tsx:141-221`                    | `ComponentRef`, Trigger state/order, Value, Icon.                     |
+| `packages/design-system/src/components/select/select.tsx:223-280`                    | Portal, Positioner, Popup, List, Content recipe.                      |
+| `packages/design-system/src/components/select/select.tsx:282-330`                    | Generic Item, state, standard children, cast.                         |
+| `packages/design-system/src/components/select/select.tsx:332-405`                    | Remaining parts and compound export.                                  |
+| `packages/design-system/src/components/actionList/actionList.tsx:16-74`              | Native, `useRender`, Button, Checkbox public types.                   |
+| `packages/design-system/src/components/actionList/actionList.tsx:76-112`             | List root, filtering, Escape/focus policy.                            |
+| `packages/design-system/src/components/actionList/actionList.tsx:114-142`            | `useRender`, `mergeProps`, render target, ref.                        |
+| `packages/design-system/src/components/actionList/actionList.tsx:144-231`            | Interactive leaves and compound export.                               |
+| `packages/design-system/src/components/menu/menu.tsx:12-143`                         | Compound prop shaping and presentation props.                         |
+| `packages/design-system/src/components/menu/menu.tsx:145-221`                        | Root through Popup and Content recipe.                                |
+| `packages/design-system/src/components/menu/menu.tsx:223-350`                        | Action/choice state and defaults.                                     |
+| `packages/design-system/src/components/menu/menu.tsx:356-419`                        | Submenu, presentation parts, export.                                  |
+| `packages/design-system/src/components/combobox/combobox.tsx:19-211`                 | Generic and popup/presentation public types.                          |
+| `packages/design-system/src/components/combobox/combobox.tsx:213-318`                | Generic Root, refs, focus state, manual event composition.            |
+| `packages/design-system/src/components/combobox/combobox.tsx:320-455`                | Alternate Trigger and popup recipe.                                   |
+| `packages/design-system/src/components/combobox/combobox.tsx:457-507`                | Plain parts using `useRender`/`mergeProps`.                           |
+| `packages/design-system/src/components/combobox/combobox.tsx:599-620`                | Generic Item cast.                                                    |
+| `packages/design-system/src/components/combobox/combobox.tsx:663-688`                | Compound export.                                                      |
+| `packages/design-system/src/primitives/createStateStyleProps.ts:3-13`                | StyleX/Base state adapter.                                            |
+| `packages/design-system/src/primitives/popupPositioning.ts:1-4`                      | Shared offset policy.                                                 |
+| `packages/design-system/src/index.ts:2-18`, `50-82`, `124-131`, `227-251`, `291-310` | Public values and types.                                              |
 
 ### Contract tests
 
-| File and lines | Evidence |
-| --- | --- |
-| `packages/design-system/src/components/button/button.test.tsx:9-33` | Icon-only accessibility/type constraints. |
-| `packages/design-system/src/components/button/button.test.tsx:35-53` | Loading translated to disabled semantics. |
-| `packages/design-system/src/components/button/button.test.tsx:71-80` | Custom render propagation. |
-| `packages/design-system/src/components/accordion/accordion.test.tsx:9-27` | Trigger/Panel behavior. |
-| `packages/design-system/src/components/select/select.test.tsx:23-30` | Generic single-value preservation. |
-| `packages/design-system/src/components/select/select.test.tsx:32-139` | State, disabled behavior, associations. |
-| `packages/design-system/src/components/select/select.test.tsx:172-241` | Owned-part de-duplication. |
-| `packages/design-system/src/components/actionList/actionList.test.tsx:31-111` | Separate controls and render composition. |
-| `packages/design-system/src/components/actionList/actionList.test.tsx:113-164` | Escape/focus contract. |
+| File and lines                                                                    | Evidence                                    |
+| --------------------------------------------------------------------------------- | ------------------------------------------- |
+| `packages/design-system/src/components/button/button.test.tsx:9-33`               | Icon-only accessibility/type constraints.   |
+| `packages/design-system/src/components/button/button.test.tsx:35-53`              | Loading translated to disabled semantics.   |
+| `packages/design-system/src/components/button/button.test.tsx:71-80`              | Custom render propagation.                  |
+| `packages/design-system/src/components/accordion/accordion.test.tsx:9-27`         | Trigger/Panel behavior.                     |
+| `packages/design-system/src/components/select/select.test.tsx:23-30`              | Generic single-value preservation.          |
+| `packages/design-system/src/components/select/select.test.tsx:32-139`             | State, disabled behavior, associations.     |
+| `packages/design-system/src/components/select/select.test.tsx:172-241`            | Owned-part de-duplication.                  |
+| `packages/design-system/src/components/actionList/actionList.test.tsx:31-111`     | Separate controls and render composition.   |
+| `packages/design-system/src/components/actionList/actionList.test.tsx:113-164`    | Escape/focus contract.                      |
 | `packages/design-system/src/components/combobox/combobox.test.tsx:9-26`, `55-112` | Roles, live regions, groups, focus visuals. |
 
 ### Installed Base UI evidence
 
 These are installed dependency files, not Inspector-authored source.
 
-| File and lines | Evidence |
-| --- | --- |
-| `packages/design-system/node_modules/@base-ui/react/internals/types.d.ts:18-57` | `BaseUIComponentProps`, state styles, `render`, native-button contracts. |
-| `packages/design-system/node_modules/@base-ui/react/button/Button.d.ts:9-26` | Button ref and Props/State namespace. |
-| `packages/design-system/node_modules/@base-ui/react/select/root/SelectRoot.d.ts:11-14`, `129-155` | Generic Root values and namespace aliases. |
-| `packages/design-system/node_modules/@base-ui/react/select/item/SelectItem.d.ts:9-46` | Item ref/state and broad upstream value. |
-| `packages/design-system/node_modules/@base-ui/react/combobox/root/ComboboxRoot.d.ts:9-17`, `50-101` | Generic Combobox Root contract. |
-| `packages/design-system/node_modules/@base-ui/react/accordion/root/AccordionRoot.d.ts:11-103` | Generic Root state and props. |
-| `packages/design-system/node_modules/@base-ui/react/accordion/trigger/AccordionTrigger.d.ts:10-16` | Trigger ref and state. |
-| `packages/design-system/node_modules/@base-ui/react/use-render/useRender.d.ts:10-70` | Render parameters, component props, state, and ref types. |
-| `packages/design-system/node_modules/@base-ui/react/merge-props/mergeProps.d.ts:5-38` | Merge order and non-merging of refs. |
-| `packages/design-system/node_modules/@base-ui/react/internals/useRenderElement.js:28-95`, `104-176` | State/ref/render-element merging and default tag rendering. |
-| `packages/design-system/node_modules/@base-ui/react/button/Button.js:18-43` | Base Button state, behavior hook, refs, internal props. |
+| File and lines                                                                                      | Evidence                                                                 |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `packages/design-system/node_modules/@base-ui/react/internals/types.d.ts:18-57`                     | `BaseUIComponentProps`, state styles, `render`, native-button contracts. |
+| `packages/design-system/node_modules/@base-ui/react/button/Button.d.ts:9-26`                        | Button ref and Props/State namespace.                                    |
+| `packages/design-system/node_modules/@base-ui/react/select/root/SelectRoot.d.ts:11-14`, `129-155`   | Generic Root values and namespace aliases.                               |
+| `packages/design-system/node_modules/@base-ui/react/select/item/SelectItem.d.ts:9-46`               | Item ref/state and broad upstream value.                                 |
+| `packages/design-system/node_modules/@base-ui/react/combobox/root/ComboboxRoot.d.ts:9-17`, `50-101` | Generic Combobox Root contract.                                          |
+| `packages/design-system/node_modules/@base-ui/react/accordion/root/AccordionRoot.d.ts:11-103`       | Generic Root state and props.                                            |
+| `packages/design-system/node_modules/@base-ui/react/accordion/trigger/AccordionTrigger.d.ts:10-16`  | Trigger ref and state.                                                   |
+| `packages/design-system/node_modules/@base-ui/react/use-render/useRender.d.ts:10-70`                | Render parameters, component props, state, and ref types.                |
+| `packages/design-system/node_modules/@base-ui/react/merge-props/mergeProps.d.ts:5-38`               | Merge order and non-merging of refs.                                     |
+| `packages/design-system/node_modules/@base-ui/react/internals/useRenderElement.js:28-95`, `104-176` | State/ref/render-element merging and default tag rendering.              |
+| `packages/design-system/node_modules/@base-ui/react/button/Button.js:18-43`                         | Base Button state, behavior hook, refs, internal props.                  |

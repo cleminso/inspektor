@@ -207,7 +207,7 @@ Dynamic imports are not always beneficial. Do not defer a dependency that is req
 3. The deferred module contains every runtime import from the heavy dependency.
 4. The component has an explicit loading, error, retry, focus, and remount strategy.
 
-## Runtime boundaries in the Inspector
+## Runtime boundaries in the Inspektor
 
 ### Jazz runtime
 

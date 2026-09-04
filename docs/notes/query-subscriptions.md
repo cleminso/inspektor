@@ -13,7 +13,7 @@
 - [Advanced binding APIs](#advanced-binding-apis)
 - [Inspector telemetry sources](#inspektor-telemetry-sources)
 - [Standalone server telemetry contract](#standalone-server-telemetry-contract)
-- [Official Jazz Inspector implementation](#official-jazz-inspektor-implementation)
+- [Official Jazz Inspector implementation](#official-jazz-inspector-implementation)
 - [Polling and snapshot semantics](#polling-and-snapshot-semantics)
 - [Observable and unavailable information](#observable-and-unavailable-information)
 - [Security and privacy](#security-and-privacy)
@@ -249,7 +249,7 @@ Sources:
 - `packages/jazz-tools/src/subscription-store-internal.ts`
 - `packages/jazz-tools/src/shared/index.ts`
 
-## Inspector telemetry sources
+## Inspektor telemetry sources
 
 Jazz has two different Inspector telemetry paths.
 
@@ -277,8 +277,8 @@ Sources:
 - `packages/jazz-tools/src/runtime/db.ts:427-436`
 - `packages/jazz-tools/src/runtime/db.ts:1754-1772`
 - `packages/jazz-tools/src/runtime/db.ts:2615-2659`
-- `packages/jazz-tools/src/dev/inspektor-overlay/inspektor-host-types.ts`
-- `packages/jazz-tools/src/dev/inspektor-overlay/host-bridge.ts`
+- `packages/jazz-tools/src/dev/inspector-overlay/inspector-host-types.ts`
+- `packages/jazz-tools/src/dev/inspector-overlay/host-bridge.ts`
 
 ### Standalone server telemetry
 
@@ -346,7 +346,7 @@ Sources:
 
 ## Official Jazz Inspector implementation
 
-The official page lives under `packages/inspektor/src/pages/live-query/`:
+The official page lives under `packages/inspector/src/pages/live-query/`:
 
 - `index.tsx`
 - `index.module.css`
@@ -369,10 +369,10 @@ The official query-to-Data-Explorer conversion only recognizes a narrow subset o
 
 Sources:
 
-- `packages/inspektor/src/routes.tsx`
-- `packages/inspektor/src/pages/live-query/index.tsx`
-- `packages/inspektor/src/pages/live-query/index.test.tsx`
-- `packages/inspektor/src/contexts/host-link.ts`
+- `packages/inspector/src/routes.tsx`
+- `packages/inspector/src/pages/live-query/index.tsx`
+- `packages/inspector/src/pages/live-query/index.test.tsx`
+- `packages/inspector/src/contexts/host-link.ts`
 
 ## Polling and snapshot semantics
 
@@ -421,7 +421,7 @@ The standalone API can support inventory, churn, persistence, and grouped-count 
 - Server response bodies must not be displayed directly after failed requests.
 - `groupKey` is opaque server data. Inspector must not parse it or depend on its format.
 
-## Inspector implications
+## Inspektor implications
 
 - Regarde’s standalone Live queries feature must use `fetchServerSubscriptions`, not `Db.subscribe`, local trace accessors, or `getSubscriptionStore`.
 - Connection identity is `serverUrl`, `appId`, and `adminSecret`.

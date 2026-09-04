@@ -99,7 +99,7 @@ Inspector Test uses the current Jazz 2 `jazz-tools` package rather than the reti
 
 Keep the overrides until `jazz-tools` resolves to patched versions without them. Verify removal with `pnpm audit --prod` and the Inspector Test validation commands.
 
-## Extending Inspector Test
+## Extending Inspektor Test
 
 1. Add a focused table or column case to `schema.ts`.
 2. Add its permission shape to `permissions.ts`.

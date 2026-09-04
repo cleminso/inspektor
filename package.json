@@ -2,7 +2,7 @@
   "name": "regarde-inspektor",
   "version": "0.0.3",
   "private": true,
-  "description": "Alternative inspektor to the default Jazz-tools inspektor",
+  "description": "Alternative inspektor to the default Jazz-tools Inspector",
   "repository": {
     "type": "git",
     "url": "https://github.com/regardedev/inspektor"
