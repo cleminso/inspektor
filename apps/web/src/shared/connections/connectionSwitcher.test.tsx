@@ -12,7 +12,6 @@ const { deleteConnection, navigate, openConnection } = vi.hoisted(() => ({
 }))
 let connections: StoredConnection[] = []
 let currentConnectionId: string | null = null
-let pendingConnectionId: string | null = null
 let runtimeScopeExitBlocked = false
 
 vi.mock('@tanstack/react-router', () => ({
@@ -42,7 +41,6 @@ vi.mock('@app/providers/inspectorSessionProvider', () => ({
     currentConnectionId,
     deleteConnection,
     openConnection,
-    pendingConnectionId,
     runtimeScopeExitBlocked,
   }),
 }))
@@ -72,7 +70,6 @@ afterEach(() => {
   cleanup()
   connections = []
   currentConnectionId = null
-  pendingConnectionId = null
   runtimeScopeExitBlocked = false
   openConnection.mockReset()
   deleteConnection.mockReset()
@@ -107,7 +104,7 @@ describe('ConnectionSwitcher', () => {
     expect(document.querySelectorAll('[data-slot="combobox-popup-footer"]')).toHaveLength(2)
   })
 
-  it('shows the active connection first and places its environment beside the trigger', () => {
+  it('keeps saved order and places the active environment beside the trigger', () => {
     connections = [createConnection('one', 'First'), createConnection('two', 'Second')]
     currentConnectionId = 'two'
 
@@ -121,14 +118,34 @@ describe('ConnectionSwitcher', () => {
     openSwitcher()
 
     expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
-      'Seconddevtwo-app',
       'Firstdevone-app',
+      'Seconddevtwo-app',
     ])
     expect(
       screen
         .getAllByRole('option')
         .map((option) => option.querySelector('[data-slot="badge"]')?.textContent),
     ).toEqual(['dev', 'dev'])
+  })
+
+  it('uses saved order and hides active-connection management with a generic label', () => {
+    connections = [createConnection('one', 'First'), createConnection('two', 'Second')]
+    currentConnectionId = 'two'
+
+    render(<ConnectionSwitcher triggerLabel="Open connection" />)
+
+    const trigger = screen.getByRole('combobox', { name: 'Switch connection' })
+    expect(trigger.textContent).toBe('Open connection')
+    expect(trigger.parentElement?.querySelector('[data-slot="badge"]')).toBeNull()
+
+    openSwitcher()
+
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Firstdevone-app',
+      'Seconddevtwo-app',
+    ])
+    expect(screen.queryByRole('link', { name: 'Edit connection' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Remove connection' })).toBeNull()
   })
 
   it('removes the active saved connection only after confirmation', () => {
@@ -225,17 +242,6 @@ describe('ConnectionSwitcher', () => {
 
     expect(screen.queryByRole('option', { name: /First/ })).toBeNull()
     expect(openConnection).toHaveBeenCalledWith('one')
-  })
-
-  it('shows router-derived pending feedback in the trigger', () => {
-    connections = [createConnection('one', 'First'), createConnection('two', 'Second')]
-    pendingConnectionId = 'one'
-
-    render(<ConnectionSwitcher />)
-
-    const trigger = screen.getByRole('combobox', { name: 'Switch connection' })
-    expect(trigger.textContent).toBe('Opening First…')
-    expect(trigger.parentElement?.querySelector('[data-slot="badge"]')?.textContent).toBe('dev')
   })
 
   it('blocks connection-management navigation while pending table state exists', () => {

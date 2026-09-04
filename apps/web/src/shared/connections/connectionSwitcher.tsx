@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { Link, useNavigate } from '@tanstack/react-router'
 
@@ -24,20 +24,6 @@ interface ConnectionSwitcherProps {
   width?: ContextSwitcherTriggerWidth
 }
 
-function sortConnections(
-  connections: StoredConnection[],
-  currentConnectionId: string | null,
-): StoredConnection[] {
-  const activeConnections = connections.filter(
-    (connection) => connection.id === currentConnectionId,
-  )
-  const inactiveConnections = connections.filter(
-    (connection) => connection.id !== currentConnectionId,
-  )
-
-  return [...activeConnections, ...inactiveConnections]
-}
-
 export function ConnectionSwitcher({
   size = 's',
   triggerLabel,
@@ -48,29 +34,17 @@ export function ConnectionSwitcher({
     currentConnectionId,
     deleteConnection,
     openConnection,
-    pendingConnectionId,
     runtimeScopeExitBlocked,
   } = useInspectorSessionContext()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [connectionToRemove, setConnectionToRemove] = useState<StoredConnection | null>(null)
-
-  const orderedConnections = useMemo(
-    () => sortConnections(connections, currentConnectionId),
-    [connections, currentConnectionId],
-  )
+  const contextualConnectionId = triggerLabel === undefined ? currentConnectionId : null
   const activeConnection =
-    orderedConnections.find((connection) => connection.id === currentConnectionId) ?? null
-  const pendingConnection =
-    orderedConnections.find((connection) => connection.id === pendingConnectionId) ?? null
+    connections.find((connection) => connection.id === contextualConnectionId) ?? null
   const resolvedTriggerLabel =
     triggerLabel ??
-    (pendingConnection !== null
-      ? `Opening ${getConnectionDisplayName(pendingConnection)}…`
-      : activeConnection !== null
-        ? getConnectionDisplayName(activeConnection)
-        : 'Open connections')
-  const triggerConnection = pendingConnection ?? activeConnection
+    (activeConnection !== null ? getConnectionDisplayName(activeConnection) : 'Open connections')
 
   const preventBlockedNavigation = (event: React.MouseEvent) => {
     if (runtimeScopeExitBlocked === true) {
@@ -88,7 +62,7 @@ export function ConnectionSwitcher({
         gap="xxs"
       >
         <ContextSwitcher.Root<StoredConnection>
-          items={orderedConnections}
+          items={connections}
           value={activeConnection}
           itemToStringLabel={getConnectionDisplayName}
           itemToStringValue={(connection) => connection.id}
@@ -125,15 +99,15 @@ export function ConnectionSwitcher({
             </Text>
           </ContextSwitcher.Trigger>
           <ContextSwitcher.Content>
-            {orderedConnections.length > 5 ? (
+            {connections.length > 5 ? (
               <ContextSwitcher.Search
                 label="Search connections"
                 placeholder="Search connections…"
               />
             ) : null}
-            {orderedConnections.length > 0 ? (
+            {connections.length > 0 ? (
               <ContextSwitcher.Viewport maxHeight="fiveItems">
-                {orderedConnections.length > 5 ? (
+                {connections.length > 5 ? (
                   <ContextSwitcher.Empty>No matching connections.</ContextSwitcher.Empty>
                 ) : null}
                 <ContextSwitcher.List>
@@ -217,12 +191,12 @@ export function ConnectionSwitcher({
             </ContextSwitcher.Footer>
           </ContextSwitcher.Content>
         </ContextSwitcher.Root>
-        {triggerConnection === null ? null : (
+        {activeConnection === null ? null : (
           <Badge
             size="s"
             translate="no"
           >
-            {triggerConnection.env}
+            {activeConnection.env}
           </Badge>
         )}
       </Box>

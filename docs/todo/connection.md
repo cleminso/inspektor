@@ -13,6 +13,27 @@
 
 [04/09/26]
 
+### Neutral saved-connection entry
+
+- [x] Present `/conn` and add-connection headers as neutral saved-connection pickers without inheriting the last workspace connection's selection or management actions.
+- [x] Keep switchers and the saved-connection list in persisted order instead of promoting the active connection in only one surface.
+- [x] Name the list `Saved connections` instead of implying unsupported recency tracking.
+
+[04/09/26]
+
+### Direct connection transition
+
+- [x] Keep the committed surface mounted while the selected connection resolves, then swap directly to its dashboard without connection-opening copy.
+- [x] Remove pending-connection presentation state that no longer has a consumer.
+
+[04/09/26]
+
+### Connection form header context
+
+- [x] Keep the edited connection name and environment in the edit header while presenting the generic add-connection header without the active environment.
+
+[04/09/26]
+
 ### Submission state
 
 - [x] Disable the complete connection fieldset while submission uses its captured values.
@@ -293,6 +314,22 @@
 
 ## Settled interaction decisions
 
+[04/09/26]
+
+- Generic `Open connection` headers do not expose remembered workspace context as a current selection.
+- Edit and remove actions are available only when the current route identifies a connection.
+- Saved-connection surfaces preserve the store's shared order; Inspector does not promote the active connection or claim recency without tracking it.
+
+[04/09/26]
+
+- Connection selection keeps the committed surface visible while route-owned schema discovery runs and presents the destination dashboard only when it can mount.
+- Do not expose duplicate `Opening connection` feedback in the switcher and route body.
+
+[04/09/26]
+
+- Add connection uses the generic `Open connection` trigger without an environment badge.
+- Edit connection keeps the current connection name and environment badge in the header.
+
 [03/09/26]
 
 - The header presents connection environment and schema status as adjacent context rather than including either badge in its switcher trigger.
@@ -410,6 +447,22 @@
 - None.
 
 ## Validation checklist
+
+[04/09/26]
+
+- [x] Cover neutral selection, saved ordering, absent management actions, and accurate saved-connection naming.
+- [x] Verify the neutral `/conn` state with an isolated Inspector Test browser fixture.
+- [x] Run Inspector formatting, lint, typecheck, build, and package tests.
+
+[04/09/26]
+
+- [x] Cover retention of the committed surface and absence of runtime-synchronization opening feedback.
+- [x] Run focused connection transition tests, Inspector lint, typecheck, build, and package tests.
+
+[04/09/26]
+
+- [x] Cover generic add-connection and contextual edit-connection headers.
+- [x] Run focused connection header tests, Inspector lint, typecheck, build, and package tests.
 
 [04/09/26]
 

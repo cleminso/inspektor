@@ -30,6 +30,18 @@ export function InspectorHeader(): React.ReactElement {
       >
         <ConnectionSwitcher />
         <Box
+          as="span"
+          ml="xs"
+        >
+          <Text
+            as="span"
+            color="muted"
+            aria-hidden="true"
+          >
+            /
+          </Text>
+        </Box>
+        <Box
           minWidth={0}
           alignItems="center"
           gap="xxs"

@@ -21,6 +21,7 @@ export function ConnRoute(): React.ReactElement {
 
   return (
     <ConnectionsLayout
+      connectionTriggerLabel={isEditConnectionRoute === true ? undefined : 'Open connection'}
       pageTitle={
         isNewConnectionRoute === true
           ? 'Add connection'

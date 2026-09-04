@@ -4,11 +4,13 @@ import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 
 interface ConnectionsLayoutProps {
   children: React.ReactNode
+  connectionTriggerLabel?: string
   pageTitle: string
 }
 
 export function ConnectionsLayout({
   children,
+  connectionTriggerLabel,
   pageTitle,
 }: ConnectionsLayoutProps): React.ReactElement {
   return (
@@ -42,7 +44,7 @@ export function ConnectionsLayout({
             paddingHorizontal="xs"
             paddingVertical="s"
           >
-            <ConnectionSwitcher triggerLabel="Open connection" />
+            <ConnectionSwitcher triggerLabel={connectionTriggerLabel} />
           </Box>
         </ShellLayout.Header>
         <ShellLayout.Body>

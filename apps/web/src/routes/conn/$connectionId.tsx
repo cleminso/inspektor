@@ -13,7 +13,7 @@ import {
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
 
-import { ConnectionRouteError, ConnectionRoutePending } from './-connectionRouteStatus'
+import { ConnectionRouteError } from './-connectionRouteStatus'
 
 interface ConnectionRouteSearch {
   schema?: string
@@ -60,9 +60,6 @@ export const Route = createFileRoute('/conn/$connectionId')({
 
     return target
   },
-  pendingComponent: ConnectionRoutePending,
-  pendingMinMs: 0,
-  pendingMs: 0,
   errorComponent: ConnectionRouteError,
   component: InspectorRuntimeRoute,
 })
@@ -75,10 +72,7 @@ function InspectorRuntimeRoute(): React.ReactElement {
   })
 
   return (
-    <InspectorRuntimeBoundary
-      fallback={<ConnectionRoutePending />}
-      target={target}
-    >
+    <InspectorRuntimeBoundary target={target}>
       <InspectorLayout pageTitle={pageTitle}>
         <Outlet />
       </InspectorLayout>

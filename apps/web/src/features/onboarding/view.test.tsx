@@ -38,18 +38,18 @@ describe('ConnectionsView', () => {
     )
   })
 
-  it('hides the recent connections section when there are no saved connections', () => {
+  it('hides the saved connections section when there are no saved connections', () => {
     render(<ConnectionsView />)
 
-    expect(screen.queryByRole('heading', { name: /recent connections/i })).toBeNull()
+    expect(screen.queryByRole('heading', { name: /saved connections/i })).toBeNull()
   })
 
-  it('shows the recent connections section when a saved connection exists', () => {
+  it('shows the saved connections section when a saved connection exists', () => {
     connections = [{ id: 'connection-1' }]
 
     render(<ConnectionsView />)
 
-    expect(screen.getByRole('heading', { name: /recent connections/i })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /saved connections/i })).toBeTruthy()
     expect(screen.getByText('Connection list')).toBeTruthy()
   })
 })

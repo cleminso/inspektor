@@ -4,20 +4,6 @@ import { Box, Button, Text } from '@inspector/ds'
 
 import { normalizeSchemaFetchError } from '@app/connections/connectionValidation'
 
-export function ConnectionRoutePending(): React.ReactElement {
-  return (
-    <Box
-      flex={1}
-      alignItems="center"
-      justifyContent="center"
-      role="status"
-      paddingTop="l"
-    >
-      <Text color="muted">Opening connection…</Text>
-    </Box>
-  )
-}
-
 export function ConnectionRouteError({ error }: ErrorComponentProps): React.ReactElement {
   const router = useRouter()
   const connectionError = normalizeSchemaFetchError(error)

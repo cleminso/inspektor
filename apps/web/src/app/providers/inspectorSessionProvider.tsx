@@ -37,7 +37,6 @@ export interface InspectorSessionContextValue {
   currentBranch: string | null
   currentSchemaHash: string | null
   currentTableName: string | null
-  pendingConnectionId: string | null
   runtimeScopeExitBlocked: boolean
   connectionLabel: string | null
   rememberedBranches: string[]
@@ -101,19 +100,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
         ? appRoutes.liveQueries
         : appRoutes.tables
   const navigateSchema = useNavigate({ from: schemaNavigationOrigin })
-  const pendingConnectionId = useRouterState({
-    select: (state) => {
-      const match = state.matches.find(
-        (candidate) =>
-          candidate.routeId === '/conn/$connectionId' &&
-          (candidate.status === 'pending' || candidate.isFetching === 'loader'),
-      )
-      return match !== undefined && 'connectionId' in match.params
-        ? match.params.connectionId
-        : null
-    },
-  })
-
   const routeConnectionId = routeParams.connectionId ?? null
   const currentConnectionId = routeConnectionId ?? session.activeConnectionId
   const currentTableName = routeParams.tableName ?? null
@@ -258,7 +244,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentBranch,
       currentSchemaHash,
       currentTableName,
-      pendingConnectionId,
       runtimeScopeExitBlocked: runtimeScopeExitGuard.isBlocked(),
       connectionLabel:
         activeConnection !== null ? getConnectionDisplayName(activeConnection) : null,
@@ -280,7 +265,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       currentSchemaHash,
       currentTableName,
       openConnection,
-      pendingConnectionId,
       runtimeScopeExitGuard,
       session,
       saveConnectionWithContext,

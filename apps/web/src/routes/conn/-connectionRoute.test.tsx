@@ -31,7 +31,7 @@ vi.mock('@app/routing/inspectorNavigation', () => ({
 }))
 
 vi.mock('@app/runtime/inspectorRuntimeBoundary', () => ({
-  InspectorRuntimeBoundary: ({ fallback }: { fallback: React.ReactNode }) => fallback,
+  InspectorRuntimeBoundary: ({ fallback }: { fallback?: React.ReactNode }) => fallback ?? null,
 }))
 
 vi.mock('@app/shell/layout', () => ({
@@ -49,7 +49,7 @@ vi.mock('@inspector/ds', () => ({
 }))
 
 await import('./$connectionId')
-const { ConnectionRouteError, ConnectionRoutePending } = await import('./-connectionRouteStatus')
+const { ConnectionRouteError } = await import('./-connectionRouteStatus')
 
 afterEach(() => {
   cleanup()
@@ -149,23 +149,17 @@ describe('connection route', () => {
     })
   })
 
-  it('registers and renders route-owned loading feedback', () => {
-    expect(routeOptions.current?.pendingComponent).toBe(ConnectionRoutePending)
-    expect(routeOptions.current?.pendingMinMs).toBe(0)
-    expect(routeOptions.current?.pendingMs).toBe(0)
+  it('keeps the current surface mounted while the destination connection loads', () => {
+    expect(routeOptions.current?.pendingComponent).toBeUndefined()
     expect(routeOptions.current?.errorComponent).toBeTypeOf('function')
-
-    render(<ConnectionRoutePending />)
-
-    expect(screen.getByRole('status').textContent).toBe('Opening connection…')
   })
 
-  it('renders connection feedback while the runtime boundary synchronizes', () => {
+  it('does not introduce connection-opening feedback while the runtime synchronizes', () => {
     const RuntimeRoute = routeOptions.current?.component as () => React.ReactElement
 
     render(<RuntimeRoute />)
 
-    expect(screen.getByRole('status').textContent).toBe('Opening connection…')
+    expect(screen.queryByRole('status')).toBeNull()
   })
 
   it('normalizes loader errors and retries through router invalidation', () => {

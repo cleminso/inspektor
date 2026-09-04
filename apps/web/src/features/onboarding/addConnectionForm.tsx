@@ -46,7 +46,7 @@ export function AddConnectionForm({
       minHeight={0}
       width="full"
       flexDirection="column"
-      gap="3xl"
+      gap="2xl"
       noValidate
       onSubmit={onSubmit}
     >

@@ -1,5 +1,5 @@
-import { Box, TextLink } from '@inspector/ds'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Box } from '@inspector/ds'
+import { useNavigate } from '@tanstack/react-router'
 
 import type { StoredConnection } from '@app/connections/connections'
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
@@ -44,14 +44,6 @@ export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): 
       flexDirection="column"
       gap="xl"
     >
-      <Box justifyContent="end">
-        <TextLink
-          variant="caption"
-          render={<Link to={appRoutes.connections} />}
-        >
-          Back
-        </TextLink>
-      </Box>
       {/* TODO: update error message UI and copywriting */}
       <AddConnectionForm
         error={flow.error}

@@ -12,7 +12,6 @@ interface ConnectionsSectionProps {
   title: string
 }
 
-// TODO: limit the recent connection list to 5 items.
 function ConnectionsSection({ children, title }: ConnectionsSectionProps): React.ReactElement {
   return (
     <Box
@@ -88,7 +87,7 @@ export function ConnectionsView(): React.ReactElement {
       </ConnectionsSection>
 
       {hasConnections === true ? (
-        <ConnectionsSection title="RECENT CONNECTIONS">
+        <ConnectionsSection title="SAVED CONNECTIONS">
           <ConnectionList />
         </ConnectionsSection>
       ) : null}

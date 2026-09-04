@@ -44,6 +44,20 @@ test('connects through the form and restores the connection after reload', async
   )
 })
 
+test('presents saved connections without remembered workspace context', async ({ page }) => {
+  await connectToFixture(page)
+  await page.goto('/conn')
+
+  await expect(page.getByRole('heading', { name: 'SAVED CONNECTIONS' })).toBeVisible()
+  await page.getByRole('combobox', { name: 'Switch connection' }).press('ArrowDown')
+
+  await expect(
+    page.getByRole('option', { name: new RegExp(connection.name, 'u') }),
+  ).toHaveAttribute('aria-selected', 'false')
+  await expect(page.getByRole('link', { name: 'Edit connection' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Remove connection' })).toHaveCount(0)
+})
+
 test('opens, closes, and switches the left dock', async ({ page }) => {
   await connectToFixture(page)
   const resizeHandle = page.locator('[data-slot="resizable-handle"]')

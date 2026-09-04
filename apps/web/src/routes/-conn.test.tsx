@@ -17,11 +17,18 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 vi.mock('@onboarding/connectionsLayout', () => ({
   ConnectionsLayout: ({
     children,
+    connectionTriggerLabel,
     pageTitle,
   }: {
     children: React.ReactNode
+    connectionTriggerLabel?: string
     pageTitle: string
-  }) => <main aria-label={pageTitle}>{children}</main>,
+  }) => (
+    <>
+      <header>{connectionTriggerLabel ?? 'Current connection'}</header>
+      <main aria-label={pageTitle}>{children}</main>
+    </>
+  ),
 }))
 
 vi.mock('@onboarding/view', () => ({
@@ -30,7 +37,11 @@ vi.mock('@onboarding/view', () => ({
 
 const { ConnRoute } = await import('./-connRoute')
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  routerState.location.pathname = '/conn/connection-1/tables'
+  routerState.resolvedLocation.pathname = '/conn/new'
+})
 
 describe('ConnRoute', () => {
   it('keeps the current onboarding layout while workspace navigation is pending', () => {
@@ -38,5 +49,21 @@ describe('ConnRoute', () => {
 
     expect(screen.getByRole('main', { name: 'Add connection' })).toBeTruthy()
     expect(screen.getByText('Route content')).toBeTruthy()
+  })
+
+  it('uses a generic header without connection context when adding a connection', () => {
+    routerState.resolvedLocation.pathname = '/conn/new'
+
+    render(<ConnRoute />)
+
+    expect(screen.getByRole('banner').textContent).toBe('Open connection')
+  })
+
+  it('keeps the current connection context when editing a connection', () => {
+    routerState.resolvedLocation.pathname = '/conn/edit/connection-1'
+
+    render(<ConnRoute />)
+
+    expect(screen.getByRole('banner').textContent).toBe('Current connection')
   })
 })

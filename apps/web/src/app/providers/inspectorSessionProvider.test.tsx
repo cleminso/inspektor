@@ -155,9 +155,6 @@ function SessionActions({ blocked }: { blocked: boolean }): React.ReactElement {
         {String(inspectorSession.runtimeScopeExitBlocked)}
       </output>
       <output aria-label="Connection open result">{openResult}</output>
-      <output aria-label="Pending connection">
-        {inspectorSession.pendingConnectionId ?? 'none'}
-      </output>
       <button
         type="button"
         onClick={() => {
@@ -456,23 +453,6 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(screen.getByRole('status', { name: 'Connection open result' }).textContent).toBe(
       'accepted',
-    )
-  })
-
-  it('derives the pending connection from the router match', () => {
-    routerMatches = [
-      {
-        isFetching: 'loader',
-        params: { connectionId: 'connection-2' },
-        routeId: '/conn/$connectionId',
-        status: 'pending',
-      },
-    ]
-
-    render(<TestSession blocked={false} />)
-
-    expect(screen.getByRole('status', { name: 'Pending connection' }).textContent).toBe(
-      'connection-2',
     )
   })
 })
