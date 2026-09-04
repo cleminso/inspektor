@@ -169,7 +169,9 @@ export function TableListPane({
   const deferTableRendering = tables.length > deferredRenderingThreshold
   const hasCheckedTables = checkedTableNames.size > 0
   const clearSelection = useEffectEvent(onClearSelection)
+  const [openActionsTableName, setOpenActionsTableName] = useState<string | null>(null)
   const pendingMenuActionRef = useRef<(() => void) | null>(null)
+  const temporaryMenuSelectionRef = useRef(false)
 
   useEffect(() => {
     if (hasCheckedTables === false) {
@@ -202,7 +204,12 @@ export function TableListPane({
 
       const pendingMenuAction = pendingMenuActionRef.current
       pendingMenuActionRef.current = null
+      const hadTemporarySelection = temporaryMenuSelectionRef.current
+      temporaryMenuSelectionRef.current = false
       pendingMenuAction?.()
+      if (hadTemporarySelection === true && pendingMenuAction === null) {
+        onClearSelection()
+      }
     }
     const togglePinnedTables = () => {
       if (section === 'pinned') {
@@ -215,7 +222,15 @@ export function TableListPane({
       pendingMenuActionRef.current = onClearSelection
     }
     return (
-      <ContextMenu.Root onOpenChangeComplete={handleActionsOpenChangeComplete}>
+      <ContextMenu.Root
+        onOpenChange={(open) => {
+          if (open === true) {
+            temporaryMenuSelectionRef.current = false
+            setOpenActionsTableName(null)
+          }
+        }}
+        onOpenChangeComplete={handleActionsOpenChangeComplete}
+      >
         <ContextMenu.Trigger
           onContextMenu={(event) => {
             if (event.target instanceof Element === false) {
@@ -253,6 +268,7 @@ export function TableListPane({
                 : null
             const handleActionsOpenChange = (open: boolean) => {
               if (open === true && isChecked === false) {
+                temporaryMenuSelectionRef.current = true
                 onReplaceSelection(tableName, section)
               }
             }
@@ -319,7 +335,11 @@ export function TableListPane({
                   tableName={tableName}
                 />
                 <Menu.Root
-                  onOpenChange={handleActionsOpenChange}
+                  open={openActionsTableName === tableName}
+                  onOpenChange={(open) => {
+                    handleActionsOpenChange(open)
+                    setOpenActionsTableName(open === true ? tableName : null)
+                  }}
                   onOpenChangeComplete={handleActionsOpenChangeComplete}
                 >
                   <Menu.Trigger

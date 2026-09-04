@@ -549,6 +549,71 @@ describe('TableListPane', () => {
     expect(onClearSelection).toHaveBeenCalledOnce()
   })
 
+  it('clears the temporary selection when its actions trigger closes the menu', () => {
+    const onClearSelection = vi.fn()
+
+    render(
+      <TableListPane
+        {...defaultActionProps}
+        checkedTableNames={new Set()}
+        selectedTableName={null}
+        tables={['accounts']}
+        onClearSelection={onClearSelection}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    const actionsTrigger = screen.getByRole('button', { name: 'Open accounts actions' })
+    fireEvent.click(actionsTrigger)
+    fireEvent.click(actionsTrigger)
+
+    expect(onClearSelection).toHaveBeenCalledOnce()
+  })
+
+  it('keeps an established selection when its actions trigger closes the menu', () => {
+    const onClearSelection = vi.fn()
+
+    render(
+      <TableListPane
+        {...defaultActionProps}
+        checkedTableNames={new Set(['accounts'])}
+        selectedTableName={null}
+        tables={['accounts']}
+        onClearSelection={onClearSelection}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    const actionsTrigger = screen.getByRole('button', { name: 'Open accounts actions' })
+    fireEvent.click(actionsTrigger)
+    fireEvent.click(actionsTrigger)
+
+    expect(onClearSelection).not.toHaveBeenCalled()
+  })
+
+  it('transfers a temporary action selection to the context menu', () => {
+    const onClearSelection = vi.fn()
+
+    render(
+      <TableListPane
+        {...defaultActionProps}
+        checkedTableNames={new Set()}
+        selectedTableName={null}
+        tables={['accounts', 'users']}
+        onClearSelection={onClearSelection}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    const actionsTrigger = screen.getByRole('button', { name: 'Open accounts actions' })
+    fireEvent.click(actionsTrigger)
+    fireEvent.contextMenu(screen.getByText('users'), { clientX: 40, clientY: 60 })
+
+    expect(actionsTrigger.getAttribute('aria-expanded')).toBe('false')
+    expect(screen.getAllByRole('menu')).toHaveLength(1)
+    expect(onClearSelection).not.toHaveBeenCalled()
+  })
+
   it('clears checked tables when the context menu is dismissed', () => {
     const onClearSelection = vi.fn()
 

@@ -19,6 +19,20 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[04/09/26]
+
+### Table-list menu coordination
+
+- [x] Close an open trailing action menu before opening the table-list context menu.
+- [x] Transfer temporary table selection to the context-menu interaction instead of clearing it with the displaced action menu.
+
+[04/09/26]
+
+### Table-list action selection
+
+- [x] Clear selection created temporarily for an unselected table's action menu when its trigger closes the menu.
+- [x] Preserve an established table selection when its action menu closes.
+
 [03/09/26]
 
 ### Row editor descriptions
@@ -1435,6 +1449,14 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[04/09/26]
+
+- [x] Cover action-menu replacement by the table-list context menu with one visible Base UI menu popup.
+
+[04/09/26]
+
+- [x] Cover temporary and established table-list action selection when the menu trigger closes the menu.
 
 [03/09/26]
 
