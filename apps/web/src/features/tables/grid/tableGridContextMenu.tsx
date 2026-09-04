@@ -10,7 +10,7 @@ import {
   type DataGridRowContextMenuHandler,
   type DataGridRowContextMenuTouchStartHandler,
   type DataGridViewportProps,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'

@@ -16,7 +16,7 @@ describe('Combobox playground', () => {
       required: false,
     })
 
-    expect(source).toContain('import { Combobox, Field } from "@inspector/ds";')
+    expect(source).toContain('import { Combobox, Field } from "@inspektor/ds";')
     expect(source).toContain('<Combobox.Root items={branches}')
     expect(source).toContain('{(branch: string) => (')
     expect(source).not.toContain('width="anchor"')

@@ -1,4 +1,4 @@
-import { Box, CopyButton } from '@inspector/ds'
+import { Box, CopyButton } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function VariantsExample(): ReactElement {

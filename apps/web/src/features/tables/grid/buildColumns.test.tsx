@@ -4,7 +4,7 @@ import type { DynamicTableRow } from 'jazz-tools'
 import { useMemo, useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { DataGrid, dataGridFeatures } from '@inspector/ds'
+import { DataGrid, dataGridFeatures } from '@inspektor/ds'
 
 import { buildDataGridColumns } from '@tables/grid/buildColumns'
 

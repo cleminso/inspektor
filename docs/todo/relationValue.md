@@ -101,6 +101,6 @@ No open product work is recorded.
 - [x] Run focused component tests, package typecheck, and changed-file lint.
 - [x] Run documentation typecheck, lint, and build.
 - [ ] Run the complete documentation test command without the unrelated Tab View `closeLabel` extractor assertion failure.
-- [ ] Run the `@inspector/ds` declaration build without the workspace TypeScript `baseUrl` deprecation error.
+- [ ] Run the `@inspektor/ds` declaration build without the workspace TypeScript `baseUrl` deprecation error.
 - [x] Re-run focused component, application, typecheck, build, changed-file lint, and browser validation after the visual polish.
 - [x] Validate the simplified relation detail presentation.

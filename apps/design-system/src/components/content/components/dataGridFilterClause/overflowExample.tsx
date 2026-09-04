@@ -1,4 +1,4 @@
-import { Box, Button, DataGridFilterClause } from '@inspector/ds'
+import { Box, Button, DataGridFilterClause } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const clauses = [

@@ -31,7 +31,7 @@
 - [x] Add the constrained `AlertDialog.Root`, `Content`, `Title`, `Description`, `Actions`, and `Close` compound API.
 - [x] Build modal presentation from existing StyleX surface, layer, width, typography, border, shadow, and spacing tokens.
 - [x] Compose Close onto Button by default while allowing consumers to select a Button variant through `render`.
-- [x] Export every public part prop type from `@inspector/ds`.
+- [x] Export every public part prop type from `@inspektor/ds`.
 - [x] Add package behavior tests and design-system documentation.
 
 ## Open product work

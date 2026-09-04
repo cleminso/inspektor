@@ -1,9 +1,9 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { createJazzContext } from 'jazz-tools/backend'
 
-import permissions from '../../inspector-test/permissions.js'
-import { app } from '../../inspector-test/schema.js'
-import { seedInspectorTest } from '../../inspector-test/seedInspectorTest.js'
+import permissions from '../../inspektor-test/permissions.js'
+import { app } from '../../inspektor-test/schema.js'
+import { seedInspectorTest } from '../../inspektor-test/seedInspectorTest.js'
 
 interface FixtureConnection {
   name: string

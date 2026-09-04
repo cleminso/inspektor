@@ -17,7 +17,7 @@ describe('Menu playground', () => {
       danger: true,
     })
 
-    expect(source).toContain('import { Button, Menu } from "@inspector/ds";')
+    expect(source).toContain('import { Button, Menu } from "@inspektor/ds";')
     expect(source).toContain('<Menu.Root>')
     expect(source).toContain('<Menu.Item variant="danger"')
     expect(source).not.toContain('width="content"')

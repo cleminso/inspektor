@@ -18,7 +18,7 @@ Use evidence in this order:
 4. Relevant utilities, especially [`useRender`](https://base-ui.com/react/utils/use-render) and [`mergeProps`](https://base-ui.com/react/utils/merge-props).
 5. Base UI [accessibility responsibilities](https://base-ui.com/react/overview/accessibility).
 6. Matching tagged source for the primitive, its parts, props, state, attributes, and variables.
-7. Existing `@inspector/ds` components and tokens.
+7. Existing `@inspektor/ds` components and tokens.
 
 Do not rely on recalled APIs. Verify import paths, default elements, required anatomy, ref behavior, event details, render composition, state attributes, CSS variables, and mount behavior.
 

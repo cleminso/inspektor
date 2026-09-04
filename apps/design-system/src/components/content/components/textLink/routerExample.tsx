@@ -1,4 +1,4 @@
-import { TextLink } from '@inspector/ds'
+import { TextLink } from '@inspektor/ds'
 import { Link as RouterLink } from '@tanstack/react-router'
 import { type ReactElement } from 'react'
 

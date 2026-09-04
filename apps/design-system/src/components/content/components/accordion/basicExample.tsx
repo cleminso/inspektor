@@ -1,4 +1,4 @@
-import { Accordion, Text } from '@inspector/ds'
+import { Accordion, Text } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -12,7 +12,7 @@ import {
   Text,
   type ContextSwitcherTriggerSize,
   type ContextSwitcherTriggerWidth,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { getConnectionDisplayName, type StoredConnection } from '@app/connections/connections'

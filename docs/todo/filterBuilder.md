@@ -221,7 +221,7 @@
 - [x] Keep `className`, inline `style`, arbitrary dimensions, broad slot overrides, Jazz schema objects, and URL state out of both public design-system APIs.
 - [x] Define controlled open, query, active-step, and selection contracts so application state can enter a command flow at a specific step without imperative DOM control.
 
-#### 2. Build the generic command foundation in `@inspector/ds`
+#### 2. Build the generic command foundation in `@inspektor/ds`
 
 - [x] Audit the installed Base UI Dialog and Combobox versions, APIs, handbook guidance, tagged source, emitted state attributes, focus behavior, and keyboard behavior before wrapping them.
 - [x] Use Base UI Dialog for modal containment, focus trapping, dismissal, and trigger focus restoration.
@@ -238,7 +238,7 @@
 - [x] Export the command component and consumer-facing types from `packages/design-system/src/index.ts`.
 - [x] Add the command documentation page, executable examples, registry metadata, generated prop metadata, and static route in `apps/design-system`.
 
-#### 3. Build segmented filter-clause presentation in `@inspector/ds`
+#### 3. Build segmented filter-clause presentation in `@inspektor/ds`
 
 - [x] Implement `DataGridFilterClause.Root`, `Column`, `Operator`, `Value`, and `Remove` under `packages/design-system/src/components/dataGridFilterClause/`.
 - [x] Render the root as a labelled group containing sibling native buttons; never nest the remove button or segment buttons inside another interactive element.
@@ -598,7 +598,7 @@ None.
 - [x] Cover root activation, master clear, repeated Backspace removal, staged chips, group labels, operator symbols, aliases, footer hints, and horizontal column metadata with focused tests.
 - [x] Run focused `Command`, Filter Builder, draft, parsing, table-view, and query tests.
 - [x] Run changed-file StyleX and application lint.
-- [x] Run `@inspector/ds`, design-system documentation, and Inspector tests, typechecks, builds, and package lint.
+- [x] Run `@inspektor/ds`, design-system documentation, and Inspector tests, typechecks, builds, and package lint.
 - [x] Verify modal sizing, keyboard selection, Escape behavior, focus restoration, footer presentation, narrow layout, and accessible names in the Command browser documentation.
 - [ ] Verify root activation, master clear, staged chips, glyph selection, and repeated Backspace removal against a connected runtime table.
 
@@ -607,8 +607,8 @@ None.
 [18/08/26]
 
 - [x] Run focused `Command` and `DataGridFilterClause` behavior tests.
-- [x] Run `@inspector/ds` changed-file StyleX lint immediately after style edits.
-- [x] Run `@inspector/ds` typecheck, build, lint, and package tests.
+- [x] Run `@inspektor/ds` changed-file StyleX lint immediately after style edits.
+- [x] Run `@inspektor/ds` typecheck, build, lint, and package tests.
 - [x] Generate and check design-system prop metadata.
 - [x] Run design-system documentation tests, typecheck, lint, and build.
 - [x] Run focused filter draft, parsing, routing, toolbar, query, prefetch, and table-view tests.

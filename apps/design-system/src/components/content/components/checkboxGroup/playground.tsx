@@ -1,4 +1,4 @@
-import { CheckboxGroup, type CheckboxGroupItem } from '@inspector/ds'
+import { CheckboxGroup, type CheckboxGroupItem } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

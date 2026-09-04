@@ -1,6 +1,6 @@
 ---
-name: document-inspector-component
-description: Generates and updates `apps/design-system` documentation for `@inspector/ds` components using registry metadata, executable raw-source examples, generated props, and Shiki code blocks. Use when adding a component page, changing a documented component API, updating examples, or fixing generated prop metadata.
+name: document-inspektor-component
+description: Generates and updates `apps/design-system` documentation for `@inspektor/ds` components using registry metadata, executable raw-source examples, generated props, and Shiki code blocks. Use when adding a component page, changing a documented component API, updating examples, or fixing generated prop metadata.
 ---
 
 # Document Inspector Component
@@ -38,19 +38,19 @@ description: Generates and updates `apps/design-system` documentation for `@insp
 
 ## Examples and code
 
-- Examples must import from `@inspector/ds` as consumers do.
+- Examples must import from `@inspektor/ds` as consumers do.
 - Show focused copyable usage; put preview-only layout in `Example`, not the example module.
 - Keep preview and displayed code synchronized through paired normal and `?raw` imports.
 - Reuse the shared Shiki highlighter; do not instantiate one per page.
 
 ## Validation
 
-- `pnpm --filter inspector.design-system test`
-- `pnpm --filter inspector.design-system gen:props`
-- `pnpm --filter inspector.design-system check:props`
-- `pnpm --filter inspector.design-system typecheck`
-- `pnpm --filter inspector.design-system lint`
-- `pnpm --filter inspector.design-system build`
-- `pnpm --filter @inspector/ds build`
+- `pnpm --filter inspektor.design-system test`
+- `pnpm --filter inspektor.design-system gen:props`
+- `pnpm --filter inspektor.design-system check:props`
+- `pnpm --filter inspektor.design-system typecheck`
+- `pnpm --filter inspektor.design-system lint`
+- `pnpm --filter inspektor.design-system build`
+- `pnpm --filter @inspektor/ds build`
 
 See [REFERENCE.md](REFERENCE.md) for page structure, compound APIs, and failure handling.

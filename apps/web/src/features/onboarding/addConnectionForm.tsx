@@ -1,6 +1,6 @@
 import { useEffect, useRef, type FormEventHandler } from 'react'
 
-import { Box, Button, Fieldset, Text, TextField } from '@inspector/ds'
+import { Box, Button, Fieldset, Text, TextField } from '@inspektor/ds'
 
 import type { ConnectionError } from '@app/connections/connectionValidation'
 

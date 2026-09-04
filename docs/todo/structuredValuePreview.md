@@ -91,4 +91,4 @@ No open design decisions are recorded.
 - [x] Run focused component tests, package typecheck, and changed-file lint.
 - [x] Run documentation typecheck, lint, and build.
 - [ ] Run the complete documentation test command without the unrelated Tab View `closeLabel` extractor assertion failure.
-- [ ] Run the `@inspector/ds` declaration build without the workspace TypeScript `baseUrl` deprecation error.
+- [ ] Run the `@inspektor/ds` declaration build without the workspace TypeScript `baseUrl` deprecation error.

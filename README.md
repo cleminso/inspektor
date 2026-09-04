@@ -1,26 +1,26 @@
 ## Regarde Inspector
 
-Alternative inspector to the official [Jazz-tools Inspector](https://jazz2-inspector.vercel.app).
+Alternative inspektor to the official [Jazz-tools Inspector](https://jazz2-inspektor.vercel.app).
 
-A 2-weeks challenge to build an inspector with my UX and product vision.
+A 2-weeks challenge to build an inspektor with my UX and product vision.
 
 **Scopes**:
 
 - Focus on usability and UX
-- Functionality parity with the official inspector
+- Functionality parity with the official inspektor
 - Setup a package UI design system that can be reused across different products
 
 **Out of scope**:
 
 - Support other framework then React
-- Extend the official inspector capabilities (only use existing APIs)
+- Extend the official inspektor capabilities (only use existing APIs)
 - "Pixel-perfect" UI design
 
 ## Option 1 - Manual connection
 
 1. Clone the repository:
-   `git clone git@github.com:regardedev/inspector.git`
-   `cd inspector`
+   `git clone git@github.com:regardedev/inspektor.git`
+   `cd inspektor`
 
 2. Install dependencies:
    `pnpm install`
@@ -28,15 +28,15 @@ A 2-weeks challenge to build an inspector with my UX and product vision.
 3. Build the workspace packages:
    `pnpm build`
 
-4. Start the inspector:
+4. Start the inspektor:
    `pnpm dev:web`
 
 5. Open in browser:
-   `https://regarde.inspector.localhost:1355/conn`
+   `https://inspektor.localhost:1355/conn`
 
-The default dev command runs Portless with an unprivileged HTTPS proxy on port `1355`, so it does not require `sudo`. If the local certificate is not trusted yet, run `pnpm --filter regarde.inspector exec portless trust`. If you want to run Vite without the named local URL, use:
+The default dev command runs Portless with an unprivileged HTTPS proxy on port `1355`, so it does not require `sudo`. If the local certificate is not trusted yet, run `pnpm --filter inspektor exec portless trust`. If you want to run Vite without the named local URL, use:
 
-`pnpm --filter regarde.inspector dev:vite`
+`pnpm --filter inspektor dev:vite`
 
 Then open `http://localhost:5173/conn`.
 
@@ -61,19 +61,19 @@ You can also clone your Jazz app into the `apps/` directory.
    });
    ```
 
-   The Regarde plugin wraps the Jazz local dev runtime and prints a local inspector URL with the app credentials in the URL hash. This is only meant for local development.
+   The Regarde plugin wraps the Jazz local dev runtime and prints a local inspektor URL with the app credentials in the URL hash. This is only meant for local development.
 
 3. Build the workspace once:
    `pnpm build`
 
-4. Start the inspector in one terminal:
+4. Start the inspektor in one terminal:
    `pnpm dev:web`
 
 5. Start your Jazz app in another terminal:
    `cd apps/{your_app_name}`
    `pnpm dev`
 
-6. Open the inspector link printed in your app's dev server logs.
+6. Open the inspektor link printed in your app's dev server logs.
 
 ## Project documentation
 

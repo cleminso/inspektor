@@ -4,7 +4,7 @@ This is a historical research note. Its implementation paths may no longer exist
 
 ## Purpose
 
-This document captures the current understanding of Jazz table exploration and how Regarde should reason about it in the v1 inspector.
+This document captures the current understanding of Jazz table exploration and how Regarde should reason about it in the v1 inspektor.
 
 The goal is to align product language, Jazz APIs, Regarde implementation details, and UI direction before improving the Table Explorer.
 
@@ -18,7 +18,7 @@ It does not import generated app-specific query builders or custom table views.
 
 ## What the table view represents
 
-The table view represents one table from the selected Jazz app schema, queried through the inspector's active Jazz client.
+The table view represents one table from the selected Jazz app schema, queried through the inspektor's active Jazz client.
 
 It solves a simple problem:
 
@@ -133,7 +133,7 @@ Regarde currently uses:
 - `fetchStoredWasmSchema(...)`
 - `fetchStoredPermissions(...)`
 
-Permissions are optional for runtime bootstrap. If permission loading fails, the rest of the inspector can still run.
+Permissions are optional for runtime bootstrap. If permission loading fails, the rest of the inspektor can still run.
 
 ## Jazz table and query APIs
 
@@ -188,7 +188,7 @@ Confirmed sources:
 
 A generic query builder is a structural implementation of Jazz's `QueryBuilder` contract that works with arbitrary table names and a fetched `WasmSchema`.
 
-Regarde uses it because the inspector must support arbitrary app schemas without importing generated table handles from the inspected app.
+Regarde uses it because the inspektor must support arbitrary app schemas without importing generated table handles from the inspected app.
 
 Current Regarde implementation:
 
@@ -232,12 +232,12 @@ Confirmed source:
 
 - Regarde: `apps/web/src/lib/table-explorer/genericQueryBuilder.ts`
 - Jazz: `packages/jazz-tools/src/runtime/query-adapter.ts`
-- Official inspector: `packages/inspector/src/utility/generic-query-builder.ts`
+- Official inspektor: `packages/inspektor/src/utility/generic-query-builder.ts`
 
 Unknown:
 
 - Jazz exports `allRowsInTableQuery(tableName, schema)` for the simplest arbitrary-table read.
-- Jazz does not appear to export a full generic query builder factory matching the official inspector's implementation.
+- Jazz does not appear to export a full generic query builder factory matching the official inspektor's implementation.
 
 ## Filtering and sorting
 
@@ -358,9 +358,9 @@ Permissions:
 - The Table Explorer does not currently use stored permissions to hide or disable mutation UI.
 - Mutations are attempted through Jazz APIs, and failures surface as mutation errors.
 
-## Official Jazz inspector comparison
+## Official Jazz inspektor comparison
 
-The official standalone inspector uses the same general approach:
+The official standalone inspektor uses the same general approach:
 
 - create a Jazz client
 - fetch stored schema
@@ -375,18 +375,18 @@ The official standalone inspector uses the same general approach:
 
 Notable differences found in source:
 
-- Official inspector uses offset pagination with `limit(pageSize + 1)` and `offset(pageIndex * pageSize)`.
+- Official inspektor uses offset pagination with `limit(pageSize + 1)` and `offset(pageIndex * pageSize)`.
 - Regarde currently grows the limit from offset `0`, which acts like incremental loading.
-- Official inspector has no row detail/sidebar route in the inspected source.
+- Official inspektor has no row detail/sidebar route in the inspected source.
 - Regarde already has row side-panel foundations.
 
 Confirmed official source:
 
-- `packages/inspector/src/App.tsx`
-- `packages/inspector/src/pages/data-explorer/index.tsx`
-- `packages/inspector/src/components/data-explorer/TableDataGrid.tsx`
-- `packages/inspector/src/components/data-explorer/TableFilterBuilder.tsx`
-- `packages/inspector/src/utility/generic-query-builder.ts`
+- `packages/inspektor/src/App.tsx`
+- `packages/inspektor/src/pages/data-explorer/index.tsx`
+- `packages/inspektor/src/components/data-explorer/TableDataGrid.tsx`
+- `packages/inspektor/src/components/data-explorer/TableFilterBuilder.tsx`
+- `packages/inspektor/src/utility/generic-query-builder.ts`
 
 ## Current limitations and risks
 

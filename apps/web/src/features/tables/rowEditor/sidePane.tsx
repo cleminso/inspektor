@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 
-import { Box, Button, Switch, Text, Tooltip } from '@inspector/ds'
+import { Box, Button, Switch, Text, Tooltip } from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 
 import { appHotkeyOptions, runAppHotkey } from '@app/hotkeys/appHotkeys'

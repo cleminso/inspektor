@@ -13,7 +13,7 @@ import {
   toasts,
   type BinaryCopyFormat,
   type DataGridCellTarget,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 
 import {

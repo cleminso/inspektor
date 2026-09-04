@@ -1,4 +1,4 @@
-import { Button, Command } from '@inspector/ds'
+import { Button, Command } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 const actions = [

@@ -16,7 +16,7 @@ describe('Tooltip playground', () => {
       closeOnClick: true,
     })
 
-    expect(source).toContain('import { Button, Tooltip } from "@inspector/ds";')
+    expect(source).toContain('import { Button, Tooltip } from "@inspektor/ds";')
     expect(source).toContain('<Tooltip.Provider>')
     expect(source).toContain('<Tooltip.Content side="right">')
     expect(source).not.toContain('closeOnClick')

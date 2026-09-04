@@ -15,7 +15,7 @@ import {
   useState,
 } from 'react'
 
-import type { DataGridCellTarget, DataGridFocusRequest } from '@inspector/ds'
+import type { DataGridCellTarget, DataGridFocusRequest } from '@inspektor/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
 import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
 

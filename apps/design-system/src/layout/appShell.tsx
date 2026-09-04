@@ -1,4 +1,4 @@
-import { Box, Button, ButtonLink, Text, Tooltip } from '@inspector/ds'
+import { Box, Button, ButtonLink, Text, Tooltip } from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 import { HeadContent, Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import { Moon, Sun } from 'lucide-react'

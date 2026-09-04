@@ -1,4 +1,4 @@
-import { Switch, type SwitchSize } from '@inspector/ds'
+import { Switch, type SwitchSize } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

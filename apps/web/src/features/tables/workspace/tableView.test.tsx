@@ -345,7 +345,7 @@ vi.mock('@tables/rowEditor/sidePane', () => ({
   ),
 }))
 
-vi.mock('@inspector/ds', () => {
+vi.mock('@inspektor/ds', () => {
   interface ContainerProps {
     'aria-live'?: 'polite'
     children?: ReactNode

@@ -1,4 +1,4 @@
-import { Box, Input } from '@inspector/ds'
+import { Box, Input } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function StatesExample(): ReactElement {

@@ -5,7 +5,7 @@ import {
   type ButtonRadius,
   type ButtonSize,
   type ButtonVariant,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { type ReactElement, type ReactNode, useState } from 'react'
 

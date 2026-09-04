@@ -1,4 +1,4 @@
-import { Box, Select } from '@inspector/ds'
+import { Box, Select } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const roles = [

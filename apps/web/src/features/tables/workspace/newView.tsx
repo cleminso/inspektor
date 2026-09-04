@@ -1,4 +1,4 @@
-import { ActionList, Box, Icon, Text } from '@inspector/ds'
+import { ActionList, Box, Icon, Text } from '@inspektor/ds'
 
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { useTableTabs } from '@tables/workspace/tabsProvider'

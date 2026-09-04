@@ -1,4 +1,4 @@
-import { Box, Text, Tooltip } from '@inspector/ds'
+import { Box, Text, Tooltip } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const value = 'usr_01J7HZ9Q4K6MW3T8V2P5N1BXCE'

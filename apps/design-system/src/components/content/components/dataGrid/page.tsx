@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react'
 
-import { Box } from '@inspector/ds'
+import { Box } from '@inspektor/ds'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PropsTable } from '@/components/docs/propsTable'

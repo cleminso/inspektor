@@ -16,7 +16,7 @@ import {
   Tooltip,
   type JsonViewObject,
   type JsonViewValue,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import type { StoredConnection } from '@app/connections/connections'
 import {

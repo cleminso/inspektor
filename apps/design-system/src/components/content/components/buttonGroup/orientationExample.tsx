@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from '@inspector/ds'
+import { Button, ButtonGroup } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function OrientationExample(): ReactElement {

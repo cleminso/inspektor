@@ -1,4 +1,4 @@
-import { TextField } from '@inspector/ds'
+import { TextField } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -1,4 +1,4 @@
-import type { IconArtwork } from '@inspector/ds'
+import type { IconArtwork } from '@inspektor/ds'
 import { ArrowUpRight, EllipsisVertical, Layers, Layers3, Table2 } from 'lucide-react'
 
 export const productGlyphs = {

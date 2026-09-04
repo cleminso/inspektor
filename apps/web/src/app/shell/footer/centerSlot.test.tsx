@@ -23,7 +23,7 @@ describe('InspectorFooterCenterPortal', () => {
     )
 
     const trigger = await screen.findByRole('button', { name: 'Staged changes' })
-    expect(trigger.closest('[data-slot="inspector-footer-center"]')).toBeTruthy()
+    expect(trigger.closest('[data-slot="inspektor-footer-center"]')).toBeTruthy()
     expect(trigger.closest('footer')).toBeTruthy()
   })
 })

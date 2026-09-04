@@ -3,7 +3,7 @@ import {
   type KeyboardInputPlatform,
   type KeyboardInputSize,
   type KeyboardInputVariant,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

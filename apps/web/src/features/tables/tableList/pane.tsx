@@ -8,7 +8,7 @@ import {
   SidePanel,
   Text,
   Tooltip,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { Link } from '@tanstack/react-router'
 import {
   useEffect,

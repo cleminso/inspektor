@@ -23,7 +23,7 @@ Use `render`; do not introduce `asChild`.
 Composition can occur at three boundaries:
 
 1. Base UI applies its behavior to a rendered target.
-2. `@inspector/ds` composes Base UI parts with Inspector components internally.
+2. `@inspektor/ds` composes Base UI parts with Inspector components internally.
 3. A product application composes public Inspector parts.
 
 Internal use does not require a public `render` prop on every wrapper. The rendered Inspector target must still accept and forward Base UI-generated props and refs.
@@ -56,13 +56,13 @@ The function controls prop application. Use `mergeProps` when combining generate
 
 Classify each part before exposing `render`:
 
-| Role | Default decision | Examples |
-| --- | --- | --- |
-| Provider or non-DOM root | Hide | Provider, state-only Root |
-| Structural part | Hide | Portal, Positioner, Popup, Separator |
-| Behavioral endpoint | Expose | Button, Trigger, Close |
-| Semantic endpoint | Prefer a dedicated part; expose if substitution remains valid | Item, LinkItem |
-| High-level composition | Hide unless composition is a product capability | Search, composed field |
+| Role                     | Default decision                                              | Examples                             |
+| ------------------------ | ------------------------------------------------------------- | ------------------------------------ |
+| Provider or non-DOM root | Hide                                                          | Provider, state-only Root            |
+| Structural part          | Hide                                                          | Portal, Positioner, Popup, Separator |
+| Behavioral endpoint      | Expose                                                        | Button, Trigger, Close               |
+| Semantic endpoint        | Prefer a dedicated part; expose if substitution remains valid | Item, LinkItem                       |
+| High-level composition   | Hide unless composition is a product capability               | Search, composed field               |
 
 ## Public policy
 

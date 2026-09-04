@@ -1,4 +1,4 @@
-import { Checkbox, type CheckboxSize } from '@inspector/ds'
+import { Checkbox, type CheckboxSize } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

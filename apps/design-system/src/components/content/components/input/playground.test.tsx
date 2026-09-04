@@ -20,7 +20,7 @@ describe('Input playground', () => {
         readOnly: false,
       }),
     ).toBe(
-      'import { Input } from "@inspector/ds";\n\nexport default function Example() {\n  return <Input aria-label="Email" placeholder="name@example.com" />;\n}',
+      'import { Input } from "@inspektor/ds";\n\nexport default function Example() {\n  return <Input aria-label="Email" placeholder="name@example.com" />;\n}',
     )
   })
 

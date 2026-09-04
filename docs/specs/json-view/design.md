@@ -12,14 +12,14 @@
 - [Public API](#public-api)
 - [Data model](#data-model)
 - [Rendering safeguards](#rendering-safeguards)
-- [Inspector integration](#inspector-integration)
+- [Inspector integration](#inspektor-integration)
 - [Documentation](#documentation)
 - [Testing strategy](#testing-strategy)
 - [Open questions](#open-questions)
 
 ## Overview
 
-`JsonView` is a reusable `@inspector/ds` component for inspecting JSON objects and arrays as a read-only, syntax-colored,
+`JsonView` is a reusable `@inspektor/ds` component for inspecting JSON objects and arrays as a read-only, syntax-colored,
 collapsible tree. It takes inspiration from the observable behavior of Vercel Geist JSON View while using Inspector tokens,
 component constraints, and an independent implementation.
 
@@ -208,7 +208,7 @@ Add a public component page under `apps/design-system` with executable examples 
 - bounded large branches
 - keyboard navigation and focus
 
-Generated prop metadata remains authoritative. Examples import `JsonView` from `@inspector/ds` and do not demonstrate styling
+Generated prop metadata remains authoritative. Examples import `JsonView` from `@inspektor/ds` and do not demonstrate styling
 escape hatches.
 
 ## Testing strategy

@@ -1,5 +1,5 @@
 ---
-name: inspector-testing
+name: inspektor-testing
 description: Implements and organizes Inspector tests with the correct Vitest project and Playwright boundary. Use when adding, renaming, or changing tests in apps/web or packages/design-system.
 ---
 
@@ -38,8 +38,8 @@ description: Implements and organizes Inspector tests with the correct Vitest pr
 
 ## Validate
 
-- Web Node test: `pnpm --filter regarde.inspector test:node`
-- Web jsdom test: `pnpm --filter regarde.inspector test:jsdom`
-- Web browser test: `pnpm --filter regarde.inspector test:browser`
-- Design-system Node allowlist: `pnpm --filter @inspector/ds test:node`
+- Web Node test: `pnpm --filter inspektor test:node`
+- Web jsdom test: `pnpm --filter inspektor test:jsdom`
+- Web browser test: `pnpm --filter inspektor test:browser`
+- Design-system Node allowlist: `pnpm --filter @inspektor/ds test:node`
 - Run the affected package's complete suite after the focused command passes.

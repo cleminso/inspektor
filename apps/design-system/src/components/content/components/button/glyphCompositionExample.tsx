@@ -1,4 +1,4 @@
-import { Box, Button } from '@inspector/ds'
+import { Box, Button } from '@inspektor/ds'
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 import { type ReactElement } from 'react'
 

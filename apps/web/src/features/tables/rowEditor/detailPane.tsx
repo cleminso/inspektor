@@ -1,4 +1,4 @@
-import { Box } from '@inspector/ds'
+import { Box } from '@inspektor/ds'
 
 interface DetailPaneProps {
   children: React.ReactNode

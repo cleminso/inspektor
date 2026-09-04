@@ -485,7 +485,7 @@
 
 - [x] Verify TanStack replacement, Shift-range, and pointer-drag cell selection through `DataGrid`.
 - [x] Verify checkbox cells and secondary mouse buttons do not start cell selection.
-- [x] Verify `@inspector/ds` and Inspector tests, typechecks, lint, and production builds.
+- [x] Verify `@inspektor/ds` and Inspector tests, typechecks, lint, and production builds.
 - [x] Verify generated Data Grid prop metadata no longer exposes duplicate active-cell or selected-cell props.
 - [x] Verify the documentation example renders native focused and selected cell state without console errors.
 - [x] Verify the production table route contains `cellSelectionFeature` without unused spanning, pagination, or grouping features.

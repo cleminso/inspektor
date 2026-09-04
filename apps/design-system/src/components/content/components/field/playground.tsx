@@ -1,4 +1,4 @@
-import { Box, Field, Input } from '@inspector/ds'
+import { Box, Field, Input } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

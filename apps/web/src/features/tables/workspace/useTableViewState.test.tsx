@@ -3,7 +3,7 @@ import { useReducer } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnDescriptor } from 'jazz-tools'
 
-import { DataGrid } from '@inspector/ds'
+import { DataGrid } from '@inspektor/ds'
 import type { TableFilterClause } from '@tables/filters/tableFilters'
 import { useTableViewState as useTableViewStateImpl } from '@tables/workspace/useTableViewState'
 

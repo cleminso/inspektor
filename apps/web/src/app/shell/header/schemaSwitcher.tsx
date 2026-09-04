@@ -6,7 +6,7 @@ import {
   Tooltip,
   type ContextSwitcherTriggerSize,
   type ContextSwitcherTriggerWidth,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import { useInspectorSessionState, useRuntimeSchemaHashes } from '@app/providers/inspectorProvider'
 

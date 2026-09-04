@@ -31,18 +31,18 @@ describe('createInspectorShellLayoutPersistence', () => {
       'react-resizable-panels:tables-side-panel',
       JSON.stringify({ content: 65, navigation: 35 }),
     )
-    window.localStorage.setItem('inspector:tables-side-panel:navigation-expanded-size', '35')
+    window.localStorage.setItem('inspektor:tables-side-panel:navigation-expanded-size', '35')
     const { id, storage } = createInspectorShellLayoutPersistence()!
 
-    expect(id).toBe('inspector-shell')
-    expect(storage.getItem('react-resizable-panels:inspector-shell:leftDock:view')).toBe(
+    expect(id).toBe('inspektor-shell')
+    expect(storage.getItem('react-resizable-panels:inspektor-shell:leftDock:view')).toBe(
       JSON.stringify({ leftDock: 35, view: 65 }),
     )
     expect(storage.getExpandedDockSize('left')).toBe(35)
     expect(
-      window.localStorage.getItem('react-resizable-panels:inspector-shell:leftDock:view'),
+      window.localStorage.getItem('react-resizable-panels:inspektor-shell:leftDock:view'),
     ).toBe(JSON.stringify({ leftDock: 35, view: 65 }))
-    expect(window.localStorage.getItem('inspector:shell-layout:left-dock-expanded-size')).toBe('35')
+    expect(window.localStorage.getItem('inspektor:shell-layout:left-dock-expanded-size')).toBe('35')
   })
 
   it.each([
@@ -56,7 +56,7 @@ describe('createInspectorShellLayoutPersistence', () => {
     ['a negative size', JSON.stringify({ leftDock: -10, view: 110 })],
     ['an unknown panel', JSON.stringify({ extra: 35, leftDock: 65 })],
   ])('ignores %s', (_case, value) => {
-    const storageKey = 'react-resizable-panels:inspector-shell:leftDock:view'
+    const storageKey = 'react-resizable-panels:inspektor-shell:leftDock:view'
     window.localStorage.setItem(storageKey, value)
     const { storage } = createInspectorShellLayoutPersistence()!
 
@@ -67,12 +67,12 @@ describe('createInspectorShellLayoutPersistence', () => {
     {
       layout: { view: 100 },
       name: 'view-only layout',
-      storageKey: 'react-resizable-panels:inspector-shell:view',
+      storageKey: 'react-resizable-panels:inspektor-shell:view',
     },
     {
       layout: { leftDock: 20, view: 60, rightDock: 20 },
       name: 'layout with both docks',
-      storageKey: 'react-resizable-panels:inspector-shell:leftDock:view:rightDock',
+      storageKey: 'react-resizable-panels:inspektor-shell:leftDock:view:rightDock',
     },
   ])('accepts a persisted $name', ({ layout, storageKey }) => {
     const value = JSON.stringify(layout)
@@ -84,7 +84,7 @@ describe('createInspectorShellLayoutPersistence', () => {
 
   it('does not restore a layout for a different panel composition', () => {
     const value = JSON.stringify({ leftDock: 35, view: 65 })
-    const storageKey = 'react-resizable-panels:inspector-shell:leftDock:view:rightDock'
+    const storageKey = 'react-resizable-panels:inspektor-shell:leftDock:view:rightDock'
     window.localStorage.setItem(storageKey, value)
     const { storage } = createInspectorShellLayoutPersistence()!
 
@@ -99,7 +99,7 @@ describe('createInspectorShellLayoutPersistence', () => {
     const { storage } = createInspectorShellLayoutPersistence()!
 
     expect(
-      storage.getItem('react-resizable-panels:inspector-shell:leftDock:view:rightDock'),
+      storage.getItem('react-resizable-panels:inspektor-shell:leftDock:view:rightDock'),
     ).toBeNull()
   })
 
@@ -108,13 +108,13 @@ describe('createInspectorShellLayoutPersistence', () => {
       'react-resizable-panels:tables-side-panel',
       JSON.stringify({ content: 65, navigation: 35 }),
     )
-    values.set('inspector:tables-side-panel:navigation-expanded-size', '35')
+    values.set('inspektor:tables-side-panel:navigation-expanded-size', '35')
     window.localStorage.setItem = () => {
       throw new Error('Quota exceeded')
     }
     const { storage } = createInspectorShellLayoutPersistence()!
 
-    expect(storage.getItem('react-resizable-panels:inspector-shell:leftDock:view')).toBe(
+    expect(storage.getItem('react-resizable-panels:inspektor-shell:leftDock:view')).toBe(
       JSON.stringify({ leftDock: 35, view: 65 }),
     )
     expect(storage.getExpandedDockSize('left')).toBe(35)

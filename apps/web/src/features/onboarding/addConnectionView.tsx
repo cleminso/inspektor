@@ -1,4 +1,4 @@
-import { Box } from '@inspector/ds'
+import { Box } from '@inspektor/ds'
 import { useNavigate } from '@tanstack/react-router'
 
 import type { StoredConnection } from '@app/connections/connections'

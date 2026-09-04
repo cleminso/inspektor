@@ -1,4 +1,4 @@
-import { Calendar } from '@inspector/ds'
+import { Calendar } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function BasicExample(): ReactElement {

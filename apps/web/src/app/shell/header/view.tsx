@@ -1,4 +1,4 @@
-import { Box, Button, Text, Tooltip } from '@inspector/ds'
+import { Box, Button, Text, Tooltip } from '@inspektor/ds'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 

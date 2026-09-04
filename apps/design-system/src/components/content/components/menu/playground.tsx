@@ -1,4 +1,4 @@
-import { Button, Menu, type MenuPopupWidth } from '@inspector/ds'
+import { Button, Menu, type MenuPopupWidth } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

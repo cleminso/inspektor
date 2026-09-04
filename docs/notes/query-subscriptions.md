@@ -11,13 +11,13 @@
 - [Subscription lifecycle](#subscription-lifecycle)
 - [React and framework integration](#react-and-framework-integration)
 - [Advanced binding APIs](#advanced-binding-apis)
-- [Inspector telemetry sources](#inspector-telemetry-sources)
+- [Inspector telemetry sources](#inspektor-telemetry-sources)
 - [Standalone server telemetry contract](#standalone-server-telemetry-contract)
-- [Official Jazz Inspector implementation](#official-jazz-inspector-implementation)
+- [Official Jazz Inspector implementation](#official-jazz-inspektor-implementation)
 - [Polling and snapshot semantics](#polling-and-snapshot-semantics)
 - [Observable and unavailable information](#observable-and-unavailable-information)
 - [Security and privacy](#security-and-privacy)
-- [Inspector implications](#inspector-implications)
+- [Inspector implications](#inspektor-implications)
 - [Source references](#source-references)
 
 ## Purpose
@@ -147,14 +147,14 @@ Sources:
 
 Application-facing `QueryOptions` includes:
 
-| Option | Values | Meaning |
-| --- | --- | --- |
-| `tier` | `ReadTier.LocalFirst`, `Remote`, `RemoteIfPossible`, or legacy durability names | Initial read policy |
-| `localUpdates` | `immediate`, `deferred` | Visibility of local writes while the requested tier settles |
-| `propagation` | `full`, `local-only` | Whether the subscription communicates with upstream servers |
-| `visibility` | `public`, `hidden_from_live_query_list` | Visibility in the local `Db` development trace list |
-| `branch` | scalar or qualified branch | Branch head |
-| `base` | live branch or branch/snapshot pair | Optional branch base |
+| Option         | Values                                                                          | Meaning                                                     |
+| -------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `tier`         | `ReadTier.LocalFirst`, `Remote`, `RemoteIfPossible`, or legacy durability names | Initial read policy                                         |
+| `localUpdates` | `immediate`, `deferred`                                                         | Visibility of local writes while the requested tier settles |
+| `propagation`  | `full`, `local-only`                                                            | Whether the subscription communicates with upstream servers |
+| `visibility`   | `public`, `hidden_from_live_query_list`                                         | Visibility in the local `Db` development trace list         |
+| `branch`       | scalar or qualified branch                                                      | Branch head                                                 |
+| `base`         | live branch or branch/snapshot pair                                             | Optional branch base                                        |
 
 `visibility` is local development-trace metadata. It is not encoded as an exclusion from server telemetry.
 
@@ -277,8 +277,8 @@ Sources:
 - `packages/jazz-tools/src/runtime/db.ts:427-436`
 - `packages/jazz-tools/src/runtime/db.ts:1754-1772`
 - `packages/jazz-tools/src/runtime/db.ts:2615-2659`
-- `packages/jazz-tools/src/dev/inspector-overlay/inspector-host-types.ts`
-- `packages/jazz-tools/src/dev/inspector-overlay/host-bridge.ts`
+- `packages/jazz-tools/src/dev/inspektor-overlay/inspektor-host-types.ts`
+- `packages/jazz-tools/src/dev/inspektor-overlay/host-bridge.ts`
 
 ### Standalone server telemetry
 
@@ -298,22 +298,22 @@ The request sends the admin secret through `X-Jazz-Admin-Secret` and scopes the 
 
 The response contains:
 
-| Field | Meaning |
-| --- | --- |
-| `appId` | App represented by the snapshot |
-| `generatedAt` | Server-generated snapshot marker |
-| `queries` | Grouped server-visible subscriptions |
+| Field         | Meaning                              |
+| ------------- | ------------------------------------ |
+| `appId`       | App represented by the snapshot      |
+| `generatedAt` | Server-generated snapshot marker     |
+| `queries`     | Grouped server-visible subscriptions |
 
 Each query group contains:
 
-| Field | Meaning |
-| --- | --- |
-| `groupKey` | Opaque server-defined group identity |
-| `count` | Number of subscriptions represented by the group |
-| `table` | Target table |
-| `query` | Serialized runtime query JSON |
-| `branches` | Branch context |
-| `propagation` | `full` or `local-only` |
+| Field         | Meaning                                          |
+| ------------- | ------------------------------------------------ |
+| `groupKey`    | Opaque server-defined group identity             |
+| `count`       | Number of subscriptions represented by the group |
+| `table`       | Target table                                     |
+| `query`       | Serialized runtime query JSON                    |
+| `branches`    | Branch context                                   |
+| `propagation` | `full` or `local-only`                           |
 
 The API does not define result rows, result counts, query source, execution duration, latency, settlement, errors, or lifecycle events.
 
@@ -346,7 +346,7 @@ Sources:
 
 ## Official Jazz Inspector implementation
 
-The official page lives under `packages/inspector/src/pages/live-query/`:
+The official page lives under `packages/inspektor/src/pages/live-query/`:
 
 - `index.tsx`
 - `index.module.css`
@@ -369,10 +369,10 @@ The official query-to-Data-Explorer conversion only recognizes a narrow subset o
 
 Sources:
 
-- `packages/inspector/src/routes.tsx`
-- `packages/inspector/src/pages/live-query/index.tsx`
-- `packages/inspector/src/pages/live-query/index.test.tsx`
-- `packages/inspector/src/contexts/host-link.ts`
+- `packages/inspektor/src/routes.tsx`
+- `packages/inspektor/src/pages/live-query/index.tsx`
+- `packages/inspektor/src/pages/live-query/index.test.tsx`
+- `packages/inspektor/src/contexts/host-link.ts`
 
 ## Polling and snapshot semantics
 
@@ -391,25 +391,25 @@ For a query timeline, a segment means that the group was observed in a successfu
 
 ## Observable and unavailable information
 
-| Information | Overlay trace | Standalone telemetry |
-| --- | --- | --- |
-| Active subscription identity | Local trace id | Group key |
-| Serialized query | Yes | Yes |
-| Table | Yes | Yes |
-| Branches | Yes | Yes |
-| Tier | Yes | No |
-| Propagation | Yes | Yes |
-| Creation stack | Captured internally, removed by host | No |
-| Grouped subscription count | No | Yes |
-| Query result rows | No | No |
-| Matching-row count | No | No |
-| Added, updated, removed rows | No | No |
-| Reset and settlement state | No | No |
-| Reconnect state | No | No |
-| Rejection or transport error | No | No |
-| Query execution latency | No | No |
-| Transaction attribution | No | No |
-| Source component or owner | No | No |
+| Information                  | Overlay trace                        | Standalone telemetry |
+| ---------------------------- | ------------------------------------ | -------------------- |
+| Active subscription identity | Local trace id                       | Group key            |
+| Serialized query             | Yes                                  | Yes                  |
+| Table                        | Yes                                  | Yes                  |
+| Branches                     | Yes                                  | Yes                  |
+| Tier                         | Yes                                  | No                   |
+| Propagation                  | Yes                                  | Yes                  |
+| Creation stack               | Captured internally, removed by host | No                   |
+| Grouped subscription count   | No                                   | Yes                  |
+| Query result rows            | No                                   | No                   |
+| Matching-row count           | No                                   | No                   |
+| Added, updated, removed rows | No                                   | No                   |
+| Reset and settlement state   | No                                   | No                   |
+| Reconnect state              | No                                   | No                   |
+| Rejection or transport error | No                                   | No                   |
+| Query execution latency      | No                                   | No                   |
+| Transaction attribution      | No                                   | No                   |
+| Source component or owner    | No                                   | No                   |
 
 The standalone API can support inventory, churn, persistence, and grouped-count debugging. It cannot explain changed application rows or query performance.
 

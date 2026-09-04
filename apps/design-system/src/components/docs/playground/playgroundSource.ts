@@ -20,7 +20,7 @@ export function createPlaygroundSource({
   const importNames = Object.entries(imports)
     .filter(([, included]) => included === true)
     .map(([name]) => name)
-  const sections = [`import { ${importNames.join(', ')} } from "@inspector/ds";`]
+  const sections = [`import { ${importNames.join(', ')} } from "@inspektor/ds";`]
 
   if (declarations !== undefined) sections.push(declarations)
   sections.push(`export default function Example() {\n  return ${example};\n}`)

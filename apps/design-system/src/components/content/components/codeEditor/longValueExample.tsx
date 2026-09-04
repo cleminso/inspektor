@@ -1,4 +1,4 @@
-import { CodeEditor } from '@inspector/ds'
+import { CodeEditor } from '@inspektor/ds'
 import { useState } from 'react'
 
 const initialValue = JSON.stringify(

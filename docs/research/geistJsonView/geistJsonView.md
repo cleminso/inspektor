@@ -6,7 +6,7 @@
 - [What it is](#what-it-is)
 - [Verified Geist behavior](#verified-geist-behavior)
 - [What we did not verify](#what-we-did-not-verify)
-- [Inspector decisions](#inspector-decisions)
+- [Inspector decisions](#inspektor-decisions)
 - [Component boundary](#component-boundary)
 - [Initial scope](#initial-scope)
 - [Sources](#sources)

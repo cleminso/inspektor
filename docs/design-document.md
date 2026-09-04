@@ -2,8 +2,8 @@
 
 Author: Cleminso
 Status: v1 - Working progress
-Repo-URL: https://github.com/regardedev/inspector/
-Doc-URL: https://github.com/regardedev/inspector/tree/main/docs/design-document.md
+Repo-URL: https://github.com/regardedev/inspektor/
+Doc-URL: https://github.com/regardedev/inspektor/tree/main/docs/design-document.md
 Audience: Project author and AI agents working on the implementation. Secondary, future contributors who want to understand
 the product direction.
 
@@ -18,7 +18,7 @@ the product direction.
 - [Glossary](#glossary)
   - [Staged mutation lifecycle](#staged-mutation-lifecycle)
 - [Known pain points](#known-pain-points)
-- [Inspector](#inspector)
+- [Inspector](#inspektor)
   - [Runtime bootstrap](#runtime-bootstrap)
     - [Accepted-intent WASM preparation](#accepted-intent-wasm-preparation)
     - [Startup chain](#startup-chain)
@@ -39,7 +39,7 @@ schema, permissions, and active sync-server query subscriptions from one interfa
 v1 continues the MVP direction with stronger UI/UX foundations, clearer interaction design, better performance, and more maintainable architecture.
 
 By better implementation/performance I mean faster browsing, clearer data-grid interactions, stronger query subscription UX,
-reusable UI foundations, and better state handling, so future inspector features can be added without becoming one-off
+reusable UI foundations, and better state handling, so future inspektor features can be added without becoming one-off
 patches.
 
 ## Background
@@ -47,15 +47,15 @@ patches.
 I'm a developer who loves Jazz-tools, a local-first relational database.
 
 I'm using Jazz because they made my developer experience simpler to create applications with features I like such as
-local-first, real-time sync. But during my developer experience there is the moment to use the inspector that I'm not
+local-first, real-time sync. But during my developer experience there is the moment to use the inspektor that I'm not
 satisfied.
 
-I found the inspector experience quality does not represent the same quality as Jazz-tools offer.
+I found the inspektor experience quality does not represent the same quality as Jazz-tools offer.
 
-I want to build an alternative Jazz inspector that's focus on modern UX and easier to use and it's central piece for a Jazz developer that require attention and cares.
+I want to build an alternative Jazz inspektor that's focus on modern UX and easier to use and it's central piece for a Jazz developer that require attention and cares.
 
-I'm making assumptions about the UX what I think is necessary for the inspector. The "UX quality" is my own judgment. My end
-goal is to present this work to Jazz team and discuss to join them to work on the official inspector. I see myself working on frontend part of Jazz, such as the official inspector and Jazz dashboard.
+I'm making assumptions about the UX what I think is necessary for the inspektor. The "UX quality" is my own judgment. My end
+goal is to present this work to Jazz team and discuss to join them to work on the official inspektor. I see myself working on frontend part of Jazz, such as the official inspektor and Jazz dashboard.
 
 The direction I take for this Inspector is quite different from the official one, who is more "standalone" about the framework used (pure css). Where I'm going with modern framework choice that I'm more comfortable with, and found more ergonomic. See Architecture
 
@@ -211,7 +211,7 @@ runtime local and non-durable, so inspected data is not persisted by the Inspect
 
 **Connections**:
 
-From a user perspective, a connection is a persisted admin session configuration with app credentials. It lets the inspector
+From a user perspective, a connection is a persisted admin session configuration with app credentials. It lets the inspektor
 introspect a remote server and fetch schema hashes, query subscriptions, and table data. Connections are stored in local
 storage under `inspektor-connections`
 
@@ -326,17 +326,17 @@ Some of my personal pain points, mostly about the UX and navigation inside the I
   - keyboard actions
   - quick way to select and/or copy row/cell
 - lack of clarity with `live-query` page
-- official inspector folder is quite "messy" hard to make a contribution to
+- official inspektor folder is quite "messy" hard to make a contribution to
 
 ## Inspector
 
-The web inspector is an app for Jazz developers to explore their application data. It loads published schema metadata, creates
+The web inspektor is an app for Jazz developers to explore their application data. It loads published schema metadata, creates
 an in-memory Jazz admin client, and renders generic schema-driven tools for reading, filtering, mutating, and inspecting
 server query activity.
 
-Because of this, the inspector can work with arbitrary app schemas without importing generated types from the target app.
+Because of this, the inspektor can work with arbitrary app schemas without importing generated types from the target app.
 
-The inspector is close to an **admin client talking to the sync system** rather than a purely local debug tool. It's for that the default durability/mutation tier is `edge`
+The inspektor is close to an **admin client talking to the sync system** rather than a purely local debug tool. It's for that the default durability/mutation tier is `edge`
 
 To me, Jazz's in-app overlay and standalone Inspector answer different problems.
 
@@ -441,7 +441,7 @@ This flow **must answer**:
 
 #### How it works
 
-From a user perspective, a connection is a persisted admin session configuration with app credentials. It lets the inspector
+From a user perspective, a connection is a persisted admin session configuration with app credentials. It lets the inspektor
 introspect a remote server and fetch schema hashes, query subscriptions, and table data. Connections are stored in local
 storage under `inspektor-connections`.
 
@@ -475,7 +475,7 @@ Must support:
 
 #### Connection switching
 
-Once connected the users must be able to switch to another connection from anywhere in the inspector dashboard instead of going back to the home page.
+Once connected the users must be able to switch to another connection from anywhere in the inspektor dashboard instead of going back to the home page.
 
 #### Editing a connection
 
@@ -500,7 +500,7 @@ server's schema hash list.
 Opening a saved connection still needs the Jazz server at `serverUrl` to be reachable when Inspector resolves schema hashes,
 fetches the selected stored schema, and creates the admin client.
 
-If the app dev server only produced the inspector link but the Jazz server is remote and still reachable, the saved connection
+If the app dev server only produced the inspektor link but the Jazz server is remote and still reachable, the saved connection
 can open without the app dev server. If the app dev server owns the managed local Jazz runtime, stopping it makes the saved
 connection unavailable until the runtime is running again.
 
@@ -629,7 +629,7 @@ It answers:
 v1 keeps this surface simple. The table list is navigation, not a full schema browser. Deeper schema details live in a table
 Schema workspace item.
 
-When the inspector opens for the first time, the Tables navigator can open the first available table as a Data workspace item.
+When the inspektor opens for the first time, the Tables navigator can open the first available table as a Data workspace item.
 
 If no workspace item is open, the main workspace renders an empty state instead of a table toolbar. That empty state can show
 recently opened items so the developer can reopen prior work quickly.
@@ -718,7 +718,7 @@ schema context, and safe edits into one coherent surface.
 
 The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspector rules.
 
-`@inspector/ds` owns the reusable `DataGrid` presentation system and its explicit TanStack Table feature registry. `apps/web`
+`@inspektor/ds` owns the reusable `DataGrid` presentation system and its explicit TanStack Table feature registry. `apps/web`
 owns the Inspector composition, TanStack table construction, Jazz queries, schema-derived columns, filters, relations, routes,
 and mutations. The design-system root receives a controlled feature-aware `DataGridTable<TData>` instance rather than receiving
 duplicate data, columns, sorting, pagination, or selection state.
@@ -1132,7 +1132,7 @@ UI representation:
 
 #### Relation navigation
 
-If a column has `references` and the current cell contains a relation id, the inspector renders a relation cell instead of
+If a column has `references` and the current cell contains a relation id, the inspektor renders a relation cell instead of
 plain text.
 
 That relation cell:
@@ -1278,7 +1278,7 @@ Behavior:
 Live-change highlights are ephemeral and brief. Any Jazz update that reaches the active query — local or external — can trigger a
 row or cell highlight so the developer sees what changed without scanning the table.
 
-Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspector can unsubscribe by skipping a query, but freezing visible rows would require an inspector-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
+Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspector can unsubscribe by skipping a query, but freezing visible rows would require an inspektor-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
 
 An out-of-scope `Live`/`Paused` presentation can freeze an Inspector-owned visible snapshot while Jazz remains connected and the table
 subscription continues receiving changes. The paused state can report pending inserted, updated, and deleted rows, then
@@ -1391,14 +1391,14 @@ The Live queries view does not show returned row data. To inspect data, Inspecto
 | Filter by table and propagation    | Keep table and returned propagation values in the Live queries navigator.                                                                      |
 | Browse grouped subscriptions       | Start with table and count in the Live queries navigator without replacing the active workspace item.                                          |
 | Inspect one subscription           | Opening a grouped subscription creates or focuses a Query workspace item with Overview and Raw JSON representations.                           |
-| Explain empty states               | Explain no active queries, local-only queries, short-lived reads, mismatched connection context, hidden inspector reads, and failed telemetry. |
+| Explain empty states               | Explain no active queries, local-only queries, short-lived reads, mismatched connection context, hidden inspektor reads, and failed telemetry. |
 | Manual refresh                     | Keep auto-refresh and let the user refresh immediately.                                                                                        |
 | Auto-refresh control               | Let the user choose auto-refresh, paused, or refresh once.                                                                                     |
 | Open in Table Explorer             | Use the subscription table and supported query filters to open matching rows.                                                                  |
 
 It shows what the server is currently tracking.
 
-It's server telemetry, not local client introspection. It polls like the Jazz standalone inspector. v1 should keep automatic refresh and add a manual refresh action.
+It's server telemetry, not local client introspection. It polls like the Jazz standalone inspektor. v1 should keep automatic refresh and add a manual refresh action.
 
 The refresh control should not be labeled as a real-time stream. It controls snapshot fetching.
 
@@ -1547,7 +1547,7 @@ When can the user open Live queries and see nothing?
 - the active queries are local-only
 - one-shot reads or short-lived queries are not active when the server snapshot is fetched
 - the inspected app is not connected to the same server/app/branch/schema context
-- inspector-originated queries are hidden from the live query list
+- inspektor-originated queries are hidden from the live query list
 - telemetry fetch failed or is stale
 
 #### Scenarios
@@ -1695,7 +1695,7 @@ main risks are credential exposure in browser storage or URLs and unintended tra
 ---
 
 > what
-> The inspector connect to a Jazz remote server
+> The inspektor connect to a Jazz remote server
 > how?
 > Using app local credentials
 > why?

@@ -1,4 +1,4 @@
-import { ContextSwitcher } from '@inspector/ds'
+import { ContextSwitcher } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const branches = ['main', 'develop', 'feature/schema-view', 'fix/connection-state']

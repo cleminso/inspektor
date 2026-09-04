@@ -1,4 +1,4 @@
-import { Box, Icon, Text } from '@inspector/ds'
+import { Box, Icon, Text } from '@inspektor/ds'
 import { Table } from 'lucide-react'
 import { type ReactElement } from 'react'
 

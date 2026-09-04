@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, ButtonGroupText } from '@inspector/ds'
+import { Button, ButtonGroup, ButtonGroupText } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

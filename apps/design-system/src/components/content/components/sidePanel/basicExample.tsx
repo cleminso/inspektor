@@ -1,4 +1,4 @@
-import { Button, Input, SidePanel, Text } from '@inspector/ds'
+import { Button, Input, SidePanel, Text } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -1,4 +1,4 @@
-import { Spinner, type SpinnerSize } from '@inspector/ds'
+import { Spinner, type SpinnerSize } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

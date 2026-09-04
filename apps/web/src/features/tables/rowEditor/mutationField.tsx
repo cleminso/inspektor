@@ -18,7 +18,7 @@ import {
   TimestampValue,
   ToggleGroup,
   type CodeEditorLayout,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import {

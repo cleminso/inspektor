@@ -1,4 +1,4 @@
-import { Box, ButtonLink, type ButtonVariant } from '@inspector/ds'
+import { Box, ButtonLink, type ButtonVariant } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const variants: ButtonVariant[] = ['primary', 'secondary', 'danger', 'ghost', 'link']

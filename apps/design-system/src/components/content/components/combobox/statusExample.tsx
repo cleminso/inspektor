@@ -1,4 +1,4 @@
-import { Box, Combobox, Spinner } from '@inspector/ds'
+import { Box, Combobox, Spinner } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function StatusExample(): ReactElement {

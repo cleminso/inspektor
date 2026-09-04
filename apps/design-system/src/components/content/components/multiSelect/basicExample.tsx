@@ -1,4 +1,4 @@
-import { MultiSelect, type MultiSelectItem } from '@inspector/ds'
+import { MultiSelect, type MultiSelectItem } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 const options: readonly MultiSelectItem[] = [

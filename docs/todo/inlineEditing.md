@@ -574,9 +574,9 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 
 - [ ] Run focused inline user-flow tests.
 - [ ] Run shared row mutation draft and parsing tests.
-- [ ] Run `pnpm --filter regarde.inspector typecheck`.
-- [ ] Run `pnpm --filter regarde.inspector lint`.
-- [ ] Run `pnpm --filter regarde.inspector build`.
+- [ ] Run `pnpm --filter inspektor typecheck`.
+- [ ] Run `pnpm --filter inspektor lint`.
+- [ ] Run `pnpm --filter inspektor build`.
 - [ ] Inspect the production bundle when inline controls add or move deferred dependencies.
 - [ ] Verify keyboard editing with focus outlines and screen-reader labels.
 - [ ] Verify dirty transitions through row, filter, sort, table, relation, and route changes.

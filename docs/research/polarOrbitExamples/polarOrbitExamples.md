@@ -5,7 +5,7 @@
 - [Why the values are separate](#why-the-values-are-separate)
 - [Evidence](#evidence)
 - [Risks](#risks)
-- [Recommended model for Inspector](#recommended-model-for-inspector)
+- [Recommended model for Inspector](#recommended-model-for-inspektor)
 - [Implementation constraints](#implementation-constraints)
 - [Escalation points](#escalation-points)
 - [Sources](#sources)
@@ -97,8 +97,8 @@ Prefer explicit paired imports for a small catalog. Move to `import.meta.glob` o
 - Let the repository formatter own TSX formatting; strip only an optional final newline at render time if needed.
 - Expose `source: string` from the example definition; keep highlighting independent.
 - Verify with:
-  1. `pnpm --filter inspector.design-system typecheck`
-  2. `pnpm --filter inspector.design-system build`
+  1. `pnpm --filter inspektor.design-system typecheck`
+  2. `pnpm --filter inspektor.design-system build`
   3. Editing an example updates both preview and displayed source in dev.
   4. Production output includes the preview and raw string only in the intended route chunk.
 

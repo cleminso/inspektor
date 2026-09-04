@@ -48,10 +48,10 @@ Interface roles answer: **what shared visual responsibility does this color have
 
 - They map light and dark schemes to palette values.
 - They are reusable across components and product surfaces.
-- They are the broad product color contract consumed through `@inspector/ds/theme` and constrained primitives such as `Box`.
+- They are the broad product color contract consumed through `@inspektor/ds/theme` and constrained primitives such as `Box`.
 - Their names describe stable visual or interaction roles, not component locations.
 
-`@inspector/ds/theme` also re-exports palette values for design-system documentation and tooling. Treat that as a technical export, not permission for product code to bypass semantic roles. A separate primitive-token entry point remains a possible enforcement improvement.
+`@inspektor/ds/theme` also re-exports palette values for design-system documentation and tooling. Treat that as a technical export, not permission for product code to bypass semantic roles. A separate primitive-token entry point remains a possible enforcement improvement.
 
 ### Linked component semantic roles
 

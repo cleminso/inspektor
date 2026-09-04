@@ -1,4 +1,4 @@
-import { CheckboxGroup, type CheckboxGroupItem } from '@inspector/ds'
+import { CheckboxGroup, type CheckboxGroupItem } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 const items: readonly CheckboxGroupItem[] = [

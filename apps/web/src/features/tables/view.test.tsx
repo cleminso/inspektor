@@ -59,7 +59,7 @@ vi.mock('@tables/tableList/pane', () => ({
   },
 }))
 
-vi.mock('@inspector/ds', () => ({
+vi.mock('@inspektor/ds', () => ({
   ShellLayout: {
     Body: Fragment,
     LeftDock: Fragment,

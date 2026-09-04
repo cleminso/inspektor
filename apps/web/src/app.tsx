@@ -8,7 +8,7 @@ import { StrictMode } from 'react'
 import { ThemeProvider } from 'next-themes'
 // The app shell only needs Tooltip. Its focused public export avoids importing through the broad
 // design-system barrel at this application-wide boundary.
-import { Tooltip } from '@inspector/ds/tooltip'
+import { Tooltip } from '@inspektor/ds/tooltip'
 
 import { routeTree } from './routeTree.gen'
 import { ThemeMetadata } from './app/themeMetadata'

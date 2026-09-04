@@ -105,9 +105,9 @@ describe('useTablePreferences', () => {
         window.localStorage.getItem('inspektor-table-preferences:connection%3Aaccounts') ?? 'null',
       ),
     ).toEqual({ version: 1, order: ['role', 'id', 'name'], hidden: ['name'] })
-    expect(window.localStorage.getItem('inspector:column-order:connection:accounts')).toBeNull()
+    expect(window.localStorage.getItem('inspektor:column-order:connection:accounts')).toBeNull()
     expect(
-      window.localStorage.getItem('inspector:column-visibility:connection:accounts'),
+      window.localStorage.getItem('inspektor:column-visibility:connection:accounts'),
     ).toBeNull()
   })
 

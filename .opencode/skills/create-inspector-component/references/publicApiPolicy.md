@@ -6,7 +6,7 @@
 - [Global omissions](#global-omissions)
 - [Part-specific omissions](#part-specific-omissions)
 - [Type ownership](#type-ownership)
-- [Inspector-owned props](#inspector-owned-props)
+- [Inspector-owned props](#inspektor-owned-props)
 - [Prop transformations](#prop-transformations)
 - [Implementation pattern](#implementation-pattern)
 
@@ -71,14 +71,14 @@ Prefer `variant="danger"`, `size="m"`, or `width="anchor"` over arbitrary color,
 
 Record every value that does not cross the wrapper unchanged:
 
-| Transformation | Meaning | Audit question |
-| --- | --- | --- |
-| Renamed | Inspector and Base UI use different names | Is any type or event information lost? |
-| Normalized | Several public forms become one internal value | Can the public states conflict? |
-| Derived | Several inputs or contexts determine one Base UI prop | Which input wins and why? |
-| Constrained | Inspector fixes or limits a Base UI capability | Is the Base prop omitted publicly? |
-| Consumed | Inspector uses the prop without forwarding it | Is the ownership clear? |
-| Injected | Inspector configures Base UI without a public prop | Is the fixed value documented? |
+| Transformation | Meaning                                               | Audit question                         |
+| -------------- | ----------------------------------------------------- | -------------------------------------- |
+| Renamed        | Inspector and Base UI use different names             | Is any type or event information lost? |
+| Normalized     | Several public forms become one internal value        | Can the public states conflict?        |
+| Derived        | Several inputs or contexts determine one Base UI prop | Which input wins and why?              |
+| Constrained    | Inspector fixes or limits a Base UI capability        | Is the Base prop omitted publicly?     |
+| Consumed       | Inspector uses the prop without forwarding it         | Is the ownership clear?                |
+| Injected       | Inspector configures Base UI without a public prop    | Is the fixed value documented?         |
 
 Transform only to enforce an invariant, centralize a design decision, replace Base UI vocabulary with Inspector semantics, or hide configuration consumers should not understand.
 

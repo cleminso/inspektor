@@ -1,6 +1,6 @@
 import { useMemo, type PropsWithChildren } from 'react'
 
-import { Box, ButtonLink, ShellLayout, Text } from '@inspector/ds'
+import { Box, ButtonLink, ShellLayout, Text } from '@inspektor/ds'
 
 import { useAppCommandPalette } from '@app/hotkeys/appHotkeys'
 

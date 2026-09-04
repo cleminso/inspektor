@@ -1,4 +1,4 @@
-import { SwimlaneTimeline } from '@inspector/ds'
+import { SwimlaneTimeline } from '@inspektor/ds'
 import { useState, type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

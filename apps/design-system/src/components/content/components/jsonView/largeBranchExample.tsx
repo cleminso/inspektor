@@ -1,4 +1,4 @@
-import { JsonView } from '@inspector/ds'
+import { JsonView } from '@inspektor/ds'
 
 const records = Array.from({ length: 205 }, (_, index) => ({
   id: `record_${String(index + 1).padStart(3, '0')}`,

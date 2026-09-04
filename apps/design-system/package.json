@@ -1,5 +1,5 @@
 {
-  "name": "inspector.design-system",
+  "name": "inspektor.design-system",
   "private": true,
   "type": "module",
   "sideEffects": false,
@@ -16,7 +16,7 @@
   "dependencies": {
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
-    "@inspector/ds": "workspace:*",
+    "@inspektor/ds": "workspace:*",
     "@shikijs/langs-precompiled": "3.23.0",
     "@stylexjs/stylex": "catalog:",
     "@tanstack/react-hotkeys": "catalog:",

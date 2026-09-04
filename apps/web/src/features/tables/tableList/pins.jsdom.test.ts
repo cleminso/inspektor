@@ -20,7 +20,7 @@ describe('table pins', () => {
     })
   })
 
-  it('persists pinned table names independently for each inspector scope', () => {
+  it('persists pinned table names independently for each inspektor scope', () => {
     savePinnedTableNames('connection:main:schema-a', new Set(['accounts', 'users']))
     savePinnedTableNames('connection:branch:schema-b', new Set(['sessions']))
 
@@ -31,20 +31,20 @@ describe('table pins', () => {
 
   it('ignores invalid persisted pin data', () => {
     window.localStorage.setItem(
-      'inspektor-table-pins:inspector',
+      'inspektor-table-pins:inspektor',
       JSON.stringify({ version: 1, tableNames: ['accounts', 42] }),
     )
 
-    expect([...loadPinnedTableNames('inspector')]).toEqual([])
+    expect([...loadPinnedTableNames('inspektor')]).toEqual([])
   })
 
   it('discards unsupported pin versions', () => {
     window.localStorage.setItem(
-      'inspektor-table-pins:inspector',
+      'inspektor-table-pins:inspektor',
       JSON.stringify({ version: 2, tableNames: ['accounts'] }),
     )
 
-    expect([...loadPinnedTableNames('inspector')]).toEqual([])
+    expect([...loadPinnedTableNames('inspektor')]).toEqual([])
   })
 
   it('keeps in-memory pinning usable when persistence fails', () => {
@@ -55,7 +55,7 @@ describe('table pins', () => {
       },
     })
 
-    expect(() => savePinnedTableNames('inspector', new Set(['accounts']))).not.toThrow()
+    expect(() => savePinnedTableNames('inspektor', new Set(['accounts']))).not.toThrow()
   })
 
   it('creates an immutable pin selection for a user action', () => {

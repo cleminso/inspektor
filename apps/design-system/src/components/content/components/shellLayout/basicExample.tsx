@@ -1,4 +1,4 @@
-import { Box, Button, ShellLayout, Text, useShellLayout } from '@inspector/ds'
+import { Box, Button, ShellLayout, Text, useShellLayout } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 function DockControls(): ReactElement {

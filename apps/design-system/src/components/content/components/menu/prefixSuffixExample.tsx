@@ -1,4 +1,4 @@
-import { Button, Menu, Icon } from '@inspector/ds'
+import { Button, Menu, Icon } from '@inspektor/ds'
 import { Copy, Pencil, Trash2 } from 'lucide-react'
 import { type ReactElement } from 'react'
 

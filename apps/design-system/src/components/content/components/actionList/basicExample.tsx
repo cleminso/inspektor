@@ -1,4 +1,4 @@
-import { ActionList, ContextMenu, Menu } from '@inspector/ds'
+import { ActionList, ContextMenu, Menu } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 function TableIcon(): ReactElement {

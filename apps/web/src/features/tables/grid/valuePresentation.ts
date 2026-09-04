@@ -1,4 +1,4 @@
-import type { StructuredValuePreviewModel, StructuredValuePreviewVariant } from '@inspector/ds'
+import type { StructuredValuePreviewModel, StructuredValuePreviewVariant } from '@inspektor/ds'
 import type { ColumnDescriptor } from 'jazz-tools'
 
 import { normalizeTimestampValue } from '@tables/valueParsing'

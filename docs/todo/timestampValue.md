@@ -103,6 +103,6 @@ No open design decisions are recorded.
 - [x] Run focused component tests, package typecheck, and changed-file lint.
 - [x] Run documentation typecheck, lint, and build.
 - [x] Run the complete documentation test command after resolving the Tab View `closeLabel` and Relation Value `target` extractor assertions.
-- [x] Run the `@inspector/ds` declaration build.
+- [x] Run the `@inspektor/ds` declaration build.
 - [x] Re-run focused component, application, typecheck, build, changed-file lint, and browser validation after the visual polish.
 - [x] Validate timestamp text editing and mutation parsing without the native picker.

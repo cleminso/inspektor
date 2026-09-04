@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { ColumnDescriptor } from 'jazz-tools'
 
-import { Box, Button, ScrollArea, Text } from '@inspector/ds'
+import { Box, Button, ScrollArea, Text } from '@inspektor/ds'
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
 import { useRowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'

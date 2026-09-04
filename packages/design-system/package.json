@@ -1,5 +1,5 @@
 {
-  "name": "@inspector/ds",
+  "name": "@inspektor/ds",
   "version": "0.0.1",
   "description": "Inspector design system",
   "author": "Regarde",
@@ -7,7 +7,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/regardedev/inspector.git",
+    "url": "https://github.com/regardedev/inspektor.git",
     "directory": "packages/design-system"
   },
   "module": "./dist/index.js",
@@ -21,23 +21,23 @@
   ],
   "exports": {
     ".": {
-      "inspector-source": "./src/index.ts",
+      "inspektor-source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./theme": {
-      "inspector-source": "./src/tokens/tokens.stylex.ts",
+      "inspektor-source": "./src/tokens/tokens.stylex.ts",
       "types": "./dist/tokens/tokens.stylex.d.ts",
       "import": "./dist/tokens/tokens.stylex.js",
       "default": "./dist/tokens/tokens.stylex.js"
     },
     "./baseline.css": {
-      "inspector-source": "./src/styles/baseline.css",
+      "inspektor-source": "./src/styles/baseline.css",
       "default": "./dist/baseline.css"
     },
     "./tooltip": {
-      "inspector-source": "./src/components/tooltip/tooltip.tsx",
+      "inspektor-source": "./src/components/tooltip/tooltip.tsx",
       "types": "./dist/components/tooltip/tooltip.d.ts",
       "import": "./dist/components/tooltip/tooltip.js",
       "default": "./dist/components/tooltip/tooltip.js"

@@ -88,7 +88,7 @@ export function jazzInspectorPlugin(options: JazzPluginOptions = {}) {
   }
 
   return {
-    name: "jazz-inspector",
+    name: "jazz-inspektor",
 
     // Keeps Vite from pre-bundling Jazz runtime pieces that must load as authored.
     async config(config: {
@@ -172,7 +172,7 @@ export function jazzInspectorPlugin(options: JazzPluginOptions = {}) {
 
       // The link hands the Inspector the admin credentials for this managed Jazz app.
       console.log(
-        `${LOG_PREFIX} Open the inspector: ${buildJazzInspectorLink(
+        `${LOG_PREFIX} Open the inspektor: ${buildJazzInspectorLink(
           managed.serverUrl,
           managed.appId,
           managed.adminSecret,

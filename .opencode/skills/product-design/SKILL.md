@@ -42,8 +42,8 @@ For color systems, token naming, theming boundaries, or component color states:
 
 1. Read [colorSystem.md](colorSystem.md).
 2. Read [colorTokenLayers.md](colorTokenLayers.md) when adding, moving, exposing, or reviewing token ownership.
-3. Load `create-inspector-component` when component implementation changes.
-4. Load `document-inspector-component` when public component documentation or examples change.
+3. Load `create-inspektor-component` when component implementation changes.
+4. Load `document-inspektor-component` when public component documentation or examples change.
 
 Follow `AGENTS.md` for architecture, constrained APIs, implementation checklists, and validation order. Canonical component behavior remains with the component skills and source code rather than being duplicated here.
 

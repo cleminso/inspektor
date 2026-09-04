@@ -1,4 +1,4 @@
-import { Field, Textarea } from '@inspector/ds'
+import { Field, Textarea } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

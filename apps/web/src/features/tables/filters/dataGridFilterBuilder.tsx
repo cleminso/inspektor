@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
-import { Box, Button, Command, DataGridFilterClause, DatePicker, Field, Text } from '@inspector/ds'
+import { Box, Button, Command, DataGridFilterClause, DatePicker, Field, Text } from '@inspektor/ds'
 
 import {
   applyFilterDraft,

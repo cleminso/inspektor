@@ -1,4 +1,4 @@
-import { Box, Button } from '@inspector/ds'
+import { Box, Button } from '@inspektor/ds'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, ArrowRight, PanelLeft, PanelRight } from 'lucide-react'
 import { type ReactElement } from 'react'

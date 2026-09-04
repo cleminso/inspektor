@@ -39,7 +39,7 @@ So the branch navigation we discussed for the new UI would be a **new feature**,
 - Branch picker in the header
 - Potentially a "create branch" workflow
 
-Is this branch management something you want to add to the inspector, or should branch remain a simple text field like today?
+Is this branch management something you want to add to the inspektor, or should branch remain a simple text field like today?
 
 ## "Creating a new branch" in Jazz means
 
@@ -60,6 +60,7 @@ Is this branch management something you want to add to the inspector, or should 
 - You're essentially partitioning your data by branch name
 
 ## What Jazz supports
+
 Jazz supports `env` + `userBranch` in the client config, so you can connect to different branches.
 
 ### What is less clear in the public JS API

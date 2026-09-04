@@ -1,4 +1,4 @@
-import { Select } from '@inspector/ds'
+import { Select } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const options = [

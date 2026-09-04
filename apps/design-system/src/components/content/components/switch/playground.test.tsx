@@ -12,7 +12,7 @@ describe('Switch playground', () => {
     expect(
       serializeSwitchPlayground({ size: 'm', checked: false, disabled: false, readOnly: false }),
     ).toBe(
-      'import { Switch } from "@inspector/ds";\n\nexport default function Example() {\n  return <Switch aria-label="Notifications" />;\n}',
+      'import { Switch } from "@inspektor/ds";\n\nexport default function Example() {\n  return <Switch aria-label="Notifications" />;\n}',
     )
   })
 

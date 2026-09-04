@@ -1,4 +1,4 @@
-const LOCAL_INSPECTOR_URL = "https://regarde.inspector.localhost:1355/conn/new";
+const LOCAL_INSPECTOR_URL = "https://inspektor.localhost:1355/conn/new";
 
 function encodeFragmentValue(value: string): string {
   return encodeURIComponent(value);

@@ -25,7 +25,7 @@ describe('ComponentDocsPage', () => {
           path: 'packages/design-system/src/components/button/button.tsx',
         }}
         preview={<button type="button">Preview</button>}
-        sourceCode={'import { Button } from "@inspector/ds";'}
+        sourceCode={'import { Button } from "@inspektor/ds";'}
         controls={<div>Variant control</div>}
       >
         <section aria-label="Existing examples">Sizes</section>
@@ -56,7 +56,7 @@ describe('ComponentDocsPage', () => {
           path: 'packages/design-system/src/components/copyButton/copyButton.tsx',
         }}
         preview={<button type="button">Preview</button>}
-        sourceCode={'import { CopyButton } from "@inspector/ds";'}
+        sourceCode={'import { CopyButton } from "@inspektor/ds";'}
         controls={<div>Controls</div>}
       />,
     )
@@ -89,7 +89,7 @@ describe('ComponentDocsPage', () => {
           path: 'packages/design-system/src/components/copyButton/copyButton.tsx',
         }}
         preview={<button type="button">Preview</button>}
-        sourceCode={'import { CopyButton } from "@inspector/ds";'}
+        sourceCode={'import { CopyButton } from "@inspektor/ds";'}
         controls={<div>Controls</div>}
       />,
     )
@@ -111,7 +111,7 @@ describe('ComponentDocsPage', () => {
           path: 'packages/design-system/src/components/button/button.tsx',
         }}
         preview={<button type="button">Preview</button>}
-        sourceCode={'import { Button } from "@inspector/ds";'}
+        sourceCode={'import { Button } from "@inspektor/ds";'}
         controls={<div>Controls</div>}
       />,
     )
@@ -128,7 +128,7 @@ describe('ComponentDocsPage', () => {
           path: 'packages/design-system/src/components/toggleGroup/toggleGroup.tsx',
         }}
         preview={<button type="button">Preview</button>}
-        sourceCode={'import { ToggleGroup } from "@inspector/ds";'}
+        sourceCode={'import { ToggleGroup } from "@inspektor/ds";'}
         controls={<div>Controls</div>}
       />,
     )
@@ -149,7 +149,7 @@ describe('ComponentDocsPage', () => {
             path: 'packages/design-system/src/components/button/button.tsx',
           }}
           preview={<button type="button">Preview</button>}
-          sourceCode={'import { Button } from "@inspector/ds";'}
+          sourceCode={'import { Button } from "@inspektor/ds";'}
           controls={<div>Button controls</div>}
         />
       </AppShellLayoutProvider>,
@@ -169,7 +169,7 @@ describe('ComponentDocsPage', () => {
             path: 'packages/design-system/src/components/checkbox/checkbox.tsx',
           }}
           preview={<button type="button">Preview</button>}
-          sourceCode={'import { Checkbox } from "@inspector/ds";'}
+          sourceCode={'import { Checkbox } from "@inspektor/ds";'}
           controls={<div>Checkbox controls</div>}
         />
       </AppShellLayoutProvider>,

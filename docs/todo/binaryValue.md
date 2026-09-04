@@ -29,7 +29,7 @@ This checklist tracks the reusable binary preview and inspection component.
 - [x] Document compact and inspection presentations with an executable consumer example.
 - [x] Register stable navigation and generated-props metadata.
 - [x] Split byte-count display from callback-driven copy and download details.
-- [x] Remove byte transformation, object URL creation, and download lifecycle from `@inspector/ds`.
+- [x] Remove byte transformation, object URL creation, and download lifecycle from `@inspektor/ds`.
 - [x] Bound application-owned Hex and Base64 copying to 1 MiB before encoding begins.
 
 - [x] Integrate the copy menu trigger with `InputGroup` styling instead of nesting a standalone menu button treatment.
@@ -80,6 +80,6 @@ No open design decisions are recorded.
 - [x] Run focused component tests, package typecheck, and changed-file lint.
 - [x] Run documentation typecheck, lint, and build.
 - [ ] Run the complete documentation test command without the unrelated Tab View `closeLabel` extractor assertion failure.
-- [ ] Run the `@inspector/ds` declaration build without the workspace TypeScript `baseUrl` deprecation error.
+- [ ] Run the `@inspektor/ds` declaration build without the workspace TypeScript `baseUrl` deprecation error.
 - [x] Re-run focused component, application, typecheck, build, changed-file lint, and browser validation after the visual polish.
 - [x] Validate binary copy formats in both inspection and row-editing surfaces.

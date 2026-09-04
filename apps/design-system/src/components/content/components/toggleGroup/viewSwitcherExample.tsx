@@ -1,4 +1,4 @@
-import { ToggleGroup } from '@inspector/ds'
+import { ToggleGroup } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 const defaultValue = ['tables']

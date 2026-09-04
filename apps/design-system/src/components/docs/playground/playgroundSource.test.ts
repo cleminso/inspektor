@@ -10,7 +10,7 @@ describe('createPlaygroundSource', () => {
         example: '<Button>Save</Button>',
       }),
     ).toBe(
-      'import { Button } from "@inspector/ds";\n\nexport default function Example() {\n  return <Button>Save</Button>;\n}',
+      'import { Button } from "@inspektor/ds";\n\nexport default function Example() {\n  return <Button>Save</Button>;\n}',
     )
   })
 
@@ -22,7 +22,7 @@ describe('createPlaygroundSource', () => {
         example: '(\n    <Select.Root items={options} />\n  )',
       }),
     ).toBe(
-      'import { Select, Field } from "@inspector/ds";\n\nconst options = ["main", "develop"];\n\nexport default function Example() {\n  return (\n    <Select.Root items={options} />\n  );\n}',
+      'import { Select, Field } from "@inspektor/ds";\n\nconst options = ["main", "develop"];\n\nexport default function Example() {\n  return (\n    <Select.Root items={options} />\n  );\n}',
     )
   })
 })

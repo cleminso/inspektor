@@ -9,7 +9,7 @@ import {
   type BinaryCopyFormat,
   type DataGridCellTarget,
   type DataGridFeatures,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
 

@@ -16,7 +16,7 @@ Meta's public pattern combines a small application baseline with complete, eleme
 ## Loading flow
 
 1. Fonts
-2. `@inspector/ds/baseline.css`
+2. `@inspektor/ds/baseline.css`
 3. Application globals
 4. Generated StyleX component CSS
 

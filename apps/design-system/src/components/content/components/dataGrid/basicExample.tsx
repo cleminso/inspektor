@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { DataGrid, Text, dataGridFeatures, type DataGridFeatures } from '@inspector/ds'
+import { DataGrid, Text, dataGridFeatures, type DataGridFeatures } from '@inspektor/ds'
 import { createColumnHelper, useTable, type CellSelectionState } from '@tanstack/react-table'
 
 interface Account {

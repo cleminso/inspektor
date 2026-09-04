@@ -1,4 +1,4 @@
-import { AlertDialog, Button } from '@inspector/ds'
+import { AlertDialog, Button } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function DefaultExample(): ReactElement {

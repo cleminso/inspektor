@@ -1,4 +1,4 @@
-import { ContextMenu, Icon } from '@inspector/ds'
+import { ContextMenu, Icon } from '@inspektor/ds'
 import { Copy, Pencil, X } from 'lucide-react'
 import { type ReactElement } from 'react'
 

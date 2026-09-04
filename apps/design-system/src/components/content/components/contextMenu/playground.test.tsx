@@ -16,7 +16,7 @@ describe('ContextMenu playground', () => {
       danger: true,
     })
 
-    expect(source).toContain('import { ContextMenu } from "@inspector/ds";')
+    expect(source).toContain('import { ContextMenu } from "@inspektor/ds";')
     expect(source).toContain('<ContextMenu.Content side="right" align="center">')
     expect(source).toContain('<ContextMenu.Item variant="danger"')
   })

@@ -4,7 +4,7 @@ import '@fontsource-variable/geist/wght.css'
 import './index.css'
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { Tooltip } from '@inspector/ds'
+import { Tooltip } from '@inspektor/ds'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 

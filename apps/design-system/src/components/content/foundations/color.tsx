@@ -1,11 +1,11 @@
-import { Box, Text, Toaster, toasts } from '@inspector/ds'
+import { Box, Text, Toaster, toasts } from '@inspektor/ds'
 import {
   paletteValues,
   type BackgroundColorToken,
   type BorderColorToken,
   type PaletteToken,
   type TextColorToken,
-} from '@inspector/ds/theme'
+} from '@inspektor/ds/theme'
 import * as stylex from '@stylexjs/stylex'
 import { type ReactElement } from 'react'
 import { useTheme } from 'next-themes'

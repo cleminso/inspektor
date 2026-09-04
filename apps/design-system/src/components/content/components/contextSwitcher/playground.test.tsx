@@ -17,7 +17,7 @@ describe('ContextSwitcher playground', () => {
       disabled: false,
     })
 
-    expect(source).toContain('import { ContextSwitcher } from "@inspector/ds";')
+    expect(source).toContain('import { ContextSwitcher } from "@inspektor/ds";')
     expect(source).toContain('<ContextSwitcher.Trigger label="Switch branch" size="s" width="s">')
     expect(source).toContain('{(branch: string) => (')
   })

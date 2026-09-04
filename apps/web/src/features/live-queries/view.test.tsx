@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { Fragment, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { Tooltip } from '@inspector/ds'
+import { Tooltip } from '@inspektor/ds'
 
 import type { StoredConnection } from '@app/connections/connections'
 
@@ -33,8 +33,8 @@ vi.mock('./useQuerySubscriptionsTelemetry', () => ({
   useQuerySubscriptionsTelemetry,
 }))
 
-vi.mock('@inspector/ds', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@inspector/ds')>()
+vi.mock('@inspektor/ds', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inspektor/ds')>()
   return {
     ...actual,
     ResizableHandle: () => <div role="separator" />,

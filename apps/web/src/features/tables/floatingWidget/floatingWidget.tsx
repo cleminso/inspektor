@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import { ChevronRight, ChevronUp } from 'lucide-react'
 
-import { Accordion, Box, Button, FloatingPanel, Text } from '@inspector/ds'
+import { Accordion, Box, Button, FloatingPanel, Text } from '@inspektor/ds'
 
 import { InspectorFooterCenterPortal } from '@app/shell/footer/centerSlot'
 import type { TableMutationExecutor } from '@tables/mutationLedger/applyLedger'

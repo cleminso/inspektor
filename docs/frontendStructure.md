@@ -81,7 +81,7 @@ Use the narrowest owner that explains both the behavior and its consumers:
 - Code moves to `shared` only after multiple owners consume it.
 - Route-specific declarations remain in `routes`; reusable behavior invoked by a route belongs to `app` or the relevant feature.
 
-A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. Generic shell geometry and dock mechanics belong to `@inspector/ds`; universal Inspector persistence and controls belong to `app/shell`; feature content remains with Tables or Live queries.
+A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. Generic shell geometry and dock mechanics belong to `@inspektor/ds`; universal Inspector persistence and controls belong to `app/shell`; feature content remains with Tables or Live queries.
 
 ## Import direction
 

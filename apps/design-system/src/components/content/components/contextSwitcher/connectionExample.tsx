@@ -1,4 +1,4 @@
-import { Button, ContextSwitcher } from '@inspector/ds'
+import { Button, ContextSwitcher } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 interface Connection {

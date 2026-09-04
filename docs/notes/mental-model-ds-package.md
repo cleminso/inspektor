@@ -12,7 +12,7 @@
 
 ## Purpose
 
-`@inspector/ds` provides reusable components and the consumer application assembles them into product features.
+`@inspektor/ds` provides reusable components and the consumer application assembles them into product features.
 
 ## Package output
 

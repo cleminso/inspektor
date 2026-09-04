@@ -1,4 +1,4 @@
-import { Button, Tooltip } from '@inspector/ds'
+import { Button, Tooltip } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function PositionExample(): ReactElement {

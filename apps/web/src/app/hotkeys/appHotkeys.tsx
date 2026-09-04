@@ -1,4 +1,4 @@
-import { Command, KeyboardInput } from '@inspector/ds'
+import { Command, KeyboardInput } from '@inspektor/ds'
 import {
   HotkeysProvider,
   useHotkey,

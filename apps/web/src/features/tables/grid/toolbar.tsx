@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-import { Box, Button, Select, Text, Tooltip } from '@inspector/ds'
+import { Box, Button, Select, Text, Tooltip } from '@inspektor/ds'
 
 import { TABLE_PAGE_SIZE_OPTIONS } from '@tables/tableTypes'
 import type { TablePageSize } from '@tables/tableTypes'

@@ -1,7 +1,7 @@
-import { Box, JsonView } from '@inspector/ds'
+import { Box, JsonView } from '@inspektor/ds'
 
 const record = {
-  description: `A long value for checking wrapping in a narrow inspector pane. ${'More detail. '.repeat(360)}`,
+  description: `A long value for checking wrapping in a narrow inspektor pane. ${'More detail. '.repeat(360)}`,
 }
 
 export default function LongContentExample() {

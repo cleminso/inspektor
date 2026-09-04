@@ -11,7 +11,7 @@
 - [How workspace applications resolve the design system](#how-workspace-applications-resolve-the-design-system)
 - [Vite configuration](#vite-configuration)
 - [Static and deferred dependency graphs](#static-and-deferred-dependency-graphs)
-- [Runtime boundaries in the Inspector](#runtime-boundaries-in-the-inspector)
+- [Runtime boundaries in the Inspector](#runtime-boundaries-in-the-inspektor)
 - [Dependency roles](#dependency-roles)
 - [Adding a dependency or export](#adding-a-dependency-or-export)
 - [Validation](#validation)
@@ -23,7 +23,7 @@ This document explains how the Inspector frontend is assembled and why its bound
 
 The key model is:
 
-> `apps/web` owns Inspector product behavior and data. `@inspector/ds` owns reusable UI behavior and presentation. `apps/design-system` documents and validates the public design-system contract.
+> `apps/web` owns Inspector product behavior and data. `@inspektor/ds` owns reusable UI behavior and presentation. `apps/design-system` documents and validates the public design-system contract.
 
 The import-boundary rules for optional heavy behavior are specified in [docs/importBoundaryPlaybook.md](docs/importBoundaryPlaybook.md). Component-level decisions belong in the corresponding `docs/todo/*.md` checklist.
 
@@ -33,12 +33,12 @@ The repository is a PNPM workspace. The root workspace configuration includes ap
 
 | Location                  | Role                                            | May depend on                                                             |
 | ------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| `apps/web`                | Inspector product application                   | `@inspector/ds`, product and data dependencies                            |
-| `apps/design-system`      | Component documentation and executable examples | public `@inspector/ds` exports and documentation dependencies             |
-| `packages/design-system`  | The `@inspector/ds` reusable UI package         | UI primitives and reusable interaction dependencies                       |
+| `apps/web`                | Inspector product application                   | `@inspektor/ds`, product and data dependencies                            |
+| `apps/design-system`      | Component documentation and executable examples | public `@inspektor/ds` exports and documentation dependencies             |
+| `packages/design-system`  | The `@inspektor/ds` reusable UI package         | UI primitives and reusable interaction dependencies                       |
 | `packages/jazz-dev-tools` | Separate Jazz tooling package                   | Outside this frontend replacement architecture unless explicitly in scope |
 
-`apps/web` and `apps/design-system` are consumers of `@inspector/ds`. They must use its public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
+`apps/web` and `apps/design-system` are consumers of `@inspektor/ds`. They must use its public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
 
 ## Ownership boundaries
 
@@ -67,7 +67,7 @@ The design system owns reusable presentation and interaction behavior:
 The documentation application is a real consumer of the design system. It owns:
 
 - Component pages, registry metadata, and navigation for pages that exist.
-- Executable examples imported from `@inspector/ds`.
+- Executable examples imported from `@inspektor/ds`.
 - Displayed example source and generated component-prop metadata.
 - Documentation-only tooling such as Shiki.
 
@@ -83,7 +83,7 @@ The normal Inspector path is:
 4. TanStack Router loads route modules according to the current URL. The connection route **resolves** a connection ID into a concrete branch, schema hash, and ordered schema catalogue
 5. `InspectorRuntimeBoundary` synchronizes that resolved target into session state and withholds **runtime**-dependent children until both identities agree.
 6. `InspectorProvider` starts runtime metadata and Jazz client initialization. Its children mount with nullable runtime projections; verified client publication remains gated by stored schema verification.
-7. Product feature routes render their loading, error, and connected states by composing those projections with `@inspector/ds` components.
+7. Product feature routes render their loading, error, and connected states by composing those projections with `@inspektor/ds` components.
 
 This separation is intentional. Connection setup and onboarding do not need a Jazz runtime. Connection-scoped routes share one runtime boundary.
 
@@ -118,9 +118,9 @@ Workspace mutation state publishes an exit blocker upward. Session enforces that
 
 | Import path             | Intended surface                                           |
 | ----------------------- | ---------------------------------------------------------- |
-| `@inspector/ds`         | Main public component, token, primitive, and hook barrel   |
-| `@inspector/ds/theme`   | Theme token entry                                          |
-| `@inspector/ds/tooltip` | Focused Tooltip entry used at an application-wide boundary |
+| `@inspektor/ds`         | Main public component, token, primitive, and hook barrel   |
+| `@inspektor/ds/theme`   | Theme token entry                                          |
+| `@inspektor/ds/tooltip` | Focused Tooltip entry used at an application-wide boundary |
 
 ### Public barrels
 
@@ -136,17 +136,17 @@ The package provides two valid resolution targets for the same public import pat
 
 | Export condition       | Target                      | Consumer                          |
 | ---------------------- | --------------------------- | --------------------------------- |
-| `inspector-source`     | TypeScript source in `src`  | Workspace Vite applications       |
+| `inspektor-source`     | TypeScript source in `src`  | Workspace Vite applications       |
 | `import` and `default` | ESM JavaScript in `dist`    | Consumers using the built package |
 | `types`                | Declaration files in `dist` | TypeScript tooling                |
 
-The public API and the resolved file are separate concepts. For example, `@inspector/ds/tooltip` remains a supported public import whether it resolves to `src/components/tooltip/tooltip.tsx` or `dist/components/tooltip/tooltip.js`.
+The public API and the resolved file are separate concepts. For example, `@inspektor/ds/tooltip` remains a supported public import whether it resolves to `src/components/tooltip/tooltip.tsx` or `dist/components/tooltip/tooltip.js`.
 
 The package emits ESM only. There is no CommonJS build because this workspace has no CommonJS consumer. This reduces package-output maintenance, but does not itself reduce web application cost when Vite resolves the source contract.
 
 ### Dependency declarations
 
-`react` and `react-dom` are peer dependencies of `@inspector/ds`. The application supplies them, so the application and the design system use the same React runtime. Bundling a separate React copy inside the design system would risk broken context, hooks, and duplicated runtime work.
+`react` and `react-dom` are peer dependencies of `@inspektor/ds`. The application supplies them, so the application and the design system use the same React runtime. Bundling a separate React copy inside the design system would risk broken context, hooks, and duplicated runtime work.
 
 Dependencies that the component implementation needs at runtime, such as Base UI and StyleX, belong to the design-system package. Build and test tooling belongs in `devDependencies` when it is not required by a consumer at runtime.
 
@@ -156,13 +156,13 @@ Dependencies that the component implementation needs at runtime, such as Base UI
 
 Both Vite applications declare these resolution conditions:
 
-`inspector-source`, `module`, `browser`, `development|production`.
+`inspektor-source`, `module`, `browser`, `development|production`.
 
-`resolve.conditions` tells Vite that `inspector-source` is an allowed package condition. The package export map declares `inspector-source` before its built `import` and `default` targets, so Vite selects the TypeScript source target for an `@inspector/ds` public import. Vite then processes that source as part of the consuming application build.
+`resolve.conditions` tells Vite that `inspektor-source` is an allowed package condition. The package export map declares `inspektor-source` before its built `import` and `default` targets, so Vite selects the TypeScript source target for an `@inspektor/ds` public import. Vite then processes that source as part of the consuming application build.
 
 This is the workspace development path for the current StyleX architecture. The StyleX Vite plugin transforms the source components and collects their styles while Vite builds each application. A distribution consumer can instead resolve the uncompiled ESM modules in `dist`; its StyleX plugin must still transform those modules and own final CSS extraction.
 
-Both applications also exclude `@inspector/ds` from Vite dependency optimization. The dependency optimizer is designed for third-party dependencies that Vite can prebundle as opaque inputs. `@inspector/ds` is linked workspace source that must remain available to the Vite and StyleX transforms.
+Both applications also exclude `@inspektor/ds` from Vite dependency optimization. The dependency optimizer is designed for third-party dependencies that Vite can prebundle as opaque inputs. `@inspektor/ds` is linked workspace source that must remain available to the Vite and StyleX transforms.
 
 This means the design-system TSDown build verifies artifact generation, while `apps/web` and `apps/design-system` builds verify source consumption. Neither check replaces the other.
 
@@ -172,9 +172,9 @@ This means the design-system TSDown build verifies artifact generation, while `a
 
 | Setting                                       | Why it exists                                                   | What to preserve                                            |
 | --------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------- |
-| `resolve.conditions`                          | Selects the workspace source contract of `@inspector/ds`        | Keep it aligned with package exports                        |
+| `resolve.conditions`                          | Selects the workspace source contract of `@inspektor/ds`        | Keep it aligned with package exports                        |
 | `resolve.tsconfigPaths`                       | Lets Vite use TypeScript path aliases                           | Keep aliases consistent with TypeScript configuration       |
-| `optimizeDeps.exclude: ["@inspector/ds"]`     | Prevents prebundling linked DS source                           | Keep DS available to StyleX transforms                      |
+| `optimizeDeps.exclude: ["@inspektor/ds"]`     | Prevents prebundling linked DS source                           | Keep DS available to StyleX transforms                      |
 | `stylex.vite()`                               | Allows Vite to compile StyleX used by the DS                    | Keep source resolution available to the StyleX transform    |
 | `tanstackRouter({ autoCodeSplitting: true })` | Generates route modules and enables route-level splitting       | Never hand-edit generated route trees                       |
 | `viteReact()`                                 | Transforms React JSX and provides React development integration | Keep it in each React application                           |
@@ -291,9 +291,9 @@ Run the focused validation commands recorded in `AGENTS.md` and the relevant fea
 | Workspace package       | A package developed in the same PNPM repository and linked through `workspace:*`                            |
 | Public barrel           | A module that intentionally re-exports supported public APIs from one import path                           |
 | Export map              | The `package.json` `exports` declaration that defines allowed import paths and resolution conditions        |
-| Export condition        | A named branch in an export map selected by a consumer or bundler, such as `inspector-source` or `import`   |
+| Export condition        | A named branch in an export map selected by a consumer or bundler, such as `inspektor-source` or `import`   |
 | Source contract         | Public imports resolve to package source for workspace application compilation                              |
-| Distribution contract   | Public imports resolve to built `dist` artifacts for consumers that do not select `inspector-source`        |
+| Distribution contract   | Public imports resolve to built `dist` artifacts for consumers that do not select `inspektor-source`        |
 | Peer dependency         | A dependency supplied by the consuming application, such as React for the design system                     |
 | Static dependency graph | Modules reachable through static imports from an entry or loaded route                                      |
 | Deferred closure        | The module graph loaded by one dynamic import boundary                                                      |

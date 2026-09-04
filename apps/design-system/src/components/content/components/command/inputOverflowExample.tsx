@@ -1,4 +1,4 @@
-import { Button, Command, DataGridFilterClause } from '@inspector/ds'
+import { Button, Command, DataGridFilterClause } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 const clauses = [

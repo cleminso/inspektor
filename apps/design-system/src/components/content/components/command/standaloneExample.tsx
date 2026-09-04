@@ -1,4 +1,4 @@
-import { Command } from '@inspector/ds'
+import { Command } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const items = [

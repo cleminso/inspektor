@@ -1,4 +1,4 @@
-import { Box, Button, Text } from '@inspector/ds'
+import { Box, Button, Text } from '@inspektor/ds'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { getConnectionDisplayName } from '@app/connections/connections'

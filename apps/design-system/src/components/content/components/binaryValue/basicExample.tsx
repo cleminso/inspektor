@@ -1,4 +1,4 @@
-import { BinaryDetails, BinaryValue, Box, Toaster, type BinaryCopyFormat } from '@inspector/ds'
+import { BinaryDetails, BinaryValue, Box, Toaster, type BinaryCopyFormat } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const value = new Uint8Array([0, 31, 127, 255])

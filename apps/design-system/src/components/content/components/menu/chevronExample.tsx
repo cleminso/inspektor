@@ -1,4 +1,4 @@
-import { Button, Menu } from '@inspector/ds'
+import { Button, Menu } from '@inspektor/ds'
 import { ChevronDown } from 'lucide-react'
 import { type ReactElement } from 'react'
 

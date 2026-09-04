@@ -1,4 +1,4 @@
-import { createInspectorTestFixture } from '../../inspector-test/inspectorTestFixture.js'
+import { createInspectorTestFixture } from '../../inspektor-test/inspectorTestFixture.js'
 
 export default async function globalSetup(): Promise<() => Promise<void>> {
   const fixture = await createInspectorTestFixture()

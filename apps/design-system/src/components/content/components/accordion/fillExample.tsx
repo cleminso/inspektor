@@ -1,4 +1,4 @@
-import { Accordion, ActionList, Box } from '@inspector/ds'
+import { Accordion, ActionList, Box } from '@inspektor/ds'
 
 const tableNames = [
   'accounts',

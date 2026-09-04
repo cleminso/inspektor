@@ -6,7 +6,7 @@ import {
   KeyboardInput,
   Tooltip,
   useShellLayout,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 import { Link, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 import { Rss, Search } from 'lucide-react'

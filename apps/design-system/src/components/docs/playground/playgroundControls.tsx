@@ -1,4 +1,4 @@
-import { Box, Button, Select, Switch, Text } from '@inspector/ds'
+import { Box, Button, Select, Switch, Text } from '@inspektor/ds'
 import { type ReactElement, useId } from 'react'
 
 import {

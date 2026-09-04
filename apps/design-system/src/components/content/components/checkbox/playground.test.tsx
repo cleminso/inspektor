@@ -18,7 +18,7 @@ describe('Checkbox playground', () => {
         readOnly: false,
       }),
     ).toBe(
-      'import { Checkbox } from "@inspector/ds";\n\nexport default function Example() {\n  return <Checkbox aria-label="Notifications" />;\n}',
+      'import { Checkbox } from "@inspektor/ds";\n\nexport default function Example() {\n  return <Checkbox aria-label="Notifications" />;\n}',
     )
   })
 

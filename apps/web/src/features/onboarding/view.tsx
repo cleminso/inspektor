@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 
-import { Box, ButtonLink, Text } from '@inspector/ds'
+import { Box, ButtonLink, Text } from '@inspektor/ds'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { appRoutes } from '@app/routing/appRoutes'

@@ -19,7 +19,7 @@ import {
   Tooltip,
   Icon,
   type DataGridFeatures,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'

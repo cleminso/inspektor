@@ -1,4 +1,4 @@
-import { Box, CopyButton, Icon } from '@inspector/ds'
+import { Box, CopyButton, Icon } from '@inspektor/ds'
 import * as stylex from '@stylexjs/stylex'
 import { ChevronDown } from 'lucide-react'
 import { type ReactElement, useId, useState } from 'react'

@@ -1,4 +1,4 @@
-import { Box, Text, type TextColor, type TextVariant } from '@inspector/ds'
+import { Box, Text, type TextColor, type TextVariant } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 import { FoundationDocsPage } from '@/components/docs/foundationDocsPage'

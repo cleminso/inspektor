@@ -1,4 +1,4 @@
-import { Button, toasts } from '@inspector/ds'
+import { Button, toasts } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function PreserveExample(): ReactElement {

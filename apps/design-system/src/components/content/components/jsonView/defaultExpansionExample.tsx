@@ -1,4 +1,4 @@
-import { JsonView } from '@inspector/ds'
+import { JsonView } from '@inspektor/ds'
 
 const connection = {
   app: { id: 'co_z3f2', name: 'Storefront' },

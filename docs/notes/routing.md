@@ -9,7 +9,7 @@
 - [State ownership](#state-ownership)
 - [Key decisions](#key-decisions)
 - [Browser-tab behavior](#browser-tab-behavior)
-- [Inspector link prefill](#inspector-link-prefill)
+- [Inspector link prefill](#inspektor-link-prefill)
 - [Example URLs](#example-urls)
 
 ## Mental model
@@ -117,14 +117,14 @@ Do not add `sessionStorage` unless a specific state must survive navigation with
 
 ## Key decisions
 
-| Decision                                     | Rationale                                                                                |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Keep connection id in the path               | Resolves one saved local profile and preserves connection-level browser-tab isolation.   |
-| Keep branch and schema out of content routes | They are visible header context and saved preferences of the selected connection.        |
-| Omit `/data`                                 | Data is the default table representation.                                                |
-| Give Schema its own path                     | Schema is a distinct workspace-item representation, not Data search state.               |
-| Keep tabs out of routes                      | Tabs are one presentation of workspace items and may later exist in several panes.       |
-| Keep filters in search parameters            | Filters are shareable state of a Data item.                                              |
+| Decision                                      | Rationale                                                                                |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Keep connection id in the path                | Resolves one saved local profile and preserves connection-level browser-tab isolation.   |
+| Keep branch and schema out of content routes  | They are visible header context and saved preferences of the selected connection.        |
+| Omit `/data`                                  | Data is the default table representation.                                                |
+| Give Schema its own path                      | Schema is a distinct workspace-item representation, not Data search state.               |
+| Keep tabs out of routes                       | Tabs are one presentation of workspace items and may later exist in several panes.       |
+| Keep filters in search parameters             | Filters are shareable state of a Data item.                                              |
 | Keep Tables and Live queries in the left dock | They are different resource navigators and switching them must not replace main content. |
 
 ## Browser-tab behavior

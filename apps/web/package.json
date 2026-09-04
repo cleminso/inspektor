@@ -1,10 +1,10 @@
 {
-  "name": "regarde.inspector",
+  "name": "inspektor",
   "private": true,
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev": "PORTLESS_PORT=1355 PORTLESS_HTTPS=1 portless inspector --force vite",
+    "dev": "PORTLESS_PORT=1355 PORTLESS_HTTPS=1 portless inspektor --force vite",
     "dev:vite": "vite",
     "portless:proxy": "portless proxy start --port 1355 --https",
     "build": "vite build && tsc -p tsconfig.app.json --noEmit",
@@ -20,7 +20,7 @@
   "dependencies": {
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
-    "@inspector/ds": "workspace:*",
+    "@inspektor/ds": "workspace:*",
     "@nanostores/react": "^2.0.1",
     "@tanstack/react-devtools": "^0.10.12",
     "@tanstack/react-hotkeys": "catalog:",

@@ -1,5 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react'
-import { ShellLayout } from '@inspector/ds'
+import { ShellLayout } from '@inspektor/ds'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'

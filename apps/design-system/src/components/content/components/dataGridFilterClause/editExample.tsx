@@ -1,4 +1,4 @@
-import { DataGridFilterClause } from '@inspector/ds'
+import { DataGridFilterClause } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function EditExample(): ReactElement {

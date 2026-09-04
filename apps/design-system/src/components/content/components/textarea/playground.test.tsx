@@ -19,7 +19,7 @@ describe('Textarea playground', () => {
         readOnly: false,
       }),
     ).toBe(
-      'import { Textarea } from "@inspector/ds";\n\nexport default function Example() {\n  return <Textarea aria-label="Notes" placeholder="Add notes" />;\n}',
+      'import { Textarea } from "@inspektor/ds";\n\nexport default function Example() {\n  return <Textarea aria-label="Notes" placeholder="Add notes" />;\n}',
     )
   })
 

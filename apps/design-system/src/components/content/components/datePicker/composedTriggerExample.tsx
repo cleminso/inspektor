@@ -1,4 +1,4 @@
-import { Button, DatePicker } from '@inspector/ds'
+import { Button, DatePicker } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function ComposedTriggerExample(): ReactElement {

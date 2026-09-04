@@ -13,7 +13,7 @@ Removing Tailwind Preflight exposed inconsistent browser defaults. StyleX genera
 
 ## Decision
 
-`@inspector/ds/baseline.css` provides one optional baseline that each controlled application imports once instead of redefining it.
+`@inspektor/ds/baseline.css` provides one optional baseline that each controlled application imports once instead of redefining it.
 
 ## Boundary
 

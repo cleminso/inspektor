@@ -27,7 +27,7 @@ export function InspectorFooterCenterSlot(): React.ReactElement {
   return (
     <div
       ref={context?.setTarget}
-      data-slot="inspector-footer-center"
+      data-slot="inspektor-footer-center"
     />
   )
 }

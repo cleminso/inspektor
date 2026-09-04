@@ -1,5 +1,5 @@
 import { HeadContent, Outlet, createRootRoute } from '@tanstack/react-router'
-import { Toaster } from '@inspector/ds'
+import { Toaster } from '@inspektor/ds'
 
 import { InspectorSessionProvider } from '@app/providers/inspectorSessionProvider'
 import { AppHotkeysProvider } from '@app/hotkeys/appHotkeys'

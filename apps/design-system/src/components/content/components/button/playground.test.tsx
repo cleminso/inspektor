@@ -22,7 +22,7 @@ describe('Button playground', () => {
         suffix: false,
       }),
     ).toBe(
-      'import { Button } from "@inspector/ds";\n\nexport default function Example() {\n  return <Button>Primary</Button>;\n}',
+      'import { Button } from "@inspektor/ds";\n\nexport default function Example() {\n  return <Button>Primary</Button>;\n}',
     )
   })
 

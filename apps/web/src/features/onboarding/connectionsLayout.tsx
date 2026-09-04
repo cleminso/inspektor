@@ -1,4 +1,4 @@
-import { Box, ButtonLink, ShellLayout, Text } from '@inspector/ds'
+import { Box, ButtonLink, ShellLayout, Text } from '@inspektor/ds'
 
 import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 

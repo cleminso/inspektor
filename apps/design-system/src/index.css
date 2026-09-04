@@ -1,5 +1,5 @@
 /* Establish the shared browser baseline once before application-specific globals. */
-@import "@inspector/ds/baseline.css";
+@import "@inspektor/ds/baseline.css";
 
 :root {
   --lightningcss-light: initial;

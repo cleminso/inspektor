@@ -12,7 +12,7 @@ function ThemeHeadEffects(): null {
   useEffect(() => {
     const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
     const themeColorMeta = document.querySelector<HTMLMetaElement>(
-      'meta[name="theme-color"][data-inspector-theme-color="true"]',
+      'meta[name="theme-color"][data-inspektor-theme-color="true"]',
     )
 
     if (themeColorMeta !== null) {

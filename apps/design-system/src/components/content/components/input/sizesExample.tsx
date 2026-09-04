@@ -1,4 +1,4 @@
-import { Input } from '@inspector/ds'
+import { Input } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function SizesExample(): ReactElement {

@@ -1,4 +1,4 @@
-import { Box, ResizableHandle, ResizablePanel, ResizablePanelGroup, Text } from '@inspector/ds'
+import { Box, ResizableHandle, ResizablePanel, ResizablePanelGroup, Text } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

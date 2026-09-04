@@ -1,4 +1,4 @@
-import { Button, Menu } from '@inspector/ds'
+import { Button, Menu } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function SelectionItemsExample(): ReactElement {

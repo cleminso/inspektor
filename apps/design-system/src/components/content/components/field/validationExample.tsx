@@ -1,4 +1,4 @@
-import { Field, Input } from '@inspector/ds'
+import { Field, Input } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function ValidationExample(): ReactElement {
@@ -9,7 +9,7 @@ export default function ValidationExample(): ReactElement {
     >
       <Field.Label>Username</Field.Label>
       <Input
-        defaultValue="inspector user"
+        defaultValue="inspektor user"
         fullWidth
       />
       <Field.Error match>Use letters, numbers, or underscores.</Field.Error>

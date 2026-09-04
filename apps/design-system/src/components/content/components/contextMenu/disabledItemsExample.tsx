@@ -1,4 +1,4 @@
-import { ContextMenu } from '@inspector/ds'
+import { ContextMenu } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function DisabledItemsExample(): ReactElement {

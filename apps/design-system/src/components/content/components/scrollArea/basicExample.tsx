@@ -1,4 +1,4 @@
-import { Box, ScrollArea, Text } from '@inspector/ds'
+import { Box, ScrollArea, Text } from '@inspektor/ds'
 
 const items = Array.from({ length: 12 }, (_, index) => `Scrollable item ${index + 1}`)
 

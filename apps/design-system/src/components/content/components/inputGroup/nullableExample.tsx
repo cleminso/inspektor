@@ -1,4 +1,4 @@
-import { Field, Input, InputGroup } from '@inspector/ds'
+import { Field, Input, InputGroup } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function NullableExample(): ReactElement {

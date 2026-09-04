@@ -22,7 +22,7 @@ The goal is not to maximize code splitting. The goal is to keep the initial depe
 
 ## Current model
 
-The application consumes `@inspector/ds` through its public barrel. A static import from any exported component can therefore make that dependency eligible for an initial application chunk, even when only one optional component uses it.
+The application consumes `@inspektor/ds` through its public barrel. A static import from any exported component can therefore make that dependency eligible for an initial application chunk, even when only one optional component uses it.
 
 The Inspector application limits its StyleX transform hook to `packages/design-system/src`. The design system is the only source owner that imports StyleX, so Rolldown can reject unrelated application and dependency modules before invoking the JavaScript plugin hook. The application suppresses only Rolldown's relative plugin-timing diagnostic after applying this boundary; all other build checks remain enabled. Expand or remove the filter before introducing StyleX imports under another owner.
 

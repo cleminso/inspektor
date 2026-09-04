@@ -1,4 +1,4 @@
-import { ButtonLink } from '@inspector/ds'
+import { ButtonLink } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

@@ -1,4 +1,4 @@
-import { Tooltip } from '@inspector/ds'
+import { Tooltip } from '@inspektor/ds'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 

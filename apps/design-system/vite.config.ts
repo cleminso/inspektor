@@ -25,11 +25,11 @@ stylexPlugin.transform = {
 
 export default defineConfig({
   resolve: {
-    conditions: ['inspector-source', 'module', 'browser', 'development|production'],
+    conditions: ['inspektor-source', 'module', 'browser', 'development|production'],
     tsconfigPaths: true,
   },
   optimizeDeps: {
-    exclude: ['@inspector/ds'],
+    exclude: ['@inspektor/ds'],
   },
   plugins: [
     stylexPlugin,

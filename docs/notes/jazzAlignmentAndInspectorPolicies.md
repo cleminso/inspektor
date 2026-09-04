@@ -4,13 +4,13 @@
 
 - [Purpose](#purpose)
 - [Upstream findings](#upstream-findings)
-- [Inspector strengths](#inspector-strengths)
+- [Inspector strengths](#inspektor-strengths)
 - [Patterns to adopt](#patterns-to-adopt)
 - [Patterns not to copy](#patterns-not-to-copy)
 - [Verified field representation contracts](#verified-field-representation-contracts)
 - [Mutation state table](#mutation-state-table)
 - [Nested Row fields](#nested-row-fields)
-- [Deliberate Inspector policy differences](#deliberate-inspector-policy-differences)
+- [Deliberate Inspector policy differences](#deliberate-inspektor-policy-differences)
 - [Structured draft formatting](#structured-draft-formatting)
 - [Verification scope](#verification-scope)
 - [Interaction decisions](#interaction-decisions)
@@ -30,15 +30,15 @@ This note records useful patterns from the official Jazz Inspector and settled d
 
 Official source reviewed:
 
-- `packages/inspector/src/components/data-explorer/TableDataGrid.tsx`
-- `packages/inspector/src/components/data-explorer/row-mutation-form.ts`
-- `packages/inspector/src/components/data-explorer/TableFilterBuilder.tsx`
-- `packages/inspector/src/components/data-explorer/ColumnCustomizationModal.tsx`
-- `packages/inspector/src/utility/generic-query-builder.ts`
+- `packages/inspektor/src/components/data-explorer/TableDataGrid.tsx`
+- `packages/inspektor/src/components/data-explorer/row-mutation-form.ts`
+- `packages/inspektor/src/components/data-explorer/TableFilterBuilder.tsx`
+- `packages/inspektor/src/components/data-explorer/ColumnCustomizationModal.tsx`
+- `packages/inspektor/src/utility/generic-query-builder.ts`
 
 ## Upstream findings
 
-The official inspector is strongest in grid workflows:
+The official inspektor is strongest in grid workflows:
 
 - It separates live source rows from pending dirty cell edits.
 - It saves dirty-field patches instead of reconstructed rows.
@@ -105,7 +105,7 @@ Jazz evidence:
 
 - `packages/jazz-tools/src/runtime/value-converter.ts` documents and implements top-level `undefined` omission in `toWriteRecord`.
 - `packages/jazz-tools/src/runtime/value-converter.test.ts` covers explicit nullable `null`, skipped `undefined`, unknown columns, required-field `null`, and JSON-schema failures.
-- `packages/inspector/src/components/data-explorer/TableDataGrid.test.tsx` covers omitted insert defaults and explicit nullable values.
+- `packages/inspektor/src/components/data-explorer/TableDataGrid.test.tsx` covers omitted insert defaults and explicit nullable values.
 
 Omission is operation-dependent: it requests the stored default during insert and means unchanged during update. Unavailable source data is presentation state, not another spelling of omission.
 
@@ -134,7 +134,7 @@ These checks provide earlier errors and preserve visible mutation intent. Do not
 
 ### Structured draft formatting
 
-The official Inspector formats a source object with `JSON.stringify` when editing begins, stores subsequent edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft. See `packages/inspector/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
+The official Inspector formats a source object with `JSON.stringify` when editing begins, stores subsequent edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft. See `packages/inspektor/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
 
 Inspector uses the same ownership rule:
 

@@ -10,7 +10,7 @@ afterEach(cleanup)
 describe('Spinner playground', () => {
   it('omits the package default size from the initial source', () => {
     expect(serializeSpinnerPlayground({ size: 'm' })).toBe(
-      'import { Spinner } from "@inspector/ds";\n\nexport default function Example() {\n  return <Spinner label="Loading" />;\n}',
+      'import { Spinner } from "@inspektor/ds";\n\nexport default function Example() {\n  return <Spinner label="Loading" />;\n}',
     )
   })
 

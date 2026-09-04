@@ -1,4 +1,4 @@
-import { Input, InputGroup } from '@inspector/ds'
+import { Input, InputGroup } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import type { ColumnDescriptor } from 'jazz-tools'
 
-import { Box, Button, FloatingPanel } from '@inspector/ds'
+import { Box, Button, FloatingPanel } from '@inspektor/ds'
 
 import type { SpreadsheetCompletionDirection } from '@tables/grid/inlineEditing'
 import { useTableMutationEditorController } from '@tables/mutationLedger/provider'

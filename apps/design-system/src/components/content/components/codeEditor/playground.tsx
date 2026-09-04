@@ -1,4 +1,4 @@
-import { Box, CodeEditor } from '@inspector/ds'
+import { Box, CodeEditor } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
@@ -48,7 +48,7 @@ export function serializeCodeEditorPlayground(state: CodeEditorPlaygroundState):
     state.readOnly === true ? 'readOnly' : null,
   ].filter((prop): prop is string => prop !== null)
 
-  return `import { CodeEditor } from "@inspector/ds";
+  return `import { CodeEditor } from "@inspektor/ds";
 import { useState } from "react";
 
 const initialValue = ${JSON.stringify(initialSource)};

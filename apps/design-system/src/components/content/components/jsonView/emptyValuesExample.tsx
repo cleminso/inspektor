@@ -1,4 +1,4 @@
-import { JsonView } from '@inspector/ds'
+import { JsonView } from '@inspektor/ds'
 
 const values = {
   object: {},

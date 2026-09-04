@@ -16,7 +16,7 @@ describe('Copy Button playground', () => {
       disabled: false,
     })
 
-    expect(source).toContain('import { Box, CopyButton, Text } from "@inspector/ds";')
+    expect(source).toContain('import { Box, CopyButton, Text } from "@inspektor/ds";')
     expect(source).toContain('const schemaHash = "sha256:41f17cc82ca";')
     expect(source).toContain('<Box alignItems="center" gap="xs">')
     expect(source).toContain('<Text as="code" monospace>')

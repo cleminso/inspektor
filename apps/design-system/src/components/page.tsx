@@ -1,4 +1,4 @@
-import { ButtonLink } from '@inspector/ds'
+import { ButtonLink } from '@inspektor/ds'
 import { Link as RouterLink } from '@tanstack/react-router'
 
 import { type ReactElement } from 'react'
@@ -11,7 +11,7 @@ export function HomePage(): ReactElement {
     <DocsPage>
       <PageHeader
         title="Inspector Design System"
-        description="Foundations and components used to build consistent inspector interfaces."
+        description="Foundations and components used to build consistent inspektor interfaces."
       />
     </DocsPage>
   )

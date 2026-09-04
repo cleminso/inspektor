@@ -1,4 +1,4 @@
-import { FindBar, type FindBarSearchOptions, type FindBarState } from '@inspector/ds'
+import { FindBar, type FindBarSearchOptions, type FindBarState } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 const matchCount = 6

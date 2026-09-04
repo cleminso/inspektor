@@ -1,4 +1,4 @@
-import { JsonView } from '@inspector/ds'
+import { JsonView } from '@inspektor/ds'
 
 const payload = {
   event: 'order.created',

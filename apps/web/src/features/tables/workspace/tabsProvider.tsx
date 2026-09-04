@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { AlertDialog, Button } from '@inspector/ds'
+import { AlertDialog, Button } from '@inspektor/ds'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import {

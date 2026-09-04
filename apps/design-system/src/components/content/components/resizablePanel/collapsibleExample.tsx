@@ -6,7 +6,7 @@ import {
   ResizablePanelGroup,
   Text,
   useResizablePanelRef,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function CollapsibleExample(): ReactElement {

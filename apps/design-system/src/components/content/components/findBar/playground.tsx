@@ -1,4 +1,4 @@
-import { Box, FindBar, type FindBarSearchOptions, type FindBarState } from '@inspector/ds'
+import { Box, FindBar, type FindBarSearchOptions, type FindBarState } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
@@ -6,7 +6,7 @@ import { findBarItem } from '@/lib/registry'
 
 const matchCount = 6
 
-export const findBarPlaygroundSource = `import { FindBar, type FindBarSearchOptions, type FindBarState } from "@inspector/ds";
+export const findBarPlaygroundSource = `import { FindBar, type FindBarSearchOptions, type FindBarState } from "@inspektor/ds";
 import { useState } from "react";
 
 const matchCount = 6;

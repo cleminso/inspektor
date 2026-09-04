@@ -1,4 +1,4 @@
-import { Box, CopyButton, Text } from '@inspector/ds'
+import { Box, CopyButton, Text } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const schemaHash = 'sha256:41f17cc82ca'

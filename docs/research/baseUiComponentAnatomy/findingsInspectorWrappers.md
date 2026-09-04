@@ -22,7 +22,7 @@
   - [Select](#select)
   - [ActionList](#actionlist)
 - [Contrasts from Menu and Combobox](#contrasts-from-menu-and-combobox)
-- [Base UI versus Inspector responsibilities](#base-ui-versus-inspector-responsibilities)
+- [Base UI versus Inspector responsibilities](#base-ui-versus-inspektor-responsibilities)
 - [Pattern-to-need map](#pattern-to-need-map)
 - [Failure modes](#failure-modes)
 - [Wrapper-reading checklist](#wrapper-reading-checklist)
@@ -32,7 +32,7 @@
 
 Inspector's wrappers are typed adapters, not restyled copies of Base UI components.
 
-```/dev/null/inspector-wrapper-layers.txt#L1-6
+```/dev/null/inspektor-wrapper-layers.txt#L1-6
 consumer JSX
   -> Inspector public prop contract
   -> Inspector defaults, structure, and StyleX policy
@@ -481,7 +481,7 @@ A practical test: if a concern requires widget interaction state or ARIA mechani
 
 ## Local source map
 
-Paths are relative to `/Users/clem/projects/regarde/inspector`.
+Paths are relative to `/Users/clem/projects/regarde/inspektor`.
 
 ### Inspector sources
 

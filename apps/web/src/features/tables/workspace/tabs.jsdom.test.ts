@@ -503,11 +503,11 @@ describe('table tabs', () => {
       recentViews: [],
     }
 
-    saveTableTabsState('inspector', state)
+    saveTableTabsState('inspektor', state)
 
-    expect(loadTableTabsState('inspector')).toEqual(state)
+    expect(loadTableTabsState('inspektor')).toEqual(state)
     expect(window.localStorage.getItem('inspektor-tabs')).toBeNull()
-    expect(JSON.parse(window.localStorage.getItem('inspektor-tabs:inspector') ?? 'null')).toEqual({
+    expect(JSON.parse(window.localStorage.getItem('inspektor-tabs:inspektor') ?? 'null')).toEqual({
       version: 1,
       ...state,
     })
@@ -534,7 +534,7 @@ describe('table tabs', () => {
 
   it('discards unsupported workspace tab versions', () => {
     window.localStorage.setItem(
-      'inspektor-tabs:inspector',
+      'inspektor-tabs:inspektor',
       JSON.stringify({
         version: 2,
         tabs: [{ id: 'table:accounts', tableName: 'accounts', search: {} }],
@@ -542,7 +542,7 @@ describe('table tabs', () => {
       }),
     )
 
-    expect(loadTableTabsState('inspector')).toEqual({
+    expect(loadTableTabsState('inspektor')).toEqual({
       tabs: [{ kind: 'newView', id: NEW_VIEW_TAB_ID }],
       recentViews: [],
     })
@@ -550,7 +550,7 @@ describe('table tabs', () => {
 
   it('canonicalizes untrusted stored tab search', () => {
     window.localStorage.setItem(
-      'inspektor-tabs:inspector',
+      'inspektor-tabs:inspektor',
       JSON.stringify({
         version: 1,
         tabs: [
@@ -572,7 +572,7 @@ describe('table tabs', () => {
       }),
     )
 
-    expect(loadTableTabsState('inspector').tabs).toEqual([
+    expect(loadTableTabsState('inspektor').tabs).toEqual([
       { id: 'table:accounts', kind: 'table', tableName: 'accounts', search: {} },
     ])
   })
@@ -586,7 +586,7 @@ describe('table tabs', () => {
     })
 
     expect(() =>
-      saveTableTabsState('inspector', {
+      saveTableTabsState('inspektor', {
         tabs: [{ kind: 'newView', id: NEW_VIEW_TAB_ID }],
         recentViews: [],
       }),

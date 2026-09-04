@@ -384,7 +384,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 [15/08/26]
 
 - [x] Keep one contextual deletion action in the complete-row pane: `Delete row` for one checked row and `Delete N checked rows`
-  for several checked rows.
+      for several checked rows.
 - [x] Confirm deletion in the pane, then close it and uncheck the affected rows after staging.
 
 [15/08/26]
@@ -647,7 +647,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 [05/08/26]
 
 - [x] Keep `DataGrid` controlled through a TanStack table instance.
-- [x] Configure the controlled table through the feature-aware `DataGridTable<TData>` contract exported by `@inspector/ds`.
+- [x] Configure the controlled table through the feature-aware `DataGridTable<TData>` contract exported by `@inspektor/ds`.
 - [x] Represent range corners with stable row IDs and column IDs while resolving range interiors against displayed row and column order.
 - [x] Keep cell-selection ranges in TanStack state while exposing controlled active-column and active-row product state.
 - [x] Bind TanStack replacement, include, exclude, Shift-extension, and drag-selection behavior without exposing raw pointer events as application state.
@@ -910,7 +910,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [26/07/26]
 
-- [x] Pass a module-scope constant options object to inspector-only relation resolution so `useAll` subscription memoization holds
+- [x] Pass a module-scope constant options object to inspektor-only relation resolution so `useAll` subscription memoization holds
       across detail renders.
 - [x] Parse URL filters in a dedicated memo keyed on the raw search string so unrelated search changes no longer rebuild the
       filters array identity consumed by the query builder and selection-scope key.
@@ -1733,32 +1733,32 @@ Checked markers in this section mean the interaction decision is settled; they d
 [02/08/26]
 
 - [x] Focused resizable-handle, token, table-layout, and playground tests pass.
-- [x] `pnpm --filter @inspector/ds test`
-- [x] `pnpm --filter @inspector/ds typecheck`
-- [x] `pnpm --filter @inspector/ds build`
-- [x] `pnpm --filter @inspector/ds lint`
-- [x] `pnpm --filter inspector.design-system test`
-- [x] `pnpm --filter inspector.design-system check:props`
-- [x] `pnpm --filter inspector.design-system typecheck`
-- [x] `pnpm --filter inspector.design-system lint`
-- [x] `pnpm --filter inspector.design-system build`
-- [x] `pnpm --filter regarde.inspector lint`
+- [x] `pnpm --filter @inspektor/ds test`
+- [x] `pnpm --filter @inspektor/ds typecheck`
+- [x] `pnpm --filter @inspektor/ds build`
+- [x] `pnpm --filter @inspektor/ds lint`
+- [x] `pnpm --filter inspektor.design-system test`
+- [x] `pnpm --filter inspektor.design-system check:props`
+- [x] `pnpm --filter inspektor.design-system typecheck`
+- [x] `pnpm --filter inspektor.design-system lint`
+- [x] `pnpm --filter inspektor.design-system build`
+- [x] `pnpm --filter inspektor lint`
 - [x] Browser verification confirms line, transparent four-pixel gutter, and grip handle rendering.
-- [x] `pnpm --filter regarde.inspector test`
-- [x] `pnpm --filter regarde.inspector typecheck` and `pnpm --filter regarde.inspector build`
+- [x] `pnpm --filter inspektor test`
+- [x] `pnpm --filter inspektor typecheck` and `pnpm --filter inspektor build`
 
 [28/07/26]
 
-- [x] `pnpm --filter @inspector/ds test`
-- [x] `pnpm --filter @inspector/ds typecheck`
-- [x] `pnpm --filter @inspector/ds build`
-- [x] `pnpm --filter regarde.inspector test`
-- [x] `pnpm --filter regarde.inspector typecheck`
-- [x] `pnpm --filter regarde.inspector build`
-- [ ] `pnpm --filter inspector.design-system test`
-- [x] `pnpm --filter inspector.design-system check:props`
-- [x] `pnpm --filter inspector.design-system typecheck`
-- [x] `pnpm --filter inspector.design-system build`
+- [x] `pnpm --filter @inspektor/ds test`
+- [x] `pnpm --filter @inspektor/ds typecheck`
+- [x] `pnpm --filter @inspektor/ds build`
+- [x] `pnpm --filter inspektor test`
+- [x] `pnpm --filter inspektor typecheck`
+- [x] `pnpm --filter inspektor build`
+- [ ] `pnpm --filter inspektor.design-system test`
+- [x] `pnpm --filter inspektor.design-system check:props`
+- [x] `pnpm --filter inspektor.design-system typecheck`
+- [x] `pnpm --filter inspektor.design-system build`
 - [x] Changed value-presentation files pass focused lint.
 - [x] Changed value-presentation and binary files pass focused tests.
 - [x] `git diff HEAD --check` passes.

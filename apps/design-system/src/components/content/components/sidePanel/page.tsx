@@ -1,4 +1,4 @@
-import { Box } from '@inspector/ds'
+import { Box } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

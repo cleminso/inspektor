@@ -7,7 +7,7 @@ import {
   Text,
   WorkspaceTabs,
   Tooltip,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 
 import { useRuntimeError, useRuntimeRetry } from '@app/providers/inspectorProvider'

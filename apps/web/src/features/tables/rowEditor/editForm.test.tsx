@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import type { CodeEditorProps } from '@inspector/ds'
+import type { CodeEditorProps } from '@inspektor/ds'
 import type { ColumnDescriptor } from 'jazz-tools'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -15,8 +15,8 @@ vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: React.ComponentProps<'a'>) => <a href="/relation">{children}</a>,
 }))
 
-vi.mock('@inspector/ds', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@inspector/ds')>()
+vi.mock('@inspektor/ds', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@inspektor/ds')>()
 
   return {
     ...actual,

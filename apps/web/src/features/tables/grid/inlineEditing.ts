@@ -1,4 +1,4 @@
-import type { DataGridCellTarget } from '@inspector/ds'
+import type { DataGridCellTarget } from '@inspektor/ds'
 
 import { getFieldReadOnlyReason } from '@tables/schema/fieldEditability'
 import type { TableColumnMeta } from '@tables/tableTypes'

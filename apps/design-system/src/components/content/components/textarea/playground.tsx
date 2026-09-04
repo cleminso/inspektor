@@ -1,4 +1,4 @@
-import { Box, Textarea, type TextareaFont, type TextareaHeight } from '@inspector/ds'
+import { Box, Textarea, type TextareaFont, type TextareaHeight } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

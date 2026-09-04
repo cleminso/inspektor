@@ -1,4 +1,4 @@
-import { Box, Button, ContextSwitcher, Spinner, Text, Icon } from '@inspector/ds'
+import { Box, Button, ContextSwitcher, Spinner, Text, Icon } from '@inspektor/ds'
 import { HashIcon } from 'lucide-react'
 import { type ReactElement, useState } from 'react'
 

@@ -1,4 +1,4 @@
-import { Box, Button } from '@inspector/ds'
+import { Box, Button } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const sizes = ['xs', 's', 'm'] as const

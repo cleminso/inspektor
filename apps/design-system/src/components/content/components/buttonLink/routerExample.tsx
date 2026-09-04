@@ -1,4 +1,4 @@
-import { ButtonLink } from '@inspector/ds'
+import { ButtonLink } from '@inspektor/ds'
 import { Link as RouterLink } from '@tanstack/react-router'
 import { type ReactElement } from 'react'
 

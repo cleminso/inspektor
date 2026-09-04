@@ -5,7 +5,7 @@ import {
   type FindBarSearchOptions,
   type FindBarState,
   type JsonViewSearchResults,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { useState } from 'react'
 
 const result = {

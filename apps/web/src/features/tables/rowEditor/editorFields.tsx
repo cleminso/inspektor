@@ -9,7 +9,7 @@ import { useMemo, useRef, useState, type FormEventHandler } from 'react'
 
 import type { ColumnDescriptor } from 'jazz-tools'
 
-import { Box, Field, Input, Text } from '@inspector/ds'
+import { Box, Field, Input, Text } from '@inspektor/ds'
 
 import { MutationField } from '@tables/rowEditor/mutationField'
 import { getMutationFieldInput, type MutationFieldInput } from '@tables/rowEditor/mutation/draft'

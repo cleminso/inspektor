@@ -5,7 +5,7 @@
 - [Context](#context)
 - [Mental model](#mental-model)
 - [Base UI state](#base-ui-state)
-- [Inspector styling decisions](#inspector-styling-decisions)
+- [Inspector styling decisions](#inspektor-styling-decisions)
 - [StyleX output](#stylex-output)
 - [Shared state-style adapter](#shared-state-style-adapter)
 - [Strict package ownership](#strict-package-ownership)

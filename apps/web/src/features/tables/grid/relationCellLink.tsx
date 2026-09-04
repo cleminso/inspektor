@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 
-import { RelationValue } from '@inspector/ds'
+import { RelationValue } from '@inspektor/ds'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 import { buildRelationTableLink } from '@tables/routing/buildRelationTableLink'

@@ -12,7 +12,7 @@ import {
   type FindBarSearchOptions,
   type FindBarState,
   type JsonViewSearchResults,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
 import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'

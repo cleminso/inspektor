@@ -1,4 +1,4 @@
-import type { BinaryCopyFormat } from '@inspector/ds'
+import type { BinaryCopyFormat } from '@inspektor/ds'
 
 import { encodeBase64 } from '@tables/rowEditor/values/byteBase64'
 

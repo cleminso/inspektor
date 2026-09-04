@@ -4,7 +4,7 @@ const activeTimestamp = new Date("2024-02-29T12:34:56.789Z");
 const archivedTimestamp = new Date("1999-12-31T23:59:59.999Z");
 const populatedColumnJson: JsonValue = {
   nested: { enabled: true },
-  tags: ["inspector-test", "populated"],
+  tags: ["inspektor-test", "populated"],
 };
 const emptyColumnJson: JsonValue = { emptyArray: [], emptyObject: {}, nullable: null };
 const populatedOptionalJson: JsonValue = { status: "present" };

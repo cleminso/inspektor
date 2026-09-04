@@ -1,4 +1,4 @@
-import { DatePicker } from '@inspector/ds'
+import { DatePicker } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 export default function BasicExample(): ReactElement {

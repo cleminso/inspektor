@@ -91,7 +91,7 @@ function normalizeNestedMutationValue(columnType: ColumnType, value: unknown): u
       }
       return value
     case 'Bytea':
-      throw new Error('Binary fields are read-only in the inspector.')
+      throw new Error('Binary fields are read-only in the inspektor.')
     case 'Array':
       if (Array.isArray(value) === false) throw new Error('Expected an array value.')
       return value.map((item) => normalizeNestedMutationValue(columnType.element, item))
@@ -208,7 +208,7 @@ export function parseMutationFieldValue(columnType: ColumnType, valueText: strin
       return parsedValue
     }
     case 'Bytea':
-      throw new Error('Binary fields are read-only in the inspector.')
+      throw new Error('Binary fields are read-only in the inspektor.')
     case 'Array': {
       try {
         const parsedValue = JSON.parse(trimmedValue) as unknown

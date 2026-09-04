@@ -1,4 +1,4 @@
-import { MultiSelect, type MultiSelectItem } from '@inspector/ds'
+import { MultiSelect, type MultiSelectItem } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

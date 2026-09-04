@@ -1,4 +1,4 @@
-import { Box } from '@inspector/ds'
+import { Box } from '@inspektor/ds'
 import * as stylex from '@stylexjs/stylex'
 import { type ReactElement } from 'react'
 

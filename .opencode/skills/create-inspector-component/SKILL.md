@@ -1,6 +1,6 @@
 ---
-name: create-inspector-component
-description: Creates or updates `@inspector/ds` components by wrapping Base UI primitives and applying Inspector StyleX tokens and styles. Use when adding components under `packages/design-system/src/components`, changing component APIs, wrapping Base UI, building compound design-system components, or implementing Base UI Scroll Area, overlay scrollbars, scrollbar gutter fixes, and nested scroll ownership.
+name: create-inspektor-component
+description: Creates or updates `@inspektor/ds` components by wrapping Base UI primitives and applying Inspector StyleX tokens and styles. Use when adding components under `packages/design-system/src/components`, changing component APIs, wrapping Base UI, building compound design-system components, or implementing Base UI Scroll Area, overlay scrollbars, scrollbar gutter fixes, and nested scroll ownership.
 ---
 
 # Create Inspector Component
@@ -24,7 +24,7 @@ description: Creates or updates `@inspector/ds` components by wrapping Base UI p
 4. Complete the audit in [componentAudit.md](references/componentAudit.md) for every wrapped part.
 5. Write the required behavioral, type, or contract test.
 6. Implement the wrapper with the policies in [REFERENCE.md](REFERENCE.md).
-7. Add documentation with the `document-inspector-component` skill.
+7. Add documentation with the `document-inspektor-component` skill.
 
 For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nested scroll-owner work, also follow [scrollArea.md](references/scrollArea.md).
 
@@ -87,8 +87,8 @@ For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nest
 
 ## Validation
 
-- `pnpm --filter @inspector/ds typecheck`
-- `pnpm --filter @inspector/ds build`
+- `pnpm --filter @inspektor/ds typecheck`
+- `pnpm --filter @inspektor/ds build`
 - Run focused package lint from `packages/design-system`, for example `pnpm exec oxlint src/components/{componentName}/{componentName}.tsx src/components/{componentName}/{componentName}.styles.ts src/index.ts`. Include `src/primitives/createStateStyleProps.ts` when changing the shared adapter.
 - Classify full-package lint findings as changed-file failures or existing repository failures. Fix all changed-file failures without expanding the task into unrelated cleanup.
 - Run package-scoped formatting only when a shared formatter configuration preserves adjacent conventions. Do not normalize unrelated files to formatter defaults.

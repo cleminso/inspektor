@@ -6,7 +6,7 @@
 - [Product problem](#product-problem)
 - [Rejected model](#rejected-model)
 - [Accepted model](#accepted-model)
-- [Inspector implementation](#inspector-implementation)
+- [Inspector implementation](#inspektor-implementation)
 - [Why focus remains orthogonal](#why-focus-remains-orthogonal)
 - [Public and private boundaries](#public-and-private-boundaries)
 - [How to repeat the pattern](#how-to-repeat-the-pattern)
@@ -123,7 +123,7 @@ Inspector therefore expresses focus through a ring or border and composes it wit
 
 ### Broadly exposed
 
-- Palette-derived interface semantics through `@inspector/ds/theme`.
+- Palette-derived interface semantics through `@inspektor/ds/theme`.
 - Constrained aliases through public design-system primitives.
 - Consumer-facing status, hierarchy, surface, and interaction roles.
 

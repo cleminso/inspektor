@@ -1,4 +1,4 @@
-import { Box, FindBar } from '@inspector/ds'
+import { Box, FindBar } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const searchOptions = {

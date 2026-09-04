@@ -1,4 +1,4 @@
-import { Button, Text } from '@inspector/ds'
+import { Button, Text } from '@inspektor/ds'
 
 export default function StackedExample(): React.ReactElement {
   return (

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ShellLayout } from '@inspector/ds'
+import { ShellLayout } from '@inspektor/ds'
 import { useSearch } from '@tanstack/react-router'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'

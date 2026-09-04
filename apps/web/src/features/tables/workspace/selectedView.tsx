@@ -1,4 +1,4 @@
-import { Box, Text } from '@inspector/ds'
+import { Box, Text } from '@inspektor/ds'
 
 import { useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'

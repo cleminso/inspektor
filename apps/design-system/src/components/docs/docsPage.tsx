@@ -1,4 +1,4 @@
-import { Box } from '@inspector/ds'
+import { Box } from '@inspektor/ds'
 import { type ReactElement, type ReactNode } from 'react'
 
 interface DocsPageProps {

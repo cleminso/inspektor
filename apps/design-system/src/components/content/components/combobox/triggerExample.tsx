@@ -1,4 +1,4 @@
-import { Combobox } from '@inspector/ds'
+import { Combobox } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const branches = ['main', 'develop', 'feature/schema-view']

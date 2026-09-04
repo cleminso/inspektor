@@ -15,7 +15,7 @@ What mental model explains the anatomy of a Base UI component, including its com
 1. **Public component anatomy:** identify the recurring roles of Root, Trigger, Portal, Positioner, Popup, Item, Indicator, and other parts, including why compound components expose these boundaries.
 2. **Behavioral contracts:** explain controlled and uncontrolled state, event callbacks, DOM attributes, accessibility semantics, element ownership, and native-element contracts such as `nativeButton`.
 3. **React and TypeScript structure:** map `Part.Props`, `Part.State`, refs, `render`, `useRender`, generic value types, prop omission, and wrapper declarations to the needs they answer.
-4. **Inspector wrapper application:** compare the Base UI boundary with representative wrappers in `@inspector/ds` and identify what must be preserved, constrained, added, or kept private.
+4. **Inspector wrapper application:** compare the Base UI boundary with representative wrappers in `@inspektor/ds` and identify what must be preserved, constrained, added, or kept private.
 
 ## Expected synthesis
 

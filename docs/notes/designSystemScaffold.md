@@ -25,7 +25,7 @@ The setup is inspired by Polar Orbit, but adapted to this workspace instead of c
 
 The package stays focused on reusable code. It should not know which app consumes it or how docs are rendered.
 
-The app stays focused on presentation, examples, and navigation. It consumes `@inspector/ds` the same way `apps/web` will consume it, so documentation catches packaging and integration issues early.
+The app stays focused on presentation, examples, and navigation. It consumes `@inspektor/ds` the same way `apps/web` will consume it, so documentation catches packaging and integration issues early.
 
 This separation keeps the design system useful outside the docs app and prevents docs-only concerns from leaking into the package API.
 
@@ -37,7 +37,7 @@ It fits the design system package because tokens and primitives can live with th
 
 ## Why `@stylexjs/unplugin`
 
-The consuming app needs to compile StyleX imports from `@inspector/ds` into CSS. Vite does not do that by itself.
+The consuming app needs to compile StyleX imports from `@inspektor/ds` into CSS. Vite does not do that by itself.
 
 `@stylexjs/unplugin` is the correct integration point for Vite because it runs during the bundling pipeline and handles StyleX transformation plus CSS extraction. That means `apps/design-system` and `apps/web` can consume package source files and still get the generated CSS output.
 
@@ -63,7 +63,7 @@ The package should build distributable JavaScript and declarations, but it shoul
 
 The useful pattern from Polar Orbit is the communication model, not the framework-specific setup.
 
-`apps/design-system` should import real package exports from `@inspector/ds`. This keeps examples in sync: if a component renders in docs, the package export works.
+`apps/design-system` should import real package exports from `@inspektor/ds`. This keeps examples in sync: if a component renders in docs, the package export works.
 
 The docs registry carries the manual metadata needed to document a package item:
 
@@ -76,7 +76,7 @@ The docs registry carries the manual metadata needed to document a package item:
 Adding a component remains deliberate:
 
 1. implement the component in `packages/design-system`
-2. export it from `@inspector/ds`
+2. export it from `@inspektor/ds`
 3. add a registry item in `apps/design-system`
 4. add or update the page module outside `src/routes`
 5. add prop metadata only when the API is stable enough to document

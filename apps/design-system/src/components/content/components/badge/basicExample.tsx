@@ -1,4 +1,4 @@
-import { Badge } from '@inspector/ds'
+import { Badge } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -1,9 +1,9 @@
-import { ButtonLink, Text, TextLink } from '@inspector/ds'
+import { ButtonLink, Text, TextLink } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 import { type SourceReference } from '@/lib/registry'
 
-const repositoryUrl = 'https://github.com/regardedev/inspector/blob/main'
+const repositoryUrl = 'https://github.com/regardedev/inspektor/blob/main'
 
 interface SourceLinkProps {
   source: SourceReference

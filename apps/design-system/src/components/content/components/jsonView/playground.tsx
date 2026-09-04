@@ -1,4 +1,4 @@
-import { Box, JsonView } from '@inspector/ds'
+import { Box, JsonView } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

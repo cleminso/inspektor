@@ -58,11 +58,11 @@
 
 [25/07/26]
 
-- `pnpm --filter @inspector/ds typecheck`
-- `pnpm --filter @inspector/ds lint`
-- `pnpm --filter @inspector/ds build`
-- `pnpm --filter inspector.design-system test`
-- `pnpm --filter inspector.design-system check:props`
+- `pnpm --filter @inspektor/ds typecheck`
+- `pnpm --filter @inspektor/ds lint`
+- `pnpm --filter @inspektor/ds build`
+- `pnpm --filter inspektor.design-system test`
+- `pnpm --filter inspektor.design-system check:props`
 - Hover the checkbox box and the label text in the docs app: border feedback appears in both cases.
 - Click the label text and gap of a `Checkbox.Label`-wrapped checkbox: the checkbox toggles.
 - Screen reader announces the visible label text as the checkbox name.

@@ -18,7 +18,7 @@ Before editing files for a substantial task involving a TanStack package:
 ## Table of contents
 
 - [Active workspace](#active-workspace)
-- [Inspector Test](#inspector-test)
+- [Inspector Test](#inspektor-test)
 - [Browser verification](#browser-verification)
 - [Implementation checklists](#implementation-checklists)
 - [Commands](#commands)
@@ -39,28 +39,28 @@ Before editing files for a substantial task involving a TanStack package:
 
 Implementation work is limited to these directories:
 
-- `packages/design-system`: reusable `@inspector/ds` components, primitives, and tokens.
+- `packages/design-system`: reusable `@inspektor/ds` components, primitives, and tokens.
 - `apps/design-system`: documentation, examples, generated API metadata, and design-system validation.
-- `apps/web`: Inspector product application consuming `@inspector/ds`.
-- `apps/inspector-test`: Inspector Test schema, deterministic data, cloud deployment tooling, and isolated Jazz fixtures.
+- `apps/web`: Inspector product application consuming `@inspektor/ds`.
+- `apps/inspektor-test`: Inspector Test schema, deterministic data, cloud deployment tooling, and isolated Jazz fixtures.
 
 Other workspace packages are outside the replacement UI architecture. Do not modify them unless the user explicitly requests work in them.
 
 ## Inspector Test
 
-Use `apps/inspector-test` as the curated test app for Inspector behavior. Read its `README.md` before changing its schema, permissions, seeded data, or fixture tooling.
+Use `apps/inspektor-test` as the curated test app for Inspector behavior. Read its `README.md` before changing its schema, permissions, seeded data, or fixture tooling.
 
-- Use `pnpm inspector-test:fixture` for automated, isolated, or destructive browser checks.
+- Use `pnpm inspektor-test:fixture` for automated, isolated, or destructive browser checks.
 - Use the shared cloud app only when the task requires shared-network or manual browser verification.
 - Do not deploy or seed the cloud app unless the task explicitly requires changing shared fixture state.
-- Never print or commit cloud credentials from `apps/inspector-test/.env.local`.
+- Never print or commit cloud credentials from `apps/inspektor-test/.env.local`.
 - Keep seeded rows deterministic and replaceable by stable ID.
 
 ## Browser verification
 
 - Start Inspector from the workspace root with `pnpm dev:web`.
 - Run the Inspector and fixture as owned persistent processes. Record their process IDs, confirm both are reachable before opening the browser, and stop only those processes when verification is complete.
-- Use `pnpm inspector-test:fixture` for automated, isolated, or destructive checks. Keep its generated credentials out of responses, screenshots, and committed artifacts.
+- Use `pnpm inspektor-test:fixture` for automated, isolated, or destructive checks. Keep its generated credentials out of responses, screenshots, and committed artifacts.
 - When the fixture uses an `http://` or `ws://` endpoint, open the direct HTTP Vite URL reported by `pnpm dev:web` instead of the Portless HTTPS URL to avoid mixed-content blocking.
 - Use a fresh Chrome isolated context for each fixture check. Do not rely on state from the persistent Chrome profile.
 - Reserve the persistent Chrome profile and any saved cloud connection for explicit shared-cloud exploration. Treat its user-data directory as a credential store: do not commit, copy, upload, or expose it to test artifacts.
@@ -100,29 +100,29 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
   - `pnpm test:web:node` runs the web Node project.
   - `pnpm test:web:jsdom` runs the isolated web jsdom project.
   - `pnpm test:design-system:node` runs the design-system Node allowlist.
-  - `pnpm --filter @inspector/ds test:json-view` runs the focused JSON View tests.
+  - `pnpm --filter @inspektor/ds test:json-view` runs the focused JSON View tests.
 - Affected-package validation:
   - `pnpm test:web` runs the complete Inspector package suite.
   - `pnpm test:design-system` runs the complete design-system package suite.
 - Run `pnpm test` only when a change crosses package boundaries or requires complete workspace coverage.
 - Inspector application:
-  - `pnpm --filter regarde.inspector dev`
-  - `pnpm --filter regarde.inspector dev:vite`
-  - `pnpm --filter regarde.inspector build`
-  - `pnpm --filter regarde.inspector typecheck`
-  - `pnpm --filter regarde.inspector lint`
+  - `pnpm --filter inspektor dev`
+  - `pnpm --filter inspektor dev:vite`
+  - `pnpm --filter inspektor build`
+  - `pnpm --filter inspektor typecheck`
+  - `pnpm --filter inspektor lint`
 - Design-system package:
-  - `pnpm --filter @inspector/ds build`
-  - `pnpm --filter @inspector/ds typecheck`
-  - `pnpm --filter @inspector/ds lint`
+  - `pnpm --filter @inspektor/ds build`
+  - `pnpm --filter @inspektor/ds typecheck`
+  - `pnpm --filter @inspektor/ds lint`
 - Design-system documentation:
-  - `pnpm --filter inspector.design-system dev`
-  - `pnpm --filter inspector.design-system test`
-  - `pnpm --filter inspector.design-system gen:props`
-  - `pnpm --filter inspector.design-system check:props`
-  - `pnpm --filter inspector.design-system build`
-  - `pnpm --filter inspector.design-system typecheck`
-  - `pnpm --filter inspector.design-system lint`
+  - `pnpm --filter inspektor.design-system dev`
+  - `pnpm --filter inspektor.design-system test`
+  - `pnpm --filter inspektor.design-system gen:props`
+  - `pnpm --filter inspektor.design-system check:props`
+  - `pnpm --filter inspektor.design-system build`
+  - `pnpm --filter inspektor.design-system typecheck`
+  - `pnpm --filter inspektor.design-system lint`
 
 ## Debugging workflow
 
@@ -157,7 +157,7 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 ## Architecture
 
 - `packages/design-system` owns reusable presentation and interaction components.
-- `apps/design-system` consumes public `@inspector/ds` exports like a product application; it does not import package-private implementation files at runtime.
+- `apps/design-system` consumes public `@inspektor/ds` exports like a product application; it does not import package-private implementation files at runtime.
 - `apps/web` owns Inspector routes, application state, Jazz data access, and feature composition.
 - The Inspector is schema-driven and generic. Do not add generated query builders or table-specific UI for inspected applications; use stored schema metadata and generic query construction.
 - Connection data includes `serverUrl`, `appId`, `adminSecret`, branch, and schema hash. Treat `adminSecret` as sensitive even when local links pass it in URL hash parameters.
@@ -177,7 +177,7 @@ Follow `docs/importBoundaryPlaybook.md` when adding a heavy dependency, deferrin
 
 - The architecture follows Polar's typed token model and shadcn CSS-in-JS's Base UI plus StyleX component structure without Tailwind component styling.
 - Public component APIs must make off-system design decisions difficult to express.
-- Do not expose `className`, inline `style`, arbitrary CSS values, or broad styling slot overrides from `@inspector/ds` components.
+- Do not expose `className`, inline `style`, arbitrary CSS values, or broad styling slot overrides from `@inspektor/ds` components.
 - Do not use `className`, inline `style`, raw HTML layout, or invented values as an application escape hatch.
 - When a valid design cannot be expressed, add a semantic token, constrained prop, variant, primitive, or composed component.
 - Use semantic tokens before primitive value tokens. Theme-specific values stay behind tokens.
@@ -205,12 +205,12 @@ Follow `docs/importBoundaryPlaybook.md` when adding a heavy dependency, deferrin
 - Package types, defaults, requiredness, descriptions, and source locations are authoritative.
 - Documentation pages select prop names and order but do not override generated API facts.
 - Keep examples in executable camelCase TSX modules imported normally for preview and with `?raw` for displayed source.
-- Examples import from `@inspector/ds` and must not demonstrate styling escape hatches.
+- Examples import from `@inspektor/ds` and must not demonstrate styling escape hatches.
 - Never edit generated `props.json` or route trees manually.
 
 ## Application rules
 
-- `apps/web` imports reusable UI from `@inspector/ds`.
+- `apps/web` imports reusable UI from `@inspektor/ds`.
 - Keep feature and data logic in `apps/web`; move reusable presentation and interaction behavior into `packages/design-system`.
 - Build layouts with constrained design-system primitives and token props instead of raw layout elements with CSS strings.
 - Do not recreate Base UI behavior in application components.

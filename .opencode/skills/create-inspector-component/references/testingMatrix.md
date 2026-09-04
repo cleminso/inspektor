@@ -34,21 +34,21 @@ Before retaining a test, identify the responsible Inspector source lines and sta
 
 ## Decision matrix
 
-| Change | Required proof |
-| --- | --- |
-| Broad Base UI prop inheritance | Typecheck and public API metadata |
-| Base UI prop omitted | Type-level rejection or extracted API assertion |
-| Base UI prop redeclared | Typecheck, JSDoc extraction, and default assertion where relevant |
-| Inspector prop added | Type contract plus focused behavior or style mapping test |
-| Prop transformed or derived | Behavioral test for precedence and resulting Base UI behavior |
-| Semantic event exposed | Handler receives complete Base UI event details |
-| Ref boundary changed | Default and composed ref target regression test |
-| `render` exposed | Composition, handlers, attributes, semantics, and ref test |
-| Default element changed | Role, native semantics, keyboard behavior, and configuration test |
-| State maps to Inspector styles | Focused state translation test when supported; otherwise typecheck and focused lint |
-| Focus-indicator styling changes | Focused lint plus a real-browser check of computed style, clipping, contrast, and forced-colors behavior |
-| Compound export changed | Extractor-resolution regression test |
-| Provider or context behavior added | Behavioral test for owned state and cleanup |
+| Change                             | Required proof                                                                                           |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Broad Base UI prop inheritance     | Typecheck and public API metadata                                                                        |
+| Base UI prop omitted               | Type-level rejection or extracted API assertion                                                          |
+| Base UI prop redeclared            | Typecheck, JSDoc extraction, and default assertion where relevant                                        |
+| Inspector prop added               | Type contract plus focused behavior or style mapping test                                                |
+| Prop transformed or derived        | Behavioral test for precedence and resulting Base UI behavior                                            |
+| Semantic event exposed             | Handler receives complete Base UI event details                                                          |
+| Ref boundary changed               | Default and composed ref target regression test                                                          |
+| `render` exposed                   | Composition, handlers, attributes, semantics, and ref test                                               |
+| Default element changed            | Role, native semantics, keyboard behavior, and configuration test                                        |
+| State maps to Inspector styles     | Focused state translation test when supported; otherwise typecheck and focused lint                      |
+| Focus-indicator styling changes    | Focused lint plus a real-browser check of computed style, clipping, contrast, and forced-colors behavior |
+| Compound export changed            | Extractor-resolution regression test                                                                     |
+| Provider or context behavior added | Behavioral test for owned state and cleanup                                                              |
 
 Inherited behavior such as clicking a checkbox label, pressing Escape to close a popup, restoring trigger focus, selecting an uncontrolled option, or suppressing a disabled primitive does not need a wrapper test. Keep coverage only when Inspector adds logic around that behavior.
 
@@ -85,14 +85,14 @@ Do not test generic TypeScript inference, exhaustive typed lookup keys, direct r
 
 ## Validation commands
 
-- `pnpm --filter @inspector/ds typecheck`
-- `pnpm --filter @inspector/ds build`
+- `pnpm --filter @inspektor/ds typecheck`
+- `pnpm --filter @inspektor/ds build`
 - run the focused component test file
 - run focused lint from `packages/design-system`
-- run `pnpm --filter inspector.design-system gen:props`
-- run `pnpm --filter inspector.design-system check:props`
-- run `pnpm --filter inspector.design-system test`
-- run `pnpm --filter inspector.design-system typecheck`
-- run `pnpm --filter inspector.design-system build`
+- run `pnpm --filter inspektor.design-system gen:props`
+- run `pnpm --filter inspektor.design-system check:props`
+- run `pnpm --filter inspektor.design-system test`
+- run `pnpm --filter inspektor.design-system typecheck`
+- run `pnpm --filter inspektor.design-system build`
 
 Classify full-package findings as changed-file failures or existing repository failures. Do not hide changed-file failures among unrelated diagnostics.

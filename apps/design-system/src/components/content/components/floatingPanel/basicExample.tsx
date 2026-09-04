@@ -1,4 +1,4 @@
-import { Box, Button, FloatingPanel, Input, Text } from '@inspector/ds'
+import { Box, Button, FloatingPanel, Input, Text } from '@inspektor/ds'
 import { useId, useState, type ReactElement } from 'react'
 
 type Presentation = 'editor' | 'failure' | 'review' | 'summary'

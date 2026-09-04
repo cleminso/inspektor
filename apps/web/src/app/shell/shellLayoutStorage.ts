@@ -3,18 +3,18 @@ import type {
   ShellLayoutDockSide,
   ShellLayoutPersistence,
   ShellLayoutStorage,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
-const shellLayoutId = 'inspector-shell'
+const shellLayoutId = 'inspektor-shell'
 const shellLayoutStorageKey = `react-resizable-panels:${shellLayoutId}`
 const shellLayoutStorageKeyPrefix = `${shellLayoutStorageKey}:`
 const legacyCompositionStorageKey = `${shellLayoutStorageKeyPrefix}leftDock:view`
 const legacyLayoutStorageKey = 'react-resizable-panels:tables-side-panel'
 const expandedDockSizeStorageKeys = {
-  left: 'inspector:shell-layout:left-dock-expanded-size',
-  right: 'inspector:shell-layout:right-dock-expanded-size',
+  left: 'inspektor:shell-layout:left-dock-expanded-size',
+  right: 'inspektor:shell-layout:right-dock-expanded-size',
 } satisfies Record<ShellLayoutDockSide, string>
-const legacyExpandedLeftDockSizeStorageKey = 'inspector:tables-side-panel:navigation-expanded-size'
+const legacyExpandedLeftDockSizeStorageKey = 'inspektor:tables-side-panel:navigation-expanded-size'
 
 function parseNumericLayout<const Id extends string>(
   value: string,

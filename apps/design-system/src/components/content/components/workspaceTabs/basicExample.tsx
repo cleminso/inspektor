@@ -1,4 +1,4 @@
-import { Box, Button, ContextMenu, WorkspaceTabs, Text } from '@inspector/ds'
+import { Box, Button, ContextMenu, WorkspaceTabs, Text } from '@inspektor/ds'
 import { type ReactElement, useState } from 'react'
 
 const initialViews = [

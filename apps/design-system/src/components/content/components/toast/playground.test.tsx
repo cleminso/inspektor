@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { toasts } from '@inspector/ds'
+import { toasts } from '@inspektor/ds'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { serializeToastPlayground, ToastPlayground } from './playground'

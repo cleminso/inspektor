@@ -3,7 +3,7 @@ import {
   Text,
   type ContextSwitcherTriggerSize,
   type ContextSwitcherTriggerWidth,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
 

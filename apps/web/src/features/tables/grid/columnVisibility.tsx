@@ -7,7 +7,7 @@ import {
   Tooltip,
   type DataGridTable,
   type MultiSelectItem,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 

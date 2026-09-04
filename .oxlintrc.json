@@ -107,7 +107,7 @@
             "forbid": [
               {
                 "element": "svg",
-                "message": "Use @inspector/ds Icon with imported SVG artwork."
+                "message": "Use @inspektor/ds Icon with imported SVG artwork."
               }
             ]
           }

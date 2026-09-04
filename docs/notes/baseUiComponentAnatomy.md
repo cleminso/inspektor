@@ -22,7 +22,7 @@
   - [Controlled and uncontrolled state](#controlled-and-uncontrolled-state)
   - [Change callbacks and event details](#change-callbacks-and-event-details)
   - [Part State and data attributes](#part-state-and-data-attributes)
-- [TypeScript tools used by Inspector wrappers](#typescript-tools-used-by-inspector-wrappers)
+- [TypeScript tools used by Inspector wrappers](#typescript-tools-used-by-inspektor-wrappers)
   - [Omit](#omit)
   - [Pick](#pick)
   - [Indexed access](#indexed-access)
@@ -37,8 +37,8 @@
   - [mergeProps](#mergeprops)
   - [Prop spread precedence](#prop-spread-precedence)
   - [nativeButton](#nativebutton)
-- [Base UI versus Inspector ownership](#base-ui-versus-inspector-ownership)
-- [Mapped Inspector examples](#mapped-inspector-examples)
+- [Base UI versus Inspector ownership](#base-ui-versus-inspektor-ownership)
+- [Mapped Inspector examples](#mapped-inspektor-examples)
   - [Button: a single-part wrapper](#button-a-single-part-wrapper)
   - [Accordion: a compound wrapper](#accordion-a-compound-wrapper)
   - [Select: compound parts, generic values, and a popup recipe](#select-compound-parts-generic-values-and-a-popup-recipe)
@@ -50,7 +50,7 @@
 - [Sources](#sources)
   - [Official Base UI documentation](#official-base-ui-documentation)
   - [Official Base UI v1.6.0 source](#official-base-ui-v160-source)
-  - [Local Inspector source map](#local-inspector-source-map)
+  - [Local Inspector source map](#local-inspektor-source-map)
 
 ## Purpose and scope
 
@@ -95,12 +95,12 @@ Select.Root                          shared state; commonly no DOM
 
 The split answers four needs:
 
-| Need | Why parts help | What breaks without the boundary |
-| --- | --- | --- |
-| Accessibility | Trigger, popup, list, item, and label receive distinct roles and ARIA relationships. | A visually correct widget can have no coherent keyboard or screen-reader model. |
-| State | Distant elements read one Root-owned state model. | Trigger, popup, and selection can disagree. |
-| Layout | Portal, Positioner, Popup, Backdrop, and Arrow each use the positioning model suited to their job. | Content semantics become coupled to clipping, stacking, or floating geometry. |
-| Composition | Each DOM-bearing part is a focused styling and `render` boundary. | Customization requires rebuilding the whole widget and its behavior. |
+| Need          | Why parts help                                                                                     | What breaks without the boundary                                                |
+| ------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Accessibility | Trigger, popup, list, item, and label receive distinct roles and ARIA relationships.               | A visually correct widget can have no coherent keyboard or screen-reader model. |
+| State         | Distant elements read one Root-owned state model.                                                  | Trigger, popup, and selection can disagree.                                     |
+| Layout        | Portal, Positioner, Popup, Backdrop, and Arrow each use the positioning model suited to their job. | Content semantics become coupled to clipping, stacking, or floating geometry.   |
+| Composition   | Each DOM-bearing part is a focused styling and `render` boundary.                                  | Customization requires rebuilding the whole widget and its behavior.            |
 
 ### Universal pattern versus component contract
 
@@ -244,20 +244,20 @@ Accessibility is therefore an end-to-end contract. Correct TypeScript types are 
 
 ### Recurring part roles
 
-| Part | What it is | Need it answers | Typical mishandling |
-| --- | --- | --- | --- |
-| `Root` | The shared state and behavior coordinator. It may render a container or no element. | Keeps distant parts consistent and coordinates state, IDs, focus, form behavior, and lifecycle. | Treating every Root as DOM; creating a second wrapper state machine. |
-| `Trigger` | The control that opens, closes, or exposes a popup or panel. | Connects activation, focus, and ARIA state to Root. | Replacing it with a styled `<div>` or dropping its props/ref. |
-| `Portal` | A part that renders descendants into another DOM container while preserving React context. | Escapes clipping and local stacking contexts; supports overlay placement and presence. | Assuming it owns positioning or that portal DOM loses Root context. |
-| `Positioner` | The geometry wrapper between an anchor and a floating surface. | Computes side, alignment, offsets, collision handling, and arrow position. | Styling Popup as the positioning wrapper or removing required geometry props/ref. |
-| `Popup` | The interactive floating surface. | Supplies popup semantics, focus behavior, transition state, and event boundaries. | Replacing it with plain DOM and losing role, focus, or dismissal behavior. |
-| `Backdrop` | A separate visual layer behind a popup. | Allows viewport coverage and independent animation. | Treating it as the only modality mechanism; focus and interaction blocking require more than paint. |
-| `Arrow` | A decorative pointer tied to Positioner geometry. | Keeps the pointer aligned after collision shifts or side changes. | Positioning it independently or exposing it to assistive technology. |
-| `Item` | One registered action or option in a collection. | Supplies keyboard movement, typeahead, disabled handling, activation, and local state. | Rendering an unregistered row that looks like an item but is skipped by keyboard behavior. |
-| `Group` | A semantic subset of related items. | Gives a collection an accessible subgroup and a place to register its label. | Using a visual wrapper without the group-label relationship. |
-| `Label` | Text that names a control or group through a generated relationship. | Keeps visual placement flexible while preserving an accessible name. | Styling a label-like `<div>` that is not associated with the control. |
-| `Indicator` | A visual reflection of checked or selected state. | Reads authoritative local state without duplicating it. | Passing separate selection state that can drift from Item or Root. |
-| `Value` | A projection of current selection into visible trigger text. | Resolves labels, placeholders, custom values, or multiple values from Root state. | Treating displayed text as the state owner. |
+| Part         | What it is                                                                                 | Need it answers                                                                                 | Typical mishandling                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `Root`       | The shared state and behavior coordinator. It may render a container or no element.        | Keeps distant parts consistent and coordinates state, IDs, focus, form behavior, and lifecycle. | Treating every Root as DOM; creating a second wrapper state machine.                                |
+| `Trigger`    | The control that opens, closes, or exposes a popup or panel.                               | Connects activation, focus, and ARIA state to Root.                                             | Replacing it with a styled `<div>` or dropping its props/ref.                                       |
+| `Portal`     | A part that renders descendants into another DOM container while preserving React context. | Escapes clipping and local stacking contexts; supports overlay placement and presence.          | Assuming it owns positioning or that portal DOM loses Root context.                                 |
+| `Positioner` | The geometry wrapper between an anchor and a floating surface.                             | Computes side, alignment, offsets, collision handling, and arrow position.                      | Styling Popup as the positioning wrapper or removing required geometry props/ref.                   |
+| `Popup`      | The interactive floating surface.                                                          | Supplies popup semantics, focus behavior, transition state, and event boundaries.               | Replacing it with plain DOM and losing role, focus, or dismissal behavior.                          |
+| `Backdrop`   | A separate visual layer behind a popup.                                                    | Allows viewport coverage and independent animation.                                             | Treating it as the only modality mechanism; focus and interaction blocking require more than paint. |
+| `Arrow`      | A decorative pointer tied to Positioner geometry.                                          | Keeps the pointer aligned after collision shifts or side changes.                               | Positioning it independently or exposing it to assistive technology.                                |
+| `Item`       | One registered action or option in a collection.                                           | Supplies keyboard movement, typeahead, disabled handling, activation, and local state.          | Rendering an unregistered row that looks like an item but is skipped by keyboard behavior.          |
+| `Group`      | A semantic subset of related items.                                                        | Gives a collection an accessible subgroup and a place to register its label.                    | Using a visual wrapper without the group-label relationship.                                        |
+| `Label`      | Text that names a control or group through a generated relationship.                       | Keeps visual placement flexible while preserving an accessible name.                            | Styling a label-like `<div>` that is not associated with the control.                               |
+| `Indicator`  | A visual reflection of checked or selected state.                                          | Reads authoritative local state without duplicating it.                                         | Passing separate selection state that can drift from Item or Root.                                  |
+| `Value`      | A projection of current selection into visible trigger text.                               | Resolves labels, placeholders, custom values, or multiple values from Root state.               | Treating displayed text as the state owner.                                                         |
 
 These are recurring roles, not promises about tags. Select Trigger uses button-like markup with combobox semantics. Checkbox Root is itself the control. Popup-family Roots commonly render no element. Verify every exact component.
 
@@ -333,11 +333,11 @@ The exact type matters because Root, Trigger, Item, Panel, and Popup do not know
 
 A stateful Base UI component commonly offers a three-part contract:
 
-| Role | Typical prop | Meaning |
-| --- | --- | --- |
-| Controlled value | `open`, `value`, or `checked` | External state is authoritative. |
-| Initial uncontrolled value | `defaultOpen`, `defaultValue`, or `defaultChecked` | Base UI owns state; this supplies the initial value only. |
-| Change request | `onOpenChange`, `onValueChange`, or `onCheckedChange` | Reports the proposed value and component-specific details. |
+| Role                       | Typical prop                                          | Meaning                                                    |
+| -------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| Controlled value           | `open`, `value`, or `checked`                         | External state is authoritative.                           |
+| Initial uncontrolled value | `defaultOpen`, `defaultValue`, or `defaultChecked`    | Base UI owns state; this supplies the initial value only.  |
+| Change request             | `onOpenChange`, `onValueChange`, or `onCheckedChange` | Reports the proposed value and component-specific details. |
 
 In controlled mode, the consumer passes the current value and commits accepted changes. In uncontrolled mode, Base UI stores the current value. A `default*` prop is not a second controlled value and does not reactively replace mounted state.
 
@@ -378,11 +378,11 @@ Do not reduce a callback to `(value) => void` in a wrapper. That discards reason
 
 Three cancellation mechanisms solve different problems:
 
-| Mechanism | Controls |
-| --- | --- |
-| `details.cancel()` | The Base UI component state transition represented by the change callback. |
-| `event.preventBaseUIHandler()` | Earlier Base UI handlers in a merged React synthetic-event chain. |
-| `event.preventDefault()` | The browser's default action for the DOM event. |
+| Mechanism                      | Controls                                                                   |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `details.cancel()`             | The Base UI component state transition represented by the change callback. |
+| `event.preventBaseUIHandler()` | Earlier Base UI handlers in a merged React synthetic-event chain.          |
+| `event.preventDefault()`       | The browser's default action for the DOM event.                            |
 
 They are not interchangeable. `stopPropagation()` also solves a separate DOM propagation concern.
 
@@ -615,10 +615,10 @@ Base UI's `render` prop composes a part's behavior onto another compatible eleme
 
 It has two common forms:
 
-| Form | Contract |
-| --- | --- |
-| `render={<Custom />}` | Base UI clones the element and merges Base props, element props, and refs. `Custom` must accept the merged props and forward the ref to the same underlying element. |
-| `render={(props, state) => <Custom {...props} />}` | The callback controls output. It must spread `props` onto the behavioral element and explicitly merge any additional prop object. |
+| Form                                               | Contract                                                                                                                                                             |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `render={<Custom />}`                              | Base UI clones the element and merges Base props, element props, and refs. `Custom` must accept the merged props and forward the ref to the same underlying element. |
+| `render={(props, state) => <Custom {...props} />}` | The callback controls output. It must spread `props` onto the behavioral element and explicitly merge any additional prop object.                                    |
 
 Pass an element or render callback, not a component function as `render={Custom}`. Base UI invokes the function form as a render function, which is different from React rendering `<Custom />` and can violate the Rules of Hooks.
 
@@ -637,15 +637,15 @@ See the [Base UI composition handbook](https://base-ui.com/react/handbook/compos
 
 `useRender` gives an Inspector-owned component Base UI's rendering infrastructure without giving it a Base widget state machine. Important inputs are:
 
-| Input | Purpose |
-| --- | --- |
-| `defaultTagName` | Selects the semantic default when no custom render target is supplied. |
-| `render` | Accepts the element or callback override. |
-| `props` | Supplies one merged prop contract for the element. |
-| `ref` | Supplies one ref or a list of refs for the renderer's separate ref-merging path. |
-| `state` | Supplies render callback state and public data-attribute input. |
-| `stateAttributesMapping` | Maps state fields to documented attribute names. |
-| `enabled` | Omits rendering when false. |
+| Input                    | Purpose                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| `defaultTagName`         | Selects the semantic default when no custom render target is supplied.           |
+| `render`                 | Accepts the element or callback override.                                        |
+| `props`                  | Supplies one merged prop contract for the element.                               |
+| `ref`                    | Supplies one ref or a list of refs for the renderer's separate ref-merging path. |
+| `state`                  | Supplies render callback state and public data-attribute input.                  |
+| `stateAttributesMapping` | Maps state fields to documented attribute names.                                 |
+| `enabled`                | Omits rendering when false.                                                      |
 
 Use `useRender.ComponentProps<'li'>` for public native props plus the render contract. Use `useRender.ElementProps<'li'>` for private element props without automatically advertising the same component API.
 
@@ -657,13 +657,13 @@ See [Base UI `useRender`](https://base-ui.com/react/utils/use-render), its [v1.6
 
 `mergeProps` combines independently produced prop objects using Base UI's semantic rules:
 
-| Prop kind | Merge behavior |
-| --- | --- |
+| Prop kind      | Merge behavior                                                                                                                                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Event handlers | Composed right-to-left, so the rightmost handler runs first. A React synthetic event can call `preventBaseUIHandler()` to suppress handlers to its left. |
-| `className` | Concatenated right-to-left. |
-| `style` | Merged; rightmost values win for duplicate style keys. |
-| Other props | Rightmost value wins. |
-| `ref` | **Not merged.** Only the rightmost ref would remain, so refs must use a separate ref-merging route. |
+| `className`    | Concatenated right-to-left.                                                                                                                              |
+| `style`        | Merged; rightmost values win for duplicate style keys.                                                                                                   |
+| Other props    | Rightmost value wins.                                                                                                                                    |
+| `ref`          | **Not merged.** Only the rightmost ref would remain, so refs must use a separate ref-merging route.                                                      |
 
 The explicit non-feature is important: **`mergeProps` does not merge refs.** Base UI's renderer and `useRender` accept refs separately because element refs need their own composition mechanism. The installed declaration states this at `packages/design-system/node_modules/@base-ui/react/merge-props/mergeProps.d.ts#L6-L38`.
 
@@ -699,9 +699,9 @@ Inspector Button demonstrates pass-through props followed by resolved policy and
 
 `nativeButton` tells Base UI whether the **final rendered element is actually a native `<button>`**. It does not select the element.
 
-| Value | Meaning |
-| --- | --- |
-| `true` | The render target is a real `<button>`. Base UI relies on native button semantics and applies relevant defaults such as `type="button"`. |
+| Value   | Meaning                                                                                                                                                                    |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `true`  | The render target is a real `<button>`. Base UI relies on native button semantics and applies relevant defaults such as `type="button"`.                                   |
 | `false` | The render target is not a native button. Base UI supplies appropriate button-like role, keyboard activation, and disabled handling for components that support this mode. |
 
 The `render` prop or default tag selects the element. `nativeButton` describes that result so Base UI can choose the correct behavior. Defaults are component-specific: Base Button defaults to native button behavior, while a control with a non-button default may not.
@@ -720,16 +720,16 @@ See [Base UI Button](https://base-ui.com/react/components/button), [`useRender` 
 
 ## Base UI versus Inspector ownership
 
-| Concern | Base UI owns | Inspector owns |
-| --- | --- | --- |
-| State mechanics | Controlled/uncontrolled storage, update details, context, registration. | Supported modes, product defaults, and translations such as loading to disabled behavior. |
-| Accessibility | Roles, ARIA relationships, keyboard/pointer behavior, focus, form mechanics. | Required names in public types, owned labels, safe composition, visible focus styling. |
-| Derived state | Fields such as open, selected, highlighted, disabled, valid, placeholder, and transition status. | The visual meaning assigned to public part state. |
-| Primary element | Default tag, internal handlers, internal refs, state attributes, `render` composition. | Whether `render` and `nativeButton` are public and which visual children are inserted. |
-| Popup behavior | Portal presence, positioning, collision handling, focus, dismissal, transition state. | Supported placement subset, shared offsets, dimensions, surface styling, convenience recipes. |
-| Styling | State callback and data-attribute extension points; unstyled primitives. | Tokens, StyleX rules, variants, sizes, slots, and standard visual markup. |
-| Compound structure | Runtime context and required relationships. | Export namespace, documented composition, aliases, and convenience parts. |
-| Product composition | Reusable behavior primitives and rendering utilities. | Feature-specific structure and policy when no Base widget exists. |
+| Concern             | Base UI owns                                                                                     | Inspector owns                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| State mechanics     | Controlled/uncontrolled storage, update details, context, registration.                          | Supported modes, product defaults, and translations such as loading to disabled behavior.     |
+| Accessibility       | Roles, ARIA relationships, keyboard/pointer behavior, focus, form mechanics.                     | Required names in public types, owned labels, safe composition, visible focus styling.        |
+| Derived state       | Fields such as open, selected, highlighted, disabled, valid, placeholder, and transition status. | The visual meaning assigned to public part state.                                             |
+| Primary element     | Default tag, internal handlers, internal refs, state attributes, `render` composition.           | Whether `render` and `nativeButton` are public and which visual children are inserted.        |
+| Popup behavior      | Portal presence, positioning, collision handling, focus, dismissal, transition state.            | Supported placement subset, shared offsets, dimensions, surface styling, convenience recipes. |
+| Styling             | State callback and data-attribute extension points; unstyled primitives.                         | Tokens, StyleX rules, variants, sizes, slots, and standard visual markup.                     |
+| Compound structure  | Runtime context and required relationships.                                                      | Export namespace, documented composition, aliases, and convenience parts.                     |
+| Product composition | Reusable behavior primitives and rendering utilities.                                            | Feature-specific structure and policy when no Base widget exists.                             |
 
 A practical ownership test:
 
@@ -873,44 +873,44 @@ The checkbox, primary trigger, and trailing action are siblings, avoiding nested
 
 ## Common misconceptions
 
-| Misconception | Correct model |
-| --- | --- |
-| "Root is the outer DOM element." | Root is the broad coordinator. Some Roots render DOM; others render no element. |
-| "All components with Trigger and Popup work the same way." | Names recur, but roles, tags, required structure, state, and callbacks are component-specific. |
-| "Portal disconnects Popup from Root." | Portal changes DOM ancestry. React context still connects the logical tree. |
-| "Object.assign creates the compound behavior." | It only packages properties on one export. Root and parts create behavior and context. |
-| "Object.assign enforces nesting." | TypeScript and runtime namespace packaging do not enforce the documented React tree. |
-| "Part.State is local React state I should synchronize." | It is Base-derived render state. Read it directly for styling. |
-| "Data attributes provide accessibility." | They are styling and inspection hooks. Roles, ARIA, semantics, and behavior provide accessibility. |
-| "render selects any tag safely." | It composes onto a target; the target must preserve compatible semantics, props, and ref behavior. |
-| "nativeButton selects the rendered element." | The default tag or `render` selects the element. `nativeButton` describes whether that result is a real button. |
-| "mergeProps merges everything." | It composes handlers/classes/styles and applies precedence, but it does not merge refs. |
-| "Omit removes runtime props." | `Omit` changes TypeScript only. Runtime enforcement needs destructuring, filtering, or overriding. |
-| "A generic Root binds every child generic." | Root and Item are separate generic calls. Context connects runtime values; the export namespace does not create one shared type scope. |
-| "useRender provides a complete behavior primitive." | It provides rendering and composition infrastructure. Widget behavior must come from other primitives or Inspector code. |
-| "A convenience Content part is always a Base primitive." | Inspector Content may only assemble Portal, Positioner, Popup, and List. Read the implementation. |
+| Misconception                                              | Correct model                                                                                                                          |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| "Root is the outer DOM element."                           | Root is the broad coordinator. Some Roots render DOM; others render no element.                                                        |
+| "All components with Trigger and Popup work the same way." | Names recur, but roles, tags, required structure, state, and callbacks are component-specific.                                         |
+| "Portal disconnects Popup from Root."                      | Portal changes DOM ancestry. React context still connects the logical tree.                                                            |
+| "Object.assign creates the compound behavior."             | It only packages properties on one export. Root and parts create behavior and context.                                                 |
+| "Object.assign enforces nesting."                          | TypeScript and runtime namespace packaging do not enforce the documented React tree.                                                   |
+| "Part.State is local React state I should synchronize."    | It is Base-derived render state. Read it directly for styling.                                                                         |
+| "Data attributes provide accessibility."                   | They are styling and inspection hooks. Roles, ARIA, semantics, and behavior provide accessibility.                                     |
+| "render selects any tag safely."                           | It composes onto a target; the target must preserve compatible semantics, props, and ref behavior.                                     |
+| "nativeButton selects the rendered element."               | The default tag or `render` selects the element. `nativeButton` describes whether that result is a real button.                        |
+| "mergeProps merges everything."                            | It composes handlers/classes/styles and applies precedence, but it does not merge refs.                                                |
+| "Omit removes runtime props."                              | `Omit` changes TypeScript only. Runtime enforcement needs destructuring, filtering, or overriding.                                     |
+| "A generic Root binds every child generic."                | Root and Item are separate generic calls. Context connects runtime values; the export namespace does not create one shared type scope. |
+| "useRender provides a complete behavior primitive."        | It provides rendering and composition infrastructure. Widget behavior must come from other primitives or Inspector code.               |
+| "A convenience Content part is always a Base primitive."   | Inspector Content may only assemble Portal, Positioner, Popup, and List. Read the implementation.                                      |
 
 ## Failure modes
 
-| Failure | Result | Safer approach |
-| --- | --- | --- |
-| Deriving Trigger props from Root or generic HTML props | Part-specific behavior, state, event, or render typing disappears. | Derive from the exact rendered `Part.Props`. |
-| Handwriting a simplified change callback | Reason, cancellation, event details, or nullability are lost. | Use indexed access into exact Base props. |
-| Duplicating open, selected, or highlighted state | Wrapper and Base UI become competing authorities. | Use controlled props for ownership and `Part.State` for derived visuals. |
-| Treating a `default*` prop as reactive | Mounted uncontrolled state does not follow changes to its initial default. | Choose controlled mode when external updates must be authoritative. |
-| Moving Base props and ref onto different elements | Focus, measurement, ARIA, and event behavior split. | Keep the complete contract on the behavior-owning element. |
-| Using plain spread for independent handler sources | One handler silently replaces another. | Use deliberate manual sequencing or `mergeProps`. |
-| Putting refs in `mergeProps` | Only one ref remains. | Supply refs separately through Base UI or `useRender`. |
-| Reversing `mergeProps` order | Precedence and handler suppression direction change. | Document owners and place the intended winner rightmost. |
-| Function render drops supplied props | Base handlers, ARIA, state attributes, and ref disappear. | Spread or correctly merge the supplied props onto the primary element. |
-| Custom render component does not forward its ref | Base focus, measurement, and consumer ref access can fail. | Forward the ref to the same underlying element receiving Base props. |
-| `nativeButton` disagrees with final tag | Native or emulated button semantics are wrong. | Make the flag describe the actual render target. |
-| Replacing a required Base part with visual DOM | Context registration, keyboard behavior, IDs, or focus logic vanish. | Keep the Base part and place presentation inside it. |
-| Treating optional as context-free | Arrow, Indicator, or Label is present under the wrong owner. | Follow the exact anatomy even for optional parts. |
-| Relying on `Omit` for runtime filtering | Untyped props can still pass through. | Destructure, filter, or explicitly overwrite sensitive keys. |
-| Broad generic `forwardRef` cast | Public types claim a value/ref contract the body does not implement. | Keep inner function and cast adjacent and structurally identical. |
-| Mistaking a recipe for a primitive | State or accessibility is assigned to a function that only assembles parts. | Expand the recipe and identify the actual Base owners. |
-| Nesting ActionList controls | Interactive elements become invalidly nested and hard to operate. | Keep checkbox, primary action, and trailing action as siblings. |
+| Failure                                                | Result                                                                      | Safer approach                                                           |
+| ------------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Deriving Trigger props from Root or generic HTML props | Part-specific behavior, state, event, or render typing disappears.          | Derive from the exact rendered `Part.Props`.                             |
+| Handwriting a simplified change callback               | Reason, cancellation, event details, or nullability are lost.               | Use indexed access into exact Base props.                                |
+| Duplicating open, selected, or highlighted state       | Wrapper and Base UI become competing authorities.                           | Use controlled props for ownership and `Part.State` for derived visuals. |
+| Treating a `default*` prop as reactive                 | Mounted uncontrolled state does not follow changes to its initial default.  | Choose controlled mode when external updates must be authoritative.      |
+| Moving Base props and ref onto different elements      | Focus, measurement, ARIA, and event behavior split.                         | Keep the complete contract on the behavior-owning element.               |
+| Using plain spread for independent handler sources     | One handler silently replaces another.                                      | Use deliberate manual sequencing or `mergeProps`.                        |
+| Putting refs in `mergeProps`                           | Only one ref remains.                                                       | Supply refs separately through Base UI or `useRender`.                   |
+| Reversing `mergeProps` order                           | Precedence and handler suppression direction change.                        | Document owners and place the intended winner rightmost.                 |
+| Function render drops supplied props                   | Base handlers, ARIA, state attributes, and ref disappear.                   | Spread or correctly merge the supplied props onto the primary element.   |
+| Custom render component does not forward its ref       | Base focus, measurement, and consumer ref access can fail.                  | Forward the ref to the same underlying element receiving Base props.     |
+| `nativeButton` disagrees with final tag                | Native or emulated button semantics are wrong.                              | Make the flag describe the actual render target.                         |
+| Replacing a required Base part with visual DOM         | Context registration, keyboard behavior, IDs, or focus logic vanish.        | Keep the Base part and place presentation inside it.                     |
+| Treating optional as context-free                      | Arrow, Indicator, or Label is present under the wrong owner.                | Follow the exact anatomy even for optional parts.                        |
+| Relying on `Omit` for runtime filtering                | Untyped props can still pass through.                                       | Destructure, filter, or explicitly overwrite sensitive keys.             |
+| Broad generic `forwardRef` cast                        | Public types claim a value/ref contract the body does not implement.        | Keep inner function and cast adjacent and structurally identical.        |
+| Mistaking a recipe for a primitive                     | State or accessibility is assigned to a function that only assembles parts. | Expand the recipe and identify the actual Base owners.                   |
+| Nesting ActionList controls                            | Interactive elements become invalidly nested and hard to operate.           | Keep checkbox, primary action, and trailing action as siblings.          |
 
 ## Wrapper-review checklist
 
@@ -975,23 +975,23 @@ The checkbox, primary trigger, and trailing action are siblings, avoiding nested
 
 Paths are relative to the repository root.
 
-| Local path and lines | Evidence |
-| --- | --- |
-| `packages/design-system/src/components/button/button.tsx#L23-L69` | Exact Base Button props, omissions, indexed access, semantic props, discriminated union. |
-| `packages/design-system/src/components/button/button.tsx#L71-L108` | `forwardRef`, loading translation, and `BaseButton.State`. |
-| `packages/design-system/src/components/button/button.tsx#L110-L140` | Prop precedence, Base element boundary, and Inspector content. |
-| `packages/design-system/src/components/accordion/accordion.tsx#L8-L61` | Exact per-part props, omissions, controlled values, and selective `render`. |
-| `packages/design-system/src/components/accordion/accordion.tsx#L63-L130` | Per-part refs, Base boundaries, Trigger state, Panel transition state, and visual children. |
-| `packages/design-system/src/components/accordion/accordion.tsx#L132-L138` | Compound API packaging with `Object.assign`. |
-| `packages/design-system/src/components/select/select.tsx#L9-L109` | Generic public types, `Omit`, `Pick`, indexed access, and constrained popup contracts. |
-| `packages/design-system/src/components/select/select.tsx#L112-L221` | Generic non-DOM Root, `ComponentRef`, Trigger state, Value, and Icon. |
-| `packages/design-system/src/components/select/select.tsx#L223-L280` | Portal, Positioner, Popup, List, and Inspector Content recipe. |
-| `packages/design-system/src/components/select/select.tsx#L282-L366` | Generic Item, `Part.State`, standard children, `forwardRef` cast, and Indicator. |
-| `packages/design-system/src/components/select/select.tsx#L368-L405` | Group, GroupLabel, remaining parts, and compound export. |
-| `packages/design-system/src/components/actionList/actionList.tsx#L18-L74` | Native list props, `useRender.ComponentProps`, and Base Button leaf props. |
-| `packages/design-system/src/components/actionList/actionList.tsx#L76-L142` | Inspector Escape policy, `useRender`, `mergeProps`, and separate ref path. |
-| `packages/design-system/src/components/actionList/actionList.tsx#L144-L231` | Checkbox/Button leaves, sibling interactive controls, and compound export. |
-| `packages/design-system/src/primitives/createStateStyleProps.ts#L3-L13` | Adapter from `Part.State` to Base-compatible StyleX callbacks. |
-| `packages/design-system/node_modules/@base-ui/react/button/Button.d.ts#L9-L26` | Installed Button ref, Props, and State declarations. |
-| `packages/design-system/node_modules/@base-ui/react/use-render/useRender.d.ts#L10-L70` | Installed `useRender` parameters, component props, state, and ref declarations. |
-| `packages/design-system/node_modules/@base-ui/react/merge-props/mergeProps.d.ts#L6-L38` | Installed merge order and explicit statement that refs are not merged. |
+| Local path and lines                                                                    | Evidence                                                                                    |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `packages/design-system/src/components/button/button.tsx#L23-L69`                       | Exact Base Button props, omissions, indexed access, semantic props, discriminated union.    |
+| `packages/design-system/src/components/button/button.tsx#L71-L108`                      | `forwardRef`, loading translation, and `BaseButton.State`.                                  |
+| `packages/design-system/src/components/button/button.tsx#L110-L140`                     | Prop precedence, Base element boundary, and Inspector content.                              |
+| `packages/design-system/src/components/accordion/accordion.tsx#L8-L61`                  | Exact per-part props, omissions, controlled values, and selective `render`.                 |
+| `packages/design-system/src/components/accordion/accordion.tsx#L63-L130`                | Per-part refs, Base boundaries, Trigger state, Panel transition state, and visual children. |
+| `packages/design-system/src/components/accordion/accordion.tsx#L132-L138`               | Compound API packaging with `Object.assign`.                                                |
+| `packages/design-system/src/components/select/select.tsx#L9-L109`                       | Generic public types, `Omit`, `Pick`, indexed access, and constrained popup contracts.      |
+| `packages/design-system/src/components/select/select.tsx#L112-L221`                     | Generic non-DOM Root, `ComponentRef`, Trigger state, Value, and Icon.                       |
+| `packages/design-system/src/components/select/select.tsx#L223-L280`                     | Portal, Positioner, Popup, List, and Inspector Content recipe.                              |
+| `packages/design-system/src/components/select/select.tsx#L282-L366`                     | Generic Item, `Part.State`, standard children, `forwardRef` cast, and Indicator.            |
+| `packages/design-system/src/components/select/select.tsx#L368-L405`                     | Group, GroupLabel, remaining parts, and compound export.                                    |
+| `packages/design-system/src/components/actionList/actionList.tsx#L18-L74`               | Native list props, `useRender.ComponentProps`, and Base Button leaf props.                  |
+| `packages/design-system/src/components/actionList/actionList.tsx#L76-L142`              | Inspector Escape policy, `useRender`, `mergeProps`, and separate ref path.                  |
+| `packages/design-system/src/components/actionList/actionList.tsx#L144-L231`             | Checkbox/Button leaves, sibling interactive controls, and compound export.                  |
+| `packages/design-system/src/primitives/createStateStyleProps.ts#L3-L13`                 | Adapter from `Part.State` to Base-compatible StyleX callbacks.                              |
+| `packages/design-system/node_modules/@base-ui/react/button/Button.d.ts#L9-L26`          | Installed Button ref, Props, and State declarations.                                        |
+| `packages/design-system/node_modules/@base-ui/react/use-render/useRender.d.ts#L10-L70`  | Installed `useRender` parameters, component props, state, and ref declarations.             |
+| `packages/design-system/node_modules/@base-ui/react/merge-props/mergeProps.d.ts#L6-L38` | Installed merge order and explicit statement that refs are not merged.                      |

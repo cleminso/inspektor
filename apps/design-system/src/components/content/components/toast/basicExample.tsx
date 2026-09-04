@@ -1,4 +1,4 @@
-import { Box, Button, Toaster, toasts } from '@inspector/ds'
+import { Box, Button, Toaster, toasts } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -1,4 +1,4 @@
-import { Box, Select, type SelectTriggerSize, type SelectWidth } from '@inspector/ds'
+import { Box, Select, type SelectTriggerSize, type SelectWidth } from '@inspektor/ds'
 import { type ReactElement, type ReactNode, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'

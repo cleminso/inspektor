@@ -1,4 +1,4 @@
-import { Box, Text } from '@inspector/ds'
+import { Box, Text } from '@inspektor/ds'
 import { type ReactElement, type ReactNode } from 'react'
 
 interface SectionProps {

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, ButtonGroupSeparator } from '@inspector/ds'
+import { Button, ButtonGroup, ButtonGroupSeparator } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function CompositionExample(): ReactElement {

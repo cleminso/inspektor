@@ -1,4 +1,4 @@
-import { Box, Text } from '@inspector/ds'
+import { Box, Text } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

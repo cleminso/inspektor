@@ -69,7 +69,7 @@
   - Register `JsonView` with a stable component ID in `apps/design-system`.
   - Add executable examples for default and collapsed expansion, nested arrays and objects, empty values, search highlighting, long
     strings, and bounded branches.
-  - Import examples from `@inspector/ds` and expose their source through the existing raw-source pattern.
+  - Import examples from `@inspektor/ds` and expose their source through the existing raw-source pattern.
   - Generate and check package-authoritative prop metadata.
   - Add focused playground or example tests where controls expose meaningful component states.
   - Reference: [Documentation](./design.md#documentation).
@@ -82,7 +82,7 @@
   - Produce a faithful whole-row Copy JSON serialization from the same normalized representation.
   - Add unit tests for schema ordering, unavailable fields, Date values, bytes, references, arrays, Row tuples, JSON containers,
     non-finite numbers, cycles, and unsupported values.
-  - Reference: [Data model](./design.md#data-model), [Inspector integration](./design.md#inspector-integration).
+  - Reference: [Data model](./design.md#data-model), [Inspector integration](./design.md#inspektor-integration).
 
 - [x] 10. Integrate read-only `JSON` representation into the row side pane.
   - Add `Details` and `JSON` representations through the design-system `ToggleGroup`.
@@ -91,13 +91,13 @@
   - Key the representation by stable row identity so a row change restores configured expansion.
   - Add application-owned search and whole-row Copy JSON controls around the tree.
   - Add integration tests for representation switching, hidden fields, search, copying, and read-only behavior.
-  - Reference: [Inspector integration](./design.md#inspector-integration).
+  - Reference: [Inspector integration](./design.md#inspektor-integration).
 
 - [x] 11. Reuse `JsonView` for read-only structured fallback inspection.
   - Use the CodeMirror-backed `CodeEditor` when a structured runtime value can be represented safely as source.
   - Use `JsonView` when normalization produces an object or array fallback instead.
   - Add field-level integration tests proving that read-only viewing and editable Details controls do not share mutation behavior.
-  - Reference: [Inspector integration](./design.md#inspector-integration).
+  - Reference: [Inspector integration](./design.md#inspektor-integration).
 
 - [ ] 12. Close final component correctness and evidence gaps.
   - Render selectable object and array punctuation as valid JSON.

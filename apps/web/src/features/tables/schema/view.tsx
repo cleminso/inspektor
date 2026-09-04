@@ -11,7 +11,7 @@ import {
   type FindBarState,
   type JsonViewSearchResults,
   type JsonViewValue,
-} from '@inspector/ds'
+} from '@inspektor/ds'
 import { Search, ChevronsUpDown, ChevronsDownUp } from 'lucide-react'
 import { useMemo, useState } from 'react'
 

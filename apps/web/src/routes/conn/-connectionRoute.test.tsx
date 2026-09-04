@@ -38,7 +38,7 @@ vi.mock('@app/shell/layout', () => ({
   InspectorLayout: ({ children }: { children: React.ReactNode }) => children,
 }))
 
-vi.mock('@inspector/ds', () => ({
+vi.mock('@inspektor/ds', () => ({
   Box: ({ children, role }: { children: React.ReactNode; role?: string }) => (
     <div role={role}>{children}</div>
   ),

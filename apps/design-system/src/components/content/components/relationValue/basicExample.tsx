@@ -1,4 +1,4 @@
-import { Box, RelationDetails, RelationValue } from '@inspector/ds'
+import { Box, RelationDetails, RelationValue } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -1,4 +1,4 @@
-import { DataGridFilterClause } from '@inspector/ds'
+import { DataGridFilterClause } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 const value = 'a-complete-value-that-is-longer-than-the-visible-segment'

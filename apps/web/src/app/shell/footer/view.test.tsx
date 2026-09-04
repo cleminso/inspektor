@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { Tooltip } from '@inspector/ds'
+import { Tooltip } from '@inspektor/ds'
 import {
   Outlet,
   RouterProvider,
@@ -19,8 +19,8 @@ const leftDock = vi.hoisted(() => ({
   toggle: vi.fn(),
 }))
 
-vi.mock('@inspector/ds', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@inspector/ds')>()),
+vi.mock('@inspektor/ds', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@inspektor/ds')>()),
   useShellLayout: () => ({
     leftDock,
     rightDock: { isOpen: false, toggle: vi.fn() },

@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-table'
 import type { DynamicTableRow } from 'jazz-tools'
 
-import { dataGridFeatures, type DataGridTable } from '@inspector/ds'
+import { dataGridFeatures, type DataGridTable } from '@inspektor/ds'
 
 import { buildDataGridColumns } from '@tables/grid/buildColumns'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'

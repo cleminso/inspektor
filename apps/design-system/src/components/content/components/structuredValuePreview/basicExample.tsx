@@ -1,4 +1,4 @@
-import { Box, StructuredValuePreview } from '@inspector/ds'
+import { Box, StructuredValuePreview } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {

@@ -15,7 +15,7 @@
 
 ## Objective
 
-Apply the Inspector semantic token model consistently across remaining active `@inspector/ds` components.
+Apply the Inspector semantic token model consistently across remaining active `@inspektor/ds` components.
 
 The work covers field controls, selection and action controls, feedback and overlay components, layout controls, and constrained public styling APIs.
 
@@ -23,17 +23,17 @@ Success means components express interaction and validation through semantic tok
 
 ## Commands
 
-- `pnpm --filter @inspector/ds test`
-- `pnpm --filter @inspector/ds typecheck`
-- `pnpm --filter @inspector/ds build`
-- `pnpm --filter inspector.design-system test`
-- `pnpm --filter inspector.design-system gen:props`
-- `pnpm --filter inspector.design-system check:props`
-- `pnpm --filter inspector.design-system typecheck`
-- `pnpm --filter inspector.design-system lint`
-- `pnpm --filter inspector.design-system build`
-- `pnpm --filter regarde.inspector typecheck`
-- `pnpm --filter regarde.inspector lint`
+- `pnpm --filter @inspektor/ds test`
+- `pnpm --filter @inspektor/ds typecheck`
+- `pnpm --filter @inspektor/ds build`
+- `pnpm --filter inspektor.design-system test`
+- `pnpm --filter inspektor.design-system gen:props`
+- `pnpm --filter inspektor.design-system check:props`
+- `pnpm --filter inspektor.design-system typecheck`
+- `pnpm --filter inspektor.design-system lint`
+- `pnpm --filter inspektor.design-system build`
+- `pnpm --filter inspektor typecheck`
+- `pnpm --filter inspektor lint`
 
 ## Project structure
 
@@ -41,7 +41,7 @@ Success means components express interaction and validation through semantic tok
 - `packages/design-system/src/tokens/` owns semantic, value, and layer tokens.
 - `packages/design-system/src/primitives/` owns constrained shared component helpers.
 - `apps/design-system/` owns executable component documentation and generated API metadata.
-- `apps/web/` consumes public `@inspector/ds` APIs and owns product composition.
+- `apps/web/` consumes public `@inspektor/ds` APIs and owns product composition.
 
 ## Code style
 
@@ -66,7 +66,7 @@ selected: {
 
 - Always: use semantic tokens, preserve Base UI behavior, omit public `className` and `style`, and keep approved escape hatches explicit and auditable.
 - Ask first: add semantic tokens, change public APIs, remove public styling escape hatches, or migrate application consumers.
-- Never: expose arbitrary CSS values from `@inspector/ds`, or hand-edit generated route trees or props metadata.
+- Never: expose arbitrary CSS values from `@inspektor/ds`, or hand-edit generated route trees or props metadata.
 
 ## Implementation batches
 

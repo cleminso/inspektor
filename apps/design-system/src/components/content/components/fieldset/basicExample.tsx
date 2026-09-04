@@ -1,4 +1,4 @@
-import { Field, Fieldset, Input } from '@inspector/ds'
+import { Field, Fieldset, Input } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
 export default function BasicExample(): ReactElement {
