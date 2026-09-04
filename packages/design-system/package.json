@@ -57,12 +57,12 @@
   "dependencies": {
     "@base-ui/react": "catalog:",
     "@codemirror/autocomplete": "^6.20.3",
-    "@codemirror/commands": "^6.10.4",
+    "@codemirror/commands": "^6.11.0",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/language": "^6.12.4",
     "@codemirror/lint": "^6.9.7",
-    "@codemirror/state": "^6.7.1",
-    "@codemirror/view": "^6.43.6",
+    "@codemirror/state": "^6.7.2",
+    "@codemirror/view": "^6.43.10",
     "@dnd-kit/abstract": "^0.5.0",
     "@dnd-kit/dom": "^0.5.0",
     "@dnd-kit/helpers": "^0.5.0",
@@ -73,7 +73,7 @@
     "@tanstack/react-table": "catalog:",
     "@tanstack/react-virtual": "catalog:",
     "lucide-react": "catalog:",
-    "react-day-picker": "^9.14.0",
+    "react-day-picker": "^10.0.1",
     "react-resizable-panels": "catalog:"
   },
   "devDependencies": {
