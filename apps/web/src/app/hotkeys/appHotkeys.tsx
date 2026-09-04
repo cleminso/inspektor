@@ -178,13 +178,13 @@ function AppCommandPalette({
         </Command.List>
         <Command.Footer>
           <span>
-            <Command.Key>↑ ↓</Command.Key> Navigate
+            <Command.Key>Esc</Command.Key> Close
           </span>
           <span>
             <Command.Key>Enter</Command.Key> Select
           </span>
           <span>
-            <Command.Key>Esc</Command.Key> Close
+            <Command.Key>↑ ↓</Command.Key> Navigate
           </span>
         </Command.Footer>
       </Command.Root>

@@ -911,45 +911,40 @@ export function DataGridFilterBuilder({
             <Command.Footer>
               <Box
                 alignItems="center"
-                gap="m"
+                gap="xs"
               >
-                <Box
-                  alignItems="center"
-                  gap="xs"
+                <Command.Key>Esc</Command.Key>
+                <Text
+                  color="muted"
+                  variant="caption"
                 >
-                  <Command.Key>↑</Command.Key>
-                  <Command.Key>↓</Command.Key>
-                  <Text
-                    color="muted"
-                    variant="caption"
-                  >
-                    Navigate
-                  </Text>
-                </Box>
-                <Box
-                  alignItems="center"
-                  gap="xs"
+                  Cancel
+                </Text>
+              </Box>
+              <Box
+                alignItems="center"
+                gap="xs"
+              >
+                <Command.Key>Enter</Command.Key>
+                <Text
+                  color="muted"
+                  variant="caption"
                 >
-                  <Command.Key>Enter</Command.Key>
-                  <Text
-                    color="muted"
-                    variant="caption"
-                  >
-                    Select / Apply
-                  </Text>
-                </Box>
-                <Box
-                  alignItems="center"
-                  gap="xs"
+                  Select / Apply
+                </Text>
+              </Box>
+              <Box
+                alignItems="center"
+                gap="xs"
+              >
+                <Command.Key>↑</Command.Key>
+                <Command.Key>↓</Command.Key>
+                <Text
+                  color="muted"
+                  variant="caption"
                 >
-                  <Command.Key>Esc</Command.Key>
-                  <Text
-                    color="muted"
-                    variant="caption"
-                  >
-                    Cancel
-                  </Text>
-                </Box>
+                  Navigate
+                </Text>
               </Box>
             </Command.Footer>
           </Command.Root>

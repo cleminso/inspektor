@@ -28,6 +28,39 @@ function CommandList({ onSelect = vi.fn() }: { onSelect?: (value: string) => voi
 }
 
 describe('Command', () => {
+  it('exposes value labels and descriptions while preserving explicit accessible names', () => {
+    render(
+      <Command.Root items={items} itemToStringLabel={(item) => item.label}>
+        <Command.Input aria-label="Filter columns" />
+        <span id="command-item-detail">Primary key</span>
+        <span id="command-item-label">Profile name</span>
+        <Command.List>
+          <Command.Item value={items[0]} aria-describedby="command-item-detail">
+            <Command.ItemText label="id" description="Rendered detail" />
+          </Command.Item>
+          <Command.Item
+            value={items[1]}
+            aria-label="Name override"
+            aria-labelledby="command-item-label"
+          >
+            <Command.ItemText label="name" />
+          </Command.Item>
+        </Command.List>
+      </Command.Root>,
+    )
+
+    screen.getByRole('option', {
+      name: 'id',
+      description: 'Primary key User identifier',
+    })
+
+    expect(
+      screen
+        .getByRole('option', { name: 'Profile name', description: 'Display name' })
+        .getAttribute('aria-label'),
+    ).toBe('Name override')
+  })
+
   it.each(['ID', 'identifier', 'PRIMARY'])(
     'filters labels, descriptions, and keywords for %s',
     (query) => {
@@ -36,8 +69,10 @@ describe('Command', () => {
 
       fireEvent.change(input, { target: { value: query } })
 
-      expect(screen.getByRole('option', { name: 'id User identifier' })).toBeTruthy()
-      expect(screen.queryByRole('option', { name: 'name Display name' })).toBeNull()
+      expect(
+        screen.getByRole('option', { name: 'id', description: 'User identifier' }),
+      ).toBeTruthy()
+      expect(screen.queryByRole('option', { name: 'name' })).toBeNull()
     },
   )
 

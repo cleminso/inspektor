@@ -12,6 +12,7 @@ import {
   type ReactElement,
   type ReactNode,
   useContext,
+  useId,
   useState,
 } from 'react'
 
@@ -342,10 +343,18 @@ const CommandSeparator = forwardRef<
 })
 
 function CommandItemInner<Value extends CommandValue>(
-  { children, value, ...props }: CommandItemProps<Value>,
+  {
+    children,
+    value,
+    'aria-label': ariaLabel,
+    'aria-describedby': describedBy,
+    'aria-labelledby': labelledBy,
+    ...props
+  }: CommandItemProps<Value>,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const query = useContext(CommandQueryContext)
+  const descriptionId = useId()
   if (commandFilter(value, query) === false) return null
   const stateStyles = createStateStyleProps<BaseCombobox.Item.State>((state) => [
     commandStyles.item,
@@ -353,16 +362,28 @@ function CommandItemInner<Value extends CommandValue>(
     state.selected === true && commandStyles.itemSelected,
     state.disabled === true && commandStyles.itemDisabled,
   ])
-  const accessibleName = [value.label, value.description].filter(Boolean).join(' ')
+  const descriptionIds = [describedBy, value.description === undefined ? undefined : descriptionId]
+    .filter(Boolean)
+    .join(' ')
   return (
     <BaseCombobox.Item
-      aria-label={accessibleName}
+      aria-label={ariaLabel ?? (labelledBy === undefined ? value.label : undefined)}
+      aria-describedby={descriptionIds || undefined}
+      aria-labelledby={labelledBy}
       {...props}
       ref={ref}
       value={value}
       {...stateStyles}
     >
       {children}
+      {value.description === undefined ? null : (
+        <span
+          id={descriptionId}
+          hidden
+        >
+          {value.description}
+        </span>
+      )}
     </BaseCombobox.Item>
   )
 }

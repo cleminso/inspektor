@@ -14,7 +14,6 @@ import {
   fontSizes,
   fontWeights,
   lineHeights,
-  shadows,
   spacing,
 } from '../../tokens/value.stylex'
 
@@ -194,8 +193,9 @@ export const commandStyles = stylex.create({
   viewportStarting: {},
   viewportEnding: {},
   popup: {
+    borderRadius: borderRadii.s,
     outline: 'none',
-    boxShadow: shadows.medium,
+    overflow: 'hidden',
     marginBlockStart: '12vh',
     position: 'relative',
     maxWidth: spatial['content-measure'],
@@ -219,7 +219,6 @@ export const commandStyles = stylex.create({
   },
   close: {
     alignItems: 'center',
-    backgroundColor: surfaceColors.raised,
     display: 'flex',
     insetBlockStart: 1,
     insetInlineEnd: 1,
