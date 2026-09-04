@@ -8,6 +8,7 @@ allowBuilds:
   esbuild: true
   msw: true
   protobufjs: true
+  workerd: true
 
 overrides:
   "@opentelemetry/core": 2.8.0
@@ -38,7 +39,6 @@ catalog:
   react: 19.2.6
   react-dom: 19.2.6
   react-resizable-panels: ^4.12.3
-  tsup: ^8.5.1
   tsdown: ^0.22.14
   typescript: ^7.0.2
   "vite": ^8.2.2

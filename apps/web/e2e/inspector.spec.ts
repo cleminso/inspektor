@@ -266,25 +266,34 @@ test('recovers when connection schema validation initially finds no schemas', as
   await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
 })
 
-test('prefills connection fields from the URL fragment', async ({ page }) => {
+test('does not read connection credentials from the URL', async ({ page }) => {
+  const query = new URLSearchParams({
+    name: 'Query app',
+    serverUrl: 'https://query.example.com',
+    appId: 'query-app',
+    adminSecret: 'query-secret',
+    env: 'production',
+    branch: 'query-branch',
+  })
   const fragment = new URLSearchParams({
     name: 'Fragment app',
     serverUrl: 'https://example.com',
     appId: 'fragment-app',
     adminSecret: 'fragment-secret',
-    env: 'dev',
-    branch: 'main',
+    env: 'staging',
+    branch: 'fragment-branch',
   })
 
-  await page.goto(`/conn/new#${fragment}`)
+  await page.goto(`/conn/new?${query}#${fragment}`)
 
-  await expect(page.getByRole('textbox', { name: 'Connection name' })).toHaveValue('Fragment app')
-  await expect(page.getByRole('textbox', { name: 'Server URL' })).toHaveValue('https://example.com')
-  await expect(page.getByRole('textbox', { name: 'App ID' })).toHaveValue('fragment-app')
-  await expect(page.getByLabel('Admin secret')).toHaveValue('fragment-secret')
+  await expect(page.getByRole('textbox', { name: 'Connection name' })).toHaveValue('')
+  await expect(page.getByRole('textbox', { name: 'Server URL' })).toHaveValue(
+    'https://v2.sync.jazz.tools/',
+  )
+  await expect(page.getByRole('textbox', { name: 'App ID' })).toHaveValue('')
+  await expect(page.getByLabel('Admin secret')).toHaveValue('')
   await expect(page.getByRole('textbox', { name: 'Env' })).toHaveValue('dev')
   await expect(page.getByRole('textbox', { name: 'Branch' })).toHaveValue('main')
-  expect(new URL(page.url()).searchParams.has('adminSecret')).toBe(false)
 })
 
 test('renders fixture rows and public permission policy', async ({ page }) => {

@@ -8,6 +8,8 @@
     "dev:vite": "vite",
     "portless:proxy": "portless proxy start --port 1355 --https",
     "build": "vite build && tsc -p tsconfig.app.json --noEmit",
+    "preview": "pnpm build && wrangler dev",
+    "deploy": "pnpm build && wrangler deploy",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
     "test": "vitest run",
@@ -49,6 +51,7 @@
     "portless": "^0.15.6",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "wrangler": "^4.128.0"
   }
 }

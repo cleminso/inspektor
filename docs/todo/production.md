@@ -16,17 +16,23 @@ This checklist records production asset-delivery requirements that cannot be val
 
 ## Implemented foundation
 
+[04/09/26]
+
+- [x] Verify production serves compressible assets with Brotli and applies immutable caching to content-hashed assets.
+
+[04/09/26]
+
+- [x] Document the Cloudflare deployment, domain, TLS, DNSSEC, security-header, cache, privacy, and production-verification workflow.
+- [x] Configure immutable browser caching for content-hashed production assets while retaining revalidation for HTML.
+- [x] Select Cloudflare Workers Static Assets as the production host.
+
 [27/08/26]
 
 - [x] Build content-hashed JavaScript, CSS, font, worker, and WASM assets through Vite.
 
 ## Open product work
 
-[27/08/26]
-
-- [ ] Add a production deployment guide covering compressed static assets, cache policy, and deployed-header verification.
-- [ ] Configure Brotli or gzip delivery for compressible built assets, including the Jazz WASM binary.
-- [ ] Configure long-lived immutable caching for content-hashed assets while keeping the HTML entry point revalidated.
+No open product work.
 
 ## Work outside the foundation scope
 
@@ -44,14 +50,12 @@ This checklist records production asset-delivery requirements that cannot be val
 
 ## Open deployment decisions
 
-[27/08/26]
-
-- [ ] Select the production host configuration that owns compression and cache headers.
+No open deployment decisions.
 
 ## Validation checklist
 
 [27/08/26]
 
-- [ ] Confirm the deployed Jazz WASM response uses Brotli or gzip content encoding.
-- [ ] Confirm hashed assets return a long-lived immutable `Cache-Control` policy and the HTML entry point does not.
+- [x] Confirm the deployed Jazz WASM response uses Brotli or gzip content encoding.
+- [x] Confirm hashed assets return a long-lived immutable `Cache-Control` policy and the HTML entry point does not.
 - [ ] Capture cold and warm built-application traces against the deployed host and verify warm font, JavaScript, CSS, worker, and WASM transfers come from cache.

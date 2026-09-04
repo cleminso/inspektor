@@ -25,6 +25,7 @@ dist-extension
 *.sw?
 
 .env*
+.wrangler
 .zed*
 .vercel
 .tanstack
