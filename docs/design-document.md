@@ -101,9 +101,6 @@ flowchart TD
       SessionProvider --> Session["useInspectorSession"]
       Session --> ConnectionStore["connections.ts"]
       ConnectionStore --> ConnectionsStorage["localStorage: inspektor-connections"]
-      Session --> Prefill["readPrefillConfig"]
-      Prefill --> UrlHash["URL hash/search prefill"]
-
       SessionProvider --> ConnectionRoute["/conn/:connectionId"]
       SessionProvider --> AcceptedIntent["Accepted connection intent"]
       AcceptedIntent --> WasmPreparation["prepareJazzWasm: one shared promise"]
@@ -423,7 +420,7 @@ This flow **must answer**:
 1. First-time user
    - has a Jazz app
    - wants to establish a connection via the Inspektor for the first time
-   - has copied credentials manually or opened a prefill link
+   - has copied credentials for manual entry
    - needs confidence that the connection points to the intended app
    - needs to understand which schemaHash is latest
    - may need to inspect older schema
@@ -456,7 +453,6 @@ From Jazz's perspective, a connection is a single active WebSocket transport lin
 | Browse active connections |                                                 |
 | Connection switching      |                                                 |
 | Delete connection         |                                                 |
-| Connection prefill        | Populate the connection form from a URL         |
 
 Must support:
 
@@ -486,12 +482,6 @@ The schema switcher shows which schema hash is latest.
 
 If validation fails, render the validation error and keep the edit form open. If the server returns no schema hashes, use the same error handling as the add-connection flow. Branch handling should follow the current connection/session behavior.
 
-#### Prefill connection
-
-Jazz dev tooling can print a direct Inspektor link with connection fields in the URL. The Inspektor parses query and fragment
-parameters into the same draft used by the connection form. Fragment parameters avoid sending `adminSecret` in the Inspektor
-page request; query parameters remain supported for compatibility.
-
 #### Saved connection availability
 
 Saved connections persist credentials and preferences in local storage. They do not persist the stored schema payload or the
@@ -500,9 +490,8 @@ server's schema hash list.
 Opening a saved connection still needs the Jazz server at `serverUrl` to be reachable when Inspektor resolves schema hashes,
 fetches the selected stored schema, and creates the admin client.
 
-If the app dev server only produced the inspektor link but the Jazz server is remote and still reachable, the saved connection
-can open without the app dev server. If the app dev server owns the managed local Jazz runtime, stopping it makes the saved
-connection unavailable until the runtime is running again.
+If the Jazz server is remote and reachable, the saved connection can open without the app dev server. If the app dev server
+owns the managed local Jazz runtime, stopping it makes the saved connection unavailable until the runtime is running again.
 
 When resolving `/conn/:connectionId`, Inspektor reads the saved branch and fetches the available schema hashes. A valid explicit
 `?schema=` value wins; otherwise Inspektor selects the first advertised schema. A remembered schema is used only as a fallback
@@ -1687,7 +1676,7 @@ main risks are credential exposure in browser storage or URLs and unintended tra
 
 - adminSecret is sensitive and must not be logged.
 - Connections are stored locally.
-- Connection prefill can pass credentials through URL hash or query parameters; fragments avoid including them in the page request.
+- Connection routes do not accept credentials through URL parameters or fragments.
 - Inspektor should avoid sending credentials anywhere except the configured Jazz server.
 - Saved connections do not persist schema payloads.
 - Inspektor does not provide application authentication or hosting access control.

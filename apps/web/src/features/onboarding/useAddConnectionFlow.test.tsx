@@ -37,7 +37,6 @@ vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
     connections,
-    prefill: null,
     saveConnectionWithContext,
     setConnectionContext,
   }),

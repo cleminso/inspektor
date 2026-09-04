@@ -160,7 +160,7 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 - `apps/design-system` consumes public `@inspektor/ds` exports like a product application; it does not import package-private implementation files at runtime.
 - `apps/web` owns Inspektor routes, application state, Jazz data access, and feature composition.
 - The Inspektor is schema-driven and generic. Do not add generated query builders or table-specific UI for inspected applications; use stored schema metadata and generic query construction.
-- Connection data includes `serverUrl`, `appId`, `adminSecret`, branch, and schema hash. Treat `adminSecret` as sensitive even when local links pass it in URL hash parameters.
+- Connection data includes `serverUrl`, `appId`, `adminSecret`, branch, and schema hash. Treat `adminSecret` as sensitive.
 - TanStack Router route trees are generated. Do not hand-edit `apps/web/src/routeTree.gen.ts` or `apps/design-system/src/routeTree.gen.ts`.
 
 ## Import boundaries

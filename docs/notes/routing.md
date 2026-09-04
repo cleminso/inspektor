@@ -9,7 +9,6 @@
 - [State ownership](#state-ownership)
 - [Key decisions](#key-decisions)
 - [Browser-tab behavior](#browser-tab-behavior)
-- [Inspektor link prefill](#inspektor-link-prefill)
 - [Example URLs](#example-urls)
 
 ## Mental model
@@ -138,15 +137,6 @@ connection.
 
 The model does not promise that two tabs using the same connection can permanently restore different branch or schema choices.
 That would require branch and schema route identity or a separate per-window workspace id.
-
-## Inspektor link prefill
-
-Local development can still open the connection flow with credentials in the URL hash:
-
-`/conn/new#serverUrl=<encoded>&appId=<encoded>&adminSecret=<encoded>`
-
-The hash pre-fills and validates a saved local connection. After validation, Inspektor assigns a local connection id and opens
-its workbench. Ordinary content routes never include the admin secret.
 
 ## Example URLs
 

@@ -16,21 +16,19 @@ import {
   type StoredConnection,
   type StoredConnectionsStore,
 } from '@app/connections/connections'
-import { readPrefillConfig, type PrefillConfig } from '@app/connections/prefill'
 import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStorage'
 
 /**
  * React-facing API for the Inspektor connection session.
  *
  * Components use this instead of reading localStorage directly so connection CRUD,
- * URL-provided dev links, active connection selection, and Jazz runtime preferences stay
- * synchronized through one state boundary.
+ * active connection selection, and Jazz runtime preferences stay synchronized through one state
+ * boundary.
  */
 export interface UseInspectorSessionResult {
   connections: StoredConnection[]
   activeConnection: StoredConnection | null
   activeConnectionId: string | null
-  prefill: PrefillConfig | null
   getConnection: (connectionId: string | null | undefined) => StoredConnection | null
   getConnectionPreferences: (
     connectionId: string,
@@ -51,11 +49,6 @@ export interface UseInspectorSessionResult {
   setConnectionContext: (connectionId: string, branch: string, schemaHash: string) => void
 }
 
-interface SessionState {
-  store: StoredConnectionsStore
-  prefill: PrefillConfig | null
-}
-
 /**
  * Owns the Inspektor's saved connection session.
  *
@@ -63,28 +56,25 @@ interface SessionState {
  * `useInspectorRuntime` needs to create an in-memory Jazz admin client.
  *
  * From the Inspektor perspective, it provides a stable UI API for saved connections,
- * remembered branches, selected schema hashes, and URL-provided prefill data.
+ * remembered branches, and selected schema hashes.
  */
 export function useInspectorSession(): UseInspectorSessionResult {
-  const [state, setState] = useState<SessionState>(() => ({
-    store: readStoredConnections(),
-    prefill: readPrefillConfig(),
-  }))
-  const storeRef = useRef(state.store)
+  const [store, setStore] = useState(readStoredConnections)
+  const storeRef = useRef(store)
 
   const updateStore = useCallback(
     (update: (store: StoredConnectionsStore) => StoredConnectionsStore) => {
       const store = update(storeRef.current)
       writeStoredConnections(store)
       storeRef.current = store
-      setState((currentState) => ({ ...currentState, store }))
+      setStore(store)
     },
     [],
   )
 
   const getConnection = useCallback(
-    (connectionId: string | null | undefined) => getConnectionById(state.store, connectionId),
-    [state.store],
+    (connectionId: string | null | undefined) => getConnectionById(store, connectionId),
+    [store],
   )
 
   const deleteConnection = useCallback(
@@ -130,17 +120,16 @@ export function useInspectorSession(): UseInspectorSessionResult {
   // Keep the returned session object stable for consumers that depend on it as one value.
   return useMemo(
     () => ({
-      connections: state.store.connections,
-      activeConnection: getActiveConnection(state.store),
-      activeConnectionId: state.store.activeConnectionId,
-      prefill: state.prefill,
+      connections: store.connections,
+      activeConnection: getActiveConnection(store),
+      activeConnectionId: store.activeConnectionId,
       getConnection,
       getConnectionPreferences: (connectionId: string) =>
-        getStoredConnectionPreferences(state.store, connectionId),
+        getStoredConnectionPreferences(store, connectionId),
       getRememberedBranches: (connectionId: string) =>
-        getStoredConnectionPreferences(state.store, connectionId).rememberedBranches,
+        getStoredConnectionPreferences(store, connectionId).rememberedBranches,
       resolveBranch: (connectionId: string, branch?: string | null) =>
-        resolveDefaultBranch(state.store, connectionId, branch),
+        resolveDefaultBranch(store, connectionId, branch),
       resolveSchemaHash: (
         schemaCatalogue: readonly { hash: string }[],
         schemaHash?: string | null,
@@ -149,13 +138,6 @@ export function useInspectorSession(): UseInspectorSessionResult {
       deleteConnection,
       setConnectionContext,
     }),
-    [
-      deleteConnection,
-      getConnection,
-      saveConnectionWithContext,
-      setConnectionContext,
-      state.prefill,
-      state.store,
-    ],
+    [deleteConnection, getConnection, saveConnectionWithContext, setConnectionContext, store],
   )
 }

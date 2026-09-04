@@ -7,6 +7,8 @@ import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvi
 import { findConnectionByCredentials } from '@app/connections/connectionIdentity'
 import {
   createConnectionFromDraft,
+  DEFAULT_BRANCH_NAME,
+  DEFAULT_SERVER_URL,
   getConnectionDisplayName,
   normalizeBranchName,
   normalizeEnvName,
@@ -22,7 +24,7 @@ import { appRoutes } from '@app/routing/appRoutes'
 import { createSchemaCatalogue } from '@app/routing/inspectorNavigation'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 
-import { createInitialFormValues, type AddConnectionFormValues } from './connectionFormTypes'
+import type { AddConnectionFormValues } from './connectionFormTypes'
 
 interface UseAddConnectionFlowResult {
   error: ConnectionError | null
@@ -46,12 +48,19 @@ interface UseAddConnectionFlowOptions {
 export function useAddConnectionFlow(
   options?: UseAddConnectionFlowOptions,
 ): UseAddConnectionFlowResult {
-  const { connections, prefill, saveConnectionWithContext, setConnectionContext } =
+  const { connections, saveConnectionWithContext, setConnectionContext } =
     useInspectorSessionContext()
   const navigate = useNavigate()
   const [formValues, setFormValues] = useState<AddConnectionFormValues>(() =>
     options === undefined
-      ? createInitialFormValues(prefill)
+      ? {
+          name: '',
+          serverUrl: DEFAULT_SERVER_URL,
+          appId: '',
+          adminSecret: '',
+          env: 'dev',
+          branch: DEFAULT_BRANCH_NAME,
+        }
       : {
           name: getConnectionDisplayName(options.connection),
           serverUrl: options.connection.serverUrl,

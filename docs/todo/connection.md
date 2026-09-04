@@ -13,6 +13,13 @@
 
 [04/09/26]
 
+### Manual credential entry
+
+- [x] Remove URL connection prefill because Jazz dev tooling links to the official Inspector rather than Inspektor.
+- [x] Keep credentials out of Inspektor query parameters and fragments.
+
+[04/09/26]
+
 ### Neutral saved-connection entry
 
 - [x] Present `/conn` and add-connection headers as neutral saved-connection pickers without inheriting the last workspace connection's selection or management actions.

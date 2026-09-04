@@ -36,7 +36,6 @@ The repository is a PNPM workspace. The root workspace configuration includes ap
 | `apps/web`                | Inspektor product application                   | `@inspektor/ds`, product and data dependencies                            |
 | `apps/design-system`      | Component documentation and executable examples | public `@inspektor/ds` exports and documentation dependencies             |
 | `packages/design-system`  | The `@inspektor/ds` reusable UI package         | UI primitives and reusable interaction dependencies                       |
-| `packages/jazz-dev-tools` | Separate Jazz tooling package                   | Outside this frontend replacement architecture unless explicitly in scope |
 
 `apps/web` and `apps/design-system` are consumers of `@inspektor/ds`. They must use its public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
 
@@ -247,7 +246,7 @@ Dependencies are selected for a role and an owning layer, not simply because the
 | Optional interactions | CodeMirror, DnD Kit                        | DS may own reusable integration, but imports must remain deferred when optional                   |
 | Product data display  | `@tanstack/react-table`                    | Used where product or DS table responsibilities require it                                        |
 | Documentation         | Shiki, generated prop extraction tooling   | Documentation app only; not a DS runtime concern                                                  |
-| Build output          | Vite, TSDown, tsup, TypeScript             | Vite builds applications; TSDown emits design-system artifacts; tsup emits Jazz tooling artifacts |
+| Build output          | Vite, TSDown, TypeScript                   | Vite builds applications; TSDown emits design-system artifacts                                    |
 | Testing               | Vitest, Testing Library, JSDOM, Playwright | Verify logic, component and application behavior, boundaries, and browser workflows               |
 
 ## Adding a dependency or export

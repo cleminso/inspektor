@@ -47,7 +47,6 @@ const session = {
   switchSchema: vi.fn(),
   deleteConnection: vi.fn(),
   setConnectionContext: vi.fn(),
-  prefill: null,
 }
 sessionHolder.current = session
 

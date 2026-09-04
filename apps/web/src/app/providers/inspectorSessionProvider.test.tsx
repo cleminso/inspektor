@@ -78,7 +78,6 @@ const session = {
   getConnection: vi.fn((connectionId: keyof typeof connections) => connections[connectionId]),
   getConnectionPreferences: vi.fn(() => connectionPreferences),
   getRememberedBranches: vi.fn(() => ['main', 'feature']),
-  prefill: null,
   resolveBranch: vi.fn((_connectionId: string, branch?: string | null) => branch ?? 'main'),
   resolveSchemaHash: vi.fn(
     (_schemas: readonly { hash: string }[], schemaHash?: string | null) => schemaHash ?? 'schema-1',

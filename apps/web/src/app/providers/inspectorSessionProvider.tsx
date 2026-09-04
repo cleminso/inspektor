@@ -59,7 +59,6 @@ export interface InspectorSessionContextValue {
     branch: string,
     schemaHash: string,
   ) => ConnectionOpenResult
-  prefill: ReturnType<typeof useInspectorSession>['prefill']
 }
 
 type ConnectionOpenResult = 'accepted' | 'blocked'
@@ -256,7 +255,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
       deleteConnection: session.deleteConnection,
       getConnectionPreferences: session.getConnectionPreferences,
       setConnectionContext,
-      prefill: session.prefill,
     }),
     [
       activeConnection,

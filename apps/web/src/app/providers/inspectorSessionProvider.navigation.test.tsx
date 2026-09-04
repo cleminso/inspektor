@@ -32,7 +32,6 @@ const session = vi.hoisted(() => ({
     lastSchemaHash: 'schema-1',
   })),
   getRememberedBranches: vi.fn(() => ['main']),
-  prefill: null,
   resolveBranch: vi.fn(),
   resolveSchemaHash: vi.fn(),
   saveConnectionWithContext: vi.fn(),

@@ -6,7 +6,6 @@
   "ignorePatterns": [
     "apps/inspektor-test/**",
     "**/routeTree.gen.ts",
-    "packages/jazz-dev-tools/**",
     "tools/oxlint/antiSlop/**"
   ],
   "overrides": [

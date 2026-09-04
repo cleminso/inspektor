@@ -165,7 +165,6 @@
   "ignorePatterns": [
     "**/dist/**",
     "**/node_modules/**",
-    "packages/jazz-dev-tools/**",
     "tools/oxlint/antiSlop/**"
   ]
 }
