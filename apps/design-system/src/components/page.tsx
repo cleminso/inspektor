@@ -10,7 +10,7 @@ export function HomePage(): ReactElement {
   return (
     <DocsPage>
       <PageHeader
-        title="Inspector Design System"
+        title="Inspektor Design System"
         description="Foundations and components used to build consistent inspektor interfaces."
       />
     </DocsPage>

@@ -4,7 +4,7 @@ import { ConnRoute } from './-connRoute'
 
 export const Route = createFileRoute('/conn')({
   head: () => ({
-    meta: [{ title: 'Connections | Inspector' }],
+    meta: [{ title: 'Connections | Inspektor' }],
   }),
   component: ConnRoute,
 })

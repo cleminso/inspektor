@@ -1,6 +1,6 @@
-# Inspector Test
+# Inspektor Test
 
-Inspector Test is a curated Jazz app for exercising Inspector schema, permissions, data-grid, filtering, sorting, relation, and row-editor behavior.
+Inspektor Test is a curated Jazz app for exercising Inspektor schema, permissions, data-grid, filtering, sorting, relation, and row-editor behavior.
 
 ## Table of contents
 
@@ -11,12 +11,12 @@ Inspector Test is a curated Jazz app for exercising Inspector schema, permission
 - [Ephemeral fixture](#ephemeral-fixture)
 - [Commands](#commands)
 - [Dependency security](#dependency-security)
-- [Extending Inspector Test](#extending-inspektor-test)
+- [Extending Inspektor Test](#extending-inspektor-test)
 - [Agent rules](#agent-rules)
 
 ## Purpose
 
-Inspector Test keeps supported UI cases discoverable and deterministic. It is a schema, permissions, and fixture package, not a web application or scratch database.
+Inspeltor Test keeps supported UI cases discoverable and deterministic. It is a schema, permissions, and fixture package, not a web application or scratch database.
 
 Use focused tables instead of adding every case to one table. Stable row IDs make seeding idempotent and keep browser checks comparable.
 
@@ -60,10 +60,10 @@ The isolated fixture uses `jazz-tools/testing` to create an in-memory local serv
 
 1. Create and claim an app in Jazz Cloud.
 2. Add its app ID, admin secret, backend secret, and server URL to `.env.local`.
-3. Validate Inspector Test with `pnpm inspektor-test:validate`.
+3. Validate Inspektor Test with `pnpm inspektor-test:validate`.
 4. Initialize an empty cloud app with `pnpm inspektor-test:initialize`.
 5. Seed deterministic rows with `pnpm inspektor-test:seed`.
-6. Add the same connection values to Inspector and name it `Inspector Test`.
+6. Add the same connection values to Inspektor and name it `Inspektor Test`.
 
 Structural changes to the cloud app may require a Jazz migration. Create the required migration reported by `jazz-tools`, review it, and run the deploy command again.
 
@@ -75,11 +75,11 @@ Run:
 pnpm inspektor-test:fixture
 ```
 
-The command prints readiness text followed by one JSON object containing the connection name, server URL, app ID, admin secret, environment, and branch. Use those values in Inspector. Press Ctrl+C to stop the fixture.
+The command prints readiness text followed by one JSON object containing the connection name, server URL, app ID, admin secret, environment, and branch. Use those values in Inspektor. Press Ctrl+C to stop the fixture.
 
 Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, permission enforcement, repeatable seeding, and server disposal.
 
-Inspector browser acceptance tests run with `pnpm test:browser`. Playwright owns a direct loopback Vite server and an ephemeral Inspector Test fixture; it never uses the shared cloud connection.
+Inspektor browser acceptance tests run with `pnpm test:browser`. Playwright owns a direct loopback Vite server and an ephemeral Inspektor Test fixture; it never uses the shared cloud connection.
 
 ## Commands
 
@@ -91,13 +91,13 @@ Inspector browser acceptance tests run with `pnpm test:browser`. Playwright owns
 | `pnpm inspektor-test:seed` | Upsert deterministic cloud rows |
 | `pnpm inspektor-test:fixture` | Start an isolated local app |
 | `pnpm --filter inspektor-test test` | Test schema metadata, serialized data, relations, permission enforcement, repeatable seeding, and fixture disposal |
-| `pnpm test:browser` | Run Inspector browser acceptance tests against an isolated fixture |
+| `pnpm test:browser` | Run Inspeltor browser acceptance tests against an isolated fixture |
 
 ## Dependency security
 
-Inspector Test uses the current Jazz 2 `jazz-tools` package rather than the retired `create-jazz-app` package layout. Jazz currently pins vulnerable transitive versions of `protobufjs`, `@opentelemetry/core`, and `esbuild`. The workspace overrides those dependencies to patched compatible versions in `pnpm-workspace.yaml`.
+Inspeltor Test uses the current Jazz 2 `jazz-tools` package rather than the retired `create-jazz-app` package layout. Jazz currently pins vulnerable transitive versions of `protobufjs`, `@opentelemetry/core`, and `esbuild`. The workspace overrides those dependencies to patched compatible versions in `pnpm-workspace.yaml`.
 
-Keep the overrides until `jazz-tools` resolves to patched versions without them. Verify removal with `pnpm audit --prod` and the Inspector Test validation commands.
+Keep the overrides until `jazz-tools` resolves to patched versions without them. Verify removal with `pnpm audit --prod` and the Inspeltor Test validation commands.
 
 ## Extending Inspektor Test
 

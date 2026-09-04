@@ -1,8 +1,8 @@
 /**
- * Central route path definitions for Inspector runtime state.
+ * Central route path definitions for Inspektor runtime state.
  *
  * Content routes identify one saved local connection. Branch and schema remain persisted
- * connection preferences displayed by the Inspector header.
+ * connection preferences displayed by the Inspektor header.
  */
 export const appRoutes = {
   connections: '/conn',

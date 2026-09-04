@@ -11,7 +11,7 @@
 - [How workspace applications resolve the design system](#how-workspace-applications-resolve-the-design-system)
 - [Vite configuration](#vite-configuration)
 - [Static and deferred dependency graphs](#static-and-deferred-dependency-graphs)
-- [Runtime boundaries in the Inspector](#runtime-boundaries-in-the-inspektor)
+- [Runtime boundaries in the Inspektor](#runtime-boundaries-in-the-inspektor)
 - [Dependency roles](#dependency-roles)
 - [Adding a dependency or export](#adding-a-dependency-or-export)
 - [Validation](#validation)
@@ -19,11 +19,11 @@
 
 ## Purpose
 
-This document explains how the Inspector frontend is assembled and why its boundaries exist. It is a guide for deciding where new code and dependencies belong, rather than a complete API reference.
+This document explains how the Inspektor frontend is assembled and why its boundaries exist. It is a guide for deciding where new code and dependencies belong, rather than a complete API reference.
 
 The key model is:
 
-> `apps/web` owns Inspector product behavior and data. `@inspektor/ds` owns reusable UI behavior and presentation. `apps/design-system` documents and validates the public design-system contract.
+> `apps/web` owns Inspektor product behavior and data. `@inspektor/ds` owns reusable UI behavior and presentation. `apps/design-system` documents and validates the public design-system contract.
 
 The import-boundary rules for optional heavy behavior are specified in [docs/importBoundaryPlaybook.md](docs/importBoundaryPlaybook.md). Component-level decisions belong in the corresponding `docs/todo/*.md` checklist.
 
@@ -33,7 +33,7 @@ The repository is a PNPM workspace. The root workspace configuration includes ap
 
 | Location                  | Role                                            | May depend on                                                             |
 | ------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| `apps/web`                | Inspector product application                   | `@inspektor/ds`, product and data dependencies                            |
+| `apps/web`                | Inspektor product application                   | `@inspektor/ds`, product and data dependencies                            |
 | `apps/design-system`      | Component documentation and executable examples | public `@inspektor/ds` exports and documentation dependencies             |
 | `packages/design-system`  | The `@inspektor/ds` reusable UI package         | UI primitives and reusable interaction dependencies                       |
 | `packages/jazz-dev-tools` | Separate Jazz tooling package                   | Outside this frontend replacement architecture unless explicitly in scope |
@@ -75,7 +75,7 @@ It must not import package-private implementation files at runtime. If documenta
 
 ## Browser-to-feature execution flow
 
-The normal Inspector path is:
+The normal Inspektor path is:
 
 1. The browser loads the HTML entry produced by Vite for `apps/web`.
 2. The entry module mounts React and creates the TanStack Router.

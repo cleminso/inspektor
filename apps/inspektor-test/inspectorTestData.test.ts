@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { inspectorTestRows } from "./inspectorTestData.js";
 
-describe("Inspector Test data", () => {
+describe("Inspektor Test data", () => {
   it("pairs populated and null optional values", () => {
     expect(inspectorTestRows.columnTypeShowcase).toHaveLength(2);
     expect(inspectorTestRows.columnTypeShowcase[0]?.optionalTextValue).toBeTruthy();

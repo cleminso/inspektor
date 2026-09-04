@@ -12,7 +12,7 @@ const populatedWideJson: JsonValue = { width: "many columns" };
 const emptyJson: JsonValue = {};
 const longText = Array.from(
   { length: 40 },
-  (_, index) => `Segment ${String(index + 1).padStart(2, "0")}: Inspector content remains readable across long values.`,
+  (_, index) => `Segment ${String(index + 1).padStart(2, "0")}: Inspektor content remains readable across long values.`,
 ).join(" ");
 
 export const inspectorTestIds = {
@@ -25,7 +25,7 @@ export const inspectorTestRows = {
   projects: [
     {
       id: inspectorTestIds.project,
-      name: "Inspector Test",
+      name: "Inspektor Test",
     },
   ],
   columnTypeShowcase: [

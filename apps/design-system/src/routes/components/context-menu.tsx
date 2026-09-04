@@ -4,5 +4,5 @@ import { ContextMenuPage } from '@/components/content/components/contextMenu/pag
 
 export const Route = createFileRoute('/components/context-menu')({
   component: ContextMenuPage,
-  head: () => ({ meta: [{ title: 'Context Menu · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Context Menu · Inspektor Design System' }] }),
 })

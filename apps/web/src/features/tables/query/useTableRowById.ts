@@ -1,7 +1,7 @@
 import type { DynamicTableRow, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 
-import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 import type { TableRowId } from '@tables/tableTypes'
 
@@ -31,7 +31,7 @@ export function useTableRowById({
   const queryState = useJazzQueryState<DynamicTableRow>(
     client?.manager ?? null,
     queryBuilder,
-    INSPECTOR_QUERY_OPTIONS,
+    INSPEKTOR_QUERY_OPTIONS,
   )
 
   if (rowId === null) {

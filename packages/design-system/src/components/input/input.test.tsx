@@ -6,7 +6,7 @@ import { Input } from './input'
 afterEach(cleanup)
 
 describe('Input', () => {
-  it('projects Inspector visual decisions and invalid state', () => {
+  it('projects Inspektor visual decisions and invalid state', () => {
     render(
       <>
         <Input aria-label="Name" />

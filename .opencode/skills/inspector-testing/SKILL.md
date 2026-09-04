@@ -1,9 +1,9 @@
 ---
 name: inspektor-testing
-description: Implements and organizes Inspector tests with the correct Vitest project and Playwright boundary. Use when adding, renaming, or changing tests in apps/web or packages/design-system.
+description: Implements and organizes Inspektor tests with the correct Vitest project and Playwright boundary. Use when adding, renaming, or changing tests in apps/web or packages/design-system.
 ---
 
-# Inspector testing
+# Inspektor testing
 
 ## Table of contents
 
@@ -32,7 +32,7 @@ description: Implements and organizes Inspector tests with the correct Vitest pr
 
 ## Focus indicators
 
-- Use Vitest for Inspector-owned focus movement, roving tab stops, manual activation, and keyboard/pointer parity.
+- Use Vitest for Inspektor-owned focus movement, roving tab stops, manual activation, and keyboard/pointer parity.
 - Use a real browser for visible-focus claims. Inspect computed outline style, width, color, clipping, filled-state contrast, and forced-colors presentation.
 - Do not use generated StyleX class names as evidence that a focus indicator is visible.
 

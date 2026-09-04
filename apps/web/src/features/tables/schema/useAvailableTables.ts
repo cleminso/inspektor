@@ -1,5 +1,5 @@
 /**
- * Derives table navigation data from the active Inspector runtime schema.
+ * Derives table navigation data from the active Inspektor runtime schema.
  *
  * Jazz table names come from stored WASM schema metadata, so this hook provides a small
  * React-facing API for routes and sidebars that only need table availability.
@@ -15,9 +15,9 @@ interface UseAvailableTablesResult {
 }
 
 /**
- * Reads table navigation data from the active Inspector runtime.
+ * Reads table navigation data from the active Inspektor runtime.
  *
- * The Inspector does not import generated app schema code. Instead, it gets table names
+ * The Inspektor does not import generated app schema code. Instead, it gets table names
  * from the runtime schema projection, which is the Jazz stored schema metadata loaded for the
  * active connection and schema hash.
  */

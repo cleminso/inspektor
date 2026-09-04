@@ -20,7 +20,7 @@ import { readPrefillConfig, type PrefillConfig } from '@app/connections/prefill'
 import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStorage'
 
 /**
- * React-facing API for the Inspector connection session.
+ * React-facing API for the Inspektor connection session.
  *
  * Components use this instead of reading localStorage directly so connection CRUD,
  * URL-provided dev links, active connection selection, and Jazz runtime preferences stay
@@ -57,12 +57,12 @@ interface SessionState {
 }
 
 /**
- * Owns the Inspector's saved connection session.
+ * Owns the Inspektor's saved connection session.
  *
  * From the Jazz perspective, it selects the connection details and runtime context that
  * `useInspectorRuntime` needs to create an in-memory Jazz admin client.
  *
- * From the Inspector perspective, it provides a stable UI API for saved connections,
+ * From the Inspektor perspective, it provides a stable UI API for saved connections,
  * remembered branches, selected schema hashes, and URL-provided prefill data.
  */
 export function useInspectorSession(): UseInspectorSessionResult {

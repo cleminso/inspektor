@@ -2,8 +2,8 @@
 
 Author: Cleminso
 Status: v1 - Working progress
-Repo-URL: https://github.com/regardedev/inspektor/
-Doc-URL: https://github.com/regardedev/inspektor/tree/main/docs/design-document.md
+Repo-URL: https://github.com/cleminso/inspektor/
+Doc-URL: https://github.com/cleminso/inspektor/tree/main/docs/design-document.md
 Audience: Project author and AI agents working on the implementation. Secondary, future contributors who want to understand
 the product direction.
 
@@ -18,7 +18,7 @@ the product direction.
 - [Glossary](#glossary)
   - [Staged mutation lifecycle](#staged-mutation-lifecycle)
 - [Known pain points](#known-pain-points)
-- [Inspector](#inspektor)
+- [Inspektor](#inspektor)
   - [Runtime bootstrap](#runtime-bootstrap)
     - [Accepted-intent WASM preparation](#accepted-intent-wasm-preparation)
     - [Startup chain](#startup-chain)
@@ -33,7 +33,7 @@ the product direction.
 
 ## Objective
 
-Inspector is a local, schema-driven developer tool for Jazz applications. It helps developers inspect their app data,
+Inspektor is a local, schema-driven developer tool for Jazz applications. It helps developers inspect their app data,
 schema, permissions, and active sync-server query subscriptions from one interface by directly talking to the sync system.
 
 v1 continues the MVP direction with stronger UI/UX foundations, clearer interaction design, better performance, and more maintainable architecture.
@@ -50,14 +50,14 @@ I'm using Jazz because they made my developer experience simpler to create appli
 local-first, real-time sync. But during my developer experience there is the moment to use the inspektor that I'm not
 satisfied.
 
-I found the Inspector experience quality does not represent the same quality as Jazz-tools offer.
+I found the Inspektor experience quality does not represent the same quality as Jazz-tools offer.
 
 I want to build an alternative Jazz inspektor that's focus on modern UX and easier to use and it's central piece for a Jazz developer that require attention and cares.
 
 I'm making assumptions about the UX what I think is necessary for the inspektor. The "UX quality" is my own judgment. My end
-goal is to present this work to Jazz team and discuss to join them to work on the official Inspector. I see myself working on frontend part of Jazz, such as the official Inspector and Jazz dashboard.
+goal is to present this work to Jazz team and discuss to join them to work on the official Inspektor. I see myself working on frontend part of Jazz, such as the official Inspektor and Jazz dashboard.
 
-The direction I take for this Inspector is quite different from the official one, who is more "standalone" about the framework used (pure css). Where I'm going with modern framework choice that I'm more comfortable with, and found more ergonomic. See Architecture
+The direction I take for this Inspektor is quite different from the official one, who is more "standalone" about the framework used (pure css). Where I'm going with modern framework choice that I'm more comfortable with, and found more ergonomic. See Architecture
 
 ## Users
 
@@ -80,10 +80,10 @@ Make the data table the core product surface
 
 ## Non-goals
 
-Inspector v1:
+Inspektor v1:
 
 - is not a generic database client. It is specific to Jazz concepts such as schemas, permissions, branches, sync-server query subscriptions, and admin client access.
-- does not replace Jazz's in-app Inspector overlay. The standalone Inspector focuses on remote admin exploration, while the overlay focuses on an application's local identity, local store, and active development context. Their user experiences may share foundations without becoming the same product surface.
+- does not replace Jazz's in-app Inspektor overlay. The standalone Inspektor focuses on remote admin exploration, while the overlay focuses on an application's local identity, local store, and active development context. Their user experiences may share foundations without becoming the same product surface.
 - does not generate or import app-specific query builders, table views, or custom admin screens
 - remains schema-driven and generic.
 - does not implement traces, logs, metrics collection, or a dedicated telemetry query endpoint. Those belong to a later telemetry-focused version.
@@ -194,7 +194,7 @@ flowchart TD
 
 ## Glossary
 
-**Inspector**
+**Inspektor**
 
 A local web React app that **connects directly to a Jazz sync server**. It loads schema metadata, creates an in-memory Jazz
 admin client, and renders UI elements for developers to inspect their Jazz application, such as schema-driven tools,
@@ -206,8 +206,8 @@ It is not tied to Jazz Cloud only. It is not driven by generated app-specific co
 
 A Jazz client acquired and managed through `JazzProvider` with `adminSecret` and `driver: { type: "memory" }`.
 
-`adminSecret` gives the Inspector admin access to inspect schema metadata and app data. The memory driver keeps the Inspector
-runtime local and non-durable, so inspected data is not persisted by the Inspector client between sessions.
+`adminSecret` gives the Inspektor admin access to inspect schema metadata and app data. The memory driver keeps the Inspektor
+runtime local and non-durable, so inspected data is not persisted by the Inspektor client between sessions.
 
 **Connections**:
 
@@ -219,7 +219,7 @@ From Jazz's perspective, a connection is a single active WebSocket transport lin
 
 **Workspace context**
 
-The selected connection, branch, and schema hash that define one Inspector runtime. The connection id stays in the route so a
+The selected connection, branch, and schema hash that define one Inspektor runtime. The connection id stays in the route so a
 browser tab can resolve its saved local connection. Branch is restored from the connection preferences. Schema hash is selected
 from explicit `?schema=` URL state or the first advertised schema and remains visible in the header.
 
@@ -244,7 +244,7 @@ Subscriptions control is reserved for the separate Live queries route.
 Server-side subscriptions that Jazz tracks for active queries. They describe which table/query/branch combinations the sync
 server is currently maintaining, not a local React state or a static query result.
 
-From the Inspector perspective, query subscription telemetry helps developers understand which app reads are active on the
+From the Inspektor perspective, query subscription telemetry helps developers understand which app reads are active on the
 server and jump from a subscription record back into the data explorer when the query can be mapped to table filters.
 
 A Jazz query subscription is a live query registered by a Jazz client. The query is forwarded to the sync system unless
@@ -269,7 +269,7 @@ persisted through Apply changes.
 **Mutation ledger**
 
 The in-memory, table-scoped collection of staged updates and deletions. Each table has an isolated ledger identified by its
-connection, branch, schema hash, and table name. The Inspector never combines changes from different tables into one Apply
+connection, branch, schema hash, and table name. The Inspektor never combines changes from different tables into one Apply
 operation.
 
 ### Staged mutation lifecycle
@@ -281,7 +281,7 @@ operation.
    close; `Discard and close` clears that table's ledger and closes the tab. Closing a tab never silently discards staged changes.
 5. Changing the connection, branch, or schema requires the developer to resolve affected ledgers because their mutation scope is
    no longer valid. Confirming discard clears them; canceling keeps the current scope active.
-6. Refreshing or closing the browser destroys the in-memory ledgers. The Inspector requests the browser's unload warning when
+6. Refreshing or closing the browser destroys the in-memory ledgers. The Inspektor requests the browser's unload warning when
    unresolved mutations or recoverable invalid drafts exist; the browser controls whether it appears and all displayed copy.
 
 **Floating widget**
@@ -314,9 +314,9 @@ disclosure, `Apply changes` for persistence, `Discard` for removal, and `Needs a
 
 ## Known pain points
 
-_First, the official Jazz Inspector is working, actions can be done and achieve the original purpose._
+_First, the official Jazz Inspektor is working, actions can be done and achieve the original purpose._
 
-Some of my personal pain points, mostly about the UX and navigation inside the Inspector:
+Some of my personal pain points, mostly about the UX and navigation inside the Inspektor:
 
 - navigation to switch connection
 - never know which schema hash is the most recent
@@ -326,9 +326,9 @@ Some of my personal pain points, mostly about the UX and navigation inside the I
   - keyboard actions
   - quick way to select and/or copy row/cell
 - lack of clarity with `live-query` page
-- official Inspector folder is quite "messy" hard to make a contribution to
+- official Inspektor folder is quite "messy" hard to make a contribution to
 
-## Inspector
+## Inspektor
 
 The web inspektor is an app for Jazz developers to explore their application data. It loads published schema metadata, creates
 an in-memory Jazz admin client, and renders generic schema-driven tools for reading, filtering, mutating, and inspecting
@@ -338,12 +338,12 @@ Because of this, the inspektor can work with arbitrary app schemas without impor
 
 The inspektor is close to an **admin client talking to the sync system** rather than a purely local debug tool. It's for that the default durability/mutation tier is `edge`
 
-To me, Jazz's in-app overlay and standalone Inspector answer different problems.
+To me, Jazz's in-app overlay and standalone Inspektor answer different problems.
 
 - The overlay joins the host application's local store and identity, which makes it useful for local and unsynced application state.
-- THe standalone Inspector keeps an independant remote-admin workflow, switching connections, branches, and schema hashes then inspecting Live queries.
+- THe standalone Inspektor keeps an independant remote-admin workflow, switching connections, branches, and schema hashes then inspecting Live queries.
 
-Standalone Inspector behavior is my product priority here.
+Standalone Inspektor behavior is my product priority here.
 
 ### Composition
 
@@ -355,11 +355,11 @@ Standalone Inspector behavior is my product priority here.
 
 ## User interface
 
-There is the list of screen and components that constitute the Inspector interface.
+There is the list of screen and components that constitute the Inspektor interface.
 
 ### Workbench
 
-The Inspector shell keeps connection context separate from routed feature content. The Tables route owns the implemented
+The Inspektor shell keeps connection context separate from routed feature content. The Tables route owns the implemented
 workspace model; the Live queries route is separate and does not share the Tables tab provider.
 
 It follows this structure:
@@ -376,7 +376,7 @@ model.
 
 #### Routing and local context
 
-Inspector routes describe the active content inside one saved local connection:
+Inspektor routes describe the active content inside one saved local connection:
 
 - `/conn/:connectionId/tables` opens the table workspace and selects an available table when needed.
 - `/conn/:connectionId/tables/:tableName` opens the selected table. `view=schema` selects its Schema representation.
@@ -392,13 +392,13 @@ remain dependent on the locally saved connection and never carry the admin secre
 Open table items, item order, recent views, and navigator state are local workspace state. The active route describes table
 content and can recreate or focus its canonical item, but it does not make the visual tab part of the route model.
 
-The focused routing decisions and examples live in [Inspector route structure](notes/routing.md).
+The focused routing decisions and examples live in [Inspektor route structure](notes/routing.md).
 
 ### Connection management
 
 Connection management is the entry point for developers to inspect their Jazz app. It enables developers to create a connection to Jazz server with their app credentials, select branch and schema.
 
-The flow must prevent silent connection failure: if the Inspector cannot validate the connection and schema are valid, it should keep the user in connection setup instead of opening a broken dashboard.
+The flow must prevent silent connection failure: if the Inspektor cannot validate the connection and schema are valid, it should keep the user in connection setup instead of opening a broken dashboard.
 
 This flow **must answer**:
 
@@ -422,7 +422,7 @@ This flow **must answer**:
 
 1. First-time user
    - has a Jazz app
-   - wants to establish a connection via the Inspector for the first time
+   - wants to establish a connection via the Inspektor for the first time
    - has copied credentials manually or opened a prefill link
    - needs confidence that the connection points to the intended app
    - needs to understand which schemaHash is latest
@@ -431,13 +431,13 @@ This flow **must answer**:
    - has saved connections
    - expects saved connections to reopen quickly
    - needs to know whether the saved connection is still valid
-   - needs to know whether Inspector opened the latest schema or a previous one
+   - needs to know whether Inspektor opened the latest schema or a previous one
    - may create a new connection and need to perform it quickly
    - may be surprised that a saved local connection still needs the local runtime/server running
 3. Debugging wrong app
    - sees unexpected rows, missing tables, or no query subscriptions
    - needs to verify `serverUrl`, `appId`, `branch` and `schemaHash`
-   - needs confidence that Inspector is attached to the same app/runtime they are debugging
+   - needs confidence that Inspektor is attached to the same app/runtime they are debugging
 
 #### How it works
 
@@ -449,14 +449,14 @@ From Jazz's perspective, a connection is a single active WebSocket transport lin
 
 #### v1 required capabilities
 
-| Capability                | Notes                                            |
-| ------------------------- | ------------------------------------------------ |
-| Add connection            |                                                  |
-| Edit connection           | Revalidate and select from the returned schemas  |
-| Browse active connections |                                                  |
-| Connection switching      |                                                  |
-| Delete connection         |                                                  |
-| Connection prefill        | Populate the connection form from a URL           |
+| Capability                | Notes                                           |
+| ------------------------- | ----------------------------------------------- |
+| Add connection            |                                                 |
+| Edit connection           | Revalidate and select from the returned schemas |
+| Browse active connections |                                                 |
+| Connection switching      |                                                 |
+| Delete connection         |                                                 |
+| Connection prefill        | Populate the connection form from a URL         |
 
 Must support:
 
@@ -488,8 +488,8 @@ If validation fails, render the validation error and keep the edit form open. If
 
 #### Prefill connection
 
-Jazz dev tooling can print a direct Inspector link with connection fields in the URL. The Inspector parses query and fragment
-parameters into the same draft used by the connection form. Fragment parameters avoid sending `adminSecret` in the Inspector
+Jazz dev tooling can print a direct Inspektor link with connection fields in the URL. The Inspektor parses query and fragment
+parameters into the same draft used by the connection form. Fragment parameters avoid sending `adminSecret` in the Inspektor
 page request; query parameters remain supported for compatibility.
 
 #### Saved connection availability
@@ -497,15 +497,15 @@ page request; query parameters remain supported for compatibility.
 Saved connections persist credentials and preferences in local storage. They do not persist the stored schema payload or the
 server's schema hash list.
 
-Opening a saved connection still needs the Jazz server at `serverUrl` to be reachable when Inspector resolves schema hashes,
+Opening a saved connection still needs the Jazz server at `serverUrl` to be reachable when Inspektor resolves schema hashes,
 fetches the selected stored schema, and creates the admin client.
 
 If the app dev server only produced the inspektor link but the Jazz server is remote and still reachable, the saved connection
 can open without the app dev server. If the app dev server owns the managed local Jazz runtime, stopping it makes the saved
 connection unavailable until the runtime is running again.
 
-When resolving `/conn/:connectionId`, Inspector reads the saved branch and fetches the available schema hashes. A valid explicit
-`?schema=` value wins; otherwise Inspector selects the first advertised schema. A remembered schema is used only as a fallback
+When resolving `/conn/:connectionId`, Inspektor reads the saved branch and fetches the available schema hashes. A valid explicit
+`?schema=` value wins; otherwise Inspektor selects the first advertised schema. A remembered schema is used only as a fallback
 when schema discovery fails. Runtime bootstrap can still fail if the server cannot return the schema or create the admin client.
 
 UI representation:
@@ -519,7 +519,7 @@ UI representation:
 
 #### Purpose
 
-Runtime bootstrap turns a selected connection, branch, and schema hash into the active Inspector runtime. All data surfaces depend on this runtime.
+Runtime bootstrap turns a selected connection, branch, and schema hash into the active Inspektor runtime. All data surfaces depend on this runtime.
 
 #### Accepted-intent WASM preparation
 
@@ -564,7 +564,7 @@ Table mounting does not preload CodeMirror. A structured editor mount starts the
 
 #### Why memory driver
 
-The Inspector creates a local admin client with `driver: { type: "memory" }` because it needs live Jazz runtime behavior without persisting inspected app data in the Inspector client.
+The Inspektor creates a local admin client with `driver: { type: "memory" }` because it needs live Jazz runtime behavior without persisting inspected app data in the Inspektor client.
 
 ### Table explorer
 
@@ -602,18 +602,18 @@ This flow **must answer**:
 
 #### v1 required capabilities
 
-| Capability              | Notes                                                                          |
-| ----------------------- | ------------------------------------------------------------------------------ |
-| Read rows clearly       | Cell rendering based on column type, column labels, truncation, copy behavior  |
-| Browse large tables     | Page-windowed loading with row-count controls                                  |
-| Filter rows             | Existing generic filter builder, validation, visible active filters            |
-| Select and inspect rows | Side panel, select state, row details                                          |
-| Foreign-key relation    | Relation cells between tables, missing relation handling, workspace items      |
-| Expose schema context   | Column types, references, nullable/required state, permissions display         |
-| Edit existing rows      | Side-panel edits with validation and unsupported type handling                 |
-| Insert rows             | Required fields, defaults, validation, permission hints                        |
-| Delete rows             | Destructive confirmation with reversible staged deletion before Apply          |
-| Show live row updates   | React to Jazz row changes without forcing a manual refresh                      |
+| Capability              | Notes                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| Read rows clearly       | Cell rendering based on column type, column labels, truncation, copy behavior |
+| Browse large tables     | Page-windowed loading with row-count controls                                 |
+| Filter rows             | Existing generic filter builder, validation, visible active filters           |
+| Select and inspect rows | Side panel, select state, row details                                         |
+| Foreign-key relation    | Relation cells between tables, missing relation handling, workspace items     |
+| Expose schema context   | Column types, references, nullable/required state, permissions display        |
+| Edit existing rows      | Side-panel edits with validation and unsupported type handling                |
+| Insert rows             | Required fields, defaults, validation, permission hints                       |
+| Delete rows             | Destructive confirmation with reversible staged deletion before Apply         |
+| Show live row updates   | React to Jazz row changes without forcing a manual refresh                    |
 
 #### Tables navigator
 
@@ -716,10 +716,10 @@ navigation.
 Most Table Explorer actions converge in the data table. It brings row reading, filtering, selection, relation navigation,
 schema context, and safe edits into one coherent surface.
 
-The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspector rules.
+The data table does not become table-specific UI. Special behavior comes from schema metadata or generic Inspektor rules.
 
 `@inspektor/ds` owns the reusable `DataGrid` presentation system and its explicit TanStack Table feature registry. `apps/web`
-owns the Inspector composition, TanStack table construction, Jazz queries, schema-derived columns, filters, relations, routes,
+owns the Inspektor composition, TanStack table construction, Jazz queries, schema-derived columns, filters, relations, routes,
 and mutations. The design-system root receives a controlled feature-aware `DataGridTable<TData>` instance rather than receiving
 duplicate data, columns, sorting, pagination, or selection state.
 
@@ -968,7 +968,7 @@ synthetic row IDs remain read-only.
 
 Jazz byte values are `Uint8Array` values stored as SQL `BYTEA`. Because a byte sequence has no canonical clipboard text form,
 binary copy commands name the encoding explicitly. Hex supports byte-level debugging and Base64 supports transport through APIs
-and text formats. PostgreSQL literals and JavaScript indexed-object serialization are not primary Inspector representations.
+and text formats. PostgreSQL literals and JavaScript indexed-object serialization are not primary Inspektor representations.
 
 Reusable, type-specific presentation and editor components belong in `packages/design-system`. The components remain independent
 from Jazz schema objects: they receive constrained display values, metadata, states, and callbacks. `apps/web` owns the mapping
@@ -1008,7 +1008,7 @@ The browsing model prioritizes:
 - clear difference between loading, empty, and filtered-empty states
 - no avoidable reloading when selection, filters, or column visibility changes
 
-Inspector uses Jazz `limit` and `offset` directly:
+Inspektor uses Jazz `limit` and `offset` directly:
 
 - `limit(pageSize + 1)` detects whether another page exists
 - `offset(pageIndex * pageSize)` selects the current page window
@@ -1028,7 +1028,7 @@ Defaults:
 - default sort: stable `id` order
 - page and non-default page size: URL-backed and saved with the canonical Data item
 
-If a requested page has no rows, Inspector returns to the first page.
+If a requested page has no rows, Inspektor returns to the first page.
 
 Avoid exact `Page X of Y` and exact record counts for v1 unless Jazz exposes a reliable count.
 
@@ -1113,7 +1113,7 @@ Supported operators:
 
 Operators are schema-gated by column type. Filter clauses combine as a flat `AND`. Each clause becomes a generic Jazz `.where(...)` condition; `eq` uses shorthand equality and other operators use explicit operator records.
 
-Filters are serialized as URL-backed tokens: `{ id, column, operator, value }`. Advanced query shapes remain out of scope. Query Subscription links into the Table Explorer only map filters Inspector can translate safely.
+Filters are serialized as URL-backed tokens: `{ id, column, operator, value }`. Advanced query shapes remain out of scope. Query Subscription links into the Table Explorer only map filters Inspektor can translate safely.
 
 Applied clauses and in-progress input are separate states. Applied clauses are URL-backed. The current column, operator, raw
 value, completion stage, and validation issue are transient memory state. Cell context actions and Query Subscription links use
@@ -1203,16 +1203,16 @@ Apply uses direct Jazz writes in deterministic update, then deletion groups. The
 complete. A rejection preserves failed and unattempted entries and displays the error without implying rollback or atomicity.
 
 Installed Jazz supports authority-validated `db.transaction(...)`, but the initial ledger Apply path intentionally preserves the
-existing direct generic mutation boundary. Inspector does not promise atomic Apply behavior.
+existing direct generic mutation boundary. Inspektor does not promise atomic Apply behavior.
 
 Permissions are shown as debugging hints, not guarantees. The server/runtime response is authoritative.
 
-Inspector follows Jazz runtime behavior. The form is generated from stored schema metadata and writes through the generic Jazz
+Inspektor follows Jazz runtime behavior. The form is generated from stored schema metadata and writes through the generic Jazz
 runtime: `db.insert(...)`, `db.update(...)`, and `db.delete(...)`.
 
-Inspector does not disable admin insert, update, or delete only from stored permissions. If a mutation fails, preserve input and show the rejection.
+Inspektor does not disable admin insert, update, or delete only from stored permissions. If a mutation fails, preserve input and show the rejection.
 
-Values are parsed conservatively from schema metadata. Primitive values, enums, JSON-like values, arrays, and relation ids can be edited when Inspector can serialize them safely. Values Inspector cannot serialize safely remain visible and read-only.
+Values are parsed conservatively from schema metadata. Primitive values, enums, JSON-like values, arrays, and relation ids can be edited when Inspektor can serialize them safely. Values Inspektor cannot serialize safely remain visible and read-only.
 
 UI representation:
 
@@ -1258,11 +1258,11 @@ v1 does not expose `upsert`, an arbitrary transaction builder, or an app-specifi
 table ledger as one product operation, but the interface does not promise database-level atomicity unless the Jazz mutation
 boundary provides it.
 
-Inspector also does not aim to support every Jazz query shape in the Table Explorer. v1 focuses on flat table queries: filters, sorting, limit, and offset.
+Inspektor also does not aim to support every Jazz query shape in the Table Explorer. v1 focuses on flat table queries: filters, sorting, limit, and offset.
 
 #### Explicit live-update UX
 
-Jazz data can change while the developer is inspecting a table through new rows, updated rows, deletes, or applied Inspector
+Jazz data can change while the developer is inspecting a table through new rows, updated rows, deletes, or applied Inspektor
 changes.
 
 v1 makes live updates visible without forcing the user to refresh and lose context.
@@ -1270,17 +1270,17 @@ v1 makes live updates visible without forcing the user to refresh and lose conte
 Behavior:
 
 - update visible rows reactively through the active Jazz query
-- highlight rows inserted through the live query, whether from Inspector or an external Jazz client
-- highlight cells that just changed through the live query, whether from Inspector or an external Jazz client
+- highlight rows inserted through the live query, whether from Inspektor or an external Jazz client
+- highlight cells that just changed through the live query, whether from Inspektor or an external Jazz client
 - preserve the selected row and side panel when possible
 - avoid jumping scroll position or replacing the visible context unexpectedly
 
 Live-change highlights are ephemeral and brief. Any Jazz update that reaches the active query — local or external — can trigger a
 row or cell highlight so the developer sees what changed without scanning the table.
 
-Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspector can unsubscribe by skipping a query, but freezing visible rows would require an inspektor-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
+Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspektor can unsubscribe by skipping a query, but freezing visible rows would require an inspektor-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
 
-An out-of-scope `Live`/`Paused` presentation can freeze an Inspector-owned visible snapshot while Jazz remains connected and the table
+An out-of-scope `Live`/`Paused` presentation can freeze an Inspektor-owned visible snapshot while Jazz remains connected and the table
 subscription continues receiving changes. The paused state can report pending inserted, updated, and deleted rows, then
 reconcile and highlight changes when returning to `Live`. Jazz `Db.disconnect()` and `Db.reconnect()` are not used for this
 feature because they control remote synchronization for the whole database connection rather than one visible table, do not
@@ -1341,7 +1341,7 @@ This flow **must answer**:
 - Does not support arbitrary query playground behavior.
 - Does not persist snapshots across reloads.
 
-#### Data source in Inspector
+#### Data source in Inspektor
 
 The planned data source is the Jazz server introspection endpoint exposed by `fetchServerSubscriptions(...)` from `Jazz-tools`.
 
@@ -1365,7 +1365,7 @@ Practical meaning:
 
 If the app changes a filter, the query shape changes. The next snapshot shows the new query shape if it is active. The old query shape only remains visible if it is still active when the server snapshot is fetched.
 
-The Live queries view does not show returned row data. To inspect data, Inspector can open the Table Explorer on the subscription table and apply supported filters recovered from the query JSON.
+The Live queries view does not show returned row data. To inspect data, Inspektor can open the Table Explorer on the subscription table and apply supported filters recovered from the query JSON.
 
 **Important fields**
 
@@ -1398,7 +1398,7 @@ The Live queries view does not show returned row data. To inspect data, Inspecto
 
 It shows what the server is currently tracking.
 
-It's server telemetry, not local client introspection. It polls like the Jazz standalone Inspector. v1 should keep automatic refresh and add a manual refresh action.
+It's server telemetry, not local client introspection. It polls like the Jazz standalone Inspektor. v1 should keep automatic refresh and add a manual refresh action.
 
 The refresh control should not be labeled as a real-time stream. It controls snapshot fetching.
 
@@ -1416,7 +1416,7 @@ The server renders grouped query records that include:
 - `branches`
 - `query`
 
-Polls the server for grouped active subscriptions and links them back into the Table Explorer when Inspector can safely map the query filters.
+Polls the server for grouped active subscriptions and links them back into the Table Explorer when Inspektor can safely map the query filters.
 
 #### Live queries navigator
 
@@ -1444,7 +1444,7 @@ The snapshot `generatedAt` should live in the navigator toolbar because it belon
 appear in the opened Query item.
 
 Branch should not be a default filter while the header already scopes the workspace to a branch. If telemetry returns multiple
-branch contexts inside the same Inspector session, then branch filtering can be reconsidered.
+branch contexts inside the same Inspektor session, then branch filtering can be reconsidered.
 
 UI representation:
 
@@ -1513,7 +1513,7 @@ Fields can include:
 - `result_element_index`
 - `relation_ir`
 
-Nested values like `disjuncts` and `relation_ir` should render as expandable tree sections. Inspector can show readable labels where possible and fall back to structured key/value rows when the shape is not yet understood.
+Nested values like `disjuncts` and `relation_ir` should render as expandable tree sections. Inspektor can show readable labels where possible and fall back to structured key/value rows when the shape is not yet understood.
 
 If a field cannot be translated reliably, the summary should say that the information is present but only readable in raw JSON.
 
@@ -1559,7 +1559,7 @@ v1 should support these Live queries scenarios:
 3. Developer notices a high `count` and checks whether several components subscribe to the same query shape.
 4. Developer selects a subscription and reads its overview without starting from raw JSON.
 5. Developer expands nested query fields like `disjuncts` or `relation_ir` in the structured query tree.
-6. Developer opens the matching Table Explorer table when Inspector can recover supported filters from the query JSON.
+6. Developer opens the matching Table Explorer table when Inspektor can recover supported filters from the query JSON.
 7. Developer sees an empty view and understands possible causes instead of assuming the app has no reads.
 8. Developer pauses auto-refresh while inspecting a selected subscription, then refreshes once when ready.
 
@@ -1571,7 +1571,7 @@ v1 focus on improve syntax rendering, JSON readability.
 
 This interface **must answer**:
 
-- What schema metadata did Inspector load for this table?
+- What schema metadata did Inspektor load for this table?
 - Which columns exist for this table?
 - What raw permissions metadata is available?
 - Is permission data missing, or did loading fail?
@@ -1682,15 +1682,15 @@ Not v1:
 
 ## Attack surface
 
-Inspector is a developer tool that stores admin credentials locally and can connect to arbitrary configured Jazz servers. Its
+Inspektor is a developer tool that stores admin credentials locally and can connect to arbitrary configured Jazz servers. Its
 main risks are credential exposure in browser storage or URLs and unintended transmission outside the configured server.
 
 - adminSecret is sensitive and must not be logged.
 - Connections are stored locally.
 - Connection prefill can pass credentials through URL hash or query parameters; fragments avoid including them in the page request.
-- Inspector should avoid sending credentials anywhere except the configured Jazz server.
+- Inspektor should avoid sending credentials anywhere except the configured Jazz server.
 - Saved connections do not persist schema payloads.
-- Inspector does not provide application authentication or hosting access control.
+- Inspektor does not provide application authentication or hosting access control.
 
 ---
 

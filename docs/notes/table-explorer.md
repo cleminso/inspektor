@@ -232,12 +232,12 @@ Confirmed source:
 
 - Regarde: `apps/web/src/lib/table-explorer/genericQueryBuilder.ts`
 - Jazz: `packages/jazz-tools/src/runtime/query-adapter.ts`
-- Official Inspector: `packages/inspector/src/utility/generic-query-builder.ts`
+- Official Inspektor: `packages/inspector/src/utility/generic-query-builder.ts`
 
 Unknown:
 
 - Jazz exports `allRowsInTableQuery(tableName, schema)` for the simplest arbitrary-table read.
-- Jazz does not appear to export a full generic query builder factory matching the official Inspector's implementation.
+- Jazz does not appear to export a full generic query builder factory matching the official Inspektor's implementation.
 
 ## Filtering and sorting
 
@@ -358,9 +358,9 @@ Permissions:
 - The Table Explorer does not currently use stored permissions to hide or disable mutation UI.
 - Mutations are attempted through Jazz APIs, and failures surface as mutation errors.
 
-## Official Jazz Inspector comparison
+## Official Jazz Inspektor comparison
 
-The official standalone Inspector uses the same general approach:
+The official standalone Inspektor uses the same general approach:
 
 - create a Jazz client
 - fetch stored schema
@@ -375,9 +375,9 @@ The official standalone Inspector uses the same general approach:
 
 Notable differences found in source:
 
-- Official Inspector uses offset pagination with `limit(pageSize + 1)` and `offset(pageIndex * pageSize)`.
+- Official Inspektor uses offset pagination with `limit(pageSize + 1)` and `offset(pageIndex * pageSize)`.
 - Regarde currently grows the limit from offset `0`, which acts like incremental loading.
-- Official Inspector has no row detail/sidebar route in the inspected source.
+- Official Inspektor has no row detail/sidebar route in the inspected source.
 - Regarde already has row side-panel foundations.
 
 Confirmed official source:

@@ -4,5 +4,5 @@ import { CheckboxGroupPage } from '@/components/content/components/checkboxGroup
 
 export const Route = createFileRoute('/components/checkbox-group')({
   component: CheckboxGroupPage,
-  head: () => ({ meta: [{ title: 'Checkbox Group · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Checkbox Group · Inspektor Design System' }] }),
 })

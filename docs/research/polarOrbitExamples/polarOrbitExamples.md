@@ -5,7 +5,7 @@
 - [Why the values are separate](#why-the-values-are-separate)
 - [Evidence](#evidence)
 - [Risks](#risks)
-- [Recommended model for Inspector](#recommended-model-for-inspektor)
+- [Recommended model for Inspektor](#recommended-model-for-inspektor)
 - [Implementation constraints](#implementation-constraints)
 - [Escalation points](#escalation-points)
 - [Sources](#sources)

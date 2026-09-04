@@ -82,7 +82,7 @@
   - Produce a faithful whole-row Copy JSON serialization from the same normalized representation.
   - Add unit tests for schema ordering, unavailable fields, Date values, bytes, references, arrays, Row tuples, JSON containers,
     non-finite numbers, cycles, and unsupported values.
-  - Reference: [Data model](./design.md#data-model), [Inspector integration](./design.md#inspektor-integration).
+  - Reference: [Data model](./design.md#data-model), [Inspektor integration](./design.md#inspektor-integration).
 
 - [x] 10. Integrate read-only `JSON` representation into the row side pane.
   - Add `Details` and `JSON` representations through the design-system `ToggleGroup`.
@@ -91,13 +91,13 @@
   - Key the representation by stable row identity so a row change restores configured expansion.
   - Add application-owned search and whole-row Copy JSON controls around the tree.
   - Add integration tests for representation switching, hidden fields, search, copying, and read-only behavior.
-  - Reference: [Inspector integration](./design.md#inspektor-integration).
+  - Reference: [Inspektor integration](./design.md#inspektor-integration).
 
 - [x] 11. Reuse `JsonView` for read-only structured fallback inspection.
   - Use the CodeMirror-backed `CodeEditor` when a structured runtime value can be represented safely as source.
   - Use `JsonView` when normalization produces an object or array fallback instead.
   - Add field-level integration tests proving that read-only viewing and editable Details controls do not share mutation behavior.
-  - Reference: [Inspector integration](./design.md#inspektor-integration).
+  - Reference: [Inspektor integration](./design.md#inspektor-integration).
 
 - [ ] 12. Close final component correctness and evidence gaps.
   - Render selectable object and array punctuation as valid JSON.
@@ -106,8 +106,8 @@
   - Resolve the open full-source traversal and root-array representation decisions.
 
 - [ ] 13. Complete cross-package and running-application verification.
-  - Run design-system, documentation, and Inspector tests, typechecks, focused lint, prop extraction checks, and production builds.
+  - Run design-system, documentation, and Inspektor tests, typechecks, focused lint, prop extraction checks, and production builds.
   - Verify pointer selection, keyboard navigation, search highlighting, narrow panes, long values, large branches, and row switching in
-    the running Inspector.
+    the running Inspektor.
   - Confirm the complete-row `JSON` representation exposes no mutation path.
   - Reference: [Testing strategy](./design.md#testing-strategy).

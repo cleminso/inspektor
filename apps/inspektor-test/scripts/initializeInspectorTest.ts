@@ -20,4 +20,4 @@ const connection = {
 await pushSchema({ ...connection, schema: app });
 const result = await deploy({ ...connection, permissions, schema: app });
 
-console.log(`Initialized Inspector Test with schema ${result.schema.hash}.`);
+console.log(`Initialized Inspektor Test with schema ${result.schema.hash}.`);

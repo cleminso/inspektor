@@ -1,8 +1,8 @@
 /**
- * Defines how the Inspector recognizes a Jazz app connection.
+ * Defines how the Inspektor recognizes a Jazz app connection.
  *
  * Dev-tool links can be opened repeatedly, so matching is based on the Jazz admin
- * credentials rather than Inspector labels or view preferences.
+ * credentials rather than Inspektor labels or view preferences.
  */
 import type { ConnectionCredentials, StoredConnection } from './connections'
 
@@ -19,7 +19,7 @@ function normalizeCredentialField(value: string): string {
 /**
  * Compares the Jazz credentials that define a runtime connection.
  *
- * Name, env, branch, and schema hash are excluded because they describe Inspector
+ * Name, env, branch, and schema hash are excluded because they describe Inspektor
  * display or runtime view state, not the Jazz admin connection itself.
  */
 function matchesConnectionCredentials(
@@ -33,7 +33,7 @@ function matchesConnectionCredentials(
   )
 }
 
-/** Finds the saved Inspector profile for the same Jazz admin credentials. */
+/** Finds the saved Inspektor profile for the same Jazz admin credentials. */
 export function findConnectionByCredentials(
   connections: StoredConnection[],
   draft: ConnectionCredentials,

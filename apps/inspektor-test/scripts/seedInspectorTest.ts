@@ -14,4 +14,4 @@ await seedInspectorTest({
   serverUrl: getRequiredEnvironmentValue("VITE_JAZZ_SERVER_URL"),
 });
 
-console.log("Seeded Inspector Test.");
+console.log("Seeded Inspektor Test.");

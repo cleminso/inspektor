@@ -5,6 +5,6 @@ import { ButtonGroupPage } from '@/components/content/components/buttonGroup/pag
 export const Route = createFileRoute('/components/button-group')({
   component: ButtonGroupPage,
   head: () => ({
-    meta: [{ title: 'Button Group · Inspector Design System' }],
+    meta: [{ title: 'Button Group · Inspektor Design System' }],
   }),
 })

@@ -4,5 +4,5 @@ import { AccordionPage } from '@/components/content/components/accordion/page'
 
 export const Route = createFileRoute('/components/accordion')({
   component: AccordionPage,
-  head: () => ({ meta: [{ title: 'Accordion · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Accordion · Inspektor Design System' }] }),
 })

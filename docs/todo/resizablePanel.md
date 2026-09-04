@@ -34,4 +34,4 @@
 
 - [x] Run focused Resizable Panel behavior tests.
 - [x] Run design-system tests, generated-prop checks, typecheck, lint, and build.
-- [x] Run Inspector tests, typecheck, lint, and build.
+- [x] Run Inspektor tests, typecheck, lint, and build.

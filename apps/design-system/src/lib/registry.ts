@@ -415,7 +415,7 @@ export const accordionItem = {
   title: 'Accordion',
   slug: 'accordion',
   href: '/components/accordion',
-  description: 'Collapsible sections with Base UI behavior and compact Inspector presentation.',
+  description: 'Collapsible sections with Base UI behavior and compact Inspektor presentation.',
   importPath: '@inspektor/ds',
   source: {
     label: 'accordion.tsx',

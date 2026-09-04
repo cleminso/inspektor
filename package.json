@@ -1,11 +1,11 @@
 {
-  "name": "regarde-inspektor",
-  "version": "0.0.3",
+  "name": "inspektor",
+  "version": "0.0.1",
   "private": true,
-  "description": "Alternative inspektor to the default Jazz-tools Inspector",
+  "description": "Alternative inspektor to the default Jazz-tools Inspektor",
   "repository": {
     "type": "git",
-    "url": "https://github.com/regardedev/inspektor"
+    "url": "https://github.com/cleminso/inspektor"
   },
   "workspaces": [
     "packages/*",

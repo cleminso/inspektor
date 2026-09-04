@@ -1,13 +1,13 @@
 {
   "name": "@inspektor/ds",
   "version": "0.0.1",
-  "description": "Inspector design system",
+  "description": "Inspektor design system",
   "author": "Regarde",
   "type": "module",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/regardedev/inspektor.git",
+    "url": "https://github.com/cleminso/inspektor.git",
     "directory": "packages/design-system"
   },
   "module": "./dist/index.js",

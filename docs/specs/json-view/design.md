@@ -12,7 +12,7 @@
 - [Public API](#public-api)
 - [Data model](#data-model)
 - [Rendering safeguards](#rendering-safeguards)
-- [Inspector integration](#inspektor-integration)
+- [Inspektor integration](#inspektor-integration)
 - [Documentation](#documentation)
 - [Testing strategy](#testing-strategy)
 - [Open questions](#open-questions)
@@ -20,7 +20,7 @@
 ## Overview
 
 `JsonView` is a reusable `@inspektor/ds` component for inspecting JSON objects and arrays as a read-only, syntax-colored,
-collapsible tree. It takes inspiration from the observable behavior of Vercel Geist JSON View while using Inspector tokens,
+collapsible tree. It takes inspiration from the observable behavior of Vercel Geist JSON View while using Inspektor tokens,
 component constraints, and an independent implementation.
 
 The Table Explorer uses `JsonView` for the row side pane's `JSON` representation and for read-only structured field inspection.
@@ -155,7 +155,7 @@ JSON cannot preserve directly:
 - unsupported or unavailable values become explicit tagged objects rather than disappearing or becoming `null`
 - non-finite numbers receive an explicit tagged representation
 
-The row JSON projection is Inspector JSON when normalization differs from the Jazz runtime object. The pane labels and Copy action
+The row JSON projection is Inspektor JSON when normalization differs from the Jazz runtime object. The pane labels and Copy action
 must not imply that tagged values are a direct runtime serialization.
 
 ## Rendering safeguards
@@ -182,7 +182,7 @@ When the total budget is exhausted, affected branches render non-actionable `Vis
 branch releases capacity and recomputes the depth-first render plan. If the active keyboard item leaves that plan, focus recovers to
 its nearest visible ancestor. These thresholds remain implementation details rather than consumer configuration.
 
-## Inspector integration
+## Inspektor integration
 
 The Table Explorer row pane uses a single-select `ToggleGroup` to switch between:
 

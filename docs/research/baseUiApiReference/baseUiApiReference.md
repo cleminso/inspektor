@@ -1,4 +1,4 @@
-# Base UI API reference — recommendation for Inspector
+# Base UI API reference — recommendation for Inspektor
 
 ## Table of contents
 

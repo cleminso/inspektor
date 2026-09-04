@@ -4,5 +4,5 @@ import { TimestampValuePage } from '@/components/content/components/timestampVal
 
 export const Route = createFileRoute('/components/timestamp-value')({
   component: TimestampValuePage,
-  head: () => ({ meta: [{ title: 'Timestamp Value · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Timestamp Value · Inspektor Design System' }] }),
 })

@@ -87,9 +87,9 @@
 - [x] Design-system package build passes.
 - [x] Documentation props generation and check pass.
 - [x] Documentation tests, typecheck, lint, and build pass.
-- [x] Inspector application scrollbar-focused tests, typecheck, and build pass.
-- [x] Inspector application full tests pass after aligning Dock icons with their extra-small semantic size.
-- [ ] Inspector application full lint retains an unrelated Row Editor `autoFocus` warning.
+- [x] Inspektor application scrollbar-focused tests, typecheck, and build pass.
+- [x] Inspektor application full tests pass after aligning Dock icons with their extra-small semantic size.
+- [ ] Inspektor application full lint retains an unrelated Row Editor `autoFocus` warning.
 - [x] Browser verification confirms no reserved Context Switcher strip, opaque sticky Data Grid headers, platform WebKit geometry, and hidden Tab View scrollbar chrome.
 - [x] Browser verification confirms constrained Accordion panels own overflow without changing the Accordion root or trigger width.
 - [x] Browser verification confirms overflowing and short Scroll Area content keep the same 320px viewport and content width with a zero-width native gutter.

@@ -21,7 +21,7 @@ The frontend uses explicit ownership boundaries instead of technical root bucket
 - `routes` contain TanStack Router adapters. Routes declare loaders, search validation, and route composition, then delegate product and runtime behavior to their owners.
 - `shared` contains code with multiple existing owners. It is not a staging area for code that might become shared.
 
-The connected header and footer chrome belong to `app/shell`. The header contains connection context and theme controls; workspace navigation controls live in the footer. The design system owns generic shell geometry and dock mechanics. `app/shell` owns the universal Inspector layout preference, storage migration, and product controls. Tables and Live queries compose their content into shell regions without owning shell state.
+The connected header and footer chrome belong to `app/shell`. The header contains connection context and theme controls; workspace navigation controls live in the footer. The design system owns generic shell geometry and dock mechanics. `app/shell` owns the universal Inspektor layout preference, storage migration, and product controls. Tables and Live queries compose their content into shell regions without owning shell state.
 
 ## Implemented structure
 
@@ -81,7 +81,7 @@ Use the narrowest owner that explains both the behavior and its consumers:
 - Code moves to `shared` only after multiple owners consume it.
 - Route-specific declarations remain in `routes`; reusable behavior invoked by a route belongs to `app` or the relevant feature.
 
-A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. Generic shell geometry and dock mechanics belong to `@inspektor/ds`; universal Inspector persistence and controls belong to `app/shell`; feature content remains with Tables or Live queries.
+A row editor therefore belongs to `features/tables/rowEditor`, even when a Tables workspace renders it in a side pane. Generic shell geometry and dock mechanics belong to `@inspektor/ds`; universal Inspektor persistence and controls belong to `app/shell`; feature content remains with Tables or Live queries.
 
 ## Import direction
 

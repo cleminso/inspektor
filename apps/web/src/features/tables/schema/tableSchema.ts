@@ -2,7 +2,7 @@
  * Reads Jazz stored schema metadata for the schema-driven explorer UI.
  *
  * Table lists, column lists, and relation labels must come from runtime metadata so the
- * Inspector can browse any app without importing generated schema code.
+ * Inspektor can browse any app without importing generated schema code.
  */
 import type { ColumnDescriptor, WasmSchema } from 'jazz-tools'
 

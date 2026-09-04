@@ -4,5 +4,5 @@ import { BinaryValuePage } from '@/components/content/components/binaryValue/pag
 
 export const Route = createFileRoute('/components/binary-value')({
   component: BinaryValuePage,
-  head: () => ({ meta: [{ title: 'Binary Value · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Binary Value · Inspektor Design System' }] }),
 })

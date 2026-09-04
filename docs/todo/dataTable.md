@@ -190,7 +190,7 @@
 - [x] Commit pointer-driven column order once on a successful drop instead of publishing transient orders during drag-over.
 - [x] Keep canceled drags state-free, preserve fixed-column slots when merging the reordered subset, and retain hidden columns in the complete order.
 - [x] Namespace header, body-cell, and row-group drag identities so arbitrary row and column IDs cannot collide.
-- [x] Namespace the Inspector selection column separately from schema column IDs and preserve composable TanStack order updaters through persistence.
+- [x] Namespace the Inspektor selection column separately from schema column IDs and preserve composable TanStack order updaters through persistence.
 
 [05/08/26]
 
@@ -398,7 +398,7 @@
 
 - [x] Cover direct mouse and touch context-menu activation, unavailable targets, selection replacement, and focus restoration with focused tests.
 - [x] Run changed-file lint, focused tests, design-system typecheck and build, application typecheck and build, and documentation metadata checks.
-- [ ] Verify mouse, keyboard, and touch context-menu behavior in the connected Inspector runtime.
+- [ ] Verify mouse, keyboard, and touch context-menu behavior in the connected Inspektor runtime.
 
 [20/08/26]
 
@@ -406,7 +406,7 @@
 
 [20/08/26]
 
-- [x] Verify Command+Shift+ArrowLeft/Right against a deployed multi-column schema in the Inspector browser runtime and assert rendered column order in the component test.
+- [x] Verify Command+Shift+ArrowLeft/Right against a deployed multi-column schema in the Inspektor browser runtime and assert rendered column order in the component test.
 
 [20/08/26]
 
@@ -472,20 +472,20 @@
 
 - [x] Verify pointer reorder keeps committed header and body order stable until drop and publishes no order for canceled drags.
 - [x] Verify fixed-column merging, collision-safe drag IDs, schema `_select` support, and composable persisted order updaters.
-- [x] Verify focused Data Grid and Inspector interaction tests, full Inspector tests, package and application typechecks, production builds, generated props, and changed-file lint.
+- [x] Verify focused Data Grid and Inspektor interaction tests, full Inspektor tests, package and application typechecks, production builds, generated props, and changed-file lint.
 - [x] Verify the Data Grid documentation example reorders matching headers and body cells after drop in a browser.
 
 [05/08/26]
 
 - [x] Verify TanStack row range selection through rendered checkbox interactions.
 - [x] Verify focused-row and pane routing remain application-owned after native row-range selection.
-- [x] Verify the reduced design-system and Inspector test suites, typechecks, lint, generated props, and production builds.
+- [x] Verify the reduced design-system and Inspektor test suites, typechecks, lint, generated props, and production builds.
 
 [05/08/26]
 
 - [x] Verify TanStack replacement, Shift-range, and pointer-drag cell selection through `DataGrid`.
 - [x] Verify checkbox cells and secondary mouse buttons do not start cell selection.
-- [x] Verify `@inspektor/ds` and Inspector tests, typechecks, lint, and production builds.
+- [x] Verify `@inspektor/ds` and Inspektor tests, typechecks, lint, and production builds.
 - [x] Verify generated Data Grid prop metadata no longer exposes duplicate active-cell or selected-cell props.
 - [x] Verify the documentation example renders native focused and selected cell state without console errors.
 - [x] Verify the production table route contains `cellSelectionFeature` without unused spanning, pagination, or grouping features.

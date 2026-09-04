@@ -4,5 +4,5 @@ import { BoxPage } from '@/components/content/components/box/page'
 
 export const Route = createFileRoute('/components/box')({
   component: BoxPage,
-  head: () => ({ meta: [{ title: 'Box · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Box · Inspektor Design System' }] }),
 })

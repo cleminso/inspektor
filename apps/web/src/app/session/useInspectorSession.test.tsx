@@ -53,7 +53,7 @@ beforeEach(() => {
 })
 
 describe('useInspectorSession', () => {
-  it('removes every Inspector preference scoped to the deleted connection', () => {
+  it('removes every Inspektor preference scoped to the deleted connection', () => {
     const connection = createConnectionFromDraft(
       {
         name: 'Local app',

@@ -65,7 +65,7 @@ describe('useInspectorRuntime', () => {
       expect(result.current.$error.get()).toEqual({ source: 'schema', error: schemaError }),
     )
     expect(consoleError).toHaveBeenCalledWith(
-      'Inspector runtime failure',
+      'Inspektor runtime failure',
       expect.objectContaining({ source: 'schema' }),
     )
 

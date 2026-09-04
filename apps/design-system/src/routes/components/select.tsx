@@ -3,5 +3,5 @@ import { SelectPage } from '@/components/content/components/select/page'
 
 export const Route = createFileRoute('/components/select')({
   component: SelectPage,
-  head: () => ({ meta: [{ title: 'Select · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Select · Inspektor Design System' }] }),
 })

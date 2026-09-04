@@ -1,7 +1,7 @@
 import type { WasmSchema } from 'jazz-tools'
 import { describe, expect, it } from 'vitest'
 
-import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { buildTableRowsQuery } from '@tables/query/tableRowsQuery'
 
 const schema = {
@@ -42,7 +42,7 @@ describe('tableRowsQuery', () => {
       offset: 0,
       hops: [],
     })
-    expect(INSPECTOR_QUERY_OPTIONS).toEqual({
+    expect(INSPEKTOR_QUERY_OPTIONS).toEqual({
       propagation: 'full',
       visibility: 'hidden_from_live_query_list',
     })

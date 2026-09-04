@@ -4,5 +4,5 @@ import { MultiSelectPage } from '@/components/content/components/multiSelect/pag
 
 export const Route = createFileRoute('/components/multi-select')({
   component: MultiSelectPage,
-  head: () => ({ meta: [{ title: 'Multi Select · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Multi Select · Inspektor Design System' }] }),
 })

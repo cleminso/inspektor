@@ -5,6 +5,6 @@ import { ContextSwitcherPage } from '@/components/content/components/contextSwit
 export const Route = createFileRoute('/components/context-switcher')({
   component: ContextSwitcherPage,
   head: () => ({
-    meta: [{ title: 'Context Switcher · Inspector Design System' }],
+    meta: [{ title: 'Context Switcher · Inspektor Design System' }],
   }),
 })

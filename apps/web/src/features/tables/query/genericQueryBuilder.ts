@@ -1,7 +1,7 @@
 /**
- * Schema-driven Jazz query builder for Inspector table exploration.
+ * Schema-driven Jazz query builder for Inspektor table exploration.
  *
- * Inspected apps can rely on generated typed builders; the Inspector cannot because it
+ * Inspected apps can rely on generated typed builders; the Inspektor cannot because it
  * loads arbitrary schemas at runtime. This builder implements Jazz's `QueryBuilder` shape
  * from table names, column names, and stored schema metadata.
  */
@@ -26,7 +26,7 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
     this._schema = schema
   }
 
-  /** Accepts Inspector filter state as explicit Jazz operators. */
+  /** Accepts Inspektor filter state as explicit Jazz operators. */
   public where(conditions: GenericWhereInput): GenericQueryBuilder {
     const clone = this.clone()
 

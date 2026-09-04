@@ -33,7 +33,7 @@ export type TableRowsSearchInput = Omit<
 /**
  * Shared state types for the schema-driven table explorer.
  *
- * The Inspector receives Jazz schema metadata at runtime, so route state, row selection,
+ * The Inspektor receives Jazz schema metadata at runtime, so route state, row selection,
  * sorting, visibility, and editor state must stay generic. These types define the UI
  * contract around runtime table metadata instead of generated inspected-app types.
  */
@@ -74,7 +74,7 @@ export interface TableExplorerSearchState extends TableRowsSearchState {
 /** Per-table visibility map keyed by rendered column ID, including synthetic columns. */
 export type TableColumnVisibilityState = Record<string, boolean>
 
-/** Column render metadata derived from Jazz schema descriptors plus Inspector columns. */
+/** Column render metadata derived from Jazz schema descriptors plus Inspektor columns. */
 export interface TableColumnMeta {
   id: string
   label: string

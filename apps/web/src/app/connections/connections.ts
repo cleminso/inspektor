@@ -1,10 +1,10 @@
 /**
- * Local persistence model for Inspector connection profiles.
+ * Local persistence model for Inspektor connection profiles.
  *
  * From the Jazz side, each connection stores the credentials needed to create an admin
  * runtime against a Jazz app: server URL, app ID, admin secret, and env.
  *
- * From the Inspector side, the same store keeps UI session preferences separate from
+ * From the Inspektor side, the same store keeps UI session preferences separate from
  * credentials so branch/schema selection can change without rewriting connection data.
  */
 const CONNECTIONS_STORAGE_KEY = 'inspektor-connections'
@@ -19,25 +19,25 @@ export interface ConnectionCredentials {
   adminSecret: string
 }
 
-/** Connection values before the Inspector assigns its local profile ID. */
+/** Connection values before the Inspektor assigns its local profile ID. */
 export interface ConnectionDraft extends ConnectionCredentials {
   name: string
   env: string
 }
 
-/** Saved Jazz admin connection used to start the Inspector runtime. */
+/** Saved Jazz admin connection used to start the Inspektor runtime. */
 export interface StoredConnection extends ConnectionDraft {
   id: string
 }
 
-/** Inspector view state stored separately from Jazz connection credentials. */
+/** Inspektor view state stored separately from Jazz connection credentials. */
 export interface ConnectionPreferences {
   lastBranch: string
   lastSchemaHash: string | null
   rememberedBranches: string[]
 }
 
-/** Version 1 localStorage schema for Jazz credentials and Inspector preferences. */
+/** Version 1 localStorage schema for Jazz credentials and Inspektor preferences. */
 export interface StoredConnectionsStore {
   version: 1
   activeConnectionId: string | null
@@ -45,7 +45,7 @@ export interface StoredConnectionsStore {
   preferencesByConnectionId: Record<string, ConnectionPreferences>
 }
 
-/** Creates the empty Inspector connection store used when persisted data is unavailable. */
+/** Creates the empty Inspektor connection store used when persisted data is unavailable. */
 export function createEmptyConnectionStore(): StoredConnectionsStore {
   return {
     version: 1,
@@ -56,10 +56,10 @@ export function createEmptyConnectionStore(): StoredConnectionsStore {
 }
 
 /**
- * Reads and validates the persisted Inspector connection store.
+ * Reads and validates the persisted Inspektor connection store.
  *
  * Stored JSON is treated as untrusted input because localStorage can be edited
- * manually and legacy Inspector stores used different shapes.
+ * manually and legacy Inspektor stores used different shapes.
  */
 export function readStoredConnections(): StoredConnectionsStore {
   if (typeof localStorage === 'undefined') {
@@ -79,7 +79,7 @@ export function readStoredConnections(): StoredConnectionsStore {
   }
 }
 
-/** Persists the complete Inspector connection store. */
+/** Persists the complete Inspektor connection store. */
 export function writeStoredConnections(store: StoredConnectionsStore): void {
   if (typeof localStorage === 'undefined') {
     return
@@ -88,7 +88,7 @@ export function writeStoredConnections(store: StoredConnectionsStore): void {
   localStorage.setItem(CONNECTIONS_STORAGE_KEY, JSON.stringify(store))
 }
 
-/** Resolves the active Inspector profile, falling back when the saved ID is stale. */
+/** Resolves the active Inspektor profile, falling back when the saved ID is stale. */
 export function getActiveConnection(store: StoredConnectionsStore): StoredConnection | null {
   return getConnectionById(store, store.activeConnectionId) ?? store.connections[0] ?? null
 }
@@ -104,7 +104,7 @@ export function getConnectionById(
   return store.connections.find((connection) => connection.id === connectionId) ?? null
 }
 
-/** Returns Inspector preferences with defaults so callers never handle a missing record. */
+/** Returns Inspektor preferences with defaults so callers never handle a missing record. */
 export function getConnectionPreferences(
   store: StoredConnectionsStore,
   connectionId: string,
@@ -176,9 +176,9 @@ export function removeConnection(
 }
 
 /**
- * Updates Inspector runtime preferences while keeping branch values normalized and deduped.
+ * Updates Inspektor runtime preferences while keeping branch values normalized and deduped.
  *
- * Branch and schema hash are Jazz runtime context, but the Inspector stores them as
+ * Branch and schema hash are Jazz runtime context, but the Inspektor stores them as
  * preferences because they describe the selected view of a saved connection.
  */
 function updateConnectionPreferences(
@@ -261,9 +261,9 @@ export function resolveDefaultBranch(
 }
 
 /**
- * Chooses the schema hash the Inspector should use for a connection.
+ * Chooses the schema hash the Inspektor should use for a connection.
  *
- * Jazz can expose multiple stored schema hashes for the same app. The Inspector only
+ * Jazz can expose multiple stored schema hashes for the same app. The Inspektor only
  * reuses a requested or remembered hash when Jazz reports it as available.
  */
 export function resolveDefaultSchemaHash(

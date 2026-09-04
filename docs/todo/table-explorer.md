@@ -499,7 +499,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 - [x] Keep the row-editor pane visible while its deferred form module or requested live row resolves, with explicit `Loading editor` and `Loading row` status content.
 - [x] Render non-native row-editor field labels and the Insert more switch with elements that match their Base UI native contracts.
-- [x] Run the Inspector client through Jazz's registry-backed React lifecycle so rapid table navigation and development remounts cannot create overlapping WASM runtimes.
+- [x] Run the Inspektor client through Jazz's registry-backed React lifecycle so rapid table navigation and development remounts cannot create overlapping WASM runtimes.
 
 [07/08/26]
 
@@ -842,7 +842,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [x] Keep table overflow inside constrained Accordion panels so section headers and the outer dock width remain stable as sections open and close.
 - [x] Hide constrained Table List scrollbar chrome across standard and WebKit scrollbar APIs while preserving wheel, touch, and keyboard scrolling.
 - [x] Preserve inter-section spacing inside each indexed fill-layout item so flex shrinking cannot remove it.
-- [x] Lock the Inspector shell to the viewport so the page never becomes a scroll owner and the header and bottom dock remain stationary.
+- [x] Lock the Inspektor shell to the viewport so the page never becomes a scroll owner and the header and bottom dock remain stationary.
 - [x] Give the bottom dock a fixed semantic height and use extra-small dock icons.
 - [x] Provide shell dock controls directly from `SidePanelLayoutProvider` so the route does not consume layout context outside its provider boundary.
 - [x] Stretch a Data Grid table to its viewport when its intrinsic column width is smaller, while retaining horizontal overflow for wider grids.
@@ -1420,7 +1420,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] Relation details may resolve a target display value, but that value does not replace the stored relation ID.
 - [x] Binary grid cells show byte count only rather than complete, preview, or indexed-object serialization.
 - [x] Binary clipboard actions state their encoding explicitly: Copy as hex or Copy as Base64.
-- [x] PostgreSQL byte literals and JavaScript indexed-object serialization are not primary Jazz Inspector copy formats.
+- [x] PostgreSQL byte literals and JavaScript indexed-object serialization are not primary Jazz Inspektor copy formats.
 - [x] Transforms use the effective value renderer and remain schema modifiers rather than standalone value presentations.
 - [x] Reusable type-specific presentation and editor components belong in the design system without depending on Jazz schema
       objects.
@@ -1474,7 +1474,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 - [x] Cover single-row selection movement, multi-row selection preservation, page-boundary continuation, navigation bounds, and query-position labels with focused tests.
 - [x] Verify persistent controls and visible grid check movement against the isolated browser fixture.
-- [x] Verify Inspector formatting, lint, typecheck, production build, and package-wide tests.
+- [x] Verify Inspektor formatting, lint, typecheck, production build, and package-wide tests.
 
 [28/08/26]
 
@@ -1483,11 +1483,11 @@ Checked markers in this section mean the interaction decision is settled; they d
 [28/08/26]
 
 - [x] Cover unavailable Details values, staged JSON projection, Row object validation, guarded structured formatting, and shared Base64 encoding with focused tests.
-- [x] Verify Inspector formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
+- [x] Verify Inspektor formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
 
 [28/08/26]
 
-- [x] Verify complete row deselection with focused tests, Inspector lint, typecheck, build, package-wide tests, and the isolated browser fixture.
+- [x] Verify complete row deselection with focused tests, Inspektor lint, typecheck, build, package-wide tests, and the isolated browser fixture.
 
 [28/08/26]
 
@@ -1496,18 +1496,18 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 [27/08/26]
 
-- [x] Verify row-editor footer composition with focused tests, Inspector lint, typecheck, build, and package-wide tests.
+- [x] Verify row-editor footer composition with focused tests, Inspektor lint, typecheck, build, and package-wide tests.
 
 [27/08/26]
 
 - [x] Verify both row forms render without editor-module loading feedback while CodeMirror remains outside the base table-view boundary.
 - [ ] Verify first edit and insert interactions do not present the editor-loading status in the production browser flow.
-- [x] Verify focused tests, Inspector formatting, lint and typecheck, the production build, and package-wide tests.
+- [x] Verify focused tests, Inspektor formatting, lint and typecheck, the production build, and package-wide tests.
 
 [26/08/26]
 
 - [x] Cover canonical URL cleanup, local row-pane state, query-scope closure, eager row-form loading, quiet workspace reconciliation, and initial pagination silence with focused tests.
-- [x] Verify insert opens without an editor-loading fallback or URL mutation and a browser refresh returns to the same table with the pane closed against an isolated Inspector Test fixture.
+- [x] Verify insert opens without an editor-loading fallback or URL mutation and a browser refresh returns to the same table with the pane closed against an isolated Inspektor Test fixture.
 - [x] Verify formatting, changed-file and package lint, application typecheck and production build, focused tests, and package-wide tests.
 
 [26/08/26]
@@ -1530,27 +1530,27 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 - [x] Cover verified-schema-only runtime initialization and remove schema-cache identity, hydration, and browser-storage tests.
 - [x] Cover combined table preferences, per-workspace pins, tabs, and recent views with version rejection, scope isolation, and unavailable storage.
-- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, lint, typecheck, and production build.
 
 [24/08/26]
 
 - [x] Cover immediate reconciled-table mounting and mismatch feedback with focused workspace tests.
 - [x] Verify connected table switches keep the toolbar and Data Grid mounted, avoid the opening flash, and center row loading within the grid viewport.
-- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, lint, typecheck, and production build.
 - [x] Profile opening the wide-table fixture after removing synchronous middle-truncation measurement and painting reconciliation feedback: INP reduced from 1877ms to 618ms.
-- [x] Re-profile wide-table closing against a connected Inspector Test fixture: INP reduced from 1460ms to 523ms.
+- [x] Re-profile wide-table closing against a connected Inspektor Test fixture: INP reduced from 1460ms to 523ms.
 
 [22/08/26]
 
 - [x] Cover generic runtime error presentation, hidden raw details, and explicit retry invocation.
-- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, changed-file lint, typecheck, and production build.
 - [ ] Verify the retry control through keyboard and pointer interaction against a connected runtime failure.
 
 [21/08/26]
 
 - [x] Cover focused-cell copy, binary formats, staged-value filtering, context-menu focus behavior, and clipboard failure feedback with focused tests.
 - [x] Run application and design-system typechecks and builds.
-- [ ] Verify context actions and copy feedback in the connected Inspector runtime.
+- [ ] Verify context actions and copy feedback in the connected Inspektor runtime.
 
 [21/08/26]
 
@@ -1565,20 +1565,20 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 - [x] Reproduce unfiltered empty-table silence with a failing table-view regression test.
 - [x] Cover empty copy, polite announcement, contextual insertion, and the existing toolbar action.
-- [x] Verify the focused table-view test, complete Inspector test suite, typecheck, and production build.
+- [x] Verify the focused table-view test, complete Inspektor test suite, typecheck, and production build.
 - [ ] Verify the centered prompt in a connected empty table whose columns overflow the viewport horizontally.
 
 [20/08/26]
 
 - [x] Cover canonical Data identity, replaceable-slot replacement, stored-search activation, table-list and tab promotion, bulk persistence, and legacy tab collapse.
-- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, changed-file lint, typecheck, and production build.
 - [x] Verify replaceable presentation and pointer and keyboard context actions in the Workspace Tabs browser fixture.
 
 [10/08/26]
 
 - [x] Reproduce contained-page refetching with a failing loaded-window regression test.
 - [x] Cover contained smaller pages, the first uncovered page, known result-set ends, larger uncovered pages, live end-boundary changes, and repeated out-of-range navigation.
-- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, lint, typecheck, and production build.
 - [ ] Verify the 500-to-100 page-size sequence against a connected table containing more than 500 rows.
 
 [10/08/26]
@@ -1587,7 +1587,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [x] Verify a prefetched editor module renders without committing its Suspense fallback.
 - [x] Reproduce cached-schema query readiness through focused runtime and provider tests.
 - [x] Verify the client remains unpublished until the selected stored schema replaces cached metadata.
-- [x] Verify focused loader, runtime, provider, and bundle-boundary tests, full Inspector tests, typecheck, and build.
+- [x] Verify focused loader, runtime, provider, and bundle-boundary tests, full Inspektor tests, typecheck, and build.
 - [ ] Verify the connected first table load no longer reports Jazz's different-schema error.
 - [ ] Verify first insert and edit pane openings do not expose `Loading editor` in a connected browser.
 
@@ -1599,12 +1599,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 - [x] Cover render-safe query snapshots, commit-phase subscription acquisition, query reset, and equivalent-key subscription stability.
 - [x] Cover that an abandoned fulfilled render cannot replace the last committed preserved rows.
-- [x] Verify focused query tests, Inspector lint and typecheck, the production build, and package-wide tests.
+- [x] Verify focused query tests, Inspektor lint and typecheck, the production build, and package-wide tests.
 
 [07/08/26]
 
 - [x] Cover plain-JSON schema-cache round trips for unknown fields that resemble the removed serialization tag.
-- [x] Verify focused runtime tests, Inspector typecheck and lint, and the production build.
+- [x] Verify focused runtime tests, Inspektor typecheck and lint, and the production build.
 
 [07/08/26]
 
@@ -1629,7 +1629,7 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 - [x] Cover reference-preserving no-op tab sanitization with a focused regression test.
 - [x] Verify focused workspace tab tests after simplifying route-owned schema reconciliation.
-- [x] Verify Inspector changed-file lint, typecheck, production build, and package-wide tests.
+- [x] Verify Inspektor changed-file lint, typecheck, production build, and package-wide tests.
 
 [06/08/26]
 
@@ -1640,14 +1640,14 @@ Checked markers in this section mean the interaction decision is settled; they d
 [06/08/26]
 
 - [x] Verify focused Data Grid and Table Explorer regression tests.
-- [x] Verify design-system and Inspector typechecks and lints.
+- [x] Verify design-system and Inspektor typechecks and lints.
 - [x] Profile a large-grid header drag after removing optimistic DOM reordering.
 - [ ] Verify page-size round trips and virtual scrolling in a connected Safari or Orion session.
 
 [06/08/26]
 
 - [x] Cover the 309-row non-virtual boundary and the larger-model virtual window with focused Data Grid tests.
-- [x] Cover right-edge pagination order and the corrected schema-aware reset width with focused Inspector tests.
+- [x] Cover right-edge pagination order and the corrected schema-aware reset width with focused Inspektor tests.
 - [ ] Verify the 309-row connected table in Orion or Safari; the automated browser does not provide those engines.
 
 [06/08/26]
@@ -1661,23 +1661,23 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 - [x] Cover page offsets, sentinel rows, route normalization, page-size reset, pagination controls, and exact paginated prefetch identity.
 - [x] Cover virtual row-window rendering, full scroll geometry, semantic row counts, and spinner loading presentation.
-- [x] Verify Inspector and design-system tests, typechecks, lints, generated metadata, and production builds.
+- [x] Verify Inspektor and design-system tests, typechecks, lints, generated metadata, and production builds.
 - [x] Verify a 1000-row Data Grid fixture keeps mounted rows bounded while scrolling across the complete page and preserves live column resizing.
-- [ ] Verify scrolling and live column resizing with 100, 500, and 1000 rows in a browser-held Inspector connection.
+- [ ] Verify scrolling and live column resizing with 100, 500, and 1000 rows in a browser-held Inspektor connection.
 
 [06/08/26]
 
 - [x] Cover inactive-tab focus, settled pointer intent, transient pointer cancellation, exact stored filter and sort resolution, and speculative release.
-- [x] Verify Inspector tests, typecheck, lint, and production build after adding tab prefetch.
+- [x] Verify Inspektor tests, typecheck, lint, and production build after adding tab prefetch.
 - [x] Verify design-system tests, typecheck, lint, generated metadata, and production builds after extending Tab View events.
-- [ ] Verify tab-to-table handoff with a browser-held Inspector connection; the automated browser profile has no saved connection.
+- [ ] Verify tab-to-table handoff with a browser-held Inspektor connection; the automated browser profile has no saved connection.
 
 [06/08/26]
 
 - [x] Cover exact query identity, orchestrator ownership, pointer and keyboard intent, transient pointer cancellation, rejected query state, and skeleton row geometry with focused tests.
-- [x] Verify Inspector and design-system tests, typechecks, lints, and production builds.
+- [x] Verify Inspektor and design-system tests, typechecks, lints, and production builds.
 - [x] Verify generated Data Grid prop metadata, design-system documentation typecheck, and production build.
-- [ ] Repeat the recorded connected-table interaction with browser-held connection credentials; the automated browser profile has no saved Inspector connection.
+- [ ] Repeat the recorded connected-table interaction with browser-held connection credentials; the automated browser profile has no saved Inspektor connection.
 
 [06/08/26]
 
@@ -1711,18 +1711,18 @@ Checked markers in this section mean the interaction decision is settled; they d
 
 - [x] Verify dropped data-column order preserves the fixed selection-column slot and updates matching header and body content.
 - [x] Verify canceled and in-progress drags do not persist transient column order.
-- [x] Verify Inspector tests, typecheck, lint, production build, and browser interaction.
+- [x] Verify Inspektor tests, typecheck, lint, production build, and browser interaction.
 
 [05/08/26]
 
 - [x] Verify native TanStack row-range selection and application pane focus through rendered checkbox interactions.
-- [x] Verify Inspector tests, typecheck, lint, and production build.
+- [x] Verify Inspektor tests, typecheck, lint, and production build.
 - [x] Verify design-system tests, typecheck, lint, generated props, and production builds.
 
 [04/08/26]
 
 - [x] Accordion, Table List, shell layout, and bottom dock regression tests pass.
-- [x] Inspector application tests and production build pass.
+- [x] Inspektor application tests and production build pass.
 - [x] Changed Accordion, Table List, shell, dock, and documentation files pass focused lint.
 - [x] Design-system and documentation production builds pass.
 - [x] Browser verification confirms the constrained Accordion root and trigger retain their width while panel content owns vertical overflow.

@@ -30,7 +30,7 @@
 
 ### [11/08/26] Theme editing
 
-- [ ] Decide whether Inspector should expose component tokens for product-level theme customization.
+- [ ] Decide whether Inspektor should expose component tokens for product-level theme customization.
 - [ ] Add linked-token controls if the color foundation becomes an interactive theme editor.
 - [ ] Add automated contrast reporting for text and on-color foreground pairs.
 

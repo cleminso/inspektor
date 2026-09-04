@@ -1,4 +1,4 @@
-# Inspector color system
+# Inspektor color system
 
 ## Table of contents
 
@@ -16,7 +16,7 @@
 
 ## Purpose
 
-Use this reference when selecting, naming, adding, reviewing, or migrating Inspector color tokens. The goal is to encode product meaning rather than expose palette choices or component implementation details.
+Use this reference when selecting, naming, adding, reviewing, or migrating Inspektor color tokens. The goal is to encode product meaning rather than expose palette choices or component implementation details.
 
 Shipped code is evidence, not automatic precedent. Confirm that an existing token still expresses the accepted role before reusing it.
 

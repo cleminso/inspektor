@@ -34,7 +34,7 @@ Base UI owns:
 - state data attributes and CSS variables
 - portal, positioning, dismissal, and transition coordination
 
-Inspector owns:
+Inspektor owns:
 
 - StyleX styles and semantic tokens
 - public omission of `className` and `style`
@@ -52,20 +52,20 @@ Evaluate every Base UI capability independently:
 1. Must the wrapper preserve it internally?
 2. Can consumers configure it publicly?
 3. Which layer owns its type and meaning?
-4. Does Inspector transform it at the Base UI boundary?
+4. Does Inspektor transform it at the Base UI boundary?
 
-Preservation and exposure are different. Base UI may generate `aria-controls` internally while consumers configure `aria-label`. A wrapper may derive `checked` from Base UI while defining an Inspector-owned `size` union.
+Preservation and exposure are different. Base UI may generate `aria-controls` internally while consumers configure `aria-label`. A wrapper may derive `checked` from Base UI while defining an Inspektor-owned `size` union.
 
 ## Preservation requirements
 
 - Preserve Base UI-generated props, event handlers, refs, roles, IDs, and ARIA relationships.
 - Preserve custom event signatures, including event details.
-- Preserve controlled and uncontrolled behavior unless Inspector intentionally fixes one mode.
+- Preserve controlled and uncontrolled behavior unless Inspektor intentionally fixes one mode.
 - Preserve default rendered elements unless a documented semantic substitution is required.
-- Preserve state attributes and CSS variables even when Inspector does not style them.
+- Preserve state attributes and CSS variables even when Inspektor does not style them.
 - Preserve required compound anatomy and provider relationships.
 - Preserve mount and transition coordination instead of implementing parallel state.
-- Add package-owned attributes only for Inspector state, variants, slots, or interoperability.
+- Add package-owned attributes only for Inspektor state, variants, slots, or interoperability.
 
 ## Source lookup
 

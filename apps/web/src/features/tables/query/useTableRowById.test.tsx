@@ -4,7 +4,7 @@ import type { JazzClient } from 'jazz-tools/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTableRowById } from '@tables/query/useTableRowById'
-import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 
 const { manager, queryError, queryRows, useJazzQueryStateMock } = vi.hoisted(() => ({
   manager: {},
@@ -61,7 +61,7 @@ describe('useTableRowById', () => {
     expect(useJazzQueryStateMock).toHaveBeenCalledWith(
       manager,
       expect.anything(),
-      INSPECTOR_QUERY_OPTIONS,
+      INSPEKTOR_QUERY_OPTIONS,
     )
   })
 
@@ -79,7 +79,7 @@ describe('useTableRowById', () => {
     const { result } = renderRow(null)
 
     expect(result.current).toEqual({ status: 'idle', row: null })
-    expect(useJazzQueryStateMock).toHaveBeenCalledWith(manager, undefined, INSPECTOR_QUERY_OPTIONS)
+    expect(useJazzQueryStateMock).toHaveBeenCalledWith(manager, undefined, INSPEKTOR_QUERY_OPTIONS)
   })
 
   it('stays idle without a runtime client provider', () => {
@@ -91,7 +91,7 @@ describe('useTableRowById', () => {
     expect(useJazzQueryStateMock).toHaveBeenCalledWith(
       null,
       expect.anything(),
-      INSPECTOR_QUERY_OPTIONS,
+      INSPEKTOR_QUERY_OPTIONS,
     )
   })
 

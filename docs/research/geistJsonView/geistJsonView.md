@@ -1,4 +1,4 @@
-# Geist JSON View — Inspector adaptation
+# Geist JSON View — Inspektor adaptation
 
 ## Table of contents
 
@@ -6,14 +6,14 @@
 - [What it is](#what-it-is)
 - [Verified Geist behavior](#verified-geist-behavior)
 - [What we did not verify](#what-we-did-not-verify)
-- [Inspector decisions](#inspektor-decisions)
+- [Inspektor decisions](#inspektor-decisions)
 - [Component boundary](#component-boundary)
 - [Initial scope](#initial-scope)
 - [Sources](#sources)
 
 ## Credit
 
-Based on [Vercel Geist JSON View](https://vercel.com/geist/json-view). This is an independent Inspector implementation informed by Geist's documented behavior and public DOM, not a reuse of its source code or package artifacts.
+Based on [Vercel Geist JSON View](https://vercel.com/geist/json-view). This is an independent Inspektor implementation informed by Geist's documented behavior and public DOM, not a reuse of its source code or package artifacts.
 
 ## What it is
 
@@ -42,7 +42,7 @@ Do not assume Geist provides:
 - Handling for `Date`, `Uint8Array`, non-finite numbers, unsupported JavaScript values, or cycles.
 - Public source, dependency graph, or reusable license.
 
-## Inspector decisions
+## Inspektor decisions
 
 ### Scope
 
@@ -64,7 +64,7 @@ Normalize Jazz values before crossing into the design-system component:
 - `Uint8Array`: render as `Uint8Array(<byte length>)` with a bounded hex/base64 preview; copy actions for hex, base64, and decoded text where valid.
 - Timestamps: keep the canonical ISO 8601/Z machine value plus an optional localized display.
 - `Date`, `undefined`, non-finite numbers, bigint, maps, sets, references: explicit display kind and copy representation, or a labeled unsupported terminal.
-- Identify the projection as Inspector JSON when it differs from a direct Jazz runtime value.
+- Identify the projection as Inspektor JSON when it differs from a direct Jazz runtime value.
 
 ### Accessibility
 

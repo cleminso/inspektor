@@ -27,13 +27,13 @@
 
 [21/08/26]
 
-- [ ] Add Inspector-specific runtime panels when product state exposes a stable, serializable, and credential-free inspection boundary.
+- [ ] Add Inspektor-specific runtime panels when product state exposes a stable, serializable, and credential-free inspection boundary.
 
 ## Work outside the foundation scope
 
 [21/08/26]
 
-- [ ] Publishing reusable Inspector Devtools plugins is separate package work.
+- [ ] Publishing reusable Inspektor Devtools plugins is separate package work.
 - [ ] A custom runtime event bus is deferred until a panel requires communication beyond the existing React tree.
 
 ## Settled interaction decisions
@@ -48,20 +48,20 @@
 
 [21/08/26]
 
-- [ ] Decide which Inspector-specific runtime state would provide distinct value beyond the TanStack Router panel.
-- [ ] Decide whether Inspector runtime panels should expose mutation commands.
+- [ ] Decide which Inspektor-specific runtime state would provide distinct value beyond the TanStack Router panel.
+- [ ] Decide whether Inspektor runtime panels should expose mutation commands.
 
 ## Validation checklist
 
 [21/08/26]
 
-- [x] Run the Inspector typecheck and production build after adding the Hotkeys panel.
+- [x] Run the Inspektor typecheck and production build after adding the Hotkeys panel.
 - [x] Run changed-file linting after adding the Hotkeys panel.
 - [x] Verify the Hotkeys panel lists registered application shortcuts in the browser.
 
 [21/08/26]
 
-- [x] Run the Inspector typecheck and production build.
+- [x] Run the Inspektor typecheck and production build.
 - [x] Confirm the production build removes Devtools code from `inspectorDevtoolsDeferred.tsx`.
 - [x] Run changed-file linting.
 - [x] Confirm importing the root route does not initialize the deferred Devtools dependency.

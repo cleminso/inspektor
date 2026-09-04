@@ -1,16 +1,16 @@
-# Jazz alignment and Inspector policies
+# Jazz alignment and Inspektor policies
 
 ## Table of contents
 
 - [Purpose](#purpose)
 - [Upstream findings](#upstream-findings)
-- [Inspector strengths](#inspektor-strengths)
+- [Inspektor strengths](#inspektor-strengths)
 - [Patterns to adopt](#patterns-to-adopt)
 - [Patterns not to copy](#patterns-not-to-copy)
 - [Verified field representation contracts](#verified-field-representation-contracts)
 - [Mutation state table](#mutation-state-table)
 - [Nested Row fields](#nested-row-fields)
-- [Deliberate Inspector policy differences](#deliberate-inspektor-policy-differences)
+- [Deliberate Inspektor policy differences](#deliberate-inspektor-policy-differences)
 - [Structured draft formatting](#structured-draft-formatting)
 - [Verification scope](#verification-scope)
 - [Interaction decisions](#interaction-decisions)
@@ -26,7 +26,7 @@
 
 ## Purpose
 
-This note records useful patterns from the official Jazz Inspector and settled decisions for Inspector's table mutation architecture. It should guide implementation without making the upstream grid component our architectural template.
+This note records useful patterns from the official Jazz Inspektor and settled decisions for Inspektor's table mutation architecture. It should guide implementation without making the upstream grid component our architectural template.
 
 Official source reviewed:
 
@@ -38,7 +38,7 @@ Official source reviewed:
 
 ## Upstream findings
 
-The official Inspector is strongest in grid workflows:
+The official Inspektor is strongest in grid workflows:
 
 - It separates live source rows from pending dirty cell edits.
 - It saves dirty-field patches instead of reconstructed rows.
@@ -54,7 +54,7 @@ Its main structural weakness is that querying, rendering, selection, editing, mu
 
 ## Inspektor strengths
 
-Keep the current Inspector direction:
+Keep the current Inspektor direction:
 
 - Application-owned schema classification and mutation logic.
 - Reusable, constrained design-system value components.
@@ -88,18 +88,18 @@ Keep the current Inspector direction:
 
 ## Verified field representation contracts
 
-These contracts are derived from the Jazz mutation converter and the official Inspector. They are the default answers for future field-editing work unless an upstream Jazz change requires another review.
+These contracts are derived from the Jazz mutation converter and the official Inspektor. They are the default answers for future field-editing work unless an upstream Jazz change requires another review.
 
 ### Mutation state table
 
-| Inspector concept  | Jazz input                                       | Jazz behavior                                                                                  | Inspector policy                                                                                        |
+| Inspektor concept  | Jazz input                                       | Jazz behavior                                                                                  | Inspektor policy                                                                                        |
 | ------------------ | ------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Unavailable source | Not a mutation input                             | Jazz has no unavailable mutation value.                                                        | Keep source unavailability distinct in presentation and prevent it from becoming a mutation implicitly. |
 | Omitted            | Property absent or `undefined`                   | `toWriteRecord` skips the field. Insert defaults may apply; updates leave the field unchanged. | Represent omission explicitly and leave the property out of the payload.                                |
 | SQL NULL           | `null`                                           | Converts to Jazz `Null` for nullable columns and fails for required columns.                   | Use an explicit nullable-only `null` mode rather than inferring NULL from empty text.                   |
 | Empty              | A present empty value such as `""` or `[]`       | Remains a value when valid for the column type.                                                | Keep empty values distinct from omission and SQL NULL; validate them by column type.                    |
 | Valid              | A present non-null value                         | Converts according to the column descriptor.                                                   | Parse and validate before adding the value to a mutation payload.                                       |
-| Invalid            | A value rejected by Inspector or Jazz validation | Must not produce a write record.                                                               | Retain raw input and its error, but exclude it from mutation payloads.                                  |
+| Invalid            | A value rejected by Inspektor or Jazz validation | Must not produce a write record.                                                               | Retain raw input and its error, but exclude it from mutation payloads.                                  |
 
 Jazz evidence:
 
@@ -113,7 +113,7 @@ Omission is operation-dependent: it requests the stored default during insert an
 
 Jazz's TypeScript `Row` converter reads declared fields from an object in descriptor order. Missing and explicit `undefined` members both reach `toValue(undefined)` and become Jazz `Null`. The native encoder accepts that value for nullable members and rejects it for required members. Unknown object keys are ignored because Jazz projects declared keys rather than enumerating input keys.
 
-Inspector follows the compatible part of that behavior and adds earlier validation:
+Inspektor follows the compatible part of that behavior and adds earlier validation:
 
 - An absent or explicit `undefined` nullable member normalizes to `null`.
 - An absent, explicit `undefined`, or explicit `null` required member is invalid.
@@ -121,22 +121,22 @@ Inspector follows the compatible part of that behavior and adds earlier validati
 - Positional Row tuples must be complete and are converted to named records in descriptor order.
 - Nested members are recursively validated before the mutation reaches Jazz.
 
-The upstream behavior is implemented in `packages/jazz-tools/src/runtime/value-converter.ts`. Inspector's stricter checks are product validation, not a different storage meaning.
+The upstream behavior is implemented in `packages/jazz-tools/src/runtime/value-converter.ts`. Inspektor's stricter checks are product validation, not a different storage meaning.
 
 ### Deliberate Inspektor policy differences
 
-Strict Row validation and JSON-null rejection are deliberate Inspector policies layered above Jazz's permissive converter:
+Strict Row validation and JSON-null rejection are deliberate Inspektor policies layered above Jazz's permissive converter:
 
-- Inspector rejects unknown Row fields, incomplete tuples, and missing required members before invoking Jazz. Jazz's TypeScript converter projects known Row fields, ignores unknown keys, and defers required-member rejection to native encoding.
-- Inspector rejects JSON text that parses to JavaScript `null`. Jazz's top-level converter treats that value as SQL NULL rather than preserving a distinguishable JSON null, so Inspector requires the explicit SQL-NULL field mode where the column is nullable.
+- Inspektor rejects unknown Row fields, incomplete tuples, and missing required members before invoking Jazz. Jazz's TypeScript converter projects known Row fields, ignores unknown keys, and defers required-member rejection to native encoding.
+- Inspektor rejects JSON text that parses to JavaScript `null`. Jazz's top-level converter treats that value as SQL NULL rather than preserving a distinguishable JSON null, so Inspektor requires the explicit SQL-NULL field mode where the column is nullable.
 
 These checks provide earlier errors and preserve visible mutation intent. Do not relax them merely to mirror the converter unless Jazz introduces distinct JSON-null storage semantics or stricter public Row validation.
 
 ### Structured draft formatting
 
-The official Inspector formats a source object with `JSON.stringify` when editing begins, stores subsequent edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft. See `packages/inspector/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
+The official Inspektor formats a source object with `JSON.stringify` when editing begins, stores subsequent edits as raw `text`, overlays that exact text in the grid, and parses it only when Save constructs the mutation. It does not reformat a queued user draft. See `packages/inspector/src/components/data-explorer/TableDataGrid.tsx` and `row-mutation-form.ts`.
 
-Inspector uses the same ownership rule:
+Inspektor uses the same ownership rule:
 
 - Source-derived structured values may be formatted when an editor draft is created.
 - User-edited structured text is preserved exactly while staged and when the editor reopens.
@@ -145,9 +145,9 @@ Inspector uses the same ownership rule:
 
 ### Verification scope
 
-The official Inspector separates focused component coverage from browser acceptance. Component tests cover Enum editor activation, NULL actions, insert omission/default behavior, queued overlays, and live-source reconciliation. Browser tests cover opening the real inline editor, local staging and Discard, Save, and persistence after navigation or refresh.
+The official Inspektor separates focused component coverage from browser acceptance. Component tests cover Enum editor activation, NULL actions, insert omission/default behavior, queued overlays, and live-source reconciliation. Browser tests cover opening the real inline editor, local staging and Discard, Save, and persistence after navigation or refresh.
 
-Inspector follows this acceptance split:
+Inspektor follows this acceptance split:
 
 - Pure tests cover state transitions, parsing, nested Row validation, omission, NULL, dirty equality, and payload construction.
 - Component tests cover control composition, validation timing, focus, keyboard behavior, and local draft preservation.
@@ -167,7 +167,7 @@ Selection, complete-row inspection, and editing are separate interactions:
 Cells do not open hover cards or a separate inspection-only cell pane. Complete inspection remains available through the
 complete-row pane, explicit commands, copy actions, and relation navigation.
 
-Inspector will support two editing surfaces:
+Inspektor will support two editing surfaces:
 
 - Side-pane editing.
 - Inline cell editing when the field type supports it.

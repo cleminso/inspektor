@@ -8,7 +8,7 @@ export default function DisabledExample(): ReactElement {
       <Field.Root name="organization">
         <Field.Label>Name</Field.Label>
         <Input
-          defaultValue="Inspector"
+          defaultValue="Inspektor"
           fullWidth
         />
         <Field.Description>Organization settings are locked.</Field.Description>

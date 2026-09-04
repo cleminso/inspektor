@@ -1,7 +1,7 @@
 /**
  * Shared filter model for schema-driven table exploration.
  *
- * Filters are stored as generic clauses because the Inspector cannot rely on an
+ * Filters are stored as generic clauses because the Inspektor cannot rely on an
  * inspected app's generated Jazz query builders. UI controls create these clauses from
  * runtime schema metadata, then table helpers parse values and translate them into
  * generic query constraints.

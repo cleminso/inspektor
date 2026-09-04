@@ -4,5 +4,5 @@ import { CodeEditorPage } from '@/components/content/components/codeEditor/page'
 
 export const Route = createFileRoute('/components/code-editor')({
   component: CodeEditorPage,
-  head: () => ({ meta: [{ title: 'Code Editor · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Code Editor · Inspektor Design System' }] }),
 })

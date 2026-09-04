@@ -4,5 +4,5 @@ import { CalendarPage } from '@/components/content/components/calendar/page'
 
 export const Route = createFileRoute('/components/calendar')({
   component: CalendarPage,
-  head: () => ({ meta: [{ title: 'Calendar · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Calendar · Inspektor Design System' }] }),
 })

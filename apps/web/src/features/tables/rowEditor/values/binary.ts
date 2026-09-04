@@ -59,7 +59,7 @@ export function downloadBinaryValue(
     revokeObjectURL: URL.revokeObjectURL.bind(URL),
   },
 ): void {
-  // Preserve the exact bytes; the Inspector cannot infer their original file type or extension.
+  // Preserve the exact bytes; the Inspektor cannot infer their original file type or extension.
   const url = environment.createObjectURL(
     new Blob([copyToArrayBuffer(value)], { type: 'application/octet-stream' }),
   )

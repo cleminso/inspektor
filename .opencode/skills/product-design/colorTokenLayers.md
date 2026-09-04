@@ -6,7 +6,7 @@
 - [Product problem](#product-problem)
 - [Rejected model](#rejected-model)
 - [Accepted model](#accepted-model)
-- [Inspector implementation](#inspektor-implementation)
+- [Inspektor implementation](#inspektor-implementation)
 - [Why focus remains orthogonal](#why-focus-remains-orthogonal)
 - [Public and private boundaries](#public-and-private-boundaries)
 - [How to repeat the pattern](#how-to-repeat-the-pattern)
@@ -15,7 +15,7 @@
 
 ## Decision
 
-Inspector colors use three layers:
+Inspektor colors use three layers:
 
 1. Palette values.
 2. Interface semantic roles.
@@ -78,7 +78,7 @@ Examples:
 
 The component vocabulary remains specific while its default visual language stays connected to the interface system.
 
-## Inspector implementation
+## Inspektor implementation
 
 ### DataGrid
 
@@ -117,7 +117,7 @@ A generic focused background would require arbitrary precedence rules:
 - Does invalid focus use the same background?
 - Does pointer focus receive the same treatment as keyboard focus?
 
-Inspector therefore expresses focus through a ring or border and composes it with the component's background state. A component may own a focused background only when its interaction model specifically requires one.
+Inspektor therefore expresses focus through a ring or border and composes it with the component's background state. A component may own a focused background only when its interaction model specifically requires one.
 
 ## Public and private boundaries
 

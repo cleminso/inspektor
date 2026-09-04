@@ -83,7 +83,7 @@
 - [x] Documentation tests, typecheck, lint, and build pass.
 - [x] Browser verification preserves nominal geometry at a `16px` root.
 - [x] Browser verification scales representative components at a `20px` root while retaining one-pixel boundaries.
-- [x] Inspector application tests, typecheck, lint, and build pass without Tailwind.
+- [x] Inspektor application tests, typecheck, lint, and build pass without Tailwind.
 - [x] Geist Sans and Geist Mono load from built application assets.
 - [x] Browser verification confirms Geist rendering in light and dark color schemes.
 - [x] Browser verification confirms zero body margin and border-box sizing without Tailwind Preflight.

@@ -4,7 +4,7 @@ import { EditConnectionView } from '@onboarding/editConnectionView'
 
 export const Route = createFileRoute('/conn/edit/$connectionId')({
   head: () => ({
-    meta: [{ title: 'Edit connection | Inspector' }],
+    meta: [{ title: 'Edit connection | Inspektor' }],
   }),
   component: EditConnectionRoute,
 })

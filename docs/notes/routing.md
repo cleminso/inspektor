@@ -1,4 +1,4 @@
-# Inspector route structure
+# Inspektor route structure
 
 ## Table of contents
 
@@ -9,7 +9,7 @@
 - [State ownership](#state-ownership)
 - [Key decisions](#key-decisions)
 - [Browser-tab behavior](#browser-tab-behavior)
-- [Inspector link prefill](#inspektor-link-prefill)
+- [Inspektor link prefill](#inspektor-link-prefill)
 - [Example URLs](#example-urls)
 
 ## Mental model
@@ -52,10 +52,10 @@ Branch and schema hash do not remain in ordinary content routes. They are worksp
 - the header displays and changes them
 - `preferencesByConnectionId` remembers the last branch and schema hash
 - runtime bootstrap validates the remembered schema against available schema hashes
-- changing either value replaces the Inspector runtime and restores workspace state for the resolved context
+- changing either value replaces the Inspektor runtime and restores workspace state for the resolved context
 
 A content URL is local-context-relative. It is expected to reopen an item using the saved connection profile on the same
-Inspector installation. It is not a portable remote-admin URL and does not carry credentials.
+Inspektor installation. It is not a portable remote-admin URL and does not carry credentials.
 
 ## Workspace-item routing
 
@@ -129,7 +129,7 @@ Do not add `sessionStorage` unless a specific state must survive navigation with
 
 ## Browser-tab behavior
 
-Each browser tab mounts an independent React state tree. The connection store is shared through `localStorage`, but Inspector
+Each browser tab mounts an independent React state tree. The connection store is shared through `localStorage`, but Inspektor
 does not automatically ingest another tab's writes while mounted.
 
 This allows two tabs using the same connection to keep independent grid presentation, filters, selection, and editor state.
@@ -139,13 +139,13 @@ connection.
 The model does not promise that two tabs using the same connection can permanently restore different branch or schema choices.
 That would require branch and schema route identity or a separate per-window workspace id.
 
-## Inspector link prefill
+## Inspektor link prefill
 
 Local development can still open the connection flow with credentials in the URL hash:
 
 `/conn/new#serverUrl=<encoded>&appId=<encoded>&adminSecret=<encoded>`
 
-The hash pre-fills and validates a saved local connection. After validation, Inspector assigns a local connection id and opens
+The hash pre-fills and validates a saved local connection. After validation, Inspektor assigns a local connection id and opens
 its workbench. Ordinary content routes never include the admin secret.
 
 ## Example URLs

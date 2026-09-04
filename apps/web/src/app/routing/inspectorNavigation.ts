@@ -1,7 +1,7 @@
 /**
- * Resolves partial Inspector navigation into concrete Jazz runtime targets.
+ * Resolves partial Inspektor navigation into concrete Jazz runtime targets.
  *
- * Entry routes may only know the connection. These helpers combine stored Inspector preferences
+ * Entry routes may only know the connection. These helpers combine stored Inspektor preferences
  * with Jazz schema-hash metadata so every connection-scoped route can bootstrap the same runtime
  * after a saved click, direct navigation, or refresh.
  */
@@ -164,7 +164,7 @@ export async function resolveTablesNavigationTarget({
 }
 
 /**
- * Resolves the authoritative connection-entry target from persisted Inspector state.
+ * Resolves the authoritative connection-entry target from persisted Inspektor state.
  *
  * The parent connection loader uses this path for saved clicks, direct URLs, and refreshes. A
  * remembered schema remains usable when discovery fails; without one, the loader preserves the

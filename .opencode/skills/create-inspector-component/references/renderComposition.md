@@ -23,10 +23,10 @@ Use `render`; do not introduce `asChild`.
 Composition can occur at three boundaries:
 
 1. Base UI applies its behavior to a rendered target.
-2. `@inspektor/ds` composes Base UI parts with Inspector components internally.
-3. A product application composes public Inspector parts.
+2. `@inspektor/ds` composes Base UI parts with Inspektor components internally.
+3. A product application composes public Inspektor parts.
 
-Internal use does not require a public `render` prop on every wrapper. The rendered Inspector target must still accept and forward Base UI-generated props and refs.
+Internal use does not require a public `render` prop on every wrapper. The rendered Inspektor target must still accept and forward Base UI-generated props and refs.
 
 ## Element and function forms
 
@@ -105,7 +105,7 @@ Each Base UI part has a default native element. A different element can require 
 For each public `render` boundary, test:
 
 - default element semantics
-- an approved composed Inspector target
+- an approved composed Inspektor target
 - consumer and Base UI handlers both run
 - generated ARIA and state attributes survive
 - the ref points to the composed DOM element

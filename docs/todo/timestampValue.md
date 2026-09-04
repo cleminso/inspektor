@@ -86,7 +86,7 @@ No open design decisions are recorded.
 [28/08/26]
 
 - [x] Cover shared Date-range normalization across mutation, nested mutation, dirty equality, filters, field parsing, and compact grid presentation.
-- [x] Verify Inspector formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
+- [x] Verify Inspektor formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
 
 [21/08/26]
 

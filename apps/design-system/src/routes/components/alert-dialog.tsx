@@ -4,5 +4,5 @@ import { AlertDialogPage } from '@/components/content/components/alertDialog/pag
 
 export const Route = createFileRoute('/components/alert-dialog')({
   component: AlertDialogPage,
-  head: () => ({ meta: [{ title: 'Alert Dialog · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Alert Dialog · Inspektor Design System' }] }),
 })

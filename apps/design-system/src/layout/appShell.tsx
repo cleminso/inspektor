@@ -109,7 +109,7 @@ function AppShellContent(): ReactElement {
               as="span"
               variant="title"
             >
-              Inspector Design System
+              Inspektor Design System
             </Text>
           </Link>
           <ThemeSwitch />

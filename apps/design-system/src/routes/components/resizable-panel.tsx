@@ -5,6 +5,6 @@ import { ResizablePanelPage } from '@/components/content/components/resizablePan
 export const Route = createFileRoute('/components/resizable-panel')({
   component: ResizablePanelPage,
   head: () => ({
-    meta: [{ title: 'Resizable Panel · Inspector Design System' }],
+    meta: [{ title: 'Resizable Panel · Inspektor Design System' }],
   }),
 })

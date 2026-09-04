@@ -651,7 +651,7 @@ describe('WorkspaceTabs', () => {
     )
   })
 
-  it('keeps Base and Inspector active state aligned when a value change is canceled', () => {
+  it('keeps Base and Inspektor active state aligned when a value change is canceled', () => {
     render(
       <WorkspaceTabs.Root
         defaultValue="all"

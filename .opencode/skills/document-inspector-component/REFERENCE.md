@@ -1,4 +1,4 @@
-# Inspector component documentation reference
+# Inspektor component documentation reference
 
 ## Table of contents
 

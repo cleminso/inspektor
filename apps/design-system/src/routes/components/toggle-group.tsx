@@ -5,6 +5,6 @@ import { ToggleGroupPage } from '@/components/content/components/toggleGroup/pag
 export const Route = createFileRoute('/components/toggle-group')({
   component: ToggleGroupPage,
   head: () => ({
-    meta: [{ title: 'Toggle Group · Inspector Design System' }],
+    meta: [{ title: 'Toggle Group · Inspektor Design System' }],
   }),
 })

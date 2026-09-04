@@ -5,6 +5,6 @@ import { ShellLayoutPage } from '@/components/content/components/shellLayout/pag
 export const Route = createFileRoute('/components/shell-layout')({
   component: ShellLayoutPage,
   head: () => ({
-    meta: [{ title: 'Shell Layout · Inspector Design System' }],
+    meta: [{ title: 'Shell Layout · Inspektor Design System' }],
   }),
 })

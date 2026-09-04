@@ -1,5 +1,5 @@
 /**
- * Parses Inspector filter inputs into values accepted by generic Jazz queries.
+ * Parses Inspektor filter inputs into values accepted by generic Jazz queries.
  *
  * The table explorer only has stored schema metadata, not generated app builders. Keeping
  * parsing here makes URL filters, relation links, and manual filters resolve through the

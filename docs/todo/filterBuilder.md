@@ -318,7 +318,7 @@
 - [ ] Verify the visible Back action and Backspace stage navigation: an incomplete clause clears value, operator, and column one operation at a time, while Backspace on a complete clause removes the entire clause.
 - [ ] Verify toolbar overflow, clause truncation, invalid-state messaging, filtered empty state, loading refresh, and query failure behavior.
 - [ ] Run focused design-system tests and changed-file lint before package-wide design-system validation.
-- [ ] Run focused application tests and changed-file lint before Inspector typecheck, build, and package-wide tests.
+- [ ] Run focused application tests and changed-file lint before Inspektor typecheck, build, and package-wide tests.
 - [ ] Inspect production output if the command implementation changes dynamic import boundaries or adds a heavy dependency.
 
 ### Visible filter interfaces
@@ -598,7 +598,7 @@ None.
 - [x] Cover root activation, master clear, repeated Backspace removal, staged chips, group labels, operator symbols, aliases, footer hints, and horizontal column metadata with focused tests.
 - [x] Run focused `Command`, Filter Builder, draft, parsing, table-view, and query tests.
 - [x] Run changed-file StyleX and application lint.
-- [x] Run `@inspektor/ds`, design-system documentation, and Inspector tests, typechecks, builds, and package lint.
+- [x] Run `@inspektor/ds`, design-system documentation, and Inspektor tests, typechecks, builds, and package lint.
 - [x] Verify modal sizing, keyboard selection, Escape behavior, focus restoration, footer presentation, narrow layout, and accessible names in the Command browser documentation.
 - [ ] Verify root activation, master clear, staged chips, glyph selection, and repeated Backspace removal against a connected runtime table.
 
@@ -612,7 +612,7 @@ None.
 - [x] Generate and check design-system prop metadata.
 - [x] Run design-system documentation tests, typecheck, lint, and build.
 - [x] Run focused filter draft, parsing, routing, toolbar, query, prefetch, and table-view tests.
-- [x] Run Inspector changed-file lint, typecheck, build, and package tests.
+- [x] Run Inspektor changed-file lint, typecheck, build, and package tests.
 - [ ] Verify pointer creation, direct segment editing, removal, and cancellation in the browser.
 - [ ] Verify keyboard creation, stage navigation, validation, dismissal, removal, and focus restoration in the browser.
 - [ ] Verify screen-reader names and state announcements for the command dialog, clause groups, invalid clauses, value errors, and filtered result status.
@@ -625,5 +625,5 @@ None.
 
 - [x] Run affected table query, prefetch, and routing tests.
 - [x] Run changed-file lint.
-- [x] Run the Inspector package test pass.
-- [x] Run the Inspector package typecheck and build.
+- [x] Run the Inspektor package test pass.
+- [x] Run the Inspektor package typecheck and build.

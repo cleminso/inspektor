@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { Text } from './text'
 
 describe('Text', () => {
-  it('constrains the text API to Inspector-owned presentation', () => {
+  it('constrains the text API to Inspektor-owned presentation', () => {
     // @ts-expect-error Text only accepts constrained design-system props.
     const className = <Text className="consumer-style" />
     // @ts-expect-error Text only accepts constrained design-system props.

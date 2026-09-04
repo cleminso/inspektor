@@ -296,7 +296,7 @@ describe('LiveQueriesView', () => {
     expect(screen.queryByRole('complementary', { name: 'Query details' })).toBeNull()
   })
 
-  it('prioritizes the Inspector-selected schema when the query reports it', () => {
+  it('prioritizes the Inspektor-selected schema when the query reports it', () => {
     mocks.connection = { ...mocks.connection!, env: 'local-dev' }
     mocks.currentSchemaHash = 'e7ebacf3577c'.padEnd(64, '0')
     const branches = [
@@ -321,7 +321,7 @@ describe('LiveQueriesView', () => {
     expect(within(details).queryByText('Branches')).toBeNull()
   })
 
-  it('uses the first reported schema without injecting an absent Inspector selection', () => {
+  it('uses the first reported schema without injecting an absent Inspektor selection', () => {
     mocks.currentSchemaHash = 'a'.repeat(64)
     const branches = ['test-7f43cb822ba5-main', 'test-e7ebacf3577c-main']
     mocks.telemetry = telemetry([success('capture-1', 1_000, [{ ...accountsGroup, branches }])])

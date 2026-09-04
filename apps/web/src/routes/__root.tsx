@@ -7,7 +7,7 @@ import { InspectorDevtools } from '@app/devtools/inspectorDevtools'
 
 export const Route = createRootRoute({
   head: () => ({
-    meta: [{ title: 'Inspector' }],
+    meta: [{ title: 'Inspektor' }],
   }),
   component: RootComponent,
 })

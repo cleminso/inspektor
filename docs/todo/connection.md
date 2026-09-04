@@ -318,7 +318,7 @@
 
 - Generic `Open connection` headers do not expose remembered workspace context as a current selection.
 - Edit and remove actions are available only when the current route identifies a connection.
-- Saved-connection surfaces preserve the store's shared order; Inspector does not promote the active connection or claim recency without tracking it.
+- Saved-connection surfaces preserve the store's shared order; Inspektor does not promote the active connection or claim recency without tracking it.
 
 [04/09/26]
 
@@ -364,7 +364,7 @@
 - A valid explicit `schema` search parameter overrides the newest-schema default and remains stable across refresh.
 - Schema switching updates the current URL without adding browser-history entries or resetting scroll position.
 - The header identifies the active schema as `Latest` or `Older schema`; the newest option also carries a `Latest` badge.
-- Schema options use a short hash and publication metadata instead of an Inspector-owned version number. The selected option retains both its background and check indicator.
+- Schema options use a short hash and publication metadata instead of an Inspektor-owned version number. The selected option retains both its background and check indicator.
 - These decisions supersede the remembered-schema selection and automatic-switch exclusion recorded below.
 
 [25/08/26]
@@ -376,7 +376,7 @@
 
 - Schema catalogue order is newest publication first and oldest publication last. Ordering uses Jazz `publishedAt` metadata rather than hash-array position.
 - Schema ordering does not force schema selection. An explicit or remembered schema remains selected while available; fallback selection uses the first ordered schema.
-- Connection entry and refresh fetch the schema catalogue so Inspector can discover migrations published outside Inspector.
+- Connection entry and refresh fetch the schema catalogue so Inspektor can discover migrations published outside Inspektor.
 - The connection route loader owns remote schema-catalogue resolution for connected route entry and returns the runtime target for saved selection, direct entry, and refresh; add and edit retain separate inline credential validation before persistence.
 - TanStack Router owns pending, superseding, loader error, and committed route state. A newer accepted connection intent supersedes an older pending intent.
 - The session boundary owns saved profiles and runtime-scope exit policy but does not own remote route-loader progress or duplicate it into a second opening state machine.
@@ -451,39 +451,39 @@
 [04/09/26]
 
 - [x] Cover neutral selection, saved ordering, absent management actions, and accurate saved-connection naming.
-- [x] Verify the neutral `/conn` state with an isolated Inspector Test browser fixture.
-- [x] Run Inspector formatting, lint, typecheck, build, and package tests.
+- [x] Verify the neutral `/conn` state with an isolated Inspektor Test browser fixture.
+- [x] Run Inspektor formatting, lint, typecheck, build, and package tests.
 
 [04/09/26]
 
 - [x] Cover retention of the committed surface and absence of runtime-synchronization opening feedback.
-- [x] Run focused connection transition tests, Inspector lint, typecheck, build, and package tests.
+- [x] Run focused connection transition tests, Inspektor lint, typecheck, build, and package tests.
 
 [04/09/26]
 
 - [x] Cover generic add-connection and contextual edit-connection headers.
-- [x] Run focused connection header tests, Inspector lint, typecheck, build, and package tests.
+- [x] Run focused connection header tests, Inspektor lint, typecheck, build, and package tests.
 
 [04/09/26]
 
 - [x] Cover required blur validation, field error association, connection-wide status, and disabled submission controls.
-- [x] Run changed-file lint, Inspector typecheck, build, and package tests.
+- [x] Run changed-file lint, Inspektor typecheck, build, and package tests.
 
 [03/09/26]
 
 - [x] Cover the active and pending connection environment beside, rather than inside, the trigger.
 - [x] Verify the connection switcher and header in the browser.
-- [x] Run Inspector formatting, lint, typecheck, build, and package-wide tests.
+- [x] Run Inspektor formatting, lint, typecheck, build, and package-wide tests.
 
 [03/09/26]
 
 - [x] Cover a permissions-head schema that differs from the first advertised schema.
-- [x] Run Inspector formatting, lint, typecheck, build, and package-wide tests.
+- [x] Run Inspektor formatting, lint, typecheck, build, and package-wide tests.
 
 [03/09/26]
 
 - [x] Verify connection list, add, and edit routes render the floating header and centered view.
-- [x] Run focused onboarding tests, changed-file lint, and Inspector typecheck.
+- [x] Run focused onboarding tests, changed-file lint, and Inspektor typecheck.
 
 [29/08/26]
 
@@ -493,12 +493,12 @@
 
 - [x] Cover advertised-order fallback when publication metadata is equal or missing.
 - [x] Verify newest-schema entry, table and query schema switching, URL replacement, selection status, and refresh persistence in the browser.
-- [x] Run Inspector lint, TypeScript checks, production build, and package-wide tests.
+- [x] Run Inspektor lint, TypeScript checks, production build, and package-wide tests.
 
 [27/08/26]
 
 - [x] Cover isolated-fixture connection entry, browser persistence, schema permissions, real row queries, filtering, sorting, mutation persistence, and relation navigation in Playwright.
-- [x] Keep automated browser tests on direct loopback HTTP with fresh browser contexts and ephemeral Inspector Test credentials.
+- [x] Keep automated browser tests on direct loopback HTTP with fresh browser contexts and ephemeral Inspektor Test credentials.
 
 [25/08/26]
 
@@ -524,10 +524,10 @@
 - [x] Cover that permissions remain non-blocking and that selected-schema loading and Jazz client creation remain parallel.
 - [x] Cover the application-root and connection-switcher import boundaries after moving route resolution.
 - [x] If WASM preparation is implemented, cover one shared promise, no preparation for blocked intent, no early Jazz client, and safe rejection handling without a toast or unhandled promise.
-- [ ] Verify with the isolated Inspector Test fixture that saved selection, direct refresh, add, edit, schema switching, connection superseding, and failure recovery reach the expected route and rows.
+- [ ] Verify with the isolated Inspektor Test fixture that saved selection, direct refresh, add, edit, schema switching, connection superseding, and failure recovery reach the expected route and rows.
 - [ ] Capture production traces for connection activation, catalogue completion, route commit, selected-schema verification, WASM completion, Jazz WebSocket readiness, first table selection, and first rows.
 - [ ] Compare production traces with and without WASM preparation and retain it only when it advances client and row readiness without duplicate WASM work.
-- [x] Run focused connection, routing, runtime, schema-switcher, add, and edit tests before Inspector lint, typecheck, production build, package-wide tests, and workspace formatting.
+- [x] Run focused connection, routing, runtime, schema-switcher, add, and edit tests before Inspektor lint, typecheck, production build, package-wide tests, and workspace formatting.
 - [x] Supersede historical saved-open toast, request-lock, pending-control, prepared-target, and navigation-error checks with the route-owned loading coverage above.
 
 [24/08/26]
@@ -563,7 +563,7 @@
 
 - [x] Verify a saved-connection open and its route loader share one schema-hash discovery result.
 - [x] Verify changed connection credentials reject a prepared route target.
-- [x] Verify the isolated Inspector Test fixture reaches schema and row rendering through the optimized route handoff.
+- [x] Verify the isolated Inspektor Test fixture reaches schema and row rendering through the optimized route handoff.
 
 [22/08/26]
 

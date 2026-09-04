@@ -22,7 +22,7 @@
   - [Controlled and uncontrolled state](#controlled-and-uncontrolled-state)
   - [Change callbacks and event details](#change-callbacks-and-event-details)
   - [Part State and data attributes](#part-state-and-data-attributes)
-- [TypeScript tools used by Inspector wrappers](#typescript-tools-used-by-inspektor-wrappers)
+- [TypeScript tools used by Inspektor wrappers](#typescript-tools-used-by-inspektor-wrappers)
   - [Omit](#omit)
   - [Pick](#pick)
   - [Indexed access](#indexed-access)
@@ -37,8 +37,8 @@
   - [mergeProps](#mergeprops)
   - [Prop spread precedence](#prop-spread-precedence)
   - [nativeButton](#nativebutton)
-- [Base UI versus Inspector ownership](#base-ui-versus-inspektor-ownership)
-- [Mapped Inspector examples](#mapped-inspektor-examples)
+- [Base UI versus Inspektor ownership](#base-ui-versus-inspektor-ownership)
+- [Mapped Inspektor examples](#mapped-inspektor-examples)
   - [Button: a single-part wrapper](#button-a-single-part-wrapper)
   - [Accordion: a compound wrapper](#accordion-a-compound-wrapper)
   - [Select: compound parts, generic values, and a popup recipe](#select-compound-parts-generic-values-and-a-popup-recipe)
@@ -50,17 +50,17 @@
 - [Sources](#sources)
   - [Official Base UI documentation](#official-base-ui-documentation)
   - [Official Base UI v1.6.0 source](#official-base-ui-v160-source)
-  - [Local Inspector source map](#local-inspektor-source-map)
+  - [Local Inspektor source map](#local-inspektor-source-map)
 
 ## Purpose and scope
 
-This document explains how a Base UI component becomes Inspector DOM. It targets a reader who can read React and TypeScript but has not yet built an accessible compound component.
+This document explains how a Base UI component becomes Inspektor DOM. It targets a reader who can read React and TypeScript but has not yet built an accessible compound component.
 
 The central idea is:
 
 > A Base UI part is not merely an HTML tag. It is a boundary where state, behavior, accessibility, props, refs, and rendering meet.
 
-Inspector does not copy that machinery. Its wrappers preserve Base UI's behavioral contract while narrowing the public API and applying Inspector's visual rules.
+Inspektor does not copy that machinery. Its wrappers preserve Base UI's behavioral contract while narrowing the public API and applying Inspektor's visual rules.
 
 This document targets `@base-ui/react` v1.6.0. Recurring names such as `Root`, `Trigger`, and `Popup` are useful clues, not universal guarantees. Consult the official anatomy and API for the exact component being used. Dialog, Menu, Select, Checkbox, and Accordion do not assign identical DOM or behavior to identically named parts.
 
@@ -131,9 +131,9 @@ Read a wrapper from the outside boundary toward the actual element:
 ```/dev/null/base-ui-anatomy.txt#L1-20
 consumer JSX
   ↓
-Inspector public props
+Inspektor public props
   ↓
-Inspector defaults, restrictions, structure, and StyleX policy
+Inspektor defaults, restrictions, structure, and StyleX policy
   ↓
 Base UI primitive or compound Root
   ↓
@@ -170,7 +170,7 @@ The JSX expresses structure and state ownership. It does not manually set `aria-
 
 ### 2. The public wrapper API limits expression
 
-Inspector's exported type decides what product code may request. It can:
+Inspektor's exported type decides what product code may request. It can:
 
 - inherit valid native and Base behavior props;
 - remove styling escape hatches;
@@ -199,7 +199,7 @@ Root is the broad behavior bus for a compound component. It commonly owns or coo
 
 React context carries that model to parts. A Portal may move descendants under `document.body`, but it does not sever React context. Logical ownership follows the React tree, not DOM ancestry.
 
-Root is not guaranteed to render an element. Select Root is a state provider with no root DOM in the Inspector mapping, while Accordion Root renders a container. Assuming every Root accepts generic DOM props or produces a `<div>` creates a false API.
+Root is not guaranteed to render an element. Select Root is a state provider with no root DOM in the Inspektor mapping, while Accordion Root renders a container. Assuming every Root accepts generic DOM props or produces a `<div>` creates a false API.
 
 ### 4. Parts take focused roles
 
@@ -215,7 +215,7 @@ A DOM-bearing part must put all of these on the same primary element:
 
 - Base UI's behavioral props;
 - consumer DOM props;
-- Inspector's resolved policy props;
+- Inspektor's resolved policy props;
 - state-dependent class and style output;
 - Base UI's internal ref;
 - the consumer's forwarded ref;
@@ -314,7 +314,7 @@ Root context is broad. Positioner, Group, and Item contexts are narrower. This m
 - controlled state props and typed callbacks;
 - state-aware `className` and `style` callbacks.
 
-Inspector derives each wrapper from the part it actually renders:
+Inspektor derives each wrapper from the part it actually renders:
 
 ```packages/design-system/src/components/accordion/accordion.tsx#L12-23
 export interface AccordionRootProps extends Omit<
@@ -374,7 +374,7 @@ The `details` object is a custom component event description, not merely a React
 
 This answers a need that `onClick` cannot: one state change may come from keyboard input, pointer input, focus movement, dismissal, an effect, or another component mechanism. The reason lets application code respond to intent rather than guessing from one DOM event.
 
-Do not reduce a callback to `(value) => void` in a wrapper. That discards reasons, cancellation, event narrowing, and component-specific details. Use indexed access such as `BaseSelect.Root.Props<Value, false>['onValueChange']` as Inspector does in `packages/design-system/src/components/select/select.tsx#L20-L34`.
+Do not reduce a callback to `(value) => void` in a wrapper. That discards reasons, cancellation, event narrowing, and component-specific details. Use indexed access such as `BaseSelect.Root.Props<Value, false>['onValueChange']` as Inspektor does in `packages/design-system/src/components/select/select.tsx#L20-L34`.
 
 Three cancellation mechanisms solve different problems:
 
@@ -392,14 +392,14 @@ See [Base UI customization events](https://base-ui.com/react/handbook/customizat
 
 `Part.State` is derived state that Base UI supplies to a part's render-time styling and rendering callbacks. It is not wrapper-owned React state and is not necessarily the same shape as the controlled value.
 
-Examples in Inspector:
+Examples in Inspektor:
 
 - `BaseButton.State` exposes resolved `disabled` in `packages/design-system/src/components/button/button.tsx#L91-L108`.
 - `BaseAccordion.Trigger.State` exposes `open` and `disabled` in `packages/design-system/src/components/accordion/accordion.tsx#L96-L104`.
 - `BaseAccordion.Panel.State` exposes `transitionStatus` in `packages/design-system/src/components/accordion/accordion.tsx#L121-L128`.
 - `BaseSelect.Item.State` exposes `selected`, `highlighted`, and `disabled` in `packages/design-system/src/components/select/select.tsx#L288-L306`.
 
-Inspector's adapter turns one StyleX selector into Base-compatible `className(state)` and `style(state)` callbacks:
+Inspektor's adapter turns one StyleX selector into Base-compatible `className(state)` and `style(state)` callbacks:
 
 ```packages/design-system/src/primitives/createStateStyleProps.ts#L3-13
 type StyleXProp = stylex.StyleXStyles | false | null | undefined;
@@ -416,7 +416,7 @@ export function createStateStyleProps<State>(
 }
 ```
 
-Base UI also maps documented state to `data-*` attributes on the rendered part. These attributes answer the styling and inspection need without making Inspector duplicate the state machine. They do not create ARIA semantics. `data-open` may support CSS, but accessible behavior still depends on the correct element, role, IDs, ARIA attributes, and handlers.
+Base UI also maps documented state to `data-*` attributes on the rendered part. These attributes answer the styling and inspection need without making Inspektor duplicate the state machine. They do not create ARIA semantics. `data-open` may support CSS, but accessible behavior still depends on the correct element, role, IDs, ARIA attributes, and handlers.
 
 What breaks:
 
@@ -432,7 +432,7 @@ See [Base UI styling with data attributes](https://base-ui.com/react/handbook/st
 
 ### Omit
 
-`Omit<Props, Keys>` starts from a broad contract and removes named capabilities. Inspector commonly removes `className`, `style`, or `render` so consumers cannot bypass the design system or replace structure unintentionally.
+`Omit<Props, Keys>` starts from a broad contract and removes named capabilities. Inspektor commonly removes `className`, `style`, or `render` so consumers cannot bypass the design system or replace structure unintentionally.
 
 Button removes Base styling plus low-level behavior and content decisions:
 
@@ -456,7 +456,7 @@ The need is API shaping. `Omit` is compile-time only: it does not remove a key f
 
 ### Pick
 
-`Pick<Props, Keys>` exposes a small allowed subset of a broad upstream API. Select Positioner permits semantic placement choices while Inspector owns detailed geometry:
+`Pick<Props, Keys>` exposes a small allowed subset of a broad upstream API. Select Positioner permits semantic placement choices while Inspektor owns detailed geometry:
 
 ```packages/design-system/src/components/select/select.tsx#L64-67
 export type SelectPositionerProps = Pick<
@@ -467,11 +467,11 @@ export type SelectPositionerProps = Pick<
 
 This answers the need to allow meaningful placement without exposing arbitrary offsets or collision tuning on every product screen. A careless `Pick` can remove a required behavioral prop, so the allowed subset must be checked against the exact part's anatomy and intended wrapper policy.
 
-`Pick` is not Inspector's default Base UI wrapper strategy. Transparent wrappers start from the exact part props and use justified omissions. A selective `Pick` is appropriate when the surface is intentionally closed, such as Positioners where consumers choose semantic `side` and `align` while Inspector owns offsets, collision behavior, anchor tracking, and positioning strategy. This allowlist fails closed: an additional upstream geometry prop does not become public without an Inspector decision.
+`Pick` is not Inspektor's default Base UI wrapper strategy. Transparent wrappers start from the exact part props and use justified omissions. A selective `Pick` is appropriate when the surface is intentionally closed, such as Positioners where consumers choose semantic `side` and `align` while Inspektor owns offsets, collision behavior, anchor tracking, and positioning strategy. This allowlist fails closed: an additional upstream geometry prop does not become public without an Inspektor decision.
 
 ### Indexed access
 
-`SomeType['property']` extracts one exact property type. Inspector uses it to document a prop locally without copying Base UI's signature:
+`SomeType['property']` extracts one exact property type. Inspektor uses it to document a prop locally without copying Base UI's signature:
 
 ```packages/design-system/src/components/select/select.tsx#L20-34
 export type SelectRootProps<Value> = Omit<
@@ -500,7 +500,7 @@ If these states are represented by independent optional booleans, consumers can 
 
 A **generic value** lets the consumer choose the type represented by a component. Select should preserve an application's value type rather than reduce every option to `string` or `any`.
 
-Inspector fixes Select Root to single selection with `BaseSelect.Root.Props<Value, false>` and preserves Root's inferred `Value` through its current/default values, items, and callback. Select Item is a separate generic call that preserves the type inferred for that Item (`packages/design-system/src/components/select/select.tsx#L20-L34`, `L83-L97`).
+Inspektor fixes Select Root to single selection with `BaseSelect.Root.Props<Value, false>` and preserves Root's inferred `Value` through its current/default values, items, and callback. Select Item is a separate generic call that preserves the type inferred for that Item (`packages/design-system/src/components/select/select.tsx#L20-L34`, `L83-L97`).
 
 The current compound API does not create one shared TypeScript generic scope across Root and every nested Item. React context connects their values at runtime, but TypeScript checks each public surface independently. It cannot prove that a nested Item's inferred type equals Root's inferred type.
 
@@ -545,7 +545,7 @@ Select Root does not need this pattern because it renders no element and remains
 
 ### `Object.assign`
 
-Inspector uses `Object.assign` to package a callable root and related members under one exported symbol:
+Inspektor uses `Object.assign` to package a callable root and related members under one exported symbol:
 
 ```packages/design-system/src/components/accordion/accordion.tsx#L132-138
 export const Accordion = Object.assign(AccordionRoot, {
@@ -565,7 +565,7 @@ This answers an API discoverability need: consumers can use `<Accordion>` or `<A
 - enforce that parts are nested correctly;
 - render additional DOM;
 - bind Root's generic type to every Item call;
-- turn an Inspector convenience recipe into a Base UI primitive.
+- turn an Inspektor convenience recipe into a Base UI primitive.
 
 Those behaviors come from the actual Root and part implementations, not namespace packaging.
 
@@ -577,7 +577,7 @@ A **ref** is React's route to a rendered element or imperative object. Base UI n
 
 `React.ComponentRef<typeof Part>` asks React for the ref target declared by the exact imported part. It avoids guessing whether the target is `HTMLButtonElement`, `HTMLElement`, or another type.
 
-`forwardRef<RefTarget, PublicProps>` carries the consumer ref across the Inspector wrapper. The implementation must still attach it to the behavior-owning Base part:
+`forwardRef<RefTarget, PublicProps>` carries the consumer ref across the Inspektor wrapper. The implementation must still attach it to the behavior-owning Base part:
 
 ```/dev/null/select-trigger-ref.tsx#L1-17
 const SelectTrigger = React.forwardRef<
@@ -598,7 +598,7 @@ const SelectTrigger = React.forwardRef<
 })
 ```
 
-The actual implementation includes Inspector sizing, adornments, and state styles in `packages/design-system/src/components/select/select.tsx#L141-L196`.
+The actual implementation includes Inspektor sizing, adornments, and state styles in `packages/design-system/src/components/select/select.tsx#L141-L196`.
 
 What breaks:
 
@@ -635,7 +635,7 @@ See the [Base UI composition handbook](https://base-ui.com/react/handbook/compos
 
 ### useRender
 
-`useRender` gives an Inspector-owned component Base UI's rendering infrastructure without giving it a Base widget state machine. Important inputs are:
+`useRender` gives an Inspektor-owned component Base UI's rendering infrastructure without giving it a Base widget state machine. Important inputs are:
 
 | Input                    | Purpose                                                                          |
 | ------------------------ | -------------------------------------------------------------------------------- |
@@ -687,13 +687,13 @@ JSX spread uses ordinary last-write-wins assignment:
 />
 ```
 
-This order means Inspector's resolved value replaces a conflicting pass-through value, private state styles replace untyped runtime styling props, and the trailing slot is fixed. It does not merge duplicate handlers, class strings, style objects, or refs.
+This order means Inspektor's resolved value replaces a conflicting pass-through value, private state styles replace untyped runtime styling props, and the trailing slot is fixed. It does not merge duplicate handlers, class strings, style objects, or refs.
 
 Destructuring is part of the policy. Removing `size`, `disabled`, or `render` from the rest object lets the wrapper forward one resolved value in one chosen position.
 
 Base UI performs another internal merge inside the primitive. Wrapper JSX precedence and Base UI's renderer merge are separate layers. If several independent owners must keep handlers/classes/styles, use `mergeProps` or deliberate manual control flow rather than hoping spread order composes them.
 
-Inspector Button demonstrates pass-through props followed by resolved policy and state styles at `packages/design-system/src/components/button/button.tsx#L110-L129`.
+Inspektor Button demonstrates pass-through props followed by resolved policy and state styles at `packages/design-system/src/components/button/button.tsx#L110-L129`.
 
 ### nativeButton
 
@@ -720,7 +720,7 @@ See [Base UI Button](https://base-ui.com/react/components/button), [`useRender` 
 
 ## Base UI versus Inspektor ownership
 
-| Concern             | Base UI owns                                                                                     | Inspector owns                                                                                |
+| Concern             | Base UI owns                                                                                     | Inspektor owns                                                                                |
 | ------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
 | State mechanics     | Controlled/uncontrolled storage, update details, context, registration.                          | Supported modes, product defaults, and translations such as loading to disabled behavior.     |
 | Accessibility       | Roles, ARIA relationships, keyboard/pointer behavior, focus, form mechanics.                     | Required names in public types, owned labels, safe composition, visible focus styling.        |
@@ -734,9 +734,9 @@ See [Base UI Button](https://base-ui.com/react/components/button), [`useRender` 
 A practical ownership test:
 
 - If the concern requires widget interaction state, ARIA wiring, focus, collection registration, or popup geometry, use the relevant Base part or its public contract.
-- If the concern requires Inspector tokens, semantic variants, supported modes, standard child markup, or feature composition, it belongs in the wrapper.
+- If the concern requires Inspektor tokens, semantic variants, supported modes, standard child markup, or feature composition, it belongs in the wrapper.
 
-Inspector should not query the DOM to reconstruct state Base UI already exposes. It should also not push product-specific visual policy into Base UI.
+Inspektor should not query the DOM to reconstruct state Base UI already exposes. It should also not push product-specific visual policy into Base UI.
 
 ## Mapped Inspektor examples
 
@@ -746,19 +746,19 @@ Button is the smallest complete model because one Base part owns the primary int
 
 ```/dev/null/button-map.txt#L1-7
 consumer <Button>
-  → Inspector ButtonProps
-  → Inspector defaults and loading policy
+  → Inspektor ButtonProps
+  → Inspektor defaults and loading policy
   → BaseButton behavior and BaseButton.State
   → Base renderer merges render target, props, and refs
   → final button-compatible element
-     └─ Inspector ButtonContent presentation
+     └─ Inspektor ButtonContent presentation
 ```
 
-**Public API.** Inspector starts from `BaseButton.Props`, removes direct styling and low-level knobs, adds semantic variants, and uses a discriminated union for icon-only accessibility (`packages/design-system/src/components/button/button.tsx#L23-L69`).
+**Public API.** Inspektor starts from `BaseButton.Props`, removes direct styling and low-level knobs, adds semantic variants, and uses a discriminated union for icon-only accessibility (`packages/design-system/src/components/button/button.tsx#L23-L69`).
 
-**State and policy.** `loading` is an Inspector concept. The wrapper resolves `disabled || loading`, keeps a loading control focusable, applies `aria-busy`, and styles from Base's resolved `state.disabled` (`packages/design-system/src/components/button/button.tsx#L71-L108`). Base UI still enforces interaction behavior.
+**State and policy.** `loading` is an Inspektor concept. The wrapper resolves `disabled || loading`, keeps a loading control focusable, applies `aria-busy`, and styles from Base's resolved `state.disabled` (`packages/design-system/src/components/button/button.tsx#L71-L108`). Base UI still enforces interaction behavior.
 
-**Element boundary.** Inspector spreads pass-through props onto `BaseButton`, applies its resolved values and state styles, and places presentation inside the Base element (`packages/design-system/src/components/button/button.tsx#L110-L140`). The ref reaches `BaseButton`, not `ButtonContent`.
+**Element boundary.** Inspektor spreads pass-through props onto `BaseButton`, applies its resolved values and state styles, and places presentation inside the Base element (`packages/design-system/src/components/button/button.tsx#L110-L140`). The ref reaches `BaseButton`, not `ButtonContent`.
 
 **Need answered.** Product code gets one consistent Button API while Base UI remains responsible for button semantics, keyboard behavior, disabled behavior, and render composition.
 
@@ -773,8 +773,8 @@ BaseAccordion.Root
 └─ BaseAccordion.Item
    ├─ BaseAccordion.Header
    │  └─ BaseAccordion.Trigger
-   │     ├─ Inspector label
-   │     ├─ Inspector chevron
+   │     ├─ Inspektor label
+   │     ├─ Inspektor chevron
    │     └─ optional suffix
    └─ BaseAccordion.Panel
       └─ consumer content
@@ -782,15 +782,15 @@ BaseAccordion.Root
 
 **Per-part props.** Root uses `BaseAccordion.Root.Props<AccordionValue>`, Item uses `Item.Props`, Header uses `Header.Props`, Trigger uses `Trigger.Props`, and Panel uses `Panel.Props` (`packages/design-system/src/components/accordion/accordion.tsx#L8-L61`). This preserves each part's distinct behavior and state typing.
 
-**Root and context.** Root owns expanded values and broad Accordion context. Item registers its value. Trigger and Panel participate in that Item relationship. Inspector does not copy expanded state into another hook (`packages/design-system/src/components/accordion/accordion.tsx#L63-L85`).
+**Root and context.** Root owns expanded values and broad Accordion context. Item registers its value. Trigger and Panel participate in that Item relationship. Inspektor does not copy expanded state into another hook (`packages/design-system/src/components/accordion/accordion.tsx#L63-L85`).
 
 **Part state.** Trigger styles `open` and `disabled`; Panel styles `transitionStatus`. Those facts come from the parts that own them (`packages/design-system/src/components/accordion/accordion.tsx#L96-L128`).
 
-**Presentation.** Inspector inserts label, chevron, and suffix inside Base Trigger. It does not create a competing button or heading (`packages/design-system/src/components/accordion/accordion.tsx#L96-L119`). Base Header and Trigger retain their semantic relationship.
+**Presentation.** Inspektor inserts label, chevron, and suffix inside Base Trigger. It does not create a competing button or heading (`packages/design-system/src/components/accordion/accordion.tsx#L96-L119`). Base Header and Trigger retain their semantic relationship.
 
 **API packaging.** `Object.assign` exposes `Accordion.Root`, `.Item`, `.Header`, `.Trigger`, and `.Panel` (`packages/design-system/src/components/accordion/accordion.tsx#L132-L138`). It does not create or enforce the Root/Item context.
 
-**Need answered.** Consumers control composition and content, Inspector controls visuals, and Base UI keeps trigger/panel IDs, expansion behavior, and keyboard semantics coherent.
+**Need answered.** Consumers control composition and content, Inspektor controls visuals, and Base UI keeps trigger/panel IDs, expansion behavior, and keyboard semantics coherent.
 
 **Breakage to watch.** A plain button in place of Base Trigger may toggle local state visually but lose Base's association and state details. A Panel outside the matching Item may lack the context it requires. Styling Panel transition from Root state assigns a local lifecycle fact to the wrong boundary.
 
@@ -806,7 +806,7 @@ BaseSelect.Root<Value, false>             no root DOM
 │  ├─ BaseSelect.Value
 │  ├─ suffix
 │  └─ BaseSelect.Icon
-└─ Select.Content                        Inspector recipe
+└─ Select.Content                        Inspektor recipe
    └─ BaseSelect.Portal
       └─ BaseSelect.Positioner
          └─ BaseSelect.Popup
@@ -819,41 +819,41 @@ BaseSelect.Root<Value, false>             no root DOM
                   └─ BaseSelect.Item<Value>
 ```
 
-**Generic Root.** Inspector fixes multiple selection to `false` while preserving caller-selected `Value` through value, default value, items, and callback (`packages/design-system/src/components/select/select.tsx#L20-L34`, `L112-L114`).
+**Generic Root.** Inspektor fixes multiple selection to `false` while preserving caller-selected `Value` through value, default value, items, and callback (`packages/design-system/src/components/select/select.tsx#L20-L34`, `L112-L114`).
 
-**Trigger.** Inspector exposes constrained size and width, forwards `nativeButton` and `render` independently, styles Base's open/valid/disabled state, and inserts a standard icon only when one is absent (`packages/design-system/src/components/select/select.tsx#L38-L58`, `L141-L196`). The consumer must ensure that `nativeButton` describes the final render target.
+**Trigger.** Inspektor exposes constrained size and width, forwards `nativeButton` and `render` independently, styles Base's open/valid/disabled state, and inserts a standard icon only when one is absent (`packages/design-system/src/components/select/select.tsx#L38-L58`, `L141-L196`). The consumer must ensure that `nativeButton` describes the final render target.
 
-**Popup layers.** Portal, Positioner, Popup, and List remain separate direct wrappers. Positioner exposes a picked placement subset while Inspector fixes the shared offset (`packages/design-system/src/components/select/select.tsx#L223-L263`). `Select.Content` is an Inspector convenience recipe that assembles those parts (`packages/design-system/src/components/select/select.tsx#L265-L280`). It is not a Base primitive and adds no new context.
+**Popup layers.** Portal, Positioner, Popup, and List remain separate direct wrappers. Positioner exposes a picked placement subset while Inspektor fixes the shared offset (`packages/design-system/src/components/select/select.tsx#L223-L263`). `Select.Content` is an Inspektor convenience recipe that assembles those parts (`packages/design-system/src/components/select/select.tsx#L265-L280`). It is not a Base primitive and adds no new context.
 
 **Items.** Item preserves generic `Value`, styles selected/highlighted/disabled state, and inserts ItemText and ItemIndicator when consumers have not supplied them (`packages/design-system/src/components/select/select.tsx#L282-L366`). The generic inner function plus `forwardRef` cast preserves call-site typing.
 
-**Need answered.** Base UI coordinates selection, label resolution, item registration, keyboard behavior, popup state, and positioning. Inspector supplies a smaller product vocabulary and a standard visual composition.
+**Need answered.** Base UI coordinates selection, label resolution, item registration, keyboard behavior, popup state, and positioning. Inspektor supplies a smaller product vocabulary and a standard visual composition.
 
 **Breakage to watch.** Treating `Select.Content` as the state owner misunderstands the recipe. Rendering visual rows instead of Base Items breaks registration and keyboard selection. Manually passing `selected` to Indicator duplicates Item context. Assuming Select Root renders a wrapper produces the wrong DOM model.
 
 ### ActionList: behavior primitives versus rendering utilities
 
-ActionList is useful because there is no Base UI ActionList primitive. Inspector owns the list-level behavior and structure:
+ActionList is useful because there is no Base UI ActionList primitive. Inspektor owns the list-level behavior and structure:
 
 ```/dev/null/action-list-map.txt#L1-9
-ul                              Inspector structure and Escape policy
-└─ li / composed item           Inspector + useRender
+ul                              Inspektor structure and Escape policy
+└─ li / composed item           Inspektor + useRender
    ├─ selection control
-   │  └─ Inspector Checkbox     Base-backed leaf behavior
+   │  └─ Inspektor Checkbox     Base-backed leaf behavior
    ├─ Base Button               primary trigger
    └─ Base Button               optional trailing action
 ```
 
 `ActionList.Item` derives from `useRender.ComponentProps<'li'>`, combines independent prop owners with `mergeProps`, and supplies the forwarded ref separately to `useRender` (`packages/design-system/src/components/actionList/actionList.tsx#L26-L35`, `L114-L142`).
 
-`useRender` supplies composition infrastructure only. It does not turn the Item into a Base collection primitive. Inspector owns Root's Escape delegation and focus-return policy (`packages/design-system/src/components/actionList/actionList.tsx#L76-L112`). Base Button and Inspector Checkbox own the interactive leaves (`packages/design-system/src/components/actionList/actionList.tsx#L144-L223`).
+`useRender` supplies composition infrastructure only. It does not turn the Item into a Base collection primitive. Inspektor owns Root's Escape delegation and focus-return policy (`packages/design-system/src/components/actionList/actionList.tsx#L76-L112`). Base Button and Inspektor Checkbox own the interactive leaves (`packages/design-system/src/components/actionList/actionList.tsx#L144-L223`).
 
 The checkbox, primary trigger, and trailing action are siblings, avoiding nested interactive controls. This example separates **Base behavior primitives** such as Button from **Base rendering utilities** such as `useRender` and `mergeProps`.
 
 ## Questions to ask while reading a component
 
 1. What does the consumer write, and which product intent does each prop express?
-2. Is this symbol the whole widget, a direct Base part wrapper, an Inspector-owned DOM part, or a convenience recipe?
+2. Is this symbol the whole widget, a direct Base part wrapper, an Inspektor-owned DOM part, or a convenience recipe?
 3. Which exact `Part.Props` or intrinsic element type defines the public starting point?
 4. Does Root render an element, only provide context, or create a portal branch?
 5. Which state is controlled, which is uncontrolled, and who is authoritative?
@@ -868,7 +868,7 @@ The checkbox, primary trigger, and trailing action are siblings, avoiding nested
 14. Are handlers being overwritten by spread, deliberately sequenced, or composed with `mergeProps`?
 15. Are refs kept out of `mergeProps` and supplied through a ref-merging path?
 16. What DOM, roles, ARIA relationships, hidden inputs, and portal nodes result?
-17. Which behavior belongs to Base UI, and which policy belongs to Inspector?
+17. Which behavior belongs to Base UI, and which policy belongs to Inspektor?
 18. What does the official anatomy and API say for this exact component?
 
 ## Common misconceptions
@@ -887,8 +887,8 @@ The checkbox, primary trigger, and trailing action are siblings, avoiding nested
 | "mergeProps merges everything."                            | It composes handlers/classes/styles and applies precedence, but it does not merge refs.                                                |
 | "Omit removes runtime props."                              | `Omit` changes TypeScript only. Runtime enforcement needs destructuring, filtering, or overriding.                                     |
 | "A generic Root binds every child generic."                | Root and Item are separate generic calls. Context connects runtime values; the export namespace does not create one shared type scope. |
-| "useRender provides a complete behavior primitive."        | It provides rendering and composition infrastructure. Widget behavior must come from other primitives or Inspector code.               |
-| "A convenience Content part is always a Base primitive."   | Inspector Content may only assemble Portal, Positioner, Popup, and List. Read the implementation.                                      |
+| "useRender provides a complete behavior primitive."        | It provides rendering and composition infrastructure. Widget behavior must come from other primitives or Inspektor code.               |
+| "A convenience Content part is always a Base primitive."   | Inspektor Content may only assemble Portal, Positioner, Popup, and List. Read the implementation.                                      |
 
 ## Failure modes
 
@@ -915,7 +915,7 @@ The checkbox, primary trigger, and trailing action are siblings, avoiding nested
 ## Wrapper-review checklist
 
 - [ ] Identify the exact Base UI version and read the component's official anatomy and API.
-- [ ] Classify each public member as a direct Base wrapper, Inspector DOM part, or convenience recipe.
+- [ ] Classify each public member as a direct Base wrapper, Inspektor DOM part, or convenience recipe.
 - [ ] Confirm whether Root renders DOM, only provides context, or coordinates a portal subtree.
 - [ ] Derive public props from the exact `Part.Props`, intrinsic props, or `useRender.ComponentProps<Tag>`.
 - [ ] Explain every `Omit` and `Pick` as a styling, semantic, mode, structure, or geometry decision.
@@ -932,7 +932,7 @@ The checkbox, primary trigger, and trailing action are siblings, avoiding nested
 - [ ] Record prop precedence across destructuring, JSX spreads, explicit props, state styles, and Base's internal merge.
 - [ ] Use `mergeProps` only when its right-to-left handler order and rightmost precedence match the intended ownership.
 - [ ] Preserve required part containment and narrow contexts such as Positioner/Arrow, Group/Label, and Item/Indicator.
-- [ ] Keep Base behavior on Base parts and Inspector presentation inside those boundaries.
+- [ ] Keep Base behavior on Base parts and Inspektor presentation inside those boundaries.
 - [ ] Verify that generic Root, values, callbacks, Item props, ref target, inner function, and cast remain aligned.
 - [ ] Treat `Object.assign` as API packaging only, not context or nesting enforcement.
 - [ ] Expand convenience parts into their real subtree before assigning ownership.
@@ -979,17 +979,17 @@ Paths are relative to the repository root.
 | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `packages/design-system/src/components/button/button.tsx#L23-L69`                       | Exact Base Button props, omissions, indexed access, semantic props, discriminated union.    |
 | `packages/design-system/src/components/button/button.tsx#L71-L108`                      | `forwardRef`, loading translation, and `BaseButton.State`.                                  |
-| `packages/design-system/src/components/button/button.tsx#L110-L140`                     | Prop precedence, Base element boundary, and Inspector content.                              |
+| `packages/design-system/src/components/button/button.tsx#L110-L140`                     | Prop precedence, Base element boundary, and Inspektor content.                              |
 | `packages/design-system/src/components/accordion/accordion.tsx#L8-L61`                  | Exact per-part props, omissions, controlled values, and selective `render`.                 |
 | `packages/design-system/src/components/accordion/accordion.tsx#L63-L130`                | Per-part refs, Base boundaries, Trigger state, Panel transition state, and visual children. |
 | `packages/design-system/src/components/accordion/accordion.tsx#L132-L138`               | Compound API packaging with `Object.assign`.                                                |
 | `packages/design-system/src/components/select/select.tsx#L9-L109`                       | Generic public types, `Omit`, `Pick`, indexed access, and constrained popup contracts.      |
 | `packages/design-system/src/components/select/select.tsx#L112-L221`                     | Generic non-DOM Root, `ComponentRef`, Trigger state, Value, and Icon.                       |
-| `packages/design-system/src/components/select/select.tsx#L223-L280`                     | Portal, Positioner, Popup, List, and Inspector Content recipe.                              |
+| `packages/design-system/src/components/select/select.tsx#L223-L280`                     | Portal, Positioner, Popup, List, and Inspektor Content recipe.                              |
 | `packages/design-system/src/components/select/select.tsx#L282-L366`                     | Generic Item, `Part.State`, standard children, `forwardRef` cast, and Indicator.            |
 | `packages/design-system/src/components/select/select.tsx#L368-L405`                     | Group, GroupLabel, remaining parts, and compound export.                                    |
 | `packages/design-system/src/components/actionList/actionList.tsx#L18-L74`               | Native list props, `useRender.ComponentProps`, and Base Button leaf props.                  |
-| `packages/design-system/src/components/actionList/actionList.tsx#L76-L142`              | Inspector Escape policy, `useRender`, `mergeProps`, and separate ref path.                  |
+| `packages/design-system/src/components/actionList/actionList.tsx#L76-L142`              | Inspektor Escape policy, `useRender`, `mergeProps`, and separate ref path.                  |
 | `packages/design-system/src/components/actionList/actionList.tsx#L144-L231`             | Checkbox/Button leaves, sibling interactive controls, and compound export.                  |
 | `packages/design-system/src/primitives/createStateStyleProps.ts#L3-L13`                 | Adapter from `Part.State` to Base-compatible StyleX callbacks.                              |
 | `packages/design-system/node_modules/@base-ui/react/button/Button.d.ts#L9-L26`          | Installed Button ref, Props, and State declarations.                                        |

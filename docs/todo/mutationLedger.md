@@ -76,13 +76,13 @@
 ### [25/08/26] Integration review commands
 
 - [x] Run focused mutation-ledger and integration tests.
-- [x] Run the Inspector lint and typecheck.
-- [x] Build the Inspector application.
-- [x] Run the Inspector test suite.
+- [x] Run the Inspektor lint and typecheck.
+- [x] Build the Inspektor application.
+- [x] Run the Inspektor test suite.
 
 ### [25/08/26] Commands
 
 - [x] Run focused mutation ledger tests.
 - [x] Run changed-file lint.
-- [x] Run the Inspector typecheck and build.
-- [x] Run the Inspector test suite.
+- [x] Run the Inspektor typecheck and build.
+- [x] Run the Inspektor test suite.

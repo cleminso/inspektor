@@ -25,7 +25,7 @@ export function reportRuntimeError(
   diagnosticError.name = redactSensitiveText(runtimeError.error.name, sensitiveValues)
   diagnosticError.stack = redactSensitiveText(runtimeError.error.stack ?? '', sensitiveValues)
 
-  console.error('Inspector runtime failure', {
+  console.error('Inspektor runtime failure', {
     source: runtimeError.source,
     error: diagnosticError,
   })

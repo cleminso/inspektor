@@ -49,7 +49,7 @@
 
 [11/08/26]
 
-- [x] Merge Base UI composition transport styles with Inspector-owned Button and ButtonLink presentation without exposing public styling props.
+- [x] Merge Base UI composition transport styles with Inspektor-owned Button and ButtonLink presentation without exposing public styling props.
 - [x] Preserve composed handlers, ARIA, state attributes, and refs on the shared DOM element.
 - [x] Provide the Button glyph-size context once around each content structure.
 
@@ -95,7 +95,7 @@
 - Sources: Base UI Button API, Composition handbook, `useRender`, `mergeProps`, and installed package source.
 - `Button` remains a behavioral endpoint backed by Base UI Button and preserves its native button semantics, exact render contract, generated behavior, and composed ref target.
 - `ButtonLink` remains a semantic anchor endpoint backed by `useRender`; links do not inherit Button behavior.
-- `className` and `style` remain omitted from both public APIs as intentional Inspector constraints.
+- `className` and `style` remain omitted from both public APIs as intentional Inspektor constraints.
 - Composition-injected `className` and `style` are transport props and merge internally according to Base UI precedence instead of being discarded or overwritten.
 - `Button.Glyph` remains presentation composition and does not participate in the Base UI render boundary.
 
@@ -174,7 +174,7 @@
 [03/09/26]
 
 - [x] Focused Button coverage verifies primary pressed and unpressed controls share the same variant presentation.
-- [x] Design-system and Inspector formatting, lint, typecheck, build, and package tests pass.
+- [x] Design-system and Inspektor formatting, lint, typecheck, build, and package tests pass.
 
 [27/08/26]
 
@@ -217,7 +217,7 @@
 - [x] Design-system Button and Button Link tests cover the semantic row layout and rejected width/alignment combinations.
 - [x] Design-system package tests, typecheck, lint, and build pass.
 - [x] Documentation tests, generated props check, typecheck, lint, and build pass.
-- [x] Inspector application typecheck, lint, and build pass after consumer migration.
+- [x] Inspektor application typecheck, lint, and build pass after consumer migration.
 - [x] Browser verification confirms the Button playground and generated layout prop documentation render correctly.
 
 [31/07/26]

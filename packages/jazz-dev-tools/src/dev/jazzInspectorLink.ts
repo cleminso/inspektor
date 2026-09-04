@@ -1,4 +1,4 @@
-const LOCAL_INSPECTOR_URL = "https://inspektor.localhost:1355/conn/new";
+const LOCAL_INSPEKTOR_URL = "https://inspektor.localhost:1355/conn/new";
 
 function encodeFragmentValue(value: string): string {
   return encodeURIComponent(value);
@@ -12,10 +12,10 @@ function encodeFragmentValue(value: string): string {
  */
 export function buildJazzInspectorLink(serverUrl: string, appId: string, adminSecret: string): string {
   return (
-    `${LOCAL_INSPECTOR_URL}#serverUrl=${encodeFragmentValue(serverUrl)}` +
+    `${LOCAL_INSPEKTOR_URL}#serverUrl=${encodeFragmentValue(serverUrl)}` +
     `&appId=${encodeFragmentValue(appId)}` +
     `&adminSecret=${encodeFragmentValue(adminSecret)}`
   );
 }
 
-export { LOCAL_INSPECTOR_URL };
+export { LOCAL_INSPEKTOR_URL };

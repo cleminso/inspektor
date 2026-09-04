@@ -5,6 +5,6 @@ import { FieldPage } from '@/components/content/components/field/page'
 export const Route = createFileRoute('/components/field')({
   component: FieldPage,
   head: () => ({
-    meta: [{ title: 'Field · Inspector Design System' }],
+    meta: [{ title: 'Field · Inspektor Design System' }],
   }),
 })

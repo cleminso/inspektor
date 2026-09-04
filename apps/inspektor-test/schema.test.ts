@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { app } from "./schema.js";
 
-describe("Inspector Test schema", () => {
-  it("covers focused Inspector scenarios", () => {
+describe("Inspektor Test schema", () => {
+  it("covers focused Inspektor scenarios", () => {
     expect(new Set(Object.keys(app.wasmSchema))).toEqual(
       new Set([
         "projects",

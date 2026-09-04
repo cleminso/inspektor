@@ -16,7 +16,7 @@
 
 The design system has two jobs:
 
-1. `packages/design-system` defines reusable Inspector primitives and tokens.
+1. `packages/design-system` defines reusable Inspektor primitives and tokens.
 2. `apps/design-system` shows those primitives in a small documentation app.
 
 The setup is inspired by Polar Orbit, but adapted to this workspace instead of copying its Next.js app structure.

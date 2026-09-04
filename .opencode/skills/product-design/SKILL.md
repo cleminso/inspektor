@@ -1,9 +1,9 @@
 ---
 name: product-design
-description: Applies Inspector product-design judgment to user-visible UI decisions and records accepted reasoning beside the code. Use when shaping, implementing, reviewing, or hardening product interfaces, design-system semantics, interaction states, visual hierarchy, color, spatial decisions, accessibility, resilience, or product copy.
+description: Applies Inspektor product-design judgment to user-visible UI decisions and records accepted reasoning beside the code. Use when shaping, implementing, reviewing, or hardening product interfaces, design-system semantics, interaction states, visual hierarchy, color, spatial decisions, accessibility, resilience, or product copy.
 ---
 
-# Inspector Product Design
+# Inspektor Product Design
 
 ## Table of contents
 

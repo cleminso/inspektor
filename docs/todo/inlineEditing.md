@@ -484,7 +484,7 @@ mutation widget specification.
 [28/07/26]
 
 - [x] Jazz owns schema, mutation conversion, permissions, persistence, and synchronization.
-- [x] Inspector owns draft input, validation presentation, dirty tracking, and transition protection.
+- [x] Inspektor owns draft input, validation presentation, dirty tracking, and transition protection.
 - [x] One active inline row draft is owned above cell renderers.
 - [x] Moving between fields in the same row preserves the row draft.
 - [x] Moving to another row is a guarded target change when the current draft is dirty.
@@ -540,7 +540,7 @@ product decisions concern timestamp interaction, pending-cell presentation, hidd
 [28/08/26]
 
 - [x] Cover canonical field input, route collapse, staged value resolution, Boolean empty state, Enum NULL recovery, and input transitions with focused tests.
-- [x] Verify Inspector formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
+- [x] Verify Inspektor formatting, lint, typecheck, production build, package-wide tests, and the isolated browser suite.
 
 [28/08/26]
 

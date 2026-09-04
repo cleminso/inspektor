@@ -45,7 +45,7 @@ function RuntimeErrorStatus(): React.ReactElement {
           variant="label"
           color="error"
         >
-          Couldn't initialize the Inspector
+          Couldn't initialize the Inspektor
         </Text>
         <Text color="muted">Check the connection and schema details.</Text>
         <Button

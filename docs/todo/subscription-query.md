@@ -18,7 +18,7 @@
 [03/09/26]
 
 - [x] Summarize resolved schema versions with one reported hash and a compact additional-version control instead of a redundant resolved-source count.
-- [x] Prioritize the Inspector-selected schema only when the query reports it, and deduplicate reported versions without changing their order.
+- [x] Prioritize the Inspektor-selected schema only when the query reports it, and deduplicate reported versions without changing their order.
 - [x] Expose hidden schema hashes in a tooltip available from pointer hover and keyboard focus.
 
 [03/09/26]
@@ -111,7 +111,7 @@
 
 [01/09/26]
 
-- [x] Read active connection credentials from the Inspector session and collect server subscription telemetry without the Jazz runtime client.
+- [x] Read active connection credentials from the Inspektor session and collect server subscription telemetry without the Jazz runtime client.
 - [x] Render retained captures through `SwimlaneTimeline` with tables as lanes, group keys as tracks, and present, absent, and unknown cells.
 - [x] Keep lane expansion inside the presentational timeline component.
 - [x] Store selection as capture ID plus group key and derive details from retained history.
@@ -138,7 +138,7 @@ No open product work is recorded for the implemented foundation.
 
 [01/09/26]
 
-- Strict rejection of malformed raw `generatedAt` and `queries` values requires a change to `fetchServerSubscriptions`, which currently coerces them before returning to Inspector.
+- Strict rejection of malformed raw `generatedAt` and `queries` values requires a change to `fetchServerSubscriptions`, which currently coerces them before returning to Inspektor.
 
 [01/09/26]
 
@@ -158,7 +158,7 @@ No open product work is recorded for the implemented foundation.
 
 [03/09/26]
 
-- Query details never inject the Inspector-selected schema into telemetry that did not report it.
+- Query details never inject the Inspektor-selected schema into telemetry that did not report it.
 - One reported schema renders without an additional-version control; multiple schemas keep hidden hashes discoverable through the `+N` control.
 
 [03/09/26]
@@ -216,7 +216,7 @@ No open product work is recorded for the implemented foundation.
 
 - The Queries feature observes standalone server telemetry through `fetchServerSubscriptions`; it does not inspect its own Jazz client or subscription store.
 - One successful response is a sampled snapshot, not a query result, sync result, lifecycle event, or server history entry.
-- Inspector retains bounded session-local history and does not persist serialized queries across reloads.
+- Inspektor retains bounded session-local history and does not persist serialized queries across reloads.
 - One table owns one lane, one observed `groupKey` owns one track, and each capture projects to present, absent, or unknown.
 - A present segment means the group was observed in that snapshot; segment length does not measure query execution duration.
 - The latest successful snapshot remains available after refresh failure while the failed capture remains an explicit unknown interval.
@@ -243,53 +243,53 @@ No open product work is recorded for the implemented foundation.
 [03/09/26]
 
 - [x] Focused Queries view coverage verifies selected-schema prioritization, absent selected schemas, deduplication, one and multiple versions, and tooltip access from hover and keyboard focus.
-- [x] Inspector formatting, lint, typecheck, and affected tests pass.
+- [x] Inspektor formatting, lint, typecheck, and affected tests pass.
 
 [03/09/26]
 
 - [x] Focused hook and view coverage verifies retained filter controls and cleared-state feedback.
-- [x] Inspector formatting, lint, typecheck, build, package tests, and browser acceptance pass.
+- [x] Inspektor formatting, lint, typecheck, build, package tests, and browser acceptance pass.
 
 [03/09/26]
 
 - [x] Focused hook and view coverage verifies clear-history state, selection, filters, Live state, and polling behavior.
-- [x] Inspector formatting, lint, typecheck, build, package tests, and browser acceptance pass.
+- [x] Inspektor formatting, lint, typecheck, build, package tests, and browser acceptance pass.
 
 [03/09/26]
 
 - [x] Focused Button and Queries view coverage verifies primary Live contrast and toggle behavior.
-- [x] Design-system and Inspector formatting, lint, typecheck, build, and package tests pass.
+- [x] Design-system and Inspektor formatting, lint, typecheck, build, and package tests pass.
 
 [02/09/26]
 
 - [x] Focused view coverage verifies active and paused Live treatments and dynamic action guidance.
-- [x] Inspector formatting, lint, typecheck, build, and package tests pass.
+- [x] Inspektor formatting, lint, typecheck, build, and package tests pass.
 
 [02/09/26]
 
 - [x] Focused hook coverage verifies active and paused states, in-flight pausing, paused manual refresh, resumed snapshots, and overlap prevention.
 - [x] Focused view coverage verifies Live toggle semantics, Refresh availability, retained-history failures, and silent routine refreshes.
-- [x] Inspector formatting, lint, typecheck, build, and package tests pass.
+- [x] Inspektor formatting, lint, typecheck, build, and package tests pass.
 
 [02/09/26]
 
 - [x] Focused model coverage verifies unique option derivation and combined table, branch, and propagation filtering.
 - [x] Focused view coverage verifies “Only,” “Check all,” changing telemetry options, and empty filtered results.
 - [x] Verify QueryFilter in the isolated browser fixture.
-- [x] Run Inspector formatting, lint, typecheck, build, and package tests.
+- [x] Run Inspektor formatting, lint, typecheck, build, and package tests.
 
 [02/09/26]
 
 - [x] Focused view coverage verifies schema-source decomposition and the unreported empty state.
 - [x] Browser acceptance verifies the resolved-source summary with multiple schema versions.
-- [x] Inspector formatting, lint, typecheck, build, and package tests pass.
+- [x] Inspektor formatting, lint, typecheck, build, and package tests pass.
 
 [02/09/26]
 
 - [x] Focused view coverage verifies selected-snapshot visibility, close actions, and focus restoration.
 - [x] Focused runtime coverage verifies visible connection synchronization feedback.
 - [x] Browser acceptance verifies selected treatment, details-pane horizontal context, and footer close behavior.
-- [x] Inspector and design-system formatting, lint, typecheck, build, and affected package tests pass.
+- [x] Inspektor and design-system formatting, lint, typecheck, build, and affected package tests pass.
 
 [02/09/26]
 
@@ -308,12 +308,12 @@ No open product work is recorded for the implemented foundation.
 
 - [x] Focused Queries view coverage verifies Query section scroll ownership.
 - [x] Browser acceptance verifies the left dock remains visible, Query owns the only details scroll area, and JSON expansion toggles.
-- [x] Inspector package tests, lint, typecheck, build, and browser acceptance pass.
+- [x] Inspektor package tests, lint, typecheck, build, and browser acceptance pass.
 
 [02/09/26]
 
 - [x] Focused Queries view coverage confirms details stay outside the shell right dock and enforce a 240px minimum width.
-- [x] Inspector lint, typecheck, build, package tests, and browser acceptance suite pass.
+- [x] Inspektor lint, typecheck, build, package tests, and browser acceptance suite pass.
 
 [01/09/26]
 
@@ -344,4 +344,4 @@ No open product work is recorded for the implemented foundation.
 [31/08/26]
 
 - [x] Verify RSS dock navigation with the focused dock test.
-- [x] Verify formatting, lint, typecheck, build, and package tests for the Inspector application.
+- [x] Verify formatting, lint, typecheck, build, and package tests for the Inspektor application.

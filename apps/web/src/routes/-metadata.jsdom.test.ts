@@ -21,13 +21,13 @@ async function getTitle(
 
 describe('route metadata', () => {
   it.each([
-    [RootRoute, {}, 'Inspector'],
-    [ConnectionsRoute, {}, 'Connections | Inspector'],
-    [EditConnectionRoute, { connectionId: 'connection-1' }, 'Edit connection | Inspector'],
-    [NewConnectionRoute, {}, 'Add connection | Inspector'],
-    [TablesRoute, {}, 'Tables | Inspector'],
-    [QueriesRoute, {}, 'Live queries | Inspector'],
-    [TableRoute, { connectionId: 'connection-1', tableName: 'accounts' }, 'accounts | Inspector'],
+    [RootRoute, {}, 'Inspektor'],
+    [ConnectionsRoute, {}, 'Connections | Inspektor'],
+    [EditConnectionRoute, { connectionId: 'connection-1' }, 'Edit connection | Inspektor'],
+    [NewConnectionRoute, {}, 'Add connection | Inspektor'],
+    [TablesRoute, {}, 'Tables | Inspektor'],
+    [QueriesRoute, {}, 'Live queries | Inspektor'],
+    [TableRoute, { connectionId: 'connection-1', tableName: 'accounts' }, 'accounts | Inspektor'],
   ])('sets the routed document title', async (route, params, title) => {
     expect(await getTitle(route, params)).toBe(title)
   })

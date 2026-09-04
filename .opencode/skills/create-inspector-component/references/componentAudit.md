@@ -11,7 +11,7 @@
 
 ## Purpose
 
-Use this audit before creating or changing a Base UI wrapper. Trace the public Inspector call through prop normalization, Base UI composition, StyleX state selection, and rendered DOM. Do not treat every difference as a defect; classify intentional Inspector policy separately from accidental divergence.
+Use this audit before creating or changing a Base UI wrapper. Trace the public Inspektor call through prop normalization, Base UI composition, StyleX state selection, and rendered DOM. Do not treat every difference as a defect; classify intentional Inspektor policy separately from accidental divergence.
 
 ## Audit sequence
 
@@ -20,7 +20,7 @@ Use this audit before creating or changing a Base UI wrapper. Trace the public I
 3. Read the matching component API and tagged source.
 4. Record required anatomy and default elements.
 5. Classify every wrapped part.
-6. Compare the Base UI and Inspector prop surfaces.
+6. Compare the Base UI and Inspektor prop surfaces.
 7. Record every omission and transformation.
 8. Trace refs, events, ARIA, state attributes, and CSS variables to the DOM.
 9. Compare tests and documentation with the resulting contract.
@@ -39,25 +39,25 @@ Copy this section into the relevant component checklist or audit document:
 - Component API:
 - Handbook pages:
 - Tagged source:
-- Adjacent Inspector components:
+- Adjacent Inspektor components:
 
 ## Required anatomy
 
-| Part | Required relationship | Default element | Inspector wrapper |
+| Part | Required relationship | Default element | Inspektor wrapper |
 | --- | --- | --- | --- |
 
 ## Public contract summary
 
-| Capability | Base UI | Inspector | Classification | Rationale |
+| Capability | Base UI | Inspektor | Classification | Rationale |
 | --- | --- | --- | --- | --- |
 
 ## Findings
 
 ### Preserved contracts
 
-### Intentional Inspector constraints
+### Intentional Inspektor constraints
 
-### Inspector extensions
+### Inspektor extensions
 
 ### Accidental divergences
 
@@ -79,7 +79,7 @@ Complete this record for every wrapped part:
 
 ### Props
 
-| Prop | Base default | Inspector default | Action | Rationale |
+| Prop | Base default | Inspektor default | Action | Rationale |
 | --- | --- | --- | --- | --- |
 
 Actions: inherit, omit, redeclare, transform, consume, inject.
@@ -126,8 +126,8 @@ Actions: inherit, omit, redeclare, transform, consume, inject.
 ## Classification
 
 - **Preserved Base UI contract:** behavior and public capability remain equivalent.
-- **Intentional Inspector constraint:** a capability is fixed, omitted, or narrowed for a recorded system reason.
-- **Inspector extension:** package-owned semantics are added without replacing primitive behavior.
+- **Intentional Inspektor constraint:** a capability is fixed, omitted, or narrowed for a recorded system reason.
+- **Inspektor extension:** package-owned semantics are added without replacing primitive behavior.
 - **Accidental divergence:** behavior, typing, semantics, refs, events, attributes, or variables differ without justification.
 - **Decision required:** evidence is complete but product or design policy is unresolved.
 

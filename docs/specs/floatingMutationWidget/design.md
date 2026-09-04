@@ -40,7 +40,7 @@ The state survives:
 Returning to a table restores its complete mutation state. Apply and Discard clear only that
 table's state. Closing its final workspace tab cannot silently discard unresolved state. Changing
 connection, branch, or schema requires resolution because that complete scope identifies the
-mutation target. Browser unload destroys all in-memory mutation states. The Inspector requests the
+mutation target. Browser unload destroys all in-memory mutation states. The Inspektor requests the
 native unload warning, but each browser controls whether it appears and its displayed copy.
 
 ## State model
@@ -189,8 +189,8 @@ scroll viewport while the summary, Apply, and Discard controls remain fixed.
 - More than ten operation items use a bounded scroll viewport.
 - At most 50 operations mount initially in each list; `Show more` adds another 50.
 - Operation rows use constrained geometry so the ten-row boundary is deterministic.
-A bulk operation remains one review item regardless of target count. A target preview, if introduced,
-owns separate bounded rendering and is not required by this implementation.
+  A bulk operation remains one review item regardless of target count. A target preview, if introduced,
+  owns separate bounded rendering and is not required by this implementation.
 
 ## Apply behavior
 

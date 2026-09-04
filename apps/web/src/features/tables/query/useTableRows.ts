@@ -1,5 +1,5 @@
 /**
- * Runs schema-driven table queries for the Inspector data explorer.
+ * Runs schema-driven table queries for the Inspektor data explorer.
  *
  * The hook turns route search state into a generic Jazz query, derives render columns from
  * stored schema metadata, and loads one URL-backed page without app-generated table types.
@@ -15,7 +15,7 @@ import {
 import type { JazzClient } from 'jazz-tools/react'
 
 import { buildTableRowsQuery, isTableColumnSortable } from '@tables/query/tableRowsQuery'
-import { INSPECTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
 import type { TableColumnMeta, TableRowsSearchState } from '@tables/tableTypes'
 
@@ -53,7 +53,7 @@ interface ResolvedRowsState {
 }
 
 /**
- * Provides columns, rows, and page controls for one Inspector table.
+ * Provides columns, rows, and page controls for one Inspektor table.
  *
  * The hook derives columns from stored Jazz runtime schema metadata and builds a generic
  * query from URL-backed filters and sorting, avoiding inspected-app generated code.
@@ -117,7 +117,7 @@ export function useTableRows({
   const queryState = useJazzQueryState<DynamicTableRow>(
     manager,
     requestedQueryBuilder ?? undefined,
-    INSPECTOR_QUERY_OPTIONS,
+    INSPEKTOR_QUERY_OPTIONS,
     (delta) => {
       const updatedRows = delta.delta.flatMap((change) => {
         if (change.kind !== RowChangeKind.Updated || change.item === undefined) {

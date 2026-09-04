@@ -5,6 +5,6 @@ import { FindBarPage } from '@/components/content/components/findBar/page'
 export const Route = createFileRoute('/components/find-bar')({
   component: FindBarPage,
   head: () => ({
-    meta: [{ title: 'Find Bar · Inspector Design System' }],
+    meta: [{ title: 'Find Bar · Inspektor Design System' }],
   }),
 })

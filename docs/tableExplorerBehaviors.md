@@ -33,7 +33,7 @@ The foundation is a read-first `DataGrid` with TanStack Table cell-selection ran
 column selection, and bulk cell editing cross the product boundary into application behavior. The richer behavior may reuse
 DataGrid rendering and schema-derived components without making the record-oriented DataGrid API ambiguous.
 
-The Inspector remains schema-driven. Selection behavior is generic and does not depend on generated table-specific code.
+The Inspektor remains schema-driven. Selection behavior is generic and does not depend on generated table-specific code.
 
 ## Terminology
 

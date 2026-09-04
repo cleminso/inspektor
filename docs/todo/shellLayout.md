@@ -12,7 +12,7 @@
 
 ## Purpose
 
-This checklist records the reusable application-shell geometry, dock controls, and universal Inspector layout preference.
+This checklist records the reusable application-shell geometry, dock controls, and universal Inspektor layout preference.
 
 ## Implemented foundation
 
@@ -31,7 +31,7 @@ This checklist records the reusable application-shell geometry, dock controls, a
 - [x] Compose header, resizable workspace body, and footer through `ShellLayout`.
 - [x] Support optional resizable left and right docks around one flexible view.
 - [x] Keep dock collapse and restore mechanics inside the design-system component.
-- [x] Keep universal preference storage, failure handling, and migration inside Inspector.
+- [x] Keep universal preference storage, failure handling, and migration inside Inspektor.
 - [x] Migrate the table-specific left-dock layout and expanded size to semantic shell storage keys.
 - [x] Preserve the existing 200px initial dock size and 160px to 360px resize range without fixing the Paper example width.
 - [x] Document the public compound API with an executable two-dock example.
@@ -40,7 +40,7 @@ This checklist records the reusable application-shell geometry, dock controls, a
 
 [01/09/26]
 
-- [ ] Add right-dock product content and controls only with an accepted Inspector use case.
+- [ ] Add right-dock product content and controls only with an accepted Inspektor use case.
 
 ## Work outside the foundation scope
 
@@ -53,7 +53,7 @@ This checklist records the reusable application-shell geometry, dock controls, a
 
 [01/09/26]
 
-- Dock geometry is one universal Inspector preference.
+- Dock geometry is one universal Inspektor preference.
 - An absent dock renders neither a panel nor a resize handle.
 - The view remains the flexible panel between optional physical left and right docks.
 - Product landmarks remain consumer-owned; structural shell parts do not force `header`, `main`, `aside`, or `footer` semantics.
@@ -75,9 +75,9 @@ This checklist records the reusable application-shell geometry, dock controls, a
 [01/09/26]
 
 - [x] Shell Layout focused tests pass.
-- [x] Inspector shell storage, layout, dock, and Tables tests pass.
-- [x] Design-system and Inspector lint and typecheck pass.
+- [x] Inspektor shell storage, layout, dock, and Tables tests pass.
+- [x] Design-system and Inspektor lint and typecheck pass.
 - [x] Shell Layout documentation metadata, extractor coverage, typecheck, lint, and build pass.
-- [x] Inspector browser verification confirms dock resizing, collapsing, route switching, and preference restoration.
+- [x] Inspektor browser verification confirms dock resizing, collapsing, route switching, and preference restoration.
 
 The package-wide documentation test retains an unrelated Tooltip provider default metadata mismatch.

@@ -20,7 +20,7 @@ I don't think a data-grid is the right representation for the query interface, s
 
 I think a swimlane timeline is a better representation, since it shows when groups appear, remain active, or disappear.
 
-The interface therefore uses a swimlane timeline built from Inspector-owned snapshots.
+The interface therefore uses a swimlane timeline built from Inspektor-owned snapshots.
 
 Retaining a small snapshot history helps with:
 
@@ -34,7 +34,7 @@ The telemetry does not expose returned rows, result changes, execution duration,
 
 ## Data source
 
-Inspector fetches the current server snapshot with:
+Inspektor fetches the current server snapshot with:
 
 `fetchServerSubscriptions(serverUrl, { appId, adminSecret })`
 
@@ -57,7 +57,7 @@ Each query group contains:
 | `branches`    | Branch context                                              |
 | `propagation` | `full` or `local-only`                                      |
 
-Equivalent subscriptions are grouped by query, branches, and propagation. `groupKey` identifies that group across retained snapshots. Inspector must not parse it or treat it as user-authored content.
+Equivalent subscriptions are grouped by query, branches, and propagation. `groupKey` identifies that group across retained snapshots. Inspektor must not parse it or treat it as user-authored content.
 
 The endpoint returns a current snapshot, not lifecycle events or historical telemetry.
 
@@ -123,7 +123,7 @@ The pane can be refined separately. Query-group metadata should not be repeated 
 - Keep the last successful history visible when a refresh fails and mark it as stale.
 - Use `generatedAt` for successful snapshot placement and identity.
 
-Snapshot history belongs to Inspector. It must not be described as server logs or a real-time event stream.
+Snapshot history belongs to Inspektor. It must not be described as server logs or a real-time event stream.
 
 ## States
 

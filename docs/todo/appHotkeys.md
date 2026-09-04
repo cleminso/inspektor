@@ -44,7 +44,7 @@
 [20/08/26]
 
 - [x] Replace browser-reserved Tables view and local-history combinations with workspace-scoped `N`, `W`, `[`, and `]` shortcuts.
-- [x] Let TanStack Hotkeys ignore single-key workspace shortcuts in text-entry controls before Inspector prevents the event.
+- [x] Let TanStack Hotkeys ignore single-key workspace shortcuts in text-entry controls before Inspektor prevents the event.
 - [x] Preserve focus while bracket shortcuts navigate Tables-local history.
 
 [20/08/26]
@@ -151,5 +151,5 @@
 - [x] Cover Tables shortcut delegation, text-input suppression, and unavailable palette commands.
 - [x] Cover grid focus scope, page boundaries, and loading-state pagination guards.
 - [x] Verify the global command palette and console state in the browser.
-- [ ] Verify Tables shortcuts, dirty-tab confirmation, and grid pagination against a connected Inspector session.
+- [ ] Verify Tables shortcuts, dirty-tab confirmation, and grid pagination against a connected Inspektor session.
 - [ ] Verify command palette keyboard selection, focus restoration, zoom, and screen-reader announcements in the browser.

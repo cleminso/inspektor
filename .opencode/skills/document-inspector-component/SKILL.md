@@ -3,7 +3,7 @@ name: document-inspektor-component
 description: Generates and updates `apps/design-system` documentation for `@inspektor/ds` components using registry metadata, executable raw-source examples, generated props, and Shiki code blocks. Use when adding a component page, changing a documented component API, updating examples, or fixing generated prop metadata.
 ---
 
-# Document Inspector Component
+# Document Inspektor Component
 
 ## Quick start
 

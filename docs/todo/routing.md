@@ -82,7 +82,7 @@
 [08/08/26]
 
 - [x] Remount the narrow registry-backed Jazz provider boundary by non-sensitive connection and branch identity so replacement runtimes cannot receive a retained previous client.
-- [x] Disable Jazz DevTools auto-attachment for the Inspector-owned runtime provider.
+- [x] Disable Jazz DevTools auto-attachment for the Inspektor-owned runtime provider.
 
 [07/08/26]
 
@@ -214,7 +214,7 @@
 [29/08/26]
 
 - [x] Cover schema switching across Tables index, table detail, and Queries with a real in-memory router.
-- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, changed-file lint, typecheck, and production build.
 
 [25/08/26]
 
@@ -224,7 +224,7 @@
 [25/08/26]
 
 - [x] Cover canonical route and stored-tab search, collision-safe scopes, schema-aware sorting, and safe pagination offsets.
-- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, lint, typecheck, and production build.
 
 [25/08/26]
 
@@ -233,12 +233,12 @@
 [25/08/26]
 
 - [x] Cover runtime replacement without cached schema hydration.
-- [x] Verify focused and package-wide Inspector tests, lint, typecheck, and production build.
+- [x] Verify focused and package-wide Inspektor tests, lint, typecheck, and production build.
 
 [24/08/26]
 
 - [x] Cover root entry redirecting to the connections route.
-- [x] Verify the focused redirect test, Inspector lint, browser redirect, typecheck, production build, and package-wide tests.
+- [x] Verify the focused redirect test, Inspektor lint, browser redirect, typecheck, production build, and package-wide tests.
 
 [22/08/26]
 
@@ -248,8 +248,8 @@
 
 - [x] Cover schema and client error classification, original error retention, credential redaction, safe React caught-error reporting, schema retry, same-configuration client recovery, and stale direct-link fallback.
 - [x] Cover the workspace retry action without exposing the raw runtime error.
-- [x] Verify focused and package-wide Inspector tests, changed-file lint, typecheck, and production build.
-- [ ] Verify schema and client recovery against a connected Inspector runtime.
+- [x] Verify focused and package-wide Inspektor tests, changed-file lint, typecheck, and production build.
+- [ ] Verify schema and client recovery against a connected Inspektor runtime.
 
 [08/08/26]
 
@@ -260,8 +260,8 @@
 
 - [x] Cover retained-client replacement across the runtime provider boundary.
 - [x] Cover disabled Jazz DevTools auto-attachment.
-- [x] Verify focused provider tests, Inspector lint and typecheck, the production build, and package-wide tests.
-- [ ] Browser verification covers resolved connection and branch replacement without previous-client queries or a nested Inspector overlay.
+- [x] Verify focused provider tests, Inspektor lint and typecheck, the production build, and package-wide tests.
+- [ ] Browser verification covers resolved connection and branch replacement without previous-client queries or a nested Inspektor overlay.
 
 [07/08/26]
 

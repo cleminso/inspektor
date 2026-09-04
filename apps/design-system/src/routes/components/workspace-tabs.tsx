@@ -5,6 +5,6 @@ import { WorkspaceTabsPage } from '@/components/content/components/workspaceTabs
 export const Route = createFileRoute('/components/workspace-tabs')({
   component: WorkspaceTabsPage,
   head: () => ({
-    meta: [{ title: 'Workspace Tabs · Inspector Design System' }],
+    meta: [{ title: 'Workspace Tabs · Inspektor Design System' }],
   }),
 })

@@ -3,7 +3,7 @@ import { type ReactElement } from 'react'
 
 import { type SourceReference } from '@/lib/registry'
 
-const repositoryUrl = 'https://github.com/regardedev/inspektor/blob/main'
+const repositoryUrl = 'https://github.com/cleminso/inspektor/blob/main'
 
 interface SourceLinkProps {
   source: SourceReference

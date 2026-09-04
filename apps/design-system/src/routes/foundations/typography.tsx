@@ -5,6 +5,6 @@ import { TypographyFoundationPage } from '@/components/content/foundations/typog
 export const Route = createFileRoute('/foundations/typography')({
   component: TypographyFoundationPage,
   head: () => ({
-    meta: [{ title: 'Typography · Inspector Design System' }],
+    meta: [{ title: 'Typography · Inspektor Design System' }],
   }),
 })

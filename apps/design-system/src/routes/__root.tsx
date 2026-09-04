@@ -7,6 +7,6 @@ export const Route = createRootRoute({
   component: AppShell,
   notFoundComponent: NotFoundPage,
   head: () => ({
-    meta: [{ title: 'Inspector Design System' }],
+    meta: [{ title: 'Inspektor Design System' }],
   }),
 })

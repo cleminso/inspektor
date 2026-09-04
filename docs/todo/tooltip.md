@@ -21,7 +21,7 @@
 
 [06/08/26]
 
-- [x] Use authored Tooltip composition instead of native browser titles across design-system and Inspector React controls.
+- [x] Use authored Tooltip composition instead of native browser titles across design-system and Inspektor React controls.
 
 [06/08/26]
 
@@ -116,7 +116,7 @@
 
 [06/08/26]
 
-- [x] Confirm active workspace source contains no native browser tooltip attributes on Inspector-owned controls.
+- [x] Confirm active workspace source contains no native browser tooltip attributes on Inspektor-owned controls.
 
 [06/08/26]
 

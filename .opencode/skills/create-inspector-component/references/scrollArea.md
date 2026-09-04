@@ -24,7 +24,7 @@ This recipe supplements the installed Base UI documentation. Confirm the install
 
 Identify the element that must retain native scrolling before writing styles.
 
-- Use Inspector `ScrollArea` for bounded surfaces where visible scrollbar chrome must overlay content without changing its width or height.
+- Use Inspektor `ScrollArea` for bounded surfaces where visible scrollbar chrome must overlay content without changing its width or height.
 - Keep native scrolling on controls whose behavior already owns the scroll element and cannot accept Scroll Area composition.
 - Use `axis="none"` when the Scroll Area must preserve its viewport and content structure while a nested editor owns scrolling.
 - Give each axis one scroll owner. Do not make both a parent and child independently scroll the same content.
@@ -49,11 +49,11 @@ The root and viewport must fill their allocated size while remaining shrinkable 
 - `both`: retain native scrolling on both axes, render both overlay tracks and the corner, and allow intrinsic content width.
 - `none`: hide viewport overflow, render no tracks, and preserve the same viewport ref and content structure.
 
-Use an Inspector-owned union for these modes. Do not expose independent booleans that permit contradictory axis combinations.
+Use an Inspektor-owned union for these modes. Do not expose independent booleans that permit contradictory axis combinations.
 
 ## Thumb geometry
 
-Base UI calculates thumb size and applies scroll-position translation along the track's travel axis. Inspector styles must not add alignment along that axis.
+Base UI calculates thumb size and applies scroll-position translation along the track's travel axis. Inspektor styles must not add alignment along that axis.
 
 - A vertical scrollbar uses the default row flex direction. Center its thumb horizontally with `justifyContent`. Do not set `alignItems: center`, because that centers the thumb vertically before Base UI translates it.
 - A horizontal scrollbar centers its thumb vertically with `alignItems`. Do not set `justifyContent: center`, because that centers the thumb horizontally before Base UI translates it.
@@ -94,15 +94,15 @@ When an expanded editor owns scrolling, switch the containing Scroll Area to `ax
 
 ## Testing boundary
 
-Unit tests should prove Inspector-owned structure and behavior:
+Unit tests should prove Inspektor-owned structure and behavior:
 
 - the public ref targets the native viewport
 - each axis mode projects the intended native overflow behavior
 - overlay tracks remain outside the viewport
 - `axis="none"` removes tracks without replacing the viewport
-- private semantic offsets map to the intended variant when that mapping contains Inspector logic
+- private semantic offsets map to the intended variant when that mapping contains Inspektor logic
 
-Do not add tests that only assert StyleX class names, diagnostic `data-*` attributes, or Base UI's internal thumb calculations. JSDOM computed styles do not reliably prove StyleX geometry. Test Base UI behavior only where Inspector transforms or constrains it.
+Do not add tests that only assert StyleX class names, diagnostic `data-*` attributes, or Base UI's internal thumb calculations. JSDOM computed styles do not reliably prove StyleX geometry. Test Base UI behavior only where Inspektor transforms or constrains it.
 
 ## Browser validation
 
@@ -140,7 +140,7 @@ Record geometry values in the relevant `docs/todo` checklist rather than relying
 - [ ] Vertical and horizontal thumbs are centered only across their tracks.
 - [ ] Nested flex and grid ancestors preserve `minHeight: 0` and `minWidth: 0` where required.
 - [ ] Sticky or fixed regions remain outside scrolling content or receive a semantic track offset.
-- [ ] Unit tests cover only Inspector-owned contracts.
+- [ ] Unit tests cover only Inspektor-owned contracts.
 - [ ] Browser measurements prove start and end thumb geometry.
 - [ ] Relevant component documentation and `docs/todo` checklist updated.
 - [ ] Focused tests, lint, typecheck, and build pass.

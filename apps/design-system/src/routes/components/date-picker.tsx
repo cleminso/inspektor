@@ -4,5 +4,5 @@ import { DatePickerPage } from '@/components/content/components/datePicker/page'
 
 export const Route = createFileRoute('/components/date-picker')({
   component: DatePickerPage,
-  head: () => ({ meta: [{ title: 'DatePicker · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'DatePicker · Inspektor Design System' }] }),
 })

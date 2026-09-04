@@ -14,7 +14,7 @@
 
 ## Purpose
 
-The Table Explorer starts its row query when the table view renders. The Inspector runtime uses the in-memory Jazz driver, so inspected
+The Table Explorer starts its row query when the table view renders. The Inspektor runtime uses the in-memory Jazz driver, so inspected
 admin data is not persisted to browser storage.
 
 ## Ownership boundaries
@@ -33,7 +33,7 @@ before the query is built.
 
 ### 2. Build and subscribe to the query
 
-`useTableRows` calls `buildTableRowsQuery` with the resolved route state and `INSPECTOR_QUERY_OPTIONS`. `useJazzQueryState` acquires the
+`useTableRows` calls `buildTableRowsQuery` with the resolved route state and `INSPEKTOR_QUERY_OPTIONS`. `useJazzQueryState` acquires the
 canonical Jazz cache entry and subscribes React to its state.
 
 ### 3. Project query state into UI state

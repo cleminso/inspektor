@@ -4,5 +4,5 @@ import { FloatingPanelPage } from '@/components/content/components/floatingPanel
 
 export const Route = createFileRoute('/components/floating-panel')({
   component: FloatingPanelPage,
-  head: () => ({ meta: [{ title: 'Floating Panel · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Floating Panel · Inspektor Design System' }] }),
 })

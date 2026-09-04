@@ -145,7 +145,7 @@
 
 - [x] Focused Context Switcher and Combobox tests pass.
 - [x] Design-system package typecheck and build pass with derived trigger types.
-- [x] Documentation and Inspector consumers pass typecheck and build.
+- [x] Documentation and Inspektor consumers pass typecheck and build.
 
 [01/08/26]
 

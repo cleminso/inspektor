@@ -27,7 +27,7 @@ Chunked file storage:
 - `db.createFileFromBlob()` and `db.createFileFromStream()` create those records
 - `db.loadFileAsBlob()` and `db.loadFileAsStream()` reconstruct the file
 
-## What our Inspector Does
+## What our Inspektor Does
 
 Our value classification verifies that a Bytea value is a Uint8Array.
 The table cell displays the byte count, such as 12KB, rather than attempting to display arbitrary binary content.

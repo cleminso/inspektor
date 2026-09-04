@@ -77,7 +77,7 @@ function setItem(storage: Storage, key: string, value: string): void {
   }
 }
 
-/** Adapts browser storage to the universal Inspector shell preference. */
+/** Adapts browser storage to the universal Inspektor shell preference. */
 export function createInspectorShellLayoutPersistence(): ShellLayoutPersistence | undefined {
   if (typeof window === 'undefined') {
     return undefined

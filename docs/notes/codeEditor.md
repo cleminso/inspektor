@@ -14,7 +14,7 @@
 
 ## Purpose
 
-This note records the design boundary between editable code fields and read-only source presentation in Inspector.
+This note records the design boundary between editable code fields and read-only source presentation in Inspektor.
 
 The initial product use case is inserting and updating JSON columns in the Table Explorer side pane. Documentation source examples remain a separate read-only use case.
 
@@ -44,15 +44,15 @@ An `interaction={false}` prop is not part of either API. It cannot distinguish e
 
 CodeMirror 6 is the selected editing engine for `CodeEditor`.
 
-The side-pane JSON field is a standalone form control, not a code node inside a rich-text document. ProseMirror would add a document schema and rich-text selection model that this field does not need. Monaco is broader and heavier than this use case requires. A custom `contenteditable` or highlighted textarea overlay would require Inspector to recreate selection, composition, caret, scroll synchronization, and undo behavior.
+The side-pane JSON field is a standalone form control, not a code node inside a rich-text document. ProseMirror would add a document schema and rich-text selection model that this field does not need. Monaco is broader and heavier than this use case requires. A custom `contenteditable` or highlighted textarea overlay would require Inspektor to recreate selection, composition, caret, scroll synchronization, and undo behavior.
 
-The design-system wrapper exposes constrained Inspector behavior rather than arbitrary CodeMirror extensions or configuration objects. The initial language is JSON.
+The design-system wrapper exposes constrained Inspektor behavior rather than arbitrary CodeMirror extensions or configuration objects. The initial language is JSON.
 
 ## Syntax presentation
 
 CodeMirror syntax tags map to the semantic `syntaxColors` tokens in `packages/design-system/src/tokens/semantics.stylex.ts`.
 
-The mapping should cover JSON properties, strings, numbers, booleans, null constants, and punctuation. Theme-specific values remain behind the semantic tokens so the editor and `JsonView` share Inspector syntax intent without sharing rendering implementations.
+The mapping should cover JSON properties, strings, numbers, booleans, null constants, and punctuation. Theme-specific values remain behind the semantic tokens so the editor and `JsonView` share Inspektor syntax intent without sharing rendering implementations.
 
 Formatting is a deliberate action. The editor does not rewrite source while the user types.
 
@@ -74,7 +74,7 @@ The editor does not animate viewport height. Layout responds directly while tool
 
 ## Field composition
 
-The field follows the Inspector label and suffix pattern:
+The field follows the Inspektor label and suffix pattern:
 
 - the field label appears at the start of the header
 - schema-level value-mode controls remain in the field header

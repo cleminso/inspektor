@@ -2,7 +2,7 @@
 
 ## Question
 
-How should Inspector structure a schema-aware data table for reading, filtering, selection, relation navigation, schema context, and safe row editing?
+How should Inspektor structure a schema-aware data table for reading, filtering, selection, relation navigation, schema context, and safe row editing?
 
 ## Scope
 
@@ -22,7 +22,7 @@ How should Inspector structure a schema-aware data table for reading, filtering,
 - Stored schemas, query operators, ordering, pagination, subscriptions.
 - Relations, permissions, mutations, durability, conflicts.
 
-### Inspector architecture mapping
+### Inspektor architecture mapping
 
 - Route state through schema metadata.
 - Query construction, table state, relation resolution, side-panel mutations.
@@ -36,4 +36,4 @@ Compare systems by responsibility, not component names. Produce alternative arch
 
 - OpenStatus repository and documentation.
 - Jazz documentation.
-- Inspector current table implementation.
+- Inspektor current table implementation.

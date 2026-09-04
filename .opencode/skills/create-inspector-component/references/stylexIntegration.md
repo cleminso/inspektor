@@ -13,7 +13,7 @@
 
 ## Closed styling boundary
 
-Consumers do not receive `className`, `style`, arbitrary CSS values, or broad styling slots. Inspector applies StyleX internally through Base UI's `className`, `style`, or render interfaces. A missing design decision requires a semantic token, constrained prop, variant, primitive, or composed component.
+Consumers do not receive `className`, `style`, arbitrary CSS values, or broad styling slots. Inspektor applies StyleX internally through Base UI's `className`, `style`, or render interfaces. A missing design decision requires a semantic token, constrained prop, variant, primitive, or composed component.
 
 Use semantic tokens before primitive tokens. Keep theme-specific values behind tokens.
 
@@ -45,9 +45,9 @@ For every rendered Base UI part, inventory:
 - CSS variables
 - pseudo-classes relevant to the native element
 
-Classify every capability as styled, consumed by behavior, intentionally unstyled, or unreachable through the Inspector wrapper.
+Classify every capability as styled, consumed by behavior, intentionally unstyled, or unreachable through the Inspektor wrapper.
 
-Name state rules after the Base UI state or attribute where practical. Keep compound Inspector conditions separate from single-state inventory entries.
+Name state rules after the Base UI state or attribute where practical. Keep compound Inspektor conditions separate from single-state inventory entries.
 
 ## Focus indicators
 
@@ -100,4 +100,4 @@ Use StyleX context-driven and descendant recipes only after checking whether com
 - keep pseudo-class conditions inside affected property values
 - allow top-level pseudo-elements where supported
 - run focused StyleX lint for every changed style file
-- test state-to-style translation owned by Inspector rather than Base UI internals
+- test state-to-style translation owned by Inspektor rather than Base UI internals

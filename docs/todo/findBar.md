@@ -85,11 +85,11 @@
 [04/08/26]
 
 - [x] Focused Find Bar, JsonView, and row-editor integration tests pass.
-- [x] Inspector application typecheck, lint, and build pass.
+- [x] Inspektor application typecheck, lint, and build pass.
 - [x] Design-system props generation and checks pass.
 - [x] Design-system documentation tests, typecheck, lint, and build pass.
 - [x] Design-system package tests, typecheck, focused lint, and build pass.
-- [ ] The complete Inspector application test suite has an unrelated dock icon-size failure: expected `xs`, received `s`.
+- [ ] The complete Inspektor application test suite has an unrelated dock icon-size failure: expected `xs`, received `s`.
 - [x] Find Bar option and row JSON integration tests pass.
 - [x] Find Bar documentation metadata, typecheck, lint, and build pass.
 - [x] Find Bar layout, pressed options, match status, arrow navigation, and absent dismiss action are verified in the design-system documentation.

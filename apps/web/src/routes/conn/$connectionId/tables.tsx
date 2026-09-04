@@ -11,7 +11,7 @@ import { canonicalizeTableRouteSearch } from '@tables/routing/tableRowsSearch'
 
 export const Route = createFileRoute('/conn/$connectionId/tables')({
   head: () => ({
-    meta: [{ title: 'Tables | Inspector' }],
+    meta: [{ title: 'Tables | Inspektor' }],
   }),
   component: TablesWorkspaceLayout,
   validateSearch: canonicalizeTableRouteSearch,

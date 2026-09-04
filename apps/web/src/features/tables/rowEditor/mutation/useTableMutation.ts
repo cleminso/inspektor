@@ -1,7 +1,7 @@
 /**
  * Wraps generic Jazz table mutations for the schema-driven data explorer.
  *
- * The Inspector builds a dynamic table proxy from stored schema metadata, then uses Jazz's
+ * The Inspektor builds a dynamic table proxy from stored schema metadata, then uses Jazz's
  * mutation runtime to insert, update, and delete rows without app-generated table code.
  */
 import type { DynamicTableRow, TableProxy, WasmSchema } from 'jazz-tools'
@@ -14,7 +14,7 @@ interface UseTableMutationsOptions {
 }
 
 /**
- * Provides insert, update, and delete actions for one schema-driven Inspector table.
+ * Provides insert, update, and delete actions for one schema-driven Inspektor table.
  *
  * The hook converts stored runtime schema metadata into a dynamic Jazz table proxy, then
  * exposes mutation commands. For example, an update `{ name: "Grace" }` reaches Jazz as a

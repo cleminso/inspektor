@@ -53,7 +53,7 @@ export function getColumnTypeMarker(column: TableColumnMeta): ColumnTypeMarker {
   }
 
   if (column.column === null) {
-    return { icon: null, label: 'Inspector column', suffix: '' }
+    return { icon: null, label: 'Inspektor column', suffix: '' }
   }
 
   const type = column.column.column_type

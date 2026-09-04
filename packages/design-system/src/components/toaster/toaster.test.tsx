@@ -62,7 +62,7 @@ describe('Toaster', () => {
     }
   })
 
-  it('presents supporting content and controls in the Inspector toast structure', async () => {
+  it('presents supporting content and controls in the Inspektor toast structure', async () => {
     render(<Toaster />)
 
     toasts.error('Couldn’t insert row', {

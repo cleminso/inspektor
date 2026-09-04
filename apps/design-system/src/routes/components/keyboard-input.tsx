@@ -4,5 +4,5 @@ import { KeyboardInputPage } from '@/components/content/components/keyboardInput
 
 export const Route = createFileRoute('/components/keyboard-input')({
   component: KeyboardInputPage,
-  head: () => ({ meta: [{ title: 'Keyboard Input · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Keyboard Input · Inspektor Design System' }] }),
 })

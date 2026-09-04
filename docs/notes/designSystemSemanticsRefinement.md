@@ -15,7 +15,7 @@
 
 ## Objective
 
-Apply the Inspector semantic token model consistently across remaining active `@inspektor/ds` components.
+Apply the Inspektor semantic token model consistently across remaining active `@inspektor/ds` components.
 
 The work covers field controls, selection and action controls, feedback and overlay components, layout controls, and constrained public styling APIs.
 
@@ -57,7 +57,7 @@ selected: {
 ## Testing strategy
 
 - Add a failing component test before behavior changes.
-- Test Inspector-owned behavior and accessibility outcomes, not Base UI implementation details.
+- Test Inspektor-owned behavior and accessibility outcomes, not Base UI implementation details.
 - Cover field state combinations: default, hover, focus-visible, invalid, invalid-focus, read-only, and disabled.
 - Cover selection state combinations: unchecked, checked, selected, pressed, checked-disabled, and selected-disabled.
 - Regenerate props after public API changes and keep documentation examples executable.
@@ -118,7 +118,7 @@ Replace public arbitrary styling contracts with constrained APIs and migrate act
 - Every refined component uses semantic colors for rest, hover, pressed, selected, focus, invalid, and disabled states where applicable.
 - Disabled styles suppress hover and pressed effects.
 - Field invalid focus is visually and semantically distinct from neutral focus.
-- Toast intent variants use Inspector semantic tokens rather than dependency defaults.
+- Toast intent variants use Inspektor semantic tokens rather than dependency defaults.
 - Resizable handles have consistent focus-visible, active, and disabled treatment.
 - No active public component exposes `className`, native `style`, or arbitrary CSS values without an explicitly approved narrow exception.
 - Generated component props, docs examples, tests, package typechecks, lints, and builds pass.

@@ -60,6 +60,6 @@
 
 - [x] Design-system lint, tests, typecheck, and build pass; existing StyleX advisory warnings remain visible.
 - [x] Design-system documentation lint, tests, typecheck, props check, and build pass.
-- [ ] Inspector application full tests pass; an unrelated dock icon-size assertion remains failing.
-- [x] Inspector application lint, targeted affected tests, typecheck, and build pass; the alert-dialog autofocus remains an explicit warning.
+- [ ] Inspektor application full tests pass; an unrelated dock icon-size assertion remains failing.
+- [x] Inspektor application lint, targeted affected tests, typecheck, and build pass; the alert-dialog autofocus remains an explicit warning.
 - [x] Repository-root lint and formatting configurations apply across each active workspace, and the design-system StyleX JavaScript plugin remains enabled.

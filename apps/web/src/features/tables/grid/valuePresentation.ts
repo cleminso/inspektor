@@ -93,7 +93,7 @@ function unsupported(rawValue: unknown, expectation: string): SchemaValuePresent
     displayValue: formatRawFallback(rawValue),
     expectation,
     rawValue,
-    reason: 'Inspector does not support this runtime value',
+    reason: 'Inspektor does not support this runtime value',
   }
 }
 

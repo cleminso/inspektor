@@ -4,5 +4,5 @@ import { RelationValuePage } from '@/components/content/components/relationValue
 
 export const Route = createFileRoute('/components/relation-value')({
   component: RelationValuePage,
-  head: () => ({ meta: [{ title: 'Relation Value · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Relation Value · Inspektor Design System' }] }),
 })

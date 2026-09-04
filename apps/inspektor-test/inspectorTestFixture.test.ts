@@ -9,7 +9,7 @@ import { app } from "./schema.js";
 import { seedInspectorTest } from "./seedInspectorTest.js";
 
 describe("createInspectorTestFixture", () => {
-  it("publishes and seeds an isolated Inspector Test app", async () => {
+  it("publishes and seeds an isolated Inspektor Test app", async () => {
     const fixture = await createInspectorTestFixture();
     const context = createJazzContext({
       app,

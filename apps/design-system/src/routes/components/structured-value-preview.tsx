@@ -4,5 +4,5 @@ import { StructuredValuePreviewPage } from '@/components/content/components/stru
 
 export const Route = createFileRoute('/components/structured-value-preview')({
   component: StructuredValuePreviewPage,
-  head: () => ({ meta: [{ title: 'Structured Value Preview · Inspector Design System' }] }),
+  head: () => ({ meta: [{ title: 'Structured Value Preview · Inspektor Design System' }] }),
 })

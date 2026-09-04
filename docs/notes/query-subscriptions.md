@@ -11,24 +11,24 @@
 - [Subscription lifecycle](#subscription-lifecycle)
 - [React and framework integration](#react-and-framework-integration)
 - [Advanced binding APIs](#advanced-binding-apis)
-- [Inspector telemetry sources](#inspektor-telemetry-sources)
+- [Inspektor telemetry sources](#inspektor-telemetry-sources)
 - [Standalone server telemetry contract](#standalone-server-telemetry-contract)
-- [Official Jazz Inspector implementation](#official-jazz-inspector-implementation)
+- [Official Jazz Inspektor implementation](#official-jazz-inspector-implementation)
 - [Polling and snapshot semantics](#polling-and-snapshot-semantics)
 - [Observable and unavailable information](#observable-and-unavailable-information)
 - [Security and privacy](#security-and-privacy)
-- [Inspector implications](#inspektor-implications)
+- [Inspektor implications](#inspektor-implications)
 - [Source references](#source-references)
 
 ## Purpose
 
-This note is the shared technical reference for Jazz live queries and the subscription telemetry available to Inspector.
+This note is the shared technical reference for Jazz live queries and the subscription telemetry available to Inspektor.
 
 It separates three related but different systems:
 
 1. Application APIs that execute and subscribe to queries.
 2. Framework bindings that manage subscription state for application components.
-3. Inspector telemetry APIs that observe active subscription definitions.
+3. Inspektor telemetry APIs that observe active subscription definitions.
 
 Product structure and interaction decisions belong in [query-interface.md](query-interface.md). Implementation tasks belong in [subscription-query.md](../todo/subscription-query.md).
 
@@ -38,9 +38,9 @@ The investigation used:
 
 - Jazz source revision `923c6a951e528e86c043b7bb375ddf83aded6b8b`.
 - Jazz Tools package version `2.0.0-alpha.53`.
-- The installed Inspector `jazz-tools` declarations.
-- The official Jazz Inspector live-query page.
-- A deployed Jazz Inspector response containing populated server subscription groups.
+- The installed Inspektor `jazz-tools` declarations.
+- The official Jazz Inspektor live-query page.
+- A deployed Jazz Inspektor response containing populated server subscription groups.
 
 The deployed server and the inspected Jazz server source do not expose identical behavior. The source handler validates the request but returns an empty query list, while the deployed endpoint returns populated groups. The exported TypeScript response contract matches the deployed response. Package version alone must not be used to infer server capability.
 
@@ -64,7 +64,7 @@ A telemetry snapshot is the grouped set of server-visible subscriptions returned
 
 ### Live query
 
-Jazz does not export a public TypeScript function named `liveQuery`. The application APIs are `Db.subscribe`, `useAll`, `useOne`, and framework-specific equivalents. “Live query” is Jazz documentation terminology; Inspector names the product workspace “Live queries.”
+Jazz does not export a public TypeScript function named `liveQuery`. The application APIs are `Db.subscribe`, `useAll`, `useOne`, and framework-specific equivalents. “Live query” is Jazz documentation terminology; Inspektor names the product workspace “Live queries.”
 
 ## Application query APIs
 
@@ -88,7 +88,7 @@ Its behavior:
 
 - The callback receives the complete materialized result whenever it changes.
 - Each callback receives a newly allocated result array and transformed row objects.
-- The returned function cancels pending setup, removes the local Inspector trace, unsubscribes the native handle, and clears materialized state.
+- The returned function cancels pending setup, removes the local Inspektor trace, unsubscribes the native handle, and clears materialized state.
 - The public callback has no error channel.
 - Setup may fail synchronously; deferred readiness failures can surface asynchronously.
 
@@ -239,7 +239,7 @@ This store is not a telemetry inventory:
 
 - It cannot enumerate another application’s active subscriptions.
 - It requires a caller-supplied query key.
-- It describes the Inspector-owned client when called from Inspector.
+- It describes the Inspektor-owned client when called from Inspektor.
 
 `jazz-tools/shared` exports `applyDelta` and `reconcileArray` for bindings that preserve object identity while applying subscription changes.
 
@@ -251,7 +251,7 @@ Sources:
 
 ## Inspektor telemetry sources
 
-Jazz has two different Inspector telemetry paths.
+Jazz has two different Inspektor telemetry paths.
 
 ### Same-origin overlay telemetry
 
@@ -268,7 +268,7 @@ With `devMode` enabled, a `Db` records `ActiveQuerySubscriptionTrace` entries co
 
 Internal `Db` methods return the active list and subscribe to list changes. Traces with hidden visibility are filtered from the returned list.
 
-`JazzInspectorHost` exposes stack-free traces to a same-origin Inspector window and pushes replacement snapshots through `postMessage`.
+`JazzInspectorHost` exposes stack-free traces to a same-origin Inspektor window and pushes replacement snapshots through `postMessage`.
 
 This path observes one inspected application runtime. It is not available to the standalone Regarde web application without a same-origin host relationship.
 
@@ -282,7 +282,7 @@ Sources:
 
 ### Standalone server telemetry
 
-The standalone Inspector calls the admin introspection endpoint through `fetchServerSubscriptions`.
+The standalone Inspektor calls the admin introspection endpoint through `fetchServerSubscriptions`.
 
 This path observes grouped subscriptions visible to the connected server and app. It does not expose an inspected client’s local trace list or JavaScript stack.
 
@@ -317,9 +317,9 @@ Each query group contains:
 
 The API does not define result rows, result counts, query source, execution duration, latency, settlement, errors, or lifecycle events.
 
-The client helper coerces a non-number `generatedAt` to `0` and a non-array `queries` value to `[]`. Inspector validates every returned group before accepting a snapshot, but code downstream of this helper cannot distinguish those malformed top-level values from a valid zero marker or empty snapshot.
+The client helper coerces a non-number `generatedAt` to `0` and a non-array `queries` value to `[]`. Inspektor validates every returned group before accepting a snapshot, but code downstream of this helper cannot distinguish those malformed top-level values from a valid zero marker or empty snapshot.
 
-Non-success responses include status, status text, and response body in the thrown error. Inspector must normalize these errors and avoid rendering arbitrary response bodies.
+Non-success responses include status, status text, and response body in the thrown error. Inspektor must normalize these errors and avoid rendering arbitrary response bodies.
 
 Sources:
 
@@ -337,14 +337,14 @@ The inspected Jazz server handler:
 
 Its test preserves that empty shell until core telemetry backs it.
 
-The deployed Jazz Inspector demonstrates populated groups using the same exported response shape. Regarde should implement against the public transport contract and verify capability against its target server rather than inferring it from the package version.
+The deployed Jazz Inspektor demonstrates populated groups using the same exported response shape. Regarde should implement against the public transport contract and verify capability against its target server rather than inferring it from the package version.
 
 Sources:
 
 - `crates/jazz-server/src/server/routes/http.rs:1216-1269`
 - `crates/jazz-server/src/server/routes/mod.rs:2420-2457`
 
-## Official Jazz Inspector implementation
+## Official Jazz Inspektor implementation
 
 The official page lives under `packages/inspector/src/pages/live-query/`:
 
@@ -376,7 +376,7 @@ Sources:
 
 ## Polling and snapshot semantics
 
-The server does not independently create a snapshot on the official Inspector’s polling cadence. The standalone Inspector requests the endpoint on a fixed cadence, and the server returns a snapshot for that request.
+The server does not independently create a snapshot on the official Inspektor’s polling cadence. The standalone Inspektor requests the endpoint on a fixed cadence, and the server returns a snapshot for that request.
 
 Consequences:
 
@@ -384,7 +384,7 @@ Consequences:
 - A query can appear, change, and disappear between requests without being observed.
 - Consecutive snapshots do not establish an exact transition point.
 - A failed request creates an unknown interval, not confirmed subscription absence.
-- Inspector-owned history is derived client state, not server logs.
+- Inspektor-owned history is derived client state, not server logs.
 - Polling frequency trades freshness against admin requests and server work.
 
 For a query timeline, a segment means that the group was observed in a successful snapshot. Segment length does not represent query execution duration or synchronization latency.
@@ -419,7 +419,7 @@ The standalone API can support inventory, churn, persistence, and grouped-count 
 - Serialized query JSON can contain application filter values and must be treated as sensitive.
 - Raw query history must remain session-local unless a separate security decision permits persistence.
 - Server response bodies must not be displayed directly after failed requests.
-- `groupKey` is opaque server data. Inspector must not parse it or depend on its format.
+- `groupKey` is opaque server data. Inspektor must not parse it or depend on its format.
 
 ## Inspektor implications
 
@@ -427,14 +427,14 @@ The standalone API can support inventory, churn, persistence, and grouped-count 
 - Connection identity is `serverUrl`, `appId`, and `adminSecret`.
 - Branch and schema selection do not scope the introspection request.
 - An empty successful snapshot means no server-visible groups were returned. It does not prove the application performed no reads.
-- Server grouping and `count` are authoritative. Inspector must not regroup or reinterpret them.
+- Server grouping and `count` are authoritative. Inspektor must not regroup or reinterpret them.
 - Query JSON remains the source representation. Parsing should produce a derived JSON-compatible value without replacing the raw string.
 - Query-result diffing requires another Jazz capability and is outside the standalone telemetry foundation.
 - A swimlane timeline may retain bounded session-local history, but every interval must preserve the distinction between observed presence, confirmed absence, and unknown capture failure.
 
 ## Source references
 
-Related Inspector references:
+Related Inspektor references:
 
 - [Live queries interface](query-interface.md)
 - [Subscription query implementation checklist](../todo/subscription-query.md)

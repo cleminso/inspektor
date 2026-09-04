@@ -18,7 +18,7 @@ Before editing files for a substantial task involving a TanStack package:
 ## Table of contents
 
 - [Active workspace](#active-workspace)
-- [Inspector Test](#inspektor-test)
+- [Inspektor Test](#inspektor-test)
 - [Browser verification](#browser-verification)
 - [Implementation checklists](#implementation-checklists)
 - [Commands](#commands)
@@ -41,14 +41,14 @@ Implementation work is limited to these directories:
 
 - `packages/design-system`: reusable `@inspektor/ds` components, primitives, and tokens.
 - `apps/design-system`: documentation, examples, generated API metadata, and design-system validation.
-- `apps/web`: Inspector product application consuming `@inspektor/ds`.
-- `apps/inspektor-test`: Inspector Test schema, deterministic data, cloud deployment tooling, and isolated Jazz fixtures.
+- `apps/web`: Inspektor product application consuming `@inspektor/ds`.
+- `apps/inspektor-test`: Inspektor Test schema, deterministic data, cloud deployment tooling, and isolated Jazz fixtures.
 
 Other workspace packages are outside the replacement UI architecture. Do not modify them unless the user explicitly requests work in them.
 
 ## Inspektor Test
 
-Use `apps/inspektor-test` as the curated test app for Inspector behavior. Read its `README.md` before changing its schema, permissions, seeded data, or fixture tooling.
+Use `apps/inspektor-test` as the curated test app for Inspektor behavior. Read its `README.md` before changing its schema, permissions, seeded data, or fixture tooling.
 
 - Use `pnpm inspektor-test:fixture` for automated, isolated, or destructive browser checks.
 - Use the shared cloud app only when the task requires shared-network or manual browser verification.
@@ -58,13 +58,13 @@ Use `apps/inspektor-test` as the curated test app for Inspector behavior. Read i
 
 ## Browser verification
 
-- Start Inspector from the workspace root with `pnpm dev:web`.
-- Run the Inspector and fixture as owned persistent processes. Record their process IDs, confirm both are reachable before opening the browser, and stop only those processes when verification is complete.
+- Start Inspektor from the workspace root with `pnpm dev:web`.
+- Run the Inspektor and fixture as owned persistent processes. Record their process IDs, confirm both are reachable before opening the browser, and stop only those processes when verification is complete.
 - Use `pnpm inspektor-test:fixture` for automated, isolated, or destructive checks. Keep its generated credentials out of responses, screenshots, and committed artifacts.
 - When the fixture uses an `http://` or `ws://` endpoint, open the direct HTTP Vite URL reported by `pnpm dev:web` instead of the Portless HTTPS URL to avoid mixed-content blocking.
 - Use a fresh Chrome isolated context for each fixture check. Do not rely on state from the persistent Chrome profile.
 - Reserve the persistent Chrome profile and any saved cloud connection for explicit shared-cloud exploration. Treat its user-data directory as a credential store: do not commit, copy, upload, or expose it to test artifacts.
-- Close pages created for the check and stop the owned fixture and Inspector processes. Do not terminate unrelated development processes.
+- Close pages created for the check and stop the owned fixture and Inspektor processes. Do not terminate unrelated development processes.
 
 ## Implementation checklists
 
@@ -95,17 +95,17 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 ## Commands
 
 - `pnpm dev` runs every workspace `dev` script.
-- `pnpm dev:web` starts the Inspector application.
+- `pnpm dev:web` starts the Inspektor application.
 - Fast test feedback:
   - `pnpm test:web:node` runs the web Node project.
   - `pnpm test:web:jsdom` runs the isolated web jsdom project.
   - `pnpm test:design-system:node` runs the design-system Node allowlist.
   - `pnpm --filter @inspektor/ds test:json-view` runs the focused JSON View tests.
 - Affected-package validation:
-  - `pnpm test:web` runs the complete Inspector package suite.
+  - `pnpm test:web` runs the complete Inspektor package suite.
   - `pnpm test:design-system` runs the complete design-system package suite.
 - Run `pnpm test` only when a change crosses package boundaries or requires complete workspace coverage.
-- Inspector application:
+- Inspektor application:
   - `pnpm --filter inspektor dev`
   - `pnpm --filter inspektor dev:vite`
   - `pnpm --filter inspektor build`
@@ -158,8 +158,8 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 
 - `packages/design-system` owns reusable presentation and interaction components.
 - `apps/design-system` consumes public `@inspektor/ds` exports like a product application; it does not import package-private implementation files at runtime.
-- `apps/web` owns Inspector routes, application state, Jazz data access, and feature composition.
-- The Inspector is schema-driven and generic. Do not add generated query builders or table-specific UI for inspected applications; use stored schema metadata and generic query construction.
+- `apps/web` owns Inspektor routes, application state, Jazz data access, and feature composition.
+- The Inspektor is schema-driven and generic. Do not add generated query builders or table-specific UI for inspected applications; use stored schema metadata and generic query construction.
 - Connection data includes `serverUrl`, `appId`, `adminSecret`, branch, and schema hash. Treat `adminSecret` as sensitive even when local links pass it in URL hash parameters.
 - TanStack Router route trees are generated. Do not hand-edit `apps/web/src/routeTree.gen.ts` or `apps/design-system/src/routeTree.gen.ts`.
 

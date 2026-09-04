@@ -635,11 +635,11 @@ function requiredEnvironmentValue(name: string): string {
 
 function fixtureConnection(): FixtureConnection {
   return {
-    name: 'Inspector Test fixture',
-    serverUrl: requiredEnvironmentValue('INSPECTOR_E2E_SERVER_URL'),
-    appId: requiredEnvironmentValue('INSPECTOR_E2E_APP_ID'),
-    adminSecret: requiredEnvironmentValue('INSPECTOR_E2E_ADMIN_SECRET'),
-    backendSecret: requiredEnvironmentValue('INSPECTOR_E2E_BACKEND_SECRET'),
+    name: 'Inspektor Test fixture',
+    serverUrl: requiredEnvironmentValue('INSPEKTOR_E2E_SERVER_URL'),
+    appId: requiredEnvironmentValue('INSPEKTOR_E2E_APP_ID'),
+    adminSecret: requiredEnvironmentValue('INSPEKTOR_E2E_ADMIN_SECRET'),
+    backendSecret: requiredEnvironmentValue('INSPEKTOR_E2E_BACKEND_SECRET'),
     env: 'dev',
   }
 }

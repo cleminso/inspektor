@@ -1,7 +1,7 @@
 /**
  * Converts generic form input into values accepted by Jazz mutations.
  *
- * Generated applications get typed mutation inputs from their schema. The Inspector does not
+ * Generated applications get typed mutation inputs from their schema. The Inspektor does not
  * import that generated code, so it uses runtime `ColumnType` metadata to perform the equivalent
  * parsing and validation before calling Jazz.
  */
