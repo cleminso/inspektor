@@ -23,6 +23,7 @@ description: Applies Inspector product-design judgment to user-visible UI decisi
 - Choose the smallest coherent intervention.
 - Resolve semantics, interaction, hierarchy, and state behavior before decoration.
 - Cover every reachable state without inventing states the product cannot enter.
+- Treat focus visibility as state behavior: check clipping, adjacent-color contrast, composite-widget position, disabled items, and forced-colors mode.
 - Verify the rendered surface; source inspection alone does not establish visual quality.
 
 ## Request modes

@@ -65,11 +65,6 @@ export function useAddConnectionFlow(
   const [error, setError] = useState<ConnectionError | null>(null)
   const isSubmittingRef = useRef(false)
 
-  const canSubmit =
-    formValues.serverUrl.trim().length > 0 &&
-    formValues.appId.trim().length > 0 &&
-    formValues.adminSecret.trim().length > 0
-
   const updateField = (field: keyof AddConnectionFormValues, value: string) => {
     setFormValues((currentValues) => ({
       ...currentValues,
@@ -115,7 +110,7 @@ export function useAddConnectionFlow(
   const fetchSchemas: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
 
-    if (canSubmit === false || isSubmittingRef.current === true) {
+    if (isSubmittingRef.current === true) {
       return
     }
 

@@ -74,7 +74,7 @@ export const toggleGroupStyles = stylex.create({
     justifyContent: 'center',
     lineHeight: lineHeights.ui,
     outlineColor: focusColors.ring,
-    outlineOffset: 1,
+    outlineOffset: `calc(-1 * ${spatial['focus-ring-width']})`,
     outlineStyle: {
       default: 'none',
       ':focus-visible': 'solid',

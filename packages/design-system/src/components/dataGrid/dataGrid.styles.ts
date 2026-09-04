@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex'
 
 import { spatial } from '../../tokens/semantics.stylex'
 import {
+  borderRadii,
   fontFamilies,
   fontSizes,
   fontWeights,
@@ -340,13 +341,7 @@ export const dataGridStyles = stylex.create({
     borderWidth: 0,
     backgroundColor: dataGridColors.resizeHandleBackground,
     cursor: 'col-resize',
-    outlineColor: dataGridColors.emphasizedColumnBorder,
-    outlineOffset: -2,
-    outlineStyle: 'solid',
-    outlineWidth: {
-      default: 0,
-      ':focus-visible': spatial['focus-ring-width'],
-    },
+    outlineStyle: 'none',
     position: 'absolute',
     touchAction: 'none',
     zIndex: 3,
@@ -354,6 +349,27 @@ export const dataGridStyles = stylex.create({
     right: 0,
     top: 0,
     width: spacing.s,
+    '::after': {
+      borderColor: {
+        default: dataGridColors.focusRing,
+        '@media (forced-colors: active)': 'Highlight',
+      },
+      borderRadius: borderRadii.m,
+      borderStyle: {
+        default: 'none',
+        ':focus-visible': 'solid',
+      },
+      borderWidth: spatial['focus-ring-width'],
+      boxSizing: 'border-box',
+      content: '',
+      pointerEvents: 'none',
+      position: 'absolute',
+      transform: 'translate(-50%, -50%)',
+      height: spatial['icon-size-s'],
+      left: '50%',
+      top: '50%',
+      width: spacing.xs,
+    },
   },
   resizeHandleDragging: {
     visibility: 'hidden',

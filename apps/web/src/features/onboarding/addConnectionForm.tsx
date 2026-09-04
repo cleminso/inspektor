@@ -1,6 +1,6 @@
 import { useEffect, useRef, type FormEventHandler } from 'react'
 
-import { Box, Button, Text, TextField } from '@inspector/ds'
+import { Box, Button, Fieldset, Text, TextField } from '@inspector/ds'
 
 import type { ConnectionError } from '@app/connections/connectionValidation'
 
@@ -25,7 +25,6 @@ export function AddConnectionForm({
   onSubmit,
   onUpdateField,
 }: AddConnectionFormProps): React.ReactElement {
-  const hasError = error !== null
   const serverUrlRef = useRef<HTMLInputElement>(null)
   const appIdRef = useRef<HTMLInputElement>(null)
   const adminSecretRef = useRef<HTMLInputElement>(null)
@@ -48,12 +47,10 @@ export function AddConnectionForm({
       width="full"
       flexDirection="column"
       gap="3xl"
+      noValidate
       onSubmit={onSubmit}
     >
-      <Box
-        flexDirection="column"
-        gap="xl"
-      >
+      <Fieldset.Root disabled={isSubmitting}>
         <TextField
           id="connection-name"
           label="Connection name"
@@ -72,6 +69,9 @@ export function AddConnectionForm({
           autoComplete="url"
           description="Sync server that stores your app data."
           error={error?.field === 'serverUrl' ? error.description : undefined}
+          validate={(value) =>
+            String(value ?? '').trim().length > 0 ? null : 'Enter a server URL.'
+          }
           ref={serverUrlRef}
           type="url"
           inputMode="url"
@@ -81,7 +81,7 @@ export function AddConnectionForm({
             onUpdateField('serverUrl', value)
           }}
           placeholder="https://v2.sync.jazz.tools/"
-          required={true}
+          aria-required={true}
         />
         <TextField
           id="connection-app-id"
@@ -89,13 +89,14 @@ export function AddConnectionForm({
           name="appId"
           autoComplete="off"
           error={error?.field === 'appId' ? error.description : undefined}
+          validate={(value) => (String(value ?? '').trim().length > 0 ? null : 'Enter an app ID.')}
           ref={appIdRef}
           spellCheck={false}
           value={formValues.appId}
           onValueChange={(value) => {
             onUpdateField('appId', value)
           }}
-          required={true}
+          aria-required={true}
         />
         <TextField
           id="connection-admin-secret"
@@ -103,6 +104,9 @@ export function AddConnectionForm({
           name="adminSecret"
           autoComplete="off"
           error={error?.field === 'adminSecret' ? error.description : undefined}
+          validate={(value) =>
+            String(value ?? '').trim().length > 0 ? null : 'Enter an admin secret.'
+          }
           ref={adminSecretRef}
           type="password"
           spellCheck={false}
@@ -110,7 +114,7 @@ export function AddConnectionForm({
           onValueChange={(value) => {
             onUpdateField('adminSecret', value)
           }}
-          required={true}
+          aria-required={true}
         />
         <Box
           display="grid"
@@ -140,8 +144,8 @@ export function AddConnectionForm({
             }}
           />
         </Box>
-      </Box>
-      {hasError === true ? (
+      </Fieldset.Root>
+      {error !== null && error.field === undefined ? (
         <Box
           flexDirection="column"
           gap="xs"
@@ -154,31 +158,36 @@ export function AddConnectionForm({
           >
             {error.title}
           </Text>
-          {error.field === undefined ? <Text color="error">{error.description}</Text> : null}
+          <Text color="error">{error.description}</Text>
         </Box>
       ) : null}
       <Box
         alignItems="center"
-        justifyContent="end"
         gap="m"
       >
-        <Button
-          type="submit"
-          size="s"
-          disabled={isSubmitting === true}
-          loading={isSubmitting === true}
-        >
-          {mode === 'edit' ? 'Save connection' : 'Add connection'}
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="s"
-          onClick={onCancel}
-          disabled={isSubmitting === true}
-        >
-          Cancel
-        </Button>
+        <Box flex={1}>
+          <Button
+            type="submit"
+            size="s"
+            layout="fill"
+            disabled={isSubmitting === true}
+            loading={isSubmitting === true}
+          >
+            {mode === 'edit' ? 'Save connection' : 'Add connection'}
+          </Button>
+        </Box>
+        <Box flex={1}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="s"
+            layout="fill"
+            onClick={onCancel}
+            disabled={isSubmitting === true}
+          >
+            Cancel
+          </Button>
+        </Box>
       </Box>
     </Box>
   )

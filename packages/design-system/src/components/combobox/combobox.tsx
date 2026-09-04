@@ -9,7 +9,6 @@ import {
   type ReactNode,
   forwardRef,
   useId,
-  useState,
 } from 'react'
 
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
@@ -240,12 +239,10 @@ const ComboboxInputGroup = forwardRef<
   { appearance = 'default', width = 'content', ...props },
   forwardedRef,
 ) {
-  const [focusVisible, setFocusVisible] = useState(false)
   const stateStyles = createStateStyleProps<BaseCombobox.InputGroup.State>((state) => [
     comboboxStyles.inputGroup,
     width === 'full' && comboboxStyles.inputGroupWidthFull,
     appearance === 'bare' && comboboxStyles.inputGroupBare,
-    focusVisible === true && comboboxStyles.inputGroupFocusVisible,
     state.valid === false && comboboxStyles.inputGroupInvalid,
     state.disabled === true && comboboxStyles.inputGroupDisabled,
     state.open === true && comboboxStyles.inputGroupOpen,
@@ -271,28 +268,6 @@ const ComboboxInputGroup = forwardRef<
       ref={forwardedRef}
       {...stateStyles}
       data-slot="combobox-input-group"
-      data-focus-visible={focusVisible === true ? '' : undefined}
-      onFocusCapture={(event) => {
-        props.onFocusCapture?.(event)
-        if (event.defaultPrevented === false && event.baseUIHandlerPrevented !== true) {
-          setFocusVisible(
-            event.target instanceof HTMLElement && event.target.matches(':focus-visible'),
-          )
-        }
-      }}
-      onBlurCapture={(event) => {
-        props.onBlurCapture?.(event)
-        if (event.defaultPrevented === true || event.baseUIHandlerPrevented === true) {
-          return
-        }
-        if (
-          event.relatedTarget instanceof Node &&
-          event.currentTarget.contains(event.relatedTarget)
-        ) {
-          return
-        }
-        setFocusVisible(false)
-      }}
     />
   )
 })

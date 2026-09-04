@@ -98,6 +98,7 @@ export const Input = forwardRef<ComponentRef<typeof BaseInput>, InputProps>(func
       aria-invalid={effectiveInvalid === true ? true : props['aria-invalid']}
       className={stateStyleProps.className}
       style={stateStyleProps.style}
+      {...(effectiveInvalid === true ? { 'data-invalid': '' } : {})}
       data-slot="input"
       data-size={effectiveSize}
       data-variant={variant}

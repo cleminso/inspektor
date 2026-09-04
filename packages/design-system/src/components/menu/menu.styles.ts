@@ -44,7 +44,7 @@ export const menuStyles = stylex.create({
     justifyContent: 'center',
     lineHeight: lineHeights.ui,
     outlineColor: focusColors.ring,
-    outlineOffset: -1,
+    outlineOffset: `calc(-1 * ${spatial['focus-ring-width']})`,
     outlineStyle: 'solid',
     outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
     userSelect: 'none',
@@ -149,6 +149,9 @@ export const menuStyles = stylex.create({
   itemHighlighted: {
     [keyboardInputVars.textColor]: textColors.default,
     backgroundColor: ghostElementColors.hover,
+    outlineColor: { default: 'transparent', '@media (forced-colors: active)': 'Highlight' },
+    outlineStyle: 'solid',
+    outlineWidth: { default: 0, '@media (forced-colors: active)': 1 },
   },
   itemDisabledState: {},
   itemSelected: { backgroundColor: ghostElementColors.selected },

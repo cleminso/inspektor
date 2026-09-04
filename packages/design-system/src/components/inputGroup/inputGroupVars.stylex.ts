@@ -12,7 +12,7 @@ export const inputGroupVars = stylex.defineVars({
   backgroundColor: surfaceColors.default,
   borderColor: borderColors.default,
   focusedBorderColor: borderColors.focused,
-  outlineColor: focusColors.ringSubtle,
+  outlineColor: focusColors.ring,
   outlineWidth: '0px',
   textColor: textColors.default,
 })

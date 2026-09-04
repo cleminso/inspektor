@@ -21,6 +21,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [04/09/26]
 
+### Keyboard focus clarity
+
+- [x] Keep column resize separators in sequential focus order with keyboard resizing and reset behavior.
+- [x] Replace full-header resize outlines with a compact indicator centered on the resize target.
+- [x] Distinguish selected rows from the blue keyboard-focus ring with a neutral selected-cell surface.
+
+[04/09/26]
+
 ### Table-list menu coordination
 
 - [x] Close an open trailing action menu before opening the table-list context menu.

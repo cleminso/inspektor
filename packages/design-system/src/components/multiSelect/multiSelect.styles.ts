@@ -1,7 +1,13 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { borderColors, spatial, surfaceColors, textColors } from '../../tokens/semantics.stylex'
+import {
+  borderColors,
+  focusColors,
+  spatial,
+  surfaceColors,
+  textColors,
+} from '../../tokens/semantics.stylex'
 import { borderRadii, shadows } from '../../tokens/value.stylex'
 
 export const multiSelectStyles = stylex.create({
@@ -27,12 +33,15 @@ export const multiSelectStyles = stylex.create({
     borderRadius: borderRadii.xs,
     borderStyle: 'solid',
     borderWidth: 1,
-    outline: 'none',
     backgroundColor: surfaceColors.raised,
     boxShadow: shadows.medium,
     color: textColors.default,
     display: 'flex',
     flexDirection: 'column',
+    outlineColor: focusColors.ring,
+    outlineOffset: 1,
+    outlineStyle: 'solid',
+    outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
     transformOrigin: 'var(--transform-origin)',
     maxHeight: 'var(--available-height)',
     maxWidth: 'var(--available-width)',

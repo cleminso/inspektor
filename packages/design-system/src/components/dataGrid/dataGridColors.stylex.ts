@@ -35,7 +35,7 @@ export const dataGridColors = stylex.defineVars({
   cellBorder: borderColors.subtle,
   emphasizedColumnBackground: selectionColors.background,
   emphasizedColumnBorder: selectionColors.border,
-  selectedCellBackground: selectionColors.background,
+  selectedCellBackground: surfaceColors.subtle,
   emphasizedCellBackground: selectionColors.background,
   currentCellInnerBorder: 'transparent',
   resizeHandleBackground: 'transparent',

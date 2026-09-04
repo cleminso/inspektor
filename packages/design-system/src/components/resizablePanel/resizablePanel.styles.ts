@@ -41,16 +41,7 @@ export const resizablePanelStyles = stylex.create({
     },
     display: 'flex',
     justifyContent: 'center',
-    outlineColor: focusColors.ring,
-    outlineOffset: -1,
-    outlineStyle: {
-      default: 'none',
-      ':focus-visible': 'solid',
-    },
-    outlineWidth: {
-      default: 0,
-      ':focus-visible': spatial['focus-ring-width'],
-    },
+    outlineStyle: 'none',
     position: 'relative',
     zIndex: {
       default: layerIndexes.navigation,
@@ -63,6 +54,26 @@ export const resizablePanelStyles = stylex.create({
     width: {
       default: spatial['panel-handle-size'],
       ':is([aria-orientation="horizontal"])': '100%',
+    },
+    '::after': {
+      borderColor: focusColors.ring,
+      borderRadius: borderRadii.m,
+      borderStyle: {
+        default: 'none',
+        ':focus-visible': 'solid',
+      },
+      borderWidth: spatial['focus-ring-width'],
+      content: '',
+      pointerEvents: 'none',
+      position: 'absolute',
+      height: {
+        default: spacing['3xl'],
+        ':is([aria-orientation="horizontal"])': spacing.s,
+      },
+      width: {
+        default: spacing.s,
+        ':is([aria-orientation="horizontal"])': spacing['4xl'],
+      },
     },
   },
   gutter: {

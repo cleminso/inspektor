@@ -34,9 +34,10 @@ export const comboboxStyles = stylex.create({
     display: 'flex',
     outlineColor: focusColors.ring,
     outlineOffset: 0,
+    outlineStyle: 'solid',
+    outlineWidth: 0,
     minWidth: spatial['combobox-min-width'],
   },
-  inputGroupFocusVisible: { outlineWidth: spatial['focus-ring-width'] },
   inputGroupInvalid: {
     borderColor: borderColors.danger,
     outlineColor: focusColors.ringDanger,
@@ -298,6 +299,9 @@ export const comboboxStyles = stylex.create({
   },
   itemHighlighted: {
     backgroundColor: ghostElementColors.hover,
+    outlineColor: { default: 'transparent', '@media (forced-colors: active)': 'Highlight' },
+    outlineStyle: 'solid',
+    outlineWidth: { default: 0, '@media (forced-colors: active)': 1 },
   },
   itemSelected: {
     backgroundColor: ghostElementColors.selected,

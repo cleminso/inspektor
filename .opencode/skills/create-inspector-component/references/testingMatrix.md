@@ -46,6 +46,7 @@ Before retaining a test, identify the responsible Inspector source lines and sta
 | `render` exposed | Composition, handlers, attributes, semantics, and ref test |
 | Default element changed | Role, native semantics, keyboard behavior, and configuration test |
 | State maps to Inspector styles | Focused state translation test when supported; otherwise typecheck and focused lint |
+| Focus-indicator styling changes | Focused lint plus a real-browser check of computed style, clipping, contrast, and forced-colors behavior |
 | Compound export changed | Extractor-resolution regression test |
 | Provider or context behavior added | Behavioral test for owned state and cleanup |
 
@@ -78,6 +79,7 @@ Do not test generic TypeScript inference, exhaustive typed lookup keys, direct r
 - Never use unconditional teardown delays. Reset managers, timers, DOM state, and module state deterministically.
 - Keep bundle-boundary tests when a static import must not initialize a deferred dependency.
 - Keep accessibility tests for Inspector's custom keyboard model, focus recovery, naming policy, state composition, and one wrapper-wiring boundary where Base UI-generated semantics could be disconnected. Delete broader accessibility matrices emitted unchanged by Base UI.
+- Test Inspector-owned roving focus, manual activation, and keyboard parity in Vitest. Verify the resulting indicator in a real browser rather than asserting generated StyleX classes.
 - Keep regression tests for precedence between Inspector states even when each individual state is covered elsewhere.
 - During cleanup, run the focused file after each coherent change and the full package suite after all files are updated.
 

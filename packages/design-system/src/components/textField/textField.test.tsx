@@ -18,6 +18,7 @@ describe('TextField', () => {
     expect(screen.getByRole('textbox', { name: 'App ID' }).getAttribute('aria-invalid')).toBe(
       'true',
     )
+    expect(screen.getByRole('textbox', { name: 'App ID' }).hasAttribute('data-invalid')).toBe(true)
     expect(screen.getByText('App ID is required')).toBeTruthy()
   })
 })

@@ -61,7 +61,7 @@ export const workspaceTabsStyles = stylex.create({
     },
   },
   trailingArea: {
-    paddingLeft: spacing.xs,
+    paddingInline: spacing.xxs,
     '::before': {
       backgroundColor: borderColors.subtle,
       content: '',
@@ -213,7 +213,7 @@ export const workspaceTabsStyles = stylex.create({
     alignItems: 'center',
     backgroundImage: `linear-gradient(to right, transparent 0, ${workspaceTabsVars.background} ${spacing.l}, ${workspaceTabsVars.background} 100%), linear-gradient(to right, transparent 0, ${workspaceTabsColors.closeBackdrop} ${spacing.l}, ${workspaceTabsColors.closeBackdrop} 100%)`,
     display: 'flex',
-    insetInlineEnd: spacing.xxs,
+    insetInlineEnd: spacing.xs,
     justifyContent: 'flex-end',
     opacity: workspaceTabsVars.closeOpacity,
     pointerEvents: 'none',
@@ -230,10 +230,7 @@ export const workspaceTabsStyles = stylex.create({
       ':focus-visible': workspaceTabsColors.closeIconHover,
       ':hover': workspaceTabsColors.closeIconHover,
     },
-    outlineOffset: {
-      default: 0,
-      ':focus-visible': 0,
-    },
+    outlineOffset: 0,
     pointerEvents: workspaceTabsVars.closePointerEvents,
     zIndex: 1,
     '::before': {

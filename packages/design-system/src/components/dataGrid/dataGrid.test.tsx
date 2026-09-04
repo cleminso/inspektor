@@ -1210,6 +1210,31 @@ describe('DataGrid', () => {
     expect(onColumnActivate).toHaveBeenCalledWith('name')
   })
 
+  it('activates a focused column with Space', () => {
+    const onColumnActivate = vi.fn()
+    render(<TestDataGrid onColumnActivate={onColumnActivate} />)
+    const header = screen.getByRole('columnheader', { name: 'Name' })
+
+    expect(header.tabIndex).toBe(0)
+    fireEvent.keyDown(header, { key: ' ' })
+
+    expect(onColumnActivate).toHaveBeenCalledWith('name')
+  })
+
+  it('activates a row consistently from its cell when cell activation is not configured', () => {
+    const onRowActivate = vi.fn()
+    render(<TestDataGrid onRowActivate={onRowActivate} />)
+    const cell = screen.getByRole('cell', { name: 'Ada' })
+
+    fireEvent.click(cell)
+    expect(onRowActivate).toHaveBeenCalledWith('person-1')
+
+    onRowActivate.mockClear()
+    fireEvent.keyDown(cell, { key: 'Enter' })
+
+    expect(onRowActivate).toHaveBeenCalledWith('person-1')
+  })
+
   it('deactivates a column when its active header is clicked again', () => {
     render(<DismissibleColumnDataGrid />)
     const header = screen.getByRole('columnheader', { name: 'Role' })

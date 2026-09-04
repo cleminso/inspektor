@@ -67,7 +67,7 @@ Every omission beyond `className` and `style` needs a rationale in the component
 - [Public API policy](references/publicApiPolicy.md): inheritance, omissions, transformations, and Inspector props.
 - [Ref forwarding](references/refForwarding.md): external, internal, and behavioral ref flow.
 - [Render composition](references/renderComposition.md): element composition, semantic substitution, and part classification.
-- [StyleX integration](references/stylexIntegration.md): state callbacks, capability inventories, variables, and contextual styles.
+- [StyleX integration](references/stylexIntegration.md): state callbacks, capability inventories, focus indicators, variables, and contextual styles.
 - [Component audit](references/componentAudit.md): manual audit template.
 - [Testing matrix](references/testingMatrix.md): proof required for each wrapper decision.
 
@@ -82,6 +82,8 @@ Every omission beyond `className` and `style` needs a rationale in the component
 - `render` exposed only where justified
 - Inspector props have a requirement, constrained type, literal default, and mapping
 - State, data attributes, transition states, and CSS variables inventoried
+- Every keyboard or programmatic focus target has a visible, unclipped indicator with sufficient adjacent-color contrast
+- Composite widgets expose one sequential entry point and retain a visible current item in forced-colors mode
 - Inspector behavior and contract tested without duplicating Base UI internals
 - Package exports, generated API metadata, and component documentation complete
 - Package and documentation validation pass

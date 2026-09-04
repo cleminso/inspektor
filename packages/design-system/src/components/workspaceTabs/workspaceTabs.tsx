@@ -36,7 +36,6 @@ interface WorkspaceTabsContextValue {
 }
 
 const WorkspaceTabsContext = createContext<WorkspaceTabsContextValue>({ value: null })
-const WorkspaceTabsActivateOnFocusContext = createContext(false)
 
 interface WorkspaceTabsReorderActionsContextValue {
   values: readonly WorkspaceTabsValue[]
@@ -316,18 +315,15 @@ function WorkspaceTabsList({
   }, [value])
 
   const list = (
-    <WorkspaceTabsActivateOnFocusContext.Provider value={activateOnFocus}>
-      <BaseTabs.List
-        {...props}
-        ref={listRef}
-        activateOnFocus={activateOnFocus}
-        loopFocus={loopFocus}
-        {...listStyles}
-        data-loop-focus={loopFocus === true ? '' : undefined}
-        data-scrollbar="hidden"
-        data-slot="workspace-tabs-list"
-      />
-    </WorkspaceTabsActivateOnFocusContext.Provider>
+    <BaseTabs.List
+      {...props}
+      ref={listRef}
+      activateOnFocus={activateOnFocus}
+      loopFocus={loopFocus}
+      {...listStyles}
+      data-scrollbar="hidden"
+      data-slot="workspace-tabs-list"
+    />
   )
   const listContent =
     reorderEnabled === true ? (
@@ -455,7 +451,6 @@ function WorkspaceTabsTabContent({
   setReorderRef,
 }: WorkspaceTabsTabContentProps) {
   const context = useContext(WorkspaceTabsContext)
-  const activateOnFocus = useContext(WorkspaceTabsActivateOnFocusContext)
   const reorderActions = useContext(WorkspaceTabsReorderActionsContext)
   const active = context.value === value
   const reorderIndex = reorderActions?.values.indexOf(value) ?? -1
@@ -495,7 +490,6 @@ function WorkspaceTabsTabContent({
 
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     const opensContextMenu =
-      event.key === 'Enter' ||
       event.key === 'ContextMenu' ||
       (event.key === 'F10' &&
         event.shiftKey === true &&
@@ -519,11 +513,7 @@ function WorkspaceTabsTabContent({
           }),
         )
       }
-      if (event.key === 'Enter') {
-        openReorderMenu()
-      } else {
-        window.setTimeout(openReorderMenu, 0)
-      }
+      window.setTimeout(openReorderMenu, 0)
       return
     }
 
@@ -537,46 +527,6 @@ function WorkspaceTabsTabContent({
     ) {
       event.preventDefault()
       moveTab(reorderIndex + (event.key === 'ArrowLeft' ? -1 : 1))
-      return
-    }
-
-    if (
-      event.shiftKey === false &&
-      event.altKey === false &&
-      event.ctrlKey === false &&
-      event.metaKey === false &&
-      (event.key === 'ArrowLeft' ||
-        event.key === 'ArrowRight' ||
-        event.key === 'Home' ||
-        event.key === 'End')
-    ) {
-      const list = event.currentTarget.closest<HTMLElement>('[data-slot="workspace-tabs-list"]')
-      const tabs = Array.from(
-        list?.querySelectorAll<HTMLButtonElement>('[data-slot="workspace-tabs-tab"]') ?? [],
-      ).filter((tab) => tab.disabled === false)
-      const currentIndex = tabs.indexOf(event.currentTarget)
-      const loops = list?.hasAttribute('data-loop-focus') === true
-      let destinationIndex = currentIndex
-      if (event.key === 'Home') {
-        destinationIndex = 0
-      } else if (event.key === 'End') {
-        destinationIndex = tabs.length - 1
-      } else {
-        const offset = event.key === 'ArrowLeft' ? -1 : 1
-        destinationIndex = currentIndex + offset
-        if (loops === true) {
-          destinationIndex = (destinationIndex + tabs.length) % tabs.length
-        }
-      }
-      const destination = tabs[destinationIndex]
-      if (destination !== undefined && destination !== event.currentTarget) {
-        event.preventDefault()
-        event.stopPropagation()
-        destination.focus()
-        if (activateOnFocus === true) {
-          destination.click()
-        }
-      }
       return
     }
 
@@ -629,8 +579,8 @@ function WorkspaceTabsTabContent({
     >
       <BaseTabs.Tab
         value={value}
+        aria-keyshortcuts={onClose === undefined ? undefined : 'Delete'}
         disabled={disabled}
-        tabIndex={disabled === true ? -1 : 0}
         onBlur={onBlur}
         onFocus={onFocus}
         onDoubleClick={onDoubleClick}

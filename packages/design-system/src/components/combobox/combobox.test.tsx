@@ -1,5 +1,5 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { Combobox } from './combobox'
 
@@ -97,24 +97,5 @@ describe('Combobox', () => {
     )
 
     expect(container.querySelector('[data-slot="combobox-chevron"]')).toBeNull()
-  })
-
-  it('moves focus-visible state to the compound input group', () => {
-    render(
-      <Combobox.Root items={[]}>
-        <Combobox.InputGroup>
-          <Combobox.Input aria-label="Branch" />
-        </Combobox.InputGroup>
-      </Combobox.Root>,
-    )
-    const input = screen.getByRole('combobox', { name: 'Branch' })
-    const group = input.closest('[data-slot="combobox-input-group"]')
-    vi.spyOn(input, 'matches').mockReturnValue(true)
-
-    fireEvent.focus(input)
-    expect(group?.getAttribute('data-focus-visible')).toBe('')
-
-    fireEvent.blur(input)
-    expect(group?.getAttribute('data-focus-visible')).toBe(null)
   })
 })

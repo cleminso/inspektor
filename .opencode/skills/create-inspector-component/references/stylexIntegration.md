@@ -5,6 +5,7 @@
 - [Closed styling boundary](#closed-styling-boundary)
 - [State callbacks](#state-callbacks)
 - [Capability inventory](#capability-inventory)
+- [Focus indicators](#focus-indicators)
 - [Empty state rules](#empty-state-rules)
 - [CSS variables](#css-variables)
 - [Contextual descendant styles](#contextual-descendant-styles)
@@ -47,6 +48,17 @@ For every rendered Base UI part, inventory:
 Classify every capability as styled, consumed by behavior, intentionally unstyled, or unreachable through the Inspector wrapper.
 
 Name state rules after the Base UI state or attribute where practical. Keep compound Inspector conditions separate from single-state inventory entries.
+
+## Focus indicators
+
+- Inventory every element that can receive sequential, roving, or programmatic focus.
+- Do not suppress a focus outline unless a visible indicator is transferred to the complete interactive owner.
+- Choose inset or outer geometry from the actual clipping boundary. An inset ring is valid only when its color has sufficient contrast against every control state it overlaps.
+- Use an on-fill semantic color for inset indicators on filled, danger, selected, and checked controls when the standard ring does not contrast with that fill.
+- Composite widgets use one sequential entry point. Arrow navigation may move the roving tab stop without activating the item when the interaction uses manual activation.
+- A highlighted composite item must remain visible in forced-colors mode. Preserve that positional indicator for disabled highlighted items instead of relying only on text color or background fill.
+- If focus moves to a popup, viewport, or other structural container, show a container indicator or a visible current-item indicator for keyboard-origin focus.
+- Verify computed `outlineStyle`, `outlineWidth`, `outlineColor`, geometry, and clipping in a real browser. jsdom and generated StyleX class assertions do not prove a visible indicator.
 
 ## Empty state rules
 

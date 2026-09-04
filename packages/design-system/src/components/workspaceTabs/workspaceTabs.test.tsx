@@ -505,12 +505,12 @@ describe('WorkspaceTabs', () => {
   })
 
   it.each([
-    { key: 'F10', shiftKey: true },
-    { key: 'ContextMenu', shiftKey: false },
-    { key: 'Enter', shiftKey: false },
-  ])('opens reorder actions from the focused tab with $key', async ({ key, shiftKey }) => {
+    { key: 'F10', shiftKey: true, opensMenu: true },
+    { key: 'ContextMenu', shiftKey: false, opensMenu: true },
+    { key: 'Enter', shiftKey: false, opensMenu: false },
+  ])('handles $key from a focused reorderable tab', async ({ key, shiftKey, opensMenu }) => {
     render(
-      <WorkspaceTabs.Root defaultValue="active">
+      <WorkspaceTabs.Root defaultValue="all">
         <WorkspaceTabs.List
           aria-label="Table views"
           values={['all', 'active']}
@@ -548,11 +548,11 @@ describe('WorkspaceTabs', () => {
     activeTab.focus()
     fireEvent.keyDown(activeTab, { key, shiftKey })
 
-    expect(await screen.findByRole('menu', { name: 'Reorder Active accounts' })).toBeTruthy()
-    expect(onContextMenu).toHaveBeenCalledOnce()
-
-    if (key === 'Enter') {
-      expect(onContextMenu.mock.calls[0]?.[0]).toMatchObject({ clientX: 100, clientY: 76 })
+    if (opensMenu === true) {
+      expect(await screen.findByRole('menu', { name: 'Reorder Active accounts' })).toBeTruthy()
+      expect(onContextMenu).toHaveBeenCalledOnce()
+    } else {
+      expect(screen.queryByRole('menu')).toBeNull()
     }
   })
 
@@ -742,7 +742,7 @@ describe('WorkspaceTabs', () => {
     ).toBeNull()
   })
 
-  it('keeps every enabled tab and close action in sequential focus order without activating on focus', () => {
+  it('uses one roving tab stop for tabs without activating on focus', async () => {
     render(
       <WorkspaceTabs.Root defaultValue="all">
         <WorkspaceTabs.List aria-label="Table views">
@@ -763,16 +763,16 @@ describe('WorkspaceTabs', () => {
     const closeButtons = screen.getAllByRole('button', { name: 'Close tab' })
 
     expect(allTab.tabIndex).toBe(0)
-    expect(activeTab.tabIndex).toBe(0)
+    expect(activeTab.tabIndex).toBe(-1)
+    expect(allTab.getAttribute('aria-keyshortcuts')).toBe('Delete')
     expect(closeButtons.map((button) => button.tabIndex)).toEqual([0, 0])
 
-    activeTab.focus()
-
-    expect(activeTab.getAttribute('aria-selected')).toBe('false')
-
+    allTab.focus()
     fireEvent.keyDown(allTab, { key: 'ArrowRight' })
 
-    expect(document.activeElement).toBe(activeTab)
+    await waitFor(() => expect(document.activeElement).toBe(activeTab))
+    expect(allTab.tabIndex).toBe(-1)
+    expect(activeTab.tabIndex).toBe(0)
     expect(activeTab.getAttribute('aria-selected')).toBe('false')
   })
 

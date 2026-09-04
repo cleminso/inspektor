@@ -62,6 +62,7 @@ export function TextField({
       <Field.Label>{label}</Field.Label>
       <Input
         {...inputProps}
+        invalid={effectiveInvalid}
         fullWidth={fullWidth}
       />
       {description === undefined ? null : <Field.Description>{description}</Field.Description>}

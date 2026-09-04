@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[04/09/26]
+
+- [x] Delegate roving focus, arrow navigation, looping, and manual activation to Base UI Tabs.
+- [x] Reserve Enter for tab activation while Shift plus F10 and the Context Menu key open reorder actions.
+- [x] Keep the close action focus ring within the clipped tab bar without an outer offset.
+
 [24/08/26]
 
 - [x] Keep each horizontal workspace tab at the shared fixed tab width instead of allowing flex sizing to distort it.
@@ -184,6 +190,11 @@
 
 ## Settled interaction decisions
 
+[04/09/26]
+
+- [x] Workspace tabs use one roving tab stop; close actions remain separate sequential controls.
+- [x] Enter activates a manually focused tab. Shift plus F10 and the Context Menu key open reorder actions.
+
 [24/08/26]
 
 - [x] Use one fixed shared tab width and end ellipsis. This supersedes intrinsic full-title widths and non-ellipsis overflow from [12/08/26].
@@ -288,6 +299,12 @@
 - [ ] Add an `easy-*` animation when closing tabs?
 
 ## Validation checklist
+
+[04/09/26]
+
+- [x] Cover Base UI-owned roving focus integration, manual activation boundaries, reorder-menu keys, and Delete closing.
+- [x] Run changed-file lint, design-system typecheck, build, and package tests.
+- [ ] Verify the close-action focus ring and tab keyboard behavior in a fresh browser context.
 
 [24/08/26]
 

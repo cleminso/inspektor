@@ -19,5 +19,6 @@ describe('Input', () => {
     expect(identifier.getAttribute('data-variant')).toBe('subtle')
     expect(identifier.getAttribute('data-font')).toBe('mono')
     expect(identifier.getAttribute('aria-invalid')).toBe('true')
+    expect(identifier.hasAttribute('data-invalid')).toBe(true)
   })
 })

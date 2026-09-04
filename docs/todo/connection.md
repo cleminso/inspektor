@@ -11,6 +11,19 @@
 
 ## Implemented foundation
 
+[04/09/26]
+
+### Submission state
+
+- [x] Disable the complete connection fieldset while submission uses its captured values.
+
+[04/09/26]
+
+### Field-local validation
+
+- [x] Validate required connection credentials on blur through Base UI Field state while keeping native validation popups disabled.
+- [x] Associate each field error with its input and reserve the form-level status for connection-wide failures. This supersedes the earlier native required-validation treatment.
+
 [03/09/26]
 
 ### Connection trigger environment
@@ -397,6 +410,11 @@
 - None.
 
 ## Validation checklist
+
+[04/09/26]
+
+- [x] Cover required blur validation, field error association, connection-wide status, and disabled submission controls.
+- [x] Run changed-file lint, Inspector typecheck, build, and package tests.
 
 [03/09/26]
 

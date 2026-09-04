@@ -187,6 +187,9 @@ export const selectStyles = stylex.create({
   itemSizeL: { minHeight: spatial['collection-row-height-l'] },
   itemHighlighted: {
     backgroundColor: ghostElementColors.hover,
+    outlineColor: { default: 'transparent', '@media (forced-colors: active)': 'Highlight' },
+    outlineStyle: 'solid',
+    outlineWidth: { default: 0, '@media (forced-colors: active)': 1 },
   },
   itemSelected: { backgroundColor: ghostElementColors.selected },
   itemDisabled: {

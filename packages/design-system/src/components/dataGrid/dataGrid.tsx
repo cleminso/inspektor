@@ -1005,16 +1005,22 @@ function DataGridHeaderCellImplementation<TData extends RowData>({
     }
 
     if (
-      event.key === 'Enter' &&
       event.altKey === false &&
       event.ctrlKey === false &&
       event.metaKey === false &&
       event.shiftKey === false &&
-      event.target === event.currentTarget &&
-      header.column.getCanSort() === true
+      event.target === event.currentTarget
     ) {
-      event.preventDefault()
-      header.column.toggleSorting(sortDirection === 'asc')
+      if (event.key === ' ' && onColumnActivate !== undefined) {
+        event.preventDefault()
+        onColumnActivate(isActive === true ? null : header.column.id)
+        return
+      }
+
+      if (event.key === 'Enter' && header.column.getCanSort() === true) {
+        event.preventDefault()
+        header.column.toggleSorting(sortDirection === 'asc')
+      }
     }
   }
 
@@ -1058,7 +1064,13 @@ function DataGridHeaderCellImplementation<TData extends RowData>({
         onContextMenu={handleContextMenu}
         onKeyDown={handleKeyDown}
         scope="col"
-        tabIndex={header.column.getCanSort() === true || columnReorderable === true ? 0 : -1}
+        tabIndex={
+          header.column.getCanSort() === true ||
+          columnReorderable === true ||
+          onColumnActivate !== undefined
+            ? 0
+            : -1
+        }
       >
         <div
           {...stylex.props(
@@ -1409,6 +1421,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     onCellContextMenu,
     onCellContextMenuTouchStart,
     onColumnActivate,
+    onRowActivate,
     registerCellElement,
     table,
   } = useDataGridContext<TData>()
@@ -1434,6 +1447,14 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     },
     [cell.id, registerCellElement],
   )
+  const activateCell = () => {
+    onColumnActivate?.(null)
+    if (onCellActivate === undefined) {
+      onRowActivate?.(target.rowId)
+    } else {
+      onCellActivate(target)
+    }
+  }
 
   const handleClick = (event: MouseEvent<HTMLTableCellElement>) => {
     if (event.detail > 1) {
@@ -1451,8 +1472,7 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
 
     event.stopPropagation()
     event.currentTarget.focus()
-    onColumnActivate?.(null)
-    onCellActivate?.(target)
+    activateCell()
   }
 
   const handleMouseDown = (event: MouseEvent<HTMLTableCellElement>) => {
@@ -1525,14 +1545,17 @@ function DataGridCell<TData extends RowData>({ children, cell }: DataGridCellPro
     }
     if (event.key === 'Enter') {
       event.preventDefault()
-      onColumnActivate?.(null)
-      onCellEditRequest?.(target)
+      if (onCellEditRequest !== undefined) {
+        onColumnActivate?.(null)
+        onCellEditRequest(target)
+      } else {
+        activateCell()
+      }
       return
     }
     if (event.key === ' ') {
       event.preventDefault()
-      onColumnActivate?.(null)
-      onCellActivate?.(target)
+      activateCell()
     }
   }
 

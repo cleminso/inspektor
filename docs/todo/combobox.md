@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[04/09/26]
+
+- [x] Use the focused border for the search input group without adding an outer focus ring.
+
 [03/09/26]
 
 - [x] Keep item labels and descriptions visually distinct and expose them as separate accessible name and description content.
@@ -25,6 +29,10 @@ None.
 
 ## Settled interaction decisions
 
+[04/09/26]
+
+- The compound search input communicates focus through its border rather than an additional outer ring.
+
 [03/09/26]
 
 - `Combobox.Item` owns required label content and an optional description; a separate `ItemText` part is unnecessary.
@@ -35,6 +43,12 @@ None.
 None.
 
 ## Validation checklist
+
+[04/09/26]
+
+- [x] Remove React-managed focus-visible state and its implementation-only test.
+- [x] Run changed-file lint, design-system typecheck, build, and package tests.
+- [ ] Verify the focused search input border in a fresh browser context.
 
 [03/09/26]
 

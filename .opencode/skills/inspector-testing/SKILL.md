@@ -5,6 +5,14 @@ description: Implements and organizes Inspector tests with the correct Vitest pr
 
 # Inspector testing
 
+## Table of contents
+
+- [Choose the test boundary](#choose-the-test-boundary)
+- [Name web Vitest files](#name-web-vitest-files)
+- [Design-system exception](#design-system-exception)
+- [Focus indicators](#focus-indicators)
+- [Validate](#validate)
+
 ## Choose the test boundary
 
 1. Use Playwright under `apps/web/e2e` only for behavior that must cross the real browser, built application, or fixture boundary.
@@ -21,6 +29,12 @@ description: Implements and organizes Inspector tests with the correct Vitest pr
 ## Design-system exception
 
 `packages/design-system` defaults to jsdom. Keep its existing `@vitest-environment node` annotations and `test:node` allowlist unless that package adopts a measured, package-wide convention.
+
+## Focus indicators
+
+- Use Vitest for Inspector-owned focus movement, roving tab stops, manual activation, and keyboard/pointer parity.
+- Use a real browser for visible-focus claims. Inspect computed outline style, width, color, clipping, filled-state contrast, and forced-colors presentation.
+- Do not use generated StyleX class names as evidence that a focus indicator is visible.
 
 ## Validate
 

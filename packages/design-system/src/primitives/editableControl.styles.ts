@@ -19,8 +19,8 @@ export const editableControlStyles = stylex.create({
       default: borderColors.default,
       ':focus-visible': borderColors.focused,
     },
-    outlineColor: focusColors.ringSubtle,
-    outlineOffset: 0,
+    outlineColor: focusColors.ring,
+    outlineOffset: `calc(-1 * ${spatial['focus-ring-width']})`,
     outlineStyle: 'solid',
     outlineWidth: {
       default: 0,

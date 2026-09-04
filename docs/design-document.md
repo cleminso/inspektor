@@ -1270,13 +1270,13 @@ v1 makes live updates visible without forcing the user to refresh and lose conte
 Behavior:
 
 - update visible rows reactively through the active Jazz query
-- highlight rows inserted through Inspector
-- highlight cells after Inspector applies an update
+- highlight rows inserted through the live query, whether from Inspector or an external Jazz client
+- highlight cells that just changed through the live query, whether from Inspector or an external Jazz client
 - preserve the selected row and side panel when possible
 - avoid jumping scroll position or replacing the visible context unexpectedly
 
-Mutation feedback highlights are ephemeral and brief. External Jazz updates refresh the represented rows without receiving a
-distinct changed-cell or inserted-row highlight.
+Live-change highlights are ephemeral and brief. Any Jazz update that reaches the active query — local or external — can trigger a
+row or cell highlight so the developer sees what changed without scanning the table.
 
 Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspector can unsubscribe by skipping a query, but freezing visible rows would require an inspector-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
 
