@@ -2,10 +2,10 @@
 // Confirm the connection switcher can remain on the lightwieght session context without importing the jazz runtime provider.
 import { describe, expect, it, vi } from 'vitest'
 
-const runtimeProviderLoaded = vi.hoisted(() => vi.fn())
+const runtimeProviderLoads = vi.hoisted(() => ({ count: 0 }))
 
 vi.mock('@app/providers/inspectorProvider', () => {
-  runtimeProviderLoaded()
+  runtimeProviderLoads.count += 1
 
   return { useInspector: vi.fn() }
 })
@@ -18,6 +18,6 @@ import './connectionSwitcher'
 
 describe('ConnectionSwitcher module boundary', () => {
   it('does not import the connection-scoped runtime provider', () => {
-    expect(runtimeProviderLoaded).not.toHaveBeenCalled()
+    expect(runtimeProviderLoads.count).toBe(0)
   })
 })

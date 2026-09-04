@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-const pointerSensorConfigure = vi.hoisted(() => vi.fn(() => ({})))
+const pointerSensorConfigureCalls = vi.hoisted(() => ({ count: 0 }))
 
 vi.mock('@dnd-kit/dom', () => ({
   AutoScroller: { configure: () => ({}) },
@@ -10,13 +10,18 @@ vi.mock('@dnd-kit/dom', () => ({
       constructor(_options: { value: number }) {}
     },
   },
-  PointerSensor: { configure: pointerSensorConfigure },
+  PointerSensor: {
+    configure: () => {
+      pointerSensorConfigureCalls.count += 1
+      return {}
+    },
+  },
 }))
 
 import './workspaceTabs'
 
 describe('WorkspaceTabs module boundary', () => {
   it('does not initialize drag-and-drop when static tabs are imported', () => {
-    expect(pointerSensorConfigure).not.toHaveBeenCalled()
+    expect(pointerSensorConfigureCalls.count).toBe(0)
   })
 })

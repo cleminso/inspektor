@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
-const codeMirrorModuleLoaded = vi.hoisted(() => vi.fn())
+const codeMirrorModuleLoads = vi.hoisted(() => ({ count: 0 }))
 
 vi.mock('@codemirror/view', () => {
-  codeMirrorModuleLoaded()
+  codeMirrorModuleLoads.count += 1
 
   return {}
 })
@@ -12,6 +12,6 @@ import './tableView'
 
 describe('TableView module boundary', () => {
   it('does not initialize CodeMirror when the base table view is imported', () => {
-    expect(codeMirrorModuleLoaded).not.toHaveBeenCalled()
+    expect(codeMirrorModuleLoads.count).toBe(0)
   })
 })
