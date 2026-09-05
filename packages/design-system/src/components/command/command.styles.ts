@@ -3,7 +3,6 @@ import * as stylex from '@stylexjs/stylex'
 import { layerIndexes } from '../../tokens/layers.stylex'
 import {
   borderColors,
-  focusColors,
   ghostElementColors,
   spatial,
   surfaceColors,
@@ -35,6 +34,7 @@ export const commandStyles = stylex.create({
   },
   input: {
     borderWidth: 0,
+    outline: 'none',
     paddingInline: spacing.s,
     appearance: 'none',
     backgroundColor: 'transparent',
@@ -46,10 +46,6 @@ export const commandStyles = stylex.create({
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[2],
     lineHeight: lineHeights.ui,
-    outlineColor: focusColors.ring,
-    outlineOffset: `calc(-1 * ${spatial['focus-ring-width']})`,
-    outlineStyle: 'solid',
-    outlineWidth: { default: 0, ':focus-visible': spatial['focus-ring-width'] },
     paddingInlineEnd: spatial['control-height-xl'],
     height: spatial['control-height-xl'],
     width: '100%',
@@ -159,7 +155,6 @@ export const commandStyles = stylex.create({
     display: 'flex',
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
-    justifyContent: 'space-between',
     height: spatial['control-height-xl'],
   },
   shortcut: { flexShrink: 0, marginInlineStart: 'auto' },

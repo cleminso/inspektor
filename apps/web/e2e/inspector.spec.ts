@@ -325,7 +325,7 @@ test('filters and sorts real fixture rows', async ({ page }) => {
   ])
 
   await page.getByRole('button', { name: 'Filter table' }).click()
-  await page.getByRole('option', { name: 'label Text', exact: true }).click()
+  await page.getByRole('option', { name: 'label', exact: true }).click()
   await page.getByRole('option', { name: 'Equals', exact: true }).click()
   const filterValue = page.getByRole('combobox', { name: 'Filter value' })
   await filterValue.fill('Optional values populated')
@@ -441,7 +441,7 @@ test('loads the deferred calendar for a timestamp filter', async ({ page }) => {
 
   expect(calendarRequested).toBe(false)
   await page.getByRole('button', { name: 'Filter table' }).click()
-  await page.getByRole('option', { name: 'timestampValue Timestamp', exact: true }).click()
+  await page.getByRole('option', { name: 'timestampValue', exact: true }).click()
   await page.getByRole('option', { name: 'Is greater than', exact: true }).click()
   await page.getByRole('option', { name: 'Pick a date…', exact: true }).click()
 

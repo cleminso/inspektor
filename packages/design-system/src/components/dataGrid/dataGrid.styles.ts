@@ -206,8 +206,7 @@ export const dataGridStyles = stylex.create({
     visibility: 'hidden',
   },
   compactCellInlinePadding: {
-    paddingLeft: spacing.s,
-    paddingRight: spacing.s,
+    paddingInline: spacing.xs,
   },
   columnDragOverlay: {
     boxSizing: 'border-box',

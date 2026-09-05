@@ -158,7 +158,8 @@ export function Toolbar({ actions, children, pagination }: ToolbarProps): React.
       flexShrink={0}
       alignItems="center"
       gap="s"
-      padding="s"
+      paddingVertical="s"
+      paddingHorizontal="xs"
       backgroundColor="surface-background"
     >
       <Box

@@ -632,6 +632,18 @@ describe('DataGridFilterBuilder', () => {
     expect(await screen.findByRole('combobox', { name: 'Filter value' })).toBeTruthy()
   })
 
+  it('groups navigation and selection guidance without cancel guidance', async () => {
+    render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Filter table' }))
+
+    await screen.findByText('Navigate')
+
+    expect(document.querySelector('[data-slot="command-footer"]')?.textContent).toBe(
+      '↑ ↓ NavigateEnter Apply filters',
+    )
+  })
+
   it('accepts standard operator glyphs and aliases from the palette input', async () => {
     render(<DataGridFilterBuilder columns={columns} filters={[]} onFiltersChange={vi.fn()} />)
 

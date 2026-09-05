@@ -48,9 +48,6 @@ export default function BasicExample(): ReactElement {
             <span>
               <Command.Key>Enter</Command.Key> Select
             </span>
-            <span>
-              <Command.Key>Esc</Command.Key> Cancel
-            </span>
           </Command.Footer>
         </Command.Root>
         <Command.Close />

@@ -87,10 +87,10 @@ it('shows safe runtime recovery with or without a selected table', () => {
   const { rerender } = render(<TableTabsView tableName={null} />)
 
   const alert = screen.getByRole('alert')
-  expect(alert.textContent).toContain("Couldn't initialize the Inspektor")
+  expect(alert.textContent).toContain("Couldn't initialize Inspektor")
   expect(alert.textContent).not.toContain('Runtime failed')
   expect(screen.queryByText('New table view content')).toBeNull()
-  fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Retry initialization' }))
   expect(mocks.retryRuntime).toHaveBeenCalledOnce()
 
   mocks.state.activeTabId = 'table:accounts'
@@ -108,7 +108,7 @@ describe('TableTabsView', () => {
 
     const { rerender } = render(<TableTabsView connectionEntryPending tableName={null} />)
 
-    expect(screen.getByRole('status').textContent).toContain('Loading schema')
+    expect(screen.getByRole('status').textContent).toContain('Loading schema…')
     expect(screen.getByRole('tab', { name: 'New view' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'New view' })).toBeTruthy()
     expect(screen.queryByText('New table view content')).toBeNull()
@@ -168,8 +168,8 @@ describe('TableTabsView', () => {
   it('exposes discoverable disabled Tables navigation controls at the history boundary', () => {
     render(<TableTabsView tableName={null} />)
 
-    const backButton = screen.getByRole('button', { name: 'Go Back' })
-    const forwardButton = screen.getByRole('button', { name: 'Go Forward' })
+    const backButton = screen.getByRole('button', { name: 'Go back' })
+    const forwardButton = screen.getByRole('button', { name: 'Go forward' })
     expect(backButton.getAttribute('aria-disabled')).toBe('true')
     expect(forwardButton.getAttribute('aria-disabled')).toBe('true')
     expect(backButton.tabIndex).toBe(0)
@@ -230,7 +230,7 @@ describe('TableTabsView', () => {
     render(<TableTabsView tableName={null} />)
 
     expect(screen.getByRole('tab', { name: 'New view' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Close New view' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Close new view' })).toBeNull()
   })
 
   it('forwards workspace navigation and tab actions', async () => {
@@ -244,8 +244,8 @@ describe('TableTabsView', () => {
     ]
     render(<TableTabsView tableName="accounts" />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go Back' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Go Forward' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Go forward' }))
     fireEvent.click(screen.getByRole('button', { name: 'New view' }))
     fireEvent.click(screen.getByRole('tab', { name: 'profiles' }))
     fireEvent.click(screen.getByRole('button', { name: 'Close profiles' }))
@@ -279,7 +279,7 @@ describe('TableTabsView', () => {
     expect(await screen.findByLabelText('Alt+N')).toBeTruthy()
 
     fireEvent.mouseLeave(newViewButton)
-    fireEvent.focus(screen.getByRole('button', { name: 'Go Back' }))
+    fireEvent.focus(screen.getByRole('button', { name: 'Go back' }))
     expect(await screen.findByLabelText('Alt+Left Bracket')).toBeTruthy()
   })
 })

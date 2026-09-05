@@ -175,7 +175,7 @@ describe('Command', () => {
 
     expect(await screen.findByRole('dialog', { name: 'Choose a column' })).toBeTruthy()
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('combobox')))
-    fireEvent.click(screen.getByRole('button', { name: 'Close command' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close command palette' }))
 
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     await waitFor(() => expect(document.activeElement).toBe(trigger))

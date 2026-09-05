@@ -28,7 +28,7 @@ export const menuStyles = stylex.create({
     borderStyle: 'solid',
     borderWidth: 1,
     gap: spacing.s,
-    paddingInline: spacing.m,
+    paddingInline: spacing.s,
     alignItems: 'center',
     appearance: 'none',
     backgroundColor: {

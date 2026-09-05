@@ -909,43 +909,12 @@ export function DataGridFilterBuilder({
               </Field.Root>
             )}
             <Command.Footer>
-              <Box
-                alignItems="center"
-                gap="xs"
-              >
-                <Command.Key>Esc</Command.Key>
-                <Text
-                  color="muted"
-                  variant="caption"
-                >
-                  Cancel
-                </Text>
-              </Box>
-              <Box
-                alignItems="center"
-                gap="xs"
-              >
-                <Command.Key>Enter</Command.Key>
-                <Text
-                  color="muted"
-                  variant="caption"
-                >
-                  Select / Apply
-                </Text>
-              </Box>
-              <Box
-                alignItems="center"
-                gap="xs"
-              >
-                <Command.Key>↑</Command.Key>
-                <Command.Key>↓</Command.Key>
-                <Text
-                  color="muted"
-                  variant="caption"
-                >
-                  Navigate
-                </Text>
-              </Box>
+              <span>
+                <Command.Key>↑ ↓</Command.Key> Navigate
+              </span>
+              <span>
+                <Command.Key>Enter</Command.Key> Apply filters
+              </span>
             </Command.Footer>
           </Command.Root>
         )}

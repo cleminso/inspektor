@@ -39,6 +39,7 @@ export const shellLayoutStyles = stylex.create({
   },
   view: {
     borderRadius: borderRadii.xs,
+    backgroundColor: 'transparent',
   },
   rightDock: {
     borderRadius: borderRadii.xs,

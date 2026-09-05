@@ -33,7 +33,6 @@ function RuntimeErrorStatus(): React.ReactElement {
       flex={1}
       alignItems="center"
       justifyContent="center"
-      backgroundColor="surface-background"
       role="alert"
     >
       <Box
@@ -45,16 +44,16 @@ function RuntimeErrorStatus(): React.ReactElement {
           variant="label"
           color="error"
         >
-          Couldn't initialize the Inspektor
+          Couldn't initialize Inspektor
         </Text>
-        <Text color="muted">Check the connection and schema details.</Text>
+        <Text color="muted">Check your connection and schema details, then retry.</Text>
         <Button
           type="button"
           size="s"
           variant="secondary"
           onClick={retryRuntime}
         >
-          Try again
+          Retry initialization
         </Button>
       </Box>
     </Box>
@@ -98,11 +97,10 @@ export function TableTabsView({
         flexShrink={0}
         alignItems="center"
         gap="s"
+        marginBottom="xs"
         padding="xs"
         backgroundColor="surface-background"
-        borderBottomWidth={1}
-        borderColor="subtle"
-        borderStyle="solid"
+        borderRadius="xs"
         overflow="hidden"
       >
         <WorkspaceTabs.Bar>
@@ -115,7 +113,7 @@ export function TableTabsView({
                     variant="ghost"
                     size="s"
                     radius="xs"
-                    aria-label="Go Back"
+                    aria-label="Go back"
                     disabled={canGoBack === false}
                     focusableWhenDisabled
                     iconOnly
@@ -126,7 +124,7 @@ export function TableTabsView({
                 }
               />
               <Tooltip.Content>
-                Go Back{' '}
+                Go back{' '}
                 <KeyboardInput
                   hotkey={appHotkeys.goBack}
                   size="small"
@@ -141,7 +139,7 @@ export function TableTabsView({
                     variant="ghost"
                     size="s"
                     radius="xs"
-                    aria-label="Go Forward"
+                    aria-label="Go forward"
                     disabled={canGoForward === false}
                     focusableWhenDisabled
                     iconOnly
@@ -152,7 +150,7 @@ export function TableTabsView({
                 }
               />
               <Tooltip.Content>
-                Go Forward{' '}
+                Go forward{' '}
                 <KeyboardInput
                   hotkey={appHotkeys.goForward}
                   size="small"
@@ -176,8 +174,8 @@ export function TableTabsView({
                     key={tab.id}
                     value={tab.id}
                     closeHotkey={appHotkeys.closeTableView}
-                    closeLabel="Close New view"
-                    reorderLabel="Reorder New view"
+                    closeLabel="Close new view"
+                    reorderLabel="Reorder new view"
                     onClose={
                       tabs.length > 1
                         ? () => {
@@ -270,46 +268,45 @@ export function TableTabsView({
           </WorkspaceTabs.TrailingArea>
         </WorkspaceTabs.Bar>
       </Box>
-      {runtimeError !== null ? (
-        <RuntimeErrorStatus />
-      ) : connectionEntryPending === true ? (
-        <Box
-          minHeight={0}
-          flex={1}
-          alignItems="center"
-          justifyContent="center"
-          backgroundColor="surface-background"
-          role="status"
-          aria-live="polite"
-        >
-          <Text
-            variant="label"
-            color="muted"
+      <Box
+        minHeight={0}
+        minWidth={0}
+        flex={1}
+        backgroundColor="surface-background"
+        borderRadius="xs"
+        overflow="hidden"
+      >
+        {runtimeError !== null ? (
+          <RuntimeErrorStatus />
+        ) : connectionEntryPending === true ? (
+          <Box
+            minHeight={0}
+            flex={1}
+            alignItems="center"
+            justifyContent="center"
+            role="status"
+            aria-live="polite"
           >
-            Loading schema
-          </Text>
-        </Box>
-      ) : tableName !== null && isTableIdentityReady === false ? (
-        <Box
-          minHeight={0}
-          flex={1}
-        />
-      ) : activeTab?.kind === 'table' && tableName !== null ? (
-        <WorkspaceTabs.Panel value={activeTab.id}>
-          <SelectedTableView tableName={tableName} />
-        </WorkspaceTabs.Panel>
-      ) : activeTab?.kind === 'newView' ? (
-        <WorkspaceTabs.Panel value={NEW_VIEW_TAB_ID}>
+            <Text
+              variant="label"
+              color="muted"
+            >
+              Loading schema…
+            </Text>
+          </Box>
+        ) : tableName !== null && isTableIdentityReady === false ? null : activeTab?.kind ===
+            'table' && tableName !== null ? (
+          <WorkspaceTabs.Panel value={activeTab.id}>
+            <SelectedTableView tableName={tableName} />
+          </WorkspaceTabs.Panel>
+        ) : activeTab?.kind === 'newView' ? (
+          <WorkspaceTabs.Panel value={NEW_VIEW_TAB_ID}>
+            <NewTableView />
+          </WorkspaceTabs.Panel>
+        ) : (
           <NewTableView />
-        </WorkspaceTabs.Panel>
-      ) : (
-        <Box
-          minHeight={0}
-          flex={1}
-        >
-          <NewTableView />
-        </Box>
-      )}
+        )}
+      </Box>
     </WorkspaceTabs.Root>
   )
 }

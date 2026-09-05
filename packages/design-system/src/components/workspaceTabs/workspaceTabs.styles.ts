@@ -61,7 +61,7 @@ export const workspaceTabsStyles = stylex.create({
     },
   },
   trailingArea: {
-    paddingInline: spacing.xxs,
+    paddingLeft: spacing.xs,
     '::before': {
       backgroundColor: borderColors.subtle,
       content: '',

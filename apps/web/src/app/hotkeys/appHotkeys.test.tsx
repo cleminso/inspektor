@@ -131,4 +131,20 @@ describe('AppHotkeysProvider', () => {
 
     expect(await screen.findByRole('dialog', { name: 'Commands' })).toBeTruthy()
   })
+
+  it('shows navigation and selection guidance together without close guidance', async () => {
+    render(
+      <AppHotkeysProvider>
+        <div>Content</div>
+      </AppHotkeysProvider>,
+    )
+
+    fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
+
+    await screen.findByText('Navigate')
+
+    expect(document.querySelector('[data-slot="command-footer"]')?.textContent).toBe(
+      '↑ ↓ NavigateEnter Select',
+    )
+  })
 })

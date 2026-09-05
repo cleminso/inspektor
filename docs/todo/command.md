@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[05/09/26]
+
+- [x] Place command navigation and selection guidance together at the footer end.
+- [x] Omit redundant Escape close and cancel guidance from command palettes.
+
 [03/09/26]
 
 - [x] Clip dialog overlays to the command surface corners.
@@ -30,6 +35,12 @@ None.
 
 ## Settled interaction decisions
 
+[05/09/26]
+
+- Command palettes show only navigation and selection guidance because close controls remain available.
+- Command footer guidance starts from the footer edge rather than competing with the command list.
+- Command search inputs do not render a visible focus ring.
+
 [03/09/26]
 
 - Filtering may use supporting text without including it in the accessible name.
@@ -39,6 +50,11 @@ None.
 None.
 
 ## Validation checklist
+
+[05/09/26]
+
+- [x] Cover footer guidance ordering for general commands and filter commands.
+- [x] Validate the affected web and design-system packages.
 
 [03/09/26]
 

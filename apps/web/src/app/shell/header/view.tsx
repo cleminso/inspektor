@@ -61,7 +61,6 @@ export function InspectorHeader(): React.ReactElement {
       <Box
         flex={1}
         justifyContent="end"
-        pr="s"
       >
         <Tooltip.Root>
           <Tooltip.Trigger

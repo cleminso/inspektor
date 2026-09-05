@@ -23,7 +23,7 @@ export const textareaStyles = stylex.create({
     borderStyle: 'solid',
     borderWidth: 1,
     paddingBlock: spacing.s,
-    paddingInline: spacing.m,
+    paddingInline: spacing.s,
     appearance: 'none',
     backgroundColor: surfaceColors.default,
     boxSizing: 'border-box',

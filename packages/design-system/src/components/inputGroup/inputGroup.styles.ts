@@ -64,7 +64,7 @@ export const inputGroupStyles = stylex.create({
     [inputGroupVars.textColor]: textColors.disabled,
   },
   text: {
-    paddingInline: spacing.m,
+    paddingInline: spacing.s,
     alignItems: 'center',
     display: 'inline-flex',
     flexShrink: 0,

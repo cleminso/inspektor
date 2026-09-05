@@ -23,7 +23,7 @@ export const inputStyles = stylex.create({
     borderStyle: 'solid',
     borderWidth: 1,
     paddingBlock: 0,
-    paddingInline: spacing.xs,
+    paddingInline: spacing.s,
     appearance: 'none',
     backgroundColor: surfaceColors.default,
     boxSizing: 'border-box',

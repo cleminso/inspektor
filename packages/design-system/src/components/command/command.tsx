@@ -220,11 +220,11 @@ const CommandClose = forwardRef<ComponentRef<typeof BaseDialog.Close>, CommandCl
         <BaseDialog.Close
           {...props}
           ref={ref}
-          aria-label="Close command"
+          aria-label="Close command palette"
           nativeButton
           render={
             <Button
-              aria-label="Close command"
+              aria-label="Close command palette"
               glyphSize="compact"
               iconOnly
               size="xs"
@@ -418,6 +418,7 @@ const CommandFooter = forwardRef<HTMLDivElement, CommandFooterProps>(
         {...props}
         ref={ref}
         {...stylex.props(commandStyles.footer)}
+        data-slot="command-footer"
       />
     )
   },
