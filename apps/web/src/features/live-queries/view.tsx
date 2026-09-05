@@ -282,6 +282,7 @@ function QueryDetails({
     <Box
       as="aside"
       aria-label="Query details"
+      backgroundColor="surface-background"
       flex={1}
       flexDirection="column"
       height="full"
@@ -530,6 +531,7 @@ function LiveQueryTimeline({
 
   return (
     <Box
+      backgroundColor="surface-background"
       flex={1}
       flexDirection="column"
       height="full"
@@ -539,7 +541,6 @@ function LiveQueryTimeline({
       <Box
         aria-label="Live queries controls"
         alignItems="center"
-        backgroundColor="surface-background"
         borderBottomWidth={1}
         borderColor="subtle"
         borderStyle="solid"

@@ -1,5 +1,10 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { type ColumnOrderState, type SortingState, useTable } from '@tanstack/react-table'
+import {
+  type ColumnOrderState,
+  type ColumnVisibilityState,
+  type SortingState,
+  useTable,
+} from '@tanstack/react-table'
 import type { DynamicTableRow } from 'jazz-tools'
 import { useMemo, useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -10,31 +15,53 @@ import { buildDataGridColumns } from '@tables/grid/buildColumns'
 
 const doNothing = () => undefined
 
+const movableColumns: NonNullable<Parameters<typeof buildDataGridColumns>[0]['columns']> = [
+  { accessorKey: 'name', column: null, id: 'name', isSortable: true, label: 'Name' },
+  { accessorKey: 'email', column: null, id: 'email', isSortable: true, label: 'Email' },
+]
+const movableColumnsWithTrailingRole = [
+  ...movableColumns,
+  { accessorKey: 'role', column: null, id: 'role', isSortable: true, label: 'Role' },
+]
+
+function openColumnMenu(menuType: 'button' | 'context', label = 'Name'): void {
+  if (menuType === 'button') {
+    fireEvent.click(screen.getByRole('button', { name: `Open ${label} column menu` }))
+  } else {
+    fireEvent.contextMenu(screen.getByText(label))
+  }
+}
+
 function TestTable({
   columns,
   data,
   disabledRowIds,
   initialColumnSizing,
   initialColumnOrder,
+  initialColumnVisibility,
   onColumnMenuOpen,
   onColumnMove,
   stagedValuesByRowId,
   onUndoRowDeletions,
-  onSortingChange,
+  onSortingChange = doNothing,
 }: {
   columns?: Parameters<typeof buildDataGridColumns>[0]['columns']
   data?: DynamicTableRow[]
   disabledRowIds?: ReadonlySet<string>
   initialColumnSizing?: Record<string, number>
   initialColumnOrder?: ColumnOrderState
+  initialColumnVisibility?: ColumnVisibilityState
   onColumnMenuOpen?: (columnId: string) => void
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]['onColumnMove']
   stagedValuesByRowId?: Parameters<typeof buildDataGridColumns>[0]['stagedValuesByRowId']
   onUndoRowDeletions?: (rowIds: readonly string[]) => void
-  onSortingChange: () => void
+  onSortingChange?: () => void
 }): React.ReactElement {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(initialColumnOrder ?? [])
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(
+    initialColumnVisibility ?? {},
+  )
   const columnDefs = useMemo(
     () =>
       buildDataGridColumns({
@@ -62,8 +89,9 @@ function TestTable({
     getRowId: (row) => String(row.id),
     initialState:
       initialColumnSizing === undefined ? undefined : { columnSizing: initialColumnSizing },
-    state: { columnOrder, sorting },
+    state: { columnOrder, columnVisibility, sorting },
     onColumnOrderChange: setColumnOrder,
+    onColumnVisibilityChange: setColumnVisibility,
     onSortingChange: (updater) => {
       setSorting(updater)
       onSortingChange()
@@ -87,17 +115,13 @@ describe('buildDataGridColumns', () => {
   it('renders valid staged values over source row values', () => {
     const data = [{ id: 'row-1', name: 'Ada' } as DynamicTableRow]
     const { rerender } = render(
-      <TestTable
-        data={data}
-        stagedValuesByRowId={{ 'row-1': { name: 'Grace' } }}
-        onSortingChange={doNothing}
-      />,
+      <TestTable data={data} stagedValuesByRowId={{ 'row-1': { name: 'Grace' } }} />,
     )
 
     expect(screen.getByText('Grace')).toBeTruthy()
     expect(screen.queryByText('Ada')).toBeNull()
 
-    rerender(<TestTable data={data} stagedValuesByRowId={{}} onSortingChange={doNothing} />)
+    rerender(<TestTable data={data} stagedValuesByRowId={{}} />)
 
     expect(screen.getByText('Ada')).toBeTruthy()
     expect(screen.queryByText('Grace')).toBeNull()
@@ -117,7 +141,6 @@ describe('buildDataGridColumns', () => {
         ]}
         data={[{ id: 'row-1', name: 'Ada' } as DynamicTableRow]}
         stagedValuesByRowId={{ 'row-1': { name: null } }}
-        onSortingChange={doNothing}
       />,
     )
 
@@ -133,7 +156,6 @@ describe('buildDataGridColumns', () => {
         data={data}
         disabledRowIds={new Set(['row-1'])}
         onUndoRowDeletions={onUndoRowDeletions}
-        onSortingChange={doNothing}
       />,
     )
 
@@ -150,12 +172,7 @@ describe('buildDataGridColumns', () => {
     expect(onUndoRowDeletions).toHaveBeenCalledWith(['row-1'])
 
     rerender(
-      <TestTable
-        data={data}
-        disabledRowIds={new Set()}
-        onUndoRowDeletions={onUndoRowDeletions}
-        onSortingChange={doNothing}
-      />,
+      <TestTable data={data} disabledRowIds={new Set()} onUndoRowDeletions={onUndoRowDeletions} />,
     )
 
     const restoredCheckbox = screen.getByRole('checkbox', { name: 'Select row row-1' })
@@ -173,7 +190,6 @@ describe('buildDataGridColumns', () => {
         data={data}
         disabledRowIds={new Set(['row-1', 'row-2'])}
         onUndoRowDeletions={onUndoRowDeletions}
-        onSortingChange={doNothing}
       />,
     )
 
@@ -186,12 +202,7 @@ describe('buildDataGridColumns', () => {
     expect(onUndoRowDeletions).toHaveBeenCalledWith(['row-1', 'row-2'])
 
     rerender(
-      <TestTable
-        data={data}
-        disabledRowIds={new Set()}
-        onUndoRowDeletions={onUndoRowDeletions}
-        onSortingChange={doNothing}
-      />,
+      <TestTable data={data} disabledRowIds={new Set()} onUndoRowDeletions={onUndoRowDeletions} />,
     )
     const restoredCheckbox = screen.getByRole('checkbox', { name: 'Select all loaded rows' })
     await waitFor(() => expect(document.activeElement).toBe(restoredCheckbox))
@@ -221,7 +232,7 @@ describe('buildDataGridColumns', () => {
   })
 
   it('opens the same column actions by right-clicking a header', () => {
-    render(<TestTable onSortingChange={() => undefined} />)
+    render(<TestTable />)
 
     fireEvent.contextMenu(screen.getByText('Name'))
 
@@ -229,16 +240,23 @@ describe('buildDataGridColumns', () => {
     expect(screen.getByRole('menuitem', { name: 'Hide column' })).toBeTruthy()
   })
 
+  it('replaces an open chevron menu with the header context menu', () => {
+    const onColumnMenuOpen = vi.fn()
+    render(<TestTable onColumnMenuOpen={onColumnMenuOpen} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
+    fireEvent.contextMenu(screen.getByText('Name'))
+
+    expect(onColumnMenuOpen).toHaveBeenCalledTimes(2)
+    expect(screen.getAllByRole('menu')).toHaveLength(1)
+  })
+
   it.each(['button', 'context'] as const)(
     'disables unavailable reset actions in the %s header menu',
     (menuType) => {
-      render(<TestTable onSortingChange={() => undefined} />)
+      render(<TestTable />)
 
-      if (menuType === 'button') {
-        fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
-      } else {
-        fireEvent.contextMenu(screen.getByText('Name'))
-      }
+      openColumnMenu(menuType)
 
       expect(
         screen.getByRole('menuitem', { name: 'Reset column order' }).getAttribute('aria-disabled'),
@@ -254,25 +272,9 @@ describe('buildDataGridColumns', () => {
     (menuType) => {
       render(
         <TestTable
-          columns={[
-            {
-              accessorKey: 'name',
-              column: null,
-              id: 'name',
-              isSortable: true,
-              label: 'Name',
-            },
-            {
-              accessorKey: 'email',
-              column: null,
-              id: 'email',
-              isSortable: true,
-              label: 'Email',
-            },
-          ]}
+          columns={movableColumns}
           data={[{ id: 'row-1', name: 'Ada', email: 'ada@example.com' } as DynamicTableRow]}
           initialColumnSizing={{ name: 420, email: 360 }}
-          onSortingChange={() => undefined}
         />,
       )
 
@@ -284,11 +286,7 @@ describe('buildDataGridColumns', () => {
       expect(nameColumn?.style.width).toBe('420px')
       expect(emailColumn?.style.width).toBe('360px')
 
-      if (menuType === 'button') {
-        fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
-      } else {
-        fireEvent.contextMenu(screen.getByText('Name'))
-      }
+      openColumnMenu(menuType)
       fireEvent.click(screen.getByRole('menuitem', { name: 'Reset column width' }))
 
       expect(nameColumn?.style.width).toBe('294px')
@@ -301,25 +299,9 @@ describe('buildDataGridColumns', () => {
     (menuType) => {
       render(
         <TestTable
-          columns={[
-            {
-              accessorKey: 'name',
-              column: null,
-              id: 'name',
-              isSortable: true,
-              label: 'Name',
-            },
-            {
-              accessorKey: 'email',
-              column: null,
-              id: 'email',
-              isSortable: true,
-              label: 'Email',
-            },
-          ]}
+          columns={movableColumns}
           data={[{ id: 'row-1', name: 'Ada', email: 'ada@example.com' } as DynamicTableRow]}
           initialColumnOrder={['email', 'name']}
-          onSortingChange={() => undefined}
         />,
       )
 
@@ -331,11 +313,7 @@ describe('buildDataGridColumns', () => {
 
       expect(getHeaderLabels()).toEqual(['Email', 'Name'])
 
-      if (menuType === 'button') {
-        fireEvent.click(screen.getByRole('button', { name: 'Open Email column menu' }))
-      } else {
-        fireEvent.contextMenu(screen.getByText('Email'))
-      }
+      openColumnMenu(menuType, 'Email')
       fireEvent.click(screen.getByRole('menuitem', { name: 'Reset column order' }))
 
       expect(getHeaderLabels()).toEqual(['Name', 'Email'])
@@ -344,42 +322,103 @@ describe('buildDataGridColumns', () => {
 
   it('moves a column through the shared Move submenu', async () => {
     const onColumnMove = vi.fn()
-    render(<TestTable onColumnMove={onColumnMove} onSortingChange={() => undefined} />)
+    render(<TestTable columns={movableColumns} onColumnMove={onColumnMove} />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
     const move = screen.getByRole('menuitem', { name: 'Move' })
     fireEvent.keyDown(move, { key: 'ArrowRight' })
 
-    await waitFor(() => {
-      expect(screen.getByRole('menuitem', { name: /Move right/ })).toBeTruthy()
-    })
+    await screen.findByRole('menuitem', { name: /Move right/ })
+    expect(screen.queryByLabelText('Ctrl+Shift+ArrowLeft')).toBeNull()
+    expect(screen.queryByLabelText('Ctrl+Shift+ArrowRight')).toBeNull()
     fireEvent.click(screen.getByRole('menuitem', { name: /Move right/ }))
 
     expect(onColumnMove).toHaveBeenCalledWith('name', 'right')
   })
 
-  it('keeps boundary movement as menu actions without hotkey hints', async () => {
-    render(<TestTable onColumnMove={() => undefined} onSortingChange={() => undefined} />)
+  it.each([
+    {
+      direction: 'left' as const,
+      label: 'Name',
+      menuType: 'button' as const,
+    },
+    {
+      direction: 'right' as const,
+      label: 'Email',
+      menuType: 'button' as const,
+    },
+    {
+      direction: 'left' as const,
+      label: 'Name',
+      menuType: 'context' as const,
+    },
+    {
+      direction: 'right' as const,
+      label: 'Email',
+      menuType: 'context' as const,
+    },
+  ])(
+    'disables unavailable movement actions for the $label column in the $menuType header menu',
+    async ({ direction, label, menuType }) => {
+      const onColumnMove = vi.fn()
+      render(<TestTable columns={movableColumns} onColumnMove={onColumnMove} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
-    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
+      openColumnMenu(menuType, label)
+      fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
 
-    expect(await screen.findByRole('menuitem', { name: 'Move to first column' })).toBeTruthy()
-    expect(screen.getByRole('menuitem', { name: 'Move to last column' })).toBeTruthy()
-    expect(screen.queryByLabelText('Ctrl+Shift+ArrowLeft')).toBeNull()
-    expect(screen.queryByLabelText('Ctrl+Shift+ArrowRight')).toBeNull()
+      for (const action of direction === 'left'
+        ? ['Move left', 'Move to first column']
+        : ['Move right', 'Move to last column']) {
+        expect(
+          (await screen.findByRole('menuitem', { name: new RegExp(`^${action}`) })).getAttribute(
+            'aria-disabled',
+          ),
+        ).toBe('true')
+      }
+
+      const enabledDirection = direction === 'left' ? 'right' : 'left'
+      fireEvent.keyDown(
+        screen.getByRole('menuitem', { name: new RegExp(`^Move ${enabledDirection}`) }),
+        {
+          key: direction === 'left' ? 'ArrowLeft' : 'ArrowRight',
+          shiftKey: true,
+        },
+      )
+      expect(onColumnMove).not.toHaveBeenCalled()
+      expect(
+        screen.getByRole('menuitem', { name: new RegExp(`^Move ${enabledDirection}`) }),
+      ).toBeTruthy()
+    },
+  )
+
+  it('uses visible columns to disable movement across a hidden trailing column', async () => {
+    const onColumnMove = vi.fn()
+    render(
+      <TestTable
+        columns={movableColumnsWithTrailingRole}
+        initialColumnVisibility={{ role: false }}
+        onColumnMove={onColumnMove}
+      />,
+    )
+
+    openColumnMenu('context', 'Email')
+    const move = screen.getByRole('menuitem', { name: 'Move' })
+    fireEvent.keyDown(move, { key: 'ArrowRight' })
+    const moveRight = await screen.findByRole('menuitem', { name: /^Move right/ })
+
+    expect(moveRight.getAttribute('aria-disabled')).toBe('true')
+    fireEvent.keyDown(move, { key: 'ArrowRight', shiftKey: true })
+    expect(onColumnMove).not.toHaveBeenCalled()
   })
 
   it.each([
     {
-      ctrlKey: false,
       direction: 'left' as const,
       hotkey: 'Shift+ArrowLeft',
       key: 'ArrowLeft',
       label: /Move left/,
     },
     {
-      ctrlKey: false,
       direction: 'right' as const,
       hotkey: 'Shift+ArrowRight',
       key: 'ArrowRight',
@@ -387,16 +426,22 @@ describe('buildDataGridColumns', () => {
     },
   ])(
     'moves a column $direction with its recorded menu hotkey',
-    async ({ ctrlKey, direction, hotkey, key, label }) => {
+    async ({ direction, hotkey, key, label }) => {
       const onColumnMove = vi.fn()
-      render(<TestTable onColumnMove={onColumnMove} onSortingChange={() => undefined} />)
+      render(
+        <TestTable
+          columns={movableColumns}
+          initialColumnOrder={direction === 'left' ? ['email', 'name'] : ['name', 'email']}
+          onColumnMove={onColumnMove}
+        />,
+      )
 
       fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
       fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
 
       const moveItem = await screen.findByRole('menuitem', { name: label })
       expect(screen.getByLabelText(hotkey)).toBeTruthy()
-      fireEvent.keyDown(moveItem, { ctrlKey, key, shiftKey: true })
+      fireEvent.keyDown(moveItem, { key, shiftKey: true })
 
       expect(onColumnMove).toHaveBeenCalledWith('name', direction)
     },
@@ -404,7 +449,13 @@ describe('buildDataGridColumns', () => {
 
   it('moves a column with the recorded context-menu hotkey', async () => {
     const onColumnMove = vi.fn()
-    render(<TestTable onColumnMove={onColumnMove} onSortingChange={() => undefined} />)
+    render(
+      <TestTable
+        columns={movableColumns}
+        initialColumnOrder={['email', 'name']}
+        onColumnMove={onColumnMove}
+      />,
+    )
 
     fireEvent.contextMenu(screen.getByText('Name'))
     fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
@@ -417,7 +468,7 @@ describe('buildDataGridColumns', () => {
   })
 
   it('hides a column through the header action menu', () => {
-    render(<TestTable onSortingChange={() => undefined} />)
+    render(<TestTable />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
     fireEvent.click(screen.getByRole('menuitem', { name: 'Hide column' }))
@@ -444,7 +495,6 @@ describe('buildDataGridColumns', () => {
             label: 'Accounts',
           },
         ]}
-        onSortingChange={() => undefined}
       />,
     )
 
@@ -509,7 +559,7 @@ describe('buildDataGridColumns', () => {
   })
 
   it('renders the selection header and row cells from one fixed-width column', () => {
-    render(<TestTable onSortingChange={() => undefined} />)
+    render(<TestTable />)
 
     const table = screen.getByRole('table', { name: 'People' })
     const renderedColumns = table.querySelectorAll('col')
@@ -546,7 +596,6 @@ describe('buildDataGridColumns', () => {
           { id: 'row-2', name: 'Grace' } as DynamicTableRow,
           { id: 'row-3', name: 'Linus' } as DynamicTableRow,
         ]}
-        onSortingChange={() => undefined}
       />,
     )
 
@@ -602,7 +651,6 @@ describe('buildDataGridColumns', () => {
         data={[
           { id: 'row-1', empty: '', missing: null, count: 42, enabled: false } as DynamicTableRow,
         ]}
-        onSortingChange={() => undefined}
       />,
     )
 
@@ -619,7 +667,6 @@ describe('buildDataGridColumns', () => {
       <TestTable
         columns={[{ accessorKey: 'id', column: null, id: 'id', isSortable: true, label: 'id' }]}
         data={[{ id } as DynamicTableRow]}
-        onSortingChange={() => undefined}
       />,
     )
 
@@ -676,7 +723,6 @@ describe('buildDataGridColumns', () => {
             count: 1203,
           } as DynamicTableRow,
         ]}
-        onSortingChange={() => undefined}
       />,
     )
 
@@ -719,7 +765,6 @@ describe('buildDataGridColumns', () => {
             tags: ['reader', 'writer', 'reader', 'owner'],
           } as DynamicTableRow,
         ]}
-        onSortingChange={() => undefined}
       />,
     )
 
@@ -764,7 +809,6 @@ describe('buildDataGridColumns', () => {
           },
         ]}
         data={[{ id: 'row-1', createdAt: timestamp, metadata: circular } as DynamicTableRow]}
-        onSortingChange={() => undefined}
       />,
     )
 

@@ -44,8 +44,9 @@ function ConnectionsSection({ children, title }: ConnectionsSectionProps): React
       <Box
         width="full"
         flexDirection="column"
+        gap="xxs"
         alignItems="start"
-        paddingHorizontal="m"
+        paddingHorizontal="xs"
       >
         {children}
       </Box>
@@ -55,7 +56,6 @@ function ConnectionsSection({ children, title }: ConnectionsSectionProps): React
 
 export function ConnectionsView(): React.ReactElement {
   const { connections } = useInspectorSessionContext()
-  const hasConnections = connections.length > 0
 
   return (
     <Box
@@ -86,7 +86,7 @@ export function ConnectionsView(): React.ReactElement {
         </ButtonLink>
       </ConnectionsSection>
 
-      {hasConnections === true ? (
+      {connections.length > 0 ? (
         <ConnectionsSection title="SAVED CONNECTIONS">
           <ConnectionList />
         </ConnectionsSection>

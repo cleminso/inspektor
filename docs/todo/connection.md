@@ -13,6 +13,12 @@
 
 [05/09/26]
 
+### Onboarding action spacing
+
+- [x] Align onboarding section headings and actions to the same inset and use the compact action-list gap.
+
+[05/09/26]
+
 ### Naming boundaries
 
 - [x] Rename the shared add/edit surface to `ConnectionForm` and its hook to `useConnectionFormFlow`.
@@ -467,6 +473,11 @@
 - None.
 
 ## Validation checklist
+
+[05/09/26]
+
+- [x] Verify Inspektor formatting, lint, typecheck, production build, and package-wide tests.
+- [ ] Verify onboarding action spacing in the isolated browser fixture.
 
 [05/09/26]
 

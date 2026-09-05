@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[05/09/26]
+
+- [x] Give the retained live-query timeline and query-details side pane their semantic background surface instead of exposing the workspace canvas.
+
 [03/09/26]
 
 - [x] Rename the product workspace from Queries to Live queries while preserving subscription terminology for server telemetry.
@@ -239,6 +243,11 @@ No open product work is recorded for the implemented foundation.
 - [ ] Decide whether Queries history should remain route-owned or move to a connection-owned lifetime only if developers need collection to continue while another workspace is active.
 
 ## Validation checklist
+
+[05/09/26]
+
+- [x] Verify Inspektor formatting, lint, typecheck, production build, and package-wide tests.
+- [ ] Verify the retained timeline and query-details background surfaces in the isolated browser fixture.
 
 [03/09/26]
 

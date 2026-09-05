@@ -19,6 +19,13 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[05/09/26]
+
+### Column movement boundaries
+
+- [x] Disable move actions that cannot change the visible data-column order at either edge.
+- [x] Keep header context and chevron action root menus mutually exclusive.
+
 [04/09/26]
 
 ### Keyboard focus clarity
@@ -1462,6 +1469,11 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[05/09/26]
+
+- [x] Cover visible column-movement boundaries, unavailable movement shortcuts, and header menu replacement in both menu variants.
+- [x] Verify Inspektor formatting, lint, typecheck, production build, and package-wide tests.
 
 [04/09/26]
 

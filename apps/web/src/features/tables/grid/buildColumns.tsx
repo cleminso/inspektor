@@ -1,4 +1,4 @@
-import { useEffect, useRef, type KeyboardEvent, type MouseEvent, type Ref } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type Ref } from 'react'
 
 import { matchesKeyboardEvent } from '@tanstack/react-hotkeys'
 import type { Column, ColumnDef } from '@tanstack/react-table'
@@ -431,10 +431,26 @@ const columnMoveHotkeys = [
   hotkey: (typeof appHotkeys)[keyof typeof appHotkeys]
 }[]
 
+function getColumnMoveAvailability(column: Column<DataGridFeatures, DynamicTableRow, unknown>): {
+  left: boolean
+  right: boolean
+} {
+  const visibleDataColumnIds = column.table
+    .getVisibleLeafColumns()
+    .filter((candidate) => candidate.id !== tableGridSelectionColumnId)
+    .map((candidate) => candidate.id)
+  const columnIndex = visibleDataColumnIds.indexOf(column.id)
+
+  return {
+    left: columnIndex > 0,
+    right: columnIndex >= 0 && columnIndex < visibleDataColumnIds.length - 1,
+  }
+}
+
 /** Captures column-move shortcuts before Base UI interprets their arrow keys as menu navigation. */
 function runColumnMoveHotkey(
   event: KeyboardEvent<HTMLDivElement>,
-  columnId: string,
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>,
   onMove: (columnId: string, direction: ColumnMoveDirection) => void,
 ): void {
   if (
@@ -454,16 +470,22 @@ function runColumnMoveHotkey(
 
   event.preventDefault()
   event.stopPropagation()
-  onMove(columnId, movement.direction)
+  if (getColumnMoveAvailability(column)[movement.direction] === false) {
+    return
+  }
+
+  onMove(column.id, movement.direction)
 }
 
 function MenuMoveActions({
-  columnId,
+  column,
   onMove,
 }: {
-  columnId: string
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>
   onMove: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
+  const moveAvailability = getColumnMoveAvailability(column)
+
   return (
     <Menu.SubmenuRoot>
       <Menu.SubmenuTrigger>Move</Menu.SubmenuTrigger>
@@ -471,17 +493,33 @@ function MenuMoveActions({
         side="right"
         align="start"
       >
-        <Menu.Item onClick={() => onMove(columnId, 'left')}>
+        <Menu.Item
+          disabled={moveAvailability.left === false}
+          onClick={() => onMove(column.id, 'left')}
+        >
           Move left
           <Menu.Shortcut hotkey={appHotkeys.moveTableColumnLeft} />
         </Menu.Item>
-        <Menu.Item onClick={() => onMove(columnId, 'right')}>
+        <Menu.Item
+          disabled={moveAvailability.right === false}
+          onClick={() => onMove(column.id, 'right')}
+        >
           Move right
           <Menu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </Menu.Item>
         <Menu.Separator />
-        <Menu.Item onClick={() => onMove(columnId, 'start')}>Move to first column</Menu.Item>
-        <Menu.Item onClick={() => onMove(columnId, 'end')}>Move to last column</Menu.Item>
+        <Menu.Item
+          disabled={moveAvailability.left === false}
+          onClick={() => onMove(column.id, 'start')}
+        >
+          Move to first column
+        </Menu.Item>
+        <Menu.Item
+          disabled={moveAvailability.right === false}
+          onClick={() => onMove(column.id, 'end')}
+        >
+          Move to last column
+        </Menu.Item>
       </Menu.Content>
     </Menu.SubmenuRoot>
   )
@@ -534,7 +572,7 @@ function MenuColumnActions({
         <>
           <Menu.Separator />
           <MenuMoveActions
-            columnId={column.id}
+            column={column}
             onMove={onMove}
           />
         </>
@@ -563,12 +601,14 @@ function MenuColumnActions({
 }
 
 function ContextMoveActions({
-  columnId,
+  column,
   onMove,
 }: {
-  columnId: string
+  column: Column<DataGridFeatures, DynamicTableRow, unknown>
   onMove: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
+  const moveAvailability = getColumnMoveAvailability(column)
+
   return (
     <ContextMenu.SubmenuRoot>
       <ContextMenu.SubmenuTrigger>Move</ContextMenu.SubmenuTrigger>
@@ -576,19 +616,31 @@ function ContextMoveActions({
         side="right"
         align="start"
       >
-        <ContextMenu.Item onClick={() => onMove(columnId, 'left')}>
+        <ContextMenu.Item
+          disabled={moveAvailability.left === false}
+          onClick={() => onMove(column.id, 'left')}
+        >
           Move left
           <ContextMenu.Shortcut hotkey={appHotkeys.moveTableColumnLeft} />
         </ContextMenu.Item>
-        <ContextMenu.Item onClick={() => onMove(columnId, 'right')}>
+        <ContextMenu.Item
+          disabled={moveAvailability.right === false}
+          onClick={() => onMove(column.id, 'right')}
+        >
           Move right
           <ContextMenu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </ContextMenu.Item>
         <ContextMenu.Separator />
-        <ContextMenu.Item onClick={() => onMove(columnId, 'start')}>
+        <ContextMenu.Item
+          disabled={moveAvailability.left === false}
+          onClick={() => onMove(column.id, 'start')}
+        >
           Move to first column
         </ContextMenu.Item>
-        <ContextMenu.Item onClick={() => onMove(columnId, 'end')}>
+        <ContextMenu.Item
+          disabled={moveAvailability.right === false}
+          onClick={() => onMove(column.id, 'end')}
+        >
           Move to last column
         </ContextMenu.Item>
       </ContextMenu.Content>
@@ -626,7 +678,7 @@ function ContextColumnActions({
         <>
           <ContextMenu.Separator />
           <ContextMoveActions
-            columnId={column.id}
+            column={column}
             onMove={onMove}
           />
         </>
@@ -669,14 +721,17 @@ function ColumnHeader({
   onMenuOpen?: (columnId: string) => void
   onMove?: (columnId: string, direction: ColumnMoveDirection) => void
 }): React.ReactElement {
-  const handleOpenChange = (open: boolean) => {
-    if (open === true) {
-      onMenuOpen?.(column.id)
-    }
-  }
+  const [actionsOpen, setActionsOpen] = useState(false)
 
   return (
-    <ContextMenu.Root onOpenChange={handleOpenChange}>
+    <ContextMenu.Root
+      onOpenChange={(open) => {
+        if (open === true) {
+          setActionsOpen(false)
+          onMenuOpen?.(column.id)
+        }
+      }}
+    >
       <ContextMenu.Trigger
         render={
           <Box
@@ -707,7 +762,15 @@ function ColumnHeader({
             {label}
           </Text>
         </Box>
-        <Menu.Root onOpenChange={handleOpenChange}>
+        <Menu.Root
+          open={actionsOpen}
+          onOpenChange={(open) => {
+            setActionsOpen(open)
+            if (open === true) {
+              onMenuOpen?.(column.id)
+            }
+          }}
+        >
           <Menu.Trigger
             render={
               <Button
@@ -735,7 +798,7 @@ function ColumnHeader({
             onKeyDownCapture={
               onMove === undefined
                 ? undefined
-                : (event) => runColumnMoveHotkey(event, column.id, onMove)
+                : (event) => runColumnMoveHotkey(event, column, onMove)
             }
           >
             <MenuColumnActions
@@ -748,9 +811,7 @@ function ColumnHeader({
       </ContextMenu.Trigger>
       <ContextMenu.Content
         onKeyDownCapture={
-          onMove === undefined
-            ? undefined
-            : (event) => runColumnMoveHotkey(event, column.id, onMove)
+          onMove === undefined ? undefined : (event) => runColumnMoveHotkey(event, column, onMove)
         }
       >
         <ContextColumnActions
