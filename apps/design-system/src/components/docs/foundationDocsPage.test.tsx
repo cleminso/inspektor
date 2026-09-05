@@ -1,8 +1,9 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { FoundationDocsPage } from './foundationDocsPage'
 import { colorsFoundationItem } from '@/lib/registry'
+import { AppShellDetailsTargetContext } from '@/layout/appShellDetails'
 
 const { navigate } = vi.hoisted(() => ({ navigate: vi.fn() }))
 
@@ -15,19 +16,22 @@ afterEach(() => {
 
 describe('FoundationDocsPage', () => {
   it('uses the shared docs header without exposing a controls pane', () => {
+    const detailsTarget = document.createElement('div')
     render(
-      <FoundationDocsPage item={colorsFoundationItem}>
-        <section>Color scales</section>
-      </FoundationDocsPage>,
+      <AppShellDetailsTargetContext.Provider value={detailsTarget}>
+        <FoundationDocsPage item={colorsFoundationItem}>
+          <section>Color scales</section>
+        </FoundationDocsPage>
+      </AppShellDetailsTargetContext.Provider>,
     )
 
     expect(screen.getByRole('heading', { level: 1, name: 'Colors' })).toBeTruthy()
     const sourceLink = screen.getByRole('link', { name: 'View Colors source on GitHub' })
     expect(sourceLink.textContent).toBe('Colors')
     expect(sourceLink.querySelector('svg')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Hide navigation' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Hide controls' })).toBeNull()
-    expect(screen.getByText(colorsFoundationItem.description)).toBeTruthy()
+    expect(
+      within(detailsTarget).getByRole('complementary', { name: 'Colors details' }).textContent,
+    ).toContain(colorsFoundationItem.description)
     const scrollArea = document.querySelector('[data-scroll-area="main-content"]')
     expect(scrollArea?.textContent).toContain('Color scales')
     expect(scrollArea?.getAttribute('data-scroll-fade')).toBe('top')

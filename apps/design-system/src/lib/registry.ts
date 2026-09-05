@@ -758,3 +758,16 @@ export const navSections: NavSection[] = [
 ]
 
 export const navigationItems = navSections.flatMap((section) => section.items)
+
+export function getAdjacentNavigationItems(pathname: string) {
+  const currentIndex = navigationItems.findIndex((item) => item.href === pathname)
+
+  if (currentIndex < 0) {
+    return { previous: undefined, next: undefined }
+  }
+
+  return {
+    previous: navigationItems.at(currentIndex - 1) ?? navigationItems.at(-1),
+    next: navigationItems[currentIndex + 1] ?? navigationItems[0],
+  }
+}

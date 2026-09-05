@@ -1,8 +1,8 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ComponentDocsPage } from './componentDocsPage'
-import { AppShellLayoutProvider } from '@/layout/appShellLayout'
+import { AppShellDetailsTargetContext } from '@/layout/appShellDetails'
 
 vi.mock('@/lib/shiki', () => ({ useHighlightedCode: () => null }))
 const { navigate } = vi.hoisted(() => ({ navigate: vi.fn() }))
@@ -16,29 +16,32 @@ afterEach(() => {
 
 describe('ComponentDocsPage', () => {
   it('places existing documentation below the playground and exposes component controls', () => {
+    const detailsTarget = document.createElement('div')
     render(
-      <ComponentDocsPage
-        title="Button"
-        description="Action primitive"
-        source={{
-          label: 'button.tsx',
-          path: 'packages/design-system/src/components/button/button.tsx',
-        }}
-        preview={<button type="button">Preview</button>}
-        sourceCode={'import { Button } from "@inspektor/ds";'}
-        controls={<div>Variant control</div>}
-      >
-        <section aria-label="Existing examples">Sizes</section>
-      </ComponentDocsPage>,
+      <AppShellDetailsTargetContext.Provider value={detailsTarget}>
+        <ComponentDocsPage
+          title="Button"
+          description="Action primitive"
+          source={{
+            label: 'button.tsx',
+            path: 'packages/design-system/src/components/button/button.tsx',
+          }}
+          preview={<button type="button">Preview</button>}
+          sourceCode={'import { Button } from "@inspektor/ds";'}
+          controls={<div>Variant control</div>}
+        >
+          <section aria-label="Existing examples">Sizes</section>
+        </ComponentDocsPage>
+      </AppShellDetailsTargetContext.Provider>,
     )
 
     expect(screen.getByRole('region', { name: 'Button playground' })).toBeTruthy()
     expect(
       screen.getByRole('region', { name: 'Button playground' }).getAttribute('style'),
     ).not.toContain('max-width:')
-    expect(screen.getByRole('complementary', { name: 'Button controls' }).textContent).toContain(
-      'Variant control',
-    )
+    expect(
+      within(detailsTarget).getByRole('complementary', { name: 'Button details' }).textContent,
+    ).toContain('Variant control')
     const documentation = screen.getByRole('region', { name: 'Button documentation' })
     expect(documentation.textContent).toContain('Sizes')
     const documentationPage = documentation.querySelector('div')
@@ -46,7 +49,7 @@ describe('ComponentDocsPage', () => {
     expect(documentationPage?.getAttribute('data-docs-width')).toBe('full')
   })
 
-  it('keeps the toolbar and controls fixed while only the center content scrolls', () => {
+  it('keeps the toolbar outside the center scroll area', () => {
     render(
       <ComponentDocsPage
         title="Copy Button"
@@ -72,11 +75,6 @@ describe('ComponentDocsPage', () => {
     expect(
       screen.getByRole('region', { name: 'Copy Button playground' }).getAttribute('style'),
     ).toContain('min-width: 0px;')
-    expect(
-      screen
-        .getByRole('complementary', { name: 'Copy Button controls' })
-        .getAttribute('data-scrollable'),
-    ).toBe('false')
   })
 
   it('navigates through component registry order', () => {
@@ -135,47 +133,5 @@ describe('ComponentDocsPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Next page: Colors' }))
     expect(navigate).toHaveBeenCalledWith({ to: '/foundations/colors' })
-  })
-
-  it('preserves a closed controls pane when the component page remounts', () => {
-    const { rerender } = render(
-      <AppShellLayoutProvider>
-        <ComponentDocsPage
-          key="button"
-          title="Button"
-          description="Action primitive"
-          source={{
-            label: 'button.tsx',
-            path: 'packages/design-system/src/components/button/button.tsx',
-          }}
-          preview={<button type="button">Preview</button>}
-          sourceCode={'import { Button } from "@inspektor/ds";'}
-          controls={<div>Button controls</div>}
-        />
-      </AppShellLayoutProvider>,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Hide controls' }))
-    expect(screen.queryByRole('complementary', { name: 'Button controls' })).toBeNull()
-
-    rerender(
-      <AppShellLayoutProvider>
-        <ComponentDocsPage
-          key="checkbox"
-          title="Checkbox"
-          description="Selection control"
-          source={{
-            label: 'checkbox.tsx',
-            path: 'packages/design-system/src/components/checkbox/checkbox.tsx',
-          }}
-          preview={<button type="button">Preview</button>}
-          sourceCode={'import { Checkbox } from "@inspektor/ds";'}
-          controls={<div>Checkbox controls</div>}
-        />
-      </AppShellLayoutProvider>,
-    )
-
-    expect(screen.queryByRole('complementary', { name: 'Checkbox controls' })).toBeNull()
-    expect(screen.getByRole('button', { name: 'Show controls' })).toBeTruthy()
   })
 })

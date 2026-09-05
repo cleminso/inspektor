@@ -1,34 +1,33 @@
-import { Box, Button, ButtonLink, Text, Tooltip } from '@inspektor/ds'
+import {
+  Box,
+  Button,
+  ButtonLink,
+  KeyboardInput,
+  ShellLayout,
+  Text,
+  Tooltip,
+  useShellLayout,
+} from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 import { HeadContent, Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
-import { Moon, Sun } from 'lucide-react'
+import { FolderTree, Info, Moon, Sun, type LucideIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { type ReactElement } from 'react'
+import { type ComponentProps, type ReactElement, useState } from 'react'
 
-import { navigationItems, navSections, type NavItem } from '@/lib/registry'
-import { AppShellLayoutProvider, useAppShellLayout } from '@/layout/appShellLayout'
+import { getAdjacentNavigationItems, navSections } from '@/lib/registry'
+import { AppShellDetailsTargetContext } from '@/layout/appShellDetails'
+import { createDesignSystemShellLayoutPersistence } from '@/layout/appShellStorage'
 
-export function getMainContentOverflowY(pathname: string): 'auto' | 'hidden' {
-  return pathname.startsWith('/components/') || pathname.startsWith('/foundations/')
-    ? 'hidden'
-    : 'auto'
-}
-
-export function getAdjacentNavigationItems(pathname: string): {
-  previous: NavItem | undefined
-  next: NavItem | undefined
-} {
-  const currentIndex = navigationItems.findIndex((item) => item.href === pathname)
-
-  if (currentIndex < 0) {
-    return { previous: undefined, next: undefined }
-  }
-
-  return {
-    previous: navigationItems.at(currentIndex - 1) ?? navigationItems.at(-1),
-    next: navigationItems[currentIndex + 1] ?? navigationItems[0],
-  }
-}
+const appShellHotkeyOptions = {
+  ignoreInputs: true,
+  preventDefault: false,
+  stopPropagation: false,
+} as const
+const appShellHotkeys = {
+  toggleLeftDock: 'Alt+B',
+  toggleRightDock: 'Alt+D',
+} as const
+const shellLayoutPersistence = createDesignSystemShellLayoutPersistence()
 
 function ThemeSwitch(): ReactElement {
   const { resolvedTheme, setTheme } = useTheme()
@@ -58,10 +57,102 @@ function ThemeSwitch(): ReactElement {
   )
 }
 
-function AppShellContent(): ReactElement {
+function runDockHotkey(event: KeyboardEvent, toggle: () => void): void {
+  if (event.defaultPrevented === true || event.isComposing === true || event.repeat === true) {
+    return
+  }
+  event.preventDefault()
+  event.stopPropagation()
+  toggle()
+}
+
+function DockControl({
+  artwork,
+  hotkey,
+  isOpen,
+  label,
+  onClick,
+}: {
+  artwork: LucideIcon
+  hotkey: ComponentProps<typeof KeyboardInput>['hotkey']
+  isOpen: boolean
+  label: string
+  onClick: () => void
+}): ReactElement {
+  const action = isOpen === true ? 'Hide' : 'Show'
+  const accessibleLabel = `${action} ${label}`
+
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger
+        render={
+          <Button
+            iconOnly
+            variant="ghost"
+            size="s"
+            aria-label={accessibleLabel}
+            aria-pressed={isOpen}
+            onClick={onClick}
+          >
+            <Button.Glyph artwork={artwork} />
+          </Button>
+        }
+      />
+      <Tooltip.Content>
+        {accessibleLabel}{' '}
+        <KeyboardInput
+          hotkey={hotkey}
+          size="small"
+        />
+      </Tooltip.Content>
+    </Tooltip.Root>
+  )
+}
+
+export function AppShellFooter(): ReactElement {
+  const { leftDock, rightDock } = useShellLayout()
+
+  useHotkey(
+    appShellHotkeys.toggleLeftDock,
+    (event) => runDockHotkey(event, leftDock.toggle),
+    appShellHotkeyOptions,
+  )
+  useHotkey(
+    appShellHotkeys.toggleRightDock,
+    (event) => runDockHotkey(event, rightDock.toggle),
+    appShellHotkeyOptions,
+  )
+
+  return (
+    <Box
+      as="footer"
+      width="full"
+      alignItems="center"
+      justifyContent="between"
+      padding="xs"
+    >
+      <DockControl
+        artwork={FolderTree}
+        hotkey={appShellHotkeys.toggleLeftDock}
+        isOpen={leftDock.isOpen}
+        label="components tree"
+        onClick={leftDock.toggle}
+      />
+      <DockControl
+        artwork={Info}
+        hotkey={appShellHotkeys.toggleRightDock}
+        isOpen={rightDock.isOpen}
+        label="details"
+        onClick={rightDock.toggle}
+      />
+    </Box>
+  )
+}
+
+export function AppShell(): ReactElement {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const navigate = useNavigate()
-  const { isNavigationOpen } = useAppShellLayout()
+  const [detailsTarget, setDetailsTarget] = useState<HTMLElement | null>(null)
   const { previous, next } = getAdjacentNavigationItems(pathname)
 
   useHotkey(
@@ -86,124 +177,110 @@ function AppShellContent(): ReactElement {
   return (
     <>
       <HeadContent />
-      <Box
-        height="full"
-        flexDirection="column"
-        overflow="hidden"
-        backgroundColor="surface-background"
-        color="default"
-      >
-        <Box
-          as="header"
-          alignItems="center"
-          justifyContent="between"
-          flexShrink={0}
-          paddingHorizontal={{ base: 'xl', md: 'xl' }}
-          paddingVertical="m"
-          borderBottomWidth={1}
-          borderStyle="solid"
-          borderColor="default"
-        >
-          <Link to="/">
-            <Text
-              as="span"
-              variant="title"
-            >
-              Inspektor Design System
-            </Text>
-          </Link>
-          <ThemeSwitch />
-        </Box>
-
-        <Box
-          flex={1}
-          flexDirection={{ base: 'column', xl: 'row' }}
-          minHeight={0}
-        >
-          {isNavigationOpen === true ? (
-            <Box
-              as="aside"
-              display={{ base: 'none', xl: 'flex' }}
-              flexDirection="column"
-              flexShrink={0}
-              gap="2xl"
-              width="popup-width-s"
-              overflowY="auto"
-              data-scroll-area="navigation"
-              padding="m"
-            >
-              <Box
-                as="nav"
-                flexDirection="column"
-                gap="2xl"
-                aria-label="Design system navigation"
-              >
-                {navSections.map((section) => (
-                  <Box
-                    as="section"
-                    key={section.title}
-                    flexDirection="column"
-                    gap="m"
-                  >
-                    <Text
-                      as="span"
-                      variant="label"
-                      color="muted"
-                    >
-                      {section.title}
-                    </Text>
-                    <Box
-                      flexDirection="column"
-                      gap="none"
-                    >
-                      {section.items.map((item) => {
-                        const isActive = pathname === item.href
-                        return (
-                          <ButtonLink
-                            key={item.href}
-                            variant={isActive === true ? 'secondary' : 'ghost'}
-                            size="m"
-                            layout="row"
-                            render={<Link to={item.href} />}
-                            aria-current={isActive === true ? 'page' : undefined}
-                            radius="none"
-                          >
-                            {item.title}
-                          </ButtonLink>
-                        )
-                      })}
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          ) : null}
-
+      <ShellLayout.Root persistence={shellLayoutPersistence}>
+        <ShellLayout.Header>
           <Box
-            id="main-content"
-            as="main"
-            display="block"
-            flex={1}
-            minWidth={0}
-            minHeight={0}
-            overflowX="hidden"
-            overflowY={getMainContentOverflowY(pathname)}
-            data-scroll-area={
-              getMainContentOverflowY(pathname) === 'auto' ? 'main-content' : undefined
-            }
+            as="header"
+            width="full"
+            alignItems="center"
+            justifyContent="between"
+            paddingHorizontal="m"
+            paddingVertical="s"
           >
-            <Outlet />
+            <Link to="/">
+              <Text
+                as="span"
+                variant="title"
+              >
+                Inspektor Design System
+              </Text>
+            </Link>
+            <ThemeSwitch />
           </Box>
-        </Box>
-      </Box>
+        </ShellLayout.Header>
+        <AppShellDetailsTargetContext.Provider value={detailsTarget}>
+          <ShellLayout.Body>
+            <ShellLayout.LeftDock>
+              <Box
+                as="aside"
+                height="full"
+                flexDirection="column"
+                overflowY="auto"
+                data-scroll-area="navigation"
+                padding="m"
+              >
+                <Box
+                  as="nav"
+                  flexDirection="column"
+                  gap="2xl"
+                  aria-label="Design system navigation"
+                >
+                  {navSections.map((section) => (
+                    <Box
+                      as="section"
+                      key={section.title}
+                      flexDirection="column"
+                      gap="m"
+                    >
+                      <Text
+                        as="span"
+                        variant="label"
+                        color="muted"
+                      >
+                        {section.title}
+                      </Text>
+                      <Box flexDirection="column">
+                        {section.items.map((item) => {
+                          const isActive = pathname === item.href
+                          return (
+                            <ButtonLink
+                              key={item.href}
+                              variant={isActive === true ? 'secondary' : 'ghost'}
+                              size="m"
+                              layout="row"
+                              render={<Link to={item.href} />}
+                              aria-current={isActive === true ? 'page' : undefined}
+                              radius="none"
+                            >
+                              {item.title}
+                            </ButtonLink>
+                          )
+                        })}
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            </ShellLayout.LeftDock>
+            <ShellLayout.View>
+              <Box
+                id="main-content"
+                as="main"
+                width="full"
+                height="full"
+                minWidth={0}
+                minHeight={0}
+                overflow="hidden"
+              >
+                <Outlet />
+              </Box>
+            </ShellLayout.View>
+            <ShellLayout.RightDock>
+              <Box
+                ref={setDetailsTarget}
+                height="full"
+                minHeight={0}
+                flexDirection="column"
+                overflowY="hidden"
+                padding="m"
+              />
+            </ShellLayout.RightDock>
+          </ShellLayout.Body>
+        </AppShellDetailsTargetContext.Provider>
+        <ShellLayout.Footer>
+          <AppShellFooter />
+        </ShellLayout.Footer>
+      </ShellLayout.Root>
     </>
-  )
-}
-
-export function AppShell(): ReactElement {
-  return (
-    <AppShellLayoutProvider>
-      <AppShellContent />
-    </AppShellLayoutProvider>
   )
 }

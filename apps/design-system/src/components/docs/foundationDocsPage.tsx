@@ -1,9 +1,10 @@
-import { Box, Text } from '@inspektor/ds'
+import { Box } from '@inspektor/ds'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { DocsHeader } from '@/components/docs/docsHeader'
 import { DocsPage } from '@/components/docs/docsPage'
 import { type NavItem } from '@/lib/registry'
+import { AppShellDetails } from '@/layout/appShellDetails'
 
 interface FoundationDocsPageProps {
   item: NavItem
@@ -31,22 +32,15 @@ export function FoundationDocsPage({ item, children }: FoundationDocsPageProps):
         overflowY="auto"
         data-scroll-area="main-content"
         data-scroll-fade="top"
+        backgroundColor="surface-background"
+        borderRadius="xs"
       >
-        <DocsPage>
-          <Box
-            display="block"
-            maxWidth="content-measure"
-          >
-            <Text
-              variant="body"
-              color="muted"
-            >
-              {item.description}
-            </Text>
-          </Box>
-          {children}
-        </DocsPage>
+        <DocsPage>{children}</DocsPage>
       </Box>
+      <AppShellDetails
+        label={`${item.title} details`}
+        description={item.description}
+      />
     </Box>
   )
 }

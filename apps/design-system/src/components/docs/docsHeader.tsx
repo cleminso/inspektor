@@ -1,23 +1,18 @@
 import { Box, Button } from '@inspektor/ds'
 import { useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, ArrowRight, PanelLeft, PanelRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { type ReactElement } from 'react'
 
 import { SourceLink } from '@/components/docs/sourceLink'
-import { navigationItems, type NavItem } from '@/lib/registry'
-import { useAppShellLayout } from '@/layout/appShellLayout'
+import { getAdjacentNavigationItems, type NavItem } from '@/lib/registry'
 
 interface DocsHeaderProps {
   item: NavItem
 }
 
 export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
-  const { isControlsOpen, isNavigationOpen, toggleControls, toggleNavigation } = useAppShellLayout()
   const navigate = useNavigate()
-  const itemIndex = navigationItems.findIndex((navigationItem) => navigationItem.href === item.href)
-  const previousItem = itemIndex >= 0 ? navigationItems.at(itemIndex - 1) : undefined
-  const nextItem =
-    itemIndex >= 0 ? (navigationItems[itemIndex + 1] ?? navigationItems[0]) : undefined
+  const { previous: previousItem, next: nextItem } = getAdjacentNavigationItems(item.href)
 
   const navigatePrevious = (): void => {
     if (previousItem !== undefined) {
@@ -38,30 +33,16 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
       justifyContent="between"
       gap="l"
       flexShrink={0}
-      padding="m"
+      marginBottom="xs"
+      padding="xs"
       backgroundColor="surface-background"
+      borderRadius="xs"
+      overflow="hidden"
     >
-      <Box
-        alignItems="center"
-        gap="m"
-        minWidth={0}
-      >
-        <Button
-          variant="ghost"
-          size="s"
-          radius="s"
-          iconOnly
-          aria-label={isNavigationOpen === true ? 'Hide navigation' : 'Show navigation'}
-          aria-pressed={isNavigationOpen}
-          onClick={toggleNavigation}
-        >
-          <Button.Glyph artwork={PanelLeft} />
-        </Button>
-        <SourceLink
-          source={item.source}
-          title={item.title}
-        />
-      </Box>
+      <SourceLink
+        source={item.source}
+        title={item.title}
+      />
       <Box
         alignItems="center"
         gap="none"
@@ -90,19 +71,6 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
         >
           <Button.Glyph artwork={ArrowRight} />
         </Button>
-        {item.componentId !== undefined ? (
-          <Button
-            variant="ghost"
-            size="s"
-            radius="s"
-            iconOnly
-            aria-label={isControlsOpen === true ? 'Hide controls' : 'Show controls'}
-            aria-pressed={isControlsOpen}
-            onClick={toggleControls}
-          >
-            <Button.Glyph artwork={PanelRight} />
-          </Button>
-        ) : null}
       </Box>
     </Box>
   )
