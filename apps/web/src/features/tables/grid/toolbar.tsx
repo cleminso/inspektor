@@ -1,10 +1,12 @@
 import { useLayoutEffect, useRef } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Download } from 'lucide-react'
 
-import { Box, Button, Select, Text, Tooltip } from '@inspektor/ds'
+import { Box, Button, Menu, Select, Text, Tooltip, type DataGridTable } from '@inspektor/ds'
+import type { DynamicTableRow } from 'jazz-tools'
 
+import { createDataExport, type DataExportFormat } from '@tables/grid/dataExport'
 import { TABLE_PAGE_SIZE_OPTIONS } from '@tables/tableTypes'
-import type { TablePageSize } from '@tables/tableTypes'
+import type { TableColumnMeta, TablePageSize } from '@tables/tableTypes'
 
 const pageSizeItems = TABLE_PAGE_SIZE_OPTIONS.map((value) => ({
   label: String(value),
@@ -12,6 +14,12 @@ const pageSizeItems = TABLE_PAGE_SIZE_OPTIONS.map((value) => ({
 }))
 
 const rowCountFormatter = new Intl.NumberFormat(undefined)
+
+const exportContentTypes = {
+  csv: 'text/csv;charset=utf-8',
+  json: 'application/json;charset=utf-8',
+  ndjson: 'application/x-ndjson;charset=utf-8',
+} satisfies Record<DataExportFormat, string>
 
 interface TablePaginationProps {
   hasNextPage: boolean
@@ -142,6 +150,75 @@ export function TablePagination({
         <Tooltip.Content>Next page</Tooltip.Content>
       </Tooltip.Root>
     </Box>
+  )
+}
+
+interface DataGridExportProps {
+  table: DataGridTable<DynamicTableRow>
+  tableColumns: readonly TableColumnMeta[]
+  tableName: string
+}
+
+function downloadExport(content: string, filename: string, type: string): void {
+  const url = URL.createObjectURL(new Blob([content], { type }))
+  const anchor = document.createElement('a')
+  anchor.download = filename
+  anchor.href = url
+  anchor.click()
+  setTimeout(() => URL.revokeObjectURL(url), 0)
+}
+
+export function DataGridExport({
+  table,
+  tableColumns,
+  tableName,
+}: DataGridExportProps): React.ReactElement {
+  const hasRows = table.getRowModel().rows.length > 0
+
+  const handleExport = (format: DataExportFormat) => {
+    const exportRows = table.getRowModel().rows.map((row) => row.original)
+    const columnsById = new Map(tableColumns.map((column) => [column.id, column]))
+    const exportColumns = table.getVisibleLeafColumns().flatMap((column) => {
+      const tableColumn = columnsById.get(column.id)
+      return tableColumn === undefined
+        ? []
+        : [{ accessorKey: tableColumn.accessorKey, label: tableColumn.label }]
+    })
+    downloadExport(
+      createDataExport(format, exportColumns, exportRows),
+      `${tableName}.${format}`,
+      exportContentTypes[format],
+    )
+  }
+
+  return (
+    <Tooltip.Root>
+      <Menu.Root disabled={hasRows === false}>
+        <Tooltip.Trigger
+          render={
+            <Menu.Trigger
+              render={
+                <Button
+                  aria-label="Export rows"
+                  iconOnly
+                  variant="ghost"
+                  size="s"
+                  disabled={hasRows === false}
+                >
+                  <Button.Glyph artwork={Download} />
+                </Button>
+              }
+            />
+          }
+        />
+        <Menu.Content align="end">
+          <Menu.Item onClick={() => handleExport('csv')}>CSV</Menu.Item>
+          <Menu.Item onClick={() => handleExport('json')}>JSON</Menu.Item>
+          <Menu.Item onClick={() => handleExport('ndjson')}>NDJSON</Menu.Item>
+        </Menu.Content>
+      </Menu.Root>
+      <Tooltip.Content>Export rows</Tooltip.Content>
+    </Tooltip.Root>
   )
 }
 

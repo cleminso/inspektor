@@ -21,7 +21,7 @@ export const surfaceColors = stylex.defineVars({
   canvas: `light-dark(${palette.grayAlpha200}, ${palette.neutralAlpha100})`,
   subtle: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha200})`,
   overlay: `light-dark(${palette.grayAlpha100}, ${palette.neutralAlpha100})`,
-  backdrop: `light-dark(${palette.grayAlpha500}, ${palette.neutralAlpha500})`,
+  backdrop: `light-dark(${palette.grayAlpha500}, ${palette.neutralAlpha300})`,
   inverse: `light-dark(${palette.gray900}, ${palette.neutral100})`,
 } as const)
 

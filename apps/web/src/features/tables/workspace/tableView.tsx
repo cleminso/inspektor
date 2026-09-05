@@ -37,7 +37,7 @@ import {
 import { serializeCellValueForClipboard } from '@tables/grid/cellActions'
 import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
-import { TablePagination, Toolbar } from '@tables/grid/toolbar'
+import { DataGridExport, TablePagination, Toolbar } from '@tables/grid/toolbar'
 import { EditRowForm, type RowRepresentation } from '@tables/rowEditor/editForm'
 import { InsertRowForm } from '@tables/rowEditor/insertForm'
 import { RowEditorSidePanel } from '@tables/rowEditor/sidePane'
@@ -545,6 +545,11 @@ function TableViewContent({
                       <Tooltip.Content>Open schema</Tooltip.Content>
                     </Tooltip.Root>
                     <DataGridColumnVisibility table={state.table} />
+                    <DataGridExport
+                      table={state.table}
+                      tableColumns={state.tableColumns}
+                      tableName={tableName}
+                    />
                   </Box>
                   <Tooltip.Root>
                     <Tooltip.Trigger

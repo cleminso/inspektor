@@ -269,6 +269,7 @@ vi.mock('@tables/filters/dataGridFilterBuilder', () => ({
 }))
 
 vi.mock('@tables/grid/toolbar', () => ({
+  DataGridExport: () => null,
   TablePagination: () => null,
   Toolbar: ({
     actions,

@@ -21,6 +21,14 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [05/09/26]
 
+### Loaded-page data export
+
+- [x] Export the loaded query page as CSV, pretty-printed JSON, or NDJSON from the toolbar action beside column visibility.
+- [x] Export only visible data columns in their visible order, excluding the selection column and hidden columns.
+- [x] Quote CSV cells containing commas, quotes, or line breaks, preserve timestamps as ISO text, and JSON-stringify object values.
+
+[05/09/26]
+
 ### Column movement boundaries
 
 - [x] Disable move actions that cannot change the visible data-column order at either edge.
@@ -1247,6 +1255,11 @@ These items were identified in the behavior design but intentionally excluded fr
 
 [05/09/26]
 
+- Export applies to the loaded query page and excludes uncommitted staged edits.
+- CSV represents `null` as `NULL` and missing values as an empty cell; JSON represents missing values as `null`.
+
+[05/09/26]
+
 - Name actions by their target, including filtering by a cell value, clearing filters, opening a referenced table, and moving a column to its first or last position.
 - Use `Stage deletion` and `Undo pending deletion` until the mutation ledger applies the change.
 
@@ -1469,6 +1482,11 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[05/09/26]
+
+- [x] Cover CSV quoting, JSON and NDJSON formatting, structured values, and missing values with focused export tests.
+- [x] Verify focused table-view tests, formatting, lint, typecheck, and the production build.
 
 [05/09/26]
 
