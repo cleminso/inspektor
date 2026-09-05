@@ -10,7 +10,7 @@ const validInput = {
 
 describe('validateConnectionInput', () => {
   it.each([
-    ['appId', 'App ID required', 'Enter an app ID.'],
+    ['appId', 'Jazz app ID required', 'Enter a Jazz app ID.'],
     ['adminSecret', 'Admin secret required', 'Enter an admin secret.'],
   ] as const)('requires %s', (field, title, description) => {
     expect(validateConnectionInput({ ...validInput, [field]: '   ' })).toEqual({
@@ -59,7 +59,7 @@ describe('validateConnectionInput', () => {
     ).toEqual({
       valid: false,
       error: {
-        title: 'Invalid app ID',
+        title: 'Invalid Jazz app ID',
         description: 'Enter the UUID from your Jazz app settings.',
         field: 'appId',
       },
@@ -99,14 +99,14 @@ describe('validateConnectionInput', () => {
 describe('normalizeSchemaFetchError', () => {
   it.each([401, 403])('normalizes direct authorization status %s', (status) => {
     expect(normalizeSchemaFetchError({ status })).toEqual({
-      title: 'Connection was rejected',
+      title: 'The server rejected this connection',
       description: 'Check the app ID and admin secret.',
     })
   })
 
   it('normalizes missing Jazz apps', () => {
     expect(normalizeSchemaFetchError({ status: 404 })).toEqual({
-      title: 'Jazz app not found',
+      title: "Couldn't find this Jazz app",
       description: 'Check the server URL and app ID.',
     })
   })
@@ -117,15 +117,15 @@ describe('normalizeSchemaFetchError', () => {
         new Error('Schema hashes fetch failed: 403 Forbidden - sensitive server detail'),
       ),
     ).toEqual({
-      title: 'Connection was rejected',
+      title: 'The server rejected this connection',
       description: 'Check the app ID and admin secret.',
     })
   })
 
   it('normalizes status-bearing server errors', () => {
     expect(normalizeSchemaFetchError({ response: { status: 503 } })).toEqual({
-      title: 'Schema service unavailable',
-      description: 'Check the server status.',
+      title: "Couldn't load schemas",
+      description: 'Check that the server is available, then try again.',
     })
   })
 
@@ -143,7 +143,7 @@ describe('normalizeSchemaFetchError', () => {
       const normalized = normalizeSchemaFetchError(error)
 
       expect(normalized).toEqual({
-        title: "Couldn't validate this connection",
+        title: "Couldn't connect to this app",
         description: 'Check the server URL, app ID, and admin secret.',
       })
       expect(`${normalized.title} ${normalized.description}`).not.toContain('Failed to fetch')
@@ -152,7 +152,7 @@ describe('normalizeSchemaFetchError', () => {
 
   it('normalizes unknown errors without exposing their contents', () => {
     expect(normalizeSchemaFetchError({ adminSecret: 'must-not-leak' })).toEqual({
-      title: "Couldn't validate this connection",
+      title: "Couldn't connect to this app",
       description: 'Check the server URL, app ID, and admin secret.',
     })
   })

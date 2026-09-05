@@ -668,7 +668,7 @@ function TableViewContent({
                                         void state.setFilters([])
                                       }}
                                     >
-                                      Clear
+                                      Clear filters
                                     </Button>
                                   </Box>
                                 ) : unfilteredEmpty ? (

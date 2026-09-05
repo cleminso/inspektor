@@ -193,7 +193,7 @@ function OperationReview({
       >
         {updates.length === 0 ? null : (
           <ReviewSection
-            label="Updated rows"
+            label="Pending updates"
             operations={updates}
             value="updates"
             onUndo={onUndo}
@@ -201,7 +201,7 @@ function OperationReview({
         )}
         {deletions.length === 0 ? null : (
           <ReviewSection
-            label="Deleted rows"
+            label="Pending deletions"
             operations={deletions}
             value="deletions"
             onUndo={onUndo}
@@ -244,7 +244,7 @@ export function TableMutationWidget({
       ? 'Applying changes'
       : mutations.execution.status === 'failed' || mutations.ledger.hasInvalidDraft === true
         ? 'Needs attention'
-        : 'Staged changes'
+        : 'Pending changes'
 
   return (
     <>
@@ -271,7 +271,7 @@ export function TableMutationWidget({
         </Button>
       </InspectorFooterCenterPortal>
       {expanded === false ? null : (
-        <FloatingPanel.Root aria-label="Staged changes">
+        <FloatingPanel.Root aria-label="Pending changes">
           <FloatingPanel.Content
             id={contentId}
             size={reviewExpanded === true ? 'expanded' : 'compact'}
@@ -301,10 +301,10 @@ export function TableMutationWidget({
                   variant="ghost"
                   onClick={() => setReviewExpanded(reviewExpanded === false)}
                 >
-                  Review changes
+                  Review pending changes
                 </Button>
                 {mutations.ledger.hasInvalidDraft === true ? (
-                  <Text color="error">Correct invalid input before applying.</Text>
+                  <Text color="error">Fix invalid fields before applying changes.</Text>
                 ) : mutations.execution.error === null ? null : (
                   <Text
                     color="error"

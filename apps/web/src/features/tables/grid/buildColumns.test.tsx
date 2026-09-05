@@ -137,13 +137,13 @@ describe('buildDataGridColumns', () => {
       />,
     )
 
-    const undoButton = screen.getByRole('button', { name: 'Undo deletion for row row-1' })
+    const undoButton = screen.getByRole('button', { name: 'Undo pending deletion for row row-1' })
 
     expect(screen.queryByRole('checkbox', { name: 'Select row row-1' })).toBeNull()
     expect(undoButton.querySelector('.lucide-undo-2')).toBeTruthy()
 
     fireEvent.focus(undoButton)
-    expect(await screen.findByText('Undo deletion')).toBeTruthy()
+    expect(await screen.findByText('Undo pending deletion')).toBeTruthy()
 
     fireEvent.click(undoButton)
 
@@ -178,7 +178,7 @@ describe('buildDataGridColumns', () => {
     )
 
     const undoButton = screen.getByRole('button', {
-      name: 'Undo deletion for all loaded rows',
+      name: 'Undo pending deletion for all loaded rows',
     })
     expect(screen.queryByRole('checkbox', { name: 'Select all loaded rows' })).toBeNull()
     fireEvent.click(undoButton)
@@ -364,8 +364,8 @@ describe('buildDataGridColumns', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open Name column menu' }))
     fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Move' }), { key: 'ArrowRight' })
 
-    expect(await screen.findByRole('menuitem', { name: 'Move to start' })).toBeTruthy()
-    expect(screen.getByRole('menuitem', { name: 'Move to end' })).toBeTruthy()
+    expect(await screen.findByRole('menuitem', { name: 'Move to first column' })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: 'Move to last column' })).toBeTruthy()
     expect(screen.queryByLabelText('Ctrl+Shift+ArrowLeft')).toBeNull()
     expect(screen.queryByLabelText('Ctrl+Shift+ArrowRight')).toBeNull()
   })

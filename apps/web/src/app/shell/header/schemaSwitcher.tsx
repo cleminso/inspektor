@@ -72,7 +72,7 @@ export function SchemaSwitcher({
             />
           ) : null}
           <ContextSwitcher.Viewport maxHeight="l">
-            <ContextSwitcher.Empty>No schemas available.</ContextSwitcher.Empty>
+            <ContextSwitcher.Empty>No published schemas available.</ContextSwitcher.Empty>
             <ContextSwitcher.List>
               {(schemaHash: string) => {
                 const isLatest = schemaHash === latestSchemaHash

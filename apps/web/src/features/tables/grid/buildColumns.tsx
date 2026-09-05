@@ -272,7 +272,7 @@ function PageSelectionControl({
             render={
               <Button
                 type="button"
-                aria-label="Undo deletion for all loaded rows"
+                aria-label="Undo pending deletion for all loaded rows"
                 glyphSize="compact"
                 iconOnly
                 size="xs"
@@ -286,7 +286,7 @@ function PageSelectionControl({
               </Button>
             }
           />
-          <Tooltip.Content>Undo all deletions</Tooltip.Content>
+          <Tooltip.Content>Undo all pending deletions</Tooltip.Content>
         </Tooltip.Root>
       </Box>
     )
@@ -335,7 +335,7 @@ function RowSelectionControl({
           render={
             <Button
               type="button"
-              aria-label={`Undo deletion for row ${rowId}`}
+              aria-label={`Undo pending deletion for row ${rowId}`}
               glyphSize="compact"
               iconOnly
               size="xs"
@@ -349,7 +349,7 @@ function RowSelectionControl({
             </Button>
           }
         />
-        <Tooltip.Content>Undo deletion</Tooltip.Content>
+        <Tooltip.Content>Undo pending deletion</Tooltip.Content>
       </Tooltip.Root>
     )
   }
@@ -480,8 +480,8 @@ function MenuMoveActions({
           <Menu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </Menu.Item>
         <Menu.Separator />
-        <Menu.Item onClick={() => onMove(columnId, 'start')}>Move to start</Menu.Item>
-        <Menu.Item onClick={() => onMove(columnId, 'end')}>Move to end</Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, 'start')}>Move to first column</Menu.Item>
+        <Menu.Item onClick={() => onMove(columnId, 'end')}>Move to last column</Menu.Item>
       </Menu.Content>
     </Menu.SubmenuRoot>
   )
@@ -585,8 +585,12 @@ function ContextMoveActions({
           <ContextMenu.Shortcut hotkey={appHotkeys.moveTableColumnRight} />
         </ContextMenu.Item>
         <ContextMenu.Separator />
-        <ContextMenu.Item onClick={() => onMove(columnId, 'start')}>Move to start</ContextMenu.Item>
-        <ContextMenu.Item onClick={() => onMove(columnId, 'end')}>Move to end</ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, 'start')}>
+          Move to first column
+        </ContextMenu.Item>
+        <ContextMenu.Item onClick={() => onMove(columnId, 'end')}>
+          Move to last column
+        </ContextMenu.Item>
       </ContextMenu.Content>
     </ContextMenu.SubmenuRoot>
   )

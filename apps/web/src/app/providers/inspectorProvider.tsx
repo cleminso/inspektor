@@ -17,7 +17,7 @@ import { JazzProvider, useJazzClient, type JazzClient } from 'jazz-tools/react'
 
 import { useInspectorRuntime, type InspectorRuntimeStore } from '@app/runtime/useInspectorRuntime'
 import type { InspectorRuntimeError } from '@app/runtime/runtimeError'
-import type { ResolvedTablesNavigationTarget } from '@app/routing/inspectorNavigation'
+import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
 import { getJazzWasmPreparation } from '@app/runtime/jazzWasmPreparation'
 import {
   useInspectorSessionContext,
@@ -33,22 +33,22 @@ interface InspectorRuntimeContextValue {
 
 const InspectorContext = createContext<InspectorContextValue | null>(null)
 const InspectorRuntimeContext = createContext<InspectorRuntimeContextValue | null>(null)
-const connectionProfileTokens = new WeakMap<object, number>()
-let nextConnectionProfileToken = 0
+const connectionIdentityTokens = new WeakMap<object, number>()
+let nextConnectionIdentityToken = 0
 
-export function getConnectionProfileToken(connection: object): number {
-  const existingToken = connectionProfileTokens.get(connection)
+export function getConnectionIdentityToken(connection: object): number {
+  const existingToken = connectionIdentityTokens.get(connection)
   if (existingToken !== undefined) {
     return existingToken
   }
 
-  nextConnectionProfileToken += 1
-  connectionProfileTokens.set(connection, nextConnectionProfileToken)
-  return nextConnectionProfileToken
+  nextConnectionIdentityToken += 1
+  connectionIdentityTokens.set(connection, nextConnectionIdentityToken)
+  return nextConnectionIdentityToken
 }
 
 interface InspectorProviderProps extends PropsWithChildren {
-  initialRuntimeTarget?: ResolvedTablesNavigationTarget
+  initialRuntimeTarget?: ResolvedRuntimeTarget
 }
 
 /** Publishes the Jazz client only after stored schema verification makes it safe for consumers. */
@@ -197,7 +197,7 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
     session.activeConnection !== null && session.currentBranch !== null
       ? JSON.stringify([
           session.activeConnection.id,
-          getConnectionProfileToken(session.activeConnection),
+          getConnectionIdentityToken(session.activeConnection),
           session.currentBranch,
         ])
       : null

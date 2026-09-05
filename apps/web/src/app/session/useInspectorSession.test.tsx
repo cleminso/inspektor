@@ -7,7 +7,7 @@ import {
   upsertConnection,
   writeStoredConnections,
 } from '@app/connections/connections'
-import { useInspectorSession } from '@app/session/useInspectorSession'
+import { useStoredConnections } from '@app/session/useInspectorSession'
 
 let entries: Map<string, string>
 let writeError: Error | null
@@ -26,7 +26,7 @@ function renderStoredSession(adminSecret = 'secret') {
   )
   writeStoredConnections(upsertConnection(createEmptyConnectionStore(), connection))
   window.localStorage.setItem(tabsKey, '{}')
-  return { connection, ...renderHook(() => useInspectorSession()) }
+  return { connection, ...renderHook(() => useStoredConnections()) }
 }
 
 beforeEach(() => {
@@ -52,7 +52,7 @@ beforeEach(() => {
   })
 })
 
-describe('useInspectorSession', () => {
+describe('useStoredConnections', () => {
   it('removes every Inspektor preference scoped to the deleted connection', () => {
     const connection = createConnectionFromDraft(
       {
@@ -73,7 +73,7 @@ describe('useInspectorSession', () => {
     )
     window.localStorage.setItem('inspektor-tabs:connection-2%3Amain%3Aschema-1', '{}')
     window.localStorage.setItem('unrelated', '{}')
-    const { result } = renderHook(() => useInspectorSession())
+    const { result } = renderHook(() => useStoredConnections())
 
     act(() => result.current.deleteConnection(connection.id))
 
@@ -91,7 +91,7 @@ describe('useInspectorSession', () => {
   })
 
   it('does not save a profile or its context when their persistence fails', () => {
-    const { result } = renderHook(() => useInspectorSession())
+    const { result } = renderHook(() => useStoredConnections())
     const draft = {
       name: 'First',
       serverUrl: 'https://sync.example.com',

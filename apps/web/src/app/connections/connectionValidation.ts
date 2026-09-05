@@ -13,8 +13,8 @@ type ConnectionValidationResult =
   | { valid: false; error: ConnectionError }
 
 export const EMPTY_SCHEMA_ERROR: ConnectionError = {
-  title: 'No stored schemas found',
-  description: 'This app has no published schema.',
+  title: 'No published schemas available',
+  description: 'This app has no published schemas.',
 }
 
 const INVALID_SERVER_URL_ERROR: ConnectionError = {
@@ -45,8 +45,8 @@ export function validateConnectionInput(input: ConnectionCredentials): Connectio
     return {
       valid: false,
       error: {
-        title: 'App ID required',
-        description: 'Enter an app ID.',
+        title: 'Jazz app ID required',
+        description: 'Enter a Jazz app ID.',
         field: 'appId',
       },
     }
@@ -57,7 +57,7 @@ export function validateConnectionInput(input: ConnectionCredentials): Connectio
     return {
       valid: false,
       error: {
-        title: 'Invalid app ID',
+        title: 'Invalid Jazz app ID',
         description: 'Enter the UUID from your Jazz app settings.',
         field: 'appId',
       },
@@ -86,22 +86,22 @@ export function normalizeSchemaFetchError(error: unknown): ConnectionError {
 
   if (status === 401 || status === 403) {
     return {
-      title: 'Connection was rejected',
+      title: 'The server rejected this connection',
       description: 'Check the app ID and admin secret.',
     }
   }
 
   if (status === 404) {
     return {
-      title: 'Jazz app not found',
+      title: "Couldn't find this Jazz app",
       description: 'Check the server URL and app ID.',
     }
   }
 
   if (status !== null && status >= 500) {
     return {
-      title: 'Schema service unavailable',
-      description: 'Check the server status.',
+      title: "Couldn't load schemas",
+      description: 'Check that the server is available, then try again.',
     }
   }
 
@@ -110,7 +110,7 @@ export function normalizeSchemaFetchError(error: unknown): ConnectionError {
   }
 
   return {
-    title: "Couldn't validate this connection",
+    title: "Couldn't connect to this app",
     description: 'Check the server URL, app ID, and admin secret.',
   }
 }

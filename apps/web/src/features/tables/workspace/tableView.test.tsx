@@ -1058,7 +1058,7 @@ describe('TableView query status', () => {
 
     renderTableView()
 
-    const clearButton = screen.getByRole('button', { name: 'Clear' })
+    const clearButton = screen.getByRole('button', { name: 'Clear filters' })
     fireEvent.click(clearButton)
 
     expect(tableViewState.setFilters).toHaveBeenCalledWith([])

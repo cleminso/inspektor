@@ -11,6 +11,13 @@
 
 ## Implemented foundation
 
+[05/09/26]
+
+### Naming boundaries
+
+- [x] Rename the shared add/edit surface to `ConnectionForm` and its hook to `useConnectionFormFlow`.
+- [x] Use `ConnectionFormValues`, `ResolvedRuntimeTarget`, `buildSchemaCatalogue`, and `useStoredConnections` to distinguish form, runtime, derivation, and persistence boundaries.
+
 [04/09/26]
 
 ### Manual credential entry
@@ -321,6 +328,12 @@
 
 ## Settled interaction decisions
 
+[05/09/26]
+
+- Use `Connection` for a saved browser-local profile and `Jazz app` for its remote target.
+- Use `Jazz app ID`, `Environment`, and `Default branch` in connection setup.
+- Use `schema hash` for the identifier and `schema version` for a selectable revision.
+
 [04/09/26]
 
 - Generic `Open connection` headers do not expose remembered workspace context as a current selection.
@@ -454,6 +467,11 @@
 - None.
 
 ## Validation checklist
+
+[05/09/26]
+
+- [x] Run focused connection-form, session, routing, and runtime tests.
+- [x] Run Inspektor lint, typecheck, and build.
 
 [04/09/26]
 

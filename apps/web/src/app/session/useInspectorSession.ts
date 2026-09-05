@@ -25,7 +25,7 @@ import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStor
  * active connection selection, and Jazz runtime preferences stay synchronized through one state
  * boundary.
  */
-export interface UseInspectorSessionResult {
+export interface UseStoredConnectionsResult {
   connections: StoredConnection[]
   activeConnection: StoredConnection | null
   activeConnectionId: string | null
@@ -58,7 +58,7 @@ export interface UseInspectorSessionResult {
  * From the Inspektor perspective, it provides a stable UI API for saved connections,
  * remembered branches, and selected schema hashes.
  */
-export function useInspectorSession(): UseInspectorSessionResult {
+export function useStoredConnections(): UseStoredConnectionsResult {
   const [store, setStore] = useState(readStoredConnections)
   const storeRef = useRef(store)
 

@@ -141,7 +141,9 @@ export function RowEditorSidePanel({
   const insertMoreFieldId = 'insert-more'
   const deleteRowIds = deleteConfirmationRowIds ?? editedRowIds
   const deleteLabel =
-    deleteRowIds.length === 1 ? 'Delete row' : `Delete ${deleteRowIds.length} checked rows`
+    deleteRowIds.length === 1
+      ? 'Stage deletion'
+      : `Stage deletion for ${deleteRowIds.length} checked rows`
   const footer =
     mode === 'edit' && (onConfirmDelete !== undefined || onClose !== undefined) ? (
       <Box
@@ -183,7 +185,7 @@ export function RowEditorSidePanel({
                   variant="secondary"
                   onClick={onClose}
                 >
-                  Close
+                  Close editor
                 </Button>
               </Box>
             )}
@@ -203,7 +205,7 @@ export function RowEditorSidePanel({
                   onConfirmDelete(confirmedRowIds)
                 }}
               >
-                Confirm delete
+                Confirm staged deletion
               </Button>
             </Box>
             <Box flex={1}>
@@ -214,7 +216,7 @@ export function RowEditorSidePanel({
                 variant="secondary"
                 onClick={() => setDeleteConfirmationRowIds(null)}
               >
-                Cancel delete
+                Cancel staged deletion
               </Button>
             </Box>
           </>

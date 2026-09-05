@@ -20,7 +20,7 @@ import {
 
 import type { StoredConnection } from '@app/connections/connections'
 import {
-  getConnectionProfileToken,
+  getConnectionIdentityToken,
   useInspectorSessionState,
 } from '@app/providers/inspectorProvider'
 
@@ -556,7 +556,9 @@ function LiveQueryTimeline({
         >
           {staleHistory === true ? (
             <Box role="alert">
-              <Text color="error">Couldn't refresh live queries. Showing retained history.</Text>
+              <Text color="error">
+                Couldn't refresh live queries. Showing the last available results.
+              </Text>
             </Box>
           ) : null}
         </Box>
@@ -586,12 +588,12 @@ function LiveQueryTimeline({
                 variant={isPaused === true ? 'ghost' : 'primary'}
                 onClick={() => setPaused(isPaused === false)}
               >
-                Auto-refresh
+                {isPaused === true ? 'Resume auto-refresh' : 'Pause auto-refresh'}
               </Button>
             }
           />
           <Tooltip.Content>
-            {isPaused === true ? 'Resume auto-refresh' : 'Pause auto-refresh'}
+            {isPaused === true ? 'Restart automatic refresh' : 'Stop automatic refresh'}
           </Tooltip.Content>
         </Tooltip.Root>
       </Box>
@@ -894,7 +896,7 @@ export function LiveQueriesView(): React.ReactElement {
         <ShellLayout.LeftDock>{null}</ShellLayout.LeftDock>
         <ShellLayout.View>
           <CenteredStatus>
-            <Text color="muted">No active connection</Text>
+            <Text color="muted">Select a connection to view live queries.</Text>
           </CenteredStatus>
         </ShellLayout.View>
       </ShellLayout.Body>
@@ -904,7 +906,7 @@ export function LiveQueriesView(): React.ReactElement {
   return (
     <ConnectedLiveQueriesView
       connection={activeConnection}
-      key={getConnectionProfileToken(activeConnection)}
+      key={getConnectionIdentityToken(activeConnection)}
       selectedSchemaHash={currentSchemaHash}
     />
   )

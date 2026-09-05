@@ -20,7 +20,7 @@ import {
 import { appRoutes } from './appRoutes'
 
 /** Resolved connection-entry or branch-selection result, including its available schema catalogue. */
-export interface ResolvedTablesNavigationTarget {
+export interface ResolvedRuntimeTarget {
   connectionId: string
   branch: string
   schemaHash: string
@@ -37,7 +37,7 @@ interface SchemaCatalogueResponse {
   schemas: readonly SchemaCatalogueRecord[]
 }
 
-interface ResolveTablesNavigationTargetOptions {
+interface ResolveRuntimeTargetOptions {
   connectionId: string
   branchOverride?: string | null
   schemaHashOverride?: string | null
@@ -50,7 +50,7 @@ interface ResolveTablesNavigationTargetOptions {
   knownSchemaHashes?: readonly string[]
 }
 
-interface ResolveStoredTablesNavigationTargetOptions {
+interface ResolveStoredRuntimeTargetOptions {
   connectionId: string
   branchOverride?: string | null
   schemaHashOverride?: string | null
@@ -58,7 +58,7 @@ interface ResolveStoredTablesNavigationTargetOptions {
 }
 
 /** Places the deployed schema first while preserving the advertised order of every other schema. */
-export function createSchemaCatalogue(
+export function buildSchemaCatalogue(
   { hashes, schemas }: SchemaCatalogueResponse,
   latestSchemaHash: string | null = null,
 ): SchemaCatalogueRecord[] {
@@ -113,7 +113,7 @@ async function fetchConnectionSchemaCatalogue(
     }),
     fetchConnectionLatestSchemaHash(connection).catch(() => null),
   ])
-  return createSchemaCatalogue(response, latestSchemaHash)
+  return buildSchemaCatalogue(response, latestSchemaHash)
 }
 
 /**
@@ -124,7 +124,7 @@ async function fetchConnectionSchemaCatalogue(
  * stays outside the application-root graph, while `knownSchemaHashes` lets the mounted runtime avoid
  * repeating schema discovery.
  */
-export async function resolveTablesNavigationTarget({
+export async function resolveRuntimeTarget({
   connectionId,
   branchOverride,
   schemaHashOverride,
@@ -132,7 +132,7 @@ export async function resolveTablesNavigationTarget({
   resolveBranch,
   resolveSchemaHash,
   knownSchemaHashes,
-}: ResolveTablesNavigationTargetOptions): Promise<ResolvedTablesNavigationTarget | null> {
+}: ResolveRuntimeTargetOptions): Promise<ResolvedRuntimeTarget | null> {
   const connection = getConnection(connectionId)
   if (connection === null) {
     return null
@@ -170,12 +170,12 @@ export async function resolveTablesNavigationTarget({
  * remembered schema remains usable when discovery fails; without one, the loader preserves the
  * discovery error for route-owned error presentation.
  */
-export async function resolveStoredTablesNavigationTarget({
+export async function resolveStoredRuntimeTarget({
   connectionId,
   branchOverride,
   schemaHashOverride,
   store,
-}: ResolveStoredTablesNavigationTargetOptions): Promise<ResolvedTablesNavigationTarget | null> {
+}: ResolveStoredRuntimeTargetOptions): Promise<ResolvedRuntimeTarget | null> {
   const resolvedStore = store ?? readStoredConnections()
   const connection = getConnectionById(resolvedStore, connectionId)
   if (connection === null) {

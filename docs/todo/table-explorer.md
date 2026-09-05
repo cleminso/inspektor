@@ -1238,6 +1238,11 @@ These items were identified in the behavior design but intentionally excluded fr
 
 ## Settled interaction decisions
 
+[05/09/26]
+
+- Name actions by their target, including filtering by a cell value, clearing filters, opening a referenced table, and moving a column to its first or last position.
+- Use `Stage deletion` and `Undo pending deletion` until the mutation ledger applies the change.
+
 [03/09/26]
 
 - Row-editor validation describes the value editor that owns the invalid state, not the structured value-mode selector.

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { StoredConnection } from '@app/connections/connections'
 
-import { useAddConnectionFlow } from './useAddConnectionFlow'
+import { useConnectionFormFlow } from './useConnectionFormFlow'
 
 const {
   fetchSchemaHashes,
@@ -58,33 +58,33 @@ beforeEach(() => {
   setConnectionContext.mockReturnValue('accepted')
 })
 
-function renderValidFlow() {
-  const hook = renderHook(() => useAddConnectionFlow())
+function renderValidConnectionFormFlow() {
+  const hook = renderHook(() => useConnectionFormFlow())
 
   act(() => {
-    hook.result.current.updateField('serverUrl', 'https://self-hosted.example.com')
-    hook.result.current.updateField('appId', 'self-hosted-app')
-    hook.result.current.updateField('adminSecret', 'secret')
+    hook.result.current.updateFieldValue('serverUrl', 'https://self-hosted.example.com')
+    hook.result.current.updateFieldValue('appId', 'self-hosted-app')
+    hook.result.current.updateFieldValue('adminSecret', 'secret')
   })
 
   return hook
 }
 
-async function submitValidFlow() {
-  const hook = renderValidFlow()
+async function submitValidConnectionForm() {
+  const hook = renderValidConnectionFormFlow()
 
   await act(async () => {
-    await hook.result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+    await hook.result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
   })
 
   return hook
 }
 
-describe('useAddConnectionFlow', () => {
-  it('does not save or navigate when the runtime context change is blocked', async () => {
+describe('useConnectionFormFlow', () => {
+  it('does not save or navigate when connection persistence is blocked', async () => {
     fetchSchemaHashes.mockResolvedValueOnce(singleSchemaResponse)
     saveConnectionWithContext.mockReturnValueOnce('blocked')
-    const { result } = await submitValidFlow()
+    const { result } = await submitValidConnectionForm()
 
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(saveConnectionWithContext).toHaveBeenCalledOnce()
@@ -97,16 +97,16 @@ describe('useAddConnectionFlow', () => {
     saveConnectionWithContext.mockImplementationOnce(() => {
       throw new Error('Storage unavailable')
     })
-    const { result } = await submitValidFlow()
+    const { result } = await submitValidConnectionForm()
 
     expect(setConnectionContext).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
-    expect(result.current.error?.title).toBe("Couldn't validate this connection")
+    expect(result.current.error?.title).toBe("Couldn't connect to this app")
   })
 
   it('uses one connection ID when saving and opening a new connection', async () => {
     fetchSchemaHashes.mockResolvedValueOnce(singleSchemaResponse)
-    await submitValidFlow()
+    await submitValidConnectionForm()
 
     const connectionId = saveConnectionWithContext.mock.calls[0]?.[1]
     expect(connectionId).toEqual(expect.any(String))
@@ -124,10 +124,10 @@ describe('useAddConnectionFlow', () => {
 
   it('starts only one schema request when submission overlaps synchronously', () => {
     fetchSchemaHashes.mockReturnValue(new Promise(() => undefined))
-    const { result } = renderValidFlow()
+    const { result } = renderValidConnectionFormFlow()
     act(() => {
-      void result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
-      void result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+      void result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
+      void result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
     })
 
     expect(fetchSchemaHashes).toHaveBeenCalledTimes(1)
@@ -141,9 +141,9 @@ describe('useAddConnectionFlow', () => {
         settleNavigation = resolve
       }),
     )
-    const { result } = renderValidFlow()
+    const { result } = renderValidConnectionFormFlow()
     act(() => {
-      void result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+      void result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
     })
 
     await waitFor(() => expect(navigate).toHaveBeenCalledOnce())
@@ -156,15 +156,15 @@ describe('useAddConnectionFlow', () => {
   })
 
   it('reports invalid URLs on the server URL field without fetching', async () => {
-    const { result } = renderHook(() => useAddConnectionFlow())
+    const { result } = renderHook(() => useConnectionFormFlow())
 
     act(() => {
-      result.current.updateField('serverUrl', 'ftp://example.com')
-      result.current.updateField('appId', 'self-hosted-app')
-      result.current.updateField('adminSecret', 'secret')
+      result.current.updateFieldValue('serverUrl', 'ftp://example.com')
+      result.current.updateFieldValue('appId', 'self-hosted-app')
+      result.current.updateFieldValue('adminSecret', 'secret')
     })
     await act(async () => {
-      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+      await result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
     })
 
     expect(result.current.error).toEqual({
@@ -177,36 +177,34 @@ describe('useAddConnectionFlow', () => {
 
   it('keeps normalized fetch failures after a field is edited', async () => {
     fetchSchemaHashes.mockRejectedValueOnce(new TypeError('Failed to fetch'))
-    const { result } = await submitValidFlow()
+    const { result } = await submitValidConnectionForm()
 
     expect(result.current.error).toEqual({
-      title: "Couldn't validate this connection",
+      title: "Couldn't connect to this app",
       description: 'Check the server URL, app ID, and admin secret.',
     })
 
-    act(() => result.current.updateField('appId', 'another-app'))
+    act(() => result.current.updateFieldValue('appId', 'another-app'))
 
-    await waitFor(() =>
-      expect(result.current.error?.title).toBe("Couldn't validate this connection"),
-    )
+    await waitFor(() => expect(result.current.error?.title).toBe("Couldn't connect to this app"))
   })
 
   it('clears only a matching field validation error when that field is edited', async () => {
-    const { result } = renderHook(() => useAddConnectionFlow())
+    const { result } = renderHook(() => useConnectionFormFlow())
 
     act(() => {
-      result.current.updateField('serverUrl', 'ftp://example.com')
-      result.current.updateField('appId', 'self-hosted-app')
-      result.current.updateField('adminSecret', 'secret')
+      result.current.updateFieldValue('serverUrl', 'ftp://example.com')
+      result.current.updateFieldValue('appId', 'self-hosted-app')
+      result.current.updateFieldValue('adminSecret', 'secret')
     })
     await act(async () => {
-      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+      await result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
     })
 
-    act(() => result.current.updateField('appId', 'another-app'))
+    act(() => result.current.updateFieldValue('appId', 'another-app'))
     expect(result.current.error?.field).toBe('serverUrl')
 
-    act(() => result.current.updateField('serverUrl', 'https://example.com'))
+    act(() => result.current.updateFieldValue('serverUrl', 'https://example.com'))
     expect(result.current.error).toBeNull()
   })
 
@@ -220,7 +218,7 @@ describe('useAddConnectionFlow', () => {
       adminSecret: 'production-secret',
       env: 'prod',
     }
-    const { result } = renderHook(() => useAddConnectionFlow({ connection, branch: 'release' }))
+    const { result } = renderHook(() => useConnectionFormFlow({ connection, branch: 'release' }))
 
     expect(result.current.formValues).toEqual({
       name: 'Production',
@@ -231,9 +229,9 @@ describe('useAddConnectionFlow', () => {
       branch: 'release',
     })
 
-    act(() => result.current.updateField('name', 'Production app'))
+    act(() => result.current.updateFieldValue('name', 'Production app'))
     await act(async () => {
-      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+      await result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
     })
 
     expect(saveConnectionWithContext).toHaveBeenCalledWith(
@@ -275,15 +273,15 @@ describe('useAddConnectionFlow', () => {
       },
     ]
     fetchSchemaHashes.mockResolvedValue(singleSchemaResponse)
-    const { result } = renderHook(() => useAddConnectionFlow({ connection, branch: 'release' }))
+    const { result } = renderHook(() => useConnectionFormFlow({ connection, branch: 'release' }))
 
     act(() => {
-      result.current.updateField('serverUrl', 'https://existing.example.com')
-      result.current.updateField('appId', 'existing-app')
-      result.current.updateField('adminSecret', 'existing-secret')
+      result.current.updateFieldValue('serverUrl', 'https://existing.example.com')
+      result.current.updateFieldValue('appId', 'existing-app')
+      result.current.updateFieldValue('adminSecret', 'existing-secret')
     })
     await act(async () => {
-      await result.current.fetchSchemas({ preventDefault: vi.fn() } as never)
+      await result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
     })
 
     expect(result.current.error).toBeNull()
@@ -306,11 +304,11 @@ describe('useAddConnectionFlow', () => {
   it('reports when no schemas are available', async () => {
     fetchSchemaHashes.mockResolvedValueOnce({ hashes: [], schemas: [] })
 
-    const { result } = await submitValidFlow()
+    const { result } = await submitValidConnectionForm()
 
     expect(result.current.error).toEqual({
-      title: 'No stored schemas found',
-      description: 'This app has no published schema.',
+      title: 'No published schemas available',
+      description: 'This app has no published schemas.',
     })
     expect(saveConnectionWithContext).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
@@ -319,7 +317,7 @@ describe('useAddConnectionFlow', () => {
   it('opens the workspace directly when multiple schemas are available', async () => {
     fetchSchemaHashes.mockResolvedValueOnce(schemaChoicesResponse)
 
-    await submitValidFlow()
+    await submitValidConnectionForm()
 
     const connectionId = saveConnectionWithContext.mock.calls[0]?.[1]
     expect(saveConnectionWithContext).toHaveBeenCalledWith(

@@ -296,7 +296,7 @@ describe('TableMutationWidget', () => {
       </InspectorFooterCenterProvider>,
     )
     fireEvent.click(screen.getByRole('button', { name: 'Stage review' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Review changes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Review pending changes' }))
   }
 
   it('renders plain-language operation review and undoes a complete operation', () => {
@@ -307,8 +307,8 @@ describe('TableMutationWidget', () => {
     expect(screen.getByText('2 selected rows')).toBeTruthy()
     expect(screen.queryByText('2 operations')).toBeNull()
     expect(screen.queryByText('3 affected rows')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Updated rows, 1' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Deleted rows, 1' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Pending updates, 1' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Pending deletions, 1' })).toBeTruthy()
     expect(screen.queryByText(/fields?/i)).toBeNull()
 
     fireEvent.click(
@@ -333,9 +333,10 @@ describe('TableMutationWidget', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Stage invalid' }))
 
     expect(screen.getByRole('button', { name: 'Needs attention' })).toBeTruthy()
-    expect(screen.getByText('Correct invalid input before applying.')).toBeTruthy()
+    expect(screen.getByText('Fix invalid fields before applying changes.')).toBeTruthy()
     expect(
-      (screen.getByRole('button', { name: 'Review changes' }) as HTMLButtonElement).disabled,
+      (screen.getByRole('button', { name: 'Review pending changes' }) as HTMLButtonElement)
+        .disabled,
     ).toBe(true)
     expect(
       (screen.getByRole('button', { name: 'Apply changes' }) as HTMLButtonElement).disabled,
@@ -350,7 +351,7 @@ describe('TableMutationWidget', () => {
     expect(lastInitialRow?.getAttribute('aria-setsize')).toBe('101')
     expect(screen.queryByRole('button', { name: 'Undo: row-53' })).toBeNull()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Show more deleted row operations' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show more pending deletion operations' }))
 
     expect(screen.getByRole('button', { name: 'Undo: row-53' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Undo: row-102' })).toBeTruthy()
@@ -382,9 +383,9 @@ describe('TableMutationWidget', () => {
       </InspectorFooterCenterProvider>,
     )
 
-    expect(screen.queryByRole('button', { name: 'Staged changes' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Pending changes' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
-    const trigger = screen.getByRole('button', { name: 'Staged changes' })
+    const trigger = screen.getByRole('button', { name: 'Pending changes' })
     expect(trigger.textContent).toContain('1')
     expect(trigger.getAttribute('aria-pressed')).toBe('true')
     fireEvent.click(trigger)
@@ -392,7 +393,7 @@ describe('TableMutationWidget', () => {
     expect(trigger.getAttribute('aria-pressed')).toBe('false')
     expect(document.querySelector('[data-slot="floating-panel-content"]')).toBeNull()
     fireEvent.click(trigger)
-    const reviewButton = screen.getByRole('button', { name: 'Review changes' })
+    const reviewButton = screen.getByRole('button', { name: 'Review pending changes' })
     const panelContent = document.querySelector('[data-slot="floating-panel-content"]')
     expect(panelContent?.getAttribute('data-size')).toBe('compact')
     fireEvent.click(reviewButton)

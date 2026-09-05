@@ -103,9 +103,9 @@ describe('RowEditorSidePanel dirty transitions', () => {
       </RowEditorSidePanel>,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete row' }))
-    expect(screen.getByRole('button', { name: 'Cancel delete' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm delete' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
+    expect(screen.getByRole('button', { name: 'Cancel staged deletion' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm staged deletion' }))
 
     expect(onConfirmDelete).toHaveBeenCalledWith(['row-1'])
   })
@@ -125,12 +125,12 @@ describe('RowEditorSidePanel dirty transitions', () => {
       </RowEditorSidePanel>,
     )
 
-    const closeButton = screen.getByRole('button', { name: 'Close' })
+    const closeButton = screen.getByRole('button', { name: 'Close editor' })
     const footer = closeButton.closest('footer')
 
     expect(footer).toBeTruthy()
     expect(
-      screen.getByRole('button', { name: 'Delete row' }).compareDocumentPosition(closeButton) &
+      screen.getByRole('button', { name: 'Stage deletion' }).compareDocumentPosition(closeButton) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).not.toBe(0)
 
@@ -152,10 +152,10 @@ describe('RowEditorSidePanel dirty transitions', () => {
       </RowEditorSidePanel>,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close editor' }))
 
     expect(onClose).toHaveBeenCalledOnce()
-    expect(screen.queryByRole('button', { name: 'Delete row' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Stage deletion' })).toBeNull()
   })
 
   it('names and snapshots every checked row for bulk deletion', () => {
@@ -173,7 +173,7 @@ describe('RowEditorSidePanel dirty transitions', () => {
       </RowEditorSidePanel>,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete 3 checked rows' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stage deletion for 3 checked rows' }))
     rerender(
       <RowEditorSidePanel
         editedRowIds={['row-1']}
@@ -187,7 +187,7 @@ describe('RowEditorSidePanel dirty transitions', () => {
         <div />
       </RowEditorSidePanel>,
     )
-    const confirmDelete = screen.getByRole('button', { name: 'Confirm delete' })
+    const confirmDelete = screen.getByRole('button', { name: 'Confirm staged deletion' })
     expect((confirmDelete as HTMLButtonElement).disabled).toBe(true)
 
     rerender(
@@ -222,12 +222,12 @@ describe('RowEditorSidePanel dirty transitions', () => {
       </RowEditorSidePanel>
     )
     const { rerender } = render(renderPanel('edit', ['row-1']))
-    fireEvent.click(screen.getByRole('button', { name: 'Delete row' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
 
     rerender(renderPanel('insert', []))
     rerender(renderPanel('edit', ['row-2']))
-    fireEvent.click(screen.getByRole('button', { name: 'Delete row' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm delete' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stage deletion' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm staged deletion' }))
 
     expect(onConfirmDelete).toHaveBeenCalledWith(['row-2'])
   })

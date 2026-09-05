@@ -71,7 +71,7 @@ describe('MutationField', () => {
     })
 
     const input = screen.getByRole('textbox', { name: 'RoomId' })
-    const targetLink = screen.getByRole('link', { name: 'Open target' })
+    const targetLink = screen.getByRole('link', { name: 'Open referenced table' })
     expect(input.closest('[data-slot="input-group"]')?.contains(targetLink)).toBe(true)
     expect(input.getAttribute('data-font')).toBe('mono')
     expect(screen.queryByRole('link', { name: 'Show' })).toBeNull()

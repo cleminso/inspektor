@@ -4,10 +4,7 @@ import {
   createEmptyConnectionStore,
   type StoredConnectionsStore,
 } from '@app/connections/connections'
-import {
-  createSchemaCatalogue,
-  resolveStoredTablesNavigationTarget,
-} from '@app/routing/inspectorNavigation'
+import { buildSchemaCatalogue, resolveStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
 
 const fetchSchemaHashes = vi.fn()
 const fetchPermissionsHead = vi.fn()
@@ -56,7 +53,7 @@ function createStore(lastSchemaHash: string | null = 'schema-1'): StoredConnecti
   }
 }
 
-describe('resolveStoredTablesNavigationTarget', () => {
+describe('resolveStoredRuntimeTarget', () => {
   it('opens the permissions-head schema instead of the first advertised schema', async () => {
     fetchSchemaHashes.mockResolvedValueOnce({
       hashes: ['schema-1', 'schema-2'],
@@ -73,7 +70,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
     })
 
     await expect(
-      resolveStoredTablesNavigationTarget({
+      resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         store: createStore(),
       }),
@@ -109,7 +106,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
     fetchPermissionsHead.mockRejectedValueOnce(new Error('Permissions head unavailable'))
 
     await expect(
-      resolveStoredTablesNavigationTarget({
+      resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         store: createStore(),
       }),
@@ -126,7 +123,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
     })
 
     await expect(
-      resolveStoredTablesNavigationTarget({
+      resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         schemaHashOverride: 'schema-1',
         store: createStore(),
@@ -152,7 +149,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
     })
 
     await expect(
-      resolveStoredTablesNavigationTarget({
+      resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         store: createStore('schema-1'),
       }),
@@ -171,7 +168,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
     fetchSchemaHashes.mockRejectedValueOnce(new Error('Network unavailable'))
 
     await expect(
-      resolveStoredTablesNavigationTarget({
+      resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         store: createStore('schema-1'),
       }),
@@ -194,7 +191,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
     })
 
     await expect(
-      resolveStoredTablesNavigationTarget({
+      resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         store: createStore(null),
       }),
@@ -214,7 +211,7 @@ describe('resolveStoredTablesNavigationTarget', () => {
     fetchSchemaHashes.mockRejectedValueOnce(error)
 
     await expect(
-      resolveStoredTablesNavigationTarget({
+      resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         store: createStore(null),
       }),
@@ -222,10 +219,10 @@ describe('resolveStoredTablesNavigationTarget', () => {
   })
 })
 
-describe('createSchemaCatalogue', () => {
+describe('buildSchemaCatalogue', () => {
   it('preserves advertised schema order regardless of publication metadata', () => {
     expect(
-      createSchemaCatalogue({
+      buildSchemaCatalogue({
         hashes: ['schema-z', 'schema-b', 'schema-a', 'schema-y'],
         schemas: [
           { hash: 'schema-z', publishedAt: null },
@@ -244,7 +241,7 @@ describe('createSchemaCatalogue', () => {
 
   it('retains hashes that do not include publication metadata', () => {
     expect(
-      createSchemaCatalogue({
+      buildSchemaCatalogue({
         hashes: ['schema-z', 'schema-a'],
         schemas: [{ hash: 'schema-a', publishedAt: 1 }],
       }),

@@ -7,7 +7,7 @@
 import type { DynamicTableRow, TableProxy, WasmSchema } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
 
-interface UseTableMutationsOptions {
+interface UseTableMutationExecutorOptions {
   client: JazzClient | null
   tableName: string
   wasmSchema: WasmSchema | null
@@ -20,7 +20,11 @@ interface UseTableMutationsOptions {
  * exposes mutation commands. For example, an update `{ name: "Grace" }` reaches Jazz as a
  * one-column patch; this hook never reconstructs the rest of the row.
  */
-export function useTableMutations({ client, tableName, wasmSchema }: UseTableMutationsOptions) {
+export function useTableMutationExecutor({
+  client,
+  tableName,
+  wasmSchema,
+}: UseTableMutationExecutorOptions) {
   const tableProxy =
     wasmSchema === null
       ? null

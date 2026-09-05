@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useTableMutations } from './useTableMutation'
+import { useTableMutationExecutor } from './useTableMutation'
 
 const { deleteRow, deleteWait, insert, update, updateWait, wait } = vi.hoisted(() => ({
   deleteRow: vi.fn(),
@@ -24,10 +24,10 @@ insert.mockReturnValue({ wait })
 update.mockReturnValue({ wait: updateWait })
 deleteRow.mockReturnValue({ wait: deleteWait })
 
-describe('useTableMutations', () => {
+describe('useTableMutationExecutor', () => {
   it('uses the runtime client directly without a Jazz React provider', async () => {
     const { result } = renderHook(() =>
-      useTableMutations({
+      useTableMutationExecutor({
         client: runtimeClient as never,
         tableName: 'users',
         wasmSchema: runtimeSchema as never,
@@ -46,7 +46,7 @@ describe('useTableMutations', () => {
 
   it('waits for edge acknowledgement when updating and deleting', async () => {
     const { result } = renderHook(() =>
-      useTableMutations({
+      useTableMutationExecutor({
         client: runtimeClient as never,
         tableName: 'users',
         wasmSchema: runtimeSchema as never,

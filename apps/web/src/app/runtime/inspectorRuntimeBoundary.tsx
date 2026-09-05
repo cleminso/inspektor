@@ -2,11 +2,11 @@ import { useEffect, useRef, type PropsWithChildren, type ReactNode } from 'react
 
 import { InspectorProvider } from '@app/providers/inspectorProvider'
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
-import type { ResolvedTablesNavigationTarget } from '@app/routing/inspectorNavigation'
+import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
 
 interface InspectorRuntimeBoundaryProps extends PropsWithChildren {
   fallback?: ReactNode
-  target: ResolvedTablesNavigationTarget
+  target: ResolvedRuntimeTarget
 }
 
 /**

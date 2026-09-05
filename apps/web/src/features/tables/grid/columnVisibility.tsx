@@ -51,13 +51,13 @@ export function DataGridColumnVisibility({
         <Tooltip.Trigger
           render={
             <MultiSelect.Trigger
-              label="Choose visible columns"
+              label="Show or hide columns"
               render={
                 <Button
                   type="button"
                   variant="ghost"
                   size="s"
-                  aria-label="Choose visible columns"
+                  aria-label="Show or hide columns"
                   aria-pressed={hasHiddenColumns}
                   iconOnly
                 />
@@ -67,7 +67,7 @@ export function DataGridColumnVisibility({
             </MultiSelect.Trigger>
           }
         />
-        <Tooltip.Content>Columns visibility</Tooltip.Content>
+        <Tooltip.Content>Show or hide columns</Tooltip.Content>
       </Tooltip.Root>
       <MultiSelect.Content
         align="end"

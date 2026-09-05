@@ -22,7 +22,7 @@ const mocks = vi.hoisted(() => ({
 const useQuerySubscriptionsTelemetry = vi.hoisted(() => vi.fn())
 
 vi.mock('@app/providers/inspectorProvider', () => ({
-  getConnectionProfileToken: (connection: StoredConnection) => JSON.stringify(connection),
+  getConnectionIdentityToken: (connection: StoredConnection) => JSON.stringify(connection),
   useInspectorSessionState: () => ({
     activeConnection: mocks.connection,
     currentSchemaHash: mocks.currentSchemaHash,
@@ -564,7 +564,7 @@ describe('LiveQueriesView', () => {
     )
   })
 
-  it('keeps routine refresh silent and stale retained history visible without replacing the timeline', () => {
+  it('keeps routine refresh silent and stale results visible without replacing the timeline', () => {
     const successful = success('capture-1', 1_000, [accountsGroup])
     mocks.telemetry = telemetry([successful], 'refreshing')
     const view = render(<LiveQueriesView />)
@@ -583,7 +583,9 @@ describe('LiveQueriesView', () => {
     view.rerender(<LiveQueriesView />)
 
     expect(screen.getByRole('toolbar', { name: 'Live queries controls' })).toBe(toolbar)
-    expect(within(toolbar).getByRole('alert').textContent).toContain('Showing retained history')
+    expect(within(toolbar).getByRole('alert').textContent).toContain(
+      'Showing the last available results',
+    )
     expect(screen.getByRole('table', { name: 'Live queries' })).toBeTruthy()
   })
 
@@ -659,11 +661,11 @@ describe('LiveQueriesView', () => {
       </Tooltip.Provider>,
     )
 
-    const autoRefresh = screen.getByRole('button', { name: 'Auto-refresh' })
+    const autoRefresh = screen.getByRole('button', { name: 'Pause auto-refresh' })
     expect(autoRefresh.getAttribute('aria-pressed')).toBe('true')
     expect(autoRefresh.getAttribute('data-variant')).toBe('primary')
     fireEvent.mouseEnter(autoRefresh)
-    expect(await screen.findByText('Pause auto-refresh')).toBeTruthy()
+    expect(await screen.findByText('Stop automatic refresh')).toBeTruthy()
     fireEvent.click(autoRefresh)
     expect(setPaused).toHaveBeenLastCalledWith(true)
 
@@ -706,7 +708,7 @@ describe('LiveQueriesView', () => {
     )
     view.rerender(<LiveQueriesView />)
 
-    expect(screen.getByRole('alert').textContent).toContain('Showing retained history')
+    expect(screen.getByRole('alert').textContent).toContain('Showing the last available results')
     expect(
       screen.getByText('Last successful snapshot contained no active live queries'),
     ).toBeTruthy()

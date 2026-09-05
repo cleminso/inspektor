@@ -4,27 +4,25 @@ import { Box, Button, Fieldset, Text, TextField } from '@inspektor/ds'
 
 import type { ConnectionError } from '@app/connections/connectionValidation'
 
-import type { AddConnectionFormValues } from './connectionFormTypes'
+import type { ConnectionFormValues } from './connectionFormTypes'
 
-interface AddConnectionFormProps {
+interface ConnectionFormProps {
   error: ConnectionError | null
-  formValues: AddConnectionFormValues
+  formValues: ConnectionFormValues
   isSubmitting: boolean
-  mode?: 'add' | 'edit'
   onCancel: () => void
   onSubmit: FormEventHandler<HTMLFormElement>
-  onUpdateField: (field: keyof AddConnectionFormValues, value: string) => void
+  onFieldValueChange: (field: keyof ConnectionFormValues, value: string) => void
 }
 
-export function AddConnectionForm({
+export function ConnectionForm({
   error,
   formValues,
   isSubmitting,
-  mode = 'add',
   onCancel,
   onSubmit,
-  onUpdateField,
-}: AddConnectionFormProps): React.ReactElement {
+  onFieldValueChange,
+}: ConnectionFormProps): React.ReactElement {
   const serverUrlRef = useRef<HTMLInputElement>(null)
   const appIdRef = useRef<HTMLInputElement>(null)
   const adminSecretRef = useRef<HTMLInputElement>(null)
@@ -58,7 +56,7 @@ export function AddConnectionForm({
           autoComplete="off"
           value={formValues.name}
           onValueChange={(value) => {
-            onUpdateField('name', value)
+            onFieldValueChange('name', value)
           }}
           placeholder="my Jazz app…"
         />
@@ -67,7 +65,7 @@ export function AddConnectionForm({
           label="Server URL"
           name="serverUrl"
           autoComplete="url"
-          description="Sync server that stores your app data."
+          description="The server that synchronizes and stores this app's data."
           error={error?.field === 'serverUrl' ? error.description : undefined}
           validate={(value) =>
             String(value ?? '').trim().length > 0 ? null : 'Enter a server URL.'
@@ -78,23 +76,25 @@ export function AddConnectionForm({
           spellCheck={false}
           value={formValues.serverUrl}
           onValueChange={(value) => {
-            onUpdateField('serverUrl', value)
+            onFieldValueChange('serverUrl', value)
           }}
           placeholder="https://v2.sync.jazz.tools/"
           aria-required={true}
         />
         <TextField
           id="connection-app-id"
-          label="App ID"
+          label="Jazz app ID"
           name="appId"
           autoComplete="off"
           error={error?.field === 'appId' ? error.description : undefined}
-          validate={(value) => (String(value ?? '').trim().length > 0 ? null : 'Enter an app ID.')}
+          validate={(value) =>
+            String(value ?? '').trim().length > 0 ? null : 'Enter a Jazz app ID.'
+          }
           ref={appIdRef}
           spellCheck={false}
           value={formValues.appId}
           onValueChange={(value) => {
-            onUpdateField('appId', value)
+            onFieldValueChange('appId', value)
           }}
           aria-required={true}
         />
@@ -112,7 +112,7 @@ export function AddConnectionForm({
           spellCheck={false}
           value={formValues.adminSecret}
           onValueChange={(value) => {
-            onUpdateField('adminSecret', value)
+            onFieldValueChange('adminSecret', value)
           }}
           aria-required={true}
         />
@@ -123,24 +123,24 @@ export function AddConnectionForm({
         >
           <TextField
             id="connection-env"
-            label="Env"
+            label="Environment"
             name="env"
             autoComplete="off"
             spellCheck={false}
             value={formValues.env}
             onValueChange={(value) => {
-              onUpdateField('env', value)
+              onFieldValueChange('env', value)
             }}
           />
           <TextField
             id="connection-branch"
-            label="Branch"
+            label="Default branch"
             name="branch"
             autoComplete="off"
             spellCheck={false}
             value={formValues.branch}
             onValueChange={(value) => {
-              onUpdateField('branch', value)
+              onFieldValueChange('branch', value)
             }}
           />
         </Box>
@@ -173,7 +173,7 @@ export function AddConnectionForm({
             disabled={isSubmitting === true}
             loading={isSubmitting === true}
           >
-            {mode === 'edit' ? 'Save connection' : 'Add connection'}
+            Save connection
           </Button>
         </Box>
         <Box flex={1}>

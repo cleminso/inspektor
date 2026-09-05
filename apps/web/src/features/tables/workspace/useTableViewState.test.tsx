@@ -94,7 +94,7 @@ vi.mock('@tables/routing/useTableSearchParams', () => ({
 }))
 
 vi.mock('@tables/rowEditor/mutation/useTableMutation', () => ({
-  useTableMutations: () => ({
+  useTableMutationExecutor: () => ({
     deleteRow: vi.fn(),
     insertRow,
     updateRow: vi.fn(),

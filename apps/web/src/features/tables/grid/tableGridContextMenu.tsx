@@ -245,7 +245,7 @@ export function TableGridContextMenu({
               onFilterByCell(cellTarget)
             }}
           >
-            Filter by
+            Filter by this value
           </ContextMenu.Item>
         ) : null}
         {cellActions?.canCopy === true && cellActions.copyAs.length === 0 && cellTarget !== null ? (
@@ -281,7 +281,7 @@ export function TableGridContextMenu({
               revertField(target.rowId, cellFieldName)
             }}
           >
-            Revert this change
+            Discard field change
           </ContextMenu.Item>
         ) : null}
         {hasCellUpdate === true && hasRowUpdate === true ? <ContextMenu.Separator /> : null}
@@ -292,7 +292,7 @@ export function TableGridContextMenu({
               revertRowUpdate(target.rowId)
             }}
           >
-            Revert staged changes
+            Discard row changes
           </ContextMenu.Item>
         ) : null}
       </ContextMenu.Content>

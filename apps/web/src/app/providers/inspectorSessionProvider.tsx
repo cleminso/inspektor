@@ -14,8 +14,8 @@ import {
   type StoredConnection,
 } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
-import { resolveTablesNavigationTarget } from '@app/routing/inspectorNavigation'
-import { useInspectorSession } from '@app/session/useInspectorSession'
+import { resolveRuntimeTarget } from '@app/routing/inspectorNavigation'
+import { useStoredConnections } from '@app/session/useInspectorSession'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import {
   RuntimeScopeExitGuardProvider,
@@ -52,8 +52,8 @@ export interface InspectorSessionContextValue {
     branch: string,
     schemaHash: string,
   ) => ConnectionOpenResult
-  deleteConnection: ReturnType<typeof useInspectorSession>['deleteConnection']
-  getConnectionPreferences: ReturnType<typeof useInspectorSession>['getConnectionPreferences']
+  deleteConnection: ReturnType<typeof useStoredConnections>['deleteConnection']
+  getConnectionPreferences: ReturnType<typeof useStoredConnections>['getConnectionPreferences']
   setConnectionContext: (
     connectionId: string,
     branch: string,
@@ -82,7 +82,7 @@ export function InspectorSessionProvider({ children }: PropsWithChildren): React
 
 /** Projects route identity and pending matches into persisted, router-blocked session commands. */
 function InspectorSessionProviderValue({ children }: PropsWithChildren): React.ReactElement {
-  const session = useInspectorSession()
+  const session = useStoredConnections()
   const runtimeScopeExitGuard = useRuntimeScopeExitGuard()
   const runtimeScopeExitGuardRef = useRef(runtimeScopeExitGuard)
   runtimeScopeExitGuardRef.current = runtimeScopeExitGuard
@@ -157,7 +157,7 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
 
       const requestId = branchRequestRef.current + 1
       branchRequestRef.current = requestId
-      const nextTarget = await resolveTablesNavigationTarget({
+      const nextTarget = await resolveRuntimeTarget({
         connectionId: activeConnection.id,
         branchOverride: branch,
         schemaHashOverride: currentSchemaHash,

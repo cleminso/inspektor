@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+### [05/09/26] Mutation command ownership
+
+- [x] Rename the direct Jazz command hook to `useTableMutationExecutor` so it cannot be confused with the staged mutation ledger.
+
 ### [27/08/26] Browser persistence coverage
 
 - [x] Verify discarding a staged row edit restores the Jazz value and does not persist the draft.
@@ -58,6 +62,11 @@
 - Insert operations continue to persist outside the staged update and deletion ledger.
 
 ## Settled interaction decisions
+
+### [05/09/26] Pending mutation copy
+
+- [x] Describe unapplied edits as pending changes, updates, and deletions.
+- [x] Reserve Apply for persistence and Discard for removing pending edits.
 
 ### [25/08/26] Apply ownership
 

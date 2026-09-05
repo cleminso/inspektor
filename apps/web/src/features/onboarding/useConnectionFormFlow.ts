@@ -21,20 +21,20 @@ import {
   type ConnectionError,
 } from '@app/connections/connectionValidation'
 import { appRoutes } from '@app/routing/appRoutes'
-import { createSchemaCatalogue } from '@app/routing/inspectorNavigation'
+import { buildSchemaCatalogue } from '@app/routing/inspectorNavigation'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 
-import type { AddConnectionFormValues } from './connectionFormTypes'
+import type { ConnectionFormValues } from './connectionFormTypes'
 
-interface UseAddConnectionFlowResult {
+interface UseConnectionFormFlowResult {
   error: ConnectionError | null
-  formValues: AddConnectionFormValues
+  formValues: ConnectionFormValues
   isSubmitting: boolean
-  fetchSchemas: FormEventHandler<HTMLFormElement>
-  updateField: (field: keyof AddConnectionFormValues, value: string) => void
+  submitConnectionForm: FormEventHandler<HTMLFormElement>
+  updateFieldValue: (field: keyof ConnectionFormValues, value: string) => void
 }
 
-interface UseAddConnectionFlowOptions {
+interface UseConnectionFormFlowOptions {
   branch: string
   connection: StoredConnection
 }
@@ -45,13 +45,13 @@ interface UseAddConnectionFlowOptions {
  * Schema discovery here provides inline credential feedback and the initial schema context. The
  * saved profile still navigates through the parent connection loader before a runtime mounts.
  */
-export function useAddConnectionFlow(
-  options?: UseAddConnectionFlowOptions,
-): UseAddConnectionFlowResult {
+export function useConnectionFormFlow(
+  options?: UseConnectionFormFlowOptions,
+): UseConnectionFormFlowResult {
   const { connections, saveConnectionWithContext, setConnectionContext } =
     useInspectorSessionContext()
   const navigate = useNavigate()
-  const [formValues, setFormValues] = useState<AddConnectionFormValues>(() =>
+  const [formValues, setFormValues] = useState<ConnectionFormValues>(() =>
     options === undefined
       ? {
           name: '',
@@ -74,7 +74,7 @@ export function useAddConnectionFlow(
   const [error, setError] = useState<ConnectionError | null>(null)
   const isSubmittingRef = useRef(false)
 
-  const updateField = (field: keyof AddConnectionFormValues, value: string) => {
+  const updateFieldValue = (field: keyof ConnectionFormValues, value: string) => {
     setFormValues((currentValues) => ({
       ...currentValues,
       [field]: value,
@@ -116,7 +116,7 @@ export function useAddConnectionFlow(
     })
   }
 
-  const fetchSchemas: FormEventHandler<HTMLFormElement> = async (event) => {
+  const submitConnectionForm: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
 
     if (isSubmittingRef.current === true) {
@@ -145,7 +145,7 @@ export function useAddConnectionFlow(
         return
       }
 
-      const schemaHash = createSchemaCatalogue(response)[0]?.hash
+      const schemaHash = buildSchemaCatalogue(response)[0]?.hash
       if (schemaHash === undefined) {
         setError(EMPTY_SCHEMA_ERROR)
         return
@@ -162,9 +162,9 @@ export function useAddConnectionFlow(
 
   return {
     error,
-    fetchSchemas,
+    submitConnectionForm,
     formValues,
     isSubmitting,
-    updateField,
+    updateFieldValue,
   }
 }

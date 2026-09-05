@@ -6,10 +6,7 @@ import {
   useRouterState,
 } from '@tanstack/react-router'
 
-import {
-  redirectToConnections,
-  resolveStoredTablesNavigationTarget,
-} from '@app/routing/inspectorNavigation'
+import { redirectToConnections, resolveStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
 
@@ -42,7 +39,7 @@ export const Route = createFileRoute('/conn/$connectionId')({
   },
   loaderDeps: ({ search }) => ({ schemaHash: search.schema }),
   loader: async ({ deps, location, params }) => {
-    const target = await resolveStoredTablesNavigationTarget({
+    const target = await resolveStoredRuntimeTarget({
       connectionId: params.connectionId,
       schemaHashOverride: deps.schemaHash,
     })

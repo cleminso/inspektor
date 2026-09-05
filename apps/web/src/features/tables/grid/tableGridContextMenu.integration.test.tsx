@@ -145,14 +145,14 @@ describe('TableGridContextMenu integration', () => {
     })
   })
 
-  it('restores cell focus after Filter by', async () => {
+  it('restores cell focus after filtering by the cell value', async () => {
     const onFilterByCell = vi.fn()
     render(<ContextMenuHarness onFilterByCell={onFilterByCell} />)
     const cell = screen.getByRole('cell', { name: 'Ada' })
     cell.focus()
 
     fireEvent.contextMenu(cell)
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Filter by' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Filter by this value' }))
 
     expect(onFilterByCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
     await waitFor(() => {
@@ -215,21 +215,27 @@ describe('TableGridContextMenu integration', () => {
       (await screen.findAllByRole('menuitem')).map((item) =>
         item.textContent?.startsWith('Copy') === true ? 'Copy' : item.textContent,
       ),
-    ).toEqual(['Edit', 'Filter by', 'Copy', 'Revert this change', 'Revert staged changes'])
+    ).toEqual([
+      'Edit',
+      'Filter by this value',
+      'Copy',
+      'Discard field change',
+      'Discard row changes',
+    ])
     fireEvent.click(screen.getByRole('menuitem', { name: /^Copy/ }))
     expect(onCopyCell).toHaveBeenCalledWith({ columnId: 'name', rowId: 'row-1' })
 
     fireEvent.contextMenu(nameCell)
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Revert this change' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Discard field change' }))
     expect(revertField).toHaveBeenCalledWith('row-1', 'name')
 
     fireEvent.contextMenu(screen.getByRole('cell', { name: 'ada@example.com' }))
-    expect(screen.queryByRole('menuitem', { name: 'Revert this change' })).toBeNull()
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Revert staged changes' }))
+    expect(screen.queryByRole('menuitem', { name: 'Discard field change' })).toBeNull()
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Discard row changes' }))
     expect(revertRowUpdate).toHaveBeenCalledWith('row-1')
 
     fireEvent.contextMenu(nameCell.closest('tr') as HTMLTableRowElement)
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Revert staged changes' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Discard row changes' }))
     expect(revertRowUpdate).toHaveBeenNthCalledWith(2, 'row-1')
   })
 

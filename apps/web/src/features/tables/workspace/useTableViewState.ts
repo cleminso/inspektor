@@ -26,7 +26,7 @@ import { useTableGrid } from '@tables/grid/useTableGrid'
 import { useTableRows } from '@tables/query/useTableRows'
 import { useTableRowById } from '@tables/query/useTableRowById'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
-import { useTableMutations } from '@tables/rowEditor/mutation/useTableMutation'
+import { useTableMutationExecutor } from '@tables/rowEditor/mutation/useTableMutation'
 import { areMutationValuesEqual } from '@tables/rowEditor/mutation/draft'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { resolveTableSortColumn } from '@tables/query/tableRowsQuery'
@@ -249,7 +249,7 @@ export function useTableViewState({
       setRecentlyAppliedCells(emptyRecentlyAppliedCells)
     })
   }
-  const mutations = useTableMutations({ client, tableName, wasmSchema })
+  const mutations = useTableMutationExecutor({ client, tableName, wasmSchema })
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
   const tablePreferences = useTablePreferences({
     tableKey,

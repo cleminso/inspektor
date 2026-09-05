@@ -526,7 +526,7 @@ export function MutationField({
                 label={label}
               >
                 {timestampValue === undefined ? (
-                  'Select Date'
+                  'Select date'
                 ) : (
                   <TimestampValue value={timestampValue} />
                 )}
@@ -580,7 +580,7 @@ export function MutationField({
                     />
                   }
                 >
-                  Open target
+                  Open referenced table
                 </TextLink>
               </InputGroup.Suffix>
             ) : null}

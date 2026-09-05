@@ -39,7 +39,7 @@ const session = vi.hoisted(() => ({
 }))
 
 vi.mock('@app/session/useInspectorSession', () => ({
-  useInspectorSession: () => session,
+  useStoredConnections: () => session,
 }))
 
 afterEach(() => {

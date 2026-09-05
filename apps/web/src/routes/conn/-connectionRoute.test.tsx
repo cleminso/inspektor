@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const routeOptions = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const router = vi.hoisted(() => ({ invalidate: vi.fn() }))
-const resolveStoredTablesNavigationTarget = vi.hoisted(() => vi.fn())
+const resolveStoredRuntimeTarget = vi.hoisted(() => vi.fn())
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
@@ -27,7 +27,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 
 vi.mock('@app/routing/inspectorNavigation', () => ({
   redirectToConnections: vi.fn(),
-  resolveStoredTablesNavigationTarget,
+  resolveStoredRuntimeTarget,
 }))
 
 vi.mock('@app/runtime/inspectorRuntimeBoundary', () => ({
@@ -53,7 +53,7 @@ const { ConnectionRouteError } = await import('./-connectionRouteStatus')
 
 afterEach(() => {
   cleanup()
-  resolveStoredTablesNavigationTarget.mockReset()
+  resolveStoredRuntimeTarget.mockReset()
   router.invalidate.mockReset()
 })
 
@@ -65,7 +65,7 @@ describe('connection route', () => {
       schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
       schemaHash: 'schema-1',
     }
-    resolveStoredTablesNavigationTarget.mockResolvedValueOnce(target)
+    resolveStoredRuntimeTarget.mockResolvedValueOnce(target)
     const loader = routeOptions.current?.loader as (options: {
       deps: { schemaHash: string | undefined }
       params: { connectionId: string }
@@ -74,7 +74,7 @@ describe('connection route', () => {
     await expect(
       loader({ deps: { schemaHash: 'schema-1' }, params: { connectionId: 'connection-1' } }),
     ).resolves.toBe(target)
-    expect(resolveStoredTablesNavigationTarget).toHaveBeenCalledWith({
+    expect(resolveStoredRuntimeTarget).toHaveBeenCalledWith({
       connectionId: 'connection-1',
       schemaHashOverride: 'schema-1',
     })
@@ -119,7 +119,7 @@ describe('connection route', () => {
   })
 
   it('replaces an unavailable schema URL with the resolved fallback', async () => {
-    resolveStoredTablesNavigationTarget.mockResolvedValueOnce({
+    resolveStoredRuntimeTarget.mockResolvedValueOnce({
       branch: 'main',
       connectionId: 'connection-1',
       schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],

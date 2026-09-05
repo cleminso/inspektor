@@ -4,8 +4,8 @@ import { useNavigate } from '@tanstack/react-router'
 import type { StoredConnection } from '@app/connections/connections'
 import { appRoutes } from '@app/routing/appRoutes'
 
-import { AddConnectionForm } from './addConnectionForm'
-import { useAddConnectionFlow } from './useAddConnectionFlow'
+import { ConnectionForm } from './connectionForm'
+import { useConnectionFormFlow } from './useConnectionFormFlow'
 
 export function AddConnectionView(): React.ReactElement {
   const navigate = useNavigate()
@@ -26,7 +26,7 @@ interface ConnectionFormViewProps {
 }
 
 export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): React.ReactElement {
-  const flow = useAddConnectionFlow(edit)
+  const flow = useConnectionFormFlow(edit)
 
   return (
     <Box
@@ -35,15 +35,13 @@ export function ConnectionFormView({ edit, onClose }: ConnectionFormViewProps): 
       flexDirection="column"
       gap="xl"
     >
-      {/* TODO: update error message UI and copywriting */}
-      <AddConnectionForm
+      <ConnectionForm
         error={flow.error}
         formValues={flow.formValues}
         isSubmitting={flow.isSubmitting}
-        mode={edit === undefined ? 'add' : 'edit'}
         onCancel={onClose}
-        onSubmit={flow.fetchSchemas}
-        onUpdateField={flow.updateField}
+        onSubmit={flow.submitConnectionForm}
+        onFieldValueChange={flow.updateFieldValue}
       />
     </Box>
   )

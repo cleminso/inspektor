@@ -44,7 +44,7 @@ export function ConnectionSwitcher({
     connections.find((connection) => connection.id === contextualConnectionId) ?? null
   const resolvedTriggerLabel =
     triggerLabel ??
-    (activeConnection !== null ? getConnectionDisplayName(activeConnection) : 'Open connections')
+    (activeConnection !== null ? getConnectionDisplayName(activeConnection) : 'Connections')
 
   const preventBlockedNavigation = (event: React.MouseEvent) => {
     if (runtimeScopeExitBlocked === true) {
@@ -173,7 +173,7 @@ export function ConnectionSwitcher({
                       }
                     }}
                   >
-                    Remove connection
+                    Remove saved connection
                   </Button>
                 </Box>
               </ContextSwitcher.Footer>
@@ -186,7 +186,7 @@ export function ConnectionSwitcher({
                 render={<Link to={appRoutes.newConnection} />}
                 onClick={preventBlockedNavigation}
               >
-                Add new connection
+                Add connection
               </ButtonLink>
             </ContextSwitcher.Footer>
           </ContextSwitcher.Content>
@@ -209,14 +209,14 @@ export function ConnectionSwitcher({
         }}
       >
         <AlertDialog.Content>
-          <AlertDialog.Title>Remove connection?</AlertDialog.Title>
+          <AlertDialog.Title>Remove saved connection?</AlertDialog.Title>
           <AlertDialog.Description>
             {connectionToRemove === null
               ? null
-              : `Remove ${getConnectionDisplayName(connectionToRemove)} and its saved preferences from this browser? This does not affect the Jazz app.`}
+              : `This removes ${getConnectionDisplayName(connectionToRemove)} and its saved preferences from this browser. It does not affect the Jazz app.`}
           </AlertDialog.Description>
           <AlertDialog.Actions>
-            <AlertDialog.Close>Keep connection</AlertDialog.Close>
+            <AlertDialog.Close>Keep saved connection</AlertDialog.Close>
             <Button
               variant="danger"
               onClick={() => {
@@ -230,7 +230,7 @@ export function ConnectionSwitcher({
                 void navigate({ to: appRoutes.connections })
               }}
             >
-              Remove connection
+              Remove saved connection
             </Button>
           </AlertDialog.Actions>
         </AlertDialog.Content>

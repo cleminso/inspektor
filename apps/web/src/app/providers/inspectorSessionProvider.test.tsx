@@ -8,12 +8,12 @@ import {
 } from '@app/providers/inspectorSessionProvider'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { useRegisterRuntimeScopeExitBlocker } from '@app/providers/runtimeScopeExitGuard'
-import type { ResolvedTablesNavigationTarget } from '@app/routing/inspectorNavigation'
+import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
 
 const navigate = vi.fn()
 const setConnectionContext = vi.fn()
 const saveConnectionWithContext = vi.fn()
-const resolveTablesNavigationTarget = vi.hoisted(() => vi.fn())
+const resolveRuntimeTarget = vi.hoisted(() => vi.fn())
 const prepareJazzWasm = vi.hoisted(() => vi.fn())
 const connectionPreferences = {
   lastBranch: 'main',
@@ -23,18 +23,16 @@ const createTarget = (
   branch: string,
   schemaHash = 'schema-1',
   connectionId = 'connection-1',
-): ResolvedTablesNavigationTarget => ({
+): ResolvedRuntimeTarget => ({
   branch,
   connectionId,
   schemaCatalogue: [{ hash: schemaHash, publishedAt: 1 }],
   schemaHash,
 })
 
-function deferNavigationTarget(): (target: ResolvedTablesNavigationTarget) => void {
-  let resolve!: (target: ResolvedTablesNavigationTarget) => void
-  resolveTablesNavigationTarget.mockImplementationOnce(
-    () => new Promise((next) => (resolve = next)),
-  )
+function deferNavigationTarget(): (target: ResolvedRuntimeTarget) => void {
+  let resolve!: (target: ResolvedRuntimeTarget) => void
+  resolveRuntimeTarget.mockImplementationOnce(() => new Promise((next) => (resolve = next)))
   return (target) => resolve(target)
 }
 interface BlockerLocation {
@@ -97,7 +95,7 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 vi.mock('@app/session/useInspectorSession', () => ({
-  useInspectorSession: () => session,
+  useStoredConnections: () => session,
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -105,7 +103,7 @@ vi.mock('@app/providers/inspectorProvider', () => ({
 }))
 
 vi.mock('@app/routing/inspectorNavigation', () => ({
-  resolveTablesNavigationTarget,
+  resolveRuntimeTarget,
 }))
 
 vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
@@ -115,7 +113,7 @@ beforeEach(() => {
   routeConnectionId = 'connection-1'
   connectionPreferences.lastBranch = 'main'
   connectionPreferences.lastSchemaHash = 'schema-1'
-  resolveTablesNavigationTarget.mockImplementation(
+  resolveRuntimeTarget.mockImplementation(
     async ({
       branchOverride,
       connectionId,
@@ -361,8 +359,8 @@ describe('InspectorSessionProvider runtime-scope exit policy', () => {
   })
 
   it('commits only the latest overlapping branch request', async () => {
-    const resolvers = new Map<string, (target: ResolvedTablesNavigationTarget) => void>()
-    resolveTablesNavigationTarget.mockImplementation(
+    const resolvers = new Map<string, (target: ResolvedRuntimeTarget) => void>()
+    resolveRuntimeTarget.mockImplementation(
       ({ branchOverride }: { branchOverride: string }) =>
         new Promise((resolve) => resolvers.set(branchOverride, resolve)),
     )

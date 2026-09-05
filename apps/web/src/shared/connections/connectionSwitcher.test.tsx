@@ -83,7 +83,7 @@ describe('ConnectionSwitcher', () => {
     openSwitcher()
 
     expect(screen.queryByRole('combobox', { name: 'Search connections' })).toBeNull()
-    expect(screen.getByRole('link', { name: 'Add new connection' }).getAttribute('href')).toBe(
+    expect(screen.getByRole('link', { name: 'Add connection' }).getAttribute('href')).toBe(
       '/conn/new',
     )
   })
@@ -99,8 +99,8 @@ describe('ConnectionSwitcher', () => {
     expect(screen.getByRole('link', { name: 'Edit connection' }).getAttribute('href')).toBe(
       '/conn/edit/one',
     )
-    expect(screen.getByRole('button', { name: 'Remove connection' })).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'Add new connection' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Remove saved connection' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Add connection' })).toBeTruthy()
     expect(document.querySelectorAll('[data-slot="combobox-popup-footer"]')).toHaveLength(2)
   })
 
@@ -145,7 +145,7 @@ describe('ConnectionSwitcher', () => {
       'Seconddevtwo-app',
     ])
     expect(screen.queryByRole('link', { name: 'Edit connection' })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Remove connection' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Remove saved connection' })).toBeNull()
   })
 
   it('removes the active saved connection only after confirmation', () => {
@@ -154,11 +154,11 @@ describe('ConnectionSwitcher', () => {
 
     render(<ConnectionSwitcher />)
     openSwitcher()
-    fireEvent.click(screen.getByRole('button', { name: 'Remove connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove saved connection' }))
 
     expect(deleteConnection).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Remove connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove saved connection' }))
 
     expect(deleteConnection).toHaveBeenCalledWith('one')
     expect(navigate).toHaveBeenCalledWith({ to: '/conn' })
@@ -170,8 +170,8 @@ describe('ConnectionSwitcher', () => {
 
     render(<ConnectionSwitcher />)
     openSwitcher()
-    fireEvent.click(screen.getByRole('button', { name: 'Remove connection' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Keep connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove saved connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Keep saved connection' }))
 
     expect(deleteConnection).not.toHaveBeenCalled()
   })
@@ -252,8 +252,8 @@ describe('ConnectionSwitcher', () => {
     render(<ConnectionSwitcher />)
     openSwitcher()
     fireEvent.click(screen.getByRole('link', { name: 'Edit connection' }))
-    fireEvent.click(screen.getByRole('link', { name: 'Add new connection' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Remove connection' }))
+    fireEvent.click(screen.getByRole('link', { name: 'Add connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove saved connection' }))
 
     expect(navigate).not.toHaveBeenCalled()
     expect(deleteConnection).not.toHaveBeenCalled()

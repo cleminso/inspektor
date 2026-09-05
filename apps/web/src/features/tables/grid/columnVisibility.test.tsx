@@ -35,15 +35,15 @@ describe('DataGridColumnVisibility', () => {
   it('labels the trigger on hover', async () => {
     render(<VisibilityMenu />)
 
-    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Choose visible columns' }))
+    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Show or hide columns' }))
 
-    expect(await screen.findByText('Columns visibility')).toBeTruthy()
+    expect(await screen.findByText('Show or hide columns')).toBeTruthy()
   })
 
   it('marks the trigger as pressed while any column is hidden', () => {
     render(<VisibilityMenu />)
 
-    const trigger = screen.getByRole('button', { name: 'Choose visible columns' })
+    const trigger = screen.getByRole('button', { name: 'Show or hide columns' })
     expect(trigger.getAttribute('aria-pressed')).toBe('false')
 
     fireEvent.click(trigger)
@@ -57,7 +57,7 @@ describe('DataGridColumnVisibility', () => {
   it('lists fixed and hideable columns and keeps the menu open for multiselect', () => {
     render(<VisibilityMenu />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Choose visible columns' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show or hide columns' }))
 
     expect(screen.getByRole('checkbox', { name: 'Select id' }).getAttribute('aria-disabled')).toBe(
       'true',
@@ -73,7 +73,7 @@ describe('DataGridColumnVisibility', () => {
   it('restores every hideable column through one convenience action', () => {
     render(<VisibilityMenu />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Choose visible columns' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show or hide columns' }))
     fireEvent.click(screen.getByRole('checkbox', { name: 'Select name' }))
     fireEvent.click(screen.getByRole('button', { name: 'Check all from role' }))
 

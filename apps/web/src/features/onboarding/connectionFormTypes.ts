@@ -1,5 +1,5 @@
 import type { ConnectionDraft } from '@app/connections/connections'
 
-export interface AddConnectionFormValues extends ConnectionDraft {
+export interface ConnectionFormValues extends ConnectionDraft {
   branch: string
 }
