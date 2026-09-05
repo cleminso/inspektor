@@ -107,7 +107,6 @@ export const commandStyles = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':hover': ghostElementColors.hover,
       ':active': ghostElementColors.pressed,
     },
     cursor: 'default',

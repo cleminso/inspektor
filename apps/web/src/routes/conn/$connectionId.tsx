@@ -9,6 +9,7 @@ import {
 import { redirectToConnections, resolveStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
+import { TableCommands } from '@tables/workspace/tableCommands'
 
 import { ConnectionRouteError } from './-connectionRouteStatus'
 
@@ -63,14 +64,14 @@ export const Route = createFileRoute('/conn/$connectionId')({
 
 function InspectorRuntimeRoute(): React.ReactElement {
   const target = Route.useLoaderData()
-  const pageTitle = useRouterState({
-    select: (state) =>
-      state.location.pathname.endsWith('/live-queries') ? 'Live queries' : 'Tables',
+  const isLiveQueriesRoute = useRouterState({
+    select: (state) => state.location.pathname.endsWith('/live-queries'),
   })
 
   return (
     <InspectorRuntimeBoundary target={target}>
-      <InspectorLayout pageTitle={pageTitle}>
+      <InspectorLayout pageTitle={isLiveQueriesRoute === true ? 'Live queries' : 'Tables'}>
+        {isLiveQueriesRoute === true ? <TableCommands /> : null}
         <Outlet />
       </InspectorLayout>
     </InspectorRuntimeBoundary>

@@ -94,6 +94,18 @@ export function createTableTabRouteSearch(tab: TableTab): TableTabsRouteSearch {
   return tab.kind === 'newView' ? { empty: 'true' } : { ...tab.search }
 }
 
+export function createTableSearchByName(
+  tabs: readonly TableTab[],
+): ReadonlyMap<string, TableTabSearch> {
+  const searches = new Map<string, TableTabSearch>()
+  for (const tab of tabs) {
+    if (tab.kind === 'table' && tab.search.view !== 'schema') {
+      searches.set(tab.tableName, tab.search)
+    }
+  }
+  return searches
+}
+
 export function selectInitialTableView(
   recentViews: readonly TableDataTab[],
   availableTables: readonly string[],

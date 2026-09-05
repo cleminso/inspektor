@@ -33,6 +33,10 @@ vi.mock('@tables/workspace/navigationHistory', () => ({
   }),
 }))
 
+vi.mock('@tables/workspace/tableCommands', () => ({
+  TableCommands: () => null,
+}))
+
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()

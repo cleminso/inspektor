@@ -11,6 +11,16 @@
 
 ## Implemented foundation
 
+[05/09/26]
+
+- [x] Keep one command item visually highlighted when pointer hover is followed by keyboard navigation.
+
+[05/09/26]
+
+- [x] Group active-connection table names under `Tables` in the global command palette.
+- [x] Register table navigation from every active-connection surface and hide it until schema tables are ready.
+- [x] Restore an open Data tab's filter, sort, and pagination search while opening missing tables through the existing replaceable-tab route flow.
+
 [03/09/26]
 
 - [x] Allow native key repeat for `J` and `K` row navigation without changing repeat suppression for other application hotkeys.
@@ -80,6 +90,16 @@
 
 ## Settled interaction decisions
 
+[05/09/26]
+
+- [x] Use Base UI's highlighted item state for both pointer and keyboard command navigation instead of a separate CSS hover highlight.
+
+[05/09/26]
+
+- [x] Match table palette items by table name only.
+- [x] Keep table commands hidden while schema table names are unresolved.
+- [x] Reuse an open Data tab's stored route search instead of resetting its view.
+
 [03/09/26]
 
 - [x] Let the operating system control held-key row navigation cadence; do not add custom acceleration or timers.
@@ -116,6 +136,14 @@
 - [ ] Decide whether disabled history and pagination shortcuts should remain intercepted or fall through to browser behavior.
 
 ## Validation checklist
+
+[05/09/26]
+
+- [x] Cover pointer-to-keyboard command navigation with a real-browser computed-style regression test.
+
+[05/09/26]
+
+- [x] Cover labelled command groups, table-name filtering, active-connection registration, stored-search restoration, missing-table navigation, and unresolved-schema omission.
 
 [03/09/26]
 

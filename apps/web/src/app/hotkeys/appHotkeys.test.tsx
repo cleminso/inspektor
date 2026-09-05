@@ -14,6 +14,7 @@ describe('AppHotkeysProvider', () => {
       const commands = useMemo(
         () => [
           {
+            group: 'Tests',
             id: 'test-command',
             label: 'Run test command',
             description: 'Verify the command palette',
@@ -38,6 +39,7 @@ describe('AppHotkeysProvider', () => {
     fireEvent.keyDown(pageInput, { key: 'k', ctrlKey: true })
 
     expect(await screen.findByRole('dialog', { name: 'Commands' })).toBeTruthy()
+    expect(screen.getByText('Tests')).toBeTruthy()
     const option = screen.getByRole('option', {
       name: 'Run test command',
       description: 'Verify the command palette',

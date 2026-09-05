@@ -84,6 +84,26 @@ test('opens, closes, and switches the left dock', async ({ page }) => {
   await expect(resizeHandle).toBeVisible()
 })
 
+test('shows one highlighted command after pointer and keyboard navigation', async ({ page }) => {
+  await connectToFixture(page)
+  await page.getByRole('button', { name: 'Open commands' }).click()
+
+  const input = page.getByRole('combobox', { name: 'Search commands' })
+  const options = page.getByRole('option')
+  const hoveredOption = options.first()
+  const keyboardOption = options.nth(1)
+  await hoveredOption.hover()
+  await input.press('ArrowDown')
+
+  await expect(hoveredOption).not.toHaveAttribute('data-highlighted')
+  await expect(keyboardOption).toHaveAttribute('data-highlighted')
+  const [hoveredBackground, keyboardBackground] = await Promise.all([
+    hoveredOption.evaluate((element) => getComputedStyle(element).backgroundColor),
+    keyboardOption.evaluate((element) => getComputedStyle(element).backgroundColor),
+  ])
+  expect(hoveredBackground).not.toBe(keyboardBackground)
+})
+
 test('keeps query details scrolling inside the workspace query section', async ({ page }) => {
   const serverUrl = new URL(connection.serverUrl)
   const basePath = serverUrl.pathname.replace(/\/+$/, '')
@@ -254,7 +274,7 @@ test('recovers when connection schema validation initially finds no schemas', as
 
   await page.goto('/conn/new')
   await fillConnectionForm(page)
-  const submit = page.getByRole('button', { name: 'Add connection' })
+  const submit = page.getByRole('button', { name: 'Save connection' })
   await submit.click()
 
   const error = page.getByRole('status').filter({ hasText: 'No stored schemas found' })
@@ -656,7 +676,7 @@ function fixtureConnection(): FixtureConnection {
 async function connectToFixture(page: Page): Promise<void> {
   await page.goto('/conn/new')
   await fillConnectionForm(page)
-  await page.getByRole('button', { name: 'Add connection' }).click()
+  await page.getByRole('button', { name: 'Save connection' }).click()
   await expect(page).toHaveURL(/\/conn\/[^/]+\/tables(?:\/[^/?]+)?/)
 }
 

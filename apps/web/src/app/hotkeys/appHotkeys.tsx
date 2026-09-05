@@ -21,6 +21,7 @@ import { appHotkeys } from './hotkeyCatalog'
 export interface AppCommand {
   description?: string
   disabled?: boolean
+  group?: string
   hotkey?: Hotkey
   id: string
   label: string
@@ -94,6 +95,19 @@ function AppCommandPalette({
   }
 
   const [query, setQuery] = useState('')
+  const commandGroups = useMemo(() => {
+    const groups = new Map<string | null, AppCommand[]>()
+    for (const command of commands) {
+      const group = command.group ?? null
+      const groupCommands = groups.get(group)
+      if (groupCommands === undefined) {
+        groups.set(group, [command])
+      } else {
+        groupCommands.push(command)
+      }
+    }
+    return groups
+  }, [commands])
 
   useHotkey(
     appHotkeys.openCommandPalette,
@@ -125,6 +139,33 @@ function AppCommandPalette({
     },
     [onOpenChange],
   )
+  const renderCommand = (command: AppCommand) => (
+    <Command.Item
+      key={command.id}
+      value={command}
+      disabled={command.disabled === true}
+      onClick={() => {
+        if (command.disabled === true) {
+          return
+        }
+        command.perform()
+        handleOpenChange(false)
+      }}
+    >
+      <Command.ItemText
+        label={command.label}
+        description={command.description}
+      />
+      {command.hotkey === undefined ? null : (
+        <Command.Shortcut>
+          <KeyboardInput
+            hotkey={command.hotkey}
+            size="small"
+          />
+        </Command.Shortcut>
+      )}
+    </Command.Item>
+  )
 
   return (
     <Command.Dialog
@@ -148,33 +189,16 @@ function AppCommandPalette({
           <Command.Empty>
             {commands.length === 0 ? 'No commands available.' : 'No matching commands.'}
           </Command.Empty>
-          {commands.map((command) => (
-            <Command.Item
-              key={command.id}
-              value={command}
-              disabled={command.disabled === true}
-              onClick={() => {
-                if (command.disabled === true) {
-                  return
-                }
-                command.perform()
-                handleOpenChange(false)
-              }}
-            >
-              <Command.ItemText
-                label={command.label}
-                description={command.description}
-              />
-              {command.hotkey === undefined ? null : (
-                <Command.Shortcut>
-                  <KeyboardInput
-                    hotkey={command.hotkey}
-                    size="small"
-                  />
-                </Command.Shortcut>
-              )}
-            </Command.Item>
-          ))}
+          {[...commandGroups].map(([group, groupCommands]) =>
+            group === null ? (
+              groupCommands.map(renderCommand)
+            ) : (
+              <Command.Group key={group}>
+                <Command.GroupLabel>{group}</Command.GroupLabel>
+                {groupCommands.map(renderCommand)}
+              </Command.Group>
+            ),
+          )}
         </Command.List>
         <Command.Footer>
           <span>

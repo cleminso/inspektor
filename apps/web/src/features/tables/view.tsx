@@ -17,6 +17,7 @@ import {
 import { useTableTabs } from '@tables/workspace/tabsProvider'
 import { useAvailableTables } from '@tables/schema/useAvailableTables'
 import { TableTabsView } from '@tables/workspace/tabsView'
+import { createTableSearchByName } from '@tables/workspace/tabs'
 
 export function TableExplorerScreen(): React.ReactElement {
   const { currentTableName } = useInspectorSessionState()
@@ -50,17 +51,7 @@ export function TableExplorerScreen(): React.ReactElement {
   const connectionEntryPending =
     isSchemaReady === false ||
     (currentTableName === null && routeSearch.empty !== 'true' && tables.length > 0)
-  const tableSearchByName = useMemo(
-    () =>
-      new Map(
-        openTabs.flatMap((tab) =>
-          tab.kind === 'table' && tab.search.view !== 'schema'
-            ? [[tab.tableName, tab.search] as const]
-            : [],
-        ),
-      ),
-    [openTabs],
-  )
+  const tableSearchByName = useMemo(() => createTableSearchByName(openTabs), [openTabs])
 
   const handleTableCheckedChange = (
     tableName: string,

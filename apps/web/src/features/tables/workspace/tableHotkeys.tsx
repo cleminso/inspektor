@@ -10,8 +10,9 @@ import {
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { useTableNavigationControls } from '@tables/workspace/navigationHistory'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
+import { TableCommands } from '@tables/workspace/tableCommands'
 
-export function TableHotkeys(): null {
+export function TableHotkeys(): React.ReactElement {
   const { activeTabId, closeTab, openNewView, tabs } = useTableTabs()
   const { canGoBack, canGoForward, goBack, goForward } = useTableNavigationControls()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
@@ -77,5 +78,5 @@ export function TableHotkeys(): null {
   )
   useAppCommands(commands)
 
-  return null
+  return <TableCommands tabs={tabs} />
 }
