@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[05/09/26]
+
+- [x] Preserve Base UI's unset trigger delay so the Provider's shared delay takes precedence when configured.
+
 [20/08/26]
 
 - [x] Provide the inverse semantic foreground to nested Keyboard Input hints through their inherited context variable.

@@ -2171,8 +2171,8 @@
       "required": false,
       "description": "Event handler called when the input value changes.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/root/ComboboxRoot.d.mts",
-        "line": 68
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/root/ComboboxRoot.d.mts",
+        "line": 72
       }
     }
   ],
@@ -2226,7 +2226,7 @@
       "required": false,
       "description": "Whether the dialog is currently open.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
         "line": 18
       }
     },
@@ -2237,7 +2237,7 @@
       "defaultValue": "false",
       "description": "Whether the dialog is initially open.\n\nTo render a controlled dialog, use the `open` prop instead.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
         "line": 25
       }
     },
@@ -2247,7 +2247,7 @@
       "required": false,
       "description": "Event handler called when the dialog is opened or closed.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/dialog/root/DialogRoot.d.mts",
         "line": 40
       }
     }
@@ -2293,7 +2293,7 @@
       "required": false,
       "description": "Whether the component should ignore user interaction.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/item/ComboboxItem.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/combobox/item/ComboboxItem.d.mts",
         "line": 44
       }
     }
@@ -4366,7 +4366,6 @@
       "name": "delay",
       "type": "number",
       "required": false,
-      "defaultValue": "500",
       "description": "Overrides the delay before this tooltip opens.",
       "source": {
         "path": "packages/design-system/src/components/tooltip/tooltip.tsx",
@@ -5397,7 +5396,7 @@
     },
     {
       "name": "validate",
-      "type": "(value: unknown, formValues: Form.Values) => string | string[] | null | Promise<string | string[] | null>",
+      "type": "(value: unknown, formValues: Form.Values) => string | string[] | null | void | Promise<string | string[] | null | void>",
       "required": false,
       "description": "Validates the field value and returns validation messages.",
       "source": {
@@ -5592,7 +5591,7 @@
     },
     {
       "name": "validate",
-      "type": "(value: unknown, formValues: Form.Values) => string | string[] | null | Promise<string | string[] | null>",
+      "type": "(value: unknown, formValues: Form.Values) => string | string[] | null | void | Promise<string | string[] | null | void>",
       "required": false,
       "description": "Validates the input value and returns validation messages.",
       "source": {
@@ -5892,10 +5891,10 @@
       "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
       "required": false,
       "defaultValue": "\"bottom\"",
-      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
+      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.\n\nSubmenus and vertical menubars default to `'inline-end'`.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
-        "line": 90
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/menu/positioner/MenuPositioner.d.mts",
+        "line": 52
       }
     },
     {
@@ -5903,10 +5902,10 @@
       "type": "\"center\" | \"start\" | \"end\"",
       "required": false,
       "defaultValue": "\"start\"",
-      "description": "How to align the popup relative to the specified side.",
+      "description": "How to align the popup relative to the specified side.\n\nSubmenus and menubars default to `'start'`.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
-        "line": 120
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/menu/positioner/MenuPositioner.d.mts",
+        "line": 44
       }
     }
   ],
@@ -6279,10 +6278,10 @@
       "type": "\"top\" | \"bottom\" | \"left\" | \"right\" | \"inline-end\" | \"inline-start\"",
       "required": false,
       "defaultValue": "\"bottom\"",
-      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
+      "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.\n\nSubmenus default to `'inline-end'`.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
-        "line": 90
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/context-menu/positioner/ContextMenuPositioner.d.mts",
+        "line": 31
       }
     },
     {
@@ -6292,8 +6291,8 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
-        "line": 120
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/context-menu/positioner/ContextMenuPositioner.d.mts",
+        "line": 60
       }
     }
   ],
@@ -6525,9 +6524,9 @@
   "combobox.root": [
     {
       "name": "items",
-      "type": "readonly any[] | readonly Group<any>[]",
+      "type": "readonly any[] | readonly Group<any>[] | ComboboxItemCollection<Value, Value>",
       "required": false,
-      "description": "The items to be displayed in the list.\nCan be either a flat array of items or an array of groups with items.\nItems available for filtering and selection.",
+      "description": "The items to be displayed in the list.\nCan be a flat array of items, an array of groups with items, or a collection created by\nthe `createItems()` function, which derives each item's selection value and label.\nNullish entries are not supported: remove them from the data before passing it.\nItems available for filtering and selection.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
         "line": 28
@@ -6638,7 +6637,7 @@
       "name": "itemToStringLabel",
       "type": "(itemValue: Value) => string",
       "required": false,
-      "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for display in the input.\nIf the shape of the object is `{ value, label }`, the label will be used automatically without needing to specify this prop.\nConverts an item into its displayed label.",
+      "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for display in the input.\nIf the shape of the object is `{ value, label }`, the label will be used automatically without needing to specify this prop.\nWith a `createItems()` collection, this receives the derived value, and the collection's\n`getLabel` takes precedence for values it can resolve.\nConverts an item into its displayed label.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
         "line": 50
@@ -6648,7 +6647,7 @@
       "name": "itemToStringValue",
       "type": "(itemValue: Value) => string",
       "required": false,
-      "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for form submission.\nIf the shape of the object is `{ value, label }`, the value will be used automatically without needing to specify this prop.\nConverts an item into the value submitted with a form.",
+      "description": "When the item values are objects (`<Combobox.Item value={object}>`), this function converts the object value to a string representation for form submission.\nIf the shape of the object is `{ value, label }`, the value will be used automatically without needing to specify this prop.\nWith a `createItems()` collection, this receives the derived value.\nConverts an item into the value submitted with a form.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
         "line": 52
@@ -6658,7 +6657,7 @@
       "name": "isItemEqualToValue",
       "type": "(itemValue: Value, value: Value) => boolean",
       "required": false,
-      "description": "Custom comparison logic used to determine if a combobox item value matches the current selected value. Useful when item values are objects without matching referentially.\nDefaults to `Object.is` comparison.\nCompares an item with the selected value.",
+      "description": "Custom comparison logic used to determine if a combobox item value matches the current selected value. Useful when item values are objects without matching referentially.\nWith a `createItems()` collection, both arguments are derived values.\nDefaults to `Object.is` comparison.\nCompares an item with the selected value.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
         "line": 54
@@ -6666,9 +6665,9 @@
     },
     {
       "name": "filter",
-      "type": "null | (itemValue: Value, query: string, itemToString?: ((itemValue: Value) => string) | undefined) => boolean",
+      "type": "null | (item: Value, query: string, itemToString?: ((item: Value) => string) | undefined) => boolean",
       "required": false,
-      "description": "Filter function used to match items vs input query.\nFilters an item against the current query.",
+      "description": "Filter function used to match items vs input query.\nReceives the source item, which is the derived value's item when `items` is a `createItems()`\ncollection, and the item itself otherwise.\nFilters an item against the current query.",
       "source": {
         "path": "packages/design-system/src/components/combobox/combobox.tsx",
         "line": 56
@@ -6877,7 +6876,7 @@
       "defaultValue": "\"bottom\"",
       "description": "Which side of the anchor element to align the popup against.\nMay automatically change to avoid collisions.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
         "line": 90
       }
     },
@@ -6888,7 +6887,7 @@
       "defaultValue": "\"start\"",
       "description": "How to align the popup relative to the specified side.",
       "source": {
-        "path": "node_modules/.pnpm/@base-ui+react@1.7.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
+        "path": "node_modules/.pnpm/@base-ui+react@1.8.0_@date-fns+tz@1.5.0_@types+react@19.2.18_date-fns@4.4.0_react-dom@19.2.6_react@19.2.6__react@19.2.6/node_modules/@base-ui/react/internals/useAnchorPositioning.d.mts",
         "line": 120
       }
     }
@@ -7097,7 +7096,7 @@
   "contextSwitcher.root": [
     {
       "name": "items",
-      "type": "readonly any[] | readonly Group<any>[]",
+      "type": "readonly any[] | readonly Group<any>[] | ComboboxItemCollection<Value, Value>",
       "required": true,
       "description": "Items available for filtering and context selection.",
       "source": {
@@ -7198,7 +7197,7 @@
     },
     {
       "name": "filter",
-      "type": "null | (itemValue: Value, query: string, itemToString?: ((itemValue: Value) => string) | undefined) => boolean",
+      "type": "null | (item: Value, query: string, itemToString?: ((item: Value) => string) | undefined) => boolean",
       "required": false,
       "description": "Filters an item against the switcher query.",
       "source": {

@@ -400,7 +400,7 @@ test("extracts the constrained Tooltip compound API", () => {
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "delay")?.defaultValue,
-    "500",
+    undefined,
   );
   assert.equal(
     metadata["tooltip.trigger"]?.find(({ name }) => name === "closeOnClick")?.defaultValue,

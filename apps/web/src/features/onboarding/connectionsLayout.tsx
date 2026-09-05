@@ -51,6 +51,7 @@ export function ConnectionsLayout({
           <ShellLayout.View>
             <Box
               as="main"
+              backgroundColor="surface-background"
               id="main-content"
               tabIndex={-1}
               height="full"
