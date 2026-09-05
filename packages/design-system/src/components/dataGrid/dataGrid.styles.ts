@@ -226,6 +226,14 @@ export const dataGridStyles = stylex.create({
       ':hover': dataGridColors.rowHoverBackground,
     },
   },
+  rowScrollTarget: {
+    scrollMarginBottom: `calc(${spatial['collection-row-height-xl']} * 2)`,
+    scrollMarginTop: `calc(${spatial['collection-row-height-xl']} * 2)`,
+  },
+  compactRowScrollTarget: {
+    scrollMarginBottom: `calc(${spatial['collection-row-height-l']} * 2)`,
+    scrollMarginTop: `calc(${spatial['collection-row-height-l']} * 2)`,
+  },
   rowSelected: {
     backgroundColor: dataGridColors.selectedRowBackground,
   },

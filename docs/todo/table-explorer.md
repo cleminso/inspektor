@@ -983,7 +983,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 [03/09/26]
 
-- [ ] Keep the focused checked row visible when repeated navigation moves beyond the current grid viewport.
+- [x] Keep the focused checked row visible when repeated navigation moves beyond the current grid viewport.
 
 ### Table query prefetch
 

@@ -565,7 +565,9 @@ test('clears all checked rows when closing the row pane', async ({ page }) => {
   await expect(secondRow).not.toBeChecked()
 })
 
-test('moves a single checked row with the row pane navigation', async ({ page }) => {
+test('moves a single checked row with the row pane navigation and keeps it visible', async ({
+  page,
+}) => {
   await connectToFixture(page)
   await openTable(page, 'paginationRecords')
 
@@ -586,6 +588,26 @@ test('moves a single checked row with the row pane navigation', async ({ page })
   await expect(firstRow).not.toBeChecked()
   await expect(secondRow).toBeChecked()
   await expect(page.getByText('2 / 101+')).toBeVisible()
+
+  for (let index = 0; index < 39; index += 1) {
+    await page.keyboard.press('j')
+  }
+
+  const trackedRow = page.getByRole('checkbox', {
+    name: 'Select row 90000000-0000-4000-8000-000000000041',
+  })
+  await expect(trackedRow).toBeChecked()
+  const hasNavigationContext = await trackedRow.evaluate((element) => {
+    const row = element.closest('tr')!
+    const viewport = element.closest('[data-slot="data-grid-viewport"]')!
+    return (
+      row.getBoundingClientRect().top >=
+        viewport.querySelector('thead')!.getBoundingClientRect().bottom - 1 &&
+      row.nextElementSibling!.getBoundingClientRect().bottom <=
+        viewport.getBoundingClientRect().bottom + 1
+    )
+  })
+  expect(hasNavigationContext).toBe(true)
 })
 
 test('discards a row edit without persisting it', async ({ page }) => {

@@ -22,6 +22,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
   type ReactNode,
+  type Ref,
   type TouchEvent,
 } from 'react'
 
@@ -1189,8 +1190,11 @@ function DataGridDefaultBody({ rowRendering }: { rowRendering: DataGridRowRender
 }
 
 function DataGridBody({ children }: DataGridBodyProps) {
-  const { table } = useDataGridContext()
+  const { activeRowId, table } = useDataGridContext()
   const rows = table.getRowModel().rows
+  const scrollActiveRowIntoView = useCallback((row: HTMLTableRowElement | null) => {
+    row?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
+  }, [])
 
   return (
     <tbody data-slot="data-grid-body">
@@ -1198,6 +1202,7 @@ function DataGridBody({ children }: DataGridBodyProps) {
         rows.map((row) => (
           <DataGridSubscribedRow
             key={row.id}
+            rowRef={row.id === activeRowId ? scrollActiveRowIntoView : undefined}
             row={row}
           />
         ))}
@@ -1242,15 +1247,18 @@ function DataGridVirtualBody() {
 }
 
 function DataGridVirtualBodyImplementation() {
-  const { density, table, viewportElement } = useDataGridContext()
+  const { activeRowId, density, table, viewportElement } = useDataGridContext()
   const rows = table.getRowModel().rows
+  const rowHeight = density === 'compact' ? 28 : 32
   const getItemKey = useCallback((index: number) => rows[index]?.id ?? index, [rows])
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    estimateSize: () => (density === 'compact' ? 28 : 32),
+    estimateSize: () => rowHeight,
     getItemKey,
     getScrollElement: () => viewportElement,
     overscan: virtualRowOverscan,
+    scrollPaddingEnd: rowHeight * 2,
+    scrollPaddingStart: rowHeight * 2,
   })
   const virtualRows = rowVirtualizer.getVirtualItems()
   const firstVirtualRow = virtualRows[0]
@@ -1258,9 +1266,15 @@ function DataGridVirtualBodyImplementation() {
   const paddingStart = firstVirtualRow?.start ?? 0
   const paddingEnd =
     lastVirtualRow === undefined ? 0 : rowVirtualizer.getTotalSize() - lastVirtualRow.end
-  const focusedCell = table.getFocusedCell()
-  const focusedRowIndex =
-    focusedCell === undefined ? -1 : rows.findIndex((row) => row.id === focusedCell.row.id)
+  const activeRowIndex = rows.findIndex((row) => row.id === activeRowId)
+  const focusedRowId = table.getFocusedCell()?.row.id
+  const focusedRowIndex = rows.findIndex((row) => row.id === focusedRowId)
+
+  useLayoutEffect(() => {
+    if (activeRowIndex >= 0) {
+      rowVirtualizer.scrollToIndex(activeRowIndex, { align: 'auto' })
+    }
+  }, [activeRowIndex, rowVirtualizer])
 
   useLayoutEffect(() => {
     if (focusedRowIndex >= 0) {
@@ -1300,7 +1314,7 @@ function DataGridRow<TData extends RowData>(props: DataGridRowProps<TData>) {
 }
 
 function DataGridSubscribedRow<TData extends RowData>(
-  props: DataGridRowProps<TData> & { ariaRowIndex?: number },
+  props: DataGridRowProps<TData> & { ariaRowIndex?: number; rowRef?: Ref<HTMLTableRowElement> },
 ) {
   const { table } = useDataGridContext<TData>()
 
@@ -1325,9 +1339,14 @@ function DataGridRowImplementation<TData extends RowData>({
   ariaRowIndex,
   children,
   row,
-}: DataGridRowProps<TData> & { ariaRowIndex?: number }) {
+  rowRef,
+}: DataGridRowProps<TData> & {
+  ariaRowIndex?: number
+  rowRef?: Ref<HTMLTableRowElement>
+}) {
   const {
     activeRowId,
+    density,
     getRowStatus,
     onCellContextMenu,
     onCellContextMenuTouchStart,
@@ -1378,8 +1397,11 @@ function DataGridRowImplementation<TData extends RowData>({
 
   return (
     <tr
+      ref={rowRef}
       {...stylex.props(
         dataGridStyles.row,
+        isActive === true && dataGridStyles.rowScrollTarget,
+        isActive === true && density === 'compact' && dataGridStyles.compactRowScrollTarget,
         isSelected === true && dataGridStyles.rowSelected,
         status === 'stagedDeletion' && dataGridStyles.rowStagedDeletion,
         status === 'recentlyInserted' &&

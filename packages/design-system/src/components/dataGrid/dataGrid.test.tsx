@@ -21,6 +21,14 @@ let dragOverlaySource: { element?: Element | null; id: string } = {
   id: getDataGridHeaderSortableId('name'),
 }
 let droppingSortableId: string | null = null
+const virtualizerScrollToIndex = vi.hoisted(() => vi.fn())
+vi.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: () => ({
+    getTotalSize: () => 0,
+    getVirtualItems: () => [],
+    scrollToIndex: virtualizerScrollToIndex,
+  }),
+}))
 vi.mock('@dnd-kit/react', () => ({
   DragOverlay: ({
     children,
@@ -120,6 +128,12 @@ const rows: Person[] = [
   { id: 'person-1', name: 'Ada', role: 'Engineer' },
   { id: 'person-2', name: 'Grace', role: 'Admiral' },
 ]
+const createPeople = (length: number): Person[] =>
+  Array.from({ length }, (_, index) => ({
+    id: `person-${index + 1}`,
+    name: `Person ${index + 1}`,
+    role: 'Member',
+  }))
 
 interface TestDataGridProps {
   activeColumnId?: string | null
@@ -626,6 +640,7 @@ function ReorderableDataGrid({
 
 afterEach(() => {
   cleanup()
+  virtualizerScrollToIndex.mockClear()
   dragOverlayDropAnimation = undefined
   dragOverlaySource = { id: getDataGridHeaderSortableId('name') }
   droppingSortableId = null
@@ -763,15 +778,31 @@ describe('DataGrid', () => {
   })
 
   it('renders the default 100-row page without scroll-synchronized virtualization', () => {
-    const data = Array.from({ length: 100 }, (_, index) => ({
-      id: `person-${index + 1}`,
-      name: `Person ${index + 1}`,
-      role: 'Member',
-    }))
-    const { container } = render(<TestDataGrid data={data} rowRendering="virtual" />)
+    const { container } = render(<TestDataGrid data={createPeople(100)} rowRendering="virtual" />)
 
     expect(container.querySelectorAll('[data-slot="data-grid-row"]')).toHaveLength(100)
     expect(container.querySelector('[data-row-rendering="virtual"]')).toBeNull()
+  })
+
+  it('keeps active-row and focused-cell scrolling independent with row virtualization', () => {
+    render(
+      <TestDataGrid
+        activeRowId="person-50"
+        data={createPeople(101)}
+        initialCellSelection={[
+          {
+            anchorRowId: 'person-2',
+            anchorColumnId: 'name',
+            focusRowId: 'person-2',
+            focusColumnId: 'name',
+          },
+        ]}
+        rowRendering="virtual"
+      />,
+    )
+
+    expect(virtualizerScrollToIndex).toHaveBeenCalledWith(49, { align: 'auto' })
+    expect(virtualizerScrollToIndex).toHaveBeenCalledWith(1, { align: 'auto' })
   })
 
   it('gives TanStack focused-cell state precedence over column highlighting', () => {
