@@ -19,6 +19,14 @@ export type {
   AccordionTriggerProps,
   AccordionValue,
 } from './components/accordion/accordion'
+export { Tree } from './components/tree/tree'
+export type {
+  TreeContentProps,
+  TreeItemProps,
+  TreeRootProps,
+  TreeSectionProps,
+  TreeTriggerProps,
+} from './components/tree/tree'
 export { FloatingPanel } from './components/floatingPanel/floatingPanel'
 export type {
   FloatingPanelActionsProps,

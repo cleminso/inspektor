@@ -52,6 +52,9 @@ export const scrollAreaStyles = stylex.create({
     minWidth: 0,
     width: '100%',
   },
+  viewportFocusDelegated: {
+    outlineStyle: 'none',
+  },
   viewportContent: {
     flexGrow: 1,
     flexShrink: 1,

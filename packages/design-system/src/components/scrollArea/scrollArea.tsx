@@ -26,6 +26,7 @@ interface ScrollAreaPrivateProps extends ScrollAreaProps {
   scrollRendering?: 'default' | 'frequent'
   verticalTrackOffset?: VerticalTrackOffset
   viewportContainerType?: 'size'
+  viewportFocus?: 'self' | 'descendants'
   viewportSlot?: string
 }
 
@@ -59,6 +60,7 @@ function renderScrollArea(
     scrollRendering = 'default',
     verticalTrackOffset,
     viewportContainerType,
+    viewportFocus = 'self',
     viewportSlot = 'scroll-area-viewport',
     ...props
   }: ScrollAreaPrivateProps,
@@ -71,6 +73,7 @@ function renderScrollArea(
   )
   const viewportStyleProps = stylex.props(
     scrollAreaStyles.viewport,
+    viewportFocus === 'descendants' && scrollAreaStyles.viewportFocusDelegated,
     layout === 'content' && scrollAreaStyles.viewportContent,
     scrollbarStyles.hidden,
     scrollRendering === 'frequent' && scrollAreaStyles.viewportFrequentScroll,
@@ -134,6 +137,7 @@ function renderScrollArea(
       <BaseScrollArea.Viewport
         {...props}
         ref={setViewportRef}
+        tabIndex={viewportFocus === 'descendants' ? -1 : props.tabIndex}
         {...viewportStyleProps}
         style={{ ...viewportStyleProps.style, ...viewportBehaviorStyle }}
         data-axis={axis}
