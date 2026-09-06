@@ -424,6 +424,20 @@ export const accordionItem = {
   componentId: 'accordion',
 } satisfies NavItem
 
+export const treeItem = {
+  title: 'Tree',
+  slug: 'tree',
+  href: '/components/tree',
+  description:
+    'Scrollable hierarchical navigation with expandable sections and current-page links.',
+  importPath: '@inspektor/ds',
+  source: {
+    label: 'tree.tsx',
+    path: 'packages/design-system/src/components/tree/tree.tsx',
+  },
+  componentId: 'tree.root',
+} satisfies NavItem
+
 export const actionListItem = {
   title: 'Action List',
   slug: 'action-list',
@@ -749,6 +763,7 @@ const componentItems: NavItem[] = [
   fieldsetItem,
   textFieldItem,
   workspaceTabsItem,
+  treeItem,
   toggleGroupItem,
 ]
 

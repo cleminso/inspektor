@@ -25,6 +25,31 @@ test("extracts documented Accordion and ActionList props", () => {
   );
 });
 
+test("extracts the constrained Tree compound API", () => {
+  const expectedProps = {
+    "tree.root": ["aria-label"],
+    "tree.section": ["defaultOpen", "open", "onOpenChange", "disabled"],
+    "tree.trigger": ["children"],
+    "tree.content": ["keepMounted", "hiddenUntilFound"],
+    "tree.item": ["href", "render", "aria-current"],
+  };
+
+  for (const [componentId, names] of Object.entries(expectedProps)) {
+    const props = metadata[componentId];
+
+    assert.deepEqual(props?.map(({ name }) => name), names);
+  }
+
+  assert.equal(
+    metadata["tree.section"]?.find(({ name }) => name === "defaultOpen")?.defaultValue,
+    "false",
+  );
+  assert.equal(
+    metadata["tree.content"]?.find(({ name }) => name === "keepMounted")?.defaultValue,
+    "false",
+  );
+});
+
 test("extracts the constrained AlertDialog compound API", () => {
   assert.deepEqual(
     metadata["alertDialog.root"]?.map(({ name }) => name),

@@ -1,10 +1,10 @@
 import {
   Box,
   Button,
-  ButtonLink,
   KeyboardInput,
   ShellLayout,
   Text,
+  Tree,
   Tooltip,
   useShellLayout,
 } from '@inspektor/ds'
@@ -149,6 +149,32 @@ export function AppShellFooter(): ReactElement {
   )
 }
 
+export function AppShellNavigation({ pathname }: { pathname: string }): ReactElement {
+  return (
+    <Tree.Root aria-label="Design system navigation">
+      {navSections.map((section) => (
+        <Tree.Section
+          key={section.title}
+          defaultOpen
+        >
+          <Tree.Trigger>{section.title}</Tree.Trigger>
+          <Tree.Content>
+            {section.items.map((item) => (
+              <Tree.Item
+                key={item.href}
+                render={<Link to={item.href} />}
+                aria-current={pathname === item.href ? 'page' : undefined}
+              >
+                {item.title}
+              </Tree.Item>
+            ))}
+          </Tree.Content>
+        </Tree.Section>
+      ))}
+    </Tree.Root>
+  )
+}
+
 export function AppShell(): ReactElement {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const navigate = useNavigate()
@@ -201,56 +227,7 @@ export function AppShell(): ReactElement {
         <AppShellDetailsTargetContext.Provider value={detailsTarget}>
           <ShellLayout.Body>
             <ShellLayout.LeftDock>
-              <Box
-                as="aside"
-                height="full"
-                flexDirection="column"
-                overflowY="auto"
-                data-scroll-area="navigation"
-                padding="m"
-              >
-                <Box
-                  as="nav"
-                  flexDirection="column"
-                  gap="2xl"
-                  aria-label="Design system navigation"
-                >
-                  {navSections.map((section) => (
-                    <Box
-                      as="section"
-                      key={section.title}
-                      flexDirection="column"
-                      gap="m"
-                    >
-                      <Text
-                        as="span"
-                        variant="label"
-                        color="muted"
-                      >
-                        {section.title}
-                      </Text>
-                      <Box flexDirection="column">
-                        {section.items.map((item) => {
-                          const isActive = pathname === item.href
-                          return (
-                            <ButtonLink
-                              key={item.href}
-                              variant={isActive === true ? 'secondary' : 'ghost'}
-                              size="m"
-                              layout="row"
-                              render={<Link to={item.href} />}
-                              aria-current={isActive === true ? 'page' : undefined}
-                              radius="none"
-                            >
-                              {item.title}
-                            </ButtonLink>
-                          )
-                        })}
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
+              <AppShellNavigation pathname={pathname} />
             </ShellLayout.LeftDock>
             <ShellLayout.View>
               <Box

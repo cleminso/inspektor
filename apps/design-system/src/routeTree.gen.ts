@@ -59,6 +59,7 @@ import { Route as ComponentsTimestampValueRouteImport } from './routes/component
 import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsToggleGroupRouteImport } from './routes/components/toggle-group'
 import { Route as ComponentsTooltipRouteImport } from './routes/components/tooltip'
+import { Route as ComponentsTreeRouteImport } from './routes/components/tree'
 import { Route as ComponentsWorkspaceTabsRouteImport } from './routes/components/workspace-tabs'
 import { Route as FoundationsColorsRouteImport } from './routes/foundations/colors'
 import { Route as FoundationsTypographyRouteImport } from './routes/foundations/typography'
@@ -319,6 +320,11 @@ const ComponentsTooltipRoute = ComponentsTooltipRouteImport.update({
   path: '/components/tooltip',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTreeRoute = ComponentsTreeRouteImport.update({
+  id: '/components/tree',
+  path: '/components/tree',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsWorkspaceTabsRoute = ComponentsWorkspaceTabsRouteImport.update({
   id: '/components/workspace-tabs',
   path: '/components/workspace-tabs',
@@ -386,6 +392,7 @@ export interface FileRoutesByFullPath {
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
+  '/components/tree': typeof ComponentsTreeRoute
   '/components/workspace-tabs': typeof ComponentsWorkspaceTabsRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
@@ -441,6 +448,7 @@ export interface FileRoutesByTo {
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
+  '/components/tree': typeof ComponentsTreeRoute
   '/components/workspace-tabs': typeof ComponentsWorkspaceTabsRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
@@ -497,6 +505,7 @@ export interface FileRoutesById {
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
+  '/components/tree': typeof ComponentsTreeRoute
   '/components/workspace-tabs': typeof ComponentsWorkspaceTabsRoute
   '/foundations/colors': typeof FoundationsColorsRoute
   '/foundations/typography': typeof FoundationsTypographyRoute
@@ -554,6 +563,7 @@ export interface FileRouteTypes {
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
+    | '/components/tree'
     | '/components/workspace-tabs'
     | '/foundations/colors'
     | '/foundations/typography'
@@ -609,6 +619,7 @@ export interface FileRouteTypes {
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
+    | '/components/tree'
     | '/components/workspace-tabs'
     | '/foundations/colors'
     | '/foundations/typography'
@@ -664,6 +675,7 @@ export interface FileRouteTypes {
     | '/components/toast'
     | '/components/toggle-group'
     | '/components/tooltip'
+    | '/components/tree'
     | '/components/workspace-tabs'
     | '/foundations/colors'
     | '/foundations/typography'
@@ -720,6 +732,7 @@ export interface RootRouteChildren {
   ComponentsToastRoute: typeof ComponentsToastRoute
   ComponentsToggleGroupRoute: typeof ComponentsToggleGroupRoute
   ComponentsTooltipRoute: typeof ComponentsTooltipRoute
+  ComponentsTreeRoute: typeof ComponentsTreeRoute
   ComponentsWorkspaceTabsRoute: typeof ComponentsWorkspaceTabsRoute
   FoundationsColorsRoute: typeof FoundationsColorsRoute
   FoundationsTypographyRoute: typeof FoundationsTypographyRoute
@@ -1077,6 +1090,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsTooltipRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/tree': {
+      id: '/components/tree'
+      path: '/components/tree'
+      fullPath: '/components/tree'
+      preLoaderRoute: typeof ComponentsTreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/workspace-tabs': {
       id: '/components/workspace-tabs'
       path: '/components/workspace-tabs'
@@ -1152,6 +1172,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsToastRoute: ComponentsToastRoute,
   ComponentsToggleGroupRoute: ComponentsToggleGroupRoute,
   ComponentsTooltipRoute: ComponentsTooltipRoute,
+  ComponentsTreeRoute: ComponentsTreeRoute,
   ComponentsWorkspaceTabsRoute: ComponentsWorkspaceTabsRoute,
   FoundationsColorsRoute: FoundationsColorsRoute,
   FoundationsTypographyRoute: FoundationsTypographyRoute,
