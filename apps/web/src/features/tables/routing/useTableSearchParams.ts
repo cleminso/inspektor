@@ -4,7 +4,7 @@
  * Persistence: TanStack Router stores the state in URL search and browser history.
  * Reset boundary: table-route navigation or a search command replaces the affected projection.
  */
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { useNavigate, useSearch } from '@tanstack/react-router'
 
@@ -70,34 +70,47 @@ export function useTableExplorerSearchParams(): UseTableExplorerSearchParamsResu
     [filters, search.view, tableRowsSearch],
   )
 
-  const updateSearch = async (updates: Partial<TableRouteSearch>): Promise<void> => {
-    // Grid refinements replace the current history entry; table and tab navigation own history steps.
-    await navigate({
-      replace: true,
-      search: (currentSearch) => canonicalizeTableRouteSearch({ ...currentSearch, ...updates }),
-    })
-  }
-
-  return {
-    ...state,
-    setFilters: async (filters) => {
+  const updateSearch = useCallback(
+    async (updates: Partial<TableRouteSearch>): Promise<void> => {
+      // Grid refinements replace the current history entry; table and tab navigation own history steps.
+      await navigate({
+        replace: true,
+        search: (currentSearch) => canonicalizeTableRouteSearch({ ...currentSearch, ...updates }),
+      })
+    },
+    [navigate],
+  )
+  // Stable commands prevent consumers from treating unchanged route behavior as new state.
+  const setFilters = useCallback(
+    async (filters: TableFilterClause[]) => {
       await updateSearch({
         filters: serializeFiltersToSearchParam(filters) ?? undefined,
         page: undefined,
       })
     },
-    setPage: async (page) => {
-      await updateSearch({ page })
-    },
-    setPageSize: async (pageSize) => {
-      await updateSearch({ page: undefined, pageSize })
-    },
-    setSorting: async (sortColumn, sortDirection) => {
+    [updateSearch],
+  )
+  const setPage = useCallback(async (page: number) => updateSearch({ page }), [updateSearch])
+  const setPageSize = useCallback(
+    async (pageSize: TablePageSize) => updateSearch({ page: undefined, pageSize }),
+    [updateSearch],
+  )
+  const setSorting = useCallback(
+    async (sortColumn: string, sortDirection: TableSortDirection) => {
       await updateSearch({
         dir: sortDirection,
         page: undefined,
         sort: sortColumn,
       })
     },
+    [updateSearch],
+  )
+
+  return {
+    ...state,
+    setFilters,
+    setPage,
+    setPageSize,
+    setSorting,
   }
 }

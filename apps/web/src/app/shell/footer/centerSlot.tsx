@@ -1,4 +1,4 @@
-import { createContext, use, useState, type ReactNode } from 'react'
+import { createContext, use, useMemo, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 interface InspectorFooterCenterContextValue {
@@ -14,12 +14,10 @@ export function InspectorFooterCenterProvider({
   children: ReactNode
 }): React.ReactElement {
   const [target, setTarget] = useState<HTMLDivElement | null>(null)
+  // Keep portal consumers stable when the provider rerenders without changing its target.
+  const value = useMemo(() => ({ setTarget, target }), [target])
 
-  return (
-    <InspectorFooterCenterContext value={{ setTarget, target }}>
-      {children}
-    </InspectorFooterCenterContext>
-  )
+  return <InspectorFooterCenterContext value={value}>{children}</InspectorFooterCenterContext>
 }
 
 export function InspectorFooterCenterSlot(): React.ReactElement {

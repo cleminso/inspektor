@@ -32,6 +32,9 @@ interface DataGridFilterBuilderProps {
   onFiltersChange: (filters: TableFilterClause[]) => void | Promise<void>
 }
 
+// The optional default must keep one identity so omitted rows do not invalidate derived options.
+const emptyRows: readonly DynamicTableRow[] = []
+
 type ColumnOption = {
   label: string
   description: string
@@ -279,7 +282,7 @@ function getClauseIssue(
 export function DataGridFilterBuilder({
   columns,
   filters,
-  rows = [],
+  rows = emptyRows,
   onFiltersChange,
 }: DataGridFilterBuilderProps): React.ReactElement {
   const [draft, setDraft] = useState<FilterDraft | null>(null)

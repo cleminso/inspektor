@@ -167,10 +167,10 @@ export function TableNavigationHistoryProvider({
       getHistoryIndex(router.latestLocation),
     ),
   )
+  // Both refs start from the same history snapshot and advance only from committed router events.
   const historyRef = useRef(history)
-  const browserIndexRef = useRef(getHistoryIndex(router.latestLocation))
+  const browserIndexRef = useRef(history.entries[history.index]?.browserIndex ?? null)
   const pendingOffsetRef = useRef<number | null>(null)
-  historyRef.current = history
 
   useEffect(() => {
     const workspacePath = getTableWorkspacePath(router.latestLocation.href)

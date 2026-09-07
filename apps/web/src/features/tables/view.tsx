@@ -21,7 +21,11 @@ import { createTableSearchByName } from '@tables/workspace/tabs'
 
 export function TableExplorerScreen(): React.ReactElement {
   const { currentTableName } = useInspectorSessionState()
-  const routeSearch = useSearch({ strict: false })
+  // Unrelated URL state must not rerender the complete table explorer.
+  const routeSearch = useSearch({
+    strict: false,
+    select: (search) => ({ empty: search.empty, view: search.view }),
+  })
   const currentView = routeSearch.view === 'schema' ? 'schema' : 'data'
   const { openBaseTabs, persistTable, scope, tabs: openTabs } = useTableTabs()
   const [checkedTableNames, setCheckedTableNames] = useState<ReadonlySet<string>>(() => new Set())

@@ -37,7 +37,7 @@ describe('ScrollArea', () => {
     expect(scrollbars.every((scrollbar) => viewport?.contains(scrollbar) === false)).toBe(true)
   })
 
-  it('can retain its viewport and content while an inner control owns scrolling', () => {
+  it('retains its viewport and content while an inner control owns scrolling', () => {
     const { container } = render(<ScrollArea axis="none">Content</ScrollArea>)
 
     const viewport = container.querySelector('[data-slot="scroll-area-viewport"]')

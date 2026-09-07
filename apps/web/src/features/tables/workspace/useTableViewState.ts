@@ -430,7 +430,10 @@ export function useTableViewState({
   }, [])
   const setColumnOrder = tablePreferences.setColumnOrder
   const columnVisibilityRef = useRef(tablePreferences.columnVisibility)
-  columnVisibilityRef.current = tablePreferences.columnVisibility
+  // Column-move callbacks stay stable while reading visibility from the committed table state.
+  useLayoutEffect(() => {
+    columnVisibilityRef.current = tablePreferences.columnVisibility
+  }, [tablePreferences.columnVisibility])
   const handleColumnMove = useCallback(
     (columnId: string, direction: ColumnMoveDirection) => {
       setColumnOrder((currentColumnOrder) => {

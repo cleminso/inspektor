@@ -168,7 +168,7 @@ export function ConnectionForm({
         <Box flex={1}>
           <Button
             type="submit"
-            size="s"
+            size="m"
             layout="fill"
             disabled={isSubmitting === true}
             loading={isSubmitting === true}
@@ -180,7 +180,7 @@ export function ConnectionForm({
           <Button
             type="button"
             variant="secondary"
-            size="s"
+            size="m"
             layout="fill"
             onClick={onCancel}
             disabled={isSubmitting === true}

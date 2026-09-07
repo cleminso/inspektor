@@ -8,6 +8,7 @@ import {
   createRouter,
   useParams,
 } from '@tanstack/react-router'
+import { useRef, useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { RuntimeScopeExitGuardProvider } from '@app/providers/runtimeScopeExitGuard'
@@ -46,8 +47,20 @@ function Providers(): React.ReactElement {
 
 function Harness(): React.ReactElement {
   const search = useTableExplorerSearchParams()
+  const [, setRenderVersion] = useState(0)
+  const initialSetters = useRef({
+    setFilters: search.setFilters,
+    setPage: search.setPage,
+    setPageSize: search.setPageSize,
+    setSorting: search.setSorting,
+  })
   const { activeTabId, tabs } = useTableTabs()
   const activeTab = tabs.find((tab) => tab.id === activeTabId)
+  const settersAreStable =
+    initialSetters.current.setFilters === search.setFilters &&
+    initialSetters.current.setPage === search.setPage &&
+    initialSetters.current.setPageSize === search.setPageSize &&
+    initialSetters.current.setSorting === search.setSorting
 
   return (
     <>
@@ -58,6 +71,10 @@ function Harness(): React.ReactElement {
       <output aria-label="Active tab search">
         {activeTab?.kind === 'table' ? JSON.stringify(activeTab.search) : ''}
       </output>
+      <output aria-label="Setter identities">{String(settersAreStable)}</output>
+      <button type="button" onClick={() => setRenderVersion((version) => version + 1)}>
+        Rerender
+      </button>
       <button type="button" onClick={() => void search.setSorting('name', 'desc')}>
         Sort by name
       </button>
@@ -118,6 +135,17 @@ function createTestRouter(initialEntry: string) {
 }
 
 describe('table route search ownership', () => {
+  it('keeps setter identities stable across unrelated rerenders', async () => {
+    const router = createTestRouter('/conn/connection/tables/accounts')
+
+    render(<RouterProvider router={router} />)
+    await screen.findByRole('button', { name: 'Rerender' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Rerender' }))
+
+    expect(screen.getByLabelText('Setter identities').textContent).toBe('true')
+  })
+
   it('commits setter updates through the active route and replaces grid history', async () => {
     const router = createTestRouter(
       '/conn/connection/tables/accounts?page=4&pageSize=500&custom=discarded',

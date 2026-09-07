@@ -40,6 +40,10 @@ interface BuildDataGridColumnsOptions {
   onColumnMove?: (columnId: string, direction: ColumnMoveDirection) => void
   onRowSelectionRequest?: (rowId: TableRowId) => void
   onUndoRowDeletions?: (rowIds: readonly string[]) => void
+}
+
+/** Live values read by cell renderers without making them column-definition dependencies. */
+interface TableGridMeta {
   stagedValuesByRowId?: TableValuesByRowId
 }
 
@@ -830,7 +834,6 @@ export function buildDataGridColumns({
   onColumnMove,
   onRowSelectionRequest,
   onUndoRowDeletions,
-  stagedValuesByRowId = {},
 }: BuildDataGridColumnsOptions): ColumnDef<DataGridFeatures, DynamicTableRow, unknown>[] {
   const defaultColumnOrder = columns.map((column) => column.id)
   const selectionColumn: ColumnDef<DataGridFeatures, DynamicTableRow, unknown> = {
@@ -925,7 +928,9 @@ export function buildDataGridColumns({
             onMove={onColumnMove}
           />
         ),
-        cell: ({ row }) => {
+        cell: ({ row, table }) => {
+          const { stagedValuesByRowId = {} } =
+            (table.options.meta as TableGridMeta | undefined) ?? {}
           const rawValue = resolveStagedFieldValue(
             row.original,
             stagedValuesByRowId[row.id],

@@ -34,6 +34,18 @@ function renderGrid(options: Partial<Parameters<typeof useTableGrid>[0]> = {}) {
 }
 
 describe('useTableGrid', () => {
+  it('keeps column definitions stable when staged values change', () => {
+    const { result, rerender } = renderHook(
+      ({ stagedValuesByRowId }) => useTableGrid({ ...defaultOptions, stagedValuesByRowId }),
+      { initialProps: { stagedValuesByRowId: {} } },
+    )
+    const columns = result.current.options.columns
+
+    rerender({ stagedValuesByRowId: { 'row-1': { name: 'Grace' } } })
+
+    expect(result.current.options.columns).toBe(columns)
+  })
+
   it.each([
     { sorting: [{ id: 'name', desc: false }], expected: ['name', 'asc'] },
     { sorting: [{ id: 'role', desc: true }], expected: ['role', 'desc'] },

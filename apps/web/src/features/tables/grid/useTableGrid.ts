@@ -68,6 +68,7 @@ export function useTableGrid({
   stagedValuesByRowId,
 }: UseTableGridOptions): DataGridTable<DynamicTableRow> {
   const rowSelectionRequestRef = useRef<TableRowId | null>(null)
+  // Column definitions describe schema and behavior; mutable staged values travel through table meta.
   const columnDefs = useMemo(
     () =>
       buildDataGridColumns({
@@ -75,12 +76,11 @@ export function useTableGrid({
         onColumnMenuOpen,
         onColumnMove,
         onUndoRowDeletions,
-        stagedValuesByRowId,
         onRowSelectionRequest: (rowId) => {
           rowSelectionRequestRef.current = rowId
         },
       }),
-    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletions, stagedValuesByRowId],
+    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletions],
   )
 
   const rowSelection = useMemo<RowSelectionState>(() => {
@@ -101,6 +101,7 @@ export function useTableGrid({
       features: dataGridFeatures,
       data: rows,
       columns: columnDefs,
+      meta: { stagedValuesByRowId },
       getRowId: (row) => String(row.id),
       autoResetCellSelection: false,
       columnResizeMode: 'onChange',

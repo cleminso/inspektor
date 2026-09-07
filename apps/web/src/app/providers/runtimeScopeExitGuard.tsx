@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type PropsWithChildren,
 } from 'react'
@@ -53,13 +52,13 @@ export function useRuntimeScopeExitGuard(): RuntimeScopeExitGuard {
 
 export function useRegisterRuntimeScopeExitBlocker(blocked: boolean): void {
   const { setBlocker } = useRuntimeScopeExitGuard()
-  const blockerId = useRef(Symbol('runtime-scope-exit-blocker'))
+  // Each mounted blocker owns one identity for registration and cleanup.
+  const [blockerId] = useState(() => Symbol('runtime-scope-exit-blocker'))
 
   useEffect(() => {
-    const currentBlockerId = blockerId.current
-    setBlocker(currentBlockerId, blocked)
+    setBlocker(blockerId, blocked)
     return () => {
-      setBlocker(currentBlockerId, false)
+      setBlocker(blockerId, false)
     }
-  }, [blocked, setBlocker])
+  }, [blocked, blockerId, setBlocker])
 }

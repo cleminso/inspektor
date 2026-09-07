@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useLayoutEffect,
   useMemo,
   useRef,
   type PropsWithChildren,
@@ -85,7 +86,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   const session = useStoredConnections()
   const runtimeScopeExitGuard = useRuntimeScopeExitGuard()
   const runtimeScopeExitGuardRef = useRef(runtimeScopeExitGuard)
-  runtimeScopeExitGuardRef.current = runtimeScopeExitGuard
   const navigate = useNavigate()
   const routeParams = useParams({ strict: false })
   const isLiveQueriesRoute = useRouterState({
@@ -105,7 +105,6 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   const activeConnection =
     routeConnectionId !== null ? session.getConnection(routeConnectionId) : session.activeConnection
   const activeConnectionIdRef = useRef(activeConnection?.id ?? null)
-  activeConnectionIdRef.current = activeConnection?.id ?? null
   const branchRequestRef = useRef(0)
   const connectionPreferences =
     activeConnection === null ? null : session.getConnectionPreferences(activeConnection.id)
@@ -113,8 +112,14 @@ function InspectorSessionProviderValue({ children }: PropsWithChildren): React.R
   const currentSchemaHash = connectionPreferences?.lastSchemaHash ?? null
   const currentBranchRef = useRef(currentBranch)
   const currentSchemaHashRef = useRef(currentSchemaHash)
-  currentBranchRef.current = currentBranch
-  currentSchemaHashRef.current = currentSchemaHash
+
+  // Imperative navigation commands must observe the last committed session, not an abandoned render.
+  useLayoutEffect(() => {
+    runtimeScopeExitGuardRef.current = runtimeScopeExitGuard
+    activeConnectionIdRef.current = activeConnection?.id ?? null
+    currentBranchRef.current = currentBranch
+    currentSchemaHashRef.current = currentSchemaHash
+  }, [activeConnection?.id, currentBranch, currentSchemaHash, runtimeScopeExitGuard])
 
   useBlocker({
     enableBeforeUnload: false,

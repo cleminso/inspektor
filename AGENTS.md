@@ -18,6 +18,7 @@ Before editing files for a substantial task involving a TanStack package:
 ## Table of contents
 
 - [Active workspace](#active-workspace)
+- [Execution scope and validation](#execution-scope-and-validation)
 - [Inspektor Test](#inspektor-test)
 - [Browser verification](#browser-verification)
 - [Implementation checklists](#implementation-checklists)
@@ -45,6 +46,43 @@ Implementation work is limited to these directories:
 - `apps/inspektor-test`: Inspektor Test schema, deterministic data, cloud deployment tooling, and isolated Jazz fixtures.
 
 Other workspace packages are outside the replacement UI architecture. Do not modify them unless the user explicitly requests work in them.
+
+## Execution scope and validation
+
+Classify implementation work before editing:
+
+- Review only: report findings without editing or validating.
+- Scoped edit: apply the requested local change and run focused checks.
+- Feature completion: complete an affected feature and run affected-package checks.
+- Commit readiness: run the complete review and validation gate.
+
+Do not promote work to a broader mode without an explicit request. Commands such as “proceed” continue the established mode. Separate adjacent correctness findings from requested simplification work unless they involve security, data loss, a broken build, or a direct regression in the requested behavior.
+
+Delegate independent file groups in parallel when they do not share source files or generated output. Keep shared production files and generated artifacts under one owner. Do not parallelize builds when one package consumes another package's output.
+
+Run only checks invalidated by files changed since their last successful result:
+
+- Documentation only: documentation formatting and checks.
+- Tests only: the changed test and its affected test suite.
+- Styles only: StyleX lint, focused tests, and browser verification when appearance changes.
+- Local implementation: focused tests, changed-file lint, and package typecheck.
+- Public API or import graph: package build and consumer typecheck.
+- Generated metadata source: stabilize source, then regenerate and check metadata once.
+- Cross-package behavior: affected-package test suites.
+- Commit readiness: the complete prescribed gate.
+
+Use this validation order when applicable:
+
+1. Focused test for changed behavior.
+2. Changed-file lint.
+3. Package typecheck for implementation or public-type changes.
+4. Browser verification for changed user-visible behavior.
+5. Build for public API, import graph, bundling, or generated-output changes.
+6. Package-wide tests for feature completion, cross-package behavior, or commit readiness.
+
+Do not rerun builds for test-only or documentation-only changes. Do not rerun a successful check unless later edits invalidate it. Run documented PNPM commands directly; do not wrap TypeScript, Vitest, build, or generation commands with output-transforming command wrappers.
+
+Use one component-level review and one complete-diff review. Repeat the complete-diff review only when a finding changes production behavior. Treat staged-state differences as a Git status to report, not a reason to repeat implementation review. Never modify the index without an explicit request.
 
 ## Inspektor Test
 
@@ -144,10 +182,10 @@ Example: `docs/todo/table-explorer.md` tracks the Table Explorer selection and p
 ## Editing and validation
 
 - Preserve existing file formatting and exclude unrelated formatting churn from behavioral changes.
-- Substantial refactors require a fresh whole-diff simplification pass across staged and unstaged changes. Search for newly single-use helpers, obsolete compatibility paths, dead mocks, redundant effects, and comments that only narrate visible code. Preserve local comments that encode ownership boundaries, invariants, failure contracts, or architectural reasoning, even when broader documentation covers the same system. Continue until a fresh pass finds no meaningful reduction; skip this gate for small isolated changes.
-- After editing, run `pnpm -r --if-present format`, affected-package lint, and affected-package typecheck before considering the work complete.
+- For feature completion and commit readiness, substantial refactors require a fresh whole-diff simplification pass across staged and unstaged changes. Search for newly single-use helpers, obsolete compatibility paths, dead mocks, redundant effects, and comments that only narrate visible code. Preserve local comments that encode ownership boundaries, invariants, failure contracts, or architectural reasoning, even when broader documentation covers the same system. Skip this gate for scoped edits and small isolated changes.
+- For feature completion and commit readiness, run `pnpm -r --if-present format`, affected-package lint, and affected-package typecheck. For scoped edits, format only changed files or their affected package.
 - After a multi-hunk or replacement patch, inspect the resulting file or semantic diff before running tests.
-- Validate in order: focused test, changed-file lint, browser behavior when applicable, affected-package typecheck and build, then one package-wide test pass.
+- Follow [Execution scope and validation](#execution-scope-and-validation) instead of running the complete validation chain for every edit.
 - Run StyleX lint immediately after editing styles; follow a nearby passing property order instead of guessing or alphabetizing it.
 - Prefer contract invariants over manually calculated expectations for long identifiers, Unicode strings, ranges, and offsets.
 - Stabilize source APIs before regenerating metadata, and commit generated output with its source change.

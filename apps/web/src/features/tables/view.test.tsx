@@ -28,9 +28,19 @@ const mocks = vi.hoisted(() => ({
 }))
 const loadPinnedTableNames = vi.hoisted(() => vi.fn(() => new Set<string>()))
 const savePinnedTableNames = vi.hoisted(() => vi.fn())
+const useSearch = vi.hoisted(() =>
+  vi.fn(
+    (options?: {
+      select?: (search: { empty?: string; ignored?: string; view?: string }) => {
+        empty?: string
+        view?: string
+      }
+    }) => options?.select?.(mocks.routeSearch) ?? mocks.routeSearch,
+  ),
+)
 
 vi.mock('@tanstack/react-router', () => ({
-  useSearch: () => mocks.routeSearch,
+  useSearch,
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -117,9 +127,20 @@ beforeEach(() => {
   mocks.tableTabsViewProps = null
   loadPinnedTableNames.mockClear()
   savePinnedTableNames.mockClear()
+  useSearch.mockClear()
 })
 
 describe('TableExplorerScreen', () => {
+  it('subscribes only to the route search fields it renders', () => {
+    render(<TableExplorerScreen />)
+
+    const options = useSearch.mock.calls[0]?.[0]
+    expect(options?.select?.({ empty: 'true', ignored: 'value', view: 'schema' })).toEqual({
+      empty: 'true',
+      view: 'schema',
+    })
+  })
+
   it('uses the tab workspace scope for pinned tables', () => {
     render(<TableExplorerScreen />)
 

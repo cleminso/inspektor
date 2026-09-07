@@ -191,6 +191,25 @@ describe('useJazzQueryState', () => {
     expect(manager.computeKey).toHaveBeenLastCalledWith(equivalentQuery, undefined)
   })
 
+  it('observes the latest onDelta callback without resubscribing', () => {
+    const firstOnDelta = vi.fn()
+    const latestOnDelta = vi.fn()
+    const { rerender } = renderHook(
+      ({ onDelta }) => useJazzQueryState(queryManager, query, undefined, onDelta),
+      { initialProps: { onDelta: firstOnDelta } },
+    )
+    const delta: SubscriptionDelta<DynamicTableRow> = { all: [], delta: [] }
+
+    rerender({ onDelta: latestOnDelta })
+    act(() => {
+      for (const listener of listeners) listener.onDelta?.(delta)
+    })
+
+    expect(entry.subscribe).toHaveBeenCalledOnce()
+    expect(firstOnDelta).not.toHaveBeenCalled()
+    expect(latestOnDelta).toHaveBeenCalledWith(delta)
+  })
+
   it('unsubscribes from a replaced manager and reads the replacement snapshot', () => {
     const replacementState = {
       status: 'fulfilled' as const,

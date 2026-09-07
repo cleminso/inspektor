@@ -12,6 +12,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { DataGrid, dataGridFeatures } from '@inspektor/ds'
 
 import { buildDataGridColumns } from '@tables/grid/buildColumns'
+import type { TableValuesByRowId } from '@tables/tableTypes'
 
 const doNothing = () => undefined
 
@@ -53,7 +54,7 @@ function TestTable({
   initialColumnVisibility?: ColumnVisibilityState
   onColumnMenuOpen?: (columnId: string) => void
   onColumnMove?: Parameters<typeof buildDataGridColumns>[0]['onColumnMove']
-  stagedValuesByRowId?: Parameters<typeof buildDataGridColumns>[0]['stagedValuesByRowId']
+  stagedValuesByRowId?: TableValuesByRowId
   onUndoRowDeletions?: (rowIds: readonly string[]) => void
   onSortingChange?: () => void
 }): React.ReactElement {
@@ -76,15 +77,15 @@ function TestTable({
         ],
         onColumnMenuOpen,
         onColumnMove,
-        stagedValuesByRowId,
         onUndoRowDeletions,
       }),
-    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletions, stagedValuesByRowId],
+    [columns, onColumnMenuOpen, onColumnMove, onUndoRowDeletions],
   )
   const table = useTable({
     features: dataGridFeatures,
     columns: columnDefs,
     data: data ?? [{ id: 'row-1', name: 'Ada' } as DynamicTableRow],
+    meta: { stagedValuesByRowId },
     enableRowSelection: (row) => disabledRowIds?.has(row.id) !== true,
     getRowId: (row) => String(row.id),
     initialState:

@@ -1,6 +1,6 @@
 import type { QueryBuilder, QueryOptions, SubscriptionDelta } from 'jazz-tools'
 import type { JazzClient } from 'jazz-tools/react'
-import { useCallback, useEffectEvent, useRef, useSyncExternalStore } from 'react'
+import { useCallback, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
 
 /** Stable state projection exposed by one Jazz orchestrator cache entry. */
 export type JazzQueryState<T> =
@@ -34,24 +34,24 @@ export function useJazzQueryState<T extends { id: string }>(
   onDelta?: (delta: SubscriptionDelta<T>) => void,
 ): JazzQueryState<T> {
   const key = manager !== null && query !== undefined ? manager.computeKey(query, options) : null
-  const queryRef = useRef(query)
-  queryRef.current = query
-  const optionsRef = useRef(options)
-  optionsRef.current = options
-  const notifyDelta = useEffectEvent((delta: SubscriptionDelta<T>) => onDelta?.(delta))
+  const inputsRef = useRef({ query, options, onDelta })
+  // Subscription callbacks must use committed inputs without changing subscription identity.
+  useLayoutEffect(() => {
+    inputsRef.current = { query, options, onDelta }
+  })
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
-      const currentQuery = queryRef.current
+      const { query: currentQuery, options: currentOptions } = inputsRef.current
       if (manager === null || currentQuery === undefined || key === null) {
         return () => undefined
       }
 
-      manager.makeQueryKey(currentQuery, optionsRef.current)
+      manager.makeQueryKey(currentQuery, currentOptions)
       const entry = manager.getCacheEntry<T>(key)
       return entry.subscribe({
         onDelta: (delta) => {
           try {
-            notifyDelta(delta)
+            inputsRef.current.onDelta?.(delta)
           } finally {
             onStoreChange()
           }

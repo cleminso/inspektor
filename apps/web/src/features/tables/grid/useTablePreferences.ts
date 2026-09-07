@@ -1,5 +1,5 @@
 import type { ColumnOrderState, OnChangeFn } from '@tanstack/react-table'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import {
   getConnectionScopedStorageKey,
@@ -79,7 +79,10 @@ export function useTablePreferences({
     setPreferenceState({ tableKey, preferences })
   }
   const preferencesRef = useRef(preferences)
-  preferencesRef.current = preferences
+  // Stable persistence callbacks must read only preferences that reached the committed UI.
+  useLayoutEffect(() => {
+    preferencesRef.current = preferences
+  }, [preferences])
   const columnOrder = useMemo(
     () => normalizeColumnOrder(preferences.order, columnIds),
     [columnIds, preferences.order],
@@ -128,13 +131,13 @@ export function useTablePreferences({
     [columnIds, storageKey, tableKey],
   )
 
-  const columnVisibility = useMemo(
-    () =>
-      Object.fromEntries(
-        columnIds.map((columnId) => [columnId, preferences.hidden.includes(columnId) === false]),
-      ),
-    [columnIds, preferences.hidden],
-  )
+  const columnVisibility = useMemo(() => {
+    // Hidden columns are membership data; a Set avoids rescanning the array for every column.
+    const hiddenColumnIds = new Set(preferences.hidden)
+    return Object.fromEntries(
+      columnIds.map((columnId) => [columnId, hiddenColumnIds.has(columnId) === false]),
+    )
+  }, [columnIds, preferences.hidden])
 
   return {
     columnOrder,

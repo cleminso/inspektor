@@ -19,6 +19,15 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[06/09/26]
+
+### React render diagnostics
+
+- [x] Keep table column definitions stable while staged cell values change by reading staged values from table metadata.
+- [x] Limit the explorer route subscription to the `view` and `empty` fields rendered by the screen.
+- [x] Preserve table search command identities across unrelated renders.
+- [x] Keep Jazz query subscriptions and table interaction refs synchronized after commit instead of mutating refs during render.
+
 [05/09/26]
 
 ### Loaded-page data export
