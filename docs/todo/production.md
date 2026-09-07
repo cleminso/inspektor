@@ -32,7 +32,9 @@ This checklist records production asset-delivery requirements that cannot be val
 
 ## Open product work
 
-No open product work.
+[07/09/26]
+
+- [ ] Define privacy-safe production error and availability observability without collecting connection credentials, inspected data, or Jazz server responses.
 
 ## Work outside the foundation scope
 

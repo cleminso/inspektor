@@ -325,11 +325,44 @@ test('recovers when connection schema validation initially finds no schemas', as
   const submit = page.getByRole('button', { name: 'Save connection' })
   await submit.click()
 
-  const error = page.getByRole('status').filter({ hasText: 'No stored schemas found' })
-  await expect(error).toContainText('This app has no published schema.')
+  const error = page.getByRole('status').filter({ hasText: 'No published schemas available' })
+  await expect(error).toContainText('This app has no published schemas.')
   await expect(page).toHaveURL(/\/conn\/new/)
   await expect(submit).toBeEnabled()
 
+  await submit.click()
+  await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
+})
+
+test('rejects invalid connection credentials and succeeds after correction', async ({ page }) => {
+  const invalidAdminSecret = 'invalid-admin-secret'
+
+  await page.goto('/conn/new')
+  await fillConnectionForm(page)
+  await page.getByRole('textbox', { name: 'Admin secret' }).fill(invalidAdminSecret)
+  const submit = page.getByRole('button', { name: 'Save connection' })
+  await submit.click()
+
+  const error = page.getByRole('status').filter({
+    hasText: 'The server rejected this connection',
+  })
+  await expect(error).toContainText('Check the app ID and admin secret.')
+  await expect(error).not.toContainText(invalidAdminSecret)
+  await expect(page).toHaveURL(/\/conn\/new/)
+  await expect(page.getByRole('list', { name: 'Tables' })).toHaveCount(0)
+  await expect(submit).toBeEnabled()
+  expect(browserErrors.length, 'expected the rejected schema requests').toBeGreaterThan(0)
+  expect(
+    browserErrors.every(
+      (message) =>
+        message ===
+        'Failed to load resource: the server responded with a status of 401 (Unauthorized)',
+    ),
+    'unexpected browser errors while rejecting the connection',
+  ).toBe(true)
+  browserErrors = []
+
+  await page.getByRole('textbox', { name: 'Admin secret' }).fill(connection.adminSecret)
   await submit.click()
   await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
 })
@@ -607,7 +640,7 @@ test('clears all checked rows when closing the row pane', async ({ page }) => {
   })
   await firstRow.click()
   await secondRow.click()
-  await page.getByRole('button', { name: 'Close', exact: true }).click()
+  await page.getByRole('button', { name: 'Close editor', exact: true }).click()
 
   await expect(firstRow).not.toBeChecked()
   await expect(secondRow).not.toBeChecked()

@@ -281,7 +281,7 @@ Use validation that matches the boundary changed:
 | Route boundary                          | Route behavior test and product build output inspection                                                  |
 | Package metadata such as `sideEffects`  | Verify modules have no required import-time effects and inspect consumer build behavior                  |
 
-Run the focused validation commands recorded in `AGENTS.md` and the relevant feature checklist. A passing package build does not prove the application resolves the same contract; a passing source-consuming application build does not prove that the private package distribution is valid.
+Run the focused validation commands in [.opencode/skills/inspektor-workflow/references/validation.md](.opencode/skills/inspektor-workflow/references/validation.md) and the relevant feature checklist. A passing package build does not prove the application resolves the same contract; a passing source-consuming application build does not prove that the private package distribution is valid.
 
 ## Glossary
 

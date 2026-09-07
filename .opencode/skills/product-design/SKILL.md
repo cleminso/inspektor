@@ -1,6 +1,6 @@
 ---
 name: product-design
-description: Applies Inspektor product-design judgment to user-visible UI decisions and records accepted reasoning beside the code. Use when shaping, implementing, reviewing, or hardening product interfaces, design-system semantics, interaction states, visual hierarchy, color, spatial decisions, accessibility, resilience, or product copy.
+description: Applies Inspektor product-design judgment to user-visible UI decisions and records accepted reasoning beside the code. Use when shaping, implementing, reviewing, or hardening product interfaces, design-system semantics, interaction states, visual hierarchy, color, spatial decisions, accessibility, resilience, product copy, or UI implementation checklists.
 ---
 
 # Inspektor Product Design
@@ -11,6 +11,7 @@ description: Applies Inspektor product-design judgment to user-visible UI decisi
 - [Request modes](#request-modes)
 - [Reference routing](#reference-routing)
 - [Recording decisions](#recording-decisions)
+- [Implementation checklists](#implementation-checklists)
 - [Validation](#validation)
 
 ## Operating contract
@@ -42,10 +43,10 @@ For color systems, token naming, theming boundaries, or component color states:
 
 1. Read [colorSystem.md](colorSystem.md).
 2. Read [colorTokenLayers.md](colorTokenLayers.md) when adding, moving, exposing, or reviewing token ownership.
-3. Load `create-inspektor-component` when component implementation changes.
-4. Load `document-inspektor-component` when public component documentation or examples change.
+3. Load `create-inspector-component` when component implementation changes.
+4. Load `document-inspector-component` when public component documentation or examples change.
 
-Follow `AGENTS.md` for architecture, constrained APIs, implementation checklists, and validation order. Canonical component behavior remains with the component skills and source code rather than being duplicated here.
+Follow `AGENTS.md` for architecture and constrained APIs. Load `inspektor-workflow` for scope and validation. Canonical component behavior remains with the component skills and source code.
 
 ## Recording decisions
 
@@ -58,6 +59,26 @@ Record accepted reasoning according to its role:
 - Tests and linters enforce deterministic parts of the decision.
 
 Do not promote one implementation into guidance without evidence that it represents an accepted reusable decision. Keep coverage gaps explicit instead of inventing a standard.
+
+## Implementation checklists
+
+Use one `docs/todo/{elementName}.md` file per UI element. Each checklist contains a table of contents and these sections:
+
+- Implemented foundation
+- Open product work
+- Work outside the foundation scope
+- Settled interaction decisions
+- Open design decisions
+- Validation checklist
+
+For each implementation:
+
+1. Create or update the relevant checklist.
+2. Add a `[DD/MM/YY]` block above older blocks in the affected section; never rewrite an existing block's date.
+3. Mark completed work with `[x]`.
+4. Record newly discovered open work, exclusions, or design decisions instead of implementing them without approval.
+5. Do not implement items marked as open or out of scope unless the user explicitly requests them.
+6. Route ideas for another UI element to that element's checklist.
 
 ## Validation
 

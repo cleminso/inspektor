@@ -1,5 +1,5 @@
 ---
-name: document-inspektor-component
+name: document-inspector-component
 description: Generates and updates `apps/design-system` documentation for `@inspektor/ds` components using registry metadata, executable raw-source examples, generated props, and Shiki code blocks. Use when adding a component page, changing a documented component API, updating examples, or fixing generated prop metadata.
 ---
 
@@ -20,13 +20,13 @@ description: Generates and updates `apps/design-system` documentation for `@insp
 - Add the component to `apps/design-system/src/lib/registry.ts` only when its page exists.
 - Give component items a stable `componentId`; do not use readiness or placeholder status markers.
 - Include title, route, description, package import path, and package source reference.
-- Register `{ componentId, exportName, inheritedProps }` in `scripts/extract-props.mjs`.
+- Register `{ componentId, exportName, inheritedProps }` in `apps/design-system/scripts/extract-props.mjs`.
 - Add a failing extractor test when the component export shape or inherited-prop policy is new.
 - Put page content under `src/components/content/components/{componentName}/`.
 - Keep each executable example in its own camelCase TSX file.
 - Import each example normally for preview and with `?raw` for displayed source.
 - Use `PageHeader`, `Section`, `Example`, `CodeBlock`, and `PropsTable` rather than recreating page chrome.
-- Add a static route under `src/routes/components/`; never hand-edit `routeTree.gen.ts`. Router generation may update the generated tree as a consequence of validation; review that generated change rather than recreating it manually.
+- Add a static route under `apps/design-system/src/routes/components/`; never hand-edit `apps/design-system/src/routeTree.gen.ts`. Router generation may update the generated tree as a consequence of validation; review that generated change rather than recreating it manually.
 
 ## Props workflow
 

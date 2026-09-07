@@ -65,7 +65,7 @@
 
 - [x] Give every finite Base UI-generated state and data attribute a named StyleX rule in each wrapper callback, including empty rules for intentionally unstyled capabilities.
 - [x] Keep empty capability rules internal so Base UI remains the source of DOM attributes and consumers do not gain styling escape hatches.
-- [x] Require the same attribute-rule inventory in the `create-inspektor-component` workflow.
+- [x] Require the same attribute-rule inventory in the `create-inspector-component` workflow.
 
 ## Component audit
 

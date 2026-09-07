@@ -1,0 +1,18 @@
+# Inspektor
+
+Inspektor is a browser-based inspector for Jazz applications. It displays published schemas, tables, rows, permissions, and live-query activity.
+
+## Links
+
+- Product: https://inspektor.dev
+- Source: https://github.com/cleminso/inspektor
+- Design guide: https://github.com/cleminso/inspektor/blob/main/DESIGN.md
+- Project guide: https://github.com/cleminso/inspektor/blob/main/README.md
+- Architecture: https://github.com/cleminso/inspektor/blob/main/ARCHITECTURE.md
+- Product design: https://github.com/cleminso/inspektor/blob/main/docs/design-document.md
+- Frontend structure: https://github.com/cleminso/inspektor/blob/main/docs/frontendStructure.md
+- Jazz documentation: https://jazz.tools/docs
+
+## Connection model
+
+Users provide a Jazz server URL, app ID, admin secret, environment, and branch. Connection profiles are stored in the browser's local storage. Credentials are used only with the configured Jazz server and must not be placed in URLs, logs, screenshots, or shared browser profiles.

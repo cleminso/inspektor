@@ -1,5 +1,5 @@
 ---
-name: create-inspektor-component
+name: create-inspector-component
 description: Creates or updates `@inspektor/ds` components by wrapping Base UI primitives and applying Inspektor StyleX tokens and styles. Use when adding components under `packages/design-system/src/components`, changing component APIs, wrapping Base UI, building compound design-system components, or implementing Base UI Scroll Area, overlay scrollbars, scrollbar gutter fixes, and nested scroll ownership.
 ---
 
@@ -20,11 +20,11 @@ description: Creates or updates `@inspektor/ds` components by wrapping Base UI p
 
 1. Read `AGENTS.md` and inspect adjacent components and tokens.
 2. Confirm the installed `@base-ui/react` version from the workspace manifests.
-3. Read Base UI's `llms.txt`, relevant handbook pages, matching API reference, and tagged source.
+3. Read Base UI's [llms.txt](https://base-ui.com/llms.txt), relevant handbook pages, matching API reference, and tagged source.
 4. Complete the audit in [componentAudit.md](references/componentAudit.md) for every wrapped part.
 5. Write the required behavioral, type, or contract test.
 6. Implement the wrapper with the policies in [REFERENCE.md](REFERENCE.md).
-7. Add documentation with the `document-inspektor-component` skill.
+7. Add documentation with the `document-inspector-component` skill.
 
 For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nested scroll-owner work, also follow [scrollArea.md](references/scrollArea.md).
 
@@ -89,7 +89,7 @@ For Base UI Scroll Area, overlay scrollbar, gutter, sticky-header track, or nest
 
 - `pnpm --filter @inspektor/ds typecheck`
 - `pnpm --filter @inspektor/ds build`
-- Run focused package lint from `packages/design-system`, for example `pnpm exec oxlint src/components/{componentName}/{componentName}.tsx src/components/{componentName}/{componentName}.styles.ts src/index.ts`. Include `src/primitives/createStateStyleProps.ts` when changing the shared adapter.
+- Run focused package lint from `packages/design-system`, for example `pnpm exec oxlint src/components/{componentName}/{componentName}.tsx src/components/{componentName}/{componentName}.styles.ts src/index.ts`. Include the shared adapter when changing it.
 - Classify full-package lint findings as changed-file failures or existing repository failures. Fix all changed-file failures without expanding the task into unrelated cleanup.
 - Run package-scoped formatting only when a shared formatter configuration preserves adjacent conventions. Do not normalize unrelated files to formatter defaults.
 - Complete the documentation workflow and its validation commands.
