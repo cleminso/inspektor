@@ -45,16 +45,16 @@ function RuntimeErrorStatus(): React.ReactElement {
           variant="label"
           color="error"
         >
-          Couldn't initialize Inspektor
+          Connection failed
         </Text>
-        <Text color="muted">Check your connection and schema details, then retry.</Text>
+        <Text color="muted">Check the connection details and try again.</Text>
         <Button
           type="button"
           size="s"
           variant="secondary"
           onClick={retryRuntime}
         >
-          Retry initialization
+          Try again
         </Button>
       </Box>
     </Box>

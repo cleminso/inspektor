@@ -93,10 +93,12 @@ it('shows safe runtime recovery with or without a selected table', () => {
   const { rerender } = render(<TableTabsView tableName={null} />)
 
   const alert = screen.getByRole('alert')
-  expect(alert.textContent).toContain("Couldn't initialize Inspektor")
+  expect(alert.textContent).toContain('Connection failed')
+  expect(alert.textContent).toContain('Check the connection details and try again.')
+  expect(alert.textContent).not.toContain("Couldn't initialize Inspektor")
   expect(alert.textContent).not.toContain('Runtime failed')
   expect(screen.queryByText('New table view content')).toBeNull()
-  fireEvent.click(screen.getByRole('button', { name: 'Retry initialization' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
   expect(mocks.retryRuntime).toHaveBeenCalledOnce()
 
   mocks.state.activeTabId = 'table:accounts'

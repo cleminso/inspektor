@@ -184,8 +184,8 @@ export async function resolveRuntimeTarget({
  * Resolves the authoritative connection-entry target from persisted Inspektor state.
  *
  * The parent connection loader uses this path for saved clicks, direct URLs, and refreshes. A
- * remembered schema remains usable when discovery fails; without one, the loader preserves the
- * discovery error for route-owned error presentation.
+ * Schema discovery must succeed before the runtime target is committed so connection failures stay
+ * owned by the route error boundary.
  */
 export async function resolveStoredRuntimeTarget({
   connectionId,
@@ -212,21 +212,7 @@ export async function resolveStoredRuntimeTarget({
   ) {
     return handoff.target
   }
-  let schemaCatalogue: readonly SchemaCatalogueRecord[]
-  try {
-    schemaCatalogue = await fetchConnectionSchemaCatalogue(connection)
-  } catch (error) {
-    if (preferredSchemaHash === null) {
-      throw error
-    }
-
-    return {
-      connectionId,
-      branch,
-      schemaHash: preferredSchemaHash,
-      schemaCatalogue: [],
-    }
-  }
+  const schemaCatalogue = await fetchConnectionSchemaCatalogue(connection)
 
   const schemaHash = resolveDefaultSchemaHash(schemaCatalogue, schemaHashOverride)
   return schemaHash === null ? null : { connectionId, branch, schemaHash, schemaCatalogue }

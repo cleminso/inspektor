@@ -237,20 +237,16 @@ describe('resolveStoredRuntimeTarget', () => {
     })
   })
 
-  it('retains an unverified persisted target when direct-link validation is unavailable', async () => {
-    fetchSchemaHashes.mockRejectedValueOnce(new Error('Network unavailable'))
+  it('preserves discovery failures when a remembered schema cannot be verified', async () => {
+    const error = new Error('Network unavailable')
+    fetchSchemaHashes.mockRejectedValueOnce(error)
 
     await expect(
       resolveStoredRuntimeTarget({
         connectionId: 'connection-1',
         store: createStore('schema-1'),
       }),
-    ).resolves.toEqual({
-      connectionId: 'connection-1',
-      branch: 'main',
-      schemaHash: 'schema-1',
-      schemaCatalogue: [],
-    })
+    ).rejects.toBe(error)
     expect(fetchSchemaHashes).toHaveBeenCalledOnce()
   })
 

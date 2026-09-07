@@ -11,6 +11,11 @@
 
 ## Implemented foundation
 
+[07/09/26]
+
+- [x] Keep failed saved-connection discovery in the route boundary instead of mounting an unverified remembered schema.
+- [x] Present runtime recovery as a concise connection error with one retry action.
+
 [03/09/26]
 
 - [x] Rename the Queries workspace to Live queries and move its entry point to `/conn/:connectionId/live-queries`.
@@ -157,6 +162,10 @@
 
 ## Settled interaction decisions
 
+[07/09/26]
+
+- Saved connection entry requires successful schema discovery before replacing the active runtime. This supersedes retaining an unverified remembered target when discovery fails.
+
 [25/08/26]
 
 - Initial table routing reuses workspace-scoped recent-view persistence and its search state instead of adding a second last-table preference.
@@ -210,6 +219,11 @@
 - [ ] Decide the unavailable-resource behavior when a table route does not exist in the newly selected schema.
 
 ## Validation checklist
+
+[07/09/26]
+
+- [x] Cover remembered-schema discovery failure and concise runtime recovery copy.
+- [x] Verify changed-file lint, Inspektor typecheck, and connection failure presentation in the browser.
 
 [29/08/26]
 
