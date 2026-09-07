@@ -6,18 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SelectedTableView } from '@tables/workspace/selectedView'
 
 let mountCount = 0
-const inspectorState = {
-  runtime: {
-    wasmSchema: null as Record<string, unknown> | null,
-  },
-}
-
-vi.mock('@app/providers/inspectorProvider', () => ({
-  useRuntimeSchema: () => inspectorState.runtime.wasmSchema,
-}))
+const searchState = { view: 'data' as 'data' | 'schema' }
 
 vi.mock('@tables/routing/useTableSearchParams', () => ({
-  useTableExplorerSearchParams: () => ({ view: 'data' }),
+  useTableExplorerSearchParams: () => searchState,
 }))
 
 vi.mock('@tables/workspace/tableView', () => ({
@@ -28,17 +20,17 @@ vi.mock('@tables/workspace/tableView', () => ({
 }))
 
 vi.mock('@tables/schema/view', () => ({
-  SchemaView: () => null,
+  SchemaView: ({ tableName }: { tableName: string }) => <div>{`Schema: ${tableName}`}</div>,
 }))
 
 afterEach(() => {
   cleanup()
   mountCount = 0
-  inspectorState.runtime.wasmSchema = null
+  searchState.view = 'data'
 })
 
 describe('SelectedTableView', () => {
-  it('keeps the table workspace mounted without schema metadata', () => {
+  it('renders table data without reading schema metadata', () => {
     render(<SelectedTableView tableName="accounts" />)
 
     expect(screen.getByText('accounts:1')).not.toBeNull()
@@ -46,12 +38,19 @@ describe('SelectedTableView', () => {
   })
 
   it('remounts table-scoped data state when the table changes', () => {
-    inspectorState.runtime.wasmSchema = {}
     const { rerender } = render(<SelectedTableView tableName="accounts" />)
     expect(screen.getByText('accounts:1')).not.toBeNull()
 
     rerender(<SelectedTableView tableName="users" />)
 
     expect(screen.getByText('users:2')).not.toBeNull()
+  })
+
+  it('renders the selected schema view', () => {
+    searchState.view = 'schema'
+
+    render(<SelectedTableView tableName="accounts" />)
+
+    expect(screen.getByText('Schema: accounts')).not.toBeNull()
   })
 })

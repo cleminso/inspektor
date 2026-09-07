@@ -20,7 +20,7 @@ the product direction.
 - [Known pain points](#known-pain-points)
 - [Inspektor](#inspektor)
   - [Runtime bootstrap](#runtime-bootstrap)
-    - [Accepted-intent WASM preparation](#accepted-intent-wasm-preparation)
+    - [Connection-entry loading and WASM preparation](#connection-entry-loading-and-wasm-preparation)
     - [Startup chain](#startup-chain)
     - [Failure and ownership model](#failure-and-ownership-model)
     - [Runtime implementation map](#runtime-implementation-map)
@@ -105,7 +105,8 @@ flowchart TD
       SessionProvider --> AcceptedIntent["Accepted connection intent"]
       AcceptedIntent --> WasmPreparation["prepareJazzWasm: one shared promise"]
       WasmPreparation --> WasmLoader["Jazz loadWasmModule"]
-      ConnectionRoute --> TargetResolver["resolveStoredTablesNavigationTarget"]
+      ConnectionRoute -->|valid saved connection| WasmPreparation
+      ConnectionRoute --> TargetResolver["resolveStoredRuntimeTarget"]
       TargetResolver --> SchemaHashes["fetchSchemaHashes"]
       ConnectionRoute --> RuntimeBoundary["InspectorRuntimeBoundary"]
       RuntimeBoundary -->|setConnectionContext| SessionProvider
@@ -129,8 +130,8 @@ flowchart TD
     subgraph RoutesGroup["Local-context routes"]
       SessionProvider --> Connections["/conn and /conn/new"]
       Connections --> AddConnection["AddConnectionView"]
-      AddConnection --> AddConnectionFlow["useAddConnectionFlow"]
-      AddConnectionFlow --> FormSchemaDiscovery["fetchSchemaHashes for form validation"]
+      AddConnection --> AddConnectionFlow["useConnectionFormFlow"]
+      AddConnectionFlow --> FormSchemaDiscovery["fetchConnectionSchemaCatalogue"]
       AddConnectionFlow -->|saveConnection and setConnectionContext| SessionProvider
       AddConnectionFlow --> AcceptedIntent
       AddConnectionFlow --> ConnectionRoute
@@ -464,10 +465,9 @@ Must support:
 
 #### First-run flow
 
-1. User fills `AddConnectionForm` with connection credentials
-2. It calls `useAddConnectionFlow` with `fetchSchemaHashes` to verify app credentials match
-3. Once validated, user chooses one published schema hash
-4. `app` persists the resolved connections
+1. The user fills `ConnectionForm` with connection credentials.
+2. `useConnectionFormFlow` validates the input and fetches the schema catalogue.
+3. The flow selects the deployed schema when available, persists the connection and runtime context, and opens the table route.
 
 #### Connection switching
 
@@ -510,24 +510,26 @@ UI representation:
 
 Runtime bootstrap turns a selected connection, branch, and schema hash into the active Inspektor runtime. All data surfaces depend on this runtime.
 
-#### Accepted-intent WASM preparation
+#### Connection-entry loading and WASM preparation
 
-Connection actions start `prepareJazzWasm()` only after the runtime-scope exit guard accepts the action and before navigation begins. This applies to saved-connection opening and accepted add or edit flows. The action does not await preparation, so route resolution and WASM initialization can overlap.
+Accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection route also starts preparation after confirming that its saved connection exists and before schema-catalogue discovery. This covers saved actions, accepted add or edit flows, direct URLs, refreshes, and history navigation while avoiding work for unknown connection IDs.
 
 `jazzWasmPreparation.ts` owns one application-wide promise. It calls Jazz's public `loadWasmModule()` API and shares the same attempt across repeated accepted actions and React remounts. `InspectorProvider` joins that promise before mounting `JazzProvider`, preventing concurrent initialization against the installed Jazz version.
 
-Direct URLs, refreshes, history navigation, and `InspectorRuntimeBoundary` session synchronization do not start preparation. If no accepted action created a promise, `InspectorProvider` mounts `JazzProvider` without an additional gate. This keeps direct route entry on Jazz's normal startup path.
+Add and edit validation hand their resolved target to the matching route loader. The handoff is single-use and accepted only when connection ID, credentials, branch, and schema hash still match persisted state. This avoids repeating schema and permissions-head requests while keeping the route loader authoritative. `InspectorRuntimeBoundary` session synchronization does not start preparation.
 
 #### Startup chain
 
-1. An accepted pre-navigation connection action starts the shared WASM preparation without awaiting it. Direct route entry skips this step.
-2. The parent connection route resolves the saved connection and branch, then awaits schema-catalogue discovery. A remembered schema hash remains usable when discovery fails.
+1. An accepted connection action may start shared WASM preparation without awaiting it.
+2. The parent connection route confirms the saved connection, starts the same preparation, and resolves the branch and schema catalogue. It consumes a matching validated target handoff or performs discovery; a remembered schema hash remains usable when discovery fails.
 3. `InspectorRuntimeBoundary` synchronizes the route-resolved connection, branch, and schema hash with session state before mounting `InspectorProvider`.
 4. `useInspectorRuntime(...)` starts stored-schema verification and optional permissions loading as sibling work.
-5. `InspectorProvider` waits only when accepted intent already started WASM preparation, then mounts `JazzProvider` with `adminSecret` and `driver: { type: "memory" }`.
+5. `InspectorProvider` joins existing WASM preparation, then mounts `JazzProvider` with `adminSecret` and `driver: { type: "memory" }`.
 6. Jazz loads its JavaScript glue, fetches and initializes `jazz_wasm_bg.wasm`, and creates the in-memory admin client. Jazz owns URL resolution, streaming instantiation, client acquisition, and shutdown.
 7. `RuntimeClientProjection` publishes the client only after stored-schema verification succeeds.
 8. The table view acquires its Jazz query subscription. Useful rows render after the first query callback.
+
+The connection route sets `pendingMs: 0` and `pendingMinMs: 0`, and leaves `gcTime` unset so TanStack Router retains inactive loader data through its default cache. `ConnectionContentBoundary` keeps the table workspace mounted but hidden behind the same loading surface until an empty workspace, schema view, runtime error, or first rows query settles. Local `Loading schema…` and `Loading rows` states remain for transitions within an already revealed workspace.
 
 Table mounting does not preload CodeMirror. A structured editor mount starts the deferred editor import and exposes a controlled, geometry-stable textarea until CodeMirror replaces it. Data-grid reordering remains optional post-mount work so the first configured drag can begin without putting DND in the static application graph.
 
@@ -544,12 +546,13 @@ Table mounting does not preload CodeMirror. A structured editor mount starts the
 #### Runtime implementation map
 
 - `apps/web/src/app/providers/inspectorSessionProvider.tsx`: accepts connection intent, applies runtime-scope blocking, starts WASM preparation, and requests navigation.
-- `apps/web/src/features/onboarding/useAddConnectionFlow.ts`: validates connection input and joins accepted add or edit flows to the same preparation boundary.
+- `apps/web/src/features/onboarding/useConnectionFormFlow.ts`: validates connection input and joins accepted add or edit flows to the same preparation boundary.
 - `apps/web/src/app/runtime/jazzWasmPreparation.ts`: owns the shared best-effort `loadWasmModule()` promise.
-- `apps/web/src/routes/conn/$connectionId.tsx`: resolves the route-owned runtime target before mounting runtime code.
+- `apps/web/src/routes/conn/$connectionId.tsx`: starts valid-route preparation and resolves the route-owned runtime target before mounting runtime code.
 - `apps/web/src/app/runtime/inspectorRuntimeBoundary.tsx`: synchronizes the resolved target with session state without starting preparation.
 - `apps/web/src/app/providers/inspectorProvider.tsx`: joins existing preparation, owns `JazzProvider`, and publishes the verified client.
 - `apps/web/src/app/runtime/useInspectorRuntime.tsx`: owns stored-schema, permissions, runtime error, and client projections.
+- `apps/web/src/app/runtime/connectionContentBoundary.tsx`: owns the single table-entry loading surface and mounted-content visibility latch.
 
 #### Why memory driver
 
@@ -1663,7 +1666,7 @@ Not v1:
 
 ## Performances
 
-- Start Jazz WASM preparation only from accepted pre-navigation connection intent; do not add it to route-owned synchronization.
+- Start Jazz WASM preparation from accepted connection actions or a route loader that has confirmed its saved connection; do not add it to route-owned session synchronization.
 - Keep WASM loading behind Jazz's public API. Do not hard-code generated asset URLs, manually instantiate the binary, inline it, or treat it as a JavaScript module preload.
 - Serve the hashed WASM asset with `Content-Type: application/wasm`, Brotli or gzip compression, and immutable caching. Revalidate HTML separately.
 - Keep CodeMirror deferred until an editor mounts. Preserve the usable textarea fallback, focus, input, and panel geometry while its chunk loads.

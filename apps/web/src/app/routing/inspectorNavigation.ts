@@ -7,12 +7,14 @@
  */
 import { redirect } from '@tanstack/react-router'
 
+import { matchesConnectionCredentials } from '@app/connections/connectionIdentity'
 import {
   getConnectionById,
   getConnectionPreferences,
   readStoredConnections,
   resolveDefaultBranch,
   resolveDefaultSchemaHash,
+  type ConnectionCredentials,
   type StoredConnection,
   type StoredConnectionsStore,
 } from '@app/connections/connections'
@@ -57,6 +59,13 @@ interface ResolveStoredRuntimeTargetOptions {
   store?: StoredConnectionsStore
 }
 
+interface RuntimeTargetHandoff {
+  connection: ConnectionCredentials
+  target: ResolvedRuntimeTarget
+}
+
+let handedOffRuntimeTarget: RuntimeTargetHandoff | null = null
+
 /** Places the deployed schema first while preserving the advertised order of every other schema. */
 export function buildSchemaCatalogue(
   { hashes, schemas }: SchemaCatalogueResponse,
@@ -71,7 +80,7 @@ export function buildSchemaCatalogue(
 }
 
 async function fetchConnectionLatestSchemaHash(
-  connection: StoredConnection,
+  connection: ConnectionCredentials,
 ): Promise<string | null> {
   const serverUrl = connection.serverUrl.trim().replace(/\/+$/, '')
   const response = await fetch(
@@ -102,8 +111,8 @@ async function fetchConnectionLatestSchemaHash(
   return body.head.schemaHash
 }
 
-async function fetchConnectionSchemaCatalogue(
-  connection: StoredConnection,
+export async function fetchConnectionSchemaCatalogue(
+  connection: ConnectionCredentials,
 ): Promise<readonly SchemaCatalogueRecord[]> {
   const { fetchSchemaHashes } = await import('jazz-tools')
   const [response, latestSchemaHash] = await Promise.all([
@@ -114,6 +123,14 @@ async function fetchConnectionSchemaCatalogue(
     fetchConnectionLatestSchemaHash(connection).catch(() => null),
   ])
   return buildSchemaCatalogue(response, latestSchemaHash)
+}
+
+/** Hands validated form discovery to the matching route entry without repeating remote requests. */
+export function handoffStoredRuntimeTarget(
+  connection: ConnectionCredentials,
+  target: ResolvedRuntimeTarget,
+): void {
+  handedOffRuntimeTarget = { connection, target }
 }
 
 /**
@@ -184,6 +201,17 @@ export async function resolveStoredRuntimeTarget({
   const branch = resolveDefaultBranch(resolvedStore, connectionId, branchOverride)
   const preferredSchemaHash =
     schemaHashOverride ?? getConnectionPreferences(resolvedStore, connectionId).lastSchemaHash
+  const handoff = handedOffRuntimeTarget
+  handedOffRuntimeTarget = null
+  if (
+    handoff !== null &&
+    handoff.target.connectionId === connectionId &&
+    matchesConnectionCredentials(connection, handoff.connection) === true &&
+    handoff.target.branch === branch &&
+    handoff.target.schemaHash === preferredSchemaHash
+  ) {
+    return handoff.target
+  }
   let schemaCatalogue: readonly SchemaCatalogueRecord[]
   try {
     schemaCatalogue = await fetchConnectionSchemaCatalogue(connection)

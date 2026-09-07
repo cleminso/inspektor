@@ -1,7 +1,6 @@
 import { useRef, useState, type FormEventHandler } from 'react'
 
 import { useNavigate } from '@tanstack/react-router'
-import { fetchSchemaHashes } from 'jazz-tools'
 
 import { useInspectorSessionContext } from '@app/providers/inspectorSessionProvider'
 import { findConnectionByCredentials } from '@app/connections/connectionIdentity'
@@ -21,7 +20,10 @@ import {
   type ConnectionError,
 } from '@app/connections/connectionValidation'
 import { appRoutes } from '@app/routing/appRoutes'
-import { buildSchemaCatalogue } from '@app/routing/inspectorNavigation'
+import {
+  fetchConnectionSchemaCatalogue,
+  handoffStoredRuntimeTarget,
+} from '@app/routing/inspectorNavigation'
 import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 
 import type { ConnectionFormValues } from './connectionFormTypes'
@@ -82,7 +84,10 @@ export function useConnectionFormFlow(
     setError((currentError) => (currentError?.field === field ? null : currentError))
   }
 
-  const openResolvedConnection = async (schemaHash: string) => {
+  const openResolvedConnection = async (
+    schemaHash: string,
+    schemaCatalogue: Awaited<ReturnType<typeof fetchConnectionSchemaCatalogue>>,
+  ) => {
     const branch = normalizeBranchName(formValues.branch)
     const draft = {
       name: formValues.name,
@@ -107,6 +112,7 @@ export function useConnectionFormFlow(
     if (opensExistingConnection === true) {
       void prepareJazzWasm()
     }
+    handoffStoredRuntimeTarget(draft, { branch, connectionId, schemaCatalogue, schemaHash })
 
     await navigate({
       to: appRoutes.tables,
@@ -134,9 +140,10 @@ export function useConnectionFormFlow(
       }
 
       setError(null)
-      let response: Awaited<ReturnType<typeof fetchSchemaHashes>>
+      let schemaCatalogue: Awaited<ReturnType<typeof fetchConnectionSchemaCatalogue>>
       try {
-        response = await fetchSchemaHashes(validation.value.serverUrl, {
+        schemaCatalogue = await fetchConnectionSchemaCatalogue({
+          serverUrl: validation.value.serverUrl,
           appId: validation.value.appId,
           adminSecret: validation.value.adminSecret,
         })
@@ -145,13 +152,13 @@ export function useConnectionFormFlow(
         return
       }
 
-      const schemaHash = buildSchemaCatalogue(response)[0]?.hash
+      const schemaHash = schemaCatalogue[0]?.hash
       if (schemaHash === undefined) {
         setError(EMPTY_SCHEMA_ERROR)
         return
       }
 
-      await openResolvedConnection(schemaHash)
+      await openResolvedConnection(schemaHash, schemaCatalogue)
     } catch (error) {
       setError(normalizeSchemaFetchError(error))
     } finally {

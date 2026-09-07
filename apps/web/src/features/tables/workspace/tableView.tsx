@@ -25,6 +25,7 @@ import {
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { useRuntimeSchema } from '@app/providers/inspectorProvider'
+import { useConnectionContentReady } from '@app/runtime/connectionContentBoundary'
 import { ColumnDragPreview } from '@tables/grid/buildColumns'
 import { DataGridColumnVisibility } from '@tables/grid/columnVisibility'
 import { TableGridContextMenu } from '@tables/grid/tableGridContextMenu'
@@ -192,6 +193,7 @@ function TableViewContent({
     tableKey,
     tableName,
   })
+  useConnectionContentReady(state.isInitialLoading === false)
 
   const { openSchemaView } = useTableTabs()
   const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)

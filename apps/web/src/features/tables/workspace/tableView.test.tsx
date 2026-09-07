@@ -121,6 +121,7 @@ const fieldEditorProps = vi.hoisted(() => ({ current: null as Record<string, unk
 const toastError = vi.hoisted(() => vi.fn())
 const toastSuccess = vi.hoisted(() => vi.fn())
 const preloadCodeEditor = vi.hoisted(() => vi.fn())
+const useConnectionContentReady = vi.hoisted(() => vi.fn())
 const schemaColumns = vi.hoisted(
   (): Array<{
     name: string
@@ -149,6 +150,8 @@ vi.mock('@tables/workspace/useTableViewState', () => ({
 vi.mock('@app/providers/inspectorProvider', () => ({
   useRuntimeSchema: () => null,
 }))
+
+vi.mock('@app/runtime/connectionContentBoundary', () => ({ useConnectionContentReady }))
 
 vi.mock('@tables/schema/tableSchema', () => ({
   getTableColumns: () => schemaColumns,
@@ -572,6 +575,7 @@ afterEach(() => {
   toastError.mockReset()
   toastSuccess.mockReset()
   preloadCodeEditor.mockReset()
+  useConnectionContentReady.mockReset()
   schemaColumns.splice(1)
   if (initialClipboardDescriptor === undefined) {
     Reflect.deleteProperty(navigator, 'clipboard')
@@ -772,6 +776,18 @@ describe('TableView cell actions', () => {
 })
 
 describe('TableView composition boundary', () => {
+  it('reports when the first rows query settles', () => {
+    tableViewState.isInitialLoading = true
+    const { rerenderTableView } = renderTableView()
+
+    expect(useConnectionContentReady).toHaveBeenLastCalledWith(false)
+
+    tableViewState.isInitialLoading = false
+    rerenderTableView()
+
+    expect(useConnectionContentReady).toHaveBeenLastCalledWith(true)
+  })
+
   it('keeps CodeMirror deferred until a structured editor opens', () => {
     schemaColumns.push({ name: 'metadata', column_type: { type: 'Json' }, nullable: false })
 

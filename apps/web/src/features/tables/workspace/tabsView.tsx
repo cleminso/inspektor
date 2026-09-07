@@ -11,6 +11,7 @@ import {
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 
 import { useRuntimeError, useRuntimeRetry } from '@app/providers/inspectorProvider'
+import { useConnectionContentReady } from '@app/runtime/connectionContentBoundary'
 import { appHotkeys } from '@app/hotkeys/hotkeyCatalog'
 import { productGlyphs } from '@app/icons/productGlyphs'
 import { useTableTabs } from '@tables/workspace/tabsProvider'
@@ -82,6 +83,10 @@ export function TableTabsView({
     activeTab?.kind === 'table' &&
     activeTab.tableName === tableName &&
     (activeTab.search.view === 'schema') === (view === 'schema')
+  useConnectionContentReady(
+    connectionEntryPending === false &&
+      (tableName === null || (view === 'schema' && isTableIdentityReady === true)),
+  )
   return (
     <WorkspaceTabs.Root
       value={activeTabId}

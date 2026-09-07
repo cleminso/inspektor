@@ -7,11 +7,13 @@ import {
 } from '@tanstack/react-router'
 
 import { redirectToConnections, resolveStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
+import { getConnectionById, readStoredConnections } from '@app/connections/connections'
+import { prepareJazzWasm } from '@app/runtime/jazzWasmPreparation'
 import { InspectorRuntimeBoundary } from '@app/runtime/inspectorRuntimeBoundary'
 import { InspectorLayout } from '@app/shell/layout'
 import { TableCommands } from '@tables/workspace/tableCommands'
 
-import { ConnectionRouteError } from './-connectionRouteStatus'
+import { ConnectionRouteError, ConnectionRouteLoading } from './-connectionRouteStatus'
 
 interface ConnectionRouteSearch {
   schema?: string
@@ -32,17 +34,21 @@ function validateConnectionRouteSearch(search: Record<string, unknown>): Connect
  * `InspectorRuntimeBoundary`.
  */
 export const Route = createFileRoute('/conn/$connectionId')({
-  gcTime: 0,
   shouldReload: false,
+  pendingMs: 0,
+  pendingMinMs: 0,
   validateSearch: validateConnectionRouteSearch,
   search: {
     middlewares: [retainSearchParams(['schema'])],
   },
   loaderDeps: ({ search }) => ({ schemaHash: search.schema }),
   loader: async ({ deps, location, params }) => {
+    const store = readStoredConnections()
+    if (getConnectionById(store, params.connectionId) !== null) void prepareJazzWasm()
     const target = await resolveStoredRuntimeTarget({
       connectionId: params.connectionId,
       schemaHashOverride: deps.schemaHash,
+      store,
     })
     if (target === null) {
       redirectToConnections()
@@ -58,6 +64,7 @@ export const Route = createFileRoute('/conn/$connectionId')({
 
     return target
   },
+  pendingComponent: ConnectionRouteLoading,
   errorComponent: ConnectionRouteError,
   component: InspectorRuntimeRoute,
 })
@@ -69,7 +76,10 @@ function InspectorRuntimeRoute(): React.ReactElement {
   })
 
   return (
-    <InspectorRuntimeBoundary target={target}>
+    <InspectorRuntimeBoundary
+      target={target}
+      fallback={<ConnectionRouteLoading />}
+    >
       <InspectorLayout pageTitle={isLiveQueriesRoute === true ? 'Live queries' : 'Tables'}>
         {isLiveQueriesRoute === true ? <TableCommands /> : null}
         <Outlet />

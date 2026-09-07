@@ -1,8 +1,35 @@
 // The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { useRouter, type ErrorComponentProps } from '@tanstack/react-router'
-import { Box, Button, Text } from '@inspektor/ds'
+import { Box, Button, Spinner, Text } from '@inspektor/ds'
 
 import { normalizeSchemaFetchError } from '@app/connections/connectionValidation'
+
+export function ConnectionRouteLoading(): React.ReactElement {
+  return (
+    <Box
+      position="fixed"
+      inset="none"
+      zIndex="overlay"
+      width="full"
+      height="screen-height-dynamic"
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
+      gap="xs"
+      backgroundColor="surface-background"
+      role="status"
+      aria-live="polite"
+    >
+      <Spinner />
+      <Text
+        variant="label"
+        color="muted"
+      >
+        Loading
+      </Text>
+    </Box>
+  )
+}
 
 export function ConnectionRouteError({ error }: ErrorComponentProps): React.ReactElement {
   const router = useRouter()

@@ -4,7 +4,11 @@ import {
   createEmptyConnectionStore,
   type StoredConnectionsStore,
 } from '@app/connections/connections'
-import { buildSchemaCatalogue, resolveStoredRuntimeTarget } from '@app/routing/inspectorNavigation'
+import {
+  buildSchemaCatalogue,
+  handoffStoredRuntimeTarget,
+  resolveStoredRuntimeTarget,
+} from '@app/routing/inspectorNavigation'
 
 const fetchSchemaHashes = vi.fn()
 const fetchPermissionsHead = vi.fn()
@@ -54,6 +58,75 @@ function createStore(lastSchemaHash: string | null = 'schema-1'): StoredConnecti
 }
 
 describe('resolveStoredRuntimeTarget', () => {
+  it('consumes a validated form target without repeating schema discovery', async () => {
+    const target = {
+      connectionId: 'connection-1',
+      branch: 'main',
+      schemaHash: 'schema-1',
+      schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
+    }
+    handoffStoredRuntimeTarget(createStore().connections[0]!, target)
+
+    await expect(
+      resolveStoredRuntimeTarget({
+        connectionId: 'connection-1',
+        store: createStore(),
+      }),
+    ).resolves.toEqual(target)
+    expect(fetchSchemaHashes).not.toHaveBeenCalled()
+    expect(fetchPermissionsHead).not.toHaveBeenCalled()
+  })
+
+  it('rejects a handed-off target after the saved credentials change', async () => {
+    const originalStore = createStore()
+    handoffStoredRuntimeTarget(originalStore.connections[0]!, {
+      connectionId: 'connection-1',
+      branch: 'main',
+      schemaHash: 'schema-1',
+      schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
+    })
+    const changedStore = {
+      ...originalStore,
+      connections: [{ ...originalStore.connections[0]!, serverUrl: 'https://changed.example.com' }],
+    }
+    fetchSchemaHashes.mockResolvedValueOnce({
+      hashes: ['schema-1'],
+      schemas: [{ hash: 'schema-1', publishedAt: 1 }],
+    })
+
+    await resolveStoredRuntimeTarget({ connectionId: 'connection-1', store: changedStore })
+
+    expect(fetchSchemaHashes).toHaveBeenCalledWith('https://changed.example.com', {
+      appId: 'app-1',
+      adminSecret: 'secret',
+    })
+  })
+
+  it('rejects a handed-off target for another connection profile', async () => {
+    const originalStore = createStore()
+    handoffStoredRuntimeTarget(originalStore.connections[0]!, {
+      connectionId: 'connection-1',
+      branch: 'main',
+      schemaHash: 'schema-1',
+      schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
+    })
+    const store = {
+      ...originalStore,
+      connections: [{ ...originalStore.connections[0]!, id: 'connection-2' }],
+      preferencesByConnectionId: {
+        'connection-2': originalStore.preferencesByConnectionId['connection-1']!,
+      },
+    }
+    fetchSchemaHashes.mockResolvedValueOnce({
+      hashes: ['schema-1'],
+      schemas: [{ hash: 'schema-1', publishedAt: 1 }],
+    })
+
+    await expect(
+      resolveStoredRuntimeTarget({ connectionId: 'connection-2', store }),
+    ).resolves.toMatchObject({ connectionId: 'connection-2' })
+  })
+
   it('opens the permissions-head schema instead of the first advertised schema', async () => {
     fetchSchemaHashes.mockResolvedValueOnce({
       hashes: ['schema-1', 'schema-2'],

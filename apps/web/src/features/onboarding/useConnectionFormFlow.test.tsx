@@ -6,34 +6,33 @@ import type { StoredConnection } from '@app/connections/connections'
 import { useConnectionFormFlow } from './useConnectionFormFlow'
 
 const {
-  fetchSchemaHashes,
+  fetchSchemaCatalogue,
+  handoffStoredRuntimeTarget,
   navigate,
   prepareJazzWasm,
   saveConnectionWithContext,
   setConnectionContext,
 } = vi.hoisted(() => ({
-  fetchSchemaHashes: vi.fn(),
+  fetchSchemaCatalogue: vi.fn(),
+  handoffStoredRuntimeTarget: vi.fn(),
   navigate: vi.fn(),
   prepareJazzWasm: vi.fn(),
   saveConnectionWithContext: vi.fn(),
   setConnectionContext: vi.fn(),
 }))
 let connections: StoredConnection[] = []
-const singleSchemaResponse = {
-  hashes: ['schema-1'],
-  schemas: [{ hash: 'schema-1', publishedAt: 1 }],
-}
-const schemaChoicesResponse = {
-  hashes: ['schema-1', 'schema-2'],
-  schemas: [
-    { hash: 'schema-1', publishedAt: 1 },
-    { hash: 'schema-2', publishedAt: 2 },
-  ],
-}
+const singleSchemaResponse = [{ hash: 'schema-1', publishedAt: 1 }]
+const schemaChoicesResponse = [
+  { hash: 'schema-1', publishedAt: 1 },
+  { hash: 'schema-2', publishedAt: 2 },
+]
 
-vi.mock('jazz-tools', () => ({ fetchSchemaHashes }))
 vi.mock('@tanstack/react-router', () => ({ useNavigate: () => navigate }))
 vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
+vi.mock('@app/routing/inspectorNavigation', () => ({
+  fetchConnectionSchemaCatalogue: fetchSchemaCatalogue,
+  handoffStoredRuntimeTarget,
+}))
 vi.mock('@app/providers/inspectorSessionProvider', () => ({
   useInspectorSessionContext: () => ({
     connections,
@@ -45,7 +44,8 @@ vi.mock('@app/providers/inspectorSessionProvider', () => ({
 afterEach(() => {
   cleanup()
   connections = []
-  fetchSchemaHashes.mockReset()
+  fetchSchemaCatalogue.mockReset()
+  handoffStoredRuntimeTarget.mockReset()
   navigate.mockReset()
   prepareJazzWasm.mockReset()
   saveConnectionWithContext.mockClear()
@@ -82,7 +82,7 @@ async function submitValidConnectionForm() {
 
 describe('useConnectionFormFlow', () => {
   it('does not save or navigate when connection persistence is blocked', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(singleSchemaResponse)
+    fetchSchemaCatalogue.mockResolvedValueOnce(singleSchemaResponse)
     saveConnectionWithContext.mockReturnValueOnce('blocked')
     const { result } = await submitValidConnectionForm()
 
@@ -93,7 +93,7 @@ describe('useConnectionFormFlow', () => {
   })
 
   it('does not set context or navigate when connection persistence fails', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(singleSchemaResponse)
+    fetchSchemaCatalogue.mockResolvedValueOnce(singleSchemaResponse)
     saveConnectionWithContext.mockImplementationOnce(() => {
       throw new Error('Storage unavailable')
     })
@@ -105,7 +105,7 @@ describe('useConnectionFormFlow', () => {
   })
 
   it('uses one connection ID when saving and opening a new connection', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(singleSchemaResponse)
+    fetchSchemaCatalogue.mockResolvedValueOnce(singleSchemaResponse)
     await submitValidConnectionForm()
 
     const connectionId = saveConnectionWithContext.mock.calls[0]?.[1]
@@ -120,21 +120,30 @@ describe('useConnectionFormFlow', () => {
       to: '/conn/$connectionId/tables',
       params: { connectionId },
     })
+    expect(handoffStoredRuntimeTarget).toHaveBeenCalledWith(
+      expect.objectContaining({ appId: 'self-hosted-app' }),
+      {
+        branch: 'main',
+        connectionId,
+        schemaCatalogue: [{ hash: 'schema-1', publishedAt: 1 }],
+        schemaHash: 'schema-1',
+      },
+    )
   })
 
   it('starts only one schema request when submission overlaps synchronously', () => {
-    fetchSchemaHashes.mockReturnValue(new Promise(() => undefined))
+    fetchSchemaCatalogue.mockReturnValue(new Promise(() => undefined))
     const { result } = renderValidConnectionFormFlow()
     act(() => {
       void result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
       void result.current.submitConnectionForm({ preventDefault: vi.fn() } as never)
     })
 
-    expect(fetchSchemaHashes).toHaveBeenCalledTimes(1)
+    expect(fetchSchemaCatalogue).toHaveBeenCalledTimes(1)
   })
 
   it('keeps submission pending until connection navigation settles', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(singleSchemaResponse)
+    fetchSchemaCatalogue.mockResolvedValueOnce(singleSchemaResponse)
     let settleNavigation: () => void = () => undefined
     navigate.mockReturnValueOnce(
       new Promise<void>((resolve) => {
@@ -172,11 +181,11 @@ describe('useConnectionFormFlow', () => {
       description: 'Enter a valid HTTP or HTTPS URL.',
       field: 'serverUrl',
     })
-    expect(fetchSchemaHashes).not.toHaveBeenCalled()
+    expect(fetchSchemaCatalogue).not.toHaveBeenCalled()
   })
 
   it('keeps normalized fetch failures after a field is edited', async () => {
-    fetchSchemaHashes.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    fetchSchemaCatalogue.mockRejectedValueOnce(new TypeError('Failed to fetch'))
     const { result } = await submitValidConnectionForm()
 
     expect(result.current.error).toEqual({
@@ -209,7 +218,7 @@ describe('useConnectionFormFlow', () => {
   })
 
   it('prefills and updates the same saved connection when editing', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(singleSchemaResponse)
+    fetchSchemaCatalogue.mockResolvedValueOnce(singleSchemaResponse)
     const connection = {
       id: 'connection-2',
       name: 'Production',
@@ -272,7 +281,7 @@ describe('useConnectionFormFlow', () => {
         env: 'dev',
       },
     ]
-    fetchSchemaHashes.mockResolvedValue(singleSchemaResponse)
+    fetchSchemaCatalogue.mockResolvedValue(singleSchemaResponse)
     const { result } = renderHook(() => useConnectionFormFlow({ connection, branch: 'release' }))
 
     act(() => {
@@ -285,7 +294,8 @@ describe('useConnectionFormFlow', () => {
     })
 
     expect(result.current.error).toBeNull()
-    expect(fetchSchemaHashes).toHaveBeenCalledWith('https://existing.example.com', {
+    expect(fetchSchemaCatalogue).toHaveBeenCalledWith({
+      serverUrl: 'https://existing.example.com',
       appId: 'existing-app',
       adminSecret: 'existing-secret',
     })
@@ -302,7 +312,7 @@ describe('useConnectionFormFlow', () => {
   })
 
   it('reports when no schemas are available', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce({ hashes: [], schemas: [] })
+    fetchSchemaCatalogue.mockResolvedValueOnce([])
 
     const { result } = await submitValidConnectionForm()
 
@@ -315,7 +325,7 @@ describe('useConnectionFormFlow', () => {
   })
 
   it('opens the workspace directly when multiple schemas are available', async () => {
-    fetchSchemaHashes.mockResolvedValueOnce(schemaChoicesResponse)
+    fetchSchemaCatalogue.mockResolvedValueOnce(schemaChoicesResponse)
 
     await submitValidConnectionForm()
 

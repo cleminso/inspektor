@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 const routeOptions = vi.hoisted(() => ({ current: null as Record<string, unknown> | null }))
 const router = vi.hoisted(() => ({ invalidate: vi.fn() }))
 const resolveStoredRuntimeTarget = vi.hoisted(() => vi.fn())
+const prepareJazzWasm = vi.hoisted(() => vi.fn())
+const storedConnections = vi.hoisted(() => ({ connections: [{ id: 'connection-1' }] }))
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
@@ -30,6 +32,14 @@ vi.mock('@app/routing/inspectorNavigation', () => ({
   resolveStoredRuntimeTarget,
 }))
 
+vi.mock('@app/connections/connections', () => ({
+  getConnectionById: (store: typeof storedConnections, connectionId: string) =>
+    store.connections.find((connection) => connection.id === connectionId) ?? null,
+  readStoredConnections: () => storedConnections,
+}))
+
+vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
+
 vi.mock('@app/runtime/inspectorRuntimeBoundary', () => ({
   InspectorRuntimeBoundary: ({ fallback }: { fallback?: React.ReactNode }) => fallback ?? null,
 }))
@@ -45,6 +55,7 @@ vi.mock('@inspektor/ds', () => ({
   Button: ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
     <button onClick={onClick}>{children}</button>
   ),
+  Spinner: () => <span data-slot="spinner" />,
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }))
 
@@ -54,6 +65,7 @@ const { ConnectionRouteError } = await import('./-connectionRouteStatus')
 afterEach(() => {
   cleanup()
   resolveStoredRuntimeTarget.mockReset()
+  prepareJazzWasm.mockReset()
   router.invalidate.mockReset()
 })
 
@@ -77,7 +89,12 @@ describe('connection route', () => {
     expect(resolveStoredRuntimeTarget).toHaveBeenCalledWith({
       connectionId: 'connection-1',
       schemaHashOverride: 'schema-1',
+      store: storedConnections,
     })
+    expect(prepareJazzWasm).toHaveBeenCalledOnce()
+    expect(prepareJazzWasm.mock.invocationCallOrder[0]).toBeLessThan(
+      resolveStoredRuntimeTarget.mock.invocationCallOrder[0]!,
+    )
   })
 
   it('validates the schema search parameter for loader dependencies', () => {
@@ -149,17 +166,24 @@ describe('connection route', () => {
     })
   })
 
-  it('keeps the current surface mounted while the destination connection loads', () => {
-    expect(routeOptions.current?.pendingComponent).toBeUndefined()
+  it('shows an empty loading view while the destination connection loads', () => {
+    const PendingComponent = routeOptions.current?.pendingComponent as () => React.ReactElement
+
+    expect(routeOptions.current?.gcTime).toBeUndefined()
+    expect(routeOptions.current?.pendingMs).toBe(0)
+    expect(routeOptions.current?.pendingMinMs).toBe(0)
     expect(routeOptions.current?.errorComponent).toBeTypeOf('function')
+    render(<PendingComponent />)
+    expect(screen.getByRole('status').textContent).toBe('Loading')
+    expect(document.querySelector('[data-slot="spinner"]')).toBeTruthy()
   })
 
-  it('does not introduce connection-opening feedback while the runtime synchronizes', () => {
+  it('keeps the loading view visible while the runtime synchronizes', () => {
     const RuntimeRoute = routeOptions.current?.component as () => React.ReactElement
 
     render(<RuntimeRoute />)
 
-    expect(screen.queryByRole('status')).toBeNull()
+    expect(screen.getByRole('status').textContent).toBe('Loading')
   })
 
   it('normalizes loader errors and retries through router invalidation', () => {

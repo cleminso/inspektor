@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 import { useInspectorSessionState } from '@app/providers/inspectorProvider'
+import { ConnectionContentBoundary } from '@app/runtime/connectionContentBoundary'
 import { TableTabsProvider } from '@tables/workspace/tabsProvider'
 import { TableHotkeys } from '@tables/workspace/tableHotkeys'
 import { TableNavigationHistoryProvider } from '@tables/workspace/navigationHistory'
@@ -8,6 +9,8 @@ import { createTableWorkspaceScope } from '@tables/workspace/scope'
 import { TableMutationLedgerWorkspaceProvider } from '@tables/mutationLedger/provider'
 import { TableExplorerScreen } from '@tables/view'
 import { canonicalizeTableRouteSearch } from '@tables/routing/tableRowsSearch'
+
+import { ConnectionRouteLoading } from '../-connectionRouteStatus'
 
 export const Route = createFileRoute('/conn/$connectionId/tables')({
   head: () => ({
@@ -33,14 +36,19 @@ function TablesWorkspaceLayout(): React.ReactElement {
   })
 
   return (
-    <TableMutationLedgerWorkspaceProvider key={workspaceScope}>
-      <TableNavigationHistoryProvider>
-        <TableTabsProvider scope={workspaceScope}>
-          <TableHotkeys />
-          <TableExplorerScreen />
-          <Outlet />
-        </TableTabsProvider>
-      </TableNavigationHistoryProvider>
-    </TableMutationLedgerWorkspaceProvider>
+    <ConnectionContentBoundary
+      key={workspaceScope}
+      fallback={<ConnectionRouteLoading />}
+    >
+      <TableMutationLedgerWorkspaceProvider>
+        <TableNavigationHistoryProvider>
+          <TableTabsProvider scope={workspaceScope}>
+            <TableHotkeys />
+            <TableExplorerScreen />
+            <Outlet />
+          </TableTabsProvider>
+        </TableNavigationHistoryProvider>
+      </TableMutationLedgerWorkspaceProvider>
+    </ConnectionContentBoundary>
   )
 }

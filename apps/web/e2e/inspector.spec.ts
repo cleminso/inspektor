@@ -44,6 +44,54 @@ test('connects through the form and restores the connection after reload', async
   )
 })
 
+test('keeps one centered loading view until the first table rows settle', async ({ page }) => {
+  let releaseWasm: () => void = () => undefined
+  const wasmRelease = new Promise<void>((resolve) => {
+    releaseWasm = resolve
+  })
+  let reportWasmRequested: () => void = () => undefined
+  const wasmRequested = new Promise<void>((resolve) => {
+    reportWasmRequested = resolve
+  })
+  await page.route(
+    (url) => url.pathname.endsWith('.wasm'),
+    async (route) => {
+      reportWasmRequested()
+      await wasmRelease
+      await route.continue()
+    },
+  )
+
+  await page.goto('/conn/new')
+  await fillConnectionForm(page)
+  await page.getByRole('button', { name: 'Save connection' }).click()
+  await wasmRequested
+
+  const loading = page.getByRole('status').filter({ hasText: /^Loading$/ })
+  await expect(loading).toBeVisible()
+  await expect(page.getByText('Loading schema…', { exact: true })).toBeHidden()
+  await expect(page.getByText('Loading rows', { exact: true })).toBeHidden()
+  const [loadingBox, spinnerBox, labelBox, viewport] = await Promise.all([
+    loading.boundingBox(),
+    loading.locator('[data-slot="spinner"]').boundingBox(),
+    loading.getByText('Loading', { exact: true }).boundingBox(),
+    page.viewportSize(),
+  ])
+  expect(loadingBox).not.toBeNull()
+  expect(spinnerBox).not.toBeNull()
+  expect(labelBox).not.toBeNull()
+  expect(viewport).not.toBeNull()
+  expect(loadingBox!.x + loadingBox!.width / 2).toBeCloseTo(viewport!.width / 2, 0)
+  expect(loadingBox!.y + loadingBox!.height / 2).toBeCloseTo(viewport!.height / 2, 0)
+  expect(spinnerBox!.y + spinnerBox!.height / 2).toBeCloseTo(labelBox!.y + labelBox!.height / 2, 0)
+  expect(spinnerBox!.x).toBeLessThan(labelBox!.x)
+
+  releaseWasm()
+  await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()
+  await expect(loading).toBeHidden()
+  await expect(page.getByText('Loading rows', { exact: true })).toBeHidden()
+})
+
 test('presents saved connections without remembered workspace context', async ({ page }) => {
   await connectToFixture(page)
   await page.goto('/conn')

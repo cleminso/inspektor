@@ -11,6 +11,24 @@
 
 ## Implemented foundation
 
+[07/09/26]
+
+### Unified connection readiness
+
+- [x] Keep the workspace mounted but hidden behind one viewport-centered `Loading` status until the first table query settles.
+- [x] Reveal runtime and query errors instead of leaving the loading status mounted.
+- [x] Reveal schema-only and empty-table workspaces when their available content settles.
+- [x] Start the shared Jazz WASM preparation when a saved connection route is accepted so download and compilation overlap route discovery.
+
+[07/09/26]
+
+### Connection loading and metadata reuse
+
+- [x] Replace the retained previous connection surface with an immediate empty `Loading` view and spinner while route discovery or runtime synchronization is pending.
+- [x] Retain inactive connection loader data through TanStack Router's default cache instead of discarding it immediately.
+- [x] Hand add and edit discovery results to the matching route loader without repeating schema or permissions-head requests, superseding the earlier removal of prepared-target handoff.
+- [x] Reject a handed-off target when its saved credentials no longer match the validated connection.
+
 [05/09/26]
 
 ### Onboarding action spacing
@@ -334,6 +352,26 @@
 
 ## Settled interaction decisions
 
+[07/09/26]
+
+- Valid saved connection routes start the shared WASM preparation before schema discovery; unknown connection IDs do not start it.
+- Add and edit reuse one validated target only when its connection ID, credentials, branch, and schema hash still match persisted state.
+- TanStack Router presents pending state immediately and retains inactive loader data through its default cache.
+- The table-entry boundary owns the single loading surface. `Loading schema…` and `Loading rows` remain local to transitions within a revealed workspace.
+- These decisions supersede the direct-entry and prepared-target exclusions below.
+
+[07/09/26]
+
+- Initial table entry uses one centered horizontal spinner and `Loading` label until the first rows query settles; intermediate schema and row loading states stay hidden.
+- The workspace remains mounted behind the loading surface so schema, Jazz client, and row work can proceed without a sequential rendering dependency.
+- These decisions supersede the runtime-mount completion point below.
+
+[07/09/26]
+
+- Connection selection replaces the previous connection surface with one empty `Loading` status and spinner until the destination runtime can mount.
+- The route and runtime-synchronization boundaries share the same loading presentation so the transition does not expose a blank commit.
+- These decisions supersede the retained-surface behavior below.
+
 [05/09/26]
 
 - Use `Connection` for a saved browser-local profile and `Jazz app` for its remote target.
@@ -473,6 +511,18 @@
 - None.
 
 ## Validation checklist
+
+[07/09/26]
+
+- [x] Cover hidden mounted content, first-query readiness, schema-only readiness, empty-workspace readiness, runtime error release, and saved-route WASM preparation.
+- [x] Verify one centered horizontal loading surface through first-row readiness in a production browser build.
+- [x] Run Inspektor formatting, lint, typecheck, build, and package-wide tests.
+
+[07/09/26]
+
+- [x] Cover immediate route loading, runtime-synchronization loading, default route cache retention, one-use form target handoff, and changed-credential rejection.
+- [ ] Verify connection switching and add or edit entry against the isolated browser fixture.
+- [x] Run Inspektor lint, typecheck, build, and package-wide tests.
 
 [05/09/26]
 

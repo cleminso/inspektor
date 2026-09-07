@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   persistTab: vi.fn(),
   reorderTabs: vi.fn(),
   retryRuntime: vi.fn(),
+  reportConnectionContentReady: vi.fn(),
   state: {
     activeTabId: null as string | null,
     canGoBack: false,
@@ -23,6 +24,10 @@ const mocks = vi.hoisted(() => ({
       | { kind: 'table'; id: string; tableName: string; search: Record<string, number | string> }
     >,
   },
+}))
+
+vi.mock('@app/runtime/connectionContentBoundary', () => ({
+  useConnectionContentReady: mocks.reportConnectionContentReady,
 }))
 
 vi.mock('@app/providers/inspectorProvider', () => ({
@@ -73,6 +78,7 @@ beforeEach(() => {
   mocks.persistTab.mockReset()
   mocks.reorderTabs.mockReset()
   mocks.retryRuntime.mockReset()
+  mocks.reportConnectionContentReady.mockReset()
   mocks.state.activeTabId = null
   mocks.state.canGoBack = false
   mocks.state.canGoForward = false
@@ -102,6 +108,31 @@ it('shows safe runtime recovery with or without a selected table', () => {
 })
 
 describe('TableTabsView', () => {
+  it('reports explicit new views ready without requiring an empty schema', () => {
+    mocks.state.activeTabId = 'new-view'
+    mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]
+
+    render(<TableTabsView tableName={null} />)
+
+    expect(mocks.reportConnectionContentReady).toHaveBeenCalledWith(true)
+  })
+
+  it('reports reconciled schema views ready', () => {
+    mocks.state.activeTabId = 'table:accounts'
+    mocks.state.tabs = [
+      {
+        kind: 'table',
+        id: 'table:accounts',
+        tableName: 'accounts',
+        search: { view: 'schema' },
+      },
+    ]
+
+    render(<TableTabsView tableName="accounts" view="schema" />)
+
+    expect(mocks.reportConnectionContentReady).toHaveBeenCalledWith(true)
+  })
+
   it('keeps workspace controls visible while schema-dependent content loads', () => {
     mocks.state.activeTabId = 'new-view'
     mocks.state.tabs = [{ kind: 'newView', id: 'new-view' }]
