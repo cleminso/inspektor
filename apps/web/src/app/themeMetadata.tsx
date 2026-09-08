@@ -6,6 +6,11 @@ const themeColors = {
   light: '#fafafa',
 } as const
 
+const faviconHrefs = {
+  dark: '/favicon-dark.svg',
+  light: '/favicon-light.svg',
+} as const
+
 export function ThemeMetadata(): null {
   const { resolvedTheme } = useTheme()
 
@@ -23,6 +28,16 @@ export function ThemeMetadata(): null {
     }
     for (const fallbackThemeColor of fallbackThemeColors) {
       fallbackThemeColor.remove()
+    }
+
+    const [themeIcon, ...fallbackThemeIcons] =
+      document.querySelectorAll<HTMLLinkElement>('link[rel="icon"][data-inspektor-theme-icon="true"]')
+    if (themeIcon !== undefined) {
+      themeIcon.href = faviconHrefs[resolvedTheme]
+      themeIcon.removeAttribute('media')
+    }
+    for (const fallbackThemeIcon of fallbackThemeIcons) {
+      fallbackThemeIcon.remove()
     }
   }, [resolvedTheme])
 
