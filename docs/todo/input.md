@@ -18,7 +18,7 @@ This checklist tracks the reusable Input component.
 
 [11/08/26]
 
-- [x] Share one token-backed focus-visible outline across Input, Textarea, Select, and Input Group, switching to danger only for focus-visible invalid state.
+- [x] Share one token-backed focus-visible outline across Input, Select, and Input Group, switching to danger only for focus-visible invalid state.
 
 [06/08/26]
 

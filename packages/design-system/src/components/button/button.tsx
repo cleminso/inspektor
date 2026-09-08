@@ -1,9 +1,8 @@
 import { Button as BaseButton } from '@base-ui/react/button'
 import { mergeProps } from '@base-ui/react/merge-props'
-import { forwardRef, useContext } from 'react'
+import { forwardRef } from 'react'
 import type React from 'react'
 
-import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
 import { createStateStyleProps } from '../../primitives/createStateStyleProps'
 import {
   ButtonContent,
@@ -94,7 +93,6 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
   },
   forwardedRef,
 ) {
-  const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const layoutOptions = buttonLayoutOptions[layout]
   const isDisabled = disabled === true
   const isInteractionBlocked = isDisabled === true || loading === true
@@ -109,7 +107,6 @@ const ButtonRoot = forwardRef<HTMLElement, ButtonProps>(function Button(
       fill: layoutOptions.fill,
       alignment: layoutOptions.alignment,
       stacked: layout === 'stacked',
-      orientation: buttonGroupOrientation,
       disabled: isDisabled === true && loading === false,
       hasPrefix: prefix !== undefined,
       hasSuffix: suffix !== undefined,

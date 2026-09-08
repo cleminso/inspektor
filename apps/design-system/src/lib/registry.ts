@@ -128,18 +128,6 @@ export const textLinkItem = {
   },
 } satisfies NavItem
 
-export const buttonGroupItem = {
-  title: 'Button Group',
-  slug: 'button-group',
-  href: '/components/button-group',
-  description: 'A container for related actions, controls, and separators.',
-  importPath: '@inspektor/ds',
-  source: {
-    label: 'buttonGroup.tsx',
-    path: 'packages/design-system/src/components/buttonGroup/buttonGroup.tsx',
-  },
-} satisfies NavItem
-
 export const copyButtonItem = {
   title: 'Copy Button',
   slug: 'copy-button',
@@ -309,18 +297,6 @@ export const keyboardInputItem = {
   },
 } satisfies NavItem
 
-export const textareaItem = {
-  title: 'Textarea',
-  slug: 'textarea',
-  href: '/components/textarea',
-  description: 'Multiline text entry with field validation and constrained editor treatments.',
-  importPath: '@inspektor/ds',
-  source: {
-    label: 'textarea.tsx',
-    path: 'packages/design-system/src/components/textarea/textarea.tsx',
-  },
-} satisfies NavItem
-
 export const codeEditorItem = {
   title: 'Code Editor',
   slug: 'code-editor',
@@ -373,7 +349,7 @@ export const relationValueItem = {
   title: 'Relation Value',
   slug: 'relation-value',
   href: '/components/relation-value',
-  description: 'Separate compact relation identifiers and resolved target details.',
+  description: 'Compact relation identifiers with optional target navigation.',
   importPath: '@inspektor/ds',
   source: {
     label: 'relationValue.tsx',
@@ -686,7 +662,6 @@ const componentItems: NavItem[] = [
   boxItem,
   buttonItem,
   buttonLinkItem,
-  buttonGroupItem,
   calendarItem,
   checkboxItem,
   checkboxGroupItem,
@@ -707,7 +682,6 @@ const componentItems: NavItem[] = [
   jsonViewItem,
   keyboardInputItem,
   textLinkItem,
-  textareaItem,
   menuItem,
   multiSelectItem,
   relationValueItem,

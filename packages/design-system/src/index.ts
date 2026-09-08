@@ -263,26 +263,13 @@ export type {
 } from './components/structuredValuePreview/structuredValuePreview'
 export { MiddleTruncate } from './components/middleTruncate/middleTruncate'
 export type { MiddleTruncateProps } from './components/middleTruncate/middleTruncate'
-export { RelationDetails, RelationValue } from './components/relationValue/relationValue'
+export { RelationValue } from './components/relationValue/relationValue'
 export type {
-  RelationDetailsProps,
   RelationValueNavigation,
   RelationValueProps,
-  RelationValueState,
 } from './components/relationValue/relationValue'
 export { CodeEditor, preloadCodeEditor } from './components/codeEditor/codeEditor'
 export type { CodeEditorLayout, CodeEditorProps } from './components/codeEditor/codeEditor'
-export {
-  ButtonGroup,
-  ButtonGroupSeparator,
-  ButtonGroupText,
-} from './components/buttonGroup/buttonGroup'
-export type {
-  ButtonGroupOrientation,
-  ButtonGroupProps,
-  ButtonGroupSeparatorProps,
-  ButtonGroupTextProps,
-} from './components/buttonGroup/buttonGroup'
 export { Field } from './components/field/field'
 export type {
   FieldDescriptionProps,
@@ -319,8 +306,6 @@ export type {
   KeyboardInputSize,
   KeyboardInputVariant,
 } from './components/keyboardInput/keyboardInput'
-export { Textarea } from './components/textarea/textarea'
-export type { TextareaFont, TextareaHeight, TextareaProps } from './components/textarea/textarea'
 export { Menu } from './components/menu/menu'
 export type {
   MenuCheckboxItemIndicatorProps,

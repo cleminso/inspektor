@@ -1,16 +1,8 @@
 import * as stylex from '@stylexjs/stylex'
 import type { ReactElement } from 'react'
-import { CopyButton } from '../copyButton/copyButton'
-import { Input } from '../input/input'
-import { InputGroup } from '../inputGroup/inputGroup'
 import { MiddleTruncate } from '../middleTruncate/middleTruncate'
 import { TextLink } from '../textLink/textLink'
 import { relationValueStyles } from './relationValue.styles'
-
-export type RelationValueState =
-  | { status: 'pending' }
-  | { status: 'resolved'; displayValue: string }
-  | { status: 'missing' }
 
 export type RelationValueNavigation =
   | { href: string; render?: never }
@@ -23,11 +15,6 @@ export interface RelationValueProps {
   navigation?: RelationValueNavigation
 }
 
-export interface RelationDetailsProps extends RelationValueProps {
-  /** Current state of target resolution. */
-  state: RelationValueState
-}
-
 function ArrowIcon() {
   return (
     <svg
@@ -37,50 +24,6 @@ function ArrowIcon() {
     >
       <path d="M2 6h7M6.5 2.5 10 6 6.5 9.5" />
     </svg>
-  )
-}
-
-export function RelationDetails(props: RelationDetailsProps) {
-  return (
-    <div {...stylex.props(relationValueStyles.details)}>
-      <dl {...stylex.props(relationValueStyles.fields)}>
-        <div {...stylex.props(relationValueStyles.field)}>
-          <dt {...stylex.props(relationValueStyles.label)}>Stored ID</dt>
-          <dd {...stylex.props(relationValueStyles.groupValue)}>
-            <InputGroup fullWidth>
-              <Input
-                aria-label="Stored relation ID"
-                readOnly
-                translate="no"
-                value={props.id}
-              />
-              <InputGroup.Suffix>
-                <span {...stylex.props(relationValueStyles.groupActions)}>
-                  {props.navigation === undefined ? null : (
-                    <TextLink {...props.navigation}>Open target</TextLink>
-                  )}
-                </span>
-              </InputGroup.Suffix>
-            </InputGroup>
-          </dd>
-        </div>
-        {props.state.status === 'resolved' ? (
-          <div {...stylex.props(relationValueStyles.field)}>
-            <dt {...stylex.props(relationValueStyles.label)}>Display value</dt>
-            <dd {...stylex.props(relationValueStyles.displayValue)}>
-              <span {...stylex.props(relationValueStyles.value)}>{props.state.displayValue}</span>
-              <CopyButton
-                textToCopy={props.state.displayValue}
-                label="Copy display value"
-                copiedLabel="Display value copied"
-                errorLabel="Could not copy display value"
-                size="s"
-              />
-            </dd>
-          </div>
-        ) : null}
-      </dl>
-    </div>
   )
 }
 

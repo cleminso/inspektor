@@ -350,7 +350,7 @@ Button is the single-part model.
 - **Public contract:** inherit Base Button, remove styling and low-level behavior knobs, add semantic variants/loading, and enforce icon-only accessibility (`button.tsx:23-69`).
 - **Ref:** `forwardRef<HTMLElement, ButtonProps>` reaches the Base Button (`button.tsx:71-90`, `110-119`).
 - **Behavior translation:** `disabled || loading` becomes Base's disabled state; loading also controls focusability and `aria-busy` (`button.tsx:91-128`). Base blocks interaction; Inspektor decides what loading means. The test verifies that boundary (`button.test.tsx:35-53`).
-- **State styling:** Base's disabled state combines with semantic props and ButtonGroup context (`button.tsx:91-108`). Exhaustive lookup records implement the constrained API (`buttonVisuals.tsx:9-96`).
+- **State styling:** Base's disabled state combines with semantic props (`button.tsx:90-110`). Exhaustive lookup records implement the constrained API (`buttonVisuals.tsx:8-90`).
 - **DOM:** Inspektor always supplies ButtonContent, but Base remains the interactive/custom-render node (`button.tsx:129-140`; `buttonVisuals.tsx:98-166`).
 
 ### Accordion

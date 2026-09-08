@@ -1,12 +1,9 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
 
-import { RelationDetails, RelationValue } from './relationValue'
+import { RelationValue } from './relationValue'
 
-afterEach(() => {
-  cleanup()
-  vi.restoreAllMocks()
-})
+afterEach(cleanup)
 
 describe('RelationValue', () => {
   it('renders only the stored ID when navigation is absent', () => {
@@ -49,65 +46,5 @@ describe('RelationValue', () => {
     expect(stateProp).toBeTruthy()
     expect(modeProp).toBeTruthy()
     expect(classNameProp).toBeTruthy()
-  })
-})
-
-describe('RelationDetails', () => {
-  it('copies the display value and composes optional target navigation', async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined)
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText },
-    })
-    render(
-      <RelationDetails
-        id="account_0123456789-complete"
-        navigation={{ href: '/accounts/account_0123456789-complete' }}
-        state={{ status: 'resolved', displayValue: 'Ada Lovelace' }}
-      />,
-    )
-
-    const storedIdInput = screen.getByRole('textbox', { name: 'Stored relation ID' })
-    const inputGroup = storedIdInput.closest('[data-slot="input-group"]')
-    const copyButton = screen.getByRole('button', { name: 'Copy display value' })
-    const targetLink = screen.getByRole('link', { name: 'Open target' })
-    expect(storedIdInput.getAttribute('value')).toBe('account_0123456789-complete')
-    expect(storedIdInput.getAttribute('translate')).toBe('no')
-    expect(screen.getByText('Ada Lovelace')).toBeTruthy()
-    expect(inputGroup?.contains(targetLink)).toBe(true)
-
-    fireEvent.click(copyButton)
-
-    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('Ada Lovelace'))
-    expect(targetLink.getAttribute('href')).toBe('/accounts/account_0123456789-complete')
-  })
-
-  it('requires valid resolution states and owns its styling', () => {
-    const unresolvedDisplay = (
-      <RelationDetails
-        id="account_1"
-        // @ts-expect-error Resolved relation state requires a display value.
-        state={{ status: 'resolved' }}
-      />
-    )
-    const missingDisplay = (
-      <RelationDetails
-        id="account_1"
-        // @ts-expect-error Missing relation state cannot carry a resolved display value.
-        state={{ status: 'missing', displayValue: 'Ada' }}
-      />
-    )
-    const styleProp = (
-      <RelationDetails
-        id="account_1"
-        state={{ status: 'missing' }}
-        // @ts-expect-error RelationDetails owns its presentation.
-        style={{ color: 'red' }}
-      />
-    )
-
-    expect(unresolvedDisplay).toBeTruthy()
-    expect(missingDisplay).toBeTruthy()
-    expect(styleProp).toBeTruthy()
   })
 })

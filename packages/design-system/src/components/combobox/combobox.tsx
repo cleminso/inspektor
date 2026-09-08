@@ -365,7 +365,6 @@ const ComboboxTrigger = forwardRef<ComponentRef<typeof BaseCombobox.Trigger>, Co
         radius: 'xs',
         fill: width === 'full',
         alignment: 'start',
-        orientation: null,
         disabled: state.disabled,
         hasPrefix: false,
         hasSuffix: false,

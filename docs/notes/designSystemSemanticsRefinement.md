@@ -71,7 +71,6 @@ selected: {
 ### Batch 1: field controls
 
 - `Input`
-- `Textarea`
 - `InputGroup`
 - `Field`
 - `TextField`
@@ -83,7 +82,6 @@ Normalize focus, invalid, disabled, read-only, and compound-action semantics.
 ### Batch 2: actions and selection
 
 - `Button`
-- `ButtonGroup`
 - `Checkbox`
 - `Switch`
 - `ToggleGroup`

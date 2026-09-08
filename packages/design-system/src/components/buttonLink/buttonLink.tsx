@@ -1,9 +1,8 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
 import * as stylex from '@stylexjs/stylex'
-import { forwardRef, useContext, type ReactNode } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 
-import { ButtonGroupOrientationContext } from '../buttonGroup/buttonGroupContext'
 import {
   ButtonContent,
   buttonLayoutOptions,
@@ -72,7 +71,6 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(functio
   },
   forwardedRef,
 ) {
-  const buttonGroupOrientation = useContext(ButtonGroupOrientationContext)
   const layoutOptions = buttonLayoutOptions[layout]
   const isCurrent = props['aria-current'] === 'page'
   const styleProps = stylex.props(
@@ -84,7 +82,6 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(functio
       radius,
       fill: layoutOptions.fill,
       alignment: layoutOptions.alignment,
-      orientation: buttonGroupOrientation,
       disabled: false,
       hasPrefix: prefix !== undefined,
       hasSuffix: suffix !== undefined,

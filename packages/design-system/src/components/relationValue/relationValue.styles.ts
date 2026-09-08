@@ -1,13 +1,7 @@
 import * as stylex from '@stylexjs/stylex'
 
 import { spatial, textColors } from '../../tokens/semantics.stylex'
-import {
-  fontFamilies,
-  fontSizes,
-  fontWeights,
-  lineHeights,
-  spacing,
-} from '../../tokens/value.stylex'
+import { fontFamilies, fontSizes, lineHeights, spacing } from '../../tokens/value.stylex'
 
 export const relationValueStyles = stylex.create({
   compact: {
@@ -47,14 +41,6 @@ export const relationValueStyles = stylex.create({
     display: 'inline-flex',
     flexShrink: 0,
   },
-  compactMissing: {
-    color: textColors.danger,
-    flexShrink: 0,
-    fontFamily: fontFamilies.mono,
-    fontSize: fontSizes[1],
-    fontWeight: fontWeights.medium,
-    lineHeight: lineHeights.compact,
-  },
   arrow: {
     fill: 'none',
     stroke: 'currentColor',
@@ -64,54 +50,5 @@ export const relationValueStyles = stylex.create({
     display: 'block',
     height: spatial['icon-size-xs'],
     width: spatial['icon-size-xs'],
-  },
-  details: {
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-  },
-  fields: {
-    margin: 0,
-    gap: spacing.m,
-    display: 'grid',
-    minWidth: 0,
-  },
-  field: {
-    margin: 0,
-    gap: spacing.xs,
-    display: 'grid',
-    minWidth: 0,
-  },
-  label: {
-    color: textColors.muted,
-    fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[1],
-    fontWeight: fontWeights.medium,
-    lineHeight: lineHeights.compact,
-  },
-  value: {
-    margin: 0,
-    color: textColors.default,
-    fontFamily: fontFamilies.sans,
-    fontSize: fontSizes[2],
-    lineHeight: lineHeights.ui,
-    overflowWrap: 'anywhere',
-  },
-  displayValue: {
-    margin: 0,
-    gap: spacing.s,
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'space-between',
-    minWidth: 0,
-  },
-  groupValue: {
-    margin: 0,
-    minWidth: 0,
-  },
-  groupActions: {
-    gap: spacing.s,
-    alignItems: 'center',
-    display: 'flex',
   },
 })

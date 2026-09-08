@@ -17,7 +17,6 @@ import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 import { Route as ComponentsBinaryValueRouteImport } from './routes/components/binary-value'
 import { Route as ComponentsBoxRouteImport } from './routes/components/box'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
-import { Route as ComponentsButtonGroupRouteImport } from './routes/components/button-group'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
 import { Route as ComponentsCalendarRouteImport } from './routes/components/calendar'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
@@ -54,7 +53,6 @@ import { Route as ComponentsSwimlaneTimelineRouteImport } from './routes/compone
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
-import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
 import { Route as ComponentsThemeSwitchRouteImport } from './routes/components/theme-switch'
 import { Route as ComponentsTimestampValueRouteImport } from './routes/components/timestamp-value'
 import { Route as ComponentsToastRouteImport } from './routes/components/toast'
@@ -103,11 +101,6 @@ const ComponentsBoxRoute = ComponentsBoxRouteImport.update({
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
   id: '/components/button',
   path: '/components/button',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComponentsButtonGroupRoute = ComponentsButtonGroupRouteImport.update({
-  id: '/components/button-group',
-  path: '/components/button-group',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsButtonLinkRoute = ComponentsButtonLinkRouteImport.update({
@@ -295,11 +288,6 @@ const ComponentsTextLinkRoute = ComponentsTextLinkRouteImport.update({
   path: '/components/text-link',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
-  id: '/components/textarea',
-  path: '/components/textarea',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ComponentsThemeSwitchRoute = ComponentsThemeSwitchRouteImport.update({
   id: '/components/theme-switch',
   path: '/components/theme-switch',
@@ -356,7 +344,6 @@ export interface FileRoutesByFullPath {
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
-  '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
@@ -393,7 +380,6 @@ export interface FileRoutesByFullPath {
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
-  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/theme-switch': typeof ComponentsThemeSwitchRoute
   '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
@@ -413,7 +399,6 @@ export interface FileRoutesByTo {
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
-  '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
@@ -450,7 +435,6 @@ export interface FileRoutesByTo {
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
-  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/theme-switch': typeof ComponentsThemeSwitchRoute
   '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
@@ -471,7 +455,6 @@ export interface FileRoutesById {
   '/components/binary-value': typeof ComponentsBinaryValueRoute
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
-  '/components/button-group': typeof ComponentsButtonGroupRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
   '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
@@ -508,7 +491,6 @@ export interface FileRoutesById {
   '/components/switch': typeof ComponentsSwitchRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
-  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/theme-switch': typeof ComponentsThemeSwitchRoute
   '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
@@ -530,7 +512,6 @@ export interface FileRouteTypes {
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
-    | '/components/button-group'
     | '/components/button-link'
     | '/components/calendar'
     | '/components/checkbox'
@@ -567,7 +548,6 @@ export interface FileRouteTypes {
     | '/components/switch'
     | '/components/text-field'
     | '/components/text-link'
-    | '/components/textarea'
     | '/components/theme-switch'
     | '/components/timestamp-value'
     | '/components/toast'
@@ -587,7 +567,6 @@ export interface FileRouteTypes {
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
-    | '/components/button-group'
     | '/components/button-link'
     | '/components/calendar'
     | '/components/checkbox'
@@ -624,7 +603,6 @@ export interface FileRouteTypes {
     | '/components/switch'
     | '/components/text-field'
     | '/components/text-link'
-    | '/components/textarea'
     | '/components/theme-switch'
     | '/components/timestamp-value'
     | '/components/toast'
@@ -644,7 +622,6 @@ export interface FileRouteTypes {
     | '/components/binary-value'
     | '/components/box'
     | '/components/button'
-    | '/components/button-group'
     | '/components/button-link'
     | '/components/calendar'
     | '/components/checkbox'
@@ -681,7 +658,6 @@ export interface FileRouteTypes {
     | '/components/switch'
     | '/components/text-field'
     | '/components/text-link'
-    | '/components/textarea'
     | '/components/theme-switch'
     | '/components/timestamp-value'
     | '/components/toast'
@@ -702,7 +678,6 @@ export interface RootRouteChildren {
   ComponentsBinaryValueRoute: typeof ComponentsBinaryValueRoute
   ComponentsBoxRoute: typeof ComponentsBoxRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
-  ComponentsButtonGroupRoute: typeof ComponentsButtonGroupRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
   ComponentsCalendarRoute: typeof ComponentsCalendarRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
@@ -739,7 +714,6 @@ export interface RootRouteChildren {
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
-  ComponentsTextareaRoute: typeof ComponentsTextareaRoute
   ComponentsThemeSwitchRoute: typeof ComponentsThemeSwitchRoute
   ComponentsTimestampValueRoute: typeof ComponentsTimestampValueRoute
   ComponentsToastRoute: typeof ComponentsToastRoute
@@ -807,13 +781,6 @@ declare module '@tanstack/react-router' {
       path: '/components/button'
       fullPath: '/components/button'
       preLoaderRoute: typeof ComponentsButtonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/components/button-group': {
-      id: '/components/button-group'
-      path: '/components/button-group'
-      fullPath: '/components/button-group'
-      preLoaderRoute: typeof ComponentsButtonGroupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/button-link': {
@@ -1068,13 +1035,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsTextLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/components/textarea': {
-      id: '/components/textarea'
-      path: '/components/textarea'
-      fullPath: '/components/textarea'
-      preLoaderRoute: typeof ComponentsTextareaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/components/theme-switch': {
       id: '/components/theme-switch'
       path: '/components/theme-switch'
@@ -1150,7 +1110,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsBinaryValueRoute: ComponentsBinaryValueRoute,
   ComponentsBoxRoute: ComponentsBoxRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
-  ComponentsButtonGroupRoute: ComponentsButtonGroupRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
   ComponentsCalendarRoute: ComponentsCalendarRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
@@ -1187,7 +1146,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsSwitchRoute: ComponentsSwitchRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextLinkRoute: ComponentsTextLinkRoute,
-  ComponentsTextareaRoute: ComponentsTextareaRoute,
   ComponentsThemeSwitchRoute: ComponentsThemeSwitchRoute,
   ComponentsTimestampValueRoute: ComponentsTimestampValueRoute,
   ComponentsToastRoute: ComponentsToastRoute,

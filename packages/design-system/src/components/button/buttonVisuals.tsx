@@ -1,8 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import * as stylex from '@stylexjs/stylex'
 
-import { buttonGroupStyles } from '../buttonGroup/buttonGroup.styles'
-import type { ButtonGroupOrientation } from '../buttonGroup/buttonGroupContext'
 import { Icon, type IconArtwork, type IconSize } from '../icon/icon'
 import { Spinner, type SpinnerSize } from '../spinner/spinner'
 import { buttonStyles } from './button.styles'
@@ -93,7 +91,6 @@ interface ButtonVisualStylesOptions {
   alignment: ButtonLayoutOptions['alignment']
   stacked?: boolean
   radius: ButtonRadius
-  orientation: ButtonGroupOrientation | null
   disabled: boolean
   hasPrefix: boolean
   hasSuffix: boolean
@@ -109,7 +106,6 @@ export function getButtonVisualStyles({
   alignment,
   stacked = false,
   radius,
-  orientation,
   disabled,
   hasPrefix,
   hasSuffix,
@@ -124,9 +120,6 @@ export function getButtonVisualStyles({
     pressed === true && variant !== 'primary' && buttonStyles.pressed,
     expanded === true && expandedStyles[variant],
     radiusStyles[radius],
-    orientation !== null && buttonGroupStyles.member,
-    orientation === 'horizontal' && buttonGroupStyles.memberHorizontal,
-    orientation === 'vertical' && buttonGroupStyles.memberVertical,
     fill === true && buttonStyles.fill,
     alignment === 'start' && buttonStyles.alignStart,
     stacked === true && buttonStyles.stacked,

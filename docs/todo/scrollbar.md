@@ -30,7 +30,7 @@
 - [x] Reveal the thumb when the scroll container is hovered or contains focus.
 - [x] Avoid reserved gutters and custom WebKit dimensions so non-overflowing regions do not gain an empty inline strip.
 - [x] Apply the standard recipe automatically to scrollable `Box` instances.
-- [x] Apply the standard recipe to Data Grid, Side Panel, Combobox, Select, Multi Select, Menu, Context Menu, Textarea, and Code Editor scroll owners.
+- [x] Apply the standard recipe to Data Grid, Side Panel, Combobox, Select, Multi Select, Menu, Context Menu, and Code Editor scroll owners.
 - [x] Move popup overscroll containment onto the elements that own scrolling.
 - [x] Bound Menu, Context Menu, and Multi Select popups by Base UI available height.
 - [x] Remove the documentation application's duplicate scrollbar appearance rules.

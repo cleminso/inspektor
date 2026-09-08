@@ -29,8 +29,7 @@
         "href": ["href", "to"]
       },
       "components": {
-        "Input": "input",
-        "Textarea": "textarea"
+        "Input": "input"
       }
     }
   },

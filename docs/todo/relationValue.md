@@ -37,7 +37,7 @@ This checklist tracks the reusable relation preview and detail component.
 - [x] Document compact and detail relation presentations with an executable consumer example.
 - [x] Generate separate package-authoritative prop sections for the public compact and detail interfaces.
 - [x] Register stable navigation and generated-props metadata.
-- [x] Split compact identifiers from target and resolution details into `RelationValue` and `RelationDetails`.
+- [x] Keep compact identifiers and optional target navigation in `RelationValue`.
 - [x] Use ordinary stable metadata IDs for both exported components.
 - [x] Reuse `CopyButton` feedback so relation ID copy success and failure are announced.
 
