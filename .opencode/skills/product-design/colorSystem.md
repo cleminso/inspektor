@@ -26,7 +26,7 @@ Shipped code is evidence, not automatic precedent. Confirm that an existing toke
 - `packages/design-system/src/tokens/semantics.stylex.ts` owns interface semantic roles.
 - `packages/design-system/src/components/{componentName}/*Colors.stylex.ts` owns private component color roles.
 - `apps/design-system/src/components/content/foundations/color.tsx` documents the rendered system.
-- `docs/todo/colorTokens.md` tracks implementation work and unresolved decisions.
+- `todo/colorTokens.md` tracks implementation work and unresolved decisions.
 
 Do not duplicate source values in this reference. This file owns the decision model and vocabulary; code owns the active values.
 
@@ -159,7 +159,7 @@ Applications consume interface roles through constrained design-system APIs. The
 4. Add a new interface role only when the ownership rules justify it.
 5. Write or update a token contract test before migrating consumers.
 6. Migrate constrained public aliases, component styles, applications, documentation, and generated metadata together.
-7. Record unresolved questions in `docs/todo/colorTokens.md` rather than hiding them in token names.
+7. Record unresolved questions in `todo/colorTokens.md` rather than hiding them in token names.
 8. Verify the rendered states in every supported color scheme.
 
 ## Validation
@@ -180,4 +180,4 @@ Applications consume interface roles through constrained design-system APIs. The
 - Whether component colors become a public theming contract.
 - Whether primitive palette exports move behind a documentation or tooling entry point.
 
-Keep unresolved decisions in `docs/todo/colorTokens.md`. Update this reference only after a decision is accepted.
+Keep unresolved decisions in `todo/colorTokens.md`. Update this reference only after a decision is accepted.

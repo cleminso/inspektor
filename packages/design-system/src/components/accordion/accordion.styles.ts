@@ -1,3 +1,4 @@
+// todo: remove background hover then play with the text color
 import * as stylex from '@stylexjs/stylex'
 
 import { focusColors, ghostElementColors, spatial, textColors } from '../../tokens/semantics.stylex'

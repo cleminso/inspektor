@@ -54,7 +54,7 @@ Record accepted reasoning according to its role:
 
 - A **reference** defines a reusable product rule, vocabulary, ownership boundary, and validation criteria.
 - An **exemplar** explains a concrete accepted decision, rejected alternatives, and why the pattern is worth repeating.
-- `docs/todo/*.md` tracks implementation work, exclusions, and unresolved questions.
+- `todo/*.md` tracks implementation work, exclusions, and unresolved questions.
 - `AGENTS.md` owns repository-wide operating constraints and skill-loading triggers.
 - Tests and linters enforce deterministic parts of the decision.
 
@@ -62,7 +62,7 @@ Do not promote one implementation into guidance without evidence that it represe
 
 ## Implementation checklists
 
-Use one `docs/todo/{elementName}.md` file per UI element. Each checklist contains a table of contents and these sections:
+Use one `todo/{elementName}.md` file per UI element. Each checklist contains a table of contents and these sections:
 
 - Implemented foundation
 - Open product work

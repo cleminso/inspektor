@@ -25,17 +25,17 @@ The key model is:
 
 > `apps/web` owns Inspektor product behavior and data. `@inspektor/ds` owns reusable UI behavior and presentation. `apps/design-system` documents and validates the public design-system contract.
 
-The import-boundary rules for optional heavy behavior are specified in [docs/importBoundaryPlaybook.md](docs/importBoundaryPlaybook.md). Component-level decisions belong in the corresponding `docs/todo/*.md` checklist.
+The import-boundary rules for optional heavy behavior are specified in [the import-boundary playbook](lat.md/importBoundaryPlaybook.md). Component-level implementation work belongs in the corresponding `todo/*.md` checklist.
 
 ## Workspace map
 
 The repository is a PNPM workspace. The root workspace configuration includes applications under `apps/*` and packages under `packages/*`. The catalog in `pnpm-workspace.yaml` centralizes versions that multiple workspace projects use.
 
-| Location                  | Role                                            | May depend on                                                             |
-| ------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| `apps/web`                | Inspektor product application                   | `@inspektor/ds`, product and data dependencies                            |
-| `apps/design-system`      | Component documentation and executable examples | public `@inspektor/ds` exports and documentation dependencies             |
-| `packages/design-system`  | The `@inspektor/ds` reusable UI package         | UI primitives and reusable interaction dependencies                       |
+| Location                 | Role                                            | May depend on                                                 |
+| ------------------------ | ----------------------------------------------- | ------------------------------------------------------------- |
+| `apps/web`               | Inspektor product application                   | `@inspektor/ds`, product and data dependencies                |
+| `apps/design-system`     | Component documentation and executable examples | public `@inspektor/ds` exports and documentation dependencies |
+| `packages/design-system` | The `@inspektor/ds` reusable UI package         | UI primitives and reusable interaction dependencies           |
 
 `apps/web` and `apps/design-system` are consumers of `@inspektor/ds`. They must use its public paths, not reach into `packages/design-system/src` with relative imports. This keeps the package boundary real even though all projects are in one repository.
 
@@ -236,18 +236,18 @@ Insert and edit row forms remain outside the static table-view graph. Schema rea
 
 Dependencies are selected for a role and an owning layer, not simply because they are available in the workspace.
 
-| Dependency group      | Examples                                   | Owner and implications                                                                            |
-| --------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| React runtime         | `react`, `react-dom`                       | Applications provide the shared runtime; DS declares peers                                        |
-| Component behavior    | `@base-ui/react`                           | DS wraps primitives to constrain APIs and preserve accessible behavior                            |
-| Styling               | `@stylexjs/stylex`, `@stylexjs/unplugin`   | DS styles are transformed by consuming Vite applications                                          |
-| Product data runtime  | `jazz-tools`                               | Web application only; keep behind connection-required boundaries                                  |
-| Routing               | `@tanstack/react-router`, router plugin    | Web and documentation apps own their route trees                                                  |
-| Optional interactions | CodeMirror, DnD Kit                        | DS may own reusable integration, but imports must remain deferred when optional                   |
-| Product data display  | `@tanstack/react-table`                    | Used where product or DS table responsibilities require it                                        |
-| Documentation         | Shiki                                      | Documentation app only; not a DS runtime concern                                                  |
-| Build output          | Vite, TSDown, TypeScript                   | Vite builds applications; TSDown emits design-system artifacts                                    |
-| Testing               | Vitest, Testing Library, JSDOM, Playwright | Verify logic, component and application behavior, boundaries, and browser workflows               |
+| Dependency group      | Examples                                   | Owner and implications                                                              |
+| --------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------- |
+| React runtime         | `react`, `react-dom`                       | Applications provide the shared runtime; DS declares peers                          |
+| Component behavior    | `@base-ui/react`                           | DS wraps primitives to constrain APIs and preserve accessible behavior              |
+| Styling               | `@stylexjs/stylex`, `@stylexjs/unplugin`   | DS styles are transformed by consuming Vite applications                            |
+| Product data runtime  | `jazz-tools`                               | Web application only; keep behind connection-required boundaries                    |
+| Routing               | `@tanstack/react-router`, router plugin    | Web and documentation apps own their route trees                                    |
+| Optional interactions | CodeMirror, DnD Kit                        | DS may own reusable integration, but imports must remain deferred when optional     |
+| Product data display  | `@tanstack/react-table`                    | Used where product or DS table responsibilities require it                          |
+| Documentation         | Shiki                                      | Documentation app only; not a DS runtime concern                                    |
+| Build output          | Vite, TSDown, TypeScript                   | Vite builds applications; TSDown emits design-system artifacts                      |
+| Testing               | Vitest, Testing Library, JSDOM, Playwright | Verify logic, component and application behavior, boundaries, and browser workflows |
 
 ## Adding a dependency or export
 
@@ -281,7 +281,7 @@ Use validation that matches the boundary changed:
 | Route boundary                          | Route behavior test and product build output inspection                                                  |
 | Package metadata such as `sideEffects`  | Verify modules have no required import-time effects and inspect consumer build behavior                  |
 
-Run the focused validation commands in [.opencode/skills/inspektor-workflow/references/validation.md](.opencode/skills/inspektor-workflow/references/validation.md) and the relevant feature checklist. A passing package build does not prove the application resolves the same contract; a passing source-consuming application build does not prove that the private package distribution is valid.
+Run the focused validation commands in [.opencode/skills/inspector-workflow/references/validation.md](.opencode/skills/inspector-workflow/references/validation.md) and the relevant feature checklist. A passing package build does not prove the application resolves the same contract; a passing source-consuming application build does not prove that the private package distribution is valid.
 
 ## Glossary
 

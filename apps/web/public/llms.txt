@@ -9,8 +9,9 @@ Inspektor is a browser-based inspector for Jazz applications. It displays publis
 - Design guide: https://github.com/cleminso/inspektor/blob/main/DESIGN.md
 - Project guide: https://github.com/cleminso/inspektor/blob/main/README.md
 - Architecture: https://github.com/cleminso/inspektor/blob/main/ARCHITECTURE.md
-- Product design: https://github.com/cleminso/inspektor/blob/main/docs/design-document.md
-- Frontend structure: https://github.com/cleminso/inspektor/blob/main/docs/frontendStructure.md
+- Knowledge graph: https://github.com/cleminso/inspektor/blob/main/lat.md/lat.md
+- Product design: https://github.com/cleminso/inspektor/blob/main/lat.md/design-document.md
+- Frontend structure: https://github.com/cleminso/inspektor/blob/main/lat.md/frontendStructure.md
 - Jazz documentation: https://jazz.tools/docs
 
 ## Connection model

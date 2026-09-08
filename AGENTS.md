@@ -20,6 +20,7 @@ Before editing files for a substantial task that changes TanStack behavior or di
 
 ## Table of contents
 
+- [Repository knowledge](#repository-knowledge)
 - [Skill routing](#skill-routing)
 - [Active workspace](#active-workspace)
 - [Git index ownership](#git-index-ownership)
@@ -28,9 +29,17 @@ Before editing files for a substantial task that changes TanStack behavior or di
 - [Repository invariants](#repository-invariants)
 - [TypeScript conventions](#typescript-conventions)
 
+## Repository knowledge
+
+- Before broad repository searches, run `lat search` for relevant architecture, ownership, behavior, decisions, and implementation paths. Read useful matches with `lat section`.
+- Treat Lat as navigation, not proof. Verify implementation claims against source, tests, manifests, generated output, or runtime behavior as applicable. Report conflicts.
+- When a change alters documented behavior, architecture, tests, or accepted decisions, update the relevant current-state Lat sections and run `lat check`.
+- Keep implementation work in `todo/`, accepted plans in `specs/`, and supporting evidence in `research/`. Do not use `lat.md/` as a changelog or task ledger.
+
 ## Skill routing
 
 - Load `inspektor-workflow` before planning, implementing, validating, debugging, optimizing performance, reviewing, or preparing repository changes for commit.
+- Load `typescript-discipline` when changing TypeScript configuration, domain or state models, reusable or public types, boundary parsing, or code that relies on assertions or custom narrowing.
 - Load `product-design` for user-visible product or design decisions and UI implementation checklists.
 - Load `create-inspector-component` when adding or changing `@inspektor/ds` components, public component APIs, Base UI wrappers, or StyleX component behavior.
 - Load `document-inspector-component` when adding a public component or changing its documentation, examples, registry metadata, or generated prop metadata.

@@ -118,7 +118,7 @@ Use a real browser with both short and overflowing fixtures.
 8. For Data Grid, confirm the vertical track begins at the sticky header boundary and table semantics remain intact.
 9. Check browser console errors after a clean reload.
 
-Record geometry values in the relevant `docs/todo` checklist rather than relying on screenshots alone.
+Record geometry values in the relevant `todo` checklist rather than relying on screenshots alone.
 
 ## Failure modes
 
@@ -142,5 +142,5 @@ Record geometry values in the relevant `docs/todo` checklist rather than relying
 - [ ] Sticky or fixed regions remain outside scrolling content or receive a semantic track offset.
 - [ ] Unit tests cover only Inspektor-owned contracts.
 - [ ] Browser measurements prove start and end thumb geometry.
-- [ ] Relevant component documentation and `docs/todo` checklist updated.
+- [ ] Relevant component documentation and `todo` checklist updated.
 - [ ] Focused tests, lint, typecheck, and build pass.

@@ -50,6 +50,9 @@ pnpm test:browser
 ## Project documentation
 
 - [Architecture](./ARCHITECTURE.md)
-- [Frontend structure](./docs/frontendStructure.md)
-- [Product design](./docs/design-document.md)
-- [Implementation checklists](./docs/todo/)
+- [Knowledge graph](./lat.md/lat.md)
+- [Frontend structure](./lat.md/frontendStructure.md)
+- [Product design](./lat.md/design-document.md)
+- [Implementation checklists](./todo/)
+- [Specifications](./specs/)
+- [Research](./research/)

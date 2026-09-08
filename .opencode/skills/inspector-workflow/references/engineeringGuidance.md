@@ -23,7 +23,7 @@
 - Present measured trade-offs when bundle size and interaction immediacy conflict.
 - Validate bundle impact and cold first-use behavior in a production browser build.
 - Add a regression test for the user-visible invariant.
-- Read `docs/importBoundaryPlaybook.md` before adding a heavy dependency, deferring optional behavior, or changing a dynamic import boundary.
+- Read `lat.md/importBoundaryPlaybook.md` before adding a heavy dependency, deferring optional behavior, or changing a dynamic import boundary.
 
 ## React
 
