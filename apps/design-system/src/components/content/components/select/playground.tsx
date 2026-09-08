@@ -1,5 +1,5 @@
 import { Box, Select, type SelectTriggerSize, type SelectWidth } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -72,7 +72,7 @@ export function serializeSelectPlayground(state: SelectPlaygroundState): string 
   })
 }
 
-export function SelectPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function SelectPlayground(): ReactElement {
   const [state, setState] = useState<SelectPlaygroundState>(initialState)
   const preview = (
     <Box>
@@ -116,8 +116,6 @@ export function SelectPlayground({ children }: { children?: ReactNode }): ReactE
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

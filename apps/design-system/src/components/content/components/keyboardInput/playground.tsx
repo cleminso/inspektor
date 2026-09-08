@@ -4,7 +4,7 @@ import {
   type KeyboardInputSize,
   type KeyboardInputVariant,
 } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -71,7 +71,7 @@ export function serializeKeyboardInputPlayground(state: KeyboardInputPlaygroundS
   })
 }
 
-export function KeyboardInputPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function KeyboardInputPlayground(): ReactElement {
   const [state, setState] = useState<KeyboardInputPlaygroundState>(initialState)
 
   return (
@@ -96,8 +96,6 @@ export function KeyboardInputPlayground({ children }: { children?: ReactNode }):
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

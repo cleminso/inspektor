@@ -124,6 +124,6 @@ Hover and checked backgrounds reuse `bg-hover` and `bg-selected` from the semant
 
 Accordion `Panel` explicitly exposes `keepMounted` and `hiddenUntilFound` in its public type so the extractor captures them.
 
-ActionList `Trigger` and `Action` explicitly expose `disabled` and `render` for the same reason. Implicit inheritance from Base UI was not sufficient for the generated `props.json`.
+ActionList `Trigger` and `Action` explicitly expose `disabled` and `render` so the supported composition contract remains visible in package source.
 
-An extractor regression test in `apps/design-system/scripts/extract-props.test.mjs` guards the documented Accordion and ActionList prop sets.
+Component tests guard the documented Accordion and ActionList behavior.

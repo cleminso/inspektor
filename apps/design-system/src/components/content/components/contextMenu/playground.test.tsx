@@ -25,7 +25,7 @@ describe('ContextMenu playground', () => {
     const { container } = render(<ContextMenuPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(container.querySelector('pre')?.textContent).toContain('<ContextMenu.Root disabled>')
   })

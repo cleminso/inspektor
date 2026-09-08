@@ -5,89 +5,62 @@
 - [Ownership boundary](#ownership-boundary)
 - [Idempotent updates](#idempotent-updates)
 - [Required files](#required-files)
-- [Generated props](#generated-props)
-- [Examples](#examples)
-- [Compound APIs](#compound-apis)
+- [Playgrounds](#playgrounds)
 - [Failure handling](#failure-handling)
 - [Completion checklist](#completion-checklist)
 
 ## Ownership boundary
 
-`packages/design-system` owns public names, types, requiredness, runtime defaults, descriptions, and deprecations. `apps/design-system` owns navigation, page composition, example selection, prop ordering, grouping, and usage guidance.
+`packages/design-system` owns public component behavior and APIs. `apps/design-system` owns navigation, one representative playground, consumer-facing source, and curated interactive controls.
 
-Do not fix generated metadata in `props.json` or duplicate API facts in a page. Correct package source or extraction logic and regenerate.
-
-Examples must demonstrate the closed styling contract. Do not teach consumers to pass `className`, inline `style`, raw CSS values, or arbitrary styling callbacks to design-system components.
+Examples must demonstrate the closed styling contract. Do not teach consumers to pass `className`, inline `style`, raw CSS values, or arbitrary styling callbacks.
 
 ## Idempotent updates
 
-Inspect all documentation surfaces for the component: public package export, extraction entry, extractor tests, generated metadata, registry item, content page, examples, prop selection, and static route. Compare them with the current package API.
-
-Create only absent surfaces and update only stale facts or examples. If every surface already matches, make no source edits and run the validation commands. This keeps repeated documentation requests safe and avoids duplicate navigation, extraction entries, or routes.
+Inspect the public package export, registry item, content page, playground, and static route. Create only absent surfaces and update only stale behavior. Do not add duplicate navigation, previews, controls, or routes.
 
 ## Required files
 
 A component page normally includes:
 
 - `src/components/content/components/{componentName}/page.tsx`
-- one or more focused `{topic}Example.tsx` modules
-- `props.ts` containing ordered prop names only
+- an optional `playground.tsx` for interactive state and controls
+- one focused example module for a fixed preview
 - `src/routes/components/{componentName}.tsx`
-- one registry item with `componentId`
-- one extraction entry and generated JSON record
+- one registry item
 
-Navigation contains documented components only. Do not add planned components or readiness badges to reserve future routes.
+Every page uses `ComponentDocsPage`. Static route files are authored source; `routeTree.gen.ts` is generated and must not be hand-edited.
 
-Static route files are authored source. `routeTree.gen.ts` is generated output and must not be hand-edited. Router tooling may regenerate it when a static route is added; review and retain the generated result produced by the repository commands.
+## Playgrounds
 
-## Generated props
+Interactive playground state drives three synchronized outputs:
 
-The extractor resolves the public export from `packages/design-system/src/index.ts`, filters external DOM props, reads package JSDoc, and reads literal defaults from parameter destructuring.
+- the center preview;
+- the right-dock controls;
+- the copyable source in the center code island.
 
-Use `inheritedProps` only for meaningful external props that are part of the design vocabulary but cannot be redeclared in the package. Prefer package redeclarations with JSDoc when the inherited behavior is part of the design-system contract. Do not document Base UI props that are not intentionally exposed.
+Controls are curated product inputs, not generated from TypeScript declarations. Use selects and switches only where the state has a clear preview effect. Omit controls for fixed previews rather than inventing configuration.
 
-Generated output is committed and deterministic. Run generation after package source formatting because source line numbers are included. `check:props` must fail when the artifact is stale.
+Fixed examples compile as consumer code. Import the module normally for preview and with `?raw` for the exact displayed source. Do not maintain a second handwritten source string.
 
-## Examples
-
-Each example module must compile as ordinary consumer code. The page imports the module twice: the normal import renders the preview, while the `?raw` import supplies the exact source string to Shiki and clipboard actions.
-
-Do not put page wrappers, fixed widths, or documentation-only labels inside the example unless consumers need them. Do not maintain a second handwritten source string.
-
-Cover the component's meaningful design dimensions without creating a matrix for every prop combination:
-
-- semantic variants
-- supported sizes
-- interaction and disabled/loading states
-- render composition
-- one representative compound composition
-
-Do not demonstrate props that are not part of the design vocabulary.
-
-## Compound APIs
-
-Treat each public part as its own API surface. Add extraction support for namespaced or `Object.assign` exports before generating tables. Present root, trigger, popup, item, or equivalent part props in separate sections, sharing examples where that improves comprehension.
-
-The registry `componentId` identifies the whole documented component. Generated metadata may use part-qualified keys beneath that identity, but route slugs must not become API identity.
+Compound components use one representative composition. Do not create separate API tables or a matrix of secondary examples.
 
 ## Failure handling
 
-- Missing public export: fix `packages/design-system/src/index.ts` or the extraction entry.
-- Missing generated prop: verify the page selection and package call signature.
-- Unwanted DOM props: tighten declaration-origin filtering.
-- Missing inherited behavior: redeclare it with package JSDoc or add a narrow allowlist entry.
-- Wrong default: fix the runtime destructuring initializer; never patch generated JSON.
-- Unsupported compound export: add a failing extractor test, then extend declaration resolution.
+- Missing public export: fix `packages/design-system/src/index.ts`.
+- Preview/source mismatch: make the serializer or paired raw import authoritative.
+- Unsupported control: keep the preview fixed or extend the constrained playground control model.
 - Shiki regression: verify the shared JavaScript engine and precompiled TSX grammar rather than adding a page-local highlighter.
+- Missing registry match: align the page source reference with the registry item.
 
 ## Completion checklist
 
-- Package public export and Base UI source verified
-- Registry item and stable `componentId` added
-- Extraction entry and tests added
-- Generated metadata refreshed
-- Focused executable examples added with `?raw`
-- Prop names selected without duplicated API facts
-- Static route and page metadata added
-- No placeholder navigation or readiness marker added
-- App and package validation pass
+- Package public export verified
+- Registry item added
+- One representative playground or fixed preview added
+- Preview and displayed source synchronized
+- Interactive controls exposed only through the right dock
+- Component title and description rendered in the center header
+- Static route added without hand-editing generated route output
+- No secondary examples, generated props tables, or placeholder guidance added
+- App validation passes

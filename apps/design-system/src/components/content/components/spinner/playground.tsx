@@ -1,5 +1,5 @@
 import { Spinner, type SpinnerSize } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -31,7 +31,7 @@ export function serializeSpinnerPlayground(state: SpinnerPlaygroundState): strin
   })
 }
 
-export function SpinnerPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function SpinnerPlayground(): ReactElement {
   const [state, setState] = useState<SpinnerPlaygroundState>(initialState)
   const controlsPane = (
     <PlaygroundControls
@@ -55,8 +55,6 @@ export function SpinnerPlayground({ children }: { children?: ReactNode }): React
       }
       sourceCode={serializeSpinnerPlayground(state)}
       controls={controlsPane}
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

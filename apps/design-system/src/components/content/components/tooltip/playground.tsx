@@ -1,5 +1,5 @@
 import { Button, Tooltip } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -56,7 +56,7 @@ export function serializeTooltipPlayground(state: TooltipPlaygroundState): strin
   })
 }
 
-export function TooltipPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function TooltipPlayground(): ReactElement {
   const [state, setState] = useState<TooltipPlaygroundState>(initialState)
   return (
     <ComponentDocsPage
@@ -91,8 +91,6 @@ export function TooltipPlayground({ children }: { children?: ReactNode }): React
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

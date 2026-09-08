@@ -41,7 +41,7 @@ Before editing files for a substantial task that changes TanStack behavior or di
 Implementation work is limited to:
 
 - `packages/design-system`: reusable `@inspektor/ds` components, primitives, and tokens.
-- `apps/design-system`: documentation, examples, generated API metadata, and design-system validation.
+- `apps/design-system`: documentation, playgrounds, and design-system validation.
 - `apps/web`: Inspektor routes, product state, Jazz access, and feature composition.
 - `apps/inspektor-test`: deterministic test schema, data, deployment tooling, and isolated fixtures.
 
@@ -72,8 +72,7 @@ Other workspace packages require an explicit user request.
 ## Repository invariants
 
 - Treat connection `adminSecret` values, fixture credentials, and persistent browser profiles as sensitive.
-- Never hand-edit `apps/web/src/routeTree.gen.ts`, `apps/design-system/src/routeTree.gen.ts`, or generated prop metadata.
-- Stabilize source APIs before regenerating metadata. Review generated output and, when preparing a commit, include it with its source change.
+- Never hand-edit `apps/web/src/routeTree.gen.ts` or `apps/design-system/src/routeTree.gen.ts`.
 
 ## TypeScript conventions
 

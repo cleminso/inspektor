@@ -20,7 +20,7 @@ describe('Fieldset playground', () => {
     const { container } = render(<FieldsetPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect((screen.getByRole('textbox', { name: 'Company' }) as HTMLInputElement).disabled).toBe(
       true,

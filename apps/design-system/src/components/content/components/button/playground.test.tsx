@@ -48,7 +48,7 @@ describe('Button playground', () => {
     const { container } = render(<ButtonPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Icon only' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(
       screen.getByRole('button', { name: 'Primary action' }).getAttribute('data-icon-only'),
@@ -58,5 +58,12 @@ describe('Button playground', () => {
     expect(container.querySelector('pre')?.textContent).toContain(
       '<svg aria-hidden="true" width={14} height={14}',
     )
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Icon only' }))
+
+    expect(screen.getByRole('button', { name: 'Primary' }).hasAttribute('data-icon-only')).toBe(
+      false,
+    )
+    expect(container.querySelector('pre')?.textContent).not.toContain('iconOnly')
   })
 })

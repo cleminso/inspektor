@@ -44,7 +44,7 @@ describe('ContextSwitcher playground', () => {
     const { container } = render(<ContextSwitcherPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(
       (screen.getByRole('combobox', { name: 'Switch branch' }) as HTMLButtonElement).disabled,

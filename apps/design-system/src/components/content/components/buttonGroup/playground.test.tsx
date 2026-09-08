@@ -26,7 +26,7 @@ describe('Button Group playground', () => {
     const { container } = render(<ButtonGroupPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Separator' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(screen.getByRole('separator')).toBeTruthy()
     expect(container.querySelector('pre')?.textContent).toContain('ButtonGroupSeparator')
@@ -55,7 +55,7 @@ describe('Button Group playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Text label' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reset controls' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(screen.queryByText('Document')).toBeNull()
     expect(container.querySelector('pre')?.textContent).not.toContain('ButtonGroupText')

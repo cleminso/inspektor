@@ -26,7 +26,7 @@ describe('Combobox playground', () => {
     const { container } = render(<ComboboxPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect((screen.getByPlaceholderText('Find a branch') as HTMLInputElement).disabled).toBe(true)
     expect(container.querySelector('pre')?.textContent).toContain('disabled')

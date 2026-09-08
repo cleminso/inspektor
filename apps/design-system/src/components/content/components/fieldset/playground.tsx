@@ -1,5 +1,5 @@
 import { Box, Field, Fieldset, Input } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -39,7 +39,7 @@ export function serializeFieldsetPlayground(state: FieldsetPlaygroundState): str
   })
 }
 
-export function FieldsetPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function FieldsetPlayground(): ReactElement {
   const [state, setState] = useState<FieldsetPlaygroundState>(initialState)
   const preview = (
     <Box width="popup-width-m">
@@ -78,8 +78,6 @@ export function FieldsetPlayground({ children }: { children?: ReactNode }): Reac
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

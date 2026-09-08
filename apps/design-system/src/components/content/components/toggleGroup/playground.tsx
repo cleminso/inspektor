@@ -6,7 +6,7 @@ import {
   type ToggleGroupSize,
   type ToggleGroupWidth,
 } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -84,7 +84,7 @@ export function serializeToggleGroupPlayground(state: ToggleGroupPlaygroundState
   })
 }
 
-export function ToggleGroupPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function ToggleGroupPlayground(): ReactElement {
   const [state, setState] = useState<ToggleGroupPlaygroundState>(initialState)
   const [value, setValue] = useState<string[]>(['tables'])
   const preview = (
@@ -130,8 +130,6 @@ export function ToggleGroupPlayground({ children }: { children?: ReactNode }): R
           }}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

@@ -23,7 +23,7 @@ describe('PlaygroundControls', () => {
     expect(onChange).toHaveBeenCalledWith('enabled', true)
   })
 
-  it('allocates equal-width slots to a label and its action control', () => {
+  it('keeps labels on one line and lets the action use its content width', () => {
     render(
       <PlaygroundControls
         controls={[{ kind: 'select', key: 'orientation', label: 'Orientation', options: [] }]}
@@ -33,10 +33,14 @@ describe('PlaygroundControls', () => {
       />,
     )
 
+    expect(
+      screen.getByText('Properties').parentElement?.parentElement?.getAttribute('style'),
+    ).toContain('width: 100%;')
+    expect(screen.getByText('Orientation').getAttribute('title')).toBe('Orientation')
     expect(screen.getByText('Orientation').parentElement?.getAttribute('style')).toContain(
       'flex: 1 1 0px;',
     )
-    expect(screen.getByRole('combobox').parentElement?.getAttribute('style')).toContain(
+    expect(screen.getByRole('combobox').parentElement?.getAttribute('style')).not.toContain(
       'flex: 1 1 0px;',
     )
   })

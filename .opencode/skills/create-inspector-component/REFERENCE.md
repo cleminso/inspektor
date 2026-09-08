@@ -85,5 +85,5 @@ Every omission beyond `className` and `style` needs a rationale in the component
 - Every keyboard or programmatic focus target has a visible, unclipped indicator with sufficient adjacent-color contrast
 - Composite widgets expose one sequential entry point and retain a visible current item in forced-colors mode
 - Inspektor behavior and contract tested without duplicating Base UI internals
-- Package exports, generated API metadata, and component documentation complete
+- Package exports and component playground documentation complete
 - Package and documentation validation pass

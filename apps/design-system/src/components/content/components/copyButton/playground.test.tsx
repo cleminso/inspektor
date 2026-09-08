@@ -27,7 +27,7 @@ describe('Copy Button playground', () => {
     const { container } = render(<CopyButtonPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(
       (screen.getByRole('button', { name: 'Copy schema hash' }) as HTMLButtonElement).disabled,
@@ -40,7 +40,7 @@ describe('Copy Button playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reset controls' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(
       (screen.getByRole('button', { name: 'Copy schema hash' }) as HTMLButtonElement).disabled,

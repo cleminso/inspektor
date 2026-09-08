@@ -14,7 +14,7 @@ afterEach(async () => {
 })
 
 describe('Toast playground', () => {
-  it('mounts one toaster when the playground and examples are composed', () => {
+  it('mounts one toaster in the component playground', () => {
     render(<ToastPage />)
 
     expect(document.querySelectorAll('[data-slot="toast-viewport"]')).toHaveLength(1)
@@ -36,7 +36,7 @@ describe('Toast playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Description' }))
     fireEvent.click(screen.getByRole('button', { name: 'Show toast' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(await screen.findByText('Additional context for this notification')).toBeTruthy()
     expect(container.querySelector('pre')?.textContent).toContain('description:')
@@ -47,7 +47,7 @@ describe('Toast playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Preserve' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reset controls' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(container.querySelector('pre')?.textContent).not.toContain('preserve:')
   })

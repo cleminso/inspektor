@@ -28,7 +28,7 @@ describe('TextField playground', () => {
     const { container } = render(<TextFieldPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Required' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect((screen.getByRole('textbox', { name: 'Server URL' }) as HTMLInputElement).required).toBe(
       true,

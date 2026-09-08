@@ -66,8 +66,8 @@ The design system owns reusable presentation and interaction behavior:
 The documentation application is a real consumer of the design system. It owns:
 
 - Component pages, registry metadata, and navigation for pages that exist.
-- Executable examples imported from `@inspektor/ds`.
-- Displayed example source and generated component-prop metadata.
+- Executable playgrounds imported from `@inspektor/ds`.
+- Displayed playground source and curated controls.
 - Documentation-only tooling such as Shiki.
 
 It must not import package-private implementation files at runtime. If documentation cannot express or demonstrate a needed public behavior, the public component API or documentation design needs reconsideration.
@@ -245,7 +245,7 @@ Dependencies are selected for a role and an owning layer, not simply because the
 | Routing               | `@tanstack/react-router`, router plugin    | Web and documentation apps own their route trees                                                  |
 | Optional interactions | CodeMirror, DnD Kit                        | DS may own reusable integration, but imports must remain deferred when optional                   |
 | Product data display  | `@tanstack/react-table`                    | Used where product or DS table responsibilities require it                                        |
-| Documentation         | Shiki, generated prop extraction tooling   | Documentation app only; not a DS runtime concern                                                  |
+| Documentation         | Shiki                                      | Documentation app only; not a DS runtime concern                                                  |
 | Build output          | Vite, TSDown, TypeScript                   | Vite builds applications; TSDown emits design-system artifacts                                    |
 | Testing               | Vitest, Testing Library, JSDOM, Playwright | Verify logic, component and application behavior, boundaries, and browser workflows               |
 

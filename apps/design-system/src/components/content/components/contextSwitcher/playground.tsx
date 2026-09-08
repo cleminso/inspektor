@@ -5,7 +5,7 @@ import {
   type ComboboxPopupWidth,
   type ComboboxViewportHeight,
 } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -75,7 +75,7 @@ export function serializeContextSwitcherPlayground(state: ContextSwitcherPlaygro
   })
 }
 
-export function ContextSwitcherPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function ContextSwitcherPlayground(): ReactElement {
   const [state, setState] = useState<ContextSwitcherPlaygroundState>(initialState)
   const preview = (
     <ContextSwitcher.Root
@@ -125,8 +125,6 @@ export function ContextSwitcherPlayground({ children }: { children?: ReactNode }
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

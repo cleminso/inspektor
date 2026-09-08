@@ -1,5 +1,5 @@
 import { Box, Textarea, type TextareaFont, type TextareaHeight } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -59,7 +59,7 @@ export function serializeTextareaPlayground(state: TextareaPlaygroundState): str
   })
 }
 
-export function TextareaPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function TextareaPlayground(): ReactElement {
   const [state, setState] = useState<TextareaPlaygroundState>(initialState)
   const controlsPane = (
     <PlaygroundControls
@@ -86,8 +86,6 @@ export function TextareaPlayground({ children }: { children?: ReactNode }): Reac
       }
       sourceCode={serializeTextareaPlayground(state)}
       controls={controlsPane}
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

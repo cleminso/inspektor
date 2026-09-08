@@ -1,4 +1,4 @@
-import { Box, Button } from '@inspektor/ds'
+import { Box, Button, Text } from '@inspektor/ds'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { type ReactElement } from 'react'
@@ -7,10 +7,11 @@ import { SourceLink } from '@/components/docs/sourceLink'
 import { getAdjacentNavigationItems, type NavItem } from '@/lib/registry'
 
 interface DocsHeaderProps {
+  description?: string
   item: NavItem
 }
 
-export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
+export function DocsHeader({ description, item }: DocsHeaderProps): ReactElement {
   const navigate = useNavigate()
   const { previous: previousItem, next: nextItem } = getAdjacentNavigationItems(item.href)
 
@@ -29,7 +30,7 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
   return (
     <Box
       as="header"
-      alignItems="center"
+      alignItems="start"
       justifyContent="between"
       gap="l"
       flexShrink={0}
@@ -39,10 +40,24 @@ export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
       borderRadius="xs"
       overflow="hidden"
     >
-      <SourceLink
-        source={item.source}
-        title={item.title}
-      />
+      <Box
+        minWidth={0}
+        flexDirection="column"
+        gap="xs"
+      >
+        <SourceLink
+          source={item.source}
+          title={item.title}
+        />
+        {description !== undefined ? (
+          <Text
+            variant="body"
+            color="muted"
+          >
+            {description}
+          </Text>
+        ) : null}
+      </Box>
       <Box
         alignItems="center"
         gap="none"

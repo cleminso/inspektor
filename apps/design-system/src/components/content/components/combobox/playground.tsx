@@ -4,7 +4,7 @@ import {
   type ComboboxViewportHeight,
   Field,
 } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -60,7 +60,7 @@ export function serializeComboboxPlayground(state: ComboboxPlaygroundState): str
   })
 }
 
-export function ComboboxPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function ComboboxPlayground(): ReactElement {
   const [state, setState] = useState<ComboboxPlaygroundState>(initialState)
   const preview = (
     <Field.Root name="branch">
@@ -108,8 +108,6 @@ export function ComboboxPlayground({ children }: { children?: ReactNode }): Reac
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

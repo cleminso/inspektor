@@ -1,5 +1,5 @@
 import { Box, Field, Input } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -53,7 +53,7 @@ export function serializeFieldPlayground(state: FieldPlaygroundState): string {
   })
 }
 
-export function FieldPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function FieldPlayground(): ReactElement {
   const [state, setState] = useState<FieldPlaygroundState>(initialState)
   const preview = (
     <Box width="popup-width-m">
@@ -93,8 +93,6 @@ export function FieldPlayground({ children }: { children?: ReactNode }): ReactEl
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

@@ -161,6 +161,7 @@ const SelectTrigger = React.forwardRef<
 const SelectValue = React.forwardRef<HTMLSpanElement, BaseSelect.Value.Props>(
   function SelectValue(props, ref) {
     const stateStyles = createStateStyleProps<BaseSelect.Value.State>((state) => [
+      selectStyles.value,
       state.placeholder === true && selectStyles.valuePlaceholder,
     ])
     return (

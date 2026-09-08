@@ -1,56 +1,47 @@
----
-name: document-inspector-component
-description: Generates and updates `apps/design-system` documentation for `@inspektor/ds` components using registry metadata, executable raw-source examples, generated props, and Shiki code blocks. Use when adding a component page, changing a documented component API, updating examples, or fixing generated prop metadata.
----
-
 # Document Inspektor Component
+
+## Table of contents
+
+- [Quick start](#quick-start)
+- [Documentation workflow](#documentation-workflow)
+- [Playground and code](#playground-and-code)
+- [Validation](#validation)
 
 ## Quick start
 
-1. Inspect the public package export and its matching Base UI API reference.
-2. Add or update the component's `componentId` extraction entry.
-3. Generate package-authoritative prop metadata.
-4. Create executable examples paired with `?raw` source imports.
-5. Add the content page, registry item, and static route.
-6. Validate generation, rendering, types, and build output.
+1. Inspect the public package export and the registry.
+2. Create one representative playground or fixed preview.
+3. Pair the preview with its exact consumer-facing source.
+4. Add the content page, registry item, and static route.
+5. Validate rendering, controls, types, and build output.
 
 ## Documentation workflow
 
-- Start with an idempotency check across the page, examples, prop selection, registry, extractor, generated metadata, and route. Update only missing or stale parts; when everything matches the public API, run validation without creating duplicate files or entries.
-- Add the component to `apps/design-system/src/lib/registry.ts` only when its page exists.
-- Give component items a stable `componentId`; do not use readiness or placeholder status markers.
-- Include title, route, description, package import path, and package source reference.
-- Register `{ componentId, exportName, inheritedProps }` in `apps/design-system/scripts/extract-props.mjs`.
-- Add a failing extractor test when the component export shape or inherited-prop policy is new.
+- Start with an idempotency check across the package export, registry, page, playground, and route.
+- Add a registry item only when its page exists. Keep its title, route, description, package import path, and package source reference current.
 - Put page content under `src/components/content/components/{componentName}/`.
-- Keep each executable example in its own camelCase TSX file.
-- Import each example normally for preview and with `?raw` for displayed source.
-- Use `PageHeader`, `Section`, `Example`, `CodeBlock`, and `PropsTable` rather than recreating page chrome.
-- Add a static route under `apps/design-system/src/routes/components/`; never hand-edit `apps/design-system/src/routeTree.gen.ts`. Router generation may update the generated tree as a consequence of validation; review that generated change rather than recreating it manually.
+- Use `ComponentDocsPage` for every component page, including pages with fixed previews.
+- Render one playground only. Do not add secondary example sections or generated props tables.
+- Put interactive playground controls in the right dock through the `controls` prop. Fixed playgrounds may omit controls.
+- Keep the component title and description in the center header. Reserve the right dock for controls and Reset.
+- Add a static route under `src/routes/components/`; never hand-edit `src/routeTree.gen.ts`.
+- Do not add a Best practices section without an explicit product decision and authored guidance.
 
-## Props workflow
-
-- Package TypeScript, runtime defaults, and JSDoc are authoritative.
-- Page prop files contain only selected prop names in display order; select only props that are part of the design vocabulary.
-- Use `getGeneratedProps(componentId, propNames)` to resolve rows.
-- Do not override generated type, requiredness, default, description, or source.
-- Group compound-component parts into separate API sections when their props differ.
-
-## Examples and code
+## Playground and code
 
 - Examples must import from `@inspektor/ds` as consumers do.
-- Show focused copyable usage; put preview-only layout in `Example`, not the example module.
-- Keep preview and displayed code synchronized through paired normal and `?raw` imports.
-- Reuse the shared Shiki highlighter; do not instantiate one per page.
+- Interactive playground state owns the preview, controls, and serialized source.
+- Fixed playgrounds use one focused example module imported normally for preview and with `?raw` for displayed source.
+- Keep preview-only layout in the page or playground, not the consumer example.
+- Reuse `createPlaygroundSource` and the shared Shiki highlighter.
+- The code island remains collapsed until its `Code` header is activated.
 
 ## Validation
 
 - `pnpm --filter inspektor.design-system test`
-- `pnpm --filter inspektor.design-system gen:props`
-- `pnpm --filter inspektor.design-system check:props`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`
-- `pnpm --filter @inspektor/ds build`
+- `pnpm --filter @inspektor/ds build` when package source or public APIs change
 
-See [REFERENCE.md](REFERENCE.md) for page structure, compound APIs, and failure handling.
+See [REFERENCE.md](REFERENCE.md) for page structure and completion criteria.

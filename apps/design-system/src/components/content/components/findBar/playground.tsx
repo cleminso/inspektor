@@ -1,5 +1,5 @@
 import { Box, FindBar, type FindBarSearchOptions, type FindBarState } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { findBarItem } from '@/lib/registry'
@@ -27,7 +27,10 @@ export default function Example() {
     <FindBar
       label="Find in document"
       value={value}
-      onValueChange={setValue}
+      onValueChange={(nextValue) => {
+        setValue(nextValue);
+        setActiveIndex(0);
+      }}
       state={state}
       searchOptions={searchOptions}
       onSearchOptionsChange={setSearchOptions}
@@ -37,7 +40,7 @@ export default function Example() {
   );
 }`
 
-export function FindBarPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function FindBarPlayground(): ReactElement {
   const [value, setValue] = useState('account')
   const [activeIndex, setActiveIndex] = useState(0)
   const [searchOptions, setSearchOptions] = useState<FindBarSearchOptions>({
@@ -75,8 +78,6 @@ export function FindBarPlayground({ children }: { children?: ReactNode }): React
         </Box>
       }
       sourceCode={findBarPlaygroundSource}
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

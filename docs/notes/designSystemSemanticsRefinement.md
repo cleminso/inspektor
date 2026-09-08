@@ -27,8 +27,6 @@ Success means components express interaction and validation through semantic tok
 - `pnpm --filter @inspektor/ds typecheck`
 - `pnpm --filter @inspektor/ds build`
 - `pnpm --filter inspektor.design-system test`
-- `pnpm --filter inspektor.design-system gen:props`
-- `pnpm --filter inspektor.design-system check:props`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`
@@ -40,7 +38,7 @@ Success means components express interaction and validation through semantic tok
 - `packages/design-system/src/components/` owns reusable component behavior and StyleX styles.
 - `packages/design-system/src/tokens/` owns semantic, value, and layer tokens.
 - `packages/design-system/src/primitives/` owns constrained shared component helpers.
-- `apps/design-system/` owns executable component documentation and generated API metadata.
+- `apps/design-system/` owns executable component playground documentation.
 - `apps/web/` consumes public `@inspektor/ds` APIs and owns product composition.
 
 ## Code style
@@ -60,13 +58,13 @@ selected: {
 - Test Inspektor-owned behavior and accessibility outcomes, not Base UI implementation details.
 - Cover field state combinations: default, hover, focus-visible, invalid, invalid-focus, read-only, and disabled.
 - Cover selection state combinations: unchecked, checked, selected, pressed, checked-disabled, and selected-disabled.
-- Regenerate props after public API changes and keep documentation examples executable.
+- Keep component playgrounds and displayed source synchronized after public API changes.
 
 ## Boundaries
 
 - Always: use semantic tokens, preserve Base UI behavior, omit public `className` and `style`, and keep approved escape hatches explicit and auditable.
 - Ask first: add semantic tokens, change public APIs, remove public styling escape hatches, or migrate application consumers.
-- Never: expose arbitrary CSS values from `@inspektor/ds`, or hand-edit generated route trees or props metadata.
+- Never: expose arbitrary CSS values from `@inspektor/ds` or hand-edit generated route trees.
 
 ## Implementation batches
 

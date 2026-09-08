@@ -1,5 +1,5 @@
 import { Switch, type SwitchSize } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -46,7 +46,7 @@ export function serializeSwitchPlayground(state: SwitchPlaygroundState): string 
   })
 }
 
-export function SwitchPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function SwitchPlayground(): ReactElement {
   const [state, setState] = useState<SwitchPlaygroundState>(initialState)
   const controlsPane = (
     <PlaygroundControls
@@ -70,8 +70,6 @@ export function SwitchPlayground({ children }: { children?: ReactNode }): ReactE
       }
       sourceCode={serializeSwitchPlayground(state)}
       controls={controlsPane}
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

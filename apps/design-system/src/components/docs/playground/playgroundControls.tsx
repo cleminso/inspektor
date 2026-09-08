@@ -76,13 +76,14 @@ function ControlRow<TState extends PlaygroundState>({
           htmlFor={controlId}
           variant="body"
           color="muted"
+          truncate
+          title={control.label}
         >
           {control.label}
         </Text>
       </Box>
       <Box
-        flex={1}
-        flexBasis={0}
+        flexShrink={1}
         minWidth={0}
         justifyContent="end"
       >
@@ -115,6 +116,7 @@ export function PlaygroundControls<TState extends PlaygroundState>({
 }: PlaygroundControlsProps<TState>): ReactElement {
   return (
     <Box
+      width="full"
       flexDirection="column"
       gap="xl"
     >

@@ -1,5 +1,5 @@
 import { ContextMenu } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -56,7 +56,7 @@ export function serializeContextMenuPlayground(state: ContextMenuPlaygroundState
   })
 }
 
-export function ContextMenuPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function ContextMenuPlayground(): ReactElement {
   const [state, setState] = useState<ContextMenuPlaygroundState>(initialState)
   return (
     <ComponentDocsPage
@@ -89,8 +89,6 @@ export function ContextMenuPlayground({ children }: { children?: ReactNode }): R
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

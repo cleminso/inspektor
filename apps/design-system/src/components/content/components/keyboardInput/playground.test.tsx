@@ -33,7 +33,7 @@ describe('KeyboardInput playground', () => {
   it('renders the default keycap and generated source', () => {
     const { container } = render(<KeyboardInputPlayground />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(screen.getByLabelText('Ctrl+K')).toBeTruthy()
     expect(container.querySelector('pre')?.textContent).toContain('hotkey="Mod+K"')

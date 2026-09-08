@@ -1,5 +1,5 @@
 import { Box, Input, InputGroup, type InputSize } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -61,7 +61,7 @@ export function serializeInputGroupPlayground(state: InputGroupPlaygroundState):
   })
 }
 
-export function InputGroupPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function InputGroupPlayground(): ReactElement {
   const [state, setState] = useState<InputGroupPlaygroundState>(initialState)
   const preview = (
     <Box width="popup-width-m">
@@ -96,8 +96,6 @@ export function InputGroupPlayground({ children }: { children?: ReactNode }): Re
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

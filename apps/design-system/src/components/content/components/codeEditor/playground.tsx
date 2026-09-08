@@ -1,5 +1,5 @@
 import { Box, CodeEditor } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -42,7 +42,8 @@ export function serializeCodeEditorPlayground(state: CodeEditorPlaygroundState):
     'accessibilityLabel="Account JSON"',
     'value={value}',
     'onValueChange={setValue}',
-    state.expanded === true ? 'expanded' : null,
+    'expanded={expanded}',
+    'onExpandedChange={setExpanded}',
     state.invalid === true ? 'invalid' : null,
     state.disabled === true ? 'disabled' : null,
     state.readOnly === true ? 'readOnly' : null,
@@ -55,6 +56,7 @@ const initialValue = ${JSON.stringify(initialSource)};
 
 export default function Example() {
   const [value, setValue] = useState(initialValue);
+  const [expanded, setExpanded] = useState(${state.expanded});
 
   return (
     <CodeEditor
@@ -64,7 +66,7 @@ export default function Example() {
 }`
 }
 
-export function CodeEditorPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function CodeEditorPlayground(): ReactElement {
   const [state, setState] = useState<CodeEditorPlaygroundState>(initialState)
   const [value, setValue] = useState(initialSource)
 
@@ -106,8 +108,6 @@ export function CodeEditorPlayground({ children }: { children?: ReactNode }): Re
           }}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

@@ -27,7 +27,7 @@ describe('Textarea playground', () => {
     const { container } = render(<TextareaPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Invalid' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
     expect(screen.getByRole('textbox', { name: 'Notes' }).getAttribute('aria-invalid')).toBe('true')
     expect(container.querySelector('pre')?.textContent).toContain('invalid')
 

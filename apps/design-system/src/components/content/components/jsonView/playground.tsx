@@ -1,5 +1,5 @@
 import { Box, JsonView } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -47,7 +47,7 @@ export function serializeJsonViewPlayground(state: JsonViewPlaygroundState): str
   })
 }
 
-export function JsonViewPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function JsonViewPlayground(): ReactElement {
   const [state, setState] = useState<JsonViewPlaygroundState>(initialState)
 
   return (
@@ -76,8 +76,6 @@ export function JsonViewPlayground({ children }: { children?: ReactNode }): Reac
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

@@ -1,150 +1,84 @@
-import { Box, CopyButton, Icon } from '@inspektor/ds'
+import { Accordion, Box, CopyButton } from '@inspektor/ds'
 import * as stylex from '@stylexjs/stylex'
-import { ChevronDown } from 'lucide-react'
-import { type ReactElement, useId, useState } from 'react'
+import { type ReactElement } from 'react'
 
 import { useHighlightedCode } from '@/lib/shiki'
 
 export function CodeBlock({ source }: { source: string }): ReactElement {
   const code = source.trim()
   const highlightedHtml = useHighlightedCode(code)
-  const contentId = useId()
-  const [isExpanded, setIsExpanded] = useState(false)
 
   return (
     <Box
-      alignItems="center"
-      flexDirection="column"
-      position="relative"
+      as="section"
+      aria-label="Code"
+      width="full"
+      minWidth={0}
       backgroundColor="surface-background"
-      borderColor="default"
-      borderBottomLeftRadius="m"
-      borderBottomRightRadius="m"
-      borderStyle="solid"
-      borderWidth={0}
-      borderTopWidth={1}
+      borderRadius="xs"
+      overflow="hidden"
     >
-      <Box
-        flexDirection="column"
-        width="full"
-        borderBottomLeftRadius="m"
-        borderBottomRightRadius="m"
-        data-state={isExpanded === true ? 'open' : 'closed'}
-      >
-        <button
-          type="button"
-          aria-controls={contentId}
-          aria-expanded={isExpanded}
-          data-state={isExpanded === true ? 'open' : 'closed'}
-          onClick={() => {
-            setIsExpanded((expanded) => expanded === false)
-          }}
-          {...stylex.props(styles.trigger, isExpanded === true && styles.triggerExpanded)}
-        >
-          <span
-            aria-hidden="true"
-            {...stylex.props(
-              styles.triggerIcon,
-              isExpanded === false && styles.triggerIconCollapsed,
-            )}
-          >
-            <Icon
-              artwork={ChevronDown}
-              size="s"
-            />
-          </span>
-          {isExpanded === true ? 'Hide code' : 'Show code'}
-        </button>
-        <Box
-          id={contentId}
-          data-state={isExpanded === true ? 'open' : 'closed'}
-          hidden={isExpanded === false}
-          display={isExpanded === true ? 'block' : 'none'}
-          position="relative"
-          backgroundColor="surface-background"
-          borderColor="default"
-          borderStyle="solid"
-          borderWidth={0}
-          borderTopWidth={1}
-        >
-          <Box
-            position="absolute"
-            right="l"
-            top="l"
-            zIndex="content"
-          >
-            <CopyButton
-              textToCopy={source}
-              label="Copy source"
-            />
-          </Box>
-          {highlightedHtml !== null ? (
-            <div
-              data-docs-code-content
-              {...stylex.props(styles.codeContent)}
-              dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-            />
-          ) : (
-            <pre {...stylex.props(styles.pre)}>
-              <code>{code}</code>
-            </pre>
-          )}
-        </Box>
-      </Box>
+      <Accordion.Root>
+        <Accordion.Item value="code">
+          <Accordion.Header level={2}>
+            <Accordion.Trigger>Code</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel>
+            <Box
+              display="block"
+              width="full"
+              minWidth={0}
+              position="relative"
+              backgroundColor="surface-background"
+              data-docs-code-panel
+            >
+              <Box
+                position="absolute"
+                right="l"
+                top="l"
+                zIndex="content"
+              >
+                <CopyButton
+                  textToCopy={source}
+                  label="Copy source"
+                />
+              </Box>
+              {highlightedHtml !== null ? (
+                <div
+                  data-docs-code-content
+                  {...stylex.props(styles.codeContent)}
+                  dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+                />
+              ) : (
+                <pre {...stylex.props(styles.pre)}>
+                  <code>{code}</code>
+                </pre>
+              )}
+            </Box>
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion.Root>
     </Box>
   )
 }
 
 const styles = stylex.create({
-  codeContent: { display: 'block' },
-  trigger: {
-    alignItems: 'center',
-    appearance: 'none',
-    backgroundColor: 'transparent',
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    borderWidth: 0,
-    color: 'inherit',
-    cursor: 'pointer',
-    display: 'flex',
-    fontFamily: "'Geist Variable', 'Inter', sans-serif",
-    fontSize: 14,
-    gap: 12,
-    height: 48,
-    outlineColor: {
-      default: 'transparent',
-      ':focus-visible': 'currentColor',
-    },
-    outlineOffset: -2,
-    outlineStyle: 'solid',
-    outlineWidth: {
-      default: 0,
-      ':focus-visible': 2,
-    },
-    paddingInline: 16,
-    textAlign: 'left',
+  codeContent: {
+    display: 'block',
+    minWidth: 0,
     width: '100%',
   },
-  triggerExpanded: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-  },
-  triggerIcon: {
-    display: 'flex',
-    flexShrink: 0,
-    transform: 'rotate(0deg)',
-  },
-  triggerIconCollapsed: {
-    transform: 'rotate(-90deg)',
-  },
   pre: {
+    boxSizing: 'border-box',
     color: 'inherit',
     fontFamily: "'Geist Mono Variable', ui-monospace, SFMono-Regular, Consolas, monospace",
     fontSize: 13,
     lineHeight: '20px',
     margin: 0,
+    minWidth: 0,
     overflowX: 'auto',
     padding: '16px 48px 16px 16px',
     whiteSpace: 'pre',
+    width: '100%',
   },
 })

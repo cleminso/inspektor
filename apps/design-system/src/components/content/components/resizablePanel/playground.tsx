@@ -7,7 +7,7 @@ import {
   type ResizablePanelGroupProps,
   Text,
 } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -80,7 +80,7 @@ export function serializeResizablePanelPlayground(state: ResizablePanelPlaygroun
   })
 }
 
-export function ResizablePanelPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function ResizablePanelPlayground(): ReactElement {
   const [state, setState] = useState<ResizablePanelPlaygroundState>(initialState)
   const preview = (
     <Box
@@ -137,8 +137,6 @@ export function ResizablePanelPlayground({ children }: { children?: ReactNode })
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

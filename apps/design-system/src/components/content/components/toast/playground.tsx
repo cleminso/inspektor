@@ -1,5 +1,5 @@
 import { Button, Toaster, toasts, type ToastOptions, type ToastStatus } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -60,13 +60,7 @@ export function serializeToastPlayground(state: ToastPlaygroundState): string {
   })
 }
 
-export function ToastPlayground({
-  children,
-  withToaster = true,
-}: {
-  children?: ReactNode
-  withToaster?: boolean
-}): ReactElement {
+export function ToastPlayground(): ReactElement {
   const [state, setState] = useState<ToastPlaygroundState>(initialState)
 
   const showToast = (): void => {
@@ -87,7 +81,7 @@ export function ToastPlayground({
       >
         Show toast
       </Button>
-      {withToaster === true ? <Toaster /> : null}
+      <Toaster />
     </>
   )
 
@@ -106,8 +100,6 @@ export function ToastPlayground({
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

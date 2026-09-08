@@ -10,7 +10,7 @@ export function AppShellDetails({
   label,
 }: {
   children?: ReactNode
-  description: string
+  description?: string
   label: string
 }): ReactElement | null {
   const target = use(AppShellDetailsTargetContext)
@@ -29,12 +29,14 @@ export function AppShellDetails({
       gap="2xl"
       data-scrollable="false"
     >
-      <Text
-        variant="body"
-        color="muted"
-      >
-        {description}
-      </Text>
+      {description !== undefined ? (
+        <Text
+          variant="body"
+          color="muted"
+        >
+          {description}
+        </Text>
+      ) : null}
       {children}
     </Box>
   )

@@ -3,7 +3,6 @@ import { type ReactElement, type ReactNode } from 'react'
 
 import { CodeBlock } from '@/components/docs/codeBlock'
 import { DocsHeader } from '@/components/docs/docsHeader'
-import { DocsPage } from '@/components/docs/docsPage'
 import { navigationItems, type SourceReference } from '@/lib/registry'
 import { AppShellDetails } from '@/layout/appShellDetails'
 
@@ -14,7 +13,6 @@ interface ComponentDocsPageProps {
   preview: ReactNode
   sourceCode: string
   controls?: ReactNode
-  children?: ReactNode
 }
 
 export function ComponentDocsPage({
@@ -24,7 +22,6 @@ export function ComponentDocsPage({
   preview,
   sourceCode,
   controls,
-  children,
 }: ComponentDocsPageProps): ReactElement {
   const item = navigationItems.find((navigationItem) => navigationItem.source.path === source.path)
 
@@ -41,7 +38,10 @@ export function ComponentDocsPage({
       flexDirection="column"
       overflow="hidden"
     >
-      <DocsHeader item={item} />
+      <DocsHeader
+        item={item}
+        description={description}
+      />
 
       <Box
         flex={1}
@@ -53,61 +53,29 @@ export function ComponentDocsPage({
         overflowY="auto"
         data-scroll-area="main-content"
         data-scroll-fade="top"
-        backgroundColor="surface-background"
-        borderRadius="xs"
+        gap="xs"
       >
         <Box
           as="section"
           aria-label={`${title} playground`}
-          flexDirection="column"
           width="full"
+          minHeight="panel-height"
           minWidth={0}
-          padding="xl"
+          alignItems="center"
+          justifyContent="center"
+          padding="2xl"
+          overflowX="hidden"
+          backgroundColor="surface-background"
+          borderRadius="xs"
         >
-          <Box
-            flexDirection="column"
-            width="full"
-            minWidth={0}
-            borderWidth={1}
-            borderStyle="solid"
-            borderColor="default"
-            borderRadius="s"
-            overflow="hidden"
-            backgroundColor="surface-background"
-          >
-            <Box
-              minHeight="panel-height"
-              minWidth={0}
-              alignItems="center"
-              justifyContent="center"
-              padding="2xl"
-              overflowX="hidden"
-            >
-              {preview}
-            </Box>
-            <CodeBlock source={sourceCode} />
-          </Box>
+          {preview}
         </Box>
 
-        {children !== undefined ? (
-          <Box
-            as="section"
-            aria-label={`${title} documentation`}
-            width="full"
-            minWidth={0}
-            flexDirection="column"
-            paddingBottom="4xl"
-          >
-            <DocsPage width="full">{children}</DocsPage>
-          </Box>
-        ) : null}
+        <CodeBlock source={sourceCode} />
       </Box>
-      <AppShellDetails
-        label={`${title} details`}
-        description={description}
-      >
-        {controls}
-      </AppShellDetails>
+      {controls !== undefined ? (
+        <AppShellDetails label={`${title} details`}>{controls}</AppShellDetails>
+      ) : null}
     </Box>
   )
 }

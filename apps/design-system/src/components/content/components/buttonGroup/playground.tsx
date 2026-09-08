@@ -5,7 +5,7 @@ import {
   ButtonGroupSeparator,
   ButtonGroupText,
 } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -78,7 +78,7 @@ export function ButtonGroupPreview({ state }: { state: ButtonGroupPlaygroundStat
   )
 }
 
-export function ButtonGroupPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function ButtonGroupPlayground(): ReactElement {
   const [state, setState] = useState<ButtonGroupPlaygroundState>(initialState)
   const preview = <ButtonGroupPreview state={state} />
 
@@ -97,8 +97,6 @@ export function ButtonGroupPlayground({ children }: { children?: ReactNode }): R
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

@@ -15,7 +15,7 @@ afterEach(() => {
 })
 
 describe('ComponentDocsPage', () => {
-  it('places existing documentation below the playground and exposes component controls', () => {
+  it('places the description and playground in the center and exposes controls in the dock', () => {
     const detailsTarget = document.createElement('div')
     render(
       <AppShellDetailsTargetContext.Provider value={detailsTarget}>
@@ -29,24 +29,51 @@ describe('ComponentDocsPage', () => {
           preview={<button type="button">Preview</button>}
           sourceCode={'import { Button } from "@inspektor/ds";'}
           controls={<div>Variant control</div>}
-        >
-          <section aria-label="Existing examples">Sizes</section>
-        </ComponentDocsPage>
+        />
       </AppShellDetailsTargetContext.Provider>,
     )
 
     expect(screen.getByRole('region', { name: 'Button playground' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Button' })).toBeTruthy()
+    expect(screen.getByText('Action primitive')).toBeTruthy()
     expect(
       screen.getByRole('region', { name: 'Button playground' }).getAttribute('style'),
     ).not.toContain('max-width:')
-    expect(
-      within(detailsTarget).getByRole('complementary', { name: 'Button details' }).textContent,
-    ).toContain('Variant control')
-    const documentation = screen.getByRole('region', { name: 'Button documentation' })
-    expect(documentation.textContent).toContain('Sizes')
-    const documentationPage = documentation.querySelector('div')
-    expect(documentationPage?.getAttribute('style')).toContain('width: 100%;')
-    expect(documentationPage?.getAttribute('data-docs-width')).toBe('full')
+    const details = within(detailsTarget).getByRole('complementary', { name: 'Button details' })
+    expect(details.textContent).toContain('Variant control')
+    expect(details.textContent).not.toContain('Action primitive')
+
+    const playground = screen.getByRole('region', { name: 'Button playground' })
+    const code = screen.getByRole('region', { name: 'Code' })
+    expect(playground.contains(code)).toBe(false)
+
+    const scrollArea = document.querySelector('[data-scroll-area="main-content"]')
+    expect(scrollArea?.children).toHaveLength(2)
+    expect(scrollArea?.children[0]).toBe(playground)
+    expect(scrollArea?.children[1]).toBe(code)
+    expect(playground.getAttribute('style')).not.toContain('border')
+    expect(code.getAttribute('style')).not.toContain('border')
+  })
+
+  it('does not render component details for a fixed playground', () => {
+    const detailsTarget = document.createElement('div')
+    render(
+      <AppShellDetailsTargetContext.Provider value={detailsTarget}>
+        <ComponentDocsPage
+          title="Badge"
+          description="Status primitive"
+          source={{
+            label: 'badge.tsx',
+            path: 'packages/design-system/src/components/badge/badge.tsx',
+          }}
+          preview={<span>Preview</span>}
+          sourceCode={'import { Badge } from "@inspektor/ds";'}
+        />
+      </AppShellDetailsTargetContext.Provider>,
+    )
+
+    expect(screen.getByRole('region', { name: 'Badge playground' })).toBeTruthy()
+    expect(detailsTarget.childElementCount).toBe(0)
   })
 
   it('keeps the toolbar outside the center scroll area', () => {

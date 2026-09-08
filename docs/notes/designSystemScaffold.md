@@ -9,7 +9,7 @@
 - [Why Oxlint and Oxfmt](#why-oxlint-and-oxfmt)
 - [Why TSDown for the Package](#why-tsdown-for-the-package)
 - [Polar-Inspired Workflow](#polar-inspired-workflow)
-- [Generated Props](#generated-props)
+- [Component playgrounds](#component-playgrounds)
 - [Validation Intent](#validation-intent)
 
 ## Goal
@@ -79,23 +79,19 @@ Adding a component remains deliberate:
 2. export it from `@inspektor/ds`
 3. add a registry item in `apps/design-system`
 4. add or update the page module outside `src/routes`
-5. add prop metadata only when the API is stable enough to document
+5. add one representative playground with synchronized source
 
-## Generated Props
+## Component playgrounds
 
-The props pipeline combines Polar's proportional generated JSON with Base UI's package-source authority.
+Each component page presents one representative playground and its consumer-facing source.
 
-The pipeline consists of:
+Interactive playground state drives:
 
-- `apps/design-system/scripts/extract-props.mjs`
-- `apps/design-system/src/generated/props.json`
-- `apps/design-system/src/lib/propsData.ts`
+- the center preview
+- curated controls in the right dock
+- the copyable source in the center code island
 
-The extractor resolves configured public exports through `packages/design-system/src/index.ts`, uses the TypeScript type checker through `ts-morph`, and writes deterministic metadata keyed by the registry's `componentId`.
-
-Package declarations supply prop names, types, requiredness, public descriptions, and source locations. Runtime parameter destructuring supplies defaults. Documentation pages select and order prop names without overriding those API facts.
-
-Package-authored inherited props are included. External inherited props require an explicit component extraction allowlist so native DOM attributes do not overwhelm the API table.
+Fixed playgrounds pair one executable example with its raw source and omit the right dock controls.
 
 ## Validation Intent
 
@@ -106,8 +102,7 @@ The focused checks each cover a different risk:
 - package build: validates package output and declaration generation
 - app lint: validates app route and shell source
 - app typecheck: validates route bindings and workspace imports
-- app prop tests: validate extraction, filtering, and runtime defaults
-- app prop check: fails when committed generated metadata is stale
-- app build: validates generated props, Vite, TanStack Router generation, and StyleX extraction together
+- app playground tests: validate preview, control, and source synchronization
+- app build: validates Vite, TanStack Router generation, and StyleX extraction together
 
 Generated files such as `src/routeTree.gen.ts` should not be edited by hand.

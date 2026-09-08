@@ -1,5 +1,5 @@
 import { Box, Input, type InputFont, type InputSize, type InputVariant } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -68,7 +68,7 @@ export function serializeInputPlayground(state: InputPlaygroundState): string {
   })
 }
 
-export function InputPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function InputPlayground(): ReactElement {
   const [state, setState] = useState<InputPlaygroundState>(initialState)
   const controlsPane = (
     <PlaygroundControls
@@ -95,8 +95,6 @@ export function InputPlayground({ children }: { children?: ReactNode }): ReactEl
       }
       sourceCode={serializeInputPlayground(state)}
       controls={controlsPane}
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

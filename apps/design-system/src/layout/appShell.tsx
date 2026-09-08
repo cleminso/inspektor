@@ -223,10 +223,12 @@ export function AppShell(): ReactElement {
             <ShellLayout.RightDock>
               <Box
                 ref={setDetailsTarget}
+                width="full"
                 height="full"
                 minHeight={0}
                 flexDirection="column"
-                overflowY="hidden"
+                overflowX="hidden"
+                overflowY="auto"
                 padding="m"
               />
             </ShellLayout.RightDock>

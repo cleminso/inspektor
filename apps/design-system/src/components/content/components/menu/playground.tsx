@@ -1,5 +1,5 @@
 import { Button, Menu, type MenuPopupWidth } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -67,7 +67,7 @@ export function serializeMenuPlayground(state: MenuPlaygroundState): string {
   })
 }
 
-export function MenuPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function MenuPlayground(): ReactElement {
   const [state, setState] = useState<MenuPlaygroundState>(initialState)
   const preview = (
     <Menu.Root disabled={state.disabled}>
@@ -103,8 +103,6 @@ export function MenuPlayground({ children }: { children?: ReactNode }): ReactEle
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

@@ -40,7 +40,7 @@ describe('Toggle Group playground', () => {
     const { container } = render(<ToggleGroupPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect((screen.getByRole('button', { name: 'Tables' }) as HTMLButtonElement).disabled).toBe(
       true,
@@ -68,7 +68,7 @@ describe('Toggle Group playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Multiple' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reset controls' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Show code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
 
     expect(container.querySelector('pre')?.textContent).not.toContain('multiple')
   })

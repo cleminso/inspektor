@@ -1,5 +1,5 @@
 import { Box, TextField } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -60,7 +60,7 @@ export function serializeTextFieldPlayground(state: TextFieldPlaygroundState): s
   })
 }
 
-export function TextFieldPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function TextFieldPlayground(): ReactElement {
   const [state, setState] = useState<TextFieldPlaygroundState>(initialState)
   const preview = (
     <Box width="popup-width-m">
@@ -95,8 +95,6 @@ export function TextFieldPlayground({ children }: { children?: ReactNode }): Rea
           onReset={() => setState(initialState)}
         />
       }
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

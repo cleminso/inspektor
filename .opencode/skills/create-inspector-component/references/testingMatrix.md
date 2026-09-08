@@ -89,8 +89,7 @@ Do not test generic TypeScript inference, exhaustive typed lookup keys, direct r
 - `pnpm --filter @inspektor/ds build`
 - run the focused component test file
 - run focused lint from `packages/design-system`
-- run `pnpm --filter inspektor.design-system gen:props`
-- run `pnpm --filter inspektor.design-system check:props`
+- verify the component playground and its displayed source
 - run `pnpm --filter inspektor.design-system test`
 - run `pnpm --filter inspektor.design-system typecheck`
 - run `pnpm --filter inspektor.design-system build`

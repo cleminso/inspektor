@@ -1,5 +1,5 @@
 import { Checkbox, type CheckboxSize } from '@inspektor/ds'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -50,7 +50,7 @@ export function serializeCheckboxPlayground(state: CheckboxPlaygroundState): str
   })
 }
 
-export function CheckboxPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function CheckboxPlayground(): ReactElement {
   const [state, setState] = useState<CheckboxPlaygroundState>(initialState)
   const controlsPane = (
     <PlaygroundControls
@@ -74,8 +74,6 @@ export function CheckboxPlayground({ children }: { children?: ReactNode }): Reac
       }
       sourceCode={serializeCheckboxPlayground(state)}
       controls={controlsPane}
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

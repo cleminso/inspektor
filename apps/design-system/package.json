@@ -4,13 +4,11 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev": "pnpm gen:props && vite --host 0.0.0.0 --port 1356",
-    "build": "pnpm check:props && vite build && pnpm typecheck",
-    "check:props": "node scripts/extract-props.mjs --check",
-    "gen:props": "node scripts/extract-props.mjs",
+    "dev": "vite --host 0.0.0.0 --port 1356",
+    "build": "vite build && pnpm typecheck",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
-    "test": "vitest run && node --test scripts/*.test.mjs",
+    "test": "vitest run",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
@@ -37,7 +35,6 @@
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "jsdom": "catalog:",
-    "ts-morph": "26.0.0",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

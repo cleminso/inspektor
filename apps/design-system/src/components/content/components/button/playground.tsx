@@ -7,7 +7,7 @@ import {
   type ButtonVariant,
 } from '@inspektor/ds'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { type ReactElement, type ReactNode, useState } from 'react'
+import { type ReactElement, useState } from 'react'
 
 import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
 import { PlaygroundControls } from '@/components/docs/playground/playgroundControls'
@@ -111,7 +111,7 @@ export function serializeButtonPlayground(state: ButtonPlaygroundState): string 
   return createPlaygroundSource({ imports: { Button: true }, example: button })
 }
 
-export function ButtonPlayground({ children }: { children?: ReactNode }): ReactElement {
+export function ButtonPlayground(): ReactElement {
   const [state, setState] = useState<ButtonPlaygroundState>(initialState)
   const sharedPreviewProps = {
     variant: state.variant,
@@ -159,6 +159,10 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
             }
           }
 
+          if (key === 'iconOnly') {
+            return { ...current, iconOnly: false }
+          }
+
           const usesLabelLayout = key === 'layout' || key === 'prefix' || key === 'suffix'
           return {
             ...current,
@@ -179,8 +183,6 @@ export function ButtonPlayground({ children }: { children?: ReactNode }): ReactE
       preview={preview}
       sourceCode={serializeButtonPlayground(state)}
       controls={controlPane}
-    >
-      {children}
-    </ComponentDocsPage>
+    />
   )
 }

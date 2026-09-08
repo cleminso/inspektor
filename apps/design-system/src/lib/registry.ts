@@ -10,7 +10,6 @@ export interface NavItem {
   description: string
   importPath?: string
   source: SourceReference
-  componentId?: string
 }
 
 export interface NavSection {
@@ -55,7 +54,6 @@ export const buttonItem = {
     label: 'button.tsx',
     path: 'packages/design-system/src/components/button/button.tsx',
   },
-  componentId: 'button',
 } satisfies NavItem
 
 export const badgeItem = {
@@ -68,10 +66,9 @@ export const badgeItem = {
     label: 'badge.tsx',
     path: 'packages/design-system/src/components/badge/badge.tsx',
   },
-  componentId: 'badge',
 } satisfies NavItem
 
-const alertDialogItem = {
+export const alertDialogItem = {
   title: 'Alert Dialog',
   slug: 'alert-dialog',
   href: '/components/alert-dialog',
@@ -81,7 +78,30 @@ const alertDialogItem = {
     label: 'alertDialog.tsx',
     path: 'packages/design-system/src/components/alertDialog/alertDialog.tsx',
   },
-  componentId: 'alertDialog',
+} satisfies NavItem
+
+export const commandItem = {
+  title: 'Command',
+  slug: 'command',
+  href: '/components/command',
+  description: 'Composable searchable command surfaces with optional modal containment.',
+  importPath: '@inspektor/ds',
+  source: {
+    label: 'command.tsx',
+    path: 'packages/design-system/src/components/command/command.tsx',
+  },
+} satisfies NavItem
+
+export const dataGridFilterClauseItem = {
+  title: 'Data Grid Filter Clause',
+  slug: 'data-grid-filter-clause',
+  href: '/components/data-grid-filter-clause',
+  description: 'Segmented column, operator, value, and removal controls for applied filters.',
+  importPath: '@inspektor/ds',
+  source: {
+    label: 'dataGridFilterClause.tsx',
+    path: 'packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx',
+  },
 } satisfies NavItem
 
 export const buttonLinkItem = {
@@ -94,7 +114,6 @@ export const buttonLinkItem = {
     label: 'buttonLink.tsx',
     path: 'packages/design-system/src/components/buttonLink/buttonLink.tsx',
   },
-  componentId: 'buttonLink',
 } satisfies NavItem
 
 export const textLinkItem = {
@@ -107,7 +126,6 @@ export const textLinkItem = {
     label: 'textLink.tsx',
     path: 'packages/design-system/src/components/textLink/textLink.tsx',
   },
-  componentId: 'textLink',
 } satisfies NavItem
 
 export const buttonGroupItem = {
@@ -120,7 +138,6 @@ export const buttonGroupItem = {
     label: 'buttonGroup.tsx',
     path: 'packages/design-system/src/components/buttonGroup/buttonGroup.tsx',
   },
-  componentId: 'buttonGroup',
 } satisfies NavItem
 
 export const copyButtonItem = {
@@ -133,7 +150,6 @@ export const copyButtonItem = {
     label: 'copyButton.tsx',
     path: 'packages/design-system/src/components/copyButton/copyButton.tsx',
   },
-  componentId: 'copyButton',
 } satisfies NavItem
 
 export const themeSwitchItem = {
@@ -146,7 +162,6 @@ export const themeSwitchItem = {
     label: 'themeSwitch.tsx',
     path: 'packages/design-system/src/components/themeSwitch/themeSwitch.tsx',
   },
-  componentId: 'themeSwitch',
 } satisfies NavItem
 
 export const toggleGroupItem = {
@@ -159,7 +174,6 @@ export const toggleGroupItem = {
     label: 'toggleGroup.tsx',
     path: 'packages/design-system/src/components/toggleGroup/toggleGroup.tsx',
   },
-  componentId: 'toggleGroup',
 } satisfies NavItem
 
 export const workspaceTabsItem = {
@@ -173,7 +187,6 @@ export const workspaceTabsItem = {
     label: 'workspaceTabs.tsx',
     path: 'packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx',
   },
-  componentId: 'workspaceTabs',
 } satisfies NavItem
 
 export const checkboxItem = {
@@ -186,7 +199,6 @@ export const checkboxItem = {
     label: 'checkbox.tsx',
     path: 'packages/design-system/src/components/checkbox/checkbox.tsx',
   },
-  componentId: 'checkbox',
 } satisfies NavItem
 
 export const checkboxGroupItem = {
@@ -199,7 +211,6 @@ export const checkboxGroupItem = {
     label: 'checkboxGroup.tsx',
     path: 'packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx',
   },
-  componentId: 'checkboxGroup',
 } satisfies NavItem
 
 export const switchItem = {
@@ -212,7 +223,6 @@ export const switchItem = {
     label: 'switch.tsx',
     path: 'packages/design-system/src/components/switch/switch.tsx',
   },
-  componentId: 'switch',
 } satisfies NavItem
 
 export const tooltipItem = {
@@ -225,7 +235,6 @@ export const tooltipItem = {
     label: 'tooltip.tsx',
     path: 'packages/design-system/src/components/tooltip/tooltip.tsx',
   },
-  componentId: 'tooltip',
 } satisfies NavItem
 
 export const toastItem = {
@@ -238,7 +247,6 @@ export const toastItem = {
     label: 'toaster.tsx',
     path: 'packages/design-system/src/components/toaster/toaster.tsx',
   },
-  componentId: 'toaster',
 } satisfies NavItem
 
 export const spinnerItem = {
@@ -251,7 +259,6 @@ export const spinnerItem = {
     label: 'spinner.tsx',
     path: 'packages/design-system/src/components/spinner/spinner.tsx',
   },
-  componentId: 'spinner',
 } satisfies NavItem
 
 export const iconItem = {
@@ -264,7 +271,6 @@ export const iconItem = {
     label: 'icon.tsx',
     path: 'packages/design-system/src/components/icon/icon.tsx',
   },
-  componentId: 'icon',
 } satisfies NavItem
 
 export const inputItem = {
@@ -277,7 +283,6 @@ export const inputItem = {
     label: 'input.tsx',
     path: 'packages/design-system/src/components/input/input.tsx',
   },
-  componentId: 'input',
 } satisfies NavItem
 
 export const inputGroupItem = {
@@ -290,7 +295,6 @@ export const inputGroupItem = {
     label: 'inputGroup.tsx',
     path: 'packages/design-system/src/components/inputGroup/inputGroup.tsx',
   },
-  componentId: 'inputGroup',
 } satisfies NavItem
 
 export const keyboardInputItem = {
@@ -303,7 +307,6 @@ export const keyboardInputItem = {
     label: 'keyboardInput.tsx',
     path: 'packages/design-system/src/components/keyboardInput/keyboardInput.tsx',
   },
-  componentId: 'keyboardInput',
 } satisfies NavItem
 
 export const textareaItem = {
@@ -316,7 +319,6 @@ export const textareaItem = {
     label: 'textarea.tsx',
     path: 'packages/design-system/src/components/textarea/textarea.tsx',
   },
-  componentId: 'textarea',
 } satisfies NavItem
 
 export const codeEditorItem = {
@@ -329,7 +331,6 @@ export const codeEditorItem = {
     label: 'codeEditor.tsx',
     path: 'packages/design-system/src/components/codeEditor/codeEditor.tsx',
   },
-  componentId: 'codeEditor',
 } satisfies NavItem
 
 export const binaryValueItem = {
@@ -342,7 +343,6 @@ export const binaryValueItem = {
     label: 'binaryValue.tsx',
     path: 'packages/design-system/src/components/binaryValue/binaryValue.tsx',
   },
-  componentId: 'binaryValue',
 } satisfies NavItem
 
 export const timestampValueItem = {
@@ -355,7 +355,6 @@ export const timestampValueItem = {
     label: 'timestampValue.tsx',
     path: 'packages/design-system/src/components/timestampValue/timestampValue.tsx',
   },
-  componentId: 'timestampValue',
 } satisfies NavItem
 
 export const structuredValuePreviewItem = {
@@ -368,7 +367,6 @@ export const structuredValuePreviewItem = {
     label: 'structuredValuePreview.tsx',
     path: 'packages/design-system/src/components/structuredValuePreview/structuredValuePreview.tsx',
   },
-  componentId: 'structuredValuePreview',
 } satisfies NavItem
 
 export const relationValueItem = {
@@ -381,7 +379,6 @@ export const relationValueItem = {
     label: 'relationValue.tsx',
     path: 'packages/design-system/src/components/relationValue/relationValue.tsx',
   },
-  componentId: 'relationValue',
 } satisfies NavItem
 
 export const menuItem = {
@@ -394,7 +391,6 @@ export const menuItem = {
     label: 'menu.tsx',
     path: 'packages/design-system/src/components/menu/menu.tsx',
   },
-  componentId: 'menu',
 } satisfies NavItem
 
 export const contextMenuItem = {
@@ -407,7 +403,6 @@ export const contextMenuItem = {
     label: 'contextMenu.tsx',
     path: 'packages/design-system/src/components/contextMenu/contextMenu.tsx',
   },
-  componentId: 'contextMenu',
 } satisfies NavItem
 
 export const findBarItem = {
@@ -421,7 +416,6 @@ export const findBarItem = {
     label: 'findBar.tsx',
     path: 'packages/design-system/src/components/findBar/findBar.tsx',
   },
-  componentId: 'findBar',
 } satisfies NavItem
 
 export const accordionItem = {
@@ -434,7 +428,6 @@ export const accordionItem = {
     label: 'accordion.tsx',
     path: 'packages/design-system/src/components/accordion/accordion.tsx',
   },
-  componentId: 'accordion',
 } satisfies NavItem
 
 export const treeItem = {
@@ -448,7 +441,6 @@ export const treeItem = {
     label: 'tree.tsx',
     path: 'packages/design-system/src/components/tree/tree.tsx',
   },
-  componentId: 'tree.root',
 } satisfies NavItem
 
 export const actionListItem = {
@@ -461,7 +453,6 @@ export const actionListItem = {
     label: 'actionList.tsx',
     path: 'packages/design-system/src/components/actionList/actionList.tsx',
   },
-  componentId: 'actionList',
 } satisfies NavItem
 
 export const boxItem = {
@@ -474,7 +465,6 @@ export const boxItem = {
     label: 'box.tsx',
     path: 'packages/design-system/src/components/box/box.tsx',
   },
-  componentId: 'box',
 } satisfies NavItem
 
 export const sidePanelItem = {
@@ -487,7 +477,6 @@ export const sidePanelItem = {
     label: 'sidePanel.tsx',
     path: 'packages/design-system/src/components/sidePanel/sidePanel.tsx',
   },
-  componentId: 'sidePanel',
 } satisfies NavItem
 
 export const floatingPanelItem = {
@@ -500,7 +489,6 @@ export const floatingPanelItem = {
     label: 'floatingPanel.tsx',
     path: 'packages/design-system/src/components/floatingPanel/floatingPanel.tsx',
   },
-  componentId: 'floatingPanel',
 } satisfies NavItem
 
 export const scrollAreaItem = {
@@ -514,7 +502,6 @@ export const scrollAreaItem = {
     label: 'scrollArea.tsx',
     path: 'packages/design-system/src/components/scrollArea/scrollArea.tsx',
   },
-  componentId: 'scrollArea',
 } satisfies NavItem
 
 export const dataGridItem = {
@@ -527,7 +514,6 @@ export const dataGridItem = {
     label: 'dataGrid.tsx',
     path: 'packages/design-system/src/components/dataGrid/dataGrid.tsx',
   },
-  componentId: 'dataGrid',
 } satisfies NavItem
 
 export const swimlaneTimelineItem = {
@@ -541,7 +527,6 @@ export const swimlaneTimelineItem = {
     label: 'swimlaneTimeline.tsx',
     path: 'packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx',
   },
-  componentId: 'swimlaneTimeline',
 } satisfies NavItem
 
 export const jsonViewItem = {
@@ -555,7 +540,6 @@ export const jsonViewItem = {
     label: 'jsonView.tsx',
     path: 'packages/design-system/src/components/jsonView/jsonView.tsx',
   },
-  componentId: 'jsonView',
 } satisfies NavItem
 
 export const resizablePanelItem = {
@@ -569,7 +553,6 @@ export const resizablePanelItem = {
     label: 'resizablePanel.tsx',
     path: 'packages/design-system/src/components/resizablePanel/resizablePanel.tsx',
   },
-  componentId: 'resizablePanelGroup',
 } satisfies NavItem
 
 export const shellLayoutItem = {
@@ -583,7 +566,6 @@ export const shellLayoutItem = {
     label: 'shellLayout.tsx',
     path: 'packages/design-system/src/components/shellLayout/shellLayout.tsx',
   },
-  componentId: 'shellLayout.root',
 } satisfies NavItem
 
 export const comboboxItem = {
@@ -596,7 +578,6 @@ export const comboboxItem = {
     label: 'combobox.tsx',
     path: 'packages/design-system/src/components/combobox/combobox.tsx',
   },
-  componentId: 'combobox',
 } satisfies NavItem
 
 export const contextSwitcherItem = {
@@ -609,7 +590,6 @@ export const contextSwitcherItem = {
     label: 'contextSwitcher.tsx',
     path: 'packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx',
   },
-  componentId: 'contextSwitcher',
 } satisfies NavItem
 
 export const multiSelectItem = {
@@ -622,7 +602,6 @@ export const multiSelectItem = {
     label: 'multiSelect.tsx',
     path: 'packages/design-system/src/components/multiSelect/multiSelect.tsx',
   },
-  componentId: 'multiSelect',
 } satisfies NavItem
 
 export const selectItem = {
@@ -635,7 +614,6 @@ export const selectItem = {
     label: 'select.tsx',
     path: 'packages/design-system/src/components/select/select.tsx',
   },
-  componentId: 'select',
 } satisfies NavItem
 
 export const calendarItem = {
@@ -648,7 +626,6 @@ export const calendarItem = {
     label: 'calendar.tsx',
     path: 'packages/design-system/src/components/calendar/calendar.tsx',
   },
-  componentId: 'calendar',
 } satisfies NavItem
 
 export const datePickerItem = {
@@ -662,7 +639,6 @@ export const datePickerItem = {
     label: 'datePicker.tsx',
     path: 'packages/design-system/src/components/datePicker/datePicker.tsx',
   },
-  componentId: 'datePicker',
 } satisfies NavItem
 
 export const fieldItem = {
@@ -675,7 +651,6 @@ export const fieldItem = {
     label: 'field.tsx',
     path: 'packages/design-system/src/components/field/field.tsx',
   },
-  componentId: 'field',
 } satisfies NavItem
 
 export const fieldsetItem = {
@@ -688,7 +663,6 @@ export const fieldsetItem = {
     label: 'fieldset.tsx',
     path: 'packages/design-system/src/components/fieldset/fieldset.tsx',
   },
-  componentId: 'fieldset',
 } satisfies NavItem
 
 export const textFieldItem = {
@@ -701,7 +675,6 @@ export const textFieldItem = {
     label: 'textField.tsx',
     path: 'packages/design-system/src/components/textField/textField.tsx',
   },
-  componentId: 'textField',
 } satisfies NavItem
 
 const componentItems: NavItem[] = [
@@ -719,35 +692,13 @@ const componentItems: NavItem[] = [
   checkboxGroupItem,
   codeEditorItem,
   comboboxItem,
-  {
-    title: 'Command',
-    slug: 'command',
-    href: '/components/command',
-    description: 'Composable searchable command surfaces with optional modal containment.',
-    importPath: '@inspektor/ds',
-    source: {
-      label: 'command.tsx',
-      path: 'packages/design-system/src/components/command/command.tsx',
-    },
-    componentId: 'command',
-  },
+  commandItem,
   contextMenuItem,
   contextSwitcherItem,
   copyButtonItem,
   dataGridItem,
   datePickerItem,
-  {
-    title: 'Data Grid Filter Clause',
-    slug: 'data-grid-filter-clause',
-    href: '/components/data-grid-filter-clause',
-    description: 'Segmented column, operator, value, and removal controls for applied filters.',
-    importPath: '@inspektor/ds',
-    source: {
-      label: 'dataGridFilterClause.tsx',
-      path: 'packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx',
-    },
-    componentId: 'dataGridFilterClause',
-  },
+  dataGridFilterClauseItem,
   findBarItem,
   floatingPanelItem,
   iconItem,
