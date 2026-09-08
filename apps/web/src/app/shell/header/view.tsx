@@ -1,5 +1,4 @@
-import { Box, Button, Text, Tooltip } from '@inspektor/ds'
-import { Moon, Sun } from 'lucide-react'
+import { Box, Text, ThemeSwitch } from '@inspektor/ds'
 import { useTheme } from 'next-themes'
 
 import { BranchSwitcher } from '@app/shell/header/branchSwitcher'
@@ -8,8 +7,7 @@ import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 
 export function InspectorHeader(): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme()
-  const isDarkTheme = resolvedTheme === 'dark'
-  const themeLabel = isDarkTheme === true ? 'Switch to light theme' : 'Switch to dark theme'
+  const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
 
   return (
     <Box
@@ -62,25 +60,10 @@ export function InspectorHeader(): React.ReactElement {
         flex={1}
         justifyContent="end"
       >
-        <Tooltip.Root>
-          <Tooltip.Trigger
-            render={
-              <Button
-                type="button"
-                variant="ghost"
-                size="s"
-                aria-label="Toggle theme"
-                iconOnly
-                onClick={() => {
-                  setTheme(isDarkTheme === true ? 'light' : 'dark')
-                }}
-              >
-                <Button.Glyph artwork={isDarkTheme === true ? Sun : Moon} />
-              </Button>
-            }
-          />
-          <Tooltip.Content>{themeLabel}</Tooltip.Content>
-        </Tooltip.Root>
+        <ThemeSwitch
+          theme={theme}
+          onThemeChange={setTheme}
+        />
       </Box>
     </Box>
   )

@@ -55,6 +55,7 @@ import { Route as ComponentsSwitchRouteImport } from './routes/components/switch
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
+import { Route as ComponentsThemeSwitchRouteImport } from './routes/components/theme-switch'
 import { Route as ComponentsTimestampValueRouteImport } from './routes/components/timestamp-value'
 import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsToggleGroupRouteImport } from './routes/components/toggle-group'
@@ -299,6 +300,11 @@ const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
   path: '/components/textarea',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsThemeSwitchRoute = ComponentsThemeSwitchRouteImport.update({
+  id: '/components/theme-switch',
+  path: '/components/theme-switch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsTimestampValueRoute =
   ComponentsTimestampValueRouteImport.update({
     id: '/components/timestamp-value',
@@ -388,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/theme-switch': typeof ComponentsThemeSwitchRoute
   '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
@@ -444,6 +451,7 @@ export interface FileRoutesByTo {
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/theme-switch': typeof ComponentsThemeSwitchRoute
   '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
@@ -501,6 +509,7 @@ export interface FileRoutesById {
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/theme-switch': typeof ComponentsThemeSwitchRoute
   '/components/timestamp-value': typeof ComponentsTimestampValueRoute
   '/components/toast': typeof ComponentsToastRoute
   '/components/toggle-group': typeof ComponentsToggleGroupRoute
@@ -559,6 +568,7 @@ export interface FileRouteTypes {
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
+    | '/components/theme-switch'
     | '/components/timestamp-value'
     | '/components/toast'
     | '/components/toggle-group'
@@ -615,6 +625,7 @@ export interface FileRouteTypes {
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
+    | '/components/theme-switch'
     | '/components/timestamp-value'
     | '/components/toast'
     | '/components/toggle-group'
@@ -671,6 +682,7 @@ export interface FileRouteTypes {
     | '/components/text-field'
     | '/components/text-link'
     | '/components/textarea'
+    | '/components/theme-switch'
     | '/components/timestamp-value'
     | '/components/toast'
     | '/components/toggle-group'
@@ -728,6 +740,7 @@ export interface RootRouteChildren {
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
+  ComponentsThemeSwitchRoute: typeof ComponentsThemeSwitchRoute
   ComponentsTimestampValueRoute: typeof ComponentsTimestampValueRoute
   ComponentsToastRoute: typeof ComponentsToastRoute
   ComponentsToggleGroupRoute: typeof ComponentsToggleGroupRoute
@@ -1062,6 +1075,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsTextareaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/theme-switch': {
+      id: '/components/theme-switch'
+      path: '/components/theme-switch'
+      fullPath: '/components/theme-switch'
+      preLoaderRoute: typeof ComponentsThemeSwitchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/timestamp-value': {
       id: '/components/timestamp-value'
       path: '/components/timestamp-value'
@@ -1168,6 +1188,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextLinkRoute: ComponentsTextLinkRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,
+  ComponentsThemeSwitchRoute: ComponentsThemeSwitchRoute,
   ComponentsTimestampValueRoute: ComponentsTimestampValueRoute,
   ComponentsToastRoute: ComponentsToastRoute,
   ComponentsToggleGroupRoute: ComponentsToggleGroupRoute,

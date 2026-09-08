@@ -136,6 +136,19 @@ export const copyButtonItem = {
   componentId: 'copyButton',
 } satisfies NavItem
 
+export const themeSwitchItem = {
+  title: 'Theme Switch',
+  slug: 'theme-switch',
+  href: '/components/theme-switch',
+  description: 'An animated icon action for choosing between light and dark themes.',
+  importPath: '@inspektor/ds',
+  source: {
+    label: 'themeSwitch.tsx',
+    path: 'packages/design-system/src/components/themeSwitch/themeSwitch.tsx',
+  },
+  componentId: 'themeSwitch',
+} satisfies NavItem
+
 export const toggleGroupItem = {
   title: 'Toggle Group',
   slug: 'toggle-group',
@@ -756,6 +769,7 @@ const componentItems: NavItem[] = [
   structuredValuePreviewItem,
   swimlaneTimelineItem,
   switchItem,
+  themeSwitchItem,
   timestampValueItem,
   toastItem,
   tooltipItem,

@@ -4,13 +4,14 @@ import {
   KeyboardInput,
   ShellLayout,
   Text,
+  ThemeSwitch,
   Tree,
   Tooltip,
   useShellLayout,
 } from '@inspektor/ds'
 import { useHotkey } from '@tanstack/react-hotkeys'
 import { HeadContent, Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
-import { FolderTree, Info, Moon, Sun, type LucideIcon } from 'lucide-react'
+import { FolderTree, Info, type LucideIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { type ComponentProps, type ReactElement, useState } from 'react'
 
@@ -28,34 +29,6 @@ const appShellHotkeys = {
   toggleRightDock: 'Alt+D',
 } as const
 const shellLayoutPersistence = createDesignSystemShellLayoutPersistence()
-
-function ThemeSwitch(): ReactElement {
-  const { resolvedTheme, setTheme } = useTheme()
-  const label = resolvedTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
-
-  const handleToggleTheme = (): void => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
-  }
-
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger
-        render={
-          <Button
-            iconOnly
-            variant="ghost"
-            size="s"
-            onClick={handleToggleTheme}
-            aria-label={label}
-          >
-            <Button.Glyph artwork={resolvedTheme === 'dark' ? Sun : Moon} />
-          </Button>
-        }
-      />
-      <Tooltip.Content>{label}</Tooltip.Content>
-    </Tooltip.Root>
-  )
-}
 
 function runDockHotkey(event: KeyboardEvent, toggle: () => void): void {
   if (event.defaultPrevented === true || event.isComposing === true || event.repeat === true) {
@@ -180,6 +153,8 @@ export function AppShell(): ReactElement {
   const navigate = useNavigate()
   const [detailsTarget, setDetailsTarget] = useState<HTMLElement | null>(null)
   const { previous, next } = getAdjacentNavigationItems(pathname)
+  const { resolvedTheme, setTheme } = useTheme()
+  const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
 
   useHotkey(
     'ArrowLeft',
@@ -221,7 +196,10 @@ export function AppShell(): ReactElement {
                 Inspektor Design System
               </Text>
             </Link>
-            <ThemeSwitch />
+            <ThemeSwitch
+              theme={theme}
+              onThemeChange={setTheme}
+            />
           </Box>
         </ShellLayout.Header>
         <AppShellDetailsTargetContext.Provider value={detailsTarget}>

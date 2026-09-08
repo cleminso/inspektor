@@ -741,6 +741,28 @@
       }
     }
   ],
+  "themeSwitch": [
+    {
+      "name": "theme",
+      "type": "\"light\" | \"dark\"",
+      "required": true,
+      "description": "The active color theme.",
+      "source": {
+        "path": "packages/design-system/src/components/themeSwitch/themeSwitch.tsx",
+        "line": 13
+      }
+    },
+    {
+      "name": "onThemeChange",
+      "type": "(theme: ThemeSwitchTheme) => void",
+      "required": true,
+      "description": "Runs with the opposite color theme when the switch is activated.",
+      "source": {
+        "path": "packages/design-system/src/components/themeSwitch/themeSwitch.tsx",
+        "line": 15
+      }
+    }
+  ],
   "box": [
     {
       "name": "padding",

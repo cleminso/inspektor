@@ -231,6 +231,8 @@ export type {
   CopyButtonSize,
   CopyButtonVariant,
 } from './components/copyButton/copyButton'
+export { ThemeSwitch } from './components/themeSwitch/themeSwitch'
+export type { ThemeSwitchProps, ThemeSwitchTheme } from './components/themeSwitch/themeSwitch'
 export { BinaryDetails, BinaryValue } from './components/binaryValue/binaryValue'
 export type {
   BinaryCopyFormat,

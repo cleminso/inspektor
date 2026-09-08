@@ -61,6 +61,11 @@ const componentEntries = [
     inheritedProps: [],
   },
   {
+    componentId: 'themeSwitch',
+    exportName: 'ThemeSwitch',
+    inheritedProps: [],
+  },
+  {
     componentId: 'box',
     exportName: 'Box',
     inheritedProps: [],

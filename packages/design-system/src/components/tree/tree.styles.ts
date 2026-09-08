@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex'
 import {
   borderColors,
   focusColors,
+  elementColors,
   selectionColors,
   spatial,
   textColors,
@@ -18,14 +19,14 @@ import {
 } from '../../tokens/value.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
-const itemHoverBackground = `color-mix(in oklch, ${selectionColors.background} 65%, transparent)`
+const itemHoverBackground = `color-mix(in oklch, ${elementColors.default} 65%, transparent)`
 
 const row = {
   borderRadius: borderRadii.xs,
   paddingBlock: 0,
   paddingInline: spacing.s,
   alignItems: 'center',
-  color: { default: textColors.secondary, ':hover': selectionColors.text },
+  color: { default: textColors.secondary, ':hover': textColors.default },
   display: 'flex',
   fontFamily: fontFamilies.sans,
   fontSize: fontSizes[2],
@@ -151,10 +152,10 @@ export const treeStyles = stylex.create({
   },
   itemLinkCurrent: {
     backgroundColor: {
-      default: selectionColors.background,
-      ':hover': selectionColors.background,
+      default: elementColors.default,
+      ':hover': elementColors.hover,
     },
-    color: selectionColors.text,
+    color: textColors.default,
   },
   label: {
     overflow: 'hidden',
