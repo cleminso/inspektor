@@ -8,6 +8,7 @@
 - [Focus indicators](#focus-indicators)
 - [Empty state rules](#empty-state-rules)
 - [CSS variables](#css-variables)
+- [Variable module boundaries](#variable-module-boundaries)
 - [Contextual descendant styles](#contextual-descendant-styles)
 - [Validation](#validation)
 
@@ -82,12 +83,23 @@ Use Base UI CSS variables for dynamic geometry such as anchor dimensions, availa
 
 Record every available variable even when unused. Explain any replacement calculation in the component audit.
 
+## Variable module boundaries
+
+Keep normal component variable declarations in dedicated `.stylex.ts` modules. The configured `@stylexjs/enforce-extension` rule treats exported `stylex.defineVars()` groups as theme exports and prevents other exports, including `stylex.create()` rules, from sharing their modules:
+
+- `{component}.styles.ts` owns concrete `stylex.create()` rules.
+- `{component}Vars.stylex.ts` owns contextual implementation channels that ancestor or state rules override.
+- `{component}Colors.stylex.ts` owns private component semantic color roles, normally linked to interface color roles.
+
+Classify Colors and Vars by responsibility, not CSS value type. A Vars contract may carry a color when the value exists to communicate context or state. A Colors contract names what a component color means independently of how styles consume it.
+
+`tokens/value.stylex.ts` and `tokens/semantics.stylex.ts` are explicit mixed-export lint exceptions. Do not use those foundational token modules as precedent for component files.
+
 ## Contextual descendant styles
 
 When an ancestor influences a descendant without prop drilling or styling escape hatches, use a component-scoped `stylex.defineVars()` contract:
 
-- put variables in a dedicated `{component}Vars.stylex.ts` module
-- export only variables from that module
+- follow the component variable module boundary above
 - consume variables in `{component}.styles.ts`
 - override specific variables from ancestor state styles
 

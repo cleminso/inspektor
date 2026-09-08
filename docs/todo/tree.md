@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+### [08/09/26] Scrollbar rail
+
+- [x] Give the overlay scrollbar thumb an opaque rail so row backgrounds do not change its visual substrate.
+- [x] Add subtle inline separators that visually distinguish the rail without changing its outer width.
+- [x] Preserve full-width rows and geometry-neutral overlay scrolling instead of reserving an inline gutter.
+
 ### [06/09/26] Indicator layout synchronization
 
 - [x] Reposition the current-item indicator when nested branch content changes its layout.
@@ -49,6 +55,11 @@
 
 ## Settled interaction decisions
 
+### [08/09/26] Scrollbar rail
+
+- [x] Use the Scroll Area private semantic treatment rather than Tree-owned scrollbar styling.
+- [x] Reveal and hide the rail through the shared Scroll Area overflow and activation states.
+
 ### [06/09/26] Navigation state transitions
 
 - [x] Animate the current-item indicator only when navigation moves within the same section.
@@ -86,6 +97,12 @@
 - Consumer `className` and `style` are omitted from every public part. Base UI `render` is intentionally omitted from structural Collapsible parts.
 
 ## Validation checklist
+
+### [08/09/26] Scrollbar rail validation
+
+- [x] Verify the rail over default, hover, current, current-hover, and keyboard-focused rows in both supported color schemes.
+- [x] Verify the bordered rail matches the reference treatment while short content remains clear and overflowing content preserves Tree width and thumb travel.
+- [x] Run focused Tree and Scroll Area tests, changed-file lint, typecheck, build, and the design-system package suite.
 
 ### [06/09/26] Navigation state polish validation
 

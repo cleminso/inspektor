@@ -1,8 +1,8 @@
 /**
- * Inherited variables for KeyboardInput. StyleX requires files that export
- * `stylex.defineVars()` to export nothing else, so this module is separate from
- * `keyboardInput.styles.ts`. Ancestors such as danger-highlighted menu items
- * override the text color without prop drilling.
+ * Inherited variables for KeyboardInput. This dedicated variable module keeps
+ * the contextual contract separate from concrete component styles. Ancestors
+ * such as danger-highlighted menu items override the text color without prop
+ * drilling.
  */
 import * as stylex from '@stylexjs/stylex'
 

@@ -76,6 +76,7 @@ function TreeRoot({ children, ...props }: TreeRootProps) {
   return (
     <ScrollAreaPrivate
       rootSlot="tree-scroll-area"
+      trackVariant="rail"
       viewportFocus="descendants"
       viewportSlot="tree-scroll-area-viewport"
     >

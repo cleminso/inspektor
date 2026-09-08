@@ -62,6 +62,8 @@ Component roles answer: **how does this component express its own state model?**
 - Use a private value only when the component has a distinct visual contract.
 - Do not expose them broadly unless independent component theming becomes a supported product contract.
 
+Place these roles in `{component}Colors.stylex.ts`. Use `{component}Vars.stylex.ts` instead for contextual channels that communicate ancestor or state values, even when the channel carries a color. See the [StyleX module boundary](../create-inspector-component/references/stylexIntegration.md#variable-module-boundaries) for the component file structure.
+
 ## Interface color families
 
 ### Surface

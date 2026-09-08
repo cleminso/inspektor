@@ -24,6 +24,7 @@ interface ScrollAreaPrivateProps extends ScrollAreaProps {
   overscrollBehavior?: 'none'
   rootSlot?: string
   scrollRendering?: 'default' | 'frequent'
+  trackVariant?: 'transparent' | 'rail'
   verticalTrackOffset?: VerticalTrackOffset
   viewportContainerType?: 'size'
   viewportFocus?: 'self' | 'descendants'
@@ -58,6 +59,7 @@ function renderScrollArea(
     overscrollBehavior,
     rootSlot = 'scroll-area',
     scrollRendering = 'default',
+    trackVariant = 'transparent',
     verticalTrackOffset,
     viewportContainerType,
     viewportFocus = 'self',
@@ -99,6 +101,11 @@ function renderScrollArea(
 
       return [
         scrollAreaStyles.scrollbar,
+        trackVariant === 'rail' && scrollAreaStyles.scrollbarRail,
+        trackVariant === 'rail' &&
+          (state.orientation === 'vertical'
+            ? scrollAreaStyles.scrollbarVerticalRail
+            : scrollAreaStyles.scrollbarHorizontalRail),
         state.orientation === 'vertical'
           ? scrollAreaStyles.scrollbarVertical
           : scrollAreaStyles.scrollbarHorizontal,

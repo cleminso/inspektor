@@ -11,6 +11,13 @@
 
 ## Implemented foundation
 
+[08/09/26]
+
+- [x] Add a private semantic rail treatment that paints the existing overlay track without changing viewport geometry.
+- [x] Bound painted rails with cross-axis semantic borders while preserving their outer dimensions and thumb travel axis.
+- [x] Apply the rail treatment to Tree so hover and current-row backgrounds do not become the thumb substrate.
+- [x] Keep the public Scroll Area default transparent and leave Data Grid adoption to separate rendered evaluation.
+
 [05/08/26]
 
 - [x] Support content-sized private Scroll Areas that grow to a semantic viewport limit.
@@ -52,6 +59,12 @@
 
 ## Settled interaction decisions
 
+[08/09/26]
+
+- [x] Treat a painted rail as an overlay surface, not a reserved content gutter.
+- [x] Keep rail selection private so one Tree-specific need does not change unrelated Scroll Area consumers.
+- [x] Preserve the existing overflow, hover, focus-within, scrolling, and pointer-interaction policy for painted rails.
+
 [05/08/26]
 
 - [x] Native scrolling remains the behavior layer; Base UI overlay tracks mirror and control the same native viewport.
@@ -71,6 +84,13 @@
 - None.
 
 ## Validation checklist
+
+[08/09/26]
+
+- [x] Verify the Tree rail with short and overflowing content in both supported color schemes.
+- [x] Verify hover, current, current-hover, keyboard focus, track click, thumb drag, and minimum/maximum thumb positions.
+- [x] Confirm the bordered rail remains 12px wide, the Tree viewport and content dimensions remain unchanged, and no native gutter appears.
+- [x] Run focused tests, changed-file lint, typecheck, build, and the design-system package suite.
 
 [05/08/26]
 

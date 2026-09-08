@@ -2,7 +2,8 @@ import * as stylex from '@stylexjs/stylex'
 
 import { borderColors, focusColors, spatial } from '../../tokens/semantics.stylex'
 import { layerIndexes } from '../../tokens/layers.stylex'
-import { borderRadii, spacing } from '../../tokens/value.stylex'
+import { borderRadii, dimensions, spacing } from '../../tokens/value.stylex'
+import { scrollAreaColors } from './scrollAreaColors.stylex'
 import { scrollAreaVars } from './scrollAreaVars.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
@@ -110,6 +111,27 @@ export const scrollAreaStyles = stylex.create({
   },
   scrollbarScrolling: {
     transitionDuration: '0ms',
+  },
+  scrollbarRail: {
+    backgroundColor: scrollAreaColors.railBackground,
+  },
+  scrollbarVerticalRail: {
+    boxSizing: 'border-box',
+    borderLeftColor: scrollAreaColors.railBorder,
+    borderLeftStyle: 'solid',
+    borderLeftWidth: dimensions[1],
+    borderRightColor: scrollAreaColors.railBorder,
+    borderRightStyle: 'solid',
+    borderRightWidth: dimensions[1],
+  },
+  scrollbarHorizontalRail: {
+    boxSizing: 'border-box',
+    borderBottomColor: scrollAreaColors.railBorder,
+    borderBottomStyle: 'solid',
+    borderBottomWidth: dimensions[1],
+    borderTopColor: scrollAreaColors.railBorder,
+    borderTopStyle: 'solid',
+    borderTopWidth: dimensions[1],
   },
   scrollbarVertical: {
     paddingBlock: spacing.xxs,

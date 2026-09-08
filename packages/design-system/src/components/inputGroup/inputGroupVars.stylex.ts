@@ -1,8 +1,8 @@
 /**
- * Inherited variables for InputGroup. StyleX requires files that export
- * `stylex.defineVars()` to export nothing else, so this module is separate from
- * `inputGroup.styles.ts`. `Field` and `InputGroup` override these variables to
- * express invalid and disabled states without prop drilling.
+ * Inherited variables for InputGroup. This dedicated variable module keeps the
+ * contextual contract separate from concrete component styles. `Field` and
+ * `InputGroup` override these variables to express invalid and disabled states
+ * without prop drilling.
  */
 import * as stylex from '@stylexjs/stylex'
 
