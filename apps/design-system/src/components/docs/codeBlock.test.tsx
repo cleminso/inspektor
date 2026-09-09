@@ -25,10 +25,9 @@ describe('CodeBlock', () => {
     render(<CodeBlock source="code" />)
 
     const region = screen.getByRole('region', { name: 'Code' })
-    const heading = within(region).getByRole('heading', { level: 2, name: 'Code' })
-    const trigger = within(heading).getByRole('button', { name: 'Code' })
+    const heading = within(region).getByRole('heading', { level: 2, name: 'Show Code' })
+    const trigger = within(heading).getByRole('button', { name: 'Show Code' })
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
-    expect(region.getAttribute('style')).not.toContain('border')
     expect(screen.queryByRole('button', { name: 'Copy source' })).toBeNull()
     expect(document.querySelector('[data-docs-code-content]')).toBeNull()
 
@@ -38,9 +37,9 @@ describe('CodeBlock', () => {
     expect(screen.getByRole('button', { name: 'Copy source' })).toBeTruthy()
     expect(document.querySelector('[data-docs-code-content] .shiki')).toBeTruthy()
 
-    const panelContent = document.querySelector<HTMLElement>('[data-docs-code-panel]')
-    expect(panelContent?.style.width).toBe('100%')
-    expect(panelContent?.style.minWidth).toBe('0px')
+    const panel = document.querySelector('[data-docs-code-panel]')
+    const content = document.querySelector('[data-docs-code-content]')
+    expect(panel?.contains(content ?? null)).toBe(true)
 
     fireEvent.click(trigger)
 
@@ -53,7 +52,7 @@ describe('CodeBlock', () => {
     highlightedCode.value = null
     render(<CodeBlock source={source} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     const panelContent = document.querySelector('[data-docs-code-panel]')
     const pre = panelContent?.querySelector('pre')

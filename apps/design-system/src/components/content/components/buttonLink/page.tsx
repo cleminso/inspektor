@@ -8,9 +8,7 @@ import { buttonLinkItem } from '@/lib/registry'
 export function ButtonLinkPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={buttonLinkItem.title}
-      description={buttonLinkItem.description}
-      source={buttonLinkItem.source}
+      item={buttonLinkItem}
       preview={<ButtonLink href="/components/button-link">Open documentation</ButtonLink>}
       sourceCode={createPlaygroundSource({
         imports: { ButtonLink: true },

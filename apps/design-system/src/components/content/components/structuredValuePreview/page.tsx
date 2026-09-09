@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function StructuredValuePreviewPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={structuredValuePreviewItem.title}
-      description={structuredValuePreviewItem.description}
-      source={structuredValuePreviewItem.source}
+      item={structuredValuePreviewItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

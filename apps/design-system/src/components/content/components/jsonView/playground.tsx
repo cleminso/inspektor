@@ -52,9 +52,7 @@ export function JsonViewPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={jsonViewItem.title}
-      description={jsonViewItem.description}
-      source={jsonViewItem.source}
+      item={jsonViewItem}
       preview={
         <Box
           width="popup-width-m"

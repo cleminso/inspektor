@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function TimestampValuePage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={timestampValueItem.title}
-      description={timestampValueItem.description}
-      source={timestampValueItem.source}
+      item={timestampValueItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

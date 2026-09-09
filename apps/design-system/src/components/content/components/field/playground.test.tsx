@@ -26,7 +26,7 @@ describe('Field playground', () => {
     const { container } = render(<FieldPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Invalid' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(screen.getByRole('textbox', { name: 'Email' }).getAttribute('aria-invalid')).toBe('true')
     expect(container.querySelector('pre')?.textContent).toContain('invalid')

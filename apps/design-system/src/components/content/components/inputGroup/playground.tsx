@@ -83,9 +83,7 @@ export function InputGroupPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={inputGroupItem.title}
-      description={inputGroupItem.description}
-      source={inputGroupItem.source}
+      item={inputGroupItem}
       preview={preview}
       sourceCode={serializeInputGroupPlayground(state)}
       controls={

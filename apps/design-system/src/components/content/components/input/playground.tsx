@@ -81,9 +81,7 @@ export function InputPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={inputItem.title}
-      description={inputItem.description}
-      source={inputItem.source}
+      item={inputItem}
       preview={
         <Box>
           <Input

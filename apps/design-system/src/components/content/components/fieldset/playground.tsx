@@ -65,9 +65,7 @@ export function FieldsetPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={fieldsetItem.title}
-      description={fieldsetItem.description}
-      source={fieldsetItem.source}
+      item={fieldsetItem}
       preview={preview}
       sourceCode={serializeFieldsetPlayground(state)}
       controls={

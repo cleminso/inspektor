@@ -10,9 +10,7 @@ import basicSource from './basicExample.tsx?raw'
 export function ActionListPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={actionListItem.title}
-      description={actionListItem.description}
-      source={actionListItem.source}
+      item={actionListItem}
       preview={
         <Box width="popup-width-m">
           <BasicExample />

@@ -23,9 +23,10 @@ describe('PlaygroundControls', () => {
     expect(onChange).toHaveBeenCalledWith('enabled', true)
   })
 
-  it('keeps labels on one line and lets the action use its content width', () => {
+  it('labels a control group and its reset action', () => {
     render(
       <PlaygroundControls
+        title="Primary action"
         controls={[{ kind: 'select', key: 'orientation', label: 'Orientation', options: [] }]}
         state={{ orientation: 'horizontal' }}
         onChange={() => undefined}
@@ -33,15 +34,9 @@ describe('PlaygroundControls', () => {
       />,
     )
 
-    expect(
-      screen.getByText('Properties').parentElement?.parentElement?.getAttribute('style'),
-    ).toContain('width: 100%;')
+    expect(screen.getByRole('group', { name: 'Primary action' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Reset Primary action controls' })).toBeTruthy()
     expect(screen.getByText('Orientation').getAttribute('title')).toBe('Orientation')
-    expect(screen.getByText('Orientation').parentElement?.getAttribute('style')).toContain(
-      'flex: 1 1 0px;',
-    )
-    expect(screen.getByRole('combobox').parentElement?.getAttribute('style')).not.toContain(
-      'flex: 1 1 0px;',
-    )
+    expect(screen.getByRole('combobox', { name: 'Orientation' })).toBeTruthy()
   })
 })

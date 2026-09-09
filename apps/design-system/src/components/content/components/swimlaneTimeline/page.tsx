@@ -10,9 +10,7 @@ import basicSource from './basicExample.tsx?raw'
 export function SwimlaneTimelinePage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={swimlaneTimelineItem.title}
-      description={swimlaneTimelineItem.description}
-      source={swimlaneTimelineItem.source}
+      item={swimlaneTimelineItem}
       preview={
         <Box
           width="full"

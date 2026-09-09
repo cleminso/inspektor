@@ -60,9 +60,7 @@ export function TooltipPlayground(): ReactElement {
   const [state, setState] = useState<TooltipPlaygroundState>(initialState)
   return (
     <ComponentDocsPage
-      title={tooltipItem.title}
-      description={tooltipItem.description}
-      source={tooltipItem.source}
+      item={tooltipItem}
       preview={
         <Tooltip.Provider>
           <Tooltip.Root>

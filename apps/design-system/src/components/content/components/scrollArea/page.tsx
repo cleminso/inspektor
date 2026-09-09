@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function ScrollAreaPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={scrollAreaItem.title}
-      description={scrollAreaItem.description}
-      source={scrollAreaItem.source}
+      item={scrollAreaItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

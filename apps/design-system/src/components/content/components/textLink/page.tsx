@@ -8,9 +8,7 @@ import { textLinkItem } from '@/lib/registry'
 export function TextLinkPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={textLinkItem.title}
-      description={textLinkItem.description}
-      source={textLinkItem.source}
+      item={textLinkItem}
       preview={<TextLink href="/components/text-link">Read documentation</TextLink>}
       sourceCode={createPlaygroundSource({
         imports: { TextLink: true },

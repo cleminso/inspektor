@@ -10,9 +10,7 @@ import basicSource from './basicExample.tsx?raw'
 export function ShellLayoutPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={shellLayoutItem.title}
-      description={shellLayoutItem.description}
-      source={shellLayoutItem.source}
+      item={shellLayoutItem}
       preview={
         <Box
           width="full"

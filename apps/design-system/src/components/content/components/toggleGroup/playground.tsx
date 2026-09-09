@@ -109,9 +109,7 @@ export function ToggleGroupPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={toggleGroupItem.title}
-      description={toggleGroupItem.description}
-      source={toggleGroupItem.source}
+      item={toggleGroupItem}
       preview={preview}
       sourceCode={serializeToggleGroupPlayground(state)}
       controls={

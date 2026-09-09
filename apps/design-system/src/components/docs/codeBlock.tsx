@@ -14,14 +14,17 @@ export function CodeBlock({ source }: { source: string }): ReactElement {
       aria-label="Code"
       width="full"
       minWidth={0}
+      flexShrink={0}
       backgroundColor="surface-background"
-      borderRadius="xs"
+      borderTopWidth={1}
+      borderStyle="solid"
+      borderColor="default"
       overflow="hidden"
     >
       <Accordion.Root>
         <Accordion.Item value="code">
           <Accordion.Header level={2}>
-            <Accordion.Trigger>Code</Accordion.Trigger>
+            <Accordion.Trigger>Show Code</Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Panel>
             <Box

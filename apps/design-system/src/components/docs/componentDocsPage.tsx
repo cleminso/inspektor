@@ -1,34 +1,24 @@
-import { Box } from '@inspektor/ds'
+import { Box, ScrollArea } from '@inspektor/ds'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { CodeBlock } from '@/components/docs/codeBlock'
 import { DocsHeader } from '@/components/docs/docsHeader'
-import { navigationItems, type SourceReference } from '@/lib/registry'
+import { type NavItem } from '@/lib/registry'
 import { AppShellDetails } from '@/layout/appShellDetails'
 
 interface ComponentDocsPageProps {
-  title: string
-  description: string
-  source: SourceReference
+  item: NavItem
   preview: ReactNode
   sourceCode: string
   controls?: ReactNode
 }
 
 export function ComponentDocsPage({
-  title,
-  description,
-  source,
+  item,
   preview,
   sourceCode,
   controls,
 }: ComponentDocsPageProps): ReactElement {
-  const item = navigationItems.find((navigationItem) => navigationItem.source.path === source.path)
-
-  if (item === undefined) {
-    throw new Error(`No navigation item found for ${source.path}`)
-  }
-
   return (
     <Box
       width="full"
@@ -37,44 +27,38 @@ export function ComponentDocsPage({
       minHeight={0}
       flexDirection="column"
       overflow="hidden"
+      backgroundColor="surface-background"
+      borderRadius="xs"
     >
-      <DocsHeader
-        item={item}
-        description={description}
-      />
-
-      <Box
-        flex={1}
-        width="full"
-        minWidth={0}
-        minHeight={0}
-        flexDirection="column"
-        overflowX="hidden"
-        overflowY="auto"
+      <ScrollArea
         data-scroll-area="main-content"
         data-scroll-fade="top"
-        gap="xs"
       >
+        <DocsHeader item={item} />
         <Box
           as="section"
-          aria-label={`${title} playground`}
+          aria-label={`${item.title} playground`}
           width="full"
-          minHeight="panel-height"
           minWidth={0}
-          alignItems="center"
-          justifyContent="center"
-          padding="2xl"
+          flexDirection="column"
           overflowX="hidden"
-          backgroundColor="surface-background"
-          borderRadius="xs"
         >
-          {preview}
+          <Box
+            width="full"
+            minWidth={0}
+            minHeight="panel-height"
+            alignItems="center"
+            justifyContent="center"
+            padding="2xl"
+            overflowX="hidden"
+          >
+            {preview}
+          </Box>
+          <CodeBlock source={sourceCode} />
         </Box>
-
-        <CodeBlock source={sourceCode} />
-      </Box>
+      </ScrollArea>
       {controls !== undefined ? (
-        <AppShellDetails label={`${title} details`}>{controls}</AppShellDetails>
+        <AppShellDetails label={`${item.title} details`}>{controls}</AppShellDetails>
       ) : null}
     </Box>
   )

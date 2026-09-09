@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function RelationValuePage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={relationValueItem.title}
-      description={relationValueItem.description}
-      source={relationValueItem.source}
+      item={relationValueItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

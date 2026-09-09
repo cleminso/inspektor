@@ -40,7 +40,7 @@ describe('CodeEditor playground', () => {
     const { container } = render(<CodeEditorPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Invalid' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(
       (

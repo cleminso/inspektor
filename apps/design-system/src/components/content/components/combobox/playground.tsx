@@ -95,9 +95,7 @@ export function ComboboxPlayground(): ReactElement {
   )
   return (
     <ComponentDocsPage
-      title={comboboxItem.title}
-      description={comboboxItem.description}
-      source={comboboxItem.source}
+      item={comboboxItem}
       preview={preview}
       sourceCode={serializeComboboxPlayground(state)}
       controls={

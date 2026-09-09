@@ -25,7 +25,7 @@ describe('Select playground', () => {
     const { container } = render(<SelectPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(
       (container.querySelector('[data-slot="select-trigger"]') as HTMLButtonElement).disabled,

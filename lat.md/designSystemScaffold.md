@@ -73,9 +73,7 @@ The docs registry carries the manual metadata needed to document a package item:
 
 - page title and slug
 - route path
-- package import path
 - source file path
-- component API identifier for documented components
 
 Adding a component remains deliberate:
 
@@ -89,13 +87,21 @@ Adding a component remains deliberate:
 
 Each component page presents one representative playground and its consumer-facing source.
 
+The component header, playground, and collapsible source render as sections inside one center
+surface. Sections use dividers instead of independent cards.
+
+Component and foundation pages use the shared overlay scroll area for center scrolling. The overlay
+track preserves content width when page overflow changes.
+
 Interactive playground state drives:
 
 - the center preview
 - curated controls in the right dock
-- the copyable source in the center code island
+- the copyable source in a collapsible footer within the center playground
 
 Fixed playgrounds pair one executable example with its raw source and omit the right dock controls.
+When comparison improves the example, one playground can render coordinated component instances
+with corresponding control groups in the right dock.
 
 ## Validation intent
 

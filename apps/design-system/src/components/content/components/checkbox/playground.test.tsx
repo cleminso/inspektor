@@ -26,7 +26,7 @@ describe('Checkbox playground', () => {
     const { container } = render(<CheckboxPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Indeterminate' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
     expect(
       screen.getByRole('checkbox', { name: 'Notifications' }).getAttribute('data-indeterminate'),
     ).not.toBeNull()

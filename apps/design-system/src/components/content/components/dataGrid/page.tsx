@@ -11,9 +11,7 @@ import basicSource from './basicExample.tsx?raw'
 export function DataGridPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={dataGridItem.title}
-      description={dataGridItem.description}
-      source={dataGridItem.source}
+      item={dataGridItem}
       preview={
         <Box
           width="full"

@@ -126,7 +126,7 @@ Hover and checked backgrounds reuse `bg-hover` and `bg-selected` from the semant
 
 ## Documentation metadata
 
-Accordion `Panel` explicitly exposes `keepMounted` and `hiddenUntilFound` in its public type so the extractor captures them.
+Accordion `Panel` explicitly exposes `keepMounted` and `hiddenUntilFound` as documented parts of its public contract.
 
 ActionList `Trigger` and `Action` explicitly expose `disabled` and `render` so the supported composition contract remains visible in package source.
 

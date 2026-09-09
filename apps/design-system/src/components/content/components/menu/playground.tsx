@@ -90,9 +90,7 @@ export function MenuPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={menuItem.title}
-      description={menuItem.description}
-      source={menuItem.source}
+      item={menuItem}
       preview={preview}
       sourceCode={serializeMenuPlayground(state)}
       controls={

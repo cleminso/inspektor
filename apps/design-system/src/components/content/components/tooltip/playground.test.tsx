@@ -26,7 +26,7 @@ describe('Tooltip playground', () => {
     const { container } = render(<TooltipPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Close on click' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(container.querySelector('pre')?.textContent).toContain('closeOnClick={false}')
   })

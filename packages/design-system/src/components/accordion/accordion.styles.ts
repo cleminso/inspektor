@@ -1,7 +1,6 @@
-// todo: remove background hover then play with the text color
 import * as stylex from '@stylexjs/stylex'
 
-import { focusColors, ghostElementColors, spatial, textColors } from '../../tokens/semantics.stylex'
+import { focusColors, spatial, textColors } from '../../tokens/semantics.stylex'
 import {
   fontFamilies,
   fontSizes,
@@ -28,8 +27,6 @@ export const accordionStyles = stylex.create({
     minHeight: 0,
   },
   rootDisabled: {},
-  rootHorizontal: {},
-  rootVertical: {},
   item: {
     minWidth: 0,
     width: '100%',
@@ -45,8 +42,6 @@ export const accordionStyles = stylex.create({
   itemOpen: {},
   itemClosed: {},
   itemDisabled: {},
-  itemHorizontal: {},
-  itemVertical: {},
   itemHidden: {},
   itemIndexed: {},
   header: {
@@ -58,8 +53,6 @@ export const accordionStyles = stylex.create({
   headerOpen: {},
   headerClosed: {},
   headerDisabled: {},
-  headerHorizontal: {},
-  headerVertical: {},
   headerHidden: {},
   headerIndexed: {},
   trigger: {
@@ -72,9 +65,11 @@ export const accordionStyles = stylex.create({
     appearance: 'none',
     backgroundColor: {
       default: 'transparent',
-      ':hover': ghostElementColors.hover,
     },
-    color: textColors.muted,
+    color: {
+      default: textColors.secondary,
+      ':hover': textColors.default,
+    },
     cursor: 'pointer',
     display: 'flex',
     fontFamily: fontFamilies.sans,
@@ -101,8 +96,6 @@ export const accordionStyles = stylex.create({
     color: textColors.disabled,
     cursor: 'not-allowed',
   },
-  triggerHorizontal: {},
-  triggerVertical: {},
   triggerHidden: {},
   triggerIndexed: {},
   triggerValue: {},
@@ -139,6 +132,7 @@ export const accordionStyles = stylex.create({
     height: 'var(--accordion-panel-height)',
     overflowX: 'hidden',
     overflowY: 'hidden',
+    paddingInline: spacing.s,
   },
   panelFill: {
     minHeight: 0,
@@ -150,8 +144,6 @@ export const accordionStyles = stylex.create({
   panelOpen: {},
   panelClosed: {},
   panelDisabled: {},
-  panelHorizontal: {},
-  panelVertical: {},
   panelHidden: {},
   panelIndexed: {},
   panelStarting: {},

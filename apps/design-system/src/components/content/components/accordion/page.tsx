@@ -1,24 +1,7 @@
-import { Box } from '@inspektor/ds'
 import { type ReactElement } from 'react'
 
-import { ComponentDocsPage } from '@/components/docs/componentDocsPage'
-import { accordionItem } from '@/lib/registry'
-
-import BasicExample from './basicExample'
-import basicSource from './basicExample.tsx?raw'
+import { AccordionPlayground } from './playground'
 
 export function AccordionPage(): ReactElement {
-  return (
-    <ComponentDocsPage
-      title={accordionItem.title}
-      description={accordionItem.description}
-      source={accordionItem.source}
-      preview={
-        <Box width="popup-width-m">
-          <BasicExample />
-        </Box>
-      }
-      sourceCode={basicSource}
-    />
-  )
+  return <AccordionPlayground />
 }

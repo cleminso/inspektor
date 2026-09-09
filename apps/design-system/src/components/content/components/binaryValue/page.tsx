@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function BinaryValuePage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={binaryValueItem.title}
-      description={binaryValueItem.description}
-      source={binaryValueItem.source}
+      item={binaryValueItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

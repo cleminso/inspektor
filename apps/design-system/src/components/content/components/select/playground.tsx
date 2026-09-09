@@ -103,9 +103,7 @@ export function SelectPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={selectItem.title}
-      description={selectItem.description}
-      source={selectItem.source}
+      item={selectItem}
       preview={preview}
       sourceCode={serializeSelectPlayground(state)}
       controls={

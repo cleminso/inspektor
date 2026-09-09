@@ -10,9 +10,7 @@ import basicSource from './basicExample.tsx?raw'
 export function SidePanelPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={sidePanelItem.title}
-      description={sidePanelItem.description}
-      source={sidePanelItem.source}
+      item={sidePanelItem}
       preview={
         <Box
           width="popup-width-m"

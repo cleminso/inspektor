@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function CommandPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={commandItem.title}
-      description={commandItem.description}
-      source={commandItem.source}
+      item={commandItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

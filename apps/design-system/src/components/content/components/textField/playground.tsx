@@ -82,9 +82,7 @@ export function TextFieldPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={textFieldItem.title}
-      description={textFieldItem.description}
-      source={textFieldItem.source}
+      item={textFieldItem}
       preview={preview}
       sourceCode={serializeTextFieldPlayground(state)}
       controls={

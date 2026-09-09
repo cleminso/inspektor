@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function CalendarPlayground(): ReactElement {
   return (
     <ComponentDocsPage
-      title={calendarItem.title}
-      description={calendarItem.description}
-      source={calendarItem.source}
+      item={calendarItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

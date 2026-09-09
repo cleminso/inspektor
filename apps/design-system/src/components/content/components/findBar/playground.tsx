@@ -53,9 +53,7 @@ export function FindBarPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={findBarItem.title}
-      description={findBarItem.description}
-      source={findBarItem.source}
+      item={findBarItem}
       preview={
         <Box width="popup-width-m">
           <FindBar

@@ -44,9 +44,7 @@ export function SpinnerPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={spinnerItem.title}
-      description={spinnerItem.description}
-      source={spinnerItem.source}
+      item={spinnerItem}
       preview={
         <Spinner
           label="Loading"

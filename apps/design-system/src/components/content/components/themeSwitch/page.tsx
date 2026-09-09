@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function ThemeSwitchPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={themeSwitchItem.title}
-      description={themeSwitchItem.description}
-      source={themeSwitchItem.source}
+      item={themeSwitchItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

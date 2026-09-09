@@ -27,7 +27,7 @@ describe('Menu playground', () => {
     const { container } = render(<MenuPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(container.querySelector('pre')?.textContent).toContain('<Menu.Root disabled>')
   })

@@ -9,9 +9,7 @@ import createSource from './createExample.tsx?raw'
 export function DataGridFilterClausePage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={dataGridFilterClauseItem.title}
-      description={dataGridFilterClauseItem.description}
-      source={dataGridFilterClauseItem.source}
+      item={dataGridFilterClauseItem}
       preview={<CreateExample />}
       sourceCode={createSource}
     />

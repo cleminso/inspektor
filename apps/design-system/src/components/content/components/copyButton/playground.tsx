@@ -100,9 +100,7 @@ export function CopyButtonPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={copyButtonItem.title}
-      description={copyButtonItem.description}
-      source={copyButtonItem.source}
+      item={copyButtonItem}
       preview={preview}
       sourceCode={serializeCopyButtonPlayground(state)}
       controls={

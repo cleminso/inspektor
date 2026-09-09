@@ -112,9 +112,7 @@ export function ContextSwitcherPlayground(): ReactElement {
   )
   return (
     <ComponentDocsPage
-      title={contextSwitcherItem.title}
-      description={contextSwitcherItem.description}
-      source={contextSwitcherItem.source}
+      item={contextSwitcherItem}
       preview={preview}
       sourceCode={serializeContextSwitcherPlayground(state)}
       controls={

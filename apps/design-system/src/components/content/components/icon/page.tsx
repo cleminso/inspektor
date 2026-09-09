@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function IconPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={iconItem.title}
-      description={iconItem.description}
-      source={iconItem.source}
+      item={iconItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

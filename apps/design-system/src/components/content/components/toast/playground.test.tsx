@@ -36,7 +36,7 @@ describe('Toast playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Description' }))
     fireEvent.click(screen.getByRole('button', { name: 'Show toast' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(await screen.findByText('Additional context for this notification')).toBeTruthy()
     expect(container.querySelector('pre')?.textContent).toContain('description:')
@@ -47,7 +47,7 @@ describe('Toast playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Preserve' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reset controls' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(container.querySelector('pre')?.textContent).not.toContain('preserve:')
   })

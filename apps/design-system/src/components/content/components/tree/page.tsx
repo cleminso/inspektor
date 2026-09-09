@@ -10,9 +10,7 @@ import basicSource from './basicExample.tsx?raw'
 export function TreePage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={treeItem.title}
-      description={treeItem.description}
-      source={treeItem.source}
+      item={treeItem}
       preview={
         <Box
           width="popup-width-m"

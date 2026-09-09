@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function BoxPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={boxItem.title}
-      description={boxItem.description}
-      source={boxItem.source}
+      item={boxItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

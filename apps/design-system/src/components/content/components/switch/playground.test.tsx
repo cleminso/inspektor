@@ -20,7 +20,7 @@ describe('Switch playground', () => {
     const { container } = render(<SwitchPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Checked' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
     expect(screen.getByRole('switch', { name: 'Notifications' }).getAttribute('aria-checked')).toBe(
       'true',
     )

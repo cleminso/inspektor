@@ -60,9 +60,7 @@ export function ContextMenuPlayground(): ReactElement {
   const [state, setState] = useState<ContextMenuPlaygroundState>(initialState)
   return (
     <ComponentDocsPage
-      title={contextMenuItem.title}
-      description={contextMenuItem.description}
-      source={contextMenuItem.source}
+      item={contextMenuItem}
       preview={
         <ContextMenu.Root disabled={state.disabled}>
           <ContextMenu.Trigger>Right-click this tab</ContextMenu.Trigger>

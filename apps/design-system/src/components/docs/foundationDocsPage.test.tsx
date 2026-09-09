@@ -35,6 +35,8 @@ describe('FoundationDocsPage', () => {
     const scrollArea = document.querySelector('[data-scroll-area="main-content"]')
     expect(scrollArea?.textContent).toContain('Color scales')
     expect(scrollArea?.getAttribute('data-scroll-fade')).toBe('top')
+    expect(scrollArea?.getAttribute('data-scrollbar')).toBe('hidden')
+    expect(scrollArea?.parentElement?.getAttribute('data-scrollbar')).toBe('overlay')
   })
 
   it('navigates through the complete docs registry', () => {

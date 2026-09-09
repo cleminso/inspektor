@@ -77,8 +77,6 @@ const AccordionRoot = forwardRef<HTMLDivElement, AccordionRootProps>(function Ac
     accordionStyles.root,
     layout === 'fill' && accordionStyles.rootFill,
     state.disabled === true && accordionStyles.rootDisabled,
-    state.orientation === 'horizontal' && accordionStyles.rootHorizontal,
-    state.orientation === 'vertical' && accordionStyles.rootVertical,
   ])
   return (
     <AccordionLayoutContext.Provider value={layout}>
@@ -107,8 +105,6 @@ const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(function Ac
     state.open === true && accordionStyles.itemOpen,
     state.open === false && accordionStyles.itemClosed,
     state.disabled === true && accordionStyles.itemDisabled,
-    state.orientation === 'horizontal' && accordionStyles.itemHorizontal,
-    state.orientation === 'vertical' && accordionStyles.itemVertical,
     state.hidden === true && accordionStyles.itemHidden,
     accordionStyles.itemIndexed,
   ])
@@ -131,8 +127,6 @@ const AccordionHeader = forwardRef<HTMLHeadingElement, AccordionHeaderProps>(
       state.open === true && accordionStyles.headerOpen,
       state.open === false && accordionStyles.headerClosed,
       state.disabled === true && accordionStyles.headerDisabled,
-      state.orientation === 'horizontal' && accordionStyles.headerHorizontal,
-      state.orientation === 'vertical' && accordionStyles.headerVertical,
       state.hidden === true && accordionStyles.headerHidden,
       accordionStyles.headerIndexed,
     ])
@@ -155,8 +149,6 @@ const AccordionTrigger = forwardRef<HTMLElement, AccordionTriggerProps>(function
     accordionStyles.trigger,
     state.open === true && accordionStyles.triggerOpen,
     state.disabled === true && accordionStyles.triggerDisabled,
-    state.orientation === 'horizontal' && accordionStyles.triggerHorizontal,
-    state.orientation === 'vertical' && accordionStyles.triggerVertical,
     state.hidden === true && accordionStyles.triggerHidden,
     state.index !== 0 && accordionStyles.triggerIndexed,
     accordionStyles.triggerValue,
@@ -203,8 +195,6 @@ const AccordionPanel = forwardRef<HTMLDivElement, AccordionPanelProps>(function 
     state.open === true && accordionStyles.panelOpen,
     state.open === false && accordionStyles.panelClosed,
     state.disabled === true && accordionStyles.panelDisabled,
-    state.orientation === 'horizontal' && accordionStyles.panelHorizontal,
-    state.orientation === 'vertical' && accordionStyles.panelVertical,
     state.hidden === true && accordionStyles.panelHidden,
     accordionStyles.panelIndexed,
     state.transitionStatus === 'starting' && accordionStyles.panelStarting,

@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function CheckboxGroupPlayground(): ReactElement {
   return (
     <ComponentDocsPage
-      title={checkboxGroupItem.title}
-      description={checkboxGroupItem.description}
-      source={checkboxGroupItem.source}
+      item={checkboxGroupItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

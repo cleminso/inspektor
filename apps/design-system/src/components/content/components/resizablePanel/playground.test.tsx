@@ -36,7 +36,7 @@ describe('Resizable Panel playground', () => {
     const { container } = render(<ResizablePanelPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(screen.getByRole('switch', { name: 'Disabled' }).getAttribute('aria-checked')).toBe(
       'true',
@@ -49,7 +49,7 @@ describe('Resizable Panel playground', () => {
 
     fireEvent.click(screen.getByRole('switch', { name: 'Collapsible' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reset controls' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect(container.querySelector('pre')?.textContent).not.toContain('collapsible')
   })

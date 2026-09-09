@@ -80,9 +80,7 @@ export function FieldPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={fieldItem.title}
-      description={fieldItem.description}
-      source={fieldItem.source}
+      item={fieldItem}
       preview={preview}
       sourceCode={serializeFieldPlayground(state)}
       controls={

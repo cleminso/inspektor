@@ -72,9 +72,7 @@ export function CodeEditorPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={codeEditorItem.title}
-      description={codeEditorItem.description}
-      source={codeEditorItem.source}
+      item={codeEditorItem}
       preview={
         <Box
           minWidth={0}

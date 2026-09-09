@@ -9,9 +9,7 @@ import defaultSource from './defaultExample.tsx?raw'
 export function AlertDialogPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={alertDialogItem.title}
-      description={alertDialogItem.description}
-      source={alertDialogItem.source}
+      item={alertDialogItem}
       preview={<DefaultExample />}
       sourceCode={defaultSource}
     />

@@ -76,9 +76,7 @@ export function KeyboardInputPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={keyboardInputItem.title}
-      description={keyboardInputItem.description}
-      source={keyboardInputItem.source}
+      item={keyboardInputItem}
       preview={
         <KeyboardInput
           hotkey={state.hotkey}

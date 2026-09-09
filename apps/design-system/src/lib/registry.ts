@@ -8,7 +8,6 @@ export interface NavItem {
   slug: string
   href: string
   description: string
-  importPath?: string
   source: SourceReference
 }
 
@@ -22,7 +21,6 @@ export const colorsFoundationItem = {
   slug: 'colors',
   href: '/foundations/colors',
   description: 'Learn how to work with our color system. Click to copy raw values.',
-  importPath: '@inspektor/ds/theme',
   source: {
     label: 'value.stylex.ts',
     path: 'packages/design-system/src/tokens/value.stylex.ts',
@@ -34,7 +32,6 @@ export const typographyFoundationItem = {
   slug: 'typography',
   href: '/foundations/typography',
   description: 'Text scale, tone, and hierarchy for inspektor surfaces.',
-  importPath: '@inspektor/ds/theme',
   source: {
     label: 'semantics.stylex.ts',
     path: 'packages/design-system/src/tokens/semantics.stylex.ts',
@@ -49,7 +46,6 @@ export const buttonItem = {
   href: '/components/button',
   description:
     'Labelled and icon-only actions with variants, sizes, loading, and composition support.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'button.tsx',
     path: 'packages/design-system/src/components/button/button.tsx',
@@ -61,7 +57,6 @@ export const badgeItem = {
   slug: 'badge',
   href: '/components/badge',
   description: 'Compact text metadata for statuses and categories.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'badge.tsx',
     path: 'packages/design-system/src/components/badge/badge.tsx',
@@ -73,7 +68,6 @@ export const alertDialogItem = {
   slug: 'alert-dialog',
   href: '/components/alert-dialog',
   description: 'Modal confirmation that requires an explicit response before proceeding.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'alertDialog.tsx',
     path: 'packages/design-system/src/components/alertDialog/alertDialog.tsx',
@@ -85,7 +79,6 @@ export const commandItem = {
   slug: 'command',
   href: '/components/command',
   description: 'Composable searchable command surfaces with optional modal containment.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'command.tsx',
     path: 'packages/design-system/src/components/command/command.tsx',
@@ -97,7 +90,6 @@ export const dataGridFilterClauseItem = {
   slug: 'data-grid-filter-clause',
   href: '/components/data-grid-filter-clause',
   description: 'Segmented column, operator, value, and removal controls for applied filters.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'dataGridFilterClause.tsx',
     path: 'packages/design-system/src/components/dataGridFilterClause/dataGridFilterClause.tsx',
@@ -109,7 +101,6 @@ export const buttonLinkItem = {
   slug: 'button-link',
   href: '/components/button-link',
   description: 'Navigation with Button presentation and native link semantics.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'buttonLink.tsx',
     path: 'packages/design-system/src/components/buttonLink/buttonLink.tsx',
@@ -121,7 +112,6 @@ export const textLinkItem = {
   slug: 'text-link',
   href: '/components/text-link',
   description: 'Inline navigation with native anchor semantics and router composition.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'textLink.tsx',
     path: 'packages/design-system/src/components/textLink/textLink.tsx',
@@ -133,7 +123,6 @@ export const copyButtonItem = {
   slug: 'copy-button',
   href: '/components/copy-button',
   description: 'An icon action that copies text and reports success or failure.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'copyButton.tsx',
     path: 'packages/design-system/src/components/copyButton/copyButton.tsx',
@@ -145,7 +134,6 @@ export const themeSwitchItem = {
   slug: 'theme-switch',
   href: '/components/theme-switch',
   description: 'An animated icon action for choosing between light and dark themes.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'themeSwitch.tsx',
     path: 'packages/design-system/src/components/themeSwitch/themeSwitch.tsx',
@@ -157,7 +145,6 @@ export const toggleGroupItem = {
   slug: 'toggle-group',
   href: '/components/toggle-group',
   description: 'A single- or multiple-selection group of related toggle buttons.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'toggleGroup.tsx',
     path: 'packages/design-system/src/components/toggleGroup/toggleGroup.tsx',
@@ -170,7 +157,6 @@ export const workspaceTabsItem = {
   href: '/components/workspace-tabs',
   description:
     'Reorderable workspace tabs with fixed control areas and horizontally scrolling views.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'workspaceTabs.tsx',
     path: 'packages/design-system/src/components/workspaceTabs/workspaceTabs.tsx',
@@ -182,7 +168,6 @@ export const checkboxItem = {
   slug: 'checkbox',
   href: '/components/checkbox',
   description: 'Binary and mixed-state selection with Field and native form integration.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'checkbox.tsx',
     path: 'packages/design-system/src/components/checkbox/checkbox.tsx',
@@ -194,7 +179,6 @@ export const checkboxGroupItem = {
   slug: 'checkbox-group',
   href: '/components/checkbox-group',
   description: 'Multiple selection with contextual bulk actions and disabled-item preservation.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'checkboxGroup.tsx',
     path: 'packages/design-system/src/components/checkboxGroup/checkboxGroup.tsx',
@@ -206,7 +190,6 @@ export const switchItem = {
   slug: 'switch',
   href: '/components/switch',
   description: 'A binary control for settings that take effect when switched on or off.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'switch.tsx',
     path: 'packages/design-system/src/components/switch/switch.tsx',
@@ -218,7 +201,6 @@ export const tooltipItem = {
   slug: 'tooltip',
   href: '/components/tooltip',
   description: 'Supplementary non-interactive context shown when a trigger is hovered or focused.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'tooltip.tsx',
     path: 'packages/design-system/src/components/tooltip/tooltip.tsx',
@@ -230,7 +212,6 @@ export const toastItem = {
   slug: 'toast',
   href: '/components/toast',
   description: 'Concise, temporary feedback for user-initiated actions.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'toaster.tsx',
     path: 'packages/design-system/src/components/toaster/toaster.tsx',
@@ -242,7 +223,6 @@ export const spinnerItem = {
   slug: 'spinner',
   href: '/components/spinner',
   description: 'A compact loading indicator with optional accessible status text.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'spinner.tsx',
     path: 'packages/design-system/src/components/spinner/spinner.tsx',
@@ -254,7 +234,6 @@ export const iconItem = {
   slug: 'icon',
   href: '/components/icon',
   description: 'Decorative imported SVG artwork with constrained semantic sizing.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'icon.tsx',
     path: 'packages/design-system/src/components/icon/icon.tsx',
@@ -266,7 +245,6 @@ export const inputItem = {
   slug: 'input',
   href: '/components/input',
   description: 'Text input with design-system sizes and Base UI field integration.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'input.tsx',
     path: 'packages/design-system/src/components/input/input.tsx',
@@ -278,7 +256,6 @@ export const inputGroupItem = {
   slug: 'input-group',
   href: '/components/input-group',
   description: 'Compound text input with constrained static and interactive affixes.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'inputGroup.tsx',
     path: 'packages/design-system/src/components/inputGroup/inputGroup.tsx',
@@ -290,7 +267,6 @@ export const keyboardInputItem = {
   slug: 'keyboard-input',
   href: '/components/keyboard-input',
   description: 'A semantic shortcut hint with ordered modifier combinations.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'keyboardInput.tsx',
     path: 'packages/design-system/src/components/keyboardInput/keyboardInput.tsx',
@@ -302,7 +278,6 @@ export const codeEditorItem = {
   slug: 'code-editor',
   href: '/components/code-editor',
   description: 'JSON source editing with formatting, diagnostics, and capped presentation.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'codeEditor.tsx',
     path: 'packages/design-system/src/components/codeEditor/codeEditor.tsx',
@@ -314,7 +289,6 @@ export const binaryValueItem = {
   slug: 'binary-value',
   href: '/components/binary-value',
   description: 'Compact byte counts and callback-driven binary inspection actions.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'binaryValue.tsx',
     path: 'packages/design-system/src/components/binaryValue/binaryValue.tsx',
@@ -326,7 +300,6 @@ export const timestampValueItem = {
   slug: 'timestamp-value',
   href: '/components/timestamp-value',
   description: 'Compact local timestamps that preserve the exact ISO instant in semantic markup.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'timestampValue.tsx',
     path: 'packages/design-system/src/components/timestampValue/timestampValue.tsx',
@@ -338,7 +311,6 @@ export const structuredValuePreviewItem = {
   slug: 'structured-value-preview',
   href: '/components/structured-value-preview',
   description: 'Bounded inline summaries from normalized array, object, and scalar models.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'structuredValuePreview.tsx',
     path: 'packages/design-system/src/components/structuredValuePreview/structuredValuePreview.tsx',
@@ -350,7 +322,6 @@ export const relationValueItem = {
   slug: 'relation-value',
   href: '/components/relation-value',
   description: 'Compact relation identifiers with optional target navigation.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'relationValue.tsx',
     path: 'packages/design-system/src/components/relationValue/relationValue.tsx',
@@ -362,7 +333,6 @@ export const menuItem = {
   slug: 'menu',
   href: '/components/menu',
   description: 'Action menu built on Base UI Menu with grouped standard and checkbox items.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'menu.tsx',
     path: 'packages/design-system/src/components/menu/menu.tsx',
@@ -374,7 +344,6 @@ export const contextMenuItem = {
   slug: 'context-menu',
   href: '/components/context-menu',
   description: 'Contextual actions opened from a pointer target without a visible trigger.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'contextMenu.tsx',
     path: 'packages/design-system/src/components/contextMenu/contextMenu.tsx',
@@ -387,7 +356,6 @@ export const findBarItem = {
   href: '/components/find-bar',
   description:
     'Controlled document-find input with query options, match position, and occurrence navigation.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'findBar.tsx',
     path: 'packages/design-system/src/components/findBar/findBar.tsx',
@@ -399,7 +367,6 @@ export const accordionItem = {
   slug: 'accordion',
   href: '/components/accordion',
   description: 'Collapsible sections with Base UI behavior and compact Inspektor presentation.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'accordion.tsx',
     path: 'packages/design-system/src/components/accordion/accordion.tsx',
@@ -412,7 +379,6 @@ export const treeItem = {
   href: '/components/tree',
   description:
     'Scrollable hierarchical navigation with expandable sections and current-page links.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'tree.tsx',
     path: 'packages/design-system/src/components/tree/tree.tsx',
@@ -424,7 +390,6 @@ export const actionListItem = {
   slug: 'action-list',
   href: '/components/action-list',
   description: 'Selectable action rows with navigation triggers and composable trailing actions.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'actionList.tsx',
     path: 'packages/design-system/src/components/actionList/actionList.tsx',
@@ -436,7 +401,6 @@ export const boxItem = {
   slug: 'box',
   href: '/components/box',
   description: 'Token-constrained layout primitive for native structural elements.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'box.tsx',
     path: 'packages/design-system/src/components/box/box.tsx',
@@ -448,7 +412,6 @@ export const sidePanelItem = {
   slug: 'side-panel',
   href: '/components/side-panel',
   description: 'Full-height panel structure with fixed header and footer regions.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'sidePanel.tsx',
     path: 'packages/design-system/src/components/sidePanel/sidePanel.tsx',
@@ -460,7 +423,6 @@ export const floatingPanelItem = {
   slug: 'floating-panel',
   href: '/components/floating-panel',
   description: 'A persistent non-modal controller surface with compact and expanded presentations.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'floatingPanel.tsx',
     path: 'packages/design-system/src/components/floatingPanel/floatingPanel.tsx',
@@ -473,7 +435,6 @@ export const scrollAreaItem = {
   href: '/components/scroll-area',
   description:
     'A native scroll viewport with token-backed overlay scrollbars that do not change content geometry.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'scrollArea.tsx',
     path: 'packages/design-system/src/components/scrollArea/scrollArea.tsx',
@@ -485,7 +446,6 @@ export const dataGridItem = {
   slug: 'data-grid',
   href: '/components/data-grid',
   description: 'Controlled TanStack table rendering with semantic structure and inspection states.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'dataGrid.tsx',
     path: 'packages/design-system/src/components/dataGrid/dataGrid.tsx',
@@ -498,7 +458,6 @@ export const swimlaneTimelineItem = {
   href: '/components/swimlane-timeline',
   description:
     'Composable activity tracks aligned to shared snapshot columns in a collapsible native table.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'swimlaneTimeline.tsx',
     path: 'packages/design-system/src/components/swimlaneTimeline/swimlaneTimeline.tsx',
@@ -511,7 +470,6 @@ export const jsonViewItem = {
   href: '/components/json-view',
   description:
     'Read-only JSON inspection with tree navigation, integrated copying, search highlighting, and bounded rendering.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'jsonView.tsx',
     path: 'packages/design-system/src/components/jsonView/jsonView.tsx',
@@ -524,7 +482,6 @@ export const resizablePanelItem = {
   href: '/components/resizable-panel',
   description:
     'Accessible split panels with constrained handles, collapse controls, and layout persistence support.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'resizablePanel.tsx',
     path: 'packages/design-system/src/components/resizablePanel/resizablePanel.tsx',
@@ -537,7 +494,6 @@ export const shellLayoutItem = {
   href: '/components/shell-layout',
   description:
     'Application shell geometry with fixed outer regions and optional resizable left and right docks.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'shellLayout.tsx',
     path: 'packages/design-system/src/components/shellLayout/shellLayout.tsx',
@@ -549,7 +505,6 @@ export const comboboxItem = {
   slug: 'combobox',
   href: '/components/combobox',
   description: 'Filterable single selection from a predefined collection.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'combobox.tsx',
     path: 'packages/design-system/src/components/combobox/combobox.tsx',
@@ -561,7 +516,6 @@ export const contextSwitcherItem = {
   slug: 'context-switcher',
   href: '/components/context-switcher',
   description: 'A searchable popup for changing the active application resource or scope.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'contextSwitcher.tsx',
     path: 'packages/design-system/src/components/contextSwitcher/contextSwitcher.tsx',
@@ -573,7 +527,6 @@ export const multiSelectItem = {
   slug: 'multi-select',
   href: '/components/multi-select',
   description: 'Multiple selection with checkbox rows and contextual Check all and Only actions.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'multiSelect.tsx',
     path: 'packages/design-system/src/components/multiSelect/multiSelect.tsx',
@@ -585,7 +538,6 @@ export const selectItem = {
   slug: 'select',
   href: '/components/select',
   description: 'Single selection from a compact predefined collection.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'select.tsx',
     path: 'packages/design-system/src/components/select/select.tsx',
@@ -597,7 +549,6 @@ export const calendarItem = {
   slug: 'calendar',
   href: '/components/calendar',
   description: 'Standalone date selection with day, month, and year navigation.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'calendar.tsx',
     path: 'packages/design-system/src/components/calendar/calendar.tsx',
@@ -610,7 +561,6 @@ export const datePickerItem = {
   href: '/components/date-picker',
   description:
     'Timestamp selection with popup and inline compositions, time entry, and explicit apply.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'datePicker.tsx',
     path: 'packages/design-system/src/components/datePicker/datePicker.tsx',
@@ -622,7 +572,6 @@ export const fieldItem = {
   slug: 'field',
   href: '/components/field',
   description: 'Accessible labels, descriptions, and validation for form controls.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'field.tsx',
     path: 'packages/design-system/src/components/field/field.tsx',
@@ -634,7 +583,6 @@ export const fieldsetItem = {
   slug: 'fieldset',
   href: '/components/fieldset',
   description: 'Accessible grouping and shared disabled state for related form controls.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'fieldset.tsx',
     path: 'packages/design-system/src/components/fieldset/fieldset.tsx',
@@ -646,7 +594,6 @@ export const textFieldItem = {
   slug: 'text-field',
   href: '/components/text-field',
   description: 'Standard labeled text input with description and validation messaging.',
-  importPath: '@inspektor/ds',
   source: {
     label: 'textField.tsx',
     path: 'packages/design-system/src/components/textField/textField.tsx',

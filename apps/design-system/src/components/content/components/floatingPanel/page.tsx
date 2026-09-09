@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function FloatingPanelPage(): ReactElement {
   return (
     <ComponentDocsPage
-      title={floatingPanelItem.title}
-      description={floatingPanelItem.description}
-      source={floatingPanelItem.source}
+      item={floatingPanelItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

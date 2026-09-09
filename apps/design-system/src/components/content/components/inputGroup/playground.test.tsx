@@ -28,7 +28,7 @@ describe('InputGroup playground', () => {
     const { container } = render(<InputGroupPlayground />)
 
     fireEvent.click(screen.getByRole('switch', { name: 'Disabled' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Code' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show Code' }))
 
     expect((screen.getByRole('textbox', { name: 'Domain' }) as HTMLInputElement).disabled).toBe(
       true,

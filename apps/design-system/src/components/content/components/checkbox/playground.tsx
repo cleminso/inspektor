@@ -63,9 +63,7 @@ export function CheckboxPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={checkboxItem.title}
-      description={checkboxItem.description}
-      source={checkboxItem.source}
+      item={checkboxItem}
       preview={
         <Checkbox
           aria-label="Notifications"

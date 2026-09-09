@@ -87,9 +87,7 @@ export function ToastPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={toastItem.title}
-      description={toastItem.description}
-      source={toastItem.source}
+      item={toastItem}
       preview={preview}
       sourceCode={serializeToastPlayground(state)}
       controls={

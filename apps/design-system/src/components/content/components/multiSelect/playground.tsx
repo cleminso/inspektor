@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function MultiSelectPlayground(): ReactElement {
   return (
     <ComponentDocsPage
-      title={multiSelectItem.title}
-      description={multiSelectItem.description}
-      source={multiSelectItem.source}
+      item={multiSelectItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

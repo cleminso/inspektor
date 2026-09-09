@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function WorkspaceTabsPlayground(): ReactElement {
   return (
     <ComponentDocsPage
-      title={workspaceTabsItem.title}
-      description={workspaceTabsItem.description}
-      source={workspaceTabsItem.source}
+      item={workspaceTabsItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />

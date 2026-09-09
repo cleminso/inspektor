@@ -7,11 +7,10 @@ import { SourceLink } from '@/components/docs/sourceLink'
 import { getAdjacentNavigationItems, type NavItem } from '@/lib/registry'
 
 interface DocsHeaderProps {
-  description?: string
   item: NavItem
 }
 
-export function DocsHeader({ description, item }: DocsHeaderProps): ReactElement {
+export function DocsHeader({ item }: DocsHeaderProps): ReactElement {
   const navigate = useNavigate()
   const { previous: previousItem, next: nextItem } = getAdjacentNavigationItems(item.href)
 
@@ -34,10 +33,10 @@ export function DocsHeader({ description, item }: DocsHeaderProps): ReactElement
       justifyContent="between"
       gap="l"
       flexShrink={0}
-      marginBottom="xs"
-      padding="xs"
-      backgroundColor="surface-background"
-      borderRadius="xs"
+      padding="xl"
+      borderBottomWidth={1}
+      borderStyle="solid"
+      borderColor="default"
       overflow="hidden"
     >
       <Box
@@ -49,14 +48,12 @@ export function DocsHeader({ description, item }: DocsHeaderProps): ReactElement
           source={item.source}
           title={item.title}
         />
-        {description !== undefined ? (
-          <Text
-            variant="body"
-            color="muted"
-          >
-            {description}
-          </Text>
-        ) : null}
+        <Text
+          variant="body"
+          color="muted"
+        >
+          {item.description}
+        </Text>
       </Box>
       <Box
         alignItems="center"

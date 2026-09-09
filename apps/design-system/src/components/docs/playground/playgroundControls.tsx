@@ -8,6 +8,7 @@ import {
 } from '@/components/docs/playground/playgroundTypes'
 
 interface PlaygroundControlsProps<TState extends PlaygroundState> {
+  title?: string
   controls: readonly PlaygroundControl<TState>[]
   state: TState
   onChange: (key: keyof TState, value: PlaygroundValue) => void
@@ -109,28 +110,39 @@ function ControlRow<TState extends PlaygroundState>({
 }
 
 export function PlaygroundControls<TState extends PlaygroundState>({
+  title = 'Properties',
   controls,
   state,
   onChange,
   onReset,
 }: PlaygroundControlsProps<TState>): ReactElement {
+  const titleId = useId()
+  const resetLabel = title === 'Properties' ? 'Reset controls' : `Reset ${title} controls`
+
   return (
     <Box
       width="full"
       flexDirection="column"
       gap="xl"
+      role="group"
+      aria-labelledby={titleId}
     >
       <Box
         alignItems="center"
         justifyContent="between"
         gap="l"
       >
-        <Text variant="label">Properties</Text>
+        <Text
+          id={titleId}
+          variant="label"
+        >
+          {title}
+        </Text>
         <Button
           variant="ghost"
           size="s"
           onClick={onReset}
-          aria-label="Reset controls"
+          aria-label={resetLabel}
         >
           Reset
         </Button>

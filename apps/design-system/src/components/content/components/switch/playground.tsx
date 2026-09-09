@@ -59,9 +59,7 @@ export function SwitchPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={switchItem.title}
-      description={switchItem.description}
-      source={switchItem.source}
+      item={switchItem}
       preview={
         <Switch
           aria-label="Notifications"

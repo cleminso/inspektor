@@ -124,9 +124,7 @@ export function ResizablePanelPlayground(): ReactElement {
 
   return (
     <ComponentDocsPage
-      title={resizablePanelItem.title}
-      description={resizablePanelItem.description}
-      source={resizablePanelItem.source}
+      item={resizablePanelItem}
       preview={preview}
       sourceCode={serializeResizablePanelPlayground(state)}
       controls={

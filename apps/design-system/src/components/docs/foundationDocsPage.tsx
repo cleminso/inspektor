@@ -1,4 +1,4 @@
-import { Box } from '@inspektor/ds'
+import { Box, ScrollArea } from '@inspektor/ds'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { DocsHeader } from '@/components/docs/docsHeader'
@@ -27,15 +27,16 @@ export function FoundationDocsPage({ item, children }: FoundationDocsPageProps):
         width="full"
         minWidth={0}
         minHeight={0}
-        flexDirection="column"
-        overflowX="hidden"
-        overflowY="auto"
-        data-scroll-area="main-content"
-        data-scroll-fade="top"
+        overflow="hidden"
         backgroundColor="surface-background"
         borderRadius="xs"
       >
-        <DocsPage>{children}</DocsPage>
+        <ScrollArea
+          data-scroll-area="main-content"
+          data-scroll-fade="top"
+        >
+          <DocsPage>{children}</DocsPage>
+        </ScrollArea>
       </Box>
       <AppShellDetails
         label={`${item.title} details`}

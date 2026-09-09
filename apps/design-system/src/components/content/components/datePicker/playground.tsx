@@ -9,9 +9,7 @@ import basicSource from './basicExample.tsx?raw'
 export function DatePickerPlayground(): ReactElement {
   return (
     <ComponentDocsPage
-      title={datePickerItem.title}
-      description={datePickerItem.description}
-      source={datePickerItem.source}
+      item={datePickerItem}
       preview={<BasicExample />}
       sourceCode={basicSource}
     />
