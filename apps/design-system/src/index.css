@@ -39,45 +39,6 @@ body {
   overflow: hidden;
 }
 
-@property --docs-scroll-fade-top {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@keyframes docs-scroll-fade-top {
-  from {
-    --docs-scroll-fade-top: 0px;
-  }
-
-  to {
-    --docs-scroll-fade-top: 24px;
-  }
-}
-
-@supports (animation-timeline: scroll()) {
-  [data-scroll-fade="top"] {
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      black var(--docs-scroll-fade-top),
-      black 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      black var(--docs-scroll-fade-top),
-      black 100%
-    );
-    animation-name: docs-scroll-fade-top;
-    animation-duration: auto;
-    animation-timing-function: linear;
-    animation-fill-mode: both;
-    animation-timeline: scroll(self y);
-    animation-range: 0 64px;
-  }
-}
-
 a {
   color: inherit;
   text-decoration: none;
@@ -90,10 +51,18 @@ select {
   font: inherit;
 }
 
+[data-docs-list="unordered"] {
+  list-style: disc;
+}
+
+[data-docs-list="ordered"] {
+  list-style: decimal;
+}
+
 [data-docs-code-content] .shiki {
   margin: 0;
-  padding: 16px 48px 16px 16px;
-  overflow-x: auto;
+  padding: 16px 48px 16px 56px;
+  overflow-x: visible;
   font-family: "Geist Mono Variable", ui-monospace, SFMono-Regular, Consolas, monospace;
   font-size: 13px;
   line-height: 20px;
@@ -103,10 +72,44 @@ select {
   font: inherit;
 }
 
+[data-docs-code-content] .shiki .line:empty::before {
+  content: " ";
+  white-space: pre;
+}
+
+[data-docs-code-line-numbers] {
+  color: currentColor;
+  font-family: "Geist Mono Variable", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 13px;
+  inset-block-start: 16px;
+  inset-inline-start: 16px;
+  line-height: 20px;
+  opacity: 0.45;
+  position: absolute;
+  text-align: end;
+  user-select: none;
+  width: 24px;
+}
+
+[data-docs-code-line-numbers] > span {
+  display: block;
+  height: 20px;
+}
+
+@media (max-width: 767px) {
+  [data-docs-code-content] .shiki {
+    padding-inline-start: 16px;
+  }
+
+  [data-docs-code-line-numbers] {
+    display: none;
+  }
+}
+
 html.dark [data-docs-code-content] .shiki,
 html.dark [data-docs-code-content] .shiki span {
   color: var(--shiki-dark) !important;
-  background-color: var(--shiki-nord) !important;
+  background-color: var(--shiki-dark-bg) !important;
   font-style: var(--shiki-dark-font-style) !important;
   font-weight: var(--shiki-dark-font-weight) !important;
   text-decoration: var(--shiki-dark-text-decoration) !important;

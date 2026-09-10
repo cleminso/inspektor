@@ -1,0 +1,18 @@
+import { ComponentDemo } from '../../../components/docs/componentDemo'
+import DefaultDemo from './demos/defaultDemo'
+import defaultSource from './demos/defaultDemo.tsx?raw'
+
+## Panel structure
+
+Use `SidePanel` for a full-height supporting region. Its header, body, and footer are optional. When
+present, the body owns vertical scrolling while the header and footer remain fixed.
+
+<ComponentDemo source={defaultSource}>
+  <DefaultDemo />
+</ComponentDemo>
+
+## Scroll ownership
+
+Use `SidePanel.Body` when the panel should own the main scrolling region. If a direct child, such as
+`Tree.Root`, already owns scrolling, render it directly inside `SidePanel` instead. Place the panel in
+`ShellLayout.LeftDock` or `ShellLayout.RightDock` when the application needs a resizable dock.

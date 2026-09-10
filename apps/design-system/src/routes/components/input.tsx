@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { InputPage } from '@/components/content/components/input/page'
+import { ComponentPage } from '@/components/docs/componentPage'
+import InputContent from '@/content/components/input/page.mdx'
+import { inputItem } from '@/lib/registry'
 
 export const Route = createFileRoute('/components/input')({
   component: InputPage,
@@ -8,3 +10,11 @@ export const Route = createFileRoute('/components/input')({
     meta: [{ title: 'Input · Inspektor Design System' }],
   }),
 })
+
+function InputPage() {
+  return (
+    <ComponentPage item={inputItem}>
+      <InputContent />
+    </ComponentPage>
+  )
+}

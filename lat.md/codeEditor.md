@@ -41,6 +41,7 @@ The initial product use case is inserting and updating JSON columns in the Table
 - browser text selection
 - copying
 - optional read-only progressive disclosure
+- one keyboard-scrollable horizontal surface for highlighted source and its line-number gutter, while the copy action remains anchored outside that surface and the page retains vertical scroll ownership
 
 An `interaction={false}` prop is not part of either API. It cannot distinguish editing, selection, copying, focus, disclosure, or disabled behavior. The two component names communicate the distinction directly.
 

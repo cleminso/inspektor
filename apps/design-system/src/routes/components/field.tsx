@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { FieldPage } from '@/components/content/components/field/page'
+import { ComponentPage } from '@/components/docs/componentPage'
+import FieldContent from '@/content/components/field/page.mdx'
+import { fieldItem } from '@/lib/registry'
 
 export const Route = createFileRoute('/components/field')({
   component: FieldPage,
@@ -8,3 +10,11 @@ export const Route = createFileRoute('/components/field')({
     meta: [{ title: 'Field · Inspektor Design System' }],
   }),
 })
+
+function FieldPage() {
+  return (
+    <ComponentPage item={fieldItem}>
+      <FieldContent />
+    </ComponentPage>
+  )
+}

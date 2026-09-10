@@ -1,6 +1,8 @@
 import stylex from '@stylexjs/unplugin'
+import mdx from '@mdx-js/rollup'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import viteReact from '@vitejs/plugin-react'
+import remarkGfm from 'remark-gfm'
 import { defineConfig } from 'vitest/config'
 
 const PORT = Number.parseInt(process.env.PORT ?? '1356', 10)
@@ -8,6 +10,13 @@ const PORT = Number.parseInt(process.env.PORT ?? '1356', 10)
 const stylexSourceId = /\/(?:apps|packages)\/design-system\/src\/.*\.tsx?(?:\?.*)?$/
 
 const stylexPlugin = stylex.vite()
+const mdxPlugin = {
+  ...mdx({
+    providerImportSource: '@mdx-js/react',
+    remarkPlugins: [remarkGfm],
+  }),
+  enforce: 'pre' as const,
+}
 const transform = stylexPlugin.transform
 
 if (typeof transform !== 'function') {
@@ -37,7 +46,8 @@ export default defineConfig({
       target: 'react',
       autoCodeSplitting: true,
     }),
-    viteReact(),
+    mdxPlugin,
+    viteReact({ include: /\.(?:js|jsx|mdx|ts|tsx)$/ }),
   ],
   server: { port: PORT, host: true, strictPort: true },
   build: {

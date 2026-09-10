@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ResizablePanelPage } from '@/components/content/components/resizablePanel/page'
+import { ComponentPage } from '@/components/docs/componentPage'
+import ResizablePanelContent from '@/content/components/resizablePanel/page.mdx'
+import { resizablePanelItem } from '@/lib/registry'
 
 export const Route = createFileRoute('/components/resizable-panel')({
   component: ResizablePanelPage,
@@ -8,3 +10,11 @@ export const Route = createFileRoute('/components/resizable-panel')({
     meta: [{ title: 'Resizable Panel · Inspektor Design System' }],
   }),
 })
+
+function ResizablePanelPage() {
+  return (
+    <ComponentPage item={resizablePanelItem}>
+      <ResizablePanelContent />
+    </ComponentPage>
+  )
+}

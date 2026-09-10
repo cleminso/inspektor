@@ -149,6 +149,7 @@ export const spatial = stylex.defineVars({
   'content-width': dimensions[1220],
   'content-width-wide': dimensions[1440],
   'example-height': dimensions[120],
+  'example-width': dimensions[284],
   'find-bar-status-width': dimensions[72],
   'focus-ring-width': dimensions[2],
   'grid-track-s': dimensions[160],

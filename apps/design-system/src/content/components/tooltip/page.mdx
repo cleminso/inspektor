@@ -1,0 +1,19 @@
+import { ComponentDemo } from '../../../components/docs/componentDemo'
+import DefaultDemo from './demos/contextDemo'
+import defaultSource from './demos/contextDemo.tsx?raw'
+import NoDelayDemo from './demos/noDelayDemo'
+import noDelaySource from './demos/noDelayDemo.tsx?raw'
+
+## Default
+
+<ComponentDemo source={defaultSource}>
+  <DefaultDemo />
+</ComponentDemo>
+
+## No delay
+
+Use a zero provider delay when tooltips need to appear as soon as their trigger is hovered or focused.
+
+<ComponentDemo source={noDelaySource}>
+  <NoDelayDemo />
+</ComponentDemo>

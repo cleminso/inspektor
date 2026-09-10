@@ -26,9 +26,10 @@
     "test:design-system": "pnpm --filter @inspektor/ds test",
     "test:design-system:node": "pnpm --filter @inspektor/ds test:node",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --workspace-concurrency=1 --if-present test && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
+    "test": "pnpm -r --filter='!inspektor.design-system' --workspace-concurrency=1 --if-present test && node --test tools/oxlint/antiSlop/rules/noDirectLucideJsx.test.mjs",
     "test:handles": "pnpm --filter @inspektor/ds exec vitest run src/tokens/tokens.stylex.test.ts --reporter=default --reporter=hanging-process",
     "test:web": "pnpm --filter inspektor test",
+    "test:web:design": "pnpm --filter inspektor.design-system test",
     "test:web:jsdom": "pnpm --filter inspektor test:jsdom",
     "test:web:node": "pnpm --filter inspektor test:node",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"

@@ -81,9 +81,11 @@ const CheckboxRoot = forwardRef<HTMLElement, CheckboxProps>(function CheckboxRoo
     state.valid === false && checkboxStyles.invalid,
     state.disabled === true && checkboxStyles.disabled,
     state.disabled === true &&
-      (state.checked === true || state.indeterminate === true) &&
-      checkboxStyles.selectedDisabled,
-    state.readOnly === true && checkboxStyles.readOnly,
+      state.checked === true &&
+      state.indeterminate === false &&
+      checkboxStyles.checkedDisabled,
+    state.disabled === true && state.indeterminate === true && checkboxStyles.indeterminateDisabled,
+    state.disabled === false && state.readOnly === true && checkboxStyles.readOnly,
     state.checked === true && checkboxStyles.rootChecked,
     state.checked === false && state.indeterminate === false && checkboxStyles.rootUnchecked,
     state.indeterminate === true && checkboxStyles.rootIndeterminate,

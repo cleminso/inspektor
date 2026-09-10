@@ -27,6 +27,7 @@ export function useHighlightedCode(code: string): string | null {
         setHtml(
           highlighter.codeToHtml(code, {
             lang: 'tsx',
+            tabindex: false,
             themes: {
               light: 'min-light',
               dark: 'github-dark',

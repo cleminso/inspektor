@@ -1,0 +1,24 @@
+import { ComponentDemo } from '../../../components/docs/componentDemo'
+import CollapsedDemo from './demos/collapsedDemo'
+import collapsedSource from './demos/collapsedDemo.tsx?raw'
+import DefaultDemo from './demos/defaultDemo'
+import defaultSource from './demos/defaultDemo.tsx?raw'
+
+## Structured data
+
+Use JSON View when users need to inspect and copy nested objects or arrays. Pass a
+JSON-compatible object or array directly to `data`; do not pre-stringify it. Start with
+the first level expanded for a scannable overview.
+
+<ComponentDemo source={defaultSource}>
+  <DefaultDemo />
+</ComponentDemo>
+
+## Collapsed
+
+Use `defaultExpandDepth={0}` when the JSON appears in a compact surface where users
+should choose which values to reveal.
+
+<ComponentDemo source={collapsedSource}>
+  <CollapsedDemo />
+</ComponentDemo>

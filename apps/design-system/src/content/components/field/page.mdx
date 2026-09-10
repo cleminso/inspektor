@@ -1,0 +1,27 @@
+import { ComponentDemo } from '../../../components/docs/componentDemo'
+import DefaultDemo from './demos/defaultDemo'
+import defaultSource from './demos/defaultDemo.tsx?raw'
+import ErrorDemo from './demos/errorDemo'
+import errorSource from './demos/errorDemo.tsx?raw'
+
+## Usage
+
+Use [Text Field](/components/text-field) for a standard labeled text input. Use `Field` when a
+field needs compound controls or a custom structure. Compose `Field.Root` with `Field.Label`,
+`Field.Description`, and `Field.Error`. Connect non-native controls through their accessible label
+and description props.
+
+Use [Fieldset](/components/fieldset) to group related fields. `Field` describes one field or compound
+control; `Fieldset` describes a group of related fields.
+
+## Default
+
+<ComponentDemo source={defaultSource}>
+  <DefaultDemo />
+</ComponentDemo>
+
+## Invalid
+
+<ComponentDemo source={errorSource}>
+  <ErrorDemo />
+</ComponentDemo>

@@ -11,92 +11,92 @@
 
 ## Implemented foundation
 
-[09/09/26]
+[10/09/26]
 
-- [x] Render component documentation sections inside one center surface with one scroll owner.
-- [x] Pass registry items directly to the shared component page instead of joining them by source path.
-- [x] Remove unused package import metadata left behind by the removed installation UI.
-- [x] Support coordinated examples with matching right-dock control groups in one playground.
-- [x] Use overlay scrolling for component and foundation pages so overflow does not change content width.
+- [x] Keep highlighted source and its line-number gutter in the same horizontal scroll surface.
 
-[09/09/26]
+[10/09/26]
 
-- [x] Integrate the collapsible source footer into the playground surface.
+- [x] Restore the resizable `ShellLayout.LeftDock` and its collapse control on wider viewports.
+- [x] Compose dock navigation with public `SidePanel` while `Tree` remains the sole scroll owner.
+- [x] Keep full-width toggled navigation on narrow viewports without restoring the right details dock.
+- [x] Keep the central shell view unpadded and apply `4xl` horizontal and `2xl` vertical padding to page surfaces.
+- [x] Render content-height component previews with `2xl` padding and a source disclosure directly below.
 
-[08/09/26]
+[10/09/26]
 
-- [x] Use one center playground for every component page.
-- [x] Place copyable source in a separate collapsible code island.
-- [x] Reserve the right dock for interactive controls and Reset.
-- [x] Support fixed playgrounds without invented controls.
-- [x] Remove generated props tables and their metadata pipeline.
+- [x] Replace the prop-inspector page model with authored MDX documentation.
+- [x] Keep React, Vite, TanStack Router, StyleX, and public `@inspektor/ds` source consumption.
+- [x] Put documentation under `src/content` and routes under the default `src/routes` directory.
+- [x] Migrate all 52 component routes to authored MDX pages and strict TSX scenarios.
+- [x] Pair every executable scenario with its exact Vite `?raw` source.
+- [x] Preserve meaningful staged examples without retaining inspector controls or source serializers.
+- [x] Add constrained MDX element mappings and shared `ComponentPage` and `ComponentDemo` renderers.
+- [x] Keep Colors and Typography as authored foundation pages.
+- [x] Add a catalog contract test that requires every component to have a route, MDX page, and executable demo.
 
 ## Open product work
 
-[08/09/26]
+[10/09/26]
 
-- [ ] Define and author component Best practices guidance using the Geist documentation pattern as a reference.
+- [ ] Add an on-page table of contents if longer component pages demonstrate a navigation need.
+- [ ] Add exhaustive generated API tables only if maintainers need a separate reference product.
 
 ## Work outside the foundation scope
 
-[08/09/26]
+[10/09/26]
 
-- [x] Do not add an empty Best practices section or placeholder.
-- [x] Do not change TanStack routing behavior.
+- [x] Do not migrate the documentation application to Astro.
+- [x] Do not add empty Anatomy, Accessibility, or Best practices sections.
+- [x] Do not add generic property controls or regenerate examples from control state.
+- [x] Do not hand-edit the generated TanStack route tree.
 
 ## Settled interaction decisions
 
-[09/09/26]
+[10/09/26]
 
-- [x] One center surface owns the header, playground, code, and vertical scrolling.
-- [x] Section dividers replace separate header, playground, and code islands.
-- [x] Component pages omit upstream API-reference blocks.
-- [x] A playground can render several coordinated instances when comparison is the component's clearest example.
-- [x] These decisions supersede the separate-island treatment recorded below.
+- [x] Horizontal source scrolling moves line numbers and code together while the copy action remains visible.
+- [x] The keyboard-scrollable source region shows a visible inset focus ring.
+- [x] Keep vertical source scrolling on the page instead of introducing a nested code-block scrollbar.
 
-[09/09/26]
+[10/09/26]
 
-- [x] The collapsed `Code` footer sits at the bottom of the playground without reducing the preview height.
-- [x] Expanded source renders at full height and uses the playground's reserved vertical scroll track.
+- [x] Component source is collapsed by default and revealed directly below its preview.
+- [x] The left navigation dock is resizable and collapsible on wider viewports.
 
-[08/09/26]
+[10/09/26]
 
-- [x] The `Code` island header uses the shared Accordion trigger.
-- [x] Code is collapsed by default and exposes copy when expanded.
-- [x] Long code scrolls inside the code block without widening the center view.
-- [x] Component name and description belong in the center header, not the right dock.
-- [x] Right-dock controls use content-aware rows with actions aligned to the right edge.
-- [x] Header, playground, and code render as separate borderless surface islands.
-- [x] The center canvas remains visible through the gap between islands.
-- [x] Right-dock content fills the available dock width.
+- [x] Component pages are authored narratives with named scenarios, not generic prop inspectors.
+- [x] MDX owns prose and ordering; strict TSX owns executable behavior and StyleX.
+- [x] Pages may contain several examples when each teaches a distinct accepted usage.
+- [x] Scenario source is copied from the executable TSX file.
+- [x] Long source is keyboard-scrollable without widening the documentation page.
+- [x] Source displays line numbers on wider viewports and hides the gutter on narrow viewports.
+- [x] Navigation is hidden by default on narrow viewports and persistent beside content on wider viewports.
+- [x] Narrow navigation returns focus to its toggle after route selection.
+- [x] Generated API tables remain outside the maintainer-focused documentation model.
 
 ## Open design decisions
 
-[08/09/26]
+[10/09/26]
 
 - None.
 
 ## Validation checklist
 
-[09/09/26]
+[10/09/26]
 
-- [x] Focused page, code, controls, Button, and Accordion tests pass.
-- [x] Documentation app lint and typecheck pass.
-- [x] Documentation app suite and build pass.
-- [x] Shared surface and exemplars are verified in both color schemes.
-- [x] Component pages render without API-reference blocks.
-- [x] Component and foundation pages preserve center width across short and overflowing content.
+- [x] Cover shared horizontal scroll ownership with a focused structural test.
+- [x] Verify pointer and keyboard scrolling on a wide viewport and contained overflow on a narrow viewport.
+- [x] Verify highlighted source in both color schemes.
+- [x] Verify the source region's focus indicator is visible and unclipped.
 
-[09/09/26]
+[10/09/26]
 
-- [x] Focused playground nesting and scroll-ownership tests pass.
-- [x] Documentation app lint, typecheck, and suite pass.
-- [x] Collapsed and expanded playgrounds are verified without horizontal layout shift in both color schemes.
-- [x] Long expanded source is fully rendered and scrolls on the playground surface.
-
-[08/09/26]
-
-- [x] Focused layout and code-island tests pass.
-- [x] Documentation app lint and typecheck pass.
-- [x] Documentation app suite and build pass.
-- [x] Interactive and fixed playgrounds are verified in supported color schemes.
+- [x] Catalog and focused interaction tests pass.
+- [ ] Complete documentation app tests pass.
+- [x] Documentation app formatting, lint, typecheck, and production build pass.
+- [x] Generated TanStack routes include every registered component page.
+- [x] Data Grid and DatePicker are verified on wide viewports in both color schemes.
+- [x] Workspace Tabs and navigation behavior are verified on a narrow viewport.
+- [x] Component pages render without inspector controls or generated API-reference blocks.

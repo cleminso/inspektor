@@ -69,9 +69,10 @@ Reserve persistent browser profiles and saved cloud connections for explicit sha
 
 ## Validate
 
-- Web Node test: `pnpm test:web:node`
-- Web jsdom test: `pnpm test:web:jsdom`
-- Web browser test: `pnpm test:browser`
+- Inspektor web app Node test: `pnpm test:web:node`
+- Inspektor web app jsdom test: `pnpm test:web:jsdom`
+- Inspektor web app browser test: `pnpm test:browser`
+- Design-system documentation app test: `pnpm test:web:design`
 - Design-system Node allowlist: `pnpm test:design-system:node`
 - Inspektor Test lint: `pnpm --filter inspektor-test lint`
 - Inspektor Test suite: `pnpm --filter inspektor-test test`

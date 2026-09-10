@@ -31,7 +31,7 @@ These commands validate the affected package, documentation application, and web
 - `pnpm --filter @inspektor/ds test`
 - `pnpm --filter @inspektor/ds typecheck`
 - `pnpm --filter @inspektor/ds build`
-- `pnpm --filter inspektor.design-system test`
+- `pnpm test:web:design`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`
@@ -45,7 +45,7 @@ Repository directories divide reusable design-system code, executable documentat
 - `packages/design-system/src/components/` owns reusable component behavior and StyleX styles.
 - `packages/design-system/src/tokens/` owns semantic, value, and layer tokens.
 - `packages/design-system/src/primitives/` owns constrained shared component helpers.
-- `apps/design-system/` owns executable component playground documentation.
+- `apps/design-system/` owns authored MDX documentation and executable TSX scenarios.
 - `apps/web/` consumes public `@inspektor/ds` APIs and owns product composition.
 
 ## Code style
@@ -61,13 +61,13 @@ selected: {
 
 ## Testing strategy
 
-Tests cover Inspektor-owned behavior, accessibility outcomes, state combinations, and synchronized documentation examples.
+Tests cover Inspektor-owned behavior, accessibility outcomes, state combinations, and documentation scenario contracts.
 
 - Add a failing component test before behavior changes.
 - Test Inspektor-owned behavior and accessibility outcomes, not Base UI implementation details.
 - Cover field state combinations: default, hover, focus-visible, invalid, invalid-focus, read-only, and disabled.
 - Cover selection state combinations: unchecked, checked, selected, pressed, checked-disabled, and selected-disabled.
-- Keep component playgrounds and displayed source synchronized after public API changes.
+- Keep executable documentation scenarios and their `?raw` displayed source synchronized after public API changes.
 
 ## Boundaries
 

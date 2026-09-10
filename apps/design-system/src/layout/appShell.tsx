@@ -1,242 +1,230 @@
 import {
   Box,
   Button,
-  KeyboardInput,
   ShellLayout,
+  SidePanel,
   Text,
+  TextLink,
   ThemeSwitch,
   Tree,
-  Tooltip,
   useShellLayout,
 } from '@inspektor/ds'
-import { useHotkey } from '@tanstack/react-hotkeys'
-import { HeadContent, Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
-import { FolderTree, Info, type LucideIcon } from 'lucide-react'
+import { HeadContent, Link, Outlet, useRouterState } from '@tanstack/react-router'
+import { FolderTree, PanelLeft } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { type ComponentProps, type ReactElement, useState } from 'react'
+import { type ReactElement, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
-import { getAdjacentNavigationItems, navSections } from '@/lib/registry'
-import { AppShellDetailsTargetContext } from '@/layout/appShellDetails'
-import { createDesignSystemShellLayoutPersistence } from '@/layout/appShellStorage'
+import { docsSections } from '@/lib/registry'
 
-const appShellHotkeyOptions = {
-  ignoreInputs: true,
-  preventDefault: false,
-  stopPropagation: false,
-} as const
-const appShellHotkeys = {
-  toggleLeftDock: 'Alt+B',
-  toggleRightDock: 'Alt+D',
-} as const
-const shellLayoutPersistence = createDesignSystemShellLayoutPersistence()
+const wideLayoutQuery = '(min-width: 768px)'
 
-function runDockHotkey(event: KeyboardEvent, toggle: () => void): void {
-  if (event.defaultPrevented === true || event.isComposing === true || event.repeat === true) {
-    return
-  }
-  event.preventDefault()
-  event.stopPropagation()
-  toggle()
+function subscribeToWideLayout(onChange: () => void): () => void {
+  const mediaQuery = window.matchMedia(wideLayoutQuery)
+  mediaQuery.addEventListener('change', onChange)
+  return () => mediaQuery.removeEventListener('change', onChange)
 }
 
-function DockControl({
-  artwork,
-  hotkey,
-  isOpen,
-  label,
-  onClick,
+function getWideLayoutSnapshot(): boolean {
+  return window.matchMedia(wideLayoutQuery).matches
+}
+
+function useWideLayout(): boolean {
+  return useSyncExternalStore(subscribeToWideLayout, getWideLayoutSnapshot, () => false)
+}
+
+function PrimaryNavigation({
+  onNavigate,
+  pathname,
 }: {
-  artwork: LucideIcon
-  hotkey: ComponentProps<typeof KeyboardInput>['hotkey']
-  isOpen: boolean
-  label: string
-  onClick: () => void
+  onNavigate?: () => void
+  pathname: string
 }): ReactElement {
-  const action = isOpen === true ? 'Hide' : 'Show'
-  const accessibleLabel = `${action} ${label}`
-
   return (
-    <Tooltip.Root>
-      <Tooltip.Trigger
-        render={
-          <Button
-            iconOnly
-            variant="ghost"
-            size="s"
-            aria-label={accessibleLabel}
-            aria-pressed={isOpen}
-            onClick={onClick}
+    <SidePanel aria-label="Design system navigation">
+      <Tree.Root aria-label="Design system pages">
+        {docsSections.map((section) => (
+          <Tree.Section
+            key={section.title}
+            defaultOpen
           >
-            <Button.Glyph artwork={artwork} />
-          </Button>
-        }
-      />
-      <Tooltip.Content>
-        {accessibleLabel}{' '}
-        <KeyboardInput
-          hotkey={hotkey}
-          size="small"
-        />
-      </Tooltip.Content>
-    </Tooltip.Root>
+            <Tree.Trigger>{section.title}</Tree.Trigger>
+            <Tree.Content>
+              {section.items.map((item) => (
+                <Tree.Item
+                  key={item.href}
+                  render={
+                    <Link
+                      to={item.href}
+                      onClick={onNavigate}
+                    />
+                  }
+                  aria-current={pathname === item.href ? 'page' : undefined}
+                >
+                  {item.title}
+                </Tree.Item>
+              ))}
+            </Tree.Content>
+          </Tree.Section>
+        ))}
+      </Tree.Root>
+    </SidePanel>
   )
 }
 
-export function AppShellFooter(): ReactElement {
-  const { leftDock, rightDock } = useShellLayout()
-
-  useHotkey(
-    appShellHotkeys.toggleLeftDock,
-    (event) => runDockHotkey(event, leftDock.toggle),
-    appShellHotkeyOptions,
-  )
-  useHotkey(
-    appShellHotkeys.toggleRightDock,
-    (event) => runDockHotkey(event, rightDock.toggle),
-    appShellHotkeyOptions,
-  )
+function LeftDockControl(): ReactElement {
+  const { leftDock } = useShellLayout()
+  const action = leftDock.isOpen === true ? 'Hide' : 'Show'
 
   return (
-    <Box
-      as="footer"
-      width="full"
-      alignItems="center"
-      justifyContent="between"
-      padding="xs"
+    <Button
+      iconOnly
+      variant="ghost"
+      size="m"
+      aria-label={`${action} components tree`}
+      aria-pressed={leftDock.isOpen}
+      onClick={leftDock.toggle}
     >
-      <DockControl
-        artwork={FolderTree}
-        hotkey={appShellHotkeys.toggleLeftDock}
-        isOpen={leftDock.isOpen}
-        label="components tree"
-        onClick={leftDock.toggle}
-      />
-      <DockControl
-        artwork={Info}
-        hotkey={appShellHotkeys.toggleRightDock}
-        isOpen={rightDock.isOpen}
-        label="details"
-        onClick={rightDock.toggle}
-      />
-    </Box>
-  )
-}
-
-export function AppShellNavigation({ pathname }: { pathname: string }): ReactElement {
-  return (
-    <Tree.Root aria-label="Design system navigation">
-      {navSections.map((section) => (
-        <Tree.Section
-          key={section.title}
-          defaultOpen
-        >
-          <Tree.Trigger>{section.title}</Tree.Trigger>
-          <Tree.Content>
-            {section.items.map((item) => (
-              <Tree.Item
-                key={item.href}
-                render={<Link to={item.href} />}
-                aria-current={pathname === item.href ? 'page' : undefined}
-              >
-                {item.title}
-              </Tree.Item>
-            ))}
-          </Tree.Content>
-        </Tree.Section>
-      ))}
-    </Tree.Root>
+      <Button.Glyph artwork={FolderTree} />
+    </Button>
   )
 }
 
 export function AppShell(): ReactElement {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
-  const navigate = useNavigate()
-  const [detailsTarget, setDetailsTarget] = useState<HTMLElement | null>(null)
-  const { previous, next } = getAdjacentNavigationItems(pathname)
   const { resolvedTheme, setTheme } = useTheme()
+  const [isNavigationOpen, setIsNavigationOpen] = useState(false)
+  const navigationToggleRef = useRef<HTMLButtonElement>(null)
+  const isWideLayout = useWideLayout()
   const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
 
-  useHotkey(
-    'ArrowLeft',
-    () => {
-      if (previous !== undefined) {
-        void navigate({ to: previous.href })
-      }
-    },
-    { enabled: previous !== undefined, ignoreInputs: true },
-  )
-  useHotkey(
-    'ArrowRight',
-    () => {
-      if (next !== undefined) {
-        void navigate({ to: next.href })
-      }
-    },
-    { enabled: next !== undefined, ignoreInputs: true },
-  )
+  useEffect(() => {
+    if (isWideLayout === true && isNavigationOpen === true) {
+      setIsNavigationOpen(false)
+      document.getElementById('main-content')?.focus()
+    }
+  }, [isNavigationOpen, isWideLayout])
+
+  const closeNavigation = (): void => {
+    if (isNavigationOpen === true) {
+      setIsNavigationOpen(false)
+      navigationToggleRef.current?.focus()
+    }
+  }
 
   return (
     <>
       <HeadContent />
-      <ShellLayout.Root persistence={shellLayoutPersistence}>
+      <ShellLayout.Root>
         <ShellLayout.Header>
           <Box
             as="header"
+            position="relative"
             width="full"
             alignItems="center"
             justifyContent="between"
+            gap="m"
             paddingHorizontal="m"
             paddingVertical="s"
           >
-            <Link to="/">
-              <Text
-                as="span"
-                variant="title"
+            <Box
+              position="absolute"
+              left="s"
+              top="s"
+              zIndex="content"
+              padding="xs"
+              opacity={{ base: 0, focusWithin: 1 }}
+              backgroundColor="surface-background"
+            >
+              <TextLink
+                href="#main-content"
+                aria-label="Skip to content"
+                variant="caption"
               >
-                Inspektor Design System
-              </Text>
-            </Link>
+                Skip to content
+              </TextLink>
+            </Box>
+            <Box
+              alignItems="center"
+              gap="s"
+            >
+              <Box display={{ base: 'flex', md: 'none' }}>
+                <Button
+                  ref={navigationToggleRef}
+                  iconOnly
+                  size="m"
+                  variant="ghost"
+                  aria-label={isNavigationOpen === true ? 'Hide navigation' : 'Show navigation'}
+                  aria-controls="primary-navigation"
+                  aria-expanded={isNavigationOpen}
+                  onClick={() => setIsNavigationOpen((isOpen) => isOpen === false)}
+                >
+                  <Button.Glyph artwork={PanelLeft} />
+                </Button>
+              </Box>
+              <Link to="/">
+                <Text
+                  as="span"
+                  variant="title"
+                >
+                  Inspektor Design System
+                </Text>
+              </Link>
+            </Box>
             <ThemeSwitch
               theme={theme}
               onThemeChange={setTheme}
             />
           </Box>
         </ShellLayout.Header>
-        <AppShellDetailsTargetContext.Provider value={detailsTarget}>
-          <ShellLayout.Body>
+        <ShellLayout.Body>
+          {isWideLayout === true ? (
             <ShellLayout.LeftDock>
-              <AppShellNavigation pathname={pathname} />
+              <PrimaryNavigation pathname={pathname} />
             </ShellLayout.LeftDock>
-            <ShellLayout.View>
+          ) : null}
+          <ShellLayout.View>
+            {isWideLayout === false ? (
               <Box
-                id="main-content"
-                as="main"
+                id="primary-navigation"
+                display={isNavigationOpen === true ? 'flex' : 'none'}
                 width="full"
                 height="full"
-                minWidth={0}
-                minHeight={0}
-                overflow="hidden"
+                backgroundColor="surface-default"
               >
-                <Outlet />
+                <PrimaryNavigation
+                  pathname={pathname}
+                  onNavigate={closeNavigation}
+                />
               </Box>
-            </ShellLayout.View>
-            <ShellLayout.RightDock>
-              <Box
-                ref={setDetailsTarget}
-                width="full"
-                height="full"
-                minHeight={0}
-                flexDirection="column"
-                overflowX="hidden"
-                overflowY="auto"
-                padding="m"
-              />
-            </ShellLayout.RightDock>
-          </ShellLayout.Body>
-        </AppShellDetailsTargetContext.Provider>
-        <ShellLayout.Footer>
-          <AppShellFooter />
-        </ShellLayout.Footer>
+            ) : null}
+            <Box
+              id="main-content"
+              as="main"
+              tabIndex={-1}
+              display={{ base: isNavigationOpen === true ? 'none' : 'flex', md: 'flex' }}
+              flex={1}
+              width="full"
+              height="full"
+              minWidth={0}
+              minHeight={0}
+              overflow="hidden"
+            >
+              <Outlet />
+            </Box>
+          </ShellLayout.View>
+        </ShellLayout.Body>
+        {isWideLayout === true ? (
+          <ShellLayout.Footer>
+            <Box
+              as="footer"
+              width="full"
+              alignItems="center"
+              padding="xs"
+            >
+              <LeftDockControl />
+            </Box>
+          </ShellLayout.Footer>
+        ) : null}
       </ShellLayout.Root>
     </>
   )

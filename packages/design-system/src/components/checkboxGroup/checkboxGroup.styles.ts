@@ -54,6 +54,7 @@ export const checkboxGroupStyles = stylex.create({
   optionButton: {
     padding: 0,
     borderWidth: 0,
+    gap: spacing.s,
     overflow: 'hidden',
     alignItems: 'center',
     appearance: 'none',

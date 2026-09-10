@@ -4,7 +4,7 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 1356",
+    "dev": "PORTLESS_PORT=1355 PORTLESS_HTTPS=1 portless ui.inspektor --force vite",
     "build": "vite build && pnpm typecheck",
     "lint": "oxlint .",
     "format": "oxfmt \"**/*.{ts,tsx}\"",
@@ -15,9 +15,9 @@
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/geist-mono": "catalog:",
     "@inspektor/ds": "workspace:*",
+    "@mdx-js/react": "^3.1.1",
     "@shikijs/langs-precompiled": "3.23.0",
     "@stylexjs/stylex": "catalog:",
-    "@tanstack/react-hotkeys": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-table": "catalog:",
     "lucide-react": "catalog:",
@@ -27,14 +27,17 @@
     "shiki": "3.23.0"
   },
   "devDependencies": {
+    "@mdx-js/rollup": "^3.1.1",
     "@stylexjs/unplugin": "catalog:",
     "@tanstack/router-plugin": "catalog:",
     "@testing-library/react": "catalog:",
+    "@types/mdx": "^2.0.14",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "jsdom": "catalog:",
+    "remark-gfm": "^4.0.1",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

@@ -1,0 +1,25 @@
+import { ComponentDemo } from '../../../components/docs/componentDemo'
+import BranchDemo from './demos/branchDemo'
+import branchSource from './demos/branchDemo.tsx?raw'
+import ConnectionDemo from './demos/connectionDemo'
+import connectionSource from './demos/connectionDemo.tsx?raw'
+import StatesDemo from './demos/statesDemo'
+import statesSource from './demos/statesDemo.tsx?raw'
+
+## Default
+
+<ComponentDemo source={branchSource}>
+  <BranchDemo />
+</ComponentDemo>
+
+## Custom items and actions
+
+<ComponentDemo source={connectionSource}>
+  <ConnectionDemo />
+</ComponentDemo>
+
+## Trigger states
+
+<ComponentDemo source={statesSource}>
+  <StatesDemo />
+</ComponentDemo>

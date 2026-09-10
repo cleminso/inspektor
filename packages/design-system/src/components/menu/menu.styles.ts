@@ -171,15 +171,15 @@ export const menuStyles = stylex.create({
   },
   choiceItem: {
     display: 'grid',
-    gridTemplateColumns: `${spatial['icon-size-m']} minmax(0, 1fr) auto`,
+    gridTemplateColumns: `minmax(0, 1fr) auto ${spatial['icon-size-m']}`,
   },
   indicator: {
     alignItems: 'center',
     display: 'inline-flex',
-    gridColumnStart: '1',
+    gridColumnStart: '3',
     gridRowStart: '1',
     justifyContent: 'center',
-    justifySelf: 'start',
+    justifySelf: 'end',
   },
   checkboxIndicatorChecked: {},
   checkboxIndicatorUnchecked: {},

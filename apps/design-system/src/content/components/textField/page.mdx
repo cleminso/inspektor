@@ -1,0 +1,26 @@
+import { ComponentDemo } from '../../../components/docs/componentDemo'
+import DefaultDemo from './demos/defaultDemo'
+import defaultSource from './demos/defaultDemo.tsx?raw'
+import ValidationDemo from './demos/validationDemo'
+import validationSource from './demos/validationDemo.tsx?raw'
+
+## Usage
+
+Use `TextField` for conventional labeled text entry. It composes `Field` and `Input`, associates
+the label and messages with the input, and coordinates validation state.
+
+Use [Field](/components/field) when a field needs additional controls or a different structure.
+Wrap related fields in a [Fieldset](/components/fieldset) when they need a shared legend or disabled
+state.
+
+## Default
+
+<ComponentDemo source={defaultSource}>
+  <DefaultDemo />
+</ComponentDemo>
+
+## Validation
+
+<ComponentDemo source={validationSource}>
+  <ValidationDemo />
+</ComponentDemo>

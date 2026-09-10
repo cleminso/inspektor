@@ -17,6 +17,7 @@ import {
   lineHeights,
   spacing,
 } from '../../tokens/value.stylex'
+import { checkboxColors } from './checkboxColors.stylex'
 
 export const checkboxStyles = stylex.create({
   label: {
@@ -26,8 +27,14 @@ export const checkboxStyles = stylex.create({
     },
     gap: spacing.s,
     alignItems: 'center',
-    color: textColors.default,
-    cursor: 'pointer',
+    color: {
+      default: textColors.default,
+      ':has([data-slot="checkbox"][data-disabled])': textColors.disabled,
+    },
+    cursor: {
+      default: 'pointer',
+      ':has([data-slot="checkbox"][data-disabled])': 'not-allowed',
+    },
     display: 'inline-flex',
     fontFamily: fontFamilies.sans,
     fontSize: fontSizes[1],
@@ -105,9 +112,12 @@ export const checkboxStyles = stylex.create({
     color: textColors.disabled,
     cursor: 'not-allowed',
   },
-  selectedDisabled: {
-    borderColor: borderColors.subtle,
+  checkedDisabled: {
+    borderColor: checkboxColors.disabledCheckedBackground,
+    backgroundColor: checkboxColors.disabledCheckedBackground,
+    color: textColors.onInverse,
   },
+  indeterminateDisabled: {},
   readOnly: {
     cursor: 'default',
   },

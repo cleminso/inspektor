@@ -66,9 +66,11 @@ The design system owns reusable presentation and interaction behavior:
 The documentation application is a real consumer of the design system. It owns:
 
 - Component pages, registry metadata, and navigation for pages that exist.
-- Executable playgrounds imported from `@inspektor/ds`.
-- Displayed playground source and curated controls.
-- Documentation-only tooling such as Shiki.
+- A responsive `ShellLayout` composition with resizable left-dock navigation and an unpadded central view.
+- Authored MDX guidance composed from constrained documentation primitives.
+- Executable TSX scenarios imported from public `@inspektor/ds` exports.
+- Displayed scenario source loaded from the same TSX module through Vite `?raw` imports.
+- Documentation-only tooling such as MDX compilation and Shiki.
 
 It must not import package-private implementation files at runtime. If documentation cannot express or demonstrate a needed public behavior, the public component API or documentation design needs reconsideration.
 
@@ -119,6 +121,7 @@ Workspace mutation state publishes an exit blocker upward. Session enforces that
 | ----------------------- | ---------------------------------------------------------- |
 | `@inspektor/ds`         | Main public component, token, primitive, and hook barrel   |
 | `@inspektor/ds/theme`   | Theme token entry                                          |
+| `@inspektor/ds/baseline.css` | Opt-in browser normalization used by workspace applications |
 | `@inspektor/ds/tooltip` | Focused Tooltip entry used at an application-wide boundary |
 
 ### Public barrels
@@ -149,7 +152,7 @@ The package emits ESM only. There is no CommonJS build because this workspace ha
 
 Dependencies that the component implementation needs at runtime, such as Base UI and StyleX, belong to the design-system package. Build and test tooling belongs in `devDependencies` when it is not required by a consumer at runtime.
 
-`sideEffects: false` is a package promise to bundlers: importing an unused module has no required import-time behavior. It enables removal of unused code. It must not be declared if a module depends on import-time global setup, CSS registration, polyfills, or singleton initialization.
+The `sideEffects` array marks only the source and built baseline CSS files as effectful. JavaScript modules remain tree-shakeable, while bundlers retain the explicitly imported normalization stylesheet.
 
 ## How workspace applications resolve the design system
 

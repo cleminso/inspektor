@@ -4,7 +4,7 @@ This document explains why the design system uses separate package and documenta
 
 ## Table of contents
 
-The sections cover package ownership, build and styling tools, documentation workflow, playgrounds, and validation.
+The sections cover package ownership, build and styling tools, documentation workflow, authored scenarios, and validation.
 
 - [Goal](#goal)
 - [Package and app split](#package-and-app-split)
@@ -12,8 +12,8 @@ The sections cover package ownership, build and styling tools, documentation wor
 - [Why `@stylexjs/unplugin`](#why-stylexjsunplugin)
 - [Why Oxlint and Oxfmt](#why-oxlint-and-oxfmt)
 - [Why TSDown for the package](#why-tsdown-for-the-package)
-- [Polar-inspired workflow](#polar-inspired-workflow)
-- [Component playgrounds](#component-playgrounds)
+- [Documentation workflow](#documentation-workflow)
+- [Authored scenarios](#authored-scenarios)
 - [Validation intent](#validation-intent)
 
 ## Goal
@@ -63,11 +63,13 @@ The package build runs TSDown for JavaScript followed by one declaration-emittin
 
 The package should build distributable JavaScript and declarations, but it should not own final StyleX CSS extraction. CSS extraction belongs to the consuming app because the app owns the final bundle and can combine styles across app code and workspace packages.
 
-## Polar-inspired workflow
+## Documentation workflow
 
-The useful pattern from Polar Orbit is the communication model, not the framework-specific setup.
+`apps/design-system` uses React, Vite, TanStack Router, and MDX with separate authoring and execution responsibilities.
 
-`apps/design-system` should import real package exports from `@inspektor/ds`. This keeps examples in sync: if a component renders in docs, the package export works.
+MDX owns prose and scenario order while strict TSX modules own executable examples, state, and StyleX. Static `.tsx` route modules import MDX pages from `src/content`; MDX files do not participate directly in TanStack route generation.
+
+Executable examples import real package exports from `@inspektor/ds`. Each example is imported normally for rendering and through Vite `?raw` for displayed source, so the preview and copyable code share one source file.
 
 The docs registry carries the manual metadata needed to document a package item:
 
@@ -80,28 +82,23 @@ Adding a component remains deliberate:
 1. implement the component in `packages/design-system`
 2. export it from `@inspektor/ds`
 3. add a registry item in `apps/design-system`
-4. add or update the page module outside `src/routes`
-5. add one representative playground with synchronized source
+4. author `src/content/components/{componentName}/page.mdx`
+5. add one or more meaningful TSX scenarios under the page's `demos` directory
+6. add a static route under `src/routes/components`
 
-## Component playgrounds
+## Authored scenarios
 
-Each component page presents one representative playground and its consumer-facing source.
+Each component page is an authored narrative rather than a generic prop inspector. Pages select scenarios that explain accepted Inspektor usage, not every technically possible prop combination.
 
-The component header, playground, and collapsible source render as sections inside one center
-surface. Sections use dividers instead of independent cards.
+The shared page renders registry-owned title, description, and package source metadata. MDX supplies headings, prose, examples, anatomy, and best practices through a constrained component map.
 
-Component and foundation pages use the shared overlay scroll area for center scrolling. The overlay
-track preserves content width when page overflow changes.
+Each scenario lives in one typechecked `.tsx` file. `ComponentDemo` renders that module inside a content-height preview and places a source disclosure directly below it in the same bordered surface. The collapsed disclosure reveals the exact raw source with copy support, keyboard scrolling, and wide-viewport line numbers. Stateful scenarios own their interaction state and receive focused tests.
 
-Interactive playground state drives:
+The documentation shell composes `ShellLayout.LeftDock` with `ShellLayout.View` on wider viewports. Dock navigation uses `SidePanel`, with `Tree.Root` as its direct child and sole scroll owner so the visible rail stays flush with the panel edge. The view owns no page padding. `ComponentPage` applies `4xl` horizontal and `2xl` vertical padding to its header and content surfaces, while `ComponentDemo` applies `2xl` padding to each executable preview. Narrow viewports retain a dedicated full-width navigation toggle.
 
-- the center preview
-- curated controls in the right dock
-- the copyable source in a collapsible footer within the center playground
+MDX remains an authoring layer. Stateful behavior, StyleX definitions, and substantial data stay in TSX. Pages may include several named scenarios when each teaches a distinct usage pattern. Generated prop tables and inspector controls are outside this model.
 
-Fixed playgrounds pair one executable example with its raw source and omit the right dock controls.
-When comparison improves the example, one playground can render coordinated component instances
-with corresponding control groups in the right dock.
+The registry preserves the complete component documentation catalog. A catalog contract test requires every registered component to have a stable route, an authored MDX page, and at least one executable TSX scenario.
 
 ## Validation intent
 
@@ -112,7 +109,7 @@ The focused checks each cover a different risk:
 - package build: validates package output and declaration generation
 - app lint: validates app route and shell source
 - app typecheck: validates route bindings and workspace imports
-- app playground tests: validate preview, control, and source synchronization
-- app build: validates Vite, TanStack Router generation, and StyleX extraction together
+- app scenario tests: validate rendered guidance and interactive behavior
+- app build: validates MDX, Vite, TanStack Router generation, and StyleX extraction together
 
 Generated files such as `src/routeTree.gen.ts` should not be edited by hand.

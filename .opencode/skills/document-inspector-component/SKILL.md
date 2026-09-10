@@ -4,44 +4,48 @@
 
 - [Quick start](#quick-start)
 - [Documentation workflow](#documentation-workflow)
-- [Playground and code](#playground-and-code)
+- [Scenarios and source](#scenarios-and-source)
 - [Validation](#validation)
 
 ## Quick start
 
-1. Inspect the public package export and the registry.
-2. Create one representative playground or fixed preview.
-3. Pair the preview with its exact consumer-facing source.
-4. Add the content page, registry item, and static route.
-5. Validate rendering, controls, types, and build output.
+1. Inspect the public package export and documentation registry.
+2. Identify the accepted Inspektor usage scenarios worth teaching.
+3. Implement each scenario as a focused TSX module.
+4. Compose guidance and scenarios in the component MDX page.
+5. Add the registry item and static route.
+6. Validate behavior, source fidelity, types, and build output.
 
 ## Documentation workflow
 
-- Start with an idempotency check across the package export, registry, page, playground, and route.
-- Add a registry item only when its page exists. Keep its title, route, description, package import path, and package source reference current.
-- Put page content under `src/components/content/components/{componentName}/`.
-- Use `ComponentDocsPage` for every component page, including pages with fixed previews.
-- Render one playground only. Do not add secondary example sections or generated props tables.
-- Put interactive playground controls in the right dock through the `controls` prop. Fixed playgrounds may omit controls.
-- Keep the component title and description in the center header. Reserve the right dock for controls and Reset.
-- Add a static route under `src/routes/components/`; never hand-edit `src/routeTree.gen.ts`.
-- Do not add a Best practices section without an explicit product decision and authored guidance.
+- Start with an idempotency check across the package export, registry, MDX page, scenario modules, and route.
+- Add a registry item only when its page exists. Keep its title, route, description, and package source reference accurate.
+- Put page content under `src/content/components/{componentName}/page.mdx`.
+- Put executable scenarios under the colocated `demos/` directory using camelCase file names.
+- Keep MDX outside `src/routes`. Add a static `.tsx` route under `src/routes/components/` and never hand-edit `src/routeTree.gen.ts`.
+- Use MDX for prose and scenario ordering. Keep state, hooks, substantial data, and StyleX in strict TSX modules.
+- Author only meaningful sections. Do not add empty Anatomy, Accessibility, or Best practices placeholders.
+- Do not add generated props tables unless the product explicitly adopts exhaustive API documentation.
 
-## Playground and code
+## Scenarios and source
 
-- Examples must import from `@inspektor/ds` as consumers do.
-- Interactive playground state owns the preview, controls, and serialized source.
-- Fixed playgrounds use one focused example module imported normally for preview and with `?raw` for displayed source.
-- Keep preview-only layout in the page or playground, not the consumer example.
-- Reuse `createPlaygroundSource` and the shared Shiki highlighter.
-- The code island remains collapsed until its `Code` header is activated.
+- Scenarios must import public `@inspektor/ds` paths as consumers do.
+- Each scenario demonstrates one accepted usage or a useful comparison, not one arbitrary prop combination.
+- Import the scenario normally for rendering and with `?raw` for displayed source.
+- Render scenarios through `ComponentDemo`; do not duplicate executable code in MDX fences or handwritten strings.
+- Keep preview-only framing in `ComponentDemo`, not in the consumer example.
+- Keep scenarios independent so focus, portals, IDs, and state do not leak between examples.
+- Use the shared Shiki code renderer. Source remains visible directly below its executable preview.
+- Respect the closed styling contract: no `className`, inline `style`, raw CSS values, or package-private runtime imports.
 
 ## Validation
 
-- `pnpm --filter inspektor.design-system test`
+- Focused scenario and page tests
+- `pnpm test:web:design`
 - `pnpm --filter inspektor.design-system typecheck`
 - `pnpm --filter inspektor.design-system lint`
 - `pnpm --filter inspektor.design-system build`
+- Browser verification in both color schemes and relevant viewport widths
 - `pnpm --filter @inspektor/ds build` when package source or public APIs change
 
 See [REFERENCE.md](REFERENCE.md) for page structure and completion criteria.

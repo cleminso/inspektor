@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { FindBarPage } from '@/components/content/components/findBar/page'
+import { ComponentPage } from '@/components/docs/componentPage'
+import FindBarContent from '@/content/components/findBar/page.mdx'
+import { findBarItem } from '@/lib/registry'
 
 export const Route = createFileRoute('/components/find-bar')({
   component: FindBarPage,
@@ -8,3 +10,11 @@ export const Route = createFileRoute('/components/find-bar')({
     meta: [{ title: 'Find Bar · Inspektor Design System' }],
   }),
 })
+
+function FindBarPage() {
+  return (
+    <ComponentPage item={findBarItem}>
+      <FindBarContent />
+    </ComponentPage>
+  )
+}

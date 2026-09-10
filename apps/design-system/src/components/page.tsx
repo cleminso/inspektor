@@ -1,50 +1,60 @@
-import { ButtonLink } from '@inspektor/ds'
-import { Link as RouterLink } from '@tanstack/react-router'
-
+import { Box, ButtonLink, Text } from '@inspektor/ds'
+import { Link } from '@tanstack/react-router'
 import { type ReactElement } from 'react'
-
-import { DocsPage } from '@/components/docs/docsPage'
-import { PageHeader } from '@/components/docs/pageHeader'
-import { AppShellDetails } from '@/layout/appShellDetails'
-
-const homeDescription = 'Foundations and components used to build consistent Inspektor interfaces.'
 
 export function HomePage(): ReactElement {
   return (
-    <>
-      <DocsPage>
-        <PageHeader
-          title="Inspektor Design System"
-          description={homeDescription}
-        />
-      </DocsPage>
-      <AppShellDetails
-        label="Design system details"
-        description={homeDescription}
-      />
-    </>
+    <Box
+      width="full"
+      height="full"
+      alignItems="center"
+      justifyContent="center"
+      padding="2xl"
+    >
+      <Box
+        maxWidth="content-measure"
+        flexDirection="column"
+        gap="l"
+      >
+        <Text
+          as="h1"
+          variant="heading"
+        >
+          Inspektor Design System
+        </Text>
+        <Text
+          variant="body"
+          color="muted"
+        >
+          Guidance and executable examples for building consistent Inspektor interfaces.
+        </Text>
+        <ButtonLink render={<Link to="/components/button" />}>Browse components</ButtonLink>
+      </Box>
+    </Box>
   )
 }
 
 export function NotFoundPage(): ReactElement {
   return (
-    <>
-      <DocsPage>
-        <PageHeader
-          title="Page not found"
-          description="This design-system page does not exist or is not documented."
-        />
-        <ButtonLink
-          variant="secondary"
-          render={<RouterLink to="/" />}
+    <Box
+      width="full"
+      height="full"
+      alignItems="center"
+      justifyContent="center"
+      padding="2xl"
+    >
+      <Box
+        flexDirection="column"
+        gap="m"
+      >
+        <Text
+          as="h1"
+          variant="heading"
         >
-          Return to the catalog
-        </ButtonLink>
-      </DocsPage>
-      <AppShellDetails
-        label="Page details"
-        description="The requested design-system page is not documented."
-      />
-    </>
+          Page not found
+        </Text>
+        <ButtonLink render={<Link to="/" />}>Return home</ButtonLink>
+      </Box>
+    </Box>
   )
 }

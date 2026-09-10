@@ -1,0 +1,33 @@
+import { ComponentDemo } from '../../../components/docs/componentDemo'
+import DefaultDemo from './demos/defaultDemo'
+import defaultSource from './demos/defaultDemo.tsx?raw'
+import VariantsDemo from './demos/variantsDemo'
+import variantsSource from './demos/variantsDemo.tsx?raw'
+import InvalidDemo from './demos/invalidDemo'
+import invalidSource from './demos/invalidDemo.tsx?raw'
+import DisabledDemo from './demos/disabledDemo'
+import disabledSource from './demos/disabledDemo.tsx?raw'
+
+## Default
+
+<ComponentDemo source={defaultSource}>
+  <DefaultDemo />
+</ComponentDemo>
+
+## Disabled
+
+<ComponentDemo source={disabledSource}>
+  <DisabledDemo />
+</ComponentDemo>
+
+## Variants
+
+<ComponentDemo source={variantsSource}>
+  <VariantsDemo />
+</ComponentDemo>
+
+## Invalid
+
+<ComponentDemo source={invalidSource}>
+  <InvalidDemo />
+</ComponentDemo>

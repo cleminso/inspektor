@@ -18,7 +18,6 @@ import { Route as ComponentsBinaryValueRouteImport } from './routes/components/b
 import { Route as ComponentsBoxRouteImport } from './routes/components/box'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsButtonLinkRouteImport } from './routes/components/button-link'
-import { Route as ComponentsCalendarRouteImport } from './routes/components/calendar'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsCheckboxGroupRouteImport } from './routes/components/checkbox-group'
 import { Route as ComponentsCodeEditorRouteImport } from './routes/components/code-editor'
@@ -40,6 +39,7 @@ import { Route as ComponentsInputGroupRouteImport } from './routes/components/in
 import { Route as ComponentsJsonViewRouteImport } from './routes/components/json-view'
 import { Route as ComponentsKeyboardInputRouteImport } from './routes/components/keyboard-input'
 import { Route as ComponentsMenuRouteImport } from './routes/components/menu'
+import { Route as ComponentsMiddleTruncateRouteImport } from './routes/components/middle-truncate'
 import { Route as ComponentsMultiSelectRouteImport } from './routes/components/multi-select'
 import { Route as ComponentsRelationValueRouteImport } from './routes/components/relation-value'
 import { Route as ComponentsResizablePanelRouteImport } from './routes/components/resizable-panel'
@@ -51,6 +51,7 @@ import { Route as ComponentsSpinnerRouteImport } from './routes/components/spinn
 import { Route as ComponentsStructuredValuePreviewRouteImport } from './routes/components/structured-value-preview'
 import { Route as ComponentsSwimlaneTimelineRouteImport } from './routes/components/swimlane-timeline'
 import { Route as ComponentsSwitchRouteImport } from './routes/components/switch'
+import { Route as ComponentsTextRouteImport } from './routes/components/text'
 import { Route as ComponentsTextFieldRouteImport } from './routes/components/text-field'
 import { Route as ComponentsTextLinkRouteImport } from './routes/components/text-link'
 import { Route as ComponentsThemeSwitchRouteImport } from './routes/components/theme-switch'
@@ -106,11 +107,6 @@ const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
 const ComponentsButtonLinkRoute = ComponentsButtonLinkRouteImport.update({
   id: '/components/button-link',
   path: '/components/button-link',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComponentsCalendarRoute = ComponentsCalendarRouteImport.update({
-  id: '/components/calendar',
-  path: '/components/calendar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
@@ -220,6 +216,12 @@ const ComponentsMenuRoute = ComponentsMenuRouteImport.update({
   path: '/components/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsMiddleTruncateRoute =
+  ComponentsMiddleTruncateRouteImport.update({
+    id: '/components/middle-truncate',
+    path: '/components/middle-truncate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsMultiSelectRoute = ComponentsMultiSelectRouteImport.update({
   id: '/components/multi-select',
   path: '/components/multi-select',
@@ -276,6 +278,11 @@ const ComponentsSwimlaneTimelineRoute =
 const ComponentsSwitchRoute = ComponentsSwitchRouteImport.update({
   id: '/components/switch',
   path: '/components/switch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsTextRoute = ComponentsTextRouteImport.update({
+  id: '/components/text',
+  path: '/components/text',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsTextFieldRoute = ComponentsTextFieldRouteImport.update({
@@ -345,7 +352,6 @@ export interface FileRoutesByFullPath {
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
-  '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/checkbox-group': typeof ComponentsCheckboxGroupRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
@@ -367,6 +373,7 @@ export interface FileRoutesByFullPath {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/middle-truncate': typeof ComponentsMiddleTruncateRoute
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
@@ -378,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/swimlane-timeline': typeof ComponentsSwimlaneTimelineRoute
   '/components/switch': typeof ComponentsSwitchRoute
+  '/components/text': typeof ComponentsTextRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/theme-switch': typeof ComponentsThemeSwitchRoute
@@ -400,7 +408,6 @@ export interface FileRoutesByTo {
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
-  '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/checkbox-group': typeof ComponentsCheckboxGroupRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByTo {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/middle-truncate': typeof ComponentsMiddleTruncateRoute
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
@@ -433,6 +441,7 @@ export interface FileRoutesByTo {
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/swimlane-timeline': typeof ComponentsSwimlaneTimelineRoute
   '/components/switch': typeof ComponentsSwitchRoute
+  '/components/text': typeof ComponentsTextRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/theme-switch': typeof ComponentsThemeSwitchRoute
@@ -456,7 +465,6 @@ export interface FileRoutesById {
   '/components/box': typeof ComponentsBoxRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/button-link': typeof ComponentsButtonLinkRoute
-  '/components/calendar': typeof ComponentsCalendarRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/checkbox-group': typeof ComponentsCheckboxGroupRoute
   '/components/code-editor': typeof ComponentsCodeEditorRoute
@@ -478,6 +486,7 @@ export interface FileRoutesById {
   '/components/json-view': typeof ComponentsJsonViewRoute
   '/components/keyboard-input': typeof ComponentsKeyboardInputRoute
   '/components/menu': typeof ComponentsMenuRoute
+  '/components/middle-truncate': typeof ComponentsMiddleTruncateRoute
   '/components/multi-select': typeof ComponentsMultiSelectRoute
   '/components/relation-value': typeof ComponentsRelationValueRoute
   '/components/resizable-panel': typeof ComponentsResizablePanelRoute
@@ -489,6 +498,7 @@ export interface FileRoutesById {
   '/components/structured-value-preview': typeof ComponentsStructuredValuePreviewRoute
   '/components/swimlane-timeline': typeof ComponentsSwimlaneTimelineRoute
   '/components/switch': typeof ComponentsSwitchRoute
+  '/components/text': typeof ComponentsTextRoute
   '/components/text-field': typeof ComponentsTextFieldRoute
   '/components/text-link': typeof ComponentsTextLinkRoute
   '/components/theme-switch': typeof ComponentsThemeSwitchRoute
@@ -513,7 +523,6 @@ export interface FileRouteTypes {
     | '/components/box'
     | '/components/button'
     | '/components/button-link'
-    | '/components/calendar'
     | '/components/checkbox'
     | '/components/checkbox-group'
     | '/components/code-editor'
@@ -535,6 +544,7 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/middle-truncate'
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
@@ -546,6 +556,7 @@ export interface FileRouteTypes {
     | '/components/structured-value-preview'
     | '/components/swimlane-timeline'
     | '/components/switch'
+    | '/components/text'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/theme-switch'
@@ -568,7 +579,6 @@ export interface FileRouteTypes {
     | '/components/box'
     | '/components/button'
     | '/components/button-link'
-    | '/components/calendar'
     | '/components/checkbox'
     | '/components/checkbox-group'
     | '/components/code-editor'
@@ -590,6 +600,7 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/middle-truncate'
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
@@ -601,6 +612,7 @@ export interface FileRouteTypes {
     | '/components/structured-value-preview'
     | '/components/swimlane-timeline'
     | '/components/switch'
+    | '/components/text'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/theme-switch'
@@ -623,7 +635,6 @@ export interface FileRouteTypes {
     | '/components/box'
     | '/components/button'
     | '/components/button-link'
-    | '/components/calendar'
     | '/components/checkbox'
     | '/components/checkbox-group'
     | '/components/code-editor'
@@ -645,6 +656,7 @@ export interface FileRouteTypes {
     | '/components/json-view'
     | '/components/keyboard-input'
     | '/components/menu'
+    | '/components/middle-truncate'
     | '/components/multi-select'
     | '/components/relation-value'
     | '/components/resizable-panel'
@@ -656,6 +668,7 @@ export interface FileRouteTypes {
     | '/components/structured-value-preview'
     | '/components/swimlane-timeline'
     | '/components/switch'
+    | '/components/text'
     | '/components/text-field'
     | '/components/text-link'
     | '/components/theme-switch'
@@ -679,7 +692,6 @@ export interface RootRouteChildren {
   ComponentsBoxRoute: typeof ComponentsBoxRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsButtonLinkRoute: typeof ComponentsButtonLinkRoute
-  ComponentsCalendarRoute: typeof ComponentsCalendarRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsCheckboxGroupRoute: typeof ComponentsCheckboxGroupRoute
   ComponentsCodeEditorRoute: typeof ComponentsCodeEditorRoute
@@ -701,6 +713,7 @@ export interface RootRouteChildren {
   ComponentsJsonViewRoute: typeof ComponentsJsonViewRoute
   ComponentsKeyboardInputRoute: typeof ComponentsKeyboardInputRoute
   ComponentsMenuRoute: typeof ComponentsMenuRoute
+  ComponentsMiddleTruncateRoute: typeof ComponentsMiddleTruncateRoute
   ComponentsMultiSelectRoute: typeof ComponentsMultiSelectRoute
   ComponentsRelationValueRoute: typeof ComponentsRelationValueRoute
   ComponentsResizablePanelRoute: typeof ComponentsResizablePanelRoute
@@ -712,6 +725,7 @@ export interface RootRouteChildren {
   ComponentsStructuredValuePreviewRoute: typeof ComponentsStructuredValuePreviewRoute
   ComponentsSwimlaneTimelineRoute: typeof ComponentsSwimlaneTimelineRoute
   ComponentsSwitchRoute: typeof ComponentsSwitchRoute
+  ComponentsTextRoute: typeof ComponentsTextRoute
   ComponentsTextFieldRoute: typeof ComponentsTextFieldRoute
   ComponentsTextLinkRoute: typeof ComponentsTextLinkRoute
   ComponentsThemeSwitchRoute: typeof ComponentsThemeSwitchRoute
@@ -788,13 +802,6 @@ declare module '@tanstack/react-router' {
       path: '/components/button-link'
       fullPath: '/components/button-link'
       preLoaderRoute: typeof ComponentsButtonLinkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/components/calendar': {
-      id: '/components/calendar'
-      path: '/components/calendar'
-      fullPath: '/components/calendar'
-      preLoaderRoute: typeof ComponentsCalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/checkbox': {
@@ -944,6 +951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/middle-truncate': {
+      id: '/components/middle-truncate'
+      path: '/components/middle-truncate'
+      fullPath: '/components/middle-truncate'
+      preLoaderRoute: typeof ComponentsMiddleTruncateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/multi-select': {
       id: '/components/multi-select'
       path: '/components/multi-select'
@@ -1019,6 +1033,13 @@ declare module '@tanstack/react-router' {
       path: '/components/switch'
       fullPath: '/components/switch'
       preLoaderRoute: typeof ComponentsSwitchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/text': {
+      id: '/components/text'
+      path: '/components/text'
+      fullPath: '/components/text'
+      preLoaderRoute: typeof ComponentsTextRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/text-field': {
@@ -1111,7 +1132,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsBoxRoute: ComponentsBoxRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsButtonLinkRoute: ComponentsButtonLinkRoute,
-  ComponentsCalendarRoute: ComponentsCalendarRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsCheckboxGroupRoute: ComponentsCheckboxGroupRoute,
   ComponentsCodeEditorRoute: ComponentsCodeEditorRoute,
@@ -1133,6 +1153,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsJsonViewRoute: ComponentsJsonViewRoute,
   ComponentsKeyboardInputRoute: ComponentsKeyboardInputRoute,
   ComponentsMenuRoute: ComponentsMenuRoute,
+  ComponentsMiddleTruncateRoute: ComponentsMiddleTruncateRoute,
   ComponentsMultiSelectRoute: ComponentsMultiSelectRoute,
   ComponentsRelationValueRoute: ComponentsRelationValueRoute,
   ComponentsResizablePanelRoute: ComponentsResizablePanelRoute,
@@ -1144,6 +1165,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsStructuredValuePreviewRoute: ComponentsStructuredValuePreviewRoute,
   ComponentsSwimlaneTimelineRoute: ComponentsSwimlaneTimelineRoute,
   ComponentsSwitchRoute: ComponentsSwitchRoute,
+  ComponentsTextRoute: ComponentsTextRoute,
   ComponentsTextFieldRoute: ComponentsTextFieldRoute,
   ComponentsTextLinkRoute: ComponentsTextLinkRoute,
   ComponentsThemeSwitchRoute: ComponentsThemeSwitchRoute,
