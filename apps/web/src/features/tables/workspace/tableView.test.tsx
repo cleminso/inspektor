@@ -85,6 +85,7 @@ const tableViewState = vi.hoisted(() => ({
       nullable: boolean
     }
     id: string
+    isReadOnly?: true
     isSortable: boolean
     label: string
   }>,
@@ -611,6 +612,39 @@ function configureNameCell(value: unknown) {
 }
 
 describe('TableView cell actions', () => {
+  it('keeps provenance cells read-only', () => {
+    tableViewState.tableColumns = [
+      {
+        accessorKey: '$createdAt',
+        id: '$createdAt',
+        isSortable: true,
+        label: '$createdAt',
+        column: {
+          column_type: { type: 'Timestamp' },
+          name: '$createdAt',
+          nullable: false,
+        },
+        isReadOnly: true,
+      },
+    ]
+    tableViewState.table = {
+      getRowModel: () => ({
+        rows: [
+          {
+            id: 'row-1',
+            original: { id: 'row-1', $createdAt: new Date() },
+          },
+        ],
+      }),
+    }
+    renderTableView()
+    const menuProps = gridContextMenuProps.current as {
+      getCellActions: (target: { columnId: string; rowId: string }) => { canEdit: boolean }
+    }
+
+    expect(menuProps.getCellActions({ columnId: '$createdAt', rowId: 'row-1' }).canEdit).toBe(false)
+  })
+
   it('connects shared context actions to the table owner', async () => {
     configureNameCell('Grace')
     mutationLedgerEntries.push({ entryId: 'delete:row-2', kind: 'delete', rowId: 'row-2' })
@@ -896,14 +930,14 @@ describe('TableView query status', () => {
     const { rerenderTableView } = renderTableView()
 
     const onRepresentationChange = editRowFormProps.current?.onRepresentationChange as
-      | ((value: 'json') => void)
+      | ((value: 'provenance') => void)
       | undefined
-    act(() => onRepresentationChange?.('json'))
+    act(() => onRepresentationChange?.('provenance'))
     tableViewState.rowEditor.activeRowId = 'row-2'
     tableViewState.rowValues = { id: 'row-2', name: 'Grace' }
     rerenderTableView()
 
-    expect(editRowFormProps.current?.representation).toBe('json')
+    expect(editRowFormProps.current?.representation).toBe('provenance')
   })
 
   it('stages checked-row deletion from the stable row editor surface', () => {

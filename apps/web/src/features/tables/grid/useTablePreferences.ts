@@ -10,6 +10,7 @@ import type { TableColumnVisibilityState } from '@tables/tableTypes'
 
 interface UseTablePreferencesOptions {
   columnIds: string[]
+  defaultHiddenColumnIds?: readonly string[]
   tableKey: string
 }
 
@@ -25,7 +26,11 @@ interface UseTablePreferencesResult {
   setColumnVisibility: (next: TableColumnVisibilityState) => void
 }
 
-function readTablePreferences(tableKey: string, columnIds: string[]): TablePreferences {
+function readTablePreferences(
+  tableKey: string,
+  columnIds: string[],
+  defaultHiddenColumnIds: readonly string[],
+): TablePreferences {
   try {
     const storedValue = getConnectionScopedStorageValue('tablePreferences', tableKey)
     const parsed = JSON.parse(storedValue ?? 'null') as {
@@ -40,15 +45,24 @@ function readTablePreferences(tableKey: string, columnIds: string[]): TablePrefe
       Array.isArray(parsed.hidden) === false ||
       parsed.hidden.every((value) => typeof value === 'string') === false
     ) {
-      return { order: [...columnIds], hidden: [] }
+      return { order: [...columnIds], hidden: [...defaultHiddenColumnIds] }
     }
 
+    const storedHidden = parsed.hidden
+    const storedOrder = parsed.order
+    const knownColumnIds = new Set(storedOrder)
     return {
-      order: parsed.order,
-      hidden: parsed.hidden,
+      order: storedOrder,
+      hidden: [
+        ...storedHidden,
+        ...defaultHiddenColumnIds.filter(
+          (columnId) =>
+            knownColumnIds.has(columnId) === false && storedHidden.includes(columnId) === false,
+        ),
+      ],
     }
   } catch {
-    return { order: [...columnIds], hidden: [] }
+    return { order: [...columnIds], hidden: [...defaultHiddenColumnIds] }
   }
 }
 
@@ -64,17 +78,18 @@ function arraysMatch(left: readonly string[], right: readonly string[]): boolean
 
 export function useTablePreferences({
   columnIds,
+  defaultHiddenColumnIds = [],
   tableKey,
 }: UseTablePreferencesOptions): UseTablePreferencesResult {
   const storageKey = getConnectionScopedStorageKey('tablePreferences', tableKey)
   const [preferenceState, setPreferenceState] = useState(() => ({
     tableKey,
-    preferences: readTablePreferences(tableKey, columnIds),
+    preferences: readTablePreferences(tableKey, columnIds, defaultHiddenColumnIds),
   }))
   const preferences =
     preferenceState.tableKey === tableKey
       ? preferenceState.preferences
-      : readTablePreferences(tableKey, columnIds)
+      : readTablePreferences(tableKey, columnIds, defaultHiddenColumnIds)
   if (preferenceState.tableKey !== tableKey) {
     setPreferenceState({ tableKey, preferences })
   }
@@ -123,12 +138,19 @@ export function useTablePreferences({
         return
       }
 
-      const next = { ...current, hidden }
+      const order = [
+        ...current.order,
+        ...defaultHiddenColumnIds.filter(
+          (columnId) =>
+            columnIds.includes(columnId) === true && current.order.includes(columnId) === false,
+        ),
+      ]
+      const next = { order, hidden }
       preferencesRef.current = next
       setPreferenceState({ tableKey, preferences: next })
       writeTablePreferences(storageKey, next)
     },
-    [columnIds, storageKey, tableKey],
+    [columnIds, defaultHiddenColumnIds, storageKey, tableKey],
   )
 
   const columnVisibility = useMemo(() => {

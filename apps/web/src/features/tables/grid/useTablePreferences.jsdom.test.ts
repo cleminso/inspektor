@@ -21,6 +21,44 @@ beforeEach(() => {
 })
 
 describe('useTablePreferences', () => {
+  it('hides new default-hidden columns until the user exposes them', () => {
+    window.localStorage.setItem(
+      'inspektor-table-preferences:connection%3Aaccounts',
+      JSON.stringify({ version: 1, order: ['id', 'name'], hidden: [] }),
+    )
+    const options = {
+      columnIds: ['id', 'name', '$createdBy', '$updatedBy'],
+      defaultHiddenColumnIds: ['$createdBy', '$updatedBy'],
+      tableKey: 'connection:accounts',
+    }
+    const firstRender = renderHook(() => useTablePreferences(options))
+
+    expect(firstRender.result.current.columnVisibility).toEqual({
+      id: true,
+      name: true,
+      $createdBy: false,
+      $updatedBy: false,
+    })
+
+    act(() => {
+      firstRender.result.current.setColumnVisibility({
+        id: true,
+        name: true,
+        $createdBy: true,
+        $updatedBy: false,
+      })
+    })
+    firstRender.unmount()
+    const secondRender = renderHook(() => useTablePreferences(options))
+
+    expect(secondRender.result.current.columnVisibility).toEqual({
+      id: true,
+      name: true,
+      $createdBy: true,
+      $updatedBy: false,
+    })
+  })
+
   it('restores column order and hidden columns from one versioned record', () => {
     window.localStorage.setItem(
       'inspektor-table-preferences:connection%3Aaccounts',

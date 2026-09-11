@@ -7,6 +7,9 @@ export type InlineFieldRoute = 'readOnly' | 'rowPane' | 'fieldEditor'
 export type SpreadsheetCompletionDirection = 'enter' | 'tabBackward' | 'tabForward'
 
 export function getInlineFieldRoute(columnMeta: TableColumnMeta): InlineFieldRoute {
+  if (columnMeta.isReadOnly === true) {
+    return 'readOnly'
+  }
   const column = columnMeta.column
   if (column === null) {
     return 'readOnly'

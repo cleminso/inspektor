@@ -4,22 +4,39 @@
  * The hook turns route search state into a generic Jazz query, derives render columns from
  * stored schema metadata, and loads one URL-backed page without app-generated table types.
  */
-import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef } from 'react'
+import { useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
-import {
-  RowChangeKind,
-  type ColumnDescriptor,
-  type DynamicTableRow,
-  type WasmSchema,
-} from 'jazz-tools'
-import type { JazzClient } from 'jazz-tools/react'
+import { type ColumnDescriptor, type WasmSchema } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/client'
+import { RowChangeKind } from 'jazz-tools/shared'
 
-import { buildTableRowsQuery, isTableColumnSortable } from '@tables/query/tableRowsQuery'
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import {
+  buildTableRowsQuery,
+  isTableColumnSortable,
+} from '@tables/query/tableRowsQuery'
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
-import type { TableColumnMeta, TableRowsSearchState } from '@tables/tableTypes'
+import { TABLE_PROVENANCE_COLUMNS } from '@tables/tableProvenance'
+import type { DynamicTableRow, TableColumnMeta, TableRowsSearchState } from '@tables/tableTypes'
 
 const EMPTY_ROWS: DynamicTableRow[] = []
+// Provenance is absent from stored schema descriptors, so the grid supplies read-only metadata
+// that matches the values returned by the explicit provenance projection.
+const PROVENANCE_COLUMNS = TABLE_PROVENANCE_COLUMNS.map((descriptor): TableColumnMeta => {
+  const { name } = descriptor
+  const column: TableColumnMeta = {
+    id: name,
+    label: name,
+    accessorKey: name,
+    column: descriptor,
+    isReadOnly: true,
+    isSortable: name === '$createdAt' || name === '$updatedAt',
+  }
+  if (name === '$createdBy' || name === '$updatedBy') {
+    column.isHiddenByDefault = true
+  }
+  return column
+})
 
 interface UseTableRowsOptions {
   client: JazzClient | null
@@ -47,9 +64,19 @@ interface UseTableRowsResult {
 interface ResolvedRowsState {
   dataScopeKey: string
   hasNextPage: boolean
-  manager: JazzClient['manager'] | null
+  client: JazzClient | null
   queryKey: string
   rows: DynamicTableRow[]
+}
+
+/** Distinguishes post-mount inserts from existing rows entering a local-first query result. */
+function wasCreatedDuringObservation(row: DynamicTableRow, observationStartedAt: number): boolean {
+  const createdAt = row.$createdAt
+  if (createdAt instanceof Date === false) {
+    return false
+  }
+  const createdAtTime = createdAt.getTime()
+  return Number.isFinite(createdAtTime) && createdAtTime > observationStartedAt
 }
 
 /**
@@ -70,6 +97,8 @@ export function useTableRows({
   wasmSchema,
 }: UseTableRowsOptions): UseTableRowsResult {
   const { filters, page, pageSize, sortColumn, sortDirection } = search
+  const [observationStartedAt] = useState(() => Date.now())
+  const reportedInsertedRowIdsRef = useRef(new Set<string>())
   // Sort is intentionally excluded from the data scope so a sort refresh can keep settled rows.
   // Page, page size, filters, table, and runtime scope stay in the key to prevent stale cross-scope data.
   const dataScopeKey = JSON.stringify([{ filters, scopeKey, tableName }, page, pageSize])
@@ -93,6 +122,7 @@ export function useTableRows({
         column,
         isSortable: isTableColumnSortable(column.column_type),
       })),
+      ...PROVENANCE_COLUMNS,
     ]
   }, [schemaColumns])
 
@@ -112,10 +142,9 @@ export function useTableRows({
     })
   }, [filters, page, pageSize, sortColumn, sortDirection, tableName, wasmSchema])
 
-  const manager = client?.manager ?? null
   const liveRowsByIdRef = useRef(new Map<string, DynamicTableRow>())
   const queryState = useJazzQueryState<DynamicTableRow>(
-    manager,
+    client,
     requestedQueryBuilder ?? undefined,
     INSPEKTOR_QUERY_OPTIONS,
     (delta) => {
@@ -126,16 +155,37 @@ export function useTableRows({
         const previous = liveRowsByIdRef.current.get(change.id)
         return previous === undefined ? [] : [{ current: change.item, previous }]
       })
-      const addedRowIds = delta.delta.flatMap((change) =>
-        change.kind === RowChangeKind.Added ? [change.id] : [],
-      )
+      const addedRowIds = delta.delta.flatMap((change) => {
+        if (
+          change.kind !== RowChangeKind.Added ||
+          reportedInsertedRowIdsRef.current.has(change.id) === true
+        ) {
+          return []
+        }
+        reportedInsertedRowIdsRef.current.add(change.id)
+        return wasCreatedDuringObservation(change.item, observationStartedAt) ? [change.id] : []
+      })
       if (addedRowIds.length > 0) {
         onRowsAdded?.(addedRowIds)
       }
       if (updatedRows.length > 0) {
         onRowsUpdated?.(updatedRows)
       }
-      liveRowsByIdRef.current = new Map(delta.all.slice(0, pageSize).map((row) => [row.id, row]))
+      if (delta.all !== undefined) {
+        liveRowsByIdRef.current = new Map(
+          delta.all.slice(0, pageSize).map((row) => [row.id, row]),
+        )
+      } else {
+        const nextRowsById = new Map(liveRowsByIdRef.current)
+        for (const change of delta.delta) {
+          if (change.kind === RowChangeKind.Removed) {
+            nextRowsById.delete(change.id)
+          } else if (change.item !== undefined) {
+            nextRowsById.set(change.id, change.item)
+          }
+        }
+        liveRowsByIdRef.current = nextRowsById
+      }
     },
   )
   const fulfilledPage = useMemo(() => {
@@ -149,7 +199,7 @@ export function useTableRows({
   useLayoutEffect(() => {
     liveRowsByIdRef.current = new Map((fulfilledRows ?? []).map((row) => [row.id, row]))
   }, [fulfilledRows, queryKey])
-  // Sort refreshes may preserve rows; data-scope or manager changes and same-query resets may not.
+  // Sort refreshes may preserve rows; data-scope or client changes and same-query resets may not.
   const resolvedRowsRef = useRef<ResolvedRowsState | null>(null)
   useLayoutEffect(() => {
     if (fulfilledRows === undefined) return
@@ -157,16 +207,16 @@ export function useTableRows({
     resolvedRowsRef.current = {
       dataScopeKey,
       hasNextPage: fulfilledHasNextPage,
-      manager,
+      client,
       queryKey,
       rows: fulfilledRows,
     }
-  }, [dataScopeKey, fulfilledHasNextPage, fulfilledRows, manager, queryKey])
+  }, [client, dataScopeKey, fulfilledHasNextPage, fulfilledRows, queryKey])
   const previousRowsState = resolvedRowsRef.current
   const canPreserveRows =
     queryState.status === 'pending' &&
     previousRowsState?.dataScopeKey === dataScopeKey &&
-    previousRowsState.manager === manager &&
+    previousRowsState.client === client &&
     previousRowsState.queryKey !== queryKey
   const visibleRows =
     fulfilledRows ?? (canPreserveRows === true ? previousRowsState.rows : EMPTY_ROWS)

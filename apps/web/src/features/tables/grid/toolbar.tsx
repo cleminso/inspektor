@@ -2,11 +2,10 @@ import { useLayoutEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight, Download } from 'lucide-react'
 
 import { Box, Button, Menu, Select, Text, Tooltip, type DataGridTable } from '@inspektor/ds'
-import type { DynamicTableRow } from 'jazz-tools'
 
 import { createDataExport, type DataExportFormat } from '@tables/grid/dataExport'
 import { TABLE_PAGE_SIZE_OPTIONS } from '@tables/tableTypes'
-import type { TableColumnMeta, TablePageSize } from '@tables/tableTypes'
+import type { TableColumnMeta, TablePageSize, DynamicTableRow } from '@tables/tableTypes'
 
 const pageSizeItems = TABLE_PAGE_SIZE_OPTIONS.map((value) => ({
   label: String(value),

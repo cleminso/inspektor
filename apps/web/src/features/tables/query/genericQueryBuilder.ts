@@ -5,7 +5,9 @@
  * loads arbitrary schemas at runtime. This builder implements Jazz's `QueryBuilder` shape
  * from table names, column names, and stored schema metadata.
  */
-import type { DynamicTableRow, QueryBuilder, WasmSchema } from 'jazz-tools'
+import type { QueryBuilder, WasmSchema } from 'jazz-tools'
+
+import type { DynamicTableRow } from '@tables/tableTypes'
 
 type GenericWhereInput = Record<string, Record<string, unknown>>
 
@@ -17,6 +19,7 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
   readonly _rowType: DynamicTableRow = undefined as unknown as DynamicTableRow
 
   private conditions: Array<{ column: string; op: string; value: unknown }> = []
+  private selectedColumns: string[] = []
   private orderBys: Array<[string, 'asc' | 'desc']> = []
   private limitValue: number | undefined
   private offsetValue: number | undefined
@@ -45,6 +48,12 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
     return clone
   }
 
+  public select(...columns: string[]): GenericQueryBuilder {
+    const clone = this.clone()
+    clone.selectedColumns = [...columns]
+    return clone
+  }
+
   public limit(value: number): GenericQueryBuilder {
     const clone = this.clone()
     clone.limitValue = value
@@ -57,13 +66,17 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
     return clone
   }
 
-  /** Emits the minimal query payload Jazz needs for table rows selected at runtime. */
+  /**
+   * Emits Jazz's generated-builder shape and cache-key input.
+   * Preserve required empty fields and byte-array conversion when upgrading Jazz.
+   */
   public _build(): string {
     return JSON.stringify(
       {
         table: this._table,
         conditions: this.conditions,
         includes: {},
+        select: this.selectedColumns,
         orderBy: this.orderBys,
         limit: this.limitValue,
         offset: this.offsetValue,
@@ -77,6 +90,7 @@ export class GenericQueryBuilder implements QueryBuilder<DynamicTableRow> {
   private clone(): GenericQueryBuilder {
     const clone = new GenericQueryBuilder(this._table, this._schema)
     clone.conditions = [...this.conditions]
+    clone.selectedColumns = [...this.selectedColumns]
     clone.orderBys = [...this.orderBys]
     clone.limitValue = this.limitValue
     clone.offsetValue = this.offsetValue

@@ -60,6 +60,16 @@ describe('getInlineFieldRoute', () => {
 
   it('rejects synthetic columns', () => {
     expect(getInlineFieldRoute(columnMeta(null))).toBe('readOnly')
+    expect(
+      getInlineFieldRoute({
+        ...columnMeta({
+          name: '$createdBy',
+          column_type: { type: 'Row', columns: [] },
+          nullable: false,
+        }),
+        isReadOnly: true,
+      }),
+    ).toBe('readOnly')
   })
 })
 

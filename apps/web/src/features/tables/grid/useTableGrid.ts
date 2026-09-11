@@ -9,7 +9,6 @@ import {
   type SortingState,
   useTable,
 } from '@tanstack/react-table'
-import type { DynamicTableRow } from 'jazz-tools'
 
 import { dataGridFeatures, type DataGridTable } from '@inspektor/ds'
 
@@ -22,6 +21,7 @@ import type {
   TableRowId,
   TableSortDirection,
   TableValuesByRowId,
+  DynamicTableRow,
 } from '@tables/tableTypes'
 
 interface UseTableGridOptions {

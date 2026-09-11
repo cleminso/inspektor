@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type 
 
 import { matchesKeyboardEvent } from '@tanstack/react-hotkeys'
 import type { Column, ColumnDef } from '@tanstack/react-table'
-import type { DynamicTableRow } from 'jazz-tools'
 import { ChevronDown, KeyRound, Undo2 } from 'lucide-react'
 
 import {
@@ -32,7 +31,7 @@ import { resolveStagedFieldValue } from '@tables/grid/stagedFieldValue'
 import { tableGridSelectionColumnId } from '@tables/grid/tableGridColumnIds'
 import { classifySchemaValue, type SchemaValuePresentation } from '@tables/grid/valuePresentation'
 import type { ColumnMoveDirection } from '@tables/grid/useColumnOrder'
-import type { TableColumnMeta, TableRowId, TableValuesByRowId } from '@tables/tableTypes'
+import type { TableColumnMeta, TableRowId, TableValuesByRowId, DynamicTableRow } from '@tables/tableTypes'
 
 interface BuildDataGridColumnsOptions {
   columns: TableColumnMeta[]

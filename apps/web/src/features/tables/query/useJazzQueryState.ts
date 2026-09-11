@@ -1,8 +1,9 @@
-import type { QueryBuilder, QueryOptions, SubscriptionDelta } from 'jazz-tools'
-import type { JazzClient } from 'jazz-tools/react'
+import type { QueryBuilder, QueryOptions } from 'jazz-tools'
+import { getSubscriptionStore, type JazzClient } from 'jazz-tools/client'
+import type { SubscriptionDelta } from 'jazz-tools/shared'
 import { useCallback, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
 
-/** Stable state projection exposed by one Jazz orchestrator cache entry. */
+/** Stable state projection exposed by one Jazz subscription-store cache entry. */
 export type JazzQueryState<T> =
   | { status: 'idle'; data: undefined; error: null }
   | { status: 'pending'; data: undefined; error: null }
@@ -15,25 +16,23 @@ const IDLE_QUERY_STATE = {
   error: null,
 } as const satisfies JazzQueryState<never>
 
-type JazzQueryManager = Pick<
-  JazzClient['manager'],
-  'computeKey' | 'getCacheEntry' | 'makeQueryKey' | 'peekState'
->
-
 /**
  * Subscribes React to the canonical Jazz cache entry for a query.
  *
  * `useSyncExternalStore` keeps subscription setup and cleanup aligned with React's lifecycle while
  * preserving the cache entry's snapshot identity between Jazz updates. Query callers that use the
- * same builder serialization and options therefore share pending and fulfilled work.
+ * same client, builder serialization, and options therefore share pending and fulfilled work.
  */
 export function useJazzQueryState<T extends { id: string }>(
-  manager: JazzQueryManager | null,
+  client: JazzClient | null,
   query: QueryBuilder<T> | undefined,
   options?: QueryOptions,
   onDelta?: (delta: SubscriptionDelta<T>) => void,
 ): JazzQueryState<T> {
-  const key = manager !== null && query !== undefined ? manager.computeKey(query, options) : null
+  // Use Jazz's attached subscription store instead of relying on client internals.
+  const store = client === null ? null : getSubscriptionStore(client)
+  // Computing a key is render-safe; registering the query is deferred to subscription setup.
+  const key = store !== null && query !== undefined ? store.computeKey(query, options) : null
   const inputsRef = useRef({ query, options, onDelta })
   // Subscription callbacks must use committed inputs without changing subscription identity.
   useLayoutEffect(() => {
@@ -42,17 +41,19 @@ export function useJazzQueryState<T extends { id: string }>(
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
       const { query: currentQuery, options: currentOptions } = inputsRef.current
-      if (manager === null || currentQuery === undefined || key === null) {
+      if (store === null || currentQuery === undefined || key === null) {
         return () => undefined
       }
 
-      manager.makeQueryKey(currentQuery, currentOptions)
-      const entry = manager.getCacheEntry<T>(key)
+      // Registration must precede cache-entry access and cannot run during React rendering.
+      store.makeQueryKey(currentQuery, currentOptions)
+      const entry = store.getCacheEntry<T>(key)
       return entry.subscribe({
         onDelta: (delta) => {
           try {
             inputsRef.current.onDelta?.(delta)
           } finally {
+            // React must receive Jazz's snapshot even when product-specific delta handling fails.
             onStoreChange()
           }
         },
@@ -61,15 +62,15 @@ export function useJazzQueryState<T extends { id: string }>(
         onReset: onStoreChange,
       })
     },
-    [key, manager],
+    [key, store],
   )
   // Return Jazz's state object directly: cloning it here would make every snapshot appear changed.
   const getSnapshot = useCallback(
     () =>
-      manager === null || key === null
+      store === null || key === null
         ? (IDLE_QUERY_STATE as JazzQueryState<T>)
-        : (manager.peekState<T>(key) as JazzQueryState<T>),
-    [key, manager],
+        : (store.peekState<T>(key) as JazzQueryState<T>),
+    [key, store],
   )
 
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)

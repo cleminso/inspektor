@@ -603,6 +603,28 @@ describe('useTableViewState', () => {
     expect(result.current.recentlyInsertedRowIds).toEqual(new Set(['row-3', 'row-4']))
   })
 
+  it('does not restart local insert feedback when the live query reports the same row', async () => {
+    vi.useFakeTimers()
+    insertRow.mockResolvedValue('row-3')
+    const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
+    act(() => {
+      result.current.rowEditor.openInsert()
+    })
+    await act(async () => {
+      await result.current.handleInsertSave({ name: 'Ada' }, { keepOpen: false })
+      await vi.advanceTimersByTimeAsync(600)
+    })
+    const onRowsAdded = (tableRowsOptions as { onRowsAdded: (rowIds: string[]) => void })
+      .onRowsAdded
+
+    act(() => onRowsAdded(['row-3']))
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(600)
+    })
+
+    expect(result.current.recentlyInsertedRowIds).toEqual(new Set())
+  })
+
   it('highlights cells changed by the active live query', () => {
     const { result } = renderHook(() => useTableViewState({ tableName: 'accounts' }))
     const onRowsUpdated = (

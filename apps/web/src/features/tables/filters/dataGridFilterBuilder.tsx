@@ -1,5 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
+import type { ColumnDescriptor } from 'jazz-tools'
+
+import type { DynamicTableRow } from '@tables/tableTypes'
 import { Box, Button, Command, DataGridFilterClause, DatePicker, Field, Text } from '@inspektor/ds'
 
 import {
@@ -63,6 +65,7 @@ const operatorLabels: Record<TableFilterOperator, string> = {
   lte: 'Is less than or equal to',
   contains: 'Contains',
   in: 'Is any of',
+  notIn: 'Is none of',
   isNull: 'Is null',
 }
 
@@ -75,6 +78,7 @@ const operatorSymbols: Record<TableFilterOperator, string> = {
   lte: '≤',
   contains: 'contains',
   in: 'in',
+  notIn: 'not in',
   isNull: 'is null',
 }
 
@@ -87,6 +91,7 @@ const operatorKeywords: Record<TableFilterOperator, string[]> = {
   lte: ['lte', 'less than or equal', '<=', '≤'],
   contains: ['contains', 'includes', '⊃'],
   in: ['in', 'any of', '∈'],
+  notIn: ['not in', 'none of', '∉'],
   isNull: ['null', 'empty', '∅'],
 }
 
@@ -114,6 +119,7 @@ function getColumnTypeLabel(column: ColumnDescriptor): string {
 function getOperatorOptions(column: ColumnDescriptor): OperatorOption[] {
   const options: OperatorOption[] = []
   for (const operator of getFilterOperatorsForColumn(column)) {
+    if (operator === 'notIn') continue
     if (operator === 'in' && ['Array', 'Json', 'Bytea'].includes(column.column_type.type)) continue
     if (operator === 'isNull') {
       options.push(

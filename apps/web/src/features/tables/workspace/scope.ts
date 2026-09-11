@@ -1,5 +1,5 @@
 /**
- * Ownership: connection session state owns connection, branch, schema, and table identity.
+ * Ownership: session state owns connection, local branch label, and schema; the route owns table identity.
  * Projections: identity segments become collision-safe workspace and table scope keys.
  * Persistence: none; tabs, pins, preferences, and mutation ledgers consume the projected keys.
  * Reset boundary: connection, branch, or schema changes reset a workspace; table changes reset a table scope.
@@ -12,7 +12,7 @@ interface TableWorkspaceIdentity {
   schemaHash: string | null
 }
 
-/** Builds the connection, branch, and schema identity shared by table workspace state. */
+/** Builds the connection, local branch label, and schema identity shared by table workspace state. */
 export function createTableWorkspaceScope({
   branch,
   connectionId,

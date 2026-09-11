@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useTable } from '@tanstack/react-table'
-import type { DynamicTableRow } from 'jazz-tools'
+import type { DynamicTableRow } from '@tables/tableTypes'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { dataGridFeatures } from '@inspektor/ds'

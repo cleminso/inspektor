@@ -17,7 +17,7 @@ import {
 
 import type { DataGridCellTarget, DataGridFocusRequest } from '@inspektor/ds'
 import type { CellSelectionState } from '@tanstack/react-table'
-import type { ColumnDescriptor, DynamicTableRow } from 'jazz-tools'
+import type { ColumnDescriptor } from 'jazz-tools'
 
 import { useRuntimeClient, useRuntimeSchema } from '@app/providers/inspectorProvider'
 import { moveColumnInOrder, type ColumnMoveDirection } from '@tables/grid/useColumnOrder'
@@ -30,7 +30,12 @@ import { useTableMutationExecutor } from '@tables/rowEditor/mutation/useTableMut
 import { areMutationValuesEqual } from '@tables/rowEditor/mutation/draft'
 import { useTableExplorerSearchParams } from '@tables/routing/useTableSearchParams'
 import { resolveTableSortColumn } from '@tables/query/tableRowsQuery'
-import type { TableFieldsByRowId, TableRowId, TableValuesByRowId } from '@tables/tableTypes'
+import type {
+  DynamicTableRow,
+  TableFieldsByRowId,
+  TableRowId,
+  TableValuesByRowId,
+} from '@tables/tableTypes'
 import { getNearestSelectedRowId } from '@tables/grid/rowSelectionFocus'
 import {
   getInlineFieldRoute,
@@ -161,6 +166,8 @@ export function useTableViewState({
   const recentChangeTimersRef = useRef(
     new Map<TableRowId | typeof recentlyAppliedTimerKey, ReturnType<typeof setTimeout>>(),
   )
+  // Local success and the live query can report the same insert; feedback runs once per view.
+  const highlightedInsertedRowIdsRef = useRef(new Set<TableRowId>())
 
   useEffect(() => {
     const timers = recentChangeTimersRef.current
@@ -188,11 +195,11 @@ export function useTableViewState({
   }
 
   const highlightRecentlyInsertedRow = (rowId: TableRowId) => {
+    if (highlightedInsertedRowIdsRef.current.has(rowId) === true) {
+      return
+    }
+    highlightedInsertedRowIdsRef.current.add(rowId)
     setRecentlyInsertedRowIds((currentRowIds) => {
-      if (currentRowIds.has(rowId) === true) {
-        return currentRowIds
-      }
-
       return new Set([...currentRowIds, rowId])
     })
 
@@ -251,9 +258,14 @@ export function useTableViewState({
   }
   const mutations = useTableMutationExecutor({ client, tableName, wasmSchema })
   const columnIds = useMemo(() => query.columns.map((column) => column.id), [query.columns])
+  const defaultHiddenColumnIds = useMemo(
+    () => query.columns.flatMap((column) => (column.isHiddenByDefault === true ? [column.id] : [])),
+    [query.columns],
+  )
   const tablePreferences = useTablePreferences({
     tableKey,
     columnIds,
+    defaultHiddenColumnIds,
   })
 
   // Filters, sorting, connection, branch, schema, and table define one selection scope.

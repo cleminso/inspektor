@@ -1,4 +1,4 @@
-import type { DynamicTableRow } from 'jazz-tools'
+import type { DynamicTableRow } from '@tables/tableTypes'
 import { Settings2 } from 'lucide-react'
 
 import {

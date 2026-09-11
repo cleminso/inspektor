@@ -5,7 +5,7 @@ import {
   type SortingState,
   useTable,
 } from '@tanstack/react-table'
-import type { DynamicTableRow } from 'jazz-tools'
+import type { DynamicTableRow } from '@tables/tableTypes'
 import { useMemo, useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 

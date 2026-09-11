@@ -275,6 +275,7 @@ function TableViewContent({
         mutationApplying === false &&
         stagedDeletionRowIds.has(target.rowId) === false &&
         columnMeta.column !== null &&
+        columnMeta.isReadOnly !== true &&
         getFieldReadOnlyReason(columnMeta.column) === null
       return {
         canCopy: value !== undefined,

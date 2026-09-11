@@ -70,4 +70,26 @@ describe('getColumnTypeMarker', () => {
       ),
     ).toMatchObject({ label: 'Typed JSON', suffix: '{T}' })
   })
+
+  it('distinguishes scalar and payload enums', () => {
+    expect(
+      getColumnTypeMarker(
+        createColumn({
+          column_type: { type: 'Enum', variants: ['todo', 'done'] },
+          nullable: false,
+        }),
+      ),
+    ).toMatchObject({ label: 'Enum', suffix: 'E' })
+    expect(
+      getColumnTypeMarker(
+        createColumn({
+          column_type: {
+            type: 'EnumPayload',
+            cases: [{ name: 'message', fields: [] }],
+          },
+          nullable: false,
+        }),
+      ),
+    ).toMatchObject({ label: 'Payload enum', suffix: '{E}' })
+  })
 })

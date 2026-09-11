@@ -17,6 +17,14 @@ const schema = {
         column_type: { type: 'Text' },
         nullable: true,
       },
+      {
+        name: 'status',
+        column_type: {
+          type: 'EnumPayload',
+          cases: [{ name: 'message', fields: [] }],
+        },
+        nullable: false,
+      },
     ],
   },
 } satisfies WasmSchema
@@ -37,15 +45,13 @@ describe('tableRowsQuery', () => {
       table: 'users',
       conditions: [],
       includes: {},
+      select: ['*', '$createdAt', '$createdBy', '$updatedAt', '$updatedBy'],
       orderBy: [['id', 'asc']],
       limit: 101,
       offset: 0,
       hops: [],
     })
-    expect(INSPEKTOR_QUERY_OPTIONS).toEqual({
-      propagation: 'full',
-      visibility: 'hidden_from_live_query_list',
-    })
+    expect(INSPEKTOR_QUERY_OPTIONS).toEqual({})
   })
 
   it('includes destination filters, sorting, page offset, and the sentinel row in query identity', () => {
@@ -108,6 +114,51 @@ describe('tableRowsQuery', () => {
       pageSize: 100,
       schema,
       sortColumn: 'missing',
+      sortDirection: 'desc',
+      tableName: 'users',
+    })
+
+    expect(JSON.parse(query._build()).orderBy).toEqual([['id', 'asc']])
+  })
+
+  it.each(['$createdAt', '$updatedAt'])('supports sorting by %s', (sortColumn) => {
+    const query = buildTableRowsQuery({
+      filters: [],
+      page: 1,
+      pageSize: 100,
+      schema,
+      sortColumn,
+      sortDirection: 'desc',
+      tableName: 'users',
+    })
+
+    expect(JSON.parse(query._build()).orderBy).toEqual([
+      [sortColumn, 'desc'],
+      ['id', 'asc'],
+    ])
+  })
+
+  it('does not sort by payload enums', () => {
+    const query = buildTableRowsQuery({
+      filters: [],
+      page: 1,
+      pageSize: 100,
+      schema,
+      sortColumn: 'status',
+      sortDirection: 'desc',
+      tableName: 'users',
+    })
+
+    expect(JSON.parse(query._build()).orderBy).toEqual([['id', 'asc']])
+  })
+
+  it.each(['$createdBy', '$updatedBy'])('does not sort by author object %s', (sortColumn) => {
+    const query = buildTableRowsQuery({
+      filters: [],
+      page: 1,
+      pageSize: 100,
+      schema,
+      sortColumn,
       sortDirection: 'desc',
       tableName: 'users',
     })

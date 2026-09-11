@@ -1,13 +1,12 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import {
-  RowChangeKind,
-  type ColumnDescriptor,
-  type DynamicTableRow,
-  type SubscriptionDelta,
-} from 'jazz-tools'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ColumnDescriptor } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/client'
+import { RowChangeKind, type SubscriptionDelta } from 'jazz-tools/shared'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTableRows } from '@tables/query/useTableRows'
+import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
+import type { DynamicTableRow } from '@tables/tableTypes'
 
 const { useJazzQueryStateMock } = vi.hoisted(() => ({
   useJazzQueryStateMock: vi.fn(),
@@ -22,7 +21,11 @@ let pageSize: 100 | 500 | 1000 = 100
 let sortColumn = 'id'
 let sortDirection: 'asc' | 'desc' = 'asc'
 let schemaColumns: ColumnDescriptor[] = []
-let runtimeClient: { manager: Record<string, never> } | null
+let runtimeClient: JazzClient | null
+
+function createRuntimeClient(): JazzClient {
+  return {} as JazzClient
+}
 let runtimeSchema: Record<string, unknown> | null
 const setPage = vi.fn()
 
@@ -40,6 +43,9 @@ vi.mock('@tables/query/genericQueryBuilder', () => ({
       return this
     }
     orderBy() {
+      return this
+    }
+    select() {
       return this
     }
     where() {
@@ -83,7 +89,7 @@ beforeEach(() => {
   sortColumn = 'id'
   sortDirection = 'asc'
   schemaColumns = []
-  runtimeClient = { manager: {} }
+  runtimeClient = createRuntimeClient()
   runtimeSchema = {
     accounts: { columns: [] },
     users: {
@@ -106,8 +112,12 @@ beforeEach(() => {
   )
 })
 
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
 describe('useTableRows', () => {
-  it('projects caller-owned schema columns into table columns', () => {
+  it('projects schema and provenance columns into table columns', () => {
     schemaColumns = [{ name: 'name', column_type: { type: 'Text' }, nullable: false }]
 
     const { result } = renderHook(() =>
@@ -119,7 +129,43 @@ describe('useTableRows', () => {
       }),
     )
 
-    expect(result.current.columns.map((column) => column.id)).toEqual(['id', 'name'])
+    expect(result.current.columns.map((column) => column.id)).toEqual([
+      'id',
+      'name',
+      '$createdAt',
+      '$createdBy',
+      '$updatedAt',
+      '$updatedBy',
+    ])
+    expect(result.current.columns.slice(-4)).toEqual([
+      expect.objectContaining({
+        id: '$createdAt',
+        column: expect.objectContaining({ column_type: { type: 'Timestamp' } }),
+        isReadOnly: true,
+        isSortable: true,
+      }),
+      expect.objectContaining({
+        id: '$createdBy',
+        column: expect.objectContaining({ column_type: expect.objectContaining({ type: 'Row' }) }),
+        isHiddenByDefault: true,
+        isReadOnly: true,
+        isSortable: false,
+      }),
+      expect.objectContaining({
+        id: '$updatedAt',
+        column: expect.objectContaining({ column_type: { type: 'Timestamp' } }),
+        isReadOnly: true,
+        isSortable: true,
+      }),
+      expect.objectContaining({
+        id: '$updatedBy',
+        column: expect.objectContaining({ column_type: expect.objectContaining({ type: 'Row' }) }),
+        isHiddenByDefault: true,
+        isReadOnly: true,
+        isSortable: false,
+      }),
+    ])
+    expect(useJazzQueryStateMock.mock.lastCall?.[2]).toBe(INSPEKTOR_QUERY_OPTIONS)
   })
 
   it('keeps row loading active until the runtime can execute the query', () => {
@@ -184,7 +230,7 @@ describe('useTableRows', () => {
     expect(result.current.isRefreshing).toBe(false)
   })
 
-  it('does not preserve resolved rows when the Jazz manager is replaced', () => {
+  it('does not preserve resolved rows when the Jazz client is replaced', () => {
     queryRows = [
       { id: 'row-1', name: 'Ada' } as DynamicTableRow,
       { id: 'row-2', name: 'Grace' } as DynamicTableRow,
@@ -198,7 +244,7 @@ describe('useTableRows', () => {
       }),
     )
 
-    runtimeClient = { manager: {} }
+    runtimeClient = createRuntimeClient()
     queryRows = undefined
     rerender()
 
@@ -368,6 +414,8 @@ describe('useTableRows', () => {
   })
 
   it('reports added and updated rows from live query deltas', () => {
+    const now = new Date('2026-09-11T12:00:00.000Z')
+    vi.spyOn(Date, 'now').mockReturnValue(now.getTime())
     const onRowsAdded = vi.fn()
     const onRowsUpdated = vi.fn()
     const previousRow = { id: 'row-1', name: 'Ada' } as DynamicTableRow
@@ -385,7 +433,11 @@ describe('useTableRows', () => {
     const onDelta = useJazzQueryStateMock.mock.lastCall?.[3] as (
       delta: SubscriptionDelta<DynamicTableRow>,
     ) => void
-    const addedRow = { id: 'row-3', name: 'Lin' } as DynamicTableRow
+    const addedRow = {
+      id: 'row-3',
+      name: 'Lin',
+      $createdAt: new Date(now.getTime() + 1),
+    } as DynamicTableRow
     const updatedRow = { id: 'row-1', name: 'Ada Lovelace' } as DynamicTableRow
 
     onDelta({
@@ -406,6 +458,117 @@ describe('useTableRows', () => {
     expect(onRowsAdded).toHaveBeenCalledWith(['row-3'])
     expect(onRowsUpdated).toHaveBeenCalledOnce()
     expect(onRowsUpdated).toHaveBeenCalledWith([{ current: updatedRow, previous: previousRow }])
+  })
+
+  it('does not report existing rows added by initial remote hydration', () => {
+    const now = new Date('2026-09-11T12:00:00.000Z')
+    vi.spyOn(Date, 'now').mockReturnValue(now.getTime())
+    const onRowsAdded = vi.fn()
+    renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        onRowsAdded,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+    const onDelta = useJazzQueryStateMock.mock.lastCall?.[3] as (
+      delta: SubscriptionDelta<DynamicTableRow>,
+    ) => void
+    const existingRow = {
+      id: 'row-1',
+      name: 'Ada',
+      $createdAt: new Date(now.getTime() - 1),
+    } as DynamicTableRow
+
+    onDelta({
+      all: [existingRow],
+      delta: [{ id: existingRow.id, index: 0, item: existingRow, kind: RowChangeKind.Added }],
+    })
+
+    expect(onRowsAdded).not.toHaveBeenCalled()
+  })
+
+  it('reports each post-open insert once and fails closed without valid provenance', () => {
+    const now = new Date('2026-09-11T12:00:00.000Z')
+    vi.spyOn(Date, 'now').mockReturnValue(now.getTime())
+    const onRowsAdded = vi.fn()
+    renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        onRowsAdded,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+    const onDelta = useJazzQueryStateMock.mock.lastCall?.[3] as (
+      delta: SubscriptionDelta<DynamicTableRow>,
+    ) => void
+    const insertedRow = {
+      id: 'inserted',
+      $createdAt: new Date(now.getTime() + 1),
+    } as DynamicTableRow
+    const equalBoundaryRow = {
+      id: 'equal-boundary',
+      $createdAt: new Date(now),
+    } as DynamicTableRow
+    const invalidDateRow = {
+      id: 'invalid-date',
+      $createdAt: new Date(Number.NaN),
+    } as DynamicTableRow
+    const missingDateRow = { id: 'missing-date' } as DynamicTableRow
+    const changes = [insertedRow, equalBoundaryRow, invalidDateRow, missingDateRow].map(
+      (row, index) => ({ id: row.id, index, item: row, kind: RowChangeKind.Added }) as const,
+    )
+
+    onDelta({ all: [insertedRow, equalBoundaryRow, invalidDateRow, missingDateRow], delta: changes })
+    onDelta({ all: [insertedRow], delta: [changes[0]!] })
+
+    expect(onRowsAdded).toHaveBeenCalledOnce()
+    expect(onRowsAdded).toHaveBeenCalledWith(['inserted'])
+  })
+
+  it('establishes a fresh insert boundary when the table view remounts', () => {
+    let now = new Date('2026-09-11T12:00:00.000Z').getTime()
+    vi.spyOn(Date, 'now').mockImplementation(() => now)
+    const firstView = renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+    firstView.unmount()
+
+    const createdBeforeReopen = new Date(now + 1)
+    now += 2
+    const onRowsAdded = vi.fn()
+    renderHook(() =>
+      useTestTableRows({
+        client: runtimeClient as never,
+        onRowsAdded,
+        scopeKey: 'schema-1',
+        tableName: 'users',
+        wasmSchema: runtimeSchema as never,
+      }),
+    )
+    const onDelta = useJazzQueryStateMock.mock.lastCall?.[3] as (
+      delta: SubscriptionDelta<DynamicTableRow>,
+    ) => void
+    const existingRow = {
+      id: 'row-1',
+      $createdAt: createdBeforeReopen,
+    } as DynamicTableRow
+
+    onDelta({
+      all: [existingRow],
+      delta: [{ id: existingRow.id, index: 0, item: existingRow, kind: RowChangeKind.Added }],
+    })
+
+    expect(onRowsAdded).not.toHaveBeenCalled()
   })
 
   it('subscribes with the requested page query when pagination changes', () => {

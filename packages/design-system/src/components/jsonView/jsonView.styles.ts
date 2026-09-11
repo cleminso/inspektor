@@ -66,7 +66,6 @@ export const jsonViewStyles = stylex.create({
   row: {
     borderRadius: borderRadii.xs,
     display: 'flex',
-    paddingInlineEnd: spacing.xs,
     maxWidth: '100%',
     minWidth: 0,
     width: 'fit-content',

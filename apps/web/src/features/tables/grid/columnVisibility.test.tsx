@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useTable, type ColumnVisibilityState } from '@tanstack/react-table'
-import type { DynamicTableRow } from 'jazz-tools'
+import type { DynamicTableRow } from '@tables/tableTypes'
 import { useState } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 

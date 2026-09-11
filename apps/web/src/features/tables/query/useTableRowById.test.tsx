@@ -1,13 +1,14 @@
 import { renderHook } from '@testing-library/react'
-import type { DynamicTableRow, WasmSchema } from 'jazz-tools'
-import type { JazzClient } from 'jazz-tools/react'
+import type { WasmSchema } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/client'
+
+import type { DynamicTableRow } from '@tables/tableTypes'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTableRowById } from '@tables/query/useTableRowById'
 import { INSPEKTOR_QUERY_OPTIONS } from '@tables/query/queryOptions'
 
-const { manager, queryError, queryRows, useJazzQueryStateMock } = vi.hoisted(() => ({
-  manager: {},
+const { queryError, queryRows, useJazzQueryStateMock } = vi.hoisted(() => ({
   queryError: { value: null as unknown },
   queryRows: { value: undefined as DynamicTableRow[] | undefined },
   useJazzQueryStateMock: vi.fn((_manager: unknown, _query: unknown, _options: unknown) =>
@@ -21,7 +22,7 @@ const { manager, queryError, queryRows, useJazzQueryStateMock } = vi.hoisted(() 
   ),
 }))
 
-let runtimeClient: Pick<JazzClient, 'manager'> | null
+let runtimeClient: JazzClient | null
 const runtimeSchema = {} as WasmSchema
 
 vi.mock('@tables/query/useJazzQueryState', () => ({
@@ -31,7 +32,7 @@ vi.mock('@tables/query/useJazzQueryState', () => ({
 beforeEach(() => {
   queryRows.value = undefined
   queryError.value = null
-  runtimeClient = { manager: manager as JazzClient['manager'] }
+  runtimeClient = {} as JazzClient
   useJazzQueryStateMock.mockClear()
 })
 
@@ -57,9 +58,10 @@ describe('useTableRowById', () => {
     expect(JSON.parse(query._build())).toMatchObject({
       conditions: [{ column: 'id', op: 'eq', value: 'row-1' }],
       limit: 1,
+      select: ['*', '$createdAt', '$createdBy', '$updatedAt', '$updatedBy'],
     })
     expect(useJazzQueryStateMock).toHaveBeenCalledWith(
-      manager,
+      runtimeClient,
       expect.anything(),
       INSPEKTOR_QUERY_OPTIONS,
     )
@@ -79,7 +81,11 @@ describe('useTableRowById', () => {
     const { result } = renderRow(null)
 
     expect(result.current).toEqual({ status: 'idle', row: null })
-    expect(useJazzQueryStateMock).toHaveBeenCalledWith(manager, undefined, INSPEKTOR_QUERY_OPTIONS)
+    expect(useJazzQueryStateMock).toHaveBeenCalledWith(
+      runtimeClient,
+      undefined,
+      INSPEKTOR_QUERY_OPTIONS,
+    )
   })
 
   it('stays idle without a runtime client provider', () => {

@@ -31,7 +31,21 @@ const columns = [
   { name: 'name', column_type: { type: 'Text' }, nullable: false },
   { name: 'age', column_type: { type: 'Integer' }, nullable: false },
 ] satisfies ColumnDescriptor[]
-const initialRowValues = { id: 'row-1', name: 'Ada', age: 37 }
+const initialRowValues = {
+  id: 'row-1',
+  name: 'Ada',
+  age: 37,
+  $createdAt: new Date('2026-04-05T06:07:08.009Z'),
+  $createdBy: {
+    account: 'account-1',
+    identity: { issuer: 'https://issuer.example', subject: 'creator-1' },
+  },
+  $updatedAt: new Date('2026-04-06T07:08:09.010Z'),
+  $updatedBy: {
+    account: 'account-2',
+    identity: { issuer: 'https://issuer.example', subject: 'editor-2' },
+  },
+}
 
 function TestLedgerProvider({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
@@ -290,7 +304,7 @@ describe('TableMutationLedgerProvider', () => {
     expect(screen.getByLabelText('Pending fields').textContent).toBe('name')
   })
 
-  it('keeps an EditRowForm field update in the workspace ledger across table-provider remounts', () => {
+  it('keeps an EditRowForm field update without provenance in the ledger across remounts', () => {
     render(<WorkspaceHarness Editor={EditRowFormHarness} />)
     fireEvent.change(screen.getByRole('textbox', { name: 'Name' }), {
       target: { value: 'Grace' },

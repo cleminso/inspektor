@@ -1,12 +1,14 @@
 import { act, renderHook } from '@testing-library/react'
-import type { DynamicTableRow, QueryBuilder, SubscriptionDelta } from 'jazz-tools'
-import type { JazzClient } from 'jazz-tools/react'
+import type { QueryBuilder } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/client'
+import type { SubscriptionDelta } from 'jazz-tools/shared'
 import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useJazzQueryState } from '@tables/query/useJazzQueryState'
+import type { DynamicTableRow } from '@tables/tableTypes'
 
-const { entry, listeners, manager } = vi.hoisted(() => {
+const { clientStores, entry, listeners, store } = vi.hoisted(() => {
   const listeners = new Set<{
     onDelta?: (delta: SubscriptionDelta<DynamicTableRow>) => void
     onError?: () => void
@@ -24,15 +26,19 @@ const { entry, listeners, manager } = vi.hoisted(() => {
       return () => listeners.delete(listener)
     }),
   }
-  const manager = {
+  const store = {
     computeKey: vi.fn(() => 'query-key'),
     makeQueryKey: vi.fn(() => 'query-key'),
     getCacheEntry: vi.fn(() => entry),
     peekState: vi.fn(() => entry.state),
   }
 
-  return { entry, listeners, manager }
+  return { clientStores: new WeakMap<object, object>(), entry, listeners, store }
 })
+
+vi.mock('jazz-tools/client', () => ({
+  getSubscriptionStore: (client: object) => clientStores.get(client),
+}))
 
 const query = {
   _build: () => 'users-query',
@@ -40,7 +46,8 @@ const query = {
   _schema: {},
   _table: 'users',
 } satisfies QueryBuilder<DynamicTableRow>
-const queryManager = manager as unknown as JazzClient['manager']
+const queryClient = {} as JazzClient
+clientStores.set(queryClient, store)
 
 beforeEach(() => {
   listeners.clear()
@@ -50,30 +57,30 @@ beforeEach(() => {
     error: null,
   }
   entry.subscribe.mockClear()
-  manager.getCacheEntry.mockClear()
-  manager.computeKey.mockClear()
-  manager.makeQueryKey.mockClear()
-  manager.peekState.mockClear()
+  store.getCacheEntry.mockClear()
+  store.computeKey.mockClear()
+  store.makeQueryKey.mockClear()
+  store.peekState.mockClear()
 })
 
 describe('useJazzQueryState', () => {
   it('does not register or create a cache entry during a render without a subscription commit', () => {
     function QueryConsumer() {
-      useJazzQueryState(queryManager, query)
+      useJazzQueryState(queryClient, query)
       return null
     }
 
     renderToString(<QueryConsumer />)
 
-    expect(manager.computeKey).toHaveBeenCalledWith(query, undefined)
-    expect(manager.peekState).toHaveBeenCalledWith('query-key')
-    expect(manager.makeQueryKey).not.toHaveBeenCalled()
-    expect(manager.getCacheEntry).not.toHaveBeenCalled()
+    expect(store.computeKey).toHaveBeenCalledWith(query, undefined)
+    expect(store.peekState).toHaveBeenCalledWith('query-key')
+    expect(store.makeQueryKey).not.toHaveBeenCalled()
+    expect(store.getCacheEntry).not.toHaveBeenCalled()
   })
 
   it('exposes fulfilled rows from the shared Jazz cache entry', () => {
     const { result } = renderHook(() =>
-      useJazzQueryState(queryManager, query, { propagation: 'full' }),
+      useJazzQueryState(queryClient, query, { tier: 'remote' }),
     )
 
     expect(result.current.status).toBe('pending')
@@ -103,7 +110,7 @@ describe('useJazzQueryState', () => {
       data: [{ id: 'user-1', name: 'Ada' } as DynamicTableRow],
       error: null,
     }
-    const { result } = renderHook(() => useJazzQueryState(queryManager, query, undefined, onDelta))
+    const { result } = renderHook(() => useJazzQueryState(queryClient, query, undefined, onDelta))
     const delta: SubscriptionDelta<DynamicTableRow> = { all: [], delta: [] }
 
     act(() => {
@@ -126,7 +133,7 @@ describe('useJazzQueryState', () => {
   })
 
   it('exposes rejected query state instead of leaving the consumer loading', () => {
-    const { result } = renderHook(() => useJazzQueryState(queryManager, query))
+    const { result } = renderHook(() => useJazzQueryState(queryClient, query))
     const error = new Error('Query unavailable')
 
     act(() => {
@@ -147,7 +154,7 @@ describe('useJazzQueryState', () => {
     })
   })
 
-  it('stays idle without a runtime query manager', () => {
+  it('stays idle without a runtime client', () => {
     const { result } = renderHook(() => useJazzQueryState(null, query))
 
     expect(result.current).toEqual({
@@ -155,11 +162,11 @@ describe('useJazzQueryState', () => {
       data: undefined,
       error: null,
     })
-    expect(manager.makeQueryKey).not.toHaveBeenCalled()
+    expect(store.makeQueryKey).not.toHaveBeenCalled()
   })
 
   it('returns to pending when Jazz resets an active query', () => {
-    const { result } = renderHook(() => useJazzQueryState(queryManager, query))
+    const { result } = renderHook(() => useJazzQueryState(queryClient, query))
 
     act(() => {
       entry.state = {
@@ -180,7 +187,7 @@ describe('useJazzQueryState', () => {
 
   it('does not resubscribe when an equivalent query builder replaces the previous object', () => {
     const { rerender } = renderHook(
-      ({ currentQuery }) => useJazzQueryState(queryManager, currentQuery),
+      ({ currentQuery }) => useJazzQueryState(queryClient, currentQuery),
       { initialProps: { currentQuery: query } },
     )
     const equivalentQuery = { ...query }
@@ -188,14 +195,14 @@ describe('useJazzQueryState', () => {
     rerender({ currentQuery: equivalentQuery })
 
     expect(entry.subscribe).toHaveBeenCalledOnce()
-    expect(manager.computeKey).toHaveBeenLastCalledWith(equivalentQuery, undefined)
+    expect(store.computeKey).toHaveBeenLastCalledWith(equivalentQuery, undefined)
   })
 
   it('observes the latest onDelta callback without resubscribing', () => {
     const firstOnDelta = vi.fn()
     const latestOnDelta = vi.fn()
     const { rerender } = renderHook(
-      ({ onDelta }) => useJazzQueryState(queryManager, query, undefined, onDelta),
+      ({ onDelta }) => useJazzQueryState(queryClient, query, undefined, onDelta),
       { initialProps: { onDelta: firstOnDelta } },
     )
     const delta: SubscriptionDelta<DynamicTableRow> = { all: [], delta: [] }
@@ -210,7 +217,7 @@ describe('useJazzQueryState', () => {
     expect(latestOnDelta).toHaveBeenCalledWith(delta)
   })
 
-  it('unsubscribes from a replaced manager and reads the replacement snapshot', () => {
+  it('unsubscribes from a replaced client and reads the replacement snapshot', () => {
     const replacementState = {
       status: 'fulfilled' as const,
       data: [{ id: 'replacement-row' } as DynamicTableRow],
@@ -220,18 +227,20 @@ describe('useJazzQueryState', () => {
       state: replacementState,
       subscribe: vi.fn(() => () => undefined),
     }
-    const replacementManager = {
+    const replacementStore = {
       computeKey: vi.fn(() => 'query-key'),
       makeQueryKey: vi.fn(() => 'query-key'),
       getCacheEntry: vi.fn(() => replacementEntry),
       peekState: vi.fn(() => replacementState),
-    } as unknown as JazzClient['manager']
+    }
+    const replacementClient = {} as JazzClient
+    clientStores.set(replacementClient, replacementStore)
     const { result, rerender } = renderHook(
-      ({ currentManager }) => useJazzQueryState(currentManager, query),
-      { initialProps: { currentManager: queryManager } },
+      ({ currentClient }) => useJazzQueryState(currentClient, query),
+      { initialProps: { currentClient: queryClient } },
     )
 
-    rerender({ currentManager: replacementManager })
+    rerender({ currentClient: replacementClient })
 
     expect(listeners).toHaveLength(0)
     expect(replacementEntry.subscribe).toHaveBeenCalledOnce()
