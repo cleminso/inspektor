@@ -194,6 +194,7 @@ describe('TableHotkeys', () => {
         'aria-disabled',
       ),
     ).toBe('true')
+    expect(screen.getByText('Actions')).toBeTruthy()
     expect(screen.getByRole('option', { name: 'Open new table view' })).toBeTruthy()
     expect(screen.queryByRole('option', { name: 'Hide table navigator' })).toBeNull()
     expect(screen.queryByRole('option', { name: 'Go back' })).toBeNull()

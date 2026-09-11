@@ -80,7 +80,7 @@ export const commandStyles = stylex.create({
   },
   list: {
     padding: spacing.xxs,
-    gap: spacing.xxs,
+    gap: spacing.xs,
     outline: 'none',
     display: 'flex',
     flexDirection: 'column',

@@ -52,6 +52,47 @@ describe('AppHotkeysProvider', () => {
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Commands' })).toBeNull())
   })
 
+  it('orders Actions before Tables and preserves the order of remaining groups', async () => {
+    function RegisteredCommands(): React.ReactElement {
+      const commands = useMemo(
+        () => [
+          { group: 'Tables', id: 'table', label: 'Open table', perform: vi.fn() },
+          {
+            group: 'First custom',
+            id: 'first-custom',
+            label: 'Run first custom',
+            perform: vi.fn(),
+          },
+          { group: 'Actions', id: 'action', label: 'Run action', perform: vi.fn() },
+          {
+            group: 'Second custom',
+            id: 'second-custom',
+            label: 'Run second custom',
+            perform: vi.fn(),
+          },
+        ],
+        [],
+      )
+      useAppCommands(commands)
+      return <div>Content</div>
+    }
+
+    render(
+      <AppHotkeysProvider>
+        <RegisteredCommands />
+      </AppHotkeysProvider>,
+    )
+
+    fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
+
+    expect(await screen.findByRole('dialog', { name: 'Commands' })).toBeTruthy()
+    expect(
+      screen
+        .getAllByText(/^(Actions|Tables|First custom|Second custom)$/)
+        .map((label) => label.textContent),
+    ).toEqual(['Actions', 'Tables', 'First custom', 'Second custom'])
+  })
+
   it('shows an empty state when the current route has no commands', async () => {
     render(
       <AppHotkeysProvider>

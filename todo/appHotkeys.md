@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[11/09/26]
+
+- [x] Group workspace commands under `Actions` and keep that group before `Tables` regardless of registration order.
+
 [05/09/26]
 
 - [x] Keep one command item visually highlighted when pointer hover is followed by keyboard navigation.
@@ -90,6 +94,10 @@
 
 ## Settled interaction decisions
 
+[11/09/26]
+
+- [x] Keep command groups in the order `Actions`, `Tables`, then any remaining groups in registration order.
+
 [05/09/26]
 
 - [x] Use Base UI's highlighted item state for both pointer and keyboard command navigation instead of a separate CSS hover highlight.
@@ -136,6 +144,10 @@
 - [ ] Decide whether disabled history and pagination shortcuts should remain intercepted or fall through to browser behavior.
 
 ## Validation checklist
+
+[11/09/26]
+
+- [x] Cover command-group priority independently from command registration order.
 
 [05/09/26]
 

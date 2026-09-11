@@ -57,12 +57,14 @@ export function TableHotkeys(): React.ReactElement {
   const commands = useMemo<readonly AppCommand[]>(
     () => [
       {
+        group: 'Actions',
         id: 'tables.openView',
         label: 'Open new table view',
         hotkey: appHotkeys.openTableView,
         perform: openNewView,
       },
       {
+        group: 'Actions',
         id: 'tables.closeView',
         label: 'Close current view',
         disabled: canCloseActiveTab === false,

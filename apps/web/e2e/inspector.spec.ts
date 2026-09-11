@@ -140,6 +140,7 @@ test('shows one highlighted command after pointer and keyboard navigation', asyn
   const options = page.getByRole('option')
   const hoveredOption = options.first()
   const keyboardOption = options.nth(1)
+  await expect(page.getByText(/^(Actions|Tables)$/u)).toHaveText(['Actions', 'Tables'])
   await hoveredOption.hover()
   await input.press('ArrowDown')
 
@@ -444,6 +445,24 @@ test('keeps nullable Enum selection and NULL intent in one field control', async
   await connectToFixture(page)
   await openTable(page, 'columnTypeShowcase')
 
+  const populatedRow = page.getByRole('row', {
+    name: /Select row 30000000-0000-4000-8000-000000000001/u,
+  })
+  const populatedCell = await getCellByColumn(page, populatedRow, 'optionalEnumValue')
+  await populatedCell.dblclick()
+
+  const populatedSelect = page.getByRole('combobox', { name: 'OptionalEnumValue' })
+  await expect(populatedSelect).toContainText('draft')
+  await expect
+    .poll(() =>
+      populatedSelect
+        .locator(':scope > span')
+        .first()
+        .evaluate((element) => getComputedStyle(element).textAlign),
+    )
+    .toBe('start')
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
+
   const row = page.getByRole('row', {
     name: /Select row 30000000-0000-4000-8000-000000000002/u,
   })
@@ -462,6 +481,15 @@ test('keeps nullable Enum selection and NULL intent in one field control', async
 
   await expect(nullControl).not.toBeChecked()
   await expect(select).toBeEnabled()
+  await expect(select).toContainText('Select value…')
+  await expect
+    .poll(() =>
+      select
+        .locator(':scope > span')
+        .first()
+        .evaluate((element) => getComputedStyle(element).textAlign),
+    )
+    .toBe('start')
   await expect(page.getByRole('listbox')).toBeVisible()
   await expect(page.getByText('Expected one of: active, archived, draft')).not.toBeVisible()
 

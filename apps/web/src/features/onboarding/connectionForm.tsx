@@ -48,7 +48,7 @@ export function ConnectionForm({
       noValidate
       onSubmit={onSubmit}
     >
-      <Fieldset.Root disabled={isSubmitting}>
+      <Fieldset.Root>
         <TextField
           id="connection-name"
           label="Connection name"

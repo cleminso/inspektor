@@ -11,6 +11,13 @@
 
 ## Implemented foundation
 
+[11/09/26]
+
+### Editable fields during submission
+
+- [x] Keep connection fields enabled while the submitted values are validated.
+- [x] Keep duplicate submission and cancellation blocked until the connection action settles.
+
 [07/09/26]
 
 ### Unified connection readiness
@@ -352,6 +359,12 @@
 
 ## Settled interaction decisions
 
+[11/09/26]
+
+- Connection submission captures one values snapshot without disabling the fields that produced it.
+- The submit button presents the pending state and blocks duplicate submission; Cancel remains blocked to prevent an unresolved action from navigating after the form closes.
+- These decisions supersede the complete-fieldset submission lock above.
+
 [07/09/26]
 
 - Valid saved connection routes start the shared WASM preparation before schema discovery; unknown connection IDs do not start it.
@@ -511,6 +524,12 @@
 - None.
 
 ## Validation checklist
+
+[11/09/26]
+
+- [x] Cover enabled connection fields and blocked submission controls while connection validation is pending.
+- [x] Run focused connection-form tests, changed-file lint and formatting, Inspektor typecheck, and Lat checks.
+- [ ] Verify pending connection submission in the isolated browser fixture; fixture seeding currently rejects a stored scalar before the browser test starts.
 
 [07/09/26]
 

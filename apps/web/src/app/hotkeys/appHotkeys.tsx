@@ -45,6 +45,16 @@ const hotkeysProviderOptions = {
   hotkey: { conflictBehavior: 'error' },
 } satisfies HotkeysProviderOptions
 
+function getAppCommandGroupPriority(group: string | null): number {
+  if (group === 'Actions') {
+    return 0
+  }
+  if (group === 'Tables') {
+    return 1
+  }
+  return 2
+}
+
 /**
  * Returns whether a global hotkey originated from an interaction layer that owns the keyboard.
  * Expanded comboboxes are checked separately because their listboxes can be rendered in a portal.
@@ -106,7 +116,10 @@ function AppCommandPalette({
         groupCommands.push(command)
       }
     }
-    return groups
+    return [...groups].sort(
+      ([leftGroup], [rightGroup]) =>
+        getAppCommandGroupPriority(leftGroup) - getAppCommandGroupPriority(rightGroup),
+    )
   }, [commands])
 
   useHotkey(
@@ -189,7 +202,7 @@ function AppCommandPalette({
           <Command.Empty>
             {commands.length === 0 ? 'No commands available.' : 'No matching commands.'}
           </Command.Empty>
-          {[...commandGroups].map(([group, groupCommands]) =>
+          {commandGroups.map(([group, groupCommands]) =>
             group === null ? (
               groupCommands.map(renderCommand)
             ) : (

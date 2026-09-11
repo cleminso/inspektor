@@ -130,7 +130,7 @@ describe('ConnectionForm', () => {
     expect(screen.getByLabelText('Admin secret').hasAttribute('required')).toBe(false)
   })
 
-  it('disables the form controls while submitting', () => {
+  it('keeps fields enabled while blocking submission', () => {
     const { rerender } = render(
       <ConnectionForm
         error={null}
@@ -160,9 +160,15 @@ describe('ConnectionForm', () => {
     expect(
       screen.getByRole('button', { name: 'Save connection' }).getAttribute('aria-disabled'),
     ).toBe('true')
-    expect(screen.getByLabelText('Server URL').hasAttribute('disabled')).toBe(true)
-    expect(screen.getByLabelText('Jazz app ID').hasAttribute('disabled')).toBe(true)
-    expect(screen.getByLabelText('Admin secret').hasAttribute('disabled')).toBe(true)
+    expect(screen.getByRole('button', { name: 'Save connection' }).getAttribute('aria-busy')).toBe(
+      'true',
+    )
+    expect(screen.getByRole('button', { name: 'Cancel' }).hasAttribute('disabled')).toBe(true)
+    expect(screen.getByLabelText('Connection name').hasAttribute('disabled')).toBe(false)
+    expect(screen.getByLabelText('Server URL').hasAttribute('disabled')).toBe(false)
+    expect(screen.getByLabelText('Jazz app ID').hasAttribute('disabled')).toBe(false)
+    expect(screen.getByLabelText('Admin secret').hasAttribute('disabled')).toBe(false)
+    expect(screen.getByLabelText('Environment').hasAttribute('disabled')).toBe(false)
   })
 
   it('uses URL and credential input semantics', () => {

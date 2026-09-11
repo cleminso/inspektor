@@ -445,6 +445,7 @@ function TableViewContent({
   const commands = useMemo<readonly AppCommand[]>(
     () => [
       {
+        group: 'Actions',
         id: 'tables.insertRow',
         label: 'Insert row',
         disabled: canOpenInsert === false,

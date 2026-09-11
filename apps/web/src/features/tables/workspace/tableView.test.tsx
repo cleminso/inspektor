@@ -489,6 +489,8 @@ vi.mock('@inspektor/ds', () => {
       open === true ? <div role="dialog">{children}</div> : null,
     Empty: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     Footer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    Group: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    GroupLabel: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     Input: (props: Record<string, unknown>) => <input {...props} />,
     InputRow: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     Item: CommandItem,
@@ -1221,6 +1223,7 @@ describe('TableView insert row hotkey', () => {
 
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
 
+    expect(screen.getByText('Actions')).toBeTruthy()
     expect(screen.getByRole('option', { name: 'Insert row' })).toBeTruthy()
   })
 })
