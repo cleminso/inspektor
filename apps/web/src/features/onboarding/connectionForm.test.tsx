@@ -185,5 +185,6 @@ describe('ConnectionForm', () => {
     expect(serverUrl.getAttribute('inputmode')).toBe('url')
     expect(adminSecret.getAttribute('autocomplete')).toBe('off')
     expect(adminSecret.getAttribute('type')).toBe('password')
+    expect(screen.queryByLabelText('Default branch')).toBeNull()
   })
 })

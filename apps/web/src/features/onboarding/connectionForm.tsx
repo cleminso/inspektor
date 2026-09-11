@@ -116,34 +116,17 @@ export function ConnectionForm({
           }}
           aria-required={true}
         />
-        <Box
-          display="grid"
-          gridTemplateColumns={{ base: 'one', sm: 'two' }}
-          gap="m"
-        >
-          <TextField
-            id="connection-env"
-            label="Environment"
-            name="env"
-            autoComplete="off"
-            spellCheck={false}
-            value={formValues.env}
-            onValueChange={(value) => {
-              onFieldValueChange('env', value)
-            }}
-          />
-          <TextField
-            id="connection-branch"
-            label="Default branch"
-            name="branch"
-            autoComplete="off"
-            spellCheck={false}
-            value={formValues.branch}
-            onValueChange={(value) => {
-              onFieldValueChange('branch', value)
-            }}
-          />
-        </Box>
+        <TextField
+          id="connection-env"
+          label="Environment"
+          name="env"
+          autoComplete="off"
+          spellCheck={false}
+          value={formValues.env}
+          onValueChange={(value) => {
+            onFieldValueChange('env', value)
+          }}
+        />
       </Fieldset.Root>
       {error !== null && error.field === undefined ? (
         <Box

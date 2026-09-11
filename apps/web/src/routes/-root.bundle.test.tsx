@@ -21,7 +21,7 @@ vi.mock('jazz-tools', () => {
   }
 })
 
-vi.mock('jazz-tools/react', () => {
+vi.mock('jazz-tools/_dev/inspector-client', () => {
   moduleLoads.jazz += 1
 
   return {

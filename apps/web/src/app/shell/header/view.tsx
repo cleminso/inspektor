@@ -1,7 +1,6 @@
 import { Box, Text, ThemeSwitch } from '@inspektor/ds'
 import { useTheme } from 'next-themes'
 
-import { BranchSwitcher } from '@app/shell/header/branchSwitcher'
 import { SchemaSwitcher } from '@app/shell/header/schemaSwitcher'
 import { ConnectionSwitcher } from '@shared/connections/connectionSwitcher'
 
@@ -39,21 +38,7 @@ export function InspectorHeader(): React.ReactElement {
             /
           </Text>
         </Box>
-        <Box
-          minWidth={0}
-          alignItems="center"
-          gap="xxs"
-        >
-          <BranchSwitcher width="s" />
-          <Text
-            as="span"
-            color="muted"
-            aria-hidden="true"
-          >
-            /
-          </Text>
-          <SchemaSwitcher width="m" />
-        </Box>
+        <SchemaSwitcher width="m" />
       </Box>
 
       <Box

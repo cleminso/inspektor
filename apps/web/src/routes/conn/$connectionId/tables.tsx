@@ -23,9 +23,9 @@ export const Route = createFileRoute('/conn/$connectionId/tables')({
 /**
  * Owns connected table presentation after session and runtime identity are available.
  *
- * Connection, branch, and schema form the workspace scope so tabs, history, and pending mutations
- * cannot leak into another runtime. This layer consumes runtime projections; it does not resolve or
- * initialize the connection.
+ * Connection, local branch label, and schema form the workspace scope so tabs, history, and pending
+ * mutations cannot leak into another workspace. The branch label does not select Jazz data. This
+ * layer consumes runtime projections; it does not resolve or initialize the connection.
  */
 function TablesWorkspaceLayout(): React.ReactElement {
   const { currentBranch, currentConnectionId, currentSchemaHash } = useInspectorSessionState()

@@ -1,5 +1,5 @@
 /**
- * Resolves partial Inspektor navigation into concrete Jazz runtime targets.
+ * Resolves partial Inspektor navigation into concrete Inspektor runtime targets.
  *
  * Entry routes may only know the connection. These helpers combine stored Inspektor preferences
  * with Jazz schema-hash metadata so every connection-scoped route can bootstrap the same runtime
@@ -21,7 +21,7 @@ import {
 
 import { appRoutes } from './appRoutes'
 
-/** Resolved connection-entry or branch-selection result, including its available schema catalogue. */
+/** Resolved connection entry and workspace preferences with the available schema catalogue. */
 export interface ResolvedRuntimeTarget {
   connectionId: string
   branch: string
@@ -134,12 +134,12 @@ export function handoffStoredRuntimeTarget(
 }
 
 /**
- * Resolves a connection into a complete runtime selection without requiring a mounted Jazz
+ * Resolves a connection into a complete workspace selection without requiring a mounted Jazz
  * provider.
  *
- * Session uses this path for branch switching inside a mounted connection. The Jazz metadata import
- * stays outside the application-root graph, while `knownSchemaHashes` lets the mounted runtime avoid
- * repeating schema discovery.
+ * Session uses this path when a mounted connection changes its local branch label. The label does
+ * not configure a Jazz branch view. The Jazz metadata import stays outside the application-root
+ * graph, while `knownSchemaHashes` avoids repeated schema discovery.
  */
 export async function resolveRuntimeTarget({
   connectionId,

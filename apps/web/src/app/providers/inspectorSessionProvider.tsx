@@ -24,11 +24,12 @@ import {
 } from '@app/providers/runtimeScopeExitGuard'
 
 /**
- * Accepted connection intent and persisted runtime selection that are safe to use before a Jazz
- * client exists.
+ * Accepted connection intent and persisted workspace selection that are safe before a Jazz client
+ * exists.
  *
  * UI components originate intent. This boundary decides whether a runtime-scope change is safe,
- * requests connection navigation, and persists branch or schema selection. Connection-entry
+ * requests connection navigation, and persists a local branch label or schema selection. The
+ * branch label does not configure alpha.54 queries or mutations. Connection-entry
  * discovery belongs to the route loader; active connectivity belongs to `InspectorProvider`.
  */
 export interface InspectorSessionContextValue {
@@ -43,7 +44,7 @@ export interface InspectorSessionContextValue {
   rememberedBranches: string[]
   /** Requests the canonical connection route without resolving or persisting its runtime target. */
   openConnection: (connectionId: string) => ConnectionOpenResult
-  /** Resolves and persists a branch selection for the mounted connection without route entry. */
+  /** Persists a local workspace branch label without configuring a Jazz branch view. */
   switchBranch: (branch: string, knownSchemaHashes?: readonly string[]) => Promise<void>
   /** Persists a caller-selected schema without repeating discovery. */
   switchSchema: (schemaHash: string) => void

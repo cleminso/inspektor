@@ -176,10 +176,10 @@ export function removeConnection(
 }
 
 /**
- * Updates Inspektor runtime preferences while keeping branch values normalized and deduped.
+ * Updates connection preferences while keeping branch labels normalized and deduped.
  *
- * Branch and schema hash are Jazz runtime context, but the Inspektor stores them as
- * preferences because they describe the selected view of a saved connection.
+ * The schema hash selects stored schema metadata. The branch label scopes local workspace state;
+ * it is not an operation-scoped Jazz branch view.
  */
 function updateConnectionPreferences(
   store: StoredConnectionsStore,

@@ -22,7 +22,7 @@ import { removeConnectionScopedStorage } from '@app/storage/connectionScopedStor
  * React-facing API for the Inspektor connection session.
  *
  * Components use this instead of reading localStorage directly so connection CRUD,
- * active connection selection, and Jazz runtime preferences stay synchronized through one state
+ * active connection selection, and workspace preferences stay synchronized through one state
  * boundary.
  */
 export interface UseStoredConnectionsResult {
@@ -52,8 +52,9 @@ export interface UseStoredConnectionsResult {
 /**
  * Owns the Inspektor's saved connection session.
  *
- * From the Jazz perspective, it selects the connection details and runtime context that
- * `useInspectorRuntime` needs to create an in-memory Jazz admin client.
+ * It selects the connection details and schema hash that `useInspectorRuntime` needs to create an
+ * in-memory Jazz admin client. The stored branch label scopes Inspektor state only; Jazz branch
+ * views must be passed to each query or mutation.
  *
  * From the Inspektor perspective, it provides a stable UI API for saved connections,
  * remembered branches, and selected schema hashes.

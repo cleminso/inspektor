@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { createJazzContext } from 'jazz-tools/backend'
+import { createJazzSession } from 'jazz-tools/backend'
 
 import permissions from '../../inspektor-test/permissions.js'
 import { app } from '../../inspektor-test/schema.js'
@@ -580,20 +580,48 @@ test('persists a row edit across reload', async ({ page }) => {
   )
 })
 
+test('persists an inserted project across reload', async ({ page }) => {
+  await connectToFixture(page)
+  await openTable(page, 'projects')
+  const table = page.getByRole('table', { name: 'projects rows' })
+
+  await page.getByRole('button', { name: 'Insert row' }).first().click()
+  await page.getByRole('textbox', { name: 'name' }).fill('Inserted through Playwright')
+  await page.getByRole('button', { name: 'Insert', exact: true }).click()
+
+  await page.getByRole('button', { name: 'Filter table' }).click()
+  await page.getByRole('option', { name: 'name', exact: true }).click()
+  await page.getByRole('option', { name: 'Equals', exact: true }).click()
+  const filterValue = page.getByRole('combobox', { name: 'Filter value' })
+  await filterValue.fill('Inserted through Playwright')
+  await filterValue.press('Enter')
+  await page.getByRole('combobox', { name: 'Filter columns' }).press('Enter')
+
+  await expect(table).toContainText('Inserted through Playwright')
+  await page.reload()
+  const reloadedRow = table.getByRole('row').filter({ hasText: 'Inserted through Playwright' })
+  await expect(reloadedRow).toBeVisible()
+  await expect(reloadedRow).not.toHaveAttribute('data-status', 'recentlyInserted')
+})
+
 test('highlights rows and cells changed through an external live client', async ({ page }) => {
   await connectToFixture(page)
   await openTable(page, 'publicEditableRecords')
-  const context = createJazzContext({
+  const session = await createJazzSession({
     app,
     permissions,
     appId: connection.appId,
-    backendSecret: connection.backendSecret,
     driver: { type: 'memory' },
     env: 'dev',
+    initial: { backendSecret: connection.backendSecret },
     serverUrl: connection.serverUrl,
-    userBranch: 'main',
   })
-  const db = context.asBackend()
+  const snapshot = session.getSnapshot()
+  if (snapshot.status !== 'ready' || snapshot.client === undefined) {
+    await session.close()
+    throw new Error('External Jazz backend session is not ready.')
+  }
+  const db = snapshot.client.db
   let insertedRowId: string | undefined
 
   try {
@@ -623,7 +651,7 @@ test('highlights rows and cells changed through an external live client', async 
         await db.delete(app.publicEditableRecords, insertedRowId).wait({ tier: 'global' })
       }
     } finally {
-      await context.shutdown()
+      await session.close()
     }
   }
 })
@@ -640,7 +668,7 @@ test('clears all checked rows when closing the row pane', async ({ page }) => {
   })
   await firstRow.click()
   await secondRow.click()
-  await page.getByRole('button', { name: 'Close editor', exact: true }).click()
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
 
   await expect(firstRow).not.toBeChecked()
   await expect(secondRow).not.toBeChecked()
@@ -789,7 +817,6 @@ async function fillConnectionForm(page: Page): Promise<void> {
   await page.getByRole('textbox', { name: 'App ID' }).fill(connection.appId)
   await page.getByRole('textbox', { name: 'Admin secret' }).fill(connection.adminSecret)
   await page.getByRole('textbox', { name: 'Env' }).fill(connection.env)
-  await page.getByRole('textbox', { name: 'Branch' }).fill('main')
 }
 
 async function openTable(page: Page, tableName: string): Promise<void> {

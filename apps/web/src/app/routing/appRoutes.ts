@@ -1,8 +1,8 @@
 /**
  * Central route path definitions for Inspektor runtime state.
  *
- * Content routes identify one saved local connection. Branch and schema remain persisted
- * connection preferences displayed by the Inspektor header.
+ * Content routes identify one saved local connection. Schema hashes and branch labels remain
+ * connection preferences; branch labels scope local state but do not select Jazz data.
  */
 export const appRoutes = {
   connections: '/conn',
