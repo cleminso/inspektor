@@ -1,5 +1,4 @@
-import { createDb, generateAuthSecret } from "jazz-tools";
-import { createJazzContext } from "jazz-tools/backend";
+import { createJazzSession } from "jazz-tools/backend";
 import { describe, expect, it } from "vitest";
 
 import { inspectorTestIds, inspectorTestRows } from "./inspectorTestData.js";
@@ -11,19 +10,22 @@ import { seedInspectorTest } from "./seedInspectorTest.js";
 describe("createInspectorTestFixture", () => {
   it("publishes and seeds an isolated Inspektor Test app", async () => {
     const fixture = await createInspectorTestFixture();
-    const context = createJazzContext({
+    const session = await createJazzSession({
       app,
       permissions,
       appId: fixture.appId,
-      backendSecret: fixture.backendSecret,
       driver: { type: "memory" },
       env: "dev",
+      initial: { backendSecret: fixture.backendSecret },
       serverUrl: fixture.serverUrl,
-      userBranch: "main",
     });
 
     try {
-      const db = context.asBackend();
+      const snapshot = session.getSnapshot();
+      if (snapshot.status !== "ready" || snapshot.client === undefined) {
+        throw new Error("Inspektor Test backend session is not ready.");
+      }
+      const db = snapshot.client.db;
       const columnTypeRows = await db.all(app.columnTypeShowcase, { tier: "global" });
       const contentRows = await db.all(app.contentEdgeCases, { tier: "global" });
       const paginationRows = await db.all(app.paginationRecords, { tier: "global" });
@@ -51,28 +53,31 @@ describe("createInspectorTestFixture", () => {
       expect(wideRecords).toHaveLength(2);
       expect(fixture.serverUrl).toMatch(/^http:\/\/127\.0\.0\.1:/);
     } finally {
-      await context.shutdown();
+      await session.close();
       await fixture.stop();
     }
   });
 
   it("keeps deterministic row counts when seeded repeatedly", async () => {
     const fixture = await createInspectorTestFixture();
-    const context = createJazzContext({
+    const session = await createJazzSession({
       app,
       permissions,
       appId: fixture.appId,
-      backendSecret: fixture.backendSecret,
       driver: { type: "memory" },
       env: "dev",
+      initial: { backendSecret: fixture.backendSecret },
       serverUrl: fixture.serverUrl,
-      userBranch: "main",
     });
 
     try {
       await seedInspectorTest(fixture);
 
-      const db = context.asBackend();
+      const snapshot = session.getSnapshot();
+      if (snapshot.status !== "ready" || snapshot.client === undefined) {
+        throw new Error("Inspektor Test backend session is not ready.");
+      }
+      const db = snapshot.client.db;
       const projects = await db.all(app.projects, { tier: "global" });
       const relationParents = await db.all(app.relationParents, { tier: "global" });
       const wideRecords = await db.all(app.wideRecords, { tier: "global" });
@@ -82,7 +87,7 @@ describe("createInspectorTestFixture", () => {
       expect(wideRecords).toHaveLength(inspectorTestRows.wideRecords.length);
       expect(projects[0]?.id).toBe(inspectorTestIds.project);
     } finally {
-      await context.shutdown();
+      await session.close();
       await fixture.stop();
     }
   });
@@ -91,16 +96,22 @@ describe("createInspectorTestFixture", () => {
     const fixture = await createInspectorTestFixture();
 
     try {
-      const db = await createDb({
+      const session = await createJazzSession({
+        app,
+        permissions,
         appId: fixture.appId,
         driver: { type: "memory" },
         env: "dev",
-        secret: generateAuthSecret(),
+        initial: "local-first",
         serverUrl: fixture.serverUrl,
-        userBranch: "main",
       });
 
       try {
+        const snapshot = session.getSnapshot();
+        if (snapshot.status !== "ready" || snapshot.client === undefined) {
+          throw new Error("Inspektor Test local-first session is not ready.");
+        }
+        const db = snapshot.client.db;
         const editableRow = inspectorTestRows.publicEditableRecords[0];
         const readOnlyRow = inspectorTestRows.publicReadOnlyRecords[0];
         await db.one(app.publicEditableRecords.where({ id: editableRow.id }), { tier: "edge" });
@@ -126,7 +137,7 @@ describe("createInspectorTestFixture", () => {
           db.one(app.publicReadOnlyRecords.where({ id: readOnlyRow.id }), { tier: "edge" }),
         ).resolves.toMatchObject(readOnlyRow);
       } finally {
-        await db.shutdown();
+        await session.close();
       }
     } finally {
       await fixture.stop();

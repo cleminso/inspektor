@@ -7,7 +7,7 @@ import {
   type StoredPermissionsResponse,
   type WasmSchema,
 } from 'jazz-tools'
-import type { JazzClient } from 'jazz-tools/react'
+import type { JazzClient } from 'jazz-tools/client'
 
 import type { StoredConnection } from '@app/connections/connections'
 import type { SchemaCatalogueRecord } from '@app/routing/inspectorNavigation'
@@ -98,6 +98,7 @@ function createInspectorRuntimeStore(
  * The route supplies the initial schema catalogue, while `InspectorProvider` owns Jazz client
  * creation and publishes the verified client into this store. Replacing the runtime identity or
  * retry generation replaces the store so stale asynchronous work cannot update the active runtime.
+ * The branch label partitions local runtime state only; it does not configure Jazz operations.
  */
 export function useInspectorRuntime({
   connection,

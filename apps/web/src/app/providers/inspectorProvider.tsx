@@ -1,5 +1,4 @@
 import {
-  Component,
   createContext,
   useCallback,
   useContext,
@@ -8,17 +7,19 @@ import {
   useReducer,
   useState,
   type PropsWithChildren,
-  type ReactNode,
 } from 'react'
 import { useStore } from '@nanostores/react'
 
 import type { StoredPermissionsResponse, WasmSchema } from 'jazz-tools'
-import { JazzProvider, useJazzClient, type JazzClient } from 'jazz-tools/react'
+import type { JazzClient } from 'jazz-tools/client'
+// Alpha.54 exposes browser admin client creation through this unstable development entry point.
+import { createInspectorAdminClient } from 'jazz-tools/_dev/inspector-client'
 
 import { useInspectorRuntime, type InspectorRuntimeStore } from '@app/runtime/useInspectorRuntime'
 import type { InspectorRuntimeError } from '@app/runtime/runtimeError'
 import type { ResolvedRuntimeTarget } from '@app/routing/inspectorNavigation'
 import { getJazzWasmPreparation } from '@app/runtime/jazzWasmPreparation'
+import type { StoredConnection } from '@app/connections/connections'
 import {
   useInspectorSessionContext,
   type InspectorSessionContextValue,
@@ -36,6 +37,7 @@ const InspectorRuntimeContext = createContext<InspectorRuntimeContextValue | nul
 const connectionIdentityTokens = new WeakMap<object, number>()
 let nextConnectionIdentityToken = 0
 
+/** Gives each connection object a remount key so credential changes replace the privileged client. */
 export function getConnectionIdentityToken(connection: object): number {
   const existingToken = connectionIdentityTokens.get(connection)
   if (existingToken !== undefined) {
@@ -51,25 +53,59 @@ interface InspectorProviderProps extends PropsWithChildren {
   initialRuntimeTarget?: ResolvedRuntimeTarget
 }
 
-/** Publishes the Jazz client only after stored schema verification makes it safe for consumers. */
-function RuntimeClientProjection({ runtime }: { runtime: InspectorRuntimeStore }) {
-  const client = useJazzClient()
+/**
+ * Owns one privileged Jazz client after stored schema verification.
+ *
+ * Stale resolutions and unmounts shut down the client because it owns runtime and worker resources.
+ * Branch views belong to individual operations and do not participate in this client identity.
+ */
+function RuntimeAdminClient({
+  connection,
+  runtime,
+}: {
+  connection: StoredConnection
+  runtime: InspectorRuntimeStore
+}) {
   const isWasmSchemaLoading = useStore(runtime.$isWasmSchemaLoading)
+  const wasmSchema = useStore(runtime.$wasmSchema)
+  const runtimeError = useStore(runtime.$error)
 
   useEffect(() => {
-    if (
-      isWasmSchemaLoading === true ||
-      runtime.$wasmSchema.get() === null ||
-      runtime.$error.get() !== null
-    ) {
+    if (isWasmSchemaLoading === true || wasmSchema === null || runtimeError !== null) {
       return
     }
 
-    runtime.publishClient(client)
+    let active = true
+    let client: JazzClient | null = null
+    void createInspectorAdminClient({
+      appId: connection.appId,
+      serverUrl: connection.serverUrl,
+      env: connection.env,
+      adminSecret: connection.adminSecret,
+    }).then(
+      (createdClient) => {
+        if (active === false) {
+          void createdClient.shutdown()
+          return
+        }
+        client = createdClient
+        runtime.publishClient(createdClient)
+      },
+      (error: unknown) => {
+        if (active === true) {
+          runtime.publishClientError(error)
+        }
+      },
+    )
+
     return () => {
-      runtime.clearClient(client)
+      active = false
+      if (client !== null) {
+        runtime.clearClient(client)
+        void client.shutdown()
+      }
     }
-  }, [client, isWasmSchemaLoading, runtime])
+  }, [connection, isWasmSchemaLoading, runtime, runtimeError, wasmSchema])
 
   return null
 }
@@ -102,36 +138,6 @@ function useRuntimeResumeRetry(runtime: InspectorRuntimeStore, retry: () => void
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [retry, runtime])
-}
-
-interface RuntimeClientErrorBoundaryProps {
-  children: ReactNode
-  onError: (error: unknown) => void
-}
-
-interface RuntimeClientErrorBoundaryState {
-  failed: boolean
-}
-
-class RuntimeClientErrorBoundary extends Component<
-  RuntimeClientErrorBoundaryProps,
-  RuntimeClientErrorBoundaryState
-> {
-  state: RuntimeClientErrorBoundaryState = {
-    failed: false,
-  }
-
-  static getDerivedStateFromError(): Partial<RuntimeClientErrorBoundaryState> {
-    return { failed: true }
-  }
-
-  componentDidCatch(error: unknown) {
-    this.props.onError(error)
-  }
-
-  render() {
-    return this.state.failed === true ? null : this.props.children
-  }
 }
 
 /**
@@ -179,28 +185,10 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
   })
   const runtimeContext = useMemo(() => ({ retry: retryRuntime, runtime }), [retryRuntime, runtime])
   useRuntimeResumeRetry(runtime, retryRuntime)
-  const clientConfig = useMemo(
-    () =>
-      session.activeConnection !== null && session.currentBranch !== null
-        ? {
-            appId: session.activeConnection.appId,
-            serverUrl: session.activeConnection.serverUrl,
-            env: session.activeConnection.env,
-            userBranch: session.currentBranch,
-            adminSecret: session.activeConnection.adminSecret,
-            driver: { type: 'memory' as const },
-          }
-        : null,
-    [session.activeConnection, session.currentBranch],
-  )
   const clientIdentity =
-    session.activeConnection !== null && session.currentBranch !== null
-      ? JSON.stringify([
-          session.activeConnection.id,
-          getConnectionIdentityToken(session.activeConnection),
-          session.currentBranch,
-        ])
-      : null
+    session.activeConnection === null
+      ? null
+      : `${session.activeConnection.id}:${getConnectionIdentityToken(session.activeConnection)}`
   const switchBranch = useCallback(
     (branch: string) =>
       session.switchBranch(
@@ -220,19 +208,12 @@ export function InspectorProvider({ children, initialRuntimeTarget }: InspectorP
 
   return (
     <InspectorRuntimeContext.Provider value={runtimeContext}>
-      {clientConfig === null || canStartJazzProvider === false ? null : (
-        <RuntimeClientErrorBoundary
+      {session.activeConnection === null || canStartJazzProvider === false ? null : (
+        <RuntimeAdminClient
           key={`${clientIdentity ?? 'unknown'}:${retryGeneration}`}
-          onError={runtime.publishClientError}
-        >
-          <JazzProvider
-            autoAttachDevTools={false}
-            config={clientConfig}
-            fallback={null}
-          >
-            <RuntimeClientProjection runtime={runtime} />
-          </JazzProvider>
-        </RuntimeClientErrorBoundary>
+          connection={session.activeConnection}
+          runtime={runtime}
+        />
       )}
       <InspectorContext.Provider value={value}>{children}</InspectorContext.Provider>
     </InspectorRuntimeContext.Provider>

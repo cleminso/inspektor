@@ -88,7 +88,7 @@ Inspektor browser acceptance tests run with `pnpm test:browser`. Playwright owns
 | `pnpm inspektor-test:validate` | Validate schema and permissions without publishing |
 | `pnpm inspektor-test:initialize` | Publish the first cloud schema and permissions |
 | `pnpm inspektor-test:deploy` | Publish the cloud schema and permissions |
-| `pnpm inspektor-test:seed` | Upsert deterministic cloud rows |
+| `pnpm inspektor-test:seed` | Seed deterministic cloud rows by inserting missing rows and updating existing rows |
 | `pnpm inspektor-test:fixture` | Start an isolated local app |
 | `pnpm --filter inspektor-test test` | Test schema metadata, serialized data, relations, permission enforcement, repeatable seeding, and fixture disposal |
 | `pnpm test:browser` | Run Inspeltor browser acceptance tests against an isolated fixture |
@@ -104,7 +104,7 @@ Keep the overrides until `jazz-tools` resolves to patched versions without them.
 1. Add a focused table or column case to `schema.ts`.
 2. Add its permission shape to `permissions.ts`.
 3. Add deterministic rows and UUIDs to `inspectorTestData.ts` when the case needs data.
-4. Add the corresponding upsert to `seedInspectorTest.ts`.
+4. Add the corresponding insert-or-update logic to `seedInspectorTest.ts`.
 5. Update the scenario inventory in this README.
 6. Add or update tests that state the supported case.
 7. Validate with the package test, typecheck, and schema validation commands.

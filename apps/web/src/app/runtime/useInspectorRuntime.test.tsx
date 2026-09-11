@@ -1,6 +1,6 @@
 import { cleanup, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { JazzClient } from 'jazz-tools/react'
+import type { JazzClient } from 'jazz-tools/client'
 
 import { useInspectorRuntime } from '@app/runtime/useInspectorRuntime'
 
@@ -189,8 +189,8 @@ describe('useInspectorRuntime', () => {
     const { result } = renderHook(() =>
       useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
     )
-    const previousClient = { manager: { client: 'previous' } } as unknown as JazzClient
-    const replacementClient = { manager: { client: 'replacement' } } as unknown as JazzClient
+    const previousClient = { db: { client: 'previous' } } as unknown as JazzClient
+    const replacementClient = { db: { client: 'replacement' } } as unknown as JazzClient
 
     result.current.publishClient(previousClient)
     result.current.publishClient(replacementClient)

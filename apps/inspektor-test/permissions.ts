@@ -3,7 +3,10 @@ import { schema as s } from "jazz-tools";
 import { app } from "./schema.js";
 
 export default s.definePermissions(app, ({ policy }) => {
-  policy.projects.managedByCreator();
+  policy.projects.allowRead.always();
+  policy.projects.allowInsert.always();
+  policy.projects.allowUpdate.always();
+  policy.projects.allowDelete.always();
 
   policy.columnTypeShowcase.allowRead.always();
   policy.columnTypeShowcase.allowInsert.always();
@@ -15,6 +18,7 @@ export default s.definePermissions(app, ({ policy }) => {
   policy.contentEdgeCases.allowUpdate.never();
   policy.contentEdgeCases.allowDelete.never();
 
+  // Backend admission does not create author identity; retain this table as a creator-policy fixture.
   policy.creatorManagedRecords.managedByCreator();
 
   policy.emptyRecords.allowRead.always();
