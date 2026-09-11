@@ -40,8 +40,8 @@ Product structure and interaction decisions belong in [[lat.md/query-interface#L
 
 The investigation used:
 
-- Jazz source revision `923c6a951e528e86c043b7bb375ddf83aded6b8b`.
-- Jazz Tools package version `2.0.0-alpha.53`.
+- Jazz source tag `v2.0.0-alpha.54`.
+- Jazz Tools package version `2.0.0-alpha.54`.
 - The installed Inspektor `jazz-tools` declarations.
 - The official Jazz Inspektor live-query page.
 - A deployed Jazz Inspektor response containing populated server subscription groups.
@@ -157,18 +157,17 @@ Sources:
 
 Application-facing `QueryOptions` includes:
 
-| Option         | Values                                                                          | Meaning                                                     |
-| -------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `tier`         | `ReadTier.LocalFirst`, `Remote`, `RemoteIfPossible`, or legacy durability names | Initial read policy                                         |
-| `localUpdates` | `immediate`, `deferred`                                                         | Visibility of local writes while the requested tier settles |
-| `propagation`  | `full`, `local-only`                                                            | Whether the subscription communicates with upstream servers |
-| `visibility`   | `public`, `hidden_from_live_query_list`                                         | Visibility in the local `Db` development trace list         |
-| `branch`       | scalar or qualified branch                                                      | Branch head                                                 |
-| `base`         | live branch or branch/snapshot pair                                             | Optional branch base                                        |
+| Option   | Values                                                                          | Meaning              |
+| -------- | ------------------------------------------------------------------------------- | -------------------- |
+| `tier`   | `ReadTier.LocalFirst`, `Remote`, `RemoteIfPossible`, or legacy durability names | Read policy          |
+| `branch` | scalar or qualified branch                                                      | Branch head          |
+| `base`   | live branch or branch/snapshot pair                                             | Optional branch base |
 
-`visibility` is local development-trace metadata. It is not encoded as an exclusion from server telemetry.
-
-`local-only` explicitly avoids upstream server communication from an application client. A subscription that never reaches the server cannot appear in standalone server telemetry.
+`localUpdates`, `propagation`, and `visibility` are internal controls rather than public query
+options. Inspektor table reads leave `tier` unset. Alpha.54 can return available local state first and
+keeps full propagation active so the live result receives server changes.
+There is no public option for hiding a standalone admin client's subscriptions from local
+development traces.
 
 Sources:
 

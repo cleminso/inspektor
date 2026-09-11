@@ -128,13 +128,13 @@ flowchart TD
       Runtime --> StoredPermissions["fetchStoredPermissions"]
       InspectorProvider --> WasmGate["Join existing WASM preparation"]
       WasmPreparation -.->|when accepted intent started it| WasmGate
-      WasmGate --> JazzProvider["JazzProvider"]
-      JazzProvider --> WasmLoader
+      WasmGate --> AdminClient["createInspectorAdminClient"]
+      AdminClient --> WasmLoader
       WasmLoader --> JazzGlue["dynamic import jazz-wasm"]
       JazzGlue --> WasmAsset["fetch and initialize jazz_wasm_bg.wasm"]
-      JazzProvider --> Client["Jazz client"]
-      Client --> RuntimeProjection["RuntimeClientProjection"]
-      RuntimeProjection --> Runtime
+      AdminClient --> Client["Jazz client"]
+      Client --> RuntimeAdminClient["RuntimeAdminClient publishes client"]
+      RuntimeAdminClient --> Runtime
     end
 
     InspectorProvider --> RoutedFeatures["Routed feature content"]
@@ -153,7 +153,7 @@ flowchart TD
     end
 
     subgraph WorkbenchFlow["Routed feature shells"]
-      RoutedFeatures --> Header["Header: connection branch schema"]
+      RoutedFeatures --> Header["Header: connection and schema"]
       TablesRoute --> TableExplorer["TableExplorerScreen"]
       TableExplorer --> TablesNavigator["Table list"]
       TableExplorer --> WorkspaceItems["Table workspace tabs"]
@@ -172,8 +172,8 @@ flowchart TD
       DataItem --> DataState["useTableViewState"]
       DataState --> TableQuery["useTableRows"]
       TableQuery --> QueryBuilder["GenericQueryBuilder"]
-      QueryBuilder --> UseAll["Jazz useAll"]
-      UseAll --> ReactiveRuntime["Jazz reactive query runtime"]
+      QueryBuilder --> SubscriptionStore["Jazz subscription store"]
+      SubscriptionStore --> ReactiveRuntime["Jazz reactive query runtime"]
 
       DataState --> DataGrid["DataGrid"]
       DataState --> RowEditor["Complete-row side pane"]
@@ -181,10 +181,10 @@ flowchart TD
       DataGrid --> MutationLedger
       RowEditor --> MutationLedger
       MutationLedger --> FloatingWidget["Floating widget"]
-      MutationLedger --> Mutations["useTableMutations"]
-      Mutations --> TableProxy["createTableProxy"]
-      TableProxy --> UseDb["Jazz useDb"]
-      UseDb --> MutationRuntime["Jazz mutation runtime"]
+      MutationLedger --> Mutations["useTableMutationExecutor"]
+      Mutations --> TableProxy["Dynamic TableProxy"]
+      TableProxy --> ClientDb["Jazz client db"]
+      ClientDb --> MutationRuntime["Jazz mutation runtime"]
 
       DataGrid --> RelationCell["RelationCellLink"]
       RelationCell --> RelationRow["useRelationRow"]
@@ -214,7 +214,8 @@ It is not tied to Jazz Cloud only. It is not driven by generated app-specific co
 
 **In-memory Jazz admin client**
 
-A Jazz client acquired and managed through `JazzProvider` with `adminSecret` and `driver: { type: "memory" }`.
+A Jazz client created through `createInspectorAdminClient` with an `adminSecret`. The helper owns an
+in-memory driver.
 
 `adminSecret` gives the Inspektor admin access to inspect schema metadata and app data. The memory driver keeps the Inspektor
 runtime local and non-durable, so inspected data is not persisted by the Inspektor client between sessions.
@@ -413,14 +414,14 @@ The focused routing decisions and examples live in [[routing#Inspektor route str
 
 ### Connection management
 
-Connection management is the entry point for developers to inspect their Jazz app. It enables developers to create a connection to Jazz server with their app credentials, select branch and schema.
+Connection management is the entry point for developers to inspect their Jazz app. It enables developers to create a connection to a Jazz server with app credentials and select a schema.
 
 The flow must prevent silent connection failure: if the Inspektor cannot validate the connection and schema are valid, it should keep the user in connection setup instead of opening a broken dashboard.
 
 This flow **must answer**:
 
 - do I have any saved connections?
-- which Jazz app am I about to inspect? which branch and schema version is it?
+- which Jazz app and schema version am I about to inspect?
 - are my credentials valid for this appId?
 - if connection to server fails, what failed, and what do I need to fix?
   - is the server URL reachable?
@@ -457,7 +458,7 @@ These user contexts explain the needs that shape the feature.
    - may be surprised that a saved local connection still needs the local runtime/server running
 3. Debugging wrong app
    - sees unexpected rows, missing tables, or no query subscriptions
-   - needs to verify `serverUrl`, `appId`, `branch` and `schemaHash`
+    - needs to verify `serverUrl`, `appId`, and `schemaHash`
    - needs confidence that Inspektor is attached to the same app/runtime they are debugging
 
 #### How it works
@@ -465,8 +466,8 @@ These user contexts explain the needs that shape the feature.
 A saved connection is a local profile. It stores the admin credentials and runtime preferences that Inspektor needs to open a
 Jazz runtime. Saved connections are stored in local storage under `inspektor-connections`.
 
-The saved profile does not contain an active transport. After route and schema resolution succeed, `JazzProvider` creates the
-client and owns its transport for the mounted runtime.
+The saved profile does not contain an active transport. After route and schema resolution succeed,
+`InspectorProvider` creates a privileged diagnostic client and owns its transport for the mounted runtime.
 
 #### v1 required capabilities
 
@@ -508,7 +509,7 @@ developer in the flow to select the schema before reopening the connection.
 
 The schema switcher shows which schema hash is latest.
 
-If validation fails, render the validation error and keep the edit form open. If the server returns no schema hashes, use the same error handling as the add-connection flow. Branch handling should follow the current connection/session behavior.
+If validation fails, render the validation error and keep the edit form open. If the server returns no schema hashes, use the same error handling as the add-connection flow.
 
 #### Saved connection availability
 
@@ -522,7 +523,7 @@ fetches the selected stored schema, and creates the admin client.
 If the Jazz server is remote and reachable, the saved connection can open without the app dev server. If the app dev server
 owns the managed local Jazz runtime, stopping it makes the saved connection unavailable until the runtime is running again.
 
-When resolving `/conn/:connectionId`, Inspektor reads the saved branch and fetches the available schema hashes. A valid explicit
+When resolving `/conn/:connectionId`, Inspektor fetches the available schema hashes. A valid explicit
 `?schema=` value wins. Without a valid explicit value, Inspektor selects the first advertised schema. Schema discovery must
 succeed before the route commits a runtime target. Runtime bootstrap can still fail if the server cannot return the selected
 schema or create the admin client.
@@ -531,7 +532,7 @@ UI representation:
 
 - Surface: connection list, add/edit connection form, schema switcher in the app shell.
 - Primary controls: add connection, edit connection, delete connection, switch connection, switch schema hash.
-- Primary content: connection name, server URL, app id, branch, active schema hash, latest schema hash.
+- Primary content: connection name, server URL, app id, active schema hash, latest schema hash.
 - States: first run, validating credentials, invalid connection, no schemas, stale schema hash, connection deleted.
 
 ### Runtime bootstrap
@@ -540,7 +541,9 @@ Runtime bootstrap turns a resolved connection context into an active Jazz admin 
 
 #### Purpose
 
-Runtime bootstrap turns a selected connection, branch, and schema hash into the active Inspektor runtime. All data surfaces depend on this runtime.
+Runtime bootstrap turns a selected connection and schema hash into the active Inspektor runtime.
+The stored branch label partitions local state but does not configure Jazz operations. All data
+surfaces depend on this runtime.
 
 #### Connection-entry loading and WASM preparation
 
@@ -548,7 +551,7 @@ Accepted connection entry starts one shared Jazz WASM preparation attempt.
 
 Accepted connection-entry actions start `prepareJazzWasm()` without awaiting it. The connection route also starts preparation after confirming that its saved connection exists and before schema-catalogue discovery. This covers saved actions, accepted add or edit flows, direct URLs, refreshes, and history navigation while avoiding work for unknown connection IDs.
 
-`jazzWasmPreparation.ts` owns one application-wide promise. It calls Jazz's public `loadWasmModule()` API and shares the same attempt across repeated accepted actions and React remounts. `InspectorProvider` joins that promise before mounting `JazzProvider`, preventing concurrent initialization against the installed Jazz version.
+`jazzWasmPreparation.ts` owns one application-wide promise. It calls Jazz's public `loadWasmModule()` API and shares the same attempt across repeated accepted actions and React remounts. `InspectorProvider` joins that promise before creating the admin client, preventing concurrent initialization against the installed Jazz version.
 
 Add and edit validation hand their resolved target to the matching route loader. The handoff is single-use and accepted only when connection ID, credentials, branch, and schema hash still match persisted state. This avoids repeating schema and permissions-head requests while keeping the route loader authoritative. `InspectorRuntimeBoundary` session synchronization does not start preparation.
 
@@ -557,12 +560,13 @@ Add and edit validation hand their resolved target to the matching route loader.
 Startup proceeds from connection intent through schema verification to the first table query.
 
 1. An accepted connection action may start shared WASM preparation without awaiting it.
-2. The parent connection route confirms the saved connection, starts the same preparation, and resolves the branch and schema catalogue. It consumes a matching validated target handoff or performs discovery. Discovery must succeed before the route commits the runtime target.
-3. `InspectorRuntimeBoundary` synchronizes the route-resolved connection, branch, and schema hash with session state before mounting `InspectorProvider`.
+2. The parent connection route confirms the saved connection, starts the same preparation, and resolves the local branch label and schema catalogue. It consumes a matching validated target handoff or performs discovery. Discovery must succeed before the route commits the runtime target.
+3. `InspectorRuntimeBoundary` synchronizes the route-resolved connection, branch label, and schema hash with session state before mounting `InspectorProvider`.
 4. `useInspectorRuntime(...)` starts stored-schema verification and optional permissions loading as sibling work.
-5. `InspectorProvider` joins existing WASM preparation, then mounts `JazzProvider` with `adminSecret` and `driver: { type: "memory" }`.
-6. Jazz loads its JavaScript glue, fetches and initializes `jazz_wasm_bg.wasm`, and creates the in-memory admin client. Jazz owns URL resolution, streaming instantiation, client acquisition, and shutdown.
-7. `RuntimeClientProjection` publishes the client only after stored-schema verification succeeds.
+5. `InspectorProvider` joins existing WASM preparation, then mounts `RuntimeAdminClient`.
+6. `RuntimeAdminClient` calls `createInspectorAdminClient`, which creates the in-memory admin client.
+   Jazz owns URL resolution, WASM initialization, client acquisition, and shutdown.
+7. `RuntimeAdminClient` publishes the client only after stored-schema verification succeeds.
 8. The table view acquires its Jazz query subscription. Useful rows render after the first query callback.
 
 The connection route sets `pendingMs: 0` and `pendingMinMs: 0`, and leaves `gcTime` unset so TanStack Router retains inactive loader data through its default cache. `ConnectionContentBoundary` keeps the table workspace mounted but hidden behind the same loading surface until an empty workspace, schema view, runtime error, or first rows query settles. Local `Loading schema…` and `Loading rows` states remain for transitions within an already revealed workspace.
@@ -578,8 +582,8 @@ Each startup failure has one owner and a defined effect on the active session.
 - Stored schema fetch failure is fatal for the active session.
 - Schema hash fetch failure blocks schema-switching context.
 - Permissions fetch failure is non-fatal; the UI can continue without permission hints.
-- Early WASM preparation is best effort. `jazzWasmPreparation.ts` owns the shared preparation promise. `JazzProvider` owns client acquisition and release, while `InspectorProvider` owns the visible runtime error and retry flow.
-- When the user changes connection, branch, or schema hash, `useInspectorRuntime` ignores stale schema and permissions work. Replacing or unmounting `JazzProvider` releases the previous client, and the installed Jazz client registry shuts it down after its last release.
+- Early WASM preparation is best effort. `jazzWasmPreparation.ts` owns the shared preparation promise. `RuntimeAdminClient` owns client acquisition and shutdown, while `InspectorProvider` owns the visible runtime error and retry flow.
+- When the user changes connection, local branch label, or schema hash, `useInspectorRuntime` ignores stale schema and permissions work. Replacing or unmounting `RuntimeAdminClient` shuts down the previous client.
 
 #### Runtime implementation map
 
@@ -590,7 +594,7 @@ These source modules own the runtime bootstrap stages.
 - `apps/web/src/app/runtime/jazzWasmPreparation.ts`: owns the shared best-effort `loadWasmModule()` promise.
 - `apps/web/src/routes/conn/$connectionId.tsx`: starts valid-route preparation and resolves the route-owned runtime target before mounting runtime code.
 - `apps/web/src/app/runtime/inspectorRuntimeBoundary.tsx`: synchronizes the resolved target with session state without starting preparation.
-- `apps/web/src/app/providers/inspectorProvider.tsx`: joins existing preparation, owns `JazzProvider`, and publishes the verified client.
+- `apps/web/src/app/providers/inspectorProvider.tsx`: joins existing preparation, owns `RuntimeAdminClient`, and publishes the verified client.
 - `apps/web/src/app/runtime/useInspectorRuntime.tsx`: owns stored-schema, permissions, runtime error, and client projections.
 - `apps/web/src/app/runtime/connectionContentBoundary.tsx`: owns the single table-entry loading surface and mounted-content visibility latch.
 
@@ -934,6 +938,7 @@ ID uses a key icon, references use a relation icon, and stored UUID values use `
 | relation icon + `[]` | `s.array(s.ref())`         | row ID `string[]`     | `UUID[]`            | Relation list. Ref array columns must end in `Ids` or `_ids`.         |
 | `ID`                 | stored UUID                | UUID `string`         | `UUID`              | UUID value without relation metadata.                                 |
 | `E`                  | `s.enum("a", "b")`         | string literal union  | `ENUM(...)`         | Show allowed values in details, not the compact header.               |
+| `{E}`                | `s.enum({ ...cases })`      | discriminated union   | payload enum        | Selected enum case with a structured payload.                         |
 | `{}`                 | `s.json()`                 | `JsonValue`           | `JSON`              | Untyped JSON; replace whole value on write.                           |
 | `{T}`                | `s.json(schema)`           | schema-inferred value | `JSON`              | Typed JSON; still atomic on write.                                    |
 | `FX`                 | `.transform({ from, to })` | transformed value     | underlying SQL type | Modifier badge. Filters use the stored column value.                  |
@@ -1019,13 +1024,16 @@ structured-value preview and JSON viewing, and relation presentation and field a
 copy, and null controls should compose existing design-system components unless a repeated semantic contract justifies a dedicated
 component.
 
-The row side pane has two representations:
+The row side pane has three representations:
 
 - `Details` is the schema-derived insert and edit form. Field labels show Jazz semantics such as `string`, `timestamp`, `bytes`,
   `ref → rooms`, and `json<typed>` rather than SQL storage labels.
 - `JSON` is a read-only, syntax-colored structured tree inspired by Geist JSON View. It expands top-level fields initially,
   supports branch disclosure, keyboard tree navigation, search highlighting, selectable text, and whole-row Copy JSON. The row
-  JSON representation is not an editing surface; all row mutations remain in `Details`.
+  JSON representation includes the four provenance values as top-level properties. It is not an editing surface; all row
+  mutations remain in `Details`.
+- `Provenance` presents `$createdAt`, `$createdBy`, `$updatedAt`, and `$updatedBy` as read-only metadata. These synthetic values
+  never enter mutation drafts or submissions.
 
 The structured tree is an independent design-system component. It owns bounded tree presentation, expansion, keyboard behavior,
 focus, accessible tree semantics, and highlighting. `apps/web` normalizes Jazz values, owns the copy representation, and supplies
@@ -1099,9 +1107,9 @@ The side panel answers:
 The active row remains stable when possible. Filtering, sorting, or refreshing data does not make the user lose context
 without a clear reason.
 
-Opening the row pane renders all schema fields, including fields hidden from the table, and focuses the active row rather than
-treating every checked row as one implicit bulk mutation. An expanded structured inline editor can open this pane and target its
-field without introducing a separate cell-inspection pane.
+Opening the row pane makes all schema fields and read-only provenance available across its representations, including values
+hidden from the table, and focuses the active row rather than treating every checked row as one implicit bulk mutation. An
+expanded structured inline editor can open this pane and target its field without introducing a separate cell-inspection pane.
 
 UI representation:
 
@@ -1320,15 +1328,17 @@ v1 makes live updates visible without forcing the user to refresh and lose conte
 Behavior:
 
 - update visible rows reactively through the active Jazz query
-- highlight rows inserted through the live query, whether from Inspektor or an external Jazz client
+- highlight rows created after the current table view mounted, whether from Inspektor or an external
+  Jazz client
 - highlight cells that just changed through the live query, whether from Inspektor or an external Jazz client
 - preserve the selected row and side panel when possible
 - avoid jumping scroll position or replacing the visible context unexpectedly
 
-Live-change highlights are ephemeral and brief. Any Jazz update that reaches the active query — local or external — can trigger a
-row or cell highlight so the developer sees what changed without scanning the table.
+Live-change highlights are ephemeral and brief. Existing rows that arrive during local-first remote
+hydration do not receive insert feedback. Inspektor compares added rows with the table observation
+boundary through `$createdAt` and fails closed when creation provenance is missing or invalid.
 
-Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. Jazz `useAll(...)` keeps a live subscription active while mounted. Inspektor can unsubscribe by skipping a query, but freezing visible rows would require an inspektor-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
+Advanced live-update controls such as pause, replay, update history, or subscription-level pause/resume are out of scope for v1. `useJazzQueryState(...)` keeps a subscription-store entry active while mounted. Inspektor can unsubscribe by skipping a query, but freezing visible rows would require an inspektor-owned snapshot and stale-data model. v1 makes live changes visible and preserves user context instead.
 
 An out-of-scope `Live`/`Paused` presentation can freeze an Inspektor-owned visible snapshot while Jazz remains connected and the table
 subscription continues receiving changes. The paused state can report pending inserted, updated, and deleted rows, then

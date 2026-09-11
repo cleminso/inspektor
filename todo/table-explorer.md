@@ -19,6 +19,15 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ## Implemented foundation
 
+[11/09/26]
+
+### Complete-row provenance
+
+- [x] Show `$createdAt`, `$createdBy`, `$updatedAt`, and `$updatedBy` in the read-only row JSON representation.
+- [x] Add a dedicated read-only Provenance representation without adding synthetic fields to mutation drafts.
+- [x] Select provenance when the active row falls outside the visible table query.
+- [x] Share one synthetic provenance descriptor contract across query, grid, and row-pane presentation.
+
 [06/09/26]
 
 ### React render diagnostics
@@ -1491,6 +1500,12 @@ Checked markers in this section mean the interaction decision is settled; they d
 - [ ] Define a safe inspected-application metadata channel before exposing transform markers; stored WASM schema metadata does not contain transforms.
 
 ## Validation checklist
+
+[11/09/26]
+
+- [x] Cover Details, row JSON, copy JSON, and fallback-row provenance with focused tests.
+- [x] Verify web lint and typecheck.
+- [ ] Verify the complete row pane against the isolated browser fixture after Jazz accepts its native JSON fixture writes.
 
 [05/09/26]
 

@@ -60,14 +60,16 @@ Regarde gets table data through the Jazz runtime, not through a bespoke REST end
 
 Current data flow:
 
-1. The active route selects a saved connection and table. Connection preferences select the branch. An available explicit
-   `?schema=` value selects the schema; otherwise the route selects the first advertised schema.
-2. `InspectorProvider` mounts `JazzProvider` with an in-memory driver for the selected connection and branch.
-3. `useInspectorRuntime(...)` fetches the selected stored schema and stored permissions.
-4. `RuntimeClientProjection` publishes the Jazz client after the stored schema is available and no runtime error exists.
-5. `useTableRows(...)` builds a generic query for the selected table.
-6. `useJazzQueryState(...)` subscribes to the Jazz query cache entry and exposes its query state.
-7. `TableExplorerScreen` passes the selected table state into the data or schema view.
+1. The active route selects a saved connection and table. An explicit `?schema=` value selects the
+   schema; otherwise the route selects the first advertised schema. The stored branch label scopes
+   local workspace state but does not select Jazz data.
+2. `useInspectorRuntime(...)` fetches the selected stored schema and stored permissions.
+3. `RuntimeAdminClient` creates and publishes an in-memory Jazz admin client after schema loading
+   succeeds. Branch views are not part of the client configuration.
+4. `useTableRows(...)` builds a generic query for the selected table.
+5. `useJazzQueryState(...)` subscribes to the client-attached Jazz subscription store and exposes
+   the query state.
+6. `TableExplorerScreen` passes the selected table state into the data or schema view.
 
 The current runtime and query entry points are [[apps/web/src/app/runtime/useInspectorRuntime.tsx#useInspectorRuntime]] and [[apps/web/src/features/tables/query/useTableRows.ts#useTableRows]]. [[lat.md/tableRowsQueryLifecycle#Table row query lifecycle]] documents their current ownership.
 
@@ -260,10 +262,9 @@ Confirmed source:
 - Jazz reference checkout: `packages/jazz-tools/src/runtime/query-adapter.ts`
 - Historical official Jazz Inspektor: `packages/inspector/src/utility/generic-query-builder.ts`
 
-Unknown:
-
-- Jazz exports `allRowsInTableQuery(tableName, schema)` for the simplest arbitrary-table read.
-- Jazz does not appear to export a full generic query builder factory matching the official Inspektor's implementation.
+Jazz exports `allRowsInTableQuery(tableName, schema)` for the simplest arbitrary-table read.
+Inspektor owns an immutable `GenericQueryBuilder` that serializes projections, filters, ordering,
+and pagination for arbitrary tables from the stored schema.
 
 ## Filtering and sorting
 

@@ -27,7 +27,7 @@ admin data is not persisted to browser storage.
 React hooks, Jazz orchestration, and DataGrid presentation each own a separate part of the query lifecycle.
 
 - `useTableRows` owns table-query derivation, compatible-row preservation, pagination, and view-facing status flags.
-- `useJazzQueryState` adapts one Jazz orchestrator cache entry to React through `useSyncExternalStore`.
+- `useJazzQueryState` adapts one Jazz subscription-store cache entry to React through `useSyncExternalStore`.
 - Jazz's `SubscriptionsOrchestrator` owns query-key generation, cache-entry reuse, subscription delivery, and reference counting.
 - `DataGrid` owns reusable loading, empty, complete-row, and virtual-row presentation without knowing about Jazz.
 
@@ -66,7 +66,15 @@ The query identity includes:
 - page and page size
 - page-derived query offset
 - extra-row pagination probe
-- propagation and visibility options
+
+The query selects the schema columns plus `$createdAt`, `$createdBy`, `$updatedAt`, and `$updatedBy`.
+The grid keeps author provenance hidden by default and exposes it through column visibility controls.
+The complete-row JSON and Provenance representations expose the selected row's provenance as read-only metadata.
+When the selected row leaves the visible page, its identity fallback query uses the same explicit provenance projection.
+
+Inspektor leaves `tier` unset. Alpha.54 starts a local-first subscription with full propagation, so
+available rows can render without waiting for a server round trip and the same subscription receives
+server changes.
 
 Change route defaults in `tableRowsSearch.ts`, query construction in `tableRowsQuery.ts`, and Jazz options in `queryOptions.ts`.
 
@@ -75,8 +83,8 @@ Change route defaults in `tableRowsSearch.ts`, query construction in `tableRowsQ
 The rendered table acquires one canonical Jazz cache entry and releases it through React cleanup.
 
 The rendered table owns its subscription through `useSyncExternalStore`. React calls the returned cleanup when the active query entry
-changes or the component unmounts. Page, page-size, filter, sort, schema, table, or manager changes acquire the matching query entry.
-The Jazz manager decides how long an entry remains available after it is no longer active.
+changes or the component unmounts. Page, page-size, filter, sort, schema, table, or client changes acquire the matching query entry.
+The Jazz subscription store decides how long an entry remains available after it is no longer active.
 
 ## Grid presentation states
 

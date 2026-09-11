@@ -77,7 +77,11 @@ Inspektor should adopt Jazz patterns that preserve mutation intent, pagination c
 - Omission of default-backed insert fields.
 - Page-windowed `pageSize + 1` pagination.
 - Schema-evolution-safe column preferences.
-- Provenance columns when product work reaches them.
+- Jazz queries select `$createdAt`, `$createdBy`, `$updatedAt`, and `$updatedBy`. Timestamp columns
+  are visible and sortable. Author columns are hidden by default and read-only. Alpha.54 does not
+  support ordering by the root author objects.
+- Alpha.54 also supports eight nested author paths under `$createdBy` and `$updatedBy`. The grid
+  exposes each root author object so its account and identity values stay together.
 - Live insert, update, and removal feedback when selection and pagination semantics are ready.
 - Relation display-label heuristics without adopting per-cell relation queries.
 - Direct contract tests around generic Jazz query and table adapters.

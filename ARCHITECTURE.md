@@ -109,7 +109,7 @@ The boundaries matter because each stage has a different failure contract:
 Two flows intentionally cross these boundaries:
 
 - Add and edit forms validate credentials and discover schemas to provide inline form feedback. They persist the profile and navigate to the same connection route, whose loader remains authoritative for connected entry.
-- Branch and schema switches update the active connection's persisted runtime selection without re-entering the connection loader. Branch switching reuses the runtime catalogue when available and may otherwise discover schemas through the shared resolver. The runtime is replaced for the resulting selection, while the route continues to own initial connection entry.
+- Schema switches and local branch-label changes update persisted workspace selection without re-entering the connection loader. A branch label can reuse the runtime catalogue or trigger schema discovery, but it does not select Jazz data. The runtime is replaced for the resulting local scope, while the route continues to own initial connection entry.
 
 Workspace mutation state publishes an exit blocker upward. Session enforces that blocker for connection, branch, schema, and router-history exits. `InspectorRuntimeBoundary` is a final invariant: route-owned children stay unmounted until the resolved route target and persisted session target match.
 
@@ -217,7 +217,7 @@ Dynamic imports are not always beneficial. Do not defer a dependency that is req
 
 `InspectorRuntimeBoundary` receives the connection route's resolved target and synchronizes it with persisted session selection. It withholds connection-scoped children while those identities differ, preventing a route from mounting against another connection's runtime.
 
-`InspectorProvider` mounts below that handoff. It creates runtime projections through `useInspectorRuntime`, configures `JazzProvider`, and publishes the Jazz client only after stored schema verification succeeds. Workspace children mount with nullable projections so they can present runtime loading and error states. This keeps active-runtime work out of onboarding and connection-management paths while preserving one boundary for connection-scoped descendants.
+`InspectorProvider` mounts below that handoff. It creates runtime projections through `useInspectorRuntime`, creates an in-memory admin client through `createInspectorAdminClient`, and publishes the client only after stored schema verification succeeds. Workspace children mount with nullable projections so they can present runtime loading and error states. This keeps active-runtime work out of onboarding and connection-management paths while preserving one boundary for connection-scoped descendants.
 
 ### Code editor
 
