@@ -52,6 +52,15 @@ export const DEFAULT_TABLE_PAGE_SIZE: TablePageSize = 100
 /** Runtime row IDs are normalized as strings for table state. */
 export type TableRowId = string
 
+/**
+ * Inspektor-local equivalent of Jazz Inspector's private DynamicTableRow.
+ * Keep this shape aligned with its generic query row contract when upgrading Jazz.
+ */
+export interface DynamicTableRow {
+  id: string
+  [columnName: string]: unknown
+}
+
 /** Sparse valid value overlays keyed by runtime row ID and schema field name. */
 export type TableValuesByRowId = Readonly<Record<TableRowId, Readonly<Record<string, unknown>>>>
 
@@ -80,5 +89,7 @@ export interface TableColumnMeta {
   label: string
   accessorKey: string
   column: ColumnDescriptor | null
+  isHiddenByDefault?: true
+  isReadOnly?: true
   isSortable: boolean
 }

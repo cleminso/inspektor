@@ -185,7 +185,7 @@ export function RowEditorSidePanel({
                   variant="secondary"
                   onClick={onClose}
                 >
-                  Close editor
+                  Close
                 </Button>
               </Box>
             )}

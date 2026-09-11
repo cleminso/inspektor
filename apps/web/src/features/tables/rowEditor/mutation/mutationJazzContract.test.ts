@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { toValue, unwrapValue, type ColumnDescriptor } from 'jazz-tools'
+import type { ColumnDescriptor } from 'jazz-tools'
 
 import {
   buildRowMutationSubmission,
@@ -16,28 +16,24 @@ function column(
   return { name, column_type: columnType, nullable }
 }
 
-describe('row mutation Jazz boundary', () => {
-  it.each([
-    ['"hello"', 'hello'],
-    ['{"enabled":true}', { enabled: true }],
-    ['42', 42],
-    ['true', true],
-  ] as const)('round-trips JSON input %s through Jazz', (input, expected) => {
-    const jsonColumn = column('payload', { type: 'Json' })
-    const draft = setMutationFieldText(
-      createUpdateRowDraft({ payload: { previous: true } }),
-      jsonColumn,
-      input,
-    )
-    const submission = buildRowMutationSubmission(draft, [jsonColumn])
+describe('row mutation submission boundary', () => {
+  it.each(['"hello"', '{"enabled":true}', '42', 'true'])(
+    'keeps JSON input %s for the Jazz mutation boundary',
+    (input) => {
+      const jsonColumn = column('payload', { type: 'Json' })
+      const draft = setMutationFieldText(
+        createUpdateRowDraft({ payload: { previous: true } }),
+        jsonColumn,
+        input,
+      )
+      const submission = buildRowMutationSubmission(draft, [jsonColumn])
 
-    const jazzValue = toValue(submission.values.payload, jsonColumn.column_type)
+      expect(submission.errors).toEqual({})
+      expect(submission.values.payload).toBe(input)
+    },
+  )
 
-    expect(submission.errors).toEqual({})
-    expect(unwrapValue(jazzValue, jsonColumn.column_type)).toEqual(expected)
-  })
-
-  it('round-trips nested JSON values through Jazz', () => {
+  it('keeps nested JSON source values for the Jazz mutation boundary', () => {
     const jsonArrayColumn = column('items', { type: 'Array', element: { type: 'Json' } })
     const draft = setMutationFieldText(
       createUpdateRowDraft({ items: [] }),
@@ -46,15 +42,35 @@ describe('row mutation Jazz boundary', () => {
     )
     const submission = buildRowMutationSubmission(draft, [jsonArrayColumn])
 
-    const jazzValue = toValue(submission.values.items, jsonArrayColumn.column_type)
-
     expect(submission.errors).toEqual({})
-    expect(unwrapValue(jazzValue, jsonArrayColumn.column_type)).toEqual([
-      'hello',
-      { enabled: true },
-      42,
-      true,
-    ])
+    expect(submission.values.items).toEqual(['"hello"', '{"enabled":true}', '42', 'true'])
+  })
+
+  it('excludes provenance values from row mutation submissions', () => {
+    const nameColumn = column('name', { type: 'Text' })
+    const draft = setMutationFieldText(
+      createUpdateRowDraft({
+        id: 'row-1',
+        name: 'Ada',
+        $createdAt: new Date('2026-04-05T06:07:08.009Z'),
+        $createdBy: {
+          account: 'account-1',
+          identity: { issuer: 'https://issuer.example', subject: 'creator-1' },
+        },
+        $updatedAt: new Date('2026-04-06T07:08:09.010Z'),
+        $updatedBy: {
+          account: 'account-2',
+          identity: { issuer: 'https://issuer.example', subject: 'editor-2' },
+        },
+      }),
+      nameColumn,
+      'Grace',
+    )
+
+    expect(buildRowMutationSubmission(draft, [nameColumn])).toEqual({
+      errors: {},
+      values: { name: 'Grace' },
+    })
   })
 
   it('keeps SQL NULL separate from JSON input', () => {
@@ -66,10 +82,10 @@ describe('row mutation Jazz boundary', () => {
     )
     const submission = buildRowMutationSubmission(draft, [jsonColumn])
 
-    expect(toValue(submission.values.payload, jsonColumn.column_type)).toEqual({ type: 'Null' })
+    expect(submission.values.payload).toBeNull()
   })
 
-  it('preserves a safe BigInt through the installed Jazz converter', () => {
+  it('preserves a safe BigInt as a submitted number', () => {
     const bigIntColumn = column('sequence', { type: 'BigInt' })
     const draft = setMutationFieldText(
       createUpdateRowDraft({ sequence: 1 }),
@@ -78,9 +94,6 @@ describe('row mutation Jazz boundary', () => {
     )
     const submission = buildRowMutationSubmission(draft, [bigIntColumn])
 
-    expect(toValue(submission.values.sequence, bigIntColumn.column_type)).toEqual({
-      type: 'BigInt',
-      value: Number.MAX_SAFE_INTEGER,
-    })
+    expect(submission.values.sequence).toBe(Number.MAX_SAFE_INTEGER)
   })
 })

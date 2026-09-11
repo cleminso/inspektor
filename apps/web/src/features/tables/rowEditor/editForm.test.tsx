@@ -4,7 +4,10 @@ import type { ColumnDescriptor } from 'jazz-tools'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { EditRowForm as ControlledEditRowForm } from '@tables/rowEditor/editForm'
+import {
+  EditRowForm as ControlledEditRowForm,
+  type RowRepresentation,
+} from '@tables/rowEditor/editForm'
 import { focusRowEditorField } from '@tables/rowEditor/fieldFocus'
 import {
   useRowDraftController,
@@ -82,7 +85,7 @@ type EditRowFormProps = Omit<
 }
 
 function EditRowForm({ draftController, ...props }: EditRowFormProps): React.ReactElement {
-  const [representation, setRepresentation] = useState<'details' | 'json'>('details')
+  const [representation, setRepresentation] = useState<RowRepresentation>('details')
   const ownedDraftController = useRowDraftController({
     initialRowValues: props.rowValues,
     mode: 'edit',
@@ -100,6 +103,16 @@ function EditRowForm({ draftController, ...props }: EditRowFormProps): React.Rea
 
 const rowValues = {
   active: true,
+  $createdAt: new Date('2026-04-05T06:07:08.009Z'),
+  $createdBy: {
+    account: 'account-1',
+    identity: { issuer: 'https://issuer.example', subject: 'creator-1' },
+  },
+  $updatedAt: new Date('2026-04-06T07:08:09.010Z'),
+  $updatedBy: {
+    account: 'account-2',
+    identity: { issuer: 'https://issuer.example', subject: 'editor-2' },
+  },
   displayName: 'Ada.Lovelace',
   id: 'person-1',
 }
@@ -186,7 +199,7 @@ describe('focusRowEditorField', () => {
   })
 })
 
-describe('EditRowForm Details and JSON views', () => {
+describe('EditRowForm row representations', () => {
   it('selects Details by default', () => {
     renderEditRowForm()
 
@@ -195,7 +208,29 @@ describe('EditRowForm Details and JSON views', () => {
       'true',
     )
     expect(screen.getByRole('button', { name: 'JSON' }).getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByRole('button', { name: 'Provenance' }).getAttribute('aria-pressed')).toBe(
+      'false',
+    )
     expect(screen.getByLabelText('DisplayName')).toBeTruthy()
+  })
+
+  it('shows provenance in a dedicated read-only representation', () => {
+    renderEditRowForm()
+
+    expect(screen.queryByRole('textbox', { name: '$createdAt' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Provenance' }))
+
+    expect(screen.queryByLabelText('DisplayName')).toBeNull()
+    const createdAt = screen.getByRole('textbox', { name: '$createdAt' }) as HTMLInputElement
+    const updatedAt = screen.getByRole('textbox', { name: '$updatedAt' }) as HTMLInputElement
+    expect(createdAt.readOnly).toBe(true)
+    expect(createdAt.value).toBe('2026-04-05T06:07:08.009Z')
+    expect(updatedAt.readOnly).toBe(true)
+    expect(updatedAt.value).toBe('2026-04-06T07:08:09.010Z')
+    const createdBy = screen.getByRole('tree', { name: '$createdBy value' })
+    const updatedBy = screen.getByRole('tree', { name: '$updatedBy value' })
+    expect(within(createdBy).getByRole('treeitem', { name: 'account: account-1' })).toBeTruthy()
+    expect(within(updatedBy).getByRole('treeitem', { name: 'account: account-2' })).toBeTruthy()
   })
 
   it('renders the complete row in schema order and marks missing fields unavailable', () => {
@@ -213,6 +248,10 @@ describe('EditRowForm Details and JSON views', () => {
       'displayName: Ada.Lovelace',
       'age: object',
       'active: true',
+      '$createdAt: 2026-04-05T06:07:08.009Z',
+      '$createdBy: object',
+      '$updatedAt: 2026-04-06T07:08:09.010Z',
+      '$updatedBy: object',
     ])
     fireEvent.click(within(json).getByRole('button', { name: 'Expand age' }))
     expect(within(json).getByRole('treeitem', { name: '$type: unavailable' })).toBeTruthy()
@@ -286,8 +325,12 @@ describe('EditRowForm Details and JSON views', () => {
 
     expect(Array.from(container.querySelectorAll('mark'), (mark) => mark.textContent)).toEqual([
       '.',
+      '.',
+      '.',
+      '.',
+      '.',
     ])
-    expect(await screen.findByRole('status', { name: 'Match 1 of 1' })).toBeTruthy()
+    expect(await screen.findByRole('status', { name: 'Match 1 of 5' })).toBeTruthy()
     expect(container.querySelector('mark')?.hasAttribute('data-active')).toBe(true)
 
     fireEvent.change(screen.getByRole('searchbox', { name: 'Find in row JSON' }), {
@@ -335,7 +378,23 @@ describe('EditRowForm Details and JSON views', () => {
         '  "age": {',
         '    "$type": "unavailable"',
         '  },',
-        '  "active": true',
+        '  "active": true,',
+        '  "$createdAt": "2026-04-05T06:07:08.009Z",',
+        '  "$createdBy": {',
+        '    "account": "account-1",',
+        '    "identity": {',
+        '      "issuer": "https://issuer.example",',
+        '      "subject": "creator-1"',
+        '    }',
+        '  },',
+        '  "$updatedAt": "2026-04-06T07:08:09.010Z",',
+        '  "$updatedBy": {',
+        '    "account": "account-2",',
+        '    "identity": {',
+        '      "issuer": "https://issuer.example",',
+        '      "subject": "editor-2"',
+        '    }',
+        '  }',
         '}',
       ].join('\n'),
     )

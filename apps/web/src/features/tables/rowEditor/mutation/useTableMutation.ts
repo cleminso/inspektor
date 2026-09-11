@@ -4,8 +4,10 @@
  * The Inspektor builds a dynamic table proxy from stored schema metadata, then uses Jazz's
  * mutation runtime to insert, update, and delete rows without app-generated table code.
  */
-import type { DynamicTableRow, TableProxy, WasmSchema } from 'jazz-tools'
-import type { JazzClient } from 'jazz-tools/react'
+import type { TableProxy, WasmSchema } from 'jazz-tools'
+import type { JazzClient } from 'jazz-tools/client'
+
+import type { DynamicTableRow } from '@tables/tableTypes'
 
 interface UseTableMutationExecutorOptions {
   client: JazzClient | null
@@ -19,6 +21,10 @@ interface UseTableMutationExecutorOptions {
  * The hook converts stored runtime schema metadata into a dynamic Jazz table proxy, then
  * exposes mutation commands. For example, an update `{ name: "Grace" }` reaches Jazz as a
  * one-column patch; this hook never reconstructs the rest of the row.
+ *
+ * Each write waits for edge durability so the mutation ledger advances only after server
+ * acceptance. Branch-aware mutations remain incomplete because this executor supplies no
+ * operation-scoped head or base options.
  */
 export function useTableMutationExecutor({
   client,

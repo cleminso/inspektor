@@ -17,7 +17,9 @@ import {
 import { RowEditorFields, useRowEditorFields } from '@tables/rowEditor/editorFields'
 import type { RowDraftController } from '@tables/rowEditor/mutation/useRowDraftController'
 import { buildRowMutationValueProjection } from '@tables/rowEditor/mutation/draft'
+import { RowProvenanceFields } from '@tables/rowEditor/provenanceFields'
 import { createRowJsonViewValue } from '@tables/rowEditor/values/jsonView'
+import { TABLE_PROVENANCE_COLUMNS } from '@tables/tableProvenance'
 
 interface EditRowFormProps {
   draftController: RowDraftController
@@ -27,7 +29,7 @@ interface EditRowFormProps {
   schemaColumns: ColumnDescriptor[]
 }
 
-export type RowRepresentation = 'details' | 'json'
+export type RowRepresentation = 'details' | 'json' | 'provenance'
 
 const defaultFindOptions: FindBarSearchOptions = {
   caseSensitive: false,
@@ -51,7 +53,10 @@ function RowJsonRepresentation({
   })
   const value = useMemo(() => {
     const projection = buildRowMutationValueProjection(draftController.state.draft, schemaColumns)
-    return createRowJsonViewValue({ ...rowValues, ...projection.displayValues }, schemaColumns)
+    return createRowJsonViewValue(
+      { ...rowValues, ...projection.displayValues },
+      [...schemaColumns, ...TABLE_PROVENANCE_COLUMNS],
+    )
   }, [draftController.state.draft, rowValues, schemaColumns])
   const findState: FindBarState =
     searchQuery.length === 0
@@ -121,6 +126,24 @@ function RowJsonRepresentation({
   )
 }
 
+function RowProvenanceRepresentation({
+  rowValues,
+}: Pick<EditRowFormProps, 'rowValues'>): React.ReactElement {
+  return (
+    <Box
+      height="full"
+      minHeight={0}
+      px="m"
+      py="m"
+      pr="l"
+    >
+      <ScrollArea>
+        <RowProvenanceFields rowValues={rowValues} />
+      </ScrollArea>
+    </Box>
+  )
+}
+
 export function EditRowForm({
   draftController,
   onRepresentationChange,
@@ -160,6 +183,7 @@ export function EditRowForm({
         >
           <ToggleGroup.Item value="details">Details</ToggleGroup.Item>
           <ToggleGroup.Item value="json">JSON</ToggleGroup.Item>
+          <ToggleGroup.Item value="provenance">Provenance</ToggleGroup.Item>
         </ToggleGroup>
       </Box>
       {representation === 'details' ? (
@@ -215,12 +239,14 @@ export function EditRowForm({
             </ScrollArea>
           </Box>
         </Box>
-      ) : (
+      ) : representation === 'json' ? (
         <RowJsonRepresentation
           draftController={draftController}
           rowValues={rowValues}
           schemaColumns={schemaColumns}
         />
+      ) : (
+        <RowProvenanceRepresentation rowValues={rowValues} />
       )}
     </Box>
   )

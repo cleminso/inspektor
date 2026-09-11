@@ -125,7 +125,7 @@ describe('RowEditorSidePanel dirty transitions', () => {
       </RowEditorSidePanel>,
     )
 
-    const closeButton = screen.getByRole('button', { name: 'Close editor' })
+    const closeButton = screen.getByRole('button', { name: 'Close' })
     const footer = closeButton.closest('footer')
 
     expect(footer).toBeTruthy()
@@ -152,7 +152,7 @@ describe('RowEditorSidePanel dirty transitions', () => {
       </RowEditorSidePanel>,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close editor' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
 
     expect(onClose).toHaveBeenCalledOnce()
     expect(screen.queryByRole('button', { name: 'Stage deletion' })).toBeNull()
