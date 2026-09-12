@@ -915,6 +915,10 @@ through the behavior discussion. Detailed acceptance rules remain in
 
 ### Compact grid value presentation
 
+[12/09/26]
+
+- [x] Start-align Integer, BigInt, and Double values while retaining monospace typography and tabular numerals.
+
 [05/08/26]
 
 - [x] Delegate text overflow to value renderers instead of imposing end truncation from the generic cell.

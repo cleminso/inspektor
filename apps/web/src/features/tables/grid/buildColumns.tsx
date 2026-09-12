@@ -137,13 +137,12 @@ function CompactCellValue({
   if (presentation.kind === 'number') {
     return (
       <Box
-        justifyContent="end"
+        justifyContent="start"
         width="full"
       >
         <Text
           as="span"
-          align="right"
-          data-cell-alignment="end"
+          data-cell-alignment="start"
           data-cell-typography="mono"
           data-numeric-variant="tabular"
           monospace

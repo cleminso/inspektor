@@ -616,7 +616,7 @@ describe('buildDataGridColumns', () => {
     ).toBe('true')
   })
 
-  it('renders explicit compact primitive states and aligns numbers', () => {
+  it('renders explicit compact primitive states and start-aligns numbers', () => {
     render(
       <TestTable
         columns={[
@@ -657,7 +657,7 @@ describe('buildDataGridColumns', () => {
 
     expect(screen.getByText('""')).toBeTruthy()
     expect(screen.getByText('NULL')).toBeTruthy()
-    expect(screen.getByText('42').getAttribute('data-cell-alignment')).toBe('end')
+    expect(screen.getByText('42').getAttribute('data-cell-alignment')).toBe('start')
     expect(screen.getByText('false')).toBeTruthy()
     expect(screen.getByLabelText('Boolean false')).toBeTruthy()
   })
