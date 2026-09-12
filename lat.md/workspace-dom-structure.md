@@ -26,6 +26,8 @@ Setting `view=schema` makes the route search non-base. `TableTabsProvider` recon
 - The compact `DataGrid` and loaded-row footer.
 - The deferred row editor when insert or edit mode is active.
 
+The toolbar keeps filter clauses in their bounded horizontal viewport. At narrower data-panel widths, filters move above the trailing pagination and action groups; those trailing groups wrap independently when needed.
+
 The schema action uses the route search setter. Tab creation remains owned by `TableTabsProvider` rather than the toolbar.
 
 `useTableViewState` connects URL-backed filters and sorting, [[tableRowsQueryLifecycle#Table row query lifecycle|Jazz row queries]], persisted column preferences, TanStack Table state, selection, and row-editor state.

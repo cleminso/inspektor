@@ -27,7 +27,7 @@ The web application assigns infrastructure, product behavior, route adapters, an
 - `routes` contain TanStack Router adapters. Routes declare loaders, search validation, and route composition, then delegate product and runtime behavior to their owners.
 - `shared` contains code with multiple existing owners. It is not a staging area for code that might become shared.
 
-The connected header and footer chrome belong to `app/shell` and follow [[shellLayout#Shell Layout ownership|Shell Layout ownership]]. The header contains connection context and theme controls; workspace navigation controls live in the footer. The design system owns generic shell geometry and dock mechanics. `app/shell` owns the universal Inspektor layout preference, storage migration, and product controls. Tables and Live queries compose their content into shell regions without owning shell state.
+The connected header and footer chrome belong to `app/shell` and follow [[shellLayout#Shell Layout ownership|Shell Layout ownership]]. The header contains connection context and theme controls; connection and schema context wrap only when their available region cannot contain both groups, while the theme control remains at the end. Workspace navigation controls live in the footer. The design system owns generic shell geometry and dock mechanics. `app/shell` owns the universal Inspektor layout preference, storage migration, and product controls. Tables and Live queries compose their content into shell regions without owning shell state.
 
 ## Implemented structure
 

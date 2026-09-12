@@ -258,8 +258,10 @@ Field type and active pane state determine whether activation opens a field edit
 The footer `Close` action and Escape use the same row-pane dismissal behavior:
 
 - with a row pane open, dismissal closes the pane and unchecks every checked row
+- row-pane dismissal returns focus to the checkbox for the focused row
+- insert-pane dismissal returns focus to the persistent toolbar `Insert row` action
 - clearing the checked rows closes selection-only widget state; staged changes keep the mutation widget available
-- without a pane open, Escape clears cell selection, cell focus, and column focus
+- without a pane open, Escape clears cell selection, semantic cell focus, and column focus while retaining DOM focus on the current grid cell
 
 Row-pane dismissal preserves valid staged fields and recoverable invalid input while clearing the checked rows. Staged changes
 are removed only through entry removal or the table-scoped `Discard` action.

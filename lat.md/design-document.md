@@ -835,7 +835,8 @@ focused row unless explicitly labelled as bulk actions.
 Insert remains a separate pane mode with direct `Insert`, `Discard`, and `Insert more` controls. Successful `Insert more` resets
 and retains the form; insert drafts never enter the pending ledger. Unless an open nested control consumes Escape first, Escape
 closes an open row pane and unchecks every checked row while preserving staged changes. Clearing the checked rows closes
-selection-only widget state. With no pane open, Escape clears cell selection, cell focus, and column focus.
+selection-only widget state. Pane dismissal restores focus to its persistent trigger. With no pane open, Escape clears semantic
+selection and focus state while retaining DOM focus on the current grid cell.
 
 Closing a pane through Escape unchecks every checked row. Filter, sort, table, schema, or direct page changes clear row and cell
 selections. Pane-owned row navigation may cross a page boundary while retaining the pane and checking the destination row. Column

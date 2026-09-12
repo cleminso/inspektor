@@ -16,6 +16,11 @@ This checklist records the reusable application-shell geometry, dock controls, a
 
 ## Implemented foundation
 
+[11/09/26]
+
+- [x] Stack connection and schema context only when their available header width cannot contain both groups.
+- [x] Hide the inline context separator while the switchers are stacked.
+
 [03/09/26]
 
 - [x] Float every shell region within an extra-small canvas inset.
@@ -51,6 +56,10 @@ This checklist records the reusable application-shell geometry, dock controls, a
 
 ## Settled interaction decisions
 
+[11/09/26]
+
+- The header keeps both context groups inline while they fit, then places connection context above schema context and keeps the theme control aligned to the end.
+
 [01/09/26]
 
 - Dock geometry is one universal Inspektor preference.
@@ -65,6 +74,12 @@ This checklist records the reusable application-shell geometry, dock controls, a
 - None.
 
 ## Validation checklist
+
+[11/09/26]
+
+- [x] Add browser regression coverage for the inline and wrapped header-context states.
+- [x] Run Inspektor lint and typecheck.
+- [ ] Verify compact header geometry in both color schemes after browser fixture seeding is operational.
 
 [03/09/26]
 

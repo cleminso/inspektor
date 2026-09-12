@@ -2,9 +2,30 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { useMemo } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { AppHotkeysProvider, useAppCommandPalette, useAppCommands } from './appHotkeys'
+import {
+  AppHotkeysProvider,
+  useAppCommandPalette,
+  useAppCommands,
+  type AppCommand,
+} from './appHotkeys'
 
 afterEach(cleanup)
+
+async function renderPaletteCommand(command: AppCommand): Promise<HTMLElement> {
+  function RegisteredCommand(): React.ReactElement {
+    const commands = useMemo(() => [command], [])
+    useAppCommands(commands)
+    return <div>Content</div>
+  }
+
+  render(
+    <AppHotkeysProvider>
+      <RegisteredCommand />
+    </AppHotkeysProvider>,
+  )
+  fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
+  return screen.findByRole('combobox', { name: 'Search commands' })
+}
 
 describe('AppHotkeysProvider', () => {
   it('opens the command palette with Mod+K from an input and executes a registered command', async () => {
@@ -50,6 +71,41 @@ describe('AppHotkeysProvider', () => {
 
     expect(perform).toHaveBeenCalledTimes(1)
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Commands' })).toBeNull())
+  })
+
+  it.each([
+    { code: 'KeyN', hotkey: 'Alt+N' as const, key: 'Dead' },
+    { code: 'KeyW', hotkey: 'Alt+W' as const, key: '∑' },
+    { code: 'KeyI', hotkey: 'Alt+I' as const, key: 'Dead' },
+  ])('executes $hotkey from the focused palette input', async ({ code, hotkey, key }) => {
+    const perform = vi.fn()
+    const input = await renderPaletteCommand({
+      hotkey,
+      id: 'test-command',
+      label: 'Run test command',
+      perform,
+    })
+    fireEvent.change(input, { target: { value: 'No matching command' } })
+    expect(screen.getByText('No matching commands.')).toBeTruthy()
+
+    expect(fireEvent.keyDown(input, { altKey: true, code, key })).toBe(false)
+    expect(perform).toHaveBeenCalledOnce()
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Commands' })).toBeNull())
+  })
+
+  it('prevents a disabled palette shortcut from entering text without executing it', async () => {
+    const perform = vi.fn()
+    const input = await renderPaletteCommand({
+      disabled: true,
+      hotkey: 'Alt+I',
+      id: 'test-command',
+      label: 'Run test command',
+      perform,
+    })
+
+    expect(fireEvent.keyDown(input, { altKey: true, code: 'KeyI', key: 'Dead' })).toBe(false)
+    expect(perform).not.toHaveBeenCalled()
+    expect(screen.getByRole('dialog', { name: 'Commands' })).toBeTruthy()
   })
 
   it('orders Actions before Tables and preserves the order of remaining groups', async () => {

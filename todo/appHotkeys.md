@@ -13,6 +13,8 @@
 
 [11/09/26]
 
+- [x] Execute displayed action shortcuts while focus remains in the command palette.
+- [x] Prevent macOS Option dead keys from entering the command query when they match an action shortcut.
 - [x] Group workspace commands under `Actions` and keep that group before `Tables` regardless of registration order.
 
 [05/09/26]
@@ -96,6 +98,8 @@
 
 [11/09/26]
 
+- [x] Treat displayed shortcuts as palette accelerators even when the command query filters out their item.
+- [x] Consume disabled palette accelerators without executing them or inserting text.
 - [x] Keep command groups in the order `Actions`, `Tables`, then any remaining groups in registration order.
 
 [05/09/26]
@@ -147,6 +151,7 @@
 
 [11/09/26]
 
+- [x] Cover palette accelerators with macOS dead-key and transformed-key event shapes.
 - [x] Cover command-group priority independently from command registration order.
 
 [05/09/26]

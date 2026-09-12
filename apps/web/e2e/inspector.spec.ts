@@ -44,6 +44,52 @@ test('connects through the form and restores the connection after reload', async
   )
 })
 
+test('wraps header context only after its controls stop fitting', async ({ page }) => {
+  await page.setViewportSize({ width: 636, height: 800 })
+  await connectToFixture(page)
+
+  const connectionTrigger = page.getByRole('combobox', { name: 'Switch connection' })
+  const schemaTrigger = page.getByRole('combobox', { name: /^Switch schema/u })
+  const themeSwitch = page.getByRole('button', { name: /^Switch to (dark|light) theme$/u })
+  const header = page.getByRole('banner')
+  const [wideConnectionBox, wideSchemaBox, wideThemeBox, headerBox] = await Promise.all([
+    connectionTrigger.boundingBox(),
+    schemaTrigger.boundingBox(),
+    themeSwitch.boundingBox(),
+    header.boundingBox(),
+  ])
+
+  expect(wideConnectionBox).not.toBeNull()
+  expect(wideSchemaBox).not.toBeNull()
+  expect(wideThemeBox).not.toBeNull()
+  expect(headerBox).not.toBeNull()
+  expect(wideSchemaBox!.y).toBeCloseTo(wideConnectionBox!.y, 0)
+  expect(
+    headerBox!.x + headerBox!.width - (wideThemeBox!.x + wideThemeBox!.width),
+  ).toBeLessThanOrEqual(8)
+
+  await page.setViewportSize({ width: 360, height: 800 })
+  const [compactConnectionBox, compactSchemaBox, compactThemeBox, compactHeaderBox] =
+    await Promise.all([
+      connectionTrigger.boundingBox(),
+      schemaTrigger.boundingBox(),
+      themeSwitch.boundingBox(),
+      header.boundingBox(),
+    ])
+
+  expect(compactConnectionBox).not.toBeNull()
+  expect(compactSchemaBox).not.toBeNull()
+  expect(compactThemeBox).not.toBeNull()
+  expect(compactHeaderBox).not.toBeNull()
+  expect(compactSchemaBox!.y).toBeGreaterThanOrEqual(
+    compactConnectionBox!.y + compactConnectionBox!.height,
+  )
+  expect(
+    compactHeaderBox!.x + compactHeaderBox!.width - (compactThemeBox!.x + compactThemeBox!.width),
+  ).toBeLessThanOrEqual(8)
+  await expect(page.getByText('/', { exact: true })).toBeHidden()
+})
+
 test('keeps one centered loading view until the first table rows settle', async ({ page }) => {
   let releaseWasm: () => void = () => undefined
   const wasmRelease = new Promise<void>((resolve) => {
@@ -441,6 +487,26 @@ test('filters and sorts real fixture rows', async ({ page }) => {
   await expect(table).not.toContainText('Optional values null')
 })
 
+test('wraps crowded table toolbar groups without overlap', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 800 })
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+  await page.getByRole('button', { name: 'Insert row' }).click()
+  await expect(page.getByRole('button', { name: 'Insert', exact: true })).toBeVisible()
+
+  await expectFilterToolbarAboveControls(page)
+
+  await page.getByRole('button', { name: 'Filter table' }).click()
+  await page.getByRole('option', { name: 'label', exact: true }).click()
+  await page.getByRole('option', { name: 'Equals', exact: true }).click()
+  const filterValue = page.getByRole('combobox', { name: 'Filter value' })
+  await filterValue.fill('Optional values populated')
+  await filterValue.press('Enter')
+  await page.getByRole('combobox', { name: 'Filter columns' }).press('Enter')
+
+  await expectFilterToolbarAboveControls(page)
+})
+
 test('keeps nullable Enum selection and NULL intent in one field control', async ({ page }) => {
   await connectToFixture(page)
   await openTable(page, 'columnTypeShowcase')
@@ -700,6 +766,47 @@ test('clears all checked rows when closing the row pane', async ({ page }) => {
 
   await expect(firstRow).not.toBeChecked()
   await expect(secondRow).not.toBeChecked()
+  await expect(secondRow).toBeFocused()
+})
+
+test('restores table focus after Escape dismisses pane and selection state', async ({ page }) => {
+  await connectToFixture(page)
+  await openTable(page, 'columnTypeShowcase')
+
+  const insertRow = page.getByRole('button', { name: 'Insert row' })
+  await insertRow.click()
+  await page.getByRole('button', { name: 'Open commands' }).click()
+  await page.getByRole('option', { name: 'Insert row' }).click()
+  await expect(page.locator('[data-slot="row-editor-body"]')).toHaveCount(0)
+  await expect(insertRow).toBeFocused()
+
+  await insertRow.click()
+  await page.locator('[data-slot="row-editor-body"] input:not([disabled])').first().focus()
+  await page.keyboard.press('Escape')
+
+  await expect(page.locator('[data-slot="row-editor-body"]')).toHaveCount(0)
+  await expect(insertRow).toBeFocused()
+
+  const row = page.getByRole('row', {
+    name: /Select row 30000000-0000-4000-8000-000000000001/u,
+  })
+  const rowCheckbox = row.getByRole('checkbox', {
+    name: 'Select row 30000000-0000-4000-8000-000000000001',
+  })
+  await rowCheckbox.click()
+  await page.locator('[data-slot="row-editor-body"] input:not([disabled])').first().focus()
+  await page.keyboard.press('Escape')
+
+  await expect(page.locator('[data-slot="row-editor-body"]')).toHaveCount(0)
+  await expect(rowCheckbox).toBeFocused()
+
+  const cell = await getCellByColumn(page, row, 'label')
+  await cell.click()
+  await expect(cell).toBeFocused()
+  await page.keyboard.press('Escape')
+
+  await expect(cell).toBeFocused()
+  await expect(cell).not.toHaveAttribute('data-cell-selected')
 })
 
 test('moves a single checked row with the row pane navigation and keeps it visible', async ({
@@ -819,6 +926,30 @@ function requiredEnvironmentValue(name: string): string {
   const value = process.env[name]
   if (value === undefined) throw new Error(`Missing ${name}`)
   return value
+}
+
+async function expectFilterToolbarAboveControls(page: Page): Promise<void> {
+  const filterToolbar = page.getByRole('toolbar', { name: 'Table filters' })
+  const pageSize = page.getByRole('combobox', { name: 'Rows per page' })
+  const insertRow = page.getByRole('button', { name: 'Insert row' })
+  const [filterBox, pageSizeBox, insertRowBox] = await Promise.all([
+    filterToolbar.boundingBox(),
+    pageSize.boundingBox(),
+    insertRow.boundingBox(),
+  ])
+
+  expect(filterBox).not.toBeNull()
+  expect(pageSizeBox).not.toBeNull()
+  expect(insertRowBox).not.toBeNull()
+  expect(filterBox!.y + filterBox!.height).toBeLessThanOrEqual(
+    Math.min(pageSizeBox!.y, insertRowBox!.y) + 1,
+  )
+  expect(
+    pageSizeBox!.x < insertRowBox!.x + insertRowBox!.width &&
+      pageSizeBox!.x + pageSizeBox!.width > insertRowBox!.x &&
+      pageSizeBox!.y < insertRowBox!.y + insertRowBox!.height &&
+      pageSizeBox!.y + pageSizeBox!.height > insertRowBox!.y,
+  ).toBe(false)
 }
 
 function fixtureConnection(): FixtureConnection {

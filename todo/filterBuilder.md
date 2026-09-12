@@ -12,6 +12,14 @@
 
 ## Implemented foundation
 
+### Responsive toolbar composition
+
+[11/09/26]
+
+- [x] Keep filters in the flexible toolbar region while moving pagination and actions to a wrapping trailing group.
+- [x] Stack the filter and trailing groups at compact viewport widths.
+- [x] Let the toolbar wrap from its available panel width when a wide viewport contains a narrow data panel.
+
 ### Cell context filter action
 
 [21/08/26]
@@ -349,6 +357,14 @@
 
 ## Settled interaction decisions
 
+### Responsive toolbar composition
+
+[11/09/26]
+
+- [x] Preserve clause-list horizontal scrolling and keep `Add more filters` reachable within the filter row.
+- [x] Keep pagination and actions together when space allows, then wrap those groups independently at smaller widths.
+- [x] Supersede the unconditional stable-height row: preserve one row while all groups fit, then add rows instead of allowing groups to overlap.
+
 ### Clause deletion cancellation
 
 [19/08/26]
@@ -505,6 +521,14 @@
 None.
 
 ## Validation checklist
+
+### Responsive toolbar composition
+
+[11/09/26]
+
+- [x] Add browser regression coverage for empty and populated filters in a data panel constrained by the row editor.
+- [x] Run Inspektor lint and typecheck.
+- [ ] Verify compact toolbar geometry in the browser fixture after fixture seeding is operational.
 
 ### Cell context filter action
 

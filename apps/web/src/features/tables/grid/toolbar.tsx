@@ -232,26 +232,43 @@ export function Toolbar({ actions, children, pagination }: ToolbarProps): React.
     <Box
       width="full"
       flexShrink={0}
-      alignItems="center"
+      alignItems={{ base: 'stretch', md: 'center' }}
+      flexDirection={{ base: 'column', md: 'row' }}
+      flexWrap="wrap"
       gap="s"
       paddingVertical="s"
       paddingHorizontal="xs"
       backgroundColor="surface-background"
     >
       <Box
-        minWidth={0}
+        minWidth={{ base: 0, md: 'grid-track-m' }}
         flex={1}
       >
         {children}
       </Box>
       <Box
+        maxWidth="full"
         flexShrink={0}
+        flexWrap="wrap"
         alignItems="center"
+        justifyContent="end"
         gap="s"
+        ml={{ md: 'auto' }}
       >
-        {pagination}
+        <Box
+          flexShrink={0}
+          alignItems="center"
+        >
+          {pagination}
+        </Box>
+        <Box
+          flexShrink={0}
+          alignItems="center"
+          gap="s"
+        >
+          {actions}
+        </Box>
       </Box>
-      {actions}
     </Box>
   )
 }

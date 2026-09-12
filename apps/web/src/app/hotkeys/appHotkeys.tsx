@@ -1,6 +1,7 @@
 import { Command, KeyboardInput } from '@inspektor/ds'
 import {
   HotkeysProvider,
+  matchesKeyboardEvent,
   useHotkey,
   type Hotkey,
   type HotkeysProviderOptions,
@@ -152,6 +153,35 @@ function AppCommandPalette({
     },
     [onOpenChange],
   )
+  useEffect(() => {
+    if (open === false) {
+      return
+    }
+
+    const handlePaletteHotkey = (event: KeyboardEvent) => {
+      if (event.defaultPrevented === true || event.isComposing === true) {
+        return
+      }
+      const command = commands.find(
+        (candidate) =>
+          candidate.hotkey !== undefined && matchesKeyboardEvent(event, candidate.hotkey),
+      )
+      if (command === undefined) {
+        return
+      }
+
+      event.preventDefault()
+      event.stopPropagation()
+      if (event.repeat === true || command.disabled === true) {
+        return
+      }
+      command.perform()
+      handleOpenChange(false)
+    }
+
+    document.addEventListener('keydown', handlePaletteHotkey, true)
+    return () => document.removeEventListener('keydown', handlePaletteHotkey, true)
+  }, [commands, handleOpenChange, open])
   const renderCommand = (command: AppCommand) => (
     <Command.Item
       key={command.id}

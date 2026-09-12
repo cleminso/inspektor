@@ -54,8 +54,8 @@ describe('TableHotkeys', () => {
       </AppHotkeysProvider>,
     )
 
-    fireEvent.keyDown(document, { altKey: true, key: 'n' })
-    fireEvent.keyDown(document, { altKey: true, key: 'w' })
+    fireEvent.keyDown(document, { altKey: true, code: 'KeyN', key: 'Dead' })
+    fireEvent.keyDown(document, { altKey: true, code: 'KeyW', key: '∑' })
     fireEvent.keyDown(document, { altKey: true, key: '[' })
     fireEvent.keyDown(document, { altKey: true, key: ']' })
 

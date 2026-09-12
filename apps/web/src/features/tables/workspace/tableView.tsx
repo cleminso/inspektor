@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import {
   Box,
@@ -60,6 +68,8 @@ import { createTableScope } from '@tables/workspace/scope'
 interface TableViewProps {
   tableName: string
 }
+
+type PaneFocusReturn = { kind: 'insert' } | { kind: 'row'; rowId: TableRowId }
 
 function RowEditorStatus({ label }: { label: string }): React.ReactElement {
   return (
@@ -197,6 +207,10 @@ function TableViewContent({
 
   const { openSchemaView } = useTableTabs()
   const gridHotkeyTargetRef = useRef<HTMLDivElement>(null)
+  const insertRowButtonRef = useRef<HTMLButtonElement>(null)
+  const paneFocusReturnRef = useRef<PaneFocusReturn | null>(null)
+  const pendingPaletteFocusReturnRef = useRef<MutationObserver | null>(null)
+  const previousDetailPaneModeRef = useRef(state.detailPaneMode)
   const gridHotkeyOptions = { ...appHotkeyOptions, target: gridHotkeyTargetRef }
   const mutationApplying = mutations.execution.status === 'applying'
   const canOpenInsert = state.canOpenRowEditor === true && mutationApplying === false
@@ -422,6 +436,56 @@ function TableViewContent({
   )
   const { canOpenRowEditor, closeRowEditor, detailPaneMode, rowEditor } = state
   const { openInsert } = rowEditor
+  const focusPaneReturn = useCallback(() => {
+    const focusReturn = paneFocusReturnRef.current
+    if (focusReturn === null) {
+      return
+    }
+    const restoreFocus = () => {
+      const target =
+        focusReturn.kind === 'insert'
+          ? insertRowButtonRef.current
+          : (Array.from(
+              gridHotkeyTargetRef.current?.querySelectorAll<HTMLElement>('[aria-label]') ?? [],
+            ).find(
+              (element) =>
+                element.getAttribute('aria-label') === `Select row ${focusReturn.rowId}`,
+            ) ?? null)
+      if (target?.isConnected === true) {
+        target.focus()
+      }
+    }
+    restoreFocus()
+    if (document.querySelector('[role="dialog"] [data-slot="command"]') !== null) {
+      pendingPaletteFocusReturnRef.current?.disconnect()
+      const observer = new MutationObserver(() => {
+        if (document.querySelector('[role="dialog"] [data-slot="command"]') === null) {
+          observer.disconnect()
+          pendingPaletteFocusReturnRef.current = null
+          restoreFocus()
+        }
+      })
+      pendingPaletteFocusReturnRef.current = observer
+      observer.observe(document.body, { childList: true, subtree: true })
+    }
+  }, [])
+  useEffect(() => {
+    return () => pendingPaletteFocusReturnRef.current?.disconnect()
+  }, [])
+  useLayoutEffect(() => {
+    const previousDetailPaneMode = previousDetailPaneModeRef.current
+    if (detailPaneMode === 'insert') {
+      pendingPaletteFocusReturnRef.current?.disconnect()
+      paneFocusReturnRef.current = { kind: 'insert' }
+    } else if (detailPaneMode === 'rows' && rowEditor.activeRowId !== null) {
+      pendingPaletteFocusReturnRef.current?.disconnect()
+      paneFocusReturnRef.current = { kind: 'row', rowId: rowEditor.activeRowId }
+    } else if (previousDetailPaneMode !== 'closed') {
+      focusPaneReturn()
+      paneFocusReturnRef.current = null
+    }
+    previousDetailPaneModeRef.current = detailPaneMode
+  }, [detailPaneMode, focusPaneReturn, rowEditor.activeRowId])
   const openInsertPane = useCallback(() => {
     setInsertMoreEnabled(false)
     openInsert()
@@ -499,7 +563,13 @@ function TableViewContent({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && event.defaultPrevented === false) {
+      if (
+        event.key === 'Escape' &&
+        event.defaultPrevented === false &&
+        event.isComposing === false
+      ) {
+        event.preventDefault()
+        event.stopPropagation()
         handleEscape()
       }
     }
@@ -559,6 +629,7 @@ function TableViewContent({
                     <Tooltip.Trigger
                       render={
                         <Button
+                          ref={insertRowButtonRef}
                           type="button"
                           variant="primary"
                           size="s"
@@ -743,7 +814,7 @@ function TableViewContent({
                 insertMoreEnabled={insertMoreEnabled}
                 mutationDisabled={state.canMutateRows === false || mutationApplying}
                 navigationLabel={state.rowEditor.navigationLabel}
-                onClose={state.closeRowEditor}
+                onClose={closeRowEditor}
                 onConfirmDelete={(rowIds) => {
                   mutations.stageDeletions(rowIds)
                   state.handleRowsStagedForDeletion(rowIds)
@@ -762,7 +833,7 @@ function TableViewContent({
                     saveDisabled={state.canMutateRows === false || mutationApplying}
                     onClose={() => {
                       setInsertMoreEnabled(false)
-                      state.closeRowEditor()
+                      closeRowEditor()
                     }}
                     onSave={async (values, options) => {
                       await state.handleInsertSave(values, options)

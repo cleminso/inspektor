@@ -527,13 +527,6 @@ export function useTableViewState({
       return
     }
 
-    const activeElement = document.activeElement
-    if (
-      activeElement instanceof HTMLElement &&
-      activeElement.closest('[data-slot="data-grid-cell"]') !== null
-    ) {
-      activeElement.blur()
-    }
     setCellSelection([])
     setActiveColumnId(null)
   }

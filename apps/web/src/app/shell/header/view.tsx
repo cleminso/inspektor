@@ -23,26 +23,40 @@ export function InspectorHeader(): React.ReactElement {
         minWidth={0}
         flex={1}
         alignItems="center"
+        flexWrap="wrap"
         gap="xxs"
       >
-        <ConnectionSwitcher />
         <Box
-          as="span"
-          ml="xs"
+          maxWidth="full"
+          flexShrink={0}
         >
-          <Text
-            as="span"
-            color="muted"
-            aria-hidden="true"
-          >
-            /
-          </Text>
+          <ConnectionSwitcher />
         </Box>
-        <SchemaSwitcher width="m" />
+        <Box
+          maxWidth="full"
+          flexShrink={0}
+          alignItems="center"
+          gap="xxs"
+        >
+          <Box
+            as="span"
+            display={{ base: 'none', sm: 'flex' }}
+            ml="xs"
+          >
+            <Text
+              as="span"
+              color="muted"
+              aria-hidden="true"
+            >
+              /
+            </Text>
+          </Box>
+          <SchemaSwitcher width="m" />
+        </Box>
       </Box>
 
       <Box
-        flex={1}
+        flexShrink={0}
         justifyContent="end"
       >
         <ThemeSwitch

@@ -38,6 +38,7 @@ const tableViewState = vi.hoisted(() => ({
   pageSize: 100,
   recentlyAppliedCells: {} as Readonly<Record<string, ReadonlySet<string>>>,
   recentlyInsertedRowIds: new Set<string>() as ReadonlySet<string>,
+  renderRowCheckbox: true,
   reorderableColumnIds: [] as string[],
   rowEditor: {
     activeRowId: null as string | null,
@@ -295,7 +296,12 @@ vi.mock('@tables/grid/toolbar', () => ({
 vi.mock('@tables/rowEditor/editForm', () => ({
   EditRowForm: (props: Record<string, unknown>) => {
     editRowFormProps.current = props
-    return <div>Edit row fields</div>
+    return (
+      <label>
+        Edit row fields
+        <input aria-label="Edit row fields" />
+      </label>
+    )
   },
 }))
 
@@ -406,6 +412,9 @@ vi.mock('@inspektor/ds', () => {
     onRowContextMenu?: (rowId: string, event: unknown) => void
   }) => (
     <div>
+      {tableViewState.renderRowCheckbox === true ? (
+        <input type="checkbox" aria-label="Select row row-1" />
+      ) : null}
       <div data-testid="row-1-status">{getRowStatus?.({ id: 'row-1' })}</div>
       <div data-testid="row-1-name-status">
         {getCellStatus?.({ column: { id: 'name' }, row: { id: 'row-1' } })}
@@ -441,23 +450,25 @@ vi.mock('@inspektor/ds', () => {
     </div>
   )
 
-  const Button = ({
-    'aria-label': ariaLabel,
-    children,
-    disabled,
-    onClick,
-    type = 'button',
-  }: {
-    'aria-label'?: string
-    children?: ReactNode
-    disabled?: boolean
-    onClick?: () => void
-    type?: 'button' | 'submit' | 'reset'
-  }) => (
-    <button aria-label={ariaLabel} disabled={disabled} onClick={onClick} type={type}>
-      {children}
-    </button>
-  )
+  const Button = forwardRef<
+    HTMLButtonElement,
+    {
+      'aria-label'?: string
+      children?: ReactNode
+      disabled?: boolean
+      onClick?: () => void
+      type?: 'button' | 'submit' | 'reset'
+    }
+  >(function Button(
+    { 'aria-label': ariaLabel, children, disabled, onClick, type = 'button' },
+    ref,
+  ) {
+    return (
+      <button ref={ref} aria-label={ariaLabel} disabled={disabled} onClick={onClick} type={type}>
+        {children}
+      </button>
+    )
+  })
 
   const CommandItem = ({
     children,
@@ -552,6 +563,7 @@ afterEach(() => {
   mutationLedgerEntries.length = 0
   tableViewState.recentlyAppliedCells = {}
   tableViewState.recentlyInsertedRowIds = new Set()
+  tableViewState.renderRowCheckbox = true
   stagedFieldsByRowId.current = {}
   stagedValuesByRowId.current = {}
   mutationExecution.current = { error: null, status: 'idle' }
@@ -830,6 +842,40 @@ describe('TableView composition boundary', () => {
     renderTableView()
 
     expect(preloadCodeEditor).not.toHaveBeenCalled()
+  })
+
+  it('tracks the active row checkbox when it mounts after the pane opens', async () => {
+    tableViewState.detailPaneMode = 'rows'
+    tableViewState.rowEditor.activeRowId = 'row-1'
+    tableViewState.rowValues = { id: 'row-1', name: 'Ada' }
+    tableViewState.renderRowCheckbox = false
+    const { rerenderTableView } = renderTableView()
+
+    tableViewState.renderRowCheckbox = true
+    rerenderTableView()
+    const checkbox = await screen.findByRole('checkbox', { name: 'Select row row-1' })
+    tableViewState.closeRowEditor.mockImplementation(() => {
+      tableViewState.detailPaneMode = 'closed'
+      tableViewState.rowEditor.activeRowId = null
+      rerenderTableView()
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Close row editor' }))
+
+    expect(screen.queryByRole('textbox', { name: 'Edit row fields' })).toBeNull()
+    expect(document.activeElement).toBe(checkbox)
+  })
+
+  it('leaves composing and previously handled Escape events to the active pane control', () => {
+    tableViewState.detailPaneMode = 'insert'
+    renderTableView()
+    const field = screen.getByRole('textbox', { name: 'Insert row fields' })
+
+    fireEvent.keyDown(field, { isComposing: true, key: 'Escape' })
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    event.preventDefault()
+    field.dispatchEvent(event)
+
+    expect(tableViewState.handleEscape).not.toHaveBeenCalled()
   })
 
   it('connects owner state and actions through the composed table surface', async () => {
@@ -1165,7 +1211,7 @@ describe('TableView insert row hotkey', () => {
   it('opens the insert pane with Alt+I', () => {
     renderTableView()
 
-    fireEvent.keyDown(document, { altKey: true, key: 'i' })
+    fireEvent.keyDown(document, { altKey: true, code: 'KeyI', key: 'Dead' })
 
     expect(tableViewState.rowEditor.openInsert).toHaveBeenCalledTimes(1)
     expect(tableViewState.closeRowEditor).not.toHaveBeenCalled()

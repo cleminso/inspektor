@@ -1186,7 +1186,7 @@ through the behavior discussion. Detailed acceptance rules remain in
 - [ ] Implement Enter as the keyboard equivalent of opening a focused cell.
 - [ ] Implement Space and Shift+Space for focused row-checkbox selection.
 - [ ] Implement keyboard additive and range cell selection.
-- [ ] Define keyboard focus restoration after pane dismissal.
+- [x] Define keyboard focus restoration after pane dismissal.
 - [x] Provide a copy shortcut for the focused cell.
 - [ ] Provide copy shortcuts for selected cells.
 - [ ] Verify screen-reader announcements for focused cell, selection size, row position, and pane target.
