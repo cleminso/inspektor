@@ -73,6 +73,9 @@ function createInspectorRuntimeStore(
 
   const publishClientError = (error: unknown) => {
     $client.set(null)
+    if ($error.get() !== null) {
+      return
+    }
     const runtimeError = { source: 'client', error: normalizeRuntimeError(error) } as const
     $error.set(runtimeError)
     reportRuntimeError(runtimeError, sensitiveValues)
@@ -127,9 +130,11 @@ export function useInspectorRuntime({
       if (active === false) {
         return
       }
-      const runtimeError = { source: 'schema', error: normalizeRuntimeError(error) } as const
-      runtime.$error.set(runtimeError)
-      reportRuntimeError(runtimeError, [connection.adminSecret])
+      if (runtime.$error.get() === null) {
+        const runtimeError = { source: 'schema', error: normalizeRuntimeError(error) } as const
+        runtime.$error.set(runtimeError)
+        reportRuntimeError(runtimeError, [connection.adminSecret])
+      }
       runtime.$isWasmSchemaLoading.set(false)
     }
 

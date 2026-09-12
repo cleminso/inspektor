@@ -8,9 +8,11 @@ This table of contents links to the document sections.
 
 - [Purpose](#purpose)
 - [Ownership boundaries](#ownership-boundaries)
+- [Runtime readiness](#runtime-readiness)
 - [Execution flow](#execution-flow)
 - [Query construction](#query-construction)
 - [Subscription lifecycle](#subscription-lifecycle)
+- [Alpha.54 opening limitation](#alpha54-opening-limitation)
 - [Grid presentation states](#grid-presentation-states)
 - [Pagination and virtualization](#pagination-and-virtualization)
 - [Implementation map](#implementation-map)
@@ -18,7 +20,7 @@ This table of contents links to the document sections.
 
 ## Purpose
 
-As defined by [[tableExplorerBehaviors#Behavior model|the Table Explorer behavior model]], the Table Explorer starts its row query when the table view renders. The Inspektor runtime uses the in-memory Jazz driver, so inspected
+As defined by [[tableExplorerBehaviors#Behavior model|the Table Explorer behavior model]], the Table Explorer renders before runtime readiness and starts its row query when the verified schema and Jazz client are available. The Inspektor runtime uses the in-memory Jazz driver, so inspected
 
 admin data is not persisted to browser storage.
 
@@ -31,6 +33,16 @@ React hooks, Jazz orchestration, and DataGrid presentation each own a separate p
 - Jazz's `SubscriptionsOrchestrator` owns query-key generation, cache-entry reuse, subscription delivery, and reference counting.
 - `DataGrid` owns reusable loading, empty, complete-row, and virtual-row presentation without knowing about Jazz.
 
+## Runtime readiness
+
+Schema verification and admin-client creation overlap, but the table cannot query Jazz until both operations succeed.
+
+Accepted connection intent starts one best-effort WASM preparation. `RuntimeAdminClient` waits for that shared preparation before it creates the admin client, which avoids competing initialization while preserving concurrent schema and client startup.
+
+`RuntimeAdminClient` publishes the client only after the selected stored schema is verified. A schema failure, runtime replacement, or unmount retires the client attempt and shuts down any client that has resolved. The first fatal startup error remains the runtime error when concurrent work also fails.
+
+While either the client or schema is absent, `useTableRows` reports initial loading and `useJazzQueryState` does not register a subscription. `ConnectionContentBoundary` keeps the mounted workspace hidden until the first row query leaves its pending state.
+
 ## Execution flow
 
 The query flow resolves route state, subscribes through Jazz, and projects the result into product states.
@@ -41,13 +53,17 @@ The table route provides filters, sorting, page, and page size. `resolveTableRow
 
 before the query is built.
 
-### 2. Build and subscribe to the query
+### 2. Wait for runtime readiness
+
+`useTableRows` waits for the verified schema and published admin client. Missing prerequisites keep the table in initial loading without acquiring a Jazz cache entry.
+
+### 3. Build and subscribe to the query
 
 `useTableRows` calls `buildTableRowsQuery` with the resolved route state and `INSPEKTOR_QUERY_OPTIONS`. `useJazzQueryState` acquires the
 
 canonical Jazz cache entry and subscribes React to its state.
 
-### 3. Project query state into UI state
+### 4. Project query state into UI state
 
 `useJazzQueryState` exposes `idle`, `pending`, `fulfilled`, and `rejected` states. `useTableRows` derives the product states:
 
@@ -85,6 +101,18 @@ The rendered table acquires one canonical Jazz cache entry and releases it throu
 The rendered table owns its subscription through `useSyncExternalStore`. React calls the returned cleanup when the active query entry
 changes or the component unmounts. Page, page-size, filter, sort, schema, table, or client changes acquire the matching query entry.
 The Jazz subscription store decides how long an entry remains available after it is no longer active.
+
+## Alpha.54 opening limitation
+
+Jazz alpha.54 can publish a provisional empty opening from a fresh memory-backed admin client before remotely stored rows reach the maintained subscription.
+
+The alpha.54 subscription store marks the first delta as fulfilled, including an empty delta. Inspektor then leaves initial loading and renders its empty state. Later subscription deltas replace that transient empty result with the remote rows. The interface can therefore show an empty table between loading and populated rows.
+
+The alpha.54 public subscription result does not say whether an empty opening is local and provisional or confirmed by the remote authority. Inspektor cannot distinguish those states without inventing settlement semantics.
+
+An independent remote `db.all()` call is not a safe settlement signal. Jazz documents the maintained stream as the owner of the opening snapshot and later changes, and warns that a raced one-shot snapshot can be older than subscription deltas already delivered.
+
+Keep this behavior visible until a Jazz release makes remote subscription openings authority-settled. Do not replace it with a timeout, a second-callback assumption, or snapshot and subscription reconciliation.
 
 ## Grid presentation states
 
@@ -124,6 +152,10 @@ changes reset both scroll axes without remounting the viewport.
 
 These source modules implement route resolution, Jazz querying, state projection, controls, and grid rendering.
 
+- `apps/web/src/app/runtime/jazzWasmPreparation.ts`: shared best-effort WASM preparation.
+- `apps/web/src/app/providers/inspectorProvider.tsx`: concurrent client ownership and verified publication.
+- `apps/web/src/app/runtime/useInspectorRuntime.tsx`: schema, permissions, client, and error projections.
+- `apps/web/src/app/runtime/connectionContentBoundary.tsx`: mounted-content visibility boundary.
 - `apps/web/src/features/tables/routing/tableRowsSearch.ts`: route query-state resolution.
 - `apps/web/src/features/tables/query/queryOptions.ts`: Jazz query options and cache identity.
 - `apps/web/src/features/tables/query/tableRowsQuery.ts`: canonical row-query construction.
@@ -138,6 +170,9 @@ These source modules implement route resolution, Jazz querying, state projection
 These constraints preserve subscription cleanup, semantic table structure, and fixed density behavior.
 
 - Keep the default admin runtime non-persistent unless durable inspected-row caching becomes an explicit product option.
+- Do not serialize admin-client creation behind stored-schema verification. Gate client publication instead.
+- Shut down an admin client that resolves after failure, replacement, or unmount.
+- Do not reconcile Jazz one-shot snapshots with maintained subscription results without an upstream ordering boundary.
 - Release every rendered subscription through the cleanup function returned by Jazz.
 - Preserve one semantic table, one `colgroup`, one header, and one body for loading and resolved rows.
 - Keep virtual row estimates aligned with the fixed Data Grid density heights.

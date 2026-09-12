@@ -34,6 +34,32 @@ afterEach(() => {
 })
 
 describe('useInspectorRuntime', () => {
+  it('keeps the first fatal startup error when concurrent work also fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const schemaFailure = deferred<never>()
+    jazzMocks.fetchStoredWasmSchema.mockReturnValue(schemaFailure.promise)
+    jazzMocks.fetchStoredPermissions.mockReturnValue(new Promise(() => undefined))
+    const connection = {
+      id: 'connection-1',
+      name: 'Local app',
+      serverUrl: 'https://example.com',
+      appId: 'app-1',
+      adminSecret: 'secret',
+      env: 'dev',
+    } as const
+    const { result } = renderHook(() =>
+      useInspectorRuntime({ connection, branch: 'main', schemaHash: 'schema-1' }),
+    )
+    const clientError = new Error('Client failed')
+    const schemaError = new Error('Schema failed')
+
+    result.current.publishClientError(clientError)
+    schemaFailure.reject(schemaError)
+
+    await waitFor(() => expect(result.current.$isWasmSchemaLoading.get()).toBe(false))
+    expect(result.current.$error.get()).toEqual({ source: 'client', error: clientError })
+  })
+
   it('reruns runtime metadata when the retry generation changes', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     const schemaError = new Error('Failed once')

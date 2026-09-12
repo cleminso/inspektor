@@ -54,10 +54,11 @@ interface InspectorProviderProps extends PropsWithChildren {
 }
 
 /**
- * Owns one privileged Jazz client after stored schema verification.
+ * Owns one privileged Jazz client while stored schema verification runs in parallel.
  *
- * Stale resolutions and unmounts shut down the client because it owns runtime and worker resources.
- * Branch views belong to individual operations and do not participate in this client identity.
+ * Publication remains gated on verified schema state. Stale resolutions and unmounts shut down the
+ * client because it owns runtime and worker resources. Branch views belong to individual operations
+ * and do not participate in this client identity.
  */
 function RuntimeAdminClient({
   connection,
@@ -69,14 +70,17 @@ function RuntimeAdminClient({
   const isWasmSchemaLoading = useStore(runtime.$isWasmSchemaLoading)
   const wasmSchema = useStore(runtime.$wasmSchema)
   const runtimeError = useStore(runtime.$error)
+  const [client, setClient] = useState<JazzClient | null>(null)
 
   useEffect(() => {
-    if (isWasmSchemaLoading === true || wasmSchema === null || runtimeError !== null) {
+    if (runtimeError !== null) {
+      setClient(null)
       return
     }
 
     let active = true
-    let client: JazzClient | null = null
+    let ownedClient: JazzClient | null = null
+    setClient(null)
     void createInspectorAdminClient({
       appId: connection.appId,
       serverUrl: connection.serverUrl,
@@ -88,8 +92,8 @@ function RuntimeAdminClient({
           void createdClient.shutdown()
           return
         }
-        client = createdClient
-        runtime.publishClient(createdClient)
+        ownedClient = createdClient
+        setClient(createdClient)
       },
       (error: unknown) => {
         if (active === true) {
@@ -100,12 +104,25 @@ function RuntimeAdminClient({
 
     return () => {
       active = false
-      if (client !== null) {
-        runtime.clearClient(client)
-        void client.shutdown()
+      if (ownedClient !== null) {
+        void ownedClient.shutdown()
       }
     }
-  }, [connection, isWasmSchemaLoading, runtime, runtimeError, wasmSchema])
+  }, [connection, runtime, runtimeError])
+
+  useEffect(() => {
+    if (
+      client === null ||
+      isWasmSchemaLoading === true ||
+      wasmSchema === null ||
+      runtimeError !== null
+    ) {
+      return
+    }
+
+    runtime.publishClient(client)
+    return () => runtime.clearClient(client)
+  }, [client, isWasmSchemaLoading, runtime, runtimeError, wasmSchema])
 
   return null
 }

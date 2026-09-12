@@ -154,16 +154,33 @@ describe('InspectorProvider runtime projections', () => {
     })
   })
 
-  it('does not create a client until the selected stored schema is verified', async () => {
+  it('creates the client while the selected stored schema is verified but withholds publication', async () => {
     session.activeConnection = connection()
     runtime.$isWasmSchemaLoading.set(true)
-    adminClientMocks.create.mockResolvedValue(client())
+    const createdClient = client()
+    adminClientMocks.create.mockResolvedValue(createdClient)
 
     render(<InspectorProvider>Workspace</InspectorProvider>)
-    expect(adminClientMocks.create).not.toHaveBeenCalled()
+    await waitFor(() => expect(adminClientMocks.create).toHaveBeenCalledOnce())
+    expect(runtime.publishClient).not.toHaveBeenCalled()
 
     act(() => runtime.$isWasmSchemaLoading.set(false))
+    await waitFor(() => expect(runtime.publishClient).toHaveBeenCalledWith(createdClient))
+  })
+
+  it('shuts down a concurrently created client when schema verification fails', async () => {
+    session.activeConnection = connection()
+    runtime.$isWasmSchemaLoading.set(true)
+    const createdClient = client()
+    adminClientMocks.create.mockResolvedValue(createdClient)
+
+    render(<InspectorProvider>Workspace</InspectorProvider>)
     await waitFor(() => expect(adminClientMocks.create).toHaveBeenCalledOnce())
+
+    act(() => runtime.$error.set('Schema failed'))
+
+    await waitFor(() => expect(createdClient.shutdown).toHaveBeenCalledOnce())
+    expect(runtime.publishClient).not.toHaveBeenCalledWith(createdClient)
   })
 
   it('shuts down a client that resolves after its runtime was replaced', async () => {
@@ -181,7 +198,9 @@ describe('InspectorProvider runtime projections', () => {
     session.currentConnectionId = 'connection-b'
     runtimeHolder.current = replacementRuntime
     rerender(<InspectorProvider>Workspace</InspectorProvider>)
-    await waitFor(() => expect(replacementRuntime.publishClient).toHaveBeenCalledWith(replacementClient))
+    await waitFor(() =>
+      expect(replacementRuntime.publishClient).toHaveBeenCalledWith(replacementClient),
+    )
 
     act(() => pendingClient.resolve(staleClient))
     await waitFor(() => expect(staleClient.shutdown).toHaveBeenCalledOnce())
