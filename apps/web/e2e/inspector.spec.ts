@@ -44,6 +44,59 @@ test('connects through the form and restores the connection after reload', async
   )
 })
 
+test('reveals every table selection control after selection starts', async ({ page }) => {
+  await connectToFixture(page)
+
+  await page
+    .getByRole('list', { name: 'Tables' })
+    .locator('[data-table-name="publicReadOnlyRecords"]')
+    .hover()
+  await page.getByRole('button', { name: 'Open publicReadOnlyRecords actions' }).click()
+  await page.getByRole('menuitem', { name: 'Pin 1 table' }).click()
+
+  const tableList = page.getByRole('list', { name: 'Tables' })
+  const pinnedList = page.getByRole('list', { name: 'Pinned tables' })
+  const tableItem = tableList.locator('[data-table-name="columnTypeShowcase"]')
+  const tableCheckbox = tableList.getByRole('checkbox', { name: 'Select columnTypeShowcase' })
+  const additionalTableCheckbox = tableList.getByRole('checkbox', { name: 'Select projects' })
+  const pinnedCheckbox = pinnedList.getByRole('checkbox', {
+    name: 'Select publicReadOnlyRecords',
+  })
+  const tableSelectionControls = tableList
+    .getByRole('checkbox', { name: /^Select /u })
+    .locator('..')
+  const pinnedSelectionControls = pinnedList
+    .getByRole('checkbox', { name: /^Select /u })
+    .locator('..')
+  const readControlOpacities = (controls: Locator) =>
+    controls.evaluateAll((elements) => elements.map((element) => getComputedStyle(element).opacity))
+  const controlOpacities = async () => [
+    ...(await readControlOpacities(pinnedSelectionControls)),
+    ...(await readControlOpacities(tableSelectionControls)),
+  ]
+
+  await expect(pinnedList).toBeVisible()
+  const selectionControlCount =
+    (await pinnedSelectionControls.count()) + (await tableSelectionControls.count())
+  await page.mouse.move(0, 0)
+  await expect.poll(controlOpacities).toEqual(Array(selectionControlCount).fill('0'))
+
+  await tableItem.hover()
+  await expect(tableCheckbox.locator('..')).toHaveCSS('opacity', '1')
+  await expect(pinnedCheckbox.locator('..')).toHaveCSS('opacity', '0')
+
+  await tableCheckbox.click()
+  await expect.poll(controlOpacities).toEqual(Array(selectionControlCount).fill('1'))
+
+  await additionalTableCheckbox.click()
+  await expect(additionalTableCheckbox).toBeChecked()
+  await tableCheckbox.click()
+  await additionalTableCheckbox.click()
+  await page.mouse.move(0, 0)
+
+  await expect.poll(controlOpacities).toEqual(Array(selectionControlCount).fill('0'))
+})
+
 test('wraps header context only after its controls stop fitting', async ({ page }) => {
   await page.setViewportSize({ width: 636, height: 800 })
   await connectToFixture(page)

@@ -5,6 +5,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { Button } from '../button/button'
 import { InputGroup } from '../inputGroup/inputGroup'
 import { DatePicker, preloadDatePickerCalendar } from './datePicker'
+import './datePickerCalendar'
 
 beforeAll(preloadDatePickerCalendar)
 

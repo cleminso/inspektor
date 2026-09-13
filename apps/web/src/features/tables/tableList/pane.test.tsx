@@ -193,6 +193,50 @@ describe('TableListPane', () => {
     expect(screen.getByRole('button', { name: 'accounts' }).tagName).toBe('A')
   })
 
+  it('shows selection controls across table sections only while selection is active', () => {
+    const { rerender } = render(
+      <TableListPane
+        checkedTableNames={new Set(['accounts'])}
+        {...defaultActionProps}
+        pinnedTableNames={new Set(['accounts'])}
+        selectedTableName={null}
+        tables={['accounts', 'users']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen
+        .getByRole('list', { name: 'Pinned tables' })
+        .hasAttribute('data-selection-controls-visible'),
+    ).toBe(true)
+    expect(
+      screen.getByRole('list', { name: 'Tables' }).hasAttribute('data-selection-controls-visible'),
+    ).toBe(true)
+
+    rerender(
+      <TableListPane
+        checkedTableNames={new Set()}
+        {...defaultActionProps}
+        pinnedTableNames={new Set(['accounts'])}
+        selectedTableName={null}
+        tables={['accounts', 'users']}
+        onClearSelection={vi.fn()}
+        onTableCheckedChange={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen
+        .getByRole('list', { name: 'Pinned tables' })
+        .hasAttribute('data-selection-controls-visible'),
+    ).toBe(false)
+    expect(
+      screen.getByRole('list', { name: 'Tables' }).hasAttribute('data-selection-controls-visible'),
+    ).toBe(false)
+  })
+
   it('keeps the complete table name in flow and exposes it in a tooltip when it overflows', async () => {
     const tableName = 'better_auth_verification'
     mockTableNameOverflow(130, 220)

@@ -7,6 +7,24 @@ import { Menu } from '../menu/menu'
 afterEach(cleanup)
 
 describe('ActionList', () => {
+  it('exposes list-wide selection control visibility', () => {
+    const { rerender } = render(<ActionList aria-label="Accounts" selectionControlsVisible />)
+
+    expect(
+      screen
+        .getByRole('list', { name: 'Accounts' })
+        .hasAttribute('data-selection-controls-visible'),
+    ).toBe(true)
+
+    rerender(<ActionList aria-label="Accounts" />)
+
+    expect(
+      screen
+        .getByRole('list', { name: 'Accounts' })
+        .hasAttribute('data-selection-controls-visible'),
+    ).toBe(false)
+  })
+
   it('keeps selection and trailing actions separate from the primary trigger', () => {
     const onCheckedChange = vi.fn()
 

@@ -21,6 +21,8 @@ export interface ActionListRootProps extends Omit<
 > {
   /** Runs when an unhandled Escape key event bubbles from within the list. Preventing default returns focus to the item's primary trigger. */
   onEscapeKeyDown?: KeyboardEventHandler<HTMLUListElement>
+  /** Shows every selection control in the list while bulk selection is active and exposes `data-selection-controls-visible` on the root. */
+  selectionControlsVisible?: boolean
 }
 
 export interface ActionListItemProps extends Omit<
@@ -79,7 +81,7 @@ export interface ActionListActionProps extends Omit<
 }
 
 const ActionListRoot = forwardRef<HTMLUListElement, ActionListRootProps>(function ActionListRoot(
-  { children, onEscapeKeyDown, onKeyDown, ...props },
+  { children, onEscapeKeyDown, onKeyDown, selectionControlsVisible = false, ...props },
   forwardedRef,
 ) {
   const handleKeyDown: KeyboardEventHandler<HTMLUListElement> = (event) => {
@@ -107,7 +109,11 @@ const ActionListRoot = forwardRef<HTMLUListElement, ActionListRootProps>(functio
     <ul
       {...domProps}
       ref={forwardedRef}
-      {...stylex.props(actionListStyles.root)}
+      {...stylex.props(
+        actionListStyles.root,
+        selectionControlsVisible === true && actionListStyles.rootSelectionControlsVisible,
+      )}
+      data-selection-controls-visible={selectionControlsVisible === true ? '' : undefined}
       data-slot="action-list"
       onKeyDown={handleKeyDown}
     >

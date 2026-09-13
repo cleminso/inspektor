@@ -18,10 +18,11 @@ import {
 import { actionListVars } from './actionListVars.stylex'
 
 const reducedMotion = '@media (prefers-reduced-motion: reduce)'
-const selectionVisibility = `clamp(0, calc(${actionListVars.selectionChecked} + ${actionListVars.selectionFocusVisible} + ${actionListVars.selectionHoverVisible}), 1)`
+const selectionVisibility = `clamp(0, calc(${actionListVars.selectionChecked} + ${actionListVars.selectionControlsVisible} + ${actionListVars.selectionFocusVisible} + ${actionListVars.selectionHoverVisible}), 1)`
 
 export const actionListStyles = stylex.create({
   root: {
+    [actionListVars.selectionControlsVisible]: '0',
     margin: 0,
     padding: 0,
     gap: spacing.xxs,
@@ -29,6 +30,9 @@ export const actionListStyles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
+  },
+  rootSelectionControlsVisible: {
+    [actionListVars.selectionControlsVisible]: '1',
   },
   item: {
     [actionListVars.actionVisible]: {

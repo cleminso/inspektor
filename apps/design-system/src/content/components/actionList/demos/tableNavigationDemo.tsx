@@ -20,6 +20,7 @@ export default function TableNavigationDemo(): ReactElement {
     <Box width="popup-width-m">
       <ActionList
         aria-label="Tables"
+        selectionControlsVisible={selected.size > 0}
         onEscapeKeyDown={(event) => {
           if (selected.size === 0) return
           setSelected(new Set())

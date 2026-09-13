@@ -245,6 +245,7 @@ export function TableListPane({
           render={
             <ActionList
               aria-label={section === 'pinned' ? 'Pinned tables' : 'Tables'}
+              selectionControlsVisible={hasCheckedTables}
               onEscapeKeyDown={(event) => {
                 if (hasCheckedTables === false) {
                   return

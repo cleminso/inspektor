@@ -53,17 +53,22 @@ Consumer (`apps/web`) owns:
 
 `ActionList.Root` exposes `onEscapeKeyDown`. It receives only unhandled Escape events bubbling from within the list.
 
+`ActionList.Root.selectionControlsVisible` reveals every selection control in that list. Consumers derive it from their aggregate selection state when selection mode spans multiple items or multiple lists.
+
 ## Selection visibility rules
 
 A checkbox is visible when:
 
 - The item is hovered, or
 - The checkbox has keyboard focus, or
-- The item is checked
+- The item is checked, or
+- The list has `selectionControlsVisible` enabled
 
-StyleX context variables on the item (`selectionHoverVisible`) and the selection control (`selectionFocusVisible`, `selectionChecked`) compose into one opacity expression. This replaces the earlier `selectionVisibility` enum, which leaked selection state across items.
+StyleX context variables on the root (`selectionControlsVisible`), item (`selectionHoverVisible`), and selection control (`selectionFocusVisible`, `selectionChecked`) compose into one opacity expression. The root state is explicit consumer input rather than selection state inferred by the design system.
 
 The item's `:hover` controls hover visibility. The selection control's `:focus-within` controls keyboard visibility. They are intentionally separated so focus on the trigger does not reveal the checkbox.
+
+The table explorer enables list-wide visibility for both the Pinned and Tables lists while its checked set is non-empty. Clearing the final checked table restores the leading icons in both lists.
 
 ## Shift-range selection
 

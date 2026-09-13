@@ -11,6 +11,10 @@
 
 ## Implemented foundation
 
+[13/09/26]
+
+- [x] Allow consumers to reveal every selection control while an aggregate bulk selection is active.
+
 [11/08/26]
 
 - [x] Support deferred offscreen rendering for large mounted collections without removing items from keyboard, selection, or accessibility order.
@@ -48,6 +52,10 @@
 
 ## Settled interaction decisions
 
+[13/09/26]
+
+- [x] Table selection reveals unchecked controls across the Pinned and Tables lists until the final selection is cleared.
+
 [03/08/26]
 
 - [x] Composed link triggers use `nativeButton={false}` so Base UI preserves link semantics.
@@ -65,6 +73,11 @@
 - None identified for the current interaction.
 
 ## Validation checklist
+
+[13/09/26]
+
+- [x] Cover list-wide selection visibility and table-pane wiring with focused component tests.
+- [x] Verify hover, selection-mode entry, additional selection, and final-selection clearing in the browser.
 
 [29/07/26]
 
