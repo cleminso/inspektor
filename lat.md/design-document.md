@@ -569,7 +569,7 @@ Startup proceeds from connection intent through schema verification to the first
 7. `RuntimeAdminClient` publishes the client only after stored-schema verification succeeds.
 8. The table view acquires its Jazz query subscription. Useful rows render after the first query callback.
 
-The connection route sets `pendingMs: 0` and `pendingMinMs: 0`, and leaves `gcTime` unset so TanStack Router retains inactive loader data through its default cache. `ConnectionContentBoundary` keeps the table workspace mounted but hidden behind the same loading surface until an empty workspace, schema view, runtime error, or first rows query settles. Local `Loading schema…` and `Loading rows` states remain for transitions within an already revealed workspace.
+The connection route sets `pendingMs: 0` and `pendingMinMs: 0`, and leaves `gcTime` unset so TanStack Router retains inactive loader data through its default cache. `ConnectionContentBoundary` keeps the table workspace mounted but hidden behind the same loading surface until an empty workspace, schema view, runtime error, or first rows query settles. The loading surface centers the theme-appropriate Inspektor wordmark while retaining an accessible loading status. Local `Loading schema…` and `Loading rows` states remain for transitions within an already revealed workspace.
 
 Table mounting does not preload CodeMirror. A structured editor mount starts the deferred editor import and exposes a controlled, geometry-stable textarea until CodeMirror replaces it. Data-grid reordering remains optional post-mount work so the first configured drag can begin without putting DND in the static application graph.
 

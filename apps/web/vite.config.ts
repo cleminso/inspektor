@@ -76,6 +76,7 @@ export default defineConfig(({ mode }) => ({
           environment: 'node',
           include: ['src/**/*.test.ts'],
           exclude: ['src/**/*.jsdom.test.ts'],
+          sequence: { groupOrder: 1 },
         },
       },
       {
@@ -84,6 +85,8 @@ export default defineConfig(({ mode }) => ({
           name: 'jsdom',
           environment: 'jsdom',
           include: ['src/**/*.test.tsx', 'src/**/*.jsdom.test.ts'],
+          maxWorkers: 4,
+          sequence: { groupOrder: 2 },
           setupFiles: ['./src/__test__/setup.ts'],
         },
       },

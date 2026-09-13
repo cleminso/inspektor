@@ -7,6 +7,7 @@ const router = vi.hoisted(() => ({ invalidate: vi.fn() }))
 const resolveStoredRuntimeTarget = vi.hoisted(() => vi.fn())
 const prepareJazzWasm = vi.hoisted(() => vi.fn())
 const storedConnections = vi.hoisted(() => ({ connections: [{ id: 'connection-1' }] }))
+let resolvedTheme = 'light'
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
@@ -40,6 +41,10 @@ vi.mock('@app/connections/connections', () => ({
 
 vi.mock('@app/runtime/jazzWasmPreparation', () => ({ prepareJazzWasm }))
 
+vi.mock('next-themes', () => ({
+  useTheme: () => ({ resolvedTheme }),
+}))
+
 vi.mock('@app/runtime/inspectorRuntimeBoundary', () => ({
   InspectorRuntimeBoundary: ({ fallback }: { fallback?: React.ReactNode }) => fallback ?? null,
 }))
@@ -49,13 +54,26 @@ vi.mock('@app/shell/layout', () => ({
 }))
 
 vi.mock('@inspektor/ds', () => ({
-  Box: ({ children, role }: { children: React.ReactNode; role?: string }) => (
-    <div role={role}>{children}</div>
+  Box: ({
+    'aria-atomic': ariaAtomic,
+    'aria-label': ariaLabel,
+    'aria-live': ariaLive,
+    children,
+    role,
+  }: {
+    'aria-atomic'?: boolean | 'false' | 'true'
+    'aria-label'?: string
+    'aria-live'?: 'assertive' | 'off' | 'polite'
+    children: React.ReactNode
+    role?: string
+  }) => (
+    <div role={role} aria-atomic={ariaAtomic} aria-label={ariaLabel} aria-live={ariaLive}>
+      {children}
+    </div>
   ),
   Button: ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
     <button onClick={onClick}>{children}</button>
   ),
-  Spinner: () => <span data-slot="spinner" />,
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }))
 
@@ -67,6 +85,7 @@ afterEach(() => {
   resolveStoredRuntimeTarget.mockReset()
   prepareJazzWasm.mockReset()
   router.invalidate.mockReset()
+  resolvedTheme = 'light'
 })
 
 describe('connection route', () => {
@@ -166,7 +185,7 @@ describe('connection route', () => {
     })
   })
 
-  it('shows an empty loading view while the destination connection loads', () => {
+  it('shows the wordmark while the destination connection loads', () => {
     const PendingComponent = routeOptions.current?.pendingComponent as () => React.ReactElement
 
     expect(routeOptions.current?.gcTime).toBeUndefined()
@@ -174,8 +193,27 @@ describe('connection route', () => {
     expect(routeOptions.current?.pendingMinMs).toBe(0)
     expect(routeOptions.current?.errorComponent).toBeTypeOf('function')
     render(<PendingComponent />)
-    expect(screen.getByRole('status').textContent).toBe('Loading')
-    expect(document.querySelector('[data-slot="spinner"]')).toBeTruthy()
+    const loading = screen.getByRole('status', { name: 'Loading' })
+    const wordmark = document.querySelector('img')
+    expect(loading.textContent).toBe('')
+    expect(loading.getAttribute('aria-live')).toBe('polite')
+    expect(loading.getAttribute('aria-atomic')).toBe('true')
+    expect(wordmark?.getAttribute('src')).toBe('/brand/inspektorWordmarkOnLight.png')
+    expect(wordmark?.getAttribute('alt')).toBe('')
+    expect(wordmark?.getAttribute('aria-hidden')).toBe('true')
+    expect(wordmark?.getAttribute('width')).toBe('160')
+    expect(wordmark?.getAttribute('height')).toBe('23')
+  })
+
+  it('uses the on-dark wordmark in the dark theme', () => {
+    resolvedTheme = 'dark'
+    const PendingComponent = routeOptions.current?.pendingComponent as () => React.ReactElement
+
+    render(<PendingComponent />)
+
+    expect(document.querySelector('img')?.getAttribute('src')).toBe(
+      '/brand/inspektorWordmarkOnDark.png',
+    )
   })
 
   it('keeps the loading view visible while the runtime synchronizes', () => {
@@ -183,7 +221,7 @@ describe('connection route', () => {
 
     render(<RuntimeRoute />)
 
-    expect(screen.getByRole('status').textContent).toBe('Loading')
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy()
   })
 
   it('normalizes loader errors and retries through router invalidation', () => {

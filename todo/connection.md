@@ -11,6 +11,12 @@
 
 ## Implemented foundation
 
+[13/09/26]
+
+### Branded connection loading
+
+- [x] Replace the spinner and visible loading label with the centered, theme-appropriate Inspektor wordmark while preserving the accessible `Loading` status.
+
 [11/09/26]
 
 ### Editable fields during submission
@@ -358,6 +364,12 @@
 - Do not apply Jazz Cloud identifier constraints to self-hosted servers.
 
 ## Settled interaction decisions
+
+[13/09/26]
+
+- Initial connection and table entry use one centered, static Inspektor wordmark until the first rows query settles.
+- The loading surface has an accessible `Loading` name while keeping the wordmark decorative.
+- These decisions supersede the spinner and visible loading-label presentation below.
 
 [11/09/26]
 

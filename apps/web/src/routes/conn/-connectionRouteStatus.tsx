@@ -1,10 +1,17 @@
 // The `-` prefix keeps this support module out of TanStack Router's generated route tree.
 import { useRouter, type ErrorComponentProps } from '@tanstack/react-router'
-import { Box, Button, Spinner, Text } from '@inspektor/ds'
+import { Box, Button, Text } from '@inspektor/ds'
+import { useTheme } from 'next-themes'
 
 import { normalizeSchemaFetchError } from '@app/connections/connectionValidation'
 
 export function ConnectionRouteLoading(): React.ReactElement {
+  const { resolvedTheme } = useTheme()
+  const wordmarkSrc =
+    resolvedTheme === 'dark'
+      ? '/brand/inspektorWordmarkOnDark.png'
+      : '/brand/inspektorWordmarkOnLight.png'
+
   return (
     <Box
       position="fixed"
@@ -12,21 +19,21 @@ export function ConnectionRouteLoading(): React.ReactElement {
       zIndex="overlay"
       width="full"
       height="screen-height-dynamic"
-      flexDirection="row"
       alignItems="center"
       justifyContent="center"
-      gap="xs"
       backgroundColor="surface-background"
       role="status"
+      aria-label="Loading"
       aria-live="polite"
+      aria-atomic="true"
     >
-      <Spinner />
-      <Text
-        variant="label"
-        color="muted"
-      >
-        Loading
-      </Text>
+      <img
+        src={wordmarkSrc}
+        width="160"
+        height="23"
+        alt=""
+        aria-hidden="true"
+      />
     </Box>
   )
 }

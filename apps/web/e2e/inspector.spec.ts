@@ -166,24 +166,28 @@ test('keeps one centered loading view until the first table rows settle', async 
   await page.getByRole('button', { name: 'Save connection' }).click()
   await wasmRequested
 
-  const loading = page.getByRole('status').filter({ hasText: /^Loading$/ })
+  const loading = page.getByRole('status', { name: 'Loading' })
   await expect(loading).toBeVisible()
   await expect(page.getByText('Loading schema…', { exact: true })).toBeHidden()
   await expect(page.getByText('Loading rows', { exact: true })).toBeHidden()
-  const [loadingBox, spinnerBox, labelBox, viewport] = await Promise.all([
+  const wordmark = loading.locator('img')
+  await expect(wordmark).toHaveAttribute('src', '/brand/inspektorWordmarkOnLight.png')
+  const [loadingBox, wordmarkBox, viewport] = await Promise.all([
     loading.boundingBox(),
-    loading.locator('[data-slot="spinner"]').boundingBox(),
-    loading.getByText('Loading', { exact: true }).boundingBox(),
+    wordmark.boundingBox(),
     page.viewportSize(),
   ])
   expect(loadingBox).not.toBeNull()
-  expect(spinnerBox).not.toBeNull()
-  expect(labelBox).not.toBeNull()
+  expect(wordmarkBox).not.toBeNull()
   expect(viewport).not.toBeNull()
+  expect(loadingBox!.width).toBeCloseTo(viewport!.width, 0)
+  expect(loadingBox!.height).toBeCloseTo(viewport!.height, 0)
   expect(loadingBox!.x + loadingBox!.width / 2).toBeCloseTo(viewport!.width / 2, 0)
   expect(loadingBox!.y + loadingBox!.height / 2).toBeCloseTo(viewport!.height / 2, 0)
-  expect(spinnerBox!.y + spinnerBox!.height / 2).toBeCloseTo(labelBox!.y + labelBox!.height / 2, 0)
-  expect(spinnerBox!.x).toBeLessThan(labelBox!.x)
+  expect(wordmarkBox!.width).toBeCloseTo(160, 0)
+  expect(wordmarkBox!.height).toBeCloseTo(23, 0)
+  expect(wordmarkBox!.x + wordmarkBox!.width / 2).toBeCloseTo(viewport!.width / 2, 0)
+  expect(wordmarkBox!.y + wordmarkBox!.height / 2).toBeCloseTo(viewport!.height / 2, 0)
 
   releaseWasm()
   await expect(page.getByRole('list', { name: 'Tables' })).toBeVisible()

@@ -1,0 +1,96 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 432 62"
+  role="img"
+>
+  <title>Inspektor</title>
+  <defs>
+    <rect id="tile" width="12" height="10" rx="2" />
+    <rect id="bar" width="40" height="10" rx="2" />
+  </defs>
+  <g fill="currentColor">
+    <g>
+      <use href="#bar" />
+      <use href="#tile" x="14" y="13" />
+      <use href="#tile" x="14" y="26" />
+      <use href="#tile" x="14" y="39" />
+      <use href="#bar" y="52" />
+    </g>
+    <g transform="translate(48)">
+      <use href="#tile" />
+      <use href="#tile" x="32" />
+      <use href="#tile" y="13" />
+      <use href="#tile" x="8" y="13" />
+      <use href="#tile" x="32" y="13" />
+      <use href="#tile" y="26" />
+      <use href="#tile" x="16" y="26" />
+      <use href="#tile" x="32" y="26" />
+      <use href="#tile" y="39" />
+      <use href="#tile" x="24" y="39" />
+      <use href="#tile" x="32" y="39" />
+      <use href="#tile" y="52" />
+      <use href="#tile" x="32" y="52" />
+    </g>
+    <g transform="translate(100)">
+      <use href="#bar" />
+      <use href="#tile" y="13" />
+      <use href="#bar" y="26" />
+      <use href="#tile" x="28" y="39" />
+      <use href="#bar" y="52" />
+    </g>
+    <g transform="translate(148)">
+      <use href="#bar" />
+      <use href="#tile" y="13" />
+      <use href="#tile" x="28" y="13" />
+      <use href="#bar" y="26" />
+      <use href="#tile" y="39" />
+      <use href="#tile" y="52" />
+    </g>
+    <g transform="translate(196)">
+      <use href="#bar" />
+      <use href="#tile" y="13" />
+      <use href="#bar" y="26" />
+      <use href="#tile" y="39" />
+      <use href="#bar" y="52" />
+    </g>
+    <g transform="translate(244)">
+      <use href="#tile" />
+      <use href="#tile" x="32" />
+      <use href="#tile" y="13" />
+      <use href="#tile" x="24" y="13" />
+      <use href="#tile" y="26" />
+      <use href="#tile" x="16" y="26" />
+      <use href="#tile" y="39" />
+      <use href="#tile" x="24" y="39" />
+      <use href="#tile" y="52" />
+      <use href="#tile" x="32" y="52" />
+    </g>
+    <g transform="translate(296)">
+      <use href="#bar" />
+      <use href="#tile" x="14" y="13" />
+      <use href="#tile" x="14" y="26" />
+      <use href="#tile" x="14" y="39" />
+      <use href="#tile" x="14" y="52" />
+    </g>
+    <g transform="translate(344)">
+      <use href="#bar" />
+      <use href="#tile" y="13" />
+      <use href="#tile" x="28" y="13" />
+      <use href="#tile" y="26" />
+      <use href="#tile" x="28" y="26" />
+      <use href="#tile" y="39" />
+      <use href="#tile" x="28" y="39" />
+      <use href="#bar" y="52" />
+    </g>
+    <g transform="translate(392)">
+      <use href="#bar" />
+      <use href="#tile" y="13" />
+      <use href="#tile" x="28" y="13" />
+      <use href="#bar" y="26" />
+      <use href="#tile" y="39" />
+      <use href="#tile" x="24" y="39" />
+      <use href="#tile" y="52" />
+      <use href="#tile" x="32" y="52" />
+    </g>
+  </g>
+</svg>
