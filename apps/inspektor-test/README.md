@@ -37,7 +37,7 @@ BACKEND_SECRET=<cloud-backend-secret>
 
 ### Isolated fixture
 
-The isolated fixture uses `jazz-tools/testing` to create an in-memory local server, publish the same schema and permissions, and seed the same rows. Stopping the fixture removes its data.
+The isolated fixture uses `jazz-tools/testing` to create an in-memory local server, publish the same schema and permissions, and seed the same rows. Stopping the fixture removes its data. Focused permission tests use Jazz's `createPolicyTestApp()` helper instead of rebuilding ordinary client sessions through the full fixture.
 
 ## Scenario inventory
 
@@ -77,7 +77,9 @@ pnpm inspektor-test:fixture
 
 The command prints readiness text followed by one JSON object containing the connection name, server URL, app ID, admin secret, environment, and branch. Use those values in Inspektor. Press Ctrl+C to stop the fixture.
 
-Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, permission enforcement, repeatable seeding, and server disposal.
+Automated tests can import `createInspectorTestFixture()` from `inspectorTestFixture.ts` and must call `fixture.stop()` in teardown. The integration suite verifies schema publication, serialized edge-case values, relations, repeatable seeding, and server disposal.
+
+Permission tests use `createPolicyTestApp(app, permissions, expect)` from `jazz-tools/testing` and must call `testApp.shutdown()` in teardown. Use `testApp.as(session)` for identity-scoped reads and writes. `expectDenied()` waits for authority rejection when a write can be staged; use a synchronous throw assertion when the loaded policy rejects before staging. `expectAllowed()` only verifies local staging and rolls the write back. Await a write at the `edge` tier when a test needs to prove authority acceptance.
 
 Inspektor browser acceptance tests run with `pnpm test:browser`. Playwright owns a direct loopback Vite server and an ephemeral Inspektor Test fixture; it never uses the shared cloud connection.
 
@@ -90,8 +92,10 @@ Inspektor browser acceptance tests run with `pnpm test:browser`. Playwright owns
 | `pnpm inspektor-test:deploy` | Publish the cloud schema and permissions |
 | `pnpm inspektor-test:seed` | Seed deterministic cloud rows by inserting missing rows and updating existing rows |
 | `pnpm inspektor-test:fixture` | Start an isolated local app |
-| `pnpm --filter inspektor-test test` | Test schema metadata, serialized data, relations, permission enforcement, repeatable seeding, and fixture disposal |
+| `pnpm --filter inspektor-test test` | Test schema metadata, serialized data, relations, permission contracts, repeatable seeding, and fixture disposal |
 | `pnpm test:browser` | Run Inspeltor browser acceptance tests against an isolated fixture |
+
+The root `pnpm test` command runs the schema, deterministic-data, and permission suites but excludes `inspectorTestFixture.test.ts`. Jazz `2.0.0-alpha.54` rejects native writes to top-level `s.json()` columns, so the complete fixture suite remains the regression gate for a compatible Jazz upgrade. Do not skip or remove those fixture tests to make the package command pass.
 
 ## Dependency security
 
@@ -106,8 +110,9 @@ Keep the overrides until `jazz-tools` resolves to patched versions without them.
 3. Add deterministic rows and UUIDs to `inspectorTestData.ts` when the case needs data.
 4. Add the corresponding insert-or-update logic to `seedInspectorTest.ts`.
 5. Update the scenario inventory in this README.
-6. Add or update tests that state the supported case.
-7. Validate with the package test, typecheck, and schema validation commands.
+6. Add or update fixture tests for publication, seeding, serialization, or integration behavior.
+7. Add or update `permissions.test.ts` with `createPolicyTestApp()` when permissions change.
+8. Validate with the package test, typecheck, and schema validation commands.
 
 Prefer additive schema changes. Use the isolated fixture for destructive schema experiments.
 

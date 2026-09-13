@@ -92,58 +92,6 @@ describe("createInspectorTestFixture", () => {
     }
   });
 
-  it("enforces fixture permissions for ordinary clients", async () => {
-    const fixture = await createInspectorTestFixture();
-
-    try {
-      const session = await createJazzSession({
-        app,
-        permissions,
-        appId: fixture.appId,
-        driver: { type: "memory" },
-        env: "dev",
-        initial: "local-first",
-        serverUrl: fixture.serverUrl,
-      });
-
-      try {
-        const snapshot = session.getSnapshot();
-        if (snapshot.status !== "ready" || snapshot.client === undefined) {
-          throw new Error("Inspektor Test local-first session is not ready.");
-        }
-        const db = snapshot.client.db;
-        const editableRow = inspectorTestRows.publicEditableRecords[0];
-        const readOnlyRow = inspectorTestRows.publicReadOnlyRecords[0];
-        await db.one(app.publicEditableRecords.where({ id: editableRow.id }), { tier: "edge" });
-        await db.one(app.publicReadOnlyRecords.where({ id: readOnlyRow.id }), { tier: "edge" });
-        await db
-          .update(app.publicEditableRecords, editableRow.id, {
-            label: "Allowed fixture mutation",
-          })
-          .wait({ tier: "edge" });
-        await expect(
-          db.one(app.publicEditableRecords.where({ id: editableRow.id }), { tier: "edge" }),
-        ).resolves.toMatchObject({
-          id: editableRow.id,
-          label: "Allowed fixture mutation",
-        });
-
-        expect(() =>
-          db.update(app.publicReadOnlyRecords, readOnlyRow.id, {
-            label: "Denied fixture mutation",
-          }),
-        ).toThrow(/policy denied UPDATE on table publicReadOnlyRecords/);
-        await expect(
-          db.one(app.publicReadOnlyRecords.where({ id: readOnlyRow.id }), { tier: "edge" }),
-        ).resolves.toMatchObject(readOnlyRow);
-      } finally {
-        await session.close();
-      }
-    } finally {
-      await fixture.stop();
-    }
-  });
-
   it("stops the local server and discards its in-memory app", async () => {
     const fixture = await createInspectorTestFixture();
 

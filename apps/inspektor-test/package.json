@@ -11,6 +11,7 @@
     "fixture:start": "tsx scripts/startInspectorTestFixture.ts",
     "lint": "oxlint .",
     "test": "vitest run",
+    "test:root": "vitest run schema.test.ts inspectorTestData.test.ts permissions.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
